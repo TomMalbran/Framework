@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Data;
 
+use Framework\Framework;
 use Framework\Utils\Utils;
-use Framework;
 
 /**
  * The Keys Data

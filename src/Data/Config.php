@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Utils\Utils;
 
 use Dotenv\Dotenv;
+use Dotenv\Exception\InvalidPathException;
 use stdClass;
 
 /**
@@ -23,12 +24,18 @@ class Config {
         if (!self::$loaded) {
             self::$loaded = true;
             
-            $path = Framework::getPath();
+            $path = Framework::getPath(Framework::ServerDir);
             Dotenv::create($path)->load();
-            if (!Utils::isSageHost()) {
-                Dotenv::create($path, ".env.stage")->overload();
+            if (Utils::isStageHost()) {
+                try {
+                    Dotenv::create($path, ".env.stage")->overload();
+                } catch (InvalidPathException $e) {
+                }
             } elseif (!Utils::isLocalHost()) {
-                Dotenv::create($path, ".env.production")->overload();
+                try {
+                    Dotenv::create($path, ".env.production")->overload();
+                } catch (InvalidPathException $e) {
+                }
             }
         }
     }
@@ -55,7 +62,8 @@ class Config {
             $parts  = explode("_", $envkey);
             $prefix = strtolower($parts[0]);
             if ($prefix == $property) {
-                $key = Utils::uppercaseToCamelcase($envkey);
+                $suffix = str_replace("{$parts[0]}_", "", $envkey);
+                $key    = Utils::uppercaseToCamelcase($suffix);
                 $result->{$key} = $value;
             }
         }
@@ -74,13 +82,17 @@ class Config {
     public static function getVersion() {
         $version = self::get("version");
         if (empty($version)) {
-            return null;
+            return (object)[
+                "version" => "",
+                "build"   => "",
+                "full"    => "",
+            ];
         }
         $parts = explode("-", $version);
         return (object)[
             "version" => $parts[0],
             "build"   => $parts[1],
-            "full"    => $verstion,
+            "full"    => $version,
         ];
     }
 

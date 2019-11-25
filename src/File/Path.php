@@ -20,7 +20,7 @@ class Path {
      * Loads the Path Data
      * @return void
      */
-    public function load() {
+    public static function load() {
         if (!self::$loaded) {
             self::$loaded   = true;
             self::$data     = Framework::loadData(Framework::Path);
