@@ -1,0 +1,324 @@
+<?php
+namespace Framework\Schema;
+
+use ArrayAccess;
+
+/**
+ * The Database Model
+ */
+class Model implements ArrayAccess {
+    
+    private $idKey   = "";
+    private $idValue = 0;
+    private $data    = [];
+    private $empty   = true;
+    
+    
+    /**
+     * Creates a new Model instance
+     * @param string $idKey Optional.
+     * @param array  $data  Optional.
+     */
+    public function __construct($idKey = "", array $data = []) {
+        $this->idKey = $idKey;
+        $this->data  = $data;
+        $this->empty = empty($data);
+
+        if (!empty($idKey) && isset($data[$idKey])) {
+            $this->idValue = $data[$idKey];
+        }
+    }
+
+    /**
+     * Creates an empty Model
+     * @param mixed $idValue Optional.
+     * @return Model
+     */
+    public static function createEmpty($idValue = 0) {
+        $model = new Model();
+        $model->idValue = $idValue;
+        $model->empty   = true;
+        return $model;
+    }
+    
+    
+    
+    /**
+     * Gets the Data
+     * @param string $key
+     * @return mixed
+     */
+    public function __get($key) {
+        return $this->get($key);
+    }
+    
+    /**
+     * Gets the Data
+     * @param string $key
+     * @param mixed  $default Optional.
+     * @return mixed
+     */
+    public function get($key, $default = null) {
+        if ($key === "id") {
+            return $this->idValue;
+        }
+        if (array_key_exists($key, $this->data)) {
+            return $this->data[$key];
+        }
+        if ($key === "isDeleted") {
+            return empty($this->data);
+        }
+        return $default;
+    }
+
+    /**
+     * Returns the data at the given key and index or the default
+     * @param string  $key
+     * @param integer $index
+     * @param string  $default Optional.
+     * @return mixed
+     */
+    public function getFromArray($key, $index, $default = "") {
+        if ($this->has($key) && !empty($this->data[$key][$index])) {
+            return $this->data[$key][$index];
+        }
+        return $default;
+    }
+    
+    
+    
+    /**
+     * Returns true if the key exists
+     * @param string $key
+     * @return boolean
+     */
+    public function __isset($key) {
+        return $this->has($key);
+    }
+    
+    /**
+     * Returns true if the key exists
+     * @param string $key
+     * @return boolean
+     */
+    public function has($key) {
+        if ($key === "id") {
+            return !empty($this->data[$this->id]);
+        }
+        return !empty($this->data[$key]);
+    }
+    
+    
+    
+    /**
+     * Sets the Data
+     * @param string $key
+     * @param mixed  $value
+     * @return void
+     */
+    public function __set($key, $value) {
+        $this->set($key, $value);
+    }
+    
+    /**
+     * Sets the Data
+     * @param string $key
+     * @param mixed  $value
+     * @return void
+     */
+    public function set($key, $value) {
+        $this->empty = false;
+        if ($key === "id") {
+            $this->idValue = $value;
+            if (!empty($this->idKey)) {
+                $this->data[$this->idKey] = $value;
+            }
+        } else {
+            $this->data[$key] = $value;
+            if (!empty($this->idKey) && $key == $this->idKey) {
+                $this->idValue = $value;
+            }
+        }
+    }
+    
+    /**
+     * Adds Data
+     * @param array $data
+     * @return void
+     */
+    public function add(array $data) {
+        foreach ($data as $key => $value) {
+            $this->set($key, $value);
+        }
+    }
+
+    /**
+     * Merges another Model into this one
+     * @param Model $model
+     * @return void
+     */
+    public function merge(Model $model) {
+        $data = $model->toObject();
+        foreach ($data as $key => $value) {
+            $this->set($key, $value);
+        }
+    }
+    
+    
+    
+    /**
+     * Returns true if the Model is Empty
+     * @return boolean
+     */
+    public function isEmpty() {
+        return $this->empty;
+    }
+    
+    /**
+     * Returns a new Model
+     * @return Model
+     */
+    public function toModel() {
+        return new Model($this->idKey, $this->data);
+    }
+
+    /**
+     * Returns all the Data
+     * @return array
+     */
+    public function toObject() {
+        return $this->data;
+    }
+    
+    /**
+     * Returns the Data as an Array
+     * @return array
+     */
+    public function toArray() {
+        return [ $this->data ];
+    }
+    
+    /**
+     * Returns the Data as an Array
+     * @return array
+     */
+    public function toMap() {
+        $result = [];
+        $result[$this->idValue] = $this->data;
+        return $result;
+    }
+
+    /**
+     * Returns true if the Model is equal to the Request
+     * @param Model    $other
+     * @param string[] $fields
+     * @param string[] $subFields Optional.
+     * @return boolean
+     */
+    public function isEqualTo(Model $other, array $fields, array $subFields = []) {
+        if ($this->empty != $other->empty) {
+            return false;
+        }
+        foreach ($fields as $key) {
+            if (isset($this->data[$key]) && isset($other[$key]) && $this->data[$key] != $other[$key]) {
+                return false;
+            }
+        }
+        foreach ($subFields as $subKey => $subKeys) {
+            if (!empty($subKeys)) {
+                if (empty($this->data[$subKey]) && empty($other[$subKey])) {
+                    continue;
+                }
+                if ((empty($this->data[$subKey])  && !empty($other[$subKey])) ||
+                    (!empty($this->data[$subKey]) && empty($other[$subKey]))  ||
+                    (count($this->data[$subKey])  != count($other[$subKey]))
+                ) {
+                    return false;
+                }
+                foreach ($this->data[$subKey] as $index => $subData) {
+                    $subOther = $other[$subKey][$index];
+                    foreach ($subKeys as $key) {
+                        if (isset($subData[$key]) && isset($subOther[$key]) && $subData[$key] != $subOther[$key]) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns true if the Model has the same fields to the given Model
+     * @param Model    $other
+     * @param string[] $fields
+     * @return boolean
+     */
+    public function hasSameFieldsAs(Model $other, array $fields) {
+        foreach ($fields as $field) {
+            if ($this->data[$field] != $other[$field]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    
+    /**
+     * Prints the Model
+     * @return void
+     */
+    public function print() {
+        print("<pre>");
+        print_r($this->data);
+        print("</pre>");
+    }
+
+    /**
+     * Dumps the Model
+     * @return void
+     */
+    public function dump() {
+        var_dump($this->data);
+    }
+
+
+    
+    /**
+     * Implements the Array Access Interface
+     * @param string $key
+     * @return mixed
+     */
+    public function offsetGet($key) {
+        return $this->get($key);
+    }
+    
+    /**
+     * Implements the Array Access Interface
+     * @param string $key
+     * @param mixed  $value
+     * @return void
+     */
+    public function offsetSet($key, $value) {
+        $this->set($key, $value);
+    }
+    
+    /**
+     * Implements the Array Access Interface
+     * @param string $key
+     * @return boolean
+     */
+    public function offsetExists($key) {
+        return array_key_exists($key, $this->data);
+    }
+    
+    /**
+     * Implements the Array Access Interface
+     * @param string $key
+     * @return void
+     */
+    public function offsetUnset($key) {
+        unset($this->data[$key]);
+    }
+}
