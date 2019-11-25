@@ -1,6 +1,6 @@
 {
-    "name" : "kappa/server",
-    "description" : "Kappa Server",
+    "name" : "tommalbran/framework",
+    "description" : "My personal framework",
     "require": {
         "mustache/mustache": "dev-master",
         "phpmailer/phpmailer": "dev-master",
