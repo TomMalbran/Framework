@@ -19,7 +19,7 @@ class Config {
      * Loads the Config Data
      * @return void
      */
-    public function load() {
+    public static function load() {
         if (!self::$loaded) {
             self::$loaded = true;
             
@@ -40,7 +40,7 @@ class Config {
      * @param string $property
      * @return mixed
      */
-    public function get($property) {
+    public static function get($property) {
         self::load();
 
         // Check if there is a property with the given value
@@ -71,7 +71,7 @@ class Config {
      * Returns the Version split into the diferent parts
      * @return object
      */
-    public function getVersion() {
+    public static function getVersion() {
         $version = self::get("version");
         if (empty($version)) {
             return null;

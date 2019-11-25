@@ -1,6 +1,8 @@
 <?php
 namespace Framework;
 
+use Framework\File\File;
+
 /**
  * The FrameWork Service
  */
@@ -68,7 +70,7 @@ class Framework {
      * Saves a Data File
      * @param string $file
      * @param mixed  $contents
-     * @return object
+     * @return void
      */
     public function saveData($file, $contents) {
         $path = self::getPath(self::DataDir, "$file.json");
