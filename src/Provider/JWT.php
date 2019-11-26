@@ -5,12 +5,14 @@ use Framework\Data\Config;
 
 use Firebase\JWT\JWT as FirebaseJWT;
 use Exception;
+use stdClass;
 
 /**
  * The JWT Provider
  */
 class JWT {
     
+    private static $loaded    = false;
     private static $encrypt   = [ "HS256" ];
     private static $secretKey = "";
     private static $longTerm  = 10 * 365 * 24;
@@ -24,6 +26,7 @@ class JWT {
     public static function load() {
         if (!self::$loaded) {
             FirebaseJWT::$leeway = 1000;
+            self::$loaded    = true;
             self::$secretKey = Config::get("jwtKey");
             self::$shortTerm = Config::get("jwtHours");
         }
@@ -71,10 +74,15 @@ class JWT {
     /**
      * Returns the JWT Token Data
      * @param string $token
-     * @return array
+     * @return object
      */
     public static function getData($token) {
         self::load();
-        return (object)FirebaseJWT::decode($token, self::$secretKey, self::$encrypt);
+        try {
+            $decode = FirebaseJWT::decode($token, self::$secretKey, self::$encrypt);
+        } catch (Exception $e) {
+            return new stdClass();
+        }
+        return (object)$decode->data;
     }
 }
