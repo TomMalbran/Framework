@@ -1,7 +1,14 @@
 {
     "name" : "tommalbran/framework",
     "description" : "My personal framework",
+    "authors": [
+        {
+            "name": "Tomás Malbrán",
+            "homepage": "https://github.com/TomMalbran"
+        }
+    ],
     "require": {
+        "php": "^7.1",
         "mustache/mustache": "dev-master",
         "phpmailer/phpmailer": "dev-master",
         "phpoffice/phpspreadsheet": "^1.2",
