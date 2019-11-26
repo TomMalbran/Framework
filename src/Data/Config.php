@@ -2,10 +2,10 @@
 namespace Framework\Data;
 
 use Framework\Framework;
+use Framework\File\File;
 use Framework\Utils\Utils;
 
 use Dotenv\Dotenv;
-use Dotenv\Exception\InvalidPathException;
 use stdClass;
 
 /**
@@ -27,14 +27,12 @@ class Config {
             $path = Framework::getPath(Framework::ServerDir);
             Dotenv::create($path)->load();
             if (Utils::isStageHost()) {
-                try {
+                if (File::exists($path, ".env.stage")) {
                     Dotenv::create($path, ".env.stage")->overload();
-                } catch (InvalidPathException $e) {
                 }
             } elseif (!Utils::isLocalHost()) {
-                try {
+                if (File::exists($path, ".env.production")) {
                     Dotenv::create($path, ".env.production")->overload();
-                } catch (InvalidPathException $e) {
                 }
             }
         }

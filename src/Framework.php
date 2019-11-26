@@ -9,16 +9,18 @@ use Framework\File\File;
 class Framework {
 
     // The Data
-    const Schema   = "schemas";
-    const Path     = "paths";
-    const Key      = "keys";
-    const Token    = "tokens";
+    const Schema    = "schemas";
+    const Path      = "paths";
+    const Key       = "keys";
+    const Token     = "tokens";
 
     // The Directories
-    const DataDir  = "data";
-    const NLSDir   = "nls";
-    const FilesDir = "files";
-    const TempDir  = "temp";
+    const ServerDir = "server";
+    const DataDir   = "server/data";
+    const NLSDir    = "server/nls";
+    const PublicDir = "server/public";
+    const FilesDir  = "files";
+    const TempDir   = "temp";
     
     private static $basePath;
 
