@@ -2,6 +2,7 @@
 namespace Framework;
 
 use Framework\File\File;
+use Framework\Utils\JSON;
 
 /**
  * The FrameWork Service
@@ -9,18 +10,19 @@ use Framework\File\File;
 class Framework {
 
     // The Data
-    const Schema    = "schemas";
-    const Path      = "paths";
-    const Key       = "keys";
-    const Token     = "tokens";
+    const RouteData  = "routes";
+    const SchemaData = "schemas";
+    const PathData   = "paths";
+    const KeyData    = "keys";
+    const TokenData  = "tokens";
 
     // The Directories
-    const ServerDir = "server";
-    const DataDir   = "server/data";
-    const NLSDir    = "server/nls";
-    const PublicDir = "server/public";
-    const FilesDir  = "files";
-    const TempDir   = "temp";
+    const ServerDir  = "server";
+    const DataDir    = "server/data";
+    const NLSDir     = "server/nls";
+    const PublicDir  = "server/public";
+    const FilesDir   = "files";
+    const TempDir    = "temp";
     
     private static $basePath;
 

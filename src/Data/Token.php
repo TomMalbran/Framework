@@ -20,7 +20,7 @@ class Token {
     public static function load() {
         if (!self::$loaded) {
             self::$loaded = true;
-            self::$data   = Framework::loadData(Framework::Token);
+            self::$data   = Framework::loadData(Framework::TokenData);
         }
     }
 

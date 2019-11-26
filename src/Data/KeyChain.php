@@ -20,7 +20,7 @@ class KeyChain {
     public static function load() {
         if (!self::$loaded) {
             self::$loaded = true;
-            self::$data   = Framework::loadData(Framework::Key);
+            self::$data   = Framework::loadData(Framework::KeyData);
         }
     }
     

@@ -28,7 +28,7 @@ class Factory {
         if (!self::$loaded) {
             self::$loaded = true;
             self::$db     = new Database(Config::get("db"));
-            self::$data   = Framework::loadData(Framework::Schema);
+            self::$data   = Framework::loadData(Framework::SchemaData);
         }
     }
     

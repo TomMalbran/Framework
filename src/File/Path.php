@@ -24,7 +24,7 @@ class Path {
     public static function load() {
         if (!self::$loaded) {
             self::$loaded   = true;
-            self::$data     = Framework::loadData(Framework::Path);
+            self::$data     = Framework::loadData(Framework::PathData);
             self::$basePath = Framework::getPath(Framework::FilesDir);
             self::$baseDir  = Framework::FilesDir;
             self::$url      = Config::get("url");
