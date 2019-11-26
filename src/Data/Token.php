@@ -24,9 +24,11 @@ class Token {
         }
     }
 
+
+    
     /**
      * Returns the Token with the given value
-     * @param string $value
+     * @param string $token
      * @return Model
      */
     public function get($token) {
