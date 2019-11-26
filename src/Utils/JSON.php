@@ -56,7 +56,7 @@ class JSON {
      * @param string $path
      * @return object
      */
-    public function read($path) {
+    public static function read($path) {
         if (File::exists($path)) {
             return self::decode(file_get_contents($path), true);
         }
@@ -69,7 +69,7 @@ class JSON {
      * @param mixed  $contents
      * @return void
      */
-    public function write($file, $contents) {
+    public static function write($file, $contents) {
         $value = Utils::toArray($contents);
         file_put_contents($path, self::encode($value, true));
     }
