@@ -14,7 +14,7 @@ class Path {
     private static $data     = [];
     private static $basePath = null;
     private static $baseDir  = null;
-    private static $tempDir  = null;
+    private static $url      = "";
     
     
     /**
@@ -27,7 +27,6 @@ class Path {
             self::$data     = Framework::loadData(Framework::Path);
             self::$basePath = Framework::getPath(Framework::FilesDir);
             self::$baseDir  = Framework::FilesDir;
-            self::$tempDir  = Framework::TempDir;
             self::$url      = Config::get("url");
         }
     }
@@ -84,7 +83,7 @@ class Path {
      * @return string
      */
     public static function getTempPath($credentialID, $create = true) {
-        $path   = self::getPath(self::$tempDir, $credentialID);
+        $path   = self::getPath(Framework::TempDir, $credentialID);
         $exists = File::exists($path);
         
         if (!$exists && $create) {
@@ -100,7 +99,7 @@ class Path {
      * @return string
      */
     public static function getTempUrl($credentialID) {
-        return self::getPath(self::$tempDir, $credentialID) . "/";
+        return self::getPath(Framework::TempDir, $credentialID) . "/";
     }
 
 
