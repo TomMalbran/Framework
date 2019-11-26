@@ -143,4 +143,37 @@ class Mailer {
         }
         return $result;
     }
+
+
+
+    /**
+     * Returns the Google Auth Url
+     * @param string $redirectUri
+     * @return string
+     */
+    public static function getAuthUrl($redirectUri) {
+        $options  = [ "scope" => [ "https://mail.google.com/" ]];
+        $provider = new Google([
+            "clientId"     => self::$google->client,
+            "clientSecret" => self::$google->secret,
+            "redirectUri"  => self::$url . $redirectUri,
+            "accessType"   => "offline",
+        ]);
+        return $provider->getAuthorizationUrl($options);
+    }
+
+    /**
+     * Returns the Google Refresh Token
+     * @param string $code
+     * @return string
+     */
+    public static function getAuthToken($code) {
+        $provider = new Google([
+            "clientId"     => self::$google->client,
+            "clientSecret" => self::$google->secret,
+            "accessType"   => "offline",
+        ]);
+        $token = $provider->getAccessToken("authorization_code", [ "code" => $code ]);
+        return $token->getRefreshToken();
+    }
 }
