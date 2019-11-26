@@ -165,12 +165,10 @@ class Utils {
         if ($millions > 10) {
             return "$" . $millions . "m";
         }
-        
         $kilos = round($price / 1000);
         if ($kilos > 10) {
             return "$" . $kilos . "k";
         }
-
         $price = round($price);
         return "$" . $price;
     }
@@ -518,8 +516,6 @@ class Utils {
         return "";
     }
     
-    
-    
     /**
      * Generates a username from a domain
      * @param string $domain
@@ -815,22 +811,5 @@ class Utils {
             }
         }
         return $result;
-    }
-    
-    /**
-     * Creates a blank Dataset for the past x years
-     * @param integer $years Optional.
-     * @return array
-     */
-    public static function createDataset($years) {
-        $dataset = [];
-        for ($y = 0; $y < $years; $y++) {
-            $year = date("Y") - $y;
-            $dataset[$year] = [];
-            for ($m = 0; $m < 12; $m++) {
-                $dataset[$year][$m] = 0;
-            }
-        }
-        return $dataset;
     }
 }
