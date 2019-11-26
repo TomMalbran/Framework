@@ -1,6 +1,6 @@
 {
-    "name" : "tommalbran/framework",
-    "description" : "My personal framework",
+    "name": "tommalbran/framework",
+    "description": "My personal framework",
     "authors": [
         {
             "name": "Tomás Malbrán",
@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.1",
         "vlucas/phpdotenv": "^3.3",
+        "firebase/php-jwt": "dev-master",
         "mustache/mustache": "dev-master",
         "phpmailer/phpmailer": "dev-master",
         "league/oauth2-google": "^2.0",

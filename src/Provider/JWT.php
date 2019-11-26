@@ -1,0 +1,80 @@
+<?php
+namespace Framework\Provider;
+
+use Framework\Data\Config;
+
+use Firebase\JWT\JWT as FirebaseJWT;
+use Exception;
+
+/**
+ * The JWT Provider
+ */
+class JWT {
+    
+    private static $encrypt   = [ "HS256" ];
+    private static $secretKey = "";
+    private static $longTerm  = 10 * 365 * 24;
+    private static $shortTerm = 2;
+    
+    
+    /**
+     * Loads the JWT Config
+     * @return void
+     */
+    public static function load() {
+        if (!self::$loaded) {
+            FirebaseJWT::$leeway = 1000;
+            self::$secretKey = Config::get("jwtKey");
+            self::$shortTerm = Config::get("jwtHours");
+        }
+    }
+    
+    
+    
+    /**
+     * Creates a JWT Token
+     * @param integer $time
+     * @param array   $data
+     * @param boolean $forLongTerm Optional.
+     * @return string
+     */
+    public static function create($time, array $data, $forLongTerm = false) {
+        self::load();
+        $length = ($forLongTerm ? self::$longTerm : self::$shortTerm) * 3600;
+        $token  = [
+            "iat"  => $time,            // Issued at: time when the token was generated
+            "nbf"  => $time + 10,       // Not before: 10 seconds
+            "exp"  => $time + $length,  // Expire: In x hour
+            "data" => $data,
+        ];
+        return FirebaseJWT::encode($token, self::$secretKey);
+    }
+    
+    /**
+     * Returns true if the JWT Token is Valid
+     * @param string $token
+     * @return boolean
+     */
+    public static function isValid($token) {
+        self::load();
+        if (empty($token)) {
+            return false;
+        }
+        try {
+            $decode = FirebaseJWT::decode($token, self::$secretKey, self::$encrypt);
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns the JWT Token Data
+     * @param string $token
+     * @return array
+     */
+    public static function getData($token) {
+        self::load();
+        return (object)FirebaseJWT::decode($token, self::$secretKey, self::$encrypt);
+    }
+}
