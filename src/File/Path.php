@@ -85,7 +85,7 @@ class Path {
      */
     public static function getTempPath($credentialID, $create = true) {
         $path   = self::getPath(self::$tempDir, $credentialID);
-        $exists = file_exists($path);
+        $exists = File::exists($path);
         
         if (!$exists && $create) {
             File::createDir($path);

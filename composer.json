@@ -9,10 +9,11 @@
     ],
     "require": {
         "php": "^7.1",
+        "vlucas/phpdotenv": "^3.3",
         "mustache/mustache": "dev-master",
         "phpmailer/phpmailer": "dev-master",
-        "phpoffice/phpspreadsheet": "^1.2",
-        "vlucas/phpdotenv": "^3.3"
+        "league/oauth2-google": "^2.0",
+        "phpoffice/phpspreadsheet": "^1.2"
     },
     "autoload": {
         "psr-4": {
