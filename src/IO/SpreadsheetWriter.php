@@ -1,14 +1,15 @@
 <?php
-namespace Framework\Spreadsheet;
+namespace Framework\IO;
 
-use Framework\Spreadsheet\Sheet;
+use Framework\IO\SpreadsheetSheet;
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
  * The Spreadsheet Writer
  */
-class Writer {
+class SpreadsheetWriter {
     
     private $data;
     private $sheets;
@@ -16,7 +17,7 @@ class Writer {
     
     
     /**
-     * Creates a new Writer instance
+     * Creates a new SpreadsheetWriter instance
      * @param string $title
      * @param string $creator Optional.
      */
@@ -34,7 +35,7 @@ class Writer {
      * Adds a new Sheet
      * @param string $sheetID
      * @param string $sheetName
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function addSheet($sheetID, $sheetName) {
         $count = $this->data->getSheetCount();
@@ -45,7 +46,7 @@ class Writer {
         }
         
         $sheet->setTitle($sheetName);
-        $ssheet = new Sheet($sheet);
+        $ssheet = new SpreadsheetSheet($sheet);
         
         $this->sheets[$sheetID] = $ssheet;
         $this->sheetNum += 1;
@@ -55,7 +56,7 @@ class Writer {
     /**
      * Returns the Sheet for the given ID, if possible
      * @param integer $sheetID
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function getSheet($sheetID) {
         if (!empty($this->sheets[$sheetID])) {

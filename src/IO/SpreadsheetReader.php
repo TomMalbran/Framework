@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Spreadsheet;
+namespace Framework\IO;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Exception;
@@ -7,13 +7,13 @@ use Exception;
 /**
  * The Spreadsheet Reader
  */
-class Reader {
+class SpreadsheetReader {
 
     private $sheet;
 
     
     /**
-     * Creates a new Reader instance
+     * Creates a new SpreadsheetReader instance
      * @param string $path
      */
     public function __construct($path) {

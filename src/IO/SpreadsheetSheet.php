@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Spreadsheet;
+namespace Framework\IO;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\WorkSheet;
@@ -7,14 +7,14 @@ use PhpOffice\PhpSpreadsheet\WorkSheet;
 /**
  * The Spreadsheet Sheet
  */
-class Sheet {
+class SpreadsheetSheet {
     
     private $sheet;
     private $row;
     
     
     /**
-     * Creates a new Sheet instance
+     * Creates a new SpreadsheetSheet instance
      * @param WorkSheet $sheet
      */
     public function __construct(WorkSheet $sheet) {
@@ -29,7 +29,7 @@ class Sheet {
      * @param array   $content
      * @param boolean $makeBold      Optional.
      * @param boolean $formatNumbers Optional.
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function writeLine(array $content, $makeBold = false, $formatNumbers = false) {
         $this->sheet->fromArray($content, null, "A" . $this->row, true);
@@ -48,7 +48,7 @@ class Sheet {
     /**
      * Writes the content in bold
      * @param array $content
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function writeHeader(array $content) {
         return $this->writeLine($content, true, false);
@@ -57,7 +57,7 @@ class Sheet {
     /**
      * Writes the content and formats the numbers
      * @param array $content
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function writeNumbers(array $content) {
         return $this->writeLine($content, false, true);
@@ -66,7 +66,7 @@ class Sheet {
     /**
      * Increases the row count by the given amount
      * @param integer $amount Optional.
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function addBlankLine($amount = 1) {
         $this->row += $amount;
@@ -80,7 +80,7 @@ class Sheet {
      * @param string  $fromCol
      * @param string  $toCol
      * @param integer $rowCount
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function makeBold($fromCol, $toCol, $rowCount) {
         $range = $fromCol . $rowCount . ":" . $toCol . $rowCount;
@@ -93,7 +93,7 @@ class Sheet {
      * @param string  $fromCol
      * @param string  $toCol
      * @param integer $rowCount
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function formatNumbers($fromCol, $toCol, $rowCount) {
         $range = $fromCol . $rowCount . ":" . $toCol . $rowCount;
@@ -105,7 +105,7 @@ class Sheet {
     
     /**
      * Auto sizes the columns
-     * @return Sheet
+     * @return SpreadsheetSheet
      */
     public function autoSizeColumns() {
         $cellIterator = $this->sheet->getRowIterator()->current()->getCellIterator();
