@@ -53,10 +53,7 @@ class Framework {
      */
     public static function loadFile($dir, $file) {
         $path = self::getPath($dir, "$file.json");
-        if (File::exists($path)) {
-            return json_decode(file_get_contents($path), true);
-        }
-        return [];
+        return JSON::read($path);
     }
 
     /**
@@ -76,6 +73,6 @@ class Framework {
      */
     public function saveData($file, $contents) {
         $path = self::getPath(self::DataDir, "$file.json");
-        file_put_contents($path, Utils::jsonEncode((array)$contents, true));
+        JSON::write($path, $contents);
     }
 }

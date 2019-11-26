@@ -467,38 +467,6 @@ class Utils {
         return $result;
     }
 
-    /**
-     * Returns true if the given string is a JSON object
-     * @param string $value
-     * @return boolean
-     */
-    public static function isJson($value) {
-        if (is_string($value)) {
-            json_decode($value);
-            return (json_last_error() == JSON_ERROR_NONE);
-        }
-        return false;
-    }
-    
-    /**
-     * Encodes an Object as a string if is not already encodes
-     * @param mixed $value
-     * @return string
-     */
-    public static function jsonEncode($value) {
-        return self::isJson($value) ? $value : json_encode($value);
-    }
-
-    /**
-     * Decodes a String if is not already decoded
-     * @param mixed   $value
-     * @param boolean $asArray Optional.
-     * @return string
-     */
-    public static function jsonDecode($value, $asArray = false) {
-        return self::isJson($value) ? json_decode($value, $asArray) : $value;
-    }
-
 
 
     /**

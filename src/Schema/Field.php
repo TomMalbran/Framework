@@ -2,6 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\File\Path;
+use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 use Framework\Request;
 
@@ -240,7 +241,7 @@ class Field {
             $result["{$key}ISO"]     = !empty($number) ? date("Y-m-d H:i",   $number) : "";
             break;
         case self::JSON:
-            $result[$key]            = json_decode($text, true);
+            $result[$key]            = JSON::decode($text, true);
             break;
         case self::Text:
             $result[$key]            = $text;

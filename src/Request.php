@@ -5,6 +5,7 @@ use Framework\File\File;
 use Framework\File\Image;
 use Framework\File\FileType;
 use Framework\Utils\DateTime;
+use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 use ArrayAccess;
 
@@ -108,7 +109,7 @@ class Request implements ArrayAccess {
      * @return string
      */
     public function getJSON($key, $asArray = false) {
-        return Utils::jsonDecode($this->get($key, "[]"), $asArray);
+        return JSON::decode($this->get($key, "[]"), $asArray);
     }
 
 
@@ -406,7 +407,7 @@ class Request implements ArrayAccess {
      * @return string
      */
     public function toJSON($key) {
-        return Utils::jsonEncode($this->get($key, []));
+        return JSON::encode($this->get($key, []));
     }
     
     /**

@@ -2,6 +2,7 @@
 namespace Framework;
 
 use Framework\Utils\Errors;
+use Framework\Utils\JSON;
 
 /**
  * The Response wrapper
@@ -40,7 +41,7 @@ class Response {
      * @return string
      */
     public function toString() {
-        return json_encode($this->data, JSON_PRETTY_PRINT);
+        return JSON::encode($this->data, true);
     }
 
 
