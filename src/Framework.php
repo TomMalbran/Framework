@@ -25,6 +25,7 @@ class Framework {
 
     // The Directories
     const ServerDir    = "server";
+    const SourceDir    = "server/src";
     const DataDir      = "server/data";
     const NLSDir       = "server/nls";
     const PublicDir    = "server/public";
@@ -41,7 +42,7 @@ class Framework {
      * @param boolean $logErrors
      * @return void
      */
-    public static function create($basePath, $logErrors = true) {
+    public static function create($basePath, $logErrors) {
         self::$framePath = dirname(__FILE__, 2);
         self::$basePath  = $basePath;
 

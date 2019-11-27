@@ -96,7 +96,6 @@ class ErrorLog {
 
 
 
-
     /**
      * Handes the PHP Error
      * @param integer $code

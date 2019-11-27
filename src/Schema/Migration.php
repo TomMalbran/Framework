@@ -33,7 +33,7 @@ class Migration {
         }
 
         // Delete the Tables or show which to delete
-        self::deleteTables($db, $tableNames, $canDelete);
+        self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
     }
 
     /**
@@ -66,10 +66,11 @@ class Migration {
      * Delete the Tables or show which to delete
      * @param Database $db
      * @param array    $tableNames
+     * @param array    $schemaNames
      * @param boolean  $canDelete
      * @return void
      */
-    private static function deleteTables(Database $db, array $tableNames, $canDelete = false) {
+    private static function deleteTables(Database $db, array $tableNames, array $schemaNames, $canDelete) {
         $prebr = "<br>";
         foreach ($tableNames as $tableName) {
             if (!in_array($tableName, $schemaNames)) {
@@ -88,10 +89,10 @@ class Migration {
      * Updates the Table
      * @param Database  $db
      * @param Structure $structure
-     * @param boolean   $canDelete Optional.
+     * @param boolean   $canDelete
      * @return void
      */
-    private static function updateTable(Database $db, Structure $structure, $canDelete = false) {
+    private static function updateTable(Database $db, Structure $structure, $canDelete) {
         $primaryKeys = $db->getPrimaryKeys($structure->table);
         $tableKeys   = $db->getTableKeys($structure->table);
         $tableFields = $db->getTableFields($structure->table);
