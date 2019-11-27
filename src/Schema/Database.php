@@ -2,6 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Query;
+use Framework\Utils\Utils;
 use mysqli;
 
 /**
@@ -587,7 +588,7 @@ class Database {
         }
         $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-        $this->db->query($sql);
+        $this->query($sql);
         return $sql;
     }
 
@@ -598,7 +599,7 @@ class Database {
      */
     public function deleteTable($table) {
         $tableName = $this->getTableName($table);
-        $this->db->query("DROP TABLE `$tableName`");
+        $this->query("DROP TABLE `$tableName`");
         return $sql;
     }
 
@@ -614,7 +615,7 @@ class Database {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName ADD COLUMN `$column` $type";
         $sql      .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
-        $this->db->query($sql);
+        $this->query($sql);
         return $sql;
     }
 
@@ -629,7 +630,7 @@ class Database {
     public function renameColumn($table, $oldColumn, $newColumn, $type) {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName CHANGE `$oldColumn` `$newColumn` $type";
-        $this->db->query($sql);
+        $this->query($sql);
         return $sql;
     }
 
@@ -643,7 +644,7 @@ class Database {
     public function updateColumn($table, $column, $type) {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName MODIFY COLUMN `$column` $type";
-        $this->db->query($sql);
+        $this->query($sql);
         return $sql;
     }
 
@@ -658,7 +659,7 @@ class Database {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName DROP COLUMN `$column`";
         if ($execute) {
-            $this->db->query($sql);
+            $this->query($sql);
         }
         return $sql;
     }
@@ -673,7 +674,7 @@ class Database {
         $tableName = $this->getTableName($table);
         $sql       = "DROP PRIMARY KEY \n";
         $sql      .= "ADD PRIMARY KEY (" . implode($primary, ", ") . ")";
-        $this->db->query($sql);
+        $this->query($sql);
         return $sql;
     }
 
@@ -686,7 +687,7 @@ class Database {
     public function createIndex($table, $key) {
         $tableName = $this->getTableName($table);
         $sql       = "CREATE INDEX $key ON $tableName($key)";
-        $this->db->query($sql);
+        $this->query($sql);
         return $sql;
     }
 
