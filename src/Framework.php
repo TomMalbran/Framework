@@ -12,9 +12,10 @@ class Framework {
     // The Data
     const RouteData  = "routes";
     const SchemaData = "schemas";
-    const PathData   = "paths";
     const KeyData    = "keys";
+    const PathData   = "paths";
     const TokenData  = "tokens";
+    const EmailData  = "emails";
 
     // The Directories
     const ServerDir  = "server";
