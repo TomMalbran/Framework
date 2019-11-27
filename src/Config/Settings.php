@@ -102,7 +102,7 @@ class Settings {
     
     
     /**
-     * Saves the given preferences if those are already on the DB
+     * Saves the given Settings if those are already on the DB
      * @param array $data
      * @return void
      */
@@ -192,14 +192,14 @@ class Settings {
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " settings</i><br>");
             print(implode($variables, ", ") . "<br>");
-            $db->batch("preferences", $adds);
+            $db->batch("settings", $adds);
         }
         if (!empty($deletes)) {
             print("<br>Deleted <i>" . count($deletes) . " settings</i><br>");
             $variables = [];
             foreach ($deletes as $row) {
                 $query = Query::create("section", "=", $row[0])->add("variable", "=", $row[1]);
-                $db->delete("preferences", $query);
+                $db->delete("settings", $query);
                 $variables[] = $row[0] . "_" . $row[1];
             }
             print(implode($variables, ", ") . "<br>");
