@@ -33,18 +33,7 @@ class Migration {
         }
 
         // Delete the Tables or show which to delete
-        $prebr = "<br>";
-        foreach ($tableNames as $tableName) {
-            if (!in_array($tableName, $schemaNames)) {
-                if ($canDelete) {
-                    $db->deleteTable($tableName);
-                    print("{$prebr}Deleteing table <i>$tableName</i><br>");
-                } else {
-                    print("{$prebr}Delete table <i>$tableName</i> (manually)<br>");
-                }
-                $prebr = "";
-            }
-        }
+        self::deleteTables($db, $tableNames, $canDelete);
     }
 
     /**
@@ -71,6 +60,28 @@ class Migration {
         $sql = $db->createTable($structure->table, $fields, $primary, $keys);
         print("<br>Creating table <b>$structure->table</b> ... <br>");
         print(str_replace("\n", "<br>", $sql) . "<br><br>");
+    }
+
+    /**
+     * Delete the Tables or show which to delete
+     * @param Database $db
+     * @param array    $tableNames
+     * @param boolean  $canDelete
+     * @return void
+     */
+    private static function deleteTables(Database $db, array $tableNames, $canDelete = false) {
+        $prebr = "<br>";
+        foreach ($tableNames as $tableName) {
+            if (!in_array($tableName, $schemaNames)) {
+                if ($canDelete) {
+                    $db->deleteTable($tableName);
+                    print("{$prebr}Deleteing table <i>$tableName</i><br>");
+                } else {
+                    print("{$prebr}Delete table <i>$tableName</i> (manually)<br>");
+                }
+                $prebr = "";
+            }
+        }
     }
 
     /**
@@ -121,9 +132,9 @@ class Migration {
             } elseif (!$found) {
                 $update = true;
                 $adds[] = [
-                    "key"  => $field->key,
-                    "type" => $type,
-                    "afer" => $prev,
+                    "key"   => $field->key,
+                    "type"  => $type,
+                    "after" => $prev,
                 ];
             }
             $prev = $field->key;
