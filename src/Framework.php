@@ -10,20 +10,21 @@ use Framework\Utils\JSON;
 class Framework {
 
     // The Data
-    const RouteData  = "routes";
-    const SchemaData = "schemas";
-    const KeyData    = "keys";
-    const PathData   = "paths";
-    const TokenData  = "tokens";
-    const EmailData  = "emails";
+    const RouteData    = "routes";
+    const SchemaData   = "schemas";
+    const KeyData      = "keys";
+    const PathData     = "paths";
+    const TokenData    = "tokens";
+    const SettingsData = "settings";
+    const EmailData    = "emails";
 
     // The Directories
-    const ServerDir  = "server";
-    const DataDir    = "server/data";
-    const NLSDir     = "server/nls";
-    const PublicDir  = "server/public";
-    const FilesDir   = "files";
-    const TempDir    = "temp";
+    const ServerDir    = "server";
+    const DataDir      = "server/data";
+    const NLSDir       = "server/nls";
+    const PublicDir    = "server/public";
+    const FilesDir     = "files";
+    const TempDir      = "temp";
     
     private static $framePath;
     private static $basePath;

@@ -44,19 +44,6 @@
         "fields" : {
             "section"  : { "type" : "string", "isPrimary" : true },
             "variable" : { "type" : "string", "isPrimary" : true },
-            "value"    : { "type" : "string"                     },
-            "type"     : { "type" : "number", "length" : 1       }
-        },
-        "hasTimestamps" : true,
-        "canCreate"     : false,
-        "canEdit"       : true,
-        "canDelete"     : false
-    },
-    "settingsTexts" : {
-        "table"  : "settings_texts",
-        "fields" : {
-            "section"  : { "type" : "string", "isPrimary" : true },
-            "variable" : { "type" : "string", "isPrimary" : true },
             "value"    : { "type" : "text"                       },
             "type"     : { "type" : "number", "length" : 1       }
         },
