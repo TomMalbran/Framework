@@ -12,10 +12,11 @@ use Framework\Utils\Utils;
  */
 class ErrorLog {
 
-    private static $loaded   = false;
-    private static $schema   = null;
-    private static $basePath = "";
-    private static $maxLog   = 1000;
+    private static $loaded    = false;
+    private static $schema    = null;
+    private static $framePath = "";
+    private static $basePath  = "";
+    private static $maxLog    = 1000;
 
 
     /**
@@ -23,7 +24,8 @@ class ErrorLog {
      * @return void
      */
     public static function init() {
-        self::$basePath = Framework::getPath(Framework::SourceDir);
+        self::$framePath = Framework::getPath("src", "", true);
+        self::$basePath  = Framework::getPath(Framework::SourceDir);
         set_error_handler("\\Framework\\Log\\ErrorLog::handler");
     }
 
@@ -37,6 +39,26 @@ class ErrorLog {
             self::$schema = Factory::getSchema("logErrors");
         }
         return self::$schema;
+    }
+
+
+
+    /**
+     * Returns an Error with the given Code
+     * @param integer $logID
+     * @return Model
+     */
+    public static function get($logID) {
+        return self::getSchema()->getByID($logID);
+    }
+    
+    /**
+     * Returns true if the given Error exists
+     * @param integer $logID
+     * @return boolean
+     */
+    public static function exists($logID) {
+        return self::getSchema()->exists($logID);
     }
 
 
@@ -107,8 +129,13 @@ class ErrorLog {
     public static function handler($code, $description, $file = "", $line = 0) {
         [ $error, $level ] = self::mapErrorCode($code);
         $schema      = self::getSchema();
-        $fileName    = str_replace(self::$basePath . "/", "", $file);
         $description = str_replace([ "'", "`" ], "", $description);
+
+        if (strstr($file, self::$framePath) !== FALSE) {
+            $fileName = "Framework/" . str_replace(self::$framePath . "/", "", $file);
+        } else {
+            $fileName = str_replace(self::$basePath . "/", "", $file);
+        }
 
         $query = Query::create("code", "=", $code);
         $query->add("description", "=", $description);
@@ -129,6 +156,7 @@ class ErrorLog {
                 "description" => $description,
                 "file"        => $fileName,
                 "line"        => $line,
+                "amount"      => 1,
                 "updatedTime" => time(),
             ]);
 
@@ -140,5 +168,50 @@ class ErrorLog {
             }
         }
         return false;
+    }
+
+    /**
+     * Map an error code into an Error word, and log location.
+     * @param integer $code
+     * @return array
+     */
+    public static function mapErrorCode($code) {
+        $error = "";
+        $level = 0;
+
+        switch ($code) {
+            case E_PARSE:
+            case E_ERROR:
+            case E_CORE_ERROR:
+            case E_COMPILE_ERROR:
+            case E_USER_ERROR:
+                $error = "Fatal Error";
+                $level = LOG_ERR;
+                break;
+            case E_WARNING:
+            case E_USER_WARNING:
+            case E_COMPILE_WARNING:
+            case E_RECOVERABLE_ERROR:
+                $error = "Warning";
+                $level = LOG_WARNING;
+                break;
+            case E_NOTICE:
+            case E_USER_NOTICE:
+                $error = "Notice";
+                $log   = LOG_NOTICE;
+                break;
+            case E_STRICT:
+                $error = "Strict";
+                $level = LOG_NOTICE;
+                break;
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
+                $error = "Deprecated";
+                $level = LOG_NOTICE;
+                break;
+            default:
+                break;
+        }
+        return [ $error, $level ];
     }
 }
