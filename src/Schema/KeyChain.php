@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Data;
+namespace Framework\Schema;
 
 use Framework\Framework;
 use Framework\Utils\Utils;

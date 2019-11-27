@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Schema;
 
-use Framework\Data\KeyChain;
+use Framework\Schema\KeyChain;
 use Framework\Schema\Field;
 use Framework\Schema\Join;
 use Framework\Schema\Count;
