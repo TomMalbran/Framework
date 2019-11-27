@@ -1,6 +1,13 @@
 <?php
 namespace Framework\Data;
 
+use Framework\Framework;
+use Framework\Request;
+use Framework\Config\Config;
+use Framework\Schema\Factory;
+use Framework\Schema\Database;
+use Framework\Schema\Query;
+
 /**
  * The Email Templates
  */
