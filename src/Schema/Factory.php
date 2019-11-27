@@ -2,7 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Framework;
-use Framework\Data\Config;
+use Framework\Config\Config;
 use Framework\Schema\Database;
 use Framework\Schema\Schema;
 use Framework\Schema\Structure;

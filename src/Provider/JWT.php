@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Data\Config;
+use Framework\Config\Config;
 
 use Firebase\JWT\JWT as FirebaseJWT;
 use Exception;

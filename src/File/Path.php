@@ -2,7 +2,7 @@
 namespace Framework\File;
 
 use Framework\Framework;
-use Framework\Data\Config;
+use Framework\Config\Config;
 use Framework\File\File;
 
 /**
@@ -14,7 +14,6 @@ class Path {
     private static $data     = [];
     private static $basePath = null;
     private static $baseDir  = null;
-    private static $url      = "";
     
     
     /**
@@ -27,7 +26,6 @@ class Path {
             self::$data     = Framework::loadData(Framework::PathData);
             self::$basePath = Framework::getPath(Framework::FilesDir);
             self::$baseDir  = Framework::FilesDir;
-            self::$url      = Config::get("url");
         }
     }
 
@@ -69,7 +67,7 @@ class Path {
     public static function getUrl($pathKey, ...$pathParts) {
         $path = self::get($pathKey);
         if (!empty($path)) {
-            return File::getPath(self::$url, self::$baseDir, $path, ...$pathParts);
+            return Config::getUrl(self::$baseDir, $path, ...$pathParts);
         }
         return "";
     }

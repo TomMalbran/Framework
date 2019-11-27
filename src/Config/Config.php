@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Data;
+namespace Framework\Config;
 
 use Framework\Framework;
 use Framework\File\File;
@@ -71,6 +71,18 @@ class Config {
 
         // We got nothing
         return null;
+    }
+
+    /**
+     * Returns the Url adding the url parts at the end
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function getUrl(...$urlParts) {
+        $url    = self::get("url");
+        $result = "$url/" . implode("/", $urlParts);
+        $result = str_replace("//", "/", $result);
+        return $result;
     }
 
     /**
