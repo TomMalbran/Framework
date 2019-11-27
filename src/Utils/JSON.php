@@ -52,6 +52,34 @@ class JSON {
 
 
     /**
+     * Converts an encoded JSON into a Coma Separated Value
+     * @param string $value
+     * @return string
+     */
+    public static function toCSV($value) {
+        $value = self::decode($value);
+        return implode(", ", $value);
+    }
+
+    /**
+     * Converts a Coma Separated Value into an encoded JSON
+     * @param string $value
+     * @return string
+     */
+    public static function fromCSV($value) {
+        $parts  = explode(",", $value);
+        $result = [];
+        foreach ($parts as $part) {
+            if (!empty($part)) {
+                $result[] = trim($part);
+            }
+        }
+        return self::encode($result);
+    }
+
+
+
+    /**
      * Reads a JSON file
      * @param string $path
      * @return object
