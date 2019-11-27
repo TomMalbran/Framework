@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Data;
+namespace Framework\Auth;
 
 use Framework\Framework;
 use Framework\Schema\Model;
