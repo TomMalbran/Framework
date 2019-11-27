@@ -36,7 +36,7 @@ class Framework {
      * @return void
      */
     public static function create($basePath) {
-        self::$framePath = __DIR__;
+        self::$framePath = dirname(__FILE__, 2);
         self::$basePath  = $basePath;
     }
 
