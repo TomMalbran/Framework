@@ -24,6 +24,7 @@ class Framework {
     const FilesDir   = "files";
     const TempDir    = "temp";
     
+    private static $framePath;
     private static $basePath;
 
 
@@ -33,28 +34,34 @@ class Framework {
      * @return void
      */
     public static function create($basePath) {
-        self::$basePath = $basePath;
+        self::$framePath = __DIR__;
+        self::$basePath  = $basePath;
     }
+
+
 
     /**
      * Returns the BasePath with the given dir
-     * @param string $dir  Optional.
-     * @param string $file Optional.
+     * @param string  $dir      Optional.
+     * @param string  $file     Optional.
+     * @param boolean $forFrame Optional.
      * @return string
      */
-    public static function getPath($dir = "", $file = "") {
-        $path = File::getPath(self::$basePath, $dir, $file);
+    public static function getPath($dir = "", $file = "", $forFrame = false) {
+        $base = $forFrame ? self::$framePath : self::$basePath;
+        $path = File::getPath($base, $dir, $file);
         return File::removeLastSlash($path);
     }
 
     /**
      * Loads a JSON File
-     * @param string $dir
-     * @param string $file
+     * @param string  $dir
+     * @param string  $file
+     * @param boolean $forFrame Optional.
      * @return object
      */
-    public static function loadFile($dir, $file) {
-        $path = self::getPath($dir, "$file.json");
+    public static function loadFile($dir, $file, $forFrame = false) {
+        $path = self::getPath($dir, "$file.json", $forFrame);
         return JSON::read($path);
     }
 

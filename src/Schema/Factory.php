@@ -26,9 +26,12 @@ class Factory {
      */
     public static function load() {
         if (!self::$loaded) {
+            $app   = Framework::loadData(Framework::SchemaData);
+            $frame = Framework::loadFile("data", Framework::SchemaData, true);
+
             self::$loaded = true;
             self::$db     = new Database(Config::get("db"));
-            self::$data   = Framework::loadData(Framework::SchemaData);
+            self::$data   = array_merge($frame, $app);
         }
     }
     

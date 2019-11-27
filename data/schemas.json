@@ -1,0 +1,68 @@
+{
+    "resets" : {
+        "table"  : "credentials_reset",
+        "fields" : {
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "idID" : true },
+            "code"          : { "type" : "string"                                         },
+            "time"          : { "type" : "number"                                         }
+        },
+        "hasTimestamps" : false,
+        "canCreate"     : false,
+        "canEdit"       : false,
+        "canDelete"     : false
+    },
+    "spam" : {
+        "table"  : "credentials_spam",
+        "fields" : {
+            "ip"   : { "type" : "string", "idID" : true },
+            "time" : { "type" : "number"                }
+        },
+        "hasTimestamps" : false,
+        "canCreate"     : false,
+        "canEdit"       : false,
+        "canDelete"     : false
+    },
+
+
+    "emailTemplates" : {
+        "table"  : "email_templates",
+        "fields" : {
+            "templateCode" : { "type" : "string", "idID" : true, "cantEdit" : true },
+            "description"  : { "type" : "string",                "cantEdit" : true },
+            "subject"      : { "type" : "string"                                   },
+            "sendAs"       : { "type" : "string"                                   },
+            "sendName"     : { "type" : "string"                                   },
+            "message"      : { "type" : "text"                                     }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : false,
+        "canEdit"       : true,
+        "canDelete"     : false
+    },
+    "settings" : {
+        "table"  : "settings",
+        "fields" : {
+            "section"  : { "type" : "string", "isPrimary" : true },
+            "variable" : { "type" : "string", "isPrimary" : true },
+            "value"    : { "type" : "string"                     },
+            "type"     : { "type" : "number", "length" : 1       }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : false,
+        "canEdit"       : true,
+        "canDelete"     : false
+    },
+    "settingsTexts" : {
+        "table"  : "settings_texts",
+        "fields" : {
+            "section"  : { "type" : "string", "isPrimary" : true },
+            "variable" : { "type" : "string", "isPrimary" : true },
+            "value"    : { "type" : "text"                       },
+            "type"     : { "type" : "number", "length" : 1       }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : false,
+        "canEdit"       : true,
+        "canDelete"     : false
+    }
+}
