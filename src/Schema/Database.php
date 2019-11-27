@@ -599,7 +599,8 @@ class Database {
      */
     public function deleteTable($table) {
         $tableName = $this->getTableName($table);
-        $this->query("DROP TABLE `$tableName`");
+        $sql       = "DROP TABLE `$tableName`";
+        $this->query($sql);
         return $sql;
     }
 
