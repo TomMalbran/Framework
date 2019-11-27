@@ -1,6 +1,10 @@
 <?php
 namespace Framework;
 
+use Framework\Data\Email;
+use Framework\Config\Settings;
+use Framework\Schema\Factory;
+use Framework\Schema\Database;
 use Framework\File\File;
 use Framework\Utils\JSON;
 
@@ -85,5 +89,20 @@ class Framework {
     public function saveData($file, $contents) {
         $path = self::getPath(self::DataDir, "$file.json");
         JSON::write($path, $contents);
+    }
+
+
+
+    /**
+     * Runs the Migrations for all the Framework
+     * @param Database $db
+     * @param boolean  $canDelete Optional.
+     * @param boolean  $recreate  Optional.
+     * @return void
+     */
+    public static function migrate(Database $db, $canDelete = false, $recreate = false) {
+        Factory::migrate($db, $canDelete);
+        Settings::migrate($db);
+        Email::migrate($db, $recreate);
     }
 }

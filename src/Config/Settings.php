@@ -140,8 +140,8 @@ class Settings {
      * @return void
      */
     public static function migrate(Database $db) {
-        $settings  = Framework::loadData(Framework::SettingsData);
         $request   = $db->getAll("settings");
+        $settings  = Framework::loadData(Framework::SettingsData);
 
         $variables = [];
         $adds      = [];

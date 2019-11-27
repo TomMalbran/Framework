@@ -9,40 +9,26 @@ use Framework\Schema\Structure;
  */
 class Migration {
     
-    private $db;
-    private $schemas;
-    
-    
-    /**
-     * Creates a Migration instance
-     * @param Database $db
-     * @param array    $schemas
-     */
-    public function __construct(Database $db, array $schemas) {
-        $this->db      = $db;
-        $this->schemas = $schemas;
-    }
-
-
-
     /**
      * Migrates the Tables
-     * @param boolean $canDelete Optional.
+     * @param Database $db
+     * @param array    $schemas
+     * @param boolean  $canDelete Optional.
      * @return void
      */
-    public function migrate($canDelete = false) {
-        $tableNames  = $this->db->getTables(null, false);
+    public static function migrate(Database $db, array $schemas, $canDelete = false) {
+        $tableNames  = $db->getTables(null, false);
         $schemaNames = [];
         
         // Create or update the Tables
-        foreach ($this->schemas as $schemaKey => $schemaData) {
+        foreach ($schemas as $schemaKey => $schemaData) {
             $structure     = new Structure($schemaKey, $schemaData);
             $schemaNames[] = $structure->table;
             
             if (!in_array($structure->table, $tableNames)) {
-                $this->createTable($structure);
+                self::createTable($db, $structure);
             } else {
-                $this->updateTable($structure, $canDelete);
+                self::updateTable($db, $structure, $canDelete);
             }
         }
 
@@ -51,7 +37,7 @@ class Migration {
         foreach ($tableNames as $tableName) {
             if (!in_array($tableName, $schemaNames)) {
                 if ($canDelete) {
-                    $this->db->deleteTable($tableName);
+                    $db->deleteTable($tableName);
                     print("{$prebr}Deleteing table <i>$tableName</i><br>");
                 } else {
                     print("{$prebr}Delete table <i>$tableName</i> (manually)<br>");
@@ -63,10 +49,11 @@ class Migration {
 
     /**
      * Creates a New Table
+     * @param Database  $db
      * @param Structure $structure
      * @return void
      */
-    private function createTable(Structure $structure) {
+    private static function createTable(Database $db, Structure $structure) {
         $fields  = [];
         $primary = [];
         $keys    = [];
@@ -81,21 +68,22 @@ class Migration {
             }
         }
         
-        $sql = $this->db->createTable($structure->table, $fields, $primary, $keys);
+        $sql = $db->createTable($structure->table, $fields, $primary, $keys);
         print("<br>Creating table <b>$structure->table</b> ... <br>");
         print(str_replace("\n", "<br>", $sql) . "<br><br>");
     }
 
     /**
      * Updates the Table
+     * @param Database  $db
      * @param Structure $structure
      * @param boolean   $canDelete Optional.
      * @return void
      */
-    private function updateTable(Structure $structure, $canDelete = false) {
-        $primaryKeys = $this->db->getPrimaryKeys($structure->table);
-        $tableKeys   = $this->db->getTableKeys($structure->table);
-        $tableFields = $this->db->getTableFields($structure->table);
+    private static function updateTable(Database $db, Structure $structure, $canDelete = false) {
+        $primaryKeys = $db->getPrimaryKeys($structure->table);
+        $tableKeys   = $db->getTableKeys($structure->table);
+        $tableFields = $db->getTableFields($structure->table);
         $update      = false;
         $adds        = [];
         $drops       = [];
@@ -107,7 +95,7 @@ class Migration {
         $prev        = "";
         
         // Add new Columns
-        foreach ($fields as $field) {
+        foreach ($structure->fields as $field) {
             $found  = false;
             $rename = false;
             foreach ($tableFields as $tableField) {
@@ -145,7 +133,7 @@ class Migration {
         foreach ($tableFields as $tableField) {
             $tableKey = $tableField["Field"];
             $found    = false;
-            foreach ($fields as $field) {
+            foreach ($structure->fields as $field) {
                 if (strtolower($field->key) === strtolower($tableKey)) {
                     $found = true;
                 }
@@ -157,7 +145,7 @@ class Migration {
         }
 
         // Modify Columns
-        foreach ($fields as $field) {
+        foreach ($structure->fields as $field) {
             foreach ($tableFields as $tableField) {
                 if ($field->key === $tableField["Field"]) {
                     $oldData = $tableField["Type"];
@@ -181,7 +169,7 @@ class Migration {
         }
 
         // Update the Table Primary Keys and Index Keys
-        foreach ($fields as $field) {
+        foreach ($structure->fields as $field) {
             if ($field->isID || $field->isPrimary) {
                 $primary[] = $field->key;
                 if (!in_array($field->key, $primaryKeys)) {
@@ -212,27 +200,27 @@ class Migration {
         // Update the Table
         print("<br>Updating table <b>$structure->table</b> ... <br>");
         foreach ($adds as $add) {
-            $sql = $this->db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
+            $sql = $db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
             print("$sql<br>");
         }
         foreach ($renames as $rename) {
-            $sql = $this->db->renameColumn($structure->table, $rename["key"], $rename["new"], $rename["type"]);
+            $sql = $db->renameColumn($structure->table, $rename["key"], $rename["new"], $rename["type"]);
             print("$sql<br>");
         }
         foreach ($modifies as $modify) {
-            $sql = $this->db->updateColumn($structure->table, $modify["key"], $modify["type"]);
+            $sql = $db->updateColumn($structure->table, $modify["key"], $modify["type"]);
             print("$sql<br>");
         }
         foreach ($drops as $drop) {
-            $sql = $this->db->deleteColumn($structure->table, $drop, $canDelete);
+            $sql = $db->deleteColumn($structure->table, $drop, $canDelete);
             print($sql . (!$canDelete ? " (manually)" : "") . "<br>");
         }
         foreach ($keys as $key) {
-            $sql = $this->db->createIndex($structure->table, $key);
+            $sql = $db->createIndex($structure->table, $key);
             print("$sql<br>");
         }
         if ($addPrimary) {
-            $sql = $this->db->updatePrimary($structure, $primary);
+            $sql = $db->updatePrimary($structure, $primary);
             print("$sql<br>");
         }
         print("<br>");
