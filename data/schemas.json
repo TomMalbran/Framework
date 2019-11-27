@@ -51,5 +51,26 @@
         "canCreate"     : false,
         "canEdit"       : true,
         "canDelete"     : false
+    },
+
+
+    "logErrors" : {
+        "table"  : "log_errors",
+        "fields" : {
+            "LOG_ID"      : { "type" : "id",    "name" : "logID" },
+            "code"        : { "type" : "number"                  },
+            "error"       : { "type" : "string"                  },
+            "level"       : { "type" : "number"                  },
+            "description" : { "type" : "text"                    },
+            "file"        : { "type" : "string"                  },
+            "line"        : { "type" : "number"                  },
+            "amount"      : { "type" : "number"                  },
+            "isResolved"  : { "type" : "boolean"                 },
+            "updatedTime" : { "type" : "date"                    }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : true,
+        "canEdit"       : false,
+        "canDelete"     : false
     }
 }

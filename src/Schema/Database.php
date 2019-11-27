@@ -325,11 +325,11 @@ class Database {
      */
     private function processQuery($expression, array $bindParams = []) {
         $expression = str_replace("{dbPrefix}", $this->prefix, trim($expression));
-        $statement  = $this->mysqli->prepare($expression);
         $query      = str_replace("\n", "", $expression);
+        $statement  = $this->mysqli->prepare($expression);
         
         if (!$statement) {
-            trigger_error("Problem preparing query {$this->mysqli->error} ({$query})", E_USER_ERROR);
+            trigger_error("Problem preparing query: {$this->mysqli->error} ($query)", E_USER_ERROR);
         }
         
         if (is_array($bindParams) && !empty($bindParams)) {
@@ -343,7 +343,7 @@ class Database {
         
         $statement->execute();
         if ($statement->error) {
-            trigger_error("Problem executing query {$statement->error} {$this->mysqli->error} ({$query})", E_USER_ERROR);
+            trigger_error("Problem executing query: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
         }
         
         return $statement;
@@ -580,7 +580,7 @@ class Database {
         $sql       = "CREATE TABLE $tableName (\n";
         
         foreach ($fields as $key => $type) {
-            $sql .= "`$key` " . $type . ",\n";
+            $sql .= "  `$key` " . $type . ",\n";
         }
         $sql .= "  PRIMARY KEY (" . implode($primary, ", ") . ")\n";
         foreach ($keys as $key) {
@@ -614,7 +614,7 @@ class Database {
      */
     public function addColumn($table, $column, $type, $afterColumn = null) {
         $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName ADD COLUMN `$column` $type";
+        $sql       = "ALTER TABLE $tableName ADD COLUMN `$column` $type ";
         $sql      .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;

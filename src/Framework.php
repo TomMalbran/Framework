@@ -3,6 +3,7 @@ namespace Framework;
 
 use Framework\Data\Email;
 use Framework\Config\Settings;
+use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\File\File;
@@ -36,12 +37,17 @@ class Framework {
 
     /**
      * Sets the Basic data
-     * @param string $basePath
+     * @param string  $basePath
+     * @param boolean $logErrors
      * @return void
      */
-    public static function create($basePath) {
+    public static function create($basePath, $logErrors = true) {
         self::$framePath = dirname(__FILE__, 2);
         self::$basePath  = $basePath;
+
+        if ($logErrors) {
+            ErrorLog::init();
+        }
     }
 
 
