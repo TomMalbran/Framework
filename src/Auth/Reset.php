@@ -21,7 +21,7 @@ class Reset {
     public static function getSchema() {
         if (!self::$loaded) {
             self::$loaded = false;
-            self::$schema = Factory::getSchema("reset");
+            self::$schema = Factory::getSchema("resets");
         }
         return self::$schema;
     }
