@@ -33,14 +33,14 @@ class Router {
      * @param string $route
      * @return object
      */
-    public function get($route) {
+    public static function get($route) {
         self::load();
         $base   = substr($route, 0, strripos($route, "/"));
-        $method = str_replace($base, "/", $route);
+        $method = str_replace("$base/", "", $route);
 
         $data   = isset(self::$data[$base]) ? self::$data[$base] : null;
-        $module = $data != null ? $data->module : null;
-        $access = $data != null ? $data->routes[$method] : null;
+        $module = $data != null ? $data["module"]          : null;
+        $access = $data != null ? $data["routes"][$method] : null;
 
         return (object)[
             "module" => $module,
@@ -102,7 +102,7 @@ class Router {
      * @param array  $params Optional.
      * @return object|null
      */
-    public function call($route, array $params = null) {
+    public static function call($route, array $params = null) {
         $data = self::get($route);
         if ($data->access != null) {
             $instance = Container::bind(self::$baseUse . $data->module);
