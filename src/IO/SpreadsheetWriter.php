@@ -2,6 +2,7 @@
 namespace Framework\IO;
 
 use Framework\IO\SpreadsheetSheet;
+use Framework\Utils\Strings;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -75,7 +76,8 @@ class SpreadsheetWriter {
      * @return string
      */
     public function getFileName($name, $withDate = true) {
-        return $name . ($withDte ? date("dMY") : "");
+        $result = $name . ($withDate ? "_" . date("dMY") : "");
+        return Strings::toLowerCase($result);
     }
 
     /**

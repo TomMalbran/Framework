@@ -2,7 +2,7 @@
 namespace Framework\IO;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\WorkSheet;
+use PhpOffice\PhpSpreadsheet\WorkSheet\WorkSheet;
 
 /**
  * The Spreadsheet Sheet
