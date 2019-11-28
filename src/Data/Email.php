@@ -36,7 +36,7 @@ class Email {
      * @param integer $templateCode
      * @return Model
      */
-    public static function get($templateCode) {
+    public static function getOne($templateCode) {
         $query = Query::create("templateCode", "=", $templateCode);
         return self::getSchema()->getOne($query);
     }
