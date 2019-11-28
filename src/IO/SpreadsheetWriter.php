@@ -33,11 +33,11 @@ class SpreadsheetWriter {
 
     /**
      * Adds a new Sheet
-     * @param string $sheetID
-     * @param string $sheetName
+     * @param string         $sheetName
+     * @param string|integer $sheetID   Optional.
      * @return SpreadsheetSheet
      */
-    public function addSheet($sheetID, $sheetName) {
+    public function addSheet($sheetName, $sheetID = null) {
         $count = $this->data->getSheetCount();
         if ($this->sheetNum < $count) {
             $sheet = $this->data->getSheet($this->sheetNum);
@@ -46,8 +46,9 @@ class SpreadsheetWriter {
         }
         
         $sheet->setTitle($sheetName);
-        $ssheet = new SpreadsheetSheet($sheet);
-        
+        $ssheet  = new SpreadsheetSheet($sheet);
+        $sheetID = $sheetID != null ? $sheetID : $this->sheetNum;
+
         $this->sheets[$sheetID] = $ssheet;
         $this->sheetNum += 1;
         return $ssheet;
@@ -55,7 +56,7 @@ class SpreadsheetWriter {
 
     /**
      * Returns the Sheet for the given ID, if possible
-     * @param integer $sheetID
+     * @param string|integer $sheetID
      * @return SpreadsheetSheet
      */
     public function getSheet($sheetID) {
