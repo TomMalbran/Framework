@@ -54,7 +54,7 @@ class Settings {
      */
     private static function getSettings($section = null) {
         $query = Query::createIf("section", "=", $section);
-        return self::getSchema()->getArray($query);
+        return self::getSchema()->getAll($query);
     }
 
     /**

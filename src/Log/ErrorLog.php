@@ -48,8 +48,8 @@ class ErrorLog {
      * @param integer $logID
      * @return Model
      */
-    public static function get($logID) {
-        return self::getSchema()->getByID($logID);
+    public static function getOne($logID) {
+        return self::getSchema()->getOne($logID);
     }
     
     /**
@@ -87,7 +87,7 @@ class ErrorLog {
         $query = self::getFilterQuery($filters);
         $query->orderBy("updatedTime", false);
         $query->paginate($sort->page, $sort->amount);
-        return self::getSchema()->getArray($query);
+        return self::getSchema()->getAll($query);
     }
 
     /**

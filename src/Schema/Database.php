@@ -105,7 +105,6 @@ class Database {
             $expression .= $query->get();
             $params      = $query->params;
         }
-        
         return $this->query($expression, $params);
     }
     

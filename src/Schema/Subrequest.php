@@ -58,7 +58,7 @@ class Subrequest {
         if ($this->hasOrder) {
             $query->orderBy($this->orderBy, $this->isAsc);
         }
-        $request   = !empty($ids) ? $this->schema->getArray($query) : [];
+        $request   = !empty($ids) ? $this->schema->getAll($query) : [];
         $subResult = [];
         
         foreach ($request as $row) {

@@ -57,7 +57,7 @@ class Email {
      * @return array
      */
     public static function getAll(Request $request) {
-        return self::getSchema()->getArray(null, $request);
+        return self::getSchema()->getAll(null, $request);
     }
 
     /**

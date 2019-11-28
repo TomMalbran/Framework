@@ -51,26 +51,14 @@ class Schema {
     
     
     /**
-     * Returns the Schema with the given ID
-     * @param integer $id
-     * @param boolean $withDeleted Optional.
-     * @param boolean $decripted   Optional.
-     * @return Model
-     */
-    public function getByID($id, $withDeleted = true, $decripted = false) {
-        $query = Query::create($this->structure->idKey, "=", $id);
-        return $this->getOne($query, $withDeleted, $decripted);
-    }
-    
-    /**
      * Returns the Model with the given Where
-     * @param Query   $query
-     * @param boolean $withDeleted Optional.
-     * @param boolean $decripted   Optional.
+     * @param Query|integer $query
+     * @param boolean       $withDeleted Optional.
+     * @param boolean       $decripted   Optional.
      * @return Model
      */
-    public function getOne(Query $query, $withDeleted = true, $decripted = false) {
-        $query   = $this->generateQuery($query, $withDeleted)->limit(1);
+    public function getOne($query, $withDeleted = true, $decripted = false) {
+        $query   = $this->generateQueryID($query, $withDeleted)->limit(1);
         $request = $this->request($query, $decripted);
         return $this->getModel($request);
     }
@@ -94,8 +82,8 @@ class Schema {
      * @return boolean
      */
     public function exists($query, $withDeleted = true) {
-        $query = $this->generateQueryID($query);
-        return $this->getTotal($query, "*", $withDeleted) == 1;
+        $query = $this->generateQueryID($query, $withDeleted);
+        return $this->getTotal($query) == 1;
     }
 
 
@@ -113,6 +101,19 @@ class Schema {
     }
 
     /**
+     * Returns an array of Schemas
+     * @param Query   $query     Optional.
+     * @param Request $sort      Optional.
+     * @param string  $decripted Optional.
+     * @return array
+     */
+    public function getAll(Query $query = null, Request $sort = null, $decripted = false) {
+        $query   = $this->generateQuerySort($query, $sort);
+        $request = $this->request($query, $decripted);
+        return $request;
+    }
+
+    /**
      * Returns a map of Schemas
      * @param Query   $query     Optional.
      * @param Request $sort      Optional.
@@ -125,19 +126,6 @@ class Schema {
         return Utils::createMap($request, $this->structure->idName);
     }
     
-    /**
-     * Returns an array of Schemas
-     * @param Query   $query     Optional.
-     * @param Request $sort      Optional.
-     * @param string  $decripted Optional.
-     * @return array
-     */
-    public function getArray(Query $query = null, Request $sort = null, $decripted = false) {
-        $query   = $this->generateQuerySort($query, $sort);
-        $request = $this->request($query, $decripted);
-        return $request;
-    }
-
     /**
      * Requests data to the database
      * @param Query  $query     Optional.
@@ -419,7 +407,7 @@ class Schema {
      * @return boolean
      */
     public function edit($query, $fields, $extra = null, $credentialID = 0) {
-        $query        = $this->generateQueryID($query);
+        $query        = $this->generateQueryID($query, false);
         $modification = new Modification($this->db, $this->structure);
         $modification->addFields($fields, $extra, $credentialID);
         $modification->addModification();
@@ -436,7 +424,7 @@ class Schema {
      * @return void
      */
     public function increase($query, $column, $amount) {
-        $query = $this->generateQueryID($query);
+        $query = $this->generateQueryID($query, false);
         $this->db->increase($this->structure->table, $column, $amount, $query);
     }
     
@@ -456,7 +444,7 @@ class Schema {
      * @return boolean
      */
     public function delete($query, $credentialID = 0) {
-        $query = $this->generateQueryID($query);
+        $query = $this->generateQueryID($query, false);
         if ($this->structure->canDelete && $this->exists($query)) {
             $this->edit($query, [ "isDeleted" => 1 ], $credentialID);
             return true;
@@ -470,7 +458,7 @@ class Schema {
      * @return boolean
      */
     public function remove($query) {
-        $query = $this->generateQueryID($query);
+        $query = $this->generateQueryID($query, false);
         return $this->db->delete($this->structure->table, $query);
     }
 
@@ -493,6 +481,19 @@ class Schema {
     }
 
     /**
+     * Generates a Query with the ID or returns the Query
+     * @param Query|integer $query
+     * @param boolean       $withDeleted Optional.
+     * @return Query
+     */
+    private function generateQueryID($query, $withDeleted = true) {
+        if (!($query instanceof Query)) {
+            $query = Query::create($this->structure->idKey, "=", $query);
+        }
+        return $this->generateQuery($query, $withDeleted);
+    }
+
+    /**
      * Generates a Query with Sorting
      * @param Query   $query Optional.
      * @param Request $sort  Optional.
@@ -510,17 +511,5 @@ class Schema {
             $query->orderBy($this->structure->idKey, true);
         }
         return $query;
-    }
-
-    /**
-     * Generates a Query with the ID or returns the Query
-     * @param Query|integer $query
-     * @return Query
-     */
-    private function generateQueryID($query) {
-        if (!($query instanceof Query)) {
-            return Query::create($this->structure->idKey, "=", $query);
-        }
-        return new Query($query);
     }
 }
