@@ -42,7 +42,7 @@ class FileType {
      * @return boolean
      */
     public static function isHidden($file) {
-        return Strings::startsWith($path, ".");
+        return Strings::startsWith($file, ".");
     }
 
     /**
