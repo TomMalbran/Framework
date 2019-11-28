@@ -18,7 +18,7 @@ class NLS {
      * @param string $lang
      * @return array
      */
-    public function load($lang) {
+    public static function load($lang) {
         if (empty(self::$loaded[$lang])) {
             self::$loaded[$lang] = true;
             self::$data[$lang]   = Framework::loadFile(Framework::NLSDir, $lang);
@@ -32,7 +32,7 @@ class NLS {
      * @param string $lang Optional.
      * @return string
      */
-    public function get($key, $lang = "root") {
+    public static function get($key, $lang = "root") {
         $lang = $lang == "root" ? self::$root : $lang;
         $data = self::load($lang);
 
