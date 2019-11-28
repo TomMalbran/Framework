@@ -1,5 +1,5 @@
 <?php
-namespace App\Utils;
+namespace Framework\Utils;
 
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
