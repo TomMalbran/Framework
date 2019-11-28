@@ -4,6 +4,7 @@ namespace Framework;
 use Framework\Framework;
 use Framework\Container;
 use Framework\Request;
+use Framework\Utils\Strings;
 
 /**
  * The Router Service
@@ -36,7 +37,7 @@ class Router {
     public static function get($route) {
         self::load();
         $base   = substr($route, 0, strripos($route, "/"));
-        $method = str_replace("$base/", "", $route);
+        $method = Strings::replace($route, "$base/", "");
 
         $data   = isset(self::$data[$base]) ? self::$data[$base] : null;
         $module = $data != null ? $data["module"]          : null;

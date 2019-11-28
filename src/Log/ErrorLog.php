@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Schema\Factory;
 use Framework\Schema\Query;
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 
 /**
@@ -129,12 +130,12 @@ class ErrorLog {
     public static function handler($code, $description, $file = "", $line = 0) {
         [ $error, $level ] = self::mapErrorCode($code);
         $schema      = self::getSchema();
-        $description = str_replace([ "'", "`" ], "", $description);
+        $description = Strings::replace($description, [ "'", "`" ], "");
 
-        if (strstr($file, self::$framePath) !== FALSE) {
-            $fileName = "Framework/" . str_replace(self::$framePath . "/", "", $file);
+        if (Strings::contains($file, self::$framePath)) {
+            $fileName = Strings::replace($file, self::$framePath . "/", "Framework/");
         } else {
-            $fileName = str_replace(self::$basePath . "/", "", $file);
+            $fileName = Strings::replace($file, self::$basePath . "/", "");
         }
 
         $query = Query::create("code", "=", $code);

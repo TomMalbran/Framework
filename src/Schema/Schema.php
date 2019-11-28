@@ -6,6 +6,7 @@ use Framework\Schema\Selection;
 use Framework\Schema\Modification;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use Framework\Request;
 
@@ -95,7 +96,7 @@ class Schema {
      * @return array
      */
     public function getQuery($expression, array $params = []) {
-        $expression = str_replace("{table}", "{dbPrefix}{$this->structure->table}", $expression);
+        $expression = Strings::replace($expression, "{table}", "{dbPrefix}{$this->structure->table}");
         $request    = $this->db->query($expression, $params);
         return $request;
     }
@@ -231,7 +232,7 @@ class Schema {
      * @return array
      */
     public function getStats(Query $query, $select) {
-        $select  = str_replace("{table}", "{dbPrefix}{$this->structure->table}", $select);
+        $select  = Strings::replace($select, "{table}", "{dbPrefix}{$this->structure->table}");
         $request = $this->db->query("$select " . $query->get(), $query);
 
         if (!empty($request[0])) {

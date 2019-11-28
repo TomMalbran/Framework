@@ -2,6 +2,7 @@
 namespace Framework\File;
 
 use Framework\File\File;
+use Framework\Utils\Strings;
 
 /**
  * The File Types used by the System
@@ -41,7 +42,7 @@ class FileType {
      * @return boolean
      */
     public static function isHidden($file) {
-        return substr($file, 0, 1) == ".";
+        return Strings::startsWith($path, ".");
     }
 
     /**

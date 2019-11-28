@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Strings;
+
 /**
  * Several Utils functions
  */
@@ -174,92 +176,7 @@ class Utils {
     }
     
     
-    
-    /**
-     * Returns the HTML version of the given text
-     * @param string $text
-     * @return string
-     */
-    public static function toHtml($text) {
-        return str_replace("\n", "<br>", $text);
-    }
-    
-    /**
-     * Returns a short version of the given text
-     * @param string  $text
-     * @param integer $len  Optional.
-     * @return string
-     */
-    public static function makeShort($text, $len = 30) {
-        $first = explode("\n", $text)[0];
-        return strlen($first) > $len ? mb_substr($first, 0, $len, 'utf-8') . "..." : $first;
-    }
-    
-    /**
-     * Returns true if the short version is different from the text
-     * @param string  $text
-     * @param integer $len  Optional.
-     * @return string
-     */
-    public static function isShort($text, $len = 30) {
-        return self::makeShort($text, $len) !== $text;
-    }
 
-    /**
-     * Returns true if the given string starts with the given needle
-     * @param string $string
-     * @param string $needle
-     * @return boolean
-     */
-    public static function startsWith($string, $needle) {
-        $length = strlen($needle);
-        return (substr($string, 0, $length) === $needle);
-    }
-
-    /**
-     * Returns true if the given string ends with the given needle
-     * @param string $string
-     * @param string $needle
-     * @return boolean
-     */
-    public static function endsWith($string, $needle) {
-        $length = strlen($needle);
-        if ($length == 0) {
-            return true;
-        }
-
-        return (substr($string, -$length) === $needle);
-    }
-
-    /**
-     * Transforms an UpperCase string with underscores to CamelCase
-     * @param string  $string
-     * @param boolean $capitalizeFirst Optional.
-     * @return string
-     */
-    public static function uppercaseToCamelcase($string, $capitalizeFirst = false) {
-        $result = ucwords(strtolower($string), "_");
-        $result = str_replace("_", "", $result);
-        if (!$capitalizeFirst) {
-            $result[0] = strtolower($result[0]);
-        }
-        return $result;
-    }
-
-    /**
-     * Transforms an CamelCase string to UpperCase with underscores
-     * @param string $string
-     * @return string
-     */
-    public static function camelcaseToUppercase($string) {
-        $parts  = preg_split('/(?=[A-Z])/', $string);
-        $result = implode("_", $parts);
-        $result = strtoupper($result);
-        return $result;
-    }
-    
-    
-    
     /**
      * Returns true if the given value is alpha-numeric
      * @param string $value
@@ -504,14 +421,14 @@ class Utils {
      * @return string
      */
     public static function parseDomain($domain) {
-        $domain = strtolower($domain);
-        if (substr($domain, 0, 4) != "http") {
+        $domain = Strings::toLowercase($domain);
+        if (Strings::startsWith($domain, "http")) {
             $domain = "http://" . $domain;
         }
         $host = parse_url($domain, PHP_URL_HOST);
         
         if ($host) {
-            return str_replace("www.", "", $host);
+            return Strings::replace($host, "www.", "");
         }
         return "";
     }
@@ -563,7 +480,7 @@ class Utils {
         
         if (self::isValidEmail($email)) {
             $domain = substr($email, strrpos($email, "@") + 1);
-            if (!in_array(strtolower($domain), $domains)) {
+            if (!in_array(Strings::toLowercase($domain), $domains)) {
                 return $domain;
             }
         }
@@ -577,9 +494,9 @@ class Utils {
      * @return string
      */
     public static function generatePassword($length = 8, $availableSets = "lud") {
-        $sets     = [];
-        $all      = "";
-        $password = "";
+        $sets   = [];
+        $all    = "";
+        $result = "";
         
         if (strpos($availableSets, "l") !== false) {
             $sets[] = "abcdefghjkmnpqrstuvwxyz";
@@ -595,17 +512,17 @@ class Utils {
         }
         
         foreach ($sets as $set) {
-            $password .= $set[array_rand(str_split($set))];
-            $all .= $set;
+            $result .= $set[array_rand(str_split($set))];
+            $all    .= $set;
         }
         
         $all = str_split($all);
         for ($i = 0; $i < $length - count($sets); $i++) {
-            $password .= $all[array_rand($all)];
+            $result .= $all[array_rand($all)];
         }
         
-        $password = str_shuffle($password);
-        return $password;
+        $result = str_shuffle($result);
+        return $result;
     }
     
     /**
@@ -615,17 +532,6 @@ class Utils {
      */
     public static function createCode($length = 50) {
         return substr(md5(rand()), 0, $length);
-    }
-    
-    /**
-     * Returns a random string
-     * @return string
-     */
-    public static function createRandomString() {
-        $size   = mcrypt_get_iv_size(MCRYPT_CAST_256, MCRYPT_MODE_CFB);
-        $iv     = mcrypt_create_iv($size, MCRYPT_DEV_RANDOM);
-        $string = base64_encode(hash("sha256", $iv, true));
-        return $string;
     }
 
     /**
@@ -637,7 +543,6 @@ class Utils {
     public static function createHash($pass, $salt = "") {
         $salt = !empty($salt) ? $salt : self::createCode();
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
-        
         return [ "password" => $hash, "salt" => $salt ];
     }
     
@@ -657,7 +562,7 @@ class Utils {
      * @return boolean
      */
     public static function isStageHost() {
-        return substr($_SERVER["HTTP_HOST"], 0, 4) == "dev.";
+        return Strings::startsWith($_SERVER["HTTP_HOST"], "dev.");
     }
 
     /**

@@ -2,6 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Query;
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use mysqli;
 
@@ -323,8 +324,8 @@ class Database {
      * @return mixed
      */
     private function processQuery($expression, array $bindParams = []) {
-        $expression = str_replace("{dbPrefix}", $this->prefix, trim($expression));
-        $query      = str_replace("\n", "", $expression);
+        $expression = Strings::replace(trim($expression), "{dbPrefix}", $this->prefix);
+        $query      = Strings::replace($expression, "\n", "");
         $statement  = $this->mysqli->prepare($expression);
         
         if (!$statement) {
@@ -496,7 +497,7 @@ class Database {
      * @return string
      */
     public function getTableName($name) {
-        if (!Utils::startsWith($name, $this->prefix)) {
+        if (!Strings::startsWith($name, $this->prefix)) {
             return $this->prefix . $name;
         }
         return $name;
@@ -516,7 +517,7 @@ class Database {
             foreach ($row as $value) {
                 if ((!empty($filter) && !in_array($value, $filter)) || empty($filter)) {
                     if (!$withPrefix) {
-                        $result[] = str_replace($this->prefix, "", $value);
+                        $result[] =  Strings::replace($value, $this->prefix, "");
                     } else {
                         $result[] = $value;
                     }

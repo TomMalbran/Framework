@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 
 /**
@@ -396,10 +397,10 @@ class Query {
     public function updateColumn($oldColumn, $newColumn) {
         foreach ([ "where", "orderBy", "groupBy" ] as $type) {
             foreach ([ "(", " " ] as $prefix) {
-                $this->{$type} = str_replace(
+                $this->{$type} = Strings::replace(
+                    $this->{$type},
                     "{$prefix}{$oldColumn}",
-                    "{$prefix}{$newColumn}",
-                    $this->{$type}
+                    "{$prefix}{$newColumn}"
                 );
             }
         }

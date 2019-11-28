@@ -1,6 +1,7 @@
 <?php
 namespace Framework\File;
 
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use ZipArchive;
 
@@ -16,7 +17,7 @@ class File {
      */
     public static function getPath(...$pathParts) {
         $result = implode("/", $pathParts);
-        $result = str_replace("//", "/", $result);
+        $result = Strings::replace($result, "//", "/");
         return $result;
     }
     
@@ -97,7 +98,7 @@ class File {
      * @return string
      */
     public static function addLastSlash($path) {
-        if (substr($path, -1) != "/") {
+        if (!Strings::endsWith($path, "/")) {
             return "$path/";
         }
         return $path;
@@ -109,7 +110,7 @@ class File {
      * @return string
      */
     public static function addFirstSlash($path) {
-        if (substr($path, 1) != "/") {
+        if (!Strings::startsWith($path, "/")) {
             return "/$path";
         }
         return $path;
@@ -121,7 +122,7 @@ class File {
      * @return string
      */
     public static function removeLastSlash($path) {
-        if (substr($path, -1) == "/") {
+        if (Strings::endsWith($path, "/")) {
             return substr($path, 0, strlen($path) - 1);
         }
         return $path;
@@ -133,7 +134,7 @@ class File {
      * @return string
      */
     public static function removeFirstSlash($path) {
-        if (substr($path, 1) == "/") {
+        if (Strings::startsWith($path, "/")) {
             return substr($path, 1, strlen($path));
         }
         return $path;
@@ -148,7 +149,7 @@ class File {
      */
     public static function getName($name) {
         $extension = pathinfo($name, PATHINFO_EXTENSION);
-        return str_replace("." . $extension, "", $name);
+        return Strings::replace($name, "." . $extension, "");
     }
 
     /**

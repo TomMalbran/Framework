@@ -3,6 +3,7 @@ namespace Framework\Schema;
 
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
+use Framework\Utils\Strings;
 
 /**
  * The Schema Migration
@@ -59,7 +60,7 @@ class Migration {
         
         $sql = $db->createTable($structure->table, $fields, $primary, $keys);
         print("<br>Creating table <b>$structure->table</b> ... <br>");
-        print(str_replace("\n", "<br>", $sql) . "<br><br>");
+        print(Strings::toHtml($sql) . "<br><br>");
     }
 
     /**
@@ -112,7 +113,7 @@ class Migration {
             $rename = false;
             foreach ($tableFields as $tableField) {
                 $tableKey = $tableField["Field"];
-                if (strtolower($field->key) === strtolower($tableKey) && $field->key !== $tableKey) {
+                if (Strings::isEqual($field->key, $tableKey) && $field->key !== $tableKey) {
                     $rename = true;
                     break;
                 }
@@ -146,7 +147,7 @@ class Migration {
             $tableKey = $tableField["Field"];
             $found    = false;
             foreach ($structure->fields as $field) {
-                if (strtolower($field->key) === strtolower($tableKey)) {
+                if (Strings::isEqual($field->key, $tableKey)) {
                     $found = true;
                 }
             }

@@ -7,6 +7,7 @@ use Framework\Config\Config;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
+use Framework\Utils\Strings;
 
 /**
  * The Email Templates
@@ -115,8 +116,8 @@ class Email {
                     "description"  => $data["description"],
                     "sendAs"       => $sendAs,
                     "sendName"     => $siteName,
-                    "subject"      => str_replace("[site]", $siteName, $data["subject"]),
-                    "message"      => str_replace("[site]", $siteName, $data["message"]),
+                    "subject"      => Strings::replace($data["subject"], "[site]", $siteName),
+                    "message"      => Strings::replace($data["message"], "[site]", $siteName),
                 ];
             }
         }

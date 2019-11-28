@@ -3,6 +3,7 @@ namespace Framework\Schema;
 
 use Framework\File\Path;
 use Framework\Utils\JSON;
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use Framework\Request;
 
@@ -246,10 +247,10 @@ class Field {
         case self::Text:
             $result[$key]            = $text;
             $result["{$key}Lines"]   = explode("\n", $text);
-            $result["{$key}Html"]    = Utils::toHtml($text);
-            $result["{$key}Short"]   = Utils::makeShort($text);
-            $result["{$key}Medium"]  = Utils::makeShort($text, 150);
-            $result["{$key}IsShort"] = Utils::isShort($text);
+            $result["{$key}Html"]    = Strings::toHtml($text);
+            $result["{$key}Short"]   = Strings::makeShort($text);
+            $result["{$key}Medium"]  = Strings::makeShort($text, 150);
+            $result["{$key}IsShort"] = Strings::isShort($text);
             break;
         case self::Encrypt:
             $result[$key]            = !empty($data["{$key}Decrypt"]) ? $data["{$key}Decrypt"] : "";

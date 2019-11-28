@@ -1,0 +1,149 @@
+<?php
+namespace Framework\Utils;
+
+/**
+ * Several String Utils
+ */
+class Strings {
+    
+    /**
+     * Returns true if the given String contains the given needle
+     * @param string $string
+     * @param string $needle
+     * @return boolean
+     */
+    public static function contains($string, $needle) {
+        return strstr($file, self::$framePath) !== FALSE;
+    }
+
+    /**
+     * Returns true if the given String starts with the given needle
+     * @param string $string
+     * @param string $needle
+     * @return boolean
+     */
+    public static function startsWith($string, $needle) {
+        $length = strlen($needle);
+        return (substr($string, 0, $length) === $needle);
+    }
+
+    /**
+     * Returns true if the given string ends with the given needle
+     * @param string $string
+     * @param string $needle
+     * @return boolean
+     */
+    public static function endsWith($string, $needle) {
+        $length = strlen($needle);
+        if ($length == 0) {
+            return true;
+        }
+        return (substr($string, -$length) === $needle);
+    }
+
+
+
+    /**
+     * Replaces in the String the search with the replace
+     * @param string $string
+     * @param string $search
+     * @param string $replace
+     * @return string
+     */
+    public function replace($string, $search, $replace) {
+        return str_replace($search, $replace, $string);
+    }
+
+
+
+    /**
+     * Returns true if the values are Equal
+     * @param string  $string
+     * @param string  $other
+     * @param boolean $asLower Optional.
+     * @return boolean
+     */
+    public function isEqual($string, $other, $asLower = true) {
+        if ($asLower) {
+            return strtolower($string) === strtolower($other);
+        }
+        return $string === $other;
+    }
+
+    /**
+     * Transforms a String to Uppercase
+     * @param string $string
+     * @return string
+     */
+    public static function toLowercase($string) {
+        return strtolower($string);
+    }
+
+    /**
+     * Transforms a String to Lowercase
+     * @param string $string
+     * @return string
+     */
+    public static function toUpercase($string) {
+        return strtoupper($string);
+    }
+
+    /**
+     * Transforms an Uppercase string with underscores to Camelcase
+     * @param string  $string
+     * @param boolean $capitalizeFirst Optional.
+     * @return string
+     */
+    public static function uppercaseToCamelcase($string, $capitalizeFirst = false) {
+        $result = ucwords(strtolower($string), "_");
+        $result = str_replace("_", "", $result);
+        if (!$capitalizeFirst) {
+            $result[0] = strtolower($result[0]);
+        }
+        return $result;
+    }
+
+    /**
+     * Transforms an CamelCase string to UpperCase with underscores
+     * @param string $string
+     * @return string
+     */
+    public static function camelcaseToUppercase($string) {
+        $parts  = preg_split('/(?=[A-Z])/', $string);
+        $result = implode("_", $parts);
+        $result = strtoupper($result);
+        return $result;
+    }
+
+
+
+    /**
+     * Returns the HTML version of the given text
+     * @param string $text
+     * @return string
+     */
+    public static function toHtml($text) {
+        return str_replace("\n", "<br>", $text);
+    }
+
+    /**
+     * Returns a short version of the given text
+     * @param string  $text
+     * @param integer $len  Optional.
+     * @return string
+     */
+    public static function makeShort($text, $len = 30) {
+        $first = explode("\n", $text)[0];
+        return strlen($first) > $len ? mb_substr($first, 0, $len, 'utf-8') . "..." : $first;
+    }
+
+    /**
+     * Returns true if the short version is different from the text
+     * @param string  $text
+     * @param integer $len  Optional.
+     * @return string
+     */
+    public static function isShort($text, $len = 30) {
+        return self::makeShort($text, $len) !== $text;
+    }
+}

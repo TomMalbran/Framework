@@ -3,6 +3,7 @@ namespace Framework\Config;
 
 use Framework\Framework;
 use Framework\File\File;
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 
 use Dotenv\Dotenv;
@@ -49,7 +50,7 @@ class Config {
         self::load();
 
         // Check if there is a property with the given value
-        $upperkey = Utils::camelcaseToUppercase($property);
+        $upperkey = Strings::camelcaseToUppercase($property);
         if (isset($_ENV[$upperkey])) {
             return $_ENV[$upperkey];
         }
@@ -58,10 +59,10 @@ class Config {
         $result = new stdClass();
         foreach ($_ENV as $envkey => $value) {
             $parts  = explode("_", $envkey);
-            $prefix = strtolower($parts[0]);
+            $prefix = Strings::toLowercase($parts[0]);
             if ($prefix == $property) {
-                $suffix = str_replace("{$parts[0]}_", "", $envkey);
-                $key    = Utils::uppercaseToCamelcase($suffix);
+                $suffix = Strings::replace($envkey, "{$parts[0]}_", "");
+                $key    = Strings::uppercaseToCamelcase($suffix);
                 $result->{$key} = $value;
             }
         }
@@ -81,7 +82,7 @@ class Config {
     public static function getUrl(...$urlParts) {
         $url    = self::get("url");
         $result = "$url/" . implode("/", $urlParts);
-        $result = str_replace("//", "/", $result);
+        $result = Strings::replace($result, "//", "/");
         return $result;
     }
 
