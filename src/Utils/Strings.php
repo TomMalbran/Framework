@@ -13,7 +13,7 @@ class Strings {
      * @return boolean
      */
     public static function contains($string, $needle) {
-        return strstr($file, self::$framePath) !== FALSE;
+        return strstr($string, $needle) !== FALSE;
     }
 
     /**
