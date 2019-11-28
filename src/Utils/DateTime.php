@@ -8,7 +8,7 @@ use Framework\Utils\Utils;
  */
 class DateTime {
 
-    public static $Months     = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
+    public static $months     = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
 
     public static $serverZone = -3;
     public static $timeDiff   = 0;
@@ -310,7 +310,7 @@ class DateTime {
      * @return string
      */
     public static function getMonth($month) {
-        return self::$Months[$month - 1];
+        return self::$months[$month - 1];
     }
     
     /**
@@ -319,6 +319,7 @@ class DateTime {
      * @return string
      */
     public static function getShortMonth($month) {
-        return strtoupper(substr(self::getMonth($month), 0, 3));
+        $result = substr(self::getMonth($month), 0, 3);
+        return Strings::toUpperCase($result);
     }
 }

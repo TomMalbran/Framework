@@ -50,7 +50,7 @@ class Config {
         self::load();
 
         // Check if there is a property with the given value
-        $upperkey = Strings::camelcaseToUppercase($property);
+        $upperkey = Strings::camelCaseToUpperCase($property);
         if (isset($_ENV[$upperkey])) {
             return $_ENV[$upperkey];
         }
@@ -59,10 +59,10 @@ class Config {
         $result = new stdClass();
         foreach ($_ENV as $envkey => $value) {
             $parts  = explode("_", $envkey);
-            $prefix = Strings::toLowercase($parts[0]);
+            $prefix = Strings::toLowerCase($parts[0]);
             if ($prefix == $property) {
                 $suffix = Strings::replace($envkey, "{$parts[0]}_", "");
-                $key    = Strings::uppercaseToCamelcase($suffix);
+                $key    = Strings::upperCaseToCamelCase($suffix);
                 $result->{$key} = $value;
             }
         }

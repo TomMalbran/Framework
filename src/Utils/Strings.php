@@ -50,7 +50,7 @@ class Strings {
      * @param string $replace
      * @return string
      */
-    public function replace($string, $search, $replace) {
+    public static function replace($string, $search, $replace) {
         return str_replace($search, $replace, $string);
     }
 
@@ -75,7 +75,7 @@ class Strings {
      * @param string $string
      * @return string
      */
-    public static function toLowercase($string) {
+    public static function toLowerCase($string) {
         return strtolower($string);
     }
 
@@ -84,7 +84,7 @@ class Strings {
      * @param string $string
      * @return string
      */
-    public static function toUpercase($string) {
+    public static function toUpperCase($string) {
         return strtoupper($string);
     }
 
@@ -94,7 +94,7 @@ class Strings {
      * @param boolean $capitalizeFirst Optional.
      * @return string
      */
-    public static function uppercaseToCamelcase($string, $capitalizeFirst = false) {
+    public static function upperCaseToCamelCase($string, $capitalizeFirst = false) {
         $result = ucwords(strtolower($string), "_");
         $result = str_replace("_", "", $result);
         if (!$capitalizeFirst) {
@@ -108,7 +108,7 @@ class Strings {
      * @param string $string
      * @return string
      */
-    public static function camelcaseToUppercase($string) {
+    public static function camelCaseToUpperCase($string) {
         $parts  = preg_split('/(?=[A-Z])/', $string);
         $result = implode("_", $parts);
         $result = strtoupper($result);
@@ -134,7 +134,7 @@ class Strings {
      */
     public static function makeShort($text, $len = 30) {
         $first = explode("\n", $text)[0];
-        return strlen($first) > $len ? mb_substr($first, 0, $len, 'utf-8') . "..." : $first;
+        return strlen($first) > $len ? mb_substr($first, 0, $len, "utf-8") . "..." : $first;
     }
 
     /**

@@ -165,14 +165,14 @@ class Utils {
     public static function toPriceString($price) {
         $millions = round($price / 1000000);
         if ($millions > 10) {
-            return "$" . $millions . "m";
+            return "${$millions}m";
         }
         $kilos = round($price / 1000);
         if ($kilos > 10) {
-            return "$" . $kilos . "k";
+            return "${$kilos}k";
         }
         $price = round($price);
-        return "$" . $price;
+        return "${$price}";
     }
     
     
@@ -328,7 +328,7 @@ class Utils {
      * @return string
      */
     public static function cuitToNumber($value) {
-        return str_replace([ " ", "-" ], "", $value);
+        return Strings::replace($value, [ " ", "-" ], "");
     }
 
     /**
@@ -337,53 +337,11 @@ class Utils {
      * @return string
      */
     public static function dniToNumber($value) {
-        return str_replace([ " ", "." ], "", $value);
+        return Strings::replace($value, [ " ", "." ], "");
     }
     
     
     
-    /**
-     * Converts a single value or an array into an array
-     * @param array|mixed $array
-     * @return array
-     */
-    public static function toArray($array) {
-        return is_array($array) ? $array : [ $array ];
-    }
-    
-    /**
-     * Removes the empty entries from the given array
-     * @param array $array
-     * @return array
-     */
-    public static function removeEmpty(array $array) {
-        $result = [];
-        foreach ($array as $value) {
-            if (!empty($value)) {
-                $result[] = $value;
-            }
-        }
-        return $result;
-    }
-    
-    /**
-     * Returns an array with values in the Base
-     * @param array $base
-     * @param array $array
-     * @return array
-     */
-    public static function subArray(array $base, array $array) {
-        $result = [];
-        foreach ($array as $value) {
-            if (in_array($value, $base)) {
-                $result[] = $value;
-            }
-        }
-        return $result;
-    }
-
-
-
     /**
      * Returns the Real Name for the given User
      * @param mixed  $data
@@ -407,46 +365,20 @@ class Utils {
     }
     
     /**
-     * Returns the extension of the given domain
-     * @param string $domain
-     * @return string
-     */
-    public static function getDomainExtension($domain) {
-        return substr($domain, strrpos($domain, "."));
-    }
-    
-    /**
-     * Parsea a Domain to try and return something like "domain.com"
-     * @param string $domain
-     * @return string
-     */
-    public static function parseDomain($domain) {
-        $domain = Strings::toLowercase($domain);
-        if (Strings::startsWith($domain, "http")) {
-            $domain = "http://" . $domain;
-        }
-        $host = parse_url($domain, PHP_URL_HOST);
-        
-        if ($host) {
-            return Strings::replace($host, "www.", "");
-        }
-        return "";
-    }
-    
-    /**
      * Generates a username from a domain
      * @param string $domain
      * @param string $email  Optional.
      * @return string
      */
     public static function generateUsername($domain, $email = "") {
-        $parts    = explode(".", $domain);
-        $username = substr(str_replace(["-", "ñ"], ["", "n"], $parts[0]), 0, 8);
+        $parts  = explode(".", $domain);
+        $result = Strings::replace($parts[0], ["-", "ñ"], ["", "n"]);
+        $result = substr($result, 0, 8);
         
-        if (!empty($email) && is_numeric($username[0])) {
-            $username = substr($email[0] . $username, 0, 8);
+        if (!empty($email) && is_numeric($result[0])) {
+            $result = substr($email[0] . $result, 0, 8);
         }
-        return $username;
+        return $result;
     }
     
     /**
@@ -480,7 +412,7 @@ class Utils {
         
         if (self::isValidEmail($email)) {
             $domain = substr($email, strrpos($email, "@") + 1);
-            if (!in_array(Strings::toLowercase($domain), $domains)) {
+            if (!in_array(Strings::toLowerCase($domain), $domains)) {
                 return $domain;
             }
         }
@@ -498,16 +430,16 @@ class Utils {
         $all    = "";
         $result = "";
         
-        if (strpos($availableSets, "l") !== false) {
+        if (Strings::contains($availableSets, "l")) {
             $sets[] = "abcdefghjkmnpqrstuvwxyz";
         }
-        if (strpos($availableSets, "u") !== false) {
+        if (Strings::contains($availableSets, "u")) {
             $sets[] = "ABCDEFGHJKMNPQRSTUVWXYZ";
         }
-        if (strpos($availableSets, "d") !== false) {
+        if (Strings::contains($availableSets, "d")) {
             $sets[] = "23456789";
         }
-        if (strpos($availableSets, "s") !== false) {
+        if (Strings::contains($availableSets, "s")) {
             $sets[] = "!@#$%&*?";
         }
         
@@ -549,20 +481,30 @@ class Utils {
     
     
     /**
-     * Returns true if running on Localhost
-     * @param array $whitelist
-     * @return boolean
+     * Returns the extension of the given domain
+     * @param string $domain
+     * @return string
      */
-    public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]) {
-        return in_array($_SERVER["REMOTE_ADDR"], $whitelist);
+    public static function getDomainExtension($domain) {
+        return substr($domain, strrpos($domain, "."));
     }
-
+    
     /**
-     * Returns true if running on a Stage host
-     * @return boolean
+     * Parsea a Domain to try and return something like "domain.com"
+     * @param string $domain
+     * @return string
      */
-    public static function isStageHost() {
-        return Strings::startsWith($_SERVER["HTTP_HOST"], "dev.");
+    public static function parseDomain($domain) {
+        $domain = Strings::toLowerCase($domain);
+        if (Strings::startsWith($domain, "http")) {
+            $domain = "http://" . $domain;
+        }
+        $host = parse_url($domain, PHP_URL_HOST);
+        
+        if ($host) {
+            return Strings::replace($host, "www.", "");
+        }
+        return "";
     }
 
     /**
@@ -592,6 +534,25 @@ class Utils {
         return !empty($host) && $host != $domain;
     }
 
+    
+
+    /**
+     * Returns true if running on Localhost
+     * @param array $whitelist
+     * @return boolean
+     */
+    public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]) {
+        return in_array($_SERVER["REMOTE_ADDR"], $whitelist);
+    }
+
+    /**
+     * Returns true if running on a Stage host
+     * @return boolean
+     */
+    public static function isStageHost() {
+        return Strings::startsWith($_SERVER["HTTP_HOST"], "dev.");
+    }
+
     /**
      * Returns the user IP
      * @return string
@@ -617,6 +578,48 @@ class Utils {
         return $ip;
     }
     
+
+
+    /**
+     * Converts a single value or an array into an array
+     * @param array|mixed $array
+     * @return array
+     */
+    public static function toArray($array) {
+        return is_array($array) ? $array : [ $array ];
+    }
+    
+    /**
+     * Removes the empty entries from the given array
+     * @param array $array
+     * @return array
+     */
+    public static function removeEmpty(array $array) {
+        $result = [];
+        foreach ($array as $value) {
+            if (!empty($value)) {
+                $result[] = $value;
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Returns an array with values in the Base
+     * @param array $base
+     * @param array $array
+     * @return array
+     */
+    public static function subArray(array $base, array $array) {
+        $result = [];
+        foreach ($array as $value) {
+            if (in_array($value, $base)) {
+                $result[] = $value;
+            }
+        }
+        return $result;
+    }
+
     /**
      * Creates a map using the given data
      * @param array           $data

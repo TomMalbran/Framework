@@ -166,7 +166,7 @@ class Migration {
                         $oldData .= " NOT NULL";
                     }
                     if (!empty($tableField["Extra"])) {
-                        $oldData .= " " . strtoupper($tableField["Extra"]);
+                        $oldData .= " " . Strings::toUpperCase($tableField["Extra"]);
                     }
                     $newData = $field->getType();
                     if ($newData !== $oldData) {

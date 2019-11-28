@@ -85,7 +85,7 @@ class Enum {
         $key   = $name;
         if (Strings::startsWith($name, "get")) {
             $key    = Strings::replace($name, "get", "");
-            $key[0] = Strings::toLowercase($key[0]);
+            $key[0] = Strings::toLowerCase($key[0]);
         }
         
         // Return the Value
