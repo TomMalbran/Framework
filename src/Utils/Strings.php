@@ -7,7 +7,7 @@ namespace Framework\Utils;
 class Strings {
     
     /**
-     * Returns true if the given String contains the given needle
+     * Returns true if the given String contains the given Needle
      * @param string $string
      * @param string $needle
      * @return boolean
@@ -17,7 +17,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String starts with the given needle
+     * Returns true if the given String starts with the given Needle
      * @param string $string
      * @param string $needle
      * @return boolean
@@ -28,7 +28,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given string ends with the given needle
+     * Returns true if the given String ends with the given Needle
      * @param string $string
      * @param string $needle
      * @return boolean
@@ -54,6 +54,28 @@ class Strings {
         return str_replace($search, $replace, $string);
     }
 
+    /**
+     * Removes the Needle from the start of the String
+     * @param string $string
+     * @param string $needle
+     * @return string
+     */
+    public static function removeFromStart($string, $needle) {
+        $length = strlen($needle);
+        return substr($string, $length, strlen($string) - $length);
+    }
+
+    /**
+     * Removes the Needle from the end of the String
+     * @param string $string
+     * @param string $needle
+     * @return string
+     */
+    public static function removeFromEnd($string, $needle) {
+        $length = strlen($needle);
+        return substr($string, 0, strlen($string) - $length);
+    }
+
 
 
     /**
@@ -63,7 +85,7 @@ class Strings {
      * @param boolean $asLower Optional.
      * @return boolean
      */
-    public function isEqual($string, $other, $asLower = true) {
+    public static function isEqual($string, $other, $asLower = true) {
         if ($asLower) {
             return strtolower($string) === strtolower($other);
         }
