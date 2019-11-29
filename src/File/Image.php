@@ -29,12 +29,21 @@ class Image {
      * @param string $file
      * @return boolean
      */
-    public function isValidType($file) {
+    public static function isValidType($file) {
         if (!empty($file)) {
             $type = exif_imagetype($file);
-            return in_array($type, $this->imageTypes);
+            return in_array($type, self::$imageTypes);
         }
         return false;
+    }
+
+    /**
+     * Returns the Size of the Image as [ width, height, type ]
+     * @param string $file
+     * @return array
+     */
+    public static function getSize($file) {
+        return getimagesize($file);
     }
     
     /**
@@ -47,7 +56,7 @@ class Image {
      * @return boolean
      */
     public static function resize($src, $dst, $width, $height, $action) {
-        [ $imgWidth, $imgHeight, $imgType ] = @getimagesize($src);
+        [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
         if (!in_array($imgType, self::$imageTypes)) {
             return false;
         }
