@@ -91,39 +91,38 @@ class AccessEnum {
 
     /**
      * Returns a value depending on the call name
-     * @param string $name
+     * @param string $function
      * @param array  $arguments
      * @return mixed|null
      */
-    public static function __callStatic($name, array $arguments) {
+    public static function __callStatic($function, array $arguments) {
         $level = (int)$arguments[0];
 
         // Check the given level in the format "isValidXxx"
-        if (Strings::startsWith($name, "isValid")) {
-            $groupName = Strings::removeFromStart($name, "isValid");
+        if (Strings::startsWith($function, "isValid")) {
+            $groupName = Strings::removeFromStart($function, "isValid");
             $groupName = Strings::toLowerCase($groupName);
             $group     = self::getGroup($groupName);
             return in_array($level, $group);
         }
 
         // Check the given level in the format "isXxxOrHigher"
-        if (Strings::startsWith($name, "is") && Strings::endsWith($name, "OrHigher")) {
-            $accessName  = Strings::removeFromStart($name, "is");
+        if (Strings::startsWith($function, "is") && Strings::endsWith($function, "OrHigher")) {
+            $accessName  = Strings::removeFromStart($function, "is");
             $accessName  = Strings::removeFromEnd($accessName, "OrHigher");
             $accessLevel = self::fromName($accessName);
             return $level >= $accessLevel;
         }
 
         // Check the given level in the format "isXxx"
-        if (Strings::startsWith($name, "is")) {
-            $accessName  = Strings::removeFromStart($name, "is");
+        if (Strings::startsWith($function, "is")) {
+            $accessName  = Strings::removeFromStart($function, "is");
             $accessLevel = self::fromName($accessName);
 
             // If "Xxx" is an Access Name check the value
             if (!empty($accessLevel)) {
                 return $level == $accessLevel;
             }
-
             // If "Xxx" is an Access Group check if the level is in the group
             $group = self::getGroup($accessName);
             return in_array($level, $group);
