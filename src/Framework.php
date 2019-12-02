@@ -112,7 +112,7 @@ class Framework {
      * Calls an API function
      * @param string $route
      * @param array  $params Optional.
-     * @return Response|null
+     * @return Response
      */
     public static function callRoute($route, array $params = null) {
         // The Route doesn´t exists
@@ -136,13 +136,15 @@ class Framework {
         // Perform the Request
         $response = Router::call($route, $params);
         
-        // Add the Token and return the Response
-        if (!empty($response)) {
-            $token = Auth::getToken();
-            $response->addToken($token);
-            return $response;
+        // Return an Empty Response
+        if (empty($response)) {
+            return Response::empty();
         }
-        return null;
+
+        // Add the Token and return the Response
+        $token = Auth::getToken();
+        $response->addToken($token);
+        return $response;
     }
 
     /**

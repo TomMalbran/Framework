@@ -43,6 +43,14 @@ class Response {
     public function toString() {
         return JSON::encode($this->data, true);
     }
+    
+    /**
+     * Prints the Data
+     * @return string
+     */
+    public function print() {
+        return print($this->toString());
+    }
 
 
 
