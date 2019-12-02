@@ -123,6 +123,7 @@ class Auth {
     public static function setToken(array $data) {
         self::$time  = time();
         self::$token = JWT::create(self::$time, [
+            "accessLevel"  => self::$accessLevel,
             "credentialID" => self::$credentialID,
             "adminID"      => self::$adminID,
             "userID"       => self::$userID,
