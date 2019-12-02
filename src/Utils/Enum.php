@@ -39,7 +39,7 @@ class Enum {
                 "data"       => $data,
                 "type"       => $type,
                 "isConstant" => $type == "constant",
-                "isArray"    => $type == "map",
+                "isArray"    => $type == "array",
                 "isMap"      => $type == "map",
             ];
         }
@@ -105,25 +105,29 @@ class Enum {
 
         // For CONSTANT
         if ($cache->isConstant) {
+            // Function "isXxx": Check if the given value is equal to xxx
             if (Strings::startsWith($function, "is")) {
                 $key = Strings::removeFromStart($function, "is");
                 return $key == $value;
             }
-            return null;
+            // Function "xxx": Return the value of xxx
+            return self::getOne($function);
         }
 
         // For ARRAY
         if ($cache->isArray) {
-            // If the name is the "getKey" or "getIndex" return the key of the data
+            // Function "getKey" or "getIndex"
+            // Return the index where the value is equalto the given one
             if ($function == "getKey" || $function == "getIndex") {
-                foreach ($cache->data as $key => $name) {
+                foreach ($cache->data as $index => $name) {
                     if (Strings::isEqual($name, $value)) {
                         return $index;
                     }
                 }
                 return "";
             }
-            // If the name is the "getName" or "getValue" return the value of the data
+            // Function "getName" or "getValue"
+            // Return the value of the data at the given key
             if ($function == "getName" || $function == "getValue") {
                 return !empty($cache->data[$value]) ? $cache->data[$value] : "";
             }
@@ -131,7 +135,19 @@ class Enum {
 
         // For MAP
         if ($cache->isMap) {
-            // Get the Key depending on the $name
+            // Function "fromXxx"
+            // Return the index where the value is the name
+            if (Strings::startsWith($function, "from")) {
+                $key = Strings::removeFromStart($function, "from");
+                foreach ($cache->data as $index => $row) {
+                    if (isset($row[$key]) && Strings::isEqual($row[$key], $value)) {
+                        return $index;
+                    }
+                }
+                return 0;
+            }
+
+            // Get the value at the given key depending on the function
             $key = $function;
             if (Strings::startsWith($function, "get")) {
                 $key    = Strings::removeFromStart($function, "get", "");
