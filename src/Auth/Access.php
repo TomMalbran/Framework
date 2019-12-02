@@ -100,9 +100,9 @@ class Access {
         }
 
         // Function "inXxxOrYyy": Check if the given level is in the group xxx or yyy
-        if (Strings::startsWith($function, "is") && Strings::contains($function, "Or")) {
-            $groupNames = Strings::removeFromStart($function, "is");
-            $groupParts = Strigs::split($groupNames, "Or");
+        if (Strings::startsWith($function, "in") && Strings::contains($function, "Or")) {
+            $groupNames = Strings::removeFromStart($function, "in");
+            $groupParts = Strings::split($groupNames, "Or");
             $groupX     = self::getGroup($groupParts[0]);
             $groupY     = self::getGroup($groupParts[1]);
             return in_array($level, $groupX) || in_array($level, $groupY);
@@ -128,7 +128,7 @@ class Access {
         // Function "isXxxOrYyy": Check if the given level is equal to xxx or yyy
         if (Strings::startsWith($function, "is") && Strings::contains($function, "Or")) {
             $accessNames  = Strings::removeFromStart($function, "is");
-            $accessParts  = Strigs::split($accessNames, "Or");
+            $accessParts  = Strings::split($accessNames, "Or");
             $accessLevelX = self::getOne($accessParts[0]);
             $accessLevelY = self::getOne($accessParts[1]);
             return $level == $accessLevelX || $level == $accessLevelY;
