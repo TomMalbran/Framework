@@ -31,7 +31,7 @@ class ErrorLog {
     }
 
     /**
-     * Loads the Reset Schema
+     * Loads the Error Schema
      * @return Schema
      */
     public static function getSchema() {
