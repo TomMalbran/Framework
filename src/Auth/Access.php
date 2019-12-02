@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Framework;
 use Framework\Utils\Strings;
 
 /**
@@ -91,7 +92,7 @@ class Access {
     public static function __callStatic($function, array $arguments) {
         $level = (int)$arguments[0];
 
-        // Function "getXxx": Get the group xxx
+        // Function "getXxx(s)": Get the group xxx
         if (Strings::startsWith($function, "get")) {
             $groupName = Strings::removeFromStart($function, "get");
             $groupName = Strings::removeFromEnd($groupName, "s");
@@ -107,10 +108,11 @@ class Access {
             return in_array($level, $groupX) || in_array($level, $groupY);
         }
 
-        // Function "inXxx" or "isValidXxx": Check if the given level is in the group xxx
+        // Function "inXxx(s)" or "isValidXxx": Check if the given level is in the group xxx
         if (Strings::startsWith($function, "in") || Strings::startsWith($function, "isValid")) {
             $groupName = Strings::removeFromStart($function, "in");
             $groupName = Strings::removeFromStart($function, "isValid");
+            $groupName = Strings::removeFromEnd($groupName, "s");
             $group     = self::getGroup($groupName);
             return in_array($level, $group);
         }
