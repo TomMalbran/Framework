@@ -36,6 +36,10 @@ class Framework {
     const FilesDir     = "files";
     const TempDir      = "temp";
     
+    // Config
+    const Namespace    = "App\\Controller\\";
+
+    // Variables
     private static $framePath;
     private static $basePath;
 
@@ -110,7 +114,7 @@ class Framework {
      * @param array  $params Optional.
      * @return Response|null
      */
-    public function callRoute($route, array $params = null) {
+    public static function callRoute($route, array $params = null) {
         // The Route doesn´t exists
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");

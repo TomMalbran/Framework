@@ -4,6 +4,7 @@ namespace Framework;
 use Framework\Framework;
 use Framework\Container;
 use Framework\Request;
+use Framework\Auth\Access;
 use Framework\Utils\Strings;
 
 /**
@@ -11,9 +12,9 @@ use Framework\Utils\Strings;
  */
 class Router {
 
-    private static $loaded  = false;
-    private static $baseUse = "App\\Controller\\";
-    private static $data    = [];
+    private static $loaded    = false;
+    private static $namespace = "";
+    private static $data      = [];
     
     
     /**
@@ -22,8 +23,9 @@ class Router {
      */
     public static function load() {
         if (!self::$loaded) {
-            self::$loaded = true;
-            self::$data   = Framework::loadData(Framework::RouteData);
+            self::$loaded    = true;
+            self::$data      = Framework::loadData(Framework::RouteData);
+            self::$namespace = Framework::Namespace;
         }
     }
 
@@ -90,7 +92,7 @@ class Router {
     public static function getInstance($route) {
         $data = self::get($route);
         if ($data->access != null) {
-            return Container::bind(self::$baseUse . $data->module);
+            return Container::bind(self::$namespace . $data->module);
         }
         return null;
     }
@@ -106,7 +108,7 @@ class Router {
     public static function call($route, array $params = null) {
         $data = self::get($route);
         if ($data->access != null) {
-            $instance = Container::bind(self::$baseUse . $data->module);
+            $instance = Container::bind(self::$namespace . $data->module);
             $request  = new Request($params);
             return call_user_func_array([ $instance, $data->method ], [ $request ]);
         }
