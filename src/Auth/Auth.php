@@ -11,15 +11,15 @@ use Framework\Provider\JWT;
  */
 class Auth {
 
-    private $accessLevel  = 0;
-    private $credential   = null;
-    private $credentialID = 0;
-    private $adminID      = 0;
-    private $userID       = 0;
-    private $apiID        = 0;
+    private static $accessLevel  = 0;
+    private static $credential   = null;
+    private static $credentialID = 0;
+    private static $adminID      = 0;
+    private static $userID       = 0;
+    private static $apiID        = 0;
 
-    private $time         = 0;
-    private $token        = "";
+    private static $time         = 0;
+    private static $token        = "";
 
 
     /**
@@ -188,7 +188,7 @@ class Auth {
      * @param integer $requested
      * @return boolean
      */
-    public function grant($requested) {
+    public static function grant($requested) {
         return Access::grant(self::$accessLevel, $requested);
     }
 
@@ -197,7 +197,7 @@ class Auth {
      * @param integer $requested
      * @return boolean
      */
-    public function requiresLogin($requested) {
+    public static function requiresLogin($requested) {
         return !Access::isGeneral($requested) && !self::isLoggedIn();
     }
     
