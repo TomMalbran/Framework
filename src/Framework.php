@@ -18,8 +18,9 @@ class Framework {
     const RouteData    = "routes";
     const SchemaData   = "schemas";
     const KeyData      = "keys";
-    const PathData     = "paths";
+    const AccessData   = "access";
     const TokenData    = "tokens";
+    const PathData     = "paths";
     const SettingsData = "settings";
     const EmailData    = "emails";
 
