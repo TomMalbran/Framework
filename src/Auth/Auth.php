@@ -71,21 +71,6 @@ class Auth {
     }
 
     /**
-     * Creates and Sets the JWT token
-     * @param array $data
-     * @return void
-     */
-    public static function setToken(array $data) {
-        self::$time  = time();
-        self::$token = JWT::create(self::$time, [
-            "credentialID" => self::$credentialID,
-            "adminID"      => self::$adminID,
-            "userID"       => self::$userID,
-            "loggedAsUser" => !empty(self::$adminID),
-        ] + $data);
-    }
-
-    /**
      * Clears the Data
      * @return void
      */
@@ -104,11 +89,54 @@ class Auth {
 
 
     /**
+     * Returns true if the given JWT Token is valid
+     * @param string $token
+     * @return array
+     */
+    public static function isValidToken($token) {
+        return JWT::isValid($token);
+    }
+
+    /**
+     * Returns the Data from the given JWT Token
+     * @param string $token
+     * @return array
+     */
+    public static function getTokenData($token) {
+        return JWT::getData($token);
+    }
+
+    /**
      * Returns the JWT Token
      * @return string
      */
     public static function getToken() {
         return self::$token;
+    }
+
+    /**
+     * Creates and Sets the JWT token
+     * @param array $data
+     * @return void
+     */
+    public static function setToken(array $data) {
+        self::$time  = time();
+        self::$token = JWT::create(self::$time, [
+            "credentialID" => self::$credentialID,
+            "adminID"      => self::$adminID,
+            "userID"       => self::$userID,
+            "loggedAsUser" => !empty(self::$adminID),
+        ] + $data);
+    }
+
+
+
+    /**
+     * Returns the Credential Model
+     * @return Model
+     */
+    public static function getCredential() {
+        return self::$credential;
     }
 
     /**
@@ -119,14 +147,6 @@ class Auth {
         return self::$credentialID;
     }
 
-    /**
-     * Returns the Credential Model
-     * @return Model
-     */
-    public static function getCredential() {
-        return self::$credential;
-    }
-    
     /**
      * Returns the Admin ID
      * @return integer
@@ -178,7 +198,7 @@ class Auth {
      * @return boolean
      */
     public function requiresLogin($requested) {
-        return !Access::isGeneral($requested) && !Auth::isLoggedIn();
+        return !Access::isGeneral($requested) && !self::isLoggedIn();
     }
     
     /**
