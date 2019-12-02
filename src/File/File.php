@@ -34,12 +34,12 @@ class File {
     /**
      * Uplods the given file to the given path
      * @param string $path
-     * @param string $file
+     * @param string $fileName
      * @param string $tmpFile
      * @return string
      */
-    public static function upload($path, $file, $tmpFile) {
-        $path = self::getPath($path, $file);
+    public static function upload($path, $fileName, $tmpFile) {
+        $path = self::getPath($path, $fileName);
         if (!empty($path)) {
             move_uploaded_file($tmpFile, $path);
         }
@@ -49,12 +49,12 @@ class File {
     /**
      * Creates a file with the given content
      * @param string          $path
-     * @param string          $file
+     * @param string          $fileName
      * @param string|string[] $content
      * @return string
      */
-    public static function create($path, $file, $content) {
-        $path = self::getPath($path, $file);
+    public static function create($path, $fileName, $content) {
+        $path = self::getPath($path, $fileName);
         if (!empty($path)) {
             file_put_contents($path, implode("\n", Utils::toArray($content)));
         }
@@ -78,11 +78,11 @@ class File {
     /**
      * Deletes the given file/directory
      * @param string $path
-     * @param string $file Optional.
+     * @param string $name Optional.
      * @return boolean
      */
-    public static function delete($path, $file = "") {
-        $path = self::getPath($path, $file);
+    public static function delete($path, $name = "") {
+        $path = self::getPath($path, $name);
         if (!empty($path) && file_exists($path)) {
             unlink($path);
             return true;
@@ -203,8 +203,7 @@ class File {
         $files = scandir($path);
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
-                $subpath  = "{$path}/{$file}";
-                $result[] = $subpath;
+                $result[] = self::getpath($path, $file);
             }
         }
         return $result;
@@ -220,7 +219,7 @@ class File {
         if (!empty($path)) {
             $files = scandir($path);
             foreach ($files as $file) {
-                if ($file != "." && $file != ".." && !is_dir($path . "/" . $file)) {
+                if ($file != "." && $file != ".." && !is_dir("$path/$file")) {
                     $result[] = $file;
                 }
             }
@@ -270,7 +269,7 @@ class File {
             $files = scandir($path);
             foreach ($files as $file) {
                 if ($file != "." && $file != "..") {
-                    self::deleteDir($path . "/" . $file);
+                    self::deleteDir("$path/$file");
                 }
             }
         }
