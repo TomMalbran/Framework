@@ -76,6 +76,28 @@ class Strings {
         return substr($string, 0, strlen($string) - $length);
     }
 
+    
+
+    /**
+     * Splits the given String at the given Needle
+     * @param string $string
+     * @param string $needle
+     * @return string[]
+     */
+    public static function split($string, $needle) {
+        return explode($needle, $string);
+    }
+
+    /**
+     * Jois the given Strings using the given glue
+     * @param string[] $strings
+     * @param string   $glue
+     * @return string
+     */
+    public static function join(array $strings, $glue) {
+        return implode($glue, $strings);
+    }
+
 
 
     /**
