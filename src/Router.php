@@ -69,7 +69,7 @@ class Router {
      */
     public static function getAccess($route) {
         $data = self::get($route);
-        return $data->access;
+        return Access::getOne($data->access);
     }
     
     /**

@@ -87,7 +87,7 @@ class Auth {
 
     /**
      * Clears the Data
-     * @return boolean
+     * @return void
      */
     public static function clear() {
         self::$accessLevel  = Access::General();
@@ -161,6 +161,8 @@ class Auth {
         return !empty(self::$adminID);
     }
 
+
+
     /**
      * Returns true if the user has that level
      * @param integer $requested
@@ -170,7 +172,14 @@ class Auth {
         return Access::grant(self::$accessLevel, $requested);
     }
 
-
+    /**
+     * Returns true if the user has that level
+     * @param integer $requested
+     * @return boolean
+     */
+    public function requiresLogin($requested) {
+        return !Access::isGeneral($requested) && !Auth::isLoggedIn();
+    }
     
     /**
      * Returns a value depending on the call name

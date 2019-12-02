@@ -1,12 +1,15 @@
 <?php
 namespace Framework;
 
+use Framework\Router;
+use Framework\Response;
+use Framework\Auth\Auth;
 use Framework\Data\Email;
 use Framework\Config\Settings;
+use Framework\File\File;
 use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
-use Framework\File\File;
 use Framework\Utils\JSON;
 
 /**
@@ -100,6 +103,43 @@ class Framework {
     }
 
 
+
+    /**
+     * Calls an API function
+     * @param string $route
+     * @param array  $params Optional.
+     * @return Response|null
+     */
+    public function callRoute($route, array $params = null) {
+        // The Route doesn´t exists
+        if (!Router::has($route)) {
+            return Response::error("GENERAL_ERROR_PATH");
+        }
+
+        // Grab the Access Level for the given Route
+        $accessLevel = Router::getAccess($route);
+        
+        // The route requires login and the user is Logged Out
+        if (Auth::requiresLogin($accessLevel)) {
+            return Response::logout();
+        }
+        
+        // The Provided Access Level is lower than the Required One
+        if (!Auth::grant($accessLevel)) {
+            return Response::error("GENERAL_ERROR_PATH");
+        }
+        
+        // Perform the Request
+        $response = Router::call($route, $params);
+        
+        // Add the Token and return the Response
+        if (!empty($response)) {
+            $token = Auth::getToken();
+            $response->addToken($token);
+            return $response;
+        }
+        return null;
+    }
 
     /**
      * Runs the Migrations for all the Framework
