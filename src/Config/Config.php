@@ -80,10 +80,9 @@ class Config {
      * @return string
      */
     public static function getUrl(...$urlParts) {
-        $url    = self::get("url");
-        $result = "$url/" . implode("/", $urlParts);
-        $result = Strings::replace($result, "//", "/");
-        return $result;
+        $url  = self::get("url");
+        $path = File::getpath(...$urlParts);
+        return $url . $path;
     }
 
     /**
