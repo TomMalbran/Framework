@@ -3,6 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Auth\Access;
 use Framework\Auth\Token;
+use Framework\Log\ActionLog;
 use Framework\Schema\Model;
 use Framework\Provider\JWT;
 
@@ -127,6 +128,45 @@ class Auth {
             "userID"       => self::$userID,
             "loggedAsUser" => !empty(self::$adminID),
         ] + $data);
+    }
+
+
+
+    /**
+     * Starts a New Log Session
+     * @return void
+     */
+    public static function createLogSession() {
+        ActionLog::startSession(self::$credentialID, true);
+    }
+
+    /**
+     * Starts/Resumes a Log Session
+     * @return void
+     */
+    public static function startLogSession() {
+        if (self::isLoggedAsUser()) {
+            ActionLog::startSession(self::$adminID);
+        } else {
+            ActionLog::startSession(self::$credentialID);
+        }
+    }
+
+    /**
+     * Restarts a Log Session
+     * @return void
+     */
+    public static function restartLogSession() {
+        ActionLog::endSession();
+        ActionLog::startSession(self::$credentialID, true);
+    }
+
+    /**
+     * Ends the Log Session
+     * @return void
+     */
+    public static function endLogSession() {
+        ActionLog::endSession();
     }
 
 
