@@ -90,7 +90,7 @@ class Access {
      * @return mixed
      */
     public static function __callStatic($function, array $arguments) {
-        $level = (int)$arguments[0];
+        $level = !empty($arguments[0]) ? (int)$arguments[0] : 0;
 
         // Function "getXxx(s)": Get the group xxx
         if (Strings::startsWith($function, "get")) {
