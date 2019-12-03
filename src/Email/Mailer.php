@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Provider;
+namespace Framework\Email;
 
 use Framework\Config\Config;
 

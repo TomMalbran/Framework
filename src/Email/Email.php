@@ -1,9 +1,10 @@
 <?php
-namespace Framework\Data;
+namespace Framework\Email;
 
 use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
+use Framework\Email\Mustache;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
@@ -81,6 +82,16 @@ class Email {
     }
 
 
+
+    /**
+     * Rnders the Template Data with Mustache
+     * @param string $template
+     * @param array  $data
+     * @return string
+     */
+    public function render($template, array $data) {
+        return Mustache::render($template, $data);
+    }
 
     /**
      * Migrates the Emails
