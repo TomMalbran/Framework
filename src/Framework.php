@@ -4,8 +4,8 @@ namespace Framework;
 use Framework\Router;
 use Framework\Response;
 use Framework\Auth\Auth;
-use Framework\Data\Email;
 use Framework\Config\Settings;
+use Framework\Email\Email;
 use Framework\File\File;
 use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
@@ -26,6 +26,8 @@ class Framework {
     const PathData     = "paths";
     const SettingsData = "settings";
     const EmailData    = "emails";
+    const LanguageData = "languages";
+    const StatusData   = "status";
 
     // The Directories
     const ServerDir    = "server";
