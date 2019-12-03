@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Provider;
+namespace Framework\Auth;
 
 use Framework\Config\Config;
 

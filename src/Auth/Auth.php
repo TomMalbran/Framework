@@ -3,9 +3,9 @@ namespace Framework\Auth;
 
 use Framework\Auth\Access;
 use Framework\Auth\Token;
+use Framework\Auth\JWT;
 use Framework\Log\ActionLog;
 use Framework\Schema\Model;
-use Framework\Provider\JWT;
 
 /**
  * The Auth
