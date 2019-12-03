@@ -1,14 +1,14 @@
 <?php
-namespace Framework\Data;
+namespace Framework\NLS;
 
 use Framework\Framework;
+use Framework\NLS\Language;
 
 /**
  * The Internalization Strings
  */
 class NLS {
     
-    private static $root   = "es";
     private static $loaded = [];
     private static $data   = [];
     
@@ -33,13 +33,13 @@ class NLS {
      * @return string
      */
     public static function get($key, $lang = "root") {
-        $lang = $lang == "root" ? self::$root : $lang;
-        $data = self::load($lang);
+        $nls  = Language::getNLS($lang);
+        $data = self::load($nls);
 
         if (!empty($data[$key])) {
             return $data[$key];
         }
-        if ($lang != self::$root) {
+        if ($nls != Language::getNLS("root")) {
             return get($key);
         }
         return "";
