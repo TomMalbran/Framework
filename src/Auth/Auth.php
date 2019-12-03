@@ -193,7 +193,7 @@ class Auth {
      * @return integer
      */
     public static function getAdminID() {
-        return self::$userID;
+        return self::$adminID;
     }
 
     /**
