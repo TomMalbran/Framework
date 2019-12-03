@@ -24,6 +24,7 @@
     },
 
 
+
     "emailTemplates" : {
         "table"  : "email_templates",
         "fields" : {
@@ -45,7 +46,7 @@
             "section"  : { "type" : "string", "isPrimary" : true },
             "variable" : { "type" : "string", "isPrimary" : true },
             "value"    : { "type" : "text"                       },
-            "type"     : { "type" : "number", "length" : 1       }
+            "type"     : { "type" : "number", "length"    : 1    }
         },
         "hasTimestamps" : true,
         "canCreate"     : false,
@@ -54,6 +55,72 @@
     },
 
 
+
+    "logIDs" : {
+        "table"  : "log_ids",
+        "fields" : {
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isID" : true },
+            "SESSION_ID"    : { "type" : "number", "name" : "sessionID"                   }
+        },
+        "hasTimestamps" : false,
+        "canCreate"     : false,
+        "canEdit"       : false,
+        "canDelete"     : false
+    },
+    "logSessions" : {
+        "table"  : "log_sessions",
+        "fields" : {
+            "SESSION_ID"    : { "type" : "id",     "name" : "sessionID"    },
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
+            "USER_ID"       : { "type" : "number", "name" : "userID"       },
+            "ip"            : { "type" : "string"                          },
+            "userAgent"     : { "type" : "string"                          },
+            "time"          : { "type" : "number"                          }
+        },
+        "joins" : {
+            "CREDENTIAL_ID" : {
+                "table"    : "credentials",
+                "prefix"   : "credential",
+                "fields"   : {
+                    "firstName" : { "type" : "string", "mergeTo" : "name" },
+                    "lastName"  : { "type" : "string", "mergeTo" : "name" },
+                    "email"     : { "type" : "string"  }
+                }
+            }
+        },
+        "hasTimestamps" : false,
+        "canCreate"     : false,
+        "canEdit"       : false,
+        "canDelete"     : false
+    },
+    "logActions" : {
+        "table"  : "log_actions",
+        "fields" : {
+            "ACTION_ID"     : { "type" : "id",     "name" : "actionID"     },
+            "SESSION_ID"    : { "type" : "number", "name" : "sessionID"    },
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
+            "USER_ID"       : { "type" : "number", "name" : "userID"       },
+            "action"        : { "type" : "number"                          },
+            "section"       : { "type" : "number"                          },
+            "dataID"        : { "type" : "string"                          },
+            "time"          : { "type" : "number"                          }
+        },
+        "joins" : {
+            "CREDENTIAL_ID" : {
+                "table"  : "credentials",
+                "prefix" : "credential",
+                "fields" : {
+                    "firstName" : { "type" : "string", "mergeTo" : "name" },
+                    "lastName"  : { "type" : "string", "mergeTo" : "name" },
+                    "email"     : { "type" : "string"  }
+                }
+            }
+        },
+        "hasTimestamps" : false,
+        "canCreate"     : false,
+        "canEdit"       : false,
+        "canDelete"     : false
+    },
     "logErrors" : {
         "table"  : "log_errors",
         "fields" : {
