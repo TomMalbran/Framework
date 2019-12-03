@@ -2,9 +2,10 @@
 namespace Framework;
 
 use Framework\File\File;
-use Framework\File\Image;
 use Framework\File\FileType;
+use Framework\File\Image;
 use Framework\Utils\DateTime;
+use Framework\Utils\Status;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 use ArrayAccess;
@@ -322,6 +323,16 @@ class Request implements ArrayAccess {
      */
     public function isValidPosition($key) {
         return !$this->has($key) || $this->isNumeric($key, 0);
+    }
+
+    /**
+     * Returns true if the given Status is valid
+     * @param string $key
+     * @param string $groupName Optional.
+     * @return boolean
+     */
+    public function isValidStatus($key, $groupName = "general") {
+        return Status::isValid($this->get($key), $groupName);
     }
     
 
