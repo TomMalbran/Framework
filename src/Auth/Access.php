@@ -10,7 +10,6 @@ use Framework\Utils\Strings;
 class Access {
 
     private static $loaded = false;
-    private static $data   = [];
     private static $groups = [];
     private static $levels = [];
     
@@ -22,10 +21,10 @@ class Access {
     public static function load() {
         if (!self::$loaded) {
             self::$loaded = true;
-            self::$data   = Framework::loadData(Framework::AccessData);
-
-            // Parse the Data
-            foreach (self::$data as $groupName => $accessData) {
+            $data = Framework::loadData(Framework::AccessData);
+            
+            // Store the groups and levels
+            foreach ($data as $groupName => $accessData) {
                 $gName = Strings::toLowerCase($groupName);
                 self::$groups[$gName] = [];
                 foreach ($accessData as $accessName => $accessLevel) {
@@ -75,8 +74,8 @@ class Access {
      * @return boolean
      */
     public static function grant($granted, $requested) {
-        if (self::isAPI($granted)) {
-            return self::isAPI($requested) || self::isGeneral($requested);
+        if (self::inAPI($granted)) {
+            return self::inAPI($requested) || self::inGeneral($requested);
         }
         return $granted >= $requested;
     }
@@ -141,7 +140,7 @@ class Access {
             return $level == $accessLevel;
         }
 
-        // Function "xxx": Return the access level with that name
+        // Function "xxx": Return the access level with the name xxx
         return self::getOne($function);
     }
 }
