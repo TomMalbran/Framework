@@ -108,11 +108,16 @@ class Enum {
             // Function "isXxx": Check if the given value is equal to xxx
             if (Strings::startsWith($function, "is")) {
                 $key = Strings::removeFromStart($function, "is");
-                return $key == $value;
+                if (!empty($cache->constants[$key])) {
+                    return $value == $cache->constants[$key];
+                }
+                return false;
             }
+
             // Function "xxx": Return the value of xxx
             return self::getOne($function);
         }
+
 
         // For ARRAY
         if ($cache->isArray) {
@@ -126,12 +131,33 @@ class Enum {
                 }
                 return "";
             }
+            
             // Function "getName" or "getValue"
-            // Return the value of the data at the given key
+            // Return the value of the data at the given index
             if ($function == "getName" || $function == "getValue") {
                 return !empty($cache->data[$value]) ? $cache->data[$value] : "";
             }
+
+            // Function "isXxx": Check if the data is equal to xxx
+            if (Strings::startsWith($function, "is")) {
+                $key = Strings::removeFromStart($function, "is");
+                if (!empty($cache->constants[$key])) {
+                    return $value == $cache->constants[$key];
+                }
+                return false;
+            }
+
+            // Function "inXxx(s)": Check if the data at the given index is equal to xxx
+            if (Strings::startsWith($function, "in")) {
+                if (!empty($cache->data[$value])) {
+                    $key = Strings::removeFromStart($function, "in");
+                    $key = Strings::removeFromEnd($function, "s");
+                    return Strings::isEqual($cache->data[$value], $key);
+                }
+                return false;
+            }
         }
+
 
         // For MAP
         if ($cache->isMap) {
