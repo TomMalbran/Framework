@@ -1,6 +1,7 @@
 <?php
 namespace Framework;
 
+use Framework\Schema\Model;
 use Framework\Utils\Errors;
 use Framework\Utils\JSON;
 
@@ -73,12 +74,12 @@ class Response {
     
     /**
      * Returns the given data
-     * @param array $data Optional.
+     * @param array|Model $data Optional.
      * @return array
      */
-    public static function data(array $data = null) {
+    public static function data($data = null) {
         return new Response([
-            "data" => $data,
+            "data" => self::getData($data),
         ]);
     }
 
@@ -105,52 +106,66 @@ class Response {
 
     /**
      * Returns a success response
-     * @param string $success
-     * @param array  $data    Optional.
+     * @param string      $success
+     * @param array|Model $data    Optional.
      * @return array
      */
-    public static function success($success, array $data = null) {
+    public static function success($success, $data = null) {
         return new Response([
             "success" => $success,
-            "data"    => $data,
+            "data"    => self::getData($data),
         ]);
     }
     
     /**
      * Returns a warning response
-     * @param string $warning
-     * @param array  $data    Optional.
+     * @param string      $warning
+     * @param array|Model $data    Optional.
      * @return array
      */
-    public static function warning($warning, array $data = null) {
+    public static function warning($warning, $data = null) {
         return new Response([
             "warning" => $warning,
-            "data"    => $data,
+            "data"    => self::getData($data),
         ]);
     }
     
     /**
      * Returns an error response
      * @param string|Errros $error
-     * @param array         $data  Optional.
+     * @param array|Model   $data  Optional.
      * @return array
      */
-    public static function error($error, array $data = null) {
+    public static function error($error, $data = null) {
         if ($error instanceof Errors) {
             if ($error->has("global")) {
                 return new Response([
                     "error" => $error->global,
-                    "data"  => $data,
+                    "data"  => self::getData($data),
                 ]);
             }
             return new Response([
                 "errors" => $error->get(),
-                "data"   => $data,
+                "data"   => self::getData($data),
             ]);
         }
         return new Response([
             "error" => $error,
-            "data"  => $data,
+            "data"  => self::getData($data),
         ]);
+    }
+
+
+
+    /**
+     * Returns the Data depending on the type
+     * @param array|Model $data Optional.
+     * @return array|null
+     */
+    private static function getData($data = null) {
+        if ($data != null && $data instanceof Model) {
+            return $data->toObject();
+        }
+        return $data;
     }
 }
