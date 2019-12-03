@@ -75,7 +75,7 @@ class Enum {
     }
 
     /**
-     * Creates a list for the templates
+     * Creates a Select for the Enum
      * @return array
      */
     public static function getSelect() {
