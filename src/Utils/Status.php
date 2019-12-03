@@ -114,7 +114,7 @@ class Status {
         // Function "isXxx": Check if the given value is equal to xxx
         if (Strings::startsWith($function, "is")) {
             $statusName  = Strings::removeFromStart($function, "is");
-            $statusValue = self::getOne($statusValue);
+            $statusValue = self::getOne($statusName);
             return $value == $statusValue;
         }
 
