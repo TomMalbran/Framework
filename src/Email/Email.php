@@ -20,7 +20,7 @@ class Email {
     
     
     /**
-     * Loads the Reset Schema
+     * Loads the Email Schema
      * @return Schema
      */
     public static function getSchema() {
