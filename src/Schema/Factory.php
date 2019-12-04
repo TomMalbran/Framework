@@ -8,6 +8,7 @@ use Framework\Schema\Schema;
 use Framework\Schema\Structure;
 use Framework\Schema\Subrequest;
 use Framework\Schema\Migration;
+use Framework\Utils\Utils;
 
 /**
  * The Schema Factory

@@ -29,7 +29,7 @@ class Auth {
      * @param string $token
      * @return boolean
      */
-    public function validateCredential($token) {
+    public static function validateCredential($token) {
         Reset::deleteOld();
         if (!JWT::isValid($token)) {
             return false;
@@ -82,7 +82,7 @@ class Auth {
      * @param Model $credential
      * @return void
      */
-    public function login(Model $credential) {
+    public static function login(Model $credential) {
         self::setCredential($credential, 0, $credential->currentUser);
 
         Credential::updateLoginTime($credential->id);
@@ -100,7 +100,7 @@ class Auth {
      * @param integer $userID     Optional.
      * @return void
      */
-    public function loginAs(Model $credential, $adminID = 0, $userID = 0) {
+    public static function loginAs(Model $credential, $adminID = 0, $userID = 0) {
         self::setCredential($credential, $adminID, $userID);
     }
 
@@ -108,7 +108,7 @@ class Auth {
      * Logouts the Current Credential
      * @return void
      */
-    public function logout() {
+    public static function logout() {
         ActionLog::endSession();
 
         self::$accessLevel  = Access::General();

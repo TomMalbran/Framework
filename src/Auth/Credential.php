@@ -1,5 +1,5 @@
 <?php
-namespace App\Repository\Core;
+namespace Framework\Auth;
 
 use Framework\Request;
 use Framework\File\Path;
