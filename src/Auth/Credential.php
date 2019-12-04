@@ -270,18 +270,19 @@ class Credential {
     /**
      * Returns a list of emails of the Credentials with the given Levels
      * @param integer[]|integer $level
-     * @param string[]          $filters Optional.
+     * @param string[]|string   $filter Optional.
      * @return array
      */
-    public static function getEmailsForLevel($level, array $filters = null) {
+    public static function getEmailsForLevel($level, $filter = null) {
         $levels = Utils::toArray($level);
         if (empty($levels)) {
             return [];
         }
         $query = Query::create("level", "IN", $levels);
-        if (!empty($filters)) {
-            foreach ($filters as $filter) {
-                $query->add($filter, "=", 1);
+        if (!empty($filter)) {
+            $filters = Utils::toArray($filter);
+            foreach ($filters as $key) {
+                $query->add($key, "=", 1);
             }
         }
         return self::getSchema()->getColumn($query, "email");
