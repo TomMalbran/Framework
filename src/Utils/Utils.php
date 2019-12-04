@@ -621,6 +621,24 @@ class Utils {
     }
 
     /**
+     * Extends the first array replacing values from the second array 
+     * @param array $array1
+     * @param array $array2
+     * @return array
+     */
+    public static function extend(array &$array1, array &$array2) {
+        $result = $array1;
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset($result[$key]) && is_array($result[$key])) {
+                $result[$key] = self::extend($result[$key], $value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Creates a map using the given data
      * @param array           $data
      * @param string          $key

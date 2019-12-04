@@ -26,12 +26,19 @@ class Factory {
      */
     public static function load() {
         if (!self::$loaded) {
-            $app   = Framework::loadData(Framework::SchemaData);
-            $frame = Framework::loadFile("data", Framework::SchemaData, true);
+            $schemas = Framework::loadData(Framework::SchemaData);
+            $frame   = Framework::loadFile("data", Framework::SchemaData, true);
 
             self::$loaded = true;
             self::$db     = new Database(Config::get("db"));
-            self::$data   = array_merge($frame, $app);
+            
+            foreach ($schemas as $key => $data) {
+                if (!empty($frame[$key])) {
+                    self::$data[$key] = Utils::extend($frame[$key], $data);
+                } else {
+                    self::$data[$key] = $data;
+                }
+            }
         }
     }
     
