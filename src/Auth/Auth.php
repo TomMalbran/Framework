@@ -2,8 +2,12 @@
 namespace Framework\Auth;
 
 use Framework\Auth\Access;
+use Framework\Auth\Credential;
 use Framework\Auth\Token;
+use Framework\Auth\Reset;
 use Framework\Auth\JWT;
+use Framework\File\Path;
+use Framework\File\File;
 use Framework\Log\ActionLog;
 use Framework\Schema\Model;
 
@@ -19,10 +23,104 @@ class Auth {
     private static $userID       = 0;
     private static $apiID        = 0;
 
-    private static $time         = 0;
-    private static $token        = "";
+
+    /**
+     * Validates the Credential
+     * @param string $token
+     * @return boolean
+     */
+    public function validateCredential($token) {
+        Reset::deleteOld();
+        if (!JWT::isValid($token)) {
+            return false;
+        }
+        
+        $data       = JWT::getData($token);
+        $credential = Credential::getOne($data->credentialID, true);
+        if ($credential->isEmpty() || $credential->isDeleted) {
+            return false;
+        }
+
+        self::setCredential($credential, $data->adminID, $credential->currentUser);
+
+        if (self::isLoggedAsUser()) {
+            ActionLog::startSession(self::$adminID);
+        } else {
+            ActionLog::startSession(self::$credentialID);
+        }
+        return true;
+    }
+
+    /**
+     * Validates and Sets the auth as API
+     * @param string $token
+     * @return boolean
+     */
+    public static function validateAPI($token) {
+        if (Token::isValid($token)) {
+            self::$apiID       = Token::get($token)->id;
+            self::$accessLevel = Access::API();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Sets the auth as API Internal
+     * @return boolean
+     */
+    public static function validateInternal() {
+        self::$apiID       = "internal";
+        self::$accessLevel = Access::API();
+        return true;
+    }
 
 
+
+    /**
+     * Logins the given Credential
+     * @param Model $credential
+     * @return void
+     */
+    public function login(Model $credential) {
+        self::setCredential($credential, 0, $credential->currentUser);
+
+        Credential::updateLoginTime($credential->id);
+        ActionLog::startSession($credential->id, true);
+        
+        $path = Path::getTempPath($credential->id, false);
+        File::emptyDir($path);
+        Reset::delete($credential->id);
+    }
+
+    /**
+     * Logins as the given Credential from an Admin account
+     * @param Model   $credential
+     * @param integer $adminID    Optional.
+     * @param integer $userID     Optional.
+     * @return void
+     */
+    public function loginAs(Model $credential, $adminID = 0, $userID = 0) {
+        self::setCredential($credential, $adminID, $userID);
+    }
+
+    /**
+     * Logouts the Current Credential
+     * @return void
+     */
+    public function logout() {
+        ActionLog::endSession();
+
+        self::$accessLevel  = Access::General();
+        self::$credential   = null;
+        self::$credentialID = 0;
+        self::$adminID      = 0;
+        self::$userID       = 0;
+        self::$apiID        = 0;
+    }
+
+
+    
     /**
      * Sets the Credential
      * @param Model   $credential
@@ -45,129 +143,30 @@ class Auth {
      */
     public function setCurrentUser($userID) {
         self::$userID = $userID;
+        ActionLog::endSession();
+        ActionLog::startSession(self::$credentialID, true);
     }
 
     /**
-     * Validates and Sets the auth as API
-     * @param string $token
-     * @return boolean
-     */
-    public static function setAPI($token) {
-        if (Token::isValid($token)) {
-            self::$apiID       = Token::get($token)->id;
-            self::$accessLevel = Access::API();
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * Sets the auth as API Internal
-     * @return boolean
-     */
-    public static function setInternal() {
-        self::$apiID       = "internal";
-        self::$accessLevel = Access::API();
-        return true;
-    }
-
-    /**
-     * Clears the Data
+     * Creates and returns the JWT token
      * @return void
-     */
-    public static function clear() {
-        self::$accessLevel  = Access::General();
-        self::$credential   = null;
-        self::$credentialID = 0;
-        self::$adminID      = 0;
-        self::$userID       = 0;
-        self::$apiID        = 0;
-
-        self::$time         = 0;
-        self::$token        = "";
-    }
-
-
-
-    /**
-     * Returns true if the given JWT Token is valid
-     * @param string $token
-     * @return array
-     */
-    public static function isValidToken($token) {
-        return JWT::isValid($token);
-    }
-
-    /**
-     * Returns the Data from the given JWT Token
-     * @param string $token
-     * @return array
-     */
-    public static function getTokenData($token) {
-        return JWT::getData($token);
-    }
-
-    /**
-     * Returns the JWT Token
-     * @return string
      */
     public static function getToken() {
-        return self::$token;
-    }
-
-    /**
-     * Creates and Sets the JWT token
-     * @param array $data
-     * @return void
-     */
-    public static function setToken(array $data) {
-        self::$time  = time();
-        self::$token = JWT::create(self::$time, [
-            "accessLevel"  => self::$accessLevel,
-            "credentialID" => self::$credentialID,
-            "adminID"      => self::$adminID,
-            "userID"       => self::$userID,
-            "loggedAsUser" => !empty(self::$adminID),
-        ] + $data);
-    }
-
-
-
-    /**
-     * Starts a New Log Session
-     * @return void
-     */
-    public static function createLogSession() {
-        ActionLog::startSession(self::$credentialID, true);
-    }
-
-    /**
-     * Starts/Resumes a Log Session
-     * @return void
-     */
-    public static function startLogSession() {
-        if (self::isLoggedAsUser()) {
-            ActionLog::startSession(self::$adminID);
-        } else {
-            ActionLog::startSession(self::$credentialID);
+        if (!self::isLoggedIn()) {
+            return "";
         }
-    }
-
-    /**
-     * Restarts a Log Session
-     * @return void
-     */
-    public static function restartLogSession() {
-        ActionLog::endSession();
-        ActionLog::startSession(self::$credentialID, true);
-    }
-
-    /**
-     * Ends the Log Session
-     * @return void
-     */
-    public static function endLogSession() {
-        ActionLog::endSession();
+        return JWT::create(time(), [
+            "accessLevel"   => self::$accessLevel,
+            "credentialID"  => self::$credentialID,
+            "adminID"       => self::$adminID,
+            "userID"        => self::$userID,
+            "email"         => self::$credential->email,
+            "name"          => self::$credential->credentialName,
+            "language"      => self::$credential->language,
+            "avatar"        => self::$credential->avatar,
+            "reqPassChange" => self::$credential->reqPassChange,
+            "loggedAsUser"  => !empty(self::$adminID),
+        ]);
     }
 
 
