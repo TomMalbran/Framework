@@ -100,6 +100,9 @@ class Email {
      * @return void
      */
     public static function migrate(Database $db, $recreate = false) {
+        if (!$db->hasTable("email_templates")) {
+            return;
+        }
         $request  = $db->getAll("email_templates");
         $emails   = Framework::loadData(Framework::EmailData);
         $siteName = Config::get("name");

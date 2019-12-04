@@ -40,7 +40,7 @@ class Database {
         $this->password = $config->password;
         $this->database = $config->database;
         $this->prefix   = $config->prefix;
-        $this->email    = $config->email;
+        $this->email    = !empty($config->email) ? $config->email : "";
         $this->persist  = $persist;
         
         $this->connect();
@@ -525,6 +525,17 @@ class Database {
             }
         }
         return $result;
+    }
+
+    /**
+     * Returns an array with all the tables
+     * @param string $table
+     * @return boolean
+     */
+    public function hasTable($table) {
+        $tableName = $this->getTableName($table);
+        $request   = $this->query("SHOW TABLES LIKE '$tableName'");
+        return !empty($request);
     }
 
     /**
