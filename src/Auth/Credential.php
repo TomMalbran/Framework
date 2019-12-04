@@ -2,8 +2,10 @@
 namespace Framework\Auth;
 
 use Framework\Request;
+use Framework\Auth\Access;
 use Framework\File\Path;
 use Framework\Schema\Factory;
+use Framework\Schema\Database;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Utils\Utils;
@@ -446,5 +448,35 @@ class Credential {
         self::getSchema()->edit($credentialID, [
             "avatar" => $avatar,
         ]);
+    }
+
+
+
+    /**
+     * Seeds the Owner
+     * @param Database $db
+     * @param string   $firstName
+     * @param string   $lastName
+     * @param string   $email
+     * @param string   $password
+     * @return void
+     */
+    public static function seedOwner(Database $db, $firstName, $lastName, $email, $password) {
+        if ($db->hasTable("credentials")) {
+            $hash = Utils::createHash($password);
+            $db->insert("credentials", [
+                "firstName"    => $firstName,
+                "lastName"     => $lastName,
+                "email"        => $email,
+                "password"     => $hash["password"],
+                "salt"         => $hash["salt"],
+                "language"     => "es",
+                "level"        => Access::Owner(),
+                "lastLogin"    => time(),
+                "currentLogin" => time(),
+                "createdTime"  => time(),
+            ]);
+            print("<i>Owner Created</i><br>");
+        }
     }
 }
