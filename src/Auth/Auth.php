@@ -5,11 +5,14 @@ use Framework\Auth\Access;
 use Framework\Auth\Credential;
 use Framework\Auth\Token;
 use Framework\Auth\Reset;
+use Framework\Auth\Spam;
 use Framework\Auth\JWT;
+use Framework\Config\Config;
 use Framework\File\Path;
 use Framework\File\File;
 use Framework\Log\ActionLog;
 use Framework\Schema\Model;
+use Framework\Utils\Strings;
 
 /**
  * The Auth
@@ -78,6 +81,14 @@ class Auth {
 
 
     /**
+     * Checks the Spam Protection for the Login
+     * @return boolean
+     */
+    public static function spamProtection() {
+        return Spam::protection();
+    }
+
+    /**
      * Logins the given Credential
      * @param Model $credential
      * @return void
@@ -94,17 +105,6 @@ class Auth {
     }
 
     /**
-     * Logins as the given Credential from an Admin account
-     * @param Model   $credential
-     * @param integer $adminID    Optional.
-     * @param integer $userID     Optional.
-     * @return void
-     */
-    public static function loginAs(Model $credential, $adminID = 0, $userID = 0) {
-        self::setCredential($credential, $adminID, $userID);
-    }
-
-    /**
      * Logouts the Current Credential
      * @return void
      */
@@ -117,6 +117,80 @@ class Auth {
         self::$adminID      = 0;
         self::$userID       = 0;
         self::$apiID        = 0;
+    }
+
+
+
+    /**
+     * Logins as the given Credential from an Admin account
+     * @param integer $credentialID
+     * @return boolean
+     */
+    public static function loginAs($credentialID) {
+        $admin = self::$credential;
+        $user  = Credential::getOne($credentialID, true);
+        
+        if (self::canLoginAs($admin, $user)) {
+            self::setCredential($user, $admin->id, $user->currentUser);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Logouts as the current Credential and logins back as the Admin
+     * @return integer
+     */
+    public static function logoutAs() {
+        if (!self::isLoggedAsUser()) {
+            return 0;
+        }
+        $admin = Credential::getOne(self::$adminID, true);
+        $user  = self::$credential;
+        
+        if (self::canLoginAs($admin, $user)) {
+            self::setCredential($admin);
+            return $user->id;
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the Credential to Login from the given Email
+     * @param string $email
+     * @return Model
+     */
+    public static function getLoginCredential($email) {
+        $parts = Strings::split($email, "|");
+        $user  = null;
+        
+        if (!empty($parts[0]) && !empty($parts[1])) {
+            $admin = Credential::getByEmail($parts[0], true);
+            $user  = Credential::getByEmail($parts[1], true);
+            
+            if (self::canLoginAs($admin, $user)) {
+                $user->password = $admin->password;
+                $user->salt     = $admin->salt;
+                $user->adminID  = $admin->id;
+            }
+        } else {
+            $user = Credential::getByEmail($email, true);
+        }
+        return $user;
+    }
+
+    /**
+     * Returns true if the Admin can login as the User
+     * @param Model $admin
+     * @param Model $user
+     * @return boolean
+     */
+    public static function canLoginAs(Model $admin, Model $user) {
+        return (
+            !$admin->isEmpty() && !$user->isEmpty() &&
+            !$admin->isDeleted && !$user->isDeleted &&
+            $admin->level > $user->level && Access::isAdminOrHigher($admin->level)
+        );
     }
 
 
@@ -149,13 +223,15 @@ class Auth {
 
     /**
      * Creates and returns the JWT token
-     * @return void
+     * @return string
      */
     public static function getToken() {
         if (!self::isLoggedIn()) {
             return "";
         }
-        return JWT::create(time(), [
+
+        // The general data
+        $data  = [
             "accessLevel"   => self::$accessLevel,
             "credentialID"  => self::$credentialID,
             "adminID"       => self::$adminID,
@@ -166,7 +242,18 @@ class Auth {
             "avatar"        => self::$credential->avatar,
             "reqPassChange" => self::$credential->reqPassChange,
             "loggedAsUser"  => !empty(self::$adminID),
-        ]);
+        ];
+
+        // Add fields from the Config
+        $fieldConf = Config::get("jwtFields");
+        if (!empty($fieldConf)) {
+            $fields = Strings::split($fieldConf, ",");
+            foreach ($fields as $field) {
+                $data[$field] = self::$credential->get($field);
+            }
+        }
+
+        return JWT::create(time(), $data);
     }
 
 
