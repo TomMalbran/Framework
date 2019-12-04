@@ -191,7 +191,7 @@ class Settings {
         // Process the SQL
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " settings</i><br>");
-            print(implode($variables, ", ") . "<br>");
+            print(Strings::join($variables, ", ") . "<br>");
             $db->batch("settings", $adds);
         }
         if (!empty($deletes)) {
@@ -202,7 +202,7 @@ class Settings {
                 $db->delete("settings", $query);
                 $variables[] = $row[0] . "_" . $row[1];
             }
-            print(implode($variables, ", ") . "<br>");
+            print(Strings::join($variables, ", ") . "<br>");
         }
         if (empty($adds) && empty($deletes)) {
             print("<br>No <i>settings</i> added or deleted <br>");

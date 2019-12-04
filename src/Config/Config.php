@@ -58,7 +58,7 @@ class Config {
         // Try to get all the properties that start with the value as a prefix
         $result = new stdClass();
         foreach ($_ENV as $envkey => $value) {
-            $parts  = explode("_", $envkey);
+            $parts  = Strings::split($envkey, "_");
             $prefix = Strings::toLowerCase($parts[0]);
             if ($prefix == $property) {
                 $suffix = Strings::replace($envkey, "{$parts[0]}_", "");
@@ -98,7 +98,7 @@ class Config {
                 "full"    => "",
             ];
         }
-        $parts = explode("-", $version);
+        $parts = Strings::split($version, "-");
         return (object)[
             "version" => $parts[0],
             "build"   => $parts[1],

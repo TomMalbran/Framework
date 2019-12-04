@@ -38,8 +38,8 @@ class Router {
      */
     public static function get($route) {
         self::load();
-        $base   = substr($route, 0, strripos($route, "/"));
-        $method = Strings::replace($route, "$base/", "");
+        $method = Strings::substringAfter($route, "/");
+        $base   = Strings::replace($route, "/$method", "");
 
         $data   = isset(self::$data[$base]) ? self::$data[$base] : null;
         $module = $data != null ? $data["module"]          : null;

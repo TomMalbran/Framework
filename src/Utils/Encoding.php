@@ -293,7 +293,7 @@ class Encoding {
      * @return string
      */
     public static function removeBOM($text = "") {
-        if (substr($text, 0,3) == pack("CCC", 0xef, 0xbb, 0xbf)) {
+        if (substr($text, 0, 3) == pack("CCC", 0xef, 0xbb, 0xbf)) {
             $text = substr($text, 3);
         }
         return $text;

@@ -98,7 +98,7 @@ class Database {
      * @return array
      */
     public function getAll($table, $columns = "*", Query $query = null) {
-        $selection  = is_array($columns) ? implode(", ", $columns) : $columns;
+        $selection  = Strings::join($columns, ", ");
         $expression = "SELECT $selection FROM {dbPrefix}$table ";
         $params     = [];
 
@@ -241,7 +241,7 @@ class Database {
             $rows[] = $this->buildTableData($tableData, $bindParams, true);
         }
         
-        $expression .= implode(", ", $rows);
+        $expression .= Strings::join($rows, ", ");
         $statement   = $this->processQuery($expression, $bindParams);
         
         return ($statement->affected_rows > 0);
@@ -427,7 +427,7 @@ class Database {
      * @return string
      */
     private function buildInsertHeader(array $fields) {
-        return "(`" . implode(array_keys($fields), "`, `") . "`) VALUES ";
+        return "(`" . Strings::join(array_keys($fields), "`, `") . "`) VALUES ";
     }
     
     /**
@@ -582,7 +582,7 @@ class Database {
         foreach ($fields as $key => $type) {
             $sql .= "  `$key` " . $type . ",\n";
         }
-        $sql .= "  PRIMARY KEY (" . implode($primary, ", ") . ")\n";
+        $sql .= "  PRIMARY KEY (" . Strings::join($primary, ", ") . ")\n";
         foreach ($keys as $key) {
             $sql .= "  KEY `$field->key` (`$field->key`)\n";
         }
@@ -674,7 +674,7 @@ class Database {
     public function updatePrimary($table, array $primary) {
         $tableName = $this->getTableName($table);
         $sql       = "DROP PRIMARY KEY \n";
-        $sql      .= "ADD PRIMARY KEY (" . implode($primary, ", ") . ")";
+        $sql      .= "ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
         $this->query($sql);
         return $sql;
     }
@@ -831,7 +831,7 @@ class Database {
         // Build the CREATEs for the keys.
         foreach ($indexes as $keyname => $columns) {
             ksort($columns);
-            $result .= "," . $crlf . "  $keyname (" . implode($columns, ", ") . ")";
+            $result .= "," . $crlf . "  $keyname (" . Strings::join($columns, ", ") . ")";
         }
         
         // Now just get the comment and type... (MyISAM, etc.)
@@ -862,7 +862,7 @@ class Database {
             $start  += 250;
             
             if (!empty($request)) {
-                $result .= "INSERT INTO `$tableName`" . $crlf . "\t(`" . implode("`, `", array_keys($request[0])) . "`) $crlf VALUES ";
+                $result .= "INSERT INTO `$tableName`" . $crlf . "\t(`" . Strings::join("`, `", array_keys($request[0])) . "`) $crlf VALUES ";
                 
                 foreach ($request as $index => $row) {
                     $fieldList = [];
@@ -876,7 +876,7 @@ class Database {
                             $fieldList[] = "'" . $this->escape($value) . "'";
                         }
                     }
-                    $result .= "(" . implode(", ", $fieldList) . ")";
+                    $result .= "(" . Strings::join($fieldList, ", ") . ")";
                     
                     if ($index < count($request) - 1) {
                         $result .= "," . $crlf . "\t";

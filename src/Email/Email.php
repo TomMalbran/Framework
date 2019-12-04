@@ -150,12 +150,12 @@ class Email {
         // Process the SQL
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " emails</i><br>");
-            print(implode($codes, ", ") . "<br>");
+            print(Strings::join($codes, ", ") . "<br>");
             $db->batch("email_templates", $adds);
         }
         if (!empty($deletes)) {
             print("<br>Deleted <i>" . count($deletes) . " emails</i><br>");
-            print(implode($deletes, ", ") . "<br>");
+            print(Strings::join($deletes, ", ") . "<br>");
             foreach ($deletes as $templateCode) {
                 $query = Query::create("templateCode", "=", $templateCode);
                 $db->delete("email_templates", $query);

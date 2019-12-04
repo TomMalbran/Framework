@@ -5,6 +5,7 @@ use Framework\Schema\KeyChain;
 use Framework\Schema\Field;
 use Framework\Schema\Join;
 use Framework\Schema\Count;
+use Framework\Utils\Strings;
 
 /**
  * The Database Structure
@@ -125,7 +126,7 @@ class Structure {
      * @return string
      */
     public function getKey($key) {
-        if (strpos($key, ".") === false) {
+        if (!Strings::contains($key, ".")) {
             $mainKey = $this->table;
             return "{$mainKey}.{$key}";
         }

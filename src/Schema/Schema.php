@@ -270,7 +270,7 @@ class Schema {
      * @return string[]
      */
     public function getColumn(Query $query, $column) {
-        $columnName = strpos($column, ".") === false ? $column : substr($column, strpos($column, ".") + 1);
+        $columnName = Strings::substringAfter($column, ".");
         $query      = $this->generateQuery($query);
         $selection  = new Selection($this->db, $this->structure);
         $selection->addSelects($column, true);

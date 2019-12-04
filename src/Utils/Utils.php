@@ -225,16 +225,16 @@ class Utils {
      * @return boolean
      */
     public static function isValidPassword($password, $checkSets = "lud", $minLength = 4) {
-        if (strlen($password) < $minLength) {
+        if (Strings::length($password) < $minLength) {
             return false;
         }
-        if (strpos($checkSets, "l") !== false && !preg_match("#[a-z]+#", $password)) {
+        if (Strings::contains($checkSets, "l") && !preg_match("#[a-z]+#", $password)) {
             return false;
         }
-        if (strpos($checkSets, "u") !== false && !preg_match("#[A-Z]+#", $password)) {
+        if (Strings::contains($checkSets, "u") && !preg_match("#[A-Z]+#", $password)) {
             return false;
         }
-        if (strpos($checkSets, "d") !== false && !preg_match("#[0-9]+#", $password)) {
+        if (Strings::contains($checkSets, "d") && !preg_match("#[0-9]+#", $password)) {
             return false;
         }
         return true;
@@ -274,18 +274,18 @@ class Utils {
      */
     public static function isValidCUIT($value) {
         $cuit = (string)self::cuitToNumber($value);
-        if (strlen($cuit) != 11) {
+        if (Strings::length($cuit) != 11) {
             return false;
         }
 
         // The last number is the verifier
-        $verify = substr($cuit, 10, 1);
+        $verify = Strings::substring($cuit, 10, 1);
         $mult   = [ 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 ];
         $total  = 0;
         
         // Multiply each number by the multiplier (except the last one)
 		for ($i = 0; $i < count($mult); $i++) {
-            $total += (substr($cuit, $i, 1)) * $mult[$i];
+            $total += ((int)Strings::substring($cuit, $i, 1)) * $mult[$i];
 		}
         
         // Calculate the left over and value
@@ -301,8 +301,8 @@ class Utils {
      * @return boolean
      */
     public static function isValidDNI($value) {
-        $dni = (string)self::dniToNumber($value);
-        if (strlen($dni) != 8) {
+        $dni = self::dniToNumber($value);
+        if (Strings::length($dni) != 8) {
             return false;
         }
         return is_numeric((int)$dni);
@@ -316,7 +316,7 @@ class Utils {
      * @return string
      */
     public static function parseCUIT($value) {
-        if (strlen((string)$value) == 11) {
+        if (Strings::length($value) == 11) {
             return preg_replace("/^(\d{2})(\d{8})(\d{1})$/", "$1-$2-$3", $value);
         }
         return $value;
@@ -371,12 +371,12 @@ class Utils {
      * @return string
      */
     public static function generateUsername($domain, $email = "") {
-        $parts  = explode(".", $domain);
+        $parts  = Strings::split($domain, ".");
         $result = Strings::replace($parts[0], ["-", "ñ"], ["", "n"]);
-        $result = substr($result, 0, 8);
+        $result = Strings::substring($result, 0, 8);
         
         if (!empty($email) && is_numeric($result[0])) {
-            $result = substr($email[0] . $result, 0, 8);
+            $result = Strings::substring($email[0] . $result, 0, 8);
         }
         return $result;
     }
@@ -411,7 +411,7 @@ class Utils {
         ];
         
         if (self::isValidEmail($email)) {
-            $domain = substr($email, strrpos($email, "@") + 1);
+            $domain = Strings::substringAfter($email, "@");
             if (!in_array(Strings::toLowerCase($domain), $domains)) {
                 return $domain;
             }
@@ -481,12 +481,12 @@ class Utils {
     
     
     /**
-     * Returns the extension of the given domain
+     * Returns the extension of the given domain (without the dot)
      * @param string $domain
      * @return string
      */
     public static function getDomainExtension($domain) {
-        return substr($domain, strrpos($domain, "."));
+        return Strings::substringAfter($domain, ".");
     }
     
     /**
@@ -621,7 +621,7 @@ class Utils {
     }
 
     /**
-     * Extends the first array replacing values from the second array 
+     * Extends the first array replacing values from the second array
      * @param array $array1
      * @param array $array2
      * @return array
@@ -729,7 +729,7 @@ class Utils {
                     $values[] = $row[$fullKey];
                 }
             }
-            $result = implode($glue, $values);
+            $result = Strings::join($values, $glue);
         } else {
             $fullKey = self::getKey($key, $prefix);
             if (!empty($row[$fullKey])) {

@@ -7,6 +7,15 @@ namespace Framework\Utils;
 class Strings {
     
     /**
+     * Returns the length og the given String
+     * @param string $string
+     * @return integer
+     */
+    public static function length($string) {
+        return strlen((string)$string);
+    }
+
+    /**
      * Returns true if the given String contains the given Needle
      * @param string $string
      * @param string $needle
@@ -61,8 +70,11 @@ class Strings {
      * @return string
      */
     public static function removeFromStart($string, $needle) {
-        $length = strlen($needle);
-        return substr($string, $length, strlen($string) - $length);
+        if (self::startsWith($string, $needle)) {
+            $length = strlen($needle);
+            return substr($string, $length, strlen($string) - $length);
+        }
+        return $string;
     }
 
     /**
@@ -72,11 +84,52 @@ class Strings {
      * @return string
      */
     public static function removeFromEnd($string, $needle) {
-        $length = strlen($needle);
-        return substr($string, 0, strlen($string) - $length);
+        if (self::endsWith($string, $needle)) {
+            $length = strlen($needle);
+            return substr($string, 0, strlen($string) - $length);
+        }
+        return $string;
     }
 
     
+    
+    /**
+     * Returns a Substring from the Start to the Length
+     * @param string  $string
+     * @param integer $start
+     * @param integer $length
+     * @return string
+     */
+    public static function substring($string, $start, $length = null) {
+        return substr($string, $start, $length);
+    }
+
+    /**
+     * Returns a Substring from the Needle to the end
+     * @param string $string
+     * @param string $needle
+     * @return string
+     */
+    public static function substringAfter($string, $needle) {
+        if (self::contains($string, $needle)) {
+            return substr($string, strrpos($string, $needle) + strlen($needle));
+        }
+        return $string;
+    }
+
+    /**
+     * Returns a Substring from the start to the Needle
+     * @param string $string
+     * @param string $needle
+     * @return string
+     */
+    public static function substringBefore($string, $needle) {
+        if (self::contains($string, $needle)) {
+            return substr($string, 0, strpos($string, $needle));
+        }
+        return $string;
+    }
+
 
     /**
      * Splits the given String at the given Needle
@@ -90,12 +143,15 @@ class Strings {
 
     /**
      * Jois the given Strings using the given glue
-     * @param string[] $strings
-     * @param string   $glue
+     * @param string[]|string $string
+     * @param string          $glue
      * @return string
      */
-    public static function join(array $strings, $glue) {
-        return implode($glue, $strings);
+    public static function join($string, $glue) {
+        if (is_array($string)) {
+            return implode($glue, $string);
+        }
+        return $string;
     }
 
 
@@ -141,9 +197,7 @@ class Strings {
     public static function upperCaseToCamelCase($string, $capitalizeFirst = false) {
         $result = ucwords(strtolower($string), "_");
         $result = str_replace("_", "", $result);
-        if (!$capitalizeFirst) {
-            $result[0] = strtolower($result[0]);
-        }
+        $result = lcfirst($result);
         return $result;
     }
 

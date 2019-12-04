@@ -2,6 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Field;
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 
 /**
@@ -145,8 +146,8 @@ class Selection {
         $this->setTableKeys($query);
 
         $mainKey    = $this->structure->table;
-        $selects    = implode($this->selects, ", ");
-        $joins      = implode($this->joins,   " ");
+        $selects    = Strings::join($this->selects, ", ");
+        $joins      = Strings::join($this->joins, " ");
         $where      = $query->get();
         $expression = "SELECT $selects FROM {dbPrefix}$mainKey AS $mainKey $joins $where";
 

@@ -16,7 +16,7 @@ class File {
      * @return string
      */
     public static function getPath(...$pathParts) {
-        $result = implode("/", $pathParts);
+        $result = Strings::join($pathParts, "/");
         $result = Strings::replace($result, "//", "/");
         return $result;
     }
@@ -56,7 +56,7 @@ class File {
     public static function create($path, $fileName, $content) {
         $path = self::getPath($path, $fileName);
         if (!empty($path)) {
-            file_put_contents($path, implode("\n", Utils::toArray($content)));
+            file_put_contents($path, Strings::join($content, "\n"));
         }
         return $path;
     }
@@ -122,10 +122,7 @@ class File {
      * @return string
      */
     public static function removeLastSlash($path) {
-        if (Strings::endsWith($path, "/")) {
-            return substr($path, 0, strlen($path) - 1);
-        }
-        return $path;
+        return Strings::removeFromEnd($path, "/");
     }
 
     /**
@@ -134,10 +131,7 @@ class File {
      * @return string
      */
     public static function removeFirstSlash($path) {
-        if (Strings::startsWith($path, "/")) {
-            return substr($path, 1, strlen($path));
-        }
-        return $path;
+        return Strings::removeFromStart($path, "/");
     }
     
     

@@ -2,6 +2,7 @@
 namespace Framework\Utils;
 
 use Framework\File\File;
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use stdClass;
 
@@ -58,7 +59,7 @@ class JSON {
      */
     public static function toCSV($value) {
         $value = self::decode($value);
-        return implode(", ", $value);
+        return Strings::join($value, ", ");
     }
 
     /**
@@ -67,7 +68,7 @@ class JSON {
      * @return string
      */
     public static function fromCSV($value) {
-        $parts  = explode(",", $value);
+        $parts  = Strings::split($value, ",");
         $result = [];
         foreach ($parts as $part) {
             if (!empty($part)) {

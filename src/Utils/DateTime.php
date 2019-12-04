@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 
 /**
@@ -145,7 +146,7 @@ class DateTime {
      * @return boolean
      */
     public static function isValidHour($string, array $minutes = null) {
-        $parts = explode(":", $string);
+        $parts = Strings::split($string, ":");
         return (
             !empty($parts[0]) && Utils::isNumeric($parts[0], 0, 23) &&
             !empty($parts[1]) && Utils::isNumeric($parts[1], 0, 59) &&
@@ -319,7 +320,8 @@ class DateTime {
      * @return string
      */
     public static function getShortMonth($month) {
-        $result = substr(self::getMonth($month), 0, 3);
+        $result = self::getMonth($month);
+        $result = Strings::substring($result, 0, 3);
         return Strings::toUpperCase($result);
     }
 }

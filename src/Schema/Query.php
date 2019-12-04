@@ -492,7 +492,7 @@ class Query {
         for ($i = 0; $i < count($array); $i++) {
             $bind[] = "?";
         }
-        return "(" . implode(",", $bind) . ")";
+        return "(" . Strings::join($bind, ",") . ")";
     }
 
 
