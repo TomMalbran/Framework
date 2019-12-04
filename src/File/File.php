@@ -137,13 +137,22 @@ class File {
     
     
     /**
+     * Returns the file name component of the path
+     * @param string $path
+     * @return string
+     */
+    public static function getBaseName($path) {
+        return basename($path);
+    }
+
+    /**
      * Returns the name without the extension
      * @param string $name
      * @return string
      */
     public static function getName($name) {
         $extension = pathinfo($name, PATHINFO_EXTENSION);
-        return Strings::replace($name, "." . $extension, "");
+        return Strings::replace($name, ".$extension", "");
     }
 
     /**
