@@ -233,7 +233,7 @@ class Migration {
             print("$sql<br>");
         }
         if ($addPrimary) {
-            $sql = $db->updatePrimary($structure, $primary);
+            $sql = $db->updatePrimary($structure->table, $primary);
             print("$sql<br>");
         }
         print("<br>");
