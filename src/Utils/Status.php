@@ -97,23 +97,23 @@ class Status {
 
         // Function "getXxx(s)": Get the group xxx
         if (Strings::startsWith($function, "get")) {
-            $groupName = Strings::removeFromStart($function, "get");
-            $groupName = Strings::removeFromEnd($groupName, "s");
+            $groupName = Strings::stripStart($function, "get");
+            $groupName = Strings::stripEnd($groupName, "s");
             return self::getGroup($groupName);
         }
 
         // Function "inXxx(s)" or "isValidXxx": Check if the given value is in the group xxx
         if (Strings::startsWith($function, "in") || Strings::startsWith($function, "isValid")) {
-            $groupName = Strings::removeFromStart($function, "in");
-            $groupName = Strings::removeFromStart($function, "isValid");
-            $groupName = Strings::removeFromEnd($groupName, "s");
+            $groupName = Strings::stripStart($function, "in");
+            $groupName = Strings::stripStart($function, "isValid");
+            $groupName = Strings::stripEnd($groupName, "s");
             $group     = self::getGroup($groupName);
             return in_array($value, $group);
         }
 
         // Function "isXxx": Check if the given value is equal to xxx
         if (Strings::startsWith($function, "is")) {
-            $statusName  = Strings::removeFromStart($function, "is");
+            $statusName  = Strings::stripStart($function, "is");
             $statusValue = self::getOne($statusName);
             return $value == $statusValue;
         }

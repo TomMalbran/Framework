@@ -54,9 +54,9 @@ class Strings {
 
     /**
      * Replaces in the String the search with the replace
-     * @param string $string
-     * @param string $search
-     * @param string $replace
+     * @param string          $string
+     * @param string|string[] $search
+     * @param string|string[] $replace
      * @return string
      */
     public static function replace($string, $search, $replace) {
@@ -69,7 +69,7 @@ class Strings {
      * @param string $needle
      * @return string
      */
-    public static function removeFromStart($string, $needle) {
+    public static function stripStart($string, $needle) {
         if (self::startsWith($string, $needle)) {
             $length = strlen($needle);
             return substr($string, $length, strlen($string) - $length);
@@ -83,7 +83,7 @@ class Strings {
      * @param string $needle
      * @return string
      */
-    public static function removeFromEnd($string, $needle) {
+    public static function stripEnd($string, $needle) {
         if (self::endsWith($string, $needle)) {
             $length = strlen($needle);
             return substr($string, 0, strlen($string) - $length);

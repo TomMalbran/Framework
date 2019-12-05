@@ -93,14 +93,14 @@ class Access {
 
         // Function "getXxx(s)": Get the group xxx
         if (Strings::startsWith($function, "get")) {
-            $groupName = Strings::removeFromStart($function, "get");
-            $groupName = Strings::removeFromEnd($groupName, "s");
+            $groupName = Strings::stripStart($function, "get");
+            $groupName = Strings::stripEnd($groupName, "s");
             return self::getGroup($groupName);
         }
 
         // Function "inXxxOrYyy": Check if the given level is in the group xxx or yyy
         if (Strings::startsWith($function, "in") && Strings::contains($function, "Or")) {
-            $groupNames = Strings::removeFromStart($function, "in");
+            $groupNames = Strings::stripStart($function, "in");
             $groupParts = Strings::split($groupNames, "Or");
             $groupX     = self::getGroup($groupParts[0]);
             $groupY     = self::getGroup($groupParts[1]);
@@ -109,24 +109,24 @@ class Access {
 
         // Function "inXxx(s)" or "isValidXxx": Check if the given level is in the group xxx
         if (Strings::startsWith($function, "in") || Strings::startsWith($function, "isValid")) {
-            $groupName = Strings::removeFromStart($function, "in");
-            $groupName = Strings::removeFromStart($function, "isValid");
-            $groupName = Strings::removeFromEnd($groupName, "s");
+            $groupName = Strings::stripStart($function, "in");
+            $groupName = Strings::stripStart($function, "isValid");
+            $groupName = Strings::stripEnd($groupName, "s");
             $group     = self::getGroup($groupName);
             return in_array($level, $group);
         }
 
         // Function "isXxxOrHigher": Check if the given level is equal or higher than xxx
         if (Strings::startsWith($function, "is") && Strings::endsWith($function, "OrHigher")) {
-            $accessName  = Strings::removeFromStart($function, "is");
-            $accessName  = Strings::removeFromEnd($accessName, "OrHigher");
+            $accessName  = Strings::stripStart($function, "is");
+            $accessName  = Strings::stripEnd($accessName, "OrHigher");
             $accessLevel = self::getOne($accessName);
             return $level >= $accessLevel;
         }
 
         // Function "isXxxOrYyy": Check if the given level is equal to xxx or yyy
         if (Strings::startsWith($function, "is") && Strings::contains($function, "Or")) {
-            $accessNames  = Strings::removeFromStart($function, "is");
+            $accessNames  = Strings::stripStart($function, "is");
             $accessParts  = Strings::split($accessNames, "Or");
             $accessLevelX = self::getOne($accessParts[0]);
             $accessLevelY = self::getOne($accessParts[1]);
@@ -135,7 +135,7 @@ class Access {
 
         // Function "isXxx": Check if the given level is equal to xxx
         if (Strings::startsWith($function, "is")) {
-            $accessName  = Strings::removeFromStart($function, "is");
+            $accessName  = Strings::stripStart($function, "is");
             $accessLevel = self::getOne($accessName);
             return $level == $accessLevel;
         }

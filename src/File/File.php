@@ -122,7 +122,7 @@ class File {
      * @return string
      */
     public static function removeLastSlash($path) {
-        return Strings::removeFromEnd($path, "/");
+        return Strings::stripEnd($path, "/");
     }
 
     /**
@@ -131,7 +131,7 @@ class File {
      * @return string
      */
     public static function removeFirstSlash($path) {
-        return Strings::removeFromStart($path, "/");
+        return Strings::stripStart($path, "/");
     }
     
     

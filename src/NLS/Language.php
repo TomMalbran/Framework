@@ -61,7 +61,6 @@ class Language {
     /**
      * Returns true if the given Status Value is valid for the given Group
      * @param integer $value
-     * @param string  $groupName Optional.
      * @return boolean
      */
     public static function isValid($value) {
@@ -109,7 +108,7 @@ class Language {
 
         // Function "isXxx": isSpanish("es") => true, isSpanish("en") => false
         if (Strings::startsWith($function, "is")) {
-            $languageName = Strings::removeFromStart($function, "is");
+            $languageName = Strings::stripStart($function, "is");
             $language     = self::getOne($value);
             return !empty($language) && Strings::isEqual($language["name"], $languageName);
         }

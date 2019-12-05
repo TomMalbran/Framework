@@ -101,13 +101,13 @@ class Enum {
      */
     public static function __callStatic($function, array $arguments) {
         $cache = self::load();
-        $value = $arguments[0];
+        $value = !empty($arguments[0]) ? $arguments[0] : null;
 
         // For CONSTANT
         if ($cache->isConstant) {
             // Function "isXxx": Check if the given value is equal to xxx
             if (Strings::startsWith($function, "is")) {
-                $key = Strings::removeFromStart($function, "is");
+                $key = Strings::stripStart($function, "is");
                 if (!empty($cache->constants[$key])) {
                     return $value == $cache->constants[$key];
                 }
@@ -140,7 +140,7 @@ class Enum {
 
             // Function "isXxx": Check if the data is equal to xxx
             if (Strings::startsWith($function, "is")) {
-                $key = Strings::removeFromStart($function, "is");
+                $key = Strings::stripStart($function, "is");
                 if (!empty($cache->constants[$key])) {
                     return $value == $cache->constants[$key];
                 }
@@ -150,8 +150,8 @@ class Enum {
             // Function "inXxx(s)": Check if the data at the given index is equal to xxx
             if (Strings::startsWith($function, "in")) {
                 if (!empty($cache->data[$value])) {
-                    $key = Strings::removeFromStart($function, "in");
-                    $key = Strings::removeFromEnd($function, "s");
+                    $key = Strings::stripStart($function, "in");
+                    $key = Strings::stripEnd($function, "s");
                     return Strings::isEqual($cache->data[$value], $key);
                 }
                 return false;
@@ -164,7 +164,7 @@ class Enum {
             // Function "fromXxx"
             // Return the index where the value is the name
             if (Strings::startsWith($function, "from")) {
-                $key = Strings::removeFromStart($function, "from");
+                $key = Strings::stripStart($function, "from");
                 foreach ($cache->data as $index => $row) {
                     if (isset($row[$key]) && Strings::isEqual($row[$key], $value)) {
                         return $index;
@@ -176,7 +176,7 @@ class Enum {
             // Get the value at the given key depending on the function
             $key = $function;
             if (Strings::startsWith($function, "get")) {
-                $key    = Strings::removeFromStart($function, "get", "");
+                $key    = Strings::stripStart($function, "get", "");
                 $key[0] = Strings::toLowerCase($key[0]);
             }
             
