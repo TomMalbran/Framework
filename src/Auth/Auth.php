@@ -61,7 +61,7 @@ class Auth {
      */
     public static function validateAPI($token) {
         if (Token::isValid($token)) {
-            self::$apiID       = Token::get($token)->id;
+            self::$apiID       = Token::getOne($token)->id;
             self::$accessLevel = Access::API();
             return true;
         }

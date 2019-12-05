@@ -29,7 +29,7 @@ class KeyChain {
      * @param string $key
      * @return string
      */
-    public static function get($key) {
+    public static function getOne($key) {
         self::load();
         if (!empty(self::$data[$key])) {
             return base64_encode(hash("sha256", self::$data[$key], true));

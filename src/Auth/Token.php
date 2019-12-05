@@ -31,7 +31,7 @@ class Token {
      * @param string $token
      * @return Model
      */
-    public function get($token) {
+    public function getOne($token) {
         foreach (self::$data as $tokenID => $value) {
             if ($value == $token) {
                 return new Model("tokenID", [
