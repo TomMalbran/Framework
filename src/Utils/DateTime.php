@@ -204,7 +204,7 @@ class DateTime {
      * @return boolean
      */
     public static function isValidWeekDay($weekDay) {
-        return Utils::isNumeric($weekDay, 1, 7);
+        return Utils::isNumeric((int)$weekDay, 0, 6);
     }
     
 
@@ -272,6 +272,16 @@ class DateTime {
      */
     public static function getMonthsDiff($time1, $time2) {
         return 12 * (date("Y", $time1) - date("Y", $time2)) + date("n", $time1) - date("n", $time2);
+    }
+
+    /**
+     * Returns the difference between 2 dates in Weeks
+     * @param integer $time1
+     * @param integer $time2
+     * @return integer
+     */
+    public static function getWeeksDiff($time1, $time2) {
+        return floor(($time1 - $time2) / (7 * 24 * 3600));
     }
     
     /**

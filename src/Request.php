@@ -395,11 +395,11 @@ class Request implements ArrayAccess {
 
     /**
      * Returns true if the given week day is valid
-     * @param integer $weekDay
+     * @param integer $key
      * @return boolean
      */
-    public static function isValidWeekDay($weekDay) {
-        return DateTime::isValidWeekDay($weekDay);
+    public function isValidWeekDay($key) {
+        return DateTime::isValidWeekDay($this->getInt($key));
     }
     
 
