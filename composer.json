@@ -10,7 +10,7 @@
     "require": {
         "php": "^7.1",
         "ext-mysqli": "*",
-        "vlucas/phpdotenv": "^3.3"
+        "vlucas/phpdotenv": "^4.0"
     },
     "suggest" : {
         "firebase/php-jwt": "Used in Auth",

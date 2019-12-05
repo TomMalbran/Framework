@@ -15,6 +15,7 @@ use stdClass;
 class Config {
     
     private static $loaded = false;
+    private static $data   = null;
     
     
     /**
@@ -23,19 +24,22 @@ class Config {
      */
     public static function load() {
         if (!self::$loaded) {
-            self::$loaded = true;
-            
-            $path = Framework::getPath(Framework::ServerDir);
-            Dotenv::create($path)->load();
+            $path    = Framework::getPath(Framework::ServerDir);
+            $data    = Dotenv::createImmutable($path)->load();
+            $replace = [];
+
             if (Utils::isStageHost()) {
                 if (File::exists($path, ".env.stage")) {
-                    Dotenv::create($path, ".env.stage")->overload();
+                    $replace = Dotenv::createMutable($path, ".env.stage")->load();
                 }
             } elseif (!Utils::isLocalHost()) {
                 if (File::exists($path, ".env.production")) {
-                    Dotenv::create($path, ".env.production")->overload();
+                    $replace = Dotenv::createMutable($path, ".env.production")->load();
                 }
             }
+
+            self::$loaded = true;
+            self::$data   = array_merge($data, $replace);
         }
     }
 
@@ -51,13 +55,13 @@ class Config {
 
         // Check if there is a property with the given value
         $upperkey = Strings::camelCaseToUpperCase($property);
-        if (isset($_ENV[$upperkey])) {
-            return $_ENV[$upperkey];
+        if (isset(self::$data[$upperkey])) {
+            return self::$data[$upperkey];
         }
 
         // Try to get all the properties that start with the value as a prefix
         $result = new stdClass();
-        foreach ($_ENV as $envkey => $value) {
+        foreach (self::$data as $envkey => $value) {
             $parts  = Strings::split($envkey, "_");
             $prefix = Strings::toLowerCase($parts[0]);
             if ($prefix == $property) {
