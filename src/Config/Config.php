@@ -60,6 +60,7 @@ class Config {
         }
 
         // Try to get all the properties that start with the value as a prefix
+        $found  = false;
         $result = new stdClass();
         foreach (self::$data as $envkey => $value) {
             $parts  = Strings::split($envkey, "_");
@@ -67,10 +68,11 @@ class Config {
             if ($prefix == $property) {
                 $suffix = Strings::replace($envkey, "{$parts[0]}_", "");
                 $key    = Strings::upperCaseToCamelCase($suffix);
+                $found  = true;
                 $result->{$key} = $value;
             }
         }
-        if (!empty($result)) {
+        if ($found) {
             return $result;
         }
 

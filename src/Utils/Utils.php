@@ -353,13 +353,16 @@ class Utils {
         $firstName = self::getValue($data, "firstName",    "", $prefix);
         $lastName  = self::getValue($data, "lastName",     "", $prefix);
         $nickName  = self::getValue($data, "nickName",     "", $prefix);
-        $result    = "#$id";
+        $result    = "";
         
         if (!empty($firstName) && !empty($lastName)) {
             $result = "$firstName $lastName";
+            if (!empty($nickName)) {
+                $result .= " ($nickName)";
+            }
         }
-        if (!empty($nickName)) {
-            $result .= " ($nickName)";
+        if (empty($result) && !empty($id)) {
+            $result = "#$id";
         }
         return $result;
     }
