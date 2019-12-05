@@ -34,14 +34,13 @@ class Field {
     public $date       = "";
     public $hour       = "";
     
-    public $isID       = false;
     public $isPrimary  = false;
     public $isKey      = false;
     public $isName     = false;
-    public $canEdit    = false;
     public $noEmpty    = false;
     public $isSigned   = false;
     public $noPrefix   = false;
+    public $canEdit    = false;
     
     public $hasMerge   = false;
     public $mergeTo    = "";
@@ -66,14 +65,13 @@ class Field {
         $this->date       = !empty($data["date"])   ? $data["date"]        : null;
         $this->hour       = !empty($data["hour"])   ? $data["hour"]        : null;
 
-        $this->isID       = !empty($data["isID"]) || $this->type === Field::ID;
         $this->isPrimary  = !empty($data["isPrimary"]);
         $this->isKey      = !empty($data["isKey"]);
         $this->isName     = !empty($data["isName"]);
-        $this->canEdit    = empty($data["cantEdit"]);
         $this->noEmpty    = !empty($data["noEmpty"]);
         $this->isSigned   = !empty($data["isSigned"]);
         $this->noPrefix   = !empty($data["noPrefix"]);
+        $this->canEdit    = empty($data["cantEdit"]);
 
         $this->hasMerge   = !empty($data["mergeTo"]);
         $this->mergeTo    = !empty($data["mergeTo"]) ? $data["mergeTo"] : "";

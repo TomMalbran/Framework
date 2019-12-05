@@ -81,31 +81,50 @@ class Structure {
             ];
         }
 
-        // Parse all the Fields
+        // Parse the Fields
+        $idKey        = "";
+        $primaryCount = 0;
         $reqMasterkey = false;
+        foreach ($data["fields"] as $key => &$value) {
+            if ($value["type"] == Field::ID) {
+                $value["isPrimary"] = true;
+                $idKey = $key;
+            }
+            if (!empty($value["isPrimary"])) {
+                $primaryCount += 1;
+            }
+            if (empty($idKey) && !empty($value["isPrimary"])) {
+                $idKey = $key;
+            }
+            if ($value["type"] == Field::Encrypt) {
+                $reqMasterkey = true;
+            }
+        }
+        if ($primaryCount > 1) {
+            $idKey = "";
+        }
+
+        // Create the Fields
         foreach ($data["fields"] as $key => $value) {
             $field = new Field($key, $value);
-            if ($field->isID) {
+            if ($key == $idKey) {
                 $this->idKey  = $field->key;
                 $this->idName = $field->name;
             }
             if ($field->isName) {
                 $this->name = $field->type == Field::Text ? "{$field->key}Short" : $field->key;
             }
-            if ($field->type == Field::Encrypt) {
-                $reqMasterkey = true;
-            }
             $this->fields[] = $field;
         }
 
-        // Parse all the Joins
+        // Create the Joins
         if (!empty($data["joins"])) {
             foreach ($data["joins"] as $key => $value) {
                 $this->joins[] = new Join($key, $value);
             }
         }
 
-        // Parse all the Counts
+        // Create the Counts
         if (!empty($data["counts"])) {
             foreach ($data["counts"] as $key => $value) {
                 $this->counts[] = new Count($key, $value);
@@ -114,7 +133,7 @@ class Structure {
 
         // Set the Masterkey
         if ($reqMasterkey) {
-            $this->masterKey = KeyChain::get($schemaKey);
+            $this->masterKey = KeyChain::getOne($schemaKey);
         }
     }
 

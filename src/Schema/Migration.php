@@ -50,7 +50,7 @@ class Migration {
         
         foreach ($structure->fields as $field) {
             $fields[$field->key] = $field->getType();
-            if ($field->isID || $field->isPrimary) {
+            if ($field->isPrimary) {
                 $primary[] = $field->key;
             }
             if ($field->isKey) {
@@ -183,7 +183,7 @@ class Migration {
 
         // Update the Table Primary Keys and Index Keys
         foreach ($structure->fields as $field) {
-            if ($field->isID || $field->isPrimary) {
+            if ($field->isPrimary) {
                 $primary[] = $field->key;
                 if (!in_array($field->key, $primaryKeys)) {
                     $addPrimary = true;
