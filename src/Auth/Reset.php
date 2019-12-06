@@ -3,7 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Schema\Factory;
 use Framework\Schema\Query;
-use Framework\Utils\Utils;
+use Framework\Utils\Strings;
 
 /**
  * The Auth Reset
@@ -56,7 +56,7 @@ class Reset {
      * @return string
      */
     public static function create($credentialID) {
-        $code = Utils::generatePassword(6, "ud");
+        $code = Strings::randomCode(6, "ud");
         self::getSchema()->replace([
             "CREDENTIAL_ID" => $credentialID,
             "code"          => $code,

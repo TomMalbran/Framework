@@ -428,7 +428,7 @@ class Database {
      * @return string
      */
     private function buildInsertHeader(array $fields) {
-        return "(`" . Strings::join(array_keys($fields), "`, `") . "`) VALUES ";
+        return "(`" . Strings::joinKeys($fields, "`, `") . "`) VALUES ";
     }
     
     /**
@@ -874,7 +874,7 @@ class Database {
             $start  += 250;
             
             if (!empty($request)) {
-                $result .= "INSERT INTO `$tableName`" . $crlf . "\t(`" . Strings::join("`, `", array_keys($request[0])) . "`) $crlf VALUES ";
+                $result .= "INSERT INTO `$tableName`" . $crlf . "\t(`" . Strings::joinKeys($request[0], "`, `") . "`) $crlf VALUES ";
                 
                 foreach ($request as $index => $row) {
                     $fieldList = [];

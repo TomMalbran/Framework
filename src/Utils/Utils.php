@@ -425,60 +425,13 @@ class Utils {
     }
     
     /**
-     * Generates a random password with the given options
-     * @param integer $length        Optional.
-     * @param string  $availableSets Optional.
-     * @return string
-     */
-    public static function generatePassword($length = 8, $availableSets = "lud") {
-        $sets   = [];
-        $all    = "";
-        $result = "";
-        
-        if (Strings::contains($availableSets, "l")) {
-            $sets[] = "abcdefghjkmnpqrstuvwxyz";
-        }
-        if (Strings::contains($availableSets, "u")) {
-            $sets[] = "ABCDEFGHJKMNPQRSTUVWXYZ";
-        }
-        if (Strings::contains($availableSets, "d")) {
-            $sets[] = "23456789";
-        }
-        if (Strings::contains($availableSets, "s")) {
-            $sets[] = "!@#$%&*?";
-        }
-        
-        foreach ($sets as $set) {
-            $result .= $set[array_rand(str_split($set))];
-            $all    .= $set;
-        }
-        
-        $all = str_split($all);
-        for ($i = 0; $i < $length - count($sets); $i++) {
-            $result .= $all[array_rand($all)];
-        }
-        
-        $result = str_shuffle($result);
-        return $result;
-    }
-    
-    /**
-     * Returns a random string
-     * @param integer $length Optional.
-     * @return string
-     */
-    public static function createCode($length = 50) {
-        return substr(md5(rand()), 0, $length);
-    }
-
-    /**
      * Grabs the given password and creates encrypts it
      * @param string $pass
      * @param string $salt Optional.
      * @return array
      */
     public static function createHash($pass, $salt = "") {
-        $salt = !empty($salt) ? $salt : self::createCode();
+        $salt = !empty($salt) ? $salt : Strings::random(50);
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
         return [ "password" => $hash, "salt" => $salt ];
     }

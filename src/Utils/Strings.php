@@ -53,6 +53,66 @@ class Strings {
 
 
     /**
+     * Returns a random String with the given length
+     * @param integer $length Optional.
+     * @return string
+     */
+    public static function random($length = 50) {
+        return substr(md5(rand()), 0, $length);
+    }
+
+    /**
+     * Returns a random char from the given String
+     * @param string $string
+     * @return string
+     */
+    public static function randomChar($string) {
+        $parts = str_split($string);
+        $index = array_rand($parts);
+        return $string[$index];
+    }
+
+    /**
+     * Generates a random String with the given options
+     * @param integer $length        Optional.
+     * @param string  $availableSets Optional.
+     * @return string
+     */
+    public static function randomCode($length = 8, $availableSets = "lud") {
+        $sets   = [];
+        $all    = "";
+        $result = "";
+        
+        if (self::contains($availableSets, "l")) {
+            $sets[] = "abcdefghjkmnpqrstuvwxyz";
+        }
+        if (self::contains($availableSets, "u")) {
+            $sets[] = "ABCDEFGHJKMNPQRSTUVWXYZ";
+        }
+        if (self::contains($availableSets, "d")) {
+            $sets[] = "23456789";
+        }
+        if (self::contains($availableSets, "s")) {
+            $sets[] = "!@#$%&*?";
+        }
+        
+        foreach ($sets as $set) {
+            $result .= self::randomChar($set);
+            $all    .= $set;
+        }
+        
+        $all = str_split($all);
+        for ($i = 0; $i < $length - count($sets); $i++) {
+            $result .= $all[array_rand($all)];
+        }
+        
+        $result = str_shuffle($result);
+        return $result;
+    }
+
+
+
+    /**
      * Replaces in the String the search with the replace
      * @param string          $string
      * @param string|string[] $search
@@ -150,6 +210,19 @@ class Strings {
     public static function join($string, $glue) {
         if (is_array($string)) {
             return implode($glue, $string);
+        }
+        return $string;
+    }
+
+    /**
+     * Jois the given Strings keys using the given glue
+     * @param string[]|string $string
+     * @param string          $glue
+     * @return string
+     */
+    public static function joinKeys($string, $glue) {
+        if (is_array($string)) {
+            return implode($glue, array_keys($string));
         }
         return $string;
     }

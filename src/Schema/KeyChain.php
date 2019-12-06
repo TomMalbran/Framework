@@ -2,7 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Framework;
-use Framework\Utils\Utils;
+use Framework\Utils\Strings;
 
 /**
  * The Keys Data
@@ -47,7 +47,7 @@ class KeyChain {
         self::load();
         $data = [];
         foreach (array_keys(self::$data) as $key) {
-            $data[$key] = Utils::generatePassword(64, "luds");
+            $data[$key] = Strings::randomCode(64, "luds");
         }
         self::$data = $data;
         return (object)$data;
