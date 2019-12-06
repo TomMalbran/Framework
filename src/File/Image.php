@@ -1,6 +1,8 @@
 <?php
 namespace Framework\File;
 
+use App\Utils\Arrays;
+
 /**
  * The Image Utils
  */
@@ -25,6 +27,15 @@ class Image {
 
 
     /**
+     * Returns true if the given type is valid
+     * @param integer $type
+     * @return boolean
+     */
+    public function hasType($type) {
+        return Arrays::contains(self::$imageTypes, $type);
+    }
+
+    /**
      * Returns true if the image type is invalid
      * @param string $file
      * @return boolean
@@ -32,7 +43,7 @@ class Image {
     public static function isValidType($file) {
         if (!empty($file)) {
             $type = exif_imagetype($file);
-            return in_array($type, self::$imageTypes);
+            return self::hasType($type);
         }
         return false;
     }
@@ -57,7 +68,7 @@ class Image {
      */
     public static function resize($src, $dst, $width, $height, $action) {
         [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
-        if (!in_array($imgType, self::$imageTypes)) {
+        if (!self::hasType($imgType)) {
             return false;
         }
         
@@ -145,7 +156,7 @@ class Image {
      */
     public static function resizeCrop($src, $dst, $resWidth, $resHeight, $cropX, $cropY, $cropWidth, $cropHeight) {
         [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
-        if (!in_array($imgType, self::$imageTypes)) {
+        if (!self::hasType($imgType)) {
             return false;
         }
         
@@ -179,7 +190,7 @@ class Image {
      */
     private static function createDestImage($imgType, $width, $height) {
         $result = imagecreatetruecolor($width, $height);
-        if (in_array($imgType, self::$imageTrans)) {
+        if (Arrays::contains(self::$imageTrans, $imgType)) {
             imagealphablending($result, false);
             imagesavealpha($result,true);
             $transparent = imagecolorallocatealpha($result, 255, 255, 255, 127);

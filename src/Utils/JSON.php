@@ -2,8 +2,8 @@
 namespace Framework\Utils;
 
 use Framework\File\File;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 use stdClass;
 
 /**
@@ -99,7 +99,7 @@ class JSON {
      * @return void
      */
     public static function write($file, $contents) {
-        $value = Utils::toArray($contents);
+        $value = Arrays::toArray($contents);
         file_put_contents($path, self::encode($value, true));
     }
 }

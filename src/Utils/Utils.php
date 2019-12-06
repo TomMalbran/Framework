@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -415,7 +416,8 @@ class Utils {
         
         if (self::isValidEmail($email)) {
             $domain = Strings::substringAfter($email, "@");
-            if (!in_array(Strings::toLowerCase($domain), $domains)) {
+            $domain = Strings::toLowerCase($domain);
+            if (!Arrays::contains($domains, $domain)) {
                 return $domain;
             }
         }
@@ -545,7 +547,7 @@ class Utils {
      * @return boolean
      */
     public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]) {
-        return in_array($_SERVER["REMOTE_ADDR"], $whitelist);
+        return Arrays::contains($whitelist, $_SERVER["REMOTE_ADDR"]);
     }
 
     /**
@@ -579,166 +581,5 @@ class Utils {
             }
         }
         return $ip;
-    }
-    
-
-
-    /**
-     * Converts a single value or an array into an array
-     * @param array|mixed $array
-     * @return array
-     */
-    public static function toArray($array) {
-        return is_array($array) ? $array : [ $array ];
-    }
-    
-    /**
-     * Removes the empty entries from the given array
-     * @param array $array
-     * @return array
-     */
-    public static function removeEmpty(array $array) {
-        $result = [];
-        foreach ($array as $value) {
-            if (!empty($value)) {
-                $result[] = $value;
-            }
-        }
-        return $result;
-    }
-    
-    /**
-     * Returns an array with values in the Base
-     * @param array $base
-     * @param array $array
-     * @return array
-     */
-    public static function subArray(array $base, array $array) {
-        $result = [];
-        foreach ($array as $value) {
-            if (in_array($value, $base)) {
-                $result[] = $value;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Extends the first array replacing values from the second array
-     * @param array $array1
-     * @param array $array2
-     * @return array
-     */
-    public static function extend(array &$array1, array &$array2) {
-        $result = $array1;
-        foreach ($array2 as $key => &$value) {
-            if (is_array($value) && isset($result[$key]) && is_array($result[$key])) {
-                $result[$key] = self::extend($result[$key], $value);
-            } else {
-                $result[$key] = $value;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Creates a map using the given data
-     * @param array           $data
-     * @param string          $key
-     * @param string|string[] $value Optional.
-     * @return array
-     */
-    public static function createMap(array $data, $key, $value = "") {
-        $result  = [];
-        foreach ($data as $row) {
-            $result[$row[$key]] = !empty($value) ? self::getValue($row, $value) : $row;
-        }
-        return $result;
-    }
-    
-    /**
-     * Creates an array using the given data
-     * @param array           $data
-     * @param string|string[] $value Optional.
-     * @return array
-     */
-    public static function createArray(array $data, $value = "") {
-        $result = [];
-        foreach ($data as $row) {
-            $result[] = !empty($value) ? self::getValue($row, $value) : $row;
-        }
-        return $result;
-    }
-    
-    /**
-     * Creates a select using the given data
-     * @param array           $data
-     * @param string          $key
-     * @param string|string[] $value
-     * @return array
-     */
-    public static function createSelect(array $data, $key, $value) {
-        $result = [];
-        foreach ($data as $row) {
-            $result[] = [
-                "key"   => $row[$key],
-                "value" => self::getValue($row, $value),
-            ];
-        }
-        return $result;
-    }
-    
-    /**
-     * Creates a select using the given data
-     * @param array $data
-     * @return array
-     */
-    public static function createSelectFromMap(array $data) {
-        $result = [];
-        foreach ($data as $key => $value) {
-            $result[] = [
-                "key"   => $key,
-                "value" => $value,
-            ];
-        }
-        return $result;
-    }
-    
-    /**
-     * Returns the key adding the prefix or not
-     * @param string $key
-     * @param string $prefix Optional.
-     * @return string
-     */
-    public static function getKey($key, $prefix = "") {
-        return !empty($prefix) ? $prefix . ucfirst($key) : $key;
-    }
-
-    /**
-     * Returns one or multiple values as a string
-     * @param mixed           $row
-     * @param string|string[] $key
-     * @param string          $glue   Optional.
-     * @param string          $prefix Optional.
-     * @return string
-     */
-    public static function getValue($row, $key, $glue = " - ", $prefix = "") {
-        $result = "";
-        if (is_array($key)) {
-            $values = [];
-            foreach ($key as $id) {
-                $fullKey = self::getKey($id, $prefix);
-                if (!empty($row[$fullKey])) {
-                    $values[] = $row[$fullKey];
-                }
-            }
-            $result = Strings::join($values, $glue);
-        } else {
-            $fullKey = self::getKey($key, $prefix);
-            if (!empty($row[$fullKey])) {
-                $result = $row[$fullKey];
-            }
-        }
-        return $result;
     }
 }

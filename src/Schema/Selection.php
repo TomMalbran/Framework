@@ -2,8 +2,8 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Field;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 
 /**
  * The Selection wrapper
@@ -64,7 +64,7 @@ class Selection {
      * @return void
      */
     public function addSelects($selects, $addMainKey = false) {
-        $selects = Utils::toArray($selects);
+        $selects = Arrays::toArray($selects);
         foreach ($selects as $select) {
             if ($addMainKey) {
                 $this->selects[] = $this->structure->getKey($select);
@@ -85,7 +85,7 @@ class Selection {
         foreach ($this->structure->joins as $join) {
             if ($join->asTable) {
                 $joinKey = $join->asTable;
-            } elseif (in_array($join->table, $this->tables)) {
+            } elseif (Arrays::contains($this->tables, $join->table)) {
                 $joinKey = chr($this->index++);
             } else {
                 $joinKey        = $join->table;
@@ -244,7 +244,7 @@ class Selection {
 
             // Parse the Extras
             if (!empty($extras)) {
-                $extras = Utils::toArray($extras);
+                $extras = Arrays::toArray($extras);
                 foreach ($extras as $extra) {
                     $fields[$extra] = $row[$extra];
                 }

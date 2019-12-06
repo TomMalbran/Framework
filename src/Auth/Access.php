@@ -2,6 +2,7 @@
 namespace Framework\Auth;
 
 use Framework\Framework;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -104,7 +105,7 @@ class Access {
             $groupParts = Strings::split($groupNames, "Or");
             $groupX     = self::getGroup($groupParts[0]);
             $groupY     = self::getGroup($groupParts[1]);
-            return in_array($level, $groupX) || in_array($level, $groupY);
+            return Arrays::contains($groupX, $level) || Arrays::contains($groupY, $level);
         }
 
         // Function "inXxx(s)" or "isValidXxx": Check if the given level is in the group xxx
@@ -113,7 +114,7 @@ class Access {
             $groupName = Strings::stripStart($function, "isValid");
             $groupName = Strings::stripEnd($groupName, "s");
             $group     = self::getGroup($groupName);
-            return in_array($level, $group);
+            return Arrays::contains($group, $level);
         }
 
         // Function "isXxxOrHigher": Check if the given level is equal or higher than xxx

@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 use ReflectionClass;
 
 /**
@@ -32,7 +32,7 @@ class Enum {
 
             if (!empty($properties["data"])) {
                 $data = $properties["data"];
-                $type = is_array(array_values($data)[0]) ? "map" : "array";
+                $type = Arrays::isMap($data) ? "map" : "array";
             }
             self::$cache[$class] = (object)[
                 "constants"  => $reflection->getConstants(),
@@ -56,9 +56,9 @@ class Enum {
     public static function isValid($value) {
         $cache = self::load();
         if ($cache->isConstant) {
-            return in_array($value, array_values($cache->constants));
+            return Arrays::contains($cache->constants, $value);
         }
-        return in_array($value, array_keys($cache->data));
+        return Arrays::containsKey($cache->data, $value);
     }
 
     /**
@@ -81,13 +81,13 @@ class Enum {
     public static function getSelect() {
         $cache = self::load();
         if ($cache->isConstant) {
-            return Utils::createSelectFromMap($cache->constants);
+            return Arrays::createSelectFromMap($cache->constants);
         }
         if ($cache->isArray) {
-            return Utils::createSelectFromMap($cache->data);
+            return Arrays::createSelectFromMap($cache->data);
         }
         if ($cache->isMap) {
-            return Utils::createSelect($cache->data, "key", "name");
+            return Arrays::createSelect($cache->data, "key", "name");
         }
     }
 

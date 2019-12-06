@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\Auth\Auth;
 use Framework\Schema\Factory;
 use Framework\Schema\Query;
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 
@@ -192,7 +193,7 @@ class ActionLog {
     public static function add($action, $section = 0, $dataID = "") {
         $sessionID = self::getSessionID();
         if (!empty($sessionID)) {
-            $dataID = Utils::toArray($dataID);
+            $dataID = Arrays::toArray($dataID);
             foreach ($dataID as $index => $value) {
                 $dataID[$index] = (int)$value;
             }

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\File;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use ZipArchive;
@@ -172,7 +173,7 @@ class File {
      */
     public static function hasExtension($name, $extensions) {
         $extension = self::getExtension($name);
-        return in_array($extension, Utils::toArray($extensions));
+        return Arrays::contains($extensions, $extension);
     }
 
     /**
@@ -288,7 +289,7 @@ class File {
      */
     public static function createZip($name, $files) {
         $zip   = new ZipArchive();
-        $files = Utils::toArray($files);
+        $files = Arrays::toArray($files);
 
         if ($zip->open($name, ZIPARCHIVE::CREATE)) {
             foreach ($files as $file) {

@@ -6,8 +6,8 @@ use Framework\Schema\Selection;
 use Framework\Schema\Modification;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 use Framework\Request;
 
 /**
@@ -124,7 +124,7 @@ class Schema {
     public function getMap(Query $query = null, Request $sort = null, $decripted = false) {
         $query   = $this->generateQuerySort($query, $sort);
         $request = $this->request($query, $decripted);
-        return Utils::createMap($request, $this->structure->idName);
+        return Arrays::createMap($request, $this->structure->idName);
     }
     
     /**
@@ -279,7 +279,7 @@ class Schema {
         $request = $selection->request($query);
         $result  = [];
         foreach ($request as $row) {
-            if (!empty($row[$columnName]) && !in_array($row[$columnName], $result)) {
+            if (!empty($row[$columnName]) && !Arrays::contains($result, $row[$columnName])) {
                 $result[] = $row[$columnName];
             }
         }
@@ -363,7 +363,7 @@ class Schema {
         $selection->addJoins();
         $selection->request($query);
         $request   = $selection->resolve();
-        return Utils::createSelect($request, $this->structure->idName, $name ?: $this->structure->name);
+        return Arrays::createSelect($request, $this->structure->idName, $name ?: $this->structure->name);
     }
     
     

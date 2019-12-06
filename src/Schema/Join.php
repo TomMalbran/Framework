@@ -2,7 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Field;
-use Framework\Utils\Utils;
+use Framework\Utils\Arrays;
 
 /**
  * The Database Join
@@ -82,7 +82,7 @@ class Join {
             $result = array_merge($result, $values);
         }
         foreach ($this->merges as $merge) {
-            $result[$merge->key] = Utils::getValue($data, $merge->fields, $merge->glue);
+            $result[$merge->key] = Arrays::getValue($data, $merge->fields, $merge->glue);
         }
         return $result;
     }

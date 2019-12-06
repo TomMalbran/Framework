@@ -8,6 +8,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
+use Framework\Utils\Arrays;
 use Framework\Utils\Utils;
 
 /**
@@ -73,7 +74,7 @@ class Credential {
      * @return boolean
      */
     public static function existsWithLevel($crendentialID, $level) {
-        $levels = Utils::toArray($level);
+        $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return false;
         }
@@ -126,7 +127,7 @@ class Credential {
      * @return array
      */
     public static function getAllForLevel($level, Request $sort = null) {
-        $levels = Utils::toArray($level);
+        $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return [];
         }
@@ -140,7 +141,7 @@ class Credential {
      * @return integer
      */
     public static function getTotalForLevel($level) {
-        $levels = Utils::toArray($level);
+        $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return 0;
         }
@@ -202,7 +203,7 @@ class Credential {
      * @return array
      */
     public static function getSelectForLevel($level) {
-        $levels = Utils::toArray($level);
+        $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return [];
         }
@@ -276,13 +277,13 @@ class Credential {
      * @return array
      */
     public static function getEmailsForLevel($level, $filter = null) {
-        $levels = Utils::toArray($level);
+        $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return [];
         }
         $query = Query::create("level", "IN", $levels);
         if (!empty($filter)) {
-            $filters = Utils::toArray($filter);
+            $filters = Arrays::toArray($filter);
             foreach ($filters as $key) {
                 $query->add($key, "=", 1);
             }

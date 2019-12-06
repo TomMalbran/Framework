@@ -86,7 +86,7 @@ class Request implements ArrayAccess {
      * @return array
      */
     public function getArray($key) {
-        return Utils::removeEmpty($this->get($key, []));
+        return Arrays::removeEmpty($this->get($key, []));
     }
     
     /**

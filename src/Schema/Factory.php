@@ -8,7 +8,7 @@ use Framework\Schema\Schema;
 use Framework\Schema\Structure;
 use Framework\Schema\Subrequest;
 use Framework\Schema\Migration;
-use Framework\Utils\Utils;
+use Framework\Utils\Arrays;
 
 /**
  * The Schema Factory
@@ -36,7 +36,7 @@ class Factory {
             
             foreach ($schemas as $key => $data) {
                 if (!empty($frame[$key])) {
-                    self::$data[$key] = Utils::extend($frame[$key], $data);
+                    self::$data[$key] = Arrays::extend($frame[$key], $data);
                 } else {
                     self::$data[$key] = $data;
                 }

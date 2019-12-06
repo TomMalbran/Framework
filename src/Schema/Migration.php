@@ -3,6 +3,7 @@ namespace Framework\Schema;
 
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -26,7 +27,7 @@ class Migration {
             $structure     = new Structure($schemaKey, $schemaData);
             $schemaNames[] = $structure->table;
             
-            if (!in_array($structure->table, $tableNames)) {
+            if (!Arrays::contains($tableNames, $structure->table)) {
                 self::createTable($db, $structure);
             } else {
                 self::updateTable($db, $structure, $canDelete);
@@ -74,7 +75,7 @@ class Migration {
     private static function deleteTables(Database $db, array $tableNames, array $schemaNames, $canDelete) {
         $prebr = "<br>";
         foreach ($tableNames as $tableName) {
-            if (!in_array($tableName, $schemaNames)) {
+            if (!Arrays::contains($schemaNames, $tableName)) {
                 if ($canDelete) {
                     $db->deleteTable($tableName);
                     print("{$prebr}Deleteing table <i>$tableName</i><br>");
@@ -185,7 +186,7 @@ class Migration {
         foreach ($structure->fields as $field) {
             if ($field->isPrimary) {
                 $primary[] = $field->key;
-                if (!in_array($field->key, $primaryKeys)) {
+                if (!Arrays::contains($primaryKeys, $field->key)) {
                     $addPrimary = true;
                     $update     = true;
                 }

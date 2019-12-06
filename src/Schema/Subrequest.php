@@ -2,7 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Field;
-use Framework\Utils\Utils;
+use Framework\Utils\Arrays;
 
 /**
  * The Schema Subrequests
@@ -52,7 +52,7 @@ class Subrequest {
      * @return array
      */
     public function request(array $result) {
-        $ids   = Utils::createArray($result, $this->idName);
+        $ids   = Arrays::createArray($result, $this->idName);
         $query = Query::create($this->idKey, "IN", $ids);
 
         if ($this->hasOrder) {

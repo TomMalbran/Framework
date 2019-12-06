@@ -150,7 +150,7 @@ class DateTime {
         return (
             !empty($parts[0]) && Utils::isNumeric($parts[0], 0, 23) &&
             !empty($parts[1]) && Utils::isNumeric($parts[1], 0, 59) &&
-            (empty($minutes) || in_array($parts[1], $minutes))
+            (empty($minutes) || Arrays::contains($minutes, $parts[1]))
         );
     }
 

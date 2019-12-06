@@ -2,6 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Query;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use mysqli;
@@ -153,7 +154,7 @@ class Database {
         $result  = [];
         
         foreach ($request as $row) {
-            if (!empty($row[$column]) && !in_array($row[$column], $result)) {
+            if (!empty($row[$column]) && !Arrays::contains($result, $row[$column])) {
                 $result[] = $row[$column];
             }
         }
@@ -515,7 +516,7 @@ class Database {
 
         foreach ($request as $row) {
             foreach ($row as $value) {
-                if ((!empty($filter) && !in_array($value, $filter)) || empty($filter)) {
+                if ((!empty($filter) && !Arrays::contains($filter, $value)) || empty($filter)) {
                     if (!$withPrefix) {
                         $result[] =  Strings::replace($value, $this->prefix, "");
                     } else {
@@ -812,7 +813,7 @@ class Database {
         
         // Find the keys.
         $request = $this->query("SHOW KEYS FROM `$tableName`");
-        $indexes = array();
+        $indexes = [];
         
         foreach ($request as $row) {
             // IS this a primary key, unique index, or regular index?
@@ -828,7 +829,7 @@ class Database {
 
             // Is this the first column in the index?
             if (empty($indexes[$row["Key_name"]])) {
-                $indexes[$row["Key_name"]] = array();
+                $indexes[$row["Key_name"]] = [];
             }
 
             // A sub part, like only indexing 15 characters of a varchar.
@@ -848,7 +849,7 @@ class Database {
         // Now just get the comment and type... (MyISAM, etc.)
         $request = $this->query("
             SHOW TABLE STATUS
-            LIKE '" . strtr($tableName, array('_' => '\\_', '%' => '\\%')) . "'
+            LIKE '" . strtr($tableName, [ '_' => '\\_', '%' => '\\%' ]) . "'
         ");
         
         // Probably MyISAM.... and it might have a comment.

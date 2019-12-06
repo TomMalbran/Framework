@@ -2,6 +2,7 @@
 namespace Framework\Utils;
 
 use Framework\Framework;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -81,7 +82,7 @@ class Status {
      */
     public static function isValid($value, $groupName = "general") {
         $group = self::getGroup($groupName);
-        return in_array($value, $group);
+        return Arrays::contains($group, $value);
     }
 
 
@@ -108,7 +109,7 @@ class Status {
             $groupName = Strings::stripStart($function, "isValid");
             $groupName = Strings::stripEnd($groupName, "s");
             $group     = self::getGroup($groupName);
-            return in_array($value, $group);
+            return Arrays::contains($group, $value);
         }
 
         // Function "isXxx": Check if the given value is equal to xxx

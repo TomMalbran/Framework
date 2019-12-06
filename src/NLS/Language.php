@@ -2,6 +2,7 @@
 namespace Framework\Auth;
 
 use Framework\Framework;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -65,7 +66,7 @@ class Language {
      */
     public static function isValid($value) {
         self::load();
-        return in_array(array_keys(self::$data), $value);
+        return Arrays::containsKey(self::$data, $value);
     }
 
     /**
@@ -92,7 +93,7 @@ class Language {
      */
     public static function getSelect() {
         $cache = self::load();
-        return Utils::createSelect(self::$data, "key", "name");
+        return Arrays::createSelect(self::$data, "key", "name");
     }
 
 

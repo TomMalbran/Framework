@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\Utils\Utils;
+use Framework\Utils\Arrays;
 
 /**
  * The Errors wrapper
@@ -17,7 +17,7 @@ class Errors {
      */
     public function __construct(array $errors = null) {
         if ($errors !== null) {
-            $errors = Utils::toArray($errors);
+            $errors = Arrays::toArray($errors);
             foreach ($errors as $error => $message) {
                 $this->add($error, $message);
             }

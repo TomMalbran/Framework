@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 
 /**
  * The Database Query
@@ -69,7 +69,7 @@ class Query {
         $prefix = $this->getPrefix();
         $binds  = is_array($value) ? self::createBinds($value) : "?";
         $value  = $expression == "LIKE" ? "%$value%" : $value;
-        $values = Utils::toArray($value);
+        $values = Arrays::toArray($value);
 
         $this->where    .= "{$prefix} {$column} {$expression} {$binds} ";
         $this->params    = array_merge($this->params, $values);
@@ -195,7 +195,7 @@ class Query {
      */
     public function search($column, $value, $expression = "LIKE") {
         if (!empty($value)) {
-            $columns = Utils::toArray($column);
+            $columns = Arrays::toArray($column);
             if (count($columns) > 1) {
                 $this->startOr();
                 foreach ($columns as $col) {
@@ -309,7 +309,7 @@ class Query {
      * @return boolean
      */
     public function hasColumn($column) {
-        return in_array($column, $this->columns);
+        return Arrays::contains($this->columns, $column);
     }
 
     /**
@@ -319,7 +319,7 @@ class Query {
      */
     public function hasOrder($order = null) {
         if (!empty($order)) {
-            return in_array($order, $this->orders);
+            return Arrays::contains($this->orders, $order);
         }
         return !empty($this->orderBy);
     }
