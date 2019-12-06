@@ -79,6 +79,17 @@ class Request implements ArrayAccess {
     public function getInt($key, $default = 0) {
         return isset($this->request[$key]) ? (int)$this->request[$key] : $default;
     }
+
+    /**
+     * Returns the request data at the given key as a trimmed string or the default
+     * @param string $key
+     * @param string $default Optional.
+     * @return string
+     */
+    public function getString($key, $default = "") {
+        return isset($this->request[$key]) ? trim((string)$this->request[$key]) : $default;
+    }
+
     
     /**
      * Returns the request data at the given key as an array and removing the empty entries
