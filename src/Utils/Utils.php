@@ -350,10 +350,10 @@ class Utils {
      * @return string
      */
     public static function createRealName($data, $prefix = "") {
-        $id        = self::getValue($data, "credentialID", "", $prefix);
-        $firstName = self::getValue($data, "firstName",    "", $prefix);
-        $lastName  = self::getValue($data, "lastName",     "", $prefix);
-        $nickName  = self::getValue($data, "nickName",     "", $prefix);
+        $id        = Arrays::getValue($data, "credentialID", "", $prefix);
+        $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
+        $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
+        $nickName  = Arrays::getValue($data, "nickName",     "", $prefix);
         $result    = "";
         
         if (!empty($firstName) && !empty($lastName)) {
