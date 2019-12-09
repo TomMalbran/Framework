@@ -29,7 +29,7 @@ class Curl {
                 $content[] = $key . "=" . urlencode($value);
             }
             $content = implode("&", $content);
-            $uri    .= "?" . $content;
+            $url    .= "?" . $content;
         }
         
         $options = [
