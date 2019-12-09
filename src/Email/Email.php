@@ -23,7 +23,7 @@ class Email {
      * Loads the Email Schema
      * @return Schema
      */
-    public static function getSchema() {
+    public static function getSchema(): Schema {
         if (!self::$loaded) {
             self::$loaded = false;
             self::$schema = Factory::getSchema("emailTemplates");
@@ -35,20 +35,20 @@ class Email {
 
     /**
      * Returns an Email Template with the given Code
-     * @param integer $templateCode
+     * @param string $templateCode
      * @return Model
      */
-    public static function getOne($templateCode) {
+    public static function getOne(string $templateCode): Model {
         $query = Query::create("templateCode", "=", $templateCode);
         return self::getSchema()->getOne($query);
     }
     
     /**
      * Returns true if the given  Email Template exists
-     * @param integer $templateCode
+     * @param string $templateCode
      * @return boolean
      */
-    public static function exists($templateCode) {
+    public static function exists(string $templateCode): bool {
         $query = Query::create("templateCode", "=", $templateCode);
         return self::getSchema()->exists($query);
     }
@@ -58,7 +58,7 @@ class Email {
      * @param Request $request
      * @return array
      */
-    public static function getAll(Request $request) {
+    public static function getAll(Request $request): array {
         return self::getSchema()->getAll(null, $request);
     }
 
@@ -66,19 +66,19 @@ class Email {
      * Returns the total amount of Email Templates
      * @return integer
      */
-    public static function getTotal() {
+    public static function getTotal(): int {
         return self::getSchema()->getTotal();
     }
     
     /**
      * Edits the given Email Template
-     * @param integer $templateCode
+     * @param string  $templateCode
      * @param Request $request
-     * @return void
+     * @return boolean
      */
-    public static function edit($templateCode, Request $request) {
+    public static function edit(string $templateCode, Request $request): bool {
         $query = Query::create("templateCode", "=", $templateCode);
-        self::getSchema()->edit($query, $request);
+        return self::getSchema()->edit($query, $request);
     }
 
 
@@ -89,7 +89,7 @@ class Email {
      * @param array  $data
      * @return string
      */
-    public function render($template, array $data) {
+    public function render(string $template, array $data): string {
         return Mustache::render($template, $data);
     }
 
@@ -99,7 +99,7 @@ class Email {
      * @param boolean  $recreate Optional.
      * @return void
      */
-    public static function migrate(Database $db, $recreate = false) {
+    public static function migrate(Database $db, bool $recreate = false): void {
         if (!$db->hasTable("email_templates")) {
             return;
         }

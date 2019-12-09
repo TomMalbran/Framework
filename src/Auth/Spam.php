@@ -18,7 +18,7 @@ class Spam {
      * Loads the Spam Schema
      * @return Schema
      */
-    public static function getSchema() {
+    public static function getSchema(): Schema {
         if (!self::$loaded) {
             self::$loaded = false;
             self::$schema = Factory::getSchema("spam");
@@ -32,7 +32,7 @@ class Spam {
      * Proection against multiple logins in a few seconds
      * @return boolean
      */
-    public static function protection() {
+    public static function protection(): bool {
         $schema = self::getSchema();
         $ip     = Utils::getIP();
         

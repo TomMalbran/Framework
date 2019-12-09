@@ -19,7 +19,7 @@ class SettingType {
      * @param mixed $value
      * @return integer
      */
-    public static function get($value) {
+    public static function get($value): int {
         if (is_array($value)) {
             return self::JSON;
         }

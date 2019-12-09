@@ -20,7 +20,7 @@ class Path {
      * Loads the Path Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded   = true;
             self::$data     = Framework::loadData(Framework::PathData);
@@ -34,7 +34,7 @@ class Path {
      * @param string $pathKey
      * @return string
      */
-    private static function get($pathKey) {
+    private static function get(string $pathKey): string {
         self::load();
         if (!empty(self::$data[$pathKey])) {
             return self::$data[$pathKey];
@@ -50,7 +50,7 @@ class Path {
      * @param string ...$pathParts
      * @return string
      */
-    public static function getPath($pathKey, ...$pathParts) {
+    public static function getPath(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
             return File::getPath(self::$basePath, $path, ...$pathParts);
@@ -64,7 +64,7 @@ class Path {
      * @param string ...$pathParts
      * @return string
      */
-    public static function getUrl($pathKey, ...$pathParts) {
+    public static function getUrl(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
             return Config::getUrl(self::$baseDir, $path, ...$pathParts);
@@ -80,7 +80,7 @@ class Path {
      * @param boolean $create
      * @return string
      */
-    public static function getTempPath($credentialID, $create = true) {
+    public static function getTempPath(int $credentialID, bool $create = true): string {
         $path   = self::getPath(Framework::TempDir, $credentialID);
         $exists = File::exists($path);
         
@@ -96,7 +96,7 @@ class Path {
      * @param integer $credentialID
      * @return string
      */
-    public static function getTempUrl($credentialID) {
+    public static function getTempUrl(int $credentialID): string {
         return self::getPath(Framework::TempDir, $credentialID) . "/";
     }
 
@@ -108,7 +108,7 @@ class Path {
      * @param string ...$pathParts
      * @return boolean
      */
-    public static function exists($pathKey, ...$pathParts) {
+    public static function exists(string $pathKey, string ...$pathParts): bool {
         $path = self::getPath($pathKey, ...$pathParts);
         return File::exists($path);
     }

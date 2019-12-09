@@ -35,7 +35,7 @@ class Database {
      * ].
      * @param boolean $persist True to persist the connection. Defaults to false.
      */
-    public function __construct(object $config, bool $persist = false) {
+    public function __construct($config, bool $persist = false) {
         $this->host     = $config->host;
         $this->username = $config->username;
         $this->password = $config->password;

@@ -45,7 +45,7 @@ class Access {
      * @param string $accessName
      * @return integer
      */
-    public static function getOne($accessName) {
+    public static function getOne(string $accessName): int {
         self::load();
         $name = Strings::toLowerCase($accessName);
         if (isset(self::$levels[$name])) {
@@ -59,7 +59,7 @@ class Access {
      * @param string $groupName
      * @return integer[]
      */
-    public static function getGroup($groupName) {
+    public static function getGroup(string $groupName): array {
         self::load();
         $name = Strings::toLowerCase($groupName);
         if (isset(self::$groups[$name])) {
@@ -74,7 +74,7 @@ class Access {
      * @param integer $requested
      * @return boolean
      */
-    public static function grant($granted, $requested) {
+    public static function grant(int $granted, int $requested): bool {
         if (self::inAPI($granted)) {
             return self::inAPI($requested) || self::inGeneral($requested);
         }
@@ -89,7 +89,7 @@ class Access {
      * @param array  $arguments
      * @return mixed
      */
-    public static function __callStatic($function, array $arguments) {
+    public static function __callStatic(string $function, array $arguments) {
         $level = !empty($arguments[0]) ? (int)$arguments[0] : 0;
 
         // Function "getXxx(s)": Get the group xxx

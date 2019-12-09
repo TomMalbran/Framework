@@ -23,7 +23,7 @@ class Mailer {
      * Loads the Mailer Config
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded = true;
             self::$url    = Config::get("url");
@@ -44,7 +44,13 @@ class Mailer {
      * @param string $message
      * @return boolean
      */
-    public static function sendHtml($to, $from, $fromName, $subject, $message) {
+    public static function sendHtml(
+        string $to,
+        string $from,
+        string $fromName,
+        string $subject,
+        string $message
+    ): bool {
         self::load();
 
         $name  = self::$name;
@@ -80,8 +86,17 @@ class Mailer {
      * @param string  $attachment Optional.
      * @return boolean
      */
-    public static function send($to, $from, $fromName, $subject, $body, $sendHtml = false, $attachment = "") {
+    public static function send(
+        string $to,
+        string $from,
+        string $fromName,
+        string $subject,
+        string $body,
+        bool   $sendHtml = false,
+        string $attachment = ""
+    ): bool {
         self::load();
+
         if (self::$smtp->sendDisabled) {
             return false;
         }
@@ -151,7 +166,7 @@ class Mailer {
      * @param string $redirectUri
      * @return string
      */
-    public static function getAuthUrl($redirectUri) {
+    public static function getAuthUrl(string $redirectUri): string {
         $options  = [ "scope" => [ "https://mail.google.com/" ]];
         $provider = new Google([
             "clientId"     => self::$google->client,
@@ -167,7 +182,7 @@ class Mailer {
      * @param string $code
      * @return string
      */
-    public static function getAuthToken($code) {
+    public static function getAuthToken(string $code): string {
         $provider = new Google([
             "clientId"     => self::$google->client,
             "clientSecret" => self::$google->secret,

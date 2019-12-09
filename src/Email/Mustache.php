@@ -23,7 +23,7 @@ class Mustache {
      * Creates a new Mustache Providers
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded = true;
 
@@ -49,7 +49,7 @@ class Mustache {
      * @param array  $data
      * @return string
      */
-    public static function render($templateOrPath, array $data) {
+    public static function render(string $templateOrPath, array $data): string {
         self::load();
         if (preg_match('/^[a-z\/]*$/', $templateOrPath)) {
             if (self::$loader != null) {

@@ -19,9 +19,9 @@ class Settings {
     
     /**
      * Loads the Settings Schemas
-     * @return void
+     * @return Schema
      */
-    public static function getSchema() {
+    public static function getSchema(): Schema {
         if (!self::$loaded) {
             self::$loaded = true;
             self::$schema = Factory::getSchema("settings");
@@ -37,7 +37,7 @@ class Settings {
      * @param string $section  Optional.
      * @return mixed|null
      */
-    public static function get($variable, $section = "general") {
+    public static function get(string $variable, string $section = "general") {
         $query = Query::create("section", "=", $section);
         $query->add("variable", "=", $variable);
         $model = self::getSchema()->getOne($query);
@@ -52,7 +52,7 @@ class Settings {
      * @param string $section Optional.
      * @return array
      */
-    private static function getSettings($section = null) {
+    private static function getSettings(string $section = null): array {
         $query = Query::createIf("section", "=", $section);
         return self::getSchema()->getAll($query);
     }
@@ -62,7 +62,7 @@ class Settings {
      * @param string $section Optional.
      * @return array
      */
-    public function getAll($section = null) {
+    public function getAll(string $section = null): array {
         $request = self::getSettings($section);
         $result  = [];
 
@@ -85,7 +85,7 @@ class Settings {
      * @param string $section Optional.
      * @return array
      */
-    public function getAllParsed($section = null) {
+    public function getAllParsed(string $section = null): array {
         $request = self::getSettings($section);
         $result  = [];
 
@@ -106,7 +106,7 @@ class Settings {
      * @param array $data
      * @return void
      */
-    public static function save(array $data) {
+    public static function save(array $data): void {
         $request = self::getSettings();
         $batch   = [];
         
@@ -139,7 +139,7 @@ class Settings {
      * @param Database $db
      * @return void
      */
-    public static function migrate(Database $db) {
+    public static function migrate(Database $db): void {
         if (!$db->hasTable("settings")) {
             return;
         }

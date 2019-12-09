@@ -22,7 +22,7 @@ class Config {
      * Loads the Config Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             $path    = Framework::getPath(Framework::ServerDir);
             $data    = Dotenv::createImmutable($path)->load();
@@ -50,7 +50,7 @@ class Config {
      * @param string $property
      * @return mixed
      */
-    public static function get($property) {
+    public static function get(string $property) {
         self::load();
 
         // Check if there is a property with the given value
@@ -85,7 +85,7 @@ class Config {
      * @param string ...$pathParts
      * @return string
      */
-    public static function getUrl(...$urlParts) {
+    public static function getUrl(string ...$urlParts): string {
         $url  = self::get("url");
         $path = File::getpath(...$urlParts);
         return $url . $path;
@@ -95,7 +95,7 @@ class Config {
      * Returns the Version split into the diferent parts
      * @return object
      */
-    public static function getVersion() {
+    public static function getVersion(): object {
         $version = self::get("version");
         if (empty($version)) {
             return (object)[
@@ -117,7 +117,7 @@ class Config {
      * @param string $property
      * @return boolean
      */
-    public static function has($property) {
+    public static function has(string $property): bool {
         $value = self::get($property);
         return isset($value);
     }

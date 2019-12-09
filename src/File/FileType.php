@@ -32,7 +32,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isDir($file) {
+    public static function isDir(string $file): bool {
         return is_dir($file);
     }
 
@@ -41,7 +41,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isHidden($file) {
+    public static function isHidden(string $file): bool {
         return Strings::startsWith($file, ".");
     }
 
@@ -50,7 +50,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isImage($file) {
+    public static function isImage(string $file): bool {
         return File::hasExtension($file, self::$imageExts);
     }
 
@@ -59,7 +59,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isPNG($file) {
+    public static function isPNG(string $file): bool {
         return File::hasExtension($file, self::$pngExts);
     }
 
@@ -68,7 +68,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isVideo($file) {
+    public static function isVideo(string $file): bool {
         return File::hasExtension($file, self::$videoExts);
     }
 
@@ -77,7 +77,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isAudio($file) {
+    public static function isAudio(string $file): bool {
         return File::hasExtension($file, self::$audioExts);
     }
 
@@ -86,7 +86,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isCode($file) {
+    public static function isCode(string $file): bool {
         return File::hasExtension($file, self::$codeExts);
     }
 
@@ -95,7 +95,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isText($file) {
+    public static function isText(string $file): bool {
         return File::hasExtension($file, self::$textExts);
     }
 
@@ -104,7 +104,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isDocument($file) {
+    public static function isDocument(string $file): bool {
         return File::hasExtension($file, self::$documentExts);
     }
 
@@ -113,7 +113,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isSpreadsheet($file) {
+    public static function isSpreadsheet(string $file): bool {
         return File::hasExtension($file, self::$spreadsheetExts);
     }
 
@@ -122,7 +122,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isPresentation($file) {
+    public static function isPresentation(string $file): bool {
         return File::hasExtension($file, self::$presentationExts);
     }
 
@@ -131,7 +131,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isPDF($file) {
+    public static function isPDF(string $file): bool {
         return File::hasExtension($file, self::$pdfExts);
     }
 
@@ -140,7 +140,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isZip($file) {
+    public static function isZip(string $file): bool {
         return File::hasExtension($file, self::$zipExts);
     }
 
@@ -149,7 +149,7 @@ class FileType {
      * @param string $file
      * @return boolean
      */
-    public static function isFile($file) {
+    public static function isFile(string $file): bool {
         return (
             !self::isDir($file) &&
             !self::isImage($file) &&
@@ -164,7 +164,7 @@ class FileType {
      * @param string $name
      * @return string
      */
-    public static function getIcon($name) {
+    public static function getIcon(string $name): string {
         if (self::isVideo($name)) {
             return "file-video";
         }

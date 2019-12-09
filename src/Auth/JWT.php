@@ -23,7 +23,7 @@ class JWT {
      * Loads the JWT Config
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             FirebaseJWT::$leeway = 1000;
             self::$loaded    = true;
@@ -41,7 +41,7 @@ class JWT {
      * @param boolean $forLongTerm Optional.
      * @return string
      */
-    public static function create($time, array $data, $forLongTerm = false) {
+    public static function create(int $time, array $data, bool $forLongTerm = false): string {
         self::load();
         $length = ($forLongTerm ? self::$longTerm : self::$shortTerm) * 3600;
         $token  = [
@@ -58,7 +58,7 @@ class JWT {
      * @param string $token
      * @return boolean
      */
-    public static function isValid($token) {
+    public static function isValid(string $token): bool {
         self::load();
         if (empty($token)) {
             return false;
@@ -76,7 +76,7 @@ class JWT {
      * @param string $token
      * @return object
      */
-    public static function getData($token) {
+    public static function getData(string $token): object {
         self::load();
         try {
             $decode = FirebaseJWT::decode($token, self::$secretKey, self::$encrypt);

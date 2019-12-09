@@ -31,7 +31,7 @@ class Image {
      * @param integer $type
      * @return boolean
      */
-    public function hasType($type) {
+    public function hasType(int $type): bool {
         return Arrays::contains(self::$imageTypes, $type);
     }
 
@@ -40,7 +40,7 @@ class Image {
      * @param string $file
      * @return boolean
      */
-    public static function isValidType($file) {
+    public static function isValidType(string $file): bool {
         if (!empty($file)) {
             $type = exif_imagetype($file);
             return self::hasType($type);
@@ -53,9 +53,11 @@ class Image {
      * @param string $file
      * @return array
      */
-    public static function getSize($file) {
+    public static function getSize(string $file): array {
         return getimagesize($file);
     }
+
+
     
     /**
      * Resizes an Image
@@ -66,7 +68,13 @@ class Image {
      * @param string  $action
      * @return boolean
      */
-    public static function resize($src, $dst, $width, $height, $action) {
+    public static function resize(
+        string $src,
+        string $dst,
+        int    $width,
+        int    $height,
+        string $action
+    ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
         if (!self::hasType($imgType)) {
             return false;
@@ -154,7 +162,16 @@ class Image {
      * @param integer $cropHeight
      * @return boolean
      */
-    public static function resizeCrop($src, $dst, $resWidth, $resHeight, $cropX, $cropY, $cropWidth, $cropHeight) {
+    public static function resizeCrop(
+        string $src,
+        string $dst,
+        int    $resWidth,
+        int    $resHeight,
+        int    $cropX,
+        int    $cropY,
+        int    $cropWidth,
+        int    $cropHeight
+    ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
         if (!self::hasType($imgType)) {
             return false;
@@ -188,7 +205,7 @@ class Image {
      * @param integer $height
      * @return mixed
      */
-    private static function createDestImage($imgType, $width, $height) {
+    private static function createDestImage(int $imgType, int $width, int $height) {
         $result = imagecreatetruecolor($width, $height);
         if (Arrays::contains(self::$imageTrans, $imgType)) {
             imagealphablending($result, false);
@@ -206,7 +223,7 @@ class Image {
      * @param mixed   $dst
      * @return void
      */
-    private static function createImage($imgType, $src, $dst) {
+    private static function createImage(int $imgType, $src, $dst) {
         if ($imgType == 2) {
             self::$imageFuncs[$imgType][1]($src, $dst, 90);
         } else {

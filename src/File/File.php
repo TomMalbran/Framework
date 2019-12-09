@@ -16,7 +16,7 @@ class File {
      * @param string ...$pathParts
      * @return string
      */
-    public static function getPath(...$pathParts) {
+    public static function getPath(string ...$pathParts): string {
         $result = Strings::join($pathParts, "/");
         $result = Strings::replace($result, "//", "/");
         return $result;
@@ -27,7 +27,7 @@ class File {
      * @param string ...$pathParts
      * @return boolean
      */
-    public static function exists(...$pathParts) {
+    public static function exists(string ...$pathParts): bool {
         $path = self::getPath(...$pathParts);
         return !empty($path) && file_exists($path);
     }
@@ -39,7 +39,7 @@ class File {
      * @param string $tmpFile
      * @return string
      */
-    public static function upload($path, $fileName, $tmpFile) {
+    public static function upload(string $path, string $fileName, string $tmpFile): string {
         $path = self::getPath($path, $fileName);
         if (!empty($path)) {
             move_uploaded_file($tmpFile, $path);
@@ -54,7 +54,7 @@ class File {
      * @param string|string[] $content
      * @return string
      */
-    public static function create($path, $fileName, $content) {
+    public static function create(string $path, string $fileName, $content): string {
         $path = self::getPath($path, $fileName);
         if (!empty($path)) {
             file_put_contents($path, Strings::join($content, "\n"));
@@ -68,7 +68,7 @@ class File {
      * @param string $toPath
      * @return boolean
      */
-    public static function move($fromPath, $toPath) {
+    public static function move(string $fromPath, string $toPath): bool {
         if (!empty($fromPath) && !empty($toPath)) {
             rename($fromPath, $toPath);
             return true;
@@ -82,7 +82,7 @@ class File {
      * @param string $name Optional.
      * @return boolean
      */
-    public static function delete($path, $name = "") {
+    public static function delete(string $path, string $name = ""): bool {
         $path = self::getPath($path, $name);
         if (!empty($path) && file_exists($path)) {
             unlink($path);
@@ -98,7 +98,7 @@ class File {
      * @param string $path
      * @return string
      */
-    public static function addLastSlash($path) {
+    public static function addLastSlash(string $path): string {
         if (!Strings::endsWith($path, "/")) {
             return "$path/";
         }
@@ -110,7 +110,7 @@ class File {
      * @param string $path
      * @return string
      */
-    public static function addFirstSlash($path) {
+    public static function addFirstSlash(string $path): string {
         if (!Strings::startsWith($path, "/")) {
             return "/$path";
         }
@@ -122,7 +122,7 @@ class File {
      * @param string $path
      * @return string
      */
-    public static function removeLastSlash($path) {
+    public static function removeLastSlash(string $path): string {
         return Strings::stripEnd($path, "/");
     }
 
@@ -131,7 +131,7 @@ class File {
      * @param string $path
      * @return string
      */
-    public static function removeFirstSlash($path) {
+    public static function removeFirstSlash(string $path): string {
         return Strings::stripStart($path, "/");
     }
     
@@ -142,7 +142,7 @@ class File {
      * @param string $path
      * @return string
      */
-    public static function getBaseName($path) {
+    public static function getBaseName(string $path): string {
         return basename($path);
     }
 
@@ -151,7 +151,7 @@ class File {
      * @param string $name
      * @return string
      */
-    public static function getName($name) {
+    public static function getName(string $name): string {
         $extension = pathinfo($name, PATHINFO_EXTENSION);
         return Strings::replace($name, ".$extension", "");
     }
@@ -161,7 +161,7 @@ class File {
      * @param string $name
      * @return string
      */
-    public static function getExtension($name) {
+    public static function getExtension(string $name): string {
         return pathinfo($name, PATHINFO_EXTENSION);
     }
 
@@ -171,7 +171,7 @@ class File {
      * @param string|string[] $extensions
      * @return boolean
      */
-    public static function hasExtension($name, $extensions) {
+    public static function hasExtension(string $name, $extensions): bool {
         $extension = self::getExtension($name);
         return Arrays::contains($extensions, $extension);
     }
@@ -182,7 +182,7 @@ class File {
      * @param string $oldName
      * @return string
      */
-    public static function parseName($newName, $oldName) {
+    public static function parseName(string $newName, string $oldName): string {
         $newExt = self::getExtension($newName);
         $oldExt = self::getExtension($oldName);
         if (empty($newExt) && !empty($oldExt)) {
@@ -198,7 +198,7 @@ class File {
      * @param string $path
      * @return string[]
      */
-    public static function getAllInDir($path) {
+    public static function getAllInDir(string $path): array {
         $result = [];
         if (!file_exists($path) || !is_dir($path)) {
             return $result;
@@ -218,7 +218,7 @@ class File {
      * @param string $path
      * @return string[]
      */
-    public static function getFilesInDir($path) {
+    public static function getFilesInDir(string $path): array {
         $result = [];
         if (!empty($path)) {
             $files = scandir($path);
@@ -236,7 +236,7 @@ class File {
      * @param string $path
      * @return string
      */
-    public static function createDir($path) {
+    public static function createDir(string $path): string {
         if (!self::exists($path)) {
             mkdir($path, 0777, true);
         }
@@ -248,7 +248,7 @@ class File {
      * @param string $path
      * @return boolean
      */
-    public static function deleteDir($path) {
+    public static function deleteDir(string $path): bool {
         if (is_dir($path)) {
             $files = scandir($path);
             foreach ($files as $file) {
@@ -268,7 +268,7 @@ class File {
      * @param string $path
      * @return void
      */
-    public static function emptyDir($path) {
+    public static function emptyDir(string $path): void {
         if (file_exists($path)) {
             $files = scandir($path);
             foreach ($files as $file) {
@@ -287,7 +287,7 @@ class File {
      * @param string|string[] $files
      * @return ZipArchive
      */
-    public static function createZip($name, $files) {
+    public static function createZip(string $name, $files): ZipArchive {
         $zip   = new ZipArchive();
         $files = Arrays::toArray($files);
 
@@ -308,7 +308,7 @@ class File {
      * @param string     $dst
      * @return void
      */
-    private static function addDirToZip(ZipArchive $zip, $src, $dst) {
+    private static function addDirToZip(ZipArchive $zip, string $src, string $dst): void {
         if (is_dir($src)) {
             $zip->addEmptyDir($dst);
             $files = scandir($src);
@@ -328,7 +328,7 @@ class File {
      * @param string $extractPath
      * @return void
      */
-    public function extractZip($zipPath, $extractPath) {
+    public function extractZip(string $zipPath, string $extractPath): void {
         $zip = new ZipArchive();
         if ($zip->open($zipPath)) {
             $zip->extractTo($extractPath);

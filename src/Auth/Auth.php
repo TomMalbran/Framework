@@ -32,7 +32,7 @@ class Auth {
      * @param string $token
      * @return boolean
      */
-    public static function validateCredential($token) {
+    public static function validateCredential(string $token): bool {
         Reset::deleteOld();
         if (!JWT::isValid($token)) {
             return false;
@@ -59,7 +59,7 @@ class Auth {
      * @param string $token
      * @return boolean
      */
-    public static function validateAPI($token) {
+    public static function validateAPI(string $token): bool {
         if (Token::isValid($token)) {
             self::$apiID       = Token::getOne($token)->id;
             self::$accessLevel = Access::API();
@@ -69,10 +69,10 @@ class Auth {
     }
 
     /**
-     * Sets the auth as API Internal
+     * Validates and Sets the auth as API Internal
      * @return boolean
      */
-    public static function validateInternal() {
+    public static function validateInternal(): bool {
         self::$apiID       = "internal";
         self::$accessLevel = Access::API();
         return true;
@@ -84,7 +84,7 @@ class Auth {
      * Checks the Spam Protection for the Login
      * @return boolean
      */
-    public static function spamProtection() {
+    public static function spamProtection(): bool {
         return Spam::protection();
     }
 
@@ -93,7 +93,7 @@ class Auth {
      * @param Model $credential
      * @return void
      */
-    public static function login(Model $credential) {
+    public static function login(Model $credential): void {
         self::setCredential($credential, 0, $credential->currentUser);
 
         Credential::updateLoginTime($credential->id);
@@ -108,7 +108,7 @@ class Auth {
      * Logouts the Current Credential
      * @return void
      */
-    public static function logout() {
+    public static function logout(): void {
         ActionLog::endSession();
 
         self::$accessLevel  = Access::General();
@@ -126,7 +126,7 @@ class Auth {
      * @param integer $credentialID
      * @return boolean
      */
-    public static function loginAs($credentialID) {
+    public static function loginAs(int $credentialID): bool {
         $admin = self::$credential;
         $user  = Credential::getOne($credentialID, true);
         
@@ -141,7 +141,7 @@ class Auth {
      * Logouts as the current Credential and logins back as the Admin
      * @return integer
      */
-    public static function logoutAs() {
+    public static function logoutAs(): int {
         if (!self::isLoggedAsUser()) {
             return 0;
         }
@@ -160,7 +160,7 @@ class Auth {
      * @param string $email
      * @return Model
      */
-    public static function getLoginCredential($email) {
+    public static function getLoginCredential(string $email): Model {
         $parts = Strings::split($email, "|");
         $user  = null;
         
@@ -185,7 +185,7 @@ class Auth {
      * @param Model $user
      * @return boolean
      */
-    public static function canLoginAs(Model $admin, Model $user) {
+    public static function canLoginAs(Model $admin, Model $user): bool {
         return (
             !$admin->isEmpty() && !$user->isEmpty() &&
             !$admin->isDeleted && !$user->isDeleted &&
@@ -202,7 +202,7 @@ class Auth {
      * @param integer $userID     Optional.
      * @return void
      */
-    public static function setCredential(Model $credential, $adminID = 0, $userID = 0) {
+    public static function setCredential(Model $credential, int $adminID = 0, int $userID = 0): void {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
         self::$accessLevel  = $credential->level;
@@ -215,7 +215,7 @@ class Auth {
      * @param integer $userID
      * @return void
      */
-    public function setCurrentUser($userID) {
+    public function setCurrentUser(int $userID): void {
         self::$userID = $userID;
         ActionLog::endSession();
         ActionLog::startSession(self::$credentialID, true);
@@ -225,7 +225,7 @@ class Auth {
      * Creates and returns the JWT token
      * @return string
      */
-    public static function getToken() {
+    public static function getToken(): string {
         if (!self::isLoggedIn()) {
             return "";
         }
@@ -262,7 +262,7 @@ class Auth {
      * Returns the Credential Model
      * @return Model
      */
-    public static function getCredential() {
+    public static function getCredential(): Model {
         return self::$credential;
     }
 
@@ -270,7 +270,7 @@ class Auth {
      * Returns the Credential ID
      * @return integer
      */
-    public static function getID() {
+    public static function getID(): int {
         return self::$credentialID;
     }
 
@@ -278,7 +278,7 @@ class Auth {
      * Returns the Admin ID
      * @return integer
      */
-    public static function getAdminID() {
+    public static function getAdminID(): int {
         return self::$adminID;
     }
 
@@ -286,7 +286,7 @@ class Auth {
      * Returns the Credential Current User
      * @return integer
      */
-    public static function getUserID() {
+    public static function getUserID(): int {
         return self::$userID;
     }
 
@@ -296,7 +296,7 @@ class Auth {
      * Returns true if the User is Logged in
      * @return boolean
      */
-    public static function isLoggedIn() {
+    public static function isLoggedIn(): bool {
         return !empty(self::$credentialID) || !empty(self::$apiID);
     }
     
@@ -304,7 +304,7 @@ class Auth {
      * Returns true or false if the admin is logged as an user
      * @return boolean
      */
-    public static function isLoggedAsUser() {
+    public static function isLoggedAsUser(): bool {
         return !empty(self::$adminID);
     }
 
@@ -315,7 +315,7 @@ class Auth {
      * @param integer $requested
      * @return boolean
      */
-    public static function grant($requested) {
+    public static function grant(int $requested): bool {
         return Access::grant(self::$accessLevel, $requested);
     }
 
@@ -324,7 +324,7 @@ class Auth {
      * @param integer $requested
      * @return boolean
      */
-    public static function requiresLogin($requested) {
+    public static function requiresLogin(int $requested): bool {
         return !Access::isGeneral($requested) && !self::isLoggedIn();
     }
     
@@ -334,7 +334,7 @@ class Auth {
      * @param array  $arguments
      * @return mixed
      */
-    public static function __callStatic($function, array $arguments) {
+    public static function __callStatic(string $function, array $arguments) {
         return Access::$function(self::$accessLevel);
     }
 }
