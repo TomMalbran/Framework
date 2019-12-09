@@ -269,7 +269,7 @@ class Request implements ArrayAccess {
     public function isAlphaNum(string $key, bool $withDashes = false, int $length = null): bool {
         return Utils::isAlphaNum($this->get($key, ""), $withDashes, $length);
     }
-    
+
     /**
      * Returns true if the given email is valid
      * @param string $key
@@ -435,15 +435,6 @@ class Request implements ArrayAccess {
     }
     
     /**
-     * Returns the given array encoded as JSON
-     * @param string $key
-     * @return string
-     */
-    public function toJSON(string $key): string {
-        return JSON::encode($this->get($key, []));
-    }
-    
-    /**
      * Converts the request data on the given key to binary
      * @param string  $key
      * @param integer $default Optional.
@@ -472,6 +463,24 @@ class Request implements ArrayAccess {
     public function toCents(string $key, int $index = null): int {
         $value = $index !== null ? $this->getFromArray($key, $index, 0) : $this->getInt($key);
         return Numbers::toCents($value);
+    }
+
+    /**
+     * Returns the given array encoded as JSON
+     * @param string $key
+     * @return string
+     */
+    public function toJSON(string $key): string {
+        return JSON::encode($this->get($key, []));
+    }
+
+    /**
+     * Returns the given array encoded as JSON
+     * @param string $key
+     * @return string
+     */
+    public function toCSV(string $key): string {
+        return Utils::toCSV($this->get($key));
     }
 
     /**

@@ -23,6 +23,7 @@ class Field {
     const Hour    = "hour";
     const String  = "string";
     const JSON    = "json";
+    const CSV     = "csv";
     const Text    = "text";
     const Encrypt = "encrypt";
     const File    = "file";
@@ -129,11 +130,12 @@ class Field {
             $result = "$type($length)$sign NOT NULL";
             break;
         case self::String:
-        case self::JSON:
         case self::File:
             $length = $this->length ?: 255;
             $result = "varchar($length) NOT NULL";
             break;
+        case self::JSON:
+        case self::CSV:
         case self::Text:
             $result = "text NOT NULL";
             break;
@@ -189,6 +191,9 @@ class Field {
         case self::JSON:
             $result = $request->toJSON($this->name);
             break;
+        case self::CSV:
+            $result = $request->toCSV($this->name);
+            break;
         case self::Encrypt:
             if (!empty($masterKey)) {
                 $value  = $request->get($this->name);
@@ -241,6 +246,10 @@ class Field {
             break;
         case self::JSON:
             $result[$key]            = JSON::decode($text, true);
+            break;
+        case self::CSV:
+            $result[$key]            = $text;
+            $result["{$key}Parts"]   = Utils::fromCSV($text);
             break;
         case self::Text:
             $result[$key]            = $text;

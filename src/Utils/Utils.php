@@ -150,8 +150,6 @@ class Utils {
         return Strings::replace($value, [ " ", "." ], "");
     }
     
-    
-    
     /**
      * Returns the Real Name for the given User
      * @param mixed  $data
@@ -243,6 +241,35 @@ class Utils {
         $salt = !empty($salt) ? $salt : Strings::random(50);
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
         return [ "password" => $hash, "salt" => $salt ];
+    }
+
+
+
+    /**
+     * Converts an array or string to a CSV string
+     * @param string[]|string $string
+     * @return string
+     */
+    public function toCSV($string): string {
+        if (is_string($string)) {
+            $parts = Strings::split($string, ",");
+            $parts = Arrays::removeEmpty($parts);
+            return Strings::join($parts, ",");
+        }
+        $parts = Arrays::removeEmpty($string);
+        return Strings::join($parts, ",");
+    }
+
+    /**
+     * Converts an array or string to a CSV string
+     * @param string[]|string $string
+     * @return string
+     */
+    public function fromCSV($string): array {
+        if (is_string($string)) {
+            return Strings::split($string, ",");
+        }
+        return $string;
     }
     
     
