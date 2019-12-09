@@ -18,27 +18,10 @@ class Language {
      * Loads the Language Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded = true;
-            $data = Framework::loadData(Framework::StatusData);
-            
-            // Store the Values
-            foreach ($data["values"] as $statusName => $statusValue) {
-                $name = Strings::toLowerCase($statusName);
-                self::$values[$name] = $statusValue;
-            }
-            // Store the Groups
-            foreach ($data["groups"] as $groupName => $statusNames) {
-                $gName = Strings::toLowerCase($groupName);
-                self::$groups[$gName] = [];
-                foreach ($statusNames as $statusName) {
-                    $sName = Strings::toLowerCase($statusName);
-                    if (isset(self::$values[$sName])) {
-                        self::$groups[$gName][] = self::$values[$sName];
-                    }
-                }
-            }
+            self::$data   = Framework::loadData(Framework::LanguageData);
         }
     }
 
@@ -46,13 +29,13 @@ class Language {
 
 
     /**
-     * Returns the Status Value from a Status Name
-     * @param string $statusName
-     * @return integer
+     * Returns the Language Value from a Language Name
+     * @param string $langName
+     * @return string
      */
-    public static function getOne($statusName) {
+    public static function getOne(string $langName): string {
         self::load();
-        $name = Strings::toLowerCase($statusName);
+        $name = Strings::toLowerCase($langName);
         if (isset(self::$data[$name])) {
             return self::$data[$name];
         }
@@ -60,11 +43,11 @@ class Language {
     }
 
     /**
-     * Returns true if the given Status Value is valid for the given Group
-     * @param integer $value
+     * Returns true if the given Language Value is valid for the given Group
+     * @param string $value
      * @return boolean
      */
-    public static function isValid($value) {
+    public static function isValid(string $value): bool {
         self::load();
         return Arrays::containsKey(self::$data, $value);
     }
@@ -74,7 +57,7 @@ class Language {
      * @param string $value
      * @return string
      */
-    public function getNLS($value) {
+    public function getNLS(string $value) {
         if ($value != "root") {
             return $value;
         }
@@ -91,7 +74,7 @@ class Language {
      * Creates a Select of Languages
      * @return array
      */
-    public static function getSelect() {
+    public static function getSelect(): array {
         $cache = self::load();
         return Arrays::createSelect(self::$data, "key", "name");
     }
@@ -104,7 +87,7 @@ class Language {
      * @param array  $arguments
      * @return mixed
      */
-    public static function __callStatic($function, array $arguments) {
+    public static function __callStatic(string $function, array $arguments) {
         $value = !empty($arguments[0]) ? $arguments[0] : "";
 
         // Function "isXxx": isSpanish("es") => true, isSpanish("en") => false
