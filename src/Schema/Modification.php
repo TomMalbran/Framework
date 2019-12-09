@@ -66,9 +66,11 @@ class Modification {
             if ($field->canEdit) {
                 $value = $field->fromRequest($request, $this->structure->masterKey);
 
-                if (!$field->noEmpty && !empty($value)) {
-                    $result[$field->key] = $value;
-                } elseif ($field->noEmpty && $value !== null) {
+                if ($field->noEmpty) {
+                    if (!empty($value)) {
+                        $result[$field->key] = $value;
+                    }
+                } elseif ($value !== null) {
                     $result[$field->key] = $value;
                 }
             }
