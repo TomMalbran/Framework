@@ -356,11 +356,11 @@ class Credential {
     /**
      * Parses the data and returns the fields
      * @param Request $request
-     * @param integer $level
-     * @param boolean $reqPassChange
+     * @param integer $level         Optional.
+     * @param boolean $reqPassChange Optional.
      * @return array
      */
-    private static function getFields(Request $request, int $level, bool $reqPassChange): array {
+    private static function getFields(Request $request, int $level = 0, bool $reqPassChange = null): array {
         $result = [];
         if ($request->has("password")) {
             $hash = Utils::createHash($request->password);

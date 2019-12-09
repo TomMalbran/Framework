@@ -325,12 +325,12 @@ class Schema {
 
     /**
      * Returns all the Sorted Names
-     * @param string  $order    Optional.
-     * @param boolean $orderAsc Optional.
-     * @param string  $name     Optional.
+     * @param string          $order    Optional.
+     * @param boolean         $orderAsc Optional.
+     * @param string|string[] $name     Optional.
      * @return array
      */
-    public function getSortedNames(string $order = null, bool $orderAsc = true, string $name = null): array {
+    public function getSortedNames(string $order = null, bool $orderAsc = true, $name = null): array {
         $field = $order ?: ($this->structure->hasPositions ? "position" : $this->structure->name);
         $query = Query::createOrderBy($field, $orderAsc);
         return $this->getSelect($query, $name);
@@ -338,13 +338,13 @@ class Schema {
     
     /**
      * Returns all the Sorted Names using the given Query
-     * @param Query   $query
-     * @param string  $order    Optional.
-     * @param boolean $orderAsc Optional.
-     * @param string  $name     Optional.
+     * @param Query           $query
+     * @param string          $order    Optional.
+     * @param boolean         $orderAsc Optional.
+     * @param string|string[] $name     Optional.
      * @return array
      */
-    public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, string $name = null): array {
+    public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, $name = null): array {
         $field = $order ?: ($this->structure->hasPositions ? "position" : $this->structure->name);
         $query->orderBy($field, $orderAsc);
         return $this->getSelect($query, $name);
@@ -352,11 +352,11 @@ class Schema {
     
     /**
      * Returns a select of Schemas
-     * @param Query  $query
-     * @param string $name  Optional.
+     * @param Query           $query
+     * @param string|string[] $name  Optional.
      * @return array
      */
-    public function getSelect(Query $query, string $name = null): array {
+    public function getSelect(Query $query, $name = null): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields();

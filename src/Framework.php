@@ -81,9 +81,9 @@ class Framework {
      * @param string  $dir
      * @param string  $file
      * @param boolean $forFrame Optional.
-     * @return object
+     * @return object|array
      */
-    public static function loadFile(string $dir, string $file, bool $forFrame = false): object {
+    public static function loadFile(string $dir, string $file, bool $forFrame = false) {
         $path = self::getPath($dir, "$file.json", $forFrame);
         return JSON::read($path);
     }
@@ -91,9 +91,9 @@ class Framework {
     /**
      * Loads a Data File
      * @param string $file
-     * @return object
+     * @return object|array
      */
-    public static function loadData(string $file): object {
+    public static function loadData(string $file) {
         return self::loadFile(self::DataDir, $file);
     }
 

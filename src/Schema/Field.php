@@ -149,9 +149,9 @@ class Field {
      * Returns the Field Value from the given Request
      * @param Request $request
      * @param string  $masterKey Optional.
-     * @return array
+     * @return mixed
      */
-    public function fromRequest(Request $request, string $masterKey = ""): array {
+    public function fromRequest(Request $request, string $masterKey = "") {
         $result = null;
         
         switch ($this->type) {
