@@ -16,10 +16,10 @@ class JSON {
      * @param string|array $value
      * @return boolean
      */
-    public static function isValid(string $value): bool {
+    public static function isValid($value): bool {
         if (is_string($value)) {
             json_decode($value);
-            return (json_last_error() == JSON_ERROR_NONE);
+            return json_last_error() == JSON_ERROR_NONE;
         }
         return false;
     }
