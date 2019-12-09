@@ -36,10 +36,10 @@ class Selection {
 
     /**
      * Adds the Fields to the Selects
-     * @param boolean $decripted Optional.
+     * @param boolean $decrypted Optional.
      * @return void
      */
-    public function addFields($decripted = false) {
+    public function addFields(bool $decrypted = false): void {
         $masterKey = $this->structure->masterKey;
         $mainKey   = $this->structure->table;
 
@@ -47,7 +47,7 @@ class Selection {
             $this->selects[] = "$mainKey.{$this->structure->idKey} AS id";
         }
         foreach ($this->structure->fields as $field) {
-            if ($decripted && $field->type == Field::Encrypt) {
+            if ($decrypted && $field->type == Field::Encrypt) {
                 $this->selects[] = "CAST(AES_DECRYPT($mainKey.$field->key, '$masterKey') AS CHAR(255)) {$field->key}Decrypt";
             } elseif ($field->hasName) {
                 $this->selects[] = "$mainKey.$field->key AS $field->name";
@@ -63,7 +63,7 @@ class Selection {
      * @param boolean         $addMainKey Optional.
      * @return void
      */
-    public function addSelects($selects, $addMainKey = false) {
+    public function addSelects($selects, bool $addMainKey = false): void {
         $selects = Arrays::toArray($selects);
         foreach ($selects as $select) {
             if ($addMainKey) {
@@ -79,7 +79,7 @@ class Selection {
      * @param boolean $withSelects Optional.
      * @return void
      */
-    public function addJoins($withSelects = true) {
+    public function addJoins(bool $withSelects = true): void {
         $mainKey = $this->structure->table;
 
         foreach ($this->structure->joins as $join) {
@@ -114,7 +114,7 @@ class Selection {
      * Adds the Counts
      * @return void
      */
-    public function addCounts() {
+    public function addCounts(): void {
         foreach ($this->structure->counts as $count) {
             $joinKey    = chr($this->index++);
             $key        = $count->key;
@@ -142,7 +142,7 @@ class Selection {
      * @param array $extras Optional.
      * @return array
      */
-    public function request(Query $query, array $extras = []) {
+    public function request(Query $query, array $extras = []): array {
         $this->setTableKeys($query);
 
         $mainKey    = $this->structure->table;
@@ -160,7 +160,7 @@ class Selection {
      * @param Query $query
      * @return void
      */
-    private function setTableKeys(Query $query) {
+    private function setTableKeys(Query $query): void {
         $columns = $query->getColumns();
         $mainKey = $this->structure->table;
         
@@ -210,7 +210,7 @@ class Selection {
      * @param string|string[] $extras Optional.
      * @return array
      */
-    public function resolve($extras = null) {
+    public function resolve($extras = null): array {
         $result = [];
         
         foreach ($this->request as $row) {

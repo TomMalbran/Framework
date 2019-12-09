@@ -57,7 +57,7 @@ class Field {
      * @param array  $data
      * @param string $prefix Optional.
      */
-    public function __construct($key, array $data, $prefix = "") {
+    public function __construct(string $key, array $data, string $prefix = "") {
         $this->key        = $key;
 
         $this->type       = !empty($data["type"])   ? $data["type"]        : Field::String;
@@ -86,7 +86,7 @@ class Field {
      * Creates a Field with a Prefix
      * @return string
      */
-    public function getFieldKey() {
+    public function getFieldKey(): string {
         $result = $this->name;
         if (!empty($this->prefix) && !$this->noPrefix) {
             $result = $this->prefix . ucfirst($this->name);
@@ -100,7 +100,7 @@ class Field {
      * Returns the Field Type from the Data
      * @return string
      */
-    public function getType() {
+    public function getType(): string {
         $result = "unknown";
 
         switch ($this->type) {
@@ -151,7 +151,7 @@ class Field {
      * @param string  $masterKey Optional.
      * @return array
      */
-    public function fromRequest(Request $request, $masterKey = "") {
+    public function fromRequest(Request $request, string $masterKey = ""): array {
         $result = null;
         
         switch ($this->type) {
@@ -206,7 +206,7 @@ class Field {
      * @param array $data
      * @return array
      */
-    public function toValues(array $data) {
+    public function toValues(array $data): array {
         $key    = $this->prefixName;
         $text   = isset($data[$key]) ? $data[$key]      : "";
         $number = isset($data[$key]) ? (int)$data[$key] : 0;

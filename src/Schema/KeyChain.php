@@ -17,7 +17,7 @@ class KeyChain {
      * Loads the Keys Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded = true;
             self::$data   = Framework::loadData(Framework::KeyData);
@@ -29,7 +29,7 @@ class KeyChain {
      * @param string $key
      * @return string
      */
-    public static function getOne($key) {
+    public static function getOne(string $key): string {
         self::load();
         if (!empty(self::$data[$key])) {
             return base64_encode(hash("sha256", self::$data[$key], true));
@@ -43,7 +43,7 @@ class KeyChain {
      * Recreates all the Master Keys
      * @return object
      */
-    public static function recreate() {
+    public static function recreate(): object {
         self::load();
         $data = [];
         foreach (array_keys(self::$data) as $key) {
@@ -58,7 +58,7 @@ class KeyChain {
      * @param mixed $data
      * @return void
      */
-    public static function save($data) {
+    public static function save($data): void {
         Framework::saveData(Framework::Key, $data);
         self::$data = $data;
     }

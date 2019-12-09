@@ -18,7 +18,7 @@ class Migration {
      * @param boolean  $canDelete Optional.
      * @return void
      */
-    public static function migrate(Database $db, array $schemas, $canDelete = false) {
+    public static function migrate(Database $db, array $schemas, bool $canDelete = false): void {
         $tableNames  = $db->getTables(null, false);
         $schemaNames = [];
         
@@ -44,7 +44,7 @@ class Migration {
      * @param Structure $structure
      * @return void
      */
-    private static function createTable(Database $db, Structure $structure) {
+    private static function createTable(Database $db, Structure $structure): void {
         $fields  = [];
         $primary = [];
         $keys    = [];
@@ -72,7 +72,7 @@ class Migration {
      * @param boolean  $canDelete
      * @return void
      */
-    private static function deleteTables(Database $db, array $tableNames, array $schemaNames, $canDelete) {
+    private static function deleteTables(Database $db, array $tableNames, array $schemaNames, bool $canDelete): void {
         $prebr = "<br>";
         foreach ($tableNames as $tableName) {
             if (!Arrays::contains($schemaNames, $tableName)) {
@@ -94,7 +94,7 @@ class Migration {
      * @param boolean   $canDelete
      * @return void
      */
-    private static function updateTable(Database $db, Structure $structure, $canDelete) {
+    private static function updateTable(Database $db, Structure $structure, bool $canDelete): void {
         $primaryKeys = $db->getPrimaryKeys($structure->table);
         $tableKeys   = $db->getTableKeys($structure->table);
         $tableFields = $db->getTableFields($structure->table);

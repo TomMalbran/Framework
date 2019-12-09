@@ -32,7 +32,7 @@ class Errors {
      * @param string $message
      * @return void
      */
-    public function __set($error, $message) {
+    public function __set(string $error, string $message): void {
         $this->add($error, $message);
     }
 
@@ -41,7 +41,7 @@ class Errors {
      * @param string $error
      * @return string
      */
-    public function __get($error) {
+    public function __get(string $error): string {
         if ($this->has($error)) {
             return $this->errors[$error];
         }
@@ -56,7 +56,7 @@ class Errors {
      * @param string $message
      * @return Errors
      */
-    public function add($error, $message) {
+    public function add(string $error, string $message): Errors {
         $this->errors[$error] = $message;
         return $this;
     }
@@ -66,7 +66,7 @@ class Errors {
      * @param string $message
      * @return Errors
      */
-    public function form($message) {
+    public function form(string $message): Errors {
         $this->errors["form"] = $message;
         return $this;
     }
@@ -76,7 +76,7 @@ class Errors {
      * @param string $message
      * @return Errors
      */
-    public function global($message) {
+    public function global(string $message): Errors {
         $this->errors["global"] = $message;
         return $this;
     }
@@ -88,7 +88,7 @@ class Errors {
      * @param string  $message
      * @return Errors
      */
-    public function addIf($condition, $error, $message) {
+    public function addIf(bool $condition, string $error, string $message): Errors {
         if ($condition) {
             $this->add($error, $message);
         }
@@ -102,7 +102,7 @@ class Errors {
      * @param string|string[] $error Optional.
      * @return boolean
      */
-    public function has($error = null) {
+    public function has($error = null): bool {
         if ($error === null) {
             return !empty($this->errors);
         }
@@ -119,7 +119,7 @@ class Errors {
      * Returns the errors as an Object
      * @return array
      */
-    public function get() {
+    public function get(): array {
         return $this->errors;
     }
 }

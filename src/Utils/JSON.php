@@ -16,7 +16,7 @@ class JSON {
      * @param string $value
      * @return boolean
      */
-    public static function is($value) {
+    public static function is(string $value): bool {
         if (is_string($value)) {
             json_decode($value);
             return (json_last_error() == JSON_ERROR_NONE);
@@ -26,11 +26,11 @@ class JSON {
 
     /**
      * Encodes an Object as a string if it is not already encoded
-     * @param mixed   $value
+     * @param string  $value
      * @param boolean $asPretty Optional.
      * @return string
      */
-    public static function encode($value, $asPretty = false) {
+    public static function encode(string $value, bool $asPretty = false): string {
         if (self::is($value)) {
             return $value;
         }
@@ -39,11 +39,11 @@ class JSON {
 
     /**
      * Decodes a String if it is not already decoded
-     * @param mixed   $value
+     * @param string  $value
      * @param boolean $asArray Optional.
      * @return string
      */
-    public static function decode($value, $asArray = false) {
+    public static function decode(string $value, bool $asArray = false): string {
         if (!self::is($value)) {
             return $value;
         }
@@ -57,7 +57,7 @@ class JSON {
      * @param string $value
      * @return string
      */
-    public static function toCSV($value) {
+    public static function toCSV(string $value): string {
         $value = self::decode($value);
         return Strings::join($value, ", ");
     }
@@ -67,7 +67,7 @@ class JSON {
      * @param string $value
      * @return string
      */
-    public static function fromCSV($value) {
+    public static function fromCSV(string $value): string {
         $parts  = Strings::split($value, ",");
         $result = [];
         foreach ($parts as $part) {
@@ -85,7 +85,7 @@ class JSON {
      * @param string $path
      * @return object
      */
-    public static function read($path) {
+    public static function read(string $path): object {
         if (File::exists($path)) {
             return self::decode(file_get_contents($path), true);
         }
@@ -94,11 +94,11 @@ class JSON {
 
     /**
      * Writes a JSON File
-     * @param string $file
-     * @param mixed  $contents
+     * @param string          $file
+     * @param string|string[] $contents
      * @return void
      */
-    public static function write($file, $contents) {
+    public static function write(string $file, $contents): void {
         $value = Arrays::toArray($contents);
         file_put_contents($path, self::encode($value, true));
     }

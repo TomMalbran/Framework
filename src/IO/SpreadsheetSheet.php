@@ -29,9 +29,9 @@ class SpreadsheetSheet {
      * @param array   $content
      * @param boolean $makeBold      Optional.
      * @param boolean $formatNumbers Optional.
-     * @return SpreadsheetSheet
+     * @return void
      */
-    public function writeLine(array $content, $makeBold = false, $formatNumbers = false) {
+    public function writeLine(array $content, bool $makeBold = false, bool $formatNumbers = false): void {
         $this->sheet->fromArray($content, null, "A" . $this->row, true);
         $toCol = Coordinate::stringFromColumnIndex(count($content));
         
@@ -42,35 +42,33 @@ class SpreadsheetSheet {
             $this->formatNumbers("a", $toCol, $this->row);
         }
         $this->row += 1;
-        return $this;
     }
     
     /**
      * Writes the content in bold
      * @param array $content
-     * @return SpreadsheetSheet
+     * @return void
      */
-    public function writeHeader(array $content) {
-        return $this->writeLine($content, true, false);
+    public function writeHeader(array $content): void {
+        $this->writeLine($content, true, false);
     }
     
     /**
      * Writes the content and formats the numbers
      * @param array $content
-     * @return SpreadsheetSheet
+     * @return void
      */
-    public function writeNumbers(array $content) {
-        return $this->writeLine($content, false, true);
+    public function writeNumbers(array $content): void {
+        $this->writeLine($content, false, true);
     }
     
     /**
      * Increases the row count by the given amount
      * @param integer $amount Optional.
-     * @return SpreadsheetSheet
+     * @return void
      */
-    public function addBlankLine($amount = 1) {
+    public function addBlankLine(int $amount = 1): void {
         $this->row += $amount;
-        return $this;
     }
     
     
@@ -80,12 +78,11 @@ class SpreadsheetSheet {
      * @param string  $fromCol
      * @param string  $toCol
      * @param integer $rowCount
-     * @return SpreadsheetSheet
+     * @return void
      */
-    public function makeBold($fromCol, $toCol, $rowCount) {
-        $range = $fromCol . $rowCount . ":" . $toCol . $rowCount;
+    public function makeBold(string $fromCol, string $toCol, int $rowCount): void {
+        $range = "$fromCol$rowCount:$toCol$rowCount";
         $this->sheet->getStyle($range)->applyFromArray([ "font" => [ "bold" => true ]]);
-        return $this;
     }
     
     /**
@@ -93,26 +90,24 @@ class SpreadsheetSheet {
      * @param string  $fromCol
      * @param string  $toCol
      * @param integer $rowCount
-     * @return SpreadsheetSheet
+     * @return void
      */
-    public function formatNumbers($fromCol, $toCol, $rowCount) {
-        $range = $fromCol . $rowCount . ":" . $toCol . $rowCount;
+    public function formatNumbers(string $fromCol, string $toCol, int $rowCount): void {
+        $range = "$fromCol$rowCount:$toCol$rowCount";
         $this->sheet->getStyle($range)->getNumberFormat()->setFormatCode("0.00");
-        return $this;
     }
     
     
     
     /**
      * Auto sizes the columns
-     * @return SpreadsheetSheet
+     * @return void
      */
-    public function autoSizeColumns() {
+    public function autoSizeColumns(): void {
         $cellIterator = $this->sheet->getRowIterator()->current()->getCellIterator();
         $cellIterator->setIterateOnlyExistingCells(true);
         foreach ($cellIterator as $cell) {
             $this->sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
         }
-        return $this;
     }
 }

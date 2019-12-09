@@ -16,7 +16,7 @@ class SpreadsheetReader {
      * Creates a new SpreadsheetReader instance
      * @param string $path
      */
-    public function __construct($path) {
+    public function __construct(string $path) {
         try {
             $fileType    = IOFactory::identify($path);
             $reader      = IOFactory::createReader($fileType);
@@ -31,7 +31,7 @@ class SpreadsheetReader {
      * Returns true if the Sheet is valid
      * @return boolean
      */
-    public function isValid() {
+    public function isValid(): bool {
         return $this->sheet !== null;
     }
     
@@ -41,7 +41,7 @@ class SpreadsheetReader {
      * Returns the Highet Sheet column, removing the empty ones
      * @return string
      */
-    public function getHighestColumn() {
+    public function getHighestColumn(): string {
         $colTotal = $this->sheet->getHighestColumn();
         $colMin   = ord("A");
         $colAmt   = ord($colTotal) - $colMin;
@@ -60,7 +60,7 @@ class SpreadsheetReader {
      * Returns the Highet Sheet row, removing the empty ones
      * @return integer
      */
-    public function getHighestRow() {
+    public function getHighestRow(): int {
         $colAmt = $this->getHighestColumn();
         $rowAmt = $this->sheet->getHighestRow();
         
@@ -81,7 +81,7 @@ class SpreadsheetReader {
      * @param string  $to
      * @return array
      */
-    public function getRow($row, $from, $to) {
+    public function getRow(int $row, string $from, string $to): array {
         try {
             $row = $this->sheet->rangeToArray("{$from}{$row}:{$to}{$row}", null, true, false);
         } catch (Exception $e) {

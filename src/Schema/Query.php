@@ -50,7 +50,7 @@ class Query {
      * Returns the Prefix
      * @return string
      */
-    public function getPrefix() {
+    public function getPrefix(): string {
         $prefix = $this->addPrefix ? $this->prefix . " " : "";
         if (!$this->addPrefix) {
             $this->addPrefix = true;
@@ -60,12 +60,12 @@ class Query {
 
     /**
      * Adds an expression as an and
-     * @param string          $column
-     * @param string          $expression
-     * @param string|string[] $value
+     * @param string $column
+     * @param string $expression
+     * @param mixed  $value
      * @return Query
      */
-    public function add($column, $expression, $value) {
+    public function add(string $column, string $expression, $value): Query {
         $prefix = $this->getPrefix();
         $binds  = is_array($value) ? self::createBinds($value) : "?";
         $value  = $expression == "LIKE" ? "%$value%" : $value;
@@ -85,7 +85,7 @@ class Query {
      * @param boolean $condition  Optional.
      * @return Query
      */
-    public function addIf($column, $expression, $value, $condition = null) {
+    public function addIf(string $column, string $expression, $value, bool $condition = null): Query {
         if ($condition !== null && $condition) {
             $this->add($column, $expression, $value);
         } elseif ($condition === null && !empty($value)) {
@@ -100,7 +100,7 @@ class Query {
      * @param mixed  ...$values
      * @return Query
      */
-    public function addExp($expression, ...$values) {
+    public function addExp(string $expression, ...$values): Query {
         $prefix       = $this->getPrefix();
         $this->where .= "{$prefix}{$expression} ";
         $this->params = array_merge($this->params, $values);
@@ -113,7 +113,7 @@ class Query {
      * @param mixed  ...$values
      * @return Query
      */
-    public function addExpIf($expression, ...$values) {
+    public function addExpIf(string $expression, ...$values): Query {
         if (!empty($values[0])) {
             $this->addExp($expression, ...$values);
         }
@@ -125,7 +125,7 @@ class Query {
      * @param string $column
      * @return Query
      */
-    public function addNull($column) {
+    public function addNull(string $column): Query {
         $prefix          = $this->getPrefix();
         $this->where    .= "{$prefix}ISNULL($column) = 1";
         $this->columns[] = $column;
@@ -138,7 +138,7 @@ class Query {
      * Starts a Parenthesis
      * @return Query
      */
-    public function startParen() {
+    public function startParen(): Query {
         $prefix          = $this->getPrefix();
         $this->where    .= "{$prefix}(";
         $this->addPrefix = false;
@@ -149,7 +149,7 @@ class Query {
      * Starts a Parenthesis
      * @return Query
      */
-    public function endParen() {
+    public function endParen(): Query {
         $this->where .= ") ";
         return $this;
     }
@@ -158,7 +158,7 @@ class Query {
      * Starts an Or expression
      * @return Query
      */
-    public function or() {
+    public function or(): Query {
         $this->where    .= " OR ";
         $this->addPrefix = false;
         return $this;
@@ -168,7 +168,7 @@ class Query {
      * Starts an Or expression
      * @return Query
      */
-    public function startOr() {
+    public function startOr(): Query {
         $prefix          = $this->getPrefix();
         $this->where    .= "{$prefix}(";
         $this->prefix    = "OR";
@@ -180,7 +180,7 @@ class Query {
      * Ends an Or expression
      * @return Query
      */
-    public function endOr() {
+    public function endOr(): Query {
         $this->where .= ") ";
         $this->prefix = "AND";
         return $this;
@@ -193,7 +193,7 @@ class Query {
      * @param string          $expression Optional.
      * @return Query
      */
-    public function search($column, $value, $expression = "LIKE") {
+    public function search($column, $value, string $expression = "LIKE"): Query {
         if (!empty($value)) {
             $columns = Arrays::toArray($column);
             if (count($columns) > 1) {
@@ -216,7 +216,7 @@ class Query {
      * @param integer $toTime
      * @return Query
      */
-    public function betweenTimes($column, $fromTime, $toTime) {
+    public function betweenTimes(string $column, int $fromTime, int $toTime): Query {
         if (!empty($fromTime) && !empty($toTime)) {
             $this->add($column, ">=", $fromTime);
             $this->add($column, "<=", $toTime);
@@ -233,7 +233,7 @@ class Query {
      * @param string $column
      * @return Query
      */
-    public function groupBy($column) {
+    public function groupBy(string $column): Query {
         if (!empty($column)) {
             $this->groupBy  = $column;
             $this->groups[] = $column;
@@ -247,7 +247,7 @@ class Query {
      * @param boolean $isASC  Optional.
      * @return Query
      */
-    public function orderBy($column, $isASC = true) {
+    public function orderBy(string $column, bool $isASC = true): Query {
         if (!empty($column)) {
             $prefix         = !empty($this->orderBy) ? ", " : "";
             $this->orderBy .= " {$prefix}{$column} " . ($isASC ? "ASC" : "DESC");
@@ -260,7 +260,7 @@ class Query {
      * Orders Randomly
      * @return Query
      */
-    public function random() {
+    public function random(): Query {
         $this->orderBy = "RAND()";
         $this->orders  = [];
         return $this;
@@ -272,7 +272,7 @@ class Query {
      * @param integer $to   Optional.
      * @return Query
      */
-    public function limit($from, $to = null) {
+    public function limit(int $from, int $to = null): Query {
         if ($to != null) {
             $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
         } else {
@@ -287,7 +287,7 @@ class Query {
      * @param integer $amount Optional.
      * @return Query
      */
-    public function paginate($page = 0, $amount = 100) {
+    public function paginate(int $page = 0, int $amount = 100): Query {
         $from = $page * $amount;
         $to   = $from + $amount;
         return $this->limit($from, $to);
@@ -299,7 +299,7 @@ class Query {
      * Returns true if the Query is empty
      * @return boolean
      */
-    public function isEmpty() {
+    public function isEmpty(): bool {
         return empty($this->where);
     }
 
@@ -308,7 +308,7 @@ class Query {
      * @param string $column
      * @return boolean
      */
-    public function hasColumn($column) {
+    public function hasColumn(string $column): bool {
         return Arrays::contains($this->columns, $column);
     }
 
@@ -317,7 +317,7 @@ class Query {
      * @param string $order Optional.
      * @return boolean
      */
-    public function hasOrder($order = null) {
+    public function hasOrder(string $order = null): bool {
         if (!empty($order)) {
             return Arrays::contains($this->orders, $order);
         }
@@ -331,7 +331,7 @@ class Query {
      * @param boolean $addWhere Optional.
      * @return string
      */
-    public function get($addWhere = true) {
+    public function get(bool $addWhere = true): string {
         $result  = $this->getWhere($addWhere);
         $result .= $this->getOrderLimit();
         return preg_replace("!\s+!", " ", $result);
@@ -342,7 +342,7 @@ class Query {
      * @param boolean $addWhere Optional.
      * @return string
      */
-    public function getWhere($addWhere = false) {
+    public function getWhere(bool $addWhere = false): string {
         if (!empty($this->where)) {
             return ($addWhere ? "WHERE " : "AND ") . $this->where;
         }
@@ -353,7 +353,7 @@ class Query {
      * Returns the group order and limit part of the Query to use with the Database
      * @return string
      */
-    public function getOrderLimit() {
+    public function getOrderLimit(): string {
         $result = "";
         if (!empty($this->groupBy)) {
             $result .= " GROUP BY " . $this->groupBy;
@@ -372,7 +372,7 @@ class Query {
      * @param boolean $duplicate Optional.
      * @return string
      */
-    public function getParams($duplicate = false) {
+    public function getParams(bool $duplicate = false): string {
         if ($duplicate) {
             return array_merge($this->params, $this->params);
         }
@@ -383,7 +383,7 @@ class Query {
      * Returns the Columns
      * @return array
      */
-    public function getColumns() {
+    public function getColumns(): array {
         $result = array_merge($this->columns, $this->groups, $this->orders);
         return array_unique($result);
     }
@@ -394,7 +394,7 @@ class Query {
      * @param string $newColumn
      * @return void
      */
-    public function updateColumn($oldColumn, $newColumn) {
+    public function updateColumn(string $oldColumn, string $newColumn): void {
         foreach ([ "where", "orderBy", "groupBy" ] as $type) {
             foreach ([ "(", " " ] as $prefix) {
                 $this->{$type} = Strings::replace(
@@ -415,7 +415,7 @@ class Query {
      * @param mixed  $value      Optional.
      * @return Query
      */
-    public static function create($column = "", $expression = "", $value = null) {
+    public static function create(string $column = "", string $expression = "", $value = null): Query {
         $query = new Query();
         if (!empty($column)) {
             $query->add($column, $expression, $value);
@@ -430,7 +430,7 @@ class Query {
      * @param mixed  $value      Optional.
      * @return Query
      */
-    public static function createIf($column = "", $expression = "", $value = null) {
+    public static function createIf(string $column = "", string $expression = "", $value = null): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {
             $query->add($column, $expression, $value);
@@ -445,7 +445,7 @@ class Query {
      * @param string          $expression Optional.
      * @return Query
      */
-    public static function createSearch($column = null, $value = null, $expression = "LIKE") {
+    public static function createSearch($column = null, $value = null, string $expression = "LIKE"): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {
             $query->search($column, $value, $expression);
@@ -460,7 +460,7 @@ class Query {
      * @param integer $toTime   Optional.
      * @return Query
      */
-    public static function createBetween($column = "", $fromTime = 0, $toTime = 0) {
+    public static function createBetween(string $column = "", int $fromTime = 0, int $toTime = 0): Query {
         $query = new Query();
         if (!empty($column)) {
             $query->betweenTimes($column, $fromTime, $toTime);
@@ -474,7 +474,7 @@ class Query {
      * @param boolean $isASC  Optional.
      * @return Query
      */
-    public static function createOrderBy($column = "", $isASC = false) {
+    public static function createOrderBy(string $column = "", bool $isASC = false): Query {
         $query = new Query();
         if (!empty($column)) {
             $query->orderBy($column, $isASC);
@@ -482,12 +482,14 @@ class Query {
         return $query;
     }
 
+
+
     /**
      * Creates a list of question marks for the given array
      * @param array $array
      * @return string
      */
-    public static function createBinds(array $array) {
+    public static function createBinds(array $array): string {
         $bind = [];
         for ($i = 0; $i < count($array); $i++) {
             $bind[] = "?";
@@ -495,15 +497,13 @@ class Query {
         return "(" . Strings::join($bind, ",") . ")";
     }
 
-
-
     /**
      * Method generates equality between columns function call
      * @param string $column Optional.
      * @return array
      */
-    public static function equal($column = null) {
-        return [ "[E]" => (string)$column ];
+    public static function equal(string $column = null): array {
+        return [ "[E]" => $column ];
     }
     
     /**
@@ -511,8 +511,8 @@ class Query {
      * @param integer $amount Optional.
      * @return array
      */
-    public static function inc($amount = 1) {
-        return [ "[I]" => "+" . (int)$amount ];
+    public static function inc(int $amount = 1): array {
+        return [ "[I]" => "+" . $amount ];
     }
 
     /**
@@ -520,8 +520,8 @@ class Query {
      * @param integer $amount Optional.
      * @return array
      */
-    public static function dec($amount = 1) {
-        return [ "[I]" => "-" . (int)$amount ];
+    public static function dec(int $amount = 1): array {
+        return [ "[I]" => "-" . $amount ];
     }
     
     /**
@@ -529,8 +529,8 @@ class Query {
      * @param string $column Optional.
      * @return array
      */
-    public static function not($column = null) {
-        return [ "[N]" => (string)$column ];
+    public static function not(string $column = null): array {
+        return [ "[N]" => $column ];
     }
 
     /**
@@ -539,7 +539,7 @@ class Query {
      * @param array  $params     Optional.
      * @return array
      */
-    public static function func($expression, array $params = []) {
+    public static function func(string $expression, array $params = []): array {
         return [ "[F]" => [ $expression, $params ]];
     }
     
@@ -549,7 +549,7 @@ class Query {
      * @param string $key
      * @return array
      */
-    public static function encrypt($value, $key) {
+    public static function encrypt(string $value, string $key): array {
         return self::func("AES_ENCRYPT(?, ?)", [ $value, $key ]);
     }
 
@@ -560,7 +560,7 @@ class Query {
      * @param string $replace
      * @return array
      */
-    public static function replace($column, $value, $replace) {
+    public static function replace(string $column, string $value, string $replace): array {
         return self::func("REPLACE($column, ?, ?)", [ $value, $replace ]);
     }
 }

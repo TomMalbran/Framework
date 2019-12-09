@@ -20,7 +20,7 @@ class DateTime {
      * @param integer $timeZone
      * @return void
      */
-    public static function setTimeZone($timeZone) {
+    public static function setTimeZone(int $timeZone): void {
         self::$timeDiff = self::$serverZone - $timeZone;
     }
 
@@ -30,7 +30,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function toUserTime($value, $useTimeZone = true) {
+    public static function toUserTime(int $value, bool $useTimeZone = true): int {
         if (!empty($value) && $useTimeZone) {
             return $value - (self::$timeDiff * 3600);
         }
@@ -43,7 +43,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function toServerTime($value, $useTimeZone = true) {
+    public static function toServerTime(int $value, bool $useTimeZone = true): int {
         if (!empty($value) && $useTimeZone) {
             return $value + (self::$timeDiff * 3600);
         }
@@ -54,17 +54,17 @@ class DateTime {
 
     /**
      * Returns the Server Date
-     * @return integer
+     * @return string
      */
-    public static function getServerDate() {
+    public static function getServerDate(): string {
         return date("d-m-Y @ H:i", time());
     }
 
     /**
      * Returns the User Date
-     * @return integer
+     * @return string
      */
-    public static function getUserDate() {
+    public static function getUserDate(): string {
         return date("d-m-Y @ H:i", self::toUserTime(time()));
     }
 
@@ -76,7 +76,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function toTime($string, $useTimeZone = true) {
+    public static function toTime(string $string, bool $useTimeZone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
             return self::toServerTime($result, $useTimeZone);
@@ -90,7 +90,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function toDayStart($string, $useTimeZone = true) {
+    public static function toDayStart(string $string, bool $useTimeZone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
             return self::toServerTime($result, $useTimeZone);
@@ -104,7 +104,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function toDayEnd($string, $useTimeZone = true) {
+    public static function toDayEnd(string $string, bool $useTimeZone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
             $result = $result + 24 * 3600 - 1;
@@ -120,8 +120,8 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function toTimeHour($dateString, $hourString, $useTimeZone = true) {
-        $result = strtotime($dateString . " " . $hourString);
+    public static function toTimeHour(string $dateString, string $hourString, bool $useTimeZone = true): int {
+        $result = strtotime("$dateString $hourString");
         if ($result !== false) {
             return self::toServerTime($result, $useTimeZone);
         }
@@ -135,7 +135,7 @@ class DateTime {
      * @param string $string
      * @return boolean
      */
-    public static function isValidDate($string) {
+    public static function isValidDate(string $string): bool {
         return strtotime($string) !== false;
     }
     
@@ -145,7 +145,7 @@ class DateTime {
      * @param array  $minutes Optional.
      * @return boolean
      */
-    public static function isValidHour($string, array $minutes = null) {
+    public static function isValidHour(string $string, array $minutes = null): bool {
         $parts = Strings::split($string, ":");
         return (
             !empty($parts[0]) && Utils::isNumeric($parts[0], 0, 23) &&
@@ -161,7 +161,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return boolean
      */
-    public static function isValidPeriod($fromDate, $toDate, $useTimeZone = true) {
+    public static function isValidPeriod(string $fromDate, string $toDate, bool $useTimeZone = true): bool {
         $fromTime = self::toDayStart($fromDate, $useTimeZone);
         $toTime   = self::toDayEnd($toDate, $useTimeZone);
         
@@ -174,7 +174,7 @@ class DateTime {
      * @param string $toHour
      * @return boolean
      */
-    public static function isValidHourPeriod($fromHour, $toHour) {
+    public static function isValidHourPeriod(string $fromHour, string $toHour): bool {
         $date     = date("d-m-Y");
         $fromTime = self::toHour($date, $fromHour);
         $toTime   = self::toHour($date, $toHour);
@@ -191,7 +191,13 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return boolean
      */
-    public static function isValidFullPeriod($fromDate, $fromHour, $toDate, $toHour, $useTimeZone = true) {
+    public static function isValidFullPeriod(
+        string $fromDate,
+        string $fromHour,
+        string $toDate,
+        string $toHour,
+        bool $useTimeZone = true
+    ): bool {
         $fromTime = self::toHour($fromDate, $fromHour, $useTimeZone);
         $toTime   = self::toHour($toDate, $toHour, $useTimeZone);
         
@@ -203,8 +209,8 @@ class DateTime {
      * @param integer $weekDay
      * @return boolean
      */
-    public static function isValidWeekDay($weekDay) {
-        return Utils::isNumeric((int)$weekDay, 0, 6);
+    public static function isValidWeekDay(int $weekDay): bool {
+        return Utils::isNumeric($weekDay, 0, 6);
     }
     
 
@@ -214,26 +220,26 @@ class DateTime {
      * @param integer $seconds
      * @return string
      */
-    public static function toTimeString($seconds) {
-        $secondsInAMinute = 60;
-        $secondsInAnHour  = 60 * $secondsInAMinute;
-        $secondsInADay    = 24 * $secondsInAnHour;
-        $secondsInAWeek   = 7  * $secondsInADay;
+    public static function toTimeString(int $seconds): string {
+        $secsInMinute = 60;
+        $secsInHour   = 60 * $secsInMinute;
+        $secsInDay    = 24 * $secsInHour;
+        $secsInWeek   = 7  * $secsInDay;
 
         // Extract the Weeks
-        $weeks       = floor($seconds / $secondsInAWeek);
+        $weeks       = floor($seconds / $secsInWeek);
         
         // Extract the Days
-        $daySeconds  = $seconds % $secondsInAWeek;
-        $days        = floor($daySeconds / $secondsInADay);
+        $daySeconds  = $seconds % $secsInWeek;
+        $days        = floor($daySeconds / $secsInDay);
 
         // Extract the Hours
-        $hourSeconds = $daySeconds % $secondsInADay;
-        $hours       = floor($hourSeconds / $secondsInAnHour);
+        $hourSeconds = $daySeconds % $secsInDay;
+        $hours       = floor($hourSeconds / $secsInHour);
         
         // Extract the Minutes
-        $minSeconds  = $daySeconds % $secondsInAnHour;
-        $mins        = floor($minSeconds / $secondsInAMinute);
+        $minSeconds  = $daySeconds % $secsInHour;
+        $mins        = floor($minSeconds / $secsInMinute);
         
         // Generate the Result
         if ($mins == 0) {
@@ -256,9 +262,9 @@ class DateTime {
      * @param integer $seconds
      * @return string
      */
-    public static function toDayString($seconds) {
-        $secondsInADay = 24 * 3600;
-        $days          = floor($seconds / $secondsInADay);
+    public static function toDayString(int $seconds): string {
+        $secsInDay = 24 * 3600;
+        $days       = floor($seconds / $secsInDay);
         return "{$days}d";
     }
 
@@ -270,7 +276,7 @@ class DateTime {
      * @param integer $time2
      * @return integer
      */
-    public static function getMonthsDiff($time1, $time2) {
+    public static function getMonthsDiff(int $time1, int $time2): int {
         return 12 * (date("Y", $time1) - date("Y", $time2)) + date("n", $time1) - date("n", $time2);
     }
 
@@ -280,7 +286,7 @@ class DateTime {
      * @param integer $time2
      * @return integer
      */
-    public static function getWeeksDiff($time1, $time2) {
+    public static function getWeeksDiff(int $time1, int $time2): int {
         return floor(($time1 - $time2) / (7 * 24 * 3600));
     }
     
@@ -290,7 +296,7 @@ class DateTime {
      * @param integer $time2
      * @return integer
      */
-    public static function getDaysDiff($time1, $time2) {
+    public static function getDaysDiff(int $time1, int $time2): int {
         return floor(($time1 - $time2) / (24 * 3600));
     }
 
@@ -300,7 +306,7 @@ class DateTime {
      * @param integer $time2
      * @return integer
      */
-    public static function getMinsDiff($time1, $time2) {
+    public static function getMinsDiff(int $time1, int $time2): int {
         return floor(($time1 - $time2) / 60);
     }
 
@@ -311,7 +317,7 @@ class DateTime {
      * @param integer $time
      * @return string
      */
-    public static function getMonthYear($time) {
+    public static function getMonthYear(int $time): string {
         return self::getMonth(date("n", $time)) . " " . date("Y", $time);
     }
 
@@ -320,8 +326,11 @@ class DateTime {
      * @param integer $month
      * @return string
      */
-    public static function getMonth($month) {
-        return self::$months[$month - 1];
+    public static function getMonth(int $month): string {
+        if ($month >= 1 && $month <= 12) {
+            return self::$months[$month - 1];
+        }
+        return "";
     }
     
     /**
@@ -329,7 +338,7 @@ class DateTime {
      * @param integer $month
      * @return string
      */
-    public static function getShortMonth($month) {
+    public static function getShortMonth(int $month): string {
         $result = self::getMonth($month);
         $result = Strings::substring($result, 0, 3);
         return Strings::toUpperCase($result);

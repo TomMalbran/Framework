@@ -25,7 +25,7 @@ class Factory {
      * Loads the Schemas Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             $config  = Config::get("db");
             $schemas = Framework::loadData(Framework::SchemaData);
@@ -51,7 +51,7 @@ class Factory {
      * @param string $key
      * @return Schema
      */
-    public static function getSchema($key) {
+    public static function getSchema(string $key): Schema {
         self::load();
         if (empty(self::$data[$key])) {
             return null;
@@ -66,7 +66,7 @@ class Factory {
      * @param string $key
      * @return Structure
      */
-    public static function getStructure($key) {
+    public static function getStructure(string $key): Structure {
         if (empty(self::$structures[$key])) {
             self::$structures[$key] = new Structure($key, self::$data[$key]);
         }
@@ -78,7 +78,7 @@ class Factory {
      * @param string $key
      * @return array
      */
-    public static function getSubrequest($key) {
+    public static function getSubrequest(string $key): array {
         $data   = self::$data[$key];
         $result = [];
 
@@ -101,7 +101,7 @@ class Factory {
      * @param boolean  $canDelete Optional.
      * @return void
      */
-    public static function migrate(Database $db = null, $canDelete = false) {
+    public static function migrate(Database $db = null, bool $canDelete = false): void {
         self::load();
         $database = $db !== null ? $db : self::$db;
         Migration::migrate($database, self::$data, $canDelete);

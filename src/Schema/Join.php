@@ -29,7 +29,7 @@ class Join {
      * @param string $key
      * @param array  $data
      */
-    public function __construct($key, array $data) {
+    public function __construct(string $key, array $data) {
         $this->key       = $key;
         $this->table     = $data["table"];
         $this->asTable   = !empty($data["asTable"])   ? $data["asTable"]      : null;
@@ -75,7 +75,7 @@ class Join {
      * @param array $data
      * @return array
      */
-    public function toValues(array $data) {
+    public function toValues(array $data): array {
         $result = [];
         foreach ($this->fields as $field) {
             $values = $field->toValues($data);

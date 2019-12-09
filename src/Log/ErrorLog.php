@@ -24,7 +24,7 @@ class ErrorLog {
      * Initializes the Log
      * @return void
      */
-    public static function init() {
+    public static function init(): void {
         self::$framePath = Framework::getPath("src", "", true);
         self::$basePath  = Framework::getPath(Framework::SourceDir);
         set_error_handler("\\Framework\\Log\\ErrorLog::handler");
@@ -34,7 +34,7 @@ class ErrorLog {
      * Loads the Error Schema
      * @return Schema
      */
-    public static function getSchema() {
+    public static function getSchema(): Schema {
         if (!self::$loaded) {
             self::$loaded = false;
             self::$schema = Factory::getSchema("logErrors");
@@ -49,7 +49,7 @@ class ErrorLog {
      * @param integer $logID
      * @return Model
      */
-    public static function getOne($logID) {
+    public static function getOne(int $logID): Model {
         return self::getSchema()->getOne($logID);
     }
     
@@ -58,7 +58,7 @@ class ErrorLog {
      * @param integer $logID
      * @return boolean
      */
-    public static function exists($logID) {
+    public static function exists(int $logID): bool {
         return self::getSchema()->exists($logID);
     }
 
@@ -69,7 +69,7 @@ class ErrorLog {
      * @param Request $filters
      * @return Query
      */
-    private static function getFilterQuery(Request $filters) {
+    private static function getFilterQuery(Request $filters): Query {
         $query = new Query();
         $query->addIf("description", "LIKE", $filters->search);
         if ($filters->has("fromTime") && $filters->has("toTime")) {
@@ -84,7 +84,7 @@ class ErrorLog {
      * @param Request $sort
      * @return array
      */
-    public static function filter(Request $filters, Request $sort) {
+    public static function filter(Request $filters, Request $sort): array {
         $query = self::getFilterQuery($filters);
         $query->orderBy("updatedTime", false);
         $query->paginate($sort->page, $sort->amount);
@@ -96,7 +96,7 @@ class ErrorLog {
      * @param Request $filters
      * @return integer
      */
-    public static function getTotal(Request $filters) {
+    public static function getTotal(Request $filters): int {
         $query = self::getFilterQuery($filters);
         return self::getSchema()->getTotal($query);
     }
@@ -106,7 +106,7 @@ class ErrorLog {
      * @param integer $logID
      * @return boolean
      */
-    public static function markResolved($logID) {
+    public static function markResolved(int $logID): bool {
         $schema = self::getSchema();
         if ($schema->exists($logID)) {
             $schema->edit($logID, [
@@ -127,7 +127,7 @@ class ErrorLog {
      * @param integer $line
      * @return boolean
      */
-    public static function handler($code, $description, $file = "", $line = 0) {
+    public static function handler(int $code, string $description, string $file = "", int $line = 0): bool {
         [ $error, $level ] = self::mapErrorCode($code);
         $schema      = self::getSchema();
         $description = Strings::replace($description, [ "'", "`" ], "");
@@ -176,7 +176,7 @@ class ErrorLog {
      * @param integer $code
      * @return array
      */
-    public static function mapErrorCode($code) {
+    public static function mapErrorCode(int $code): array {
         $error = "";
         $level = 0;
 

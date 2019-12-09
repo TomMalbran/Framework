@@ -30,7 +30,7 @@ class Count {
      * @param string $key
      * @param array  $data
      */
-    public function __construct($key, array $data) {
+    public function __construct(string $key, array $data) {
         $this->index     = "count-{$key}";
         $this->table     = $data["table"];
         $this->key       = $data["key"];

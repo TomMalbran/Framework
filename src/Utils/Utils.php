@@ -11,11 +11,11 @@ class Utils {
     
     /**
      * Rounds the given number to the given decimals
-     * @param integer $number
+     * @param float   $number
      * @param integer $decimals
      * @return integer
      */
-    public static function roundNumber($number, $decimals) {
+    public static function roundNumber(float $number, int $decimals): int {
         if (is_numeric($number)) {
             $padding = pow(10, $decimals);
             return ceil($number * $padding) / $padding;
@@ -25,11 +25,11 @@ class Utils {
     
     /**
      * Returns the given number as an integer using the given decimals
-     * @param integer $number
+     * @param float   $number
      * @param integer $decimals
      * @return integer
      */
-    public static function toInt($number, $decimals) {
+    public static function toInt(float $number, int $decimals): int {
         if (is_numeric($number)) {
             $padding = pow(10, $decimals);
             return round($number * $padding);
@@ -41,9 +41,9 @@ class Utils {
      * Returns the given number as a float using the given decimals
      * @param integer $number
      * @param integer $decimals
-     * @return integer
+     * @return float
      */
-    public static function toFloat($number, $decimals) {
+    public static function toFloat(int $number, int $decimals): float {
         $padding = pow(10, $decimals);
         return $number / $padding;
     }
@@ -53,7 +53,7 @@ class Utils {
      * @param mixed $value
      * @return integer
      */
-    public static function toNumber($value) {
+    public static function toNumber($value): int {
         return !empty($value) ? $value : 0;
     }
     
@@ -64,7 +64,7 @@ class Utils {
      * @param integer $decimals Optional.
      * @return integer
      */
-    public static function toPercent($number, $total, $decimals = 0) {
+    public static function toPercent(int $number, int $total, int $decimals = 0): int {
         return $total == 0 ? 0 : self::roundNumber($number * 100 / $total, $decimals);
     }
     
@@ -75,7 +75,7 @@ class Utils {
      * @param integer $decimals  Optional.
      * @return integer
      */
-    public static function toDivision($numerator, $divisor, $decimals = 0) {
+    public static function toDivision(int $numerator, int $divisor, int $decimals = 0): int {
         return $divisor == 0 ? 0 : self::roundNumber($numerator / $divisor, $decimals);
     }
     
@@ -88,7 +88,7 @@ class Utils {
      * @param integer $toHigh
      * @return integer
      */
-    public static function mapValue($value, $fromLow, $fromHigh, $toLow, $toHigh) {
+    public static function mapValue(int $value, int $fromLow, int $fromHigh, int $toLow, int $toHigh): int {
         $fromRange = $fromHigh - $fromLow;
         $toRange   = $toHigh - $toLow;
         if ($fromRange == 0) {
@@ -108,38 +108,38 @@ class Utils {
     
     /**
      * Rounds the given price to 2 decimals
-     * @param integer $price
+     * @param float $price
      * @return integer
      */
-    public static function roundCents($price) {
+    public static function roundCents(float $price): int {
         return self::roundNumber($price, 2);
     }
     
     /**
      * Returns the given price in Cents
-     * @param integer $price
+     * @param float $price
      * @return integer
      */
-    public static function toCents($price) {
+    public static function toCents(float $price): int {
         return self::toInt($price, 2);
     }
     
     /**
      * Returns the given price in Dollars
      * @param integer $price
-     * @return integer
+     * @return float
      */
-    public static function fromCents($price) {
+    public static function fromCents(int $price): float {
         return self::toFloat($price, 2);
     }
 
     /**
      * Returns a price using the right format
-     * @param integer $price
+     * @param float   $price
      * @param integer $decimals Optional.
      * @return string
      */
-    public static function formatPrice($price, $decimals = 2) {
+    public static function formatPrice(float $price, int $decimals = 2): string {
         $price = floatval($price);
         if (!empty($price)) {
             return number_format($price, $decimals, ",", "");
@@ -153,17 +153,17 @@ class Utils {
      * @param integer $decimals Optional.
      * @return string
      */
-    public static function formatCents($cents, $decimals = 2) {
+    public static function formatCents(int $cents, int $decimals = 2): string {
         $price = self::fromCents($cents);
         return self::formatPrice($price, $decimals);
     }
 
     /**
      * Returns a price string
-     * @param integer $price
+     * @param float $price
      * @return string
      */
-    public static function toPriceString($price) {
+    public static function toPriceString(float $price): string {
         $millions = round($price / 1000000);
         if ($millions > 10) {
             return "${$millions}m";
@@ -183,7 +183,7 @@ class Utils {
      * @param string $value
      * @return boolean
      */
-    public static function isAlphaNum($value) {
+    public static function isAlphaNum(string $value): bool {
         return ctype_alnum($value);
     }
     
@@ -194,7 +194,7 @@ class Utils {
      * @param integer $max    Optional.
      * @return boolean
      */
-    public static function isNumeric($number, $min = 1, $max = null) {
+    public static function isNumeric($number, int $min = 1, int $max = null): bool {
         return is_numeric($number) && $number >= $min && ($max != null ? $number <= $max : true);
     }
     
@@ -205,7 +205,7 @@ class Utils {
      * @param integer $max   Optional.
      * @return boolean
      */
-    public static function isValidPrice($price, $min = 1, $max = null) {
+    public static function isValidPrice($price, int $min = 1, int $max = null): bool {
         return self::isNumeric($price * 100, $min, $max);
     }
     
@@ -214,7 +214,7 @@ class Utils {
      * @param string $email
      * @return boolean
      */
-    public static function isValidEmail($email) {
+    public static function isValidEmail(string $email): bool {
         return filter_var($email, FILTER_VALIDATE_EMAIL);
     }
     
@@ -225,7 +225,7 @@ class Utils {
      * @param integer $minLength Optional.
      * @return boolean
      */
-    public static function isValidPassword($password, $checkSets = "lud", $minLength = 4) {
+    public static function isValidPassword(string $password, string $checkSets = "lud", int $minLength = 4): bool {
         if (Strings::length($password) < $minLength) {
             return false;
         }
@@ -246,7 +246,7 @@ class Utils {
      * @param string $domain
      * @return boolean
      */
-    public static function isValidDomain($domain) {
+    public static function isValidDomain(string $domain): bool {
         return preg_match('/^([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i', $domain);
     }
     
@@ -255,7 +255,7 @@ class Utils {
      * @param string $username
      * @return boolean
      */
-    public static function isValidUsername($username) {
+    public static function isValidUsername(string $username): bool {
         return preg_match('/^[a-z]+[a-z0-9]{2,11}$/i', $username);
     }
     
@@ -264,7 +264,7 @@ class Utils {
      * @param string $name
      * @return boolean
      */
-    public static function isValidName($name) {
+    public static function isValidName(string $name): bool {
         return preg_match('/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i', $name);
     }
     
@@ -273,7 +273,7 @@ class Utils {
      * @param string $value
      * @return boolean
      */
-    public static function isValidCUIT($value) {
+    public static function isValidCUIT(string $value): bool {
         $cuit = (string)self::cuitToNumber($value);
         if (Strings::length($cuit) != 11) {
             return false;
@@ -301,7 +301,7 @@ class Utils {
      * @param string $value
      * @return boolean
      */
-    public static function isValidDNI($value) {
+    public static function isValidDNI(string $value): bool {
         $dni = self::dniToNumber($value);
         if (Strings::length($dni) != 8) {
             return false;
@@ -316,7 +316,7 @@ class Utils {
      * @param string $value
      * @return string
      */
-    public static function parseCUIT($value) {
+    public static function parseCUIT(string $value): string {
         if (Strings::length($value) == 11) {
             return preg_replace("/^(\d{2})(\d{8})(\d{1})$/", "$1-$2-$3", $value);
         }
@@ -328,7 +328,7 @@ class Utils {
      * @param string $value
      * @return string
      */
-    public static function cuitToNumber($value) {
+    public static function cuitToNumber(string $value): string {
         return Strings::replace($value, [ " ", "-" ], "");
     }
 
@@ -337,7 +337,7 @@ class Utils {
      * @param string $value
      * @return string
      */
-    public static function dniToNumber($value) {
+    public static function dniToNumber(string $value): string {
         return Strings::replace($value, [ " ", "." ], "");
     }
     
@@ -349,7 +349,7 @@ class Utils {
      * @param string $prefix
      * @return string
      */
-    public static function createRealName($data, $prefix = "") {
+    public static function createRealName($data, string $prefix = ""): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
@@ -374,7 +374,7 @@ class Utils {
      * @param string $email  Optional.
      * @return string
      */
-    public static function generateUsername($domain, $email = "") {
+    public static function generateUsername(string $domain, string $email = ""): string {
         $parts  = Strings::split($domain, ".");
         $result = Strings::replace($parts[0], ["-", "ñ"], ["", "n"]);
         $result = Strings::substring($result, 0, 8);
@@ -390,7 +390,7 @@ class Utils {
      * @param string $email
      * @return string
      */
-    public static function generateDomain($email) {
+    public static function generateDomain(string $email): string {
         $domains = [
             /* Default domains included */
             "aol.com", "att.net", "comcast.net", "facebook.com", "fb.com", "gmail.com", "gmx.com", "googlemail.com",
@@ -430,7 +430,7 @@ class Utils {
      * @param string $salt Optional.
      * @return array
      */
-    public static function createHash($pass, $salt = "") {
+    public static function createHash(string $pass, string $salt = ""): string {
         $salt = !empty($salt) ? $salt : Strings::random(50);
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
         return [ "password" => $hash, "salt" => $salt ];
@@ -443,7 +443,7 @@ class Utils {
      * @param string $domain
      * @return string
      */
-    public static function getDomainExtension($domain) {
+    public static function getDomainExtension(string $domain): string {
         return Strings::substringAfter($domain, ".");
     }
     
@@ -452,7 +452,7 @@ class Utils {
      * @param string $domain
      * @return string
      */
-    public static function parseDomain($domain) {
+    public static function parseDomain(string $domain): string {
         $domain = Strings::toLowerCase($domain);
         if (Strings::startsWith($domain, "http")) {
             $domain = "http://" . $domain;
@@ -471,7 +471,7 @@ class Utils {
      * @param string $serverIP Optional.
      * @return boolean
      */
-    public static function isDelegated($domain, $serverIP = "") {
+    public static function isDelegated(string $domain, string $serverIP = ""): bool {
         if (self::verifyDelegation($domain, $serverIP)) {
             return true;
         }
@@ -484,7 +484,7 @@ class Utils {
      * @param string $serverIP Optional.
      * @return boolean
      */
-    public static function verifyDelegation($domain, $serverIP = "") {
+    public static function verifyDelegation(string $domain, string $serverIP = ""): bool {
         $host = gethostbyname($domain);
         if (!empty($serverIP)) {
             return !empty($host) && $host == $serverIP;
@@ -499,7 +499,7 @@ class Utils {
      * @param array $whitelist
      * @return boolean
      */
-    public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]) {
+    public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]): bool {
         return Arrays::contains($whitelist, $_SERVER["REMOTE_ADDR"]);
     }
 
@@ -507,7 +507,7 @@ class Utils {
      * Returns true if running on a Stage host
      * @return boolean
      */
-    public static function isStageHost() {
+    public static function isStageHost(): bool {
         return Strings::startsWith($_SERVER["HTTP_HOST"], "dev.");
     }
 
@@ -515,7 +515,7 @@ class Utils {
      * Returns the user IP
      * @return string
      */
-    public static function getIP() {
+    public static function getIP(): string {
         if ($_SERVER) {
             if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
                 $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];

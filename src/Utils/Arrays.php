@@ -11,7 +11,7 @@ class Arrays {
      * @param mixed $array
      * @return boolean
      */
-    public static function isArray($array) {
+    public static function isArray($array): bool {
         return is_array($array);
     }
 
@@ -20,7 +20,7 @@ class Arrays {
      * @param mixed $array
      * @return boolean
      */
-    public static function isMap($array) {
+    public static function isMap($array): bool {
         return is_array($array) && is_array(array_values($array)[0]);
     }
 
@@ -30,7 +30,7 @@ class Arrays {
      * @param mixed       $needle
      * @return boolean
      */
-    public static function contains($array, $needle) {
+    public static function contains($array, $needle): bool {
         return in_array($needle, self::toArray($array));
     }
 
@@ -40,7 +40,7 @@ class Arrays {
      * @param mixed $needle
      * @return boolean
      */
-    public static function containsKey(array $array, $needle) {
+    public static function containsKey(array $array, $needle): bool {
         return in_array($needle, array_keys($array));
     }
     
@@ -51,7 +51,7 @@ class Arrays {
      * @param array|mixed $array
      * @return array
      */
-    public static function toArray($array) {
+    public static function toArray($array): array {
         return is_array($array) ? $array : [ $array ];
     }
     
@@ -69,7 +69,7 @@ class Arrays {
      * @param array $array
      * @return array
      */
-    public static function removeEmpty(array $array) {
+    public static function removeEmpty(array $array): array {
         $result = [];
         foreach ($array as $value) {
             if (!empty($value)) {
@@ -85,7 +85,7 @@ class Arrays {
      * @param array $array
      * @return array
      */
-    public static function subArray(array $base, array $array) {
+    public static function subArray(array $base, array $array): array {
         $result = [];
         foreach ($array as $value) {
             if (in_array($value, $base)) {
@@ -101,7 +101,7 @@ class Arrays {
      * @param array $array2
      * @return array
      */
-    public static function extend(array &$array1, array &$array2) {
+    public static function extend(array &$array1, array &$array2): array {
         $result = $array1;
         foreach ($array2 as $key => &$value) {
             if (is_array($value) && isset($result[$key]) && is_array($result[$key])) {
@@ -122,7 +122,7 @@ class Arrays {
      * @param string|string[] $value Optional.
      * @return array
      */
-    public static function createMap(array $array, $key, $value = "") {
+    public static function createMap(array $array, string $key, $value = null): array {
         $result  = [];
         foreach ($array as $row) {
             $result[$row[$key]] = !empty($value) ? self::getValue($row, $value) : $row;
@@ -136,7 +136,7 @@ class Arrays {
      * @param string|string[] $value Optional.
      * @return array
      */
-    public static function createArray(array $array, $value = "") {
+    public static function createArray(array $array, $value = null): array {
         $result = [];
         foreach ($array as $row) {
             $result[] = !empty($value) ? self::getValue($row, $value) : $row;
@@ -151,7 +151,7 @@ class Arrays {
      * @param string|string[] $value
      * @return array
      */
-    public static function createSelect(array $array, $key, $value) {
+    public static function createSelect(array $array, string $key, $value): array {
         $result = [];
         foreach ($array as $row) {
             $result[] = [
@@ -167,7 +167,7 @@ class Arrays {
      * @param array $array
      * @return array
      */
-    public static function createSelectFromMap(array $array) {
+    public static function createSelectFromMap(array $array): array {
         $result = [];
         foreach ($array as $key => $value) {
             $result[] = [
@@ -186,7 +186,7 @@ class Arrays {
      * @param string $prefix Optional.
      * @return string
      */
-    public static function getKey($key, $prefix = "") {
+    public static function getKey(string $key, string $prefix = ""): string {
         return !empty($prefix) ? $prefix . ucfirst($key) : $key;
     }
 
@@ -198,7 +198,7 @@ class Arrays {
      * @param string          $prefix Optional.
      * @return string
      */
-    public static function getValue($array, $key, $glue = " - ", $prefix = "") {
+    public static function getValue($array, $key, string $glue = " - ", string $prefix = ""): string {
         $result = "";
         if (is_array($key)) {
             $values = [];

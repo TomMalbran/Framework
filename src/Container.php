@@ -17,7 +17,7 @@ class Container {
      * @param mixed  ...$params
      * @return object
      */
-    public static function create($key, ...$params) {
+    public static function create(string $key, ...$params): object {
         self::$keys = [];
         return self::resolve($key, false, $params);
     }
@@ -28,7 +28,7 @@ class Container {
      * @param mixed  ...$params
      * @return object
      */
-    public static function bind($key, ...$params) {
+    public static function bind(string $key, ...$params): object {
         self::$keys = [];
         return self::resolve($key, true, $params);
     }
@@ -42,7 +42,7 @@ class Container {
      * @param array   $params Optional.
      * @return object
      */
-    public static function resolve($key, $save = false, array $params = []) {
+    public static function resolve(string $key, bool $save = false, array $params = []): object {
         // If there are too many keys, we are probably in a loop
         self::$keys[] = $key;
         if (count(self::$keys) > 1000) {
@@ -68,7 +68,7 @@ class Container {
      * @param array   $params    Optional.
      * @return object
      */
-    private static function buildObject($className, $save = false, array $params = []) {
+    private static function buildObject(string $className, bool $save = false, array $params = []): object {
         $reflector = new ReflectionClass($className);
         $instances = [];
         

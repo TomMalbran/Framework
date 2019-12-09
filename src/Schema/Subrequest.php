@@ -51,7 +51,7 @@ class Subrequest {
      * @param array $result
      * @return array
      */
-    public function request(array $result) {
+    public function request(array $result): array {
         $ids   = Arrays::createArray($result, $this->idName);
         $query = Query::create($this->idKey, "IN", $ids);
 
@@ -89,7 +89,7 @@ class Subrequest {
      * @param array $row
      * @return array
      */
-    private function getValues(array $row) {
+    private function getValues(array $row): array {
         if (empty($this->value)) {
             return $row;
         }

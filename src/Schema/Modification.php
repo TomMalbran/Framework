@@ -37,7 +37,7 @@ class Modification {
      * @param integer       $credentialID Optional.
      * @return void
      */
-    public function addFields($fields, $extra = null, $credentialID = 0) {
+    public function addFields($fields, $extra = null, int $credentialID = 0): void {
         if ($fields instanceof Request) {
             $this->fields = $this->parseFields($fields);
         } else {
@@ -60,7 +60,7 @@ class Modification {
      * @param Request $request
      * @return array
      */
-    private function parseFields(Request $request) {
+    private function parseFields(Request $request): array {
         $result = [];
         foreach ($this->structure->fields as $field) {
             if ($field->canEdit) {
@@ -80,7 +80,7 @@ class Modification {
      * Adds the Creation Fields
      * @return void
      */
-    public function addCreation() {
+    public function addCreation(): void {
         if ($this->structure->canDelete && empty($this->fields["isDeleted"])) {
             $this->fields["isDeleted"] = 0;
         }
@@ -96,7 +96,7 @@ class Modification {
      * Adds the Modification Fields
      * @return void
      */
-    public function addModification() {
+    public function addModification(): void {
         if ($this->structure->canEdit && $this->structure->hasTimestamps) {
             $this->fields["modifiedTime"] = time();
         }
@@ -111,7 +111,7 @@ class Modification {
      * Inserts the Fields into the Database
      * @return integer
      */
-    public function insert() {
+    public function insert(): int {
         return $this->db->insert($this->structure->table, $this->fields);
     }
 
@@ -119,7 +119,7 @@ class Modification {
      * Replaces the Fields into the Database
      * @return integer
      */
-    public function replace() {
+    public function replace(): int {
         return $this->db->insert($this->structure->table, $this->fields, "REPLACE");
     }
 
@@ -128,7 +128,7 @@ class Modification {
      * @param Query $query
      * @return boolean
      */
-    public function update(Query $query) {
+    public function update(Query $query): bool {
         return $this->db->update($this->structure->table, $this->fields, $query);
     }
 }

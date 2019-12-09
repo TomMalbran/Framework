@@ -11,8 +11,8 @@ class Strings {
      * @param string $string
      * @return integer
      */
-    public static function length($string) {
-        return strlen((string)$string);
+    public static function length(string $string): int {
+        return strlen($string);
     }
 
     /**
@@ -21,7 +21,7 @@ class Strings {
      * @param string $needle
      * @return boolean
      */
-    public static function contains($string, $needle) {
+    public static function contains(string $string, string $needle): bool {
         return strstr($string, $needle) !== FALSE;
     }
 
@@ -31,9 +31,9 @@ class Strings {
      * @param string $needle
      * @return boolean
      */
-    public static function startsWith($string, $needle) {
+    public static function startsWith(string $string, string $needle): bool {
         $length = strlen($needle);
-        return (substr($string, 0, $length) === $needle);
+        return substr($string, 0, $length) === $needle;
     }
 
     /**
@@ -42,12 +42,12 @@ class Strings {
      * @param string $needle
      * @return boolean
      */
-    public static function endsWith($string, $needle) {
+    public static function endsWith(string $string, string $needle): bool {
         $length = strlen($needle);
         if ($length == 0) {
             return true;
         }
-        return (substr($string, -$length) === $needle);
+        return substr($string, -$length) === $needle;
     }
 
 
@@ -57,7 +57,7 @@ class Strings {
      * @param integer $length Optional.
      * @return string
      */
-    public static function random($length = 50) {
+    public static function random(int $length = 50): string {
         return substr(md5(rand()), 0, $length);
     }
 
@@ -66,7 +66,7 @@ class Strings {
      * @param string $string
      * @return string
      */
-    public static function randomChar($string) {
+    public static function randomChar(string $string): string {
         $parts = str_split($string);
         $index = array_rand($parts);
         return $string[$index];
@@ -78,7 +78,7 @@ class Strings {
      * @param string  $availableSets Optional.
      * @return string
      */
-    public static function randomCode($length = 8, $availableSets = "lud") {
+    public static function randomCode(int $length = 8, string $availableSets = "lud"): string {
         $sets   = [];
         $all    = "";
         $result = "";
@@ -119,7 +119,7 @@ class Strings {
      * @param string|string[] $replace
      * @return string
      */
-    public static function replace($string, $search, $replace) {
+    public static function replace(string $string, $search, $replace): string {
         return str_replace($search, $replace, $string);
     }
 
@@ -129,7 +129,7 @@ class Strings {
      * @param string $needle
      * @return string
      */
-    public static function stripStart($string, $needle) {
+    public static function stripStart(string $string, string $needle): string {
         if (self::startsWith($string, $needle)) {
             $length = strlen($needle);
             return substr($string, $length, strlen($string) - $length);
@@ -143,7 +143,7 @@ class Strings {
      * @param string $needle
      * @return string
      */
-    public static function stripEnd($string, $needle) {
+    public static function stripEnd(string $string, string $needle): string {
         if (self::endsWith($string, $needle)) {
             $length = strlen($needle);
             return substr($string, 0, strlen($string) - $length);
@@ -157,10 +157,10 @@ class Strings {
      * Returns a Substring from the Start to the Length
      * @param string  $string
      * @param integer $start
-     * @param integer $length
+     * @param integer $length Optional.
      * @return string
      */
-    public static function substring($string, $start, $length = null) {
+    public static function substring(string $string, int $start, int $length = null): string {
         return substr($string, $start, $length);
     }
 
@@ -170,7 +170,7 @@ class Strings {
      * @param string $needle
      * @return string
      */
-    public static function substringAfter($string, $needle) {
+    public static function substringAfter(string $string, string $needle): string {
         if (self::contains($string, $needle)) {
             return substr($string, strrpos($string, $needle) + strlen($needle));
         }
@@ -183,7 +183,7 @@ class Strings {
      * @param string $needle
      * @return string
      */
-    public static function substringBefore($string, $needle) {
+    public static function substringBefore(string $string, string $needle): string {
         if (self::contains($string, $needle)) {
             return substr($string, 0, strpos($string, $needle));
         }
@@ -197,7 +197,7 @@ class Strings {
      * @param string $needle
      * @return string[]
      */
-    public static function split($string, $needle) {
+    public static function split(string $string, string $needle): array {
         return explode($needle, $string);
     }
 
@@ -207,7 +207,7 @@ class Strings {
      * @param string          $glue
      * @return string
      */
-    public static function join($string, $glue) {
+    public static function join($string, string $glue): string {
         if (is_array($string)) {
             return implode($glue, $string);
         }
@@ -220,7 +220,7 @@ class Strings {
      * @param string          $glue
      * @return string
      */
-    public static function joinKeys($string, $glue) {
+    public static function joinKeys($string, string $glue): string {
         if (is_array($string)) {
             return implode($glue, array_keys($string));
         }
@@ -236,7 +236,7 @@ class Strings {
      * @param boolean $asLower Optional.
      * @return boolean
      */
-    public static function isEqual($string, $other, $asLower = true) {
+    public static function isEqual(string $string, string $other, bool $asLower = true): bool {
         if ($asLower) {
             return strtolower($string) === strtolower($other);
         }
@@ -248,7 +248,7 @@ class Strings {
      * @param string $string
      * @return string
      */
-    public static function toLowerCase($string) {
+    public static function toLowerCase(string $string): string {
         return strtolower($string);
     }
 
@@ -257,7 +257,7 @@ class Strings {
      * @param string $string
      * @return string
      */
-    public static function toUpperCase($string) {
+    public static function toUpperCase(string $string): string {
         return strtoupper($string);
     }
 
@@ -267,7 +267,7 @@ class Strings {
      * @param boolean $capitalizeFirst Optional.
      * @return string
      */
-    public static function upperCaseToCamelCase($string, $capitalizeFirst = false) {
+    public static function upperCaseToCamelCase(string $string, bool $capitalizeFirst = false): string {
         $result = ucwords(strtolower($string), "_");
         $result = str_replace("_", "", $result);
         $result = lcfirst($result);
@@ -279,7 +279,7 @@ class Strings {
      * @param string $string
      * @return string
      */
-    public static function camelCaseToUpperCase($string) {
+    public static function camelCaseToUpperCase(string $string): string {
         $parts  = preg_split('/(?=[A-Z])/', $string);
         $result = implode("_", $parts);
         $result = strtoupper($result);
@@ -289,32 +289,35 @@ class Strings {
 
 
     /**
-     * Returns the HTML version of the given text
-     * @param string $text
+     * Returns the HTML version of the given string
+     * @param string $string
      * @return string
      */
-    public static function toHtml($text) {
-        return str_replace("\n", "<br>", $text);
+    public static function toHtml(string $string): string {
+        return str_replace("\n", "<br>", $string);
     }
 
     /**
-     * Returns a short version of the given text
-     * @param string  $text
-     * @param integer $len  Optional.
+     * Returns a short version of the given string
+     * @param string  $string
+     * @param integer $length Optional.
      * @return string
      */
-    public static function makeShort($text, $len = 30) {
-        $first = explode("\n", $text)[0];
-        return strlen($first) > $len ? mb_substr($first, 0, $len, "utf-8") . "..." : $first;
+    public static function makeShort(string $string, int $length = 30): string {
+        $first = explode("\n", $string)[0];
+        if (strlen($first) > $length) {
+            return mb_substr($first, 0, $length, "utf-8") . "...";
+        }
+        return $first;
     }
 
     /**
-     * Returns true if the short version is different from the text
-     * @param string  $text
-     * @param integer $len  Optional.
+     * Returns true if the short version is different from the string
+     * @param string  $string
+     * @param integer $length Optional.
      * @return string
      */
-    public static function isShort($text, $len = 30) {
-        return self::makeShort($text, $len) !== $text;
+    public static function isShort(string $string, int $length = 30): string {
+        return self::makeShort($string, $length) !== $string;
     }
 }

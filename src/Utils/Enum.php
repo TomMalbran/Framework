@@ -22,7 +22,7 @@ class Enum {
      * Loads the Data from the Cache
      * @return object
      */
-    public static function load() {
+    public static function load(): object {
         $class = get_called_class();
         if (empty(self::$cache[$class])) {
             $reflection = new ReflectionClass($class);
@@ -53,7 +53,7 @@ class Enum {
      * @param mixed $value
      * @return boolean
      */
-    public static function isValid($value) {
+    public static function isValid($value): boolean {
         $cache = self::load();
         if ($cache->isConstant) {
             return Arrays::contains($cache->constants, $value);
@@ -78,7 +78,7 @@ class Enum {
      * Creates a Select for the Enum
      * @return array
      */
-    public static function getSelect() {
+    public static function getSelect(): array {
         $cache = self::load();
         if ($cache->isConstant) {
             return Arrays::createSelectFromMap($cache->constants);
@@ -99,7 +99,7 @@ class Enum {
      * @param array  $arguments
      * @return mixed|null
      */
-    public static function __callStatic($function, array $arguments) {
+    public static function __callStatic(string $function, array $arguments) {
         $cache = self::load();
         $value = !empty($arguments[0]) ? $arguments[0] : null;
 

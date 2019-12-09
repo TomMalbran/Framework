@@ -24,7 +24,7 @@ class ActionLog {
      * Loads the Action Schemas
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$logIDs      = Factory::getSchema("logIDs");
             self::$logSessions = Factory::getSchema("logSessions");
@@ -36,7 +36,7 @@ class ActionLog {
      * Loads the IDs Schemas
      * @return Schema
      */
-    public static function getIDsSchema() {
+    public static function getIDsSchema(): Schema {
         self::load();
         return self::$logIDs;
     }
@@ -45,7 +45,7 @@ class ActionLog {
      * Loads the Sessions Schemas
      * @return Schema
      */
-    public static function getSessionsSchema() {
+    public static function getSessionsSchema(): Schema {
         self::load();
         return self::$logSessions;
     }
@@ -54,7 +54,7 @@ class ActionLog {
      * Loads the Actions Schemas
      * @return Schema
      */
-    public static function getActionsSchema() {
+    public static function getActionsSchema(): Schema {
         self::load();
         return self::$logActions;
     }
@@ -67,7 +67,7 @@ class ActionLog {
      * @param array   $mappings
      * @return Query
      */
-    private static function getFilterQuery(Request $filters, array $mappings) {
+    private static function getFilterQuery(Request $filters, array $mappings): Query {
         $query = new Query();
         $query->addIf("CREDENTIAL_ID", "=", $filters->credentialID);
         foreach ($mappings as $key => $value) {
@@ -87,7 +87,7 @@ class ActionLog {
      * @param array   $mappings
      * @return array
      */
-    public static function filter(Request $filters, Request $sort, array $mappings) {
+    public static function filter(Request $filters, Request $sort, array $mappings): array {
         $query = self::getFilterQuery($filters, $mappings);
         $query->orderBy("time", false);
         $query->paginate($sort->page, $sort->amount);
@@ -100,7 +100,7 @@ class ActionLog {
      * @param array   $mappings
      * @return integer
      */
-    public static function getTotal(Request $filters, array $mappings) {
+    public static function getTotal(Request $filters, array $mappings): int {
         $query = self::getFilterQuery($filters, $mappings);
         return self::getSessionsSchema()->getTotal($query);
     }
@@ -110,7 +110,7 @@ class ActionLog {
      * @param Query $query
      * @return array
      */
-    private static function request(Query $query) {
+    private static function request(Query $query): array {
         $sessionIDs = self::getSessionsSchema()->getColumn($query, "SESSION_ID");
         $querySess  = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", false);
         $queryActs  = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", true);
@@ -158,7 +158,7 @@ class ActionLog {
      * @param boolean $destroy      Optional.
      * @return void
      */
-    public static function startSession($credentialID, $destroy = false) {
+    public static function startSession(int $credentialID, bool $destroy = false): void {
         $sessionID = self::getSessionID();
         
         if ($destroy || empty($sessionID)) {
@@ -177,7 +177,7 @@ class ActionLog {
      * Ends the Log Session
      * @return void
      */
-    public static function endSession() {
+    public static function endSession(): void {
         self::setSessionID();
     }
     
@@ -190,7 +190,7 @@ class ActionLog {
      * @param integer|integer[] $dataID  Optional.
      * @return void
      */
-    public static function add($action, $section = 0, $dataID = "") {
+    public static function add(int $action, int $section = 0, $dataID = ""): void {
         $sessionID = self::getSessionID();
         if (!empty($sessionID)) {
             $dataID = Arrays::toArray($dataID);
@@ -214,7 +214,7 @@ class ActionLog {
      * Returns the Session ID for the current Credential
      * @return integer
      */
-    public static function getSessionID() {
+    public static function getSessionID(): int {
         $query = Query::create("CREDENTIAL_ID", "=", Auth::getID());
         return self::getIDsSchema()->getValue($query, "SESSION_ID");
     }
@@ -224,7 +224,7 @@ class ActionLog {
      * @param integer $sessionID Optional.
      * @return void
      */
-    public static function setSessionID($sessionID = 0) {
+    public static function setSessionID(int $sessionID = 0): void {
         self::getIDsSchema()->replace([
             "CREDENTIAL_ID" => Auth::getID(),
             "SESSION_ID"    => $sessionID,

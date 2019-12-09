@@ -132,7 +132,7 @@ class Encoding {
      * @param string $text
      * @return string The same string, UTF8 encoded
      */
-    public static function toUTF8($text) {
+    public static function toUTF8(string $text): string {
         if (is_array($text)) {
             foreach ($text as $k => $v) {
                 $text[$k] = self::toUTF8($v);
@@ -221,7 +221,7 @@ class Encoding {
      * @param string $text
      * @return string
      */
-    public static function toWin1252($text) {
+    public static function toWin1252(string $text): string {
         if (is_array($text)) {
             foreach ($text as $k => $v) {
                 $text[$k] = self::toWin1252($v);
@@ -239,7 +239,7 @@ class Encoding {
      * @param string $text
      * @return string
      */
-    public static function toISO8859($text) {
+    public static function toISO8859(string $text): string {
         return self::toWin1252($text);
     }
     
@@ -248,7 +248,7 @@ class Encoding {
      * @param string $text
      * @return string
      */
-    public static function toLatin1($text) {
+    public static function toLatin1(string $text): string {
         return self::toWin1252($text);
     }
     
@@ -257,7 +257,7 @@ class Encoding {
      * @param string $text
      * @return string
      */
-    public static function fixUTF8($text) {
+    public static function fixUTF8(string $text): string {
         if (is_array($text)) {
             foreach ($text as $k => $v) {
                 $text[$k] = self::fixUTF8($v);
@@ -279,7 +279,7 @@ class Encoding {
      * @param string $text
      * @return string
      */
-    public static function UTF8FixWin1252Chars($text) {
+    public static function UTF8FixWin1252Chars(string $text): string {
         // If you received an UTF-8 string that was converted from Windows-1252 as it was ISO8859-1
         // (ignoring Windows-1252 chars from 80 to 9F) use this function to fix it.
         // See: http://en.wikipedia.org/wiki/Windows-1252
@@ -292,7 +292,7 @@ class Encoding {
      * @param string $text Optional.
      * @return string
      */
-    public static function removeBOM($text = "") {
+    public static function removeBOM(string $text = ""): string {
         if (substr($text, 0, 3) == pack("CCC", 0xef, 0xbb, 0xbf)) {
             $text = substr($text, 3);
         }

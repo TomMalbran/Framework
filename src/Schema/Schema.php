@@ -36,7 +36,7 @@ class Schema {
      * Returns the Schema Fields
      * @return array
      */
-    public function getFields() {
+    public function getFields(): array {
         return $this->structure->fields;
     }
 
@@ -45,7 +45,7 @@ class Schema {
      * @param string $value
      * @return string
      */
-    public function encrypt($value) {
+    public function encrypt(string $value): string {
         return Query::encrypt($value, $this->structure->masterKey);
     }
     
@@ -55,12 +55,12 @@ class Schema {
      * Returns the Model with the given Where
      * @param Query|integer $query
      * @param boolean       $withDeleted Optional.
-     * @param boolean       $decripted   Optional.
+     * @param boolean       $decrypted   Optional.
      * @return Model
      */
-    public function getOne($query, $withDeleted = true, $decripted = false) {
+    public function getOne($query, bool $withDeleted = true, bool $decrypted = false): Model {
         $query   = $this->generateQueryID($query, $withDeleted)->limit(1);
-        $request = $this->request($query, $decripted);
+        $request = $this->request($query, $decrypted);
         return $this->getModel($request);
     }
     
@@ -69,7 +69,7 @@ class Schema {
      * @param array $request Optional.
      * @return Model
      */
-    public function getModel(array $request = null) {
+    public function getModel(array $request = null): Model {
         if (!empty($request[0])) {
             return new Model($this->structure->idName, $request[0]);
         }
@@ -82,7 +82,7 @@ class Schema {
      * @param boolean       $withDeleted Optional.
      * @return boolean
      */
-    public function exists($query, $withDeleted = true) {
+    public function exists($query, bool $withDeleted = true): bool {
         $query = $this->generateQueryID($query, $withDeleted);
         return $this->getTotal($query) == 1;
     }
@@ -95,7 +95,7 @@ class Schema {
      * @param array  $params     Optional.
      * @return array
      */
-    public function getQuery($expression, array $params = []) {
+    public function getQuery(string $expression, array $params = []): array {
         $expression = Strings::replace($expression, "{table}", "{dbPrefix}{$this->structure->table}");
         $request    = $this->db->query($expression, $params);
         return $request;
@@ -105,12 +105,12 @@ class Schema {
      * Returns an array of Schemas
      * @param Query   $query     Optional.
      * @param Request $sort      Optional.
-     * @param string  $decripted Optional.
+     * @param boolean $decrypted Optional.
      * @return array
      */
-    public function getAll(Query $query = null, Request $sort = null, $decripted = false) {
+    public function getAll(Query $query = null, Request $sort = null, bool $decrypted = false): array {
         $query   = $this->generateQuerySort($query, $sort);
-        $request = $this->request($query, $decripted);
+        $request = $this->request($query, $decrypted);
         return $request;
     }
 
@@ -118,24 +118,24 @@ class Schema {
      * Returns a map of Schemas
      * @param Query   $query     Optional.
      * @param Request $sort      Optional.
-     * @param string  $decripted Optional.
+     * @param boolean $decrypted Optional.
      * @return array
      */
-    public function getMap(Query $query = null, Request $sort = null, $decripted = false) {
+    public function getMap(Query $query = null, Request $sort = null, bool $decrypted = false): array {
         $query   = $this->generateQuerySort($query, $sort);
-        $request = $this->request($query, $decripted);
+        $request = $this->request($query, $decrypted);
         return Arrays::createMap($request, $this->structure->idName);
     }
     
     /**
      * Requests data to the database
-     * @param Query  $query     Optional.
-     * @param string $decripted Optional.
+     * @param Query   $query     Optional.
+     * @param boolean $decrypted Optional.
      * @return array
      */
-    private function request(Query $query = null, $decripted = false) {
+    private function request(Query $query = null, bool $decrypted = false): array {
         $selection = new Selection($this->db, $this->structure);
-        $selection->addFields($decripted);
+        $selection->addFields($decrypted);
         $selection->addJoins();
         $selection->addCounts();
         $selection->request($query);
@@ -156,7 +156,7 @@ class Schema {
      * @param string|string[] $names
      * @return array
      */
-    public function getColumns(Query $query, $columns, $names) {
+    public function getColumns(Query $query, $columns, $names): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields();
@@ -173,7 +173,7 @@ class Schema {
      * @param boolean  $withFields Optional.
      * @return array
      */
-    public function getSome(Query $query, array $selects, $withFields = false) {
+    public function getSome(Query $query, array $selects, bool $withFields = false): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects($selects);
@@ -193,7 +193,7 @@ class Schema {
      * @param boolean $withDeleted Optional.
      * @return integer
      */
-    public function getTotal(Query $query = null, $column = "*", $withDeleted = true) {
+    public function getTotal(Query $query = null, string $column = "*", bool $withDeleted = true): int {
         $query     = $this->generateQuery($query, $withDeleted);
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects("COUNT($column) AS cnt");
@@ -212,7 +212,7 @@ class Schema {
      * @param string $column
      * @return integer
      */
-    public function getSum(Query $query, $column) {
+    public function getSum(Query $query, string $column): int {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects("SUM($column) AS cnt");
@@ -231,7 +231,7 @@ class Schema {
      * @param string $select
      * @return array
      */
-    public function getStats(Query $query, $select) {
+    public function getStats(Query $query, string $select): array {
         $select  = Strings::replace($select, "{table}", "{dbPrefix}{$this->structure->table}");
         $request = $this->db->query("$select " . $query->get(), $query);
 
@@ -247,7 +247,7 @@ class Schema {
      * @param string $title Optional.
      * @return array
      */
-    public function getSearch(Query $query, $title = null) {
+    public function getSearch(Query $query, string $title = null): array {
         $query   = $this->generateQuery($query);
         $request = $this->request($query);
         $result  = [];
@@ -269,7 +269,7 @@ class Schema {
      * @param string $column
      * @return string[]
      */
-    public function getColumn(Query $query, $column) {
+    public function getColumn(Query $query, string $column): array {
         $columnName = Strings::substringAfter($column, ".");
         $query      = $this->generateQuery($query);
         $selection  = new Selection($this->db, $this->structure);
@@ -292,7 +292,7 @@ class Schema {
      * @param boolean $withDeleted Optional.
      * @return integer
      */
-    public function getNextPosition(Query $query = null, $withDeleted = true) {
+    public function getNextPosition(Query $query = null, bool $withDeleted = true): int {
         if (!$this->structure->hasPositions) {
             return 0;
         }
@@ -315,9 +315,9 @@ class Schema {
      * Selects the given column from a single table and returns a single value
      * @param Query  $query
      * @param string $column
-     * @return string
+     * @return mixed
      */
-    public function getValue(Query $query, $column) {
+    public function getValue(Query $query, string $column) {
         return $this->db->getValue($this->structure->table, $column, $query);
     }
     
@@ -330,7 +330,7 @@ class Schema {
      * @param string  $name     Optional.
      * @return array
      */
-    public function getSortedNames($order = null, $orderAsc = true, $name = null) {
+    public function getSortedNames(string $order = null, bool $orderAsc = true, string $name = null): array {
         $field = $order ?: ($this->structure->hasPositions ? "position" : $this->structure->name);
         $query = Query::createOrderBy($field, $orderAsc);
         return $this->getSelect($query, $name);
@@ -344,7 +344,7 @@ class Schema {
      * @param string  $name     Optional.
      * @return array
      */
-    public function getSortedSelect(Query $query, $order = null, $orderAsc = true, $name = null) {
+    public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, string $name = null): array {
         $field = $order ?: ($this->structure->hasPositions ? "position" : $this->structure->name);
         $query->orderBy($field, $orderAsc);
         return $this->getSelect($query, $name);
@@ -356,7 +356,7 @@ class Schema {
      * @param string $name  Optional.
      * @return array
      */
-    public function getSelect(Query $query, $name = null) {
+    public function getSelect(Query $query, string $name = null): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields();
@@ -377,7 +377,7 @@ class Schema {
      * @param integer       $credentialID Optional.
      * @return integer
      */
-    public function create($fields, $extra = null, $credentialID = 0) {
+    public function create($fields, $extra = null, int $credentialID = 0): int {
         $modification = new Modification($this->db, $this->structure);
         $modification->addFields($fields, $extra, $credentialID);
         $modification->addCreation();
@@ -392,7 +392,7 @@ class Schema {
      * @param integer       $credentialID Optional.
      * @return integer
      */
-    public function replace($fields, $extra = null, $credentialID = 0) {
+    public function replace($fields, $extra = null, int $credentialID = 0): int {
         $modification = new Modification($this->db, $this->structure);
         $modification->addFields($fields, $extra, $credentialID);
         $modification->addModification();
@@ -407,7 +407,7 @@ class Schema {
      * @param integer       $credentialID Optional.
      * @return boolean
      */
-    public function edit($query, $fields, $extra = null, $credentialID = 0) {
+    public function edit($query, $fields, $extra = null, int $credentialID = 0): bool {
         $query        = $this->generateQueryID($query, false);
         $modification = new Modification($this->db, $this->structure);
         $modification->addFields($fields, $extra, $credentialID);
@@ -422,20 +422,20 @@ class Schema {
      * @param Query|integer $query
      * @param string        $column
      * @param integer       $amount
-     * @return void
+     * @return boolean
      */
-    public function increase($query, $column, $amount) {
+    public function increase($query, string $column, int $amount): bool {
         $query = $this->generateQueryID($query, false);
-        $this->db->increase($this->structure->table, $column, $amount, $query);
+        return $this->db->increase($this->structure->table, $column, $amount, $query);
     }
     
     /**
      * Batches the Schema
      * @param array $fields
-     * @return void
+     * @return boolean
      */
-    public function batch(array $fields) {
-        $this->db->batch($this->structure->table, $fields);
+    public function batch(array $fields): bool {
+        return $this->db->batch($this->structure->table, $fields);
     }
     
     /**
@@ -444,7 +444,7 @@ class Schema {
      * @param integer       $credentialID Optional.
      * @return boolean
      */
-    public function delete($query, $credentialID = 0) {
+    public function delete($query, int $credentialID = 0): bool {
         $query = $this->generateQueryID($query, false);
         if ($this->structure->canDelete && $this->exists($query)) {
             $this->edit($query, [ "isDeleted" => 1 ], $credentialID);
@@ -458,7 +458,7 @@ class Schema {
      * @param Query|integer $query
      * @return boolean
      */
-    public function remove($query) {
+    public function remove($query): bool {
         $query = $this->generateQueryID($query, false);
         return $this->db->delete($this->structure->table, $query);
     }
@@ -471,7 +471,7 @@ class Schema {
      * @param boolean $withDeleted Optional.
      * @return Query
      */
-    private function generateQuery(Query $query = null, $withDeleted = true) {
+    private function generateQuery(Query $query = null, bool $withDeleted = true): Query {
         $query     = new Query($query);
         $isDeleted = $this->structure->getKey("isDeleted");
 
@@ -487,7 +487,7 @@ class Schema {
      * @param boolean       $withDeleted Optional.
      * @return Query
      */
-    private function generateQueryID($query, $withDeleted = true) {
+    private function generateQueryID($query, bool $withDeleted = true): Query {
         if (!($query instanceof Query)) {
             $query = Query::create($this->structure->idKey, "=", $query);
         }
@@ -500,7 +500,7 @@ class Schema {
      * @param Request $sort  Optional.
      * @return Query
      */
-    private function generateQuerySort(Query $query = null, Request $sort = null) {
+    private function generateQuerySort(Query $query = null, Request $sort = null): Query {
         $query = $this->generateQuery($query);
         
         if (!empty($sort) && $sort->has("orderBy")) {

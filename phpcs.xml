@@ -24,7 +24,6 @@
     <!-- Comments -->
     <rule ref="Squiz.Commenting.FunctionComment">
         <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
-        <exclude name="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing"/>
     </rule>
     <rule ref="Squiz.Commenting.FunctionCommentThrowTag"/>
     <rule ref="Squiz.Commenting.ClassComment"/>

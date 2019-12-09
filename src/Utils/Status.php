@@ -19,7 +19,7 @@ class Status {
      * Loads the Status Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded = true;
             $data = Framework::loadData(Framework::StatusData);
@@ -51,7 +51,7 @@ class Status {
      * @param string $statusName
      * @return integer
      */
-    public static function getOne($statusName) {
+    public static function getOne(string $statusName): int {
         self::load();
         $name = Strings::toLowerCase($statusName);
         if (isset(self::$values[$name])) {
@@ -65,7 +65,7 @@ class Status {
      * @param string $groupName
      * @return integer[]
      */
-    public static function getGroup($groupName) {
+    public static function getGroup(string $groupName): array {
         self::load();
         $name = Strings::toLowerCase($groupName);
         if (isset(self::$groups[$name])) {
@@ -80,7 +80,7 @@ class Status {
      * @param string  $groupName Optional.
      * @return boolean
      */
-    public static function isValid($value, $groupName = "general") {
+    public static function isValid(int $value, string $groupName = "general"): bool {
         $group = self::getGroup($groupName);
         return Arrays::contains($group, $value);
     }
@@ -93,7 +93,7 @@ class Status {
      * @param array  $arguments
      * @return mixed
      */
-    public static function __callStatic($function, array $arguments) {
+    public static function __callStatic(string $function, array $arguments) {
         $value = !empty($arguments[0]) ? (int)$arguments[0] : 0;
 
         // Function "getXxx(s)": Get the group xxx

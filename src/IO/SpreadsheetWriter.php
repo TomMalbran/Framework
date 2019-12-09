@@ -22,7 +22,7 @@ class SpreadsheetWriter {
      * @param string $title
      * @param string $creator Optional.
      */
-    public function __construct($title, $creator = "") {
+    public function __construct(string $title, string $creator = "") {
         $this->data = new Spreadsheet();
         $this->data->getProperties()->setCreator($creator)->setTitle($title);
         
@@ -38,7 +38,7 @@ class SpreadsheetWriter {
      * @param string|integer $sheetID   Optional.
      * @return SpreadsheetSheet
      */
-    public function addSheet($sheetName, $sheetID = null) {
+    public function addSheet(string $sheetName, $sheetID = null): SpreadsheetSheet {
         $count = $this->data->getSheetCount();
         if ($this->sheetNum < $count) {
             $sheet = $this->data->getSheet($this->sheetNum);
@@ -58,9 +58,9 @@ class SpreadsheetWriter {
     /**
      * Returns the Sheet for the given ID, if possible
      * @param string|integer $sheetID
-     * @return SpreadsheetSheet
+     * @return SpreadsheetSheet|null
      */
-    public function getSheet($sheetID) {
+    public function getSheet($sheetID): ?SpreadsheetSheet {
         if (!empty($this->sheets[$sheetID])) {
             return $this->sheets[$sheetID];
         }
@@ -75,7 +75,7 @@ class SpreadsheetWriter {
      * @param boolean $withDate
      * @return string
      */
-    public function getFileName($name, $withDate = true) {
+    public function getFileName(string $name, bool $withDate = true): string {
         $result = $name . ($withDate ? "_" . date("dMY") : "");
         return Strings::toLowerCase($result);
     }
@@ -86,7 +86,7 @@ class SpreadsheetWriter {
      * @param boolean $withDate Optional.
      * @return void
      */
-    public function download($name, $withDate = true) {
+    public function download(string $name, bool $withDate = true): void {
         $fileName = $this->getFileName($name, $withDate);
         header("Content-type: application/vnd.ms-excel");
         header("Content-Encoding: none");
@@ -104,7 +104,7 @@ class SpreadsheetWriter {
      * @param boolean $withDate Optional.
      * @return void
      */
-    public function downloadXlsx($name, $withDate = true) {
+    public function downloadXlsx(string $name, bool $withDate = true): void {
         $fileName = $this->getFileName($name, $withDate);
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF16-LE; encoding=UTF16-LE");
         header("Content-Disposition: attachment; filename=\"{$fileName}.xlsx\"");
@@ -121,7 +121,7 @@ class SpreadsheetWriter {
      * @param boolean $withDate Optional.
      * @return void
      */
-    public function downloadCsv($name, $withDate = true) {
+    public function downloadCsv(string $name, bool $withDate = true): void {
         $fileName = $this->getFileName($name, $withDate);
         header("Content-Type: application/csv; charset=UTF16-LE; encoding=UTF16-LE");
         header("Content-Disposition: attachment; filename=\"{$fileName}.csv\"");

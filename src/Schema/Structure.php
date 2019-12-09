@@ -35,7 +35,7 @@ class Structure {
      * @param string $schemaKey
      * @param array  $data
      */
-    public function __construct($schemaKey, array $data) {
+    public function __construct(string $schemaKey, array $data) {
         $this->table         = $data["table"];
         $this->hasPositions  = !empty($data["hasPositions"])  && $data["hasPositions"];
         $this->hasTimestamps = !empty($data["hasTimestamps"]) && $data["hasTimestamps"];
@@ -144,7 +144,7 @@ class Structure {
      * @param string $key
      * @return string
      */
-    public function getKey($key) {
+    public function getKey(string $key): string {
         if (!Strings::contains($key, ".")) {
             $mainKey = $this->table;
             return "{$mainKey}.{$key}";

@@ -18,7 +18,7 @@ class NLS {
      * @param string $lang
      * @return array
      */
-    public static function load($lang) {
+    public static function load(string $lang): array {
         if (empty(self::$loaded[$lang])) {
             self::$loaded[$lang] = true;
             self::$data[$lang]   = Framework::loadFile(Framework::NLSDir, $lang);
@@ -32,7 +32,7 @@ class NLS {
      * @param string $lang Optional.
      * @return string
      */
-    public static function get($key, $lang = "root") {
+    public static function get(string $key, string $lang = "root"): string {
         $nls  = Language::getNLS($lang);
         $data = self::load($nls);
 
@@ -47,12 +47,12 @@ class NLS {
 
     /**
      * Returns a string from the data at the given index
-     * @param string $key
-     * @param string $index
-     * @param string $lang  Optional.
+     * @param string  $key
+     * @param integer $index
+     * @param string  $lang  Optional.
      * @return string
      */
-    public static function getIndex($key, $index, $lang = "root") {
+    public static function getIndex(string $key, int $index, string $lang = "root"): string {
         $result = self::get($key, $lang);
         if (!empty($result[$index])) {
             return $result[$index];
@@ -66,7 +66,7 @@ class NLS {
      * @param string   $lang Optional.
      * @return string[]
      */
-    public static function getAll(array $keys, $lang = "root") {
+    public static function getAll(array $keys, string $lang = "root"): array {
         $result = [];
         foreach ($keys as $key) {
             if (!empty($key)) {

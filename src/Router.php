@@ -21,7 +21,7 @@ class Router {
      * Loads the Routes Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded    = true;
             self::$data      = Framework::loadData(Framework::RouteData);
@@ -36,7 +36,7 @@ class Router {
      * @param string $route
      * @return object
      */
-    public static function get($route) {
+    public static function get(string $route): object {
         self::load();
         $method = Strings::substringAfter($route, "/");
         $base   = Strings::replace($route, "/$method", "");
@@ -57,7 +57,7 @@ class Router {
      * @param string $route
      * @return boolean
      */
-    public static function has($route) {
+    public static function has(string $route): bool {
         $data = self::get($route);
         return $data->access != null;
     }
@@ -67,9 +67,9 @@ class Router {
     /**
      * Returns the Access Level for the given Route, if it exists
      * @param string $route
-     * @return string|null
+     * @return integer
      */
-    public static function getAccess($route) {
+    public static function getAccess(string $route): integer {
         $data = self::get($route);
         return Access::getOne($data->access);
     }
@@ -79,7 +79,7 @@ class Router {
      * @param string $route
      * @return string
      */
-    public static function getMethod($route) {
+    public static function getMethod(string $route): string {
         $data = self::get($route);
         return $data->method;
     }
@@ -89,7 +89,7 @@ class Router {
      * @param string $route
      * @return object|null
      */
-    public static function getInstance($route) {
+    public static function getInstance(string $route) {
         $data = self::get($route);
         if ($data->access != null) {
             return Container::bind(self::$namespace . $data->module);
@@ -103,9 +103,9 @@ class Router {
      * Calls the given Route with the given params, if it exists
      * @param string $route
      * @param array  $params Optional.
-     * @return object|null
+     * @return Response|null
      */
-    public static function call($route, array $params = null) {
+    public static function call(string $route, array $params = null) {
         $data = self::get($route);
         if ($data->access != null) {
             $instance = Container::bind(self::$namespace . $data->module);

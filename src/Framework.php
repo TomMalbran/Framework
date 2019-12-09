@@ -52,7 +52,7 @@ class Framework {
      * @param boolean $logErrors
      * @return void
      */
-    public static function create($basePath, $logErrors) {
+    public static function create(string $basePath, bool $logErrors): void {
         self::$framePath = dirname(__FILE__, 2);
         self::$basePath  = $basePath;
 
@@ -70,7 +70,7 @@ class Framework {
      * @param boolean $forFrame Optional.
      * @return string
      */
-    public static function getPath($dir = "", $file = "", $forFrame = false) {
+    public static function getPath(string $dir = "", string $file = "", bool $forFrame = false): string {
         $base = $forFrame ? self::$framePath : self::$basePath;
         $path = File::getPath($base, $dir, $file);
         return File::removeLastSlash($path);
@@ -83,7 +83,7 @@ class Framework {
      * @param boolean $forFrame Optional.
      * @return object
      */
-    public static function loadFile($dir, $file, $forFrame = false) {
+    public static function loadFile(string $dir, string $file, bool $forFrame = false): object {
         $path = self::getPath($dir, "$file.json", $forFrame);
         return JSON::read($path);
     }
@@ -93,7 +93,7 @@ class Framework {
      * @param string $file
      * @return object
      */
-    public static function loadData($file) {
+    public static function loadData(string $file): object {
         return self::loadFile(self::DataDir, $file);
     }
 
@@ -103,7 +103,7 @@ class Framework {
      * @param mixed  $contents
      * @return void
      */
-    public function saveData($file, $contents) {
+    public function saveData(string $file, $contents): void {
         $path = self::getPath(self::DataDir, "$file.json");
         JSON::write($path, $contents);
     }
@@ -116,7 +116,7 @@ class Framework {
      * @param array  $params Optional.
      * @return Response
      */
-    public static function callRoute($route, array $params = null) {
+    public static function callRoute(string $route, array $params = null): Response {
         // The Route doesn´t exists
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");
@@ -156,7 +156,7 @@ class Framework {
      * @param boolean  $recreate  Optional.
      * @return void
      */
-    public static function migrate(Database $db, $canDelete = false, $recreate = false) {
+    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false): void {
         Factory::migrate($db, $canDelete);
         Settings::migrate($db);
         Email::migrate($db, $recreate);

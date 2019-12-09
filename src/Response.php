@@ -25,7 +25,7 @@ class Response {
      * @param string $token
      * @return void
      */
-    public function addToken($token) {
+    public function addToken(string $token): void {
         $this->data["jwt"] = $token;
     }
 
@@ -33,7 +33,7 @@ class Response {
      * Returns the Data as an Object
      * @return array
      */
-    public function toObject() {
+    public function toObject(): array {
         return $this->data;
     }
 
@@ -41,43 +41,43 @@ class Response {
      * Returns the Data as String
      * @return string
      */
-    public function toString() {
+    public function toString(): string {
         return JSON::encode($this->data, true);
     }
     
     /**
      * Prints the Data
-     * @return string
+     * @return void
      */
-    public function print() {
-        return print($this->toString());
+    public function print(): void {
+        print($this->toString());
     }
 
 
 
     /**
      * Returns an empty result
-     * @return array
+     * @return Response
      */
-    public static function empty() {
+    public static function empty(): Response {
         return new Response();
     }
 
     /**
      * Returns the given result
      * @param array $result Optional.
-     * @return array
+     * @return Response
      */
-    public static function result(array $result = []) {
+    public static function result(array $result = []): Response {
         return new Response($result);
     }
     
     /**
      * Returns the given data
      * @param array|Model $data Optional.
-     * @return array
+     * @return Response
      */
-    public static function data($data = null) {
+    public static function data($data = null): Response {
         return new Response([
             "data" => self::getData($data),
         ]);
@@ -85,9 +85,9 @@ class Response {
 
     /**
      * Returns an invalid data
-     * @return array
+     * @return Response
      */
-    public static function invalid() {
+    public static function invalid(): Response {
         return new Response([
             "data" => [ "error" => true ],
         ]);
@@ -95,9 +95,9 @@ class Response {
     
     /**
      * Returns a logout
-     * @return array
+     * @return Response
      */
-    public static function logout() {
+    public static function logout(): Response {
         return new Response([
             "userLoggedOut" => true,
         ]);
@@ -108,9 +108,9 @@ class Response {
      * Returns a success response
      * @param string      $success
      * @param array|Model $data    Optional.
-     * @return array
+     * @return Response
      */
-    public static function success($success, $data = null) {
+    public static function success(string $success, $data = null): Response {
         return new Response([
             "success" => $success,
             "data"    => self::getData($data),
@@ -121,9 +121,9 @@ class Response {
      * Returns a warning response
      * @param string      $warning
      * @param array|Model $data    Optional.
-     * @return array
+     * @return Response
      */
-    public static function warning($warning, $data = null) {
+    public static function warning(string $warning, $data = null): Response {
         return new Response([
             "warning" => $warning,
             "data"    => self::getData($data),
@@ -134,9 +134,9 @@ class Response {
      * Returns an error response
      * @param string|Errros $error
      * @param array|Model   $data  Optional.
-     * @return array
+     * @return Response
      */
-    public static function error($error, $data = null) {
+    public static function error($error, $data = null): Response {
         if ($error instanceof Errors) {
             if ($error->has("global")) {
                 return new Response([
