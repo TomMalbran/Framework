@@ -3,8 +3,10 @@ namespace Framework\Schema;
 
 use Framework\File\Path;
 use Framework\Utils\JSON;
+use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
+use Framework\Utils\Utils;
 use Framework\Request;
 
 /**
@@ -250,6 +252,7 @@ class Field {
         case self::CSV:
             $result[$key]            = $text;
             $result["{$key}Parts"]   = Utils::fromCSV($text);
+            $result["{$key}Count"]   = Arrays::length($result["{$key}Parts"]);
             break;
         case self::Text:
             $result[$key]            = $text;

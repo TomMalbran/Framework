@@ -24,6 +24,17 @@ class Arrays {
         return is_array($array) && is_array(array_values($array)[0]);
     }
 
+
+    
+    /**
+     * Returns the length of the given array
+     * @param array $array
+     * @return integer
+     */
+    public static function length(array $array): int {
+        return count($array);
+    }
+
     /**
      * Returns true if the array contains the needle
      * @param array|mixed $array
