@@ -151,31 +151,6 @@ class Utils {
     }
     
     /**
-     * Returns the Real Name for the given User
-     * @param mixed  $data
-     * @param string $prefix
-     * @return string
-     */
-    public static function createRealName($data, string $prefix = ""): string {
-        $id        = Arrays::getValue($data, "credentialID", "", $prefix);
-        $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
-        $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
-        $nickName  = Arrays::getValue($data, "nickName",     "", $prefix);
-        $result    = "";
-        
-        if (!empty($firstName) && !empty($lastName)) {
-            $result = "$firstName $lastName";
-            if (!empty($nickName)) {
-                $result .= " ($nickName)";
-            }
-        }
-        if (empty($result) && !empty($id)) {
-            $result = "#$id";
-        }
-        return $result;
-    }
-    
-    /**
      * Generates a username from a domain
      * @param string $domain
      * @param string $email  Optional.
@@ -231,18 +206,6 @@ class Utils {
         return "";
     }
     
-    /**
-     * Grabs the given password and creates encrypts it
-     * @param string $pass
-     * @param string $salt Optional.
-     * @return array
-     */
-    public static function createHash(string $pass, string $salt = ""): array {
-        $salt = !empty($salt) ? $salt : Strings::random(50);
-        $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
-        return [ "password" => $hash, "salt" => $salt ];
-    }
-
 
 
     /**

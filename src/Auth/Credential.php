@@ -10,7 +10,7 @@ use Framework\Schema\Database;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
-use Framework\Utils\Utils;
+use Framework\Utils\Strings;
 
 /**
  * The Auth Credential
@@ -163,7 +163,7 @@ class Credential {
         
         foreach ($request as $row) {
             $fields = $row;
-            $fields["credentialName"] = Utils::createRealName($row);
+            $fields["credentialName"] = self::createName($row);
 
             if (!empty($row["avatar"]) && Path::exists("avatars", $row["avatar"])) {
                 $fields["avatar"] = Path::getUrl("avatars", $row["avatar"]);
@@ -265,7 +265,7 @@ class Credential {
         foreach ($request as $row) {
             $result[] = [
                 "key"   => $row["credentialID"],
-                "value" => Utils::createRealName($row),
+                "value" => self::createName($row),
             ];
         }
         return $result;
@@ -301,7 +301,7 @@ class Credential {
      * @return boolean
      */
     public static function isPasswordCorrect(Model $credential, string $password): bool {
-        $hash = Utils::createHash($password, $credential->salt);
+        $hash = self::createHash($password, $credential->salt);
         return $hash["password"] == $credential->password;
     }
     
@@ -363,7 +363,7 @@ class Credential {
     private static function getFields(Request $request, int $level = 0, bool $reqPassChange = null): array {
         $result = [];
         if ($request->has("password")) {
-            $hash = Utils::createHash($request->password);
+            $hash = self::createHash($request->password);
             $result["password"] = $hash["password"];
             $result["salt"]     = $hash["salt"];
         }
@@ -420,7 +420,7 @@ class Credential {
      * @return string
      */
     public static function setPassword(int $credentialID, string $password): string {
-        $hash = Utils::createHash($password);
+        $hash = self::createHash($password);
         self::getSchema()->edit($credentialID, [
             "password" => $hash["password"],
             "salt"     => $hash["salt"],
@@ -455,6 +455,43 @@ class Credential {
 
 
     /**
+     * Creates a hash and salt (if required) for the the given password
+     * @param string $pass
+     * @param string $salt Optional.
+     * @return array
+     */
+    public static function createHash(string $pass, string $salt = ""): array {
+        $salt = !empty($salt) ? $salt : Strings::random(50);
+        $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
+        return [ "password" => $hash, "salt" => $salt ];
+    }
+
+    /**
+     * Returns the Real Name for the given User
+     * @param Model|array $data
+     * @param string      $prefix
+     * @return string
+     */
+    public static function createName($data, string $prefix = ""): string {
+        $id        = Arrays::getValue($data, "credentialID", "", $prefix);
+        $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
+        $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
+        $nickName  = Arrays::getValue($data, "nickName",     "", $prefix);
+        $result    = "";
+        
+        if (!empty($firstName) && !empty($lastName)) {
+            $result = "$firstName $lastName";
+            if (!empty($nickName)) {
+                $result .= " ($nickName)";
+            }
+        }
+        if (empty($result) && !empty($id)) {
+            $result = "#$id";
+        }
+        return $result;
+    }
+
+    /**
      * Seeds the Owner
      * @param Database $db
      * @param string   $firstName
@@ -471,7 +508,7 @@ class Credential {
         string $password
     ): void {
         if ($db->hasTable("credentials")) {
-            $hash = Utils::createHash($password);
+            $hash = self::createHash($password);
             $db->insert("credentials", [
                 "firstName"    => $firstName,
                 "lastName"     => $lastName,
