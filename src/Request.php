@@ -5,6 +5,7 @@ use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Utils\DateTime;
+use Framework\Utils\Numbers;
 use Framework\Utils\Status;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
@@ -236,17 +237,6 @@ class Request implements ArrayAccess {
     
     
     /**
-     * Returns true if the given value is alpha-numeric
-     * @param string  $key
-     * @param boolean $withDashes Optional.
-     * @param integer $length     Optional.
-     * @return boolean
-     */
-    public function isAlphaNum(string $key, bool $withDashes = false, int $length = null): bool {
-        return Utils::isAlphaNum($this->get($key, ""), $withDashes, $length);
-    }
-    
-    /**
      * Returns true if the given value is a number and greater and/or equal to cero
      * @param string  $key
      * @param integer $min  Optional.
@@ -255,7 +245,7 @@ class Request implements ArrayAccess {
      * @return boolean
      */
     public function isNumeric(string $key, int $min = 1, int $max = null, int $mult = 1): bool {
-        return Utils::isNumeric($this->getInt($key) * $mult, $min, $max);
+        return Numbers::isValid($this->getInt($key) * $mult, $min, $max);
     }
     
     /**
@@ -266,7 +256,18 @@ class Request implements ArrayAccess {
      * @return boolean
      */
     public function isValidPrice(string $key, int $min = 1, int $max = null): bool {
-        return Utils::isNumeric($this->getInt($key) * 100, $min, $max);
+        return Numbers::isValidPrice($this->getInt($key), $min, $max);
+    }
+    
+    /**
+     * Returns true if the given value is alpha-numeric
+     * @param string  $key
+     * @param boolean $withDashes Optional.
+     * @param integer $length     Optional.
+     * @return boolean
+     */
+    public function isAlphaNum(string $key, bool $withDashes = false, int $length = null): bool {
+        return Utils::isAlphaNum($this->get($key, ""), $withDashes, $length);
     }
     
     /**
@@ -459,7 +460,7 @@ class Request implements ArrayAccess {
      * @return integer
      */
     public function toInt(string $key, int $decimals): int {
-        return Utils::toInt($this->getInt($key), $decimals);
+        return Numbers::toInt($this->getInt($key), $decimals);
     }
     
     /**
@@ -470,7 +471,7 @@ class Request implements ArrayAccess {
      */
     public function toCents(string $key, int $index = null): int {
         $value = $index !== null ? $this->getFromArray($key, $index, 0) : $this->getInt($key);
-        return Utils::toCents($value);
+        return Numbers::toCents($value);
     }
 
     /**

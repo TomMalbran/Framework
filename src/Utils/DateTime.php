@@ -148,8 +148,8 @@ class DateTime {
     public static function isValidHour(string $string, array $minutes = null): bool {
         $parts = Strings::split($string, ":");
         return (
-            !empty($parts[0]) && Utils::isNumeric($parts[0], 0, 23) &&
-            !empty($parts[1]) && Utils::isNumeric($parts[1], 0, 59) &&
+            !empty($parts[0]) && Numbers::isValid($parts[0], 0, 23) &&
+            !empty($parts[1]) && Numbers::isValid($parts[1], 0, 59) &&
             (empty($minutes) || Arrays::contains($minutes, $parts[1]))
         );
     }
@@ -210,7 +210,7 @@ class DateTime {
      * @return boolean
      */
     public static function isValidWeekDay(int $weekDay): bool {
-        return Utils::isNumeric($weekDay, 0, 6);
+        return Numbers::isValid($weekDay, 0, 6);
     }
     
 

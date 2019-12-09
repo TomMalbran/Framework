@@ -16,7 +16,7 @@ class JSON {
      * @param string|array $value
      * @return boolean
      */
-    public static function is(string $value): bool {
+    public static function isValid(string $value): bool {
         if (is_string($value)) {
             json_decode($value);
             return (json_last_error() == JSON_ERROR_NONE);
@@ -31,7 +31,7 @@ class JSON {
      * @return string
      */
     public static function encode(array $value, bool $asPretty = false): string {
-        if (self::is($value)) {
+        if (self::isValid($value)) {
             return $value;
         }
         return json_encode($value, $asPretty ? JSON_PRETTY_PRINT : null);
@@ -44,7 +44,7 @@ class JSON {
      * @return object|array
      */
     public static function decode(string $value, bool $asArray = false) {
-        if (!self::is($value)) {
+        if (!self::isValid($value)) {
             return $value;
         }
         return json_decode($value, $asArray);

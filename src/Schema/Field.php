@@ -3,8 +3,8 @@ namespace Framework\Schema;
 
 use Framework\File\Path;
 use Framework\Utils\JSON;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 use Framework\Request;
 
 /**
@@ -222,13 +222,13 @@ class Field {
             $result[$key]            = $number;
             break;
         case self::Float:
-            $result[$key]            = Utils::toFloat($number, 3);
-            $result["{$key}Format"]  = Utils::formatFloat($number, 3, 3);
+            $result[$key]            = Numbers::toFloat($number, 3);
+            $result["{$key}Format"]  = Numbers::formatFloat($number, 3, 3);
             $result["{$key}Int"]     = $number;
             break;
         case self::Price:
-            $result[$key]            = Utils::fromCents($number);
-            $result["{$key}Format"]  = Utils::formatCents($number);
+            $result[$key]            = Numbers::fromCents($number);
+            $result["{$key}Format"]  = Numbers::formatCents($number);
             $result["{$key}Cents"]   = $number;
             break;
         case self::Date:

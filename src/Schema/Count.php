@@ -2,7 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Field;
-use Framework\Utils\Utils;
+use Framework\Utils\Numbers;
 
 /**
  * The Database Count
@@ -59,9 +59,9 @@ class Count {
         $result = !empty($data[$key]) ? $data[$key] : 0;
 
         if ($this->type == Field::Float) {
-            $result = Utils::toFloat($result, 3);
+            $result = Numbers::toFloat($result, 3);
         } elseif ($this->type == Field::Price) {
-            $result = Utils::fromCents($result);
+            $result = Numbers::fromCents($result);
         }
         return $result;
     }
