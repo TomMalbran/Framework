@@ -6,6 +6,7 @@ use Framework\Request;
 use Framework\Config\Config;
 use Framework\Email\Mustache;
 use Framework\Schema\Factory;
+use Framework\Schema\Schema;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;

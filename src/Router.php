@@ -69,7 +69,7 @@ class Router {
      * @param string $route
      * @return integer
      */
-    public static function getAccess(string $route): integer {
+    public static function getAccess(string $route): int {
         $data = self::get($route);
         return Access::getOne($data->access);
     }

@@ -430,7 +430,7 @@ class Utils {
      * @param string $salt Optional.
      * @return array
      */
-    public static function createHash(string $pass, string $salt = ""): string {
+    public static function createHash(string $pass, string $salt = ""): array {
         $salt = !empty($salt) ? $salt : Strings::random(50);
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
         return [ "password" => $hash, "salt" => $salt ];
@@ -454,8 +454,8 @@ class Utils {
      */
     public static function parseDomain(string $domain): string {
         $domain = Strings::toLowerCase($domain);
-        if (Strings::startsWith($domain, "http")) {
-            $domain = "http://" . $domain;
+        if (!Strings::startsWith($domain, "http://")) {
+            $domain = "http://$domain";
         }
         $host = parse_url($domain, PHP_URL_HOST);
         

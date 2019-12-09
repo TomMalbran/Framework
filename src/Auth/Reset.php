@@ -2,6 +2,7 @@
 namespace Framework\Auth;
 
 use Framework\Schema\Factory;
+use Framework\Schema\Schema;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;
 

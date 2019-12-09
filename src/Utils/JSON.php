@@ -13,7 +13,7 @@ class JSON {
 
     /**
      * Returns true if the given value is a JSON object
-     * @param string $value
+     * @param string|array $value
      * @return boolean
      */
     public static function is(string $value): bool {
@@ -26,11 +26,11 @@ class JSON {
 
     /**
      * Encodes an Object as a string if it is not already encoded
-     * @param string  $value
+     * @param array   $value
      * @param boolean $asPretty Optional.
      * @return string
      */
-    public static function encode(string $value, bool $asPretty = false): string {
+    public static function encode(array $value, bool $asPretty = false): string {
         if (self::is($value)) {
             return $value;
         }
@@ -41,9 +41,9 @@ class JSON {
      * Decodes a String if it is not already decoded
      * @param string  $value
      * @param boolean $asArray Optional.
-     * @return string
+     * @return object|array
      */
-    public static function decode(string $value, bool $asArray = false): string {
+    public static function decode(string $value, bool $asArray = false) {
         if (!self::is($value)) {
             return $value;
         }
@@ -83,9 +83,9 @@ class JSON {
     /**
      * Reads a JSON file
      * @param string $path
-     * @return object
+     * @return object|array
      */
-    public static function read(string $path): object {
+    public static function read(string $path) {
         if (File::exists($path)) {
             return self::decode(file_get_contents($path), true);
         }

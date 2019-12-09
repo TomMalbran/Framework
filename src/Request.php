@@ -626,38 +626,38 @@ class Request implements ArrayAccess {
     
     /**
      * Implements the Array Access Interface
-     * @param string $key
+     * @param mixed $key
      * @return mixed
      */
-    public function offsetGet(string $key) {
+    public function offsetGet($key) {
         return $this->get($key);
     }
     
     /**
      * Implements the Array Access Interface
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $key
+     * @param mixed $value
      * @return void
      */
-    public function offsetSet(string $key, $value): void {
+    public function offsetSet($key, $value) {
         $this->set($key, $value);
     }
     
     /**
      * Implements the Array Access Interface
-     * @param string $key
+     * @param mixed $key
      * @return boolean
      */
-    public function offsetExists(string $key): bool {
+    public function offsetExists($key) {
         return array_key_exists($key, $this->request);
     }
     
     /**
      * Implements the Array Access Interface
-     * @param string $key
+     * @param mixed $key
      * @return void
      */
-    public function offsetUnset(string $key): void {
+    public function offsetUnset($key) {
         unset($this->request[$key]);
     }
 }

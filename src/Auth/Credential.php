@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\Auth\Access;
 use Framework\File\Path;
 use Framework\Schema\Factory;
+use Framework\Schema\Schema;
 use Framework\Schema\Database;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
