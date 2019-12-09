@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Auth;
+namespace Framework\NLS;
 
 use Framework\Framework;
 use Framework\Utils\Arrays;
