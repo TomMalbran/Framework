@@ -71,6 +71,17 @@ class Path {
         }
         return "";
     }
+
+    /**
+     * Returns true if given file exists
+     * @param string $pathKey
+     * @param string ...$pathParts
+     * @return boolean
+     */
+    public static function exists(string $pathKey, string ...$pathParts): bool {
+        $path = self::getPath($pathKey, ...$pathParts);
+        return File::exists($path);
+    }
     
 
 
@@ -98,18 +109,5 @@ class Path {
      */
     public static function getTempUrl(int $credentialID): string {
         return self::getPath(Framework::TempDir, $credentialID) . "/";
-    }
-
-
-
-    /**
-     * Returns true if given file exists
-     * @param string $pathKey
-     * @param string ...$pathParts
-     * @return boolean
-     */
-    public static function exists(string $pathKey, string ...$pathParts): bool {
-        $path = self::getPath($pathKey, ...$pathParts);
-        return File::exists($path);
     }
 }

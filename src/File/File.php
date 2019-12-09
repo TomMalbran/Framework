@@ -32,6 +32,8 @@ class File {
         return !empty($path) && file_exists($path);
     }
 
+    
+
     /**
      * Uplods the given file to the given path
      * @param string $path
