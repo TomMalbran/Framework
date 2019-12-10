@@ -24,7 +24,7 @@ class Config {
      */
     public static function load(): void {
         if (!self::$loaded) {
-            $path    = Framework::getPath(Framework::ServerDir);
+            $path    = Framework::getPath();
             $data    = Dotenv::createImmutable($path)->load();
             $replace = [];
 
