@@ -39,7 +39,7 @@ class Mustache {
                 
                 // Main templates can either be in public or public/templaes
                 if (File::exists($path, Framework::TemplatesDir)) {
-                    $loaderPath = Files::getPath($path, Framework::TemplatesDir);
+                    $loaderPath = File::getPath($path, Framework::TemplatesDir);
                     $loaders["loader"] = new Mustache_Loader_FilesystemLoader($loaderPath, $config);
                 } else {
                     $loaders["loader"] = new Mustache_Loader_FilesystemLoader($path, $config);
@@ -47,10 +47,10 @@ class Mustache {
 
                 // Partials can be in public/partials or be missing
                 if (File::exists($path, Framework::PartialsDir)) {
-                    $loaderPath = Files::getPath($path, Framework::PartialsDir);
+                    $loaderPath = File::getPath($path, Framework::PartialsDir);
                     $loaders["partials_loader"] = new Mustache_Loader_FilesystemLoader($loaderPath, $config);
                 }
-                
+
                 self::$loader = new Mustache_Engine($loaders);
             }
         }
