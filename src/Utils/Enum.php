@@ -53,7 +53,7 @@ class Enum {
      * @param mixed $value
      * @return boolean
      */
-    public static function isValid($value): boolean {
+    public static function isValid($value): bool {
         $cache = self::load();
         if ($cache->isConstant) {
             return Arrays::contains($cache->constants, $value);

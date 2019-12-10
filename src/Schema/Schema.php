@@ -43,9 +43,9 @@ class Schema {
     /**
      * Encrypts the given Value
      * @param string $value
-     * @return string
+     * @return array
      */
-    public function encrypt(string $value): string {
+    public function encrypt(string $value): array {
         return Query::encrypt($value, $this->structure->masterKey);
     }
     
