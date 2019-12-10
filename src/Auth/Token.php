@@ -31,7 +31,7 @@ class Token {
      * @param string $token
      * @return Model
      */
-    public function getOne(string $token): Model {
+    public static function getOne(string $token): Model {
         foreach (self::$data as $tokenID => $value) {
             if ($value == $token) {
                 return new Model("tokenID", [
@@ -48,7 +48,7 @@ class Token {
      * @param string $token
      * @return boolean
      */
-    public function isValid(string $token): bool {
+    public static function isValid(string $token): bool {
         foreach (self::$data as $value) {
             if ($value == $token) {
                 return true;
