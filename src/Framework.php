@@ -30,11 +30,11 @@ class Framework {
     const StatusData   = "status";
 
     // The Directories
-    const ServerDir    = "server";
-    const SourceDir    = "server/src";
-    const DataDir      = "server/data";
-    const NLSDir       = "server/nls";
-    const PublicDir    = "server/public";
+    const SourceDir    = "src";
+    const DataDir      = "data";
+    const NLSDir       = "nls";
+    const PublicDir    = "public";
+
     const FilesDir     = "files";
     const TempDir      = "temp";
     
@@ -44,17 +44,20 @@ class Framework {
     // Variables
     private static $framePath;
     private static $basePath;
+    private static $baseDir;
 
 
     /**
      * Sets the Basic data
      * @param string  $basePath
+     * @param string  $baseDir
      * @param boolean $logErrors
      * @return void
      */
-    public static function create(string $basePath, bool $logErrors): void {
+    public static function create(string $basePath, string $baseDir, bool $logErrors): void {
         self::$framePath = dirname(__FILE__, 2);
         self::$basePath  = $basePath;
+        self::$baseDir   = $baseDir;
 
         if ($logErrors) {
             ErrorLog::init();
@@ -71,8 +74,22 @@ class Framework {
      * @return string
      */
     public static function getPath(string $dir = "", string $file = "", bool $forFrame = false): string {
-        $base = $forFrame ? self::$framePath : self::$basePath;
-        $path = File::getPath($base, $dir, $file);
+        $path = "";
+        if ($forFrame) {
+            $path = File::getPath(self::$framePath, $dir, $file);
+        } else {
+            $path = File::getPath(self::$basePath, self::$baseDir, $dir, $file);
+        }
+        return File::removeLastSlash($path);
+    }
+
+    /**
+     * Returns the FilesPath with the given file
+     * @param string $file Optional.
+     * @return string
+     */
+    public static function getFilesPath(string $file = ""): string {
+        $path = File::getPath(self::$basePath, self::FilesDir, $file);
         return File::removeLastSlash($path);
     }
 

@@ -24,7 +24,7 @@ class Path {
         if (!self::$loaded) {
             self::$loaded   = true;
             self::$data     = Framework::loadData(Framework::PathData);
-            self::$basePath = Framework::getPath(Framework::FilesDir);
+            self::$basePath = Framework::getFilesPath();
             self::$baseDir  = Framework::FilesDir;
         }
     }
