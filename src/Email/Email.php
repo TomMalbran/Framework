@@ -4,7 +4,7 @@ namespace Framework\Email;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
-use Framework\Email\Mustache;
+use Framework\Provider\Mustache;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Database;

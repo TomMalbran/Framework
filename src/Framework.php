@@ -33,7 +33,10 @@ class Framework {
     const SourceDir    = "src";
     const DataDir      = "data";
     const NLSDir       = "nls";
+
     const PublicDir    = "public";
+    const TemplatesDir = "templates";
+    const PartialsDir  = "partials";
 
     const FilesDir     = "files";
     const TempDir      = "temp";
