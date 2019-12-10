@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Utils;
+namespace Framework\Provider;
 
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
@@ -20,9 +20,9 @@ class Curl {
      * @param string $url
      * @param array  $params Optional.
      * @param string $method Optional.
-     * @return array
+     * @return mixed
      */
-    public static function execute(string $url, array $params = [], string $method = self::GET): array {
+    public static function execute(string $url, array $params = [], string $method = self::GET) {
         if (Strings::isEqual($method, self::GET)) {
             $content = [];
             foreach ($params as $key => $value) {
@@ -51,6 +51,7 @@ class Curl {
             ];
         }
         
+        // Execute the Curl
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         $response = curl_exec($curl);
@@ -58,6 +59,13 @@ class Curl {
             return [];
         }
 
+        // Remove any possible warning after the response
+        $warning = "<br />\n<b>Warning</b>";
+        if (Strings::contains($response, $warning)) {
+            $response = Strings::substringBefore($response, $warning);
+        }
+
+        // Try to decode the response as a JSON
         $result = JSON::decode($response, true);
         if (!empty($result["data"])) {
             return $result["data"];
