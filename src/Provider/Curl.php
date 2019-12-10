@@ -9,29 +9,48 @@ use Framework\Utils\Strings;
  */
 class Curl {
 
-    // The Method Types
-    const GET  = "get";
-    const POST = "post";
-    
+    /**
+     * Executes a GET Request
+     * @param string $url
+     * @param array  $params Optional.
+     * @return mixed
+     */
+    public static function get(string $url, array $params = []) {
+        $content = [];
+        foreach ($params as $key => $value) {
+            if (is_array($value)) {
+                $content[] = "$key=" . JSON::encode($value);
+            } else {
+                $content[] = "$key=" . urlencode($value);
+            }
+        }
+        $content = Strings::join($content, "&");
+        if (!empty($content)) {
+            $url .= "?$content";
+        }
+
+        return self::execute($url);
+    }
+
+    /**
+     * Executes a POST Request
+     * @param string $url
+     * @param array  $params
+     * @return mixed
+     */
+    public static function post(string $url, array $params) {
+        return self::execute($url, $params);
+    }
+
 
 
     /**
-     * Executes the Query
+     * Executes the Request
      * @param string $url
      * @param array  $params Optional.
-     * @param string $method Optional.
      * @return mixed
      */
-    public static function execute(string $url, array $params = [], string $method = self::GET) {
-        if (Strings::isEqual($method, self::GET)) {
-            $content = [];
-            foreach ($params as $key => $value) {
-                $content[] = $key . "=" . urlencode($value);
-            }
-            $content = implode("&", $content);
-            $url    .= "?" . $content;
-        }
-        
+    private static function execute(string $url, array $params = []) {
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
@@ -44,7 +63,7 @@ class Curl {
             CURLOPT_LOW_SPEED_LIMIT => 512,
             CURLOPT_LOW_SPEED_TIME  => 120,
         ];
-        if (Strings::isEqual($method, self::POST)) {
+        if (!empty($params)) {
             $options += [
                 CURLOPT_POST       => 1,
                 CURLOPT_POSTFIELDS => $params,
