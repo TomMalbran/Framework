@@ -62,15 +62,26 @@ class Numbers {
 
 
     /**
-     * Maps a value that is in the from range to the to range
-     * @param integer $value
+     * Clamps the given number between the min and max
+     * @param integer $number
+     * @param integer $min
+     * @param integer $max
+     * @return integer
+     */
+    public function clamp(int $number, int $min, int $max) {
+        return max($min, min($max, $number));
+    }
+
+    /**
+     * Maps the given number that is in the from range to the to range
+     * @param integer $number
      * @param integer $fromLow
      * @param integer $fromHigh
      * @param integer $toLow
      * @param integer $toHigh
      * @return integer
      */
-    public static function map(int $value, int $fromLow, int $fromHigh, int $toLow, int $toHigh): int {
+    public static function map(int $number, int $fromLow, int $fromHigh, int $toLow, int $toHigh): int {
         $fromRange = $fromHigh - $fromLow;
         $toRange   = $toHigh - $toLow;
         if ($fromRange == 0) {
@@ -79,7 +90,7 @@ class Numbers {
         $scaleFactor = $toRange / $fromRange;
 
         // Re-zero the value within the from range
-        $tmpValue = $value - $fromLow;
+        $tmpValue = $number - $fromLow;
         // Rescale the value to the to range
         $tmpValue *= $scaleFactor;
         // Re-zero back to the to range
