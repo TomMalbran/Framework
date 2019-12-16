@@ -6,11 +6,11 @@ use Framework\Auth\Credential;
 use Framework\Auth\Token;
 use Framework\Auth\Reset;
 use Framework\Auth\Spam;
-use Framework\Auth\JWT;
 use Framework\Config\Config;
 use Framework\File\Path;
 use Framework\File\File;
 use Framework\Log\ActionLog;
+use Framework\Provider\JWT;
 use Framework\Schema\Model;
 use Framework\Utils\Strings;
 
