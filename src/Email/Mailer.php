@@ -1,7 +1,9 @@
 <?php
 namespace Framework\Email;
 
+use Framework\Request;
 use Framework\Config\Config;
+use Framework\Utils\JSON;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\OAuth;
@@ -190,5 +192,24 @@ class Mailer {
         ]);
         $token = $provider->getAccessToken("authorization_code", [ "code" => $code ]);
         return $token->getRefreshToken();
+    }
+
+
+
+    /**
+     * Checks if the Recaptcha is Valid
+     * @param Request $request
+     * @return boolean
+     */
+    public static function isCpatchaValid(Request $request) {
+        $secretKey = urlencode(Config::get("recaptchaKey"));
+        $captcha   = urlencode($request->get("g-recaptcha-response"));
+        $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";
+        $response  = JSON::readUrl($url, true);
+
+        if (empty($response["success"])) {
+            return false;
+        }
+        return true;
     }
 }
