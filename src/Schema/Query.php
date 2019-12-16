@@ -289,7 +289,7 @@ class Query {
      */
     public function paginate(int $page = 0, int $amount = 100): Query {
         $from = $page * $amount;
-        $to   = $from + $amount;
+        $to   = $from + $amount - 1;
         return $this->limit($from, $to);
     }
     

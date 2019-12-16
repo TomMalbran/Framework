@@ -503,8 +503,10 @@ class Schema {
     private function generateQuerySort(Query $query = null, Request $sort = null): Query {
         $query = $this->generateQuery($query);
         
-        if (!empty($sort) && $sort->has("orderBy")) {
-            $query->orderBy($sort->orderBy, !empty($sort->orderAsc));
+        if (!empty($sort)) {
+            if ($sort->has("orderBy")) {
+                $query->orderBy($sort->orderBy, !empty($sort->orderAsc));
+            }
             if ($sort->exists("page")) {
                 $query->paginate($sort->page, $sort->amount);
             }
