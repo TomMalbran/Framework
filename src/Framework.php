@@ -101,19 +101,19 @@ class Framework {
      * @param string  $dir
      * @param string  $file
      * @param boolean $forFrame Optional.
-     * @return object|array
+     * @return array
      */
-    public static function loadFile(string $dir, string $file, bool $forFrame = false) {
+    public static function loadFile(string $dir, string $file, bool $forFrame = false): array {
         $path = self::getPath($dir, "$file.json", $forFrame);
-        return JSON::read($path);
+        return JSON::readFile($path, true);
     }
 
     /**
      * Loads a Data File
      * @param string $file
-     * @return object|array
+     * @return array
      */
-    public static function loadData(string $file) {
+    public static function loadData(string $file): array {
         return self::loadFile(self::DataDir, $file);
     }
 
@@ -125,7 +125,7 @@ class Framework {
      */
     public function saveData(string $file, $contents): void {
         $path = self::getPath(self::DataDir, "$file.json");
-        JSON::write($path, $contents);
+        JSON::writeFile($path, $contents);
     }
 
 
@@ -137,7 +137,7 @@ class Framework {
      * @return Response
      */
     public static function callRoute(string $route, array $params = null): Response {
-        // The Route doesn´t exists
+        // The Route doesn't exists
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");
         }

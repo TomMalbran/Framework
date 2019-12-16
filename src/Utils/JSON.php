@@ -82,14 +82,25 @@ class JSON {
 
     /**
      * Reads a JSON file
-     * @param string $path
+     * @param string  $path
+     * @param boolean $asArray Optional.
      * @return object|array
      */
-    public static function read(string $path) {
+    public static function readFile(string $path, $asArray = false) {
         if (File::exists($path)) {
-            return self::decode(file_get_contents($path), true);
+            return self::decode(file_get_contents($path), $asArray);
         }
-        return new stdClass();
+        return $asArray ? [] : new stdClass();
+    }
+
+    /**
+     * Reads a JSON url
+     * @param string  $url
+     * @param boolean $asArray Optional.
+     * @return object|array
+     */
+    public static function readUrl(string $url, $asArray = false) {
+        return self::decode(file_get_contents($url), $asArray);
     }
 
     /**
@@ -98,7 +109,7 @@ class JSON {
      * @param string|string[] $contents
      * @return void
      */
-    public static function write(string $file, $contents): void {
+    public static function writeFile(string $file, $contents): void {
         $value = Arrays::toArray($contents);
         file_put_contents($path, self::encode($value, true));
     }
