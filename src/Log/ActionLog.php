@@ -217,7 +217,7 @@ class ActionLog {
      */
     public static function getSessionID(): int {
         $query = Query::create("CREDENTIAL_ID", "=", Auth::getID());
-        return self::getIDsSchema()->getValue($query, "SESSION_ID");
+        return (int)self::getIDsSchema()->getValue($query, "SESSION_ID");
     }
 
     /**
