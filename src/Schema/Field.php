@@ -191,10 +191,8 @@ class Field {
             }
             break;
         case self::JSON:
-            $result = $request->toJSON($this->name);
-            break;
         case self::CSV:
-            $result = $request->toCSV($this->name);
+            $result = $request->toJSON($this->name);
             break;
         case self::Encrypt:
             if (!empty($masterKey)) {
@@ -251,7 +249,7 @@ class Field {
             break;
         case self::CSV:
             $result[$key]            = $text;
-            $result["{$key}Parts"]   = Utils::fromCSV($text);
+            $result["{$key}Parts"]   = JSON::decode($text, true);
             $result["{$key}Count"]   = Arrays::length($result["{$key}Parts"]);
             break;
         case self::Text:
