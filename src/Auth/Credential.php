@@ -79,8 +79,9 @@ class Credential {
         if (empty($levels)) {
             return false;
         }
-        $query = Query::create("level", "IN", $levels);
-        return self::getSchema()->exists($crendentialID, $query);
+        $query = Query::create("CREDENTIAL_ID", "=", $crendentialID);
+        $query->add("level", "IN", $levels);
+        return self::getSchema()->exists($query);
     }
     
     /**
