@@ -34,7 +34,7 @@ class SettingType {
      * @param Model|array $data
      * @return mixed
      */
-    private static function parseValue($data) {
+    public static function parseValue($data) {
         switch ($data["type"]) {
         case self::Binary:
             return !empty($data["value"]);

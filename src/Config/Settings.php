@@ -4,6 +4,7 @@ namespace Framework\Config;
 use Framework\Framework;
 use Framework\Config\SettingType;
 use Framework\Schema\Factory;
+use Framework\Schema\Schema;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
 use Framework\Utils\JSON;
