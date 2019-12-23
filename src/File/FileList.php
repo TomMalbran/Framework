@@ -26,12 +26,13 @@ class FileList {
         $imgWidth  = 0;
         $imgHeight = 0;
         if ($isImage) {
-            [ $imgWidth, $imgHeight ] = Image::getSize($fileUrl);
+            [ $imgWidth, $imgHeight ] = Image::getSize($source);
         }
         $this->list[] = [
             "name"          => $name,
             "path"          => $path,
             "canSelect"     => !$isDir,
+            "isBack"        => false,
             "isDir"         => $isDir,
             "isImage"       => $isImage,
             "isTransparent" => $isImage && FileType::isPNG($name),
