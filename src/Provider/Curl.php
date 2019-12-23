@@ -56,10 +56,10 @@ class Curl {
             CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_HEADER          => false,
-            CURLOPT_FAILONERROR     => 1,
+            CURLOPT_FAILONERROR     => true,
+            CURLOPT_FORBID_REUSE    => true,
             CURLOPT_TIMEOUT         => 100,
             CURLOPT_CONNECTTIMEOUT  => 10,
-            CURLOPT_FORBID_REUSE    => 1,
             CURLOPT_LOW_SPEED_LIMIT => 512,
             CURLOPT_LOW_SPEED_TIME  => 120,
         ];
