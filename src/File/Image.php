@@ -1,7 +1,7 @@
 <?php
 namespace Framework\File;
 
-use App\Utils\Arrays;
+use Framework\Utils\Arrays;
 
 /**
  * The Image Utils
@@ -31,7 +31,7 @@ class Image {
      * @param integer $type
      * @return boolean
      */
-    public function hasType(int $type): bool {
+    public static function hasType(int $type): bool {
         return Arrays::contains(self::$imageTypes, $type);
     }
 
