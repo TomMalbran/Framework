@@ -26,11 +26,11 @@ class JSON {
 
     /**
      * Encodes an Object as a string if it is not already encoded
-     * @param array   $value
-     * @param boolean $asPretty Optional.
+     * @param array|string $value
+     * @param boolean      $asPretty Optional.
      * @return string
      */
-    public static function encode(array $value, bool $asPretty = false): string {
+    public static function encode($value, bool $asPretty = false): string {
         if (self::isValid($value)) {
             return $value;
         }
@@ -39,11 +39,11 @@ class JSON {
 
     /**
      * Decodes a String if it is not already decoded
-     * @param string  $value
-     * @param boolean $asArray Optional.
+     * @param array|string $value
+     * @param boolean      $asArray Optional.
      * @return object|array
      */
-    public static function decode(string $value, bool $asArray = false) {
+    public static function decode($value, bool $asArray = false) {
         if (!self::isValid($value)) {
             return $value;
         }
