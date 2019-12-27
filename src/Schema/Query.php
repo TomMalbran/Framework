@@ -190,13 +190,15 @@ class Query {
      * Adds a Search expression
      * @param string|string[] $column
      * @param mixed           $value
-     * @param string          $expression Optional.
+     * @param string          $expression      Optional.
+     * @param boolean         $caseInsensitive Optional.
      * @return Query
      */
-    public function search($column, $value, string $expression = "LIKE"): Query {
+    public function search($column, $value, string $expression = "LIKE", bool $caseInsensitive = true): Query {
         if (!empty($value)) {
+            $value   = $caseInsensitive ? Strings::toLowerCase($value) : $value;
             $columns = Arrays::toArray($column);
-            if (count($columns) > 1) {
+            if (Arrays::length($columns) > 1) {
                 $this->startOr();
                 foreach ($columns as $col) {
                     $this->add($col, "LIKE", $value);
@@ -440,15 +442,16 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string|string[] $column     Optional.
-     * @param mixed           $value      Optional.
-     * @param string          $expression Optional.
+     * @param string|string[] $column          Optional.
+     * @param mixed           $value           Optional.
+     * @param string          $expression      Optional.
+     * @param boolean         $caseInsensitive Optional.
      * @return Query
      */
-    public static function createSearch($column = null, $value = null, string $expression = "LIKE"): Query {
+    public static function createSearch($column = null, $value = null, string $expression = "LIKE", bool $caseInsensitive = true): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {
-            $query->search($column, $value, $expression);
+            $query->search($column, $value, $expression, $caseInsensitive);
         }
         return $query;
     }
