@@ -191,14 +191,18 @@ class Strings {
     }
 
 
+
     /**
      * Splits the given String at the given Needle
-     * @param string $string
-     * @param string $needle
+     * @param string[]|string $string
+     * @param string          $needle
      * @return string[]
      */
-    public static function split(string $string, string $needle): array {
-        return explode($needle, $string);
+    public static function split($string, string $needle): array {
+        if (!is_array($string)) {
+            return explode($needle, $string);
+        }
+        return $string;
     }
 
     /**
@@ -233,11 +237,11 @@ class Strings {
      * Returns true if the values are Equal
      * @param string  $string
      * @param string  $other
-     * @param boolean $asLower Optional.
+     * @param boolean $caseInsensitive Optional.
      * @return boolean
      */
-    public static function isEqual(string $string, string $other, bool $asLower = true): bool {
-        if ($asLower) {
+    public static function isEqual(string $string, string $other, bool $caseInsensitive = true): bool {
+        if ($caseInsensitive) {
             return strtolower($string) === strtolower($other);
         }
         return $string === $other;
