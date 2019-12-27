@@ -230,16 +230,16 @@ class Credential {
     
     /**
      * Returns the Credentials  that contains the text and the given Levels
-     * @param string    $text
-     * @param integer   $amount        Optional.
-     * @param integer[] $levels        Optional.
-     * @param integer[] $credentialIDs Optional.
+     * @param string            $text
+     * @param integer           $amount       Optional.
+     * @param integer[]|integer $level        Optional.
+     * @param integer[]|integer $credentialID Optional.
      * @return array
      */
-    public static function search(string $text, int $amount = 10, array $levels = null, array $credentialIDs = null): array {
-        $query = Query::createSearch([ "firstName", "lastName", "email", "phone" ], $text);
-        $query->addIf("level",         "IN", $levels);
-        $query->addIf("CREDENTIAL_ID", "IN", $credentialIDs);
+    public static function search(string $text, int $amount = 10, $level = null, $credentialID = null): array {
+        $query = Query::createSearch([ "firstName", "lastName", "nickName", "email", "phone" ], $text);
+        $query->addIf("level",         "IN", Arrays::toArray($level),        $level !== null);
+        $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
         
         $request = self::requestSelect($query);
