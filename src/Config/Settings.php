@@ -49,7 +49,23 @@ class Settings {
     }
 
     /**
-     * Returns the Settings merging both Schemas
+     * Returns a single Setting as an Integer
+     * @param string $variable
+     * @param string $section  Optional.
+     * @return integer
+     */
+    public static function getInt(string $variable, string $section = "general"): int {
+        $result = self::get($variable, $section);
+        if ($result !== null) {
+            return (int)$result;
+        }
+        return 0;
+    }
+
+
+
+    /**
+     * Returns the Settings
      * @param string $section Optional.
      * @return array
      */
