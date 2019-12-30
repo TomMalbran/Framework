@@ -112,6 +112,15 @@ class Status {
             return Arrays::contains($group, $value);
         }
 
+        // Function "isXxxOrYyy": Check if the given value is equal to xxx or yyy
+        if (Strings::startsWith($function, "is") && Strings::contains($function, "Or")) {
+            $statusNames  = Strings::stripStart($function, "is");
+            $statusParts  = Strings::split($statusNames, "Or");
+            $statusValueX = self::getOne($statusParts[0]);
+            $statusValueY = self::getOne($statusParts[1]);
+            return $value == $statusValueX || $value == $statusValueY;
+        }
+
         // Function "isXxx": Check if the given value is equal to xxx
         if (Strings::startsWith($function, "is")) {
             $statusName  = Strings::stripStart($function, "is");
