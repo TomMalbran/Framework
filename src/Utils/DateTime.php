@@ -212,6 +212,29 @@ class DateTime {
     public static function isValidWeekDay(int $weekDay): bool {
         return Numbers::isValid($weekDay, 0, 6);
     }
+
+
+
+    /**
+     * Returns true if the given Time is between the from and to Times
+     * @param integer $time
+     * @param integer $fromTime
+     * @param integer $toTime
+     * @return boolean
+     */
+    public static function isBetween(int $time, int $fromTime, int $toTime): bool {
+        return $time >= $fromTime && $time <= $toTime;
+    }
+
+    /**
+     * Returns true if the current Time is between the from and to Times
+     * @param integer $fromTime
+     * @param integer $toTime
+     * @return boolean
+     */
+    public static function isCurrentBetween(int $fromTime, int $toTime): bool {
+        return self::isBetween(time(), $fromTime, $toTime);
+    }
     
 
 
