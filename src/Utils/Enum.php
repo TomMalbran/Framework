@@ -151,7 +151,7 @@ class Enum {
             if (Strings::startsWith($function, "in")) {
                 if (!empty($cache->data[$value])) {
                     $key = Strings::stripStart($function, "in");
-                    $key = Strings::stripEnd($function, "s");
+                    $key = Strings::stripEnd($key, "s");
                     return Strings::isEqual($cache->data[$value], $key);
                 }
                 return false;
