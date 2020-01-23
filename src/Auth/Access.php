@@ -108,11 +108,17 @@ class Access {
             return Arrays::contains($groupX, $level) || Arrays::contains($groupY, $level);
         }
 
-        // Function "inXxx(s)" or "isValidXxx": Check if the given level is in the group xxx
-        if (Strings::startsWith($function, "in") || Strings::startsWith($function, "isValid")) {
+        // Function "inXxx(s)": Check if the given level is in the group xxx
+        if (Strings::startsWith($function, "in")) {
             $groupName = Strings::stripStart($function, "in");
-            $groupName = Strings::stripStart($function, "isValid");
             $groupName = Strings::stripEnd($groupName, "s");
+            $group     = self::getGroup($groupName);
+            return Arrays::contains($group, $level);
+        }
+
+        // Function "isValidXxx": Check if the given level is in the group xxx
+        if (Strings::startsWith($function, "isValid")) {
+            $groupName = Strings::stripStart($function, "isValid");
             $group     = self::getGroup($groupName);
             return Arrays::contains($group, $level);
         }
