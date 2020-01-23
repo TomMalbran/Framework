@@ -175,6 +175,7 @@ class File {
      */
     public static function hasExtension(string $name, $extensions): bool {
         $extension = self::getExtension($name);
+        $extension = Strings::toLowerCase($extension);
         return Arrays::contains($extensions, $extension);
     }
 
