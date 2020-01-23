@@ -28,11 +28,11 @@ class Arrays {
     
     /**
      * Returns the length of the given array
-     * @param array $array
+     * @param array|mixed $array
      * @return integer
      */
-    public static function length(array $array): int {
-        return count($array);
+    public static function length($array): int {
+        return is_array($array) ? count($array) : 0;
     }
 
     /**
