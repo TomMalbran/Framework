@@ -253,7 +253,7 @@ class Schema {
         $result  = [];
         
         foreach ($request as $row) {
-            $key = $title ?: $this->structure->name;
+            $key      = $title ?: $this->structure->name;
             $result[] = [
                 "id"    => $row[$this->structure->idName],
                 "title" => $row[$key],
