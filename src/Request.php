@@ -592,7 +592,7 @@ class Request implements ArrayAccess {
      * @return boolean
      */
     public function hasFile(string $key): bool {
-         return !empty($this->files[$key]) && !empty($this->files[$key]["name"]);
+        return !empty($this->files[$key]) && !empty($this->files[$key]["name"]);
     }
     
     /**
