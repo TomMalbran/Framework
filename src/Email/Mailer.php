@@ -57,7 +57,7 @@ class Mailer {
 
         $name  = self::$name;
         $url   = self::$url;
-        $img   = self::$url . self::$smtp->header;
+        $img   = !empty(self::$smtp->header) ? self::$url . self::$smtp->header : "";
 
         $body  = "<table cellpadding='0' cellspacing='0' border='0' height='100%' width='100%' bgcolor='#f4f4f4' style='background-color:#f4f4f4;background-image:none;background-repeat:repeat;border-spacing:0'>";
         $body .= "<tbody><tr><td style='border-collapse:collapse'>";
