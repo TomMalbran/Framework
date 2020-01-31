@@ -243,20 +243,19 @@ class Schema {
 
     /**
      * Returns the search results
-     * @param Query  $query
-     * @param string $title Optional.
+     * @param Query           $query
+     * @param string|string[] $name  Optional.
      * @return array
      */
-    public function getSearch(Query $query, string $title = null): array {
+    public function getSearch(Query $query, $name = null): array {
         $query   = $this->generateQuery($query);
         $request = $this->request($query);
         $result  = [];
         
         foreach ($request as $row) {
-            $key      = $title ?: $this->structure->name;
             $result[] = [
                 "id"    => $row[$this->structure->idName],
-                "title" => $row[$key],
+                "title" => Arrays::getValue($row, $name ?: $this->structure->name),
                 "data"  => $row,
             ];
         }
