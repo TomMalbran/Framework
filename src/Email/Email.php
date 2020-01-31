@@ -8,6 +8,7 @@ use Framework\Provider\Mustache;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Database;
+use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;
 
@@ -90,7 +91,7 @@ class Email {
      * @param array  $data
      * @return string
      */
-    public function render(string $template, array $data): string {
+    public static function render(string $template, array $data): string {
         return Mustache::render($template, $data);
     }
 
