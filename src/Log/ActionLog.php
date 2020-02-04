@@ -8,7 +8,7 @@ use Framework\Schema\Schema;
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
-use Framework\Utils\Utils;
+use Framework\Utils\Server;
 
 /**
  * The Actions Log
@@ -166,8 +166,8 @@ class ActionLog {
             $sessionID = self::getSessionsSchema()->create([
                 "CREDENTIAL_ID" => $credentialID,
                 "USER_ID"       => Auth::getUserID(),
-                "ip"            => Utils::getIP(),
-                "userAgent"     => $_SERVER["HTTP_USER_AGENT"],
+                "ip"            => Server::getIP(),
+                "userAgent"     => Server::getUserAgent(),
                 "time"          => time(),
             ]);
             self::setSessionID($sessionID);

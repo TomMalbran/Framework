@@ -3,8 +3,8 @@ namespace Framework\Config;
 
 use Framework\Framework;
 use Framework\File\File;
+use Framework\Utils\Server;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 
 use Dotenv\Dotenv;
 use stdClass;
@@ -28,11 +28,11 @@ class Config {
             $data    = Dotenv::createImmutable($path)->load();
             $replace = [];
 
-            if (Utils::isStageHost()) {
+            if (Server::isStageHost()) {
                 if (File::exists($path, ".env.stage")) {
                     $replace = Dotenv::createMutable($path, ".env.stage")->load();
                 }
-            } elseif (!Utils::isLocalHost()) {
+            } elseif (!Server::isLocalHost()) {
                 if (File::exists($path, ".env.production")) {
                     $replace = Dotenv::createMutable($path, ".env.production")->load();
                 }

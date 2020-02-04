@@ -4,7 +4,7 @@ namespace Framework\Auth;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
-use Framework\Utils\Utils;
+use Framework\Utils\Server;
 
 /**
  * The Auth Spam
@@ -35,7 +35,7 @@ class Spam {
      */
     public static function protection(): bool {
         $schema = self::getSchema();
-        $ip     = Utils::getIP();
+        $ip     = Server::getIP();
         
         // Delete old entries
         $schema->remove(Query::create("time", "<", time() - 2)->add("ip", "=", $ip));
