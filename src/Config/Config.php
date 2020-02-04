@@ -40,6 +40,14 @@ class Config {
 
             self::$loaded = true;
             self::$data   = array_merge($data, $replace);
+
+            foreach (self::$data as $key => $value) {
+                if ($value === "true") {
+                    self::$data[$key] = true;
+                } elseif ($value === "false") {
+                    self::$data[$key] = false;
+                }
+            }
         }
     }
 
