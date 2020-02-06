@@ -116,7 +116,7 @@ class Mailer {
         $mail->SMTPAuth    = true;
         $mail->SMTPAutoTLS = false;
         
-        if (self::$smtp->useOAUTH) {
+        if (self::$smtp->useOauth) {
             $mail->SMTPAuth = true;
             $mail->AuthType = "XOAUTH2";
 
