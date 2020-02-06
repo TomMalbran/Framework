@@ -119,6 +119,15 @@ class Auth {
         self::$apiID        = 0;
     }
 
+    /**
+     * Returns true if the Credential can login
+     * @param Model $credential
+     * @return boolean
+     */
+    public static function canLogin(Model $credential): bool {
+        return !$credential->isEmpty() && !$credential->isDeleted && !empty($credential->password);
+    }
+
 
 
     /**
