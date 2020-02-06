@@ -128,7 +128,7 @@ class Image {
                 $xCorner   = ($imgWidth - $oldWidth) / 2;
                 $yCorner   = 0;
             } else {
-                $newWidth  = round($width  * $xScale);
+                $oldWidth  = round($width  * $xScale);
                 $oldHeight = round($height * $xScale);
                 $xCorner   = 0;
                 $yCorner   = ($imgHeight - $oldHeight) / 2;
