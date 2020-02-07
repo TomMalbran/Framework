@@ -70,6 +70,16 @@ class Request implements ArrayAccess {
     public function get(string $key, $default = "") {
         return isset($this->request[$key]) ? $this->request[$key] : $default;
     }
+
+    /**
+     * Returns the request data at the given key or the default
+     * @param string $key
+     * @param mixed  $default Optional.
+     * @return mixed
+     */
+    public function getOr(string $key, $default) {
+        return !empty($this->request[$key]) ? $this->request[$key] : $default;
+    }
     
     /**
      * Returns the request data at the given key or the default
@@ -82,6 +92,16 @@ class Request implements ArrayAccess {
     }
 
     /**
+     * Returns the request data at the given key or the default
+     * @param string  $key
+     * @param integer $default
+     * @return integer
+     */
+    public function getIntOr(string $key, int $default): int {
+        return !empty($this->request[$key]) ? (int)$this->request[$key] : $default;
+    }
+
+    /**
      * Returns the request data at the given key as a trimmed string or the default
      * @param string $key
      * @param string $default Optional.
@@ -91,6 +111,15 @@ class Request implements ArrayAccess {
         return isset($this->request[$key]) ? trim((string)$this->request[$key]) : $default;
     }
 
+    /**
+     * Returns the request data at the given key as a trimmed string or the default
+     * @param string $key
+     * @param string $default
+     * @return string
+     */
+    public function getStringOr(string $key, string $default): string {
+        return !empty($this->request[$key]) ? trim((string)$this->request[$key]) : $default;
+    }
     
     /**
      * Returns the request data at the given key as an array and removing the empty entries
