@@ -131,12 +131,36 @@ class Framework {
 
 
     /**
-     * Calls an API function
+     * Parses and returns the initial Request
+     * @return object
+     */
+    public static function getRequest() {
+        $request = $_REQUEST;
+        $result  = [
+            "route"  => !empty($request["route"]) ? $request["route"] : "",
+            "token"  => !empty($request["token"]) ? $request["token"] : "",
+            "jwt"    => !empty($request["jwt"])   ? $request["jwt"]   : "",
+            "params" => [],
+        ];
+
+        if (!empty($request["params"])) {
+            $result["params"] = json_decode($request["params"], true);
+        } else {
+            unset($request["route"]);
+            unset($request["token"]);
+            unset($request["jwt"]);
+            $result["params"] = $request;
+        }
+        return (object)$result;
+    }
+
+    /**
+     * Requests an API function
      * @param string $route
      * @param array  $params Optional.
      * @return Response
      */
-    public static function callRoute(string $route, array $params = null): Response {
+    public static function request(string $route, array $params = null): Response {
         // The Route doesn't exists
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");
