@@ -34,9 +34,9 @@
     "resets" : {
         "table"  : "credentials_reset",
         "fields" : {
-            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "idID" : true },
-            "code"          : { "type" : "string"                                         },
-            "time"          : { "type" : "number"                                         }
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "idPrimary" : true },
+            "code"          : { "type" : "string"                                              },
+            "time"          : { "type" : "number"                                              }
         },
         "hasTimestamps" : false,
         "canCreate"     : false,
@@ -46,8 +46,8 @@
     "spam" : {
         "table"  : "credentials_spam",
         "fields" : {
-            "ip"   : { "type" : "string", "idID" : true },
-            "time" : { "type" : "number"                }
+            "ip"   : { "type" : "string", "idPrimary" : true },
+            "time" : { "type" : "number"                     }
         },
         "hasTimestamps" : false,
         "canCreate"     : false,
@@ -60,12 +60,12 @@
     "emailTemplates" : {
         "table"  : "email_templates",
         "fields" : {
-            "templateCode" : { "type" : "string", "idID" : true, "cantEdit" : true },
-            "description"  : { "type" : "string",                "cantEdit" : true },
-            "subject"      : { "type" : "string"                                   },
-            "sendAs"       : { "type" : "string"                                   },
-            "sendName"     : { "type" : "string"                                   },
-            "message"      : { "type" : "text"                                     }
+            "templateCode" : { "type" : "string", "idPrimary" : true, "cantEdit" : true },
+            "description"  : { "type" : "string",                     "cantEdit" : true },
+            "subject"      : { "type" : "string"                                        },
+            "sendAs"       : { "type" : "string"                                        },
+            "sendName"     : { "type" : "string"                                        },
+            "message"      : { "type" : "text"                                          }
         },
         "hasTimestamps" : true,
         "canCreate"     : false,
