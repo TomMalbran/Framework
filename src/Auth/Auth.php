@@ -12,6 +12,7 @@ use Framework\File\File;
 use Framework\Log\ActionLog;
 use Framework\Provider\JWT;
 use Framework\Schema\Model;
+use Framework\Utils\Status;
 use Framework\Utils\Strings;
 
 /**
@@ -125,7 +126,10 @@ class Auth {
      * @return boolean
      */
     public static function canLogin(Model $credential): bool {
-        return !$credential->isEmpty() && !$credential->isDeleted && !empty($credential->password);
+        return (
+            !$credential->isEmpty() && !$credential->isDeleted &&
+            !empty($credential->password) && Status::isActive($credential->status)
+        );
     }
 
 
@@ -196,8 +200,7 @@ class Auth {
      */
     public static function canLoginAs(Model $admin, Model $user): bool {
         return (
-            !$admin->isEmpty() && !$user->isEmpty() &&
-            !$admin->isDeleted && !$user->isDeleted &&
+            self::canLogin($admin) && !$user->isEmpty() && !$user->isDeleted &&
             $admin->level > $user->level && Access::isAdminOrHigher($admin->level)
         );
     }
