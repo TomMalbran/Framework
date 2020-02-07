@@ -8,6 +8,7 @@ use Framework\Schema\Schema;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
 use Framework\Utils\JSON;
+use Framework\Utils\Strings;
 
 /**
  * The Settings Data
