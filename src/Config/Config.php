@@ -28,7 +28,11 @@ class Config {
             $data    = Dotenv::createImmutable($path)->load();
             $replace = [];
 
-            if (Server::isStageHost()) {
+            if (Server::isDevHost()) {
+                if (File::exists($path, ".env.dev")) {
+                    $replace = Dotenv::createMutable($path, ".env.dev")->load();
+                }
+            } elseif (Server::isStageHost()) {
                 if (File::exists($path, ".env.stage")) {
                     $replace = Dotenv::createMutable($path, ".env.stage")->load();
                 }

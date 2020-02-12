@@ -19,11 +19,19 @@ class Server {
     }
 
     /**
+     * Returns true if running on a Dev host
+     * @return boolean
+     */
+    public static function isDevHost(): bool {
+        return Strings::startsWith($_SERVER["HTTP_HOST"], "dev.");
+    }
+
+    /**
      * Returns true if running on a Stage host
      * @return boolean
      */
     public static function isStageHost(): bool {
-        return Strings::startsWith($_SERVER["HTTP_HOST"], "dev.");
+        return Strings::startsWith($_SERVER["HTTP_HOST"], "stage.");
     }
 
 
