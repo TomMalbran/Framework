@@ -54,7 +54,7 @@ class Image {
      * @return array
      */
     public static function getSize(string $file): array {
-        if (file_exists($path)) {
+        if (file_exists($file)) {
             return getimagesize($file);
         }
         return [ 0, 0, 0 ];
