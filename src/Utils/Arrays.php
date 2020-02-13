@@ -207,9 +207,9 @@ class Arrays {
      * @param string|string[] $key
      * @param string          $glue   Optional.
      * @param string          $prefix Optional.
-     * @return string
+     * @return mixed
      */
-    public static function getValue($array, $key, string $glue = " - ", string $prefix = ""): string {
+    public static function getValue($array, $key, string $glue = " - ", string $prefix = "") {
         $result = "";
         if (is_array($key)) {
             $values = [];
