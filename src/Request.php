@@ -480,7 +480,7 @@ class Request implements ArrayAccess {
      * @return integer
      */
     public function toInt(string $key, int $decimals): int {
-        return Numbers::toInt($this->getInt($key), $decimals);
+        return Numbers::toInt($this->get($key), $decimals);
     }
     
     /**
@@ -490,7 +490,7 @@ class Request implements ArrayAccess {
      * @return integer
      */
     public function toCents(string $key, int $index = null): int {
-        $value = $index !== null ? $this->getFromArray($key, $index, 0) : $this->getInt($key);
+        $value = $index !== null ? $this->getFromArray($key, $index, 0) : $this->get($key);
         return Numbers::toCents($value);
     }
 
