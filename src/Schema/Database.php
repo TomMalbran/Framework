@@ -352,10 +352,10 @@ class Database {
     
     /**
      * This method is used to prepare the statements by turning the item type into a type used by mysqli
-     * @param string $item Input to determine the type.
+     * @param mixed $item Input to determine the type.
      * @return string The parameter type.
      */
-    private function determineType(string $item): string {
+    private function determineType($item): string {
         switch (gettype($item)) {
         case "NULL":
         case "string":
