@@ -594,11 +594,11 @@ class Database {
         foreach ($fields as $key => $type) {
             $sql .= "  `$key` " . $type . ",\n";
         }
-        $sql .= "  PRIMARY KEY (" . Strings::join($primary, ", ") . ")\n";
+        $sql .= "  PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
         foreach ($keys as $key) {
-            $sql .= "  KEY `$field->key` (`$field->key`)\n";
+            $sql .= ",\n  KEY `$field->key` (`$field->key`)";
         }
-        $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+        $sql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
         $this->query($sql);
         return $sql;
