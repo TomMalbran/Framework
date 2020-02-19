@@ -18,31 +18,32 @@ use Framework\Utils\JSON;
 class Framework {
 
     // The Data
-    const RouteData    = "routes";
-    const SchemaData   = "schemas";
-    const KeyData      = "keys";
-    const AccessData   = "access";
-    const TokenData    = "tokens";
-    const PathData     = "paths";
-    const SettingsData = "settings";
-    const EmailData    = "emails";
-    const LanguageData = "languages";
-    const StatusData   = "status";
+    const RouteData     = "routes";
+    const SchemaData    = "schemas";
+    const KeyData       = "keys";
+    const AccessData    = "access";
+    const TokenData     = "tokens";
+    const PathData      = "paths";
+    const SettingsData  = "settings";
+    const EmailData     = "emails";
+    const LanguageData  = "languages";
+    const StatusData    = "status";
 
     // The Directories
-    const SourceDir    = "src";
-    const DataDir      = "data";
-    const NLSDir       = "nls";
+    const SourceDir     = "src";
+    const DataDir       = "data";
+    const NLSDir        = "nls";
+    
+    const PublicDir     = "public";
+    const TemplatesDir  = "templates";
+    const PartialsDir   = "partials";
+    const MigrationsDir = "migrations";
 
-    const PublicDir    = "public";
-    const TemplatesDir = "templates";
-    const PartialsDir  = "partials";
-
-    const FilesDir     = "files";
-    const TempDir      = "temp";
+    const FilesDir      = "files";
+    const TempDir       = "temp";
     
     // Config
-    const Namespace    = "App\\Controller\\";
+    const Namespace     = "App\\Controller\\";
 
     // Variables
     private static $framePath;

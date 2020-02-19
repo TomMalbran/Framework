@@ -1,8 +1,10 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Framework;
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -36,6 +38,9 @@ class Migration {
 
         // Delete the Tables or show which to delete
         self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
+
+        // Run extra migrations created in files
+        self::extraMigrations($db);
     }
 
     /**
@@ -238,5 +243,46 @@ class Migration {
             print("$sql<br>");
         }
         print("<br>");
+    }
+
+
+
+    /**
+     * Runs extra Migrations
+     * @param Database $db
+     * @return void
+     */
+    private static function extraMigrations(Database $db) {
+        $query     = Query::create("section", "=", "general")->add("variable", "=", "migration");
+        $migration = $db->getValue("settings", "value", $query);
+
+        $path  = Framework::getPath(Framework::MigrationsDir);
+        $files = File::getFilesInDir($path);
+        $names = [];
+        foreach ($files as $file) {
+            $names[] = (int)File::getName($file);
+        }
+
+        sort($names);
+        $first = !empty($migration) ? $migration + 1 : 1;
+        $last  = end($names);
+        if (empty($names) || $first > $last) {
+            print("<br>No <i>migrations</i> required");
+            return;
+        }
+
+        print("<br>Running <b>migrations $first to $last</b><br>");
+        foreach ($names as $name) {
+            if ($name >= $first) {
+                include_once("$path/$name.php");
+                call_user_func("migration$name", $db);
+            }
+        }
+
+        $db->insert("settings", [
+            "section"  => "general",
+            "variable" => "migration",
+            "value"    => $last,
+        ], "REPLACE");
     }
 }
