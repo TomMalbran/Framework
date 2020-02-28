@@ -11,6 +11,7 @@ use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
+use Framework\Utils\Status;
 
 /**
  * The Auth Credential
@@ -509,20 +510,26 @@ class Credential {
         string $password
     ): void {
         if ($db->hasTable("credentials")) {
-            $hash = self::createHash($password);
-            $db->insert("credentials", [
-                "firstName"    => $firstName,
-                "lastName"     => $lastName,
-                "email"        => $email,
-                "password"     => $hash["password"],
-                "salt"         => $hash["salt"],
-                "language"     => "es",
-                "level"        => Access::Owner(),
-                "lastLogin"    => time(),
-                "currentLogin" => time(),
-                "createdTime"  => time(),
-            ]);
-            print("<i>Owner Created</i><br>");
+            $query = Query::create("email", "=", $email);
+            if (!$db->exists("credentials", $query)) {
+                $hash = self::createHash($password);
+                $db->insert("credentials", [
+                    "firstName"    => $firstName,
+                    "lastName"     => $lastName,
+                    "email"        => $email,
+                    "password"     => $hash["password"],
+                    "salt"         => $hash["salt"],
+                    "language"     => "es",
+                    "level"        => Access::Owner(),
+                    "status"       => Status::Active(),
+                    "lastLogin"    => time(),
+                    "currentLogin" => time(),
+                    "createdTime"  => time(),
+                ]);
+                print("<br><i>Owner</i> created<br>");
+            } else {
+                print("<br><i>Owner</i> already created<br>");
+            }
         }
     }
 }
