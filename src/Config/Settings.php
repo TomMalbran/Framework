@@ -226,7 +226,7 @@ class Settings {
             print(Strings::join($variables, ", ") . "<br>");
         }
         if (empty($adds) && empty($deletes)) {
-            print("<br>No <i>settings</i> added or deleted <br>");
+            print("<br>No <i>settings</i> added or deleted<br>");
         }
     }
 }

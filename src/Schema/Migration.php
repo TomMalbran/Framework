@@ -83,7 +83,7 @@ class Migration {
             if (!Arrays::contains($schemaNames, $tableName)) {
                 if ($canDelete) {
                     $db->deleteTable($tableName);
-                    print("{$prebr}Deleteing table <i>$tableName</i><br>");
+                    print("{$prebr}Deleted table <i>$tableName</i><br>");
                 } else {
                     print("{$prebr}Delete table <i>$tableName</i> (manually)<br>");
                 }
@@ -257,6 +257,11 @@ class Migration {
         $migration = $db->getValue("settings", "value", $query);
 
         $path  = Framework::getPath(Framework::MigrationsDir);
+        if (!File::exists($path)) {
+            print("<br>No <i>migrations</i> required<br>");
+            return;
+        }
+
         $files = File::getFilesInDir($path);
         $names = [];
         foreach ($files as $file) {
@@ -267,7 +272,7 @@ class Migration {
         $first = !empty($migration) ? $migration + 1 : 1;
         $last  = end($names);
         if (empty($names) || $first > $last) {
-            print("<br>No <i>migrations</i> required");
+            print("<br>No <i>migrations</i> required<br>");
             return;
         }
 
