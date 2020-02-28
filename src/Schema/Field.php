@@ -36,6 +36,7 @@ class Field {
     public $length     = 0;
     public $date       = "";
     public $hour       = "";
+    public $default    = null;
     
     public $isPrimary  = false;
     public $isKey      = false;
@@ -63,10 +64,11 @@ class Field {
     public function __construct(string $key, array $data, string $prefix = "") {
         $this->key        = $key;
 
-        $this->type       = !empty($data["type"])   ? $data["type"]        : Field::String;
-        $this->length     = !empty($data["length"]) ? (int)$data["length"] : 0;
-        $this->date       = !empty($data["date"])   ? $data["date"]        : null;
-        $this->hour       = !empty($data["hour"])   ? $data["hour"]        : null;
+        $this->type       = !empty($data["type"])    ? $data["type"]        : Field::String;
+        $this->length     = !empty($data["length"])  ? (int)$data["length"] : 0;
+        $this->date       = !empty($data["date"])    ? $data["date"]        : null;
+        $this->hour       = !empty($data["hour"])    ? $data["hour"]        : null;
+        $this->default    = !empty($data["default"]) ? $data["default"]     : null;
 
         $this->isPrimary  = !empty($data["isPrimary"]);
         $this->isKey      = !empty($data["isKey"]);
@@ -145,6 +147,10 @@ class Field {
             $length = $this->length ?: 255;
             $result = "varbinary($length) NOT NULL";
             break;
+        }
+
+        if ($result != "unknown" && $this->default != null) {
+            $result .= " DEFAULT '{$this->default}'";
         }
         return $result;
     }

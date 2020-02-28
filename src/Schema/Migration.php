@@ -171,6 +171,9 @@ class Migration {
                     if ($tableField["Null"] === "NO") {
                         $oldData .= " NOT NULL";
                     }
+                    if ($tableField["Default"] !== NULL) {
+                        $oldData .= " DEFAULT '{$tableField["Default"]}'";
+                    }
                     if (!empty($tableField["Extra"])) {
                         $oldData .= " " . Strings::toUpperCase($tableField["Extra"]);
                     }
