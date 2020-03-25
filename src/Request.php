@@ -491,7 +491,7 @@ class Request implements ArrayAccess {
      */
     public function toCents(string $key, int $index = null): int {
         $value = $index !== null ? $this->getFromArray($key, $index, 0) : $this->get($key);
-        return Numbers::toCents($value);
+        return Numbers::toCents((float)$value);
     }
 
     /**
