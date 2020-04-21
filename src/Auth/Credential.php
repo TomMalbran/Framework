@@ -368,6 +368,25 @@ class Credential {
         $fields = self::getFields($request, $level, $reqPassChange);
         return self::getSchema()->edit($credentialID, $request, $fields);
     }
+
+    /**
+     * Updates the given Credential
+     * @param integer $credentialID
+     * @param array   $fields
+     * @return boolean
+     */
+    public static function update(int $credentialID, array $fields): bool {
+        return self::getSchema()->edit($credentialID, $fields);
+    }
+
+    /**
+     * Deletes the given Credential
+     * @param integer $credentialID
+     * @return boolean
+     */
+    public static function delete(int $credentialID): bool {
+        return self::getSchema()->delete($credentialID);
+    }
     
     /**
      * Parses the data and returns the fields
@@ -390,15 +409,6 @@ class Credential {
             $result["reqPassChange"] = $reqPassChange ? 1 : 0;
         }
         return $result;
-    }
-    
-    /**
-     * Deletes the given Credential
-     * @param integer $credentialID
-     * @return boolean
-     */
-    public static function delete(int $credentialID): bool {
-        return self::getSchema()->delete($credentialID);
     }
     
     
