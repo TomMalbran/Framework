@@ -274,7 +274,9 @@ class Strings {
     public static function upperCaseToCamelCase(string $string, bool $capitalizeFirst = false): string {
         $result = ucwords(strtolower($string), "_");
         $result = str_replace("_", "", $result);
-        $result = lcfirst($result);
+        if (!$capitalizeFirst) {
+            $result = lcfirst($result);
+        }
         return $result;
     }
 
