@@ -139,6 +139,20 @@ class Credential {
     }
 
     /**
+     * Returns all the Credentials for the given IDs
+     * @param integer[] $credentialIDs
+     * @param Request   $sort          Optional.
+     * @return array
+     */
+    public static function getAllWithIDs(array $credentialIDs, Request $sort = null): array {
+        if (empty($credentialIDs)) {
+            return [];
+        }
+        $query = Query::create("CREDENTIAL_ID", "IN", $credentialIDs);
+        return self::request($query, false, $sort);
+    }
+
+    /**
      * Returns the total amount of Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @return integer
