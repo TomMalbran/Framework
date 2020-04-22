@@ -34,7 +34,7 @@
     "resets" : {
         "table"  : "credentials_reset",
         "fields" : {
-            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "idPrimary" : true },
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
             "code"          : { "type" : "string"                                              },
             "time"          : { "type" : "number"                                              }
         },
@@ -46,7 +46,7 @@
     "spam" : {
         "table"  : "credentials_spam",
         "fields" : {
-            "ip"   : { "type" : "string", "idPrimary" : true },
+            "ip"   : { "type" : "string", "isPrimary" : true },
             "time" : { "type" : "number"                     }
         },
         "hasTimestamps" : false,
@@ -60,7 +60,7 @@
     "emailTemplates" : {
         "table"  : "email_templates",
         "fields" : {
-            "templateCode" : { "type" : "string", "idPrimary" : true, "cantEdit" : true },
+            "templateCode" : { "type" : "string", "isPrimary" : true, "cantEdit" : true },
             "description"  : { "type" : "string",                     "cantEdit" : true },
             "subject"      : { "type" : "string"                                        },
             "sendAs"       : { "type" : "string"                                        },
