@@ -65,7 +65,7 @@ class Migration {
         }
         
         $sql = $db->createTable($structure->table, $fields, $primary, $keys);
-        print("<br>Creating table <b>$structure->table</b> ... <br>");
+        print("<br>Created table <b>$structure->table</b> ... <br>");
         print(Strings::toHtml($sql) . "<br><br>");
     }
 
@@ -220,7 +220,7 @@ class Migration {
         }
         
         // Update the Table
-        print("<br>Updating table <b>$structure->table</b> ... <br>");
+        print("<br>Updated table <b>$structure->table</b> ... <br>");
         foreach ($adds as $add) {
             $sql = $db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
             print("$sql<br>");
