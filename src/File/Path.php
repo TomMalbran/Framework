@@ -36,8 +36,8 @@ class Path {
      */
     private static function get(string $pathKey): string {
         self::load();
-        if (!empty(self::$data[$pathKey])) {
-            return self::$data[$pathKey];
+        if (!empty(self::$data["paths"][$pathKey])) {
+            return self::$data["paths"][$pathKey];
         }
         return null;
     }
@@ -109,5 +109,38 @@ class Path {
      */
     public static function getTempUrl(int $credentialID): string {
         return self::getPath(Framework::TempDir, $credentialID) . "/";
+    }
+
+
+
+    /**
+     * Ensures that the Paths are created
+     * @return void
+     */
+    public static function ensurePaths() {
+        self::load();
+        $paths = [];
+
+        foreach (array_keys(self::$data["paths"]) as $pathKey) {
+            $path = self::getPath($pathKey);
+            if (File::createDir($path)) {
+                $paths[] = $pathKey;
+            }
+            if ($pathKey == "source" || $pathKey == "thumbs") {
+                foreach (self::$data["directories"] as $pathDir) {
+                    $path = self::getPath($pathKey, $pathDir);
+                    if (File::createDir($path)) {
+                        $paths[] = "$pathKey/$pathDir";
+                    }
+                }
+            }
+        }
+
+        if (!empty($paths)) {
+            print("<br>Added <i>" . count($paths) . " paths</i><br>");
+            print(implode($paths, ", ") . "<br>");
+        } else {
+            print("<br>No <i>paths</i> added<br>");
+        }
     }
 }

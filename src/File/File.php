@@ -237,13 +237,14 @@ class File {
     /**
      * Creates a directory at the given path if it doesn't exists
      * @param string $path
-     * @return string
+     * @return boolean
      */
     public static function createDir(string $path): string {
         if (!self::exists($path)) {
             mkdir($path, 0777, true);
+            return true;
         }
-        return $path;
+        return false;
     }
 
     /**

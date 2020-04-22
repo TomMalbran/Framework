@@ -7,6 +7,7 @@ use Framework\Auth\Auth;
 use Framework\Config\Settings;
 use Framework\Email\Email;
 use Framework\File\File;
+use Framework\File\Path;
 use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
@@ -205,5 +206,6 @@ class Framework {
         Factory::migrate($db, $canDelete);
         Settings::migrate($db);
         Email::migrate($db, $recreate);
+        Path::ensurePaths();
     }
 }
