@@ -25,7 +25,7 @@ class Database {
     
     /**
      * Creates a new Database instance
-     * @param object  $config  Object[
+     * @param mixed   $config  Object[
      *    host      Usually localhost
      *    username  Database username
      *    password  Database password
