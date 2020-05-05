@@ -111,8 +111,9 @@ class Utils {
      * @return boolean
      */
     public static function isValidDNI(string $value): bool {
-        $dni = self::dniToNumber($value);
-        if (Strings::length($dni) != 8) {
+        $dni    = self::dniToNumber($value);
+        $length = Strings::length($dni);
+        if ($length < 6 || $length > 9) {
             return false;
         }
         return is_numeric((int)$dni);
