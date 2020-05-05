@@ -135,7 +135,7 @@ class Query {
 
     
     /**
-     * Starts a Parenthesis
+     * Adds a Open Parenthesis
      * @return Query
      */
     public function startParen(): Query {
@@ -146,7 +146,7 @@ class Query {
     }
 
     /**
-     * Starts a Parenthesis
+     * Adds a Close Parenthesis
      * @return Query
      */
     public function endParen(): Query {
@@ -155,7 +155,17 @@ class Query {
     }
 
     /**
-     * Starts an Or expression
+     * Adds an And
+     * @return Query
+     */
+    public function and(): Query {
+        $this->where    .= " AND ";
+        $this->addPrefix = false;
+        return $this;
+    }
+
+    /**
+     * Adds an Or
      * @return Query
      */
     public function or(): Query {
@@ -192,21 +202,41 @@ class Query {
      * @param mixed           $value
      * @param string          $expression      Optional.
      * @param boolean         $caseInsensitive Optional.
+     * @param boolean         $splitValue      Optional.
      * @return Query
      */
-    public function search($column, $value, string $expression = "LIKE", bool $caseInsensitive = true): Query {
-        if (!empty($value)) {
-            $value   = $caseInsensitive ? Strings::toLowerCase($value) : $value;
-            $columns = Arrays::toArray($column);
-            if (Arrays::length($columns) > 1) {
-                $this->startOr();
-                foreach ($columns as $col) {
-                    $this->add($col, "LIKE", $value);
-                }
-                $this->endOr();
-            } else {
-                $this->add($columns[0], "LIKE", $value);
+    public function search($column, $value, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
+        if (empty($value)) {
+            return $this;
+        }
+        $valueParts = $splitValue ? Strings::split($value, " ") : [ $value ];
+        $valueParts = Arrays::removeEmpty($valueParts);
+        $columns    = Arrays::toArray($column);
+        $multiparts = Arrays::length($valueParts) > 1;
+        $multicols  = Arrays::length($columns) > 1;
+        $isFirst    = true;
+
+        if ($multiparts) {
+            $this->startParen();
+        }
+        foreach ($valueParts as $valuePart) {
+            $valueSearch = $caseInsensitive ? Strings::toLowerCase($valuePart) : $valuePart;
+            if ($multiparts && !$isFirst) {
+                $this->and();
             }
+            if ($multicols) {
+                $this->startOr();
+            }
+            foreach ($columns as $columnSearch) {
+                $this->add($columnSearch, "LIKE", $valueSearch);
+            }
+            if ($multicols) {
+                $this->endOr();
+            }
+            $isFirst = false;
+        }
+        if ($multiparts) {
+            $this->endParen();
         }
         return $this;
     }
@@ -446,12 +476,13 @@ class Query {
      * @param mixed           $value           Optional.
      * @param string          $expression      Optional.
      * @param boolean         $caseInsensitive Optional.
+     * @param boolean         $splitValue      Optional.
      * @return Query
      */
-    public static function createSearch($column = null, $value = null, string $expression = "LIKE", bool $caseInsensitive = true): Query {
+    public static function createSearch($column = null, $value = null, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {
-            $query->search($column, $value, $expression, $caseInsensitive);
+            $query->search($column, $value, $expression, $caseInsensitive, $splitValue);
         }
         return $query;
     }

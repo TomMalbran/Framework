@@ -249,10 +249,11 @@ class Credential {
      * @param integer           $amount       Optional.
      * @param integer[]|integer $level        Optional.
      * @param integer[]|integer $credentialID Optional.
+     * @param boolean           $splitText    Optional.
      * @return array
      */
-    public static function search(string $text, int $amount = 10, $level = null, $credentialID = null): array {
-        $query = Query::createSearch([ "firstName", "lastName", "nickName", "email", "phone" ], $text);
+    public static function search(string $text, int $amount = 10, $level = null, $credentialID = null, bool $splitText = false): array {
+        $query = Query::createSearch([ "firstName", "lastName", "nickName", "email" ], $text, "LIKE", true, $splitText);
         $query->addIf("level",         "IN", Arrays::toArray($level),        $level !== null);
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
@@ -440,7 +441,7 @@ class Credential {
     }
     
     /**
-     * Sets the Credential password
+     * Sets the Credential Password
      * @param integer $credentialID
      * @param string  $password
      * @return string
@@ -467,7 +468,7 @@ class Credential {
     }
 
     /**
-     * Sets the Credential avatar
+     * Sets the Credential Avatar
      * @param integer $credentialID
      * @param string  $avatar
      * @return boolean
@@ -475,6 +476,18 @@ class Credential {
     public static function setAvatar(int $credentialID, string $avatar): bool {
         return self::getSchema()->edit($credentialID, [
             "avatar" => $avatar,
+        ]);
+    }
+
+    /**
+     * Sets the Credential Level
+     * @param integer $credentialID
+     * @param integer $level
+     * @return boolean
+     */
+    public static function setLevel(int $credentialID, int $level): bool {
+        return self::getSchema()->edit($credentialID, [
+            "level" => $level,
         ]);
     }
 
