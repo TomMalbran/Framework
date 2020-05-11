@@ -260,11 +260,6 @@ class Field {
             break;
         case self::Text:
             $result[$key]            = $text;
-            $result["{$key}Lines"]   = Strings::split($text, "\n");
-            $result["{$key}Html"]    = Strings::toHtml($text);
-            $result["{$key}Short"]   = Strings::makeShort($text);
-            $result["{$key}Medium"]  = Strings::makeShort($text, 150);
-            $result["{$key}IsShort"] = Strings::isShort($text);
             break;
         case self::Encrypt:
             $result[$key]            = !empty($data["{$key}Decrypt"]) ? $data["{$key}Decrypt"] : "";
