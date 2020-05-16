@@ -22,7 +22,7 @@ class Email {
     
     
     /**
-     * Loads the Email Schema
+     * Loads the Email Templates Schema
      * @return Schema
      */
     public static function getSchema(): Schema {
@@ -86,13 +86,13 @@ class Email {
 
 
     /**
-     * Rnders the Template Data with Mustache
+     * Renders the Template Data with Mustache
      * @param string $template
      * @param array  $data
      * @return string
      */
     public static function render(string $template, array $data): string {
-        return Mustache::render($template, $data);
+        return Mustache::render(Strings::toHtml($template), $data);
     }
 
     /**
@@ -132,6 +132,7 @@ class Email {
                     "description"  => $data["description"],
                     "sendAs"       => $sendAs,
                     "sendName"     => $siteName,
+                    "sendTo"       => "",
                     "subject"      => Strings::replace($data["subject"], "[site]", $siteName),
                     "message"      => Strings::replace($data["message"], "[site]", $siteName),
                 ];

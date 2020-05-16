@@ -62,9 +62,10 @@
         "fields" : {
             "templateCode" : { "type" : "string", "isPrimary" : true, "cantEdit" : true },
             "description"  : { "type" : "string",                     "cantEdit" : true },
-            "subject"      : { "type" : "string"                                        },
+            "sendTo"       : { "type" : "csv"                                           },
             "sendAs"       : { "type" : "string"                                        },
             "sendName"     : { "type" : "string"                                        },
+            "subject"      : { "type" : "string"                                        },
             "message"      : { "type" : "text"                                          }
         },
         "hasTimestamps" : true,
