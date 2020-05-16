@@ -1,8 +1,10 @@
 <?php
 namespace Framework\Email;
 
+use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
+use Framework\Provider\Mustache;
 use Framework\Utils\JSON;
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -14,11 +16,12 @@ use League\OAuth2\Client\Provider\Google;
  */
 class Mailer {
     
-    private static $loaded = false;
-    private static $url    = "";
-    private static $name   = "";
-    private static $smtp   = null;
-    private static $google = null;
+    private static $loaded   = false;
+    private static $template = null;
+    private static $url      = "";
+    private static $name     = "";
+    private static $smtp     = null;
+    private static $google   = null;
     
     
     /**
@@ -27,11 +30,12 @@ class Mailer {
      */
     public static function load(): void {
         if (!self::$loaded) {
-            self::$loaded = true;
-            self::$url    = Config::get("url");
-            self::$name   = Config::get("name");
-            self::$smtp   = Config::get("smtp");
-            self::$google = Config::get("google");
+            self::$loaded   = true;
+            self::$template = Framework::loadFile(Frameword::DataDir, "email.html");
+            self::$url      = Config::get("url");
+            self::$name     = Config::get("name");
+            self::$smtp     = Config::get("smtp");
+            self::$google   = Config::get("google");
         }
     }
     
@@ -54,26 +58,12 @@ class Mailer {
         string $message
     ): bool {
         self::load();
-
-        $name  = self::$name;
-        $url   = self::$url;
-        $img   = !empty(self::$smtp->header) ? self::$url . self::$smtp->header : "";
-
-        $body  = "<table cellpadding='0' cellspacing='0' border='0' height='100%' width='100%' bgcolor='#f4f4f4' style='background-color:#f4f4f4;background-image:none;background-repeat:repeat;border-spacing:0'>";
-        $body .= "<tbody><tr><td style='border-collapse:collapse'>";
-        $body .= "<table border='0' width='100%' cellpadding='0' cellspacing='0' align='center' style='max-width:600px;margin-top:auto;margin-bottom:auto;margin-right:auto;margin-left:auto;border-spacing:0'>";
-        $body .= "<tbody><tr>";
-        $body .= "<td valign='middle' style='padding-top:30px;padding-bottom:20px;padding-right:20px;padding-left:20px;text-align:left;border-collapse:collapse'>";
-        $body .= "<a href='$url' target='_blank'><img src='$img' alt='$name' border='0' style='height:50px;display:block;max-width:100%'></a>";
-        $body .= "</td></tr><tr>";
-        $body .= "<td style='background-color:#ffffff;background-image:none;background-repeat:repeat;border-spacing:0;padding-top:20px;padding-bottom:20px;padding-right:40px;padding-left:40px;font-family:sans-serif;font-size:15px;line-height:27px;border-collapse:collapse'>";
-        $body .= $message;
-        $body .= "</td></tr>";
-        $body .= "<tr><td style='padding-top:0px;padding-bottom:20px;padding-right:20px;padding-left:20px;text-align:left;border-collapse:collapse'></td></tr>";
-        $body .= "</tbody></table>";
-        $body .= "</td></tr></tbody>";
-        $body .= "</table>";
-        
+        $body = Mustache::render(self::$template, [
+            "url"     => self::$url,
+            "name"    => self::$name,
+            "image"   => !empty(self::$smtp->header) ? self::$url . self::$smtp->header : "",
+            "message" => $message,
+        ]);
         return self::send($to, $from, $fromName, $subject, $body, true);
     }
     
@@ -201,7 +191,7 @@ class Mailer {
      * @param Request $request
      * @return boolean
      */
-    public static function isCpatchaValid(Request $request) {
+    public static function isCaptchaValid(Request $request) {
         $secretKey = urlencode(Config::get("recaptchaKey"));
         $captcha   = urlencode($request->get("g-recaptcha-response"));
         $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";
