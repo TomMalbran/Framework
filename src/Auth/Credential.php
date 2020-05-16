@@ -153,6 +153,24 @@ class Credential {
     }
 
     /**
+     * Returns all the Credentials for the given Level(s) and filter
+     * @param integer[]|integer $level
+     * @param string            $filter
+     * @param mixed             $value
+     * @param Request           $sort   Optional.
+     * @return array
+     */
+    public function getAllWithFilter($level, string $filter, $value, Request $sort = null): array {
+        $levels = Arrays::toArray($level);
+        if (empty($levels)) {
+            return [];
+        }
+        $query = Query::create("level", "IN", $levels);
+        $query->add($filter, "=", $value);
+        return self::request($query, false, $sort);
+    }
+
+    /**
      * Returns the total amount of Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @return integer
