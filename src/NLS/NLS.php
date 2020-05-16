@@ -21,7 +21,7 @@ class NLS {
     public static function load(string $lang): array {
         if (empty(self::$loaded[$lang])) {
             self::$loaded[$lang] = true;
-            self::$data[$lang]   = Framework::loadFile(Framework::NLSDir, $lang);
+            self::$data[$lang]   = Framework::loadJSON(Framework::NLSDir, $lang);
         }
         return self::$data[$lang];
     }

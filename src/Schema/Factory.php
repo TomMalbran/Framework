@@ -29,7 +29,7 @@ class Factory {
         if (!self::$loaded) {
             $config  = Config::get("db");
             $schemas = Framework::loadData(Framework::SchemaData);
-            $frame   = Framework::loadFile("data", Framework::SchemaData, true);
+            $frame   = Framework::loadJSON("data", Framework::SchemaData, true);
 
             self::$loaded = true;
             self::$db     = new Database($config);

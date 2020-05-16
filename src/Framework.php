@@ -73,14 +73,14 @@ class Framework {
 
     /**
      * Returns the BasePath with the given dir
-     * @param string  $dir      Optional.
-     * @param string  $file     Optional.
-     * @param boolean $forFrame Optional.
+     * @param string  $dir          Optional.
+     * @param string  $file         Optional.
+     * @param boolean $forFramework Optional.
      * @return string
      */
-    public static function getPath(string $dir = "", string $file = "", bool $forFrame = false): string {
+    public static function getPath(string $dir = "", string $file = "", bool $forFrameworkwork = false): string {
         $path = "";
-        if ($forFrame) {
+        if ($forFramework) {
             $path = File::getPath(self::$framePath, $dir, $file);
         } else {
             $path = File::getPath(self::$basePath, self::$baseDir, $dir, $file);
@@ -99,14 +99,32 @@ class Framework {
     }
 
     /**
+     * Loads a File from the App or defaults to the Framework
+     * @param string $dir
+     * @param string $file
+     * @return string
+     */
+    public function loadFile(string $dir, string $file) {
+        $path = self::getPath($dir, $file, false);
+        $file = "";
+        if (File::exists($path)) {
+            $file = file_get_contents($path);
+        } else {
+            $path = self::getPath($dir, $file, true);
+            $file = file_get_contents($path);
+        }
+        return $file;
+    }
+
+    /**
      * Loads a JSON File
      * @param string  $dir
      * @param string  $file
-     * @param boolean $forFrame Optional.
+     * @param boolean $forFramework Optional.
      * @return array
      */
-    public static function loadFile(string $dir, string $file, bool $forFrame = false): array {
-        $path = self::getPath($dir, "$file.json", $forFrame);
+    public static function loadJSON(string $dir, string $file, bool $forFramework = false): array {
+        $path = self::getPath($dir, "$file.json", $forFramework);
         return JSON::readFile($path, true);
     }
 
@@ -116,7 +134,7 @@ class Framework {
      * @return array
      */
     public static function loadData(string $file): array {
-        return self::loadFile(self::DataDir, $file);
+        return self::loadJSON(self::DataDir, $file);
     }
 
     /**
