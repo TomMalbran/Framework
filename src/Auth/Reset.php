@@ -45,7 +45,7 @@ class Reset {
      * @return boolean
      */
     public static function codeExists(string $code): bool {
-        $query = Query::create("level", "=", $level);
+        $query = Query::create("code", "=", $code);
         return self::getSchema()->exists($query);
     }
     

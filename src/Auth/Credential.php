@@ -462,9 +462,9 @@ class Credential {
      * Sets the Credential Password
      * @param integer $credentialID
      * @param string  $password
-     * @return string
+     * @return array
      */
-    public static function setPassword(int $credentialID, string $password): string {
+    public static function setPassword(int $credentialID, string $password): array {
         $hash = self::createHash($password);
         self::getSchema()->edit($credentialID, [
             "password" => $hash["password"],
