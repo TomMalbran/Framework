@@ -68,6 +68,7 @@
             "subject"      : { "type" : "string"                                        },
             "message"      : { "type" : "text"                                          }
         },
+        "hasPositions"  : true,
         "hasTimestamps" : true,
         "canCreate"     : false,
         "canEdit"       : true,

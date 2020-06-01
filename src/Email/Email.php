@@ -113,6 +113,7 @@ class Email {
         $adds     = [];
         $deletes  = [];
         $codes    = [];
+        $position = $recreate ? 1 : count($request);
 
         // Adds Emails
         foreach ($emails as $templateCode => $data) {
@@ -126,6 +127,7 @@ class Email {
                 }
             }
             if (!$found) {
+                $message = Strings::join($data["message"], "\n\n");
                 $codes[] = $templateCode;
                 $adds[]  = [
                     "templateCode" => $templateCode,
@@ -134,8 +136,10 @@ class Email {
                     "sendName"     => $siteName,
                     "sendTo"       => "",
                     "subject"      => Strings::replace($data["subject"], "[site]", $siteName),
-                    "message"      => Strings::replace($data["message"], "[site]", $siteName),
+                    "message"      => Strings::replace($message, "[site]", $siteName),
+                    "position"     => $position,
                 ];
+                $position += 1;
             }
         }
 
