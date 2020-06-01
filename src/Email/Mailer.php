@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
 use Framework\Provider\Mustache;
+use Framework\File\Path;
 use Framework\Utils\JSON;
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -31,7 +32,7 @@ class Mailer {
     public static function load(): void {
         if (!self::$loaded) {
             self::$loaded   = true;
-            self::$template = Framework::loadFile(Frameword::DataDir, "email.html");
+            self::$template = Framework::loadFile(Framework::DataDir, "email.html");
             self::$url      = Config::get("url");
             self::$name     = Config::get("name");
             self::$smtp     = Config::get("smtp");
@@ -58,9 +59,11 @@ class Mailer {
         string $message
     ): bool {
         self::load();
+
         $body = Mustache::render(self::$template, [
             "url"     => self::$url,
             "name"    => self::$name,
+            "files"   => Path::getUrl("email"),
             "image"   => !empty(self::$smtp->header) ? self::$url . self::$smtp->header : "",
             "message" => $message,
         ]);
@@ -159,6 +162,8 @@ class Mailer {
      * @return string
      */
     public static function getAuthUrl(string $redirectUri): string {
+        self::load();
+
         $options  = [ "scope" => [ "https://mail.google.com/" ]];
         $provider = new Google([
             "clientId"     => self::$google->client,
@@ -171,13 +176,17 @@ class Mailer {
 
     /**
      * Returns the Google Refresh Token
+     * @param string $redirectUri
      * @param string $code
      * @return string
      */
-    public static function getAuthToken(string $code): string {
+    public static function getAuthToken(string $redirectUri, string $code): string {
+        self::load();
+
         $provider = new Google([
             "clientId"     => self::$google->client,
             "clientSecret" => self::$google->secret,
+            "redirectUri"  => self::$url . $redirectUri,
             "accessType"   => "offline",
         ]);
         $token = $provider->getAccessToken("authorization_code", [ "code" => $code ]);

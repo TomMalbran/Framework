@@ -20,7 +20,7 @@ class Mustache {
     
     
     /**
-     * Creates the Mustache Providers
+     * Creates the Mustache Provider
      * @return void
      */
     public static function load(): void {

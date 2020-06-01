@@ -78,7 +78,7 @@ class Framework {
      * @param boolean $forFramework Optional.
      * @return string
      */
-    public static function getPath(string $dir = "", string $file = "", bool $forFrameworkwork = false): string {
+    public static function getPath(string $dir = "", string $file = "", bool $forFramework = false): string {
         $path = "";
         if ($forFramework) {
             $path = File::getPath(self::$framePath, $dir, $file);
@@ -104,7 +104,7 @@ class Framework {
      * @param string $file
      * @return string
      */
-    public function loadFile(string $dir, string $file) {
+    public static function loadFile(string $dir, string $file) {
         $path = self::getPath($dir, $file, false);
         $file = "";
         if (File::exists($path)) {
