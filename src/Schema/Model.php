@@ -189,6 +189,19 @@ class Model implements ArrayAccess {
     public function toObject(): array {
         return $this->data;
     }
+
+    /**
+     * Returns all the Data
+     * @param string ...$fields
+     * @return array
+     */
+    public function toFields(string ...$fields): array {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[$field] = $this->data[$field];
+        }
+        return $result;
+    }
     
     /**
      * Returns the Data as an Array

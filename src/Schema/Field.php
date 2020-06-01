@@ -219,8 +219,8 @@ class Field {
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;
-        $text   = isset($data[$key]) ? $data[$key]      : "";
-        $number = isset($data[$key]) ? (int)$data[$key] : 0;
+        $text   = isset($data[$key]) ? (string)$data[$key] : "";
+        $number = isset($data[$key]) ? (int)$data[$key]    : 0;
         $result = [];
 
         switch ($this->type) {
