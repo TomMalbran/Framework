@@ -89,20 +89,24 @@ class Utils {
         }
 
         // The last number is the verifier
-        $verify = Strings::substring($cuit, 10, 1);
+        $verify = (int)$cuit[10];
         $mult   = [ 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 ];
         $total  = 0;
         
         // Multiply each number by the multiplier (except the last one)
 		for ($i = 0; $i < count($mult); $i++) {
-            $total += ((int)Strings::substring($cuit, $i, 1)) * $mult[$i];
+            $total += (int)$cuit[$i] * $mult[$i];
 		}
         
         // Calculate the left over and value
-		$mod   = $total % 11;
-        $digit = (string)($mod == 0 ? 0 : $mod == 1 ? 9 : 11 - $mod);
- 
-        return $verify == $digit;
+        $mod = $total % 11;
+        if ($mod == 0) {
+            return $verify == 0;
+        }
+        if ($mod == 1) {
+            return $verify == 9;
+        }
+        return $verify == 11 - $mod;
     }
 
     /**
