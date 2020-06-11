@@ -17,7 +17,8 @@
         "firebase/php-jwt": "Used in Auth",
         "phpmailer/phpmailer": "Used for Mailing",
         "league/oauth2-google": "Used for Mailing with Gmail",
-        "mustache/mustache": "Used for Rendering templates in public",
+        "drewm/mailchimp-api": "Used for Mailing with MailChimp",
+        "mustache/mustache": "Used for Rendering templates",
         "phpoffice/phpspreadsheet": "Used to Import/Export data"
     },
     "autoload": {
