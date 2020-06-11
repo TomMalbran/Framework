@@ -102,6 +102,7 @@ class Queue {
             "sendName"     => $template->sendName ?: "",
             "subject"      => $subject,
             "message"      => $message,
+            "sentSuccess"  => 0,
             "sentTime"     => 0,
         ]);
     }
@@ -109,11 +110,13 @@ class Queue {
     /**
      * Marks the given Email as sent
      * @param integer $emailID
+     * @param bool    $success
      * @return boolean
      */
-    public static function markAsSent(int $emailID): bool {
+    public static function markAsSent(int $emailID, bool $success): bool {
         return self::getSchema()->edit($emailID, [
-            "sentTime" => time(),
+            "sentSuccess" => $success ? 1 : 0,
+            "sentTime"    => time(),
         ]);
     }
 }

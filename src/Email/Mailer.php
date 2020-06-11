@@ -154,6 +154,23 @@ class Mailer {
         return $result;
     }
 
+    /**
+     * Sends the Unsent emails from the Queue
+     * @return void
+     */
+    public static function sendQueue() {
+        $emails = Queue::getAllUnsent();
+        foreach ($emails as $email) {
+            $success = false;
+            foreach ($email["sendToParts"] as $sendTo) {
+                if (!empty($sendTo)) {
+                    $success = self::sendHTML($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
+                }
+            }
+            Queue::markAsSent($email["emailID"], $success);
+        }
+    }
+
 
 
     /**

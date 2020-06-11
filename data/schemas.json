@@ -84,6 +84,7 @@
             "sendName"     : { "type" : "string"                    },
             "subject"      : { "type" : "string"                    },
             "message"      : { "type" : "text"                      },
+            "sentSuccess"  : { "type" : "boolean"                   },
             "sentTime"     : { "type" : "date"                      }
         },
         "hasTimestamps" : true,
