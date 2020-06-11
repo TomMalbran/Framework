@@ -4,8 +4,10 @@ namespace Framework\Email;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
+use Framework\Email\Queue;
 use Framework\Provider\Mustache;
 use Framework\File\Path;
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -23,6 +25,7 @@ class Mailer {
     private static $name     = "";
     private static $smtp     = null;
     private static $google   = null;
+    private static $emails   = [];
     
     
     /**
@@ -37,6 +40,7 @@ class Mailer {
             self::$name     = Config::get("name");
             self::$smtp     = Config::get("smtp");
             self::$google   = Config::get("google");
+            self::$emails   = Config::getArray("smtpActiveEmails");
         }
     }
     
@@ -95,6 +99,10 @@ class Mailer {
         if (self::$smtp->sendDisabled) {
             return false;
         }
+        if (!empty(self::$emails) && !Arrays::contains(self::$emails, $to)) {
+            return false;
+        }
+
         $mail = new PHPMailer();
         
         $mail->isSMTP();

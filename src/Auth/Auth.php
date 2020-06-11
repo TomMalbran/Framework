@@ -257,12 +257,9 @@ class Auth {
         ];
 
         // Add fields from the Config
-        $fieldConf = Config::get("jwtFields");
-        if (!empty($fieldConf)) {
-            $fields = Strings::split($fieldConf, ",");
-            foreach ($fields as $field) {
-                $data[$field] = self::$credential->get($field);
-            }
+        $fields = Config::getArray("jwtFields");
+        foreach ($fields as $field) {
+            $data[$field] = self::$credential->get($field);
         }
 
         return JWT::create(time(), $data);
@@ -300,6 +297,14 @@ class Auth {
      */
     public static function getUserID(): int {
         return self::$userID;
+    }
+
+    /**
+     * Returns the Access Level
+     * @return integer
+     */
+    public static function getAccessLevel(): int {
+        return self::$accessLevel;
     }
 
 

@@ -93,6 +93,19 @@ class Config {
     }
 
     /**
+     * Returns a Config Property or null
+     * @param string $property
+     * @return array
+     */
+    public static function getArray(string $property) {
+        $value = Config::get($property);
+        if (!empty($value)) {
+            return Strings::split($value, ",");
+        }
+        return [];
+    }
+
+    /**
      * Returns the Url adding the url parts at the end
      * @param string ...$pathParts
      * @return string
