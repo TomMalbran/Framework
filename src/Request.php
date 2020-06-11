@@ -310,11 +310,13 @@ class Request implements ArrayAccess {
     
     /**
      * Returns true if the given password is valid
-     * @param string $key
+     * @param string  $key
+     * @param string  $checkSets Optional.
+     * @param integer $minLength Optional.
      * @return boolean
      */
-    public function isValidPassword(string $key): bool {
-        return Utils::isValidPassword($this->get($key));
+    public function isValidPassword(string $key, string $checkSets = "lud", int $minLength = 4): bool {
+        return Utils::isValidPassword($this->get($key), $checkSets, $minLength);
     }
     
     /**
