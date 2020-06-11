@@ -15,8 +15,9 @@ class Image {
     
     // The Image Types and Functions
     private static $imageTypes = [ 1, 2, 3, 15, 16 ];
-    private static $imageTrans = [ 1, 3 ];
-    private static $imageFuncs = [
+    private static $transTypes = [ 1, 3 ];
+    private static $exifTypes  = [ 2 ];
+    private static $functions  = [
         1  => [ "imagecreatefromgif",  "imagegif"  ],
         2  => [ "imagecreatefromjpeg", "imagejpeg" ],
         3  => [ "imagecreatefrompng",  "imagepng"  ],
@@ -60,7 +61,70 @@ class Image {
         return [ 0, 0, 0 ];
     }
 
+    /**
+     * Returns the Orientation for the given Image
+     * @param string $file
+     * @return integer
+     */
+    public static function getOrientation(string $file): int {
+        if (!file_exists($file)) {
+            return 0;
+        }
+        $exif = @exif_read_data($file);
+        if ($exif !== false && !empty($exif["Orientation"])) {
+            return $exif["Orientation"];
+        }
+        return 0;
+    }
+    
 
+
+    /**
+     * Resamples the given image
+     * @param string  $src
+     * @param string  $dst
+     * @param integer $orientation Optional.
+     * @return boolean
+     */
+    public static function resample(string $src, string $dst, int $orientation = null): bool {
+        if ($orientation == null) {
+            $orientation = self::getOrientation($src);
+        }
+        if (empty($orientation)) {
+            return false;
+        }
+
+        [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
+        if (!self::hasType($imgType)) {
+            return false;
+        }
+        
+        // Resample
+        $srcImage = self::$functions[$imgType][0]($src);
+        $dstImage = self::createDstImage($imgType, $imgWidth, $imgHeight);
+        imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $imgWidth, $imgHeight, $imgWidth, $imgHeight);
+        
+        // Fix Orientation
+        switch ($orientation) {
+        case 3:
+            $dstImage = imagerotate($dstImage, 180, 0);
+            break;
+        case 6:
+            $dstImage = imagerotate($dstImage, -90, 0);
+            break;
+        case 8:
+            $dstImage = imagerotate($dstImage, 90, 0);
+            break;
+        }
+        
+        // Create the Image
+        self::createImage($imgType, $dstImage, $dst);
+        
+        // Free Resources
+        imagedestroy($srcImage);
+        imagedestroy($dstImage);
+        return true;
+    }
     
     /**
      * Resizes an Image
@@ -140,8 +204,8 @@ class Image {
         }
         
         // Creation Process
-        $srcResize = self::$imageFuncs[$imgType][0]($src);
-        $dstResize = self::createDestImage($imgType, $width, $height);
+        $srcResize = self::$functions[$imgType][0]($src);
+        $dstResize = self::createDstImage($imgType, $width, $height);
         imagecopyresampled($dstResize, $srcResize, 0, 0, $xCorner, $yCorner, $width, $height, $oldWidth, $oldHeight);
         
         // Create Image
@@ -181,8 +245,8 @@ class Image {
         }
         
         // Resize Image
-        $srcResize = self::$imageFuncs[$imgType][0]($src);
-        $dstResize = self::createDestImage($imgType, $resWidth, $resHeight);
+        $srcResize = self::$functions[$imgType][0]($src);
+        $dstResize = self::createDstImage($imgType, $resWidth, $resHeight);
         imagecopyresampled($dstResize, $srcResize, 0, 0, 0, 0, $resWidth, $resHeight, $imgWidth, $imgHeight);
         
         // Crop Image
@@ -202,15 +266,15 @@ class Image {
     }
 
     /**
-     * Creates the Destiny Image based on the Type
+     * Creates the Destination Image based on the Type
      * @param integer $imgType
      * @param integer $width
      * @param integer $height
      * @return mixed
      */
-    private static function createDestImage(int $imgType, int $width, int $height) {
+    private static function createDstImage(int $imgType, int $width, int $height) {
         $result = imagecreatetruecolor($width, $height);
-        if (Arrays::contains(self::$imageTrans, $imgType)) {
+        if (Arrays::contains(self::$transTypes, $imgType)) {
             imagealphablending($result, false);
             imagesavealpha($result,true);
             $transparent = imagecolorallocatealpha($result, 255, 255, 255, 127);
@@ -228,9 +292,9 @@ class Image {
      */
     private static function createImage(int $imgType, $src, $dst) {
         if ($imgType == 2) {
-            self::$imageFuncs[$imgType][1]($src, $dst, 90);
+            self::$functions[$imgType][1]($src, $dst, 90);
         } else {
-            self::$imageFuncs[$imgType][1]($src, $dst);
+            self::$functions[$imgType][1]($src, $dst);
         }
     }
 }
