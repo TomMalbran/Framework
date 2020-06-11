@@ -200,7 +200,8 @@ class Credential {
             $fields["credentialName"] = self::createName($row);
 
             if (!empty($row["avatar"]) && Path::exists("avatars", $row["avatar"])) {
-                $fields["avatar"] = Path::getUrl("avatars", $row["avatar"]);
+                $fields["avatarFile"] = $row["avatar"];
+                $fields["avatar"]     = Path::getUrl("avatars", $row["avatar"]);
             }
             if (!$complete) {
                 unset($fields["password"]);

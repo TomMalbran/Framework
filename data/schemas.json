@@ -15,7 +15,7 @@
             "address"       : { "type" : "string"                           },
             "birthDate"     : { "type" : "string"                           },
             "language"      : { "type" : "string",  "length" : 2            },
-            "avatar"        : { "type" : "string"                           },
+            "avatar"        : { "type" : "string",  "cantEdit" : true       },
             "level"         : { "type" : "number",  "cantEdit" : true       },
             "password"      : { "type" : "string",  "cantEdit" : true       },
             "salt"          : { "type" : "string",  "cantEdit" : true       },
