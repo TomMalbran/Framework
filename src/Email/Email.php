@@ -153,7 +153,7 @@ class Email {
                 }
             }
             if (!$found) {
-                $deletes[] = $templateCode;
+                $deletes[] = $row["templateCode"];
             }
         }
 
