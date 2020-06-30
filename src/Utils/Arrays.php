@@ -65,6 +65,15 @@ class Arrays {
     public static function toArray($array): array {
         return is_array($array) ? $array : [ $array ];
     }
+
+    /**
+     * Converts an empty array into an object or returns the array
+     * @param array $array Optional.
+     * @return mixed
+     */
+    public static function toObject(array $array = null) {
+        return !empty($array) ? $array : new \stdClass();
+    }
     
     /**
      * Returns a random value from the array
