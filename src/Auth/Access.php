@@ -147,6 +147,15 @@ class Access {
             return $level == $accessLevel;
         }
 
+        // Function "xxxs": Get the group xxx
+        if (Strings::endsWith($function, "s")) {
+            $groupName = Strings::stripEnd($function, "s");
+            $group     = self::getGroup($groupName);
+            if (!empty($group)) {
+                return $group;
+            }
+        }
+
         // Function "xxx": Return the access level with the name xxx
         return self::getOne($function);
     }
