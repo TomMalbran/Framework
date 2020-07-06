@@ -30,9 +30,9 @@ class NLS {
      * Returns a string from the data
      * @param string $key
      * @param string $lang Optional.
-     * @return string
+     * @return mixed
      */
-    public static function get(string $key, string $lang = "root"): string {
+    public static function get(string $key, string $lang = "root") {
         $nls  = Language::getNLS($lang);
         $data = self::load($nls);
 
