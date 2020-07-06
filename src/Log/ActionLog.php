@@ -65,10 +65,10 @@ class ActionLog {
     /**
      * Returns the Filter Query
      * @param Request $filters
-     * @param array   $mappings
+     * @param array   $mappings Optional.
      * @return Query
      */
-    private static function getFilterQuery(Request $filters, array $mappings): Query {
+    private static function getFilterQuery(Request $filters, array $mappings = []): Query {
         $query = new Query();
         $query->addIf("CREDENTIAL_ID", "=", $filters->credentialID);
         foreach ($mappings as $key => $value) {
@@ -85,10 +85,10 @@ class ActionLog {
      * Returns all the Actions Log filtered by the given filters
      * @param Request $filters
      * @param Request $sort
-     * @param array   $mappings
+     * @param array   $mappings Optional.
      * @return array
      */
-    public static function filter(Request $filters, Request $sort, array $mappings): array {
+    public static function filter(Request $filters, Request $sort, array $mappings = []): array {
         $query = self::getFilterQuery($filters, $mappings);
         $query->orderBy("time", false);
         $query->paginate($sort->page, $sort->amount);
@@ -98,10 +98,10 @@ class ActionLog {
     /**
      * Returns the Total Actions Log with the given Filters
      * @param Request $filters
-     * @param array   $mappings
+     * @param array   $mappings Optional.
      * @return integer
      */
-    public static function getTotal(Request $filters, array $mappings): int {
+    public static function getTotal(Request $filters, array $mappings = []): int {
         $query = self::getFilterQuery($filters, $mappings);
         return self::getSessionsSchema()->getTotal($query);
     }
