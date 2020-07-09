@@ -66,9 +66,9 @@
             "sendAs"       : { "type" : "string"                                        },
             "sendName"     : { "type" : "string"                                        },
             "subject"      : { "type" : "string"                                        },
-            "message"      : { "type" : "text"                                          }
+            "message"      : { "type" : "text"                                          },
+            "position"     : { "type" : "number",                     "cantEdit" : true }
         },
-        "hasPositions"  : true,
         "hasTimestamps" : true,
         "canCreate"     : false,
         "canEdit"       : true,

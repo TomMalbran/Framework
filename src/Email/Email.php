@@ -99,9 +99,10 @@ class Email {
      * Migrates the Emails
      * @param Database $db
      * @param boolean  $recreate Optional.
+     * @param boolean  $sandbox  Optional.
      * @return void
      */
-    public static function migrate(Database $db, bool $recreate = false): void {
+    public static function migrate(Database $db, bool $recreate = false, $sandbox = false): void {
         if (!$db->hasTable("email_templates")) {
             return;
         }
@@ -134,8 +135,8 @@ class Email {
                     "description"  => $data["description"],
                     "sendAs"       => $sendAs,
                     "sendName"     => $siteName,
-                    "sendTo"       => "",
-                    "subject"      => Strings::replace($data["subject"], "[site]", $siteName),
+                    "sendTo"       => !empty($data["sendTo"]) ? "\"{$data["sendTo"]}\"" : "",
+                    "subject"      => ($sandbox ? "PRUEBA - " : "") . Strings::replace($data["subject"], "[site]", $siteName),
                     "message"      => Strings::replace($message, "[site]", $siteName),
                     "position"     => $position,
                 ];
@@ -144,20 +145,26 @@ class Email {
         }
 
         // Removes Emails
-        foreach ($request as $row) {
-            $found = false;
-            foreach (array_keys($emails) as $templateCode) {
-                if ($row["templateCode"] == $templateCode) {
-                    $found = true;
-                    break;
+        if (!$recreate) {
+            foreach ($request as $row) {
+                $found = false;
+                foreach (array_keys($emails) as $templateCode) {
+                    if ($row["templateCode"] == $templateCode) {
+                        $found = true;
+                        break;
+                    }
                 }
-            }
-            if (!$found) {
-                $deletes[] = $row["templateCode"];
+                if (!$found) {
+                    $deletes[] = $row["templateCode"];
+                }
             }
         }
 
         // Process the SQL
+        if ($recreate) {
+            print("<br>Removed <i>" . count($request) . " emails</i><br>");
+            $db->truncate("email_templates");
+        }
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " emails</i><br>");
             print(Strings::join($codes, ", ") . "<br>");

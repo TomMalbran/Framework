@@ -218,12 +218,13 @@ class Framework {
      * @param Database $db
      * @param boolean  $canDelete Optional.
      * @param boolean  $recreate  Optional.
+     * @param boolean  $sandbox   Optional.
      * @return void
      */
-    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false): void {
+    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false, bool $sandbox = false): void {
         Factory::migrate($db, $canDelete);
         Settings::migrate($db);
-        Email::migrate($db, $recreate);
+        Email::migrate($db, $recreate, $sandbox);
         Path::ensurePaths();
     }
 }

@@ -306,6 +306,18 @@ class Database {
         
         return $statement->affected_rows > 0;
     }
+
+    /**
+     * Truncates the given table
+     * @param string $table
+     * @return boolean
+     */
+    public function truncate(string $table): bool {
+        $expression = "TRUNCATE TABLE `{dbPrefix}$table`";
+        $statement  = $this->processQuery($expression, []);
+        
+        return ($statement->affected_rows > 0);
+    }
     
     
 
