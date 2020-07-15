@@ -238,7 +238,7 @@ class Auth {
      * @return string
      */
     public static function getToken(): string {
-        if (!self::isLoggedIn()) {
+        if (!self::hasCredential()) {
             return "";
         }
 
@@ -323,6 +323,14 @@ class Auth {
      */
     public static function isLoggedAsUser(): bool {
         return !empty(self::$adminID);
+    }
+
+    /**
+     * Returns true if there is a Credential
+     * @return boolean
+     */
+    public static function hasCredential(): bool {
+        return !empty(self::$credentialID);
     }
 
 
