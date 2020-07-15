@@ -121,6 +121,9 @@ class Path {
         self::load();
         $paths = [];
 
+        if (empty(self::$data["paths"])) {
+            return;
+        }
         foreach (array_keys(self::$data["paths"]) as $pathKey) {
             $path = self::getPath($pathKey);
             if (File::createDir($path)) {
