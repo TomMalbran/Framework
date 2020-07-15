@@ -102,7 +102,7 @@ class Email {
      * @param boolean  $sandbox  Optional.
      * @return void
      */
-    public static function migrate(Database $db, bool $recreate = false, $sandbox = false): void {
+    public static function migrate(Database $db, bool $recreate = false, bool $sandbox = false): void {
         if (!$db->hasTable("email_templates")) {
             return;
         }
