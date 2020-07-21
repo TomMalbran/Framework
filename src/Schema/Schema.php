@@ -330,7 +330,7 @@ class Schema {
      * @return array
      */
     public function getSortedNames(string $order = null, bool $orderAsc = true, $name = null): array {
-        $field = $order ?: ($this->structure->hasPositions ? "position" : $this->structure->name);
+        $field = $this->structure->getOrder($order);
         $query = Query::createOrderBy($field, $orderAsc);
         return $this->getSelect($query, $name);
     }
@@ -344,7 +344,7 @@ class Schema {
      * @return array
      */
     public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, $name = null): array {
-        $field = $order ?: ($this->structure->hasPositions ? "position" : $this->structure->name);
+        $field = $this->structure->getOrder($order);
         $query->orderBy($field, $orderAsc);
         return $this->getSelect($query, $name);
     }

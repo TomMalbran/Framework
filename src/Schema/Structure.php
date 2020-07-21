@@ -151,4 +151,16 @@ class Structure {
         }
         return $key;
     }
+
+    /**
+     * Returns the Order Field
+     * @param string $field Optional.
+     * @return string
+     */
+    public function getOrder(string $field = ""): string {
+        if (!empty($field)) {
+            return $field;
+        }
+        return $this->hasPositions ? "position" : $this->name;
+    }
 }
