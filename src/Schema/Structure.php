@@ -157,7 +157,7 @@ class Structure {
      * @param string $field Optional.
      * @return string
      */
-    public function getOrder(string $field = ""): string {
+    public function getOrder(string $field = null): string {
         if (!empty($field)) {
             return $field;
         }

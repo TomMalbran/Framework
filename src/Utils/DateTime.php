@@ -85,6 +85,39 @@ class DateTime {
     }
 
     /**
+     * Returns the given string as a time
+     * @param string  $dateString
+     * @param string  $hourString
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function toTimeHour(string $dateString, string $hourString, bool $useTimeZone = true): int {
+        $result = strtotime("$dateString $hourString");
+        if ($result !== false) {
+            return self::toServerTime($result, $useTimeZone);
+        }
+        return 0;
+    }
+    
+    /**
+     * Returns the given string as a time
+     * @param string  $string
+     * @param string  $type        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function toDay(string $string, string $type = "start", bool $useTimeZone = true): int {
+        switch ($type) {
+        case "start":
+            return self::toDayStart($string, $useTimeZone);
+        case "end":
+            return self::toDayEnd($string, $useTimeZone);
+        default:
+            return self::toDayMiddle($string, $useTimeZone);
+        }
+    }
+
+    /**
      * Returns the given string as a time of the start of the day
      * @param string  $string
      * @param boolean $useTimeZone Optional.
@@ -99,6 +132,21 @@ class DateTime {
     }
     
     /**
+     * Returns the given string as a time of the start of the day
+     * @param string  $string
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
+        $result = strtotime($string);
+        if ($result !== false) {
+            $result += 12 * 3600;
+            return self::toServerTime($result, $useTimeZone);
+        }
+        return 0;
+    }
+
+    /**
      * Returns the given string as a time of the end of the day
      * @param string  $string
      * @param boolean $useTimeZone Optional.
@@ -107,22 +155,7 @@ class DateTime {
     public static function toDayEnd(string $string, bool $useTimeZone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
-            $result = $result + 24 * 3600 - 1;
-            return self::toServerTime($result, $useTimeZone);
-        }
-        return 0;
-    }
-
-    /**
-     * Returns the given string as a time
-     * @param string  $dateString
-     * @param string  $hourString
-     * @param boolean $useTimeZone Optional.
-     * @return integer
-     */
-    public static function toTimeHour(string $dateString, string $hourString, bool $useTimeZone = true): int {
-        $result = strtotime("$dateString $hourString");
-        if ($result !== false) {
+            $result += 24 * 3600 - 1;
             return self::toServerTime($result, $useTimeZone);
         }
         return 0;

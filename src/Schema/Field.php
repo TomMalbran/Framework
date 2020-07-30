@@ -34,6 +34,7 @@ class Field {
     public $key        = "";
     public $type       = "";
     public $length     = 0;
+    public $dateType   = "";
     public $date       = "";
     public $hour       = "";
     public $default    = null;
@@ -64,11 +65,12 @@ class Field {
     public function __construct(string $key, array $data, string $prefix = "") {
         $this->key        = $key;
 
-        $this->type       = !empty($data["type"])    ? $data["type"]        : Field::String;
-        $this->length     = !empty($data["length"])  ? (int)$data["length"] : 0;
-        $this->date       = !empty($data["date"])    ? $data["date"]        : null;
-        $this->hour       = !empty($data["hour"])    ? $data["hour"]        : null;
-        $this->default    = !empty($data["default"]) ? $data["default"]     : null;
+        $this->type       = !empty($data["type"])     ? $data["type"]        : Field::String;
+        $this->length     = !empty($data["length"])   ? (int)$data["length"] : 0;
+        $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]    : "middle";
+        $this->date       = !empty($data["date"])     ? $data["date"]        : null;
+        $this->hour       = !empty($data["hour"])     ? $data["hour"]        : null;
+        $this->default    = !empty($data["default"])  ? $data["default"]     : null;
 
         $this->isPrimary  = !empty($data["isPrimary"]);
         $this->isKey      = !empty($data["isKey"]);
@@ -182,11 +184,11 @@ class Field {
             break;
         case self::Date:
             if (!empty($this->date)) {
-                $result = $request->toDayEnd($this->date, false);
+                $result = $request->toDay($this->date, $this->dateType, false);
             } elseif ($request->has("{$this->name}Date")) {
-                $result = $request->toDayEnd("{$this->name}Date", false);
+                $result = $request->toDay("{$this->name}Date", $this->dateType, false);
             } else {
-                $result = $request->toDayEnd($this->name, false);
+                $result = $request->toDay($this->name, $this->dateType, false);
             }
             break;
         case self::Hour:

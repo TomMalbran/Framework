@@ -367,8 +367,6 @@ class Schema {
     
     
     
-    
-
     /**
      * Creates a new Schema
      * @param Request|array $fields
