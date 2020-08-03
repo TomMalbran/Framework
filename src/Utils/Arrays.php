@@ -169,14 +169,15 @@ class Arrays {
      * @param array           $array
      * @param string          $key
      * @param string|string[] $value
+     * @param boolean         $useEmpty Optional.
      * @return array
      */
-    public static function createSelect(array $array, string $key, $value): array {
+    public static function createSelect(array $array, string $key, $value, bool $useEmpty = false): array {
         $result = [];
         foreach ($array as $row) {
             $result[] = [
                 "key"   => $row[$key],
-                "value" => self::getValue($row, $value),
+                "value" => self::getValue($row, $value, " - ", "", $useEmpty),
             ];
         }
         return $result;
@@ -214,24 +215,29 @@ class Arrays {
      * Returns one or multiple values as a string
      * @param mixed           $array
      * @param string|string[] $key
-     * @param string          $glue   Optional.
-     * @param string          $prefix Optional.
+     * @param string          $glue     Optional.
+     * @param string          $prefix   Optional.
+     * @param boolean         $useEmpty Optional.
      * @return mixed
      */
-    public static function getValue($array, $key, string $glue = " - ", string $prefix = "") {
+    public static function getValue($array, $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false) {
         $result = "";
         if (is_array($key)) {
             $values = [];
             foreach ($key as $id) {
                 $fullKey = self::getKey($id, $prefix);
-                if (!empty($array[$fullKey])) {
+                if ($useEmpty && isset($array[$fullKey])) {
+                    $values[] = $array[$fullKey];
+                } elseif (!$useEmpty && !empty($array[$fullKey])) {
                     $values[] = $array[$fullKey];
                 }
             }
             $result = implode($glue, $values);
         } else {
             $fullKey = self::getKey($key, $prefix);
-            if (!empty($array[$fullKey])) {
+            if ($useEmpty && isset($array[$fullKey])) {
+                $result = $array[$fullKey];
+            } elseif (!$useEmpty && !empty($array[$fullKey])) {
                 $result = $array[$fullKey];
             }
         }

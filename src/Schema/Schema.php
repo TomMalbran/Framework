@@ -327,12 +327,13 @@ class Schema {
      * @param string          $order    Optional.
      * @param boolean         $orderAsc Optional.
      * @param string|string[] $name     Optional.
+     * @param boolean         $useEmpty Optional.
      * @return array
      */
-    public function getSortedNames(string $order = null, bool $orderAsc = true, $name = null): array {
+    public function getSortedNames(string $order = null, bool $orderAsc = true, $name = null, bool $useEmpty = false): array {
         $field = $this->structure->getOrder($order);
         $query = Query::createOrderBy($field, $orderAsc);
-        return $this->getSelect($query, $name);
+        return $this->getSelect($query, $name, $useEmpty);
     }
     
     /**
@@ -341,28 +342,30 @@ class Schema {
      * @param string          $order    Optional.
      * @param boolean         $orderAsc Optional.
      * @param string|string[] $name     Optional.
+     * @param boolean         $useEmpty Optional.
      * @return array
      */
-    public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, $name = null): array {
+    public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, $name = null, bool $useEmpty = false): array {
         $field = $this->structure->getOrder($order);
         $query->orderBy($field, $orderAsc);
-        return $this->getSelect($query, $name);
+        return $this->getSelect($query, $name, $useEmpty);
     }
     
     /**
      * Returns a select of Schemas
      * @param Query           $query
-     * @param string|string[] $name  Optional.
+     * @param string|string[] $name     Optional.
+     * @param boolean         $useEmpty Optional.
      * @return array
      */
-    public function getSelect(Query $query, $name = null): array {
+    public function getSelect(Query $query, $name = null, bool $useEmpty = false): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields();
         $selection->addJoins();
         $selection->request($query);
         $request   = $selection->resolve();
-        return Arrays::createSelect($request, $this->structure->idName, $name ?: $this->structure->name);
+        return Arrays::createSelect($request, $this->structure->idName, $name ?: $this->structure->name, $useEmpty);
     }
     
     
