@@ -17,12 +17,12 @@ class Image {
     private static $imageTypes = [ 1, 2, 3, 15, 16 ];
     private static $transTypes = [ 1, 3 ];
     private static $exifTypes  = [ 2 ];
-    private static $functions  = [
-        1  => [ "imagecreatefromgif",  "imagegif"  ],
-        2  => [ "imagecreatefromjpeg", "imagejpeg" ],
-        3  => [ "imagecreatefrompng",  "imagepng"  ],
-        15 => [ "imagecreatefromwbmp", "imagewbmp" ],
-        16 => [ "imagecreatefromxbm",  "imagexbm"  ],
+    private static $imageData  = [
+        1  => [ "imagecreatefromgif",  "imagegif",  "image/gif",  "gif" ],
+        2  => [ "imagecreatefromjpeg", "imagejpeg", "image/jpeg", "jpg" ],
+        3  => [ "imagecreatefrompng",  "imagepng",  "image/png",  "png" ],
+        15 => [ "imagecreatefromwbmp", "imagewbmp", "image/wbmp", "bmp" ],
+        16 => [ "imagecreatefromxbm",  "imagexbm",  "image/xbm",  "xbm" ],
     ];
 
 
@@ -37,16 +37,24 @@ class Image {
     }
 
     /**
-     * Returns true if the image type is invalid
+     * Returns true if the Image type is invalid
      * @param string $file
      * @return boolean
      */
     public static function isValidType(string $file): bool {
-        if (!empty($file)) {
-            $type = exif_imagetype($file);
-            return self::hasType($type);
+        return self::hasType(self::getType($type));
+    }
+
+    /**
+     * Returns the Type of the Image
+     * @param string $file
+     * @return integer
+     */
+    public static function getType(string $file): int {
+        if (file_exists($file)) {
+            return exif_imagetype($file);
         }
-        return false;
+        return 0;
     }
 
     /**
@@ -100,7 +108,7 @@ class Image {
         }
         
         // Resample
-        $srcImage = self::$functions[$imgType][0]($src);
+        $srcImage = self::createSrcImage($imgType, $src);
         $dstImage = self::createDstImage($imgType, $imgWidth, $imgHeight);
         imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $imgWidth, $imgHeight, $imgWidth, $imgHeight);
         
@@ -122,7 +130,6 @@ class Image {
         
         // Free Resources
         imagedestroy($srcImage);
-        imagedestroy($dstImage);
         return true;
     }
     
@@ -204,7 +211,7 @@ class Image {
         }
         
         // Creation Process
-        $srcResize = self::$functions[$imgType][0]($src);
+        $srcResize = self::createSrcImage($imgType, $src);
         $dstResize = self::createDstImage($imgType, $width, $height);
         imagecopyresampled($dstResize, $srcResize, 0, 0, $xCorner, $yCorner, $width, $height, $oldWidth, $oldHeight);
         
@@ -213,7 +220,6 @@ class Image {
         
         // Free Resources
         imagedestroy($srcResize);
-        imagedestroy($dstResize);
         return true;
     }
 
@@ -245,7 +251,7 @@ class Image {
         }
         
         // Resize Image
-        $srcResize = self::$functions[$imgType][0]($src);
+        $srcResize = self::createSrcImage($imgType, $src);
         $dstResize = self::createDstImage($imgType, $resWidth, $resHeight);
         imagecopyresampled($dstResize, $srcResize, 0, 0, 0, 0, $resWidth, $resHeight, $imgWidth, $imgHeight);
         
@@ -261,8 +267,37 @@ class Image {
         // Free Resources
         imagedestroy($srcResize);
         imagedestroy($dstResize);
-        imagedestroy($dstCrop);
         return true;
+    }
+
+
+
+    /**
+     * Returns the Image Content Type
+     * @param integer $imgType
+     * @return string
+     */
+    public static function getContentType(int $imgType) {
+        return self::$imageData[$imgType][2];
+    }
+
+    /**
+     * Returns the Image Extension
+     * @param integer $imgType
+     * @return string
+     */
+    public static function getExtension(int $imgType) {
+        return self::$imageData[$imgType][3];
+    }
+
+    /**
+     * Creates an Image based on the Type
+     * @param integer $imgType
+     * @param mixed   $image
+     * @return mixed
+     */
+    public static function createSrcImage(int $imgType, $image) {
+        return self::$imageData[$imgType][0]($image);
     }
 
     /**
@@ -272,7 +307,7 @@ class Image {
      * @param integer $height
      * @return mixed
      */
-    private static function createDstImage(int $imgType, int $width, int $height) {
+    public static function createDstImage(int $imgType, int $width, int $height) {
         $result = imagecreatetruecolor($width, $height);
         if (Arrays::contains(self::$transTypes, $imgType)) {
             imagealphablending($result, false);
@@ -286,15 +321,26 @@ class Image {
     /**
      * Creates an Image based on the Type
      * @param integer $imgType
-     * @param mixed   $src
-     * @param mixed   $dst
+     * @param mixed   $image
+     * @param string  $fileName Optional.
+     * @param integer $quality  Optional.
      * @return void
      */
-    private static function createImage(int $imgType, $src, $dst) {
+    public static function createImage(int $imgType, $image, string $fileName = null, int $quality = 90) {
         if ($imgType == 2) {
-            self::$functions[$imgType][1]($src, $dst, 90);
+            self::$imageData[$imgType][1]($image, $fileName, $quality);
         } else {
-            self::$functions[$imgType][1]($src, $dst);
+            self::$imageData[$imgType][1]($image, $fileName);
         }
+        imagedestroy($image);
+    }
+
+    /**
+     * Destroys the Image
+     * @param mixed $image
+     * @return void
+     */
+    public function destroy($image) {
+        imagedestroy($image);
     }
 }
