@@ -10,6 +10,15 @@ use Framework\Utils\Strings;
 class Numbers {
 
     /**
+     * Returns the length og the given Number
+     * @param integer $number
+     * @return integer
+     */
+    public static function length(int $number): int {
+        return strlen((string)$number);
+    }
+
+    /**
      * Returns true if the given value is a number and greater and/or equal to cero
      * @param mixed   $number
      * @param integer $min    Optional.
@@ -200,5 +209,18 @@ class Numbers {
         }
         $price = round($price);
         return "${$price}";
+    }
+
+    /**
+     * Adds zeros to the start of the number
+     * @param mixed   $value
+     * @param integer $amount
+     * @return string
+     */
+    public static function zerosPad($value, int $amount) {
+        if (!empty($value)) {
+            return str_pad((string)$value, $amount, "0", STR_PAD_LEFT);
+        }
+        return $value;
     }
 }
