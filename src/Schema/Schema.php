@@ -463,6 +463,69 @@ class Schema {
         return $this->db->delete($this->structure->table, $query);
     }
 
+    /**
+     * Ensures that the order of the Elements is correct on Create/Edit
+     * @param integer $oldPosition
+     * @param integer $newPosition
+     * @param Query   $query       Optional.
+     * @return integer
+     */
+    public function ensureOrder(int $oldPosition, int $newPosition, Query $query = null): int {
+        $isEdit          = !empty($oldPosition);
+        $nextPosition    = $this->getNextPosition($query);
+        $oldPosition     = $isEdit ? $oldPosition : $nextPosition;
+        $newPosition     = !empty($newPosition) ? $newPosition : $nextPosition;
+        $updatedPosition = $newPosition;
+
+        if (!$isEdit && (empty($newPosition) || $newPosition > $nextPosition)) {
+            return $nextPosition;
+        }
+        if ($oldPosition == $newPosition) {
+            return $newPosition;
+        }
+
+        if ($isEdit && $newPosition > $nextPosition) {
+            $updatedPosition = $nextPosition - 1;
+        }
+        if ($newPosition > $oldPosition) {
+            $newQuery = new Query($query);
+            $newQuery->add("position",  ">",  $oldPosition);
+            $newQuery->add("position",  "<=", $newPosition);
+            $newQuery->add("isDeleted", "=",  0);
+            $this->increase($newQuery, "position", -1);
+        } else {
+            $newQuery = new Query($query);
+            $newQuery->add("position",  ">=", $newPosition);
+            $newQuery->add("position",  "<",  $oldPosition);
+            $newQuery->add("isDeleted", "=",  0);
+            $this->increase($newQuery, "position", 1);
+        }
+        return $updatedPosition;
+    }
+
+    /**
+     * Ensures that only one Element has the Unique field set
+     * @param string  $field
+     * @param integer $id
+     * @param integer $oldValue
+     * @param integer $newValue
+     * @param Query   $query    Optional.
+     * @return void
+     */
+    public function ensureUnique(string $field, int $id, int $oldValue, int $newValue, Query $query = null): void {
+        if (!empty($newValue) && empty($oldValue)) {
+            $newQuery = new Query($query);
+            $newQuery->add($this->structure->idKey, "<>", $id);
+            $newQuery->add($field, "=", 1);
+            $this->edit($newQuery, [ $field => 0 ]);
+        }
+        if (empty($newValue) && !empty($oldValue)) {
+            $newQuery = new Query($query);
+            $newQuery->orderBy($this->structure->getOrder(), true)->limit(1);
+            $this->edit($newQuery, [ $field => 1 ]);
+        }
+    }
+
 
 
     /**
