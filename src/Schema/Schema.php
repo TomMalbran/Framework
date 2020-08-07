@@ -464,6 +464,16 @@ class Schema {
     }
 
     /**
+     * Truncates the given Schema
+     * @return boolean
+     */
+    public function truncate() {
+        return $this->db->truncate($this->structure->table);
+    }
+
+
+
+    /**
      * Ensures that the order of the Elements is correct on Create/Edit
      * @param integer $oldPosition
      * @param integer $newPosition
