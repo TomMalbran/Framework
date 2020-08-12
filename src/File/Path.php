@@ -39,7 +39,7 @@ class Path {
         if (!empty(self::$data["paths"][$pathKey])) {
             return self::$data["paths"][$pathKey];
         }
-        return null;
+        return "";
     }
 
     
