@@ -83,11 +83,11 @@ class Queue {
      * Adds the given Email to the Queue
      * @param Model           $template
      * @param string|string[] $sendTo
-     * @param string          $subject  Optional.
      * @param string          $message  Optional.
+     * @param string          $subject  Optional.
      * @return integer
      */
-    public static function add(Model $template, $sendTo, string $subject = null, string $message = null): bool {
+    public static function add(Model $template, $sendTo, string $message = null, string $subject = null): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
@@ -110,7 +110,7 @@ class Queue {
     /**
      * Marks the given Email as sent
      * @param integer $emailID
-     * @param bool    $success
+     * @param boolean $success
      * @return boolean
      */
     public static function markAsSent(int $emailID, bool $success): bool {

@@ -7,6 +7,7 @@ use Framework\Config\Config;
 use Framework\Email\Queue;
 use Framework\Provider\Mustache;
 use Framework\File\Path;
+use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 
@@ -65,11 +66,12 @@ class Mailer {
         self::load();
 
         $body = Mustache::render(self::$template, [
-            "url"     => self::$url,
-            "name"    => self::$name,
-            "files"   => Path::getUrl("email"),
-            "image"   => !empty(self::$smtp->header) ? self::$url . self::$smtp->header : "",
-            "message" => $message,
+            "url"      => self::$url,
+            "name"     => self::$name,
+            "files"    => Path::getUrl("email"),
+            "logo"     => self::$smtp->logo,
+            "siteName" => self::$name,
+            "message"  => $message,
         ]);
         return self::send($to, $from, $fromName, $subject, $body, true);
     }
@@ -163,7 +165,27 @@ class Mailer {
     }
 
     /**
-     * Sends the Unsent emails from the Queue
+     * Sends the given Template Email
+     * @param Model           $template
+     * @param string|string[] $sendTo
+     * @param string          $message  Optional.
+     * @param string          $subject  Optional.
+     * @return boolean
+     */
+    public static function sendTemplate(Model $template, $sendTo, string $message = null, string $subject = null): bool {
+        $sendTo  = Arrays::toArray($sendTo);
+        $subject = $subject ?: $template->subject;
+        $message = $message ?: $template->message;
+        $success = false;
+
+        foreach ($sendTo as $email) {
+            $success = self::sendHtml($email, $template->sendAs, $template->sendName, $subject, $message);
+        }
+        return $success;
+    }
+
+    /**
+     * Sends the Unsent Emails from the Queue
      * @return void
      */
     public static function sendQueue() {
@@ -177,6 +199,19 @@ class Mailer {
             }
             Queue::markAsSent($email["emailID"], $success);
         }
+    }
+
+    /**
+     * Sends the Backup to the Backup account
+     * @param string $email
+     * @param string $attachment
+     * @return boolean
+     */
+    public function sendBackup(string $email, string $attachment): bool {
+        $subject = Config::get("name") . ": Database Backup";
+        $message = "Backup de la base de datos al dia: " . date("d M Y, H:i:s");
+        
+        return self::send($email, null, null, $subject, $message, false, $attachment);
     }
 
 
