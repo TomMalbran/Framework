@@ -249,6 +249,27 @@ class DateTime {
 
 
     /**
+     * Returns true if the given Date is in the future
+     * @param string  $date
+     * @param string  $type        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return boolean
+     */
+    public static function isFutureDate(string $date, string $type = "middle", bool $useTimeZone = true): bool {
+        $time = self::toDay($date, $type, $useTimeZone);
+        return self::isFutureTime($time);
+    }
+
+    /**
+     * Returns true if the given Time is in the future
+     * @param integer $time
+     * @return boolean
+     */
+    public static function isFutureTime(int $time): bool {
+        return $time > time();
+    }
+
+    /**
      * Returns true if the given Time is between the from and to Times
      * @param integer $time
      * @param integer $fromTime

@@ -454,6 +454,16 @@ class Request implements ArrayAccess {
     public function isValidWeekDay(string $key): bool {
         return DateTime::isValidWeekDay($this->getInt($key));
     }
+
+    /**
+     * Returns true if the given date is in the future
+     * @param string $key
+     * @param string $type Optional.
+     * @return boolean
+     */
+    public function isFutureDate(string $key, string $type = "middle"): bool {
+        return DateTime::isFutureDate($this->get($key), $type);
+    }
     
 
     
