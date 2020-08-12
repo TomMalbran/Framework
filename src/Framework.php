@@ -105,15 +105,16 @@ class Framework {
      * @return string
      */
     public static function loadFile(string $dir, string $file) {
-        $path = self::getPath($dir, $file, false);
-        $file = "";
+        $path   = self::getPath($dir, $file, false);
+        $result = "";
         if (File::exists($path)) {
-            $file = file_get_contents($path);
-        } else {
-            $path = self::getPath($dir, $file, true);
-            $file = file_get_contents($path);
+            $result = file_get_contents($path);
         }
-        return $file;
+        if (empty($result)) {
+            $path   = self::getPath($dir, $file, true);
+            $result = file_get_contents($path);
+        }
+        return $result;
     }
 
     /**
