@@ -68,6 +68,21 @@ class Numbers {
         return $number / $padding;
     }
 
+    /**
+     * Returns a number using the right format
+     * @param float   $number
+     * @param integer $decimals
+     * @return string
+     */
+    public static function formatFloat(float $number, int $decimals): string {
+        $float = floatval($number);
+        if (!empty($float)) {
+            $decimals = $float < 1000 && !is_int($number) ? $decimals : 0;
+            return number_format($float, $decimals, ",", ".");
+        }
+        return "";
+    }
+
 
 
     /**
@@ -175,11 +190,7 @@ class Numbers {
      * @return string
      */
     public static function formatPrice(float $price, int $decimals = 2): string {
-        $price = floatval($price);
-        if (!empty($price)) {
-            return number_format($price, $decimals, ",", "");
-        }
-        return "";
+        return self::formatFloat($price, $decimals);
     }
 
     /**
@@ -190,7 +201,7 @@ class Numbers {
      */
     public static function formatCents(int $cents, int $decimals = 2): string {
         $price = self::fromCents($cents);
-        return self::formatPrice($price, $decimals);
+        return self::formatFloat($price, $decimals);
     }
 
     /**
