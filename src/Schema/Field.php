@@ -34,6 +34,7 @@ class Field {
     public $key        = "";
     public $type       = "";
     public $length     = 0;
+    public $decimals   = 3;
     public $dateType   = "";
     public $date       = "";
     public $hour       = "";
@@ -65,12 +66,13 @@ class Field {
     public function __construct(string $key, array $data, string $prefix = "") {
         $this->key        = $key;
 
-        $this->type       = !empty($data["type"])     ? $data["type"]        : Field::String;
-        $this->length     = !empty($data["length"])   ? (int)$data["length"] : 0;
-        $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]    : "middle";
-        $this->date       = !empty($data["date"])     ? $data["date"]        : null;
-        $this->hour       = !empty($data["hour"])     ? $data["hour"]        : null;
-        $this->default    = !empty($data["default"])  ? $data["default"]     : null;
+        $this->type       = !empty($data["type"])     ? $data["type"]          : Field::String;
+        $this->length     = !empty($data["length"])   ? (int)$data["length"]   : 0;
+        $this->decimals   = !empty($data["decimals"]) ? (int)$data["decimals"] : 3;
+        $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : "middle";
+        $this->date       = !empty($data["date"])     ? $data["date"]          : null;
+        $this->hour       = !empty($data["hour"])     ? $data["hour"]          : null;
+        $this->default    = !empty($data["default"])  ? $data["default"]       : null;
 
         $this->isPrimary  = !empty($data["isPrimary"]);
         $this->isKey      = !empty($data["isKey"]);
@@ -177,7 +179,7 @@ class Field {
             $result = $request->getInt($this->name);
             break;
         case self::Float:
-            $result = $request->toInt($this->name, 3);
+            $result = $request->toInt($this->name, $this->decimals);
             break;
         case self::Price:
             $result = $request->toCents($this->name);
@@ -227,52 +229,52 @@ class Field {
 
         switch ($this->type) {
         case self::Boolean:
-            $result[$key]            = !empty($data[$key]);
+            $result[$key]           = !empty($data[$key]);
             break;
         case self::ID:
         case self::Binary:
         case self::Number:
-            $result[$key]            = $number;
+            $result[$key]           = $number;
             break;
         case self::Float:
-            $result[$key]            = Numbers::toFloat($number, 3);
-            $result["{$key}Format"]  = Numbers::formatFloat($number, 3, 3);
-            $result["{$key}Int"]     = $number;
+            $result[$key]           = Numbers::toFloat($number, $this->decimals);
+            $result["{$key}Format"] = Numbers::formatFloat($number, $this->decimals);
+            $result["{$key}Int"]    = $number;
             break;
         case self::Price:
-            $result[$key]            = Numbers::fromCents($number);
-            $result["{$key}Format"]  = Numbers::formatCents($number);
-            $result["{$key}Cents"]   = $number;
+            $result[$key]           = Numbers::fromCents($number);
+            $result["{$key}Format"] = Numbers::formatCents($number);
+            $result["{$key}Cents"]  = $number;
             break;
         case self::Date:
         case self::Hour:
-            $result[$key]            = $number;
-            $result["{$key}Date"]    = !empty($number) ? date("d-m-Y",       $number) : "";
-            $result["{$key}Hour"]    = !empty($number) ? date("H:i",         $number) : "";
-            $result["{$key}Full"]    = !empty($number) ? date("d-m-Y @ H:i", $number) : "";
-            $result["{$key}ISO"]     = !empty($number) ? date("Y-m-d H:i",   $number) : "";
+            $result[$key]           = $number;
+            $result["{$key}Date"]   = !empty($number) ? date("d-m-Y",       $number) : "";
+            $result["{$key}Hour"]   = !empty($number) ? date("H:i",         $number) : "";
+            $result["{$key}Full"]   = !empty($number) ? date("d-m-Y @ H:i", $number) : "";
+            $result["{$key}ISO"]    = !empty($number) ? date("Y-m-d H:i",   $number) : "";
             break;
         case self::JSON:
-            $result[$key]            = JSON::decode($text, true);
+            $result[$key]           = JSON::decode($text, true);
             break;
         case self::CSV:
-            $result[$key]            = $text;
-            $result["{$key}Parts"]   = JSON::decode($text, true);
-            $result["{$key}Count"]   = Arrays::length($result["{$key}Parts"]);
+            $result[$key]           = $text;
+            $result["{$key}Parts"]  = JSON::decode($text, true);
+            $result["{$key}Count"]  = Arrays::length($result["{$key}Parts"]);
             break;
         case self::Text:
-            $result[$key]            = $text;
+            $result[$key]           = $text;
             break;
         case self::Encrypt:
-            $result[$key]            = !empty($data["{$key}Decrypt"]) ? $data["{$key}Decrypt"] : "";
+            $result[$key]           = !empty($data["{$key}Decrypt"]) ? $data["{$key}Decrypt"] : "";
             break;
         case self::File:
-            $result[$key]            = $text;
-            $result["{$key}Url"]     = !empty($text) ? Path::getUrl("source", $text) : "";
-            $result["{$key}Thumb"]   = !empty($text) ? Path::getUrl("thumbs", $text) : "";
+            $result[$key]           = $text;
+            $result["{$key}Url"]    = !empty($text) ? Path::getUrl("source", $text) : "";
+            $result["{$key}Thumb"]  = !empty($text) ? Path::getUrl("thumbs", $text) : "";
             break;
         default:
-            $result[$key]            = $text;
+            $result[$key]           = $text;
         }
         return $result;
     }
