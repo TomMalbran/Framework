@@ -3,6 +3,8 @@ namespace Framework\Email;
 
 use Framework\Framework;
 use Framework\Request;
+use Framework\Auth\Access;
+use Framework\Auth\Credential;
 use Framework\Config\Config;
 use Framework\Email\Queue;
 use Framework\Provider\Mustache;
@@ -46,35 +48,6 @@ class Mailer {
     }
     
     
-    
-    /**
-     * Sends Emails in HTML
-     * @param string $to
-     * @param string $from
-     * @param string $fromName
-     * @param string $subject
-     * @param string $message
-     * @return boolean
-     */
-    public static function sendHtml(
-        string $to,
-        string $from,
-        string $fromName,
-        string $subject,
-        string $message
-    ): bool {
-        self::load();
-
-        $body = Mustache::render(self::$template, [
-            "url"      => self::$url,
-            "name"     => self::$name,
-            "files"    => Path::getUrl("email"),
-            "logo"     => self::$smtp->logo,
-            "siteName" => self::$name,
-            "message"  => $message,
-        ]);
-        return self::send($to, $from, $fromName, $subject, $body, true);
-    }
     
     /**
      * Sends the Email
@@ -165,6 +138,30 @@ class Mailer {
     }
 
     /**
+     * Sends Emails in HTML
+     * @param string $to
+     * @param string $from
+     * @param string $fromName
+     * @param string $subject
+     * @param string $message
+     * @return boolean
+     */
+    public static function sendHtml(string $to, string $from, string $fromName, string $subject, string $message): bool {
+        self::load();
+        $body = Mustache::render(self::$template, [
+            "url"      => self::$url,
+            "name"     => self::$name,
+            "files"    => Path::getUrl("email"),
+            "logo"     => self::$smtp->logo,
+            "siteName" => self::$name,
+            "message"  => $message,
+        ]);
+        return self::send($to, $from, $fromName, $subject, $body, true);
+    }
+
+
+
+    /**
      * Sends the given Template Email
      * @param Model           $template
      * @param string|string[] $sendTo
@@ -172,7 +169,7 @@ class Mailer {
      * @param string          $subject  Optional.
      * @return boolean
      */
-    public static function sendTemplate(Model $template, $sendTo, string $message = null, string $subject = null): bool {
+    public static function sendToEmails(Model $template, $sendTo, string $message = null, string $subject = null): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
@@ -182,6 +179,23 @@ class Mailer {
             $success = self::sendHtml($email, $template->sendAs, $template->sendName, $subject, $message);
         }
         return $success;
+    }
+
+    /**
+     * Sends the Message to all the Admins or the ones in the Template
+     * @param Model  $template
+     * @param string $message  Optional.
+     * @param string $subject  Optional.
+     * @return boolean
+     */
+    public static function sendToAdmins(Model $template, string $message = null, string $subject = null): bool {
+        $sendTo = [];
+        if (!empty($template->sendTo)) {
+            $sendTo = $template->sendToParts;
+        } else {
+            $sendTo = Credential::getEmailsForLevel(Access::getAdmins());
+        }
+        return self::sendToEmails($template, $sendTo, $message, $subject);
     }
 
     /**
@@ -203,15 +217,15 @@ class Mailer {
 
     /**
      * Sends the Backup to the Backup account
-     * @param string $email
+     * @param string $sendTo
      * @param string $attachment
      * @return boolean
      */
-    public function sendBackup(string $email, string $attachment): bool {
+    public function sendBackup(string $sendTo, string $attachment): bool {
         $subject = Config::get("name") . ": Database Backup";
         $message = "Backup de la base de datos al dia: " . date("d M Y, H:i:s");
         
-        return self::send($email, null, null, $subject, $message, false, $attachment);
+        return self::send($sendTo, null, null, $subject, $message, false, $attachment);
     }
 
 
