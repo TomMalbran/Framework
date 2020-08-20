@@ -26,6 +26,16 @@ class Strings {
     }
 
     /**
+     * Returns true if the given String matches the given Pattern
+     * @param string $string
+     * @param string $pattern
+     * @return boolean
+     */
+    public static function match(string $string, string $pattern): bool {
+        return preg_match($pattern, $string);
+    }
+
+    /**
      * Returns true if the given String starts with the given Needle
      * @param string $string
      * @param string $needle

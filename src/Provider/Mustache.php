@@ -3,6 +3,7 @@ namespace Framework\Provider;
 
 use Framework\Framework;
 use Framework\File\File;
+use Framework\Utils\Strings;
 
 use Mustache_Autoloader;
 use Mustache_Engine;
@@ -66,7 +67,7 @@ class Mustache {
      */
     public static function render(string $templateOrPath, array $data): string {
         self::load();
-        if (preg_match('/^[a-z\/]*$/', $templateOrPath)) {
+        if (Strings::match($templateOrPath, '/^[a-z\/]*$/')) {
             if (self::$loader != null) {
                 return self::$loader->render($templateOrPath, $data);
             }

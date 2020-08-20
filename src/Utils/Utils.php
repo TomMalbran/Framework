@@ -38,13 +38,13 @@ class Utils {
         if (Strings::length($password) < $minLength) {
             return false;
         }
-        if (Strings::contains($checkSets, "l") && !preg_match("#[a-z]+#", $password)) {
+        if (Strings::contains($checkSets, "l") && !Strings::match($password, "#[a-z]+#")) {
             return false;
         }
-        if (Strings::contains($checkSets, "u") && !preg_match("#[A-Z]+#", $password)) {
+        if (Strings::contains($checkSets, "u") && !Strings::match($password, "#[A-Z]+#")) {
             return false;
         }
-        if (Strings::contains($checkSets, "d") && !preg_match("#[0-9]+#", $password)) {
+        if (Strings::contains($checkSets, "d") && !Strings::match($password, "#[0-9]+#")) {
             return false;
         }
         return true;
@@ -56,7 +56,7 @@ class Utils {
      * @return boolean
      */
     public static function isValidDomain(string $domain): bool {
-        return preg_match('/^([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i', $domain);
+        return Strings::match($domain, '/^([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
     }
     
     /**
@@ -65,7 +65,7 @@ class Utils {
      * @return boolean
      */
     public static function isValidUsername(string $username): bool {
-        return preg_match('/^[a-z]+[a-z0-9]{2,11}$/i', $username);
+        return Strings::match($username, '/^[a-z]+[a-z0-9]{2,11}$/i');
     }
     
     /**
@@ -74,7 +74,7 @@ class Utils {
      * @return boolean
      */
     public static function isValidName(string $name): bool {
-        return preg_match('/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i', $name);
+        return Strings::match($name, '/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i');
     }
     
     /**
