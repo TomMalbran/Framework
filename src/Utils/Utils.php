@@ -34,8 +34,11 @@ class Utils {
      * @param integer $minLength Optional.
      * @return boolean
      */
-    public static function isValidPassword(string $password, string $checkSets = "lud", int $minLength = 4): bool {
+    public static function isValidPassword(string $password, string $checkSets = "ad", int $minLength = 6): bool {
         if (Strings::length($password) < $minLength) {
+            return false;
+        }
+        if (Strings::contains($checkSets, "a") && !Strings::match($password, "#[a-zA-Z]+#")) {
             return false;
         }
         if (Strings::contains($checkSets, "l") && !Strings::match($password, "#[a-z]+#")) {

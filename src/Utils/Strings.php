@@ -93,14 +93,18 @@ class Strings {
         $all    = "";
         $result = "";
         
-        if (self::contains($availableSets, "l")) {
-            $sets[] = "abcdefghjkmnpqrstuvwxyz";
-        }
-        if (self::contains($availableSets, "u")) {
-            $sets[] = "ABCDEFGHJKMNPQRSTUVWXYZ";
+        if (self::contains($availableSets, "a")) {
+            $sets[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        } else {
+            if (self::contains($availableSets, "l")) {
+                $sets[] = "abcdefghijklmnopqrstuvwxyz";
+            }
+            if (self::contains($availableSets, "u")) {
+                $sets[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            }
         }
         if (self::contains($availableSets, "d")) {
-            $sets[] = "23456789";
+            $sets[] = "0123456789";
         }
         if (self::contains($availableSets, "s")) {
             $sets[] = "!@#$%&*?";
