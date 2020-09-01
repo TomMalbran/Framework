@@ -214,7 +214,7 @@ class Strings {
      */
     public static function split($string, string $needle): array {
         if (!is_array($string)) {
-            return explode($needle, $string);
+            return !empty($string) ? explode($needle, $string) : [];
         }
         return $string;
     }
