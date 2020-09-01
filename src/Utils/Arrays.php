@@ -243,4 +243,21 @@ class Arrays {
         }
         return $result;
     }
+
+    /**
+     * Returns the Value at the given id with the given key
+     * @param array  $data
+     * @param string $idKey
+     * @param mixed  $idValue
+     * @param string $key     Optional.
+     * @return mixed
+     */
+    public static function findValue(array $data, string $idKey, $idValue, string $key = "") {
+        foreach ($data as $elem) {
+            if ($elem[$idKey] == $idValue) {
+                return $key ? $elem[$key] : $elem;
+            }
+        }
+        return $key ? "" : [];
+    }
 }
