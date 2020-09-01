@@ -34,8 +34,8 @@ class Subrequest {
         $this->structure = $structure;
 
         $this->name      = $data["name"];
-        $this->idKey     = !empty($data["idKey"])  ? $data["idKey"]  : $structure->idKey;
-        $this->idName    = !empty($data["idName"]) ? $data["idName"] : $structure->idName;
+        $this->idKey     = !empty($data["idKey"])   ? $data["idKey"]   : $structure->idKey;
+        $this->idName    = !empty($data["idName"])  ? $data["idName"]  : $structure->idName;
 
         $this->hasOrder  = !empty($data["orderBy"]);
         $this->orderBy   = !empty($data["orderBy"]) ? $data["orderBy"] : "";
