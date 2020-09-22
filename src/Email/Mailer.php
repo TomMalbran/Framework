@@ -152,7 +152,7 @@ class Mailer {
             "url"      => self::$url,
             "name"     => self::$name,
             "files"    => Path::getUrl("email"),
-            "logo"     => !empty(self::$smtp->logo) ? self::$smtp->logo : "",
+            "logo"     => self::$smtp->logo ?: "",
             "siteName" => self::$name,
             "message"  => $message,
         ]);
