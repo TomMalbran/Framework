@@ -88,9 +88,7 @@ class ErrorLog {
      */
     public static function filter(Request $filters, Request $sort): array {
         $query = self::getFilterQuery($filters);
-        $query->orderBy("updatedTime", false);
-        $query->paginate($sort->page, $sort->amount);
-        return self::getSchema()->getAll($query);
+        return self::getSchema()->getAll($query, $sort);
     }
 
     /**
