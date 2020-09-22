@@ -42,7 +42,8 @@ class Image {
      * @return boolean
      */
     public static function isValidType(string $file): bool {
-        return self::hasType(self::getType($type));
+        $type = self::getType($file);
+        return self::hasType($type);
     }
 
     /**
