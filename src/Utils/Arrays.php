@@ -133,6 +133,33 @@ class Arrays {
         return $result;
     }
 
+    /**
+     * Sorts an array using the given callback
+     * @param array    $array
+     * @param callback $callback
+     * @return array
+     */
+    public static function sort(array &$array, callable $callback): array {
+        usort($array, $callback);
+        return $array;
+    }
+
+    /**
+     * Sorts the arrays at the given key of the given array using the given callback
+     * @param array    $array
+     * @param string   $field
+     * @param callback $callback
+     * @return array
+     */
+    public static function sortArray(array &$array, string $field, callable $callback): array {
+        foreach ($array as $value) {
+            if (!empty($value[$field]) && is_array($value[$field])) {
+                usort($value[$field], $callback);
+            }
+        }
+        return $array;
+    }
+
 
 
     /**
