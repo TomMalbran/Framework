@@ -79,7 +79,7 @@ class FileList {
      */
     public function getSorted(): array {
         usort($this->list, function ($a, $b) {
-            // Is Back goes first
+            // Back goes first
             if ($a["isBack"] && !$b["isBack"]) {
                 return -1;
             }

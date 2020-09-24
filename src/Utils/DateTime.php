@@ -132,7 +132,7 @@ class DateTime {
     }
     
     /**
-     * Returns the given string as a time of the start of the day
+     * Returns the given string as a time of the middle of the day
      * @param string  $string
      * @param boolean $useTimeZone Optional.
      * @return integer
