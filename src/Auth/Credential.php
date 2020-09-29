@@ -446,6 +446,18 @@ class Credential {
     }
 
     /**
+     * Updates the Timezone for the given Credential
+     * @param integer $credentialID
+     * @param integer $timezone
+     * @return boolean
+     */
+    public static function setTimezone(int $credentialID, int $timezone): bool {
+        return self::getSchema()->edit($credentialID, [
+            "timezone" => $timezone,
+        ]);
+    }
+
+    /**
      * Updates the login time for the given Credential
      * @param integer $credentialID
      * @return boolean

@@ -186,18 +186,18 @@ class Field {
             break;
         case self::Date:
             if (!empty($this->date)) {
-                $result = $request->toDay($this->date, $this->dateType, false);
+                $result = $request->toDay($this->date, $this->dateType, true);
             } elseif ($request->has("{$this->name}Date")) {
-                $result = $request->toDay("{$this->name}Date", $this->dateType, false);
+                $result = $request->toDay("{$this->name}Date", $this->dateType, true);
             } else {
-                $result = $request->toDay($this->name, $this->dateType, false);
+                $result = $request->toDay($this->name, $this->dateType, true);
             }
             break;
         case self::Hour:
             if (!empty($this->date) && !empty($this->hour)) {
-                $result = $request->toTimeHour($this->date, $this->hour, false);
+                $result = $request->toTimeHour($this->date, $this->hour, true);
             } elseif ($request->has("{$this->name}Date") && $request->has("{$this->name}Hour")) {
-                $result = $request->toTimeHour("{$this->name}Date", "{$this->name}Hour", false);
+                $result = $request->toTimeHour("{$this->name}Date", "{$this->name}Hour", true);
             }
             break;
         case self::JSON:
@@ -249,10 +249,9 @@ class Field {
         case self::Date:
         case self::Hour:
             $result[$key]           = $number;
-            $result["{$key}Date"]   = !empty($number) ? date("d-m-Y",       $number) : "";
-            $result["{$key}Full"]   = !empty($number) ? date("d-m-Y @ H:i", $number) : "";
-            $result["{$key}ISO"]    = !empty($number) ? date("Y-m-d H:i",   $number) : "";
-            $result["{$key}Dashes"] = !empty($number) ? date("Y-m-d",       $number) : "";
+            $result["{$key}Date"]   = !empty($number) ? date("d-m-Y",     $number) : "";
+            $result["{$key}Full"]   = !empty($number) ? date("d-m-Y H:i", $number) : "";
+            $result["{$key}ISO"]    = !empty($number) ? date("Y-m-d H:i", $number) : "";
             break;
         case self::JSON:
             $result[$key]           = JSON::decode($text, true);

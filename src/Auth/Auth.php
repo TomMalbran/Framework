@@ -12,6 +12,8 @@ use Framework\File\File;
 use Framework\Log\ActionLog;
 use Framework\Provider\JWT;
 use Framework\Schema\Model;
+use Framework\Utils\Arrays;
+use Framework\Utils\DateTime;
 use Framework\Utils\Status;
 use Framework\Utils\Strings;
 
@@ -30,23 +32,33 @@ class Auth {
 
     /**
      * Validates the Credential
-     * @param string $token
+     * @param string  $token
+     * @param integer $timezone Optional.
      * @return boolean
      */
-    public static function validateCredential(string $token): bool {
+    public static function validateCredential(string $token, int $timezone = null): bool {
         Reset::deleteOld();
         if (!JWT::isValid($token)) {
             return false;
         }
         
+        // Retrieve the Token data
         $data       = JWT::getData($token);
         $credential = Credential::getOne($data->credentialID, true);
         if ($credential->isEmpty() || $credential->isDeleted) {
             return false;
         }
 
+        // Set the new TImezone if required
+        if (!empty($timezone)) {
+            $credentialID = !empty($data->adminID) ? $data->adminID : $data->credentialID;
+            Credential::setTimezone($credentialID, $timezone);
+        }
+
+        // Set the Credential
         self::setCredential($credential, $data->adminID, $credential->currentUser);
 
+        // Start or reuse a log session
         if (self::isLoggedAsUser()) {
             ActionLog::startSession(self::$adminID);
         } else {
@@ -220,6 +232,12 @@ class Auth {
         self::$accessLevel  = $credential->level;
         self::$adminID      = $adminID;
         self::$userID       = $userID;
+
+        $timezone = !empty($adminID) ? Credential::getOne($adminID)->timezone : $credential->timezone;
+        $levels   = Config::getArray("authTimezone");
+        if (!empty($timezone) && (empty($levels) || Arrays::contains($levels, $credential->level))) {
+            DateTime::setTimezone($timezone);
+        }
     }
 
     /**
@@ -243,7 +261,7 @@ class Auth {
         }
 
         // The general data
-        $data  = [
+        $data = [
             "accessLevel"   => self::$accessLevel,
             "credentialID"  => self::$credentialID,
             "adminID"       => self::$adminID,
@@ -257,7 +275,7 @@ class Auth {
         ];
 
         // Add fields from the Config
-        $fields = Config::getArray("jwtFields");
+        $fields = Config::getArray("authFields");
         foreach ($fields as $field) {
             $data[$field] = self::$credential->get($field);
         }

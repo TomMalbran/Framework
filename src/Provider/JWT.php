@@ -27,8 +27,8 @@ class JWT {
         if (!self::$loaded) {
             FirebaseJWT::$leeway = 1000;
             self::$loaded    = true;
-            self::$secretKey = Config::get("jwtKey");
-            self::$shortTerm = Config::get("jwtHours");
+            self::$secretKey = Config::get("authKey");
+            self::$shortTerm = Config::get("authHours");
         }
     }
     

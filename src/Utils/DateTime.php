@@ -11,28 +11,42 @@ class DateTime {
 
     public static $months     = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
 
-    public static $serverZone = -3;
+    public static $serverDiff = -180;
     public static $timeDiff   = 0;
 
 
     /**
-     * Sets the Time Zone
-     * @param integer $timeZone
+     * Sets the Time Zone in minutes
+     * @param integer $timezone
      * @return void
      */
-    public static function setTimeZone(int $timeZone): void {
-        self::$timeDiff = self::$serverZone - $timeZone;
+    public static function setTimezone(int $timezone): void {
+        self::$timeDiff = (self::$serverDiff - $timezone) * 60;
+    }
+
+    /**
+     * Returns the given time using the given Time Zone
+     * @param integer $value
+     * @param integer $timezone
+     * @return integer
+     */
+    public static function toTimezone(int $value, int $timezone) {
+        if (!empty($value) && !empty($timezone)) {
+            $timeDiff = (self::$serverDiff - $timezone) * 60;
+            return $value - $timeDiff;
+        }
+        return $value;
     }
 
     /**
      * Returns the given time in the User Time Zone
      * @param integer $value
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toUserTime(int $value, bool $useTimeZone = true): int {
-        if (!empty($value) && $useTimeZone) {
-            return $value - (self::$timeDiff * 3600);
+    public static function toUserTime(int $value, bool $useTimezone = true): int {
+        if (!empty($value) && $useTimezone) {
+            return $value - self::$timeDiff;
         }
         return $value;
     }
@@ -40,12 +54,12 @@ class DateTime {
     /**
      * Returns the given time in the Server Time Zone
      * @param integer $value
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toServerTime(int $value, bool $useTimeZone = true): int {
-        if (!empty($value) && $useTimeZone) {
-            return $value + (self::$timeDiff * 3600);
+    public static function toServerTime(int $value, bool $useTimezone = true): int {
+        if (!empty($value) && $useTimezone) {
+            return $value + self::$timeDiff;
         }
         return $value;
     }
@@ -73,13 +87,13 @@ class DateTime {
     /**
      * Returns the given string as a time
      * @param string  $string
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toTime(string $string, bool $useTimeZone = true): int {
+    public static function toTime(string $string, bool $useTimezone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
-            return self::toServerTime($result, $useTimeZone);
+            return self::toServerTime($result, $useTimezone);
         }
         return 0;
     }
@@ -88,13 +102,13 @@ class DateTime {
      * Returns the given string as a time
      * @param string  $dateString
      * @param string  $hourString
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toTimeHour(string $dateString, string $hourString, bool $useTimeZone = true): int {
+    public static function toTimeHour(string $dateString, string $hourString, bool $useTimezone = true): int {
         $result = strtotime("$dateString $hourString");
         if ($result !== false) {
-            return self::toServerTime($result, $useTimeZone);
+            return self::toServerTime($result, $useTimezone);
         }
         return 0;
     }
@@ -103,30 +117,30 @@ class DateTime {
      * Returns the given string as a time
      * @param string  $string
      * @param string  $type        Optional.
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toDay(string $string, string $type = "start", bool $useTimeZone = true): int {
+    public static function toDay(string $string, string $type = "start", bool $useTimezone = true): int {
         switch ($type) {
         case "start":
-            return self::toDayStart($string, $useTimeZone);
+            return self::toDayStart($string, $useTimezone);
         case "end":
-            return self::toDayEnd($string, $useTimeZone);
+            return self::toDayEnd($string, $useTimezone);
         default:
-            return self::toDayMiddle($string, $useTimeZone);
+            return self::toDayMiddle($string, $useTimezone);
         }
     }
 
     /**
      * Returns the given string as a time of the start of the day
      * @param string  $string
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toDayStart(string $string, bool $useTimeZone = true): int {
+    public static function toDayStart(string $string, bool $useTimezone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
-            return self::toServerTime($result, $useTimeZone);
+            return self::toServerTime($result, $useTimezone);
         }
         return 0;
     }
@@ -134,14 +148,14 @@ class DateTime {
     /**
      * Returns the given string as a time of the middle of the day
      * @param string  $string
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
+    public static function toDayMiddle(string $string, bool $useTimezone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
             $result += 12 * 3600;
-            return self::toServerTime($result, $useTimeZone);
+            return self::toServerTime($result, $useTimezone);
         }
         return 0;
     }
@@ -149,14 +163,14 @@ class DateTime {
     /**
      * Returns the given string as a time of the end of the day
      * @param string  $string
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toDayEnd(string $string, bool $useTimeZone = true): int {
+    public static function toDayEnd(string $string, bool $useTimezone = true): int {
         $result = strtotime($string);
         if ($result !== false) {
             $result += 24 * 3600 - 1;
-            return self::toServerTime($result, $useTimeZone);
+            return self::toServerTime($result, $useTimezone);
         }
         return 0;
     }
@@ -191,12 +205,12 @@ class DateTime {
      * Returns true if the given dates are a valid period
      * @param string  $fromDate
      * @param string  $toDate
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return boolean
      */
-    public static function isValidPeriod(string $fromDate, string $toDate, bool $useTimeZone = true): bool {
-        $fromTime = self::toDayStart($fromDate, $useTimeZone);
-        $toTime   = self::toDayEnd($toDate, $useTimeZone);
+    public static function isValidPeriod(string $fromDate, string $toDate, bool $useTimezone = true): bool {
+        $fromTime = self::toDayStart($fromDate, $useTimezone);
+        $toTime   = self::toDayEnd($toDate, $useTimezone);
         
         return $fromTime !== null && $toTime !== null && $fromTime < $toTime;
     }
@@ -209,8 +223,8 @@ class DateTime {
      */
     public static function isValidHourPeriod(string $fromHour, string $toHour): bool {
         $date     = date("d-m-Y");
-        $fromTime = self::toHour($date, $fromHour);
-        $toTime   = self::toHour($date, $toHour);
+        $fromTime = self::toTimeHour($date, $fromHour);
+        $toTime   = self::toTimeHour($date, $toHour);
         
         return $fromTime !== 0 && $toTime !== 0 && $fromTime < $toTime;
     }
@@ -221,7 +235,7 @@ class DateTime {
      * @param string  $fromHour
      * @param string  $toDate
      * @param string  $toHour
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return boolean
      */
     public static function isValidFullPeriod(
@@ -229,10 +243,10 @@ class DateTime {
         string $fromHour,
         string $toDate,
         string $toHour,
-        bool $useTimeZone = true
+        bool $useTimezone = true
     ): bool {
-        $fromTime = self::toHour($fromDate, $fromHour, $useTimeZone);
-        $toTime   = self::toHour($toDate, $toHour, $useTimeZone);
+        $fromTime = self::toTimeHour($fromDate, $fromHour, $useTimezone);
+        $toTime   = self::toTimeHour($toDate, $toHour, $useTimezone);
         
         return $fromTime !== 0 && $toTime !== 0 && $fromTime < $toTime;
     }
@@ -252,11 +266,11 @@ class DateTime {
      * Returns true if the given Date is in the future
      * @param string  $date
      * @param string  $type        Optional.
-     * @param boolean $useTimeZone Optional.
+     * @param boolean $useTimezone Optional.
      * @return boolean
      */
-    public static function isFutureDate(string $date, string $type = "middle", bool $useTimeZone = true): bool {
-        $time = self::toDay($date, $type, $useTimeZone);
+    public static function isFutureDate(string $date, string $type = "middle", bool $useTimezone = true): bool {
+        $time = self::toDay($date, $type, $useTimezone);
         return self::isFutureTime($time);
     }
 
@@ -291,6 +305,20 @@ class DateTime {
     }
     
 
+
+    /**
+     * Formats the time using the given Time Zone
+     * @param integer $seconds
+     * @param string  $format
+     * @param integer $timezone Optional.
+     * @return string
+     */
+    public static function format(int $seconds, string $format, int $timezone = null) {
+        if (!empty($timezone)) {
+            $seconds = self::toTimezone($seconds, $timezone);
+        }
+        return date($format, $seconds);
+    }
 
     /**
      * Returns the Seconds as a string
