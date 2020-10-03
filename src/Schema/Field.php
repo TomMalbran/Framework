@@ -134,6 +134,8 @@ class Field {
                 $type = "smallint";
             } elseif ($length < 8) {
                 $type = "mediumint";
+            } elseif ($length > 10) {
+                $type = "bigint";
             }
             $result = "$type($length)$sign NOT NULL";
             break;
