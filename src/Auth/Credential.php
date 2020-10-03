@@ -3,6 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Request;
 use Framework\Auth\Access;
+use Framework\Auth\Document;
 use Framework\File\Path;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
@@ -198,6 +199,7 @@ class Credential {
         foreach ($request as $row) {
             $fields = $row;
             $fields["credentialName"] = self::createName($row);
+            $fields["document"]       = Document::forCredential($row);
 
             if (!empty($row["avatar"]) && Path::exists("avatars", $row["avatar"])) {
                 $fields["avatarFile"] = $row["avatar"];
