@@ -197,15 +197,20 @@ class Arrays {
      * @param string          $key
      * @param string|string[] $value
      * @param boolean         $useEmpty Optional.
+     * @param string          $extra    Optional.
      * @return array
      */
-    public static function createSelect(array $array, string $key, $value, bool $useEmpty = false): array {
+    public static function createSelect(array $array, string $key, $value, bool $useEmpty = false, string $extra = null): array {
         $result = [];
         foreach ($array as $row) {
-            $result[] = [
+            $fields = [
                 "key"   => $row[$key],
                 "value" => self::getValue($row, $value, " - ", "", $useEmpty),
             ];
+            if ($extra) {
+                $fields[$extra] = self::getValue($row, $extra);
+            }
+            $result[] = $fields;
         }
         return $result;
     }
