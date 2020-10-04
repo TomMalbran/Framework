@@ -1,13 +1,13 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Request;
 use Framework\File\Path;
 use Framework\Utils\JSON;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
-use Framework\Request;
 
 /**
  * The Database Field

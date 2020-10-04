@@ -84,6 +84,16 @@ class Model implements ArrayAccess {
         }
         return $default;
     }
+
+    /**
+     * Returns the first not empty value with the given keys
+     * @param string[] $keys
+     * @param mixed    $default Optional.
+     * @return mixed
+     */
+    public function getAnyValue(array $keys, $default = null) {
+        return Arrays::getAnyValue($this->data, $keys, $default);
+    }
     
     
     

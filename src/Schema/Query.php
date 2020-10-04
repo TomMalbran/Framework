@@ -314,6 +314,19 @@ class Query {
     }
 
     /**
+     * Adds a Limit
+     * @param integer $from Optional.
+     * @param integer $to   Optional.
+     * @return Query
+     */
+    public function limitIf(int $from = null, int $to = null) {
+        if (!empty($from)) {
+            $this->limit($from, $to);
+        }
+        return $this;
+    }
+
+    /**
      * Adds a limit using pagination
      * @param integer $page   Optional.
      * @param integer $amount Optional.

@@ -1,10 +1,10 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Request;
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
 use Framework\Schema\Query;
-use Framework\Request;
 
 /**
  * The Modification Wrapper

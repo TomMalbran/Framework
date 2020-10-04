@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Request;
 use Framework\Schema\Database;
 use Framework\Schema\Selection;
 use Framework\Schema\Modification;
@@ -8,7 +9,6 @@ use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Request;
 
 /**
  * The Database Schema
@@ -151,19 +151,27 @@ class Schema {
 
     /**
      * Selects the given column from a single table and returns the entire column
-     * @param Query           $query
-     * @param string|string[] $columns
-     * @param string|string[] $names
+     * @param Query   $query
+     * @param array   $selects
+     * @param boolean $decrypted Optional.
+     * @param boolean $withSubs  Optional.
      * @return array
      */
-    public function getColumns(Query $query, $columns, $names): array {
+    public function getColumns(Query $query, array $selects, bool $decrypted = false, bool $withSubs = false): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
-        $selection->addFields();
-        $selection->addSelects($columns);
+        $selection->addFields($decrypted);
+        $selection->addSelects(array_values($selects));
         $selection->addJoins();
         $selection->request($query);
-        return $selection->resolve($names);
+
+        $result = $selection->resolve(array_keys($selects));
+        if ($withSubs) {
+            foreach ($this->subrequests as $subrequest) {
+                $result = $subrequest->request($result);
+            }
+        }
+        return $result;
     }
 
     /**
