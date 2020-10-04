@@ -58,6 +58,15 @@ class Request implements ArrayAccess {
     public function __isset(string $key): bool {
         return $this->exists($key);
     }
+
+    /**
+     * Removes the request data at the given key
+     * @param string $key
+     * @return void
+     */
+    public function __unset(string $key) {
+        $this->remove($key);
+    }
     
     
     
@@ -178,7 +187,7 @@ class Request implements ArrayAccess {
     }
 
     /**
-     * Removes the data at the given key
+     * Removes the request data at the given key
      * @param string $key
      * @return void
      */
