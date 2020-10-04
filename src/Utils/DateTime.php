@@ -195,8 +195,8 @@ class DateTime {
     public static function isValidHour(string $string, array $minutes = null): bool {
         $parts = Strings::split($string, ":");
         return (
-            !empty($parts[0]) && Numbers::isValid($parts[0], 0, 23) &&
-            !empty($parts[1]) && Numbers::isValid($parts[1], 0, 59) &&
+            isset($parts[0]) && Numbers::isValid($parts[0], 0, 23) &&
+            isset($parts[1]) && Numbers::isValid($parts[1], 0, 59) &&
             (empty($minutes) || Arrays::contains($minutes, $parts[1]))
         );
     }
