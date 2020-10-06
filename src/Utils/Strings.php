@@ -210,13 +210,26 @@ class Strings {
      * Splits the given String at the given Needle
      * @param string[]|string $string
      * @param string          $needle
+     * @param boolean         $trim      Optional.
+     * @param boolean         $skipEmpty Optional.
      * @return string[]
      */
-    public static function split($string, string $needle): array {
-        if (!is_array($string)) {
-            return !empty($string) ? explode($needle, $string) : [];
+    public static function split($string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
+        if (is_array($string)) {
+            return $string;
         }
-        return $string;
+        $content = !empty($string) ? explode($needle, $string) : [];
+        if (!$trim) {
+            return $content;
+        }
+        $parts  = Strings::split($content, ",");
+        $result = [];
+        foreach ($parts as $part) {
+            if (!$skipEmpty || ($skipEmpty && !empty($part))) {
+                $result[] = trim($part);
+            }
+        }
+        return $result;
     }
 
     /**

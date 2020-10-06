@@ -217,41 +217,6 @@ class Utils {
 
 
     /**
-     * Converts an array or string to a CSV string
-     * @param string[]|string $value
-     * @return string
-     */
-    public static function toCSV($value): string {
-        if (is_string($value)) {
-            $parts = Strings::split($value, ",");
-            $parts = Arrays::removeEmpty($parts);
-            return Strings::join($parts, ",");
-        }
-        if (is_array($value)) {
-            $parts = Arrays::removeEmpty($value);
-            return Strings::join($parts, ",");
-        }
-        return "";
-    }
-
-    /**
-     * Converts an array or string to a CSV array
-     * @param string[]|string $value
-     * @return array
-     */
-    public static function fromCSV($value): array {
-        if (is_string($value)) {
-            return Strings::split($value, ",");
-        }
-        if (is_array($value)) {
-            return $value;
-        }
-        return [];
-    }
-    
-    
-    
-    /**
      * Returns the extension of the given domain (without the dot)
      * @param string $domain
      * @return string

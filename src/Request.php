@@ -7,6 +7,7 @@ use Framework\File\Image;
 use Framework\Utils\DateTime;
 use Framework\Utils\Numbers;
 use Framework\Utils\Status;
+use Framework\Utils\CSV;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 use ArrayAccess;
@@ -530,7 +531,7 @@ class Request implements ArrayAccess {
      * @return string
      */
     public function toCSV(string $key): string {
-        return Utils::toCSV($this->get($key));
+        return CSV::encode($this->get($key));
     }
 
     /**

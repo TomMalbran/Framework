@@ -58,7 +58,7 @@ class JSON {
      * @return string
      */
     public static function toCSV(string $value): string {
-        $value = self::decode($value);
+        $content = self::decode($value);
         return Strings::join($value, ", ");
     }
 
@@ -68,14 +68,8 @@ class JSON {
      * @return string
      */
     public static function fromCSV(string $value): string {
-        $parts  = Strings::split($value, ",");
-        $result = [];
-        foreach ($parts as $part) {
-            if (!empty($part)) {
-                $result[] = trim($part);
-            }
-        }
-        return self::encode($result);
+        $content = Strings::split($value, ",", true, true);
+        return self::encode($content);
     }
 
 
@@ -86,7 +80,7 @@ class JSON {
      * @param boolean $asArray Optional.
      * @return object|array
      */
-    public static function readFile(string $path, $asArray = false) {
+    public static function readFile(string $path, bool $asArray = false) {
         if (File::exists($path)) {
             return self::decode(file_get_contents($path), $asArray);
         }
@@ -99,7 +93,7 @@ class JSON {
      * @param boolean $asArray Optional.
      * @return object|array
      */
-    public static function readUrl(string $url, $asArray = false) {
+    public static function readUrl(string $url, bool $asArray = false) {
         return self::decode(file_get_contents($url), $asArray);
     }
 
