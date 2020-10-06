@@ -14,6 +14,7 @@ class FileType {
      */
     public static $imageExts        = [ "jpg", "jpeg", "gif", "png", "ico" ];
     public static $pngExts          = [ "png" ];
+    public static $icoExts          = [ "ico" ];
     public static $videoExts        = [ "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm" ];
     public static $audioExts        = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];
     public static $codeExts         = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
@@ -61,6 +62,15 @@ class FileType {
      */
     public static function isPNG(string $file): bool {
         return File::hasExtension($file, self::$pngExts);
+    }
+
+    /**
+     * Returns true if the given file is a ICO
+     * @param string $file
+     * @return boolean
+     */
+    public static function isICO(string $file): bool {
+        return File::hasExtension($file, self::$icoExts);
     }
 
     /**
