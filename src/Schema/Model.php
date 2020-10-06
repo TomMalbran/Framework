@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Utils\Arrays;
 use ArrayAccess;
 
 /**
