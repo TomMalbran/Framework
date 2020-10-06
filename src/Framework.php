@@ -32,16 +32,18 @@ class Framework {
 
     // The Directories
     const SourceDir     = "src";
+    
     const DataDir       = "data";
-    const NLSDir        = "nls";
+    const MigrationsDir = "data/migrations";
     
     const PublicDir     = "public";
     const TemplatesDir  = "templates";
     const PartialsDir   = "partials";
-    const MigrationsDir = "migrations";
-
+    
     const FilesDir      = "files";
     const TempDir       = "temp";
+
+    const NLSDir        = "nls";
     
     // Config
     const Namespace     = "App\\Controller\\";
