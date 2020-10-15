@@ -221,7 +221,7 @@ class Mailer {
      * @param string $attachment
      * @return boolean
      */
-    public function sendBackup(string $sendTo, string $attachment): bool {
+    public static function sendBackup(string $sendTo, string $attachment): bool {
         $subject = Config::get("name") . ": Database Backup";
         $message = "Backup de la base de datos al dia: " . date("d M Y, H:i:s");
         

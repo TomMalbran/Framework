@@ -106,7 +106,7 @@ class Errors {
         if ($error === null) {
             return !empty($this->errors);
         }
-        $errors = !is_array($error) ? [ $error ] : $error;
+        $errors = Arrays::toArray($error);
         foreach ($errors as $err) {
             if (!empty($this->errors[$err])) {
                 return true;
