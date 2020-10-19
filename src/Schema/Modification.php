@@ -63,16 +63,21 @@ class Modification {
     private function parseFields(Request $request): array {
         $result = [];
         foreach ($this->structure->fields as $field) {
-            if ($field->canEdit) {
-                $value = $field->fromRequest($request, $this->structure->masterKey);
+            if (!$field->canEdit) {
+                continue;
+            }
+            $value = $field->fromRequest($request, $this->structure->masterKey);
 
-                if ($field->noEmpty) {
-                    if (!empty($value)) {
-                        $result[$field->key] = $value;
-                    }
-                } elseif ($value !== null) {
+            if ($field->noExists) {
+                if ($request->exists($field->name)) {
                     $result[$field->key] = $value;
                 }
+            } elseif ($field->noEmpty) {
+                if (!empty($value)) {
+                    $result[$field->key] = $value;
+                }
+            } elseif ($value !== null) {
+                $result[$field->key] = $value;
             }
         }
         return $result;

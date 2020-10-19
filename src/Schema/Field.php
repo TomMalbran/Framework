@@ -43,6 +43,7 @@ class Field {
     public $isPrimary  = false;
     public $isKey      = false;
     public $isName     = false;
+    public $noExists   = false;
     public $noEmpty    = false;
     public $isSigned   = false;
     public $noPrefix   = false;
@@ -77,6 +78,7 @@ class Field {
         $this->isPrimary  = !empty($data["isPrimary"]);
         $this->isKey      = !empty($data["isKey"]);
         $this->isName     = !empty($data["isName"]);
+        $this->noExists   = !empty($data["noExists"]);
         $this->noEmpty    = !empty($data["noEmpty"]);
         $this->isSigned   = !empty($data["isSigned"]);
         $this->noPrefix   = !empty($data["noPrefix"]);
