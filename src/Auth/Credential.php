@@ -527,7 +527,7 @@ class Credential {
 
 
     /**
-     * Creates a hash and salt (if required) for the the given password
+     * Creates a Hash and Salt (if required) for the the given Password
      * @param string $pass
      * @param string $salt Optional.
      * @return array
@@ -541,10 +541,11 @@ class Credential {
     /**
      * Returns the Real Name for the given User
      * @param Model|array $data
-     * @param string      $prefix
+     * @param string      $prefix   Optional.
+     * @param boolean     $withNick Optional.
      * @return string
      */
-    public static function createName($data, string $prefix = ""): string {
+    public static function createName($data, string $prefix = "", bool $withNick = false): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
@@ -553,7 +554,7 @@ class Credential {
         
         if (!empty($firstName) && !empty($lastName)) {
             $result = "$firstName $lastName";
-            if (!empty($nickName)) {
+            if ($withNick && !empty($nickName)) {
                 $result .= " ($nickName)";
             }
         }
