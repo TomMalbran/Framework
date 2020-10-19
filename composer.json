@@ -14,12 +14,14 @@
         "vlucas/phpdotenv": "^4.0"
     },
     "suggest" : {
+        "mustache/mustache": "Used for Rendering templates",
         "firebase/php-jwt": "Used in Auth",
         "phpmailer/phpmailer": "Used for Mailing",
         "league/oauth2-google": "Used for Mailing with Gmail",
         "drewm/mailchimp-api": "Used for Mailing with MailChimp",
-        "mustache/mustache": "Used for Rendering templates",
-        "phpoffice/phpspreadsheet": "Used to Import/Export data"
+        "phpoffice/phpspreadsheet": "Used to Import/Export data",
+        "norkunas/onesignal-php-api": "Used for App Notifications",
+        "php-http/guzzle6-adapter": "Used for App Notifications"
     },
     "autoload": {
         "psr-4": {
