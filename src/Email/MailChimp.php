@@ -52,6 +52,7 @@ class MailChimp {
      * @return array
      */
     public static function getAllSubscribers(int $amount = 100): array {
+        self::load();
         if (!self::$api) {
             return null;
         }
@@ -66,6 +67,7 @@ class MailChimp {
      * @return array
      */
     public static function getOneSubscriber(string $email): array {
+        self::load();
         if (!self::$api) {
             return null;
         }
@@ -83,6 +85,7 @@ class MailChimp {
      * @return boolean
      */
     public static function addSubscriber(string $email, string $firstName, string $lastName): boolean {
+        self::load();
         if (!self::$api || !self::$config->clientActive) {
             return false;
         }
@@ -104,6 +107,7 @@ class MailChimp {
      * @return void
      */
     public static function addSubscriberBatch(array $subscribers): void {
+        self::load();
         if (!self::$api || !self::$config->clientActive) {
             return;
         }
@@ -130,6 +134,7 @@ class MailChimp {
      * @return boolean
      */
     public static function editSubscriber(string $email, string $firstName, string $lastName, string $status = "subscribed"): boolean {
+        self::load();
         if (!self::$api || !self::$config->clientActive) {
             return false;
         }
@@ -152,6 +157,7 @@ class MailChimp {
      * @return boolean
      */
     public static function deleteSubscriber(string $email): boolean {
+        self::load();
         if (!self::$api || !self::$config->clientActive) {
             return false;
         }
@@ -174,6 +180,8 @@ class MailChimp {
      * @return string|null
      */
     public static function sendCampaign(string $subject, int $templateID, array $sections, array $emails = null, int $folderID = 0, int $time = null) {
+        self::load();
+
         // We do Nothing
         if (!self::$api || !self::$config->createActive) {
             return "disabled";
@@ -306,6 +314,7 @@ class MailChimp {
      * @return array
      */
     public static function getReport(string $mailChimpID): array {
+        self::load();
         $result = [
             "hasReport"    => false,
             "opensUnique"  => 0,
@@ -334,6 +343,7 @@ class MailChimp {
      * @return array
      */
     public static function getOpenDetails(string $mailChimpID): array {
+        self::load();
         $result = [];
         if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
             return $result;
@@ -354,6 +364,7 @@ class MailChimp {
      * @return array
      */
     public static function getClickDetails(string $mailChimpID): array {
+        self::load();
         $result = [];
         if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
             return $result;
