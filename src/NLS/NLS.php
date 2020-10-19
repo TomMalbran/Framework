@@ -40,7 +40,7 @@ class NLS {
             return $data[$key];
         }
         if ($nls != Language::getNLS("root")) {
-            return get($key);
+            return self::get($key);
         }
         return "";
     }
