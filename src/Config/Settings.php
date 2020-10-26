@@ -80,7 +80,7 @@ class Settings {
      * @param string $section Optional.
      * @return array
      */
-    public function getAll(string $section = null): array {
+    public static function getAll(string $section = null): array {
         $request = self::getSettings($section);
         $result  = [];
 
@@ -103,7 +103,7 @@ class Settings {
      * @param string $section Optional.
      * @return array
      */
-    public function getAllParsed(string $section = null): array {
+    public static function getAllParsed(string $section = null): array {
         $request = self::getSettings($section);
         $result  = [];
 
