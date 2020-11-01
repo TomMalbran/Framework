@@ -111,7 +111,7 @@ class Notification {
 
         $icon = "";
         if (!empty(self::$config->icon)) {
-            $icon = Path::getUrl("email", self::$config->icon);
+            $icon = Path::getUrl("framework", self::$config->icon);
         }
         $response = self::$api->notifications->add([
             "headings"       => [ "en" => $title ],

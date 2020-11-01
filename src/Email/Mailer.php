@@ -148,11 +148,15 @@ class Mailer {
      */
     public static function sendHtml(string $to, string $from, string $fromName, string $subject, string $message): bool {
         self::load();
+        $logo = "";
+        if (!empty(self::$smtp->logo)) {
+            $logo = self::$smtp->logo;
+        }
         $body = Mustache::render(self::$template, [
             "url"      => self::$url,
             "name"     => self::$name,
-            "files"    => Path::getUrl("email"),
-            "logo"     => self::$smtp->logo ?: "",
+            "files"    => Path::getUrl("framework"),
+            "logo"     => $logo,
             "siteName" => self::$name,
             "message"  => $message,
         ]);
