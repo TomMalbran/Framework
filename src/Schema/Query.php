@@ -228,7 +228,7 @@ class Query {
                 $this->startOr();
             }
             foreach ($columns as $columnSearch) {
-                $this->add($columnSearch, "LIKE", $valueSearch);
+                $this->add($columnSearch, $expression, $valueSearch);
             }
             if ($multicols) {
                 $this->endOr();
