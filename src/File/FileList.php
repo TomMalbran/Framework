@@ -26,7 +26,7 @@ class FileList {
         $imgWidth  = 0;
         $imgHeight = 0;
         if ($isImage) {
-            [ $imgWidth, $imgHeight ] = Image::getSize($source);
+            [ $imgWidth, $imgHeight ] = getimagesize($source);
         }
         $this->list[] = [
             "name"          => $name,
