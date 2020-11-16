@@ -307,6 +307,14 @@ class Model implements ArrayAccess {
         var_dump($this->data);
     }
 
+    /**
+     * Return the Data for var_dump
+     * @return array
+     */
+    public function __debugInfo(): array {
+        return $this->data;
+    }
+
 
     
     /**
