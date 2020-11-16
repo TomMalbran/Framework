@@ -606,7 +606,7 @@ class Database {
         foreach ($fields as $key => $type) {
             $sql .= "  `$key` " . $type . ",\n";
         }
-        $sql .= "  PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
+        $sql .= "  PRIMARY KEY (`" . Strings::join($primary, "`, `") . "`)";
         foreach ($keys as $key) {
             $sql .= ",\n  KEY `$field->key` (`$field->key`)";
         }
