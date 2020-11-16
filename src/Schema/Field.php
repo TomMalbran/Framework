@@ -179,6 +179,9 @@ class Field {
         case self::Binary:
             $result = $request->toBinary($this->name);
             break;
+        case self::String:
+            $result = $request->getString($this->name);
+            break;
         case self::Number:
             $result = $request->getInt($this->name);
             break;
