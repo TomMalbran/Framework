@@ -718,7 +718,35 @@ class Request implements ArrayAccess {
     }
     
     
-    
+
+    /**
+     * Prints the Request
+     * @return void
+     */
+    public function print(): void {
+        print("<pre>");
+        print_r($this->request);
+        print("</pre>");
+    }
+
+    /**
+     * Dumps the Request
+     * @return void
+     */
+    public function dump(): void {
+        var_dump($this->request);
+    }
+
+    /**
+     * Return the Data for var_dump
+     * @return array
+     */
+    public function __debugInfo(): array {
+        return $this->request;
+    }
+
+
+
     /**
      * Implements the Array Access Interface
      * @param mixed $key
