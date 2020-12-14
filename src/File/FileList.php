@@ -17,16 +17,17 @@ class FileList {
      * @param string  $name
      * @param string  $path
      * @param boolean $isDir
-     * @param string  $source
-     * @param string  $thumb
+     * @param string  $sourcePath
+     * @param string  $sourceUrl
+     * @param string  $thumbUrl
      * @return void
      */
-    public function add(string $name, string $path, bool $isDir, string $source, string $thumb): void {
+    public function add(string $name, string $path, bool $isDir, string $sourcePath, string $sourceUrl, string $thumbUrl): void {
         $isImage   = !$isDir && FileType::isImage($name);
         $imgWidth  = 0;
         $imgHeight = 0;
         if ($isImage) {
-            [ $imgWidth, $imgHeight ] = getimagesize($source);
+            [ $imgWidth, $imgHeight ] = getimagesize($sourcePath);
         }
         $this->list[] = [
             "name"          => $name,
@@ -38,9 +39,9 @@ class FileList {
             "isTransparent" => $isImage && FileType::isPNG($name),
             "isFile"        => !$isImage,
             "icon"          => $isDir ? "directory" : FileType::getIcon($name),
-            "source"        => $source,
-            "url"           => $source,
-            "thumb"         => $thumb,
+            "source"        => $sourceUrl,
+            "url"           => $sourceUrl,
+            "thumb"         => $thumbUrl,
             "width"         => $imgWidth,
             "height"        => $imgHeight,
         ];
