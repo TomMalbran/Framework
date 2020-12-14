@@ -570,6 +570,28 @@ class Database {
     }
 
     /**
+     * Returns the Table Primary Key with Auto Increment
+     * @param string $table
+     * @return string
+     */
+    public function getAutoIncrement(string $table): string {
+        $tableName = $this->getTableName($table);
+        $request   = $this->query("SELECT *
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = '$tableName'
+                AND DATA_TYPE = 'int'
+                AND COLUMN_DEFAULT IS NULL
+                AND IS_NULLABLE = 'NO'
+                AND EXTRA like '%auto_increment%'
+            LIMIT 1
+        ");
+        if (!empty($request[0])) {
+            return $request[0]["COLUMN_NAME"];
+        }
+        return "";
+    }
+
+    /**
      * Returns the Table Keys
      * @param string $table
      * @return array
@@ -592,6 +614,18 @@ class Database {
 
 
     /**
+     * Returns true if a Table exists
+     * @param string $table
+     * @return string
+     */
+    public function tableExists(string $table): string {
+        $tableName = $this->getTableName($table);
+        $sql       = "SHOW TABLES LIKE '$tableName'";
+        $result    = $this->query($sql);
+        return !empty($result);
+    }
+
+    /**
      * Creates a Table
      * @param string $table
      * @param array  $fields
@@ -612,6 +646,20 @@ class Database {
         }
         $sql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
+        $this->query($sql);
+        return $sql;
+    }
+
+    /**
+     * Renames a Table
+     * @param string $oldTable
+     * @param string $newTable
+     * @return string
+     */
+    public function renameTable(string $oldTable, string $newTable): string {
+        $oldName = $this->getTableName($oldTable);
+        $newName = $this->getTableName($newTable);
+        $sql     = "ALTER TABLE `$oldName` RENAME `$newName`";
         $this->query($sql);
         return $sql;
     }
@@ -699,6 +747,18 @@ class Database {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName DROP PRIMARY KEY \n";
         $sql      .= "ALTER TABLE $tableName ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
+        $this->query($sql);
+        return $sql;
+    }
+
+    /**
+     * Drops the Primary Keys on the Table
+     * @param string $table
+     * @return string
+     */
+    public function drpoPrimary(string $table): string {
+        $tableName = $this->getTableName($table);
+        $sql       = "ALTER TABLE $tableName DROP PRIMARY KEY";
         $this->query($sql);
         return $sql;
     }

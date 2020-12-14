@@ -16,9 +16,13 @@ class Subrequest {
     private $idKey    = "";
     private $idName   = "";
 
+    private $hasWhere = false;
+    private $where    = null;
+
     private $hasOrder = false;
     private $orderBy  = "";
     private $isAsc    = false;
+
     private $field    = "";
     private $value    = null;
     
@@ -37,9 +41,13 @@ class Subrequest {
         $this->idKey     = !empty($data["idKey"])   ? $data["idKey"]   : $structure->idKey;
         $this->idName    = !empty($data["idName"])  ? $data["idName"]  : $structure->idName;
 
+        $this->hasWhere  = !empty($data["where"]);
+        $this->where     = !empty($data["where"])   ? $data["where"]   : null;
+
         $this->hasOrder  = !empty($data["orderBy"]);
         $this->orderBy   = !empty($data["orderBy"]) ? $data["orderBy"] : "";
         $this->isAsc     = !empty($data["isAsc"])   ? $data["isAsc"]   : false;
+
         $this->field     = !empty($data["field"])   ? $data["field"]   : "";
         $this->value     = !empty($data["value"])   ? $data["value"]   : null;
     }
@@ -55,6 +63,9 @@ class Subrequest {
         $ids   = Arrays::createArray($result, $this->idName);
         $query = Query::create($this->idKey, "IN", $ids);
 
+        if ($this->hasWhere) {
+            $query->add($this->where[0], $this->where[1], $this->where[2]);
+        }
         if ($this->hasOrder) {
             $query->orderBy($this->orderBy, $this->isAsc);
         }

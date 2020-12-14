@@ -2,6 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Framework;
+use Framework\Config\Settings;
 use Framework\File\File;
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
@@ -21,6 +22,49 @@ class Migration {
      * @return void
      */
     public static function migrate(Database $db, array $schemas, bool $canDelete = false): void {
+        self::moveTables($db);
+        self::migrateTables($db, $schemas, $canDelete);
+        self::extraMigrations($db);
+    }
+
+    /**
+     * Moves the Tables
+     * @param Database $db
+     * @return void
+     */
+    private static function moveTables(Database $db) {
+        $movement  = Settings::getCore($db, "movement");
+        $movements = Framework::loadData("migrations/movements");
+        $last      = count($movements);
+        $didMove   = false;
+
+        for ($i = $movement; $i < $last; $i++) {
+            $oldName = $movements[$i]["old"];
+            $newName = $movements[$i]["new"];
+
+            if ($db->tableExists($oldName)) {
+                $db->renameTable($oldName, $newName);
+                print("Renamed table <i>$oldName</i> to <b>$newName</b><br>");
+                $didMove = true;
+            }
+        }
+
+        if ($didMove) {
+            print("<br>");
+        } else {
+            print("No <i>movements</i> required<br>");
+        }
+        Settings::setCore($db, "movement", $last);
+    }
+    
+    /**
+     * Migrates the Tables
+     * @param Database $db
+     * @param array    $schemas
+     * @param boolean  $canDelete Optional.
+     * @return void
+     */
+    private static function migrateTables(Database $db, array $schemas, bool $canDelete = false) {
         $tableNames  = $db->getTables(null, false);
         $schemaNames = [];
         
@@ -38,9 +82,6 @@ class Migration {
 
         // Delete the Tables or show which to delete
         self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
-
-        // Run extra migrations created in files
-        self::extraMigrations($db);
     }
 
     /**
@@ -100,6 +141,7 @@ class Migration {
      * @return void
      */
     private static function updateTable(Database $db, Structure $structure, bool $canDelete): void {
+        $autoKey     = $db->getAutoIncrement($structure->table);
         $primaryKeys = $db->getPrimaryKeys($structure->table);
         $tableKeys   = $db->getTableKeys($structure->table);
         $tableFields = $db->getTableFields($structure->table);
@@ -110,6 +152,8 @@ class Migration {
         $renames     = [];
         $primary     = [];
         $addPrimary  = false;
+        $dropPrimary = false;
+        $canDrop     = !empty($primaryKeys);
         $keys        = [];
         $prev        = "";
         
@@ -139,11 +183,25 @@ class Migration {
                 ];
             } elseif (!$found) {
                 $update = true;
-                $adds[] = [
-                    "key"   => $field->key,
-                    "type"  => $type,
-                    "after" => $prev,
-                ];
+                if ($field->isID && !empty($autoKey)) {
+                    $primaryKeys[] = $field->key;
+                    $renames[]     = [
+                        "key"  => $autoKey,
+                        "new"  => $field->key,
+                        "type" => $type,
+                    ];
+                } else {
+                    if ($field->isID) {
+                        $dropPrimary   = true;
+                        $primaryKeys[] = $field->key;
+                        $type         .= " PRIMARY KEY";
+                    }
+                    $adds[] = [
+                        "key"   => $field->key,
+                        "type"  => $type,
+                        "after" => $prev,
+                    ];
+                }
             }
             $prev = $field->key;
         }
@@ -221,8 +279,8 @@ class Migration {
         
         // Update the Table
         print("<br>Updated table <b>$structure->table</b> ... <br>");
-        foreach ($adds as $add) {
-            $sql = $db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
+        if ($dropPrimary && $canDrop) {
+            $sql = $db->drpoPrimary($structure->table);
             print("$sql<br>");
         }
         foreach ($renames as $rename) {
@@ -231,6 +289,10 @@ class Migration {
         }
         foreach ($modifies as $modify) {
             $sql = $db->updateColumn($structure->table, $modify["key"], $modify["type"]);
+            print("$sql<br>");
+        }
+        foreach ($adds as $add) {
+            $sql = $db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
             print("$sql<br>");
         }
         foreach ($drops as $drop) {
@@ -256,10 +318,9 @@ class Migration {
      * @return void
      */
     private static function extraMigrations(Database $db) {
-        $query     = Query::create("section", "=", "general")->add("variable", "=", "migration");
-        $migration = $db->getValue("settings", "value", $query);
+        $migration = Settings::getCore($db, "migration");
+        $path      = Framework::getPath(Framework::MigrationsDir);
 
-        $path  = Framework::getPath(Framework::MigrationsDir);
         if (!File::exists($path)) {
             print("<br>No <i>migrations</i> required<br>");
             return;
@@ -268,10 +329,12 @@ class Migration {
         $files = File::getFilesInDir($path);
         $names = [];
         foreach ($files as $file) {
-            $names[] = (int)File::getName($file);
+            if (File::hasExtension($file, "php")) {
+                $names[] = (int)File::getName($file);
+            }
         }
-
         sort($names);
+
         $first = !empty($migration) ? $migration + 1 : 1;
         $last  = end($names);
         if (empty($names) || $first > $last) {
@@ -287,10 +350,6 @@ class Migration {
             }
         }
 
-        $db->insert("settings", [
-            "section"  => "general",
-            "variable" => "migration",
-            "value"    => $last,
-        ], "REPLACE");
+        Settings::setCore($db, "migration", $last);
     }
 }

@@ -124,7 +124,7 @@ class Selection {
             $asKey      = $count->asKey;
             $onTable    = $count->onTable ?: $this->structure->table;
             $leftKey    = $count->leftKey;
-            $where      = $count->noDeleted ? "WHERE isDeleted = 0" : "";
+            $where      = $count->getWhere();
             $select     = "SELECT $groupKey, $what AS $asKey FROM $table $where GROUP BY $groupKey";
             $expression = "LEFT JOIN ($select) AS $joinKey ON ($joinKey.$leftKey = $onTable.$key)";
 

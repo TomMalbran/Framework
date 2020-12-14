@@ -153,6 +153,33 @@ class Settings {
 
 
     /**
+     * Returns a Core Setting
+     * @param Database $db
+     * @param string   $variable
+     * @return integer
+     */
+    public static function getCore(Database $db, string $variable): int {
+        $query  = Query::create("section", "=", "general")->add("variable", "=", $variable);
+        $result = $db->getValue("settings", "value", $query);
+        return !empty($result) ? $result : 0;
+    }
+
+    /**
+     * Sets a Core Preference
+     * @param Database $db
+     * @param string   $variable
+     * @param integer  $value
+     * @return void
+     */
+    public static function setCore(Database $db, string $variable, int $value): void {
+        $db->insert("settings", [
+            "section"  => "general",
+            "variable" => $variable,
+            "value"    => $value,
+        ], "REPLACE");
+    }
+
+    /**
      * Migrates the Settings
      * @param Database $db
      * @return void

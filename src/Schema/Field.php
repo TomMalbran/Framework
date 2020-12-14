@@ -40,6 +40,7 @@ class Field {
     public $hour       = "";
     public $default    = null;
     
+    public $isID       = false;
     public $isPrimary  = false;
     public $isKey      = false;
     public $isName     = false;
@@ -75,6 +76,7 @@ class Field {
         $this->hour       = !empty($data["hour"])     ? $data["hour"]          : null;
         $this->default    = !empty($data["default"])  ? $data["default"]       : null;
 
+        $this->isID       = $this->type === self::ID;
         $this->isPrimary  = !empty($data["isPrimary"]);
         $this->isKey      = !empty($data["isKey"]);
         $this->isName     = !empty($data["isName"]);
