@@ -39,10 +39,20 @@ class Arrays {
      * Returns true if the array contains the needle
      * @param array|mixed $array
      * @param mixed       $needle
+     * @param mixed       $key    Optional.
      * @return boolean
      */
-    public static function contains($array, $needle): bool {
-        return in_array($needle, self::toArray($array));
+    public static function contains($array, $needle, $key = null): bool {
+        $array = self::toArray($array);
+        if ($key === null) {
+            return in_array($needle, $array);
+        }
+        foreach ($array as $row) {
+            if (isset($row[$key]) && $row[$key] == $needle) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
