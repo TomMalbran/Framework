@@ -712,11 +712,13 @@ class Database {
      * @param string $table
      * @param string $column
      * @param string $type
+     * @param string $afterColumn Optional.
      * @return string
      */
-    public function updateColumn(string $table, string $column, string $type): string {
+    public function updateColumn(string $table, string $column, string $type, string $afterColumn = null): string {
         $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName MODIFY COLUMN `$column` $type";
+        $sql       = "ALTER TABLE $tableName MODIFY COLUMN `$column` $type ";
+        $sql      .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;
     }

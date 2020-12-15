@@ -21,7 +21,7 @@
             "password"      : { "type" : "string",                          "cantEdit" : true },
             "salt"          : { "type" : "string",                          "cantEdit" : true },
             "reqPassChange" : { "type" : "boolean",                         "cantEdit" : true },
-            "status"        : { "type" : "number",  "length"   : 3,         "noExists" : true },
+            "status"        : { "type" : "number",  "length" : 3,           "noExists" : true },
             "observations"  : { "type" : "text",                            "noExists" : true },
             "sendEmails"    : { "type" : "boolean",                         "noExists" : true },
             "timezone"      : { "type" : "number",  "isSigned" : true,      "cantEdit" : true },

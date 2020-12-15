@@ -52,7 +52,7 @@ class Migration {
         if ($didMove) {
             print("<br>");
         } else {
-            print("No <i>movements</i> required<br>");
+            print("No <i>movements</i> required<br><br>");
         }
         Settings::setCore($db, "movement", $last);
     }
@@ -155,9 +155,9 @@ class Migration {
         $dropPrimary = false;
         $canDrop     = !empty($primaryKeys);
         $keys        = [];
-        $prev        = "";
         
         // Add new Columns
+        $prev = "";
         foreach ($structure->fields as $field) {
             $found  = false;
             $rename = false;
@@ -222,7 +222,9 @@ class Migration {
         }
 
         // Modify Columns
+        $newPrev = "";
         foreach ($structure->fields as $field) {
+            $oldPrev = "";
             foreach ($tableFields as $tableField) {
                 if ($field->key === $tableField["Field"]) {
                     $oldData = $tableField["Type"];
@@ -236,16 +238,19 @@ class Migration {
                         $oldData .= " " . Strings::toUpperCase($tableField["Extra"]);
                     }
                     $newData = $field->getType();
-                    if ($newData !== $oldData) {
+                    if ($newData !== $oldData || $newPrev !== $oldPrev) {
                         $update     = true;
                         $modifies[] = [
-                            "key"  => $field->key,
-                            "type" => $newData,
+                            "key"   => $field->key,
+                            "type"  => $newData,
+                            "after" => $newPrev,
                         ];
                     }
                     break;
                 }
+                $oldPrev = $tableField["Field"];
             }
+            $newPrev = $field->key;
         }
 
         // Update the Table Primary Keys and Index Keys
@@ -287,12 +292,12 @@ class Migration {
             $sql = $db->renameColumn($structure->table, $rename["key"], $rename["new"], $rename["type"]);
             print("$sql<br>");
         }
-        foreach ($modifies as $modify) {
-            $sql = $db->updateColumn($structure->table, $modify["key"], $modify["type"]);
-            print("$sql<br>");
-        }
         foreach ($adds as $add) {
             $sql = $db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
+            print("$sql<br>");
+        }
+        foreach ($modifies as $modify) {
+            $sql = $db->updateColumn($structure->table, $modify["key"], $modify["type"], $modify["after"]);
             print("$sql<br>");
         }
         foreach ($drops as $drop) {
