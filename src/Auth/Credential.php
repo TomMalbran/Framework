@@ -565,6 +565,26 @@ class Credential {
     }
 
     /**
+     * Returns the Real Phone for the given User
+     * @param Model|array $data
+     * @param string      $prefix Optional.
+     * @return string
+     */
+    public static function createPhone($data, string $prefix = ""): string {
+        $phone     = Arrays::getValue($data, "phone",     "", $prefix);
+        $cellphone = Arrays::getValue($data, "cellphone", "", $prefix);
+        $iddRoot   = Arrays::getValue($data, "iddRoot",   "", $prefix);
+
+        if (!empty($cellphone) && !empty($iddRoot)) {
+            return $iddRoot . $cellphone;
+        }
+        if (!empty($cellphone)) {
+            return $cellphone;
+        }
+        return $phone;
+    }
+
+    /**
      * Seeds the Owner
      * @param Database $db
      * @param string   $firstName
