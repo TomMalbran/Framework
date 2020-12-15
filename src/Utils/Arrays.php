@@ -64,6 +64,25 @@ class Arrays {
     public static function containsKey(array $array, $needle): bool {
         return in_array($needle, array_keys($array));
     }
+
+    /**
+     * Returns true if the arrays are Equal
+     * @param array  $array
+     * @param array  $other
+     * @param string $key
+     * @return boolean
+     */
+    public static function isEqual(array $array, array $other, string $key): bool {
+        if (self::length($array) !== self::length($other)) {
+            return false;
+        }
+        foreach ($array as $row) {
+            if (!isset($row[$key]) || !self::contains($other, $row[$key], $key)) {
+                return false;
+            }
+        }
+        return true;
+    }
     
 
 
