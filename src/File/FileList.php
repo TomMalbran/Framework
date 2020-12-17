@@ -26,7 +26,7 @@ class FileList {
         $isImage   = !$isDir && FileType::isImage($name);
         $imgWidth  = 0;
         $imgHeight = 0;
-        if ($isImage) {
+        if ($isImage && file_exists($sourcePath)) {
             [ $imgWidth, $imgHeight ] = getimagesize($sourcePath);
         }
         $this->list[] = [
@@ -38,6 +38,9 @@ class FileList {
             "isImage"       => $isImage,
             "isTransparent" => $isImage && FileType::isPNG($name),
             "isFile"        => !$isImage,
+            "isPDF"         => FileType::isPDF($name),
+            "isAudio"       => FileType::isAudio($name),
+            "isDocument"    => FileType::isDocument($name),
             "icon"          => $isDir ? "directory" : FileType::getIcon($name),
             "source"        => $sourceUrl,
             "url"           => $sourceUrl,

@@ -25,6 +25,7 @@ class Framework {
     const AccessData    = "access";
     const TokenData     = "tokens";
     const PathData      = "paths";
+    const MediaData     = "media";
     const SettingsData  = "settings";
     const EmailData     = "emails";
     const LanguageData  = "languages";
