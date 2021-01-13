@@ -216,8 +216,8 @@ class Migration {
                 }
             }
             if (!$found) {
-                $drops[] = $tableKey;
                 $update  = true;
+                $drops[] = $tableKey;
             }
         }
 
@@ -258,8 +258,8 @@ class Migration {
             if ($field->isPrimary) {
                 $primary[] = $field->key;
                 if (!Arrays::contains($primaryKeys, $field->key)) {
-                    $addPrimary = true;
                     $update     = true;
+                    $addPrimary = true;
                 }
             }
             if ($field->isKey) {
@@ -270,8 +270,8 @@ class Migration {
                     }
                 }
                 if (!$found) {
-                    $keys[] = $field->key;
                     $update = true;
+                    $keys[] = $field->key;
                 }
             }
         }
