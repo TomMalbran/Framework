@@ -30,6 +30,17 @@ class Numbers {
     }
 
     /**
+     * Returns < 0 if number is less than other; > 0 if number is greater than other, and 0 if they are equal
+     * @param mixed   $number
+     * @param mixed   $other
+     * @param boolean $orderAsc Optional.
+     * @return integer
+     */
+    public static function compare($number, $other, bool $orderAsc = true) {
+        return ($number - $other) * ($orderAsc ? 1 : -1);
+    }
+
+    /**
      * Rounds the given number to the given decimals
      * @param float   $number
      * @param integer $decimals

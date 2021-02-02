@@ -275,6 +275,23 @@ class Strings {
     }
 
     /**
+     * Returns < 0 if string is less than other; > 0 if string is greater than other, and 0 if they are equal
+     * @param string  $string
+     * @param string  $other
+     * @param boolean $orderAsc        Optional.
+     * @param boolean $caseInsensitive Optional.
+     * @return integer
+     */
+    public static function compare(string $string, string $other, bool $orderAsc = true, bool $caseInsensitive = false) {
+        if ($caseInsensitive) {
+            $result = strcasecmp($string, $other);
+        } else {
+            $result = strcmp($string, $other);
+        }
+        return $orderAsc ? $result : $result * -1;
+    }
+
+    /**
      * Transforms a String to Uppercase
      * @param string $string
      * @return string
