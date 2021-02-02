@@ -470,15 +470,16 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string $column     Optional.
-     * @param string $expression Optional.
-     * @param mixed  $value      Optional.
+     * @param string  $column     Optional.
+     * @param string  $expression Optional.
+     * @param mixed   $value      Optional.
+     * @param boolean $condition  Optional.
      * @return Query
      */
-    public static function createIf(string $column = "", string $expression = "", $value = null): Query {
+    public static function createIf(string $column = "", string $expression = "", $value = null, bool $condition = null): Query {
         $query = new Query();
-        if (!empty($column) && !empty($value)) {
-            $query->add($column, $expression, $value);
+        if (!empty($column)) {
+            $query->addIf($column, $expression, $value, $condition);
         }
         return $query;
     }
