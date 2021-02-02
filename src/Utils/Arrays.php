@@ -346,14 +346,30 @@ class Arrays {
 
     /**
      * Returns the Value at the given id with the given key
-     * @param array  $data
+     * @param array  $array
+     * @param string $idKey
+     * @param mixed  $idValue
+     * @return integer
+     */
+    public static function findIndex(array $array, string $idKey, $idValue) {
+        foreach ($array as $index => $elem) {
+            if ($elem[$idKey] == $idValue) {
+                return $index;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the Value at the given id with the given key
+     * @param array  $array
      * @param string $idKey
      * @param mixed  $idValue
      * @param string $key     Optional.
      * @return mixed
      */
-    public static function findValue(array $data, string $idKey, $idValue, string $key = "") {
-        foreach ($data as $elem) {
+    public static function findValue(array $array, string $idKey, $idValue, string $key = "") {
+        foreach ($array as $elem) {
             if ($elem[$idKey] == $idValue) {
                 return $key ? $elem[$key] : $elem;
             }
