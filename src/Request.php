@@ -240,6 +240,15 @@ class Request implements ArrayAccess {
         }
         return isset($this->request[$key]);
     }
+
+    /**
+     * Returns true if the given key exists ans is true
+     * @param string $key
+     * @return boolean
+     */
+    public function isTrue(string $key): bool {
+        return !empty($this->request[$key]) && $this->request[$key] === "true";
+    }
     
     
     
