@@ -27,12 +27,34 @@ class Credential {
      * Loads the Credential Schema
      * @return Schema
      */
-    public static function getSchema(): Schema {
+    private static function getSchema(): Schema {
         if (!self::$loaded) {
             self::$loaded = false;
             self::$schema = Factory::getSchema("credentials");
         }
         return self::$schema;
+    }
+
+    /**
+     * Creates a Level Query
+     * @param integer[]|integer $level
+     * @param string[]|string   $filter Optional.
+     * @param mixed             $value  Optional.
+     * @return Query
+     */
+    private static function createLevelQuery($level, $filter = null, $value = 1) {
+        $levels = Arrays::toArray($level);
+        if (empty($levels)) {
+            return null;
+        }
+        $query = Query::create("level", "IN", $levels);
+        if (!empty($filter)) {
+            $filters = Arrays::toArray($filter);
+            foreach ($filters as $key) {
+                $query->add($key, "=", $value);
+            }
+        }
+        return $query;
     }
     
     
@@ -74,15 +96,15 @@ class Credential {
      * Returns true if there is an Credential with the given ID and Level(s)
      * @param integer           $crendentialID
      * @param integer|integer[] $level
+     * @param string[]|string   $filter        Optional.
      * @return boolean
      */
-    public static function existsWithLevel(int $crendentialID, $level): bool {
-        $levels = Arrays::toArray($level);
-        if (empty($levels)) {
+    public static function existsWithLevel(int $crendentialID, $level, $filter = null): bool {
+        $query = self::createLevelQuery($level, $filter);
+        if (empty($query)) {
             return false;
         }
-        $query = Query::create("CREDENTIAL_ID", "=", $crendentialID);
-        $query->add("level", "IN", $levels);
+        $query->add("CREDENTIAL_ID", "=", $crendentialID);
         return self::getSchema()->exists($query);
     }
     
@@ -131,11 +153,10 @@ class Credential {
      * @return array
      */
     public static function getAllForLevel($level, Request $sort = null): array {
-        $levels = Arrays::toArray($level);
-        if (empty($levels)) {
+        $query = self::createLevelQuery($level);
+        if (empty($query)) {
             return [];
         }
-        $query = Query::create("level", "IN", $levels);
         return self::request($query, false, $sort);
     }
 
@@ -161,13 +182,11 @@ class Credential {
      * @param Request           $sort   Optional.
      * @return array
      */
-    public function getAllWithFilter($level, string $filter, $value, Request $sort = null): array {
-        $levels = Arrays::toArray($level);
-        if (empty($levels)) {
+    public static function getAllWithFilter($level, string $filter, $value, Request $sort = null): array {
+        $query = self::createLevelQuery($level, $filter, $value);
+        if (empty($query)) {
             return [];
         }
-        $query = Query::create("level", "IN", $levels);
-        $query->add($filter, "=", $value);
         return self::request($query, false, $sort);
     }
 
@@ -177,11 +196,10 @@ class Credential {
      * @return integer
      */
     public static function getTotalForLevel($level): int {
-        $levels = Arrays::toArray($level);
-        if (empty($levels)) {
+        $query = self::createLevelQuery($level);
+        if (empty($query)) {
             return 0;
         }
-        $query = Query::create("level", "IN", $levels);
         return self::getSchema()->getTotal($query);
     }
     
@@ -238,14 +256,14 @@ class Credential {
     /**
      * Returns a select of Credentials for the given Level(s)
      * @param integer[]|integer $level
+     * @param string[]|string   $filter Optional.
      * @return array
      */
-    public static function getSelectForLevel($level): array {
-        $levels = Arrays::toArray($level);
-        if (empty($levels)) {
+    public static function getSelectForLevel($level, $filter = null): array {
+        $query = self::createLevelQuery($level, $filter);
+        if (empty($query)) {
             return [];
         }
-        $query = Query::create("level", "IN", $levels);
         $query->orderBy("level", false);
         return self::requestSelect($query);
     }
@@ -316,16 +334,9 @@ class Credential {
      * @return array
      */
     public static function getEmailsForLevel($level, $filter = null): array {
-        $levels = Arrays::toArray($level);
-        if (empty($levels)) {
+        $query = self::createLevelQuery($level, $filter);
+        if (empty($query)) {
             return [];
-        }
-        $query = Query::create("level", "IN", $levels);
-        if (!empty($filter)) {
-            $filters = Arrays::toArray($filter);
-            foreach ($filters as $key) {
-                $query->add($key, "=", 1);
-            }
         }
         return self::getSchema()->getColumn($query, "email");
     }
