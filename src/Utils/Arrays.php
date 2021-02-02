@@ -129,6 +129,29 @@ class Arrays {
     }
     
     /**
+     * Slices an Array from the index the amount of items
+     * @param array   $array
+     * @param integer $from
+     * @param integer $amount Optional.
+     * @return array
+     */
+    public static function slice(array $array, int $from, int $amount = null) {
+        return array_slice($array, $from, $amount);
+    }
+
+    /**
+     * Paginates an Array from the page to the amount of items
+     * @param array   $array
+     * @param integer $page
+     * @param integer $amount
+     * @return array
+     */
+    public static function paginate(array $array, int $page, int $amount) {
+        $from = $page * $amount;
+        return array_slice($array, $from, $amount - 1);
+    }
+
+    /**
      * Returns an array with values in the Base
      * @param array $base
      * @param array $array
