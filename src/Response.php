@@ -53,6 +53,16 @@ class Response {
         print($this->toString());
     }
 
+    /**
+     * Prints the Data Data
+     * @return void
+     */
+    public function printData(): void {
+        if (!empty($this->data["data"])) {
+            print(JSON::encode($this->data["data"], true));
+        }
+    }
+
 
 
     /**
@@ -79,7 +89,7 @@ class Response {
      */
     public static function data($data = null): Response {
         return new Response([
-            "data" => self::getData($data),
+            "data" => self::createData($data),
         ]);
     }
 
@@ -113,7 +123,7 @@ class Response {
     public static function success(string $success, $data = null): Response {
         return new Response([
             "success" => $success,
-            "data"    => self::getData($data),
+            "data"    => self::createData($data),
         ]);
     }
     
@@ -126,7 +136,7 @@ class Response {
     public static function warning(string $warning, $data = null): Response {
         return new Response([
             "warning" => $warning,
-            "data"    => self::getData($data),
+            "data"    => self::createData($data),
         ]);
     }
     
@@ -141,17 +151,17 @@ class Response {
             if ($error->has("global")) {
                 return new Response([
                     "error" => $error->global,
-                    "data"  => self::getData($data),
+                    "data"  => self::createData($data),
                 ]);
             }
             return new Response([
                 "errors" => $error->get(),
-                "data"   => self::getData($data),
+                "data"   => self::createData($data),
             ]);
         }
         return new Response([
             "error" => $error,
-            "data"  => self::getData($data),
+            "data"  => self::createData($data),
         ]);
     }
 
@@ -162,7 +172,7 @@ class Response {
      * @param array|Model $data Optional.
      * @return array|null
      */
-    private static function getData($data = null) {
+    private static function createData($data = null) {
         if ($data != null && $data instanceof Model) {
             return $data->toObject();
         }
