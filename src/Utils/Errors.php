@@ -122,4 +122,12 @@ class Errors {
     public function get(): array {
         return $this->errors;
     }
+
+    /**
+     * Returns the error keys
+     * @return array
+     */
+    public function keys(): array {
+        return array_keys($this->errors);
+    }
 }
