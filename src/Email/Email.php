@@ -88,10 +88,10 @@ class Email {
     /**
      * Renders the Template Data with Mustache
      * @param string $template
-     * @param array  $data
+     * @param array  $data     Optional.
      * @return string
      */
-    public static function render(string $template, array $data): string {
+    public static function render(string $template, array $data = []): string {
         return Mustache::render(Strings::toHtml($template), $data);
     }
 
