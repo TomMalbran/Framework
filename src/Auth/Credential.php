@@ -578,16 +578,17 @@ class Credential {
     /**
      * Returns the Real Phone for the given User
      * @param Model|array $data
-     * @param string      $prefix Optional.
+     * @param string      $prefix   Optional.
+     * @param boolean     $withPlus Optional.
      * @return string
      */
-    public static function createPhone($data, string $prefix = ""): string {
+    public static function createPhone($data, string $prefix = "", bool $withPlus = false): string {
         $phone     = Arrays::getValue($data, "phone",     "", $prefix);
         $cellphone = Arrays::getValue($data, "cellphone", "", $prefix);
         $iddRoot   = Arrays::getValue($data, "iddRoot",   "", $prefix);
 
         if (!empty($cellphone) && !empty($iddRoot)) {
-            return $iddRoot . $cellphone;
+            return ($withPlus ? "+" : "") . $iddRoot . $cellphone;
         }
         if (!empty($cellphone)) {
             return $cellphone;
