@@ -161,6 +161,15 @@ class Enum {
 
         // For MAP
         if ($cache->isMap) {
+            // Function "isXxx": Check if the data is equal to xxx
+            if (Strings::startsWith($function, "is")) {
+                $key = Strings::stripStart($function, "is");
+                if (!empty($cache->constants[$key])) {
+                    return $value == $cache->constants[$key];
+                }
+                return false;
+            }
+
             // Function "fromXxx"
             // Return the index where the value is the name
             if (Strings::startsWith($function, "from")) {
