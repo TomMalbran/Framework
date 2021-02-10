@@ -88,17 +88,19 @@ class Arrays {
      * Returns the elements from the array that are not in the other array
      * @param array  $array
      * @param array  $other
-     * @param string $key
+     * @param string $checkKey
+     * @param string $getKey   Optional.
      * @return array
      */
-    public static function getDiff(array $array, array $other, string $key): array {
-        if (self::length($array) !== self::length($other)) {
-            return [];
-        }
+    public static function getDiff(array $array, array $other, string $checkKey, string $getKey = null): array {
         $result = [];
         foreach ($array as $row) {
-            if (!isset($row[$key]) || !self::contains($other, $row[$key], $key)) {
-                $result[] = $row;
+            if (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey)) {
+                if ($getKey != null) {
+                    $result[] = $row[$getKey];
+                } else {
+                    $result[] = $row;
+                }
             }
         }
         return $result;
