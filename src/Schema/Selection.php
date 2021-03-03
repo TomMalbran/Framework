@@ -9,7 +9,7 @@ use Framework\Utils\Strings;
  * The Selection wrapper
  */
 class Selection {
-    
+
     private $db;
     private $structure;
 
@@ -20,7 +20,7 @@ class Selection {
     private $selects = [];
     private $joins   = [];
     private $request = [];
-    
+
 
     /**
      * Creates a new Selection instance
@@ -91,17 +91,17 @@ class Selection {
                 $joinKey        = $join->table;
                 $this->tables[] = $join->table;
             }
-            
+
             $table      = "{dbPrefix}{$join->table}";
             $onTable    = $join->onTable ?: $mainKey;
             $leftKey    = $join->leftKey;
             $rightKey   = $join->rightKey;
             $and        = $join->and;
             $expression = "LEFT JOIN $table AS $joinKey ON ($joinKey.$leftKey = $onTable.$rightKey $and)";
-            
+
             $this->joins[]          = $expression;
             $this->keys[$join->key] = $joinKey;
-            
+
             if ($withSelects) {
                 foreach ($join->fields as $field) {
                     $this->selects[] = "$joinKey.{$field->key} AS $field->prefixName";
@@ -137,12 +137,11 @@ class Selection {
 
 
     /**
-     * Does a Request to the Query
+     * Creates a Request Expression
      * @param Query $query
-     * @param array $extras Optional.
      * @return array
      */
-    public function request(Query $query, array $extras = []): array {
+    public function getExpression(Query $query) {
         $this->setTableKeys($query);
 
         $mainKey    = $this->structure->table;
@@ -150,7 +149,16 @@ class Selection {
         $joins      = Strings::join($this->joins, " ");
         $where      = $query->get();
         $expression = "SELECT $selects FROM {dbPrefix}$mainKey AS $mainKey $joins $where";
+        return $expression;
+    }
 
+    /**
+     * Does a Request to the Query
+     * @param Query $query
+     * @return array
+     */
+    public function request(Query $query): array {
+        $expression    = $this->getExpression($query);
         $this->request = $this->db->query($expression, $query);
         return $this->request;
     }
@@ -163,7 +171,7 @@ class Selection {
     private function setTableKeys(Query $query): void {
         $columns = $query->getColumns();
         $mainKey = $this->structure->table;
-        
+
         foreach ($columns as $column) {
             $found = false;
             foreach ($this->structure->fields as $field) {
@@ -212,7 +220,7 @@ class Selection {
      */
     public function resolve($extras = null): array {
         $result = [];
-        
+
         foreach ($this->request as $row) {
             $fields = [];
             if (!empty($this->structure->idKey) && !empty($this->structure->idName)) {
