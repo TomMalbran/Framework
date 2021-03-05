@@ -8,11 +8,11 @@ use Framework\NLS\Language;
  * The Internalization Strings
  */
 class NLS {
-    
+
     private static $loaded = [];
     private static $data   = [];
-    
-    
+
+
     /**
      * Loads an NLS Language
      * @param string $lang
@@ -46,6 +46,19 @@ class NLS {
     }
 
     /**
+     * Returns a formated string using the correct plural string
+     * @param string  $key
+     * @param integer $count
+     * @param string  $lang  Optional.
+     * @return string
+     */
+    public static function pluralize(string $key, int $count, string $lang = "root"): string {
+        $suffix = $count === 1 ? "_SINGULAR" : "_PLURAL";
+        $result = self::get($key . $suffix, $lang);
+        return $result;
+    }
+
+    /**
      * Returns a string from the data at the given index
      * @param string  $key
      * @param integer $index
@@ -59,7 +72,7 @@ class NLS {
         }
         return "";
     }
-    
+
     /**
      * Returns all the strings from the$key$keydata
      * @param string[] $keys
