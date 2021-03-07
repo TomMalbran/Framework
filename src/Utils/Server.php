@@ -8,7 +8,7 @@ use Framework\Utils\Strings;
  * The Server Utils
  */
 class Server {
-    
+
     /**
      * Returns true if running on Localhost
      * @param array $whitelist
@@ -35,7 +35,7 @@ class Server {
     }
 
 
-    
+
     /**
      * Returns the Origin Url
      * @param boolean $useForwarded

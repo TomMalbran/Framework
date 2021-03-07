@@ -8,11 +8,11 @@ use PhpOffice\PhpSpreadsheet\WorkSheet\WorkSheet;
  * The Spreadsheet Sheet
  */
 class SpreadsheetSheet {
-    
+
     private $sheet;
     private $row;
-    
-    
+
+
     /**
      * Creates a new SpreadsheetSheet instance
      * @param WorkSheet $sheet
@@ -21,9 +21,9 @@ class SpreadsheetSheet {
         $this->sheet = $sheet;
         $this->row   = 1;
     }
-    
-    
-    
+
+
+
     /**
      * Writes the content in a new line and formats it
      * @param array   $content
@@ -34,7 +34,7 @@ class SpreadsheetSheet {
     public function writeLine(array $content, bool $makeBold = false, bool $formatNumbers = false): void {
         $this->sheet->fromArray($content, null, "A" . $this->row, true);
         $toCol = Coordinate::stringFromColumnIndex(count($content));
-        
+
         if ($makeBold) {
             $this->makeBold("a", $toCol, $this->row);
         }
@@ -43,7 +43,7 @@ class SpreadsheetSheet {
         }
         $this->row += 1;
     }
-    
+
     /**
      * Writes the content in bold
      * @param array $content
@@ -52,7 +52,7 @@ class SpreadsheetSheet {
     public function writeHeader(array $content): void {
         $this->writeLine($content, true, false);
     }
-    
+
     /**
      * Writes the content and formats the numbers
      * @param array $content
@@ -61,7 +61,7 @@ class SpreadsheetSheet {
     public function writeNumbers(array $content): void {
         $this->writeLine($content, false, true);
     }
-    
+
     /**
      * Increases the row count by the given amount
      * @param integer $amount Optional.
@@ -70,9 +70,9 @@ class SpreadsheetSheet {
     public function addBlankLine(int $amount = 1): void {
         $this->row += $amount;
     }
-    
-    
-    
+
+
+
     /**
      * Makes a range bold
      * @param string  $fromCol
@@ -84,7 +84,7 @@ class SpreadsheetSheet {
         $range = "$fromCol$rowCount:$toCol$rowCount";
         $this->sheet->getStyle($range)->applyFromArray([ "font" => [ "bold" => true ]]);
     }
-    
+
     /**
      * Makes the numbers have always 2 decimals
      * @param string  $fromCol
@@ -96,9 +96,9 @@ class SpreadsheetSheet {
         $range = "$fromCol$rowCount:$toCol$rowCount";
         $this->sheet->getStyle($range)->getNumberFormat()->setFormatCode("0.00");
     }
-    
-    
-    
+
+
+
     /**
      * Auto sizes the columns
      * @return void

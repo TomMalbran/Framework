@@ -7,7 +7,7 @@ use Framework\Utils\Enum;
  * The Documents used by the System
  */
 class Document extends Enum {
-    
+
     const DNI   = 1;
     const CUIT  = 2;
     const Other = 3;

@@ -69,7 +69,7 @@ class Curl {
                 CURLOPT_POSTFIELDS => $params,
             ];
         }
-        
+
         // Execute the Curl
         $curl = curl_init();
         curl_setopt_array($curl, $options);

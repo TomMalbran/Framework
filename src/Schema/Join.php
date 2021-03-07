@@ -8,7 +8,7 @@ use Framework\Utils\Arrays;
  * The Database Join
  */
 class Join {
-    
+
     public $key       = "";
     public $table     = "";
     public $asTable   = "";

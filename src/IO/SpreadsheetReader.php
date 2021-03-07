@@ -11,7 +11,7 @@ class SpreadsheetReader {
 
     private $sheet;
 
-    
+
     /**
      * Creates a new SpreadsheetReader instance
      * @param string $path
@@ -34,7 +34,7 @@ class SpreadsheetReader {
     public function isValid(): bool {
         return $this->sheet !== null;
     }
-    
+
 
 
     /**
@@ -46,7 +46,7 @@ class SpreadsheetReader {
         $colMin   = ord("A");
         $colAmt   = ord($colTotal) - $colMin;
         $firstRow = $this->getRow(1, "A", $colTotal);
-        
+
         for ($i = $colAmt; $i >= 0; $i--) {
             if (!empty($firstRow[$i])) {
                 break;
@@ -55,7 +55,7 @@ class SpreadsheetReader {
         }
         return chr($colAmt + $colMin);
     }
-    
+
     /**
      * Returns the Highet Sheet row, removing the empty ones
      * @return integer
@@ -63,7 +63,7 @@ class SpreadsheetReader {
     public function getHighestRow(): int {
         $colAmt = $this->getHighestColumn();
         $rowAmt = $this->sheet->getHighestRow();
-        
+
         for ($i = $rowAmt; $i >= 0; $i--) {
             $row = $this->getRow($i, "A", $colAmt);
             if (!empty($row)) {
@@ -73,7 +73,7 @@ class SpreadsheetReader {
         }
         return $rowAmt;
     }
-    
+
     /**
      * Returns the Row from the given Sheet
      * @param integer $row

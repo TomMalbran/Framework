@@ -13,7 +13,7 @@ use Framework\Utils\Utils;
  * The Database Field
  */
 class Field {
-    
+
     // The Types
     const ID      = "id";
     const Boolean = "boolean";
@@ -39,7 +39,7 @@ class Field {
     public $date       = "";
     public $hour       = "";
     public $default    = null;
-    
+
     public $isID       = false;
     public $isPrimary  = false;
     public $isKey      = false;
@@ -49,7 +49,7 @@ class Field {
     public $isSigned   = false;
     public $noPrefix   = false;
     public $canEdit    = false;
-    
+
     public $hasMerge   = false;
     public $mergeTo    = "";
 
@@ -173,7 +173,7 @@ class Field {
      */
     public function fromRequest(Request $request, string $masterKey = "") {
         $result = null;
-        
+
         switch ($this->type) {
         case self::ID:
             break;

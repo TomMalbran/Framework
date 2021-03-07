@@ -7,7 +7,7 @@ use ReflectionClass;
  * The Container Service
  */
 class Container {
-    
+
     private static $instances = [];
     private static $keys      = [];
 
@@ -49,7 +49,7 @@ class Container {
             print_r(self::$keys);
             die();
         }
-        
+
         if (!array_key_exists($key, self::$instances)) {
             $instance = self::buildObject($key, $save, $params);
         } else {
@@ -60,7 +60,7 @@ class Container {
         }
         return $instance;
     }
-    
+
     /**
      * Instantiates each Class
      * @param string  $className
@@ -71,19 +71,19 @@ class Container {
     private static function buildObject(string $className, bool $save = false, array $params = []): object {
         $reflector = new ReflectionClass($className);
         $instances = [];
-        
+
         if (!$reflector->isInstantiable()) {
             return null;
         }
-        
+
         if ($reflector->getConstructor() !== null) {
             $constructor  = $reflector->getConstructor();
             $dependencies = $constructor->getParameters();
-            
+
             foreach ($dependencies as $dependency) {
                 if (!$dependency->isOptional() && !$dependency->isArray()) {
                     $class = $dependency->getClass();
-                    
+
                     if ($class !== null) {
                         $instances[] = self::resolve($class->name, $save);
                     }

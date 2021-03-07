@@ -16,11 +16,11 @@ use Framework\Utils\Strings;
  * The Email Templates
  */
 class Email {
-    
+
     private static $loaded = false;
     private static $schema = null;
-    
-    
+
+
     /**
      * Loads the Email Templates Schema
      * @return Schema
@@ -32,8 +32,8 @@ class Email {
         }
         return self::$schema;
     }
-    
-    
+
+
 
     /**
      * Returns an Email Template with the given Code
@@ -44,7 +44,7 @@ class Email {
         $query = Query::create("templateCode", "=", $templateCode);
         return self::getSchema()->getOne($query);
     }
-    
+
     /**
      * Returns true if the given  Email Template exists
      * @param string $templateCode
@@ -54,7 +54,7 @@ class Email {
         $query = Query::create("templateCode", "=", $templateCode);
         return self::getSchema()->exists($query);
     }
-    
+
     /**
      * Returns all the Email Templates
      * @param Request $request
@@ -71,7 +71,7 @@ class Email {
     public static function getTotal(): int {
         return self::getSchema()->getTotal();
     }
-    
+
     /**
      * Edits the given Email Template
      * @param string  $templateCode

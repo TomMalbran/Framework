@@ -14,12 +14,12 @@ use Mustache_Exception_UnknownTemplateException;
  * The Mustache Provider
  */
 class Mustache {
-    
+
     private static $loaded = false;
     private static $engine = null;
     private static $loader = null;
-    
-    
+
+
     /**
      * Creates the Mustache Provider
      * @return void
@@ -31,13 +31,13 @@ class Mustache {
             // Create a simple engine
             Mustache_Autoloader::register();
             self::$engine = new Mustache_Engine();
-            
+
             // Create a loader engine
             $path = Framework::getPath(Framework::PublicDir);
             if (File::exists($path)) {
                 $config  = [ "extension" => ".html" ];
                 $loaders = [];
-                
+
                 // Main templates can either be in public or public/templaes
                 if (File::exists($path, Framework::TemplatesDir)) {
                     $loaderPath = File::getPath($path, Framework::TemplatesDir);
@@ -56,9 +56,9 @@ class Mustache {
             }
         }
     }
-    
-    
-    
+
+
+
     /**
      * Renders the template using any of the engines depending on the first parameter
      * @param string $templateOrPath

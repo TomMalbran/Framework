@@ -9,12 +9,12 @@ use DrewM\MailChimp\MailChimp as MailChimpAPI;
  * The MailChimp Provider
  */
 class MailChimp {
-    
+
     private static $loaded = false;
     private static $config = null;
     private static $api    = null;
-    
-    
+
+
     /**
      * Creates the MailChimp Provider
      * @return void
@@ -30,8 +30,8 @@ class MailChimp {
             }
         }
     }
-    
-    
+
+
 
     /**
      * Returns the Members Route
@@ -45,7 +45,7 @@ class MailChimp {
         }
         return $result;
     }
-    
+
     /**
      * Returns all the subscribers
      * @param integer $amount Optional.
@@ -60,7 +60,7 @@ class MailChimp {
         $result = self::$api->get($route, [ "count" => $amount ], 120);
         return $result;
     }
-    
+
     /**
      * Returns the Subscriber with the given email
      * @param string $email
@@ -76,7 +76,7 @@ class MailChimp {
         $result = self::$api->get($route);
         return $result;
     }
-    
+
     /**
      * Adds a Subscriber
      * @param string $email
@@ -100,7 +100,7 @@ class MailChimp {
         ]);
         return self::$api->success();
     }
-    
+
     /**
      * Adds a Subscriber Batch
      * @param array $subscribers
@@ -124,7 +124,7 @@ class MailChimp {
 			]);
         }
     }
-    
+
     /**
      * Edits a Subscriber
      * @param string $email
@@ -150,7 +150,7 @@ class MailChimp {
         ]);
         return self::$api->success();
     }
-    
+
     /**
      * Deletes a Subscriber
      * @param string $email
@@ -166,9 +166,9 @@ class MailChimp {
         self::$api->delete($route);
         return self::$api->success();
     }
-    
-    
-    
+
+
+
     /**
      * Sends a Campaign
      * @param string   $subject
@@ -221,7 +221,7 @@ class MailChimp {
      */
     private static function createCampaign(string $subject, array $emails = null, int $folderID = 0): string {
         $recipients = [ "list_id" => self::$config->listID ];
-        
+
         if (!empty($emails)) {
             $conditions = [];
             foreach ($emails as $email) {
@@ -237,7 +237,7 @@ class MailChimp {
                 "conditions" => $conditions,
             ];
         }
-        
+
         $post = [
             "type"       => "regular",
             "recipients" => $recipients,
@@ -251,7 +251,7 @@ class MailChimp {
             ],
         ];
         $result = self::$api->post("campaigns", $post, 60);
-        
+
         if (self::$api->success()) {
             return $result["id"];
         }
@@ -274,7 +274,7 @@ class MailChimp {
         ], 60);
         return self::$api->success();
     }
-    
+
     /**
      * Schedules the given MailChimp campaign
      * @param string  $mailChimpID
@@ -292,7 +292,7 @@ class MailChimp {
         }
         return self::$api->success();
     }
-    
+
     /**
      * Unschedules the given MailChimp campaign
      * @param string $mailChimpID
@@ -305,9 +305,9 @@ class MailChimp {
         self::$api->post("campaigns/{$mailChimpID}/actions/unschedule");
         return self::$api->success();
     }
-    
-    
-    
+
+
+
     /**
      * Returns the Report for the given MailChimp campaign
      * @param string $mailChimpID
@@ -325,7 +325,7 @@ class MailChimp {
         if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
             return $result;
         }
-        
+
         $report = self::$api->get("reports/{$mailChimpID}");
         if (empty($report["status"]) || (!empty($report["status"]) && $report["status"] != 404)) {
             $result["hasReport"]    = true;
@@ -336,7 +336,7 @@ class MailChimp {
         }
         return $result;
     }
-    
+
     /**
      * Returns the Open Details Report for the given MailChimp campaign
      * @param string $mailChimpID
@@ -357,7 +357,7 @@ class MailChimp {
         }
         return $result;
     }
-    
+
     /**
      * Returns the Click Details Report for the given MailChimp campaign
      * @param string $mailChimpID

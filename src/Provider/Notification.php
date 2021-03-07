@@ -16,14 +16,14 @@ use OneSignal\OneSignal as OneSignalAPI;
  * The Notification Provider
  */
 class Notification {
-    
+
     private $settings;
 
     private static $loaded = false;
     private static $config = null;
     private static $api    = null;
-    
-    
+
+
     /**
      * Creates the Notification Provider
      * @return void
@@ -37,7 +37,7 @@ class Notification {
                 $config = new OneSignalConfig();
                 $config->setApplicationId(self::$config->appId);
                 $config->setApplicationAuthKey(self::$config->restKey);
-                
+
                 $guzzle    = new GuzzleClient([]);
                 $client    = new HttpClient(new GuzzleAdapter($guzzle), new GuzzleMessageFactory());
                 self::$api = new OneSignalAPI($config, $client);
@@ -46,7 +46,7 @@ class Notification {
     }
 
 
-    
+
     /**
      * Send to All
      * @param string  $title
@@ -121,7 +121,7 @@ class Notification {
             "ios_badgeCount" => 1,
             "data"           => [ "type" => $type, "id" => $id ],
         ] + $params);
-        
+
         if (empty($response["id"])) {
             return null;
         }

@@ -54,7 +54,7 @@ class ErrorLog {
     public static function getOne(int $logID): Model {
         return self::getSchema()->getOne($logID);
     }
-    
+
     /**
      * Returns true if the given Error exists
      * @param integer $logID
@@ -142,7 +142,7 @@ class ErrorLog {
         $query->add("description", "=", $description);
         $query->addIf("file", "=", $fileName);
         $query->addIf("line", "=", $line);
-        
+
         if ($schema->getTotal($query) > 0) {
             $query->orderBy("updatedTime", false)->limit(1);
             $schema->edit($query, [

@@ -5,7 +5,7 @@ namespace Framework\Utils;
  * Several String Utils
  */
 class Strings {
-    
+
     /**
      * Returns the length og the given String
      * @param string $string
@@ -92,7 +92,7 @@ class Strings {
         $sets   = [];
         $all    = "";
         $result = "";
-        
+
         if (self::contains($availableSets, "a")) {
             $sets[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         } else {
@@ -109,17 +109,17 @@ class Strings {
         if (self::contains($availableSets, "s")) {
             $sets[] = "!@#$%&*?";
         }
-        
+
         foreach ($sets as $set) {
             $result .= self::randomChar($set);
             $all    .= $set;
         }
-        
+
         $all = str_split($all);
         for ($i = 0; $i < $length - count($sets); $i++) {
             $result .= $all[array_rand($all)];
         }
-        
+
         $result = str_shuffle($result);
         return $result;
     }
@@ -165,8 +165,8 @@ class Strings {
         return $string;
     }
 
-    
-    
+
+
     /**
      * Returns a Substring from the Start to the Length
      * @param string  $string

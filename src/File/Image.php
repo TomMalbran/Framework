@@ -12,7 +12,7 @@ class Image {
     const Resize  = "resize";
     const Maximum = "maximum";
     const Thumb   = "thumb";
-    
+
     // The Image Types and Functions
     private static $imageTypes = [ 1, 2, 3, 15, 16 ];
     private static $transTypes = [ 1, 3 ];
@@ -85,7 +85,7 @@ class Image {
         }
         return 0;
     }
-    
+
 
 
     /**
@@ -107,12 +107,12 @@ class Image {
         if (!self::hasType($imgType)) {
             return false;
         }
-        
+
         // Resample
         $srcImage = self::createSrcImage($imgType, $src);
         $dstImage = self::createDstImage($imgType, $imgWidth, $imgHeight);
         imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $imgWidth, $imgHeight, $imgWidth, $imgHeight);
-        
+
         // Fix Orientation
         switch ($orientation) {
         case 3:
@@ -125,15 +125,15 @@ class Image {
             $dstImage = imagerotate($dstImage, 90, 0);
             break;
         }
-        
+
         // Create the Image
         self::createImage($imgType, $dstImage, $dst);
-        
+
         // Free Resources
         imagedestroy($srcImage);
         return true;
     }
-    
+
     /**
      * Resizes an Image
      * @param string  $src
@@ -154,7 +154,7 @@ class Image {
         if (!self::hasType($imgType)) {
             return false;
         }
-        
+
         switch ($action) {
         // Resize to a Size respecting aspect ratio
         case self::Resize:
@@ -162,19 +162,19 @@ class Image {
             $oldHeight = $imgHeight;
             $xCorner   = 0;
             $yCorner   = 0;
-            
+
             if ($imgWidth > $imgHeight) {
                 $height = $imgHeight * $width / $imgWidth;
             } else {
                 $width  = $imgWidth * $height / $imgHeight;
             }
             break;
-        
+
         // Resize if the image is greater
         case self::Maximum:
             $xCorner = 0;
             $yCorner = 0;
-            
+
             if ($imgWidth > $width || $imgHeight > $height) {
                 $oldWidth  = $imgWidth;
                 $oldHeight = $imgHeight;
@@ -191,12 +191,12 @@ class Image {
                 $oldHeight = $imgHeight;
             }
             break;
-        
+
         // Resize to a specific Size
         case self::Thumb:
             $xScale = $imgWidth  / $width;
             $yScale = $imgHeight / $height;
-            
+
             if ($yScale < $xScale) {
                 $oldWidth  = round($width  * $yScale);
                 $oldHeight = round($height * $yScale);
@@ -210,15 +210,15 @@ class Image {
             }
             break;
         }
-        
+
         // Creation Process
         $srcResize = self::createSrcImage($imgType, $src);
         $dstResize = self::createDstImage($imgType, $width, $height);
         imagecopyresampled($dstResize, $srcResize, 0, 0, $xCorner, $yCorner, $width, $height, $oldWidth, $oldHeight);
-        
+
         // Create Image
         self::createImage($imgType, $dstResize, $dst);
-        
+
         // Free Resources
         imagedestroy($srcResize);
         return true;
@@ -250,21 +250,21 @@ class Image {
         if (!self::hasType($imgType)) {
             return false;
         }
-        
+
         // Resize Image
         $srcResize = self::createSrcImage($imgType, $src);
         $dstResize = self::createDstImage($imgType, $resWidth, $resHeight);
         imagecopyresampled($dstResize, $srcResize, 0, 0, 0, 0, $resWidth, $resHeight, $imgWidth, $imgHeight);
-        
+
         // Crop Image
         $dstCrop = imagecreatetruecolor($cropWidth, $cropHeight);
         $bgColor = imagecolorallocate($dstCrop, 255, 255, 255);
         imagefill($dstCrop, 0, 0, $bgColor);
         imagecopy($dstCrop, $dstResize, -$cropX, -$cropY, 0, 0, $resWidth, $resHeight);
-        
+
         // Create Image
         self::createImage($imgType, $dstCrop, $dst);
-        
+
         // Free Resources
         imagedestroy($srcResize);
         imagedestroy($dstResize);

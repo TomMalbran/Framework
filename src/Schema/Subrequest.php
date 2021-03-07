@@ -25,7 +25,7 @@ class Subrequest {
 
     private $field    = "";
     private $value    = null;
-    
+
 
     /**
      * Creates a new Subrequest instance
@@ -71,7 +71,7 @@ class Subrequest {
         }
         $request   = !empty($ids) ? $this->schema->getAll($query) : [];
         $subResult = [];
-        
+
         foreach ($request as $row) {
             $name = $row[$this->idName];
             if (empty($subResult[$name])) {
@@ -83,7 +83,7 @@ class Subrequest {
                 $subResult[$name][] = $this->getValues($row);
             }
         }
-        
+
         foreach ($result as $index => $row) {
             $result[$index][$this->name] = [];
             foreach ($subResult as $key => $subRow) {
@@ -94,7 +94,7 @@ class Subrequest {
         }
         return $result;
     }
-    
+
     /**
      * Returns the Values depending on the Data
      * @param array $row

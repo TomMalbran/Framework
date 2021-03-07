@@ -13,11 +13,11 @@ use stdClass;
  * The Config Data
  */
 class Config {
-    
+
     private static $loaded = false;
     private static $data   = null;
-    
-    
+
+
     /**
      * Loads the Config Data
      * @return void

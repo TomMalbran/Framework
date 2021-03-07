@@ -14,11 +14,11 @@ use Framework\Utils\JSON;
  * The Email Queue
  */
 class Queue {
-    
+
     private static $loaded = false;
     private static $schema = null;
-    
-    
+
+
     /**
      * Loads the Email Queue Schema
      * @return Schema
@@ -30,8 +30,8 @@ class Queue {
         }
         return self::$schema;
     }
-    
-    
+
+
 
     /**
      * Returns an Email Queue with the given Code
@@ -41,7 +41,7 @@ class Queue {
     public static function getOne(int $emailID): Model {
         return self::getSchema()->getOne($emailID);
     }
-    
+
     /**
      * Returns true if the given  Email Queue exists
      * @param integer $emailID
@@ -50,7 +50,7 @@ class Queue {
     public static function exists(int $emailID): bool {
         return self::getSchema()->exists($emailID);
     }
-    
+
     /**
      * Returns all the Email Queues
      * @param Request $request
@@ -76,7 +76,7 @@ class Queue {
     public static function getTotal(): int {
         return self::getSchema()->getTotal();
     }
-    
+
 
 
     /**

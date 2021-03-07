@@ -13,8 +13,8 @@ class Access {
     private static $loaded = false;
     private static $groups = [];
     private static $levels = [];
-    
-    
+
+
     /**
      * Loads the Access Data
      * @return void
@@ -23,7 +23,7 @@ class Access {
         if (!self::$loaded) {
             self::$loaded = true;
             $data = Framework::loadData(Framework::AccessData);
-            
+
             // Store the groups and levels
             foreach ($data as $groupName => $accessData) {
                 $gName = Strings::toLowerCase($groupName);

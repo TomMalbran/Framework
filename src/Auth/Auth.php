@@ -41,7 +41,7 @@ class Auth {
         if (!JWT::isValid($token)) {
             return false;
         }
-        
+
         // Retrieve the Token data
         $data       = JWT::getData($token);
         $credential = Credential::getOne($data->credentialID, true);
@@ -111,7 +111,7 @@ class Auth {
 
         Credential::updateLoginTime($credential->id);
         ActionLog::startSession($credential->id, true);
-        
+
         $path = Path::getTempPath($credential->id, false);
         File::emptyDir($path);
         Reset::delete($credential->id);
@@ -154,7 +154,7 @@ class Auth {
     public static function loginAs(int $credentialID): bool {
         $admin = self::$credential;
         $user  = Credential::getOne($credentialID, true);
-        
+
         if (self::canLoginAs($admin, $user)) {
             self::setCredential($user, $admin->id, $user->currentUser);
             return true;
@@ -172,7 +172,7 @@ class Auth {
         }
         $admin = Credential::getOne(self::$adminID, true);
         $user  = self::$credential;
-        
+
         if (self::canLoginAs($admin, $user)) {
             self::setCredential($admin);
             return $user->id;
@@ -188,11 +188,11 @@ class Auth {
     public static function getLoginCredential(string $email): Model {
         $parts = Strings::split($email, "|");
         $user  = null;
-        
+
         if (!empty($parts[0]) && !empty($parts[1])) {
             $admin = Credential::getByEmail($parts[0], true);
             $user  = Credential::getByEmail($parts[1], true);
-            
+
             if (self::canLoginAs($admin, $user)) {
                 $user->password = $admin->password;
                 $user->salt     = $admin->salt;
@@ -218,7 +218,7 @@ class Auth {
     }
 
 
-    
+
     /**
      * Sets the Credential
      * @param Model   $credential
@@ -334,7 +334,7 @@ class Auth {
     public static function isLoggedIn(): bool {
         return !empty(self::$credentialID) || !empty(self::$apiID);
     }
-    
+
     /**
      * Returns true or false if the admin is logged as an user
      * @return boolean
@@ -370,7 +370,7 @@ class Auth {
     public static function requiresLogin(int $requested): bool {
         return !Access::isGeneral($requested) && !self::isLoggedIn();
     }
-    
+
     /**
      * Returns a value depending on the call name
      * @param string $function

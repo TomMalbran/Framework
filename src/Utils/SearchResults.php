@@ -22,7 +22,7 @@ class SearchResults {
     }
 
 
-    
+
     /**
      * Returns true if it can add more Results
      * @return boolean

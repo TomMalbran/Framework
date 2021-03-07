@@ -131,7 +131,7 @@ class Enum {
                 }
                 return "";
             }
-            
+
             // Function "getName" or "getValue"
             // Return the value of the data at the given index
             if ($function == "getName" || $function == "getValue") {
@@ -188,7 +188,7 @@ class Enum {
                 $key    = Strings::stripStart($function, "get", "");
                 $key[0] = Strings::toLowerCase($key[0]);
             }
-            
+
             // If the values of each element is an array try to get the "key" there
             if (!empty($cache->data[$value])) {
                 return $cache->data[$value][$key];

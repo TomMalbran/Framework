@@ -10,7 +10,7 @@ use Framework\Schema\Query;
  * The Modification Wrapper
  */
 class Modification {
-    
+
     private $db;
     private $structure;
 

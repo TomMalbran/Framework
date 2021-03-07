@@ -33,19 +33,19 @@ class Framework {
 
     // The Directories
     const SourceDir     = "src";
-    
+
     const DataDir       = "data";
     const MigrationsDir = "data/migrations";
-    
+
     const PublicDir     = "public";
     const TemplatesDir  = "templates";
     const PartialsDir   = "partials";
-    
+
     const FilesDir      = "files";
     const TempDir       = "temp";
 
     const NLSDir        = "nls";
-    
+
     // Config
     const Namespace     = "App\\Controller\\";
 
@@ -194,20 +194,20 @@ class Framework {
 
         // Grab the Access Level for the given Route
         $accessLevel = Router::getAccess($route);
-        
+
         // The route requires login and the user is Logged Out
         if (Auth::requiresLogin($accessLevel)) {
             return Response::logout();
         }
-        
+
         // The Provided Access Level is lower than the Required One
         if (!Auth::grant($accessLevel)) {
             return Response::error("GENERAL_ERROR_PATH");
         }
-        
+
         // Perform the Request
         $response = Router::call($route, $params);
-        
+
         // Return an Empty Response
         if (empty($response)) {
             return Response::empty();

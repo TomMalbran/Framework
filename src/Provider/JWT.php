@@ -11,14 +11,14 @@ use stdClass;
  * The JWT Provider
  */
 class JWT {
-    
+
     private static $loaded    = false;
     private static $encrypt   = [ "HS256" ];
     private static $secretKey = "";
     private static $longTerm  = 10 * 365 * 24;
     private static $shortTerm = 2;
-    
-    
+
+
     /**
      * Loads the JWT Config
      * @return void
@@ -31,9 +31,9 @@ class JWT {
             self::$shortTerm = Config::get("authHours");
         }
     }
-    
-    
-    
+
+
+
     /**
      * Creates a JWT Token
      * @param integer $time
@@ -52,7 +52,7 @@ class JWT {
         ];
         return FirebaseJWT::encode($token, self::$secretKey);
     }
-    
+
     /**
      * Returns true if the JWT Token is Valid
      * @param string $token

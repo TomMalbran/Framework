@@ -8,12 +8,12 @@ use Framework\Utils\Strings;
  * The Database Query
  */
 class Query {
-    
+
     public $where     = "";
     public $params    = [];
     public $prefix    = "AND";
     public $addPrefix = false;
-    
+
     public $limit     = "";
     public $groupBy   = "";
     public $orderBy   = "";
@@ -21,8 +21,8 @@ class Query {
     public $columns   = [];
     public $groups    = [];
     public $orders    = [];
-    
-    
+
+
     /**
      * Creates a new Query instance
      * @param Query $query Optional.
@@ -33,7 +33,7 @@ class Query {
             $this->params    = $query->params;
             $this->prefix    = $query->prefix;
             $this->addPrefix = $query->addPrefix;
-            
+
             $this->limit     = $query->limit;
             $this->orderBy   = $query->orderBy;
             $this->groupBy   = $query->groupBy;
@@ -43,9 +43,9 @@ class Query {
             $this->orders    = $query->orders;
         }
     }
-    
-    
-    
+
+
+
     /**
      * Returns the Prefix
      * @return string
@@ -76,7 +76,7 @@ class Query {
         $this->columns[] = $column;
         return $this;
     }
-    
+
     /**
      * Adds an expression as an and if the value is not empty
      * @param string  $column
@@ -131,9 +131,9 @@ class Query {
         $this->columns[] = $column;
         return $this;
     }
-    
 
-    
+
+
     /**
      * Adds a Open Parenthesis
      * @return Query
@@ -185,7 +185,7 @@ class Query {
         $this->addPrefix = false;
         return $this;
     }
-    
+
     /**
      * Ends an Or expression
      * @return Query
@@ -195,7 +195,7 @@ class Query {
         $this->prefix = "AND";
         return $this;
     }
-    
+
     /**
      * Adds a Search expression
      * @param string|string[] $column
@@ -259,7 +259,7 @@ class Query {
         }
         return $this;
     }
-    
+
     /**
      * Adds an Group By
      * @param string $column
@@ -287,7 +287,7 @@ class Query {
         }
         return $this;
     }
-    
+
     /**
      * Orders Randomly
      * @return Query
@@ -297,7 +297,7 @@ class Query {
         $this->orders  = [];
         return $this;
     }
-    
+
     /**
      * Adds an Limit
      * @param integer $from
@@ -337,8 +337,8 @@ class Query {
         $to   = $from + $amount - 1;
         return $this->limit($from, $to);
     }
-    
-    
+
+
 
     /**
      * Returns true if the Query is empty
@@ -368,7 +368,7 @@ class Query {
         }
         return !empty($this->orderBy);
     }
-    
+
 
 
     /**
@@ -553,7 +553,7 @@ class Query {
     public static function equal(string $column = null): array {
         return [ "[E]" => $column ];
     }
-    
+
     /**
      * Method generates incremental function call
      * @param integer $amount Optional.
@@ -571,7 +571,7 @@ class Query {
     public static function dec(int $amount = 1): array {
         return [ "[I]" => "-" . $amount ];
     }
-    
+
     /**
      * Method generates change boolean function call
      * @param string $column Optional.
@@ -590,7 +590,7 @@ class Query {
     public static function func(string $expression, array $params = []): array {
         return [ "[F]" => [ $expression, $params ]];
     }
-    
+
     /**
      * Method generates an AES Encrypt function call
      * @param string $value

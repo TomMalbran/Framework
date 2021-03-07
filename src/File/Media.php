@@ -15,12 +15,12 @@ use Framework\Schema\Database;
  * The Media Utils
  */
 class Media {
-    
+
     private static $loaded = false;
     private static $db     = null;
     private static $data   = [];
-    
-    
+
+
     /**
      * Loads the Media Data
      * @return void
@@ -78,7 +78,7 @@ class Media {
         $tmpFile  = $request->getTmpName("file");
         $source   = Path::getPath("source", $path);
         $uploaded = File::upload($source, $fileName, $tmpFile);
-        
+
         if (!File::exists($uploaded)) {
             return false;
         }

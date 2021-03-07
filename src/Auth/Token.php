@@ -8,11 +8,11 @@ use Framework\Schema\Model;
  * The Token Data
  */
 class Token {
-    
+
     private static $loaded = false;
     private static $data   = [];
-    
-    
+
+
     /**
      * Loads the Tokens Data
      * @return void
@@ -25,7 +25,7 @@ class Token {
     }
 
 
-    
+
     /**
      * Returns the Token with the given value
      * @param string $token
@@ -33,7 +33,7 @@ class Token {
      */
     public static function getOne(string $token): Model {
         self::load();
-        
+
         foreach (self::$data as $tokenID => $value) {
             if ($value == $token) {
                 return new Model("tokenID", [
@@ -52,7 +52,7 @@ class Token {
      */
     public static function isValid(string $token): bool {
         self::load();
-        
+
         foreach (self::$data as $value) {
             if ($value == $token) {
                 return true;

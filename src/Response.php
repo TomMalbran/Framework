@@ -9,7 +9,7 @@ use Framework\Utils\JSON;
  * The Response wrapper
  */
 class Response {
-    
+
     private $data;
 
     /**
@@ -44,7 +44,7 @@ class Response {
     public function toString(): string {
         return JSON::encode($this->data, true);
     }
-    
+
     /**
      * Prints the Data
      * @return void
@@ -81,7 +81,7 @@ class Response {
     public static function result(array $result = []): Response {
         return new Response($result);
     }
-    
+
     /**
      * Returns the given data
      * @param array|Model $data Optional.
@@ -102,7 +102,7 @@ class Response {
             "data" => [ "error" => true ],
         ]);
     }
-    
+
     /**
      * Returns a logout
      * @return Response
@@ -126,7 +126,7 @@ class Response {
             "data"    => self::createData($data),
         ]);
     }
-    
+
     /**
      * Returns a warning response
      * @param string      $warning
@@ -139,7 +139,7 @@ class Response {
             "data"    => self::createData($data),
         ]);
     }
-    
+
     /**
      * Returns an error response
      * @param string|Errros $error

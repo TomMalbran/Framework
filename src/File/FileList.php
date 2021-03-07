@@ -8,10 +8,10 @@ use Framework\File\FileType;
  * The FileList wrapper
  */
 class FileList {
-    
+
     private $list = [];
-    
-    
+
+
     /**
      * Adds a File/Directory
      * @param string  $name

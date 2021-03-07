@@ -11,12 +11,12 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  * The Spreadsheet Writer
  */
 class SpreadsheetWriter {
-    
+
     private $data;
     private $sheets;
     private $sheetNum;
-    
-    
+
+
     /**
      * Creates a new SpreadsheetWriter instance
      * @param string $title
@@ -25,7 +25,7 @@ class SpreadsheetWriter {
     public function __construct(string $title, string $creator = "") {
         $this->data = new Spreadsheet();
         $this->data->getProperties()->setCreator($creator)->setTitle($title);
-        
+
         $this->sheets   = [];
         $this->sheetNum = 0;
     }
@@ -45,7 +45,7 @@ class SpreadsheetWriter {
         } else {
             $sheet = $this->data->createSheet($this->sheetNum);
         }
-        
+
         $sheet->setTitle($sheetName);
         $ssheet  = new SpreadsheetSheet($sheet);
         $sheetID = $sheetID != null ? $sheetID : $this->sheetNum;
@@ -66,9 +66,9 @@ class SpreadsheetWriter {
         }
         return null;
     }
-    
-    
-    
+
+
+
     /**
      * Creates a FileName with an optional date
      * @param string  $name
@@ -93,7 +93,7 @@ class SpreadsheetWriter {
         header("Content-Disposition: attachment; filename=\"{$fileName}.xls\"");
         header("Cache-Control: private");
         header("Connection: close");
-        
+
         $writer = IOFactory::createWriter($this->data, "Xls");
         $writer->save("php://output");
     }
@@ -110,7 +110,7 @@ class SpreadsheetWriter {
         header("Content-Disposition: attachment; filename=\"{$fileName}.xlsx\"");
         header("Cache-Control: max-age=0");
         header("Connection: close");
-        
+
         $writer = IOFactory::createWriter($this->data, "Xlsx");
         $writer->save("php://output");
     }
@@ -127,7 +127,7 @@ class SpreadsheetWriter {
         header("Content-Disposition: attachment; filename=\"{$fileName}.csv\"");
         header("Cache-Control: private");
         header("Connection: close");
-        
+
         $writer = IOFactory::createWriter($this->data, "Csv");
         $writer->save("php://output");
     }

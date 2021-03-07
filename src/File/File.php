@@ -10,7 +10,7 @@ use ZipArchive;
  * The File Utils
  */
 class File {
-    
+
     /**
      * Returns the path used to store the files
      * @param string ...$pathParts
@@ -21,7 +21,7 @@ class File {
         $result = Strings::replace($result, "//", "/");
         return $result;
     }
-    
+
     /**
      * Returns true if given file exists
      * @param string ...$pathParts
@@ -32,7 +32,7 @@ class File {
         return !empty($path) && file_exists($path);
     }
 
-    
+
 
     /**
      * Uplods the given file to the given path
@@ -48,7 +48,7 @@ class File {
         }
         return $path;
     }
-    
+
     /**
      * Creates a file with the given content
      * @param string          $path
@@ -63,7 +63,7 @@ class File {
         }
         return $path;
     }
-    
+
     /**
      * Moves a file from one path to another
      * @param string $fromPath
@@ -77,7 +77,7 @@ class File {
         }
         return false;
     }
-    
+
     /**
      * Deletes the given file/directory
      * @param string $path
@@ -136,9 +136,9 @@ class File {
     public static function removeFirstSlash(string $path): string {
         return Strings::stripStart($path, "/");
     }
-    
-    
-    
+
+
+
     /**
      * Returns the file name component of the path
      * @param string $path
@@ -215,7 +215,7 @@ class File {
         }
         return $result;
     }
-    
+
     /**
      * Returns all the Files inside the given path
      * @param string $path
@@ -233,7 +233,7 @@ class File {
         }
         return $result;
     }
-    
+
     /**
      * Creates a directory at the given path if it doesn't exists
      * @param string $path
@@ -266,7 +266,7 @@ class File {
         }
         return !file_exists($path);
     }
-    
+
     /**
      * Deletes all the content from a directory
      * @param string $path
@@ -282,9 +282,9 @@ class File {
             }
         }
     }
-    
-    
-    
+
+
+
     /**
      * Creates a new zip archive and adds the given files/directories
      * @param string          $name
@@ -304,7 +304,7 @@ class File {
         }
         return null;
     }
-    
+
     /**
      * Adds a directory and all the files/directories inside or just a single file
      * @param ZipArchive $zip
@@ -325,7 +325,7 @@ class File {
             $zip->addFile($src, $dst);
         }
     }
-    
+
     /**
      * Extracts the given zip to the given path
      * @param string $zipPath

@@ -15,8 +15,8 @@ class Router {
     private static $loaded    = false;
     private static $namespace = "";
     private static $data      = [];
-    
-    
+
+
     /**
      * Loads the Routes Data
      * @return void
@@ -51,7 +51,7 @@ class Router {
             "access" => $access,
         ];
     }
-    
+
     /**
      * Returns true if the give Route exists
      * @param string $route
@@ -73,7 +73,7 @@ class Router {
         $data = self::get($route);
         return Access::getOne($data->access);
     }
-    
+
     /**
      * Returns the Method for the given Route, if it exists
      * @param string $route

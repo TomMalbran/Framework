@@ -13,8 +13,8 @@ class Status {
     private static $loaded = false;
     private static $groups = [];
     private static $values = [];
-    
-    
+
+
     /**
      * Loads the Status Data
      * @return void
@@ -23,7 +23,7 @@ class Status {
         if (!self::$loaded) {
             self::$loaded = true;
             $data = Framework::loadData(Framework::StatusData);
-            
+
             // Store the Values
             foreach ($data["values"] as $statusName => $statusValue) {
                 $name = Strings::toLowerCase($statusName);

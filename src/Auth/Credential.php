@@ -18,11 +18,11 @@ use Framework\Utils\Status;
  * The Auth Credential
  */
 class Credential {
-    
+
     private static $loaded = false;
     private static $schema = null;
-    
-    
+
+
     /**
      * Loads the Credential Schema
      * @return Schema
@@ -56,9 +56,9 @@ class Credential {
         }
         return $query;
     }
-    
-    
-    
+
+
+
     /**
      * Returns the Credential with the given ID
      * @param integer $credentialID
@@ -69,7 +69,7 @@ class Credential {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         return self::requestOne($query, $complete);
     }
-    
+
     /**
      * Returns the Credential with the given Email
      * @param string  $email
@@ -91,7 +91,7 @@ class Credential {
     public static function exists(int $crendentialID): bool {
         return self::getSchema()->exists($crendentialID);
     }
-    
+
     /**
      * Returns true if there is an Credential with the given ID and Level(s)
      * @param integer           $crendentialID
@@ -107,7 +107,7 @@ class Credential {
         $query->add("CREDENTIAL_ID", "=", $crendentialID);
         return self::getSchema()->exists($query);
     }
-    
+
     /**
      * Returns true if there is an Credential with the given Email
      * @param string  $email
@@ -143,9 +143,9 @@ class Credential {
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
         return self::getSchema()->exists($query);
     }
-    
-    
-    
+
+
+
     /**
      * Returns all the Credentials for the given Level(s)
      * @param integer[]|integer $level
@@ -202,7 +202,7 @@ class Credential {
         }
         return self::getSchema()->getTotal($query);
     }
-    
+
     /**
      * Requests data to the database
      * @param Query   $query    Optional.
@@ -213,7 +213,7 @@ class Credential {
     private static function request(Query $query = null, bool $complete = false, Request $sort = null): array {
         $request = self::getSchema()->getAll($query, $sort);
         $result  = [];
-        
+
         foreach ($request as $row) {
             $fields = $row;
             $fields["credentialName"] = self::createName($row);
@@ -231,7 +231,7 @@ class Credential {
         }
         return $result;
     }
-    
+
     /**
      * Requests a single row from the database
      * @param Query   $query    Optional.
@@ -242,9 +242,9 @@ class Credential {
         $request = self::request($query, $complete);
         return self::getSchema()->getModel($request);
     }
-    
-    
-    
+
+
+
     /**
      * Returns a select of all the Credentials
      * @return array
@@ -252,7 +252,7 @@ class Credential {
     public static function getSelect(): array {
         return self::requestSelect();
     }
-    
+
     /**
      * Returns a select of Credentials for the given Level(s)
      * @param integer[]|integer $level
@@ -267,7 +267,7 @@ class Credential {
         $query->orderBy("level", false);
         return self::requestSelect($query);
     }
-    
+
     /**
      * Returns a select of Credentials with the given IDs
      * @param integer[] $credentialIDs
@@ -281,7 +281,7 @@ class Credential {
         $query->orderBy("firstName", true);
         return self::requestSelect($query);
     }
-    
+
     /**
      * Returns the Credentials  that contains the text and the given Levels
      * @param string            $text
@@ -296,10 +296,10 @@ class Credential {
         $query->addIf("level",         "IN", Arrays::toArray($level),        $level !== null);
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
-        
+
         $request = self::requestSelect($query);
         $result  = [];
-        
+
         foreach ($request as $row) {
             $result[] = [
                 "id"    => $row["key"],
@@ -317,7 +317,7 @@ class Credential {
     private static function requestSelect(Query $query = null): array {
         $request = self::getSchema()->getMap($query);
         $result  = [];
-        
+
         foreach ($request as $row) {
             $result[] = [
                 "key"   => $row["credentialID"],
@@ -340,9 +340,9 @@ class Credential {
         }
         return self::getSchema()->getColumn($query, "email");
     }
-    
-    
-    
+
+
+
     /**
      * Returns true if the given password is correct for the given Credential ID
      * @param Model  $credential
@@ -353,7 +353,7 @@ class Credential {
         $hash = self::createHash($password, $credential->salt);
         return $hash["password"] == $credential->password;
     }
-    
+
     /**
      * Returns true if the given Credential requires a password change
      * @param integer $credentialID
@@ -371,9 +371,9 @@ class Credential {
         $query->endOr();
         return self::getSchema()->getValue($query, "reqPassChange") == 1;
     }
-    
-    
-    
+
+
+
     /**
      * Creates a new Credential
      * @param Request $request
@@ -388,7 +388,7 @@ class Credential {
             "currentLogin" => time(),
         ]);
     }
-    
+
     /**
      * Edits the given Credential
      * @param integer $credentialID
@@ -420,7 +420,7 @@ class Credential {
     public static function delete(int $credentialID): bool {
         return self::getSchema()->delete($credentialID);
     }
-    
+
     /**
      * Parses the data and returns the fields
      * @param Request $request
@@ -443,9 +443,9 @@ class Credential {
         }
         return $result;
     }
-    
-    
-    
+
+
+
     /**
      * Sets the current User for the given Credential
      * @param integer $credentialID
@@ -483,7 +483,7 @@ class Credential {
             "currentLogin" => time(),
         ]);
     }
-    
+
     /**
      * Sets the Credential Password
      * @param integer $credentialID
@@ -498,7 +498,7 @@ class Credential {
         ]);
         return $hash;
     }
-    
+
     /**
      * Sets the require password change for the given Credential
      * @param integer $credentialID
@@ -562,7 +562,7 @@ class Credential {
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
         $nickName  = Arrays::getValue($data, "nickName",     "", $prefix);
         $result    = "";
-        
+
         if (!empty($firstName) && !empty($lastName)) {
             $result = "$firstName $lastName";
             if ($withNick && !empty($nickName)) {

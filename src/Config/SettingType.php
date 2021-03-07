@@ -7,7 +7,7 @@ use Framework\Utils\JSON;
  * The Setting Types used by the System
  */
 class SettingType {
-    
+
     const General = 0;
     const Binary  = 1;
     const JSON    = 2;

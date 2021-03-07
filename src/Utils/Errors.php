@@ -7,10 +7,10 @@ use Framework\Utils\Arrays;
  * The Errors wrapper
  */
 class Errors {
-    
+
     private $errors = [];
-    
-    
+
+
     /**
      * Creates a new Errors instance
      * @param array $errors
@@ -23,8 +23,8 @@ class Errors {
             }
         }
     }
-    
-    
+
+
 
     /**
      * Sets the given key on the error data with the given value
@@ -47,7 +47,7 @@ class Errors {
         }
         return "";
     }
-    
+
 
 
     /**
@@ -80,7 +80,7 @@ class Errors {
         $this->errors["global"] = $message;
         return $this;
     }
-    
+
     /**
      * Adds a new error if the condition is true
      * @param boolean $condition
@@ -94,7 +94,7 @@ class Errors {
         }
         return $this;
     }
-    
+
 
 
     /**
@@ -114,7 +114,7 @@ class Errors {
         }
         return false;
     }
-    
+
     /**
      * Returns the errors as an Object
      * @return array

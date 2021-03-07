@@ -9,13 +9,13 @@ use Framework\File\File;
  * The Files Paths
  */
 class Path {
-    
+
     private static $loaded   = false;
     private static $data     = [];
     private static $basePath = null;
     private static $baseDir  = null;
-    
-    
+
+
     /**
      * Loads the Path Data
      * @return void
@@ -42,7 +42,7 @@ class Path {
         return "";
     }
 
-    
+
 
     /**
      * Returns the path used to store the files
@@ -82,7 +82,7 @@ class Path {
         $path = self::getPath($pathKey, ...$pathParts);
         return File::exists($path);
     }
-    
+
 
 
     /**
@@ -94,14 +94,14 @@ class Path {
     public static function getTempPath(int $credentialID, bool $create = true): string {
         $path   = self::getPath(Framework::TempDir, $credentialID);
         $exists = File::exists($path);
-        
+
         if (!$exists && $create) {
             File::createDir($path);
             return $path;
         }
         return $exists ? $path : "";
     }
-    
+
     /**
      * Creates an url to the files temp directory
      * @param integer $credentialID

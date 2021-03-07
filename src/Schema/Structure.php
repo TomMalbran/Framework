@@ -18,7 +18,7 @@ class Structure {
     public $idKey         = "";
     public $idName        = "";
     public $name          = "";
-    
+
     public $fields        = [];
     public $joins         = [];
     public $counts        = [];

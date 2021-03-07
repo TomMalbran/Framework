@@ -12,8 +12,8 @@ class Language {
 
     private static $loaded = false;
     private static $data   = [];
-    
-    
+
+
     /**
      * Loads the Language Data
      * @return void

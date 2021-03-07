@@ -13,7 +13,7 @@ use Framework\Utils\Strings;
  * The Schema Migration
  */
 class Migration {
-    
+
     /**
      * Migrates the Tables
      * @param Database $db
@@ -56,7 +56,7 @@ class Migration {
         }
         Settings::setCore($db, "movement", $last);
     }
-    
+
     /**
      * Migrates the Tables
      * @param Database $db
@@ -67,12 +67,12 @@ class Migration {
     private static function migrateTables(Database $db, array $schemas, bool $canDelete = false) {
         $tableNames  = $db->getTables(null, false);
         $schemaNames = [];
-        
+
         // Create or update the Tables
         foreach ($schemas as $schemaKey => $schemaData) {
             $structure     = new Structure($schemaKey, $schemaData);
             $schemaNames[] = $structure->table;
-            
+
             if (!Arrays::contains($tableNames, $structure->table)) {
                 self::createTable($db, $structure);
             } else {
@@ -94,7 +94,7 @@ class Migration {
         $fields  = [];
         $primary = [];
         $keys    = [];
-        
+
         foreach ($structure->fields as $field) {
             $fields[$field->key] = $field->getType();
             if ($field->isPrimary) {
@@ -104,7 +104,7 @@ class Migration {
                 $keys[] = $field->key;
             }
         }
-        
+
         $sql = $db->createTable($structure->table, $fields, $primary, $keys);
         print("<br>Created table <b>$structure->table</b> ... <br>");
         print(Strings::toHtml($sql) . "<br><br>");
@@ -155,7 +155,7 @@ class Migration {
         $dropPrimary = false;
         $canDrop     = !empty($primaryKeys);
         $keys        = [];
-        
+
         // Add new Columns
         $prev = "";
         foreach ($structure->fields as $field) {
@@ -205,7 +205,7 @@ class Migration {
             }
             $prev = $field->key;
         }
-        
+
         // Remove Columns
         foreach ($tableFields as $tableField) {
             $tableKey = $tableField["Field"];
@@ -275,13 +275,13 @@ class Migration {
                 }
             }
         }
-        
+
         // Nothing to change
         if (!$update) {
             print("No changes for <i>$structure->table</i><br>");
             return;
         }
-        
+
         // Update the Table
         print("<br>Updated table <b>$structure->table</b> ... <br>");
         if ($dropPrimary && $canDrop) {

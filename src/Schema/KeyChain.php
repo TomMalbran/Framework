@@ -8,11 +8,11 @@ use Framework\Utils\Strings;
  * The Keys Data
  */
 class KeyChain {
-    
+
     private static $loaded = false;
     private static $data   = [];
-    
-    
+
+
     /**
      * Loads the Keys Data
      * @return void
@@ -23,7 +23,7 @@ class KeyChain {
             self::$data   = Framework::loadData(Framework::KeyData);
         }
     }
-    
+
     /**
      * Returns the Master Key with the given key
      * @param string $key
@@ -38,7 +38,7 @@ class KeyChain {
     }
 
 
-    
+
     /**
      * Recreates all the Master Keys
      * @return object
@@ -52,7 +52,7 @@ class KeyChain {
         self::$data = $data;
         return (object)$data;
     }
-    
+
     /**
      * Saves all the Master Keys
      * @param mixed $data

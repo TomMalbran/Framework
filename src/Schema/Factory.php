@@ -14,13 +14,13 @@ use Framework\Utils\Arrays;
  * The Schema Factory
  */
 class Factory {
-    
+
     private static $loaded     = false;
     private static $db         = null;
     private static $data       = [];
     private static $structures = [];
-    
-    
+
+
     /**
      * Loads the Schemas Data
      * @return void
@@ -33,7 +33,7 @@ class Factory {
 
             self::$loaded = true;
             self::$db     = new Database($config);
-            
+
             foreach ($schemas as $key => $data) {
                 if (!empty($frame[$key])) {
                     self::$data[$key] = Arrays::extend($frame[$key], $data);
@@ -43,9 +43,9 @@ class Factory {
             }
         }
     }
-    
-    
-    
+
+
+
     /**
      * Gets the Schema
      * @param string $key
