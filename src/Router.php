@@ -42,8 +42,8 @@ class Router {
         $base   = Strings::stripEnd($route, "/$method");
 
         $data   = isset(self::$data[$base]) ? self::$data[$base] : null;
-        $module = $data != null ? $data["module"]          : null;
-        $access = $data != null ? $data["routes"][$method] : null;
+        $module = $data != null ? $data["module"] : null;
+        $access = $data != null && !empty($data["routes"][$method]) ? $data["routes"][$method] : null;
 
         return (object)[
             "module" => $module,
