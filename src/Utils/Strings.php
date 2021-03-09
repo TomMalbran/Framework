@@ -370,4 +370,44 @@ class Strings {
     public static function isShort(string $string, int $length = 30): string {
         return self::makeShort($string, $length) !== $string;
     }
+
+    /**
+     * Returns a Slug from the given string
+     * @param string $string
+     * @return string
+     */
+    public static function toSlug(string $string): string {
+        $result = self::sanitize($string, true, true);
+        $result = str_replace("---", "-", $result);
+        $result = str_replace("--", "-", $result);
+        return $result;
+    }
+
+    /**
+     * Sanitizes a String
+     * @param string  $string
+     * @param boolean $lowercase Optional.
+     * @param boolean $anal      Optional.
+     * @return string
+     */
+    public static function sanitize(string $string, bool $lowercase = true, bool $anal = false): string {
+        $strip = [
+            "~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
+            "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
+            "â€”", "â€“", ",", "<", ".", ">", "/", "?",
+        ];
+        $clean = trim(str_replace($strip, "", strip_tags($string)));
+        $clean = preg_replace('/\s+/', "-", $clean);
+
+        if ($anal) {
+            $tilde = [ "á", "é", "í", "ó", "ú", "ü", "ñ", "Á", "É", "Í", "Ó", "Ú", "Ü", "Ñ" ];
+            $with  = [ "a", "e", "i", "o", "u", "u", "n", "A", "E", "I", "O", "U", "U", "N" ];
+            $clean = str_replace($tilde, $with, $clean);
+            $clean = preg_replace("/[^a-zA-Z0-9\-]/", "", $clean);
+        }
+        if ($lowercase) {
+            return function_exists("mb_strtolower") ? mb_strtolower($clean, "UTF-8") : strtolower($clean);
+        }
+        return $clean;
+    }
 }
