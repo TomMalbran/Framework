@@ -666,7 +666,7 @@ class Database {
         }
         $sql .= "  PRIMARY KEY (`" . Strings::join($primary, "`, `") . "`)";
         foreach ($keys as $key) {
-            $sql .= ",\n  KEY `$field->key` (`$field->key`)";
+            $sql .= ",\n  KEY `$key` (`$key`)";
         }
         $sql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
