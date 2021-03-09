@@ -502,6 +502,62 @@ class Schema {
 
 
     /**
+     * Creates and ensures the Order
+     * @param Request $request
+     * @param array   $extra        Optional.
+     * @param integer $credentialID Optional.
+     * @return integer
+     */
+    public function createWithOrder(Request $request, array $extra = null, int $credentialID = 0): int {
+        $this->ensurePosOrder(null, $request);
+        return $this->create($request, $extra, $credentialID);
+    }
+
+    /**
+     * Edits and ensures the Order
+     * @param Query|integer $query
+     * @param Request       $request
+     * @param array         $extra        Optional.
+     * @param integer       $credentialID Optional.
+     * @return boolean
+     */
+    public function editWithOrder($query, Request $request, array $extra = null, int $credentialID = 0): bool {
+        $model = $this->getOne($query);
+        $this->ensurePosOrder($model, $request);
+        return $this->edit($query, $request, $extra, $credentialID);
+    }
+
+    /**
+     * Deletes and ensures the Order
+     * @param Query|integer $query
+     * @param integer       $credentialID Optional.
+     * @return boolean
+     */
+    public function deleteWithOrder($query, int $credentialID = 0): bool {
+        $model = $this->getOne($query);
+        if ($this->delete($query, $credentialID)) {
+            $this->ensurePosOrder($model, null);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Ensures that the order of the Elements is correct
+     * @param Model   $model   Optional.
+     * @param Request $request Optional.
+     * @return void
+     */
+    public function ensurePosOrder(Model $model = null, Request $request = null): void {
+        $oldPosition = !empty($model)   ? $model->position             : 0;
+        $newPosition = !empty($request) ? $request->getInt("position") : 0;
+        $updPosition = $this->ensureOrder($oldPosition, $newPosition);
+        if (!empty($request)) {
+            $request->position = $updPosition;
+        }
+    }
+
+    /**
      * Ensures that the order of the Elements is correct on Create/Edit
      * @param integer $oldPosition
      * @param integer $newPosition
