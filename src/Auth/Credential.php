@@ -97,10 +97,11 @@ class Credential {
      * @param integer           $crendentialID
      * @param integer|integer[] $level
      * @param string[]|string   $filter        Optional.
+     * @param mixed             $value         Optional.
      * @return boolean
      */
-    public static function existsWithLevel(int $crendentialID, $level, $filter = null): bool {
-        $query = self::createLevelQuery($level, $filter);
+    public static function existsWithLevel(int $crendentialID, $level, $filter = null, $value = 1): bool {
+        $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return false;
         }
@@ -178,11 +179,11 @@ class Credential {
      * Returns all the Credentials for the given Level(s) and filter
      * @param integer[]|integer $level
      * @param string            $filter
-     * @param mixed             $value
+     * @param mixed             $value  Optional.
      * @param Request           $sort   Optional.
      * @return array
      */
-    public static function getAllWithFilter($level, string $filter, $value, Request $sort = null): array {
+    public static function getAllWithFilter($level, string $filter, $value = 1, Request $sort = null): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -193,10 +194,12 @@ class Credential {
     /**
      * Returns the total amount of Credentials for the given Level(s)
      * @param integer[]|integer $level
+     * @param string            $filter Optional.
+     * @param mixed             $value  Optional.
      * @return integer
      */
-    public static function getTotalForLevel($level): int {
-        $query = self::createLevelQuery($level);
+    public static function getTotalForLevel($level, string $filter = null, $value = 1): int {
+        $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return 0;
         }
@@ -257,10 +260,11 @@ class Credential {
      * Returns a select of Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @param string[]|string   $filter Optional.
+     * @param mixed             $value  Optional.
      * @return array
      */
-    public static function getSelectForLevel($level, $filter = null): array {
-        $query = self::createLevelQuery($level, $filter);
+    public static function getSelectForLevel($level, $filter = null, $value = 1): array {
+        $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
         }
@@ -331,10 +335,11 @@ class Credential {
      * Returns a list of emails of the Credentials with the given Levels
      * @param integer[]|integer $level
      * @param string[]|string   $filter Optional.
+     * @param mixed             $value  Optional.
      * @return array
      */
-    public static function getEmailsForLevel($level, $filter = null): array {
-        $query = self::createLevelQuery($level, $filter);
+    public static function getEmailsForLevel($level, $filter = null, $value = 1): array {
+        $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
         }
