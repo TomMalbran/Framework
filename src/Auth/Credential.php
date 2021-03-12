@@ -540,6 +540,18 @@ class Credential {
         ]);
     }
 
+    /**
+     * Sets a Credential Value
+     * @param integer $credentialID
+     * @param string  $key
+     * @param mixed   $value
+     * @return boolean
+     */
+    public static function setValue(int $credentialID, string $key, $value): bool {
+        return self::getSchema()->edit($credentialID, [
+            $key => $value,
+        ]);
+    }
 
 
     /**
