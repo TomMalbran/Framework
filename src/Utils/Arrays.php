@@ -150,6 +150,19 @@ class Arrays {
         return $result;
     }
 
+
+
+    /**
+     * Adds the given element to the start of the Array
+     * @param array $array
+     * @param mixed ...$elem
+     * @return array
+     */
+    public static function unshift(array $array, ...$elem) {
+        array_unshift($array, ...$elem);
+        return $array;
+    }
+
     /**
      * Slices an Array from the index the amount of items
      * @param array   $array
