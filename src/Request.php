@@ -729,6 +729,14 @@ class Request implements ArrayAccess {
 
 
     /**
+     * Dumps the Request
+     * @return array
+     */
+    public function toObject(): array {
+        return $this->request;
+    }
+
+    /**
      * Prints the Request
      * @return void
      */
