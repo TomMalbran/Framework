@@ -355,17 +355,20 @@ class Credential {
      * @return boolean
      */
     public static function isPasswordCorrect(Model $credential, string $password): bool {
+        if ($credential->passExpiration > 0 && $credential->passExpiration < time()) {
+            return false;
+        }
         $hash = self::createHash($password, $credential->salt);
         return $hash["password"] == $credential->password;
     }
 
     /**
      * Returns true if the given Credential requires a password change
-     * @param integer $credentialID
+     * @param integer $credentialID Optional.
      * @param string  $email        Optional.
      * @return boolean
      */
-    public static function reqPassChange(int $credentialID, string $email = null): bool {
+    public static function reqPassChange(int $credentialID = null, string $email = null): bool {
         if (empty($credentialID) && empty($email)) {
             return false;
         }
@@ -498,8 +501,10 @@ class Credential {
     public static function setPassword(int $credentialID, string $password): array {
         $hash = self::createHash($password);
         self::getSchema()->edit($credentialID, [
-            "password" => $hash["password"],
-            "salt"     => $hash["salt"],
+            "password"       => $hash["password"],
+            "salt"           => $hash["salt"],
+            "passExpiration" => 0,
+            "reqPassChange"  => 0,
         ]);
         return $hash;
     }
@@ -514,6 +519,24 @@ class Credential {
         return self::getSchema()->edit($credentialID, [
             "reqPassChange" => $require ? 1 : 0,
         ]);
+    }
+
+    /**
+     * Sets a temporary Password to the given Credential
+     * @param integer $credentialID
+     * @param integer $hours        Optional.
+     * @return string
+     */
+    public static function setTempPass(int $credentialID, int $hours = 48): string {
+        $password = Strings::randomCode(10, "lud");
+        $hash     = self::createHash($password);
+        self::getSchema()->edit($credentialID, [
+            "password"       => $hash["password"],
+            "salt"           => $hash["salt"],
+            "passExpiration" => time() + 48 * 3600,
+            "reqPassChange"  => 1,
+        ]);
+        return $password;
     }
 
     /**
