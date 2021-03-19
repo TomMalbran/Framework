@@ -192,6 +192,22 @@ class Credential {
     }
 
     /**
+     * Returns the latest Credentials for the given Level(s)
+     * @param integer[]|integer $level
+     * @param integer           $amount
+     * @return array
+     */
+    public static function getLatestForLevel($level, int $amount): array {
+        $query = self::createLevelQuery($level);
+        if (empty($query)) {
+            return [];
+        }
+        $query->orderBy("createdTime", false);
+        $query->limit($amount);
+        return self::request($query, false);
+    }
+
+    /**
      * Returns the total amount of Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @param string            $filter Optional.
