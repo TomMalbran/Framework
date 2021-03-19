@@ -140,9 +140,6 @@ class Period {
         $result = 0;
 
         switch ($this->period) {
-        case self::Last24Hours:
-            $result = time();
-            break;
         case self::Last7Days:
         case self::Last15Days:
         case self::Last30Days:
