@@ -247,6 +247,24 @@ class Arrays {
         return $array;
     }
 
+    /**
+     * Returns the sum of the elements of the given array
+     * @param array  $array
+     * @param string $key   Optional.
+     * @return integer|float
+     */
+    public static function sum(array $array, string $key = null) {
+        $result = 0;
+        foreach ($array as $value) {
+            if (!empty($key)) {
+                $result += $value[$key];
+            } else {
+                $result += $value;
+            }
+        }
+        return $result;
+    }
+
 
 
     /**
