@@ -269,20 +269,28 @@ class Schema {
     /**
      * Returns the search results
      * @param Query           $query
-     * @param string|string[] $name  Optional.
+     * @param string|string[] $name   Optional.
+     * @param string          $idName Optional.
      * @return array
      */
-    public function getSearch(Query $query, $name = null): array {
+    public function getSearch(Query $query, $name = null, string $idName = null): array {
         $query   = $this->generateQuery($query);
         $request = $this->request($query);
+        $idKey   = $idName ?: $this->structure->idName;
+        $nameKey = $name   ?: $this->structure->name;
+        $ids     = [];
         $result  = [];
 
         foreach ($request as $row) {
-            $result[] = [
-                "id"    => $row[$this->structure->idName],
-                "title" => Arrays::getValue($row, $name ?: $this->structure->name),
-                "data"  => $row,
-            ];
+            $id = $row[$idKey];
+            if (!in_array($id, $ids)) {
+                $result[] = [
+                    "id"    => $id,
+                    "title" => Arrays::getValue($row, $nameKey),
+                    "data"  => $row,
+                ];
+                $ids[] = $id;
+            }
         }
         return $result;
     }
@@ -359,7 +367,7 @@ class Schema {
     public function getSortedNames(string $order = null, bool $orderAsc = true, $name = null, bool $useEmpty = false, string $extra = null): array {
         $field = $this->structure->getOrder($order);
         $query = Query::createOrderBy($field, $orderAsc);
-        return $this->getSelect($query, $name, $useEmpty, $extra);
+        return $this->getSelect($query, null, $name, $useEmpty, $extra);
     }
 
     /**
@@ -375,25 +383,29 @@ class Schema {
     public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, $name = null, bool $useEmpty = false, string $extra = null): array {
         $field = $this->structure->getOrder($order);
         $query->orderBy($field, $orderAsc);
-        return $this->getSelect($query, $name, $useEmpty, $extra);
+        return $this->getSelect($query, null, $name, $useEmpty, $extra);
     }
 
     /**
      * Returns a select of Schemas
      * @param Query           $query
+     * @param string          $idName   Optional.
      * @param string|string[] $name     Optional.
      * @param boolean         $useEmpty Optional.
      * @param string          $extra    Optional.
      * @return array
      */
-    public function getSelect(Query $query, $name = null, bool $useEmpty = false, string $extra = null): array {
+    public function getSelect(Query $query, string $idName = null, $name = null, bool $useEmpty = false, string $extra = null): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
+        if ($idName != null) {
+            $selection->addSelects("DISTINCT($idName)");
+        }
         $selection->addFields();
         $selection->addJoins();
         $selection->request($query);
         $request   = $selection->resolve();
-        return Arrays::createSelect($request, $this->structure->idName, $name ?: $this->structure->name, $useEmpty, $extra);
+        return Arrays::createSelect($request, $idName ?: $this->structure->idName, $name ?: $this->structure->name, $useEmpty, $extra);
     }
 
 
