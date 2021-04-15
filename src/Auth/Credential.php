@@ -195,10 +195,12 @@ class Credential {
      * Returns the latest Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @param integer           $amount
+     * @param string            $filter Optional.
+     * @param mixed             $value  Optional.
      * @return array
      */
-    public static function getLatestForLevel($level, int $amount): array {
-        $query = self::createLevelQuery($level);
+    public static function getLatestForLevel($level, int $amount, string $filter = null, $value = 1): array {
+        $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
         }
