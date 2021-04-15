@@ -1,8 +1,10 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Request;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
+use Framework\Utils\Period;
 
 /**
  * The Database Query
@@ -129,6 +131,18 @@ class Query {
         $prefix          = $this->getPrefix();
         $this->where    .= "{$prefix}ISNULL($column) = 1";
         $this->columns[] = $column;
+        return $this;
+    }
+
+    /**
+     * Adds an expression as NULL
+     * @param string  $column
+     * @param Request $request
+     * @return Query
+     */
+    public function addPeriod(string $column, Request $request): Query {
+        $period = new Period($request);
+        $this->betweenTimes($column, $period->fromTime, $period->toTime);
         return $this;
     }
 
