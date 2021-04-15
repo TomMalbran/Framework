@@ -92,6 +92,7 @@ class Mailer {
         $mail->SMTPAuth    = true;
         $mail->SMTPAutoTLS = false;
 
+        $username = !empty(self::$smtp->username) ? self::$smtp->username : self::$smtp->email;
         if (self::$smtp->useOauth) {
             $mail->SMTPAuth = true;
             $mail->AuthType = "XOAUTH2";
@@ -105,10 +106,10 @@ class Mailer {
                 "clientId"     => self::$google->client,
                 "clientSecret" => self::$google->secret,
                 "refreshToken" => self::$smtp->refreshToken,
-                "userName"     => self::$smtp->email,
+                "userName"     => $username,
             ]));
         } else {
-            $mail->Username = self::$smtp->email;
+            $mail->Username = $username;
             $mail->Password = self::$smtp->password;
         }
 
