@@ -223,11 +223,15 @@ class Arrays {
     /**
      * Sorts an array using the given callback
      * @param array    $array
-     * @param callback $callback
+     * @param callback $callback Optional.
      * @return array
      */
-    public static function sort(array &$array, callable $callback): array {
-        usort($array, $callback);
+    public static function sort(array &$array, callable $callback = null): array {
+        if (empty($callback)) {
+            sort($array);
+        } else {
+            usort($array, $callback);
+        }
         return $array;
     }
 
@@ -285,13 +289,17 @@ class Arrays {
     /**
      * Creates an sub array using the given array
      * @param array           $array
-     * @param string|string[] $value Optional.
+     * @param string|string[] $value     Optional.
+     * @param boolean         $skipEmpty Optional.
      * @return array
      */
-    public static function createArray(array $array, $value = null): array {
+    public static function createArray(array $array, $value = null, bool $skipEmpty = false): array {
         $result = [];
         foreach ($array as $row) {
-            $result[] = !empty($value) ? self::getValue($row, $value) : $row;
+            $elem = !empty($value) ? self::getValue($row, $value) : $row;
+            if (!$skipEmpty || !empty($elem)) {
+                $result[] = $elem;
+            }
         }
         return $result;
     }
