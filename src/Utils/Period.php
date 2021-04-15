@@ -9,24 +9,24 @@ use Framework\Utils\Utils;
  */
 class Period {
 
-    const Last7Days   = 3;
-    const Last15Days  = 4;
-    const Last30Days  = 5;
-    const Last60Days  = 6;
-    const Last90Days  = 7;
-    const LastYear    = 8;
-    const ThisWeek    = 9;
-    const ThisMonth   = 10;
-    const ThisYear    = 11;
-    const PastWeek    = 12;
-    const PastMonth   = 13;
-    const PastYear    = 14;
-    const AllPeriod   = 2;
-    const Custom      = 1;
+    const Last7Days  = 3;
+    const Last15Days = 4;
+    const Last30Days = 5;
+    const Last60Days = 6;
+    const Last90Days = 7;
+    const LastYear   = 8;
+    const ThisWeek   = 9;
+    const ThisMonth  = 10;
+    const ThisYear   = 11;
+    const PastWeek   = 12;
+    const PastMonth  = 13;
+    const PastYear   = 14;
+    const AllPeriod  = 2;
+    const Custom     = 1;
 
-    public $period    = 0;
-    public $fromTime  = 0;
-    public $toTime    = 0;
+    public $period   = 0;
+    public $fromTime = 0;
+    public $toTime   = 0;
 
     /** All the Period Names */
     public static $Names = [
@@ -53,22 +53,24 @@ class Period {
      * @param Request|Model $data
      */
     public function __construct($data) {
-        if ($data->has("period") && $data->period != self::Custom) {
+        $this->period = self::Custom;
+
+        if ($data->has("fromDate")) {
+            $this->fromTime = DateTime::toDayStart($data->fromDate);
+        } elseif ($data->has("fromTime")) {
+            $this->fromTime = $data->fromTime;
+        } elseif ($data->has("period")) {
             $this->period   = $data->period;
             $this->fromTime = $this->getFromTime();
-            $this->toTime   = $this->getToTime();
-        } else {
-            $this->period = self::Custom;
-            if ($data->has("fromDate")) {
-                $this->fromTime = DateTime::toDayStart($data->fromDate);
-            } elseif ($data->has("fromTime")) {
-                $this->fromTime = $data->fromTime;
-            }
-            if ($data->has("toDate")) {
-                $this->toTime = DateTime::toDayEnd($data->toDate);
-            } elseif ($data->has("toTime")) {
-                $this->toTime = $data->toTime;
-            }
+        }
+
+        if ($data->has("toDate")) {
+            $this->toTime = DateTime::toDayEnd($data->toDate);
+        } elseif ($data->has("toTime")) {
+            $this->toTime = $data->toTime;
+        } elseif ($data->has("period")) {
+            $this->period = $data->period;
+            $this->toTime = $this->getToTime();
         }
     }
 
