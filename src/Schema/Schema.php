@@ -372,7 +372,7 @@ class Schema {
 
     /**
      * Returns all the Sorted Names using the given Query
-     * @param Query           $query
+     * @param Query           $query    Optional.
      * @param string          $order    Optional.
      * @param boolean         $orderAsc Optional.
      * @param string|string[] $name     Optional.
@@ -380,7 +380,7 @@ class Schema {
      * @param string          $extra    Optional.
      * @return array
      */
-    public function getSortedSelect(Query $query, string $order = null, bool $orderAsc = true, $name = null, bool $useEmpty = false, string $extra = null): array {
+    public function getSortedSelect(Query $query = null, string $order = null, bool $orderAsc = true, $name = null, bool $useEmpty = false, string $extra = null): array {
         $field = $this->structure->getOrder($order);
         $query->orderBy($field, $orderAsc);
         return $this->getSelect($query, null, $name, $useEmpty, $extra);
@@ -388,14 +388,14 @@ class Schema {
 
     /**
      * Returns a select of Schemas
-     * @param Query           $query
+     * @param Query           $query    Optional.
      * @param string          $idName   Optional.
      * @param string|string[] $name     Optional.
      * @param boolean         $useEmpty Optional.
      * @param string          $extra    Optional.
      * @return array
      */
-    public function getSelect(Query $query, string $idName = null, $name = null, bool $useEmpty = false, string $extra = null): array {
+    public function getSelect(Query $query = null, string $idName = null, $name = null, bool $useEmpty = false, string $extra = null): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         if ($idName != null) {
