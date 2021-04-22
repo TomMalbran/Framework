@@ -430,7 +430,10 @@ class Request implements ArrayAccess {
      * @return boolean
      */
     public function isValidPeriod(string $fromKey, string $toKey): bool {
-        return DateTime::isValidPeriod($this->get($fromKey), $this->get($toKey));
+        if (!$this->isEmpty([ $fromKey, $toKey ])) {
+            return DateTime::isValidPeriod($this->get($fromKey), $this->get($toKey));
+        }
+        return true;
     }
 
     /**
@@ -440,7 +443,10 @@ class Request implements ArrayAccess {
      * @return boolean
      */
     public function isValidHourPeriod(string $fromKey, string $toKey): bool {
-        return DateTime::isValidHourPeriod($this->get($fromKey), $this->get($toKey));
+        if (!$this->isEmpty([ $fromKey, $toKey ])) {
+            return DateTime::isValidHourPeriod($this->get($fromKey), $this->get($toKey));
+        }
+        return true;
     }
 
     /**
@@ -457,12 +463,15 @@ class Request implements ArrayAccess {
         string $toDateKey,
         string $toHourKey
     ): bool {
-        return DateTime::isValidFullPeriod(
-            $this->get($fromDateKey),
-            $this->get($fromHourKey),
-            $this->get($toDateKey),
-            $this->get($toHourKey)
-        );
+        if (!$this->isEmpty([ $fromDateKey, $fromHourKey, $toDateKey, $toHourKey ])) {
+            return DateTime::isValidFullPeriod(
+                $this->get($fromDateKey),
+                $this->get($fromHourKey),
+                $this->get($toDateKey),
+                $this->get($toHourKey)
+            );
+        }
+        return true;
     }
 
     /**
