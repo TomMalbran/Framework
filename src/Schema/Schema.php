@@ -405,7 +405,7 @@ class Schema {
         $selection->addJoins();
         $selection->request($query);
         $request   = $selection->resolve();
-        return Arrays::createSelect($request, $idName ?: $this->structure->idName, $name ?: $this->structure->name, $useEmpty, $extra);
+        return Arrays::createSelect($request, $idName ?: $this->structure->idName, $name ?: $this->structure->name, $useEmpty, $extra, true);
     }
 
 

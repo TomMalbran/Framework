@@ -307,23 +307,29 @@ class Arrays {
     /**
      * Creates a select using the given array
      * @param array           $array
-     * @param string          $key
-     * @param string|string[] $value
+     * @param string          $keyName
+     * @param string|string[] $valName
      * @param boolean         $useEmpty Optional.
      * @param string          $extra    Optional.
+     * @param boolean         $distinct Optional.
      * @return array
      */
-    public static function createSelect(array $array, string $key, $value, bool $useEmpty = false, string $extra = null): array {
+    public static function createSelect(array $array, string $keyName, $valName, bool $useEmpty = false, string $extra = null, bool $distinct = false): array {
         $result = [];
+        $keys   = [];
+
         foreach ($array as $row) {
-            $fields = [
-                "key"   => $row[$key],
-                "value" => self::getValue($row, $value, " - ", "", $useEmpty),
-            ];
+            $key   = $row[$keyName];
+            $value = self::getValue($row, $valName, " - ", "", $useEmpty);
+            if (($distinct && in_array($key, $keys)) || (!$useEmpty && empty($value))) {
+                continue;
+            }
+            $fields = [ "key" => $key, "value" => $value ];
             if ($extra) {
                 $fields[$extra] = self::getValue($row, $extra);
             }
             $result[] = $fields;
+            $keys[]   = $key;
         }
         return $result;
     }
