@@ -24,8 +24,8 @@ class MailChimp {
             self::$loaded = true;
             self::$config = Config::get("mailchimp");
 
-            if (self::$config->isActive && !empty(self::$config->apiKey)) {
-                self::$api = new MailChimpAPI(self::$config->apiKey);
+            if (self::$config->active && !empty(self::$config->key)) {
+                self::$api = new MailChimpAPI(self::$config->key);
                 self::$api->verify_ssl = false;
             }
         }
@@ -38,8 +38,8 @@ class MailChimp {
      * @param string $route
      * @return string
      */
-    private static function getMembersRoute(string $route): string {
-        $result = "lists/" . self::$config->listID . "/members";
+    private static function getSubscribersRoute(string $route): string {
+        $result = "lists/" . self::$config->list . "/members";
         if (!empty($route)) {
             $result .= "/$route";
         }
@@ -56,7 +56,7 @@ class MailChimp {
         if (!self::$api) {
             return null;
         }
-        $route  = self::getMembersRoute();
+        $route  = self::getSubscribersRoute();
         $result = self::$api->get($route, [ "count" => $amount ], 120);
         return $result;
     }
@@ -72,7 +72,7 @@ class MailChimp {
             return null;
         }
         $hash   = self::$api->subscriberHash($email);
-        $route  = self::getMembersRoute($hash);
+        $route  = self::getSubscribersRoute($hash);
         $result = self::$api->get($route);
         return $result;
     }
@@ -86,10 +86,10 @@ class MailChimp {
      */
     public static function addSubscriber(string $email, string $firstName, string $lastName): boolean {
         self::load();
-        if (!self::$api || !self::$config->clientActive) {
+        if (!self::$api || !self::$config->subscriberActive) {
             return false;
         }
-        $route  = self::getMembersRoute();
+        $route  = self::getSubscribersRoute();
         $result = self::$api->post($route, [
             "status"        => "subscribed",
             "email_address" => $email,
@@ -108,10 +108,10 @@ class MailChimp {
      */
     public static function addSubscriberBatch(array $subscribers): void {
         self::load();
-        if (!self::$api || !self::$config->clientActive) {
+        if (!self::$api || !self::$config->subscriberActive) {
             return;
         }
-        $route = self::getMembersRoute();
+        $route = self::getSubscribersRoute();
         $batch = self::$api->new_batch();
         foreach ($subscribers as $index => $subscriber) {
             $batch->post("op$index", $route, [
@@ -135,11 +135,11 @@ class MailChimp {
      */
     public static function editSubscriber(string $email, string $firstName, string $lastName, string $status = "subscribed"): boolean {
         self::load();
-        if (!self::$api || !self::$config->clientActive) {
+        if (!self::$api || !self::$config->subscriberActive) {
             return false;
         }
         $hash   = self::$api->subscriberHash($email);
-        $route  = self::getMembersRoute($hash);
+        $route  = self::getSubscribersRoute($hash);
         $result = self::$api->patch($route, [
             "status"        => $status,
             "email_address" => $email,
@@ -158,11 +158,11 @@ class MailChimp {
      */
     public static function deleteSubscriber(string $email): boolean {
         self::load();
-        if (!self::$api || !self::$config->clientActive) {
+        if (!self::$api || !self::$config->subscriberActive) {
             return false;
         }
         $hash  = self::$api->subscriberHash($email);
-        $route = self::getMembersRoute($hash);
+        $route = self::getSubscribersRoute($hash);
         self::$api->delete($route);
         return self::$api->success();
     }
@@ -220,7 +220,7 @@ class MailChimp {
      * @return string
      */
     private static function createCampaign(string $subject, array $emails = null, int $folderID = 0): string {
-        $recipients = [ "list_id" => self::$config->listID ];
+        $recipients = [ "list_id" => self::$config->list ];
 
         if (!empty($emails)) {
             $conditions = [];
@@ -244,7 +244,7 @@ class MailChimp {
             "settings"   => [
                 "subject_line" => $subject,
                 "title"        => $subject,
-                "from_name"    => self::$config->fromName,
+                "from_name"    => self::$config->name,
                 "reply_to"     => self::$config->replyTo,
                 "to_name"      => "*|FNAME|*",
                 "folder_id"    => $folderID,
@@ -286,7 +286,7 @@ class MailChimp {
             self::$api->post("campaigns/{$mailChimpID}/actions/send");
         } else {
             self::$api->post("campaigns/{$mailChimpID}/actions/schedule", [
-                "schedule_time" => gmdate('Y-m-d H:i:s', $time),
+                "schedule_time" => gmdate("Y-m-d H:i:s", $time),
                 "timewarp"      => false,
             ]);
         }
