@@ -291,15 +291,17 @@ class Arrays {
      * @param array           $array
      * @param string|string[] $value     Optional.
      * @param boolean         $skipEmpty Optional.
+     * @param boolean         $distinct  Optional.
      * @return array
      */
-    public static function createArray(array $array, $value = null, bool $skipEmpty = false): array {
+    public static function createArray(array $array, $value = null, bool $skipEmpty = false, bool $distinct = false): array {
         $result = [];
         foreach ($array as $row) {
             $elem = !empty($value) ? self::getValue($row, $value) : $row;
-            if (!$skipEmpty || !empty($elem)) {
-                $result[] = $elem;
+            if (($distinct && in_array($elem, $result)) || ($skipEmpty && empty($value))) {
+                continue;
             }
+            $result[] = $elem;
         }
         return $result;
     }
