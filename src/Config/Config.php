@@ -93,7 +93,21 @@ class Config {
     }
 
     /**
-     * Returns a Config Property or null
+     * Returns a Config Property as an Int
+     * @param string  $property
+     * @param integer $default  Optional.
+     * @return array
+     */
+    public static function getInt(string $property, int $default = 0) {
+        $value = Config::get($property);
+        if (!empty($value) && is_numeric($value)) {
+            return (int)$value;
+        }
+        return $default;
+    }
+
+    /**
+     * Returns a Config Property as an Array
      * @param string $property
      * @return array
      */
