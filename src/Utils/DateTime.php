@@ -9,7 +9,9 @@ use Framework\Utils\Utils;
  */
 class DateTime {
 
+    public static $days       = [ "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" ];
     public static $months     = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
+    public static $formats    = [ "dashes" => "d-m-Y", "time" => "H:i", "dashesTime" => "d-m-Y H:i" ];
 
     public static $serverDiff = -180;
     public static $timeDiff   = 0;
@@ -323,6 +325,20 @@ class DateTime {
     /**
      * Returns the Seconds as a string
      * @param integer $seconds
+     * @param string  $format
+     * @param integer $timezone Optional.
+     * @return string
+     */
+    public static function toString(int $seconds, string $format, int $timezone = null) {
+        if (!empty(self::$formats[$format])) {
+            return self::format($seconds, self::$formats[$format], $timezone);
+        }
+        return "";
+    }
+
+    /**
+     * Returns the Seconds as a string
+     * @param integer $seconds
      * @return string
      */
     public static function toTimeString(int $seconds): string {
@@ -418,6 +434,18 @@ class DateTime {
 
 
     /**
+     * Returns the Month name at the given month
+     * @param integer $day
+     * @return string
+     */
+    public static function getDayName(int $day): string {
+        if (!empty(self::$days[$day])) {
+            return self::$days[$day];
+        }
+        return "";
+    }
+
+    /**
      * Returns the Month and Year at the given month
      * @param integer $time
      * @return string
@@ -427,7 +455,7 @@ class DateTime {
     }
 
     /**
-     * Returns the Month at the given month
+     * Returns the Month name at the given month
      * @param integer $month
      * @return string
      */
