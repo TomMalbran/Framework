@@ -84,11 +84,11 @@ class Selection {
 
         foreach ($this->structure->joins as $join) {
             if ($join->asTable) {
-                $joinKey = $join->asTable;
+                $asTable = $join->asTable;
             } elseif (Arrays::contains($this->tables, $join->table)) {
-                $joinKey = chr($this->index++);
+                $asTable = chr($this->index++);
             } else {
-                $joinKey        = $join->table;
+                $asTable        = $join->table;
                 $this->tables[] = $join->table;
             }
 
@@ -96,15 +96,15 @@ class Selection {
             $onTable    = $join->onTable ?: $mainKey;
             $leftKey    = $join->leftKey;
             $rightKey   = $join->rightKey;
-            $and        = $join->and;
-            $expression = "LEFT JOIN $table AS $joinKey ON ($joinKey.$leftKey = $onTable.$rightKey $and)";
+            $and        = $join->getAnd($asTable);
+            $expression = "LEFT JOIN $table AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey $and)";
 
             $this->joins[]          = $expression;
-            $this->keys[$join->key] = $joinKey;
+            $this->keys[$join->key] = $asTable;
 
             if ($withSelects) {
                 foreach ($join->fields as $field) {
-                    $this->selects[] = "$joinKey.{$field->key} AS $field->prefixName";
+                    $this->selects[] = "$asTable.{$field->key} AS $field->prefixName";
                 }
             }
         }

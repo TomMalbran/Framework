@@ -16,6 +16,7 @@ class Join {
     public $leftKey   = "";
     public $rightKey  = "";
     public $and       = "";
+    public $andKey    = "";
 
     public $fields    = [];
     public $merges    = [];
@@ -37,6 +38,7 @@ class Join {
         $this->leftKey   = !empty($data["leftKey"])   ? $data["leftKey"]      : $key;
         $this->rightKey  = !empty($data["rightKey"])  ? $data["rightKey"]     : $key;
         $this->and       = !empty($data["and"])       ? "AND " . $data["and"] : "";
+        $this->andKey    = !empty($data["andKey"])    ? $data["andKey"]       : "";
 
         $this->hasPrefix = !empty($data["prefix"]);
         $this->prefix    = !empty($data["prefix"])    ? $data["prefix"]       : "";
@@ -83,6 +85,19 @@ class Join {
         }
         foreach ($this->merges as $merge) {
             $result[$merge->key] = Arrays::getValue($data, $merge->fields, $merge->glue);
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the And for the Query
+     * @param string $asTable
+     * @return string
+     */
+    public function getAnd(string $asTable): string {
+        $result = $this->and;
+        if (!empty($this->andKey)) {
+            $result .= "AND $asTable.{$this->andKey} = $asTable.{$this->andKey}";
         }
         return $result;
     }
