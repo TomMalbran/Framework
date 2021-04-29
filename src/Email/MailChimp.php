@@ -2,6 +2,7 @@
 namespace Framework\Email;
 
 use Framework\Config\Config;
+use Framework\Utils\Arrays;
 
 use DrewM\MailChimp\MailChimp as MailChimpAPI;
 
@@ -168,6 +169,19 @@ class MailChimp {
     }
 
 
+
+    /**
+     * Returns a list of Templates
+     * @return array
+     */
+    public static function getTemplates() {
+        self::load();
+        if (!self::$api) {
+            return [];
+        }
+        $data = self::$api->get("templates");
+        return Arrays::createSelect($data["templates"], "id", "name");
+    }
 
     /**
      * Sends a Campaign
