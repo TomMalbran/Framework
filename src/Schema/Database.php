@@ -650,6 +650,18 @@ class Database {
     }
 
     /**
+     * Returns true if a Table exists
+     * @param string $table
+     * @return string
+     */
+    public function tableIsEmpty(string $table): string {
+        $tableName = $this->getTableName($table);
+        $sql       = "SELECT COUNT(*) AS count FROM $tableName";
+        $result    = $this->query($sql);
+        return empty($result) || $result[0]["count"] == 0;
+    }
+
+    /**
      * Creates a Table
      * @param string $table
      * @param array  $fields
