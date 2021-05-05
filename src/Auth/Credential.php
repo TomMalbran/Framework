@@ -237,7 +237,7 @@ class Credential {
 
         foreach ($request as $row) {
             $fields = $row;
-            $fields["credentialName"] = self::createName($row);
+            $fields["credentialName"] = self::getName($row);
             $fields["document"]       = Document::forCredential($row);
 
             if (!empty($row["avatar"]) && Path::exists("avatars", $row["avatar"])) {
@@ -343,7 +343,7 @@ class Credential {
         foreach ($request as $row) {
             $result[] = [
                 "key"   => $row["credentialID"],
-                "value" => self::createName($row),
+                "value" => self::getName($row),
             ];
         }
         return $result;
@@ -421,11 +421,12 @@ class Credential {
      * @param Request $request
      * @param integer $level         Optional.
      * @param boolean $reqPassChange Optional.
+     * @param boolean $skipEmpty     Optional.
      * @return boolean
      */
-    public static function edit(int $credentialID, Request $request, int $level = 0, bool $reqPassChange = null): bool {
+    public static function edit(int $credentialID, Request $request, int $level = 0, bool $reqPassChange = null, bool $skipEmpty = false): bool {
         $fields = self::getFields($request, $level, $reqPassChange);
-        return self::getSchema()->edit($credentialID, $request, $fields);
+        return self::getSchema()->edit($credentialID, $request, $fields, 0, $skipEmpty);
     }
 
     /**
@@ -595,6 +596,7 @@ class Credential {
     }
 
 
+
     /**
      * Creates a Hash and Salt (if required) for the the given Password
      * @param string $pass
@@ -608,13 +610,13 @@ class Credential {
     }
 
     /**
-     * Returns the Real Name for the given User
+     * Returns a parsed Name for the given Credential
      * @param Model|array $data
      * @param string      $prefix   Optional.
      * @param boolean     $withNick Optional.
      * @return string
      */
-    public static function createName($data, string $prefix = "", bool $withNick = false): string {
+    public static function getName($data, string $prefix = "", bool $withNick = false): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
@@ -634,13 +636,13 @@ class Credential {
     }
 
     /**
-     * Returns the Real Phone for the given User
+     * Returns a parsed Phone for the given Credential
      * @param Model|array $data
      * @param string      $prefix   Optional.
      * @param boolean     $withPlus Optional.
      * @return string
      */
-    public static function createPhone($data, string $prefix = "", bool $withPlus = false): string {
+    public static function getPhone($data, string $prefix = "", bool $withPlus = false): string {
         $phone     = Arrays::getValue($data, "phone",     "", $prefix);
         $cellphone = Arrays::getValue($data, "cellphone", "", $prefix);
         $iddRoot   = Arrays::getValue($data, "iddRoot",   "", $prefix);
