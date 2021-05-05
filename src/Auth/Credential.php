@@ -13,6 +13,7 @@ use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Utils\Status;
+use Framework\Utils\Utils;
 
 /**
  * The Auth Credential
@@ -655,6 +656,19 @@ class Credential {
         }
         return $phone;
     }
+
+    /**
+     * Returns a WhatsApp url
+     * @param Model|array $data
+     * @param string      $prefix Optional.
+     * @return string
+     */
+    public static function getWhatsAppUrl($data, string $prefix = ""): string {
+        $whatsapp = self::createPhone($data, $prefix, false);
+        return Utils::getWhatsAppUrl($whatsapp);
+    }
+
+
 
     /**
      * Seeds the Owner

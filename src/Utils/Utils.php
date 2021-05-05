@@ -166,7 +166,7 @@ class Utils {
      */
     public static function generateUsername(string $domain, string $email = ""): string {
         $parts  = Strings::split($domain, ".");
-        $result = Strings::replace($parts[0], ["-", "ñ"], ["", "n"]);
+        $result = Strings::replace($parts[0], [ "-", "ñ" ], [ "", "n" ]);
         $result = Strings::substring($result, 0, 8);
 
         if (!empty($email) && is_numeric($result[0])) {
@@ -213,8 +213,6 @@ class Utils {
         }
         return "";
     }
-
-
 
     /**
      * Returns the extension of the given domain (without the dot)
@@ -268,5 +266,14 @@ class Utils {
             return !empty($host) && $host == $serverIP;
         }
         return !empty($host) && $host != $domain;
+    }
+
+    /**
+     * Returns a WhatsApp url
+     * @param string $whtasapp
+     * @return string
+     */
+    public static function getWhatsAppUrl(string $whtasapp): string {
+        return "https://wa.me/$whtasapp";
     }
 }
