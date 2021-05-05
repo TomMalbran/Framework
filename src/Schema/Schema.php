@@ -445,12 +445,13 @@ class Schema {
      * @param Request|array $fields
      * @param array|integer $extra        Optional.
      * @param integer       $credentialID Optional.
+     * @param boolean       $skipEmpty    Optional.
      * @return boolean
      */
-    public function edit($query, $fields, $extra = null, int $credentialID = 0): bool {
+    public function edit($query, $fields, $extra = null, int $credentialID = 0, bool $skipEmpty = false): bool {
         $query        = $this->generateQueryID($query, false);
         $modification = new Modification($this->db, $this->structure);
-        $modification->addFields($fields, $extra, $credentialID);
+        $modification->addFields($fields, $extra, $credentialID, $skipEmpty);
         $modification->addModification();
         return $modification->update($query);
     }

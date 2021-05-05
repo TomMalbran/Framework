@@ -35,11 +35,12 @@ class Modification {
      * @param Request|array $fields
      * @param array|integer $extra        Optional.
      * @param integer       $credentialID Optional.
+     * @param boolean       $skipEmpty    Optional.
      * @return void
      */
-    public function addFields($fields, $extra = null, int $credentialID = 0): void {
+    public function addFields($fields, $extra = null, int $credentialID = 0, bool $skipEmpty = false): void {
         if ($fields instanceof Request) {
-            $this->fields = $this->parseFields($fields);
+            $this->fields = $this->parseFields($fields, $skipEmpty);
         } else {
             $this->fields = $fields;
         }
@@ -58,15 +59,19 @@ class Modification {
     /**
      * Parses the data and returns the fields
      * @param Request $request
+     * @param boolean $skipEmpty Optional.
      * @return array
      */
-    private function parseFields(Request $request): array {
+    private function parseFields(Request $request, bool $skipEmpty = false): array {
         $result = [];
         foreach ($this->structure->fields as $field) {
             if (!$field->canEdit) {
                 continue;
             }
             $value = $field->fromRequest($request, $this->structure->masterKey);
+            if ($skipEmpty && empty($value)) {
+                continue;
+            }
 
             if ($field->noExists) {
                 if ($request->exists($field->name)) {
