@@ -92,7 +92,11 @@ class Email {
      * @return string
      */
     public static function render(string $template, array $data = []): string {
-        return Mustache::render(Strings::toHtml($template), $data);
+        $result = Mustache::render(Strings::toHtml($template), $data);
+        while (Strings::contains($result, "<br><br><br>")) {
+            $result = Strings::replace($result, "<br><br><br>", "<br><br>");
+        }
+        return $result;
     }
 
     /**
