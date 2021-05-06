@@ -275,13 +275,14 @@ class Arrays {
      * Creates a map using the given array
      * @param array           $array
      * @param string          $key
-     * @param string|string[] $value Optional.
+     * @param string|string[] $value    Optional.
+     * @param boolean         $useEmpty Optional.
      * @return array
      */
-    public static function createMap(array $array, string $key, $value = null): array {
+    public static function createMap(array $array, string $key, $value = null, bool $useEmpty = false): array {
         $result  = [];
         foreach ($array as $row) {
-            $result[$row[$key]] = !empty($value) ? self::getValue($row, $value) : $row;
+            $result[$row[$key]] = !empty($value) ? self::getValue($row, $value, " - ", "", $useEmpty) : $row;
         }
         return $result;
     }
