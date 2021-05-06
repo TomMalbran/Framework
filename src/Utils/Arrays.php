@@ -400,12 +400,12 @@ class Arrays {
 
     /**
      * Returns the first value that is not empty in the given keys
-     * @param array    $array
+     * @param mixed    $array
      * @param string[] $keys
      * @param mixed    $default Optional.
      * @return string
      */
-    public static function getAnyValue(array $array, array $keys, $default = null) {
+    public static function getAnyValue($array, array $keys, $default = null) {
         foreach ($keys as $key) {
             if (!empty($array[$key])) {
                 return $array[$key];
