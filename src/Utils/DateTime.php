@@ -278,11 +278,28 @@ class DateTime {
 
     /**
      * Returns true if the given Time is in the future
-     * @param integer $time
+     * @param integer $seconds
+     * @param integer $timezone Optional.
      * @return boolean
      */
-    public static function isFutureTime(int $time): bool {
-        return $time > time();
+    public static function isFutureTime(int $seconds, int $timezone = null): bool {
+        if (!empty($timezone)) {
+            $seconds = self::toTimezone($seconds, $timezone);
+        }
+        return $seconds > time();
+    }
+
+     /**
+     * Returns true if the given Time is today
+     * @param integer $seconds
+     * @param integer $timezone Optional.
+     * @return boolean
+     */
+    public static function isToday(int $seconds, int $timezone = null): bool {
+        if (!empty($timezone)) {
+            $seconds = self::toTimezone($seconds, $timezone);
+        }
+        return date("d-m-Y", $seconds) == date("d-m-Y");
     }
 
     /**
@@ -385,7 +402,7 @@ class DateTime {
      */
     public static function toDayString(int $seconds): string {
         $secsInDay = 24 * 3600;
-        $days       = floor($seconds / $secsInDay);
+        $days      = floor($seconds / $secsInDay);
         return "{$days}d";
     }
 
