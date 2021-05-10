@@ -325,6 +325,20 @@ class MailChimp {
 
 
     /**
+     * Returns the Content of the given MailChimp campaign
+     * @param string $mailChimpID
+     * @return array
+     */
+    public static function getContent(string $mailChimpID): array {
+        self::load();
+        if (!self::$api) {
+            return false;
+        }
+        $result = self::$api->get("campaigns/{$mailChimpID}/content");
+        return $result;
+    }
+
+    /**
      * Returns the Report for the given MailChimp campaign
      * @param string $mailChimpID
      * @return array
@@ -349,6 +363,27 @@ class MailChimp {
             $result["opensRate"]    = round($report["opens"]["open_rate"] * 1000) / 10;
             $result["clicksUnique"] = $report["clicks"]["unique_clicks"];
             $result["clicksRate"]   = round($report["clicks"]["click_rate"] * 1000) / 10;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Send Details Report for the given MailChimp campaign
+     * @param string $mailChimpID
+     * @return array
+     */
+    public static function getSendDetails(string $mailChimpID): array {
+        self::load();
+        $result = [];
+        if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
+            return $result;
+        }
+
+        $report = self::$api->get("reports/{$mailChimpID}/sent-to", [
+            "count" => 2000,
+        ]);
+        foreach ($report["sent_to"] as $member) {
+            $result[] = $member["email_address"];
         }
         return $result;
     }
