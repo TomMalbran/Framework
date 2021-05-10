@@ -85,7 +85,7 @@ class MailChimp {
      * @param string $lastName
      * @return boolean
      */
-    public static function addSubscriber(string $email, string $firstName, string $lastName): boolean {
+    public static function addSubscriber(string $email, string $firstName, string $lastName): bool {
         self::load();
         if (!self::$api || !self::$config->subscriberActive) {
             return false;
@@ -134,7 +134,7 @@ class MailChimp {
      * @param string $status    Optional.
      * @return boolean
      */
-    public static function editSubscriber(string $email, string $firstName, string $lastName, string $status = "subscribed"): boolean {
+    public static function editSubscriber(string $email, string $firstName, string $lastName, string $status = "subscribed"): bool {
         self::load();
         if (!self::$api || !self::$config->subscriberActive) {
             return false;
@@ -157,7 +157,7 @@ class MailChimp {
      * @param string $email
      * @return boolean
      */
-    public static function deleteSubscriber(string $email): boolean {
+    public static function deleteSubscriber(string $email): bool {
         self::load();
         if (!self::$api || !self::$config->subscriberActive) {
             return false;
@@ -187,13 +187,13 @@ class MailChimp {
      * Sends a Campaign
      * @param string   $subject
      * @param integer  $templateID
-     * @param array    $sections
+     * @param array    $sections   Optional.
      * @param string[] $emails     Optional.
-     * @param integer  $folderID   Optional.
      * @param integer  $time       Optional.
+     * @param integer  $folderID   Optional.
      * @return string|null
      */
-    public static function sendCampaign(string $subject, int $templateID, array $sections, array $emails = null, int $folderID = 0, int $time = null) {
+    public static function sendCampaign(string $subject, int $templateID, array $sections = null, array $emails = null, int $time = null, int $folderID = 0) {
         self::load();
 
         // We do Nothing
@@ -261,9 +261,11 @@ class MailChimp {
                 "from_name"    => self::$config->name,
                 "reply_to"     => self::$config->replyTo,
                 "to_name"      => "*|FNAME|*",
-                "folder_id"    => $folderID,
             ],
         ];
+        if (!empty($folderID)) {
+            $post["settings"]["folder_id"] = $folderID;
+        }
         $result = self::$api->post("campaigns", $post, 60);
 
         if (self::$api->success()) {
@@ -276,16 +278,15 @@ class MailChimp {
      * Puts the content into the given MailChimp campaign
      * @param string  $mailChimpID
      * @param integer $templateID
-     * @param array   $sections
+     * @param array   $sections    Optional.
      * @return boolean
      */
-    private static function placeContent(string $mailChimpID, int $templateID, array $sections): boolean {
-        self::$api->put("campaigns/{$mailChimpID}/content", [
-            "template" => [
-                "id"       => $templateID,
-                "sections" => $sections,
-            ],
-        ], 60);
+    private static function placeContent(string $mailChimpID, int $templateID, array $sections = null): bool {
+        $post = [ "template" => [ "id" => $templateID ] ];
+        if (!empty($sections)) {
+            $post["template"]["sections"] = $sections;
+        }
+        $result = self::$api->put("campaigns/{$mailChimpID}/content", $post, 60);
         return self::$api->success();
     }
 
@@ -295,7 +296,7 @@ class MailChimp {
      * @param integer $time        Optional.
      * @return boolean
      */
-    private static function mailCampaign(string $mailChimpID, int $time = null): boolean {
+    private static function mailCampaign(string $mailChimpID, int $time = null): bool {
         if (empty($time) || $time <= time()) {
             self::$api->post("campaigns/{$mailChimpID}/actions/send");
         } else {
@@ -312,11 +313,12 @@ class MailChimp {
      * @param string $mailChimpID
      * @return boolean
      */
-    public static function unscheduleCampaign(string $mailChimpID): boolean {
+    public static function unscheduleCampaign(string $mailChimpID): bool {
+        self::load();
         if (!self::$api) {
             return false;
         }
-        self::$api->post("campaigns/{$mailChimpID}/actions/unschedule");
+        $result = self::$api->post("campaigns/{$mailChimpID}/actions/unschedule");
         return self::$api->success();
     }
 
@@ -363,11 +365,11 @@ class MailChimp {
             return $result;
         }
 
-        $result = self::$api->get("reports/{$mailChimpID}/open-details", [
+        $report = self::$api->get("reports/{$mailChimpID}/open-details", [
             "count" => 2000,
         ]);
-        foreach ($result["members"] as $member) {
-            $result[] = $member["merge_fields"]["ID"];
+        foreach ($report["members"] as $member) {
+            $result[] = $member["email_address"];
         }
         return $result;
     }
@@ -387,11 +389,11 @@ class MailChimp {
         $request = self::$api->get("reports/{$mailChimpID}/click-details");
         if (!empty($request["urls_clicked"][0]["id"])) {
             $clickID = $request["urls_clicked"][0]["id"];
-            return self::$api->get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
+            $report  = self::$api->get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
                 "count" => 2000,
             ]);
-            foreach ($result["members"] as $member) {
-                $result[] = $member["merge_fields"]["ID"];
+            foreach ($report["members"] as $member) {
+                $result[] = $member["email_address"];
             }
         }
         return $result;
