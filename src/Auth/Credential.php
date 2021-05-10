@@ -611,6 +611,31 @@ class Credential {
     }
 
     /**
+     * Creates a list of names and emais for the given array
+     * @param array  $data
+     * @param string $prefix Optional.
+     * @return array
+     */
+    public static function createEmailList(array $data, string $prefix = ""): array {
+        $result = [];
+        $ids    = [];
+
+        foreach ($data as $row) {
+            $id = Arrays::getAnyValue($row, [ "credentialID", "id" ]);
+            if (Arrays::contains($ids, $id)) {
+                continue;
+            }
+            $result[] = [
+                "credentialID"   => $id,
+                "credentialName" => self::getName($row, $prefix),
+                "email"          => Arrays::getValue($row, "email", "", $prefix),
+            ];
+            $ids[] = $id;
+        }
+        return $result;
+    }
+
+    /**
      * Returns a parsed Name for the given Credential
      * @param Model|array $data
      * @param string      $prefix   Optional.
