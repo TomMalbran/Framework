@@ -145,13 +145,13 @@ class Encoding {
             $buf = "";
 
             for ($i = 0; $i < $max; $i++) {
-                $c1 = $text{$i};
+                $c1 = $text[$i];
 
                 // Should be converted to UTF8, if it's not UTF8 already
                 if ($c1>="\xc0") {
-                    $c2 = $i+1 >= $max? "\x00" : $text{$i+1};
-                    $c3 = $i+2 >= $max? "\x00" : $text{$i+2};
-                    $c4 = $i+3 >= $max? "\x00" : $text{$i+3};
+                    $c2 = $i + 1 >= $max? "\x00" : $text[$i + 1];
+                    $c3 = $i + 2 >= $max? "\x00" : $text[$i + 2];
+                    $c4 = $i + 3 >= $max? "\x00" : $text[$i + 3];
 
                     // looks like 2 bytes UTF8
                     if ($c1 >= "\xc0" & $c1 <= "\xdf") {
