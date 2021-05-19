@@ -86,6 +86,18 @@ class Image {
         return 0;
     }
 
+    /**
+     * Returns the Width of the given Text
+     * @param string  $text
+     * @param string  $fontFile
+     * @param integer $fontSize
+     * @return integer
+     */
+    public static function getTextWidth(string $text, string $fontFile, int $fontSize): int {
+        $dimensions = imagettfbbox($fontSize, 0, $fontFile, $text);
+        return abs($dimensions[4] - $dimensions[0]);
+    }
+
 
 
     /**
