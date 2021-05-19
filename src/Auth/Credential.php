@@ -622,7 +622,7 @@ class Credential {
         $ids    = [];
 
         foreach ($data as $row) {
-            $id = Arrays::getAnyValue($row, [ "credentialID", "id" ]);
+            $id = Arrays::getAnyValue($row, [ "credentialID", "id", "{$prefix}ID" ]);
             if (Arrays::contains($ids, $id)) {
                 continue;
             }
