@@ -314,19 +314,20 @@ class Credential {
      * @param boolean           $splitText    Optional.
      * @return array
      */
-    public static function search(string $text, int $amount = 10, $level = null, $credentialID = null, bool $splitText = false): array {
+    public static function search(string $text, int $amount = 10, $level = null, $credentialID = null, bool $splitText = true): array {
         $query = Query::createSearch([ "firstName", "lastName", "nickName", "email" ], $text, "LIKE", true, $splitText);
         $query->addIf("level",         "IN", Arrays::toArray($level),        $level !== null);
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
 
-        $request = self::requestSelect($query);
+        $request = self::getSchema()->getMap($query);
         $result  = [];
 
         foreach ($request as $row) {
             $result[] = [
-                "id"    => $row["key"],
-                "title" => $row["value"],
+                "id"    => $row["credentialID"],
+                "title" => self::getName($row),
+                "extra" => $row["email"],
             ];
         }
         return $result;
