@@ -11,6 +11,13 @@ use DrewM\MailChimp\MailChimp as MailChimpAPI;
  */
 class MailChimp {
 
+    const Subscribed    = 1;
+    const Unsubscribed  = 2;
+    const Cleaned       = 3;
+    const Pending       = 4;
+    const Transactional = 5;
+    const Archived      = 6;
+
     private static $loaded = false;
     private static $config = null;
     private static $api    = null;
@@ -36,10 +43,10 @@ class MailChimp {
 
     /**
      * Returns the Members Route
-     * @param string $route
+     * @param string $route Optional.
      * @return string
      */
-    private static function getSubscribersRoute(string $route): string {
+    private static function getSubscribersRoute(string $route = ""): string {
         $result = "lists/" . self::$config->list . "/members";
         if (!empty($route)) {
             $result .= "/$route";
@@ -67,7 +74,7 @@ class MailChimp {
      * @param string $email
      * @return array
      */
-    public static function getOneSubscriber(string $email): array {
+    public static function getSubscriber(string $email): array {
         self::load();
         if (!self::$api) {
             return null;
@@ -76,6 +83,33 @@ class MailChimp {
         $route  = self::getSubscribersRoute($hash);
         $result = self::$api->get($route);
         return $result;
+    }
+
+    /**
+     * Returns the Subscriber with the given email
+     * @param string $email
+     * @return integer
+     */
+    public static function getSubscriberStatus(string $email): int {
+        $subscriber = self::getSubscriber($email);
+        if (empty($subscriber) || !self::$api->success()) {
+            return 0;
+        }
+        switch ($subscriber["status"]) {
+        case "subscribed":
+            return self::Subscribed;
+        case "unsubscribed":
+            return self::Unsubscribed;
+        case "cleaned":
+            return self::Cleaned;
+        case "pending":
+            return self::Pending;
+        case "transactional":
+            return self::Transactional;
+        case "archived":
+            return self::Archived;
+        }
+        return 0;
     }
 
     /**
@@ -186,14 +220,14 @@ class MailChimp {
     /**
      * Sends a Campaign
      * @param string   $subject
+     * @param integer  $time
      * @param integer  $templateID
      * @param array    $sections   Optional.
      * @param string[] $emails     Optional.
-     * @param integer  $time       Optional.
      * @param integer  $folderID   Optional.
      * @return string|null
      */
-    public static function sendCampaign(string $subject, int $templateID, array $sections = null, array $emails = null, int $time = null, int $folderID = 0) {
+    public static function sendCampaign(string $subject, int $time, int $templateID, array $sections = null, array $emails = null, int $folderID = 0) {
         self::load();
 
         // We do Nothing
@@ -218,7 +252,7 @@ class MailChimp {
         }
 
         // Send/Schedule the Campaign
-        if (self::mailCampaign($mailChimpID, $time)) {
+        if (empty($time) || self::mailCampaign($mailChimpID, $time)) {
             return $mailChimpID;
         }
 
@@ -227,34 +261,60 @@ class MailChimp {
     }
 
     /**
-     * Create a Campaign
+     * Updates a Campaign
+     * @param string   $mailChimpID
+     * @param string   $subject
+     * @param integer  $time
+     * @param integer  $templateID
+     * @param array    $sections    Optional.
+     * @param string[] $emails      Optional.
+     * @param integer  $folderID    Optional.
+     * @return boolean
+     */
+    public static function updateCampaign(string $mailChimpID, string $subject, int $time, int $templateID, array $sections = null, array $emails = null, int $folderID = 0): bool {
+        self::load();
+
+        // We do Nothing
+        if (!self::$api || !self::$config->createActive) {
+            return false;
+        }
+
+        // Edit the Campaign
+        if (!self::editCampaign($mailChimpID, $subject, $emails, $folderID)) {
+            var_dump(self::$api->getLastResponse());
+            return false;
+        }
+
+        // Place the Content
+        if (!self::placeContent($mailChimpID, $templateID, $sections)) {
+            return false;
+        }
+
+        // We cant send
+        if (!self::$config->sendActive) {
+            return true;
+        }
+
+        // Send/Schedule the Campaign
+        if (!empty($time) && !self::mailCampaign($mailChimpID, $time)) {
+            return false;
+        }
+
+        // All good
+        return true;
+    }
+
+    /**
+     * Creates a Campaign
      * @param string   $subject
      * @param string[] $emails   Optional.
      * @param integer  $folderID Optional.
      * @return string
      */
     private static function createCampaign(string $subject, array $emails = null, int $folderID = 0): string {
-        $recipients = [ "list_id" => self::$config->list ];
-
-        if (!empty($emails)) {
-            $conditions = [];
-            foreach ($emails as $email) {
-                $conditions[] = [
-                    "condition_type" => "EmailAddress",
-                    "op"             => "is",
-                    "field"          => "EMAIL",
-                    "value"          => $email,
-                ];
-            }
-            $recipients["segment_opts"] = [
-                "match"      => "any",
-                "conditions" => $conditions,
-            ];
-        }
-
         $post = [
             "type"       => "regular",
-            "recipients" => $recipients,
+            "recipients" => self::parseRecipiets($emails),
             "settings"   => [
                 "subject_line" => $subject,
                 "title"        => $subject,
@@ -272,6 +332,54 @@ class MailChimp {
             return $result["id"];
         }
         return "";
+    }
+
+    /**
+     * Edits a Campaign
+     * @param string   $mailChimpID
+     * @param string   $subject
+     * @param string[] $emails      Optional.
+     * @param integer  $folderID    Optional.
+     * @return boolean
+     */
+    private static function editCampaign(string $mailChimpID, string $subject, array $emails = null, int $folderID = 0): string {
+        $post = [
+            "recipients" => self::parseRecipiets($emails),
+            "settings"   => [
+                "subject_line" => $subject,
+                "title"        => $subject,
+            ],
+        ];
+        if (!empty($folderID)) {
+            $post["settings"]["folder_id"] = $folderID;
+        }
+        self::$api->patch("campaigns/$mailChimpID", $post, 60);
+        return self::$api->success();
+    }
+
+    /**
+     * Parses the recipients of a Campaign
+     * @param string[] $emails Optional.
+     * @return array
+     */
+    private static function parseRecipiets(array $emails = null) {
+        $recipients = [ "list_id" => self::$config->list ];
+        if (!empty($emails)) {
+            $conditions = [];
+            foreach ($emails as $email) {
+                $conditions[] = [
+                    "condition_type" => "EmailAddress",
+                    "op"             => "is",
+                    "field"          => "EMAIL",
+                    "value"          => $email,
+                ];
+            }
+            $recipients["segment_opts"] = [
+                "match"      => "any",
+                "conditions" => $conditions,
+            ];
+        }
+        return $recipients;
     }
 
     /**
@@ -293,11 +401,15 @@ class MailChimp {
     /**
      * Schedules the given MailChimp campaign
      * @param string  $mailChimpID
-     * @param integer $time        Optional.
+     * @param integer $time
      * @return boolean
      */
-    private static function mailCampaign(string $mailChimpID, int $time = null): bool {
-        if (empty($time) || $time <= time()) {
+    private static function mailCampaign(string $mailChimpID, int $time): bool {
+        if (empty($time)) {
+            var_dump("no-time");
+            return false;
+        }
+        if ($time <= time()) {
             self::$api->post("campaigns/{$mailChimpID}/actions/send");
         } else {
             self::$api->post("campaigns/{$mailChimpID}/actions/schedule", [
@@ -318,7 +430,21 @@ class MailChimp {
         if (!self::$api) {
             return false;
         }
-        $result = self::$api->post("campaigns/{$mailChimpID}/actions/unschedule");
+        self::$api->post("campaigns/{$mailChimpID}/actions/unschedule");
+        return self::$api->success();
+    }
+
+    /**
+     * Deletes the given MailChimp campaign
+     * @param string $mailChimpID
+     * @return boolean
+     */
+    public static function deleteCampaign(string $mailChimpID): bool {
+        self::load();
+        if (!self::$api) {
+            return false;
+        }
+        self::$api->delete("campaigns/{$mailChimpID}");
         return self::$api->success();
     }
 
