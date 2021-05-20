@@ -149,6 +149,15 @@ class Credential {
 
 
     /**
+     * Returns all the Credentials
+     * @param Request $sort Optional.
+     * @return array
+     */
+    public static function getAll(Request $sort = null) {
+        return self::request(null, false, $sort);
+    }
+
+    /**
      * Returns all the Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @param Request           $sort  Optional.
