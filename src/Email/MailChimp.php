@@ -56,16 +56,20 @@ class MailChimp {
 
     /**
      * Returns all the subscribers
-     * @param integer $amount Optional.
+     * @param integer $count  Optional.
+     * @param integer $offset Optional.
      * @return array
      */
-    public static function getAllSubscribers(int $amount = 100): array {
+    public static function getAllSubscribers(int $count = 100, int $offset = 0): array {
         self::load();
         if (!self::$api) {
             return null;
         }
         $route  = self::getSubscribersRoute();
-        $result = self::$api->get($route, [ "count" => $amount ], 120);
+        $result = self::$api->get($route, [
+            "count"  => $count,
+            "offset" => $offset,
+        ], 120);
         return $result;
     }
 
@@ -95,7 +99,16 @@ class MailChimp {
         if (empty($subscriber) || !self::$api->success()) {
             return 0;
         }
-        switch ($subscriber["status"]) {
+        return self::parseSubscriberStatus($subscriber["status"]);
+    }
+
+    /**
+     * Returns the Subscriber Status as an int
+     * @param string $status
+     * @return integer
+     */
+    public static function parseSubscriberStatus(string $status): int {
+        switch ($status) {
         case "subscribed":
             return self::Subscribed;
         case "unsubscribed":
