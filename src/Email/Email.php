@@ -3,187 +3,282 @@ namespace Framework\Email;
 
 use Framework\Framework;
 use Framework\Request;
+use Framework\Auth\Access;
+use Framework\Auth\Credential;
 use Framework\Config\Config;
+use Framework\Email\Queue;
 use Framework\Provider\Mustache;
-use Framework\Schema\Factory;
-use Framework\Schema\Schema;
-use Framework\Schema\Database;
+use Framework\File\Path;
 use Framework\Schema\Model;
-use Framework\Schema\Query;
-use Framework\Utils\Strings;
+use Framework\Utils\Arrays;
+use Framework\Utils\JSON;
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\OAuth;
+use League\OAuth2\Client\Provider\Google;
 
 /**
- * The Email Templates
+ * The Email Provider
  */
 class Email {
 
-    private static $loaded = false;
-    private static $schema = null;
+    private static $loaded   = false;
+    private static $template = null;
+    private static $url      = "";
+    private static $name     = "";
+    private static $smtp     = null;
+    private static $google   = null;
+    private static $emails   = [];
 
 
     /**
-     * Loads the Email Templates Schema
-     * @return Schema
+     * Loads the Email Config
+     * @return void
      */
-    public static function getSchema(): Schema {
+    public static function load(): void {
         if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("emailTemplates");
+            self::$loaded   = true;
+            self::$template = Framework::loadFile(Framework::DataDir, "email.html");
+            self::$url      = Config::get("url");
+            self::$name     = Config::get("name");
+            self::$smtp     = Config::get("smtp");
+            self::$google   = Config::get("google");
+            self::$emails   = Config::getArray("smtpActiveEmails");
         }
-        return self::$schema;
     }
 
 
 
     /**
-     * Returns an Email Template with the given Code
-     * @param string $templateCode
-     * @return Model
-     */
-    public static function getOne(string $templateCode): Model {
-        $query = Query::create("templateCode", "=", $templateCode);
-        return self::getSchema()->getOne($query);
-    }
-
-    /**
-     * Returns true if the given  Email Template exists
-     * @param string $templateCode
+     * Sends the Email
+     * @param string  $to
+     * @param string  $from
+     * @param string  $fromName
+     * @param string  $subject
+     * @param string  $body
+     * @param boolean $sendHtml   Optional.
+     * @param string  $attachment Optional.
      * @return boolean
      */
-    public static function exists(string $templateCode): bool {
-        $query = Query::create("templateCode", "=", $templateCode);
-        return self::getSchema()->exists($query);
-    }
+    public static function send(
+        string $to,
+        string $from,
+        string $fromName,
+        string $subject,
+        string $body,
+        bool   $sendHtml = false,
+        string $attachment = ""
+    ): bool {
+        self::load();
 
-    /**
-     * Returns all the Email Templates
-     * @param Request $request
-     * @return array
-     */
-    public static function getAll(Request $request): array {
-        return self::getSchema()->getAll(null, $request);
-    }
+        if (self::$smtp->sendDisabled) {
+            return false;
+        }
+        if (!empty(self::$emails) && !Arrays::contains(self::$emails, $to)) {
+            return false;
+        }
 
-    /**
-     * Returns the total amount of Email Templates
-     * @return integer
-     */
-    public static function getTotal(): int {
-        return self::getSchema()->getTotal();
-    }
+        $email = new PHPMailer();
 
-    /**
-     * Edits the given Email Template
-     * @param string  $templateCode
-     * @param Request $request
-     * @return boolean
-     */
-    public static function edit(string $templateCode, Request $request): bool {
-        $query = Query::create("templateCode", "=", $templateCode);
-        return self::getSchema()->edit($query, $request);
-    }
+        $email->isSMTP();
+        $email->isHTML($sendHtml);
+        $email->clearAllRecipients();
+        $email->clearReplyTos();
 
+        $email->Timeout     = 10;
+        $email->Host        = self::$smtp->host;
+        $email->Port        = self::$smtp->port;
+        $email->SMTPSecure  = self::$smtp->secure;
+        $email->SMTPAuth    = true;
+        $email->SMTPAutoTLS = false;
 
+        $username = !empty(self::$smtp->username) ? self::$smtp->username : self::$smtp->email;
+        if (self::$smtp->useOauth) {
+            $email->SMTPAuth = true;
+            $email->AuthType = "XOAUTH2";
 
-    /**
-     * Renders the Template Data with Mustache
-     * @param string $template
-     * @param array  $data     Optional.
-     * @return string
-     */
-    public static function render(string $template, array $data = []): string {
-        $result = Mustache::render(Strings::toHtml($template), $data);
-        while (Strings::contains($result, "<br><br><br>")) {
-            $result = Strings::replace($result, "<br><br><br>", "<br><br>");
+            $provider = new Google([
+                "clientId"     => self::$google->client,
+                "clientSecret" => self::$google->secret,
+            ]);
+            $email->setOAuth(new OAuth([
+                "provider"     => $provider,
+                "clientId"     => self::$google->client,
+                "clientSecret" => self::$google->secret,
+                "refreshToken" => self::$smtp->refreshToken,
+                "userName"     => $username,
+            ]));
+        } else {
+            $email->Username = $username;
+            $email->Password = self::$smtp->password;
+        }
+
+        $email->CharSet  = "UTF-8";
+        $email->From     = self::$smtp->email;
+        $email->FromName = $fromName ?: self::$name;
+        $email->Subject  = $subject;
+        $email->Body     = $body;
+
+        $email->addAddress($to);
+        if (!empty($from)) {
+            $email->addReplyTo($from, $fromName ?: self::$name);
+        }
+        if (!empty($attachment)) {
+            $email->AddAttachment($attachment);
+        }
+        if (self::$smtp->showErrors) {
+            $email->SMTPDebug = 3;
+        }
+
+        $result = $email->send();
+        if (self::$smtp->showErrors && !$result) {
+            echo "Message could not be sent.";
+            echo "Email Error: " . $email->ErrorInfo;
         }
         return $result;
     }
 
     /**
-     * Migrates the Emails
-     * @param Database $db
-     * @param boolean  $recreate Optional.
-     * @param boolean  $sandbox  Optional.
+     * Sends Emails in HTML
+     * @param string $to
+     * @param string $from
+     * @param string $fromName
+     * @param string $subject
+     * @param string $message
+     * @return boolean
+     */
+    public static function sendHtml(string $to, string $from, string $fromName, string $subject, string $message): bool {
+        self::load();
+        $logo = "";
+        if (!empty(self::$smtp->logo)) {
+            $logo = self::$smtp->logo;
+        }
+        $body = Mustache::render(self::$template, [
+            "url"      => self::$url,
+            "name"     => self::$name,
+            "files"    => Path::getUrl("framework"),
+            "logo"     => $logo,
+            "siteName" => self::$name,
+            "message"  => $message,
+        ]);
+        return self::send($to, $from, $fromName, $subject, $body, true);
+    }
+
+
+
+    /**
+     * Sends the given Template Email
+     * @param Model           $template
+     * @param string|string[] $sendTo
+     * @param string          $message  Optional.
+     * @param string          $subject  Optional.
+     * @return boolean
+     */
+    public static function sendTemplate(Model $template, $sendTo, string $message = null, string $subject = null): bool {
+        $sendTo  = Arrays::toArray($sendTo);
+        $subject = $subject ?: $template->subject;
+        $message = $message ?: $template->message;
+        $success = false;
+
+        foreach ($sendTo as $email) {
+            $success = self::sendHtml($email, $template->sendAs, $template->sendName, $subject, $message);
+        }
+        return $success;
+    }
+
+    /**
+     * Sends the Unsent Emails from the Queue
      * @return void
      */
-    public static function migrate(Database $db, bool $recreate = false, bool $sandbox = false): void {
-        if (!$db->hasTable("email_templates")) {
-            return;
-        }
-        $request  = $db->getAll("email_templates");
-        $emails   = Framework::loadData(Framework::EmailData);
-        $siteName = Config::get("name");
-        $sendAs   = Config::get("smtpEmail");
-
-        $adds     = [];
-        $deletes  = [];
-        $codes    = [];
-        $position = $recreate ? 1 : count($request);
-
-        // Adds Emails
-        foreach ($emails as $templateCode => $data) {
-            $found = false;
-            if (!$recreate) {
-                foreach ($request as $row) {
-                    if ($row["templateCode"] == $templateCode) {
-                        $found = true;
-                        break;
-                    }
+    public static function sendQueue() {
+        $emails = Queue::getAllUnsent();
+        foreach ($emails as $email) {
+            $success = false;
+            foreach ($email["sendToParts"] as $sendTo) {
+                if (!empty($sendTo)) {
+                    $success = self::sendHTML($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
                 }
             }
-            if (!$found) {
-                $message = Strings::join($data["message"], "\n\n");
-                $codes[] = $templateCode;
-                $adds[]  = [
-                    "templateCode" => $templateCode,
-                    "description"  => $data["description"],
-                    "sendAs"       => $sendAs,
-                    "sendName"     => $siteName,
-                    "sendTo"       => !empty($data["sendTo"]) ? "\"{$data["sendTo"]}\"" : "",
-                    "subject"      => ($sandbox ? "PRUEBA - " : "") . Strings::replace($data["subject"], "[site]", $siteName),
-                    "message"      => Strings::replace($message, "[site]", $siteName),
-                    "position"     => $position,
-                ];
-                $position += 1;
-            }
+            Queue::markAsSent($email["emailID"], $success);
         }
+    }
 
-        // Removes Emails
-        if (!$recreate) {
-            foreach ($request as $row) {
-                $found = false;
-                foreach (array_keys($emails) as $templateCode) {
-                    if ($row["templateCode"] == $templateCode) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if (!$found) {
-                    $deletes[] = $row["templateCode"];
-                }
-            }
-        }
+    /**
+     * Sends the Backup to the Backup account
+     * @param string $sendTo
+     * @param string $attachment
+     * @return boolean
+     */
+    public static function sendBackup(string $sendTo, string $attachment): bool {
+        $subject = Config::get("name") . ": Database Backup";
+        $message = "Backup de la base de datos al dia: " . date("d M Y, H:i:s");
 
-        // Process the SQL
-        if ($recreate) {
-            print("<br>Removed <i>" . count($request) . " emails</i><br>");
-            $db->truncate("email_templates");
+        return self::send($sendTo, null, null, $subject, $message, false, $attachment);
+    }
+
+
+
+    /**
+     * Returns the Google Auth Url
+     * @param string $redirectUri
+     * @return string
+     */
+    public static function getAuthUrl(string $redirectUri): string {
+        self::load();
+
+        $options  = [ "scope" => [ "https://mail.google.com/" ]];
+        $provider = new Google([
+            "clientId"     => self::$google->client,
+            "clientSecret" => self::$google->secret,
+            "redirectUri"  => self::$url . $redirectUri,
+            "accessType"   => "offline",
+        ]);
+        return $provider->getAuthorizationUrl($options);
+    }
+
+    /**
+     * Returns the Google Refresh Token
+     * @param string $redirectUri
+     * @param string $code
+     * @return string
+     */
+    public static function getAuthToken(string $redirectUri, string $code): string {
+        self::load();
+
+        $provider = new Google([
+            "clientId"     => self::$google->client,
+            "clientSecret" => self::$google->secret,
+            "redirectUri"  => self::$url . $redirectUri,
+            "accessType"   => "offline",
+        ]);
+        $token = $provider->getAccessToken("authorization_code", [ "code" => $code ]);
+        return $token->getRefreshToken();
+    }
+
+
+
+    /**
+     * Checks if the Recaptcha is Valid
+     * @param Request $request
+     * @param boolean $withScore Optional.
+     * @return boolean
+     */
+    public static function isCaptchaValid(Request $request, bool $withScore = false) {
+        $recaptchaSecret = Config::get("recaptchaSecret");
+        if (!$request->has("g-recaptcha-response") || empty($recaptchaSecret)) {
+            return false;
         }
-        if (!empty($adds)) {
-            print("<br>Added <i>" . count($adds) . " emails</i><br>");
-            print(Strings::join($codes, ", ") . "<br>");
-            $db->batch("email_templates", $adds);
+        $secretKey = urlencode($recaptchaSecret);
+        $captcha   = urlencode($request->get("g-recaptcha-response"));
+        $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";
+        $response  = JSON::readUrl($url, true);
+
+        if (empty($response["success"])) {
+            return false;
         }
-        if (!empty($deletes)) {
-            print("<br>Deleted <i>" . count($deletes) . " emails</i><br>");
-            print(Strings::join($deletes, ", ") . "<br>");
-            foreach ($deletes as $templateCode) {
-                $query = Query::create("templateCode", "=", $templateCode);
-                $db->delete("email_templates", $query);
-            }
+        if ($withScore && $response["score"] <= 0.5) {
+            return false;
         }
-        if (empty($adds) && empty($deletes)) {
-            print("<br>No <i>emails</i> added or deleted <br>");
-        }
+        return true;
     }
 }
