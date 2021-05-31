@@ -409,6 +409,56 @@ class DateTime {
 
 
     /**
+     * Returns the time of the start of the day
+     * @param integer $time        Optional.
+     * @param integer $dayDiff     Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getDayStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+        $result = mktime(0, 0, 0, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
+     * Returns the time of the end of the day
+     * @param integer $time        Optional.
+     * @param integer $dayDiff     Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getDayEnd(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+        $result = mktime(23, 59, 59, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
+     * Returns the time of the start of the month
+     * @param integer $time        Optional.
+     * @param integer $monthDiff   Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getMonthStart(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
+        $result = mktime(0, 0, 0, date("n", $time) + $monthDiff, 1, date("Y", $time));
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
+     * Returns the start of the last x days
+     * @param integer $days
+     * @param integer $time        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getLastXDays(int $days, int $time = 0, bool $useTimeZone = false): int {
+        $result = ($time == 0 ? time() : $time) - $days * 24 * 3600;
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+
+
+    /**
      * Returns the difference between 2 dates in Months
      * @param integer $time1
      * @param integer $time2
