@@ -5,7 +5,7 @@ use Framework\Router;
 use Framework\Response;
 use Framework\Auth\Auth;
 use Framework\Config\Settings;
-use Framework\Email\Email;
+use Framework\Email\Template;
 use Framework\File\File;
 use Framework\File\Path;
 use Framework\Log\ErrorLog;
@@ -230,7 +230,7 @@ class Framework {
     public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false, bool $sandbox = false): void {
         Factory::migrate($db, $canDelete);
         Settings::migrate($db);
-        Email::migrate($db, $recreate, $sandbox);
+        Template::migrate($db, $recreate, $sandbox);
         Path::ensurePaths();
     }
 }
