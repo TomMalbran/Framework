@@ -46,19 +46,6 @@ class NLS {
     }
 
     /**
-     * Returns a formated string using the correct plural string
-     * @param string  $key
-     * @param integer $count
-     * @param string  $lang  Optional.
-     * @return string
-     */
-    public static function pluralize(string $key, int $count, string $lang = "root"): string {
-        $suffix = $count === 1 ? "_SINGULAR" : "_PLURAL";
-        $result = self::get($key . $suffix, $lang);
-        return $result;
-    }
-
-    /**
      * Returns a string from the data at the given index
      * @param string  $key
      * @param integer $index
@@ -85,6 +72,40 @@ class NLS {
             if (!empty($key)) {
                 $result[] = self::get($key, $lang);
             }
+        }
+        return $result;
+    }
+
+
+
+    /**
+     * Returns a formated string using the correct plural string
+     * @param string  $key
+     * @param integer $count
+     * @param string  $lang  Optional.
+     * @return string
+     */
+    public static function pluralize(string $key, int $count, string $lang = "root"): string {
+        $suffix = $count === 1 ? "_SINGULAR" : "_PLURAL";
+        $result = self::get($key . $suffix, $lang);
+        return $result;
+    }
+
+    /**
+     * Joins the given strings to form a sentence
+     * @param string[] $strings
+     * @param string   $lang    Optional.
+     * @return string
+     */
+    public static function join(array $strings, string $lang = "root"): string {
+        $count = count($strings);
+        if ($count === 1) {
+            return $strings[0];
+        }
+        $and    = self::get("GENERAL_AND", $lang);
+        $result = $strings[0];
+        for ($i = 1; $i < $count; $i++) {
+            $result .= ($i < $count - 1 ? ", " : " $and ") . $strings[$i];
         }
         return $result;
     }
