@@ -54,10 +54,15 @@ class Errors {
      * Adds a new error
      * @param string $error
      * @param string $message
+     * @param string $value   Optional.
      * @return Errors
      */
-    public function add(string $error, string $message): Errors {
-        $this->errors[$error] = $message;
+    public function add(string $error, string $message, string $value = null): Errors {
+        if (!empty($value)) {
+            $this->errors[$error] = [ $message, $value ];
+        } else {
+            $this->errors[$error] = $message;
+        }
         return $this;
     }
 
