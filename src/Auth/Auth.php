@@ -98,7 +98,7 @@ class Auth {
      * @return boolean
      */
     public static function spamProtection(): bool {
-        return Spam::protection();
+        return Spam::protect();
     }
 
     /**
