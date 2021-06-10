@@ -388,17 +388,20 @@ class Schema {
 
     /**
      * Returns a select of Schemas
-     * @param Query           $query    Optional.
-     * @param string          $idName   Optional.
-     * @param string|string[] $name     Optional.
-     * @param boolean         $useEmpty Optional.
-     * @param string          $extra    Optional.
+     * @param Query           $query      Optional.
+     * @param string          $idName     Optional.
+     * @param string|string[] $name       Optional.
+     * @param boolean         $useEmpty   Optional.
+     * @param string          $extra      Optional.
+     * @param string          $distinctID Optional.
      * @return array
      */
-    public function getSelect(Query $query = null, string $idName = null, $name = null, bool $useEmpty = false, string $extra = null): array {
+    public function getSelect(Query $query = null, string $idName = null, $name = null, bool $useEmpty = false, string $extra = null, string $distinctID = null): array {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
-        if ($idName != null) {
+        if ($distinctID !== null) {
+            $selection->addSelects("DISTINCT($distinctID)");
+        } elseif ($idName != null) {
             $selection->addSelects("DISTINCT($idName)");
         }
         $selection->addFields();
