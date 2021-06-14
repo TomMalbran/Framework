@@ -27,7 +27,8 @@
             "sendEmails"     : { "type" : "boolean",                         "noExists" : true },
             "timezone"       : { "type" : "number",  "isSigned" : true,      "cantEdit" : true },
             "currentLogin"   : { "type" : "date",                            "cantEdit" : true },
-            "lastLogin"      : { "type" : "date",                            "cantEdit" : true }
+            "lastLogin"      : { "type" : "date",                            "cantEdit" : true },
+            "subscription"   : { "type" : "number",  "length" : 1,           "cantEdit" : true }
         },
         "hasTimestamps" : true,
         "canCreate"     : true,

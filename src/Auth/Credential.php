@@ -594,6 +594,18 @@ class Credential {
     }
 
     /**
+     * Sets the Credential Subscription
+     * @param integer $credentialID
+     * @param integer $subscription
+     * @return boolean
+     */
+    public static function setSubscription(int $credentialID, int $subscription): bool {
+        return self::getSchema()->edit($credentialID, [
+            "subscription" => $subscription,
+        ]);
+    }
+
+    /**
      * Sets a Credential Value
      * @param integer $credentialID
      * @param string  $key
@@ -639,6 +651,7 @@ class Credential {
                 "credentialID"   => $id,
                 "credentialName" => self::getName($row, $prefix),
                 "email"          => Arrays::getValue($row, "email", "", $prefix),
+                "subscription"   => Arrays::getValue($row, "subscription", "", $prefix, true, 0),
             ];
             $ids[] = $id;
         }
@@ -699,7 +712,7 @@ class Credential {
      * @return string
      */
     public static function getWhatsAppUrl($data, string $prefix = ""): string {
-        $whatsapp = self::createPhone($data, $prefix, false);
+        $whatsapp = self::getPhone($data, $prefix, false);
         return Utils::getWhatsAppUrl($whatsapp);
     }
 

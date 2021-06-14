@@ -11,13 +11,6 @@ use DrewM\MailChimp\MailChimp as MailChimpAPI;
  */
 class MailChimp {
 
-    const Subscribed    = 1;
-    const Unsubscribed  = 2;
-    const Cleaned       = 3;
-    const Pending       = 4;
-    const Transactional = 5;
-    const Archived      = 6;
-
     private static $loaded = false;
     private static $config = null;
     private static $api    = null;
@@ -99,30 +92,7 @@ class MailChimp {
         if (empty($subscriber) || !self::$api->success()) {
             return 0;
         }
-        return self::parseSubscriberStatus($subscriber["status"]);
-    }
-
-    /**
-     * Returns the Subscriber Status as an int
-     * @param string $status
-     * @return integer
-     */
-    public static function parseSubscriberStatus(string $status): int {
-        switch ($status) {
-        case "subscribed":
-            return self::Subscribed;
-        case "unsubscribed":
-            return self::Unsubscribed;
-        case "cleaned":
-            return self::Cleaned;
-        case "pending":
-            return self::Pending;
-        case "transactional":
-            return self::Transactional;
-        case "archived":
-            return self::Archived;
-        }
-        return 0;
+        return Subscription::fromString($subscriber["status"]);
     }
 
     /**
