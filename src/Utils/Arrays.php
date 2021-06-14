@@ -372,10 +372,11 @@ class Arrays {
      * @param string          $glue     Optional.
      * @param string          $prefix   Optional.
      * @param boolean         $useEmpty Optional.
+     * @param mixed           $default  Optional.
      * @return mixed
      */
-    public static function getValue($array, $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false) {
-        $result = "";
+    public static function getValue($array, $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, $default = "") {
+        $result = $default;
         if (is_array($key)) {
             $values = [];
             foreach ($key as $id) {
