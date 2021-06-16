@@ -281,7 +281,8 @@ class Query {
      */
     public function groupBy(string $column): Query {
         if (!empty($column)) {
-            $this->groupBy  = $column;
+            $prefix         = !empty($this->groupBy) ? ", " : "";
+            $this->groupBy .= $prefix . $column;
             $this->groups[] = $column;
         }
         return $this;
