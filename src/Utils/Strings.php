@@ -225,7 +225,7 @@ class Strings {
         $parts  = Strings::split($content, ",");
         $result = [];
         foreach ($parts as $part) {
-            if (!$skipEmpty || ($skipEmpty && !empty($part))) {
+            if (!$skipEmpty || ($skipEmpty && !empty($part))) {
                 $result[] = trim($part);
             }
         }
