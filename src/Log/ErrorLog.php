@@ -158,6 +158,7 @@ class ErrorLog {
                 "file"        => $fileName,
                 "line"        => $line,
                 "amount"      => 1,
+                "isResolved"  => 0,
                 "updatedTime" => time(),
             ]);
 

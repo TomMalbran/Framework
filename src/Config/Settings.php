@@ -173,9 +173,11 @@ class Settings {
      */
     public static function setCore(Database $db, string $variable, int $value): void {
         $db->insert("settings", [
-            "section"  => "general",
-            "variable" => $variable,
-            "value"    => $value,
+            "section"      => "general",
+            "variable"     => $variable,
+            "value"        => $value,
+            "type"         => SettingType::General,
+            "modifiedTime" => time(),
         ], "REPLACE");
     }
 
@@ -209,10 +211,11 @@ class Settings {
                     $type        = SettingType::get($value);
                     $variables[] = "{$section}_{$variable}";
                     $fields      = [
-                        "section"  => $section,
-                        "variable" => $variable,
-                        "value"    => $type == SettingType::JSON ? JSON::encode($value) : $value,
-                        "type"     => $type,
+                        "section"      => $section,
+                        "variable"     => $variable,
+                        "value"        => $type == SettingType::JSON ? JSON::encode($value) : $value,
+                        "type"         => $type,
+                        "modifiedTime" => time(),
                     ];
                     $adds[]      = $fields;
                     $request[]   = $fields;

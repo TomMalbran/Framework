@@ -74,7 +74,7 @@ class Field {
         $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : "middle";
         $this->date       = !empty($data["date"])     ? $data["date"]          : null;
         $this->hour       = !empty($data["hour"])     ? $data["hour"]          : null;
-        $this->default    = !empty($data["default"])  ? $data["default"]       : null;
+        $this->default    = isset($data["default"])   ? $data["default"]       : null;
 
         $this->isID       = $this->type === self::ID;
         $this->isPrimary  = !empty($data["isPrimary"]);
@@ -159,7 +159,7 @@ class Field {
             break;
         }
 
-        if ($result != "unknown" && $this->default != null) {
+        if ($result != "unknown" && $this->default !== null) {
             $result .= " DEFAULT '{$this->default}'";
         }
         return $result;
