@@ -10,15 +10,6 @@ use Framework\Utils\Strings;
 class Utils {
 
     /**
-     * Returns true if the given value is alpha-numeric
-     * @param string $value
-     * @return boolean
-     */
-    public static function isAlphaNum(string $value): bool {
-        return ctype_alnum($value);
-    }
-
-    /**
      * Returns true if the given email is valid
      * @param string $email
      * @return boolean

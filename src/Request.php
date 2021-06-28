@@ -6,6 +6,7 @@ use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Utils\DateTime;
 use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
 use Framework\Utils\Status;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;
@@ -315,7 +316,7 @@ class Request implements ArrayAccess {
      * @return boolean
      */
     public function isAlphaNum(string $key, bool $withDashes = false, int $length = null): bool {
-        return Utils::isAlphaNum($this->get($key, ""), $withDashes, $length);
+        return Strings::isAlphaNum($this->get($key, ""), $withDashes, $length);
     }
 
     /**

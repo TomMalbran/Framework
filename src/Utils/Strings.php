@@ -371,6 +371,25 @@ class Strings {
         return self::makeShort($string, $length) !== $string;
     }
 
+
+
+    /**
+     * Returns true if the given value is alpha-numeric
+     * @param string  $value
+     * @param boolean $withDashes Optional.
+     * @param integer $length     Optional.
+     * @return boolean
+     */
+    public static function isAlphaNum(string $value, bool $withDashes = false, int $length = null): bool {
+        if ($length !== null && strlen($value) != $length) {
+            return false;
+        }
+        if ($withDashes) {
+            $value = str_replace([ "-", "_" ], "", $value);
+        }
+        return ctype_alnum($value);
+    }
+
     /**
      * Returns a Slug from the given string
      * @param string $string
