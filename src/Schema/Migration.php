@@ -230,6 +230,8 @@ class Migration {
                     $oldData = $tableField["Type"];
                     if ($tableField["Null"] === "NO") {
                         $oldData .= " NOT NULL";
+                    } else {
+                        $oldData .= " NULL";
                     }
                     if ($tableField["Default"] !== NULL) {
                         $oldData .= " DEFAULT '{$tableField["Default"]}'";

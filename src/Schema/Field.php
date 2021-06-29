@@ -114,7 +114,8 @@ class Field {
      * @return string
      */
     public function getType(): string {
-        $result = "unknown";
+        $result  = "unknown";
+        $default = null;
 
         switch ($this->type) {
         case self::ID:
@@ -122,7 +123,8 @@ class Field {
             break;
         case self::Binary:
         case self::Boolean:
-            $result = "tinyint(1) unsigned NOT NULL";
+            $result  = "tinyint(1) unsigned NOT NULL";
+            $default = 0;
             break;
         case self::Number:
         case self::Float:
@@ -141,17 +143,19 @@ class Field {
             } elseif ($length > 10) {
                 $type = "bigint";
             }
-            $result = "$type($length)$sign NOT NULL";
+            $result  = "$type($length)$sign NOT NULL";
+            $default = 0;
             break;
         case self::String:
         case self::File:
-            $length = $this->length ?: 255;
-            $result = "varchar($length) NOT NULL";
+            $length  = $this->length ?: 255;
+            $result  = "varchar($length) NOT NULL";
+            $default = "";
             break;
         case self::JSON:
         case self::CSV:
         case self::Text:
-            $result = "text NOT NULL";
+            $result = "text NULL";
             break;
         case self::Encrypt:
             $length = $this->length ?: 255;
@@ -159,8 +163,12 @@ class Field {
             break;
         }
 
-        if ($result != "unknown" && $this->default !== null) {
-            $result .= " DEFAULT '{$this->default}'";
+        if ($result !== "unknown") {
+            if ($this->default !== null) {
+                $result .= " DEFAULT '{$this->default}'";
+            } elseif ($default !== null) {
+                $result .= " DEFAULT '{$default}'";
+            }
         }
         return $result;
     }
