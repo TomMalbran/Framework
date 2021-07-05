@@ -18,6 +18,7 @@
         "firebase/php-jwt": "Used in Auth",
         "phpmailer/phpmailer": "Used for Mailing",
         "league/oauth2-google": "Used for Mailing with Gmail",
+        "google/apiclient": "Used to get emails from Gmail",
         "drewm/mailchimp-api": "Used for Mailing with MailChimp",
         "phpoffice/phpspreadsheet": "Used to Import/Export data",
         "norkunas/onesignal-php-api": "Used for App Notifications",
