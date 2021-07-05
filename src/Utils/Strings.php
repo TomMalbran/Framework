@@ -204,6 +204,19 @@ class Strings {
         return $string;
     }
 
+    /**
+     * Returns a Substring between the From and To
+     * @param string $string
+     * @param string $from
+     * @param string $to
+     * @return string
+     */
+    public static function substringBetween(string $string, string $from, string $to): string {
+        $result = self::substringAfter($string, $from);
+        $result = self::substringBefore($result, $to);
+        return $result;
+    }
+
 
 
     /**
@@ -222,7 +235,7 @@ class Strings {
         if (!$trim) {
             return $content;
         }
-        $parts  = Strings::split($content, ",");
+        $parts  = self::split($content, ",");
         $result = [];
         foreach ($parts as $part) {
             if (!$skipEmpty || ($skipEmpty && !empty($part))) {
@@ -345,6 +358,15 @@ class Strings {
      */
     public static function toHtml(string $string): string {
         return str_replace("\n", "<br>", $string);
+    }
+
+    /**
+     * Returns the given string without HTML
+     * @param string $string
+     * @return string
+     */
+    public static function removeHtml(string $string): string {
+        return strip_tags($string);
     }
 
     /**
