@@ -4,6 +4,7 @@ namespace Framework;
 use Framework\Router;
 use Framework\Response;
 use Framework\Auth\Auth;
+use Framework\Config\Config;
 use Framework\Config\Settings;
 use Framework\Email\Template;
 use Framework\File\File;
@@ -53,6 +54,7 @@ class Framework {
     private static $framePath;
     private static $basePath;
     private static $baseDir;
+    private static $db;
 
 
     /**
@@ -73,6 +75,18 @@ class Framework {
     }
 
 
+
+    /**
+     * Returns the Framework Database
+     * @return Database
+     */
+    public static function getDatabase() {
+        if (empty(self::$db)) {
+            $config   = Config::get("db");
+            self::$db = new Database($config);
+        }
+        return self::$db;
+    }
 
     /**
      * Returns the BasePath with the given dir

@@ -3,7 +3,6 @@ namespace Framework\Schema;
 
 use Framework\Framework;
 use Framework\Config\Config;
-use Framework\Schema\Database;
 use Framework\Schema\Schema;
 use Framework\Schema\Structure;
 use Framework\Schema\Subrequest;
@@ -27,12 +26,11 @@ class Factory {
      */
     public static function load(): void {
         if (!self::$loaded) {
-            $config  = Config::get("db");
             $schemas = Framework::loadData(Framework::SchemaData);
             $frame   = Framework::loadJSON("data", Framework::SchemaData, true);
 
             self::$loaded = true;
-            self::$db     = new Database($config);
+            self::$db     = Framework::getDatabase();
 
             foreach ($schemas as $key => $data) {
                 if (!empty($frame[$key])) {

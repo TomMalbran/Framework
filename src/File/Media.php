@@ -27,10 +27,8 @@ class Media {
      */
     private static function load(): void {
         if (!self::$loaded) {
-            $config = Config::get("db");
-
             self::$loaded = true;
-            self::$db     = new Database($config);
+            self::$db     = Framework::getDatabase();
             self::$data   = Framework::loadData(Framework::MediaData);
         }
     }
