@@ -794,7 +794,7 @@ class Database {
      * @param string $table
      * @return string
      */
-    public function drpoPrimary(string $table): string {
+    public function dropPrimary(string $table): string {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName DROP PRIMARY KEY";
         $this->query($sql);

@@ -287,7 +287,7 @@ class Migration {
         // Update the Table
         print("<br>Updated table <b>$structure->table</b> ... <br>");
         if ($dropPrimary && $canDrop) {
-            $sql = $db->drpoPrimary($structure->table);
+            $sql = $db->dropPrimary($structure->table);
             print("$sql<br>");
         }
         foreach ($renames as $rename) {
