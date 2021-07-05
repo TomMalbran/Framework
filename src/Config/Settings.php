@@ -182,6 +182,37 @@ class Settings {
     }
 
     /**
+     * Returns a Core Data Setting
+     * @param Database $db
+     * @param string   $variable
+     * @return array
+     */
+    public static function getCoreData(Database $db, string $variable) {
+        $query  = Query::create("section", "=", "general")->add("variable", "=", $variable);
+        $result = $db->getValue("settings", "value", $query);
+        return !empty($result) ? JSON::decode($result, true) : null;
+    }
+
+    /**
+     * Sets a Core Data Preference
+     * @param Database $db
+     * @param string   $variable
+     * @param mixed    $value
+     * @return void
+     */
+    public static function setCoreData(Database $db, string $variable, $value): void {
+        $db->insert("settings", [
+            "section"      => "general",
+            "variable"     => $variable,
+            "value"        => JSON::encode($value),
+            "type"         => SettingType::JSON,
+            "modifiedTime" => time(),
+        ], "REPLACE");
+    }
+
+
+
+    /**
      * Migrates the Settings
      * @param Database $db
      * @return void
