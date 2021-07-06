@@ -131,13 +131,17 @@ class Schema {
      * Returns the expression of the Query
      * @param Query   $query     Optional.
      * @param Request $sort      Optional.
+     * @param array   $selects   Optional.
      * @param boolean $decrypted Optional.
      * @return array
      */
-    public function getExpression(Query $query, Request $sort = null, bool $decrypted = false) {
+    public function getExpression(Query $query, Request $sort = null, array $selects = null, bool $decrypted = false) {
         $query     = $this->generateQuerySort($query, $sort);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields($decrypted);
+        if (!empty($selects)) {
+            $selection->addSelects(array_values($selects));
+        }
         $selection->addJoins();
         $selection->addCounts();
         $expression = $selection->getExpression($query);
