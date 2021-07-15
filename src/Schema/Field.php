@@ -204,7 +204,7 @@ class Field {
         case self::Date:
             if (!empty($this->date)) {
                 $result = $request->toDay($this->date, $this->dateType, true);
-            } elseif (Numbers::isValid($request->name)) {
+            } elseif (Numbers::isValid($request->get($this->name))) {
                 $result = $request->getInt($this->name);
             } elseif ($request->has("{$this->name}Date")) {
                 $result = $request->toDay("{$this->name}Date", $this->dateType, true);
