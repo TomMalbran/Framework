@@ -226,7 +226,7 @@ class Schema {
         $query     = $this->generateQuery($query, $withDeleted);
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects("COUNT($column) AS cnt");
-        $selection->addJoins();
+        $selection->addJoins(false);
 
         $request = $selection->request($query);
         if (isset($request[0]["cnt"])) {
@@ -245,7 +245,7 @@ class Schema {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects("SUM($column) AS cnt");
-        $selection->addJoins();
+        $selection->addJoins(false);
 
         $request = $selection->request($query);
         if (isset($request[0]["cnt"])) {
