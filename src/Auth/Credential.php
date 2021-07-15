@@ -334,9 +334,10 @@ class Credential {
 
         foreach ($request as $row) {
             $result[] = [
-                "id"    => $row["credentialID"],
-                "title" => self::getName($row),
-                "extra" => $row["email"],
+                "id"           => $row["credentialID"],
+                "title"        => self::getName($row),
+                "email"        => $row["email"],
+                "subscription" => $row["subscription"],
             ];
         }
         return $result;
