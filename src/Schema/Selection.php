@@ -43,7 +43,7 @@ class Selection {
         $masterKey = $this->structure->masterKey;
         $mainKey   = $this->structure->table;
 
-        if (!empty($this->structure->idKey) && !empty($this->structure->idName)) {
+        if ($this->structure->hasID) {
             $this->selects[] = "$mainKey.{$this->structure->idKey} AS id";
         }
         foreach ($this->structure->fields as $field) {
@@ -223,7 +223,7 @@ class Selection {
 
         foreach ($this->request as $row) {
             $fields = [];
-            if (!empty($this->structure->idKey) && !empty($this->structure->idName)) {
+            if ($this->structure->hasID) {
                 if (!empty($row["id"])) {
                     $fields["id"] = $row["id"];
                 } elseif (!empty($row[$this->structure->idKey])) {

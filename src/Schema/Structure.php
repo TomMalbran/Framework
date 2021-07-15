@@ -15,6 +15,7 @@ class Structure {
     public $masterKey     = "";
 
     public $table         = "";
+    public $hasID         = false;
     public $idKey         = "";
     public $idName        = "";
     public $name          = "";
@@ -114,6 +115,7 @@ class Structure {
         foreach ($data["fields"] as $key => $value) {
             $field = new Field($key, $value);
             if ($key == $idKey) {
+                $this->hasID  = true;
                 $this->idKey  = $field->key;
                 $this->idName = $field->name;
             }
