@@ -384,6 +384,18 @@ class Query {
         return !empty($this->orderBy);
     }
 
+    /**
+     * Returns true if there is an Group By
+     * @param string $group Optional.
+     * @return boolean
+     */
+    public function hasGroup(string $group = null): bool {
+        if (!empty($group)) {
+            return Arrays::contains($this->groups, $group);
+        }
+        return !empty($this->groupBy);
+    }
+
 
 
     /**
