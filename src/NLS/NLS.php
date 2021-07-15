@@ -79,16 +79,30 @@ class NLS {
 
 
     /**
-     * Returns a formated string using the correct plural string
+     * Returns a formatted string
+     * @param string $key
+     * @param array  $args
+     * @param string $lang Optional.
+     * @return string
+     */
+    public static function format(string $key, array $args, string $lang = "root"): string {
+        $subject = self::get($key, $lang);
+        return preg_replace_callback("/\{(\d+)\}/", function ($match) use ($args) {
+            return $args[$match[1]] ?: "";
+        }, $subject);
+    }
+
+    /**
+     * Returns a formatted string using the correct plural string
      * @param string  $key
      * @param integer $count
+     * @param array   $args  Optional.
      * @param string  $lang  Optional.
      * @return string
      */
-    public static function pluralize(string $key, int $count, string $lang = "root"): string {
+    public static function pluralize(string $key, int $count, array $args = [], string $lang = "root"): string {
         $suffix = $count === 1 ? "_SINGULAR" : "_PLURAL";
-        $result = self::get($key . $suffix, $lang);
-        return $result;
+        return self::format($key . $suffix, array_merge([ $count ], $args), $lang);
     }
 
     /**
