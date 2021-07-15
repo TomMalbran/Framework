@@ -69,9 +69,9 @@ class MailChimp {
     /**
      * Returns the Subscriber with the given email
      * @param string $email
-     * @return array
+     * @return array|null
      */
-    public static function getSubscriber(string $email): array {
+    public static function getSubscriber(string $email) {
         self::load();
         if (!self::$api) {
             return null;
@@ -79,7 +79,7 @@ class MailChimp {
         $hash   = self::$api->subscriberHash($email);
         $route  = self::getSubscribersRoute($hash);
         $result = self::$api->get($route);
-        return $result;
+        return !empty($result) ? $result : null;
     }
 
     /**
