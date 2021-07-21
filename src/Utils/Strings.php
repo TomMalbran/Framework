@@ -396,20 +396,29 @@ class Strings {
 
 
     /**
-     * Returns true if the given value is alpha-numeric
-     * @param string  $value
+     * Returns true if the given string is alpha-numeric
+     * @param string  $string
      * @param boolean $withDashes Optional.
      * @param integer $length     Optional.
      * @return boolean
      */
-    public static function isAlphaNum(string $value, bool $withDashes = false, int $length = null): bool {
-        if ($length !== null && strlen($value) != $length) {
+    public static function isAlphaNum(string $string, bool $withDashes = false, int $length = null): bool {
+        if ($length !== null && strlen($string) != $length) {
             return false;
         }
         if ($withDashes) {
-            $value = str_replace([ "-", "_" ], "", $value);
+            $string = str_replace([ "-", "_" ], "", $string);
         }
-        return ctype_alnum($value);
+        return ctype_alnum($string);
+    }
+
+    /**
+     * Returns true if the given string is a valid slug
+     * @param string $string
+     * @return boolean
+     */
+    public static function isValidSlug(string $string): bool {
+        return self::match($string, '/^[a-z0-9\-]+$/');
     }
 
     /**

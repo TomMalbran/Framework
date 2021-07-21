@@ -320,6 +320,15 @@ class Request implements ArrayAccess {
     }
 
     /**
+     * Returns true if the given slug is valid
+     * @param string $key
+     * @return boolean
+     */
+    public function isValidSlug(string $key): bool {
+        return Strings::isValidSlug($this->get($key, ""));
+    }
+
+    /**
      * Returns true if the given email is valid
      * @param string $key
      * @return boolean
