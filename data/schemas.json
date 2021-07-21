@@ -97,6 +97,18 @@
         "canEdit"       : false,
         "canDelete"     : false
     },
+    "emailWhiteList" : {
+        "table"  : "email_white_list",
+        "fields" : {
+            "EMAIL_ID"    : { "type" : "id",    "name" : "emailID" },
+            "email"       : { "type" : "string"                    },
+            "description" : { "type" : "string"                    }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : true,
+        "canEdit"       : true,
+        "canDelete"     : false
+    },
     "settings" : {
         "table"  : "settings",
         "fields" : {
