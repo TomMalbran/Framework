@@ -291,15 +291,15 @@ class DateTime {
 
      /**
      * Returns true if the given Time is today
-     * @param integer $seconds
+     * @param integer $time
      * @param integer $timezone Optional.
      * @return boolean
      */
-    public static function isToday(int $seconds, int $timezone = null): bool {
+    public static function isToday(int $time, int $timezone = null): bool {
         if (!empty($timezone)) {
-            $seconds = self::toTimezone($seconds, $timezone);
+            $time = self::toTimezone($time, $timezone);
         }
-        return date("d-m-Y", $seconds) == date("d-m-Y");
+        return date("d-m-Y", $time) == date("d-m-Y");
     }
 
     /**
@@ -416,6 +416,7 @@ class DateTime {
      * @return integer
      */
     public static function getDayStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+        $time   = empty($time) ? time() : $time;
         $result = mktime(0, 0, 0, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
@@ -428,6 +429,7 @@ class DateTime {
      * @return integer
      */
     public static function getDayEnd(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+        $time   = empty($time) ? time() : $time;
         $result = mktime(23, 59, 59, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
@@ -440,6 +442,7 @@ class DateTime {
      * @return integer
      */
     public static function getMonthStart(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
+        $time   = empty($time) ? time() : $time;
         $result = mktime(0, 0, 0, date("n", $time) + $monthDiff, 1, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
@@ -452,7 +455,8 @@ class DateTime {
      * @return integer
      */
     public static function getLastXDays(int $days, int $time = 0, bool $useTimeZone = false): int {
-        $result = ($time == 0 ? time() : $time) - $days * 24 * 3600;
+        $time   = empty($time) ? time() : $time;
+        $result = $time - $days * 24 * 3600;
         return self::toServerTime($result, $useTimeZone);
     }
 
