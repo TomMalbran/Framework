@@ -132,7 +132,7 @@ class Media {
     }
 
     /**
-     * Renames a Media Element
+     * Moves or Renames a Media Element
      * @param string $oldPath
      * @param string $newpath
      * @param string $oldName

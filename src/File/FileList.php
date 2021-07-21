@@ -32,6 +32,7 @@ class FileList {
         $this->list[] = [
             "name"          => $name,
             "path"          => $path,
+            "mvPath"        => !empty($path) ? $path : "/",
             "canSelect"     => !$isDir,
             "isBack"        => false,
             "isDir"         => $isDir,
@@ -60,6 +61,7 @@ class FileList {
         $this->list[] = [
             "name"      => "...",
             "path"      => $dir != "." ? $dir : "",
+            "mvPath"    => $dir != "." ? $dir : "/",
             "canSelect" => false,
             "isBack"    => true,
             "isFile"    => true,
