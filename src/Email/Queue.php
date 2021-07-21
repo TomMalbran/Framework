@@ -34,7 +34,7 @@ class Queue {
 
 
     /**
-     * Returns an Email Queue with the given Code
+     * Returns an Email Queue with the given ID
      * @param integer $emailID
      * @return Model
      */
@@ -43,7 +43,7 @@ class Queue {
     }
 
     /**
-     * Returns true if the given  Email Queue exists
+     * Returns true if the given Email Queue exists
      * @param integer $emailID
      * @return boolean
      */
@@ -52,7 +52,7 @@ class Queue {
     }
 
     /**
-     * Returns all the Email Queues
+     * Returns all the Emails from the Queue
      * @param Request $request
      * @return array
      */
@@ -61,7 +61,7 @@ class Queue {
     }
 
     /**
-     * Returns all the Email Queues
+     * Returns all the not sent Emails from the Queue
      * @return array
      */
     public static function getAllUnsent(): array {
@@ -70,7 +70,7 @@ class Queue {
     }
 
     /**
-     * Returns the total amount of Email Queues
+     * Returns the total amount of Emails from the Queue
      * @return integer
      */
     public static function getTotal(): int {
