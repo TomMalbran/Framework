@@ -2,6 +2,7 @@
 namespace Framework\Email;
 
 use Framework\Config\Config;
+use Framework\Email\WhiteList;
 use Framework\Utils\Arrays;
 
 use DrewM\MailChimp\MailChimp as MailChimpAPI;
@@ -264,7 +265,6 @@ class MailChimp {
 
         // Edit the Campaign
         if (!self::editCampaign($mailChimpID, $subject, $emails, $folderID)) {
-            var_dump(self::$api->getLastResponse());
             return false;
         }
 
@@ -295,9 +295,14 @@ class MailChimp {
      * @return string
      */
     private static function createCampaign(string $subject, array $emails = null, int $folderID = 0): string {
+        $recipients = self::parseRecipients($emails);
+        if (empty($recipients)) {
+            return "";
+        }
+
         $post = [
             "type"       => "regular",
-            "recipients" => self::parseRecipiets($emails),
+            "recipients" => $recipients,
             "settings"   => [
                 "subject_line" => $subject,
                 "title"        => $subject,
@@ -326,8 +331,13 @@ class MailChimp {
      * @return boolean
      */
     private static function editCampaign(string $mailChimpID, string $subject, array $emails = null, int $folderID = 0): string {
+        $recipients = self::parseRecipients($emails);
+        if (empty($recipients)) {
+            return false;
+        }
+
         $post = [
-            "recipients" => self::parseRecipiets($emails),
+            "recipients" => $recipients,
             "settings"   => [
                 "subject_line" => $subject,
                 "title"        => $subject,
@@ -345,23 +355,32 @@ class MailChimp {
      * @param string[] $emails Optional.
      * @return array
      */
-    private static function parseRecipiets(array $emails = null) {
+    private static function parseRecipients(array $emails = null) {
         $recipients = [ "list_id" => self::$config->list ];
-        if (!empty($emails)) {
-            $conditions = [];
-            foreach ($emails as $email) {
-                $conditions[] = [
-                    "condition_type" => "EmailAddress",
-                    "op"             => "is",
-                    "field"          => "EMAIL",
-                    "value"          => $email,
-                ];
+        if (empty($emails)) {
+            return $recipients;
+        }
+
+        $conditions = [];
+        foreach ($emails as $email) {
+            if (self::$config->useWhiteList && !WhiteList::emailExists($email)) {
+                continue;
             }
-            $recipients["segment_opts"] = [
-                "match"      => "any",
-                "conditions" => $conditions,
+            $conditions[] = [
+                "condition_type" => "EmailAddress",
+                "op"             => "is",
+                "field"          => "EMAIL",
+                "value"          => $email,
             ];
         }
+        if (empty($conditions)) {
+            return null;
+        }
+
+        $recipients["segment_opts"] = [
+            "match"      => "any",
+            "conditions" => $conditions,
+        ];
         return $recipients;
     }
 

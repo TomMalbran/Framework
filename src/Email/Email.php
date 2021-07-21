@@ -7,6 +7,7 @@ use Framework\Auth\Access;
 use Framework\Auth\Credential;
 use Framework\Config\Config;
 use Framework\Email\Queue;
+use Framework\Email\WhiteList;
 use Framework\Provider\Mustache;
 use Framework\File\Path;
 use Framework\Schema\Model;
@@ -28,7 +29,6 @@ class Email {
     private static $name     = "";
     private static $smtp     = null;
     private static $google   = null;
-    private static $emails   = [];
 
 
     /**
@@ -43,7 +43,6 @@ class Email {
             self::$name     = Config::get("name");
             self::$smtp     = Config::get("smtp");
             self::$google   = Config::get("google");
-            self::$emails   = Config::getArray("smtpActiveEmails");
         }
     }
 
@@ -70,11 +69,7 @@ class Email {
         string $attachment = ""
     ): bool {
         self::load();
-
-        if (self::$smtp->sendDisabled) {
-            return false;
-        }
-        if (!empty(self::$emails) && !Arrays::contains(self::$emails, $to)) {
+        if (self::$smtp->sendDisabled || (self::$smtp->useWhiteList && !WhiteList::emailExists($to))) {
             return false;
         }
 
