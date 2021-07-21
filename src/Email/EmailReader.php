@@ -42,7 +42,7 @@ class EmailReader {
      * @param string $redirectUri Optional.
      * @return void
      */
-    public function loadClient(string $redirectUri = ""): void {
+    public static function loadClient(string $redirectUri = ""): void {
         self::load();
 
         if (empty(self::$client)) {
@@ -101,7 +101,7 @@ class EmailReader {
      * Returns the Time of the last Fetch
      * @return integer
      */
-    public function getLastFetch(): int {
+    public static function getLastFetch(): int {
         self::load();
         return Settings::getCore(self::$db, "lastGmailFetch");
     }
@@ -171,7 +171,7 @@ class EmailReader {
      * @param string $key
      * @return array
      */
-    private function getFromTo(array $headers, string $key): array {
+    private static function getFromTo(array $headers, string $key): array {
         $string = self::getHeader($headers, $key);
         $name   = trim(Strings::substringBefore($string, "<"));
         $email  = trim(Strings::substringBetween($string, "<", ">"));
@@ -183,7 +183,7 @@ class EmailReader {
      * @param mixed $payload
      * @return string
      */
-    private function getBody($payload) {
+    private static function getBody($payload) {
         $body   = $payload->getBody();
         $result = self::decodeBody($body["data"]);
 
@@ -236,7 +236,7 @@ class EmailReader {
      * @param string $toEmail
      * @return string
      */
-    private function parseBody(string $body, string $toName, string $toEmail): string {
+    private static function parseBody(string $body, string $toName, string $toEmail): string {
         $body      = Strings::removeHtml($body);
         $parts     = Strings::split($body, "\n");
         $result    = [];
