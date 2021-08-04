@@ -112,6 +112,10 @@ class EmailReader {
      */
     public static function getLatestEmails(): array {
         self::loadClient();
+        if (empty(self::$service)) {
+            return [];
+        }
+
         $time = Settings::getCore(self::$db, "lastGmailFetch");
 
         $result   = [];
@@ -146,7 +150,6 @@ class EmailReader {
         }
 
         Settings::setCore(self::$db, "lastGmailFetch", time());
-        var_dump($result);
         return $result;
     }
 
