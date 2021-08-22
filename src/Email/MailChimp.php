@@ -487,6 +487,7 @@ class MailChimp {
         $report = self::$api->get("reports/{$mailChimpID}");
         if (empty($report["status"]) || (!empty($report["status"]) && $report["status"] != 404)) {
             $result["hasReport"]    = true;
+            $result["emailsSent"]   = $report["emails_sent"];
             $result["opensUnique"]  = $report["opens"]["unique_opens"];
             $result["opensRate"]    = round($report["opens"]["open_rate"] * 1000) / 10;
             $result["clicksUnique"] = $report["clicks"]["unique_clicks"];
