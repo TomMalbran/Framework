@@ -21,6 +21,7 @@ class Structure {
     public $name          = "";
 
     public $fields        = [];
+    public $expressions   = [];
     public $joins         = [];
     public $counts        = [];
 
@@ -38,6 +39,7 @@ class Structure {
      */
     public function __construct(string $schemaKey, array $data) {
         $this->table         = $data["table"];
+        $this->expressions   = !empty($data["expressions"])   ?  $data["expressions"] : [];
         $this->hasPositions  = !empty($data["hasPositions"])  && $data["hasPositions"];
         $this->hasTimestamps = !empty($data["hasTimestamps"]) && $data["hasTimestamps"];
         $this->hasUsers      = !empty($data["hasUsers"])      && $data["hasUsers"];

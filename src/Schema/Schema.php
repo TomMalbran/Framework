@@ -139,6 +139,7 @@ class Schema {
         $query     = $this->generateQuerySort($query, $sort);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields($decrypted);
+        $selection->addExpressions();
         if (!empty($selects)) {
             $selection->addSelects(array_values($selects));
         }
@@ -157,6 +158,7 @@ class Schema {
     private function request(Query $query = null, bool $decrypted = false): array {
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields($decrypted);
+        $selection->addExpressions();
         $selection->addJoins();
         $selection->addCounts();
         $selection->request($query);
@@ -182,6 +184,7 @@ class Schema {
         $query     = $this->generateQuery($query);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields($decrypted);
+        $selection->addExpressions();
         $selection->addSelects(array_values($selects));
         $selection->addJoins();
         $selection->request($query);
@@ -210,6 +213,7 @@ class Schema {
         $selection->addCounts();
         if ($withFields) {
             $selection->addFields();
+            $selection->addExpressions();
         }
         $selection->request($query);
         return $selection->resolve();
@@ -409,6 +413,7 @@ class Schema {
             $selection->addSelects("DISTINCT($idName)");
         }
         $selection->addFields();
+        $selection->addExpressions();
         $selection->addJoins();
         $selection->request($query);
         $request   = $selection->resolve();
