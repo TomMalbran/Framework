@@ -33,6 +33,28 @@ class MailChimp {
         }
     }
 
+    /**
+     * Returns the Last Error
+     * @return mixed
+     */
+    public static function getLastError() {
+        if (self::$api) {
+            return self::$api->getLastError();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the Last Response
+     * @return mixed
+     */
+    public static function getLastResponse() {
+        if (self::$api) {
+            return self::$api->getLastResponse();
+        }
+        return null;
+    }
+
 
 
     /**
