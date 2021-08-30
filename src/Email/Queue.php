@@ -52,13 +52,28 @@ class Queue {
         return self::getSchema()->exists($emailID);
     }
 
+
+
+    /**
+     * Returns the Filter Query
+     * @param Request $request
+     * @return Query
+     */
+    private static function getFilterQuery(Request $request): Query {
+        $query = Query::createSearch([ "subject", "sendTo" ], $request->search);
+        $query->addIf("createdTime", ">", $request->fromTime);
+        $query->addIf("createdTime", "<", $request->toTime);
+        return $query;
+    }
+
     /**
      * Returns all the Emails from the Queue
      * @param Request $request
      * @return array
      */
     public static function getAll(Request $request): array {
-        return self::getSchema()->getAll(null, $request);
+        $query = self::getFilterQuery($request);
+        return self::getSchema()->getAll($query, $request);
     }
 
     /**
@@ -72,10 +87,12 @@ class Queue {
 
     /**
      * Returns the total amount of Emails from the Queue
+     * @param Request $request
      * @return integer
      */
-    public static function getTotal(): int {
-        return self::getSchema()->getTotal();
+    public static function getTotal(Request $request): int {
+        $query = self::getFilterQuery($request);
+        return self::getSchema()->getTotal($query);
     }
 
 
