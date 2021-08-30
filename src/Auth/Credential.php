@@ -202,6 +202,21 @@ class Credential {
     }
 
     /**
+     * Returns all the Credentials for the given Level(s)
+     * @param integer[]|integer $level
+     * @param Request           $sort  Optional.
+     * @return array
+     */
+    public static function getActiveForLevel($level, Request $sort = null): array {
+        $query = self::createLevelQuery($level);
+        if (empty($query)) {
+            return [];
+        }
+        $query->add("status", "=", Status::Active());
+        return self::request($query, false, $sort);
+    }
+
+    /**
      * Returns the latest Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @param integer           $amount
@@ -635,15 +650,22 @@ class Credential {
 
     /**
      * Creates a list of names and emais for the given array
-     * @param array  $data
-     * @param string $prefix Optional.
+     * @param array   $data
+     * @param string  $prefix     Optional.
+     * @param boolean $onlyActive Optional.
      * @return array
      */
-    public static function createEmailList(array $data, string $prefix = ""): array {
+    public static function createEmailList(array $data, string $prefix = "", bool $onlyActive = false): array {
         $result = [];
         $ids    = [];
 
         foreach ($data as $row) {
+            if ($onlyActive) {
+                $status = Arrays::getValue($row, "status", "", $prefix);
+                if (!Status::isActive($status)) {
+                    continue;
+                }
+            }
             $id = Arrays::getAnyValue($row, [ "credentialID", "id", "{$prefix}ID" ]);
             if (Arrays::contains($ids, $id)) {
                 continue;
