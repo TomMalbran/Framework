@@ -75,9 +75,8 @@ class ActionLog {
             $query->addIf($value, "=", $filters->get($key));
         }
 
-        if ($filters->has("fromTime") && $filters->has("toTime")) {
-            $query->betweenTimes("time", $filters->fromTime, $filters->toTime);
-        }
+        $query->addIf("time", ">", $filters->fromTime);
+        $query->addIf("time", "<", $filters->toTime);
         return $query;
     }
 

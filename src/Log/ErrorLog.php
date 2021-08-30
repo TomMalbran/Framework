@@ -68,36 +68,33 @@ class ErrorLog {
 
     /**
      * Returns the Filter Query
-     * @param Request $filters
+     * @param Request $request
      * @return Query
      */
-    private static function getFilterQuery(Request $filters): Query {
-        $query = new Query();
-        $query->addIf("description", "LIKE", $filters->search);
-        if ($filters->has("fromTime") && $filters->has("toTime")) {
-            $query->betweenTimes("time", $filters->fromTime, $filters->toTime);
-        }
+    private static function getFilterQuery(Request $request): Query {
+        $query = Query::createSearch([ "description", "file" ], $request->search);
+        $query->addIf("createdTime", ">", $request->fromTime);
+        $query->addIf("createdTime", "<", $request->toTime);
         return $query;
     }
 
     /**
      * Returns all the Product Logs filtered by the given times
-     * @param Request $filters
-     * @param Request $sort
+     * @param Request $request
      * @return array
      */
-    public static function filter(Request $filters, Request $sort): array {
-        $query = self::getFilterQuery($filters);
-        return self::getSchema()->getAll($query, $sort);
+    public static function filter(Request $request): array {
+        $query = self::getFilterQuery($request);
+        return self::getSchema()->getAll($query, $request);
     }
 
     /**
      * Returns the Total Actions Log with the given Filters
-     * @param Request $filters
+     * @param Request $request
      * @return integer
      */
-    public static function getTotal(Request $filters): int {
-        $query = self::getFilterQuery($filters);
+    public static function getTotal(Request $request): int {
+        $query = self::getFilterQuery($request);
         return self::getSchema()->getTotal($query);
     }
 
