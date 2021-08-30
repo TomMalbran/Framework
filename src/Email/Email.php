@@ -6,7 +6,6 @@ use Framework\Request;
 use Framework\Auth\Access;
 use Framework\Auth\Credential;
 use Framework\Config\Config;
-use Framework\Email\Queue;
 use Framework\Email\WhiteList;
 use Framework\Provider\Mustache;
 use Framework\File\Path;
@@ -179,23 +178,6 @@ class Email {
             $success = self::sendHtml($email, $template->sendAs, $template->sendName, $subject, $message);
         }
         return $success;
-    }
-
-    /**
-     * Sends the Unsent Emails from the Queue
-     * @return void
-     */
-    public static function sendQueue() {
-        $emails = Queue::getAllUnsent();
-        foreach ($emails as $email) {
-            $success = false;
-            foreach ($email["sendToParts"] as $sendTo) {
-                if (!empty($sendTo)) {
-                    $success = self::sendHTML($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
-                }
-            }
-            Queue::markAsSent($email["emailID"], $success);
-        }
     }
 
     /**

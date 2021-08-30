@@ -7,6 +7,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
+use Framework\Email\Email;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 
@@ -85,17 +86,18 @@ class Queue {
      * @param string|string[] $sendTo
      * @param string          $message  Optional.
      * @param string          $subject  Optional.
-     * @return integer
+     * @param boolean         $sendNow  Optional.
+     * @return boolean
      */
-    public static function add(Model $template, $sendTo, string $message = null, string $subject = null): bool {
+    public static function add(Model $template, $sendTo, string $message = null, string $subject = null, bool $sendNow = false): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
 
         if (empty($sendTo)) {
-            return 0;
+            return false;
         }
-        return self::getSchema()->create([
+        $emailID = self::getSchema()->create([
             "templateCode" => $template->id,
             "sendTo"       => JSON::encode($sendTo),
             "sendAs"       => $template->sendAs   ?: "",
@@ -105,16 +107,40 @@ class Queue {
             "sentSuccess"  => 0,
             "sentTime"     => 0,
         ]);
+
+        if (!$sendNow) {
+            return true;
+        }
+        $email = self::getOne($emailID);
+        return self::send($email);
+    }
+
+
+
+    /**
+     * Sends all the Unsent Emails
+     * @return void
+     */
+    public function sendAll() {
+        $emails = self::getAllUnsent();
+        foreach ($emails as $email) {
+            self::send($email);
+        }
     }
 
     /**
-     * Marks the given Email as sent
-     * @param integer $emailID
-     * @param boolean $success
+     * Sends the given Email
+     * @param Model|array $email
      * @return boolean
      */
-    public static function markAsSent(int $emailID, bool $success): bool {
-        return self::getSchema()->edit($emailID, [
+    public static function send($email): bool {
+        $success = false;
+        foreach ($email["sendToParts"] as $sendTo) {
+            if (!empty($sendTo)) {
+                $success = Email::sendHTML($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
+            }
+        }
+        return self::getSchema()->edit($email["emailID"], [
             "sentSuccess" => $success ? 1 : 0,
             "sentTime"    => time(),
         ]);
