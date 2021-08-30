@@ -95,7 +95,7 @@ class Reset {
      * @return boolean
      */
     public static function deleteOld(): bool {
-        $query = Query::create("time", "<", time() - 900);
+        $query = Query::create("time", "<", time() - 3 * 3600);
         return self::getSchema()->remove($query);
     }
 }
