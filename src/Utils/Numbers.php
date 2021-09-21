@@ -1,9 +1,6 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\Utils\Arrays;
-use Framework\Utils\Strings;
-
 /**
  * Several Numbers Utils
  */
