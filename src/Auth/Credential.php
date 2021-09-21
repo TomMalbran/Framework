@@ -150,11 +150,12 @@ class Credential {
 
     /**
      * Returns all the Credentials
-     * @param Request $sort Optional.
+     * @param Request $sort  Optional.
+     * @param Query   $query Optional.
      * @return array
      */
-    public static function getAll(Request $sort = null) {
-        return self::request(null, false, $sort);
+    public static function getAll(Request $sort = null, Query $query = null) {
+        return self::request($query, false, $sort);
     }
 
     /**
@@ -232,6 +233,15 @@ class Credential {
         $query->orderBy("createdTime", false);
         $query->limit($amount);
         return self::request($query, false);
+    }
+
+    /**
+     * Returns the total amount of Credentials
+     * @param Query $query Optional.
+     * @return integer
+     */
+    public static function getTotal(Query $query = null): int {
+        return self::getSchema()->getTotal($query);
     }
 
     /**
