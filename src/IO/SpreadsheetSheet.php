@@ -1,6 +1,9 @@
 <?php
 namespace Framework\IO;
 
+use Framework\NLS\NLS;
+use Framework\Utils\Elements;
+
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\WorkSheet\WorkSheet;
 
@@ -11,6 +14,7 @@ class SpreadsheetSheet {
 
     private $sheet;
     private $row;
+    private $header;
 
 
     /**
@@ -18,8 +22,52 @@ class SpreadsheetSheet {
      * @param WorkSheet $sheet
      */
     public function __construct(WorkSheet $sheet) {
-        $this->sheet = $sheet;
-        $this->row   = 1;
+        $this->sheet  = $sheet;
+        $this->row    = 1;
+        $this->header = null;
+    }
+
+
+
+    /**
+     * Sets the Header
+     * @param Elements $header
+     * @return void
+     */
+    public function setHeader(Elements $header): void {
+        $this->header = $header;
+        $values = $header->getValues();
+        $this->writeHeader(NLS::getAll($values));
+    }
+
+    /**
+     * Sets a Line
+     * @param array $line
+     * @return void
+     */
+    public function setLine(array $line): void {
+        $parsed = $this->header->parseValues($line);
+        $this->writeLine($parsed);
+    }
+
+
+
+    /**
+     * Adds the Header
+     * @param string ...$header
+     * @return void
+     */
+    public function addHeader(string ...$header): void {
+        $this->writeHeader(NLS::getAll($header));
+    }
+
+    /**
+     * Adds a Line
+     * @param string ...$line
+     * @return void
+     */
+    public function addLine(string ...$line): void {
+        $this->writeLine($line);
     }
 
 

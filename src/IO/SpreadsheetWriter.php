@@ -1,6 +1,7 @@
 <?php
 namespace Framework\IO;
 
+use Framework\NLS\NLS;
 use Framework\IO\SpreadsheetSheet;
 use Framework\Utils\Strings;
 
@@ -12,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  */
 class SpreadsheetWriter {
 
+    private $title;
     private $data;
     private $sheets;
     private $sheetNum;
@@ -20,11 +22,11 @@ class SpreadsheetWriter {
     /**
      * Creates a new SpreadsheetWriter instance
      * @param string $title
-     * @param string $creator Optional.
      */
-    public function __construct(string $title, string $creator = "") {
-        $this->data = new Spreadsheet();
-        $this->data->getProperties()->setCreator($creator)->setTitle($title);
+    public function __construct(string $title) {
+        $this->title = NLS::get($title);
+        $this->data  = new Spreadsheet();
+        $this->data->getProperties()->setTitle($this->title);
 
         $this->sheets   = [];
         $this->sheetNum = 0;
@@ -34,11 +36,11 @@ class SpreadsheetWriter {
 
     /**
      * Adds a new Sheet
-     * @param string         $sheetName
+     * @param string         $sheetName Optional.
      * @param string|integer $sheetID   Optional.
      * @return SpreadsheetSheet
      */
-    public function addSheet(string $sheetName, $sheetID = null): SpreadsheetSheet {
+    public function addSheet(string $sheetName = "", $sheetID = null): SpreadsheetSheet {
         $count = $this->data->getSheetCount();
         if ($this->sheetNum < $count) {
             $sheet = $this->data->getSheet($this->sheetNum);
@@ -46,7 +48,7 @@ class SpreadsheetWriter {
             $sheet = $this->data->createSheet($this->sheetNum);
         }
 
-        $sheet->setTitle($sheetName);
+        $sheet->setTitle(!empty($sheetName) ? NLS::get($sheetName) : $this->title);
         $ssheet  = new SpreadsheetSheet($sheet);
         $sheetID = $sheetID != null ? $sheetID : $this->sheetNum;
 
@@ -76,7 +78,7 @@ class SpreadsheetWriter {
      * @return string
      */
     public function getFileName(string $name, bool $withDate = true): string {
-        $result = $name . ($withDate ? "_" . date("dMY") : "");
+        $result = NLS::get($name) . ($withDate ? "_" . date("Y-m-d") : "");
         return Strings::toLowerCase($result);
     }
 
@@ -88,6 +90,7 @@ class SpreadsheetWriter {
      */
     public function download(string $name, bool $withDate = true): void {
         $fileName = $this->getFileName($name, $withDate);
+
         header("Content-type: application/vnd.ms-excel");
         header("Content-Encoding: none");
         header("Content-Disposition: attachment; filename=\"{$fileName}.xls\"");
@@ -106,6 +109,7 @@ class SpreadsheetWriter {
      */
     public function downloadXlsx(string $name, bool $withDate = true): void {
         $fileName = $this->getFileName($name, $withDate);
+
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF16-LE; encoding=UTF16-LE");
         header("Content-Disposition: attachment; filename=\"{$fileName}.xlsx\"");
         header("Cache-Control: max-age=0");
@@ -123,6 +127,7 @@ class SpreadsheetWriter {
      */
     public function downloadCsv(string $name, bool $withDate = true): void {
         $fileName = $this->getFileName($name, $withDate);
+
         header("Content-Type: application/csv; charset=UTF16-LE; encoding=UTF16-LE");
         header("Content-Disposition: attachment; filename=\"{$fileName}.csv\"");
         header("Cache-Control: private");
