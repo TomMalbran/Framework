@@ -27,20 +27,6 @@ class DateTime {
     }
 
     /**
-     * Returns the given time using the given Time Zone
-     * @param integer $value
-     * @param integer $timezone
-     * @return integer
-     */
-    public static function toTimezone(int $value, int $timezone) {
-        if (!empty($value) && !empty($timezone)) {
-            $timeDiff = (self::$serverDiff - $timezone) * 60;
-            return $value - $timeDiff;
-        }
-        return $value;
-    }
-
-    /**
      * Returns the given time in the User Time Zone
      * @param integer $value
      * @param boolean $useTimezone Optional.
@@ -88,17 +74,41 @@ class DateTime {
 
     /**
      * Returns the given string as a time
-     * @param string  $string
+     * @param mixed   $time
      * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toTime(string $string, bool $useTimezone = true): int {
-        $result = strtotime($string);
-        if ($result !== false) {
-            return self::toServerTime($result, $useTimezone);
+    public static function toTime($time, bool $useTimezone = true): int {
+        if (is_string($time)) {
+            $time = strtotime($time);
         }
-        return 0;
+        if (empty($time)) {
+            return 0;
+        }
+        return self::toServerTime($time, $useTimezone);
     }
+
+    /**
+     * Returns the given time using the given Time Zone
+     * @param mixed   $time
+     * @param integer $timezone Optional.
+     * @return integer
+     */
+    public static function toTimezone($time, int $timezone = null) {
+        if (is_string($time)) {
+            $time = strtotime($time);
+        }
+        if (empty($time)) {
+            return 0;
+        }
+        if (!empty($timezone)) {
+            $timeDiff = (self::$serverDiff - $timezone) * 60;
+            return $time - $timeDiff;
+        }
+        return $time;
+    }
+
+
 
     /**
      * Returns the given string as a time
@@ -108,11 +118,7 @@ class DateTime {
      * @return integer
      */
     public static function toTimeHour(string $dateString, string $hourString, bool $useTimezone = true): int {
-        $result = strtotime("$dateString $hourString");
-        if ($result !== false) {
-            return self::toServerTime($result, $useTimezone);
-        }
-        return 0;
+        return self::toTime("$dateString $hourString", $useTimezone);
     }
 
     /**
@@ -140,11 +146,7 @@ class DateTime {
      * @return integer
      */
     public static function toDayStart(string $string, bool $useTimezone = true): int {
-        $result = strtotime($string);
-        if ($result !== false) {
-            return self::toServerTime($result, $useTimezone);
-        }
-        return 0;
+        return self::toTime($string, $useTimezone);
     }
 
     /**
@@ -154,10 +156,9 @@ class DateTime {
      * @return integer
      */
     public static function toDayMiddle(string $string, bool $useTimezone = true): int {
-        $result = strtotime($string);
-        if ($result !== false) {
-            $result += 12 * 3600;
-            return self::toServerTime($result, $useTimezone);
+        $result = self::toTime($string, $useTimezone);
+        if (!empty($result)) {
+            return $result + 12 * 3600;
         }
         return 0;
     }
@@ -169,10 +170,9 @@ class DateTime {
      * @return integer
      */
     public static function toDayEnd(string $string, bool $useTimezone = true): int {
-        $result = strtotime($string);
-        if ($result !== false) {
-            $result += 24 * 3600 - 1;
-            return self::toServerTime($result, $useTimezone);
+        $result = self::toTime($string, $useTimezone);
+        if (!empty($result)) {
+            return $result + 24 * 3600 - 1;
         }
         return 0;
     }
@@ -278,27 +278,23 @@ class DateTime {
 
     /**
      * Returns true if the given Time is in the future
-     * @param integer $seconds
+     * @param mixed   $time
      * @param integer $timezone Optional.
      * @return boolean
      */
-    public static function isFutureTime(int $seconds, int $timezone = null): bool {
-        if (!empty($timezone)) {
-            $seconds = self::toTimezone($seconds, $timezone);
-        }
+    public static function isFutureTime($time, int $timezone = null): bool {
+        $seconds = self::toTimezone($time, $timezone);
         return $seconds > time();
     }
 
      /**
      * Returns true if the given Time is today
-     * @param integer $time
+     * @param mixed   $time
      * @param integer $timezone Optional.
      * @return boolean
      */
-    public static function isToday(int $time, int $timezone = null): bool {
-        if (!empty($timezone)) {
-            $time = self::toTimezone($time, $timezone);
-        }
+    public static function isToday($time, int $timezone = null): bool {
+        $seconds = self::toTimezone($time, $timezone);
         return date("d-m-Y", $time) == date("d-m-Y");
     }
 
@@ -327,28 +323,29 @@ class DateTime {
 
     /**
      * Formats the time using the given Time Zone
-     * @param integer $seconds
+     * @param mixed   $time
      * @param string  $format
      * @param integer $timezone Optional.
      * @return string
      */
-    public static function format(int $seconds, string $format, int $timezone = null) {
-        if (!empty($timezone)) {
-            $seconds = self::toTimezone($seconds, $timezone);
+    public static function format($time, string $format, int $timezone = null): string {
+        $seconds = self::toTimezone($time, $timezone);
+        if (empty($seconds)) {
+            return "";
         }
         return date($format, $seconds);
     }
 
     /**
      * Returns the Seconds as a string
-     * @param integer $seconds
+     * @param mixed   $time
      * @param string  $format
      * @param integer $timezone Optional.
      * @return string
      */
-    public static function toString(int $seconds, string $format, int $timezone = null) {
+    public static function toString($time, string $format, int $timezone = null): string {
         if (!empty(self::$formats[$format])) {
-            return self::format($seconds, self::$formats[$format], $timezone);
+            return self::format($time, self::$formats[$format], $timezone);
         }
         return "";
     }
@@ -500,6 +497,26 @@ class DateTime {
      */
     public static function getMinsDiff(int $time1, int $time2): int {
         return floor(($time1 - $time2) / 60);
+    }
+
+    /**
+     * Returns the amount of years between given date and today AKA the age
+     * @param mixed   $time
+     * @param integer $timezone Optional.
+     * @return integer
+     */
+    public static function getAge($time, int $timezone = null): int {
+        $seconds  = self::toTimezone($time, $timezone);
+        if (empty($seconds)) {
+            return 0;
+        }
+        $thisYear = (int)date("Y");
+        $thatYear = (int)date("Y", $seconds);
+        $result   = $thisYear - $thatYear;
+        if ($seconds > time()) {
+            $result += 1;
+        }
+        return $result;
     }
 
 
