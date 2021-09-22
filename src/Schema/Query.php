@@ -275,15 +275,17 @@ class Query {
     }
 
     /**
-     * Adds an Group By
-     * @param string $column
+     * Adds a Group By
+     * @param string ...$columns
      * @return Query
      */
-    public function groupBy(string $column): Query {
-        if (!empty($column)) {
-            $prefix         = !empty($this->groupBy) ? ", " : "";
-            $this->groupBy .= $prefix . $column;
-            $this->groups[] = $column;
+    public function groupBy(string ...$columns): Query {
+        foreach ($columns as $column) {
+            if (!empty($column)) {
+                $prefix         = !empty($this->groupBy) ? ", " : "";
+                $this->groupBy .= $prefix . $column;
+                $this->groups[] = $column;
+            }
         }
         return $this;
     }
