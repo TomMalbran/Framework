@@ -36,14 +36,14 @@ class Media {
     /**
      * Updates the Paths in the Database
      * @param string $oldPath
-     * @param string $newpath
+     * @param string $newPath
      * @return void
      */
-    private static function update(string $oldPath, string $newpath): void {
+    private static function update(string $oldPath, string $newPath): void {
         self::load();
         foreach (self::$data as $table) {
             $query = Query::create($table["field"], "=", $oldPath);
-            self::$db->update($table["table"], [ $table["field"] => $newpath ], $query);
+            self::$db->update($table["table"], [ $table["field"] => $newPath ], $query);
         }
     }
 
