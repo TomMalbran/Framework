@@ -69,15 +69,19 @@ class Arrays {
      * Returns true if the arrays are Equal
      * @param array  $array
      * @param array  $other
-     * @param string $key
+     * @param string $key   Optional.
      * @return boolean
      */
-    public static function isEqual(array $array, array $other, string $key): bool {
+    public static function isEqual(array $array, array $other, string $key = ""): bool {
         if (self::length($array) !== self::length($other)) {
             return false;
         }
-        foreach ($array as $row) {
-            if (!isset($row[$key]) || !self::contains($other, $row[$key], $key)) {
+        foreach ($array as $index => $value) {
+            if (!empty($key)) {
+                if (!isset($value[$key]) || !self::contains($other, $value[$key], $key)) {
+                    return false;
+                }
+            } elseif ($value != $other[$index]) {
                 return false;
             }
         }
