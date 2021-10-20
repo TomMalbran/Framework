@@ -118,7 +118,7 @@ class Template {
         $adds     = [];
         $deletes  = [];
         $codes    = [];
-        $position = $recreate ? 1 : count($request);
+        $position = $recreate ? 0 : count($request);
 
         // Adds the Email Templates
         foreach ($emails as $templateCode => $data) {
@@ -132,9 +132,10 @@ class Template {
                 }
             }
             if (!$found) {
-                $message = Strings::join($data["message"], "\n\n");
-                $codes[] = $templateCode;
-                $adds[]  = [
+                $position += 1;
+                $message   = Strings::join($data["message"], "\n\n");
+                $codes[]   = $templateCode;
+                $adds[]    = [
                     "templateCode" => $templateCode,
                     "description"  => $data["description"],
                     "sendAs"       => $sendAs,
@@ -144,7 +145,6 @@ class Template {
                     "message"      => Strings::replace($message, "[site]", $siteName),
                     "position"     => $position,
                 ];
-                $position += 1;
             }
         }
 
