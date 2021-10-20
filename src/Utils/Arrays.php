@@ -136,6 +136,22 @@ class Arrays {
     }
 
     /**
+     * Removes the given value from the array
+     * @param array $array
+     * @param mixed $key
+     * @return array
+     */
+    public static function removeValue(array $array, $key): array {
+        $result = [];
+        foreach ($array as $value) {
+            if ($value != $key) {
+                $result[] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Removes the empty entries from the given array
      * @param array $array
      * @return array
