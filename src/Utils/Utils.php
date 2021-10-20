@@ -259,6 +259,8 @@ class Utils {
         return !empty($host) && $host != $domain;
     }
 
+
+
     /**
      * Returns a WhatsApp url
      * @param string $whtasapp
@@ -266,5 +268,14 @@ class Utils {
      */
     public static function getWhatsAppUrl(string $whtasapp): string {
         return "https://wa.me/$whtasapp";
+    }
+
+    /**
+     * Returns true if is a valid Zoom url
+     * @param string $url
+     * @return boolean
+     */
+    public static function isValidZoom(string $url): bool {
+        return Strings::startsWith($url, "https://us02web.zoom.us/j/");
     }
 }

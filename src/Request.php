@@ -394,6 +394,15 @@ class Request implements ArrayAccess {
     }
 
     /**
+     * Returns true if the given Zoom Link is valid
+     * @param string $key
+     * @return boolean
+     */
+    public function isValidZoom(string $key): bool {
+        return Utils::isValidZoom($this->get($key));
+    }
+
+    /**
      * Returns true if the given Position is valid
      * @param string $key
      * @return boolean
