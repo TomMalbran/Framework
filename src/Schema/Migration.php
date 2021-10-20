@@ -22,21 +22,23 @@ class Migration {
      * @return void
      */
     public static function migrate(Database $db, array $schemas, bool $canDelete = false): void {
-        self::moveTables($db);
-        self::migrateTables($db, $schemas, $canDelete);
+        $migrations = Framework::loadData("migrations/migrations");
+
+        self::moveTables($db, $migrations["movements"]);
+        self::migrateTables($db, $schemas, $migrations["updates"], $canDelete);
         self::extraMigrations($db);
     }
 
     /**
      * Moves the Tables
      * @param Database $db
+     * @param array    $movements
      * @return void
      */
-    private static function moveTables(Database $db) {
-        $movement  = Settings::getCore($db, "movement");
-        $movements = Framework::loadData("migrations/movements");
-        $last      = count($movements);
-        $didMove   = false;
+    private static function moveTables(Database $db, array $movements) {
+        $movement = Settings::getCore($db, "movement");
+        $last     = count($movements);
+        $didMove  = false;
 
         for ($i = $movement; $i < $last; $i++) {
             $oldName = $movements[$i]["old"];
@@ -61,10 +63,11 @@ class Migration {
      * Migrates the Tables
      * @param Database $db
      * @param array    $schemas
+     * @param array    $updates
      * @param boolean  $canDelete Optional.
      * @return void
      */
-    private static function migrateTables(Database $db, array $schemas, bool $canDelete = false) {
+    private static function migrateTables(Database $db, array $schemas, array $updates, bool $canDelete = false) {
         $tableNames  = $db->getTables(null, false);
         $schemaNames = [];
 
@@ -76,7 +79,8 @@ class Migration {
             if (!Arrays::contains($tableNames, $structure->table)) {
                 self::createTable($db, $structure);
             } else {
-                self::updateTable($db, $structure, $canDelete);
+                $schemaUpdates = !empty($updates[$structure->table]) ? $updates[$structure->table] : [];
+                self::updateTable($db, $structure, $schemaUpdates, $canDelete);
             }
         }
 
@@ -137,10 +141,11 @@ class Migration {
      * Updates the Table
      * @param Database  $db
      * @param Structure $structure
+     * @param array     $updates
      * @param boolean   $canDelete
      * @return void
      */
-    private static function updateTable(Database $db, Structure $structure, bool $canDelete): void {
+    private static function updateTable(Database $db, Structure $structure, array $updates, bool $canDelete): void {
         $autoKey     = $db->getAutoIncrement($structure->table);
         $primaryKeys = $db->getPrimaryKeys($structure->table);
         $tableKeys   = $db->getTableKeys($structure->table);
@@ -150,6 +155,7 @@ class Migration {
         $drops       = [];
         $modifies    = [];
         $renames     = [];
+        $renamed     = [];
         $primary     = [];
         $addPrimary  = false;
         $dropPrimary = false;
@@ -191,17 +197,33 @@ class Migration {
                         "type" => $type,
                     ];
                 } else {
-                    if ($field->isID) {
-                        $dropPrimary   = true;
-                        $primaryKeys[] = $field->key;
-                        $type         .= " PRIMARY KEY";
+                    foreach ($updates as $update) {
+                        if ($update["new"] == $field->key) {
+                            $primaryKeys[] = $field->key;
+                            $renamed[]     = $update["old"];
+                            $renames[]     = [
+                                "key"  => $update["old"],
+                                "new"  => $field->key,
+                                "type" => $type,
+                            ];
+                            $prev  = $update["new"];
+                            $found = true;
+                            break;
+                        }
                     }
-                    $adds[] = [
-                        "key"   => $field->key,
-                        "type"  => $type,
-                        "after" => $prev,
-                    ];
                 }
+            }
+            if (!$found) {
+                if ($field->isID) {
+                    $dropPrimary   = true;
+                    $primaryKeys[] = $field->key;
+                    $type         .= " PRIMARY KEY";
+                }
+                $adds[] = [
+                    "key"   => $field->key,
+                    "type"  => $type,
+                    "after" => $prev,
+                ];
             }
             $prev = $field->key;
         }
@@ -211,7 +233,7 @@ class Migration {
             $tableKey = $tableField["Field"];
             $found    = false;
             foreach ($structure->fields as $field) {
-                if (Strings::isEqual($field->key, $tableKey)) {
+                if (Strings::isEqual($field->key, $tableKey) || Arrays::contains($renamed, $tableKey)) {
                     $found = true;
                 }
             }
