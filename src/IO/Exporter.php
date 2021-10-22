@@ -36,7 +36,7 @@ class Exporter {
         $this->total    = $total;
         $this->header   = new Elements();
 
-        if ($total < 6000) {
+        if ($total < 5000) {
             $this->isCSV  = false;
             $this->writer = new SpreadsheetWriter($title);
             $this->sheet  = $this->writer->addSheet();
