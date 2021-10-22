@@ -4,6 +4,7 @@ namespace Framework;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
+use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -163,6 +164,16 @@ class Request implements ArrayAccess {
      */
     public function getJSON(string $key, bool $asArray = false) {
         return JSON::decode($this->get($key, "[]"), $asArray);
+    }
+
+    /**
+     * Returns the request data at the given key as CSV
+     * @param string $key
+     * @return array
+     */
+    public function getCSV(string $key) {
+        $result = Strings::split($this->get($key, ""), ",");
+        return Arrays::removeEmpty($result);
     }
 
 
@@ -559,7 +570,13 @@ class Request implements ArrayAccess {
      * @return string
      */
     public function toJSON(string $key): string {
-        return JSON::encode($this->get($key, []));
+        $value = $this->get($key);
+        if (empty($value)) {
+            $value = [];
+        } elseif (Strings::isString($value)) {
+            $value = Strings::split($value, ",");
+        }
+        return JSON::encode($value);
     }
 
     /**
