@@ -7,6 +7,15 @@ namespace Framework\Utils;
 class Strings {
 
     /**
+     * Returns true if the given value is a string
+     * @param mixed $string
+     * @return boolean
+     */
+    public static function isString($string): bool {
+        return is_string($string);
+    }
+
+    /**
      * Returns the length og the given String
      * @param string $string
      * @return integer
