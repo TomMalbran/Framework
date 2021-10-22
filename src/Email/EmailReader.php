@@ -256,7 +256,7 @@ class EmailReader {
             if ($lastBlank && empty($string)) {
                 continue;
             }
-            if ($string === "--" || Strings::startsWith($string, "_____") || $string === "|      |") {
+            if ($string === "--" || Strings::startsWith($string, "_____") || $string === "|      |") {
                 break;
             }
 
