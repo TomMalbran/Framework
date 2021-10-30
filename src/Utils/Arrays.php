@@ -89,6 +89,23 @@ class Arrays {
     }
 
     /**
+     * Returns true if the arrays intersect
+     * @param array $array
+     * @param array $other
+     * @return boolean
+     */
+    public static function intersects(array $array, array $other): bool {
+        foreach ($array as $mine) {
+            foreach ($other as $yours) {
+                if ($mine == $yours) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns the elements from the array that are not in the other array
      * @param array  $array
      * @param array  $other
