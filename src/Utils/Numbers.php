@@ -33,7 +33,7 @@ class Numbers {
      * @param boolean $orderAsc Optional.
      * @return integer
      */
-    public static function compare($number, $other, bool $orderAsc = true) {
+    public static function compare($number, $other, bool $orderAsc = true): int {
         return ($number - $other) * ($orderAsc ? 1 : -1);
     }
 
@@ -46,7 +46,7 @@ class Numbers {
     public static function round(float $number, int $decimals): int {
         if (is_numeric($number)) {
             $padding = pow(10, $decimals);
-            return ceil($number * $padding) / $padding;
+            return (int)ceil($number * $padding) / $padding;
         }
         return 0;
     }
@@ -60,7 +60,7 @@ class Numbers {
     public static function toInt(float $number, int $decimals): int {
         if (is_numeric($number)) {
             $padding = pow(10, $decimals);
-            return round($number * $padding);
+            return (int)round($number * $padding);
         }
         return 0;
     }
@@ -236,7 +236,7 @@ class Numbers {
      * @param integer $amount
      * @return string
      */
-    public static function zerosPad($value, int $amount) {
+    public static function zerosPad($value, int $amount): string {
         if (!empty($value)) {
             return str_pad((string)$value, $amount, "0", STR_PAD_LEFT);
         }
