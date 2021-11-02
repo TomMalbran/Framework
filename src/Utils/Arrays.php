@@ -437,7 +437,7 @@ class Arrays {
     }
 
     /**
-     * Returns the first value that is not empty in the given keys
+     * Returns the first Value that is not empty in the given keys
      * @param mixed    $array
      * @param string[] $keys
      * @param mixed    $default Optional.
@@ -453,11 +453,20 @@ class Arrays {
     }
 
     /**
-     * Returns the Value at the given id with the given key
+     * Returns the first Key of the given array
+     * @param array $array
+     * @return string|integer
+     */
+    public static function getFirstKey(array $array) {
+        return array_keys($array)[0];
+    }
+
+    /**
+     * Returns the index at the given id key with the given is value
      * @param array  $array
      * @param string $idKey
      * @param mixed  $idValue
-     * @return integer
+     * @return string|integer
      */
     public static function findIndex(array $array, string $idKey, $idValue) {
         foreach ($array as $index => $elem) {
