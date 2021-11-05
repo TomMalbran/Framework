@@ -138,7 +138,7 @@ class Queue {
      * Sends all the Unsent Emails
      * @return void
      */
-    public function sendAll() {
+    public static function sendAll() {
         $emails = self::getAllUnsent();
         foreach ($emails as $email) {
             self::send($email);
