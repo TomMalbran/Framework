@@ -38,17 +38,28 @@ class Arrays {
     /**
      * Returns true if the array contains the needle
      * @param array|mixed $array
-     * @param mixed       $needle
+     * @param array|mixed $needle
      * @param mixed       $key    Optional.
      * @return boolean
      */
     public static function contains($array, $needle, $key = null): bool {
         $array = self::toArray($array);
-        if ($key === null) {
-            return in_array($needle, $array);
+
+        if (self::isArray($needle)) {
+            $count = 0;
+            foreach ($array as $row) {
+                foreach ($needle as $value) {
+                    if (($key === null && $row == $value) || ($key !== null && isset($row[$key]) && $row[$key] == $value)) {
+                        $count++;
+                        break;
+                    }
+                }
+            }
+            return $count === count($needle);
         }
+
         foreach ($array as $row) {
-            if (isset($row[$key]) && $row[$key] == $needle) {
+            if (($key === null && $row == $needle) || ($key !== null && isset($row[$key]) && $row[$key] == $needle)) {
                 return true;
             }
         }
