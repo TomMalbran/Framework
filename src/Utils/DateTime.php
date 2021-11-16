@@ -9,7 +9,7 @@ use Framework\Utils\Utils;
  */
 class DateTime {
 
-    public static $days       = [ "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" ];
+    public static $days       = [ "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado" ];
     public static $months     = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
     public static $formats    = [ "dashes" => "d-m-Y", "time" => "H:i", "dashesTime" => "d-m-Y H:i" ];
 
@@ -432,6 +432,20 @@ class DateTime {
     }
 
     /**
+     * Returns the time of the start of the week
+     * @param integer $time        Optional.
+     * @param integer $dayDiff     Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getWeekStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false) {
+        $time     = empty($time) ? time() : $time;
+        $startDay = date("j", $time) - date("w", $time);
+        $result   = mktime(0, 0, 0, date("n", $time), $startDay + $dayDiff, date("Y", $time));
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
      * Returns the time of the start of the month
      * @param integer $time        Optional.
      * @param integer $monthDiff   Optional.
@@ -522,7 +536,18 @@ class DateTime {
 
 
     /**
-     * Returns the Month name at the given month
+     * Returns the Day name at the given Time
+     * @param integer $time
+     * @param integer $timezone Optional.
+     * @return string
+     */
+    public static function getDay(int $time, int $timezone = null): string {
+        $seconds = self::toTimezone($time, $timezone);
+        return self::getDayName(date("w", $seconds));
+    }
+
+    /**
+     * Returns the Day name at the given day
      * @param integer $day
      * @return string
      */
