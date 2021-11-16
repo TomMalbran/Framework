@@ -93,6 +93,18 @@ class NLS {
     }
 
     /**
+     * Format and Joins the given strings to form a sentence
+     * @param string   $key
+     * @param string[] $strings
+     * @param boolean  $useOr   Optional.
+     * @param string   $lang    Optional.
+     * @return string
+     */
+    public static function formatJoin(string $key, array $strings, bool $useOr = false, string $lang = "root"): string {
+        return self::format($key, [ self::join($strings, $useOr, $lang) ], $lang);
+    }
+
+    /**
      * Returns a formatted string using the correct plural string
      * @param string  $key
      * @param integer $count
@@ -106,20 +118,35 @@ class NLS {
     }
 
     /**
-     * Joins the given strings to form a sentence
+     * Returns a formated string using the correct plural string
+     * @param string   $key
      * @param string[] $strings
+     * @param boolean  $useOr   Optional.
      * @param string   $lang    Optional.
      * @return string
      */
-    public static function join(array $strings, string $lang = "root"): string {
-        $count = count($strings);
+    public static function pluralizeList(string $key, array $strings, bool $useOr = false, string $lang = "root"): string {
+        $suffix = count($strings) === 1 ? "_SINGULAR" : "_PLURAL";
+        return self::format($key . $suffix, [ self::join($strings, $useOr, $lang) ], $lang);
+    }
+
+    /**
+     * Joins the given strings to form a sentence
+     * @param string[] $strings
+     * @param boolean  $useOr   Optional.
+     * @param string   $lang    Optional.
+     * @return string
+     */
+    public static function join(array $strings, bool $useOr = false, string $lang = "root"): string {
+        $strings = array_values($strings);
+        $count   = count($strings);
         if ($count === 1) {
             return $strings[0];
         }
-        $and    = self::get("GENERAL_AND", $lang);
+        $glue   = self::get($useOr ? "GENERAL_OR" : "GENERAL_AND", $lang);
         $result = $strings[0];
         for ($i = 1; $i < $count; $i++) {
-            $result .= ($i < $count - 1 ? ", " : " $and ") . $strings[$i];
+            $result .= ($i < $count - 1 ? ", " : " $glue ") . $strings[$i];
         }
         return $result;
     }
