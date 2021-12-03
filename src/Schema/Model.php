@@ -195,9 +195,13 @@ class Model implements ArrayAccess {
 
     /**
      * Returns all the Data
-     * @return array
+     * @param boolean $asObject Optional.
+     * @return mixed
      */
-    public function toObject(): array {
+    public function toObject(bool $asObject = false) {
+        if ($asObject) {
+            return Arrays::toObject($this->data);
+        }
         return $this->data;
     }
 
