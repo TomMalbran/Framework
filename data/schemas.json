@@ -43,6 +43,9 @@
             "code"          : { "type" : "string"                                              },
             "time"          : { "type" : "number"                                              }
         },
+        "foreigns" : {
+            "CREDENTIAL_ID" : { "table" : "credentials" }
+        },
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : false,
@@ -131,6 +134,10 @@
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
             "SESSION_ID"    : { "type" : "number", "name" : "sessionID"                        }
         },
+        "foreigns" : {
+            "CREDENTIAL_ID" : { "table" : "credentials"  },
+            "SESSION_ID"    : { "table" : "log_sessions" }
+        },
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : false,
@@ -184,6 +191,9 @@
                     "email"     : { "type" : "string"  }
                 }
             }
+        },
+        "foreigns" : {
+            "SESSION_ID" : { "table" : "log_sessions" }
         },
         "hasTimestamps" : false,
         "canCreate"     : false,
