@@ -783,8 +783,8 @@ class Database {
      */
     public function updatePrimary(string $table, array $primary): string {
         $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName DROP PRIMARY KEY \n";
-        $sql      .= "ALTER TABLE $tableName ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
+        $sql       = "ALTER TABLE $tableName DROP PRIMARY KEY, ";
+        $sql      .= "ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
         $this->query($sql);
         return $sql;
     }
