@@ -102,6 +102,19 @@ class Schema {
     }
 
     /**
+     * Returns the first line of the given query
+     * @param Query  $query
+     * @param string $expression
+     * @return array
+     */
+    public function getData(Query $query, string $expression): array {
+        $expression  = Strings::replace($expression, "{table}", "{dbPrefix}{$this->structure->table}");
+        $expression .= $query->get(true);
+        $request     = $this->db->query($expression, $query->params);
+        return $request;
+    }
+
+    /**
      * Returns an array of Schemas
      * @param Query   $query     Optional.
      * @param Request $sort      Optional.
