@@ -336,7 +336,7 @@ class MailChimp {
         if (!empty($folderID)) {
             $post["settings"]["folder_id"] = $folderID;
         }
-        $result = self::$api->post("campaigns", $post, 60);
+        $result = self::$api->post("campaigns", $post, 300);
 
         if (self::$api->success()) {
             return $result["id"];
