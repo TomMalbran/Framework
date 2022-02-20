@@ -4,6 +4,7 @@ namespace Framework\Utils;
 use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
+
 use stdClass;
 
 /**
@@ -58,7 +59,6 @@ class JSON {
      * @return string
      */
     public static function toCSV(string $value): string {
-        $content = self::decode($value);
         return Strings::join($value, ", ");
     }
 
@@ -99,11 +99,11 @@ class JSON {
 
     /**
      * Writes a JSON File
-     * @param string          $file
+     * @param string          $path
      * @param string|string[] $contents
      * @return void
      */
-    public static function writeFile(string $file, $contents): void {
+    public static function writeFile(string $path, $contents): void {
         $value = Arrays::toArray($contents);
         file_put_contents($path, self::encode($value, true));
     }

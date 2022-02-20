@@ -2,6 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Utils\Arrays;
+
 use ArrayAccess;
 
 /**
@@ -336,7 +337,7 @@ class Model implements ArrayAccess {
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($key, $value) {
+    public function offsetSet($key, $value): void {
         $this->set($key, $value);
     }
 
@@ -345,7 +346,7 @@ class Model implements ArrayAccess {
      * @param mixed $key
      * @return boolean
      */
-    public function offsetExists($key) {
+    public function offsetExists($key): bool {
         return array_key_exists($key, $this->data);
     }
 
@@ -354,7 +355,7 @@ class Model implements ArrayAccess {
      * @param mixed $key
      * @return void
      */
-    public function offsetUnset($key) {
+    public function offsetUnset($key): void {
         unset($this->data[$key]);
     }
 }

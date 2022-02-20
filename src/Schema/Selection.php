@@ -149,9 +149,9 @@ class Selection {
     /**
      * Creates a Request Expression
      * @param Query $query
-     * @return array
+     * @return string
      */
-    public function getExpression(Query $query) {
+    public function getExpression(Query $query): string {
         $this->setTableKeys($query);
 
         $mainKey    = $this->structure->table;

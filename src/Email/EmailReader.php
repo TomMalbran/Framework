@@ -4,7 +4,6 @@ namespace Framework\Email;
 use Framework\Framework;
 use Framework\Config\Config;
 use Framework\Config\Settings;
-use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
 use Google\Client;

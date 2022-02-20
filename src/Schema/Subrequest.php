@@ -1,7 +1,9 @@
 <?php
 namespace Framework\Schema;
 
-use Framework\Schema\Field;
+use Framework\Schema\Schema;
+use Framework\Schema\Structure;
+use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 
 /**
@@ -10,7 +12,6 @@ use Framework\Utils\Arrays;
 class Subrequest {
 
     private $schema;
-    private $structure;
 
     private $name     = "";
     private $idKey    = "";
@@ -35,7 +36,6 @@ class Subrequest {
      */
     public function __construct(Schema $schema, Structure $structure, array $data) {
         $this->schema    = $schema;
-        $this->structure = $structure;
 
         $this->name      = $data["name"];
         $this->idKey     = !empty($data["idKey"])   ? $data["idKey"]   : $structure->idKey;

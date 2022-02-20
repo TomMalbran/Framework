@@ -161,7 +161,7 @@ class Framework {
      * @param mixed  $contents
      * @return void
      */
-    public function saveData(string $file, $contents): void {
+    public static function saveData(string $file, $contents): void {
         $path = self::getPath(self::DataDir, "$file.json");
         JSON::writeFile($path, $contents);
     }

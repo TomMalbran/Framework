@@ -16,7 +16,6 @@ class Image {
     // The Image Types and Functions
     private static $imageTypes = [ 1, 2, 3, 15, 16 ];
     private static $transTypes = [ 1, 3 ];
-    private static $exifTypes  = [ 2 ];
     private static $imageData  = [
         1  => [ "imagecreatefromgif",  "imagegif",  "image/gif",  "gif" ],
         2  => [ "imagecreatefromjpeg", "imagejpeg", "image/jpeg", "jpg" ],

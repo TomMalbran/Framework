@@ -3,13 +3,11 @@ namespace Framework\File;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Config\Config;
 use Framework\File\Path;
 use Framework\File\File;
 use Framework\File\Image;
 use Framework\File\FileType;
 use Framework\Schema\Query;
-use Framework\Schema\Database;
 
 /**
  * The Media Utils

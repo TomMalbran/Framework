@@ -1,7 +1,6 @@
 <?php
 namespace Framework\File;
 
-use Framework\File\Image;
 use Framework\File\FileType;
 
 /**

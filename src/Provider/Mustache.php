@@ -8,7 +8,6 @@ use Framework\Utils\Strings;
 use Mustache_Autoloader;
 use Mustache_Engine;
 use Mustache_Loader_FilesystemLoader;
-use Mustache_Exception_UnknownTemplateException;
 
 /**
  * The Mustache Provider

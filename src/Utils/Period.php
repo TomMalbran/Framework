@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
-use Framework\Utils\Utils;
 
 /**
  * The Period Types used by the System
@@ -199,6 +199,6 @@ class Period {
      * @return object[]
      */
     public static function getSelect(): array {
-        return Utils::createSelectFromMap(self::$Names);
+        return Arrays::createSelectFromMap(self::$Names);
     }
 }

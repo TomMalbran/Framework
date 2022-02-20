@@ -59,7 +59,7 @@ class KeyChain {
      * @return void
      */
     public static function save($data): void {
-        Framework::saveData(Framework::Key, $data);
+        Framework::saveData(Framework::KeyData, $data);
         self::$data = $data;
     }
 }

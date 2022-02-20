@@ -4,7 +4,7 @@ namespace Framework\Schema;
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
+
 use mysqli;
 
 /**
@@ -830,7 +830,7 @@ class Database {
             $fp,
             "# ========================================================= $crlf" .
             "# $crlf" .
-            "# Database dump of tables in `{$this->getName()}` $crlf" .
+            "# Database dump of tables in `{$this->database}` $crlf" .
             "# " . date("d M Y, H:i:s") . $crlf .
             "# $crlf" .
             "# ========================================================= $crlf" .

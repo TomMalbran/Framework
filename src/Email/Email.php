@@ -3,8 +3,6 @@ namespace Framework\Email;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Auth\Access;
-use Framework\Auth\Credential;
 use Framework\Config\Config;
 use Framework\Email\WhiteList;
 use Framework\Provider\Mustache;
@@ -190,7 +188,7 @@ class Email {
         $subject = Config::get("name") . ": Database Backup";
         $message = "Backup de la base de datos al dia: " . date("d M Y, H:i:s");
 
-        return self::send($sendTo, null, null, $subject, $message, false, $attachment);
+        return self::send($sendTo, "", "", $subject, $message, false, $attachment);
     }
 
 

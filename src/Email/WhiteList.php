@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Framework;
 use Framework\Request;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;

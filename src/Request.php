@@ -12,6 +12,7 @@ use Framework\Utils\Status;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
+
 use ArrayAccess;
 
 /**
@@ -824,7 +825,7 @@ class Request implements ArrayAccess {
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($key, $value) {
+    public function offsetSet($key, $value): void {
         $this->set($key, $value);
     }
 
@@ -833,7 +834,7 @@ class Request implements ArrayAccess {
      * @param mixed $key
      * @return boolean
      */
-    public function offsetExists($key) {
+    public function offsetExists($key): bool {
         return array_key_exists($key, $this->request);
     }
 
@@ -842,7 +843,7 @@ class Request implements ArrayAccess {
      * @param mixed $key
      * @return void
      */
-    public function offsetUnset($key) {
+    public function offsetUnset($key): void {
         unset($this->request[$key]);
     }
 }

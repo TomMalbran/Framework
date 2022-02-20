@@ -17,8 +17,6 @@ use OneSignal\OneSignal as OneSignalAPI;
  */
 class Notification {
 
-    private $settings;
-
     private static $loaded = false;
     private static $config = null;
     private static $api    = null;

@@ -8,7 +8,6 @@ use Framework\Schema\Schema;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
 
 /**
  * The Errors Log

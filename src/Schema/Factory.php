@@ -2,7 +2,6 @@
 namespace Framework\Schema;
 
 use Framework\Framework;
-use Framework\Config\Config;
 use Framework\Schema\Schema;
 use Framework\Schema\Structure;
 use Framework\Schema\Subrequest;

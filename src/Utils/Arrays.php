@@ -271,7 +271,7 @@ class Arrays {
     /**
      * Sorts an array using the given callback
      * @param array    $array
-     * @param callback $callback Optional.
+     * @param callable $callback Optional.
      * @return array
      */
     public static function sort(array &$array, callable $callback = null): array {
@@ -287,7 +287,7 @@ class Arrays {
      * Sorts the arrays at the given key of the given array using the given callback
      * @param array    $array
      * @param string   $field
-     * @param callback $callback
+     * @param callable $callback
      * @return array
      */
     public static function sortArray(array &$array, string $field, callable $callback): array {

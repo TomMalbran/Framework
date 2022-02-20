@@ -71,12 +71,12 @@ class CSV {
 
     /**
      * Writes a CSV File
-     * @param string   $file
+     * @param string   $path
      * @param string[] $contents
      * @param string   $separator Optional.
      * @return void
      */
-    public static function writeFile(string $file, array $contents, string $separator = ","): void {
+    public static function writeFile(string $path, array $contents, string $separator = ","): void {
         $lines = [];
         foreach ($contents as $row) {
             $lines[] = self::encode($row, $separator);
