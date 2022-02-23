@@ -100,7 +100,7 @@ class DateTime {
         if (empty($time)) {
             return 0;
         }
-        if (!empty($timezone)) {
+        if ($timezone !== null) {
             $timeDiff = (self::$serverDiff - $timezone) * 60;
             return $time - $timeDiff;
         }
