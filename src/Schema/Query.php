@@ -62,15 +62,34 @@ class Query {
 
     /**
      * Adds an expression as an and
-     * @param string $column
-     * @param string $expression
-     * @param mixed  $value
+     * @param string               $column
+     * @param string               $expression
+     * @param string|integer|array $value
      * @return Query
      */
     public function add(string $column, string $expression, $value): Query {
         $prefix = $this->getPrefix();
-        $binds  = is_array($value) ? self::createBinds($value) : "?";
-        $value  = $expression == "LIKE" ? "%$value%" : $value;
+        $binds  = "?";
+
+        switch ($expression) {
+        case "=":
+            if (Arrays::isArray($value)) {
+                $expression = "IN";
+                $binds      = self::createBinds($value);
+            }
+            break;
+        case "IN":
+            if (!Arrays::isArray($value)) {
+                $expression = "=";
+            } else {
+                $binds = self::createBinds($value);
+            }
+            break;
+        case "LIKE":
+            $value = "%$value%";
+            break;
+        default:
+        }
         $values = Arrays::toArray($value);
 
         $this->where    .= "{$prefix} {$column} {$expression} {$binds} ";
