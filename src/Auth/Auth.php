@@ -49,7 +49,7 @@ class Auth {
             return false;
         }
 
-        // Set the new TImezone if required
+        // Set the new Timezone if required
         if (!empty($timezone)) {
             $credentialID = !empty($data->adminID) ? $data->adminID : $data->credentialID;
             Credential::setTimezone($credentialID, $timezone);
@@ -139,8 +139,10 @@ class Auth {
      */
     public static function canLogin(Model $credential): bool {
         return (
-            !$credential->isEmpty() && !$credential->isDeleted &&
-            !empty($credential->password) && Status::isActive($credential->status)
+            !$credential->isEmpty() &&
+            !$credential->isDeleted &&
+            !empty($credential->password) &&
+            Status::isActive($credential->status)
         );
     }
 

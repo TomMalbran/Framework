@@ -423,7 +423,7 @@ class Credential {
      * @param string  $email        Optional.
      * @return boolean
      */
-    public static function reqPassChange(int $credentialID = null, string $email = null): bool {
+    public static function reqPassChange(int $credentialID = 0, string $email = ""): bool {
         if (empty($credentialID) && empty($email)) {
             return false;
         }
