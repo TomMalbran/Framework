@@ -114,7 +114,10 @@ class Email {
         $email->addAddress($to);
         if (!empty($from)) {
             $email->addReplyTo($from, $fromName ?: self::$name);
+        } elseif (!empty(self::$smtp->replyTo)) {
+            $email->addReplyTo(self::$smtp->replyTo, self::$name);
         }
+
         if (!empty($attachment)) {
             $email->AddAttachment($attachment);
         }

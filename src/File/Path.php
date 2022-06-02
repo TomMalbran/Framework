@@ -14,7 +14,6 @@ class Path {
     private static $loaded   = false;
     private static $data     = [];
     private static $basePath = null;
-    private static $baseDir  = null;
 
 
     /**
@@ -26,7 +25,6 @@ class Path {
             self::$loaded   = true;
             self::$data     = Framework::loadData(Framework::PathData);
             self::$basePath = Framework::getFilesPath();
-            self::$baseDir  = Framework::FilesDir;
         }
     }
 
@@ -44,6 +42,20 @@ class Path {
     }
 
 
+
+    /**
+     * Returns the directory used to store the files
+     * @param string $pathKey
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function getDir(string $pathKey, string ...$pathParts): string {
+        $path = self::get($pathKey);
+        if (!empty($path)) {
+            return File::getPath(Framework::FilesDir, $path, ...$pathParts);
+        }
+        return "";
+    }
 
     /**
      * Returns the path used to store the files
@@ -68,7 +80,7 @@ class Path {
     public static function getUrl(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
-            return Config::getUrl(self::$baseDir, $path, ...$pathParts);
+            return Config::getUrl(Framework::FilesDir, $path, ...$pathParts);
         }
         return "";
     }
@@ -106,10 +118,11 @@ class Path {
     /**
      * Creates an url to the files temp directory
      * @param integer $credentialID
+     * @param string  ...$pathParts
      * @return string
      */
-    public static function getTempUrl(int $credentialID): string {
-        return self::getPath(Framework::TempDir, $credentialID) . "/";
+    public static function getTempUrl(int $credentialID, string ...$pathParts): string {
+        return Config::getUrl(Framework::TempDir, $credentialID, ...$pathParts);
     }
 
 

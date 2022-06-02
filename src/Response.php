@@ -147,6 +147,13 @@ class Response {
      * @return Response
      */
     public static function error($error, $data = null): Response {
+        if (is_array($error)) {
+            return new Response([
+                "errors" => $error,
+                "data"   => self::createData($data),
+            ]);
+        }
+
         if ($error instanceof Errors) {
             if ($error->has("global")) {
                 return new Response([
@@ -159,6 +166,7 @@ class Response {
                 "data"   => self::createData($data),
             ]);
         }
+
         return new Response([
             "error" => $error,
             "data"  => self::createData($data),

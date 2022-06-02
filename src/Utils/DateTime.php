@@ -176,6 +176,18 @@ class DateTime {
         return 0;
     }
 
+    /**
+     * Creates a Time, with the given month and year
+     * @param integer $month       Optional.
+     * @param integer $year        Optional.
+     * @param boolean $useTimezone Optional.
+     * @return integer
+     */
+    public static function fromMonthYear(int $month = null, int $year = null, bool $useTimezone = false): int {
+        $time = mktime(0, 0, 0, !empty($month) ? $month : date("n"), 1, !empty($year) ? $year : date("Y"));
+        return self::toTime($time, $useTimezone);
+    }
+
 
 
     /**
@@ -294,7 +306,7 @@ class DateTime {
      */
     public static function isToday($time, int $timezone = null): bool {
         $seconds = self::toTimezone($time, $timezone);
-        return date("d-m-Y", $time) == date("d-m-Y");
+        return date("d-m-Y", $seconds) == date("d-m-Y");
     }
 
     /**
@@ -454,6 +466,19 @@ class DateTime {
     public static function getMonthStart(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
         $result = mktime(0, 0, 0, date("n", $time) + $monthDiff, 1, date("Y", $time));
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
+     * Add the given months to the given time
+     * @param integer $time        Optional.
+     * @param integer $monthDiff   Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function addMonths(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false) {
+        $time   = empty($time) ? time() : $time;
+        $result = mktime(0, 0, 0, date("n", $time) + $monthDiff, date("j", $time), date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
 

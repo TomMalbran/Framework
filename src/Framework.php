@@ -139,20 +139,22 @@ class Framework {
      * @param string  $dir
      * @param string  $file
      * @param boolean $forFramework Optional.
-     * @return array
+     * @param boolean $asArray      Optional.
+     * @return array|object
      */
-    public static function loadJSON(string $dir, string $file, bool $forFramework = false): array {
+    public static function loadJSON(string $dir, string $file, bool $forFramework = false, bool $asArray = true) {
         $path = self::getPath($dir, "$file.json", $forFramework);
-        return JSON::readFile($path, true);
+        return JSON::readFile($path, $asArray);
     }
 
     /**
      * Loads a Data File
-     * @param string $file
-     * @return array
+     * @param string  $file
+     * @param boolean $asArray Optional.
+     * @return array|object
      */
-    public static function loadData(string $file): array {
-        return self::loadJSON(self::DataDir, $file);
+    public static function loadData(string $file, bool $asArray = true) {
+        return self::loadJSON(self::DataDir, $file, false, $asArray);
     }
 
     /**

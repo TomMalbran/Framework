@@ -144,7 +144,13 @@ class Access {
         if (Strings::startsWith($function, "is")) {
             $accessName  = Strings::stripStart($function, "is");
             $accessLevel = self::getOne($accessName);
-            return $level == $accessLevel;
+            if (!empty($accessLevel)) {
+                return $level == $accessLevel;
+            }
+
+            $groupName = Strings::stripStart($function, "is");
+            $group     = self::getGroup($groupName);
+            return Arrays::contains($group, $level);
         }
 
         // Function "xxxs": Get the group xxx
