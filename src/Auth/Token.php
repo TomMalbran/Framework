@@ -3,6 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Framework;
 use Framework\Schema\Model;
+use Framework\Utils\Arrays;
 
 /**
  * The Token Data
@@ -43,6 +44,22 @@ class Token {
             }
         }
         return new Model("tokenID");
+    }
+
+    /**
+     * Returns the first Token string or the one with the given ID
+     * @param integer $tokenID Optional.
+     * @return string
+     */
+    public static function getToken(int $tokenID = null): string {
+        self::load();
+        if (empty($tokenID)) {
+            return Arrays::getFirst(self::$data);
+        }
+        if (!empty(self::$data[$tokenID])) {
+            return self::$data[$tokenID];
+        }
+        return "";
     }
 
     /**

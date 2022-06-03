@@ -404,6 +404,59 @@ class Arrays {
 
 
     /**
+     * Returns the first Key of the given array
+     * @param array $array
+     * @return mixed
+     */
+    public static function getFirst(array $array) {
+        return !empty($array) ? $array[array_keys($array)[0]] : null;
+    }
+
+    /**
+     * Returns the first Key of the given array
+     * @param array $array
+     * @return string|integer
+     */
+    public static function getFirstKey(array $array) {
+        return array_keys($array)[0];
+    }
+
+    /**
+     * Returns the index at the given id key with the given is value
+     * @param array  $array
+     * @param string $idKey
+     * @param mixed  $idValue
+     * @return string|integer
+     */
+    public static function findIndex(array $array, string $idKey, $idValue) {
+        foreach ($array as $index => $elem) {
+            if ($elem[$idKey] == $idValue) {
+                return $index;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the Value at the given id with the given key
+     * @param array  $array
+     * @param string $idKey
+     * @param mixed  $idValue
+     * @param string $key     Optional.
+     * @return mixed
+     */
+    public static function findValue(array $array, string $idKey, $idValue, string $key = "") {
+        foreach ($array as $elem) {
+            if ($elem[$idKey] == $idValue) {
+                return $key ? $elem[$key] : $elem;
+            }
+        }
+        return $key ? "" : [];
+    }
+
+
+
+    /**
      * Returns the key adding the prefix or not
      * @param string $key
      * @param string $prefix Optional.
@@ -461,47 +514,5 @@ class Arrays {
             }
         }
         return $default;
-    }
-
-    /**
-     * Returns the first Key of the given array
-     * @param array $array
-     * @return string|integer
-     */
-    public static function getFirstKey(array $array) {
-        return array_keys($array)[0];
-    }
-
-    /**
-     * Returns the index at the given id key with the given is value
-     * @param array  $array
-     * @param string $idKey
-     * @param mixed  $idValue
-     * @return string|integer
-     */
-    public static function findIndex(array $array, string $idKey, $idValue) {
-        foreach ($array as $index => $elem) {
-            if ($elem[$idKey] == $idValue) {
-                return $index;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Returns the Value at the given id with the given key
-     * @param array  $array
-     * @param string $idKey
-     * @param mixed  $idValue
-     * @param string $key     Optional.
-     * @return mixed
-     */
-    public static function findValue(array $array, string $idKey, $idValue, string $key = "") {
-        foreach ($array as $elem) {
-            if ($elem[$idKey] == $idValue) {
-                return $key ? $elem[$key] : $elem;
-            }
-        }
-        return $key ? "" : [];
     }
 }
