@@ -143,7 +143,7 @@ class Structure {
 
         // Set the Masterkey
         if ($reqMasterkey) {
-            $this->masterKey = KeyChain::getOne($schemaKey);
+            $this->masterKey = KeyChain::get($schemaKey);
         }
     }
 
