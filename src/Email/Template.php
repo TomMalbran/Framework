@@ -110,10 +110,15 @@ class Template {
         if (!$db->hasTable("email_templates")) {
             return;
         }
+
         $request  = $db->getAll("email_templates");
         $emails   = Framework::loadData(Framework::EmailData);
         $siteName = Config::get("name");
         $sendAs   = Config::get("smtpEmail");
+
+        if (empty($emails)) {
+            return;
+        }
 
         $adds     = [];
         $deletes  = [];
