@@ -236,6 +236,25 @@ class Credential {
     }
 
     /**
+     * Returns the create times for all the Credentials with the given level
+     * @param integer $fromTime
+     * @param integer $level    Optional.
+     * @return array
+     */
+    public static function getAllCreateTimes(int $fromTime, int $level = 0): array {
+        $query   = Query::create("createdTime", ">=", $fromTime);
+        $query->addIf("level", "=", $level);
+
+        $request = self::getSchema()->getAll($query);
+        $result  = [];
+
+        foreach ($request as $row) {
+            $result[$row["credentialID"]] = $row["createdTime"];
+        }
+        return $result;
+    }
+
+    /**
      * Returns the total amount of Credentials
      * @param Query $query Optional.
      * @return integer
@@ -354,7 +373,7 @@ class Credential {
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
 
-        $request = self::getSchema()->getMap($query);
+        $request = self::getSchema()->getAll($query);
         $result  = [];
 
         foreach ($request as $row) {
@@ -374,7 +393,7 @@ class Credential {
      * @return array
      */
     private static function requestSelect(Query $query = null): array {
-        $request = self::getSchema()->getMap($query);
+        $request = self::getSchema()->getAll($query);
         $result  = [];
 
         foreach ($request as $row) {
@@ -405,11 +424,14 @@ class Credential {
 
     /**
      * Returns true if the given password is correct for the given Credential ID
-     * @param Model  $credential
-     * @param string $password
+     * @param Model|integer $credential
+     * @param string        $password
      * @return boolean
      */
-    public static function isPasswordCorrect(Model $credential, string $password): bool {
+    public static function isPasswordCorrect($credential, string $password): bool {
+        if (!($credential instanceof Model)) {
+            $credential = self::getOne($credential, true);
+        }
         if ($credential->passExpiration > 0 && $credential->passExpiration < time()) {
             return false;
         }
@@ -549,6 +571,18 @@ class Credential {
     }
 
     /**
+     * Sets the Credential Email
+     * @param integer $credentialID
+     * @param string  $email
+     * @return boolean
+     */
+    public static function setEmail(int $credentialID, string $email): bool {
+        return self::getSchema()->edit($credentialID, [
+            "email" => $email,
+        ]);
+    }
+
+    /**
      * Sets the Credential Password
      * @param integer $credentialID
      * @param string  $password
@@ -616,6 +650,18 @@ class Credential {
     public static function setLevel(int $credentialID, int $level): bool {
         return self::getSchema()->edit($credentialID, [
             "level" => $level,
+        ]);
+    }
+
+    /**
+     * Sets the Credential Status
+     * @param integer $credentialID
+     * @param integer $status
+     * @return boolean
+     */
+    public static function setStatus(int $credentialID, int $status): bool {
+        return self::getSchema()->edit($credentialID, [
+            "status" => $status,
         ]);
     }
 
