@@ -17,6 +17,7 @@ class Factory {
     private static $db         = null;
     private static $data       = [];
     private static $structures = [];
+    private static $schemas    = [];
 
 
     /**
@@ -24,19 +25,20 @@ class Factory {
      * @return void
      */
     public static function load(): void {
-        if (!self::$loaded) {
-            $schemas = Framework::loadData(Framework::SchemaData);
-            $frame   = Framework::loadJSON("data", Framework::SchemaData, true);
+        if (self::$loaded) {
+            return;
+        }
+        $schemas = Framework::loadData(Framework::SchemaData);
+        $frame   = Framework::loadJSON("data", Framework::SchemaData, true);
 
-            self::$loaded = true;
-            self::$db     = Framework::getDatabase();
+        self::$loaded = true;
+        self::$db     = Framework::getDatabase();
 
-            foreach ($schemas as $key => $data) {
-                if (!empty($frame[$key])) {
-                    self::$data[$key] = Arrays::extend($frame[$key], $data);
-                } else {
-                    self::$data[$key] = $data;
-                }
+        foreach ($schemas as $key => $data) {
+            if (!empty($frame[$key])) {
+                self::$data[$key] = Arrays::extend($frame[$key], $data);
+            } else {
+                self::$data[$key] = $data;
             }
         }
     }
@@ -53,9 +55,13 @@ class Factory {
         if (empty(self::$data[$key])) {
             return null;
         }
+        if (!empty(self::$schemas[$key])) {
+            return self::$schemas[$key];
+        }
         $structure  = self::getStructure($key);
         $subrequest = self::getSubrequest($key);
-        return new Schema(self::$db, $structure, $subrequest);
+        self::$schemas[$key] = new Schema(self::$db, $structure, $subrequest);
+        return self::$schemas[$key];
     }
 
     /**
