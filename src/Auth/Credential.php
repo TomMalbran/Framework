@@ -349,7 +349,7 @@ class Credential {
      * @return array
      */
     public static function search(string $text, int $amount = 10, $level = null, $credentialID = null, bool $splitText = true): array {
-        $query = Query::createSearch([ "firstName", "lastName", "nickName", "email" ], $text, "LIKE", true, $splitText);
+        $query = Query::createSearch([ "firstName", "lastName", "email" ], $text, "LIKE", true, $splitText);
         $query->addIf("level",         "IN", Arrays::toArray($level),        $level !== null);
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
@@ -702,14 +702,10 @@ class Credential {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
-        $nickName  = Arrays::getValue($data, "nickName",     "", $prefix);
         $result    = "";
 
         if (!empty($firstName) && !empty($lastName)) {
             $result = "$firstName $lastName";
-            if ($withNick && !empty($nickName)) {
-                $result .= " ($nickName)";
-            }
         }
         if (empty($result) && !empty($id)) {
             $result = "#$id";

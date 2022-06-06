@@ -7,8 +7,6 @@
             "email"          : { "type" : "string"                                             },
             "firstName"      : { "type" : "string"                                             },
             "lastName"       : { "type" : "string"                                             },
-            "nickName"       : { "type" : "string",                          "noExists" : true },
-            "gender"         : { "type" : "number",  "length" : 1                              },
             "phone"          : { "type" : "string",                          "noExists" : true },
             "dni"            : { "type" : "string"                                             },
             "cuit"           : { "type" : "string"                                             },
