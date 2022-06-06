@@ -92,7 +92,7 @@ class Router {
     public static function getInstance(string $route) {
         $data = self::get($route);
         if ($data->access != null) {
-            return Container::bind(self::$namespace . $data->module);
+            return Container::create(self::$namespace . $data->module);
         }
         return null;
     }
@@ -108,7 +108,7 @@ class Router {
     public static function call(string $route, array $params = null) {
         $data = self::get($route);
         if ($data->access != null) {
-            $instance = Container::bind(self::$namespace . $data->module);
+            $instance = Container::create(self::$namespace . $data->module);
             $request  = new Request($params);
             return call_user_func_array([ $instance, $data->method ], [ $request ]);
         }

@@ -22,17 +22,6 @@ class Container {
         return self::resolve($key, false, $params);
     }
 
-    /**
-     * Resolves the dependencies and binds a new instance of the class
-     * @param string $key
-     * @param mixed  ...$params
-     * @return object
-     */
-    public static function bind(string $key, ...$params): object {
-        self::$keys = [];
-        return self::resolve($key, true, $params);
-    }
-
 
 
     /**
@@ -42,7 +31,7 @@ class Container {
      * @param array   $params Optional.
      * @return object
      */
-    public static function resolve(string $key, bool $save = false, array $params = []): object {
+    private static function resolve(string $key, bool $save = false, array $params = []): object {
         // If there are too many keys, we are probably in a loop
         self::$keys[] = $key;
         if (count(self::$keys) > 1000) {
