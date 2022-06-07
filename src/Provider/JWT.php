@@ -4,6 +4,7 @@ namespace Framework\Provider;
 use Framework\Config\Config;
 
 use Firebase\JWT\JWT as FirebaseJWT;
+use Firebase\JWT\Key;
 use Exception;
 use stdClass;
 
@@ -13,10 +14,10 @@ use stdClass;
 class JWT {
 
     private static $loaded    = false;
-    private static $encrypt   = [ "HS256" ];
+    private static $algorithm = "HS256";
     private static $secretKey = "";
-    private static $longTerm  = 10 * 365 * 24;
-    private static $shortTerm = 2;
+    private static $longTerm  = 10 * 365 * 24 * 3600;
+    private static $shortTerm = 30 * 60;
 
 
     /**
@@ -43,14 +44,14 @@ class JWT {
      */
     public static function create(int $time, array $data, bool $forLongTerm = false): string {
         self::load();
-        $length = ($forLongTerm ? self::$longTerm : self::$shortTerm) * 3600;
+        $length = $forLongTerm ? self::$longTerm : self::$shortTerm;
         $token  = [
             "iat"  => $time,            // Issued at: time when the token was generated
             "nbf"  => $time + 10,       // Not before: 10 seconds
             "exp"  => $time + $length,  // Expire: In x hour
             "data" => $data,
         ];
-        return FirebaseJWT::encode($token, self::$secretKey);
+        return FirebaseJWT::encode($token, self::$secretKey, self::$algorithm);
     }
 
     /**
@@ -64,7 +65,7 @@ class JWT {
             return false;
         }
         try {
-            $decode = FirebaseJWT::decode($token, self::$secretKey, self::$encrypt);
+            FirebaseJWT::decode($token, new Key(self::$secretKey, self::$algorithm));
         } catch (Exception $e) {
             return false;
         }
@@ -79,7 +80,7 @@ class JWT {
     public static function getData(string $token): object {
         self::load();
         try {
-            $decode = FirebaseJWT::decode($token, self::$secretKey, self::$encrypt);
+            $decode = FirebaseJWT::decode($token, new Key(self::$secretKey, self::$algorithm));
         } catch (Exception $e) {
             return new stdClass();
         }
