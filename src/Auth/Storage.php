@@ -17,7 +17,7 @@ class Storage {
 
 
     /**
-     * Creates a new SessionStorage instance
+     * Creates a new Storage instance
      * @param string $bucket
      */
     public function __construct(string $bucket) {
@@ -27,6 +27,7 @@ class Storage {
         $query = Query::create("bucket", "=", $bucket);
         $query->add("CREDENTIAL_ID", "=", Auth::getID());
         $data  = $this->schema->getValue($query, "data");
+
         if (!empty($data)) {
             $this->data = JSON::decode($data);
             $this->schema->edit($query, [

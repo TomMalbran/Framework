@@ -48,9 +48,9 @@ class Factory {
     /**
      * Gets the Schema
      * @param string $key
-     * @return Schema
+     * @return Schema|null
      */
-    public static function getSchema(string $key): Schema {
+    public static function getSchema(string $key) {
         self::load();
         if (empty(self::$data[$key])) {
             return null;
