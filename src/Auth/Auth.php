@@ -6,6 +6,7 @@ use Framework\Auth\Credential;
 use Framework\Auth\Token;
 use Framework\Auth\Reset;
 use Framework\Auth\Spam;
+use Framework\Auth\Storage;
 use Framework\Config\Config;
 use Framework\File\Path;
 use Framework\File\File;
@@ -38,6 +39,8 @@ class Auth {
      */
     public static function validateCredential(string $token, int $timezone = null): bool {
         Reset::deleteOld();
+        Storage::deleteOld();
+
         if (!JWT::isValid($token)) {
             return false;
         }
@@ -354,6 +357,15 @@ class Auth {
     }
 
 
+
+    /**
+     * Returns true if the password is correct for the current auth
+     * @param string $password
+     * @return boolean
+     */
+    public static function isPasswordCorrect(string $password): bool {
+        return Credential::isPasswordCorrect(self::$credentialID, $password);
+    }
 
     /**
      * Returns true if the user has that level
