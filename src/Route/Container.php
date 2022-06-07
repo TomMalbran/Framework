@@ -22,6 +22,17 @@ class Container {
         return self::resolve($key, false, $params);
     }
 
+    /**
+     * Resolves the dependencies and binds a new instance of the class
+     * @param string $key
+     * @param mixed  ...$params
+     * @return object
+     */
+    public static function bind(string $key, ...$params): object {
+        self::$keys = [];
+        return self::resolve($key, true, $params);
+    }
+
 
 
     /**

@@ -94,7 +94,7 @@ class Router {
             return call_user_func_array(self::Namespace . "{$data->module}::{$data->method}", [ $request ]);
         }
 
-        $instance = Container::create(self::Controller . $data->module);
+        $instance = Container::bind(self::Controller . $data->module);
         return call_user_func_array([ $instance, $data->method ], [ $request ]);
     }
 }
