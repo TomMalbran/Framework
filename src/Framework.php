@@ -1,8 +1,8 @@
 <?php
 namespace Framework;
 
-use Framework\Router;
 use Framework\Response;
+use Framework\Route\Router;
 use Framework\Auth\Auth;
 use Framework\Config\Config;
 use Framework\Config\Settings;
@@ -46,9 +46,6 @@ class Framework {
     const TempDir       = "temp";
 
     const NLSDir        = "nls";
-
-    // Config
-    const Namespace     = "App\\Controller\\";
 
     // Variables
     private static $framePath;

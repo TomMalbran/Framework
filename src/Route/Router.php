@@ -1,9 +1,9 @@
 <?php
-namespace Framework;
+namespace Framework\Route;
 
 use Framework\Framework;
-use Framework\Container;
 use Framework\Request;
+use Framework\Route\Container;
 use Framework\Auth\Access;
 use Framework\Utils\Strings;
 
@@ -12,9 +12,11 @@ use Framework\Utils\Strings;
  */
 class Router {
 
-    private static $loaded    = false;
-    private static $namespace = "";
-    private static $data      = [];
+    const Namespace  = "App\\";
+    const Controller = "App\\Controller\\";
+
+    private static $loaded = false;
+    private static $data   = [];
 
 
     /**
@@ -23,9 +25,8 @@ class Router {
      */
     public static function load(): void {
         if (!self::$loaded) {
-            self::$loaded    = true;
-            self::$data      = Framework::loadData(Framework::RouteData);
-            self::$namespace = Framework::Namespace;
+            self::$loaded = true;
+            self::$data   = Framework::loadData(Framework::RouteData);
         }
     }
 
@@ -41,11 +42,13 @@ class Router {
         $method = Strings::substringAfter($route, "/");
         $base   = Strings::stripEnd($route, "/$method");
 
-        $data   = isset(self::$data[$base]) ? self::$data[$base] : null;
-        $module = $data != null ? $data["module"] : null;
-        $access = $data != null && !empty($data["routes"][$method]) ? $data["routes"][$method] : null;
+        $data   = isset(self::$data[$base]) ? self::$data[$base] : [];
+        $static = !empty($data["static"]) ? $data["static"] : false;
+        $module = !empty($data["module"]) ? $data["module"] : null;
+        $access = !empty($data["routes"]) && !empty($data["routes"][$method]) ? $data["routes"][$method] : null;
 
         return (object)[
+            "static" => $static,
             "module" => $module,
             "method" => $method,
             "access" => $access,
@@ -62,8 +65,6 @@ class Router {
         return $data->access != null;
     }
 
-
-
     /**
      * Returns the Access Level for the given Route, if it exists
      * @param string $route
@@ -72,29 +73,6 @@ class Router {
     public static function getAccess(string $route): int {
         $data = self::get($route);
         return Access::getOne($data->access);
-    }
-
-    /**
-     * Returns the Method for the given Route, if it exists
-     * @param string $route
-     * @return string
-     */
-    public static function getMethod(string $route): string {
-        $data = self::get($route);
-        return $data->method;
-    }
-
-    /**
-     * Returns the Instance for the given Route, if it exists
-     * @param string $route
-     * @return object|null
-     */
-    public static function getInstance(string $route) {
-        $data = self::get($route);
-        if ($data->access != null) {
-            return Container::create(self::$namespace . $data->module);
-        }
-        return null;
     }
 
 
@@ -107,11 +85,16 @@ class Router {
      */
     public static function call(string $route, array $params = null) {
         $data = self::get($route);
-        if ($data->access != null) {
-            $instance = Container::create(self::$namespace . $data->module);
-            $request  = new Request($params);
-            return call_user_func_array([ $instance, $data->method ], [ $request ]);
+        if ($data->access == null) {
+            return null;
         }
-        return null;
+
+        $request = new Request($params);
+        if ($data->static) {
+            return call_user_func_array(self::Namespace . "{$data->module}::{$data->method}", [ $request ]);
+        }
+
+        $instance = Container::create(self::Controller . $data->module);
+        return call_user_func_array([ $instance, $data->method ], [ $request ]);
     }
 }
