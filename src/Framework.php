@@ -13,6 +13,7 @@ use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Utils\JSON;
+use Exception;
 
 /**
  * The FrameWork Service
@@ -68,6 +69,38 @@ class Framework {
 
         if ($logErrors) {
             ErrorLog::init();
+        }
+    }
+
+    /**
+     * Executes the Framework
+     * @return void
+     */
+    public static function execute() {
+        $request = self::getRequest();
+
+        // The Route is required
+        if (empty($request->route)) {
+            return;
+        }
+
+        // Validate the API
+        if (!empty($request->token)) {
+            Auth::validateAPI($request->token);
+
+        // Validate the Credential
+        } elseif (!empty($request->jwt)) {
+            Auth::validateCredential($request->jwt, $request->timezone);
+        }
+
+        // Perform the Request
+        try {
+            header("Content-Type:application/json;charset=utf-8");
+            $response = self::request($request->route, $request->params);
+            $response->print();
+        } catch (Exception $e) {
+            http_response_code(400);
+            die($e->getMessage());
         }
     }
 
