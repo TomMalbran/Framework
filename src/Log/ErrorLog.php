@@ -14,8 +14,6 @@ use Framework\Utils\Strings;
  */
 class ErrorLog {
 
-    private static $loaded    = false;
-    private static $schema    = null;
     private static $framePath = "";
     private static $basePath  = "";
     private static $maxLog    = 1000;
@@ -35,12 +33,8 @@ class ErrorLog {
      * Loads the Error Schema
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("logErrors");
-        }
-        return self::$schema;
+    public static function schema(): Schema {
+        return Factory::getSchema("logErrors");
     }
 
 
@@ -51,7 +45,7 @@ class ErrorLog {
      * @return Model
      */
     public static function getOne(int $logID): Model {
-        return self::getSchema()->getOne($logID);
+        return self::schema()->getOne($logID);
     }
 
     /**
@@ -60,7 +54,7 @@ class ErrorLog {
      * @return boolean
      */
     public static function exists(int $logID): bool {
-        return self::getSchema()->exists($logID);
+        return self::schema()->exists($logID);
     }
 
 
@@ -84,7 +78,7 @@ class ErrorLog {
      */
     public static function filter(Request $request): array {
         $query = self::getFilterQuery($request);
-        return self::getSchema()->getAll($query, $request);
+        return self::schema()->getAll($query, $request);
     }
 
     /**
@@ -94,7 +88,7 @@ class ErrorLog {
      */
     public static function getTotal(Request $request): int {
         $query = self::getFilterQuery($request);
-        return self::getSchema()->getTotal($query);
+        return self::schema()->getTotal($query);
     }
 
     /**
@@ -103,7 +97,7 @@ class ErrorLog {
      * @return boolean
      */
     public static function markResolved(int $logID): bool {
-        $schema = self::getSchema();
+        $schema = self::schema();
         if ($schema->exists($logID)) {
             $schema->edit($logID, [
                 "isResolved" => 1,
@@ -125,7 +119,7 @@ class ErrorLog {
      */
     public static function handler(int $code, string $description, string $file = "", int $line = 0): bool {
         [ $error, $level ] = self::mapErrorCode($code);
-        $schema      = self::getSchema();
+        $schema      = self::schema();
         $description = Strings::replace($description, [ "'", "`" ], "");
 
         if (Strings::contains($file, self::$framePath)) {

@@ -20,20 +20,12 @@ use Framework\Utils\Utils;
  */
 class Credential {
 
-    private static $loaded = false;
-    private static $schema = null;
-
-
     /**
      * Loads the Credential Schema
      * @return Schema
      */
-    private static function getSchema(): Schema {
-        if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("credentials");
-        }
-        return self::$schema;
+    private static function schema(): Schema {
+        return Factory::getSchema("credentials");
     }
 
     /**
@@ -90,7 +82,7 @@ class Credential {
      * @return boolean
      */
     public static function exists(int $crendentialID): bool {
-        return self::getSchema()->exists($crendentialID);
+        return self::schema()->exists($crendentialID);
     }
 
     /**
@@ -107,7 +99,7 @@ class Credential {
             return false;
         }
         $query->add("CREDENTIAL_ID", "=", $crendentialID);
-        return self::getSchema()->exists($query);
+        return self::schema()->exists($query);
     }
 
     /**
@@ -119,7 +111,7 @@ class Credential {
     public static function emailExists(string $email, int $skipID = 0): bool {
         $query = Query::create("email", "=", $email);
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
-        return self::getSchema()->exists($query);
+        return self::schema()->exists($query);
     }
 
     /**
@@ -131,7 +123,7 @@ class Credential {
     public static function dniExists(string $dni, int $skipID = 0): bool {
         $query = Query::create("dni", "=", $dni);
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
-        return self::getSchema()->exists($query);
+        return self::schema()->exists($query);
     }
 
     /**
@@ -143,7 +135,7 @@ class Credential {
     public static function cuitExists(string $cuit, int $skipID = 0): bool {
         $query = Query::create("cuit", "=", $cuit);
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
-        return self::getSchema()->exists($query);
+        return self::schema()->exists($query);
     }
 
 
@@ -245,7 +237,7 @@ class Credential {
         $query   = Query::create("createdTime", ">=", $fromTime);
         $query->addIf("level", "=", $level);
 
-        $request = self::getSchema()->getAll($query);
+        $request = self::schema()->getAll($query);
         $result  = [];
 
         foreach ($request as $row) {
@@ -260,7 +252,7 @@ class Credential {
      * @return integer
      */
     public static function getTotal(Query $query = null): int {
-        return self::getSchema()->getTotal($query);
+        return self::schema()->getTotal($query);
     }
 
     /**
@@ -275,7 +267,7 @@ class Credential {
         if (empty($query)) {
             return 0;
         }
-        return self::getSchema()->getTotal($query);
+        return self::schema()->getTotal($query);
     }
 
     /**
@@ -286,7 +278,7 @@ class Credential {
      * @return array
      */
     private static function request(Query $query = null, bool $complete = false, Request $sort = null): array {
-        $request = self::getSchema()->getAll($query, $sort);
+        $request = self::schema()->getAll($query, $sort);
         $result  = [];
 
         foreach ($request as $row) {
@@ -315,7 +307,7 @@ class Credential {
      */
     private static function requestOne(Query $query = null, bool $complete = false): Model {
         $request = self::request($query, $complete);
-        return self::getSchema()->getModel($request);
+        return self::schema()->getModel($request);
     }
 
 
@@ -373,7 +365,7 @@ class Credential {
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
 
-        $request = self::getSchema()->getAll($query);
+        $request = self::schema()->getAll($query);
         $result  = [];
 
         foreach ($request as $row) {
@@ -393,7 +385,7 @@ class Credential {
      * @return array
      */
     private static function requestSelect(Query $query = null): array {
-        $request = self::getSchema()->getAll($query);
+        $request = self::schema()->getAll($query);
         $result  = [];
 
         foreach ($request as $row) {
@@ -417,7 +409,7 @@ class Credential {
         if (empty($query)) {
             return [];
         }
-        return self::getSchema()->getColumn($query, "email");
+        return self::schema()->getColumn($query, "email");
     }
 
 
@@ -454,7 +446,7 @@ class Credential {
         $query->addIf("CREDENTIAL_ID", "=", $credentialID);
         $query->addIf("email",         "=", $email);
         $query->endOr();
-        return self::getSchema()->getValue($query, "reqPassChange") == 1;
+        return self::schema()->getValue($query, "reqPassChange") == 1;
     }
 
 
@@ -468,7 +460,7 @@ class Credential {
      */
     public static function create(Request $request, int $level, bool $reqPassChange = null): int {
         $fields = self::getFields($request, $level, $reqPassChange);
-        return self::getSchema()->create($request, $fields + [
+        return self::schema()->create($request, $fields + [
             "lastLogin"    => time(),
             "currentLogin" => time(),
         ]);
@@ -485,7 +477,7 @@ class Credential {
      */
     public static function edit(int $credentialID, Request $request, int $level = 0, bool $reqPassChange = null, bool $skipEmpty = false): bool {
         $fields = self::getFields($request, $level, $reqPassChange);
-        return self::getSchema()->edit($credentialID, $request, $fields, 0, $skipEmpty);
+        return self::schema()->edit($credentialID, $request, $fields, 0, $skipEmpty);
     }
 
     /**
@@ -495,7 +487,7 @@ class Credential {
      * @return boolean
      */
     public static function update(int $credentialID, array $fields): bool {
-        return self::getSchema()->edit($credentialID, $fields);
+        return self::schema()->edit($credentialID, $fields);
     }
 
     /**
@@ -504,7 +496,7 @@ class Credential {
      * @return boolean
      */
     public static function delete(int $credentialID): bool {
-        return self::getSchema()->delete($credentialID);
+        return self::schema()->delete($credentialID);
     }
 
     /**
@@ -539,7 +531,7 @@ class Credential {
      * @return boolean
      */
     public static function setCurrentUser(int $credentialID, int $userID): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "currentUser" => $userID,
         ]);
     }
@@ -551,7 +543,7 @@ class Credential {
      * @return boolean
      */
     public static function setTimezone(int $credentialID, int $timezone): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "timezone" => $timezone,
         ]);
     }
@@ -563,8 +555,8 @@ class Credential {
      */
     public static function updateLoginTime(int $credentialID): bool {
         $query   = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $current = self::getSchema()->getValue($query, "currentLogin");
-        return self::getSchema()->edit($credentialID, [
+        $current = self::schema()->getValue($query, "currentLogin");
+        return self::schema()->edit($credentialID, [
             "lastLogin"    => $current,
             "currentLogin" => time(),
         ]);
@@ -577,7 +569,7 @@ class Credential {
      * @return boolean
      */
     public static function setEmail(int $credentialID, string $email): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "email" => $email,
         ]);
     }
@@ -590,7 +582,7 @@ class Credential {
      */
     public static function setPassword(int $credentialID, string $password): array {
         $hash = self::createHash($password);
-        self::getSchema()->edit($credentialID, [
+        self::schema()->edit($credentialID, [
             "password"       => $hash["password"],
             "salt"           => $hash["salt"],
             "passExpiration" => 0,
@@ -606,7 +598,7 @@ class Credential {
      * @return boolean
      */
     public static function setReqPassChange(int $credentialID, bool $require): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "reqPassChange" => $require ? 1 : 0,
         ]);
     }
@@ -620,7 +612,7 @@ class Credential {
     public static function setTempPass(int $credentialID, int $hours = 48): string {
         $password = Strings::randomCode(10, "lud");
         $hash     = self::createHash($password);
-        self::getSchema()->edit($credentialID, [
+        self::schema()->edit($credentialID, [
             "password"       => $hash["password"],
             "salt"           => $hash["salt"],
             "passExpiration" => time() + 48 * 3600,
@@ -636,7 +628,7 @@ class Credential {
      * @return boolean
      */
     public static function setAvatar(int $credentialID, string $avatar): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "avatar" => $avatar,
         ]);
     }
@@ -648,7 +640,7 @@ class Credential {
      * @return boolean
      */
     public static function setLevel(int $credentialID, int $level): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "level" => $level,
         ]);
     }
@@ -660,7 +652,7 @@ class Credential {
      * @return boolean
      */
     public static function setStatus(int $credentialID, int $status): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "status" => $status,
         ]);
     }
@@ -672,7 +664,7 @@ class Credential {
      * @return boolean
      */
     public static function setSubscription(int $credentialID, int $subscription): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             "subscription" => $subscription,
         ]);
     }
@@ -685,7 +677,7 @@ class Credential {
      * @return boolean
      */
     public static function setValue(int $credentialID, string $key, $value): bool {
-        return self::getSchema()->edit($credentialID, [
+        return self::schema()->edit($credentialID, [
             $key => $value,
         ]);
     }

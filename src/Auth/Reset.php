@@ -11,20 +11,12 @@ use Framework\Utils\Strings;
  */
 class Reset {
 
-    private static $loaded = false;
-    private static $schema = null;
-
-
     /**
      * Loads the Reset Schema
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("resets");
-        }
-        return self::$schema;
+    public static function schema(): Schema {
+        return Factory::getSchema("resets");
     }
 
 
@@ -36,7 +28,7 @@ class Reset {
      */
     public static function getCredentialID(string $code): int {
         $query = Query::create("code", "=", $code);
-        return self::getSchema()->getValue($query, "CREDENTIAL_ID");
+        return self::schema()->getValue($query, "CREDENTIAL_ID");
     }
 
     /**
@@ -46,7 +38,7 @@ class Reset {
      */
     public static function getEmail(string $code): string {
         $query = Query::create("code", "=", $code);
-        return self::getSchema()->getValue($query, "email");
+        return self::schema()->getValue($query, "email");
     }
 
     /**
@@ -56,7 +48,7 @@ class Reset {
      */
     public static function codeExists(string $code): bool {
         $query = Query::create("code", "=", $code);
-        return self::getSchema()->exists($query);
+        return self::schema()->exists($query);
     }
 
 
@@ -69,7 +61,7 @@ class Reset {
      */
     public static function create(int $credentialID = 0, string $email = ""): string {
         $code = Strings::randomCode(6, "ud");
-        self::getSchema()->replace([
+        self::schema()->replace([
             "CREDENTIAL_ID" => $credentialID,
             "email"         => $email,
             "code"          => $code,
@@ -87,15 +79,18 @@ class Reset {
     public static function delete(int $credentialID = 0, string $email = ""): bool {
         $query = Query::createIf("CREDENTIAL_ID", "=", $credentialID);
         $query->addIf("email", "=", $email);
-        return self::getSchema()->remove($query);
+        return self::schema()->remove($query);
     }
 
     /**
      * Deletes the old reset data for all the Credentials
-     * @return boolean
+     * @return void
      */
-    public static function deleteOld(): bool {
-        $query = Query::create("time", "<", time() - 3 * 3600);
-        return self::getSchema()->remove($query);
+    public static function deleteOld(): void {
+        $schema = self::schema();
+        if (!empty($schema)) {
+            $query = Query::create("time", "<", time() - 3 * 3600);
+            $schema->remove($query);
+        }
     }
 }

@@ -17,20 +17,12 @@ use Framework\Utils\Strings;
  */
 class Template {
 
-    private static $loaded = false;
-    private static $schema = null;
-
-
     /**
      * Loads the Email Templates Schema
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("emailTemplates");
-        }
-        return self::$schema;
+    public static function schema(): Schema {
+        return Factory::getSchema("emailTemplates");
     }
 
 
@@ -42,7 +34,7 @@ class Template {
      */
     public static function getOne(string $templateCode): Model {
         $query = Query::create("templateCode", "=", $templateCode);
-        return self::getSchema()->getOne($query);
+        return self::schema()->getOne($query);
     }
 
     /**
@@ -52,7 +44,7 @@ class Template {
      */
     public static function exists(string $templateCode): bool {
         $query = Query::create("templateCode", "=", $templateCode);
-        return self::getSchema()->exists($query);
+        return self::schema()->exists($query);
     }
 
     /**
@@ -61,7 +53,7 @@ class Template {
      * @return array
      */
     public static function getAll(Request $request): array {
-        return self::getSchema()->getAll(null, $request);
+        return self::schema()->getAll(null, $request);
     }
 
     /**
@@ -69,7 +61,7 @@ class Template {
      * @return integer
      */
     public static function getTotal(): int {
-        return self::getSchema()->getTotal();
+        return self::schema()->getTotal();
     }
 
     /**
@@ -80,7 +72,7 @@ class Template {
      */
     public static function edit(string $templateCode, Request $request): bool {
         $query = Query::create("templateCode", "=", $templateCode);
-        return self::getSchema()->edit($query, $request);
+        return self::schema()->edit($query, $request);
     }
 
 

@@ -12,20 +12,12 @@ use Framework\Schema\Query;
  */
 class WhiteList {
 
-    private static $loaded = false;
-    private static $schema = null;
-
-
     /**
      * Loads the Email WhiteList Schema
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("emailWhiteList");
-        }
-        return self::$schema;
+    public static function schema(): Schema {
+        return Factory::getSchema("emailWhiteList");
     }
 
 
@@ -36,7 +28,7 @@ class WhiteList {
      * @return Model
      */
     public static function getOne(int $emailID): Model {
-        return self::getSchema()->getOne($emailID);
+        return self::schema()->getOne($emailID);
     }
 
     /**
@@ -45,7 +37,7 @@ class WhiteList {
      * @return boolean
      */
     public static function exists(int $emailID): bool {
-        return self::getSchema()->exists($emailID);
+        return self::schema()->exists($emailID);
     }
 
     /**
@@ -55,7 +47,7 @@ class WhiteList {
      */
     public static function emailExists(string $email): bool {
         $query = Query::create("email", "=", $email);
-        return self::getSchema()->exists($query);
+        return self::schema()->exists($query);
     }
 
 
@@ -66,7 +58,7 @@ class WhiteList {
      * @return array
      */
     public static function getAll(Request $request): array {
-        return self::getSchema()->getAll(null, $request);
+        return self::schema()->getAll(null, $request);
     }
 
     /**
@@ -74,7 +66,7 @@ class WhiteList {
      * @return integer
      */
     public static function getTotal(): int {
-        return self::getSchema()->getTotal();
+        return self::schema()->getTotal();
     }
 
 
@@ -85,7 +77,7 @@ class WhiteList {
      * @return boolean
      */
     public static function add(Request $request): bool {
-        return self::getSchema()->create($request);
+        return self::schema()->create($request);
     }
 
     /**
@@ -95,7 +87,7 @@ class WhiteList {
      * @return boolean
      */
     public static function edit(int $emailID, Request $request): bool {
-        return self::getSchema()->edit($emailID, $request);
+        return self::schema()->edit($emailID, $request);
     }
 
     /**
@@ -104,6 +96,6 @@ class WhiteList {
      * @return boolean
      */
     public static function remove(int $emailID): bool {
-        return self::getSchema()->remove($emailID);
+        return self::schema()->remove($emailID);
     }
 }

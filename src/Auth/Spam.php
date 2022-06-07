@@ -11,20 +11,12 @@ use Framework\Utils\Server;
  */
 class Spam {
 
-    private static $loaded = false;
-    private static $schema = null;
-
-
     /**
      * Loads the Spam Schema
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("spam");
-        }
-        return self::$schema;
+    public static function schema(): Schema {
+        return Factory::getSchema("spam");
     }
 
 
@@ -34,7 +26,7 @@ class Spam {
      * @return boolean
      */
     public static function protect(): bool {
-        $schema = self::getSchema();
+        $schema = self::schema();
         $ip     = Server::getIP();
 
         // Delete old entries
@@ -60,6 +52,6 @@ class Spam {
      */
     public static function reset(): void {
         $ip = Server::getIP();
-        self::getSchema()->remove(Query::create("ip", "=", $ip));
+        self::schema()->remove(Query::create("ip", "=", $ip));
     }
 }

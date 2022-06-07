@@ -15,20 +15,12 @@ use Framework\Utils\JSON;
  */
 class Queue {
 
-    private static $loaded = false;
-    private static $schema = null;
-
-
     /**
      * Loads the Email Queue Schema
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        if (!self::$loaded) {
-            self::$loaded = false;
-            self::$schema = Factory::getSchema("emailQueue");
-        }
-        return self::$schema;
+    public static function schema(): Schema {
+        return Factory::getSchema("emailQueue");
     }
 
 
@@ -39,7 +31,7 @@ class Queue {
      * @return Model
      */
     public static function getOne(int $emailID): Model {
-        return self::getSchema()->getOne($emailID);
+        return self::schema()->getOne($emailID);
     }
 
     /**
@@ -48,7 +40,7 @@ class Queue {
      * @return boolean
      */
     public static function exists(int $emailID): bool {
-        return self::getSchema()->exists($emailID);
+        return self::schema()->exists($emailID);
     }
 
 
@@ -72,7 +64,7 @@ class Queue {
      */
     public static function getAll(Request $request): array {
         $query = self::getFilterQuery($request);
-        return self::getSchema()->getAll($query, $request);
+        return self::schema()->getAll($query, $request);
     }
 
     /**
@@ -81,7 +73,7 @@ class Queue {
      */
     public static function getAllUnsent(): array {
         $query = Query::create("sentTime", "=", 0);
-        return self::getSchema()->getAll($query);
+        return self::schema()->getAll($query);
     }
 
     /**
@@ -91,7 +83,7 @@ class Queue {
      */
     public static function getTotal(Request $request): int {
         $query = self::getFilterQuery($request);
-        return self::getSchema()->getTotal($query);
+        return self::schema()->getTotal($query);
     }
 
 
@@ -113,7 +105,7 @@ class Queue {
         if (empty($sendTo)) {
             return false;
         }
-        $emailID = self::getSchema()->create([
+        $emailID = self::schema()->create([
             "templateCode" => $template->id,
             "sendTo"       => JSON::encode($sendTo),
             "sendAs"       => $template->sendAs   ?: "",
@@ -156,7 +148,7 @@ class Queue {
                 $success = Email::sendHTML($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
             }
         }
-        return self::getSchema()->edit($email["emailID"], [
+        return self::schema()->edit($email["emailID"], [
             "sentSuccess" => $success ? 1 : 0,
             "sentTime"    => time(),
         ]);
