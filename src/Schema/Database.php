@@ -77,6 +77,14 @@ class Database {
         $this->mysqli->close();
     }
 
+    /**
+     * Returns the connection
+     * @return mixed
+     */
+    public function get() {
+        return $this->mysqli;
+    }
+
 
 
     /**
