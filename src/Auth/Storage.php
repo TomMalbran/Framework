@@ -29,7 +29,7 @@ class Storage {
         $data  = $this->schema->getValue($query, "data");
 
         if (!empty($data)) {
-            $this->data = JSON::decode($data);
+            $this->data = JSON::decode($data, true);
             $this->schema->edit($query, [
                 "time" => time(),
             ]);
