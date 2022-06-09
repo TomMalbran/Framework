@@ -49,10 +49,10 @@ class Template {
 
     /**
      * Returns all the Email Templates
-     * @param Request $request
+     * @param Request $request Optional.
      * @return array
      */
-    public static function getAll(Request $request): array {
+    public static function getAll(Request $request = null): array {
         return self::schema()->getAll(null, $request);
     }
 
@@ -84,7 +84,10 @@ class Template {
      * @return string
      */
     public static function render(string $message, array $data = []): string {
-        $result = Mustache::render(Strings::toHtml($message), $data);
+        $html   = !Strings::contains($message, "</p>\n\n<p>") ? Strings::toHtml($message) : $message;
+        $result = Mustache::render($html, $data);
+
+        $result = Strings::replace($result, "<p></p>", "");
         while (Strings::contains($result, "<br><br><br>")) {
             $result = Strings::replace($result, "<br><br><br>", "<br><br>");
         }
@@ -135,7 +138,8 @@ class Template {
                 $adds[]    = [
                     "templateCode" => $templateCode,
                     "description"  => $data["description"],
-                    "sendAs"       => $sendAs,
+                    "type"         => !empty($data["type"]) ? $data["type"] : "",
+                    "sendAs"       => !empty($data["sendAs"]) ? $data["sendAs"] : $sendAs,
                     "sendName"     => $siteName,
                     "sendTo"       => !empty($data["sendTo"]) ? "\"{$data["sendTo"]}\"" : "",
                     "subject"      => ($sandbox ? "PRUEBA - " : "") . Strings::replace($data["subject"], "[site]", $siteName),
