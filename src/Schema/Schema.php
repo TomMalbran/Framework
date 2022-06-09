@@ -77,6 +77,17 @@ class Schema {
     }
 
     /**
+     * Selects the given column from a single table and returns a single value
+     * @param Query|integer $query
+     * @param string        $column
+     * @return mixed
+     */
+    public function getValue($query, string $column) {
+        $query = $this->generateQueryID($query, false)->limit(1);
+        return $this->db->getValue($this->structure->table, $column, $query);
+    }
+
+    /**
      * Returns true if there is a Schema with the given ID
      * @param Query|integer $query
      * @param boolean       $withDeleted Optional.
@@ -362,16 +373,6 @@ class Schema {
             return (int)$request[0]["position"] + 1;
         }
         return 1;
-    }
-
-    /**
-     * Selects the given column from a single table and returns a single value
-     * @param Query  $query
-     * @param string $column
-     * @return mixed
-     */
-    public function getValue(Query $query, string $column) {
-        return $this->db->getValue($this->structure->table, $column, $query);
     }
 
 
