@@ -101,7 +101,7 @@ class Schema {
 
 
     /**
-     * Returns the first line of the given query
+     * Process the given expression
      * @param string $expression
      * @param array  $params     Optional.
      * @return array
@@ -113,15 +113,14 @@ class Schema {
     }
 
     /**
-     * Returns the first line of the given query
+     * Process the given expression using a Query
      * @param Query  $query
      * @param string $expression
      * @return array
      */
     public function getData(Query $query, string $expression): array {
-        $expression  = Strings::replace($expression, "{table}", "{dbPrefix}{$this->structure->table}");
-        $expression .= $query->get(true);
-        $request     = $this->db->query($expression, $query->params);
+        $expression = Strings::replace($expression, "{table}", "{dbPrefix}{$this->structure->table}");
+        $request    = $this->db->getData($expression, $query);
         return $request;
     }
 

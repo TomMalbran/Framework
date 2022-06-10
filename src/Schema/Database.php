@@ -88,7 +88,7 @@ class Database {
 
 
     /**
-     * Process the given query
+     * Process the given expression
      * @param string $expression
      * @param mixed  $params     Optional.
      * @return array
@@ -97,6 +97,17 @@ class Database {
         $binds     = $params instanceof Query ? $params->params : $params;
         $statement = $this->processQuery($expression, $binds);
         return $this->dynamicBindResults($statement);
+    }
+
+    /**
+     * Process the given expression using a Query
+     * @param string $expression
+     * @param Query  $query
+     * @return array
+     */
+    public function getData(string $expression, Query $query): array {
+        $expression .= $query->get(true);
+        return $this->query($expression, $query->params);
     }
 
     /**
