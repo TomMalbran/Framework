@@ -65,6 +65,19 @@ class File {
     }
 
     /**
+     * Reads the contents of a file
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function read(string ...$pathParts): string {
+        $path = self::getPath(...$pathParts);
+        if (!empty($path) && file_exists($path)) {
+            return file_get_contents($path);
+        }
+        return "";
+    }
+
+    /**
      * Moves a file from one path to another
      * @param string $fromPath
      * @param string $toPath

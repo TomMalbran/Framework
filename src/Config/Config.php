@@ -6,7 +6,6 @@ use Framework\File\File;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
-use Dotenv\Dotenv;
 use stdClass;
 
 /**
@@ -23,36 +22,66 @@ class Config {
      * @return void
      */
     public static function load(): void {
-        if (!self::$loaded) {
-            $path    = Framework::getPath();
-            $data    = Dotenv::createImmutable($path)->load();
-            $replace = [];
+        if (self::$loaded) {
+            return;
+        }
+        $path    = Framework::getPath();
+        $data    = self::loadENV($path, ".env");
+        $replace = [];
 
-            if (Server::isDevHost()) {
-                if (File::exists($path, ".env.dev")) {
-                    $replace = Dotenv::createMutable($path, ".env.dev")->load();
-                }
-            } elseif (Server::isStageHost()) {
-                if (File::exists($path, ".env.stage")) {
-                    $replace = Dotenv::createMutable($path, ".env.stage")->load();
-                }
-            } elseif (!Server::isLocalHost()) {
-                if (File::exists($path, ".env.production")) {
-                    $replace = Dotenv::createMutable($path, ".env.production")->load();
-                }
+        if (Server::isDevHost()) {
+            if (File::exists($path, ".env.dev")) {
+                $replace = self::loadENV($path, ".env.dev");
             }
-
-            self::$loaded = true;
-            self::$data   = array_merge($data, $replace);
-
-            foreach (self::$data as $key => $value) {
-                if ($value === "true") {
-                    self::$data[$key] = true;
-                } elseif ($value === "false") {
-                    self::$data[$key] = false;
-                }
+        } elseif (Server::isStageHost()) {
+            if (File::exists($path, ".env.stage")) {
+                $replace = self::loadENV($path, ".env.stage");
+            }
+        } elseif (!Server::isLocalHost()) {
+            if (File::exists($path, ".env.production")) {
+                $replace = self::loadENV($path, ".env.production");
             }
         }
+
+        self::$loaded = true;
+        self::$data   = array_merge($data, $replace);
+    }
+
+    /**
+     * Parses the Contents of the env files
+     * @param string $path
+     * @param string $fileName
+     * @return array
+     */
+    private static function loadENV(string $path, string $fileName): array {
+        $contents = File::read($path, $fileName);
+        $lines    = Strings::split($contents, "\n");
+        $result   = [];
+
+        foreach ($lines as $line) {
+            if (empty(trim($line))) {
+                continue;
+            }
+            $parts = Strings::split($line, " = ");
+            if (count($parts) != 2) {
+                continue;
+            }
+
+            $key   = trim($parts[0]);
+            $value = trim($parts[1]);
+
+            if ($value === "true") {
+                $value = true;
+            } elseif ($value === "false") {
+                $value = false;
+            } elseif (Strings::startsWith($value, "\"")) {
+                $value = Strings::replace($value, "\"", "");
+            } else {
+                $value = (int)$value;
+            }
+            $result[$key] = $value;
+        }
+        return $result;
     }
 
 
