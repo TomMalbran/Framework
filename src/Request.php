@@ -551,7 +551,8 @@ class Request implements ArrayAccess {
      * @return integer
      */
     public function toInt(string $key, int $decimals): int {
-        return Numbers::toInt($this->get($key), $decimals);
+        $value = (float)$this->get($key);
+        return Numbers::toInt($value, $decimals);
     }
 
     /**
