@@ -6,6 +6,7 @@ use Framework\File\Path;
 use Framework\Utils\JSON;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
 
 /**
  * The Database Field
@@ -24,6 +25,7 @@ class Field {
     const String  = "string";
     const JSON    = "json";
     const CSV     = "csv";
+    const HTML    = "html";
     const Text    = "text";
     const Encrypt = "encrypt";
     const File    = "file";
@@ -152,6 +154,7 @@ class Field {
             break;
         case self::JSON:
         case self::CSV:
+        case self::HTML:
         case self::Text:
             $result = "text NULL";
             break;
@@ -277,6 +280,10 @@ class Field {
             $result[$key]           = $text;
             $result["{$key}Parts"]  = JSON::decode($text, true);
             $result["{$key}Count"]  = Arrays::length($result["{$key}Parts"]);
+            break;
+        case self::HTML:
+            $result[$key]           = $text;
+            $result["{$key}Html"]   = Strings::toHtml($text);
             break;
         case self::Text:
             $result[$key]           = $text;

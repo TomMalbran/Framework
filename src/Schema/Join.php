@@ -33,15 +33,15 @@ class Join {
     public function __construct(string $key, array $data) {
         $this->key       = $key;
         $this->table     = $data["table"];
-        $this->asTable   = !empty($data["asTable"])   ? $data["asTable"]      : null;
-        $this->onTable   = !empty($data["onTable"])   ? $data["onTable"]      : null;
-        $this->leftKey   = !empty($data["leftKey"])   ? $data["leftKey"]      : $key;
-        $this->rightKey  = !empty($data["rightKey"])  ? $data["rightKey"]     : $key;
-        $this->and       = !empty($data["and"])       ? "AND " . $data["and"] : "";
-        $this->andKey    = !empty($data["andKey"])    ? $data["andKey"]       : "";
+        $this->asTable   = !empty($data["asTable"])  ? $data["asTable"]      : null;
+        $this->onTable   = !empty($data["onTable"])  ? $data["onTable"]      : null;
+        $this->leftKey   = !empty($data["leftKey"])  ? $data["leftKey"]      : $key;
+        $this->rightKey  = !empty($data["rightKey"]) ? $data["rightKey"]     : $key;
+        $this->and       = !empty($data["and"])      ? "AND " . $data["and"] : "";
+        $this->andKey    = !empty($data["andKey"])   ? $data["andKey"]       : "";
 
         $this->hasPrefix = !empty($data["prefix"]);
-        $this->prefix    = !empty($data["prefix"])    ? $data["prefix"]       : "";
+        $this->prefix    = !empty($data["prefix"])   ? $data["prefix"]       : "";
 
 
         // Creates the Fields
