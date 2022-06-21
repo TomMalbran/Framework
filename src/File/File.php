@@ -252,7 +252,7 @@ class File {
      * @param string $path
      * @return string
      */
-    public function getFirstFileInDir(string $path): string {
+    public static function getFirstFileInDir(string $path): string {
         $files = self::getFilesInDir($path);
         return !empty($files[0]) ? $path . $files[0] : "";
     }
