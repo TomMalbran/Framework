@@ -32,6 +32,18 @@ class Model implements ArrayAccess {
     }
 
     /**
+     * Creates a Model without an ID
+     * @param array $data Optional.
+     * @return Model
+     */
+    public static function create(array $data = []) {
+        $model = new Model();
+        $model->data  = $data;
+        $model->empty = empty($data);
+        return $model;
+    }
+
+    /**
      * Creates an empty Model
      * @param mixed $idValue Optional.
      * @return Model
