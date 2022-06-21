@@ -159,6 +159,10 @@ class Selection {
         $joins      = Strings::join($this->joins, " ");
         $where      = $query->get();
         $expression = "SELECT $selects FROM {dbPrefix}$mainKey AS $mainKey $joins $where";
+
+        foreach ([ "FROM", "LEFT JOIN", "WHERE", "ORDER BY", "LIMIT" ] as $key) {
+            $expression = Strings::replace($expression, $key, "\n$key");
+        }
         return $expression;
     }
 
