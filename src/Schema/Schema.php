@@ -41,6 +41,14 @@ class Schema {
     }
 
     /**
+     * Returns the Schema Master Key
+     * @return string
+     */
+    public function getMasterKey(): string {
+        return $this->structure->masterKey;
+    }
+
+    /**
      * Encrypts the given Value
      * @param string $value
      * @return array
@@ -52,7 +60,7 @@ class Schema {
 
 
     /**
-     * Returns the Model with the given Where
+     * Returns the Model with the given ID or Query
      * @param Query|integer $query
      * @param boolean       $withDeleted Optional.
      * @param boolean       $decrypted   Optional.
