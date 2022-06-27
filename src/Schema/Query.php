@@ -78,9 +78,22 @@ class Query {
                 $binds      = self::createBinds($value);
             }
             break;
+        case "<>":
+            if (Arrays::isArray($value)) {
+                $expression = "NOT IN";
+                $binds      = self::createBinds($value);
+            }
+            break;
         case "IN":
             if (!Arrays::isArray($value)) {
                 $expression = "=";
+            } else {
+                $binds = self::createBinds($value);
+            }
+            break;
+        case "NOT IN":
+            if (!Arrays::isArray($value)) {
+                $expression = "<>";
             } else {
                 $binds = self::createBinds($value);
             }
