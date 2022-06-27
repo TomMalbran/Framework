@@ -207,19 +207,24 @@ class Model implements ArrayAccess {
     }
 
     /**
-     * Returns all the Data
-     * @param boolean $asObject Optional.
-     * @return mixed
+     * Returns the Data as an Array
+     * @param array $extraData
+     * @return array
      */
-    public function toObject(bool $asObject = false) {
-        if ($asObject) {
-            return Arrays::toObject($this->data);
-        }
-        return $this->data;
+    public function toArray(array $extraData = []): array {
+        return $this->data + $extraData;
     }
 
     /**
-     * Returns all the Data
+     * Returns all the Data as an Object
+     * @return mixed
+     */
+    public function toObject() {
+        return Arrays::toObject($this->data);
+    }
+
+    /**
+     * Returns only the requested Fields
      * @param string ...$fields
      * @return array
      */
@@ -228,24 +233,6 @@ class Model implements ArrayAccess {
         foreach ($fields as $field) {
             $result[$field] = $this->data[$field];
         }
-        return $result;
-    }
-
-    /**
-     * Returns the Data as an Array
-     * @return array
-     */
-    public function toArray(): array {
-        return [ $this->data ];
-    }
-
-    /**
-     * Returns the Data as an Array
-     * @return array
-     */
-    public function toMap(): array {
-        $result = [];
-        $result[$this->idValue] = $this->data;
         return $result;
     }
 
