@@ -115,6 +115,16 @@ class Request implements ArrayAccess {
     }
 
     /**
+     * Returns the request data at the given key or the default
+     * @param string $key
+     * @param float  $default Optional.
+     * @return float
+     */
+    public function getFloat(string $key, float $default = 0): int {
+        return isset($this->request[$key]) ? (float)$this->request[$key] : $default;
+    }
+
+    /**
      * Returns the request data at the given key as a trimmed string or the default
      * @param string $key
      * @param string $default Optional.
