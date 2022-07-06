@@ -66,7 +66,7 @@ class Email {
         string $attachment = ""
     ): bool {
         self::load();
-        if (self::$smtp->sendDisabled || (self::$smtp->useWhiteList && !WhiteList::emailExists($to))) {
+        if (self::$smtp->sendDisabled || (!empty(self::$smtp->useWhiteList) && !WhiteList::emailExists($to))) {
             return false;
         }
 
