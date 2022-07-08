@@ -72,6 +72,16 @@ class Strings {
 
 
     /**
+     * Repeates the given Stirng the given times
+     * @param string  $string
+     * @param integer $times
+     * @return string
+     */
+    public static function repeat(string $string, int $times): string {
+        return str_repeat($string, $times);
+    }
+
+    /**
      * Returns a random String with the given length
      * @param integer $length Optional.
      * @return string

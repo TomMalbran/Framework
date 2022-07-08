@@ -328,7 +328,7 @@ class Arrays {
      * @return array
      */
     public static function createMap(array $array, string $key, $value = null, bool $useEmpty = false): array {
-        $result  = [];
+        $result = [];
         foreach ($array as $row) {
             $result[$row[$key]] = !empty($value) ? self::getValue($row, $value, " - ", "", $useEmpty) : $row;
         }
