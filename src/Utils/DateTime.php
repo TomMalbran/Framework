@@ -483,6 +483,19 @@ class DateTime {
     }
 
     /**
+     * Returns the start of the last x months
+     * @param integer $months
+     * @param integer $time        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getLastXMonths(int $months, int $time = 0, bool $useTimeZone = false): int {
+        $time   = empty($time) ? time() : $time;
+        $result = mktime(0, 0, 0, date("n", $time) - $months, date("j", $time), date("Y", $time));
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
      * Returns the start of the last x days
      * @param integer $days
      * @param integer $time        Optional.
