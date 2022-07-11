@@ -443,6 +443,19 @@ class DateTime {
     }
 
     /**
+     * Add the given Days to the given time
+     * @param integer $time        Optional.
+     * @param integer $dayDiff     Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function addDays(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false) {
+        $time   = empty($time) ? time() : $time;
+        $result = mktime(0, 0, 0, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
      * Returns the time of the start of the week
      * @param integer $time        Optional.
      * @param integer $dayDiff     Optional.
