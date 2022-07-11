@@ -76,6 +76,18 @@ class Enum {
     }
 
     /**
+     * Returns all the Values
+     * @return array
+     */
+    public static function getAll() {
+        $cache = self::load();
+        if ($cache->isConstant) {
+            return $cache->constants;
+        }
+        return array_keys($cache->data);
+    }
+
+    /**
      * Creates a Select for the Enum
      * @return array
      */
@@ -122,8 +134,7 @@ class Enum {
 
         // For ARRAY
         if ($cache->isArray) {
-            // Function "getKey" or "getIndex"
-            // Return the index where the value is equalto the given one
+            // Function "getKey" or "getIndex": Return the index where the value is equalto the given one
             if ($function == "getKey" || $function == "getIndex") {
                 foreach ($cache->data as $index => $name) {
                     if (Strings::isEqual($name, $value)) {
@@ -133,8 +144,7 @@ class Enum {
                 return "";
             }
 
-            // Function "getName" or "getValue"
-            // Return the value of the data at the given index
+            // Function "getName" or "getValue": Return the value of the data at the given index
             if ($function == "getName" || $function == "getValue") {
                 return !empty($cache->data[$value]) ? $cache->data[$value] : "";
             }
@@ -171,8 +181,7 @@ class Enum {
                 return false;
             }
 
-            // Function "fromXxx"
-            // Return the index where the value is the name
+            // Function "fromXxx": Return the index where the value is the name
             if (Strings::startsWith($function, "from")) {
                 $key = Strings::stripStart($function, "from");
                 foreach ($cache->data as $index => $row) {
@@ -183,7 +192,7 @@ class Enum {
                 return 0;
             }
 
-            // Get the value at the given key depending on the function
+            // Function "getXxx": Get the value at the given key depending on the function
             $key = $function;
             if (Strings::startsWith($function, "get")) {
                 $key    = Strings::stripStart($function, "get", "");
