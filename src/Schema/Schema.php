@@ -589,6 +589,20 @@ class Schema {
     }
 
     /**
+     * Edits all the Positions
+     * @param Request $request
+     * @param integer $credentialID Optional.
+     * @return void
+     */
+    public function editPositions(Request $request, int $credentialID = 0): void {
+        foreach ($request->getArray("ids") as $index => $id) {
+            $this->edit($id, [
+                "position" => $index + 1,
+            ], $credentialID);
+        }
+    }
+
+    /**
      * Ensures that the order of the Elements is correct
      * @param Model   $model   Optional.
      * @param Request $request Optional.
