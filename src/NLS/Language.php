@@ -74,7 +74,7 @@ class Language {
      * @return array
      */
     public static function getSelect(): array {
-        $cache = self::load();
+        self::load();
         return Arrays::createSelect(self::$data, "key", "name");
     }
 
