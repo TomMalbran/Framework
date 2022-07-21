@@ -64,6 +64,17 @@ class Credential {
     }
 
     /**
+     * Returns the Credential with the given ID
+     * @param integer $credentialID
+     * @return string
+     */
+    public static function getOneName(int $credentialID): string {
+        $query      = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        $credential = self::requestOne($query);
+        return self::getName($credential);
+    }
+
+    /**
      * Returns the Credential with the given Email
      * @param string  $email
      * @param boolean $complete Optional.
