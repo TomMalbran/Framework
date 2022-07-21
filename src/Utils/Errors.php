@@ -100,6 +100,16 @@ class Errors {
         return $this;
     }
 
+    /**
+     * Merges the other Errors
+     * @param Errors $errors
+     * @return Errors
+     */
+    public function merge(Errors $errors): Errors {
+        $this->errors += $errors->get();
+        return $this;
+    }
+
 
 
     /**
