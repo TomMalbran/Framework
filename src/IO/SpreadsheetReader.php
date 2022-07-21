@@ -10,6 +10,7 @@ use Exception;
 class SpreadsheetReader {
 
     private $sheet;
+    private $columns;
 
 
     /**
@@ -42,6 +43,10 @@ class SpreadsheetReader {
      * @return string
      */
     public function getHighestColumn(): string {
+        if (empty($this->sheet)) {
+            return "";
+        }
+
         $colTotal = $this->sheet->getHighestColumn();
         $colMin   = ord("A");
         $colAmt   = ord($colTotal) - $colMin;
@@ -61,6 +66,10 @@ class SpreadsheetReader {
      * @return integer
      */
     public function getHighestRow(): int {
+        if (empty($this->sheet)) {
+            return 0;
+        }
+
         $colAmt = $this->getHighestColumn();
         $rowAmt = $this->sheet->getHighestRow();
 
@@ -75,13 +84,27 @@ class SpreadsheetReader {
     }
 
     /**
-     * Returns the Row from the given Sheet
+     * Returns the Row from the current Sheet
      * @param integer $row
-     * @param string  $from
-     * @param string  $to
+     * @param string  $from Optional.
+     * @param string  $to   Optional.
      * @return array
      */
-    public function getRow(int $row, string $from, string $to): array {
+    public function getRow(int $row, string $from = "A", string $to = ""): array {
+        if (empty($this->sheet)) {
+            return [];
+        }
+
+        if (empty($to)) {
+            if (empty($this->columns)) {
+                $this->columns = $this->getHighestColumn();
+            }
+            $to = $this->columns;
+        }
+        if (empty($from) || empty($to)) {
+            return [];
+        }
+
         try {
             $row = $this->sheet->rangeToArray("{$from}{$row}:{$to}{$row}", null, true, false);
         } catch (Exception $e) {
