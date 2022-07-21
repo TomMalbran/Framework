@@ -732,11 +732,10 @@ class Credential {
     /**
      * Returns a parsed Name for the given Credential
      * @param Model|array $data
-     * @param string      $prefix   Optional.
-     * @param boolean     $withNick Optional.
+     * @param string      $prefix Optional.
      * @return string
      */
-    public static function getName($data, string $prefix = "", bool $withNick = false): string {
+    public static function getName($data, string $prefix = ""): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
