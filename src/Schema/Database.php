@@ -158,7 +158,7 @@ class Database {
         if (isset($request[0])) {
             return $request[0];
         }
-        return "";
+        return [];
     }
 
     /**
