@@ -27,7 +27,6 @@ class Language {
 
 
 
-
     /**
      * Returns the Language Value from a Language Name
      * @param string $langName
@@ -67,7 +66,7 @@ class Language {
                 return $index;
             }
         }
-        return array_keys(self::$data)[0];
+        return Arrays::getFirstKey(self::$data);
     }
 
     /**

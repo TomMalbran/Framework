@@ -415,10 +415,14 @@ class Arrays {
     /**
      * Returns the first Key of the given array
      * @param array $array
-     * @return string|integer
+     * @return string|integer|null
      */
     public static function getFirstKey(array $array) {
-        return array_keys($array)[0];
+        $keys = array_keys($array);
+        if (!empty($keys)) {
+            return $keys[0];
+        }
+        return null;
     }
 
     /**
