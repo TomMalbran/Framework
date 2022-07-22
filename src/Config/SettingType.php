@@ -30,7 +30,7 @@ class SettingType {
     }
 
     /**
-     * Parses a Settings Value
+     * Parses a Settings Value from the Database
      * @param Model|array $data
      * @return mixed
      */
@@ -42,6 +42,23 @@ class SettingType {
             return JSON::decode($data["value"]);
         default:
             return $data["value"];
+        }
+    }
+
+    /**
+     * Encodes the Settings Value for the Database
+     * @param integer $type
+     * @param mixed   $value
+     * @return mixed
+     */
+    public static function encodeValue($type, $value) {
+        switch ($type) {
+        case self::Binary:
+            return !empty($value) ? 1 : 0;
+        case self::JSON:
+            return JSON::encode($value);
+        default:
+            return $value;
         }
     }
 }

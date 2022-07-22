@@ -123,6 +123,30 @@ class Settings {
 
 
     /**
+     * Sets a Core Preference
+     * @param string  $section
+     * @param string  $variable
+     * @param integer $value
+     * @return void
+     */
+    public static function set(string $section, string $variable, int $value): void {
+        $query = Query::create("section", "=", $section);
+        $query->add("variable", "=", $variable);
+        $model = self::schema()->getOne($query);
+        if ($model->isEmpty()) {
+            return;
+        }
+
+        self::schema()->replace([
+            "section"      => $section,
+            "variable"     => $variable,
+            "value"        => SettingType::encodeValue($model->type, $value),
+            "type"         => $model->type,
+            "modifiedTime" => time(),
+        ]);
+    }
+
+    /**
      * Saves the given Settings if those are already on the DB
      * @param array $data
      * @return void
@@ -132,20 +156,18 @@ class Settings {
         $batch   = [];
 
         foreach ($request as $row) {
-            $variable = $row["section"] . "-" . $row["variable"];
-            if (isset($data[$variable])) {
-                $value = $data[$variable];
-                if ($row["type"] == SettingType::JSON) {
-                    $value = JSON::fromCSV($value);
-                }
-                $batch[] = [
-                    "section"      => $row["section"],
-                    "variable"     => $row["variable"],
-                    "value"        => $value,
-                    "type"         => $row["type"],
-                    "modifiedTime" => time(),
-                ];
+            $variable = "{$row["section"]}-{$row["variable"]}";
+            if (!isset($data[$variable])) {
+                continue;
             }
+
+            $batch[] = [
+                "section"      => $row["section"],
+                "variable"     => $row["variable"],
+                "value"        => SettingType::encodeValue($row["type"], $data[$variable]),
+                "type"         => $row["type"],
+                "modifiedTime" => time(),
+            ];
         }
 
         if (!empty($batch)) {
@@ -266,7 +288,7 @@ class Settings {
                     $fields      = [
                         "section"      => $section,
                         "variable"     => $variable,
-                        "value"        => $type == SettingType::JSON ? JSON::encode($value) : $value,
+                        "value"        => SettingType::encodeValue($type, $value),
                         "type"         => $type,
                         "modifiedTime" => time(),
                     ];
