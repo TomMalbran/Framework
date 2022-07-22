@@ -20,6 +20,7 @@ class Join {
 
     public $fields    = [];
     public $merges    = [];
+    public $defaults  = [];
 
     public $hasPrefix = false;
     public $prefix    = "";
@@ -57,7 +58,7 @@ class Join {
 
         // Creates the Merges
         foreach ($this->fields as $field) {
-            if ($field->hasMerge) {
+            if (!empty($field->mergeTo)) {
                 if (empty($this->merges[$field->mergeTo])) {
                     $this->merges[$field->mergeTo] = (object)[
                         "key"    => $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo,
@@ -66,6 +67,12 @@ class Join {
                     ];
                 }
                 $this->merges[$field->mergeTo]->fields[] = $field->prefixName;
+            }
+            if (!empty($field->defaultTo)) {
+                if (empty($this->defaults[$field->defaultTo])) {
+                    $this->defaults[$field->defaultTo] = [];
+                }
+                $this->defaults[$field->defaultTo][] = $field->prefixName;
             }
         }
     }
@@ -85,6 +92,9 @@ class Join {
         }
         foreach ($this->merges as $merge) {
             $result[$merge->key] = Arrays::getValue($data, $merge->fields, $merge->glue);
+        }
+        foreach ($this->defaults as $key => $fields) {
+            $result[$key] = Arrays::getAnyValue($data, $fields, "");
         }
         return $result;
     }

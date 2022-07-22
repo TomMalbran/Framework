@@ -50,8 +50,8 @@ class Field {
     public $noPrefix   = false;
     public $canEdit    = false;
 
-    public $hasMerge   = false;
     public $mergeTo    = "";
+    public $defaultTo  = "";
 
     public $hasName    = false;
     public $name       = "";
@@ -86,8 +86,8 @@ class Field {
         $this->noPrefix   = !empty($data["noPrefix"]);
         $this->canEdit    = empty($data["cantEdit"]);
 
-        $this->hasMerge   = !empty($data["mergeTo"]);
-        $this->mergeTo    = !empty($data["mergeTo"]) ? $data["mergeTo"] : "";
+        $this->mergeTo    = !empty($data["mergeTo"])   ? $data["mergeTo"]   : "";
+        $this->defaultTo  = !empty($data["defaultTo"]) ? $data["defaultTo"] : "";
 
         $this->hasName    = !empty($data["name"]);
         $this->name       = !empty($data["name"]) ? $data["name"] : $key;
