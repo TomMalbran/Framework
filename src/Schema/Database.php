@@ -40,8 +40,8 @@ class Database {
         $this->username = $config->username;
         $this->password = $config->password;
         $this->database = $config->database;
-        $this->prefix   = $config->prefix;
-        $this->email    = !empty($config->email) ? $config->email : "";
+        $this->prefix   = !empty($config->prefix) ? $config->prefix : "";
+        $this->email    = !empty($config->email)  ? $config->email  : "";
         $this->persist  = $persist;
 
         $this->connect();
