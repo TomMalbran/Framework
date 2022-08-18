@@ -611,22 +611,33 @@ class DateTime {
     /**
      * Returns the Month and Year at the given month
      * @param integer $time
+     * @param integer $length      Optional.
+     * @param boolean $inUpperCase Optional.
      * @return string
      */
-    public static function getMonthYear(int $time): string {
-        return self::getMonth(date("n", $time)) . " " . date("Y", $time);
+    public static function getMonthYear(int $time, int $length = 0, bool $inUpperCase = false): string {
+        return self::getMonth(date("n", $time), $length, $inUpperCase) . " " . date("Y", $time);
     }
 
     /**
      * Returns the Month name at the given month
      * @param integer $month
+     * @param integer $length      Optional.
+     * @param boolean $inUpperCase Optional.
      * @return string
      */
-    public static function getMonth(int $month): string {
+    public static function getMonth(int $month, int $length = 0, bool $inUpperCase = false): string {
+        $result = "";
         if ($month >= 1 && $month <= 12) {
-            return self::$months[$month - 1];
+            $result = self::$months[$month - 1];
         }
-        return "";
+        if ($length > 0) {
+            $result = Strings::substring($result, 0, $length);
+        }
+        if ($inUpperCase) {
+            $result = Strings::toUpperCase($result);
+        }
+        return $result;
     }
 
     /**
@@ -635,8 +646,6 @@ class DateTime {
      * @return string
      */
     public static function getShortMonth(int $month): string {
-        $result = self::getMonth($month);
-        $result = Strings::substring($result, 0, 3);
-        return Strings::toUpperCase($result);
+        return self::getMonth($month, 3, true);
     }
 }
