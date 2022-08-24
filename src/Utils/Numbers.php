@@ -41,12 +41,12 @@ class Numbers {
      * Rounds the given number to the given decimals
      * @param float   $number
      * @param integer $decimals
-     * @return integer
+     * @return float|integer
      */
-    public static function round(float $number, int $decimals): int {
+    public static function round(float $number, int $decimals) {
         if (is_numeric($number)) {
             $padding = pow(10, $decimals);
-            return (int)ceil($number * $padding) / $padding;
+            return round($number * $padding) / $padding;
         }
         return 0;
     }
@@ -167,9 +167,9 @@ class Numbers {
     /**
      * Rounds the given price to 2 decimals
      * @param float $price
-     * @return integer
+     * @return float
      */
-    public static function roundCents(float $price): int {
+    public static function roundCents(float $price): float {
         return self::round($price, 2);
     }
 
