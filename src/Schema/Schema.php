@@ -692,7 +692,7 @@ class Schema {
         $query     = new Query($query);
         $isDeleted = $this->structure->getKey("isDeleted");
 
-        if ($withDeleted && $this->structure->canDelete && !$query->hasColumn($isDeleted)) {
+        if ($withDeleted && $this->structure->canDelete && !$query->hasColumn($isDeleted) && !$query->hasColumn("isDeleted")) {
             $query->add($isDeleted, "=", 0);
         }
         return $query;
