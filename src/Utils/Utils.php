@@ -262,17 +262,6 @@ class Utils {
 
 
     /**
-     * Returns the memory in MB or GB with the units
-     * @param integer $memory
-     * @return string
-     */
-    public static function parseMemory(int $memory): string {
-        return $memory < 1024 ? $memory . " MB" : ($memory / 1024) . " GB";
-    }
-
-
-
-    /**
      * Returns a WhatsApp url
      * @param string $whtasapp
      * @return string

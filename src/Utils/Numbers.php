@@ -231,6 +231,25 @@ class Numbers {
     }
 
     /**
+     * Returns the memory in MB or GB with the units
+     * @param integer $bytes
+     * @param boolean $inGigas Optional.
+     * @return string
+     */
+    public static function toBytesString(int $bytes, bool $inGigas = false): string {
+        $megaBytes = $inGigas ? $bytes * 1024 : $bytes;
+        $teraBytes = floor($megaBytes / (1024 * 1024));
+        if ($teraBytes >= 1) {
+            return "$teraBytes TB";
+        }
+        $gigaBytes = floor($megaBytes / 1024);
+        if ($inGigas || $gigaBytes >= 1) {
+            return "$gigaBytes GB";
+        }
+        return "$megaBytes MB";
+    }
+
+    /**
      * Adds zeros to the start of the number
      * @param mixed   $value
      * @param integer $amount
