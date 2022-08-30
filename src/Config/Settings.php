@@ -55,10 +55,17 @@ class Settings {
      */
     public static function getInt(string $preference): int {
         $result = self::get($preference);
-        if ($result !== null) {
-            return (int)$result;
-        }
-        return 0;
+        return $result !== null ? (int)$result : 0;
+    }
+
+    /**
+     * Returns a single Setting as a Float
+     * @param string $preference
+     * @return float
+     */
+    public static function getFloat(string $preference): float {
+        $result = self::get($preference);
+        return $result !== null ? (float)Strings::replace($result, ",", ".") : 0;
     }
 
 
