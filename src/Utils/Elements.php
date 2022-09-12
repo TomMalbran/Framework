@@ -45,16 +45,16 @@ class Elements {
      * @return boolean
      */
     public function has($elements = null): bool {
-        if ($elements !== null) {
-            $elements = Arrays::toArray($elements);
-            foreach ($elements as $element) {
-                if (!empty($this->elements[$element])) {
-                    return true;
-                }
-            }
-            return false;
+        if ($elements == null) {
+            return !empty($this->elements);
         }
-        return !empty($this->elements);
+        $elements = Arrays::toArray($elements);
+        foreach ($elements as $element) {
+            if (!empty($this->elements[$element])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
