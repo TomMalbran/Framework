@@ -653,6 +653,14 @@ class Query {
     }
 
     /**
+     * Method generates an UUID function call
+     * @return array
+     */
+    public static function guid(): array {
+        return self::func("UUID()");
+    }
+
+    /**
      * Method generates an AES Encrypt function call
      * @param string $value
      * @param string $key
