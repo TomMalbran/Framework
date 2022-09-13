@@ -18,14 +18,15 @@ class Storage {
 
     /**
      * Creates a new Storage instance
-     * @param string $bucket
+     * @param string  $bucket
+     * @param boolean $forAPI Optional.
      */
-    public function __construct(string $bucket) {
+    public function __construct(string $bucket, bool $forAPI = false) {
         $this->schema = Factory::getSchema("storage");
         $this->bucket = $bucket;
 
         $query = Query::create("bucket", "=", $bucket);
-        $query->add("CREDENTIAL_ID", "=", Auth::getID());
+        $query->addIf("CREDENTIAL_ID", "=", Auth::getID(), $forAPI);
         $data  = $this->schema->getValue($query, "data");
 
         if (!empty($data)) {

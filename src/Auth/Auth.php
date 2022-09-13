@@ -356,6 +356,14 @@ class Auth {
         return !empty(self::$credentialID);
     }
 
+    /**
+     * Returns true if there is an API
+     * @return boolean
+     */
+    public static function hasAPI(): bool {
+        return !empty(self::$apiID);
+    }
+
 
 
     /**
