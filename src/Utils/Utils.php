@@ -50,7 +50,7 @@ class Utils {
      * @return boolean
      */
     public static function isValidDomain(string $domain): bool {
-        return Strings::match($domain, '/^([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
+        return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
     }
 
     /**
