@@ -130,13 +130,13 @@ class Settings {
 
 
     /**
-     * Sets a Core Preference
-     * @param string  $section
-     * @param string  $variable
-     * @param integer $value
+     * Sets a single Setting
+     * @param string $section
+     * @param string $variable
+     * @param mixed  $value
      * @return void
      */
-    public static function set(string $section, string $variable, int $value): void {
+    public static function set(string $section, string $variable, $value): void {
         $query = Query::create("section", "=", $section);
         $query->add("variable", "=", $variable);
         $model = self::schema()->getOne($query);
