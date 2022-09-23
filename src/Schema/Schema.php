@@ -642,16 +642,14 @@ class Schema {
             $updatedPosition = $nextPosition - 1;
         }
         if ($newPosition > $oldPosition) {
-            $newQuery = new Query($query);
+            $newQuery = $this->generateQuery($query);
             $newQuery->add("position",  ">",  $oldPosition);
             $newQuery->add("position",  "<=", $newPosition);
-            $newQuery->add("isDeleted", "=",  0);
             $this->increase($newQuery, "position", -1);
         } else {
-            $newQuery = new Query($query);
+            $newQuery = $this->generateQuery($query);
             $newQuery->add("position",  ">=", $newPosition);
             $newQuery->add("position",  "<",  $oldPosition);
-            $newQuery->add("isDeleted", "=",  0);
             $this->increase($newQuery, "position", 1);
         }
         return $updatedPosition;
