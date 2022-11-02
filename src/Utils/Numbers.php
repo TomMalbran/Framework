@@ -80,6 +80,17 @@ class Numbers {
      * Returns a number using the right format
      * @param float   $number
      * @param integer $decimals
+     * @return integer
+     */
+    public static function formatInt(float $number, int $decimals = 0): string {
+        $float = $decimals > 0 ? self::toFloat($number, $decimals) : $number;
+        return self::formatFloat($float, $decimals);
+    }
+
+    /**
+     * Returns a number using the right format
+     * @param float   $number
+     * @param integer $decimals
      * @return string
      */
     public static function formatFloat(float $number, int $decimals): string {

@@ -258,7 +258,7 @@ class Field {
             break;
         case self::Float:
             $result[$key]           = Numbers::toFloat($number, $this->decimals);
-            $result["{$key}Format"] = Numbers::formatFloat($number, $this->decimals);
+            $result["{$key}Format"] = Numbers::formatInt($number, $this->decimals);
             $result["{$key}Int"]    = $number;
             break;
         case self::Price:
