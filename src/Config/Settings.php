@@ -307,6 +307,9 @@ class Settings {
 
         // Removes Settings
         foreach ($request as $row) {
+            if ($row["section"] == "core") {
+                continue;
+            }
             $found = false;
             foreach ($settings as $section => $data) {
                 foreach ($data as $variable => $value) {
