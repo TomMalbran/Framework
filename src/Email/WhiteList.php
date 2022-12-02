@@ -42,11 +42,13 @@ class WhiteList {
 
     /**
      * Returns true if the given Email exists in the White List
-     * @param string $email
+     * @param string  $email
+     * @param integer $skipID Optional.
      * @return boolean
      */
-    public static function emailExists(string $email): bool {
+    public static function emailExists(string $email, int $skipID = 0): bool {
         $query = Query::create("email", "=", $email);
+        $query->addIf("EMAIL_ID", "<>", $skipID);
         return self::schema()->exists($query);
     }
 
