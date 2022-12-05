@@ -35,7 +35,7 @@ class Credential {
      * @param mixed             $value  Optional.
      * @return Query
      */
-    private static function createLevelQuery($level, $filter = null, $value = 1) {
+    private static function createLevelQuery(mixed $level, $filter = null, mixed $value = 1) {
         $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return null;
@@ -104,7 +104,7 @@ class Credential {
      * @param mixed             $value         Optional.
      * @return boolean
      */
-    public static function existsWithLevel(int $crendentialID, $level, $filter = null, $value = 1): bool {
+    public static function existsWithLevel(int $crendentialID, mixed $level, mixed $filter = null, mixed $value = 1): bool {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return false;
@@ -197,7 +197,7 @@ class Credential {
      * @param Request           $sort   Optional.
      * @return array
      */
-    public static function getAllWithFilter($level, string $filter, $value = 1, Request $sort = null): array {
+    public static function getAllWithFilter(mixed $level, string $filter, mixed $value = 1, Request $sort = null): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -228,7 +228,7 @@ class Credential {
      * @param mixed             $value  Optional.
      * @return array
      */
-    public static function getLatestForLevel($level, int $amount, string $filter = null, $value = 1): array {
+    public static function getLatestForLevel(mixed $level, int $amount, string $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -273,7 +273,7 @@ class Credential {
      * @param mixed             $value  Optional.
      * @return integer
      */
-    public static function getTotalForLevel($level, string $filter = null, $value = 1): int {
+    public static function getTotalForLevel(mixed $level, string $filter = null, mixed $value = 1): int {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return 0;
@@ -338,7 +338,7 @@ class Credential {
      * @param mixed             $value  Optional.
      * @return array
      */
-    public static function getSelectForLevel($level, $filter = null, $value = 1): array {
+    public static function getSelectForLevel(mixed $level, mixed $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -415,7 +415,7 @@ class Credential {
      * @param mixed             $value  Optional.
      * @return array
      */
-    public static function getEmailsForLevel($level, $filter = null, $value = 1): array {
+    public static function getEmailsForLevel(mixed $level, mixed $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -687,7 +687,7 @@ class Credential {
      * @param mixed   $value
      * @return boolean
      */
-    public static function setValue(int $credentialID, string $key, $value): bool {
+    public static function setValue(int $credentialID, string $key, mixed $value): bool {
         return self::schema()->edit($credentialID, [
             $key => $value,
         ]);

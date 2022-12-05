@@ -5,6 +5,7 @@ use Framework\Schema\KeyChain;
 use Framework\Schema\Field;
 use Framework\Schema\Join;
 use Framework\Schema\Count;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -12,30 +13,37 @@ use Framework\Utils\Strings;
  */
 class Structure {
 
-    public $masterKey     = "";
+    public string $masterKey    = "";
 
-    public $table         = "";
-    public $hasID         = false;
-    public $idKey         = "";
-    public $idName        = "";
-    public $name          = "";
+    public string $table        = "";
+    public bool   $hasID        = false;
+    public string $idKey        = "";
+    public string $idName       = "";
+    public string $name         = "";
 
-    public $fields        = [];
-    public $expressions   = [];
-    public $joins         = [];
-    public $counts        = [];
+    /** @var Field[] */
+    public array $fields        = [];
 
-    public $hasPositions  = false;
-    public $hasTimestamps = false;
-    public $hasUsers      = false;
-    public $canCreate     = false;
-    public $canDelete     = false;
+    /** @var Field[] */
+    public array $expressions   = [];
+
+    /** @var Join[] */
+    public array $joins         = [];
+
+    /** @var Count[] */
+    public array $counts        = [];
+
+    public bool $hasPositions   = false;
+    public bool $hasTimestamps  = false;
+    public bool $hasUsers       = false;
+    public bool $canCreate      = false;
+    public bool $canDelete      = false;
 
 
     /**
      * Creates a new Structure instance
-     * @param string $schemaKey
-     * @param array  $data
+     * @param string  $schemaKey
+     * @param mixed[] $data
      */
     public function __construct(string $schemaKey, array $data) {
         $this->table         = $data["table"];
@@ -174,10 +182,10 @@ class Structure {
 
     /**
      * Returns the Order Field
-     * @param string $field Optional.
+     * @param string|null $field Optional.
      * @return string
      */
-    public function getOrder(string $field = null): string {
+    public function getOrder(?string $field = null): string {
         if (!empty($field)) {
             return $field;
         }

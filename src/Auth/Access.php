@@ -10,16 +10,20 @@ use Framework\Utils\Strings;
  */
 class Access {
 
-    private static $loaded = false;
-    private static $groups = [];
-    private static $levels = [];
+    private static bool $loaded = false;
+
+    /** @var mixed[] */
+    private static array $groups = [];
+
+    /** @var mixed[] */
+    private static array $levels = [];
 
 
     /**
      * Loads the Access Data
      * @return void
      */
-    public static function load() {
+    public static function load(): void {
         if (!self::$loaded) {
             self::$loaded = true;
             $data = Framework::loadData(Framework::AccessData);

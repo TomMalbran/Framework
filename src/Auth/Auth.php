@@ -23,21 +23,21 @@ use Framework\Utils\Strings;
  */
 class Auth {
 
-    private static $accessLevel  = 0;
-    private static $credential   = null;
-    private static $credentialID = 0;
-    private static $adminID      = 0;
-    private static $userID       = 0;
-    private static $apiID        = 0;
+    private static int    $accessLevel  = 0;
+    private static ?Model $credential   = null;
+    private static int    $credentialID = 0;
+    private static int    $adminID      = 0;
+    private static int    $userID       = 0;
+    private static int    $apiID        = 0;
 
 
     /**
      * Validates the Credential
-     * @param string  $token
-     * @param integer $timezone Optional.
+     * @param string       $token
+     * @param integer|null $timezone Optional.
      * @return boolean
      */
-    public static function validateCredential(string $token, int $timezone = null): bool {
+    public static function validateCredential(string $token, ?int $timezone = null): bool {
         Reset::deleteOld();
         Storage::deleteOld();
 
