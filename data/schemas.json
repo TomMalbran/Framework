@@ -85,7 +85,7 @@
             "templateCode" : { "type" : "string", "isPrimary" : true, "cantEdit" : true },
             "description"  : { "type" : "string",                     "cantEdit" : true },
             "type"         : { "type" : "string"                                        },
-            "sendTo"       : { "type" : "csv"                                           },
+            "sendTo"       : { "type" : "json"                                          },
             "sendAs"       : { "type" : "string"                                        },
             "sendName"     : { "type" : "string"                                        },
             "subject"      : { "type" : "string"                                        },
