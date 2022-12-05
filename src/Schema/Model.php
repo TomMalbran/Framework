@@ -86,6 +86,17 @@ class Model implements ArrayAccess {
     }
 
     /**
+     * Returns the request data at the given key or the default
+     * @param string  $key
+     * @param integer $default Optional.
+     * @return integer
+     */
+    public function getInt(string $key, int $default = 0): int {
+        $value = $this->get($key);
+        return !empty($value) ? (int)$value : $default;
+    }
+
+    /**
      * Returns the data at the given key and index or the default
      * @param string  $key
      * @param integer $index
