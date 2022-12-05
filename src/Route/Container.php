@@ -77,19 +77,21 @@ class Container {
         }
 
         if ($reflector->getConstructor() !== null) {
-            $constructor  = $reflector->getConstructor();
-            $dependencies = $constructor->getParameters();
+            $constructor = $reflector->getConstructor();
+            $parameters  = $constructor->getParameters();
 
-            foreach ($dependencies as $dependency) {
-                if (!$dependency->isOptional() && !$dependency->isArray()) {
-                    $class = $dependency->getClass();
-
-                    if ($class !== null) {
-                        $instances[] = self::resolve($class->name, $save);
+            foreach ($parameters as $parameter) {
+                $parameterType = $parameter->getType();
+                $parameterName = $parameterType->getName();
+                if (!$parameter->isOptional() && !empty($parameterType) && $parameterName !== "array") {
+                    $className = !$parameterType->isBuiltin() ? $parameterType->getName() : null;
+                    if ($className !== null) {
+                        $instances[] = self::resolve($className, $save);
                     }
                 }
             }
         }
+
         return $reflector->newInstanceArgs(array_merge($instances, $params));
     }
 }
