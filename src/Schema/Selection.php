@@ -62,8 +62,8 @@ class Selection {
      * @return void
      */
     public function addExpressions(): void {
-        foreach ($this->structure->expressions as $key => $expression) {
-            $this->selects[] = "($expression) AS $key";
+        foreach ($this->structure->expressions as $expression => $field) {
+            $this->selects[] = "($expression) AS $field->key";
         }
     }
 
@@ -254,8 +254,9 @@ class Selection {
             }
 
             // Parse the Expressions
-            foreach ($this->structure->expressions as $key => $value) {
-                $fields[$key] = $row[$key];
+            foreach ($this->structure->expressions as $field) {
+                $values = $field->toValues($row);
+                $fields = array_merge($fields, $values);
             }
 
             // Parse the Joins

@@ -39,7 +39,6 @@ class Structure {
      */
     public function __construct(string $schemaKey, array $data) {
         $this->table         = $data["table"];
-        $this->expressions   = !empty($data["expressions"])   ?  $data["expressions"] : [];
         $this->hasPositions  = !empty($data["hasPositions"])  && $data["hasPositions"];
         $this->hasTimestamps = !empty($data["hasTimestamps"]) && $data["hasTimestamps"];
         $this->hasUsers      = !empty($data["hasUsers"])      && $data["hasUsers"];
@@ -138,6 +137,17 @@ class Structure {
         if (!empty($data["counts"])) {
             foreach ($data["counts"] as $key => $value) {
                 $this->counts[] = new Count($key, $value);
+            }
+        }
+
+        // Parse the Expressions
+        if (!empty($data["expressions"])) {
+            foreach ($data["expressions"] as $key => $value) {
+                if (Arrays::isArray($value)) {
+                    $this->expressions[$value["expression"]] = new Field($key, $value);
+                } else {
+                    $this->expressions[$value] = new Field($key, []);
+                }
             }
         }
 
