@@ -352,7 +352,7 @@ class Image {
      * @param mixed $image
      * @return void
      */
-    public function destroy($image) {
+    public static function destroy($image) {
         imagedestroy($image);
     }
 }

@@ -355,7 +355,7 @@ class File {
      * @param string $extractPath
      * @return void
      */
-    public function extractZip(string $zipPath, string $extractPath): void {
+    public static function extractZip(string $zipPath, string $extractPath): void {
         $zip = new ZipArchive();
         if ($zip->open($zipPath)) {
             $zip->extractTo($extractPath);

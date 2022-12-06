@@ -250,7 +250,7 @@ class Auth {
      * @param integer $userID
      * @return void
      */
-    public function setCurrentUser(int $userID): void {
+    public static function setCurrentUser(int $userID): void {
         self::$userID = $userID;
         ActionLog::endSession();
         ActionLog::startSession(self::$credentialID, true);

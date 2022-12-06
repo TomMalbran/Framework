@@ -111,7 +111,7 @@ class Numbers {
      * @param integer $max
      * @return integer
      */
-    public function clamp(int $number, int $min, int $max) {
+    public static function clamp(int $number, int $min, int $max) {
         return max($min, min($max, $number));
     }
 
