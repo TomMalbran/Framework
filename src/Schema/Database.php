@@ -12,15 +12,15 @@ use mysqli;
  */
 class Database {
 
-    private $mysqli;
+    private mysqli $mysqli;
 
-    public $host;
-    public $username;
-    public $password;
-    public $database;
-    public $prefix;
-    public $email;
-    public $persist;
+    public string $host;
+    public string $username;
+    public string $password;
+    public string $database;
+    public string $prefix;
+    public string $email;
+    public bool   $persist;
 
 
     /**
@@ -35,7 +35,7 @@ class Database {
      * ].
      * @param boolean $persist True to persist the connection. Defaults to false.
      */
-    public function __construct($config, bool $persist = false) {
+    public function __construct(mixed $config, bool $persist = false) {
         $this->host     = $config->host;
         $this->username = $config->username;
         $this->password = $config->password;
@@ -93,7 +93,7 @@ class Database {
      * @param mixed  $params     Optional.
      * @return array
      */
-    public function query(string $expression, $params = []): array {
+    public function query(string $expression, mixed $params = []): array {
         $binds     = $params instanceof Query ? $params->params : $params;
         $statement = $this->processQuery($expression, $binds);
         return $this->dynamicBindResults($statement);
@@ -240,8 +240,9 @@ class Database {
         $expression .= $this->buildInsertHeader($fields);
         $expression .= $this->buildTableData($fields, $bindParams, true);
         $statement   = $this->processQuery($expression, $bindParams);
-
-        return $statement->affected_rows > 0 ? $statement->insert_id : -1;
+        $result      = $statement->affected_rows > 0 ? $statement->insert_id : -1;
+        $statement->free_result();
+        return $result;
     }
 
     /**
@@ -263,8 +264,9 @@ class Database {
 
         $expression .= Strings::join($rows, ", ");
         $statement   = $this->processQuery($expression, $bindParams);
-
-        return $statement->affected_rows > 0;
+        $result      = $statement->affected_rows > 0;
+        $statement->free_result();
+        return $result;
     }
 
 
@@ -283,8 +285,9 @@ class Database {
         $expression .= " " . $query->get();
         $bindParams  = array_merge($bindParams, $query->params);
         $statement   = $this->processQuery($expression, $bindParams);
-
-        return $statement->affected_rows > 0;
+        $result      = $statement->affected_rows > 0;
+        $statement->free_result();
+        return $result;
     }
 
     /**
@@ -310,8 +313,9 @@ class Database {
     public function delete(string $table, Query $query): bool {
         $expression = "DELETE FROM `{dbPrefix}$table` " . $query->get();
         $statement  = $this->processQuery($expression, $query->params);
-
-        return $statement->affected_rows > 0;
+        $result     = $statement->affected_rows > 0;
+        $statement->free_result();
+        return $result;
     }
 
     /**
@@ -322,8 +326,9 @@ class Database {
     public function deleteAll(string $table): bool {
         $expression = "DELETE FROM `{dbPrefix}$table`";
         $statement  = $this->processQuery($expression, []);
-
-        return $statement->affected_rows > 0;
+        $result     = $statement->affected_rows > 0;
+        $statement->free_result();
+        return $result;
     }
 
     /**
@@ -334,8 +339,9 @@ class Database {
     public function truncate(string $table): bool {
         $expression = "TRUNCATE TABLE `{dbPrefix}$table`";
         $statement  = $this->processQuery($expression, []);
-
-        return ($statement->affected_rows > 0);
+        $result     = $statement->affected_rows > 0;
+        $statement->free_result();
+        return $result;
     }
 
 
@@ -353,15 +359,16 @@ class Database {
      * Process a mysqli query
      * @param string $expression
      * @param array  $bindParams Optional.
-     * @return mixed
+     * @return mysqli_stmt|null
      */
-    private function processQuery(string $expression, array $bindParams = []) {
+    private function processQuery(string $expression, array $bindParams = []): mixed {
         $expression = Strings::replace(trim($expression), "{dbPrefix}", $this->prefix);
         $query      = Strings::replace($expression, "\n", "");
         $statement  = $this->mysqli->prepare($expression);
 
         if (!$statement) {
             trigger_error("Problem preparing query: {$this->mysqli->error} ($query)", E_USER_ERROR);
+            return null;
         }
 
         if (is_array($bindParams) && !empty($bindParams)) {
@@ -375,7 +382,9 @@ class Database {
 
         $statement->execute();
         if ($statement->error) {
+            $statement->free_result();
             trigger_error("Problem executing query: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
+            return null;
         }
 
         return $statement;
@@ -410,7 +419,7 @@ class Database {
      * @param mixed $item Input to determine the type.
      * @return string The parameter type.
      */
-    private function determineType($item): string {
+    private function determineType(mixed $item): string {
         switch (gettype($item)) {
         case "NULL":
         case "string":
@@ -447,7 +456,7 @@ class Database {
      * @param mixed $statement Equal to the prepared statement object.
      * @return array The results of the SQL fetch.
      */
-    private function dynamicBindResults($statement): array {
+    private function dynamicBindResults(mixed $statement): array {
         $parameters = [];
         $results    = [];
         $meta       = $statement->result_metadata();
@@ -841,7 +850,7 @@ class Database {
      * @param mixed    $fp     Optional.
      * @return void
      */
-    public function dump(array $filter = null, $fp = null): void {
+    public function dump(array $filter = null, mixed $fp = null): void {
         $crlf = "\r\n";
 
         // SQL Dump Header
@@ -901,7 +910,7 @@ class Database {
      * @param string $content
      * @return void
      */
-    private function write($fp, string $content): void {
+    private function write(mixed $fp, string $content): void {
         if (!empty($fp)) {
             fwrite($fp, $content);
         } else {

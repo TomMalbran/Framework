@@ -40,7 +40,7 @@ class Request implements ArrayAccess {
      * @param string $key
      * @return mixed
      */
-    public function __get(string $key) {
+    public function __get(string $key): mixed {
         return $this->get($key);
     }
 
@@ -50,7 +50,7 @@ class Request implements ArrayAccess {
      * @param mixed  $value
      * @return void
      */
-    public function __set(string $key, $value): void {
+    public function __set(string $key, mixed $value): void {
         $this->set($key, $value);
     }
 
@@ -68,7 +68,7 @@ class Request implements ArrayAccess {
      * @param string $key
      * @return void
      */
-    public function __unset(string $key) {
+    public function __unset(string $key): void {
         $this->remove($key);
     }
 
@@ -80,7 +80,7 @@ class Request implements ArrayAccess {
      * @param mixed  $default Optional.
      * @return mixed
      */
-    public function get(string $key, $default = "") {
+    public function get(string $key, mixed $default = ""): mixed {
         return isset($this->request[$key]) ? $this->request[$key] : $default;
     }
 
@@ -90,7 +90,7 @@ class Request implements ArrayAccess {
      * @param mixed  $default Optional.
      * @return mixed
      */
-    public function getOr(string $key, $default) {
+    public function getOr(string $key, mixed $default): mixed {
         return !empty($this->request[$key]) ? $this->request[$key] : $default;
     }
 
@@ -160,7 +160,7 @@ class Request implements ArrayAccess {
      * @param mixed   $default Optional.
      * @return mixed
      */
-    public function getFromArray(string $key, int $index, $default = "") {
+    public function getFromArray(string $key, int $index, mixed $default = ""): mixed {
         if (isset($this->request[$key]) && isset($this->request[$key][$index])) {
             return $this->request[$key][$index];
         }
@@ -173,7 +173,7 @@ class Request implements ArrayAccess {
      * @param boolean $asArray Optional.
      * @return object|array
      */
-    public function getJSON(string $key, bool $asArray = false) {
+    public function getJSON(string $key, bool $asArray = false): mixed {
         return JSON::decode($this->get($key, "[]"), $asArray);
     }
 
@@ -182,7 +182,7 @@ class Request implements ArrayAccess {
      * @param string $key
      * @return array
      */
-    public function getCSV(string $key) {
+    public function getCSV(string $key): array {
         $result = Strings::split($this->get($key, ""), ",");
         return Arrays::removeEmpty($result);
     }
@@ -195,7 +195,7 @@ class Request implements ArrayAccess {
      * @param mixed  $value Optional.
      * @return void
      */
-    public function set(string $key, $value = ""): void {
+    public function set(string $key, mixed $value = ""): void {
         $this->request[$key] = $value;
     }
 
@@ -709,7 +709,7 @@ class Request implements ArrayAccess {
      * @param string $key
      * @return mixed
      */
-    public function getFile(string $key) {
+    public function getFile(string $key): mixed {
         return isset($this->files[$key]) ? $this->files[$key] : null;
     }
 
@@ -826,7 +826,7 @@ class Request implements ArrayAccess {
      * @param mixed $key
      * @return mixed
      */
-    public function offsetGet($key) {
+    public function offsetGet(mixed $key): mixed {
         return $this->get($key);
     }
 
@@ -836,7 +836,7 @@ class Request implements ArrayAccess {
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($key, $value): void {
+    public function offsetSet(mixed $key, mixed $value): void {
         $this->set($key, $value);
     }
 
@@ -845,7 +845,7 @@ class Request implements ArrayAccess {
      * @param mixed $key
      * @return boolean
      */
-    public function offsetExists($key): bool {
+    public function offsetExists(mixed $key): bool {
         return array_key_exists($key, $this->request);
     }
 
@@ -854,7 +854,7 @@ class Request implements ArrayAccess {
      * @param mixed $key
      * @return void
      */
-    public function offsetUnset($key): void {
+    public function offsetUnset(mixed $key): void {
         unset($this->request[$key]);
     }
 }
