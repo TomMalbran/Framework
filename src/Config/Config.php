@@ -19,11 +19,11 @@ class Config {
 
     /**
      * Loads the Config Data
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
+    public static function load(): bool {
         if (self::$loaded) {
-            return;
+            return false;
         }
         $path    = Framework::getPath();
         $data    = self::loadENV($path, ".env");
@@ -45,6 +45,7 @@ class Config {
 
         self::$loaded = true;
         self::$data   = array_merge($data, $replace);
+        return true;
     }
 
     /**

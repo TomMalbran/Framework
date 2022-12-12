@@ -19,18 +19,20 @@ class MailChimp {
 
     /**
      * Creates the MailChimp Provider
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            self::$loaded = true;
-            self::$config = Config::get("mailchimp");
-
-            if (self::$config->active && !empty(self::$config->key)) {
-                self::$api = new MailChimpAPI(self::$config->key);
-                self::$api->verify_ssl = false;
-            }
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
         }
+        self::$loaded = true;
+        self::$config = Config::get("mailchimp");
+
+        if (self::$config->active && !empty(self::$config->key)) {
+            self::$api = new MailChimpAPI(self::$config->key);
+            self::$api->verify_ssl = false;
+        }
+        return true;
     }
 
     /**

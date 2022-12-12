@@ -17,30 +17,32 @@ class Status {
 
     /**
      * Loads the Status Data
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            self::$loaded = true;
-            $data = Framework::loadData(Framework::StatusData);
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
+        }
+        self::$loaded = true;
+        $data = Framework::loadData(Framework::StatusData);
 
-            // Store the Values
-            foreach ($data["values"] as $statusName => $statusValue) {
-                $name = Strings::toLowerCase($statusName);
-                self::$values[$name] = $statusValue;
-            }
-            // Store the Groups
-            foreach ($data["groups"] as $groupName => $statusNames) {
-                $gName = Strings::toLowerCase($groupName);
-                self::$groups[$gName] = [];
-                foreach ($statusNames as $statusName) {
-                    $sName = Strings::toLowerCase($statusName);
-                    if (isset(self::$values[$sName])) {
-                        self::$groups[$gName][] = self::$values[$sName];
-                    }
+        // Store the Values
+        foreach ($data["values"] as $statusName => $statusValue) {
+            $name = Strings::toLowerCase($statusName);
+            self::$values[$name] = $statusValue;
+        }
+        // Store the Groups
+        foreach ($data["groups"] as $groupName => $statusNames) {
+            $gName = Strings::toLowerCase($groupName);
+            self::$groups[$gName] = [];
+            foreach ($statusNames as $statusName) {
+                $sName = Strings::toLowerCase($statusName);
+                if (isset(self::$values[$sName])) {
+                    self::$groups[$gName][] = self::$values[$sName];
                 }
             }
         }
+        return true;
     }
 
 

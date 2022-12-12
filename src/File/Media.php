@@ -21,14 +21,16 @@ class Media {
 
     /**
      * Loads the Media Data
-     * @return void
+     * @return boolean
      */
-    private static function load(): void {
-        if (!self::$loaded) {
-            self::$loaded = true;
-            self::$db     = Framework::getDatabase();
-            self::$data   = Framework::loadData(Framework::MediaData);
+    private static function load(): bool {
+        if (self::$loaded) {
+            return false;
         }
+        self::$loaded = true;
+        self::$db     = Framework::getDatabase();
+        self::$data   = Framework::loadData(Framework::MediaData);
+        return true;
     }
 
     /**

@@ -22,16 +22,18 @@ class JWT {
 
     /**
      * Loads the JWT Config
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            FirebaseJWT::$leeway = 1000;
-
-            self::$loaded    = true;
-            self::$secretKey = Config::get("authKey");
-            self::$shortTerm = Config::getInt("authHours")  * 3600;
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
         }
+        FirebaseJWT::$leeway = 1000;
+
+        self::$loaded    = true;
+        self::$secretKey = Config::get("authKey");
+        self::$shortTerm = Config::getInt("authHours")  * 3600;
+        return true;
     }
 
 

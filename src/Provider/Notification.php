@@ -24,23 +24,25 @@ class Notification {
 
     /**
      * Creates the Notification Provider
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            self::$loaded = true;
-            self::$config = Config::get("onesignal");
-
-            if (!empty(self::$config->appId) && !empty(self::$config->restKey)) {
-                $config = new OneSignalConfig();
-                $config->setApplicationId(self::$config->appId);
-                $config->setApplicationAuthKey(self::$config->restKey);
-
-                $guzzle    = new GuzzleClient([]);
-                $client    = new HttpClient(new GuzzleAdapter($guzzle), new GuzzleMessageFactory());
-                self::$api = new OneSignalAPI($config, $client);
-            }
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
         }
+        self::$loaded = true;
+        self::$config = Config::get("onesignal");
+
+        if (!empty(self::$config->appId) && !empty(self::$config->restKey)) {
+            $config = new OneSignalConfig();
+            $config->setApplicationId(self::$config->appId);
+            $config->setApplicationAuthKey(self::$config->restKey);
+
+            $guzzle    = new GuzzleClient([]);
+            $client    = new HttpClient(new GuzzleAdapter($guzzle), new GuzzleMessageFactory());
+            self::$api = new OneSignalAPI($config, $client);
+        }
+        return true;
     }
 
 

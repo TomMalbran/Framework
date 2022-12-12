@@ -30,17 +30,19 @@ class Email {
 
     /**
      * Loads the Email Config
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            self::$loaded   = true;
-            self::$template = Framework::loadFile(Framework::DataDir, "email.html");
-            self::$url      = Config::get("url");
-            self::$name     = Config::get("name");
-            self::$smtp     = Config::get("smtp");
-            self::$google   = Config::get("google");
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
         }
+        self::$loaded   = true;
+        self::$template = Framework::loadFile(Framework::DataDir, "email.html");
+        self::$url      = Config::get("url");
+        self::$name     = Config::get("name");
+        self::$smtp     = Config::get("smtp");
+        self::$google   = Config::get("google");
+        return true;
     }
 
 

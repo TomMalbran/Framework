@@ -25,15 +25,17 @@ class EmailReader {
 
     /**
      * Loads the Email Reader Config
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            self::$url    = Config::get("url");
-            self::$config = Config::get("google");
-            self::$db     = Framework::getDatabase();
-            self::$loaded = true;
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
         }
+        self::$url    = Config::get("url");
+        self::$config = Config::get("google");
+        self::$db     = Framework::getDatabase();
+        self::$loaded = true;
+        return true;
     }
 
     /**

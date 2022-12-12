@@ -16,13 +16,15 @@ class Token {
 
     /**
      * Loads the Tokens Data
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            self::$loaded = true;
-            self::$data   = Framework::loadData(Framework::TokenData);
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
         }
+        self::$loaded = true;
+        self::$data   = Framework::loadData(Framework::TokenData);
+        return true;
     }
 
 

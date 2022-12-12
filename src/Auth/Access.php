@@ -21,24 +21,26 @@ class Access {
 
     /**
      * Loads the Access Data
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
-        if (!self::$loaded) {
-            self::$loaded = true;
-            $data = Framework::loadData(Framework::AccessData);
+    public static function load(): bool {
+        if (self::$loaded) {
+            return false;
+        }
+        self::$loaded = true;
+        $data = Framework::loadData(Framework::AccessData);
 
-            // Store the groups and levels
-            foreach ($data as $groupName => $accessData) {
-                $gName = Strings::toLowerCase($groupName);
-                self::$groups[$gName] = [];
-                foreach ($accessData as $accessName => $accessLevel) {
-                    $aName = Strings::toLowerCase($accessName);
-                    self::$groups[$gName][] = $accessLevel;
-                    self::$levels[$aName]   = $accessLevel;
-                }
+        // Store the groups and levels
+        foreach ($data as $groupName => $accessData) {
+            $gName = Strings::toLowerCase($groupName);
+            self::$groups[$gName] = [];
+            foreach ($accessData as $accessName => $accessLevel) {
+                $aName = Strings::toLowerCase($accessName);
+                self::$groups[$gName][] = $accessLevel;
+                self::$levels[$aName]   = $accessLevel;
             }
         }
+        return true;
     }
 
 

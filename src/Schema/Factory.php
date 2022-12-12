@@ -22,11 +22,11 @@ class Factory {
 
     /**
      * Loads the Schemas Data
-     * @return void
+     * @return boolean
      */
-    public static function load(): void {
+    public static function load(): bool {
         if (self::$loaded) {
-            return;
+            return false;
         }
         $schemas = Framework::loadData(Framework::SchemaData);
         $frame   = Framework::loadJSON("data", Framework::SchemaData, true);
@@ -41,6 +41,7 @@ class Factory {
                 self::$data[$key] = $data;
             }
         }
+        return true;
     }
 
 
