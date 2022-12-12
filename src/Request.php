@@ -585,6 +585,8 @@ class Request implements ArrayAccess {
         $value = $this->get($key);
         if (empty($value)) {
             $value = [];
+        } elseif (JSON::isValid($value)) {
+            $value = JSON::decode($value);
         } elseif (Strings::isString($value)) {
             $value = Strings::split($value, ",");
         }
