@@ -309,25 +309,25 @@ class Request implements ArrayAccess {
 
     /**
      * Returns true if the given value is a number and greater and/or equal to cero
-     * @param string  $key
-     * @param integer $min  Optional.
-     * @param integer $max  Optional.
-     * @param integer $mult Optional.
+     * @param string       $key
+     * @param integer|null $min      Optional.
+     * @param integer|null $max      Optional.
+     * @param integer|null $decimals Optional.
      * @return boolean
      */
-    public function isNumeric(string $key, int $min = 1, int $max = null, int $mult = 1): bool {
-        return Numbers::isValid($this->getInt($key) * $mult, $min, $max);
+    public function isNumeric(string $key, ?int $min = 1, ?int $max = null, int $decimals = null): bool {
+        return Numbers::isValidFloat($this->getFloat($key), $min, $max, $decimals);
     }
 
     /**
      * Returns true if the given price is valid
-     * @param string  $key
-     * @param integer $min Optional.
-     * @param integer $max Optional.
+     * @param string       $key
+     * @param integer|null $min Optional.
+     * @param integer|null $max Optional.
      * @return boolean
      */
-    public function isValidPrice(string $key, int $min = 1, int $max = null): bool {
-        return Numbers::isValidPrice($this->getInt($key), $min, $max);
+    public function isValidPrice(string $key, ?int $min = 1, ?int $max = null): bool {
+        return Numbers::isValidPrice($this->getFloat($key), $min, $max);
     }
 
     /**

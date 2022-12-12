@@ -17,13 +17,22 @@ class Numbers {
 
     /**
      * Returns true if the given value is a number and greater and/or equal to cero
-     * @param mixed   $number
-     * @param integer $min    Optional.
-     * @param integer $max    Optional.
+     * @param mixed        $number
+     * @param integer|null $min    Optional.
+     * @param integer|null $max    Optional.
      * @return boolean
      */
-    public static function isValid($number, int $min = 1, int $max = null): bool {
-        return is_numeric($number) && $number >= $min && ($max != null ? $number <= $max : true);
+    public static function isValid(mixed $number, ?int $min = 1, ?int $max = null): bool {
+        if (!is_numeric($number)) {
+            return false;
+        }
+        if ($min != null && $number < $min) {
+            return false;
+        }
+        if ($max != null && $number > $max) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -166,13 +175,35 @@ class Numbers {
 
     /**
      * Returns true if the given price is valid
-     * @param mixed   $price
-     * @param integer $min   Optional.
-     * @param integer $max   Optional.
+     * @param mixed        $float
+     * @param integer|null $min      Optional.
+     * @param integer|null $max      Optional.
+     * @param integer|null $decimals Optional.
      * @return boolean
      */
-    public static function isValidPrice($price, int $min = 1, int $max = null): bool {
-        return self::isValid($price * 100, $min, $max);
+    public static function isValidFloat(mixed $float, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
+        $mult = 1;
+        if ($decimals != null) {
+            $decimalCount = strlen($float) - strrpos($float, ".") - 1;
+            if (strrpos($float, ".") > 0 && $decimalCount > $decimals) {
+                return false;
+            }
+            $mult = pow(10, $decimals);
+        }
+        $multMin = $min !== null ? $min * $mult : $min;
+        $multMax = $max !== null ? $max * $mult : $max;
+        return self::isValid($float * $mult, $multMin, $multMax);
+    }
+
+    /**
+     * Returns true if the given price is valid
+     * @param mixed        $price
+     * @param integer|null $min   Optional.
+     * @param integer|null $max   Optional.
+     * @return boolean
+     */
+    public static function isValidPrice(mixed $price, ?int $min = 1, ?int $max = null): bool {
+        return self::isValidFloat($price, $min, $max, 2);
     }
 
     /**
