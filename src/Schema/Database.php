@@ -6,6 +6,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use mysqli;
+use mysqli_stmt;
 
 /**
  * The mysqli Database Wrapper
@@ -241,7 +242,7 @@ class Database {
         $expression .= $this->buildTableData($fields, $bindParams, true);
         $statement   = $this->processQuery($expression, $bindParams);
         $result      = $statement->affected_rows > 0 ? $statement->insert_id : -1;
-        $statement->free_result();
+        $statement->close();
         return $result;
     }
 
@@ -264,9 +265,7 @@ class Database {
 
         $expression .= Strings::join($rows, ", ");
         $statement   = $this->processQuery($expression, $bindParams);
-        $result      = $statement->affected_rows > 0;
-        $statement->free_result();
-        return $result;
+        return $this->closeQuery($statement);
     }
 
 
@@ -285,9 +284,7 @@ class Database {
         $expression .= " " . $query->get();
         $bindParams  = array_merge($bindParams, $query->params);
         $statement   = $this->processQuery($expression, $bindParams);
-        $result      = $statement->affected_rows > 0;
-        $statement->free_result();
-        return $result;
+        return $this->closeQuery($statement);
     }
 
     /**
@@ -313,9 +310,7 @@ class Database {
     public function delete(string $table, Query $query): bool {
         $expression = "DELETE FROM `{dbPrefix}$table` " . $query->get();
         $statement  = $this->processQuery($expression, $query->params);
-        $result     = $statement->affected_rows > 0;
-        $statement->free_result();
-        return $result;
+        return $this->closeQuery($statement);
     }
 
     /**
@@ -326,9 +321,7 @@ class Database {
     public function deleteAll(string $table): bool {
         $expression = "DELETE FROM `{dbPrefix}$table`";
         $statement  = $this->processQuery($expression, []);
-        $result     = $statement->affected_rows > 0;
-        $statement->free_result();
-        return $result;
+        return $this->closeQuery($statement);
     }
 
     /**
@@ -339,9 +332,7 @@ class Database {
     public function truncate(string $table): bool {
         $expression = "TRUNCATE TABLE `{dbPrefix}$table`";
         $statement  = $this->processQuery($expression, []);
-        $result     = $statement->affected_rows > 0;
-        $statement->free_result();
-        return $result;
+        return $this->closeQuery($statement);
     }
 
 
@@ -359,9 +350,9 @@ class Database {
      * Process a mysqli query
      * @param string $expression
      * @param array  $bindParams Optional.
-     * @return mysqli_stmt|null
+     * @return mysqli_stmt
      */
-    private function processQuery(string $expression, array $bindParams = []): mixed {
+    private function processQuery(string $expression, array $bindParams = []): mysqli_stmt {
         $expression = Strings::replace(trim($expression), "{dbPrefix}", $this->prefix);
         $query      = Strings::replace($expression, "\n", "");
         $statement  = $this->mysqli->prepare($expression);
@@ -382,12 +373,23 @@ class Database {
 
         $statement->execute();
         if ($statement->error) {
-            $statement->free_result();
+            $statement->close();
             trigger_error("Problem executing query: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
             return null;
         }
 
         return $statement;
+    }
+
+    /**
+     * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
+     * @param mysqli_stmt $statement
+     * @return boolean
+     */
+    private function closeQuery(mysqli_stmt $statement): bool {
+        $result = $statement->affected_rows > 0;
+        $statement->close();
+        return $result;
     }
 
     /**
@@ -453,10 +455,10 @@ class Database {
 
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
-     * @param mixed $statement Equal to the prepared statement object.
+     * @param mysqli_stmt $statement Equal to the prepared statement object.
      * @return array The results of the SQL fetch.
      */
-    private function dynamicBindResults(mixed $statement): array {
+    private function dynamicBindResults(mysqli_stmt $statement): array {
         $parameters = [];
         $results    = [];
         $meta       = $statement->result_metadata();
@@ -474,10 +476,12 @@ class Database {
         }
         call_user_func_array([ $statement, "bind_result" ], $parameters);
 
+        $statement->store_result();
         while ($statement->fetch()) {
             $x = [];
             foreach ($row as $key => $val) {
-                $x[$key] = ctype_digit($val) && strrpos($val, "0", -strlen($val)) === false ? (int)$val : $val;
+                $string  = (string)$val;
+                $x[$key] = ctype_digit($string) && strrpos($string, "0", -strlen($string)) === false ? (int)$val : $val;
             }
             array_push($results, $x);
         }
