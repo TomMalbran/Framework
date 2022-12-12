@@ -35,7 +35,7 @@ class JSON {
         if (self::isValid($value)) {
             return $value;
         }
-        return json_encode($value, $asPretty ? JSON_PRETTY_PRINT : null);
+        return json_encode($value, $asPretty ? JSON_PRETTY_PRINT : 0);
     }
 
     /**
@@ -44,7 +44,7 @@ class JSON {
      * @param boolean      $asArray Optional.
      * @return object|array
      */
-    public static function decode($value, bool $asArray = false) {
+    public static function decode($value, bool $asArray = false): mixed {
         if (!self::isValid($value)) {
             return $value;
         }
@@ -80,7 +80,7 @@ class JSON {
      * @param boolean $asArray Optional.
      * @return object|array
      */
-    public static function readFile(string $path, bool $asArray = false) {
+    public static function readFile(string $path, bool $asArray = false): mixed {
         if (File::exists($path)) {
             return self::decode(file_get_contents($path), $asArray);
         }
@@ -93,17 +93,17 @@ class JSON {
      * @param boolean $asArray Optional.
      * @return object|array
      */
-    public static function readUrl(string $url, bool $asArray = false) {
+    public static function readUrl(string $url, bool $asArray = false): mixed {
         return self::decode(file_get_contents($url), $asArray);
     }
 
     /**
      * Writes a JSON File
      * @param string          $path
-     * @param string|string[] $contents
+     * @param string[]|string $contents
      * @return void
      */
-    public static function writeFile(string $path, $contents): void {
+    public static function writeFile(string $path, array|string $contents): void {
         $value = Arrays::toArray($contents);
         file_put_contents($path, self::encode($value, true));
     }

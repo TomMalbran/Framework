@@ -54,7 +54,7 @@ class Enum {
      * @param mixed $value
      * @return boolean
      */
-    public static function isValid($value): bool {
+    public static function isValid(mixed $value): bool {
         $cache = self::load();
         if ($cache->isConstant) {
             return Arrays::contains($cache->constants, $value);
@@ -67,7 +67,7 @@ class Enum {
      * @param mixed $value
      * @return mixed
      */
-    public static function getOne($value) {
+    public static function getOne(mixed $value): mixed {
         $cache = self::load();
         if ($cache->isConstant) {
             return $cache->constants[$value];

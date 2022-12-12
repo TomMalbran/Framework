@@ -3,6 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Auth\Auth;
 use Framework\Schema\Factory;
+use Framework\Schema\Schema;
 use Framework\Schema\Query;
 use Framework\Utils\JSON;
 
@@ -11,9 +12,9 @@ use Framework\Utils\JSON;
  */
 class Storage {
 
-    private $schema;
-    private $data   = [];
-    private $bucket = "";
+    private Schema $schema;
+    private array  $data   = [];
+    private string $bucket = "";
 
 
     /**
@@ -44,7 +45,7 @@ class Storage {
      * @param string $key
      * @return mixed
      */
-    public function __get(string $key) {
+    public function __get(string $key): mixed {
         return $this->get($key);
     }
 
@@ -54,7 +55,7 @@ class Storage {
      * @param mixed  $value
      * @return void
      */
-    public function __set(string $key, $value): void {
+    public function __set(string $key, mixed $value): void {
         $this->set($key, $value);
     }
 
@@ -80,11 +81,11 @@ class Storage {
 
     /**
      * Returns the data at the given key or the default
-     * @param string $key
-     * @param mixed  $default Optional.
+     * @param string       $key
+     * @param mixed|string $default Optional.
      * @return mixed
      */
-    public function get(string $key, $default = "") {
+    public function get(string $key, mixed $default = ""): mixed {
         if ($this->exists($key)) {
             return $this->data[$key];
         }
@@ -93,11 +94,11 @@ class Storage {
 
     /**
      * Sets the given data at the given key
-     * @param string $key
-     * @param mixed  $value Optional.
+     * @param string       $key
+     * @param mixed|string $value Optional.
      * @return void
      */
-    public function set(string $key, $value = ""): void {
+    public function set(string $key, mixed $value = ""): void {
         $this->data[$key] = $value;
         $this->save();
     }

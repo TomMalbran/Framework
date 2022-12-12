@@ -53,10 +53,10 @@ class File {
      * Creates a file with the given content
      * @param string          $path
      * @param string          $fileName
-     * @param string|string[] $content
+     * @param string[]|string $content
      * @return string
      */
-    public static function create(string $path, string $fileName, $content): string {
+    public static function create(string $path, string $fileName, array|string $content): string {
         $path = self::getPath($path, $fileName);
         if (!empty($path)) {
             file_put_contents($path, Strings::join($content, "\n"));
@@ -183,10 +183,10 @@ class File {
     /**
      * Returns true if the file has the given extension
      * @param string          $name
-     * @param string|string[] $extensions
+     * @param string[]|string $extensions
      * @return boolean
      */
-    public static function hasExtension(string $name, $extensions): bool {
+    public static function hasExtension(string $name, array|string $extensions): bool {
         $extension = self::getExtension($name);
         $extension = Strings::toLowerCase($extension);
         return Arrays::contains($extensions, $extension);
@@ -311,10 +311,10 @@ class File {
     /**
      * Creates a new zip archive and adds the given files/directories
      * @param string          $name
-     * @param string|string[] $files
+     * @param string[]|string $files
      * @return ZipArchive
      */
-    public static function createZip(string $name, $files): ZipArchive {
+    public static function createZip(string $name, array|string $files): ZipArchive {
         $zip   = new ZipArchive();
         $files = Arrays::toArray($files);
 

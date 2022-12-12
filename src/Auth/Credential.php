@@ -30,12 +30,12 @@ class Credential {
 
     /**
      * Creates a Level Query
-     * @param integer[]|integer $level
-     * @param string[]|string   $filter Optional.
-     * @param mixed             $value  Optional.
+     * @param integer[]|integer    $level
+     * @param string[]|string|null $filter Optional.
+     * @param mixed|integer        $value  Optional.
      * @return Query
      */
-    private static function createLevelQuery(mixed $level, $filter = null, mixed $value = 1) {
+    private static function createLevelQuery(array|int $level, array|string $filter = null, mixed $value = 1): Query {
         $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return null;
@@ -98,13 +98,13 @@ class Credential {
 
     /**
      * Returns true if there is an Credential with the given ID and Level(s)
-     * @param integer           $crendentialID
-     * @param integer|integer[] $level
-     * @param string[]|string   $filter        Optional.
-     * @param mixed             $value         Optional.
+     * @param integer              $crendentialID
+     * @param integer[]|integer    $level
+     * @param string[]|string|null $filter        Optional.
+     * @param mixed|integer        $value         Optional.
      * @return boolean
      */
-    public static function existsWithLevel(int $crendentialID, mixed $level, mixed $filter = null, mixed $value = 1): bool {
+    public static function existsWithLevel(int $crendentialID, array|int $level, array|string $filter = null, mixed $value = 1): bool {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return false;
@@ -153,21 +153,21 @@ class Credential {
 
     /**
      * Returns all the Credentials
-     * @param Request $sort  Optional.
-     * @param Query   $query Optional.
-     * @return array
+     * @param Request|null $sort  Optional.
+     * @param Query|null   $query Optional.
+     * @return array{}[]
      */
-    public static function getAll(Request $sort = null, Query $query = null) {
+    public static function getAll(?Request $sort = null, ?Query $query = null): array {
         return self::request($query, false, $sort);
     }
 
     /**
      * Returns all the Credentials for the given Level(s)
      * @param integer[]|integer $level
-     * @param Request           $sort  Optional.
-     * @return array
+     * @param Request|null      $sort  Optional.
+     * @return array{}[]
      */
-    public static function getAllForLevel($level, Request $sort = null): array {
+    public static function getAllForLevel(array|int $level, ?Request $sort = null): array {
         $query = self::createLevelQuery($level);
         if (empty($query)) {
             return [];
@@ -177,11 +177,11 @@ class Credential {
 
     /**
      * Returns all the Credentials for the given IDs
-     * @param integer[] $credentialIDs
-     * @param Request   $sort          Optional.
-     * @return array
+     * @param integer[]    $credentialIDs
+     * @param Request|null $sort          Optional.
+     * @return array{}[]
      */
-    public static function getAllWithIDs(array $credentialIDs, Request $sort = null): array {
+    public static function getAllWithIDs(array $credentialIDs, ?Request $sort = null): array {
         if (empty($credentialIDs)) {
             return [];
         }
@@ -193,11 +193,11 @@ class Credential {
      * Returns all the Credentials for the given Level(s) and filter
      * @param integer[]|integer $level
      * @param string            $filter
-     * @param mixed             $value  Optional.
-     * @param Request           $sort   Optional.
-     * @return array
+     * @param mixed|integer     $value  Optional.
+     * @param Request|null      $sort   Optional.
+     * @return array{}[]
      */
-    public static function getAllWithFilter(mixed $level, string $filter, mixed $value = 1, Request $sort = null): array {
+    public static function getAllWithFilter(array|int $level, string $filter, mixed $value = 1, ?Request $sort = null): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -208,10 +208,10 @@ class Credential {
     /**
      * Returns all the Credentials for the given Level(s)
      * @param integer[]|integer $level
-     * @param Request           $sort  Optional.
-     * @return array
+     * @param Request|null      $sort  Optional.
+     * @return array{}[]
      */
-    public static function getActiveForLevel($level, Request $sort = null): array {
+    public static function getActiveForLevel(array|int $level, ?Request $sort = null): array {
         $query = self::createLevelQuery($level);
         if (empty($query)) {
             return [];
@@ -224,11 +224,11 @@ class Credential {
      * Returns the latest Credentials for the given Level(s)
      * @param integer[]|integer $level
      * @param integer           $amount
-     * @param string            $filter Optional.
-     * @param mixed             $value  Optional.
-     * @return array
+     * @param string|null       $filter Optional.
+     * @param mixed|integer     $value  Optional.
+     * @return array{}[]
      */
-    public static function getLatestForLevel(mixed $level, int $amount, string $filter = null, mixed $value = 1): array {
+    public static function getLatestForLevel(array|int $level, int $amount, ?string $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -242,7 +242,7 @@ class Credential {
      * Returns the create times for all the Credentials with the given level
      * @param integer $fromTime
      * @param integer $level    Optional.
-     * @return array
+     * @return array{}[]
      */
     public static function getAllCreateTimes(int $fromTime, int $level = 0): array {
         $query   = Query::create("createdTime", ">=", $fromTime);
@@ -259,21 +259,21 @@ class Credential {
 
     /**
      * Returns the total amount of Credentials
-     * @param Query $query Optional.
+     * @param Query|null $query Optional.
      * @return integer
      */
-    public static function getTotal(Query $query = null): int {
+    public static function getTotal(?Query $query = null): int {
         return self::schema()->getTotal($query);
     }
 
     /**
      * Returns the total amount of Credentials for the given Level(s)
      * @param integer[]|integer $level
-     * @param string            $filter Optional.
-     * @param mixed             $value  Optional.
+     * @param string|null       $filter Optional.
+     * @param mixed|integer     $value  Optional.
      * @return integer
      */
-    public static function getTotalForLevel(mixed $level, string $filter = null, mixed $value = 1): int {
+    public static function getTotalForLevel(array|int $level, ?string $filter = null, mixed $value = 1): int {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return 0;
@@ -283,12 +283,12 @@ class Credential {
 
     /**
      * Requests data to the database
-     * @param Query   $query    Optional.
-     * @param boolean $complete Optional.
-     * @param Request $sort     Optional.
-     * @return array
+     * @param Query|null   $query    Optional.
+     * @param boolean      $complete Optional.
+     * @param Request|null $sort     Optional.
+     * @return array{}[]
      */
-    private static function request(Query $query = null, bool $complete = false, Request $sort = null): array {
+    private static function request(?Query $query = null, bool $complete = false, ?Request $sort = null): array {
         $request = self::schema()->getAll($query, $sort);
         $result  = [];
 
@@ -312,11 +312,11 @@ class Credential {
 
     /**
      * Requests a single row from the database
-     * @param Query   $query    Optional.
-     * @param boolean $complete Optional.
+     * @param Query|null $query    Optional.
+     * @param boolean    $complete Optional.
      * @return Model
      */
-    private static function requestOne(Query $query = null, bool $complete = false): Model {
+    private static function requestOne(?Query $query = null, bool $complete = false): Model {
         $request = self::request($query, $complete);
         return self::schema()->getModel($request);
     }
@@ -325,7 +325,7 @@ class Credential {
 
     /**
      * Returns a select of all the Credentials
-     * @return array
+     * @return array{}[]
      */
     public static function getSelect(): array {
         return self::requestSelect();
@@ -333,12 +333,12 @@ class Credential {
 
     /**
      * Returns a select of Credentials for the given Level(s)
-     * @param integer[]|integer $level
-     * @param string[]|string   $filter Optional.
-     * @param mixed             $value  Optional.
-     * @return array
+     * @param integer[]|integer    $level
+     * @param string[]|string|null $filter Optional.
+     * @param mixed|integer        $value  Optional.
+     * @return array{}[]
      */
-    public static function getSelectForLevel(mixed $level, mixed $filter = null, mixed $value = 1): array {
+    public static function getSelectForLevel(array|int $level, array|string $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -350,7 +350,7 @@ class Credential {
     /**
      * Returns a select of Credentials with the given IDs
      * @param integer[] $credentialIDs
-     * @return array
+     * @return array{}[]
      */
     public static function getSelectForIDs(array $credentialIDs): array {
         if (empty($credentialIDs)) {
@@ -363,14 +363,14 @@ class Credential {
 
     /**
      * Returns the Credentials  that contains the text and the given Levels
-     * @param string            $text
-     * @param integer           $amount       Optional.
-     * @param integer[]|integer $level        Optional.
-     * @param integer[]|integer $credentialID Optional.
-     * @param boolean           $splitText    Optional.
-     * @return array
+     * @param string                 $text
+     * @param integer                $amount       Optional.
+     * @param integer[]|integer|null $level        Optional.
+     * @param integer[]|integer|null $credentialID Optional.
+     * @param boolean                $splitText    Optional.
+     * @return array{}[]
      */
-    public static function search(string $text, int $amount = 10, $level = null, $credentialID = null, bool $splitText = true): array {
+    public static function search(string $text, int $amount = 10, array|int $level = null, array|int $credentialID = null, bool $splitText = true): array {
         $query = Query::createSearch([ "firstName", "lastName", "email" ], $text, "LIKE", true, $splitText);
         $query->addIf("level",         "IN", Arrays::toArray($level),        $level !== null);
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
@@ -392,10 +392,10 @@ class Credential {
 
     /**
      * Returns a select of Credentials under the given conditions
-     * @param Query $query Optional.
-     * @return array
+     * @param Query|null $query Optional.
+     * @return array{}[]
      */
-    private static function requestSelect(Query $query = null): array {
+    private static function requestSelect(?Query $query = null): array {
         $request = self::schema()->getAll($query);
         $result  = [];
 
@@ -410,12 +410,12 @@ class Credential {
 
     /**
      * Returns a list of emails of the Credentials with the given Levels
-     * @param integer[]|integer $level
-     * @param string[]|string   $filter Optional.
-     * @param mixed             $value  Optional.
-     * @return array
+     * @param integer[]|integer    $level
+     * @param string[]|string|null $filter Optional.
+     * @param mixed|integer        $value  Optional.
+     * @return array{}[]
      */
-    public static function getEmailsForLevel(mixed $level, mixed $filter = null, mixed $value = 1): array {
+    public static function getEmailsForLevel(array|int $level, array|string $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
@@ -431,7 +431,7 @@ class Credential {
      * @param string        $password
      * @return boolean
      */
-    public static function isPasswordCorrect($credential, string $password): bool {
+    public static function isPasswordCorrect(Model|int $credential, string $password): bool {
         if (!($credential instanceof Model)) {
             $credential = self::getOne($credential, true);
         }
@@ -464,12 +464,12 @@ class Credential {
 
     /**
      * Creates a new Credential
-     * @param Request $request
-     * @param integer $level
-     * @param boolean $reqPassChange Optional.
+     * @param Request      $request
+     * @param integer      $level
+     * @param boolean|null $reqPassChange Optional.
      * @return integer
      */
-    public static function create(Request $request, int $level, bool $reqPassChange = null): int {
+    public static function create(Request $request, int $level, ?bool $reqPassChange = null): int {
         $fields = self::getFields($request, $level, $reqPassChange);
         return self::schema()->create($request, $fields + [
             "lastLogin"    => time(),
@@ -479,22 +479,22 @@ class Credential {
 
     /**
      * Edits the given Credential
-     * @param integer $credentialID
-     * @param Request $request
-     * @param integer $level         Optional.
-     * @param boolean $reqPassChange Optional.
-     * @param boolean $skipEmpty     Optional.
+     * @param integer      $credentialID
+     * @param Request      $request
+     * @param integer      $level         Optional.
+     * @param boolean|null $reqPassChange Optional.
+     * @param boolean      $skipEmpty     Optional.
      * @return boolean
      */
-    public static function edit(int $credentialID, Request $request, int $level = 0, bool $reqPassChange = null, bool $skipEmpty = false): bool {
+    public static function edit(int $credentialID, Request $request, int $level = 0, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
         $fields = self::getFields($request, $level, $reqPassChange);
         return self::schema()->edit($credentialID, $request, $fields, 0, $skipEmpty);
     }
 
     /**
      * Updates the given Credential
-     * @param integer $credentialID
-     * @param array   $fields
+     * @param integer   $credentialID
+     * @param array{}[] $fields
      * @return boolean
      */
     public static function update(int $credentialID, array $fields): bool {
@@ -512,12 +512,12 @@ class Credential {
 
     /**
      * Parses the data and returns the fields
-     * @param Request $request
-     * @param integer $level         Optional.
-     * @param boolean $reqPassChange Optional.
-     * @return array
+     * @param Request      $request
+     * @param integer      $level         Optional.
+     * @param boolean|null $reqPassChange Optional.
+     * @return array{}[]
      */
-    private static function getFields(Request $request, int $level = 0, bool $reqPassChange = null): array {
+    private static function getFields(Request $request, int $level = 0, ?bool $reqPassChange = null): array {
         $result = [];
         if ($request->has("password")) {
             $hash = self::createHash($request->password);
@@ -589,7 +589,7 @@ class Credential {
      * Sets the Credential Password
      * @param integer $credentialID
      * @param string  $password
-     * @return array
+     * @return array{}[]
      */
     public static function setPassword(int $credentialID, string $password): array {
         $hash = self::createHash($password);
@@ -699,7 +699,7 @@ class Credential {
      * Creates a Hash and Salt (if required) for the the given Password
      * @param string $pass
      * @param string $salt Optional.
-     * @return array
+     * @return array{}
      */
     public static function createHash(string $pass, string $salt = ""): array {
         $salt = !empty($salt) ? $salt : Strings::random(50);
@@ -709,10 +709,10 @@ class Credential {
 
     /**
      * Creates a list of names and emais for the given array
-     * @param array   $data
-     * @param string  $prefix     Optional.
-     * @param boolean $onlyActive Optional.
-     * @return array
+     * @param array{}[] $data
+     * @param string    $prefix     Optional.
+     * @param boolean   $onlyActive Optional.
+     * @return array{}[]
      */
     public static function createEmailList(array $data, string $prefix = "", bool $onlyActive = false): array {
         $result = [];
@@ -742,11 +742,11 @@ class Credential {
 
     /**
      * Returns a parsed Name for the given Credential
-     * @param Model|array $data
-     * @param string      $prefix Optional.
+     * @param Model|array{} $data
+     * @param string        $prefix Optional.
      * @return string
      */
-    public static function getName($data, string $prefix = ""): string {
+    public static function getName(Model|array $data, string $prefix = ""): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
@@ -763,12 +763,12 @@ class Credential {
 
     /**
      * Returns a parsed Phone for the given Credential
-     * @param Model|array $data
-     * @param string      $prefix   Optional.
-     * @param boolean     $withPlus Optional.
+     * @param Model|array{} $data
+     * @param string        $prefix   Optional.
+     * @param boolean       $withPlus Optional.
      * @return string
      */
-    public static function getPhone($data, string $prefix = "", bool $withPlus = false): string {
+    public static function getPhone(Model|array $data, string $prefix = "", bool $withPlus = false): string {
         $phone     = Arrays::getValue($data, "phone",     "", $prefix);
         $cellphone = Arrays::getValue($data, "cellphone", "", $prefix);
         $iddRoot   = Arrays::getValue($data, "iddRoot",   "", $prefix);
@@ -784,11 +784,11 @@ class Credential {
 
     /**
      * Returns a WhatsApp url
-     * @param Model|array $data
-     * @param string      $prefix Optional.
+     * @param Model|array{} $data
+     * @param string        $prefix Optional.
      * @return string
      */
-    public static function getWhatsAppUrl($data, string $prefix = ""): string {
+    public static function getWhatsAppUrl(Model|array $data, string $prefix = ""): string {
         $whatsapp = self::getPhone($data, $prefix, false);
         return Utils::getWhatsAppUrl($whatsapp);
     }

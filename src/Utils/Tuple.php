@@ -28,7 +28,7 @@ class Tuple implements IteratorAggregate {
      * @param boolean $condition Optional.
      * @return Tuple
      */
-    public static function create(string $key, $value, bool $condition = true): Tuple {
+    public static function create(string $key, mixed $value, bool $condition = true): Tuple {
         $tuple = new Tuple();
         $tuple->add($key, $value, $condition);
         return $tuple;
@@ -43,7 +43,7 @@ class Tuple implements IteratorAggregate {
      * @param boolean $condition Optional.
      * @return Tuple
      */
-    public function add(string $key, $value, bool $condition = true): Tuple {
+    public function add(string $key, mixed $value, bool $condition = true): Tuple {
         if ($condition && !empty($value)) {
             $this->items[] = (object)[
                 "key"   => $key,
@@ -63,10 +63,10 @@ class Tuple implements IteratorAggregate {
 
     /**
      * Returns true if there are items
-     * @param string|string[] $items Optional.
+     * @param string[]|string $items Optional.
      * @return boolean
      */
-    public function has($items = null): bool {
+    public function has(array|string $items = null): bool {
         if ($items == null) {
             return !empty($this->items);
         }

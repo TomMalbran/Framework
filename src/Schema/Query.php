@@ -11,25 +11,32 @@ use Framework\Utils\Period;
  */
 class Query {
 
-    public $where     = "";
-    public $params    = [];
-    public $prefix    = "AND";
-    public $addPrefix = false;
+    public string $where     = "";
+    public string $prefix    = "AND";
+    public bool   $addPrefix = false;
 
-    public $limit     = "";
-    public $groupBy   = "";
-    public $orderBy   = "";
+    public string $limit     = "";
+    public string $groupBy   = "";
+    public string $orderBy   = "";
 
-    public $columns   = [];
-    public $groups    = [];
-    public $orders    = [];
+    /** @var mixed[] */
+    public array  $params    = [];
+
+    /** @var string[] */
+    public array  $columns   = [];
+
+    /** @var string[] */
+    public array  $groups    = [];
+
+    /** @var string[] */
+    public array  $orders    = [];
 
 
     /**
      * Creates a new Query instance
-     * @param Query $query Optional.
+     * @param Query|null $query Optional.
      */
-    public function __construct(Query $query = null) {
+    public function __construct(?Query $query = null) {
         if (!empty($query)) {
             $this->where     = $query->where;
             $this->params    = $query->params;
@@ -62,12 +69,12 @@ class Query {
 
     /**
      * Adds an expression as an and
-     * @param string               $column
-     * @param string               $expression
-     * @param string|integer|array $value
+     * @param string                 $column
+     * @param string                 $expression
+     * @param mixed[]|integer|string $value
      * @return Query
      */
-    public function add(string $column, string $expression, $value): Query {
+    public function add(string $column, string $expression, array|int|string $value): Query {
         $prefix = $this->getPrefix();
         $binds  = "?";
 
@@ -113,13 +120,13 @@ class Query {
 
     /**
      * Adds an expression as an and if the value is not empty
-     * @param string  $column
-     * @param string  $expression
-     * @param mixed   $value
-     * @param boolean $condition  Optional.
+     * @param string       $column
+     * @param string       $expression
+     * @param mixed        $value
+     * @param boolean|null $condition  Optional.
      * @return Query
      */
-    public function addIf(string $column, string $expression, $value, bool $condition = null): Query {
+    public function addIf(string $column, string $expression, mixed $value, ?bool $condition = null): Query {
         if ($condition !== null && $condition) {
             $this->add($column, $expression, $value);
         } elseif ($condition === null && !empty($value)) {
@@ -134,7 +141,7 @@ class Query {
      * @param mixed  ...$values
      * @return Query
      */
-    public function addExp(string $expression, ...$values): Query {
+    public function addExp(string $expression, mixed ...$values): Query {
         $prefix       = $this->getPrefix();
         $this->where .= "{$prefix}{$expression} ";
         $this->params = array_merge($this->params, $values);
@@ -147,7 +154,7 @@ class Query {
      * @param mixed  ...$values
      * @return Query
      */
-    public function addExpIf(string $expression, ...$values): Query {
+    public function addExpIf(string $expression, mixed ...$values): Query {
         if (!empty($values[0])) {
             $this->addExp($expression, ...$values);
         }
@@ -244,14 +251,14 @@ class Query {
 
     /**
      * Adds a Search expression
-     * @param string|string[] $column
+     * @param string[]|string $column
      * @param mixed           $value
      * @param string          $expression      Optional.
      * @param boolean         $caseInsensitive Optional.
      * @param boolean         $splitValue      Optional.
      * @return Query
      */
-    public function search($column, $value, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
+    public function search(array|string $column, mixed $value, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
         if (empty($value)) {
             return $this;
         }
@@ -349,11 +356,11 @@ class Query {
 
     /**
      * Adds an Limit
-     * @param integer $from
-     * @param integer $to   Optional.
+     * @param integer      $from
+     * @param integer|null $to   Optional.
      * @return Query
      */
-    public function limit(int $from, int $to = null): Query {
+    public function limit(int $from, ?int $to = null): Query {
         if ($to != null) {
             $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
         } else {
@@ -364,11 +371,11 @@ class Query {
 
     /**
      * Adds a Limit
-     * @param integer $from Optional.
-     * @param integer $to   Optional.
+     * @param integer|null $from Optional.
+     * @param integer|null $to   Optional.
      * @return Query
      */
-    public function limitIf(int $from = null, int $to = null) {
+    public function limitIf(?int $from = null, ?int $to = null): Query {
         if (!empty($from)) {
             $this->limit($from, $to);
         }
@@ -408,10 +415,10 @@ class Query {
 
     /**
      * Returns true if there is an Order By
-     * @param string $order Optional.
+     * @param string|null $order Optional.
      * @return boolean
      */
-    public function hasOrder(string $order = null): bool {
+    public function hasOrder(?string $order = null): bool {
         if (!empty($order)) {
             return Arrays::contains($this->orders, $order);
         }
@@ -420,10 +427,10 @@ class Query {
 
     /**
      * Returns true if there is an Group By
-     * @param string $group Optional.
+     * @param string|null $group Optional.
      * @return boolean
      */
-    public function hasGroup(string $group = null): bool {
+    public function hasGroup(?string $group = null): bool {
         if (!empty($group)) {
             return Arrays::contains($this->groups, $group);
         }
@@ -476,9 +483,9 @@ class Query {
     /**
      * Returns the params part of the Query to use with the Database
      * @param boolean $duplicate Optional.
-     * @return string
+     * @return mixed[]
      */
-    public function getParams(bool $duplicate = false): string {
+    public function getParams(bool $duplicate = false): array {
         if ($duplicate) {
             return array_merge($this->params, $this->params);
         }
@@ -487,7 +494,7 @@ class Query {
 
     /**
      * Returns the Columns
-     * @return array
+     * @return string[]
      */
     public function getColumns(): array {
         $result = array_merge($this->columns, $this->groups, $this->orders);
@@ -516,12 +523,12 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string $column     Optional.
-     * @param string $expression Optional.
-     * @param mixed  $value      Optional.
+     * @param string     $column     Optional.
+     * @param string     $expression Optional.
+     * @param mixed|null $value      Optional.
      * @return Query
      */
-    public static function create(string $column = "", string $expression = "", $value = null): Query {
+    public static function create(string $column = "", string $expression = "", mixed $value = null): Query {
         $query = new Query();
         if (!empty($column)) {
             $query->add($column, $expression, $value);
@@ -531,13 +538,13 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string  $column     Optional.
-     * @param string  $expression Optional.
-     * @param mixed   $value      Optional.
-     * @param boolean $condition  Optional.
+     * @param string       $column     Optional.
+     * @param string       $expression Optional.
+     * @param mixed|null   $value      Optional.
+     * @param boolean|null $condition  Optional.
      * @return Query
      */
-    public static function createIf(string $column = "", string $expression = "", $value = null, bool $condition = null): Query {
+    public static function createIf(string $column = "", string $expression = "", mixed $value = null, ?bool $condition = null): Query {
         $query = new Query();
         if (!empty($column)) {
             $query->addIf($column, $expression, $value, $condition);
@@ -547,14 +554,14 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string|string[] $column          Optional.
-     * @param mixed           $value           Optional.
-     * @param string          $expression      Optional.
-     * @param boolean         $caseInsensitive Optional.
-     * @param boolean         $splitValue      Optional.
+     * @param string[]|string|null $column          Optional.
+     * @param mixed|null           $value           Optional.
+     * @param string               $expression      Optional.
+     * @param boolean              $caseInsensitive Optional.
+     * @param boolean              $splitValue      Optional.
      * @return Query
      */
-    public static function createSearch($column = null, $value = null, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
+    public static function createSearch(array|string $column = null, mixed $value = null, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {
             $query->search($column, $value, $expression, $caseInsensitive, $splitValue);
@@ -595,7 +602,7 @@ class Query {
 
     /**
      * Creates a list of question marks for the given array
-     * @param array $array
+     * @param mixed[] $array
      * @return string
      */
     public static function createBinds(array $array): string {
@@ -608,17 +615,17 @@ class Query {
 
     /**
      * Method generates equality between columns function call
-     * @param string $column Optional.
-     * @return array
+     * @param string|null $column Optional.
+     * @return array{}
      */
-    public static function equal(string $column = null): array {
+    public static function equal(?string $column = null): array {
         return [ "[E]" => $column ];
     }
 
     /**
      * Method generates incremental function call
      * @param integer $amount Optional.
-     * @return array
+     * @return array{}
      */
     public static function inc(int $amount = 1): array {
         return [ "[I]" => "+" . $amount ];
@@ -627,7 +634,7 @@ class Query {
     /**
      * Method generates decrimental function call
      * @param integer $amount Optional.
-     * @return array
+     * @return array{}
      */
     public static function dec(int $amount = 1): array {
         return [ "[I]" => "-" . $amount ];
@@ -635,18 +642,18 @@ class Query {
 
     /**
      * Method generates change boolean function call
-     * @param string $column Optional.
-     * @return array
+     * @param string|null $column Optional.
+     * @return array{}
      */
-    public static function not(string $column = null): array {
+    public static function not(?string $column = null): array {
         return [ "[N]" => $column ];
     }
 
     /**
      * Method generates user defined function call
-     * @param string $expression
-     * @param array  $params     Optional.
-     * @return array
+     * @param string  $expression
+     * @param mixed[] $params     Optional.
+     * @return array{}
      */
     public static function func(string $expression, array $params = []): array {
         return [ "[F]" => [ $expression, $params ]];
@@ -654,7 +661,7 @@ class Query {
 
     /**
      * Method generates an UUID function call
-     * @return array
+     * @return array{}
      */
     public static function guid(): array {
         return self::func("UUID()");
@@ -664,7 +671,7 @@ class Query {
      * Method generates an AES Encrypt function call
      * @param string $value
      * @param string $key
-     * @return array
+     * @return array{}
      */
     public static function encrypt(string $value, string $key): array {
         return self::func("AES_ENCRYPT(?, ?)", [ $value, $key ]);
@@ -675,7 +682,7 @@ class Query {
      * @param string $column
      * @param string $value
      * @param string $replace
-     * @return array
+     * @return array{}
      */
     public static function replace(string $column, string $value, string $replace): array {
         return self::func("REPLACE($column, ?, ?)", [ $value, $replace ]);

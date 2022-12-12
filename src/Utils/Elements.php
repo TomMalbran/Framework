@@ -41,10 +41,10 @@ class Elements {
 
     /**
      * Returns true if there is at least 1 Element, or the given Element exists
-     * @param string|string[] $elements Optional.
+     * @param string[]|string $elements Optional.
      * @return boolean
      */
-    public function has($elements = null): bool {
+    public function has(array|string $elements = null): bool {
         if ($elements == null) {
             return !empty($this->elements);
         }
@@ -97,7 +97,7 @@ class Elements {
      * @param string $key
      * @return mixed
      */
-    public function offsetGet(string $key) {
+    public function offsetGet(string $key): mixed {
         return $this->elements[$key];
     }
 
@@ -107,7 +107,7 @@ class Elements {
      * @param mixed  $value
      * @return void
      */
-    public function offsetSet(string $key, $value) {
+    public function offsetSet(string $key, mixed $value): void {
         $this->elements[$key] = $value;
     }
 
@@ -116,7 +116,7 @@ class Elements {
      * @param string $key
      * @return boolean
      */
-    public function offsetExists(string $key) {
+    public function offsetExists(string $key): bool {
         return array_key_exists($key, $this->elements);
     }
 
@@ -125,7 +125,7 @@ class Elements {
      * @param string $key
      * @return void
      */
-    public function offsetUnset(string $key) {
+    public function offsetUnset(string $key): void {
         unset($this->elements[$key]);
     }
 }

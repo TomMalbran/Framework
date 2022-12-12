@@ -180,7 +180,7 @@ class Field {
      * @param string  $masterKey Optional.
      * @return mixed
      */
-    public function fromRequest(Request $request, string $masterKey = "") {
+    public function fromRequest(Request $request, string $masterKey = ""): mixed {
         $result = null;
 
         switch ($this->type) {

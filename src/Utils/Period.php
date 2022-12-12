@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Request;
+use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 
@@ -24,12 +26,12 @@ class Period {
     const AllPeriod  = 2;
     const Custom     = 1;
 
-    public $period   = 0;
-    public $fromTime = 0;
-    public $toTime   = 0;
+    public int $period   = 0;
+    public int $fromTime = 0;
+    public int $toTime   = 0;
 
-    /** All the Period Names */
-    public static $Names = [
+    /** @var array{} All the Period Names */
+    public static array $Names = [
         self::Last7Days  => "Últimos 7 días",
         self::Last15Days => "Últimos 15 días",
         self::Last30Days => "Últimos 30 días",
@@ -52,7 +54,7 @@ class Period {
      * Creates a new Period instance
      * @param Request|Model $data
      */
-    public function __construct($data) {
+    public function __construct(Request|Model $data) {
         $this->period = self::Custom;
 
         if ($data->has("fromDate")) {
@@ -196,7 +198,7 @@ class Period {
 
     /**
      * Returns a select of Periods
-     * @return object[]
+     * @return array{}[]
      */
     public static function getSelect(): array {
         return Arrays::createSelectFromMap(self::$Names);

@@ -16,9 +16,9 @@ class Migration {
 
     /**
      * Migrates the Tables
-     * @param Database $db
-     * @param array    $schemas
-     * @param boolean  $canDelete Optional.
+     * @param Database  $db
+     * @param array{}[] $schemas
+     * @param boolean   $canDelete Optional.
      * @return void
      */
     public static function migrate(Database $db, array $schemas, bool $canDelete = false): void {
@@ -31,11 +31,11 @@ class Migration {
 
     /**
      * Moves the Tables
-     * @param Database $db
-     * @param array    $movements
+     * @param Database  $db
+     * @param array{}[] $movements
      * @return void
      */
-    private static function moveTables(Database $db, array $movements) {
+    private static function moveTables(Database $db, array $movements): void {
         $movement = Settings::getCore($db, "movement");
         $last     = count($movements);
         $didMove  = false;
@@ -61,13 +61,13 @@ class Migration {
 
     /**
      * Migrates the Tables
-     * @param Database $db
-     * @param array    $schemas
-     * @param array    $updates
-     * @param boolean  $canDelete Optional.
+     * @param Database  $db
+     * @param array{}[] $schemas
+     * @param array{}[] $updates
+     * @param boolean   $canDelete Optional.
      * @return void
      */
-    private static function migrateTables(Database $db, array $schemas, array $updates, bool $canDelete = false) {
+    private static function migrateTables(Database $db, array $schemas, array $updates, bool $canDelete = false): void {
         $tableNames  = $db->getTables(null, false);
         $schemaNames = [];
 
@@ -117,8 +117,8 @@ class Migration {
     /**
      * Delete the Tables or show which to delete
      * @param Database $db
-     * @param array    $tableNames
-     * @param array    $schemaNames
+     * @param string[] $tableNames
+     * @param string[] $schemaNames
      * @param boolean  $canDelete
      * @return void
      */
@@ -141,7 +141,7 @@ class Migration {
      * Updates the Table
      * @param Database  $db
      * @param Structure $structure
-     * @param array     $updates
+     * @param array{}[] $updates
      * @param boolean   $canDelete
      * @return void
      */
@@ -346,7 +346,7 @@ class Migration {
      * @param Database $db
      * @return void
      */
-    private static function extraMigrations(Database $db) {
+    private static function extraMigrations(Database $db): void {
         $migration = Settings::getCore($db, "migration");
         $path      = Framework::getPath(Framework::MigrationsDir);
 

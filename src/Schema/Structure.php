@@ -43,7 +43,7 @@ class Structure {
     /**
      * Creates a new Structure instance
      * @param string  $schemaKey
-     * @param mixed[] $data
+     * @param array{} $data
      */
     public function __construct(string $schemaKey, array $data) {
         $this->table         = $data["table"];

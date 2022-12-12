@@ -77,7 +77,7 @@ class DateTime {
      * @param boolean $useTimezone Optional.
      * @return integer
      */
-    public static function toTime($time, bool $useTimezone = true): int {
+    public static function toTime(mixed $time, bool $useTimezone = true): int {
         if (is_string($time)) {
             $time = strtotime($time);
         }
@@ -93,7 +93,7 @@ class DateTime {
      * @param integer $timezone Optional.
      * @return integer
      */
-    public static function toTimezone($time, int $timezone = null) {
+    public static function toTimezone(mixed $time, int $timezone = null): int {
         if (is_string($time)) {
             $time = strtotime($time);
         }
@@ -293,7 +293,7 @@ class DateTime {
      * @param integer $timezone Optional.
      * @return boolean
      */
-    public static function isFutureTime($time, int $timezone = null): bool {
+    public static function isFutureTime(mixed $time, int $timezone = null): bool {
         $seconds = self::toTimezone($time, $timezone);
         return $seconds > time();
     }
@@ -304,7 +304,7 @@ class DateTime {
      * @param integer $timezone Optional.
      * @return boolean
      */
-    public static function isToday($time, int $timezone = null): bool {
+    public static function isToday(mixed $time, int $timezone = null): bool {
         $seconds = self::toTimezone($time, $timezone);
         return date("d-m-Y", $seconds) == date("d-m-Y");
     }
@@ -339,7 +339,7 @@ class DateTime {
      * @param integer $timezone Optional.
      * @return string
      */
-    public static function format($time, string $format, int $timezone = null): string {
+    public static function format(mixed $time, string $format, int $timezone = null): string {
         $seconds = self::toTimezone($time, $timezone);
         if (empty($seconds)) {
             return "";
@@ -354,7 +354,7 @@ class DateTime {
      * @param integer $timezone Optional.
      * @return string
      */
-    public static function toString($time, string $format, int $timezone = null): string {
+    public static function toString(mixed $time, string $format, int $timezone = null): string {
         if (!empty(self::$formats[$format])) {
             return self::format($time, self::$formats[$format], $timezone);
         }
@@ -449,7 +449,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addDays(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false) {
+    public static function addDays(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
         $result = mktime(0, 0, 0, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
@@ -462,7 +462,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getWeekStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false) {
+    public static function getWeekStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
         $time     = empty($time) ? time() : $time;
         $startDay = date("j", $time) - date("w", $time);
         $result   = mktime(0, 0, 0, date("n", $time), $startDay + $dayDiff, date("Y", $time));
@@ -489,7 +489,7 @@ class DateTime {
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addMonths(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false) {
+    public static function addMonths(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
         $result = mktime(0, 0, 0, date("n", $time) + $monthDiff, date("j", $time), date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
@@ -569,7 +569,7 @@ class DateTime {
      * @param integer $timezone Optional.
      * @return integer
      */
-    public static function getAge($time, int $timezone = null): int {
+    public static function getAge(mixed $time, int $timezone = null): int {
         $seconds  = self::toTimezone($time, $timezone);
         if (empty($seconds)) {
             return 0;

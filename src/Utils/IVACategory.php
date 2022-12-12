@@ -74,7 +74,7 @@ class IVACategory extends Enum {
      * @param Model $model
      * @return array
      */
-    public static function getTypeAndDocument(Model $model) {
+    public static function getTypeAndDocument(Model $model): array {
         $cuit   = $model->getInt("cuit");
         $dni    = $model->getInt("dni");
         $result = [

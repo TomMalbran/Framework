@@ -13,8 +13,8 @@ use stdClass;
  */
 class Config {
 
-    private static $loaded = false;
-    private static $data   = null;
+    private static bool  $loaded = false;
+    private static array $data   = [];
 
 
     /**
@@ -92,7 +92,7 @@ class Config {
      * @param string $property
      * @return mixed
      */
-    public static function get(string $property) {
+    public static function get(string $property): mixed {
         self::load();
 
         // Check if there is a property with the given value

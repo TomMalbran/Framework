@@ -58,7 +58,7 @@ class Language {
      * @param string $value
      * @return string
      */
-    public static function getNLS(string $value) {
+    public static function getNLS(string $value): string {
         if ($value != "root") {
             return $value;
         }

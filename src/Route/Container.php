@@ -17,7 +17,7 @@ class Container {
      * @param mixed  ...$params
      * @return object
      */
-    public static function create(string $key, ...$params): object {
+    public static function create(string $key, mixed ...$params): object {
         self::$keys = [];
         return self::resolve($key, false, $params);
     }
@@ -28,7 +28,7 @@ class Container {
      * @param mixed  ...$params
      * @return object
      */
-    public static function bind(string $key, ...$params): object {
+    public static function bind(string $key, mixed ...$params): object {
         self::$keys = [];
         return self::resolve($key, true, $params);
     }

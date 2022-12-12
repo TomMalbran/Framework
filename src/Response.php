@@ -180,7 +180,7 @@ class Response {
      * @param array|Model $data Optional.
      * @return array|null
      */
-    private static function createData($data = null) {
+    private static function createData($data = null): mixed {
         if ($data != null && $data instanceof Model) {
             return $data->toObject();
         }

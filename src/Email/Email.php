@@ -20,12 +20,12 @@ use League\OAuth2\Client\Provider\Google;
  */
 class Email {
 
-    private static $loaded   = false;
-    private static $template = null;
-    private static $url      = "";
-    private static $name     = "";
-    private static $smtp     = null;
-    private static $google   = null;
+    private static bool    $loaded   = false;
+    private static ?string $template = null;
+    private static string  $url      = "";
+    private static string  $name     = "";
+    private static mixed   $smtp     = null;
+    private static mixed   $google   = null;
 
 
     /**
@@ -166,12 +166,12 @@ class Email {
     /**
      * Sends the given Template Email
      * @param Model           $template
-     * @param string|string[] $sendTo
+     * @param string[]|string $sendTo
      * @param string          $message  Optional.
      * @param string          $subject  Optional.
      * @return boolean
      */
-    public static function sendTemplate(Model $template, $sendTo, string $message = null, string $subject = null): bool {
+    public static function sendTemplate(Model $template, array|string $sendTo, string $message = null, string $subject = null): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
@@ -243,7 +243,7 @@ class Email {
      * @param boolean $withScore Optional.
      * @return boolean
      */
-    public static function isCaptchaValid(Request $request, bool $withScore = false) {
+    public static function isCaptchaValid(Request $request, bool $withScore = false): bool {
         $recaptchaSecret = Config::get("recaptchaSecret");
         if (!$request->has("g-recaptcha-response") || empty($recaptchaSecret)) {
             return false;

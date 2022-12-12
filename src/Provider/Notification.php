@@ -53,9 +53,9 @@ class Notification {
      * @param string  $body
      * @param integer $type
      * @param integer $id
-     * @return string
+     * @return string|null
      */
-    public static function sendToAll(string $title, string $body, int $type, int $id) {
+    public static function sendToAll(string $title, string $body, int $type, int $id): ?string {
         return self::send($title, $body, $type, $id, [
             "included_segments" => [ "All" ],
         ]);
@@ -68,9 +68,9 @@ class Notification {
      * @param integer  $type
      * @param integer  $id
      * @param string[] $playerIDs
-     * @return string
+     * @return string|null
      */
-    public static function sendToSome(string $title, string $body, int $type, int $id, array $playerIDs) {
+    public static function sendToSome(string $title, string $body, int $type, int $id, array $playerIDs): ?string {
         if (empty($playerIDs)) {
             return null;
         }
@@ -86,9 +86,9 @@ class Notification {
      * @param integer $type
      * @param integer $id
      * @param string  $playerID
-     * @return string
+     * @return string|null
      */
-    public static function sendToOne(string $title, string $body, int $type, int $id, string $playerID) {
+    public static function sendToOne(string $title, string $body, int $type, int $id, string $playerID): ?string {
         return self::send($title, $body, $type, $id, [
             "include_player_ids" => [ $playerID ],
         ]);
@@ -101,9 +101,9 @@ class Notification {
      * @param integer $type
      * @param integer $id
      * @param array   $params
-     * @return string
+     * @return string|null
      */
-    private static function send(string $title, string $body, int $type, int $id, array $params) {
+    private static function send(string $title, string $body, int $type, int $id, array $params): ?string {
         self::load();
         if (empty(self::$api)) {
             return null;

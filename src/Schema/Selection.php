@@ -69,11 +69,11 @@ class Selection {
 
     /**
      * Adds extra Selects
-     * @param string|string[] $selects
+     * @param string[]|string $selects
      * @param boolean         $addMainKey Optional.
      * @return void
      */
-    public function addSelects($selects, bool $addMainKey = false): void {
+    public function addSelects(array|string $selects, bool $addMainKey = false): void {
         $selects = Arrays::toArray($selects);
         foreach ($selects as $select) {
             if ($addMainKey) {
@@ -229,10 +229,10 @@ class Selection {
 
     /**
      * Generates the Result from the Request
-     * @param string|string[] $extras Optional.
+     * @param string[]|string $extras Optional.
      * @return array
      */
-    public function resolve($extras = null): array {
+    public function resolve(array|string $extras = null): array {
         $result = [];
 
         foreach ($this->request as $row) {

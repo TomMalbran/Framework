@@ -57,7 +57,7 @@ class Count {
      * @param array $data
      * @return mixed
      */
-    public function getValue(array $data) {
+    public function getValue(array $data): mixed {
         $key    = $this->asKey;
         $result = !empty($data[$key]) ? $data[$key] : 0;
 

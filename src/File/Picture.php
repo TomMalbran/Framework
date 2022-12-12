@@ -51,7 +51,7 @@ class Picture {
      * @param boolean $centered Optional.
      * @return void
      */
-    public function writeText(string $text, int $x, int $y, int $color, string $fontFile, int $fontSize, bool $centered = false) {
+    public function writeText(string $text, int $x, int $y, int $color, string $fontFile, int $fontSize, bool $centered = false): void {
         if ($centered) {
             $textWidth = Image::getTextWidth($text, $fontFile, $fontSize);
             $x -= $textWidth / 2;
@@ -65,7 +65,7 @@ class Picture {
      * @param string  $name     Optional.
      * @return void
      */
-    public function print(bool $download = false, string $name = "image") {
+    public function print(bool $download = false, string $name = "image"): void {
         $contentType = Image::getContentType($this->type);
 
         header("Content-Type: $contentType");

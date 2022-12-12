@@ -187,7 +187,7 @@ class EmailReader {
      * @param mixed $payload
      * @return string
      */
-    private static function getBody($payload) {
+    private static function getBody(mixed $payload): string {
         $body   = $payload->getBody();
         $result = self::decodeBody($body["data"]);
 
@@ -223,7 +223,7 @@ class EmailReader {
      * @param string|null $body
      * @return string|null
      */
-    private static function decodeBody($body) {
+    private static function decodeBody(?string $body): ?string {
         if (empty($body)) {
             return null;
         }

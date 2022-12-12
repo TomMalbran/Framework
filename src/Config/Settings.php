@@ -30,7 +30,7 @@ class Settings {
      * @param string $preference
      * @return mixed|null
      */
-    public static function get(string $preference) {
+    public static function get(string $preference): mixed {
         $section  = "general";
         $variable = $preference;
 
@@ -86,7 +86,7 @@ class Settings {
      * @param boolean $asObject Optional.
      * @return array|object
      */
-    public static function getAll(string $section = null, bool $asObject = false) {
+    public static function getAll(string $section = null, bool $asObject = false): mixed {
         $request = self::getSettings($section);
         $result  = [];
 
@@ -136,7 +136,7 @@ class Settings {
      * @param mixed  $value
      * @return void
      */
-    public static function set(string $section, string $variable, $value): void {
+    public static function set(string $section, string $variable, mixed $value): void {
         $query = Query::create("section", "=", $section);
         $query->add("variable", "=", $variable);
         $model = self::schema()->getOne($query);
@@ -236,9 +236,9 @@ class Settings {
      * Returns a Core Data Setting
      * @param Database $db
      * @param string   $variable
-     * @return array
+     * @return array|null
      */
-    public static function getCoreData(Database $db, string $variable) {
+    public static function getCoreData(Database $db, string $variable): mixed {
         $query  = Query::create("section", "=", "general")->add("variable", "=", $variable);
         $result = $db->getValue("settings", "value", $query);
         return !empty($result) ? JSON::decode($result, true) : null;
@@ -251,7 +251,7 @@ class Settings {
      * @param mixed    $value
      * @return void
      */
-    public static function setCoreData(Database $db, string $variable, $value): void {
+    public static function setCoreData(Database $db, string $variable, mixed $value): void {
         $db->insert("settings", [
             "section"      => "general",
             "variable"     => $variable,

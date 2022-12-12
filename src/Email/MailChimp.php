@@ -96,7 +96,7 @@ class MailChimp {
      * @param string $email
      * @return array|null
      */
-    public static function getSubscriber(string $email) {
+    public static function getSubscriber(string $email): mixed {
         self::load();
         if (!self::$api) {
             return null;
@@ -235,7 +235,7 @@ class MailChimp {
      * @param integer  $folderID   Optional.
      * @return string|null
      */
-    public static function sendCampaign(string $subject, int $time, int $templateID, array $sections = null, array $emails = null, int $folderID = 0) {
+    public static function sendCampaign(string $subject, int $time, int $templateID, array $sections = null, array $emails = null, int $folderID = 0): ?string {
         self::load();
 
         // We do Nothing
@@ -379,7 +379,7 @@ class MailChimp {
      * @param string[] $emails Optional.
      * @return array
      */
-    private static function parseRecipients(array $emails = null) {
+    private static function parseRecipients(array $emails = null): array {
         $recipients = [ "list_id" => self::$config->list ];
         if (empty($emails)) {
             return $recipients;

@@ -20,15 +20,18 @@ use ArrayAccess;
  */
 class Request implements ArrayAccess {
 
-    private $request;
-    private $files;
+    /** @var array{} */
+    private array $request;
+
+    /** @var array{} */
+    private array $files;
 
 
     /**
      * Creates a new Request instance
-     * @param array $request Optional.
+     * @param array{}|null $request Optional.
      */
-    public function __construct(array $request = null) {
+    public function __construct(?array $request = null) {
         $this->request = $request ?: $_REQUEST;
         $this->files   = $_FILES;
     }
@@ -76,8 +79,8 @@ class Request implements ArrayAccess {
 
     /**
      * Returns the request data at the given key or the default
-     * @param string $key
-     * @param mixed  $default Optional.
+     * @param string       $key
+     * @param mixed|string $default Optional.
      * @return mixed
      */
     public function get(string $key, mixed $default = ""): mixed {
@@ -120,7 +123,7 @@ class Request implements ArrayAccess {
      * @param float  $default Optional.
      * @return float
      */
-    public function getFloat(string $key, float $default = 0): int {
+    public function getFloat(string $key, float $default = 0): float {
         return isset($this->request[$key]) ? (float)$this->request[$key] : $default;
     }
 
@@ -147,7 +150,7 @@ class Request implements ArrayAccess {
     /**
      * Returns the request data at the given key as an array and removing the empty entries
      * @param string $key
-     * @return array
+     * @return mixed[]
      */
     public function getArray(string $key): array {
         return Arrays::removeEmpty($this->get($key, []));
@@ -155,9 +158,9 @@ class Request implements ArrayAccess {
 
     /**
      * Returns the request data at the given key from an array or the default
-     * @param string  $key
-     * @param integer $index
-     * @param mixed   $default Optional.
+     * @param string       $key
+     * @param integer      $index
+     * @param mixed|string $default Optional.
      * @return mixed
      */
     public function getFromArray(string $key, int $index, mixed $default = ""): mixed {
@@ -171,7 +174,7 @@ class Request implements ArrayAccess {
      * Returns the request data at the given key as JSON
      * @param string  $key
      * @param boolean $asArray Optional.
-     * @return object|array
+     * @return mixed
      */
     public function getJSON(string $key, bool $asArray = false): mixed {
         return JSON::decode($this->get($key, "[]"), $asArray);
@@ -180,7 +183,7 @@ class Request implements ArrayAccess {
     /**
      * Returns the request data at the given key as CSV
      * @param string $key
-     * @return array
+     * @return mixed[]
      */
     public function getCSV(string $key): array {
         $result = Strings::split($this->get($key, ""), ",");
@@ -191,8 +194,8 @@ class Request implements ArrayAccess {
 
     /**
      * Sets the given key on the request data with the given value
-     * @param string $key
-     * @param mixed  $value Optional.
+     * @param string       $key
+     * @param mixed|string $value Optional.
      * @return void
      */
     public function set(string $key, mixed $value = ""): void {
@@ -201,7 +204,7 @@ class Request implements ArrayAccess {
 
     /**
      * Sets the data of the give object
-     * @param array $object
+     * @param mixed[] $object
      * @return void
      */
     public function setObject(array $object): void {
@@ -225,11 +228,11 @@ class Request implements ArrayAccess {
 
     /**
      * Returns true if the given key exists in the request data
-     * @param string|string[] $key   Optional.
-     * @param integer         $index Optional.
+     * @param string[]|string|null $key   Optional.
+     * @param integer|null         $index Optional.
      * @return boolean
      */
-    public function has($key = null, int $index = null): bool {
+    public function has(array|string $key = null, ?int $index = null): bool {
         if ($key === null) {
             return !empty($this->request);
         }
@@ -249,10 +252,10 @@ class Request implements ArrayAccess {
 
     /**
      * Returns true if the given key is set in the request data
-     * @param string|string[] $key
+     * @param string[]|string $key
      * @return boolean
      */
-    public function exists($key): bool {
+    public function exists(array|string $key): bool {
         if (is_array($key)) {
             foreach ($key as $keyID) {
                 if (!isset($this->request[$keyID])) {
@@ -315,7 +318,7 @@ class Request implements ArrayAccess {
      * @param integer|null $decimals Optional.
      * @return boolean
      */
-    public function isNumeric(string $key, ?int $min = 1, ?int $max = null, int $decimals = null): bool {
+    public function isNumeric(string $key, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
         return Numbers::isValidFloat($this->getFloat($key), $min, $max, $decimals);
     }
 
@@ -332,12 +335,12 @@ class Request implements ArrayAccess {
 
     /**
      * Returns true if the given value is alpha-numeric
-     * @param string  $key
-     * @param boolean $withDashes Optional.
-     * @param integer $length     Optional.
+     * @param string       $key
+     * @param boolean      $withDashes Optional.
+     * @param integer|null $length     Optional.
      * @return boolean
      */
-    public function isAlphaNum(string $key, bool $withDashes = false, int $length = null): bool {
+    public function isAlphaNum(string $key, bool $withDashes = false, ?int $length = null): bool {
         return Strings::isAlphaNum($this->get($key, ""), $withDashes, $length);
     }
 
@@ -456,11 +459,11 @@ class Request implements ArrayAccess {
 
     /**
      * Returns true if the given hour is Valid
-     * @param string   $key
-     * @param string[] $minutes Optional.
+     * @param string|null   $key
+     * @param string[]|null $minutes Optional.
      * @return boolean
      */
-    public function isValidHour(string $key, array $minutes = null): bool {
+    public function isValidHour(?string $key, ?array $minutes = null): bool {
         return DateTime::isValidHour($this->get($key), $minutes);
     }
 
@@ -538,7 +541,7 @@ class Request implements ArrayAccess {
 
     /**
      * Returns the request as an array
-     * @return array
+     * @return array{}
      */
     public function toArray(): array {
         return $this->request;
@@ -567,11 +570,11 @@ class Request implements ArrayAccess {
 
     /**
      * Returns the given price in Cents
-     * @param string  $key
-     * @param integer $index Optional.
+     * @param string       $key
+     * @param integer|null $index Optional.
      * @return integer
      */
-    public function toCents(string $key, int $index = null): int {
+    public function toCents(string $key, ?int $index = null): int {
         $value = $index !== null ? $this->getFromArray($key, $index, 0) : $this->get($key);
         return Numbers::toCents((float)$value);
     }
@@ -698,7 +701,7 @@ class Request implements ArrayAccess {
     /**
      * Returns the Array keys from the given array
      * @param string $key
-     * @return array
+     * @return string[]
      */
     public function getKeys(string $key): array {
         return array_keys($this->get($key, []));
@@ -763,10 +766,10 @@ class Request implements ArrayAccess {
     /**
      * Returns true if the file at the given key has the given extension
      * @param string          $key
-     * @param string|string[] $extensions
+     * @param string[]|string $extensions
      * @return boolean
      */
-    public function hasExtension(string $key, $extensions): bool {
+    public function hasExtension(string $key, array|string $extensions): bool {
         if ($this->hasFile($key)) {
             return File::hasExtension($_FILES[$key]["name"], $extensions);
         }
@@ -789,7 +792,7 @@ class Request implements ArrayAccess {
 
     /**
      * Dumps the Request
-     * @return array
+     * @return array{}
      */
     public function toObject(): array {
         return $this->request;

@@ -289,7 +289,7 @@ class Image {
      * @param integer $imgType
      * @return string
      */
-    public static function getContentType(int $imgType) {
+    public static function getContentType(int $imgType): string {
         return self::$imageData[$imgType][2];
     }
 
@@ -298,7 +298,7 @@ class Image {
      * @param integer $imgType
      * @return string
      */
-    public static function getExtension(int $imgType) {
+    public static function getExtension(int $imgType): string {
         return self::$imageData[$imgType][3];
     }
 
@@ -308,7 +308,7 @@ class Image {
      * @param mixed   $image
      * @return mixed
      */
-    public static function createSrcImage(int $imgType, $image) {
+    public static function createSrcImage(int $imgType, mixed $image): mixed {
         return self::$imageData[$imgType][0]($image);
     }
 
@@ -319,7 +319,7 @@ class Image {
      * @param integer $height
      * @return mixed
      */
-    public static function createDstImage(int $imgType, int $width, int $height) {
+    public static function createDstImage(int $imgType, int $width, int $height): mixed {
         $result = imagecreatetruecolor($width, $height);
         if (Arrays::contains(self::$transTypes, $imgType)) {
             imagealphablending($result, false);
@@ -338,7 +338,7 @@ class Image {
      * @param integer $quality  Optional.
      * @return void
      */
-    public static function createImage(int $imgType, $image, string $fileName = null, int $quality = 90) {
+    public static function createImage(int $imgType, mixed $image, string $fileName = null, int $quality = 90): void {
         if ($imgType == 2) {
             self::$imageData[$imgType][1]($image, $fileName, $quality);
         } else {
@@ -352,7 +352,7 @@ class Image {
      * @param mixed $image
      * @return void
      */
-    public static function destroy($image) {
+    public static function destroy(mixed $image): void {
         imagedestroy($image);
     }
 }

@@ -6,6 +6,7 @@ use Framework\Schema\Schema;
 use Framework\Schema\Structure;
 use Framework\Schema\Subrequest;
 use Framework\Schema\Migration;
+use Framework\Schema\Database;
 use Framework\Utils\Arrays;
 
 /**
@@ -13,11 +14,17 @@ use Framework\Utils\Arrays;
  */
 class Factory {
 
-    private static $loaded     = false;
-    private static $db         = null;
-    private static $data       = [];
-    private static $structures = [];
-    private static $schemas    = [];
+    private static bool      $loaded     = false;
+    private static ?Database $db         = null;
+
+    /** @var array{}[] */
+    private static array     $data       = [];
+
+    /** @var Structure[] */
+    private static array     $structures = [];
+
+    /** @var Schema[] */
+    private static array     $schemas    = [];
 
 
     /**
@@ -51,7 +58,7 @@ class Factory {
      * @param string $key
      * @return Schema|null
      */
-    public static function getSchema(string $key) {
+    public static function getSchema(string $key): ?Schema {
         self::load();
         if (empty(self::$data[$key])) {
             return null;
@@ -80,7 +87,7 @@ class Factory {
     /**
      * Creates and Returns the Subrequests for the given Key
      * @param string $key
-     * @return array
+     * @return Subrequest[]
      */
     public static function getSubrequest(string $key): array {
         $data   = self::$data[$key];
@@ -101,11 +108,11 @@ class Factory {
 
     /**
      * Performs a Migration on the Schema
-     * @param Database $db        Optional.
-     * @param boolean  $canDelete Optional.
+     * @param Database|null $db        Optional.
+     * @param boolean       $canDelete Optional.
      * @return void
      */
-    public static function migrate(Database $db = null, bool $canDelete = false): void {
+    public static function migrate(?Database $db = null, bool $canDelete = false): void {
         self::load();
         $database = $db !== null ? $db : self::$db;
         Migration::migrate($database, self::$data, $canDelete);

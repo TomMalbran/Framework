@@ -10,8 +10,8 @@ use Framework\Utils\Arrays;
  */
 class Token {
 
-    private static $loaded = false;
-    private static $data   = [];
+    private static bool  $loaded = false;
+    private static array $data   = [];
 
 
     /**
@@ -50,10 +50,10 @@ class Token {
 
     /**
      * Returns the first Token string or the one with the given ID
-     * @param integer $tokenID Optional.
+     * @param integer|null $tokenID Optional.
      * @return string
      */
-    public static function getToken(int $tokenID = null): string {
+    public static function getToken(?int $tokenID = null): string {
         self::load();
         if (empty($tokenID)) {
             return Arrays::getFirst(self::$data);

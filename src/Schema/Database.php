@@ -82,7 +82,7 @@ class Database {
      * Returns the connection
      * @return mixed
      */
-    public function get() {
+    public function get(): mixed {
         return $this->mysqli;
     }
 
@@ -90,11 +90,11 @@ class Database {
 
     /**
      * Process the given expression
-     * @param string $expression
-     * @param mixed  $params     Optional.
-     * @return array
+     * @param string        $expression
+     * @param Query|mixed[] $params     Optional.
+     * @return array{}[]
      */
-    public function query(string $expression, mixed $params = []): array {
+    public function query(string $expression, Query|array $params = []): array {
         $binds     = $params instanceof Query ? $params->params : $params;
         $statement = $this->processQuery($expression, $binds);
         return $this->dynamicBindResults($statement);
@@ -104,7 +104,7 @@ class Database {
      * Process the given expression using a Query
      * @param string $expression
      * @param Query  $query
-     * @return array
+     * @return array{}[]
      */
     public function getData(string $expression, Query $query): array {
         $expression .= $query->get(true);
@@ -114,11 +114,11 @@ class Database {
     /**
      * Selects the given columns from a single table and returns the result as an array
      * @param string          $table
-     * @param string|string[] $columns Optional.
-     * @param Query           $query   Optional.
-     * @return array
+     * @param string[]|string $columns Optional.
+     * @param Query|null      $query   Optional.
+     * @return array{}[]
      */
-    public function getAll(string $table, $columns = "*", Query $query = null): array {
+    public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
         $selection  = Strings::join($columns, ", ");
         $expression = "SELECT $selection FROM {dbPrefix}$table ";
         $params     = [];
@@ -137,7 +137,7 @@ class Database {
      * @param Query  $query
      * @return mixed
      */
-    public function getValue(string $table, string $column, Query $query) {
+    public function getValue(string $table, string $column, Query $query): mixed {
         $request = $this->getAll($table, $column, $query->limit(1));
 
         if (isset($request[0][$column])) {
@@ -149,11 +149,11 @@ class Database {
     /**
      * Selects the given columns from a single table and returns the first row
      * @param string          $table
-     * @param string|string[] $columns
+     * @param string[]|string $columns
      * @param Query           $query
-     * @return array
+     * @return array{}[]
      */
-    public function getRow(string $table, $columns, Query $query): array {
+    public function getRow(string $table, array|string $columns, Query $query): array {
         $request = $this->getAll($table, $columns, $query->limit(1));
 
         if (isset($request[0])) {
@@ -230,9 +230,9 @@ class Database {
 
     /**
      * Replaces or Inserts the given content into the given table
-     * @param string $table
-     * @param array  $fields
-     * @param string $method Optional.
+     * @param string    $table
+     * @param array{}[] $fields
+     * @param string    $method Optional.
      * @return integer The Inserted ID or -1
      */
     public function insert(string $table, array $fields, string $method = "INSERT"): int {
@@ -248,9 +248,9 @@ class Database {
 
     /**
      * Replaces or Inserts multiple rows
-     * @param string $table
-     * @param array  $fields
-     * @param string $method Optional.
+     * @param string    $table
+     * @param array{}[] $fields
+     * @param string    $method Optional.
      * @return boolean
      */
     public function batch(string $table, array $fields, string $method = "REPLACE"): bool {
@@ -272,9 +272,9 @@ class Database {
 
     /**
      * Updates the content of the database based on the query and given fields
-     * @param string $table
-     * @param array  $fields
-     * @param Query  $query
+     * @param string    $table
+     * @param array{}[] $fields
+     * @param Query     $query
      * @return boolean
      */
     public function update(string $table, array $fields, Query $query): bool {
@@ -348,8 +348,8 @@ class Database {
 
     /**
      * Process a mysqli query
-     * @param string $expression
-     * @param array  $bindParams Optional.
+     * @param string  $expression
+     * @param mixed[] $bindParams Optional.
      * @return mysqli_stmt
      */
     private function processQuery(string $expression, array $bindParams = []): mysqli_stmt {
@@ -455,8 +455,8 @@ class Database {
 
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
-     * @param mysqli_stmt $statement Equal to the prepared statement object.
-     * @return array The results of the SQL fetch.
+     * @param mysqli_stmt $statement
+     * @return array{}[]
      */
     private function dynamicBindResults(mysqli_stmt $statement): array {
         $parameters = [];
@@ -492,7 +492,7 @@ class Database {
 
     /**
      * Builds the query for inserting or updating
-     * @param array $fields
+     * @param array{}[] $fields
      * @return string
      */
     private function buildInsertHeader(array $fields): string {
@@ -501,9 +501,9 @@ class Database {
 
     /**
      * Process the table data for building the query for inserting or updating
-     * @param array   $fields
-     * @param array   $bindParams
-     * @param boolean $isInsert
+     * @param array{}[] $fields
+     * @param mixed[]   $bindParams
+     * @param boolean   $isInsert
      * @return string
      */
     private function buildTableData(array $fields, array &$bindParams, bool $isInsert): string {
@@ -574,11 +574,11 @@ class Database {
 
     /**
      * Returns an array with all the tables
-     * @param string[] $filter     Optional.
-     * @param boolean  $withPrefix Optional.
+     * @param string[]|null $filter     Optional.
+     * @param boolean       $withPrefix Optional.
      * @return string[]
      */
-    public function getTables(array $filter = null, bool $withPrefix = true): array {
+    public function getTables(?array $filter = null, bool $withPrefix = true): array {
         $request = $this->query("SHOW TABLES FROM `$this->database`");
         $result  = [];
 
@@ -610,7 +610,7 @@ class Database {
     /**
      * Returns the Table Primary Keys
      * @param string $table
-     * @return array
+     * @return string[]
      */
     public function getPrimaryKeys(string $table): array {
         $tableName = $this->getTableName($table);
@@ -650,7 +650,7 @@ class Database {
     /**
      * Returns the Table Keys
      * @param string $table
-     * @return array
+     * @return string[]
      */
     public function getTableKeys(string $table): array {
         $tableName = $this->getTableName($table);
@@ -660,7 +660,7 @@ class Database {
     /**
      * Returns the Table Fields
      * @param string $table
-     * @return array
+     * @return string[]
      */
     public function getTableFields(string $table): array {
         $tableName = $this->getTableName($table);
@@ -695,10 +695,10 @@ class Database {
 
     /**
      * Creates a Table
-     * @param string $table
-     * @param array  $fields
-     * @param array  $primary
-     * @param array  $keys
+     * @param string    $table
+     * @param array{}[] $fields
+     * @param string[]  $primary
+     * @param string[]  $keys
      * @return string
      */
     public function createTable(string $table, array $fields, array $primary, array $keys): string {
@@ -746,13 +746,13 @@ class Database {
 
     /**
      * Renames a Column from the Table
-     * @param string $table
-     * @param string $column
-     * @param string $type
-     * @param string $afterColumn Optional.
+     * @param string      $table
+     * @param string      $column
+     * @param string      $type
+     * @param string|null $afterColumn Optional.
      * @return string
      */
-    public function addColumn(string $table, string $column, string $type, string $afterColumn = null): string {
+    public function addColumn(string $table, string $column, string $type, ?string $afterColumn = null): string {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName ADD COLUMN `$column` $type ";
         $sql      .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
@@ -777,13 +777,13 @@ class Database {
 
     /**
      * Updates a Column from the Table
-     * @param string $table
-     * @param string $column
-     * @param string $type
-     * @param string $afterColumn Optional.
+     * @param string      $table
+     * @param string      $column
+     * @param string      $type
+     * @param string|null $afterColumn Optional.
      * @return string
      */
-    public function updateColumn(string $table, string $column, string $type, string $afterColumn = null): string {
+    public function updateColumn(string $table, string $column, string $type, ?string $afterColumn = null): string {
         $tableName = $this->getTableName($table);
         $sql       = "ALTER TABLE $tableName MODIFY COLUMN `$column` $type ";
         $sql      .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
@@ -809,8 +809,8 @@ class Database {
 
     /**
      * Updates the Primary Keys on the Table
-     * @param string $table
-     * @param array  $primary
+     * @param string   $table
+     * @param string[] $primary
      * @return string
      */
     public function updatePrimary(string $table, array $primary): string {
@@ -850,11 +850,11 @@ class Database {
 
     /**
      * Dumps the entire database
-     * @param string[] $filter Optional.
-     * @param mixed    $fp     Optional.
+     * @param string[]|null $filter Optional.
+     * @param mixed|null    $fp     Optional.
      * @return void
      */
-    public function dump(array $filter = null, mixed $fp = null): void {
+    public function dump(?array $filter = null, mixed $fp = null): void {
         $crlf = "\r\n";
 
         // SQL Dump Header

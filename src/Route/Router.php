@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Route\Container;
 use Framework\Auth\Access;
+use Framework\Response;
 use Framework\Utils\Strings;
 
 /**
@@ -85,7 +86,7 @@ class Router {
      * @param array  $params Optional.
      * @return Response|null
      */
-    public static function call(string $route, array $params = null) {
+    public static function call(string $route, array $params = null): ?Response {
         $data = self::get($route);
         if ($data->access == null) {
             return null;

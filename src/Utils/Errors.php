@@ -114,10 +114,10 @@ class Errors {
 
     /**
      * Returns true if there are errors or if the given error exists
-     * @param string|string[] $error Optional.
+     * @param string[]|string $error Optional.
      * @return boolean
      */
-    public function has($error = null): bool {
+    public function has(array|string $error = null): bool {
         if ($error === null) {
             return !empty($this->errors);
         }

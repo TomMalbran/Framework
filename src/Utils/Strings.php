@@ -11,7 +11,7 @@ class Strings {
      * @param mixed $string
      * @return boolean
      */
-    public static function isString($string): bool {
+    public static function isString(mixed $string): bool {
         return is_string($string);
     }
 
@@ -148,11 +148,11 @@ class Strings {
     /**
      * Replaces in the String the search with the replace
      * @param string          $string
-     * @param string|string[] $search
-     * @param string|string[] $replace
+     * @param string[]|string $search
+     * @param string[]|string $replace
      * @return string
      */
-    public static function replace(string $string, $search, $replace): string {
+    public static function replace(string $string, array|string $search, array|string $replace): string {
         return str_replace($search, $replace, $string);
     }
 
@@ -246,7 +246,7 @@ class Strings {
      * @param boolean         $skipEmpty Optional.
      * @return string[]
      */
-    public static function split($string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
+    public static function split(array|string $string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
         if (is_array($string)) {
             return $string;
         }
@@ -270,7 +270,7 @@ class Strings {
      * @param string          $glue
      * @return string
      */
-    public static function join($string, string $glue): string {
+    public static function join(array|string $string, string $glue): string {
         if (is_array($string)) {
             return implode($glue, $string);
         }
@@ -283,7 +283,7 @@ class Strings {
      * @param string          $glue
      * @return string
      */
-    public static function joinKeys($string, string $glue): string {
+    public static function joinKeys(array|string $string, string $glue): string {
         if (is_array($string)) {
             return implode($glue, array_keys($string));
         }
@@ -314,7 +314,7 @@ class Strings {
      * @param boolean $caseInsensitive Optional.
      * @return integer
      */
-    public static function compare(string $string, string $other, bool $orderAsc = true, bool $caseInsensitive = false) {
+    public static function compare(string $string, string $other, bool $orderAsc = true, bool $caseInsensitive = false): int {
         if ($caseInsensitive) {
             $result = strcasecmp($string, $other);
         } else {

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Config;
 
+use Framework\Schema\Model;
 use Framework\Utils\JSON;
 
 /**
@@ -19,7 +20,7 @@ class SettingType {
      * @param mixed $value
      * @return integer
      */
-    public static function get($value): int {
+    public static function get(mixed $value): int {
         if (is_array($value)) {
             return self::JSON;
         }
@@ -34,7 +35,7 @@ class SettingType {
      * @param Model|array $data
      * @return mixed
      */
-    public static function parseValue($data) {
+    public static function parseValue(Model|array $data): mixed {
         switch ($data["type"]) {
         case self::Binary:
             return !empty($data["value"]);
@@ -51,7 +52,7 @@ class SettingType {
      * @param mixed   $value
      * @return mixed
      */
-    public static function encodeValue($type, $value) {
+    public static function encodeValue(int $type, mixed $value): mixed {
         switch ($type) {
         case self::Binary:
             return !empty($value) ? 1 : 0;

@@ -91,13 +91,13 @@ class Queue {
     /**
      * Adds the given Email to the Queue
      * @param Model           $template
-     * @param string|string[] $sendTo
+     * @param string[]|string $sendTo
      * @param string          $message  Optional.
      * @param string          $subject  Optional.
      * @param boolean         $sendNow  Optional.
      * @return boolean
      */
-    public static function add(Model $template, $sendTo, string $message = null, string $subject = null, bool $sendNow = false): bool {
+    public static function add(Model $template, array|string $sendTo, string $message = null, string $subject = null, bool $sendNow = false): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;

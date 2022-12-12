@@ -34,7 +34,7 @@ class Reset {
     /**
      * Returns the Email for the given Code
      * @param string $code
-     * @return integer
+     * @return string
      */
     public static function getEmail(string $code): string {
         $query = Query::create("code", "=", $code);

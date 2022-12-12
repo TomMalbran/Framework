@@ -151,7 +151,7 @@ class Framework {
      * @param string $file
      * @return string
      */
-    public static function loadFile(string $dir, string $file) {
+    public static function loadFile(string $dir, string $file): string {
         $path   = self::getPath($dir, $file, false);
         $result = "";
         if (File::exists($path)) {
@@ -172,7 +172,7 @@ class Framework {
      * @param boolean $asArray      Optional.
      * @return array|object
      */
-    public static function loadJSON(string $dir, string $file, bool $forFramework = false, bool $asArray = true) {
+    public static function loadJSON(string $dir, string $file, bool $forFramework = false, bool $asArray = true): mixed {
         $path = self::getPath($dir, "$file.json", $forFramework);
         return JSON::readFile($path, $asArray);
     }
@@ -183,17 +183,17 @@ class Framework {
      * @param boolean $asArray Optional.
      * @return array|object
      */
-    public static function loadData(string $file, bool $asArray = true) {
+    public static function loadData(string $file, bool $asArray = true): mixed {
         return self::loadJSON(self::DataDir, $file, false, $asArray);
     }
 
     /**
      * Saves a Data File
-     * @param string $file
-     * @param mixed  $contents
+     * @param string          $file
+     * @param string[]|string $contents
      * @return void
      */
-    public static function saveData(string $file, $contents): void {
+    public static function saveData(string $file, array|string $contents): void {
         $path = self::getPath(self::DataDir, "$file.json");
         JSON::writeFile($path, $contents);
     }

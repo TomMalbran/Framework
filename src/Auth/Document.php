@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Schema\Model;
 use Framework\Utils\Enum;
 
 /**
@@ -15,10 +16,10 @@ class Document extends Enum {
 
     /**
      * Returns all the Document Types for the given Credential
-     * @param mixed $credential
-     * @return array
+     * @param Model|array{} $credential
+     * @return integer
      */
-    public static function forCredential($credential) {
+    public static function forCredential(Model|array $credential): int {
         if (!empty($credential["dni"])) {
             return self::DNI;
         }

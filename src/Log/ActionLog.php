@@ -189,10 +189,10 @@ class ActionLog {
      * Logs the given Action
      * @param integer           $action
      * @param integer           $section Optional.
-     * @param integer|integer[] $dataID  Optional.
+     * @param integer[]|integer $dataID  Optional.
      * @return void
      */
-    public static function add(int $action, int $section = 0, $dataID = ""): void {
+    public static function add(int $action, int $section = 0, array|int $dataID = 0): void {
         $sessionID = self::getSessionID();
         if (!empty($sessionID)) {
             $dataID = Arrays::toArray($dataID);

@@ -11,7 +11,7 @@ class Arrays {
      * @param mixed $array
      * @return boolean
      */
-    public static function isArray($array): bool {
+    public static function isArray(mixed $array): bool {
         return is_array($array);
     }
 
@@ -20,7 +20,7 @@ class Arrays {
      * @param mixed $array
      * @return boolean
      */
-    public static function isMap($array): bool {
+    public static function isMap(mixed $array): bool {
         return is_array($array) && is_array(array_values($array)[0]);
     }
 
@@ -28,21 +28,21 @@ class Arrays {
 
     /**
      * Returns the length of the given array
-     * @param array|mixed $array
+     * @param mixed $array
      * @return integer
      */
-    public static function length($array): int {
+    public static function length(mixed $array): int {
         return is_array($array) ? count($array) : 0;
     }
 
     /**
      * Returns true if the array contains the needle
-     * @param array|mixed $array
-     * @param array|mixed $needle
-     * @param mixed       $key    Optional.
+     * @param mixed      $array
+     * @param mixed      $needle
+     * @param mixed|null $key    Optional.
      * @return boolean
      */
-    public static function contains($array, $needle, $key = null): bool {
+    public static function contains(mixed $array, mixed $needle, mixed $key = null): bool {
         $array = self::toArray($array);
 
         if (self::isArray($needle)) {
@@ -68,19 +68,19 @@ class Arrays {
 
     /**
      * Returns true if the array contains the needle as a key
-     * @param array $array
-     * @param mixed $needle
+     * @param mixed[] $array
+     * @param mixed   $needle
      * @return boolean
      */
-    public static function containsKey(array $array, $needle): bool {
+    public static function containsKey(array $array, mixed $needle): bool {
         return in_array($needle, array_keys($array));
     }
 
     /**
      * Returns true if the arrays are Equal
-     * @param array  $array
-     * @param array  $other
-     * @param string $key   Optional.
+     * @param mixed[] $array
+     * @param mixed[] $other
+     * @param string  $key   Optional.
      * @return boolean
      */
     public static function isEqual(array $array, array $other, string $key = ""): bool {
@@ -101,8 +101,8 @@ class Arrays {
 
     /**
      * Returns true if the arrays intersect
-     * @param array $array
-     * @param array $other
+     * @param mixed[] $array
+     * @param mixed[] $other
      * @return boolean
      */
     public static function intersects(array $array, array $other): bool {
@@ -118,13 +118,13 @@ class Arrays {
 
     /**
      * Returns the elements from the array that are not in the other array
-     * @param array  $array
-     * @param array  $other
-     * @param string $checkKey
-     * @param string $getKey   Optional.
-     * @return array
+     * @param mixed[]     $array
+     * @param mixed[]     $other
+     * @param string      $checkKey
+     * @param string|null $getKey   Optional.
+     * @return mixed[]
      */
-    public static function getDiff(array $array, array $other, string $checkKey, string $getKey = null): array {
+    public static function getDiff(array $array, array $other, string $checkKey, ?string $getKey = null): array {
         $result = [];
         foreach ($array as $row) {
             if (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey)) {
@@ -142,38 +142,38 @@ class Arrays {
 
     /**
      * Converts a single value or an array into an array
-     * @param array|mixed $array
-     * @return array
+     * @param mixed $array
+     * @return mixed[]
      */
-    public static function toArray($array): array {
+    public static function toArray(mixed $array): array {
         return is_array($array) ? $array : [ $array ];
     }
 
     /**
      * Converts an empty array into an object or returns the array
-     * @param array $array Optional.
+     * @param mixed[]|null $array Optional.
      * @return mixed
      */
-    public static function toObject(array $array = null) {
+    public static function toObject(?array $array = null): mixed {
         return !empty($array) ? $array : new \stdClass();
     }
 
     /**
      * Returns a random value from the array
-     * @param array $array
+     * @param mixed[] $array
      * @return mixed
      */
-    public static function random(array $array) {
+    public static function random(array $array): mixed {
         return $array[array_rand($array)];
     }
 
     /**
      * Removes the given value from the array
-     * @param array $array
-     * @param mixed $key
-     * @return array
+     * @param mixed[] $array
+     * @param mixed   $key
+     * @return mixed[]
      */
-    public static function removeValue(array $array, $key): array {
+    public static function removeValue(array $array, mixed $key): array {
         $result = [];
         foreach ($array as $value) {
             if ($value != $key) {
@@ -185,8 +185,8 @@ class Arrays {
 
     /**
      * Removes the empty entries from the given array
-     * @param array $array
-     * @return array
+     * @param mixed[] $array
+     * @return mixed[]
      */
     public static function removeEmpty(array $array): array {
         $result = [];
@@ -202,43 +202,43 @@ class Arrays {
 
     /**
      * Adds the given element to the start of the Array
-     * @param array $array
-     * @param mixed ...$elem
-     * @return array
+     * @param mixed[] $array
+     * @param mixed   ...$elem
+     * @return mixed[]
      */
-    public static function unshift(array $array, ...$elem) {
+    public static function unshift(array $array, mixed ...$elem): array {
         array_unshift($array, ...$elem);
         return $array;
     }
 
     /**
      * Slices an Array from the index the amount of items
-     * @param array   $array
-     * @param integer $from
-     * @param integer $amount Optional.
-     * @return array
+     * @param mixed[]      $array
+     * @param integer      $from
+     * @param integer|null $amount Optional.
+     * @return mixed[]
      */
-    public static function slice(array $array, int $from, int $amount = null) {
+    public static function slice(array $array, int $from, ?int $amount = null): array {
         return array_slice($array, $from, $amount);
     }
 
     /**
      * Paginates an Array from the page to the amount of items
-     * @param array   $array
+     * @param mixed[] $array
      * @param integer $page
      * @param integer $amount
-     * @return array
+     * @return mixed[]
      */
-    public static function paginate(array $array, int $page, int $amount) {
+    public static function paginate(array $array, int $page, int $amount): array {
         $from = $page * $amount;
         return array_slice($array, $from, $amount - 1);
     }
 
     /**
      * Returns an array with values in the Base
-     * @param array $base
-     * @param array $array
-     * @return array
+     * @param mixed[] $base
+     * @param mixed[] $array
+     * @return mixed[]
      */
     public static function subArray(array $base, array $array): array {
         $result = [];
@@ -252,9 +252,9 @@ class Arrays {
 
     /**
      * Extends the first array replacing values from the second array
-     * @param array $array1
-     * @param array $array2
-     * @return array
+     * @param mixed[] $array1
+     * @param mixed[] $array2
+     * @return mixed[]
      */
     public static function extend(array &$array1, array &$array2): array {
         $result = $array1;
@@ -270,11 +270,11 @@ class Arrays {
 
     /**
      * Sorts an array using the given callback
-     * @param array    $array
-     * @param callable $callback Optional.
-     * @return array
+     * @param mixed[]       $array
+     * @param callable|null $callback Optional.
+     * @return mixed[]
      */
-    public static function sort(array &$array, callable $callback = null): array {
+    public static function sort(array &$array, ?callable $callback = null): array {
         if (empty($callback)) {
             sort($array);
         } else {
@@ -285,10 +285,10 @@ class Arrays {
 
     /**
      * Sorts the arrays at the given key of the given array using the given callback
-     * @param array    $array
+     * @param mixed[]  $array
      * @param string   $field
      * @param callable $callback
-     * @return array
+     * @return mixed[]
      */
     public static function sortArray(array &$array, string $field, callable $callback): array {
         foreach ($array as $value) {
@@ -301,11 +301,11 @@ class Arrays {
 
     /**
      * Returns the sum of the elements of the given array
-     * @param array  $array
-     * @param string $key   Optional.
-     * @return integer|float
+     * @param mixed[]     $array
+     * @param string|null $key   Optional.
+     * @return mixed|integer|float
      */
-    public static function sum(array $array, string $key = null) {
+    public static function sum(array $array, ?string $key = null): mixed {
         $result = 0;
         foreach ($array as $value) {
             if (!empty($key)) {
@@ -321,13 +321,13 @@ class Arrays {
 
     /**
      * Creates a map using the given array
-     * @param array           $array
-     * @param string          $key
-     * @param string|string[] $value    Optional.
-     * @param boolean         $useEmpty Optional.
-     * @return array
+     * @param mixed[]              $array
+     * @param string               $key
+     * @param string[]|string|null $value    Optional.
+     * @param boolean              $useEmpty Optional.
+     * @return mixed[]
      */
-    public static function createMap(array $array, string $key, $value = null, bool $useEmpty = false): array {
+    public static function createMap(array $array, string $key, array|string $value = null, bool $useEmpty = false): array {
         $result = [];
         foreach ($array as $row) {
             $result[$row[$key]] = !empty($value) ? self::getValue($row, $value, " - ", "", $useEmpty) : $row;
@@ -337,13 +337,13 @@ class Arrays {
 
     /**
      * Creates an sub array using the given array
-     * @param array           $array
-     * @param string|string[] $value     Optional.
-     * @param boolean         $skipEmpty Optional.
-     * @param boolean         $distinct  Optional.
-     * @return array
+     * @param mixed[]              $array
+     * @param string[]|string|null $value     Optional.
+     * @param boolean              $skipEmpty Optional.
+     * @param boolean              $distinct  Optional.
+     * @return mixed[]
      */
-    public static function createArray(array $array, $value = null, bool $skipEmpty = false, bool $distinct = false): array {
+    public static function createArray(array $array, array|string $value = null, bool $skipEmpty = false, bool $distinct = false): array {
         $result = [];
         foreach ($array as $row) {
             $elem = !empty($value) ? self::getValue($row, $value) : $row;
@@ -357,15 +357,15 @@ class Arrays {
 
     /**
      * Creates a select using the given array
-     * @param array           $array
+     * @param mixed[]         $array
      * @param string          $keyName
-     * @param string|string[] $valName
+     * @param string[]|string $valName
      * @param boolean         $useEmpty Optional.
-     * @param string          $extra    Optional.
+     * @param string|null     $extra    Optional.
      * @param boolean         $distinct Optional.
-     * @return array
+     * @return mixed[]
      */
-    public static function createSelect(array $array, string $keyName, $valName, bool $useEmpty = false, string $extra = null, bool $distinct = false): array {
+    public static function createSelect(array $array, string $keyName, array|string $valName, bool $useEmpty = false, ?string $extra = null, bool $distinct = false): array {
         $result = [];
         $keys   = [];
 
@@ -387,8 +387,8 @@ class Arrays {
 
     /**
      * Creates a select using the given array
-     * @param array $array
-     * @return array
+     * @param mixed[] $array
+     * @return mixed[]
      */
     public static function createSelectFromMap(array $array): array {
         $result = [];
@@ -405,19 +405,19 @@ class Arrays {
 
     /**
      * Returns the first Key of the given array
-     * @param array $array
+     * @param mixed[] $array
      * @return mixed
      */
-    public static function getFirst(array $array) {
+    public static function getFirst(array $array): mixed {
         return !empty($array) ? $array[array_keys($array)[0]] : null;
     }
 
     /**
      * Returns the first Key of the given array
-     * @param array $array
-     * @return string|integer|null
+     * @param mixed[] $array
+     * @return string|integer|mixed|null
      */
-    public static function getFirstKey(array $array) {
+    public static function getFirstKey(array $array): mixed {
         $keys = array_keys($array);
         if (!empty($keys)) {
             return $keys[0];
@@ -427,12 +427,12 @@ class Arrays {
 
     /**
      * Returns the index at the given id key with the given is value
-     * @param array  $array
-     * @param string $idKey
-     * @param mixed  $idValue
-     * @return string|integer
+     * @param mixed[] $array
+     * @param string  $idKey
+     * @param mixed   $idValue
+     * @return string|integer|mixed
      */
-    public static function findIndex(array $array, string $idKey, $idValue) {
+    public static function findIndex(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $index => $elem) {
             if ($elem[$idKey] == $idValue) {
                 return $index;
@@ -443,13 +443,13 @@ class Arrays {
 
     /**
      * Returns the Value at the given id with the given key
-     * @param array  $array
-     * @param string $idKey
-     * @param mixed  $idValue
-     * @param string $key     Optional.
+     * @param mixed[] $array
+     * @param string  $idKey
+     * @param mixed   $idValue
+     * @param string  $key     Optional.
      * @return mixed
      */
-    public static function findValue(array $array, string $idKey, $idValue, string $key = "") {
+    public static function findValue(array $array, string $idKey, mixed $idValue, string $key = ""): mixed {
         foreach ($array as $elem) {
             if ($elem[$idKey] == $idValue) {
                 return $key ? $elem[$key] : $elem;
@@ -473,14 +473,14 @@ class Arrays {
     /**
      * Returns one or multiple values as a string
      * @param mixed           $array
-     * @param string|string[] $key
+     * @param string[]|string $key
      * @param string          $glue     Optional.
      * @param string          $prefix   Optional.
      * @param boolean         $useEmpty Optional.
-     * @param mixed           $default  Optional.
+     * @param mixed|string    $default  Optional.
      * @return mixed
      */
-    public static function getValue($array, $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, $default = "") {
+    public static function getValue(mixed $array, array|string $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
         $result = $default;
         if (is_array($key)) {
             $values = [];
@@ -506,12 +506,12 @@ class Arrays {
 
     /**
      * Returns the first Value that is not empty in the given keys
-     * @param mixed    $array
-     * @param string[] $keys
-     * @param mixed    $default Optional.
-     * @return string
+     * @param mixed      $array
+     * @param string[]   $keys
+     * @param mixed|null $default Optional.
+     * @return mixed
      */
-    public static function getAnyValue($array, array $keys, $default = null) {
+    public static function getAnyValue(mixed $array, array $keys, mixed $default = null): mixed {
         foreach ($keys as $key) {
             if (!empty($array[$key])) {
                 return $array[$key];

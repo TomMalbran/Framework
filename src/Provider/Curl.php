@@ -15,7 +15,7 @@ class Curl {
      * @param array  $params Optional.
      * @return mixed
      */
-    public static function get(string $url, array $params = []) {
+    public static function get(string $url, array $params = []): mixed {
         $content = [];
         foreach ($params as $key => $value) {
             if (is_array($value)) {
@@ -38,7 +38,7 @@ class Curl {
      * @param array  $params
      * @return mixed
      */
-    public static function post(string $url, array $params) {
+    public static function post(string $url, array $params): mixed {
         return self::execute($url, $params);
     }
 
@@ -50,7 +50,7 @@ class Curl {
      * @param array  $params Optional.
      * @return mixed
      */
-    private static function execute(string $url, array $params = []) {
+    private static function execute(string $url, array $params = []): mixed {
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,

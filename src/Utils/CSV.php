@@ -16,7 +16,7 @@ class CSV {
      * @param string          $separator Optional.
      * @return string
      */
-    public static function encode($value, string $separator = ","): string {
+    public static function encode(array|string $value, string $separator = ","): string {
         if (is_string($value)) {
             $parts = Strings::split($value, $separator);
             $parts = Arrays::removeEmpty($parts);
@@ -35,7 +35,7 @@ class CSV {
      * @param string          $separator Optional.
      * @return array
      */
-    public static function decode($value, string $separator = ","): array {
+    public static function decode(array|string $value, string $separator = ","): array {
         if (is_string($value)) {
             return Strings::split($value, $separator, true);
         }

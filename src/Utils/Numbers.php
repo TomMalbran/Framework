@@ -40,9 +40,9 @@ class Numbers {
      * @param mixed   $number
      * @param mixed   $other
      * @param boolean $orderAsc Optional.
-     * @return integer
+     * @return float|integer
      */
-    public static function compare($number, $other, bool $orderAsc = true): int {
+    public static function compare(mixed $number, mixed $other, bool $orderAsc = true): mixed {
         return ($number - $other) * ($orderAsc ? 1 : -1);
     }
 
@@ -52,7 +52,7 @@ class Numbers {
      * @param integer $decimals
      * @return float|integer
      */
-    public static function round(float $number, int $decimals) {
+    public static function round(float $number, int $decimals): mixed {
         if (is_numeric($number)) {
             $padding = pow(10, $decimals);
             return round($number * $padding) / $padding;
@@ -115,12 +115,12 @@ class Numbers {
 
     /**
      * Clamps the given number between the min and max
-     * @param integer $number
-     * @param integer $min
-     * @param integer $max
+     * @param mixed $number
+     * @param mixed $min
+     * @param mixed $max
      * @return integer
      */
-    public static function clamp(int $number, int $min, int $max) {
+    public static function clamp(mixed $number, mixed $min, mixed $max): mixed {
         return max($min, min($max, $number));
     }
 
@@ -297,7 +297,7 @@ class Numbers {
      * @param integer $amount
      * @return string
      */
-    public static function zerosPad($value, int $amount): string {
+    public static function zerosPad(mixed $value, int $amount): string {
         if (!empty($value)) {
             return str_pad((string)$value, $amount, "0", STR_PAD_LEFT);
         }

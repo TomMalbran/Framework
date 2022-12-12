@@ -36,7 +36,7 @@ class Model implements ArrayAccess {
      * @param array $data Optional.
      * @return Model
      */
-    public static function create(array $data = []) {
+    public static function create(array $data = []): Model {
         $model = new Model();
         $model->data  = $data;
         $model->empty = empty($data);
@@ -48,7 +48,7 @@ class Model implements ArrayAccess {
      * @param mixed $idValue Optional.
      * @return Model
      */
-    public static function createEmpty($idValue = null): Model {
+    public static function createEmpty(mixed $idValue = null): Model {
         $model = new Model();
         $model->idValue = $idValue;
         $model->empty   = true;
@@ -62,7 +62,7 @@ class Model implements ArrayAccess {
      * @param string $key
      * @return mixed
      */
-    public function __get(string $key) {
+    public function __get(string $key): mixed {
         return $this->get($key);
     }
 
@@ -72,7 +72,7 @@ class Model implements ArrayAccess {
      * @param mixed  $default Optional.
      * @return mixed
      */
-    public function get(string $key, $default = null) {
+    public function get(string $key, mixed $default = null): mixed {
         if ($key === "id") {
             return $this->idValue;
         }
@@ -103,7 +103,7 @@ class Model implements ArrayAccess {
      * @param mixed   $default Optional.
      * @return mixed
      */
-    public function getFromArray(string $key, int $index, $default = "") {
+    public function getFromArray(string $key, int $index, mixed $default = ""): mixed {
         if ($this->has($key) && !empty($this->data[$key][$index])) {
             return $this->data[$key][$index];
         }
@@ -116,7 +116,7 @@ class Model implements ArrayAccess {
      * @param mixed    $default Optional.
      * @return mixed
      */
-    public function getAnyValue(array $keys, $default = null) {
+    public function getAnyValue(array $keys, mixed $default = null): mixed {
         return Arrays::getAnyValue($this->data, $keys, $default);
     }
 
@@ -151,7 +151,7 @@ class Model implements ArrayAccess {
      * @param mixed  $value
      * @return void
      */
-    public function __set(string $key, $value): void {
+    public function __set(string $key, mixed $value): void {
         $this->set($key, $value);
     }
 
@@ -161,7 +161,7 @@ class Model implements ArrayAccess {
      * @param mixed  $value
      * @return void
      */
-    public function set(string $key, $value): void {
+    public function set(string $key, mixed $value): void {
         $this->empty = false;
         if ($key === "id") {
             $this->idValue = $value;
@@ -230,7 +230,7 @@ class Model implements ArrayAccess {
      * Returns all the Data as an Object
      * @return mixed
      */
-    public function toObject() {
+    public function toObject(): mixed {
         return Arrays::toObject($this->data);
     }
 
@@ -337,7 +337,7 @@ class Model implements ArrayAccess {
      * @param mixed $key
      * @return mixed
      */
-    public function offsetGet($key) {
+    public function offsetGet(mixed $key): mixed {
         return $this->get($key);
     }
 
@@ -347,7 +347,7 @@ class Model implements ArrayAccess {
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($key, $value): void {
+    public function offsetSet(mixed $key, mixed $value): void {
         $this->set($key, $value);
     }
 
@@ -356,7 +356,7 @@ class Model implements ArrayAccess {
      * @param mixed $key
      * @return boolean
      */
-    public function offsetExists($key): bool {
+    public function offsetExists(mixed $key): bool {
         return array_key_exists($key, $this->data);
     }
 
@@ -365,7 +365,7 @@ class Model implements ArrayAccess {
      * @param mixed $key
      * @return void
      */
-    public function offsetUnset($key): void {
+    public function offsetUnset(mixed $key): void {
         unset($this->data[$key]);
     }
 }
