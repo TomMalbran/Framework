@@ -12,6 +12,18 @@
         "ext-mysqli": "*",
         "ext-curl": "*"
     },
+    "require-dev": {
+        "firebase/php-jwt": "^6.3",
+        "mustache/mustache": "^2.14",
+        "phpmailer/phpmailer": "^6.7",
+        "league/oauth2-google": "^4.0",
+        "google/apiclient": "^2.12",
+        "phpoffice/phpspreadsheet": "^1.25",
+        "drewm/mailchimp-api": "^2.5",
+        "norkunas/onesignal-php-api": "^2.9",
+        "symfony/http-client": "^6.2",
+        "nyholm/psr7": "^1.5"
+    },
     "suggest" : {
         "mustache/mustache": "Used for Rendering templates",
         "firebase/php-jwt": "Used in Auth",
