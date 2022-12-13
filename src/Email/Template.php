@@ -49,10 +49,10 @@ class Template {
 
     /**
      * Returns all the Email Templates
-     * @param Request $request Optional.
-     * @return array
+     * @param Request|null $request Optional.
+     * @return array{}[]
      */
-    public static function getAll(Request $request = null): array {
+    public static function getAll(?Request $request = null): array {
         return self::schema()->getAll(null, $request);
     }
 
@@ -79,8 +79,8 @@ class Template {
 
     /**
      * Renders the Email Template message with Mustache
-     * @param string $message
-     * @param array  $data    Optional.
+     * @param string  $message
+     * @param array{} $data    Optional.
      * @return string
      */
     public static function render(string $message, array $data = []): string {
@@ -99,11 +99,11 @@ class Template {
      * @param Database $db
      * @param boolean  $recreate Optional.
      * @param boolean  $sandbox  Optional.
-     * @return void
+     * @return boolean
      */
-    public static function migrate(Database $db, bool $recreate = false, bool $sandbox = false): void {
+    public static function migrate(Database $db, bool $recreate = false, bool $sandbox = false): bool {
         if (!$db->hasTable("email_templates")) {
-            return;
+            return false;
         }
 
         $request  = $db->getAll("email_templates");
@@ -112,7 +112,7 @@ class Template {
         $sendAs   = Config::get("smtpEmail");
 
         if (empty($emails)) {
-            return;
+            return false;
         }
 
         $adds     = [];
@@ -186,5 +186,7 @@ class Template {
         if (empty($adds) && empty($deletes)) {
             print("<br>No <i>emails</i> added or deleted <br>");
         }
+
+        return true;
     }
 }

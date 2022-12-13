@@ -8,7 +8,8 @@ use Framework\File\FileType;
  */
 class FileList {
 
-    private $list = [];
+    /** @var array{}[] */
+    private array $list = [];
 
 
     /**
@@ -72,7 +73,7 @@ class FileList {
 
     /**
      * Returns the List
-     * @return array
+     * @return array{}[]
      */
     public function get(): array {
         return $this->list;
@@ -80,7 +81,7 @@ class FileList {
 
     /**
      * Sorts and restuns the List
-     * @return array
+     * @return array{}[]
      */
     public function getSorted(): array {
         usort($this->list, function ($a, $b) {

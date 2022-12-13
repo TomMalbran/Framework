@@ -13,8 +13,10 @@ use Framework\Utils\JSON;
 class Storage {
 
     private Schema $schema;
-    private array  $data   = [];
     private string $bucket = "";
+
+    /** @var array{}[] */
+    private array  $data   = [];
 
 
     /**
@@ -96,23 +98,23 @@ class Storage {
      * Sets the given data at the given key
      * @param string       $key
      * @param mixed|string $value Optional.
-     * @return void
+     * @return boolean
      */
-    public function set(string $key, mixed $value = ""): void {
+    public function set(string $key, mixed $value = ""): bool {
         $this->data[$key] = $value;
-        $this->save();
+        return $this->save();
     }
 
     /**
      * Sets multiple values at once
-     * @param array $array
-     * @return void
+     * @param array{}[] $array
+     * @return boolean
      */
-    public function setArray(array $array): void {
+    public function setArray(array $array): bool {
         foreach ($array as $key => $value) {
             $this->data[$key] = $value;
         }
-        $this->save();
+        return $this->save();
     }
 
 
@@ -120,27 +122,27 @@ class Storage {
     /**
      * Removes the data at the given key
      * @param string $key
-     * @return void
+     * @return boolean
      */
-    public function remove(string $key): void {
+    public function remove(string $key): bool {
         if ($this->exists($key)) {
             unset($this->data[$key]);
         }
-        $this->save();
+        return $this->save();
     }
 
     /**
      * Removes the data at all the given keys
      * @param string[] $keys
-     * @return void
+     * @return boolean
      */
-    public function removeAll(array $keys): void {
+    public function removeAll(array $keys): bool {
         foreach ($keys as $key) {
             if ($this->exists($key)) {
                 unset($this->data[$key]);
             }
         }
-        $this->save();
+        return $this->save();
     }
 
 
@@ -181,7 +183,7 @@ class Storage {
 
     /**
      * Returns all the data as an array
-     * @return array
+     * @return array{}[]
      */
     public function toArray(): array {
         return $this->data;
@@ -189,23 +191,26 @@ class Storage {
 
     /**
      * Removes all the data
-     * @return void
+     * @return boolean
      */
-    public function clear(): void {
+    public function clear(): bool {
         $query = Query::create("bucket", "=", $this->bucket);
         $query->add("CREDENTIAL_ID", "=", Auth::getID());
-        $this->schema->remove($query);
+        if (!$this->schema->remove($query)) {
+            return false;
+        }
         $this->data = [];
+        return true;
     }
 
     /**
      * Saves the data
-     * @return void
+     * @return boolean
      */
-    private function save(): void {
+    private function save(): bool {
         if (empty($this->data)) {
             $this->clear();
-            return;
+            return false;
         }
         $this->schema->replace([
             "CREDENTIAL_ID" => Auth::getID(),
@@ -213,17 +218,19 @@ class Storage {
             "data"          => JSON::encode($this->data),
             "time"          => time(),
         ]);
+        return true;
     }
 
     /**
      * Deletes the old storage data for all the Credentials
-     * @return void
+     * @return boolean
      */
-    public static function deleteOld(): void {
+    public static function deleteOld(): bool {
         $schema = Factory::getSchema("storage");
-        if (!empty($schema)) {
-            $query  = Query::create("time", "<", time() - 24 * 3600);
-            $schema->remove($query);
+        if (empty($schema)) {
+            return false;
         }
+        $query  = Query::create("time", "<", time() - 24 * 3600);
+        return $schema->remove($query);
     }
 }

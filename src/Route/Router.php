@@ -16,8 +16,10 @@ class Router {
     const Namespace  = "App\\";
     const Controller = "App\\Controller\\";
 
-    private static $loaded = false;
-    private static $data   = [];
+    private static bool  $loaded = false;
+
+    /** @var array{}[] */
+    private static array $data   = [];
 
 
     /**
@@ -82,11 +84,11 @@ class Router {
 
     /**
      * Calls the given Route with the given params, if it exists
-     * @param string $route
-     * @param array  $params Optional.
+     * @param string       $route
+     * @param array{}|null $params Optional.
      * @return Response|null
      */
-    public static function call(string $route, array $params = null): ?Response {
+    public static function call(string $route, ?array $params = null): ?Response {
         $data = self::get($route);
         if ($data->access == null) {
             return null;

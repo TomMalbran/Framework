@@ -57,7 +57,7 @@ class WhiteList {
     /**
      * Returns all the Emails in the White List
      * @param Request $request
-     * @return array
+     * @return array{}[]
      */
     public static function getAll(Request $request): array {
         return self::schema()->getAll(null, $request);

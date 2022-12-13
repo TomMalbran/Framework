@@ -13,11 +13,11 @@ use stdClass;
  */
 class JWT {
 
-    private static $loaded    = false;
-    private static $algorithm = "HS256";
-    private static $secretKey = "";
-    private static $longTerm  = 10 * 365 * 24 * 3600;
-    private static $shortTerm = 30 * 60;
+    private static bool   $loaded    = false;
+    private static string $algorithm = "HS256";
+    private static string $secretKey = "";
+    private static int    $longTerm  = 10 * 365 * 24 * 3600;
+    private static int    $shortTerm = 30 * 60;
 
 
     /**
@@ -41,7 +41,7 @@ class JWT {
     /**
      * Creates a JWT Token
      * @param integer $time
-     * @param array   $data
+     * @param array{} $data
      * @param boolean $forLongTerm Optional.
      * @return string
      */

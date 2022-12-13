@@ -802,7 +802,7 @@ class Credential {
      * @param string   $lastName
      * @param string   $email
      * @param string   $password
-     * @return void
+     * @return boolean
      */
     public static function seedOwner(
         Database $db,
@@ -810,28 +810,32 @@ class Credential {
         string $lastName,
         string $email,
         string $password
-    ): void {
-        if ($db->hasTable("credentials")) {
-            $query = Query::create("email", "=", $email);
-            if (!$db->exists("credentials", $query)) {
-                $hash = self::createHash($password);
-                $db->insert("credentials", [
-                    "firstName"    => $firstName,
-                    "lastName"     => $lastName,
-                    "email"        => $email,
-                    "password"     => $hash["password"],
-                    "salt"         => $hash["salt"],
-                    "language"     => "es",
-                    "level"        => Access::Owner(),
-                    "status"       => Status::Active(),
-                    "lastLogin"    => time(),
-                    "currentLogin" => time(),
-                    "createdTime"  => time(),
-                ]);
-                print("<br><i>Owner</i> created<br>");
-            } else {
-                print("<br><i>Owner</i> already created<br>");
-            }
+    ): bool {
+        if (!$db->hasTable("credentials")) {
+            return false;
         }
+
+        $query = Query::create("email", "=", $email);
+        if (!$db->exists("credentials", $query)) {
+            $hash = self::createHash($password);
+            $db->insert("credentials", [
+                "firstName"    => $firstName,
+                "lastName"     => $lastName,
+                "email"        => $email,
+                "password"     => $hash["password"],
+                "salt"         => $hash["salt"],
+                "language"     => "es",
+                "level"        => Access::Owner(),
+                "status"       => Status::Active(),
+                "lastLogin"    => time(),
+                "currentLogin" => time(),
+                "createdTime"  => time(),
+            ]);
+            print("<br><i>Owner</i> created<br>");
+            return true;
+        }
+
+        print("<br><i>Owner</i> already created<br>");
+        return false;
     }
 }

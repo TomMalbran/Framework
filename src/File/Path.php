@@ -11,9 +11,11 @@ use Framework\Utils\Strings;
  */
 class Path {
 
-    private static $loaded   = false;
-    private static $data     = [];
-    private static $basePath = null;
+    private static bool   $loaded   = false;
+    private static string $basePath = "";
+
+    /** @var array{}[] */
+    private static array  $data     = [];
 
 
     /**
@@ -131,14 +133,14 @@ class Path {
 
     /**
      * Ensures that the Paths are created
-     * @return void
+     * @return boolean
      */
-    public static function ensurePaths() {
+    public static function ensurePaths(): bool {
         self::load();
         $paths = [];
 
         if (empty(self::$data["paths"])) {
-            return;
+            return false;
         }
         foreach (array_keys(self::$data["paths"]) as $pathKey) {
             $path = self::getPath($pathKey);
@@ -161,5 +163,6 @@ class Path {
         } else {
             print("<br>No <i>paths</i> added<br>");
         }
+        return true;
     }
 }

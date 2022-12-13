@@ -12,9 +12,9 @@ use DrewM\MailChimp\MailChimp as MailChimpAPI;
  */
 class MailChimp {
 
-    private static $loaded = false;
-    private static $config = null;
-    private static $api    = null;
+    private static bool          $loaded = false;
+    private static mixed         $config = null;
+    private static ?MailChimpAPI $api    = null;
 
 
     /**
@@ -39,7 +39,7 @@ class MailChimp {
      * Returns the Last Error
      * @return mixed
      */
-    public static function getLastError() {
+    public static function getLastError(): mixed {
         if (self::$api) {
             return self::$api->getLastError();
         }
@@ -50,7 +50,7 @@ class MailChimp {
      * Returns the Last Response
      * @return mixed
      */
-    public static function getLastResponse() {
+    public static function getLastResponse(): mixed {
         if (self::$api) {
             return self::$api->getLastResponse();
         }
@@ -76,7 +76,7 @@ class MailChimp {
      * Returns all the subscribers
      * @param integer $count  Optional.
      * @param integer $offset Optional.
-     * @return array
+     * @return mixed[]
      */
     public static function getAllSubscribers(int $count = 100, int $offset = 0): array {
         self::load();
@@ -94,7 +94,7 @@ class MailChimp {
     /**
      * Returns the Subscriber with the given email
      * @param string $email
-     * @return array|null
+     * @return mixed[]|mixed|null
      */
     public static function getSubscriber(string $email): mixed {
         self::load();
@@ -146,13 +146,13 @@ class MailChimp {
 
     /**
      * Adds a Subscriber Batch
-     * @param array $subscribers
-     * @return void
+     * @param array{}[] $subscribers
+     * @return boolean
      */
-    public static function addSubscriberBatch(array $subscribers): void {
+    public static function addSubscriberBatch(array $subscribers): bool {
         self::load();
         if (!self::$api || !self::$config->subscriberActive) {
-            return;
+            return false;
         }
         $route = self::getSubscribersRoute();
         $batch = self::$api->new_batch();
@@ -166,6 +166,7 @@ class MailChimp {
                 ],
 			]);
         }
+        return true;
     }
 
     /**
@@ -214,9 +215,9 @@ class MailChimp {
 
     /**
      * Returns a list of Templates
-     * @return array
+     * @return array{}
      */
-    public static function getTemplates() {
+    public static function getTemplates(): array {
         self::load();
         if (!self::$api) {
             return [];
@@ -227,15 +228,15 @@ class MailChimp {
 
     /**
      * Sends a Campaign
-     * @param string   $subject
-     * @param integer  $time
-     * @param integer  $templateID
-     * @param array    $sections   Optional.
-     * @param string[] $emails     Optional.
-     * @param integer  $folderID   Optional.
+     * @param string         $subject
+     * @param integer        $time
+     * @param integer        $templateID
+     * @param array{}[]|null $sections   Optional.
+     * @param string[]|null  $emails     Optional.
+     * @param integer        $folderID   Optional.
      * @return string|null
      */
-    public static function sendCampaign(string $subject, int $time, int $templateID, array $sections = null, array $emails = null, int $folderID = 0): ?string {
+    public static function sendCampaign(string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): ?string {
         self::load();
 
         // We do Nothing
@@ -270,16 +271,16 @@ class MailChimp {
 
     /**
      * Updates a Campaign
-     * @param string   $mailChimpID
-     * @param string   $subject
-     * @param integer  $time
-     * @param integer  $templateID
-     * @param array    $sections    Optional.
-     * @param string[] $emails      Optional.
-     * @param integer  $folderID    Optional.
+     * @param string         $mailChimpID
+     * @param string         $subject
+     * @param integer        $time
+     * @param integer        $templateID
+     * @param array{}[]|null $sections    Optional.
+     * @param string[]|null  $emails      Optional.
+     * @param integer        $folderID    Optional.
      * @return boolean
      */
-    public static function updateCampaign(string $mailChimpID, string $subject, int $time, int $templateID, array $sections = null, array $emails = null, int $folderID = 0): bool {
+    public static function updateCampaign(string $mailChimpID, string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): bool {
         self::load();
 
         // We do Nothing
@@ -313,12 +314,12 @@ class MailChimp {
 
     /**
      * Creates a Campaign
-     * @param string   $subject
-     * @param string[] $emails   Optional.
-     * @param integer  $folderID Optional.
+     * @param string        $subject
+     * @param string[]|null $emails   Optional.
+     * @param integer       $folderID Optional.
      * @return string
      */
-    private static function createCampaign(string $subject, array $emails = null, int $folderID = 0): string {
+    private static function createCampaign(string $subject, ?array $emails = null, int $folderID = 0): string {
         $recipients = self::parseRecipients($emails);
         if (empty($recipients)) {
             return "";
@@ -348,13 +349,13 @@ class MailChimp {
 
     /**
      * Edits a Campaign
-     * @param string   $mailChimpID
-     * @param string   $subject
-     * @param string[] $emails      Optional.
-     * @param integer  $folderID    Optional.
+     * @param string        $mailChimpID
+     * @param string        $subject
+     * @param string[]|null $emails      Optional.
+     * @param integer       $folderID    Optional.
      * @return boolean
      */
-    private static function editCampaign(string $mailChimpID, string $subject, array $emails = null, int $folderID = 0): string {
+    private static function editCampaign(string $mailChimpID, string $subject, ?array $emails = null, int $folderID = 0): bool {
         $recipients = self::parseRecipients($emails);
         if (empty($recipients)) {
             return false;
@@ -376,10 +377,10 @@ class MailChimp {
 
     /**
      * Parses the recipients of a Campaign
-     * @param string[] $emails Optional.
-     * @return array
+     * @param string[]|null $emails Optional.
+     * @return array{}[]|null
      */
-    private static function parseRecipients(array $emails = null): array {
+    private static function parseRecipients(?array $emails = null): ?array {
         $recipients = [ "list_id" => self::$config->list ];
         if (empty($emails)) {
             return $recipients;
@@ -410,17 +411,17 @@ class MailChimp {
 
     /**
      * Puts the content into the given MailChimp campaign
-     * @param string  $mailChimpID
-     * @param integer $templateID
-     * @param array   $sections    Optional.
+     * @param string         $mailChimpID
+     * @param integer        $templateID
+     * @param array{}[]|null $sections    Optional.
      * @return boolean
      */
-    private static function placeContent(string $mailChimpID, int $templateID, array $sections = null): bool {
+    private static function placeContent(string $mailChimpID, int $templateID, ?array $sections = null): bool {
         $post = [ "template" => [ "id" => $templateID ] ];
         if (!empty($sections)) {
             $post["template"]["sections"] = $sections;
         }
-        $result = self::$api->put("campaigns/{$mailChimpID}/content", $post, 60);
+        self::$api->put("campaigns/{$mailChimpID}/content", $post, 60);
         return self::$api->success();
     }
 
@@ -479,7 +480,7 @@ class MailChimp {
     /**
      * Returns the Content of the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array
+     * @return array{}
      */
     public static function getContent(string $mailChimpID): array {
         self::load();
@@ -493,7 +494,7 @@ class MailChimp {
     /**
      * Returns the Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array
+     * @return array{}
      */
     public static function getReport(string $mailChimpID): array {
         self::load();
@@ -523,7 +524,7 @@ class MailChimp {
     /**
      * Returns the Send Details Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array
+     * @return string[]
      */
     public static function getSendDetails(string $mailChimpID): array {
         self::load();
@@ -544,7 +545,7 @@ class MailChimp {
     /**
      * Returns the Open Details Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array
+     * @return string[]
      */
     public static function getOpenDetails(string $mailChimpID): array {
         self::load();
@@ -565,7 +566,7 @@ class MailChimp {
     /**
      * Returns the Click Details Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array
+     * @return string[]
      */
     public static function getClickDetails(string $mailChimpID): array {
         self::load();

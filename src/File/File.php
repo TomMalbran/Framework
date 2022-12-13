@@ -262,7 +262,7 @@ class File {
      * @param string $path
      * @return boolean
      */
-    public static function createDir(string $path): string {
+    public static function createDir(string $path): bool {
         if (!self::exists($path)) {
             mkdir($path, 0777, true);
             return true;
@@ -293,17 +293,20 @@ class File {
     /**
      * Deletes all the content from a directory
      * @param string $path
-     * @return void
+     * @return boolean
      */
-    public static function emptyDir(string $path): void {
-        if (file_exists($path)) {
-            $files = scandir($path);
-            foreach ($files as $file) {
-                if ($file != "." && $file != "..") {
-                    self::deleteDir("$path/$file");
-                }
+    public static function emptyDir(string $path): bool {
+        if (!file_exists($path)) {
+            return false;
+        }
+        $result = true;
+        $files  = scandir($path);
+        foreach ($files as $file) {
+            if ($file != "." && $file != "..") {
+                $result &= self::deleteDir("$path/$file");
             }
         }
+        return $result;
     }
 
 
@@ -333,33 +336,42 @@ class File {
      * @param ZipArchive $zip
      * @param string     $src
      * @param string     $dst
-     * @return void
+     * @return boolean
      */
-    private static function addDirToZip(ZipArchive $zip, string $src, string $dst): void {
+    private static function addDirToZip(ZipArchive $zip, string $src, string $dst): bool {
+        if (!file_exists($src)) {
+            return false;
+        }
+
         if (is_dir($src)) {
+            $result = true;
             $zip->addEmptyDir($dst);
             $files = scandir($src);
             foreach ($files as $file) {
                 if ($file != "." && $file != "..") {
-                    self::addDirToZip($zip, "$src/$file", "$dst/$file");
+                    $result &= self::addDirToZip($zip, "$src/$file", "$dst/$file");
                 }
             }
-        } elseif (file_exists($src)) {
-            $zip->addFile($src, $dst);
+            return $result;
         }
+
+        $zip->addFile($src, $dst);
+        return true;
     }
 
     /**
      * Extracts the given zip to the given path
      * @param string $zipPath
      * @param string $extractPath
-     * @return void
+     * @return boolean
      */
-    public static function extractZip(string $zipPath, string $extractPath): void {
+    public static function extractZip(string $zipPath, string $extractPath): bool {
         $zip = new ZipArchive();
-        if ($zip->open($zipPath)) {
-            $zip->extractTo($extractPath);
-            $zip->close();
+        if (!$zip->open($zipPath)) {
+            return false;
         }
+        $zip->extractTo($extractPath);
+        $zip->close();
+        return true;
     }
 }

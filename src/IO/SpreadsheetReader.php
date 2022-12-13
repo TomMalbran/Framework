@@ -2,6 +2,7 @@
 namespace Framework\IO;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Exception;
 
 /**
@@ -9,8 +10,8 @@ use Exception;
  */
 class SpreadsheetReader {
 
-    private $sheet;
-    private $columns;
+    private ?Worksheet $sheet;
+    private ?string    $columns;
 
 
     /**
@@ -88,7 +89,7 @@ class SpreadsheetReader {
      * @param integer $row
      * @param string  $from Optional.
      * @param string  $to   Optional.
-     * @return array
+     * @return mixed[]
      */
     public function getRow(int $row, string $from = "A", string $to = ""): array {
         if (empty($this->sheet)) {

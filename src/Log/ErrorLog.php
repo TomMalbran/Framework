@@ -14,19 +14,25 @@ use Framework\Utils\Strings;
  */
 class ErrorLog {
 
-    private static $framePath = "";
-    private static $basePath  = "";
-    private static $maxLog    = 1000;
+    private static bool   $loaded    = false;
+    private static string $framePath = "";
+    private static string $basePath  = "";
+    private static int    $maxLog    = 1000;
 
 
     /**
      * Initializes the Log
-     * @return void
+     * @return boolean
      */
-    public static function init(): void {
+    public static function init(): bool {
+        if (!self::$loaded) {
+            return false;
+        }
+        self::$loaded    = true;
         self::$framePath = Framework::getPath("src", "", true);
         self::$basePath  = Framework::getPath(Framework::SourceDir);
         set_error_handler("\\Framework\\Log\\ErrorLog::handler");
+        return true;
     }
 
     /**
@@ -74,7 +80,7 @@ class ErrorLog {
     /**
      * Returns all the Product Logs filtered by the given times
      * @param Request $request
-     * @return array
+     * @return array{}[]
      */
     public static function filter(Request $request): array {
         $query = self::getFilterQuery($request);
@@ -165,7 +171,7 @@ class ErrorLog {
     /**
      * Map an error code into an Error word, and log location.
      * @param integer $code
-     * @return array
+     * @return array{}
      */
     public static function mapErrorCode(int $code): array {
         $error = "";

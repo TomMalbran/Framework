@@ -15,10 +15,10 @@ use Framework\Utils\Server;
  */
 class ActionLog {
 
-    private static $loaded      = false;
-    private static $logIDs      = null;
-    private static $logSessions = null;
-    private static $logActions  = null;
+    private static bool    $loaded      = false;
+    private static ?Schema $logIDs      = null;
+    private static ?Schema $logSessions = null;
+    private static ?Schema $logActions  = null;
 
 
     /**
@@ -67,7 +67,7 @@ class ActionLog {
     /**
      * Returns the Filter Query
      * @param Request $filters
-     * @param array   $mappings Optional.
+     * @param array{} $mappings Optional.
      * @return Query
      */
     private static function getFilterQuery(Request $filters, array $mappings = []): Query {
@@ -86,8 +86,8 @@ class ActionLog {
      * Returns all the Actions Log filtered by the given filters
      * @param Request $filters
      * @param Request $sort
-     * @param array   $mappings Optional.
-     * @return array
+     * @param array{} $mappings Optional.
+     * @return array{}[]
      */
     public static function filter(Request $filters, Request $sort, array $mappings = []): array {
         $query = self::getFilterQuery($filters, $mappings);
@@ -99,7 +99,7 @@ class ActionLog {
     /**
      * Returns the Total Actions Log with the given Filters
      * @param Request $filters
-     * @param array   $mappings Optional.
+     * @param array{} $mappings Optional.
      * @return integer
      */
     public static function getTotal(Request $filters, array $mappings = []): int {
@@ -110,7 +110,7 @@ class ActionLog {
     /**
      * Returns the Actions Log using the given Query
      * @param Query $query
-     * @return array
+     * @return array{}[]
      */
     private static function request(Query $query): array {
         $sessionIDs = self::getSessionsSchema()->getColumn($query, "SESSION_ID");
@@ -158,9 +158,9 @@ class ActionLog {
      * Starts a Log Session
      * @param integer $credentialID
      * @param boolean $destroy      Optional.
-     * @return void
+     * @return boolean
      */
-    public static function startSession(int $credentialID, bool $destroy = false): void {
+    public static function startSession(int $credentialID, bool $destroy = false): bool {
         $sessionID = self::getSessionID();
 
         if ($destroy || empty($sessionID)) {
@@ -172,7 +172,9 @@ class ActionLog {
                 "time"          => time(),
             ]);
             self::setSessionID($sessionID);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -190,26 +192,28 @@ class ActionLog {
      * @param integer           $action
      * @param integer           $section Optional.
      * @param integer[]|integer $dataID  Optional.
-     * @return void
+     * @return boolean
      */
-    public static function add(int $action, int $section = 0, array|int $dataID = 0): void {
+    public static function add(int $action, int $section = 0, array|int $dataID = 0): bool {
         $sessionID = self::getSessionID();
-        if (!empty($sessionID)) {
-            $dataID = Arrays::toArray($dataID);
-            foreach ($dataID as $index => $value) {
-                $dataID[$index] = (int)$value;
-            }
-
-            self::getActionsSchema()->create([
-                "SESSION_ID"    => $sessionID,
-                "CREDENTIAL_ID" => Auth::getID(),
-                "USER_ID"       => Auth::getUserID(),
-                "action"        => $action,
-                "section"       => $section,
-                "dataID"        => JSON::encode($dataID),
-                "time"          => time(),
-            ]);
+        if (empty($sessionID)) {
+            return false;
         }
+        $dataID = Arrays::toArray($dataID);
+        foreach ($dataID as $index => $value) {
+            $dataID[$index] = (int)$value;
+        }
+
+        self::getActionsSchema()->create([
+            "SESSION_ID"    => $sessionID,
+            "CREDENTIAL_ID" => Auth::getID(),
+            "USER_ID"       => Auth::getUserID(),
+            "action"        => $action,
+            "section"       => $section,
+            "dataID"        => JSON::encode($dataID),
+            "time"          => time(),
+        ]);
+        return true;
     }
 
     /**

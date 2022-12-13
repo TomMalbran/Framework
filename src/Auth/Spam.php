@@ -48,10 +48,10 @@ class Spam {
 
     /**
      * Reset the spam protections
-     * @return void
+     * @return boolean
      */
-    public static function reset(): void {
+    public static function reset(): bool {
         $ip = Server::getIP();
-        self::schema()->remove(Query::create("ip", "=", $ip));
+        return self::schema()->remove(Query::create("ip", "=", $ip));
     }
 }

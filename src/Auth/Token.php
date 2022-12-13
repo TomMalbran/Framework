@@ -11,6 +11,8 @@ use Framework\Utils\Arrays;
 class Token {
 
     private static bool  $loaded = false;
+
+    /** @var array{}[] */
     private static array $data   = [];
 
 

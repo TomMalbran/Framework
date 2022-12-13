@@ -8,10 +8,11 @@ use Framework\File\Image;
  */
 class Picture {
 
-    private $image;
-    public $type;
-    public $width;
-    public $height;
+    private mixed $image;
+
+    public int $type;
+    public int $width;
+    public int $height;
 
 
     /**
@@ -49,14 +50,15 @@ class Picture {
      * @param string  $fontFile
      * @param integer $fontSize
      * @param boolean $centered Optional.
-     * @return void
+     * @return boolean
      */
-    public function writeText(string $text, int $x, int $y, int $color, string $fontFile, int $fontSize, bool $centered = false): void {
+    public function writeText(string $text, int $x, int $y, int $color, string $fontFile, int $fontSize, bool $centered = false): bool {
         if ($centered) {
             $textWidth = Image::getTextWidth($text, $fontFile, $fontSize);
             $x -= $textWidth / 2;
         }
-        imagettftext($this->image, $fontSize, 0, $x, $y, $color, $fontFile, $text);
+        $result = imagettftext($this->image, $fontSize, 0, $x, $y, $color, $fontFile, $text);
+        return $result != false;
     }
 
     /**

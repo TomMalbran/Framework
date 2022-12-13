@@ -14,13 +14,13 @@ use Google\Service\Gmail;
  */
 class EmailReader {
 
-    private static $loaded  = false;
-    private static $url     = "";
-    private static $config  = null;
-    private static $db      = null;
+    private static bool   $loaded  = false;
+    private static string $url     = "";
+    private static mixed  $config  = null;
+    private static mixed  $db      = null;
 
-    private static $client  = null;
-    private static $service = null;
+    private static ?Client $client  = null;
+    private static ?Gmail  $service = null;
 
 
     /**
@@ -87,7 +87,7 @@ class EmailReader {
      * Returns the Google Refresh Token
      * @param string $redirectUri
      * @param string $code
-     * @return array
+     * @return array{}
      */
     public static function getAuthToken(string $redirectUri, string $code): array {
         self::loadClient($redirectUri);
@@ -109,7 +109,7 @@ class EmailReader {
 
     /**
      * Returns the new Emails
-     * @return array
+     * @return object[]
      */
     public static function getLatestEmails(): array {
         self::loadClient();
@@ -156,8 +156,8 @@ class EmailReader {
 
     /**
      * Return the header with the given key
-     * @param array  $headers
-     * @param string $key
+     * @param array{}[] $headers
+     * @param string    $key
      * @return string
      */
     private static function getHeader(array $headers, string $key): string {
@@ -171,9 +171,9 @@ class EmailReader {
 
     /**
      * Parses the Email From/To
-     * @param array  $headers
-     * @param string $key
-     * @return array
+     * @param array{}[] $headers
+     * @param string    $key
+     * @return array{}
      */
     private static function getFromTo(array $headers, string $key): array {
         $string = self::getHeader($headers, $key);

@@ -84,13 +84,15 @@ class Reset {
 
     /**
      * Deletes the old reset data for all the Credentials
-     * @return void
+     * @return boolean
      */
-    public static function deleteOld(): void {
+    public static function deleteOld(): bool {
         $schema = self::schema();
-        if (!empty($schema)) {
-            $query = Query::create("time", "<", time() - 3 * 3600);
-            $schema->remove($query);
+        if (empty($schema)) {
+            return false;
         }
+        $query = Query::create("time", "<", time() - 3 * 3600);
+        $schema->remove($query);
+        return true;
     }
 }

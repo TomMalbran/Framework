@@ -9,22 +9,41 @@ use Framework\Utils\Strings;
  */
 class FileType {
 
-    /**
-     * All the valid Values
-     */
-    public static $imageExts        = [ "jpg", "jpeg", "gif", "png", "ico" ];
-    public static $pngExts          = [ "png" ];
-    public static $icoExts          = [ "ico" ];
-    public static $videoExts        = [ "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm" ];
-    public static $audioExts        = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];
-    public static $codeExts         = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
-    public static $textExts         = [ "txt", "csv", "log", "rtf" ];
-    public static $documentExts     = [ "doc", "docx", "odt", "ott" ];
-    public static $spreadsheetExts  = [ "xls", "xlsx", "ods" ];
-    public static $presentationExts = [ "ppt", "pptx" ];
-    public static $pdfExts          = [ "pdf" ];
-    public static $zipExts          = [ "zip", "rar", "gz", "tar", "iso", "7zip" ];
+    /** @var string[] */
+    public static array $imageExts        = [ "jpg", "jpeg", "gif", "png", "ico" ];
 
+    /** @var string[] */
+    public static array $pngExts          = [ "png" ];
+
+    /** @var string[] */
+    public static array $icoExts          = [ "ico" ];
+
+    /** @var string[] */
+    public static array $videoExts        = [ "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm" ];
+
+    /** @var string[] */
+    public static array $audioExts        = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];
+
+    /** @var string[] */
+    public static array $codeExts         = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
+
+    /** @var string[] */
+    public static array $textExts         = [ "txt", "csv", "log", "rtf" ];
+
+    /** @var string[] */
+    public static array $documentExts     = [ "doc", "docx", "odt", "ott" ];
+
+    /** @var string[] */
+    public static array $spreadsheetExts  = [ "xls", "xlsx", "ods" ];
+
+    /** @var string[] */
+    public static array $presentationExts = [ "ppt", "pptx" ];
+
+    /** @var string[] */
+    public static array $pdfExts          = [ "pdf" ];
+
+    /** @var string[] */
+    public static array $zipExts          = [ "zip", "rar", "gz", "tar", "iso", "7zip" ];
 
 
 

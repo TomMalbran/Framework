@@ -10,8 +10,10 @@ use Framework\Utils\Strings;
  */
 class Language {
 
-    private static $loaded = false;
-    private static $data   = [];
+    private static bool  $loaded = false;
+
+    /** @var array{}[] */
+    private static array $data   = [];
 
 
     /**
@@ -73,7 +75,7 @@ class Language {
 
     /**
      * Creates a Select of Languages
-     * @return array
+     * @return array{}[]
      */
     public static function getSelect(): array {
         self::load();

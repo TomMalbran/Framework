@@ -13,10 +13,12 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  */
 class SpreadsheetWriter {
 
-    private $title;
-    private $data;
-    private $sheets;
-    private $sheetNum;
+    private string      $title;
+    private Spreadsheet $data;
+    private int         $sheetNum;
+
+    /** @var SpreadsheetSheet[] */
+    private array       $sheets;
 
 
     /**
@@ -36,11 +38,11 @@ class SpreadsheetWriter {
 
     /**
      * Adds a new Sheet
-     * @param string         $sheetName Optional.
-     * @param string|integer $sheetID   Optional.
+     * @param string              $sheetName Optional.
+     * @param string|integer|null $sheetID   Optional.
      * @return SpreadsheetSheet
      */
-    public function addSheet(string $sheetName = "", $sheetID = null): SpreadsheetSheet {
+    public function addSheet(string $sheetName = "", string|int $sheetID = null): SpreadsheetSheet {
         $count = $this->data->getSheetCount();
         if ($this->sheetNum < $count) {
             $sheet = $this->data->getSheet($this->sheetNum);
@@ -62,7 +64,7 @@ class SpreadsheetWriter {
      * @param string|integer $sheetID
      * @return SpreadsheetSheet|null
      */
-    public function getSheet($sheetID): ?SpreadsheetSheet {
+    public function getSheet(string|int $sheetID): ?SpreadsheetSheet {
         if (!empty($this->sheets[$sheetID])) {
             return $this->sheets[$sheetID];
         }

@@ -11,8 +11,8 @@ class Curl {
 
     /**
      * Executes a GET Request
-     * @param string $url
-     * @param array  $params Optional.
+     * @param string  $url
+     * @param array{} $params Optional.
      * @return mixed
      */
     public static function get(string $url, array $params = []): mixed {
@@ -34,8 +34,8 @@ class Curl {
 
     /**
      * Executes a POST Request
-     * @param string $url
-     * @param array  $params
+     * @param string  $url
+     * @param array{} $params
      * @return mixed
      */
     public static function post(string $url, array $params): mixed {
@@ -46,8 +46,8 @@ class Curl {
 
     /**
      * Executes the Request
-     * @param string $url
-     * @param array  $params Optional.
+     * @param string  $url
+     * @param array{} $params Optional.
      * @return mixed
      */
     private static function execute(string $url, array $params = []): mixed {

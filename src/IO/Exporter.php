@@ -4,6 +4,7 @@ namespace Framework\IO;
 use Framework\Request;
 use Framework\NLS\NLS;
 use Framework\IO\SpreadsheetWriter;
+use Framework\IO\SpreadsheetSheet;
 use Framework\Utils\Elements;
 
 /**
@@ -11,18 +12,18 @@ use Framework\Utils\Elements;
  */
 class Exporter {
 
-    private $isCSV;
-    private $writer;
-    private $sheet;
-    private $csv;
+    private string            $fileName;
+    private int               $total;
+    private Elements          $header;
+    private bool              $isCSV;
+    private SpreadsheetWriter $writer;
+    private SpreadsheetSheet  $sheet;
+    private mixed             $csv;
 
-    private $fileName = "";
-    private $total    = 0;
-    private $header   = null;
-    private $requests = 0;
-    private $perPage  = 2000;
-    private $page     = 0;
-    private $line     = 0;
+    private int $requests = 0;
+    private int $perPage  = 2000;
+    private int $page     = 0;
+    private int $line     = 0;
 
 
     /**
@@ -61,22 +62,24 @@ class Exporter {
     /**
      * Sets the Header
      * @param Elements $header
-     * @return void
+     * @return Exporter
      */
-    public function setHeader(Elements $header): void {
+    public function setHeader(Elements $header): Exporter {
         $this->header = $header;
         $this->writeHeader();
+        return $this;
     }
 
     /**
      * Adds multiple Headers
-     * @param array $headers
-     * @return void
+     * @param array{} $headers
+     * @return Exporter
      */
-    public function addHeaders(array $headers): void {
+    public function addHeaders(array $headers): Exporter {
         foreach ($headers as $key => $value) {
             $this->header->add($key, $value);
         }
+        return $this;
     }
 
     /**
@@ -84,23 +87,25 @@ class Exporter {
      * @param string  $key
      * @param string  $value
      * @param boolean $condition Optional.
-     * @return void
+     * @return Exporter
      */
-    public function addHeader(string $key, string $value, bool $condition = true): void {
+    public function addHeader(string $key, string $value, bool $condition = true): Exporter {
         $this->header->add($key, $value, $condition);
+        return $this;
     }
 
     /**
      * Writes the Header
-     * @return void
+     * @return Exporter
      */
-    public function writeHeader(): void {
+    public function writeHeader(): Exporter {
         if ($this->isCSV) {
             $values = NLS::getAll($this->header->getValues());
             fputcsv($this->csv, $values);
         } else {
             $this->sheet->setHeader($this->header);
         }
+        return $this;
     }
 
 
@@ -108,13 +113,14 @@ class Exporter {
     /**
      * Starts a Chumk Export
      * @param Request $request
-     * @return void
+     * @return Exporter
      */
-    public function startChunk(Request $request): void {
+    public function startChunk(Request $request): Exporter {
         $request->amount = $this->perPage;
         $request->page   = $this->page;
         $this->page     += 1;
         $this->requests += $this->perPage;
+        return $this;
     }
 
     /**
@@ -127,10 +133,10 @@ class Exporter {
 
     /**
      * Writes a Line
-     * @param array $line
-     * @return void
+     * @param array{}[] $line
+     * @return Exporter
      */
-    public function writeLine(array $line): void {
+    public function writeLine(array $line): Exporter {
         $this->line += 1;
 
         if ($this->isCSV) {
@@ -142,6 +148,7 @@ class Exporter {
         } else {
             $this->sheet->setLine($line);
         }
+        return $this;
     }
 
 
@@ -155,9 +162,9 @@ class Exporter {
             fclose($this->csv);
             flush();
             die();
-        } else {
-            $this->sheet->autoSizeColumns();
-            $this->writer->download($this->fileName, true);
         }
+
+        $this->sheet->autoSizeColumns();
+        $this->writer->download($this->fileName, true);
     }
 }

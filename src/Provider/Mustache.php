@@ -14,9 +14,9 @@ use Mustache_Loader_FilesystemLoader;
  */
 class Mustache {
 
-    private static $loaded = false;
-    private static $engine = null;
-    private static $loader = null;
+    private static bool             $loaded = false;
+    private static ?Mustache_Engine $engine = null;
+    private static ?Mustache_Engine $loader = null;
 
 
     /**
@@ -62,8 +62,8 @@ class Mustache {
 
     /**
      * Renders the template using any of the engines depending on the first parameter
-     * @param string $templateOrPath
-     * @param array  $data
+     * @param string  $templateOrPath
+     * @param array{} $data
      * @return string
      */
     public static function render(string $templateOrPath, array $data): string {

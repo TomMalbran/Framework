@@ -167,11 +167,11 @@ class Email {
      * Sends the given Template Email
      * @param Model           $template
      * @param string[]|string $sendTo
-     * @param string          $message  Optional.
-     * @param string          $subject  Optional.
+     * @param string|null     $message  Optional.
+     * @param string|null     $subject  Optional.
      * @return boolean
      */
-    public static function sendTemplate(Model $template, array|string $sendTo, string $message = null, string $subject = null): bool {
+    public static function sendTemplate(Model $template, array|string $sendTo, ?string $message = null, ?string $subject = null): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;

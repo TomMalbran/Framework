@@ -7,6 +7,7 @@ use Framework\File\Path;
 use Framework\File\File;
 use Framework\File\Image;
 use Framework\File\FileType;
+use Framework\Schema\Database;
 use Framework\Schema\Query;
 
 /**
@@ -14,9 +15,11 @@ use Framework\Schema\Query;
  */
 class Media {
 
-    private static $loaded = false;
-    private static $db     = null;
-    private static $data   = [];
+    private static bool      $loaded = false;
+    private static ?Database $db     = null;
+
+    /** @var array{}[] */
+    private static array     $data   = [];
 
 
     /**
@@ -37,14 +40,16 @@ class Media {
      * Updates the Paths in the Database
      * @param string $oldPath
      * @param string $newPath
-     * @return void
+     * @return boolean
      */
-    private static function update(string $oldPath, string $newPath): void {
+    private static function update(string $oldPath, string $newPath): bool {
         self::load();
+        $result = true;
         foreach (self::$data as $table) {
             $query = Query::create($table["field"], "=", $oldPath);
-            self::$db->update($table["table"], [ $table["field"] => $newPath ], $query);
+            $result &= self::$db->update($table["table"], [ $table["field"] => $newPath ], $query);
         }
+        return $result;
     }
 
 

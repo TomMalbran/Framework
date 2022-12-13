@@ -13,10 +13,14 @@ class Image {
     const Maximum = "maximum";
     const Thumb   = "thumb";
 
-    // The Image Types and Functions
-    private static $imageTypes = [ 1, 2, 3, 15, 16 ];
-    private static $transTypes = [ 1, 3 ];
-    private static $imageData  = [
+    /** @var int[] The image types */
+    private static array $imageTypes = [ 1, 2, 3, 15, 16 ];
+
+    /** @var int[] The transparent image type */
+    private static array $transTypes = [ 1, 3 ];
+
+    /** @var array{}[] */
+    private static array $imageData  = [
         1  => [ "imagecreatefromgif",  "imagegif",  "image/gif",  "gif" ],
         2  => [ "imagecreatefromjpeg", "imagejpeg", "image/jpeg", "jpg" ],
         3  => [ "imagecreatefrompng",  "imagepng",  "image/png",  "png" ],
@@ -60,7 +64,7 @@ class Image {
     /**
      * Returns the Size of the Image as [ width, height, type ]
      * @param string $file
-     * @return array
+     * @return int[]
      */
     public static function getSize(string $file): array {
         if (file_exists($file)) {
@@ -101,12 +105,12 @@ class Image {
 
     /**
      * Resamples the given image
-     * @param string  $src
-     * @param string  $dst
-     * @param integer $orientation Optional.
+     * @param string       $src
+     * @param string       $dst
+     * @param integer|null $orientation Optional.
      * @return boolean
      */
-    public static function resample(string $src, string $dst, int $orientation = null): bool {
+    public static function resample(string $src, string $dst, ?int $orientation = null): bool {
         if ($orientation == null) {
             $orientation = self::getOrientation($src);
         }
@@ -332,13 +336,13 @@ class Image {
 
     /**
      * Creates an Image based on the Type
-     * @param integer $imgType
-     * @param mixed   $image
-     * @param string  $fileName Optional.
-     * @param integer $quality  Optional.
+     * @param integer     $imgType
+     * @param mixed       $image
+     * @param string|null $fileName Optional.
+     * @param integer     $quality  Optional.
      * @return void
      */
-    public static function createImage(int $imgType, mixed $image, string $fileName = null, int $quality = 90): void {
+    public static function createImage(int $imgType, mixed $image, ?string $fileName = null, int $quality = 90): void {
         if ($imgType == 2) {
             self::$imageData[$imgType][1]($image, $fileName, $quality);
         } else {

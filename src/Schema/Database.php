@@ -910,11 +910,11 @@ class Database {
 
     /**
      * Writes the content in a file or prints them in the screen
-     * @param mixed  $fp
-     * @param string $content
+     * @param mixed|null $fp
+     * @param string     $content
      * @return void
      */
-    private function write(mixed $fp, string $content): void {
+    private function write(?mixed $fp, string $content): void {
         if (!empty($fp)) {
             fwrite($fp, $content);
         } else {

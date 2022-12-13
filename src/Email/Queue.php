@@ -60,7 +60,7 @@ class Queue {
     /**
      * Returns all the Emails from the Queue
      * @param Request $request
-     * @return array
+     * @return array{}[]
      */
     public static function getAll(Request $request): array {
         $query = self::getFilterQuery($request);
@@ -69,7 +69,7 @@ class Queue {
 
     /**
      * Returns all the not sent Emails from the Queue
-     * @return array
+     * @return array{}[]
      */
     public static function getAllUnsent(): array {
         $query = Query::create("sentTime", "=", 0);
@@ -92,12 +92,12 @@ class Queue {
      * Adds the given Email to the Queue
      * @param Model           $template
      * @param string[]|string $sendTo
-     * @param string          $message  Optional.
-     * @param string          $subject  Optional.
+     * @param string|null     $message  Optional.
+     * @param string|null     $subject  Optional.
      * @param boolean         $sendNow  Optional.
      * @return boolean
      */
-    public static function add(Model $template, array|string $sendTo, string $message = null, string $subject = null, bool $sendNow = false): bool {
+    public static function add(Model $template, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
@@ -127,21 +127,23 @@ class Queue {
 
     /**
      * Sends all the Unsent Emails
-     * @return void
+     * @return boolean
      */
-    public static function sendAll() {
+    public static function sendAll(): bool {
         $emails = self::getAllUnsent();
+        $result = true;
         foreach ($emails as $email) {
-            self::send($email);
+            $result &= self::send($email);
         }
+        return $result;
     }
 
     /**
      * Sends the given Email
-     * @param Model|array $email
+     * @param Model|array{} $email
      * @return boolean
      */
-    public static function send($email): bool {
+    public static function send(Model|array $email): bool {
         $success = false;
         foreach ($email["sendToParts"] as $sendTo) {
             if (!empty($sendTo)) {

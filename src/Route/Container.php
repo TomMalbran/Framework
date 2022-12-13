@@ -8,8 +8,12 @@ use ReflectionClass;
  */
 class Container {
 
-    private static $instances = [];
-    private static $keys      = [];
+    /** @var mixed[] */
+    private static array $instances = [];
+
+    /** @var string[] */
+    private static array $keys      = [];
+
 
     /**
      * Resolves the dependencies and creates a new instance of the class
@@ -39,7 +43,7 @@ class Container {
      * Resolves the dependencies and saves a new instance of the class
      * @param string  $key
      * @param boolean $save   Optional.
-     * @param array   $params Optional.
+     * @param array{} $params Optional.
      * @return object
      */
     private static function resolve(string $key, bool $save = false, array $params = []): object {
@@ -65,7 +69,7 @@ class Container {
      * Instantiates each Class
      * @param string  $className
      * @param boolean $save      Optional.
-     * @param array   $params    Optional.
+     * @param array{} $params    Optional.
      * @return object
      */
     private static function buildObject(string $className, bool $save = false, array $params = []): object {

@@ -9,14 +9,17 @@ use Framework\NLS\Language;
  */
 class NLS {
 
-    private static $loaded = [];
-    private static $data   = [];
+    /** @var boolean[] */
+    private static array $loaded = [];
+
+    /** @var array{}{} */
+    private static array $data   = [];
 
 
     /**
      * Loads an NLS Language
      * @param string $lang
-     * @return array
+     * @return array{}
      */
     public static function load(string $lang): array {
         if (empty(self::$loaded[$lang])) {
@@ -80,9 +83,9 @@ class NLS {
 
     /**
      * Returns a formatted string
-     * @param string $key
-     * @param array  $args
-     * @param string $lang Optional.
+     * @param string  $key
+     * @param mixed[] $args
+     * @param string  $lang Optional.
      * @return string
      */
     public static function format(string $key, array $args, string $lang = "root"): string {
@@ -108,7 +111,7 @@ class NLS {
      * Returns a formatted string using the correct plural string
      * @param string  $key
      * @param integer $count
-     * @param array   $args  Optional.
+     * @param mixed[] $args  Optional.
      * @param string  $lang  Optional.
      * @return string
      */
