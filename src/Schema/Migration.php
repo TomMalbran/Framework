@@ -19,23 +19,24 @@ class Migration {
      * @param Database  $db
      * @param array{}[] $schemas
      * @param boolean   $canDelete Optional.
-     * @return void
+     * @return boolean
      */
-    public static function migrate(Database $db, array $schemas, bool $canDelete = false): void {
+    public static function migrate(Database $db, array $schemas, bool $canDelete = false): bool {
         $migrations = Framework::loadData("migrations/migrations");
 
-        self::moveTables($db, $migrations["movements"]);
-        self::migrateTables($db, $schemas, $migrations["updates"], $canDelete);
-        self::extraMigrations($db);
+        $moved    = self::moveTables($db, $migrations["movements"]);
+        $migrated = self::migrateTables($db, $schemas, $migrations["updates"], $canDelete);
+        $extras   = self::extraMigrations($db);
+        return $moved || $migrated || $extras;
     }
 
     /**
      * Moves the Tables
      * @param Database  $db
      * @param array{}[] $movements
-     * @return void
+     * @return boolean
      */
-    private static function moveTables(Database $db, array $movements): void {
+    private static function moveTables(Database $db, array $movements): bool {
         $movement = Settings::getCore($db, "movement");
         $last     = count($movements);
         $didMove  = false;
@@ -57,6 +58,7 @@ class Migration {
             print("No <i>movements</i> required<br><br>");
         }
         Settings::setCore($db, "movement", $last);
+        return $didMove;
     }
 
     /**
@@ -65,11 +67,12 @@ class Migration {
      * @param array{}[] $schemas
      * @param array{}[] $updates
      * @param boolean   $canDelete Optional.
-     * @return void
+     * @return boolean
      */
-    private static function migrateTables(Database $db, array $schemas, array $updates, bool $canDelete = false): void {
+    private static function migrateTables(Database $db, array $schemas, array $updates, bool $canDelete = false): bool {
         $tableNames  = $db->getTables(null, false);
         $schemaNames = [];
+        $didMigrate  = false;
 
         // Create or update the Tables
         foreach ($schemas as $schemaKey => $schemaData) {
@@ -77,24 +80,25 @@ class Migration {
             $schemaNames[] = $structure->table;
 
             if (!Arrays::contains($tableNames, $structure->table)) {
-                self::createTable($db, $structure);
+                $didMigrate = $didMigrate || self::createTable($db, $structure);
             } else {
                 $schemaUpdates = !empty($updates[$structure->table]) ? $updates[$structure->table] : [];
-                self::updateTable($db, $structure, $schemaUpdates, $canDelete);
+                $didMigrate    = $didMigrate || self::updateTable($db, $structure, $schemaUpdates, $canDelete);
             }
         }
 
         // Delete the Tables or show which to delete
-        self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
+        $didMigrate = $didMigrate || self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
+        return $didMigrate;
     }
 
     /**
      * Creates a New Table
      * @param Database  $db
      * @param Structure $structure
-     * @return void
+     * @return boolean
      */
-    private static function createTable(Database $db, Structure $structure): void {
+    private static function createTable(Database $db, Structure $structure): bool {
         $fields  = [];
         $primary = [];
         $keys    = [];
@@ -112,6 +116,7 @@ class Migration {
         $sql = $db->createTable($structure->table, $fields, $primary, $keys);
         print("<br>Created table <b>$structure->table</b> ... <br>");
         print(Strings::toHtml($sql) . "<br><br>");
+        return true;
     }
 
     /**
@@ -120,10 +125,11 @@ class Migration {
      * @param string[] $tableNames
      * @param string[] $schemaNames
      * @param boolean  $canDelete
-     * @return void
+     * @return boolean
      */
-    private static function deleteTables(Database $db, array $tableNames, array $schemaNames, bool $canDelete): void {
-        $prebr = "<br>";
+    private static function deleteTables(Database $db, array $tableNames, array $schemaNames, bool $canDelete): bool {
+        $deleted = 0;
+        $prebr   = "<br>";
         foreach ($tableNames as $tableName) {
             if (!Arrays::contains($schemaNames, $tableName)) {
                 if ($canDelete) {
@@ -132,9 +138,11 @@ class Migration {
                 } else {
                     print("{$prebr}Delete table <i>$tableName</i> (manually)<br>");
                 }
-                $prebr = "";
+                $deleted += 1;
+                $prebr    = "";
             }
         }
+        return $deleted > 0;
     }
 
     /**
@@ -143,9 +151,9 @@ class Migration {
      * @param Structure $structure
      * @param array{}[] $updates
      * @param boolean   $canDelete
-     * @return void
+     * @return boolean
      */
-    private static function updateTable(Database $db, Structure $structure, array $updates, bool $canDelete): void {
+    private static function updateTable(Database $db, Structure $structure, array $updates, bool $canDelete): bool {
         $autoKey     = $db->getAutoIncrement($structure->table);
         $primaryKeys = $db->getPrimaryKeys($structure->table);
         $tableKeys   = $db->getTableKeys($structure->table);
@@ -303,7 +311,7 @@ class Migration {
         // Nothing to change
         if (!$update) {
             print("No changes for <i>$structure->table</i><br>");
-            return;
+            return false;
         }
 
         // Update the Table
@@ -337,6 +345,7 @@ class Migration {
             print("$sql<br>");
         }
         print("<br>");
+        return true;
     }
 
 
@@ -344,15 +353,15 @@ class Migration {
     /**
      * Runs extra Migrations
      * @param Database $db
-     * @return void
+     * @return boolean
      */
-    private static function extraMigrations(Database $db): void {
+    private static function extraMigrations(Database $db): bool {
         $migration = Settings::getCore($db, "migration");
         $path      = Framework::getPath(Framework::MigrationsDir);
 
         if (!File::exists($path)) {
             print("<br>No <i>migrations</i> required<br>");
-            return;
+            return false;
         }
 
         $files = File::getFilesInDir($path);
@@ -368,7 +377,7 @@ class Migration {
         $last  = end($names);
         if (empty($names) || $first > $last) {
             print("<br>No <i>migrations</i> required<br>");
-            return;
+            return false;
         }
 
         print("<br>Running <b>migrations $first to $last</b><br>");
@@ -380,5 +389,6 @@ class Migration {
         }
 
         Settings::setCore($db, "migration", $last);
+        return true;
     }
 }

@@ -72,10 +72,10 @@ class Database {
 
     /**
      * Closes the connection
-     * @return void
+     * @return boolean
      */
-    public function close(): void {
-        $this->mysqli->close();
+    public function close(): bool {
+        return $this->mysqli->close();
     }
 
     /**
@@ -910,11 +910,11 @@ class Database {
 
     /**
      * Writes the content in a file or prints them in the screen
-     * @param mixed|null $fp
-     * @param string     $content
+     * @param mixed  $fp
+     * @param string $content
      * @return void
      */
-    private function write(?mixed $fp, string $content): void {
+    private function write(mixed $fp, string $content): void {
         if (!empty($fp)) {
             fwrite($fp, $content);
         } else {

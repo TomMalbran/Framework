@@ -303,7 +303,9 @@ class File {
         $files  = scandir($path);
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
-                $result &= self::deleteDir("$path/$file");
+                if (!self::deleteDir("$path/$file")) {
+                    $result = false;
+                }
             }
         }
         return $result;
@@ -349,7 +351,9 @@ class File {
             $files = scandir($src);
             foreach ($files as $file) {
                 if ($file != "." && $file != "..") {
-                    $result &= self::addDirToZip($zip, "$src/$file", "$dst/$file");
+                    if (!self::addDirToZip($zip, "$src/$file", "$dst/$file")) {
+                        $result = false;
+                    }
                 }
             }
             return $result;

@@ -110,11 +110,11 @@ class Factory {
      * Performs a Migration on the Schema
      * @param Database|null $db        Optional.
      * @param boolean       $canDelete Optional.
-     * @return void
+     * @return boolean
      */
-    public static function migrate(?Database $db = null, bool $canDelete = false): void {
+    public static function migrate(?Database $db = null, bool $canDelete = false): bool {
         self::load();
         $database = $db !== null ? $db : self::$db;
-        Migration::migrate($database, self::$data, $canDelete);
+        return Migration::migrate($database, self::$data, $canDelete);
     }
 }

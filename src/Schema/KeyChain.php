@@ -9,8 +9,10 @@ use Framework\Utils\Strings;
  */
 class KeyChain {
 
-    private static $loaded = false;
-    private static $data   = [];
+    private static bool  $loaded = false;
+
+    /** @var string[] */
+    private static array $data   = [];
 
 
     /**
@@ -43,7 +45,7 @@ class KeyChain {
 
     /**
      * Recreates all the Master Keys
-     * @return array
+     * @return string[]
      */
     public static function recreate(): array {
         self::load();
@@ -57,7 +59,7 @@ class KeyChain {
 
     /**
      * Saves all the Master Keys
-     * @param array $data
+     * @param string[] $data
      * @return void
      */
     public static function save(array $data): void {

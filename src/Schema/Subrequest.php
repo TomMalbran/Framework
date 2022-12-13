@@ -11,28 +11,30 @@ use Framework\Utils\Arrays;
  */
 class Subrequest {
 
-    private $schema;
+    private Schema $schema;
 
-    private $name     = "";
-    private $idKey    = "";
-    private $idName   = "";
+    private string $name     = "";
+    private string $idKey    = "";
+    private string $idName   = "";
 
-    private $hasWhere = false;
-    private $where    = null;
+    private bool   $hasWhere = false;
 
-    private $hasOrder = false;
-    private $orderBy  = "";
-    private $isAsc    = false;
+    /** @var mixed[] */
+    private array  $where    = [];
 
-    private $field    = "";
-    private $value    = null;
+    private bool   $hasOrder = false;
+    private string $orderBy  = "";
+    private bool   $isAsc    = false;
+
+    private string $field    = "";
+    private mixed  $value    = null;
 
 
     /**
      * Creates a new Subrequest instance
      * @param Schema    $schema
      * @param Structure $structure
-     * @param array     $data
+     * @param array{}   $data
      */
     public function __construct(Schema $schema, Structure $structure, array $data) {
         $this->schema    = $schema;
@@ -56,8 +58,8 @@ class Subrequest {
 
     /**
      * Does the Request with a Sub Request
-     * @param array $result
-     * @return array
+     * @param mixed[] $result
+     * @return array{}[]
      */
     public function request(array $result): array {
         $ids   = Arrays::createArray($result, $this->idName);
@@ -97,8 +99,8 @@ class Subrequest {
 
     /**
      * Returns the Values depending on the Data
-     * @param array $row
-     * @return array
+     * @param array{} $row
+     * @return array{}
      */
     private function getValues(array $row): array {
         if (empty($this->value)) {

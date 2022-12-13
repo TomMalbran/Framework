@@ -31,39 +31,39 @@ class Field {
     const File    = "file";
 
     // The Data
-    public $key        = "";
-    public $type       = "";
-    public $length     = 0;
-    public $decimals   = 3;
-    public $dateType   = "";
-    public $date       = "";
-    public $hour       = "";
-    public $default    = null;
+    public string $key        = "";
+    public string $type       = "";
+    public int    $length     = 0;
+    public int    $decimals   = 3;
+    public string $dateType   = "";
+    public string $date       = "";
+    public string $hour       = "";
+    public mixed  $default    = null;
 
-    public $isID       = false;
-    public $isPrimary  = false;
-    public $isKey      = false;
-    public $isName     = false;
-    public $noExists   = false;
-    public $noEmpty    = false;
-    public $isSigned   = false;
-    public $noPrefix   = false;
-    public $canEdit    = false;
+    public bool   $isID       = false;
+    public bool   $isPrimary  = false;
+    public bool   $isKey      = false;
+    public bool   $isName     = false;
+    public bool   $noExists   = false;
+    public bool   $noEmpty    = false;
+    public bool   $isSigned   = false;
+    public bool   $noPrefix   = false;
+    public bool   $canEdit    = false;
 
-    public $mergeTo    = "";
-    public $defaultTo  = "";
+    public string $mergeTo    = "";
+    public string $defaultTo  = "";
 
-    public $hasName    = false;
-    public $name       = "";
-    public $prefix     = "";
-    public $prefixName = "";
+    public bool   $hasName    = false;
+    public string $name       = "";
+    public string $prefix     = "";
+    public string $prefixName = "";
 
 
     /**
      * Creates a new Field instance
-     * @param string $key
-     * @param array  $data
-     * @param string $prefix Optional.
+     * @param string  $key
+     * @param array{} $data
+     * @param string  $prefix Optional.
      */
     public function __construct(string $key, array $data, string $prefix = "") {
         $this->key        = $key;
@@ -238,8 +238,8 @@ class Field {
 
     /**
      * Returns the Field Values from the given Data
-     * @param array $data
-     * @return array
+     * @param array{} $data
+     * @return array{}
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;

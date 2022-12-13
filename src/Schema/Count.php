@@ -10,27 +10,29 @@ use Framework\Utils\Numbers;
  */
 class Count {
 
-    public $index     = "";
-    public $table     = "";
-    public $key       = "";
-    public $isSum     = false;
-    public $isCount   = false;
-    public $value     = "";
-    public $mult      = 1;
+    public string $index     = "";
+    public string $table     = "";
+    public string $key       = "";
+    public bool   $isSum     = false;
+    public bool   $isCount   = false;
+    public string $value     = "";
+    public int    $mult      = 1;
 
-    public $asKey     = "";
-    public $onTable   = "";
-    public $leftKey   = "";
-    public $rightKey  = "";
-    public $type      = "";
-    public $where     = null;
-    public $noDeleted = false;
+    public string $asKey     = "";
+    public string $onTable   = "";
+    public string $leftKey   = "";
+    public string $rightKey  = "";
+    public string $type      = "";
+    public bool   $noDeleted = false;
+
+    /** @var mixed[]|null */
+    public ?array $where     = null;
 
 
     /**
      * Creates a new Count instance
-     * @param string $key
-     * @param array  $data
+     * @param string  $key
+     * @param array{} $data
      */
     public function __construct(string $key, array $data) {
         $this->index     = "count-{$key}";
@@ -54,7 +56,7 @@ class Count {
 
     /**
      * Returns the Count Value
-     * @param array $data
+     * @param array{} $data
      * @return mixed
      */
     public function getValue(array $data): mixed {
@@ -73,7 +75,7 @@ class Count {
      * Returns the Count Where
      * @return string
      */
-    public function getWhere() {
+    public function getWhere(): string {
         if (empty($this->where) && !$this->noDeleted) {
             return "";
         }

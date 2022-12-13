@@ -47,7 +47,9 @@ class Media {
         $result = true;
         foreach (self::$data as $table) {
             $query = Query::create($table["field"], "=", $oldPath);
-            $result &= self::$db->update($table["table"], [ $table["field"] => $newPath ], $query);
+            if (!self::$db->update($table["table"], [ $table["field"] => $newPath ], $query)) {
+                $result = false;
+            }
         }
         return $result;
     }

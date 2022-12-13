@@ -505,9 +505,9 @@ class Query {
      * Updates a Column
      * @param string $oldColumn
      * @param string $newColumn
-     * @return void
+     * @return Query
      */
-    public function updateColumn(string $oldColumn, string $newColumn): void {
+    public function updateColumn(string $oldColumn, string $newColumn): Query {
         foreach ([ "where", "orderBy", "groupBy" ] as $type) {
             foreach ([ "(", " " ] as $prefix) {
                 $this->{$type} = Strings::replace(
@@ -517,6 +517,7 @@ class Query {
                 );
             }
         }
+        return $this;
     }
 
 

@@ -133,7 +133,9 @@ class Queue {
         $emails = self::getAllUnsent();
         $result = true;
         foreach ($emails as $email) {
-            $result &= self::send($email);
+            if (!self::send($email)) {
+                $result = false;
+            }
         }
         return $result;
     }

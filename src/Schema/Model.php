@@ -10,16 +10,18 @@ use ArrayAccess;
  */
 class Model implements ArrayAccess {
 
-    private $idKey   = "";
-    private $idValue = 0;
-    private $data    = [];
-    private $empty   = true;
+    private bool   $empty   = true;
+    private string $idKey   = "";
+    private int    $idValue = 0;
+
+    /** @var array{} */
+    private array  $data    = [];
 
 
     /**
      * Creates a new Model instance
-     * @param string $idKey Optional.
-     * @param array  $data  Optional.
+     * @param string  $idKey Optional.
+     * @param array{} $data  Optional.
      */
     public function __construct(string $idKey = "", array $data = []) {
         $this->idKey = $idKey;
@@ -33,7 +35,7 @@ class Model implements ArrayAccess {
 
     /**
      * Creates a Model without an ID
-     * @param array $data Optional.
+     * @param array{} $data Optional.
      * @return Model
      */
     public static function create(array $data = []): Model {
@@ -45,7 +47,7 @@ class Model implements ArrayAccess {
 
     /**
      * Creates an empty Model
-     * @param mixed $idValue Optional.
+     * @param mixed|null $idValue Optional.
      * @return Model
      */
     public static function createEmpty(mixed $idValue = null): Model {
@@ -68,8 +70,8 @@ class Model implements ArrayAccess {
 
     /**
      * Gets the Data
-     * @param string $key
-     * @param mixed  $default Optional.
+     * @param string     $key
+     * @param mixed|null $default Optional.
      * @return mixed
      */
     public function get(string $key, mixed $default = null): mixed {
@@ -98,9 +100,9 @@ class Model implements ArrayAccess {
 
     /**
      * Returns the data at the given key and index or the default
-     * @param string  $key
-     * @param integer $index
-     * @param mixed   $default Optional.
+     * @param string       $key
+     * @param integer      $index
+     * @param mixed|string $default Optional.
      * @return mixed
      */
     public function getFromArray(string $key, int $index, mixed $default = ""): mixed {
@@ -112,8 +114,8 @@ class Model implements ArrayAccess {
 
     /**
      * Returns the first not empty value with the given keys
-     * @param string[] $keys
-     * @param mixed    $default Optional.
+     * @param string[]   $keys
+     * @param mixed|null $default Optional.
      * @return mixed
      */
     public function getAnyValue(array $keys, mixed $default = null): mixed {
@@ -159,9 +161,9 @@ class Model implements ArrayAccess {
      * Sets the Data
      * @param string $key
      * @param mixed  $value
-     * @return void
+     * @return Model
      */
-    public function set(string $key, mixed $value): void {
+    public function set(string $key, mixed $value): Model {
         $this->empty = false;
         if ($key === "id") {
             $this->idValue = $value;
@@ -174,29 +176,32 @@ class Model implements ArrayAccess {
                 $this->idValue = $value;
             }
         }
+        return $this;
     }
 
     /**
      * Adds Data
-     * @param array $data
-     * @return void
+     * @param array{} $data
+     * @return Model
      */
-    public function add(array $data): void {
+    public function add(array $data): Model {
         foreach ($data as $key => $value) {
             $this->set($key, $value);
         }
+        return $this;
     }
 
     /**
      * Merges another Model into this one
      * @param Model $model
-     * @return void
+     * @return Model
      */
-    public function merge(Model $model): void {
+    public function merge(Model $model): Model {
         $data = $model->toObject();
         foreach ($data as $key => $value) {
             $this->set($key, $value);
         }
+        return $this;
     }
 
 
@@ -219,8 +224,8 @@ class Model implements ArrayAccess {
 
     /**
      * Returns the Data as an Array
-     * @param array $extraData
-     * @return array
+     * @param array{} $extraData
+     * @return array{}
      */
     public function toArray(array $extraData = []): array {
         return $this->data + $extraData;
@@ -237,7 +242,7 @@ class Model implements ArrayAccess {
     /**
      * Returns only the requested Fields
      * @param string ...$fields
-     * @return array
+     * @return array{}
      */
     public function toFields(string ...$fields): array {
         $result = [];
