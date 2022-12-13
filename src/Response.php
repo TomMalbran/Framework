@@ -10,11 +10,13 @@ use Framework\Utils\JSON;
  */
 class Response {
 
-    private $data;
+    /** @var array{} */
+    private array $data;
+
 
     /**
      * Creates a new Response instance
-     * @param array $data Optional.
+     * @param array{} $data Optional.
      */
     public function __construct(array $data = []) {
         $this->data = $data;
@@ -23,15 +25,16 @@ class Response {
     /**
      * Adds a Token
      * @param string $token
-     * @return void
+     * @return Response
      */
-    public function addToken(string $token): void {
+    public function addToken(string $token): Response {
         $this->data["jwt"] = $token;
+        return $this;
     }
 
     /**
      * Returns the Data as an Object
-     * @return array
+     * @return array{}
      */
     public function toObject(): array {
         return $this->data;
@@ -75,7 +78,7 @@ class Response {
 
     /**
      * Returns the given result
-     * @param array $result Optional.
+     * @param array{} $result Optional.
      * @return Response
      */
     public static function result(array $result = []): Response {
@@ -84,10 +87,10 @@ class Response {
 
     /**
      * Returns the given data
-     * @param array|Model $data Optional.
+     * @param Model|array{}|null $data Optional.
      * @return Response
      */
-    public static function data($data = null): Response {
+    public static function data(Model|array|null $data = null): Response {
         return new Response([
             "data" => self::createData($data),
         ]);
@@ -116,11 +119,11 @@ class Response {
 
     /**
      * Returns a success response
-     * @param string      $success
-     * @param array|Model $data    Optional.
+     * @param string             $success
+     * @param Model|array{}|null $data    Optional.
      * @return Response
      */
-    public static function success(string $success, $data = null): Response {
+    public static function success(string $success, Model|array|null $data = null): Response {
         return new Response([
             "success" => $success,
             "data"    => self::createData($data),
@@ -129,11 +132,11 @@ class Response {
 
     /**
      * Returns a warning response
-     * @param string      $warning
-     * @param array|Model $data    Optional.
+     * @param string             $warning
+     * @param Model|array{}|null $data    Optional.
      * @return Response
      */
-    public static function warning(string $warning, $data = null): Response {
+    public static function warning(string $warning, Model|array|null $data = null): Response {
         return new Response([
             "warning" => $warning,
             "data"    => self::createData($data),
@@ -142,11 +145,11 @@ class Response {
 
     /**
      * Returns an error response
-     * @param string|Errros $error
-     * @param array|Model   $data  Optional.
+     * @param Errors|string      $error
+     * @param Model|array{}|null $data  Optional.
      * @return Response
      */
-    public static function error($error, $data = null): Response {
+    public static function error(Errors|string $error, Model|array|null $data = null): Response {
         if (is_array($error)) {
             return new Response([
                 "errors" => $error,
@@ -177,10 +180,10 @@ class Response {
 
     /**
      * Returns the Data depending on the type
-     * @param array|Model $data Optional.
-     * @return array|null
+     * @param Model|array{}|null $data Optional.
+     * @return mixed
      */
-    private static function createData($data = null): mixed {
+    private static function createData(Model|array|null $data = null): mixed {
         if ($data != null && $data instanceof Model) {
             return $data->toObject();
         }

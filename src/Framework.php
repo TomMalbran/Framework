@@ -49,10 +49,10 @@ class Framework {
     const NLSDir        = "nls";
 
     // Variables
-    private static $framePath;
-    private static $basePath;
-    private static $baseDir;
-    private static $db;
+    private static string   $framePath;
+    private static string   $basePath;
+    private static string   $baseDir;
+    private static Database $db;
 
 
     /**
@@ -74,14 +74,14 @@ class Framework {
 
     /**
      * Executes the Framework
-     * @return void
+     * @return boolean
      */
-    public static function execute() {
+    public static function execute(): bool {
         $request = self::getRequest();
 
         // The Route is required
         if (empty($request->route)) {
-            return;
+            return false;
         }
 
         // Validate the API
@@ -98,9 +98,11 @@ class Framework {
             header("Content-Type:application/json;charset=utf-8");
             $response = self::request($request->route, $request->params);
             $response->print();
+            return true;
         } catch (Exception $e) {
             http_response_code(400);
             die($e->getMessage());
+            return false;
         }
     }
 
@@ -110,7 +112,7 @@ class Framework {
      * Returns the Framework Database
      * @return Database
      */
-    public static function getDatabase() {
+    public static function getDatabase(): Database {
         if (empty(self::$db)) {
             $config   = Config::get("db");
             self::$db = new Database($config);
@@ -170,7 +172,7 @@ class Framework {
      * @param string  $file
      * @param boolean $forFramework Optional.
      * @param boolean $asArray      Optional.
-     * @return array|object
+     * @return array{}|object|mixed
      */
     public static function loadJSON(string $dir, string $file, bool $forFramework = false, bool $asArray = true): mixed {
         $path = self::getPath($dir, "$file.json", $forFramework);
@@ -181,7 +183,7 @@ class Framework {
      * Loads a Data File
      * @param string  $file
      * @param boolean $asArray Optional.
-     * @return array|object
+     * @return array{}|object|mixed
      */
     public static function loadData(string $file, bool $asArray = true): mixed {
         return self::loadJSON(self::DataDir, $file, false, $asArray);
@@ -191,11 +193,11 @@ class Framework {
      * Saves a Data File
      * @param string          $file
      * @param string[]|string $contents
-     * @return void
+     * @return boolean
      */
-    public static function saveData(string $file, array|string $contents): void {
+    public static function saveData(string $file, array|string $contents): bool {
         $path = self::getPath(self::DataDir, "$file.json");
-        JSON::writeFile($path, $contents);
+        return JSON::writeFile($path, $contents);
     }
 
 
@@ -204,7 +206,7 @@ class Framework {
      * Parses and returns the initial Request
      * @return object
      */
-    public static function getRequest() {
+    public static function getRequest(): object {
         $request = $_REQUEST;
         $result  = [
             "route"    => !empty($request["route"])    ? $request["route"]         : "",
@@ -228,11 +230,11 @@ class Framework {
 
     /**
      * Requests an API function
-     * @param string $route
-     * @param array  $params Optional.
+     * @param string       $route
+     * @param array{}|null $params Optional.
      * @return Response
      */
-    public static function request(string $route, array $params = null): Response {
+    public static function request(string $route, ?array $params = null): Response {
         // The Route doesn't exists
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");
@@ -271,12 +273,13 @@ class Framework {
      * @param boolean  $canDelete Optional.
      * @param boolean  $recreate  Optional.
      * @param boolean  $sandbox   Optional.
-     * @return void
+     * @return boolean
      */
-    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false, bool $sandbox = false): void {
-        Factory::migrate($db, $canDelete);
-        Settings::migrate($db);
-        Template::migrate($db, $recreate, $sandbox);
-        Path::ensurePaths();
+    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false, bool $sandbox = false): bool {
+        $factMigrated = Factory::migrate($db, $canDelete);
+        $settMigrated = Settings::migrate($db);
+        $tempMigrated = Template::migrate($db, $recreate, $sandbox);
+        $pathMigrated = Path::ensurePaths();
+        return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated;
     }
 }

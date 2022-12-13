@@ -59,9 +59,20 @@ class File {
     public static function create(string $path, string $fileName, array|string $content): string {
         $path = self::getPath($path, $fileName);
         if (!empty($path)) {
-            file_put_contents($path, Strings::join($content, "\n"));
+            self::write($path, Strings::join($content, "\n"));
         }
         return $path;
+    }
+
+    /**
+     * Creates a file with the given content
+     * @param string $path
+     * @param mixed  $content
+     * @return string
+     */
+    public static function write(string $path, mixed $content): string {
+        $result = file_put_contents($path, $content);
+        return $result != false;
     }
 
     /**

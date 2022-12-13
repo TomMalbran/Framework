@@ -188,12 +188,12 @@ class Strings {
 
     /**
      * Returns a Substring from the Start to the Length
-     * @param string  $string
-     * @param integer $start
-     * @param integer $length Optional.
+     * @param string       $string
+     * @param integer      $start
+     * @param integer|null $length Optional.
      * @return string
      */
-    public static function substring(string $string, int $start, int $length = null): string {
+    public static function substring(string $string, int $start, ?int $length = null): string {
         return substr($string, $start, $length);
     }
 
@@ -416,12 +416,12 @@ class Strings {
 
     /**
      * Returns true if the given string is alpha-numeric
-     * @param string  $string
-     * @param boolean $withDashes Optional.
-     * @param integer $length     Optional.
+     * @param string       $string
+     * @param boolean      $withDashes Optional.
+     * @param integer|null $length     Optional.
      * @return boolean
      */
-    public static function isAlphaNum(string $string, bool $withDashes = false, int $length = null): bool {
+    public static function isAlphaNum(string $string, bool $withDashes = false, ?int $length = null): bool {
         if ($length !== null && strlen($string) != $length) {
             return false;
         }

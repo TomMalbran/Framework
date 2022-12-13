@@ -72,21 +72,21 @@ class Settings {
 
     /**
      * Returns the Settings
-     * @param string $section Optional.
-     * @return array
+     * @param string|null $section Optional.
+     * @return array{}[]
      */
-    private static function getSettings(string $section = null): array {
+    private static function getSettings(?string $section = null): array {
         $query = Query::createIf("section", "=", $section);
         return self::schema()->getAll($query);
     }
 
     /**
      * Returns all the Settings
-     * @param string  $section  Optional.
-     * @param boolean $asObject Optional.
-     * @return array|object
+     * @param string|null $section  Optional.
+     * @param boolean     $asObject Optional.
+     * @return array{}|object|mixed
      */
-    public static function getAll(string $section = null, bool $asObject = false): mixed {
+    public static function getAll(?string $section = null, bool $asObject = false): mixed {
         $request = self::getSettings($section);
         $result  = [];
 
@@ -110,10 +110,10 @@ class Settings {
 
     /**
      * Returns all the Settings Parsed
-     * @param string $section Optional.
-     * @return array
+     * @param string|null $section Optional.
+     * @return array{}{}
      */
-    public static function getAllParsed(string $section = null): array {
+    public static function getAllParsed(?string $section = null): array {
         $request = self::getSettings($section);
         $result  = [];
 
@@ -134,31 +134,32 @@ class Settings {
      * @param string $section
      * @param string $variable
      * @param mixed  $value
-     * @return void
+     * @return boolean
      */
-    public static function set(string $section, string $variable, mixed $value): void {
+    public static function set(string $section, string $variable, mixed $value): bool {
         $query = Query::create("section", "=", $section);
         $query->add("variable", "=", $variable);
         $model = self::schema()->getOne($query);
         if ($model->isEmpty()) {
-            return;
+            return false;
         }
 
-        self::schema()->replace([
+        $result = self::schema()->replace([
             "section"      => $section,
             "variable"     => $variable,
             "value"        => SettingType::encodeValue($model->type, $value),
             "type"         => $model->type,
             "modifiedTime" => time(),
         ]);
+        return $result > 0;
     }
 
     /**
      * Saves the given Settings if those are already on the DB
-     * @param array $data
-     * @return void
+     * @param array{} $data
+     * @return boolean
      */
-    public static function save(array $data): void {
+    public static function save(array $data): bool {
         $request = self::getSettings();
         $batch   = [];
 
@@ -177,23 +178,24 @@ class Settings {
             ];
         }
 
-        if (!empty($batch)) {
-            self::schema()->batch($batch);
+        if (empty($batch)) {
+            return false;
         }
+        return self::schema()->batch($batch);
     }
 
     /**
      * Saves the given Settings from the given section
-     * @param string $section
-     * @param array  $data
-     * @return void
+     * @param string  $section
+     * @param array{} $data
+     * @return boolean
      */
-    public static function saveIntoSection(string $section, array $data): void {
+    public static function saveIntoSection(string $section, array $data): bool {
         $fields = [];
         foreach ($data as $key => $value) {
             $fields["$section-$key"] = $value;
         }
-        self::save($fields);
+        return self::save($fields);
     }
 
 
@@ -218,27 +220,29 @@ class Settings {
      * @param Database $db
      * @param string   $variable
      * @param integer  $value
-     * @return void
+     * @return boolean
      */
-    public static function setCore(Database $db, string $variable, int $value): void {
-        if ($db->tableExists("settings")) {
-            $db->insert("settings", [
-                "section"      => "core",
-                "variable"     => $variable,
-                "value"        => $value,
-                "type"         => SettingType::General,
-                "modifiedTime" => time(),
-            ], "REPLACE");
+    public static function setCore(Database $db, string $variable, int $value): bool {
+        if (!$db->tableExists("settings")) {
+            return false;
         }
+        $result = $db->insert("settings", [
+            "section"      => "core",
+            "variable"     => $variable,
+            "value"        => $value,
+            "type"         => SettingType::General,
+            "modifiedTime" => time(),
+        ], "REPLACE");
+        return $result > 0;
     }
 
     /**
      * Returns a Core Data Setting
      * @param Database $db
      * @param string   $variable
-     * @return array|null
+     * @return array{}|null
      */
-    public static function getCoreData(Database $db, string $variable): mixed {
+    public static function getCoreData(Database $db, string $variable): ?array {
         $query  = Query::create("section", "=", "general")->add("variable", "=", $variable);
         $result = $db->getValue("settings", "value", $query);
         return !empty($result) ? JSON::decode($result, true) : null;
@@ -249,16 +253,17 @@ class Settings {
      * @param Database $db
      * @param string   $variable
      * @param mixed    $value
-     * @return void
+     * @return boolean
      */
-    public static function setCoreData(Database $db, string $variable, mixed $value): void {
-        $db->insert("settings", [
+    public static function setCoreData(Database $db, string $variable, mixed $value): bool {
+        $result = $db->insert("settings", [
             "section"      => "general",
             "variable"     => $variable,
             "value"        => JSON::encode($value),
             "type"         => SettingType::JSON,
             "modifiedTime" => time(),
         ], "REPLACE");
+        return $result > 0;
     }
 
 
@@ -266,11 +271,11 @@ class Settings {
     /**
      * Migrates the Settings
      * @param Database $db
-     * @return void
+     * @return boolean
      */
-    public static function migrate(Database $db): void {
+    public static function migrate(Database $db): bool {
         if (!$db->hasTable("settings")) {
-            return;
+            return false;
         }
         $settings  = Framework::loadData(Framework::SettingsData);
         $request   = $db->getAll("settings");
@@ -340,8 +345,11 @@ class Settings {
             }
             print(Strings::join($variables, ", ") . "<br>");
         }
+
         if (empty($adds) && empty($deletes)) {
             print("<br>No <i>settings</i> added or deleted<br>");
+            return false;
         }
+        return true;
     }
 }

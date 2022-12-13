@@ -179,10 +179,10 @@ class ActionLog {
 
     /**
      * Ends the Log Session
-     * @return void
+     * @return boolean
      */
-    public static function endSession(): void {
-        self::setSessionID();
+    public static function endSession(): bool {
+        return self::setSessionID();
     }
 
 
@@ -228,12 +228,13 @@ class ActionLog {
     /**
      * Sets the given Session ID for the current Credential
      * @param integer $sessionID Optional.
-     * @return void
+     * @return boolean
      */
-    public static function setSessionID(int $sessionID = 0): void {
-        self::getIDsSchema()->replace([
+    public static function setSessionID(int $sessionID = 0): bool {
+        $result = self::getIDsSchema()->replace([
             "CREDENTIAL_ID" => Auth::getID(),
             "SESSION_ID"    => $sessionID,
         ]);
+        return $result > 0;
     }
 }

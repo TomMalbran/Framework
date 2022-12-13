@@ -32,7 +32,7 @@ class SettingType {
 
     /**
      * Parses a Settings Value from the Database
-     * @param Model|array $data
+     * @param Model|array{} $data
      * @return mixed
      */
     public static function parseValue(Model|array $data): mixed {

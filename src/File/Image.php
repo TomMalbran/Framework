@@ -340,23 +340,23 @@ class Image {
      * @param mixed       $image
      * @param string|null $fileName Optional.
      * @param integer     $quality  Optional.
-     * @return void
+     * @return boolean
      */
-    public static function createImage(int $imgType, mixed $image, ?string $fileName = null, int $quality = 90): void {
+    public static function createImage(int $imgType, mixed $image, ?string $fileName = null, int $quality = 90): bool {
         if ($imgType == 2) {
             self::$imageData[$imgType][1]($image, $fileName, $quality);
         } else {
             self::$imageData[$imgType][1]($image, $fileName);
         }
-        imagedestroy($image);
+        return imagedestroy($image);
     }
 
     /**
      * Destroys the Image
      * @param mixed $image
-     * @return void
+     * @return boolean
      */
-    public static function destroy(mixed $image): void {
-        imagedestroy($image);
+    public static function destroy(mixed $image): bool {
+        return imagedestroy($image);
     }
 }

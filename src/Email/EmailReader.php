@@ -14,10 +14,10 @@ use Google\Service\Gmail;
  */
 class EmailReader {
 
-    private static bool   $loaded  = false;
-    private static string $url     = "";
-    private static mixed  $config  = null;
-    private static mixed  $db      = null;
+    private static bool    $loaded  = false;
+    private static string  $url     = "";
+    private static mixed   $config  = null;
+    private static mixed   $db      = null;
 
     private static ?Client $client  = null;
     private static ?Gmail  $service = null;

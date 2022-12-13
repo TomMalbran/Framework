@@ -11,7 +11,8 @@ use Traversable;
  */
 class Tuple implements IteratorAggregate {
 
-    private $items;
+    /** @var object[] */
+    private array $items;
 
 
     /**
@@ -55,7 +56,7 @@ class Tuple implements IteratorAggregate {
 
     /**
      * Returns the Tuple items
-     * @return array
+     * @return object[]
      */
     public function get(): array {
         return $this->items;
@@ -63,7 +64,7 @@ class Tuple implements IteratorAggregate {
 
     /**
      * Returns true if there are items
-     * @param string[]|string $items Optional.
+     * @param string[]|string|null $items Optional.
      * @return boolean
      */
     public function has(array|string $items = null): bool {

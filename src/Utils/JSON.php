@@ -101,10 +101,13 @@ class JSON {
      * Writes a JSON File
      * @param string          $path
      * @param string[]|string $contents
-     * @return void
+     * @return boolean
      */
-    public static function writeFile(string $path, array|string $contents): void {
+    public static function writeFile(string $path, array|string $contents): bool {
+        if (!File::exists($path)) {
+            return false;
+        }
         $value = Arrays::toArray($contents);
-        file_put_contents($path, self::encode($value, true));
+        return File::write($path, self::encode($value, true));
     }
 }

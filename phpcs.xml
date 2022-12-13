@@ -29,7 +29,7 @@
     <rule ref="Squiz.Commenting.ClassComment"/>
 
     <!-- Types -->
-    <!-- <rule ref="/Users/tomas/.composer/vendor/gskema/phpcs-type-sniff/src/Sniffs/CompositeCodeElementSniff.php" /> -->
+    <rule ref="/Users/tomas/.composer/vendor/gskema/phpcs-type-sniff/src/Sniffs/CompositeCodeElementSniff.php" />
 
     <!-- Arrays -->
     <rule ref="Squiz.Arrays.ArrayDeclaration">
@@ -138,7 +138,6 @@
     <exclude-pattern>*/docs/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/migrations/*</exclude-pattern>
-    <exclude-pattern>*/config/*</exclude-pattern>
     <exclude-pattern>*/public/index.php</exclude-pattern>
 
     <arg name="colors"/>

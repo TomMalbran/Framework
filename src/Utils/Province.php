@@ -8,8 +8,8 @@ use Framework\Utils\Enum;
  */
 class Province extends Enum {
 
-    /** All the posible Values */
-    public static $data = [
+    /** @var array{} All the posible Values */
+    public static array $data = [
         "AR-B" => "Buenos Aires",
         "AR-C" => "CABA",
         "AR-K" => "Catamarca",

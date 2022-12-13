@@ -8,14 +8,15 @@ use Framework\Utils\Arrays;
  */
 class Elements {
 
-    private $elements = [];
+    /** @var array{} */
+    private array $elements = [];
 
 
     /**
      * Creates a new Elements instance
-     * @param array $elements Optional.
+     * @param array{}|null $elements Optional.
      */
-    public function __construct(array $elements = null) {
+    public function __construct(?array $elements = null) {
         if ($elements !== null) {
             foreach ($elements as $key => $element) {
                 $this->add($key, $element);
@@ -41,7 +42,7 @@ class Elements {
 
     /**
      * Returns true if there is at least 1 Element, or the given Element exists
-     * @param string[]|string $elements Optional.
+     * @param string[]|string|null $elements Optional.
      * @return boolean
      */
     public function has(array|string $elements = null): bool {
@@ -59,7 +60,7 @@ class Elements {
 
     /**
      * Returns the Elements as an Object
-     * @return array
+     * @return array{}
      */
     public function get(): array {
         return $this->elements;
@@ -67,7 +68,7 @@ class Elements {
 
     /**
      * Returns the Elements as an Object
-     * @return array
+     * @return mixed[]
      */
     public function getValues(): array {
         return array_values($this->elements);
@@ -75,8 +76,8 @@ class Elements {
 
     /**
      * Parses the given Values using the elements
-     * @param array $values
-     * @return array
+     * @param mixed[] $values
+     * @return mixed[]
      */
     public function parseValues(array $values): array {
         $result = [];

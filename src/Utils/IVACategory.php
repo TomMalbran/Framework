@@ -15,8 +15,8 @@ class IVACategory extends Enum {
     const Ex  = 4;
 
 
-    /** All the posible Values */
-    public static $data = [
+    /** @var array{} All the posible Values */
+    public static array $data = [
         self::Mon => [
             "key"          => self::Mon,
             "name"         => "Responsable Monotributo",
@@ -55,9 +55,9 @@ class IVACategory extends Enum {
 
     /**
      * Returns the IVA Categories that requires a CUIT
-     * @return array
+     * @return string[]
      */
-    public static function withCUIT() {
+    public static function withCUIT(): array {
         $result = [];
         foreach (self::$data as $key => $data) {
             if ($data["requiresCUIT"]) {
@@ -72,7 +72,7 @@ class IVACategory extends Enum {
     /**
      * Returns the Type and Document for the given Model
      * @param Model $model
-     * @return array
+     * @return array{}
      */
     public static function getTypeAndDocument(Model $model): array {
         $cuit   = $model->getInt("cuit");

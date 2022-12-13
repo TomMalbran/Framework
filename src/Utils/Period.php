@@ -31,7 +31,7 @@ class Period {
     public int $toTime   = 0;
 
     /** @var array{} All the Period Names */
-    public static array $Names = [
+    public static array $names = [
         self::Last7Days  => "Últimos 7 días",
         self::Last15Days => "Últimos 15 días",
         self::Last30Days => "Últimos 30 días",
@@ -184,7 +184,7 @@ class Period {
      * @return boolean
      */
     public static function isValid(int $value): bool {
-        return in_array($value, array_keys(self::$Names));
+        return in_array($value, array_keys(self::$names));
     }
 
     /**
@@ -193,7 +193,7 @@ class Period {
      * @return string
      */
     public static function getName(int $value): string {
-        return !empty(self::$Names[$value]) ? self::$Names[$value] : "";
+        return !empty(self::$names[$value]) ? self::$names[$value] : "";
     }
 
     /**
@@ -201,6 +201,6 @@ class Period {
      * @return array{}[]
      */
     public static function getSelect(): array {
-        return Arrays::createSelectFromMap(self::$Names);
+        return Arrays::createSelectFromMap(self::$names);
     }
 }

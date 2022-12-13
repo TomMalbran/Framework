@@ -8,12 +8,22 @@ use Framework\Utils\Strings;
  */
 class DateTime {
 
-    public static $days       = [ "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado" ];
-    public static $months     = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
-    public static $formats    = [ "dashes" => "d-m-Y", "time" => "H:i", "dashesTime" => "d-m-Y H:i" ];
+    /** @var string[] */
+    public static array $days = [ "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado" ];
 
-    public static $serverDiff = -180;
-    public static $timeDiff   = 0;
+    /** @var string[] */
+    public static array $months = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
+
+    /** @var array{} The Date Formats */
+    public static array $formats = [
+        "dashes"     => "d-m-Y",
+        "time"       => "H:i",
+        "dashesTime" => "d-m-Y H:i",
+    ];
+
+    public static int $serverDiff = -180;
+    public static int $timeDiff   = 0;
+
 
 
     /**
@@ -89,11 +99,11 @@ class DateTime {
 
     /**
      * Returns the given time using the given Time Zone
-     * @param mixed   $time
-     * @param integer $timezone Optional.
+     * @param mixed        $time
+     * @param integer|null $timezone Optional.
      * @return integer
      */
-    public static function toTimezone(mixed $time, int $timezone = null): int {
+    public static function toTimezone(mixed $time, ?int $timezone = null): int {
         if (is_string($time)) {
             $time = strtotime($time);
         }
@@ -178,12 +188,12 @@ class DateTime {
 
     /**
      * Creates a Time, with the given month and year
-     * @param integer $month       Optional.
-     * @param integer $year        Optional.
-     * @param boolean $useTimezone Optional.
+     * @param integer|null $month       Optional.
+     * @param integer|null $year        Optional.
+     * @param boolean      $useTimezone Optional.
      * @return integer
      */
-    public static function fromMonthYear(int $month = null, int $year = null, bool $useTimezone = false): int {
+    public static function fromMonthYear(?int $month = null, ?int $year = null, bool $useTimezone = false): int {
         $time = mktime(0, 0, 0, !empty($month) ? $month : date("n"), 1, !empty($year) ? $year : date("Y"));
         return self::toTime($time, $useTimezone);
     }
@@ -201,11 +211,11 @@ class DateTime {
 
     /**
      * Returns true if the given hour is Valid
-     * @param string $string
-     * @param array  $minutes Optional.
+     * @param string         $string
+     * @param integer[]|null $minutes Optional.
      * @return boolean
      */
-    public static function isValidHour(string $string, array $minutes = null): bool {
+    public static function isValidHour(string $string, ?array $minutes = null): bool {
         $parts = Strings::split($string, ":");
         return (
             isset($parts[0]) && Numbers::isValid($parts[0], 0, 23) &&
@@ -289,22 +299,22 @@ class DateTime {
 
     /**
      * Returns true if the given Time is in the future
-     * @param mixed   $time
-     * @param integer $timezone Optional.
+     * @param mixed        $time
+     * @param integer|null $timezone Optional.
      * @return boolean
      */
-    public static function isFutureTime(mixed $time, int $timezone = null): bool {
+    public static function isFutureTime(mixed $time, ?int $timezone = null): bool {
         $seconds = self::toTimezone($time, $timezone);
         return $seconds > time();
     }
 
      /**
      * Returns true if the given Time is today
-     * @param mixed   $time
-     * @param integer $timezone Optional.
+     * @param mixed        $time
+     * @param integer|null $timezone Optional.
      * @return boolean
      */
-    public static function isToday(mixed $time, int $timezone = null): bool {
+    public static function isToday(mixed $time, ?int $timezone = null): bool {
         $seconds = self::toTimezone($time, $timezone);
         return date("d-m-Y", $seconds) == date("d-m-Y");
     }
@@ -334,12 +344,12 @@ class DateTime {
 
     /**
      * Formats the time using the given Time Zone
-     * @param mixed   $time
-     * @param string  $format
-     * @param integer $timezone Optional.
+     * @param mixed        $time
+     * @param string       $format
+     * @param integer|null $timezone Optional.
      * @return string
      */
-    public static function format(mixed $time, string $format, int $timezone = null): string {
+    public static function format(mixed $time, string $format, ?int $timezone = null): string {
         $seconds = self::toTimezone($time, $timezone);
         if (empty($seconds)) {
             return "";
@@ -349,12 +359,12 @@ class DateTime {
 
     /**
      * Returns the Seconds as a string
-     * @param mixed   $time
-     * @param string  $format
-     * @param integer $timezone Optional.
+     * @param mixed        $time
+     * @param string       $format
+     * @param integer|null $timezone Optional.
      * @return string
      */
-    public static function toString(mixed $time, string $format, int $timezone = null): string {
+    public static function toString(mixed $time, string $format, ?int $timezone = null): string {
         if (!empty(self::$formats[$format])) {
             return self::format($time, self::$formats[$format], $timezone);
         }
@@ -565,11 +575,11 @@ class DateTime {
 
     /**
      * Returns the amount of years between given date and today AKA the age
-     * @param mixed   $time
-     * @param integer $timezone Optional.
+     * @param mixed        $time
+     * @param integer|null $timezone Optional.
      * @return integer
      */
-    public static function getAge(mixed $time, int $timezone = null): int {
+    public static function getAge(mixed $time, ?int $timezone = null): int {
         $seconds  = self::toTimezone($time, $timezone);
         if (empty($seconds)) {
             return 0;
@@ -587,11 +597,11 @@ class DateTime {
 
     /**
      * Returns the Day name at the given Time
-     * @param integer $time
-     * @param integer $timezone Optional.
+     * @param integer      $time
+     * @param integer|null $timezone Optional.
      * @return string
      */
-    public static function getDay(int $time, int $timezone = null): string {
+    public static function getDay(int $time, ?int $timezone = null): string {
         $seconds = self::toTimezone($time, $timezone);
         return self::getDayName(date("w", $seconds));
     }

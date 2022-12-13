@@ -8,14 +8,15 @@ use Framework\Utils\Arrays;
  */
 class Errors {
 
-    private $errors = [];
+    /** @var array{} */
+    private array $errors = [];
 
 
     /**
      * Creates a new Errors instance
-     * @param array $errors
+     * @param array{}|null $errors
      */
-    public function __construct(array $errors = null) {
+    public function __construct(?array $errors = null) {
         if ($errors !== null) {
             $errors = Arrays::toArray($errors);
             foreach ($errors as $error => $message) {
@@ -52,12 +53,12 @@ class Errors {
 
     /**
      * Adds a new error
-     * @param string $error
-     * @param string $message
-     * @param string $value   Optional.
+     * @param string      $error
+     * @param string      $message
+     * @param string|null $value   Optional.
      * @return Errors
      */
-    public function add(string $error, string $message, string $value = null): Errors {
+    public function add(string $error, string $message, ?string $value = null): Errors {
         if (!empty($value)) {
             $this->errors[$error] = [ $message, $value ];
         } else {
@@ -114,7 +115,7 @@ class Errors {
 
     /**
      * Returns true if there are errors or if the given error exists
-     * @param string[]|string $error Optional.
+     * @param string[]|string|null $error Optional.
      * @return boolean
      */
     public function has(array|string $error = null): bool {
@@ -132,7 +133,7 @@ class Errors {
 
     /**
      * Returns the errors as an Object
-     * @return array
+     * @return array{}
      */
     public function get(): array {
         return $this->errors;
@@ -140,7 +141,7 @@ class Errors {
 
     /**
      * Returns the error keys
-     * @return array
+     * @return mixed[]
      */
     public function keys(): array {
         return array_keys($this->errors);

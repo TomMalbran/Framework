@@ -40,7 +40,7 @@ class Numbers {
      * @param mixed   $number
      * @param mixed   $other
      * @param boolean $orderAsc Optional.
-     * @return float|integer
+     * @return mixed
      */
     public static function compare(mixed $number, mixed $other, bool $orderAsc = true): mixed {
         return ($number - $other) * ($orderAsc ? 1 : -1);
@@ -50,7 +50,7 @@ class Numbers {
      * Rounds the given number to the given decimals
      * @param float   $number
      * @param integer $decimals
-     * @return float|integer
+     * @return mixed
      */
     public static function round(float $number, int $decimals): mixed {
         if (is_numeric($number)) {
@@ -89,7 +89,7 @@ class Numbers {
      * Returns a number using the right format
      * @param float   $number
      * @param integer $decimals
-     * @return integer
+     * @return string
      */
     public static function formatInt(float $number, int $decimals = 0): string {
         $float = $decimals > 0 ? self::toFloat($number, $decimals) : $number;
@@ -118,7 +118,7 @@ class Numbers {
      * @param mixed $number
      * @param mixed $min
      * @param mixed $max
-     * @return integer
+     * @return mixed
      */
     public static function clamp(mixed $number, mixed $min, mixed $max): mixed {
         return max($min, min($max, $number));

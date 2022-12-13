@@ -11,7 +11,7 @@ class Server {
 
     /**
      * Returns true if running on Localhost
-     * @param array $whitelist
+     * @param string[] $whitelist
      * @return boolean
      */
     public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]): bool {

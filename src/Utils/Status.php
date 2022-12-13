@@ -10,9 +10,13 @@ use Framework\Utils\Strings;
  */
 class Status {
 
-    private static $loaded = false;
-    private static $groups = [];
-    private static $values = [];
+    private static bool  $loaded = false;
+
+    /** @var array{} */
+    private static array $groups = [];
+
+    /** @var array{} */
+    private static array $values = [];
 
 
     /**

@@ -11,11 +11,8 @@ use ReflectionClass;
  */
 class Enum {
 
-    /**
-     * Store existing constants in a static cache per object
-     * @var array
-     */
-    protected static $cache = [];
+    /** @var array{} Stores existing constants in a static cache per object */
+    protected static array $cache = [];
 
 
 
@@ -77,9 +74,9 @@ class Enum {
 
     /**
      * Returns all the Values
-     * @return array
+     * @return mixed[]
      */
-    public static function getAll() {
+    public static function getAll(): array {
         $cache = self::load();
         if ($cache->isConstant) {
             return $cache->constants;
@@ -89,7 +86,7 @@ class Enum {
 
     /**
      * Creates a Select for the Enum
-     * @return array
+     * @return mixed[]
      */
     public static function getSelect(): array {
         $cache = self::load();

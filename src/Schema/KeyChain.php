@@ -60,10 +60,13 @@ class KeyChain {
     /**
      * Saves all the Master Keys
      * @param string[] $data
-     * @return void
+     * @return boolean
      */
-    public static function save(array $data): void {
-        Framework::saveData(Framework::KeyData, $data);
-        self::$data = $data;
+    public static function save(array $data): bool {
+        if (Framework::saveData(Framework::KeyData, $data)) {
+            self::$data = $data;
+            return true;
+        }
+        return false;
     }
 }

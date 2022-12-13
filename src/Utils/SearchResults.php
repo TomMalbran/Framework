@@ -6,9 +6,11 @@ namespace Framework\Utils;
  */
 class SearchResults {
 
-    public $text   = "";
-    public $amount = 50;
-    public $list   = [];
+    public string $text   = "";
+    public int    $amount = 50;
+
+    /** @var array{}[] */
+    public array  $list   = [];
 
 
     /**
@@ -33,13 +35,13 @@ class SearchResults {
 
     /**
      * Adds the given Results
-     * @param array  $results
-     * @param string $type
-     * @param string $url
-     * @param string $name
-     * @return void
+     * @param array{}[] $results
+     * @param string    $type
+     * @param string    $url
+     * @param string    $name
+     * @return integer
      */
-    public function add(array $results, string $type, string $url, string $name): void {
+    public function add(array $results, string $type, string $url, string $name): int {
         foreach ($results as $result) {
             $this->list[] = [
                 "type"  => $type,
@@ -50,5 +52,6 @@ class SearchResults {
             ];
             $this->amount -= 1;
         }
+        return $this->amount;
     }
 }

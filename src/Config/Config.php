@@ -14,6 +14,8 @@ use stdClass;
 class Config {
 
     private static bool  $loaded = false;
+
+    /** @var array{}[] */
     private static array $data   = [];
 
 
@@ -52,7 +54,7 @@ class Config {
      * Parses the Contents of the env files
      * @param string $path
      * @param string $fileName
-     * @return array
+     * @return array{}
      */
     private static function loadENV(string $path, string $fileName): array {
         $contents = File::read($path, $fileName);
@@ -139,7 +141,7 @@ class Config {
     /**
      * Returns a Config Property as an Array
      * @param string $property
-     * @return array
+     * @return mixed[]
      */
     public static function getArray(string $property): array {
         $value = Config::get($property);
@@ -151,7 +153,7 @@ class Config {
 
     /**
      * Returns the Url adding the url parts at the end
-     * @param string ...$pathParts
+     * @param string ...$urlParts
      * @return string
      */
     public static function getUrl(string ...$urlParts): string {

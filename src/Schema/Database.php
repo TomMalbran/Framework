@@ -61,13 +61,15 @@ class Database {
 
     /**
      * Connects with the database
-     * @return void
+     * @return boolean
      */
-    public function connect(): void {
+    public function connect(): bool {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database);
-        if ($this->mysqli->connect_error) {
-            die("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}");
+        if (!$this->mysqli->connect_error) {
+            return true;
         }
+        die("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}");
+        return false;
     }
 
     /**
