@@ -33,7 +33,8 @@
         "drewm/mailchimp-api": "Used for Mailing with MailChimp",
         "phpoffice/phpspreadsheet": "Used to Import/Export data",
         "norkunas/onesignal-php-api": "Used for App Notifications",
-        "php-http/guzzle6-adapter": "Used for App Notifications"
+        "symfony/http-client": "Used for App Notifications",
+        "nyholm/psr7": "Used for App Notifications"
     },
     "autoload": {
         "psr-4": {
