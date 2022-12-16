@@ -636,7 +636,7 @@ class Schema {
         $newPosition     = !empty($newPosition) ? $newPosition : $nextPosition;
         $updatedPosition = $newPosition;
 
-        if (!$isEdit && (empty($newPosition) || $newPosition > $nextPosition)) {
+        if (!$isEdit && (empty($newPosition) || $newPosition >= $nextPosition)) {
             return $nextPosition;
         }
         if ($oldPosition == $newPosition) {
