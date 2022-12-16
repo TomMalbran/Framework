@@ -39,8 +39,8 @@ class Join {
     public function __construct(string $key, array $data) {
         $this->key       = $key;
         $this->table     = $data["table"];
-        $this->asTable   = !empty($data["asTable"])  ? $data["asTable"]      : null;
-        $this->onTable   = !empty($data["onTable"])  ? $data["onTable"]      : null;
+        $this->asTable   = !empty($data["asTable"])  ? $data["asTable"]      : "";
+        $this->onTable   = !empty($data["onTable"])  ? $data["onTable"]      : "";
         $this->leftKey   = !empty($data["leftKey"])  ? $data["leftKey"]      : $key;
         $this->rightKey  = !empty($data["rightKey"]) ? $data["rightKey"]     : $key;
         $this->and       = !empty($data["and"])      ? "AND " . $data["and"] : "";

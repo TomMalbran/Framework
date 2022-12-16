@@ -25,8 +25,8 @@ class Count {
     public string $type      = "";
     public bool   $noDeleted = false;
 
-    /** @var mixed[]|null */
-    public ?array $where     = null;
+    /** @var mixed|string */
+    public mixed  $where     = "";
 
 
     /**

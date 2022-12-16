@@ -12,7 +12,7 @@ class Model implements ArrayAccess {
 
     private bool   $empty   = true;
     private string $idKey   = "";
-    private int    $idValue = 0;
+    private mixed  $idValue = 0;
 
     /** @var array{} */
     private array  $data    = [];
@@ -47,10 +47,10 @@ class Model implements ArrayAccess {
 
     /**
      * Creates an empty Model
-     * @param mixed|null $idValue Optional.
+     * @param mixed|integer $idValue Optional.
      * @return Model
      */
-    public static function createEmpty(mixed $idValue = null): Model {
+    public static function createEmpty(mixed $idValue = 0): Model {
         $model = new Model();
         $model->idValue = $idValue;
         $model->empty   = true;

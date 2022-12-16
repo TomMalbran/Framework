@@ -189,12 +189,12 @@ class ActionLog {
 
     /**
      * Logs the given Action
-     * @param integer           $action
-     * @param integer           $section Optional.
-     * @param integer[]|integer $dataID  Optional.
+     * @param integer       $action
+     * @param integer       $section Optional.
+     * @param mixed|integer $dataID  Optional.
      * @return boolean
      */
-    public static function add(int $action, int $section = 0, array|int $dataID = 0): bool {
+    public static function add(int $action, int $section = 0, mixed $dataID = 0): bool {
         $sessionID = self::getSessionID();
         if (empty($sessionID)) {
             return false;

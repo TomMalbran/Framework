@@ -72,9 +72,9 @@ class Field {
         $this->length     = !empty($data["length"])   ? (int)$data["length"]   : 0;
         $this->decimals   = !empty($data["decimals"]) ? (int)$data["decimals"] : 3;
         $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : "middle";
-        $this->date       = !empty($data["date"])     ? $data["date"]          : null;
-        $this->hour       = !empty($data["hour"])     ? $data["hour"]          : null;
-        $this->default    = isset($data["default"])   ? $data["default"]       : null;
+        $this->date       = !empty($data["date"])     ? $data["date"]          : "";
+        $this->hour       = !empty($data["hour"])     ? $data["hour"]          : "";
+        $this->default    = isset($data["default"])   ? $data["default"]       : "";
 
         $this->isID       = $this->type === self::ID;
         $this->isPrimary  = !empty($data["isPrimary"]);
