@@ -311,6 +311,15 @@ class Request implements ArrayAccess {
 
 
     /**
+     * Returns true if the given email is valid
+     * @param string $key
+     * @return boolean
+     */
+    public function isValidString(string $key): bool {
+        return !empty(trim($this->get($key, "")));
+    }
+
+    /**
      * Returns true if the given value is a number and greater and/or equal to cero
      * @param string       $key
      * @param integer|null $min      Optional.
