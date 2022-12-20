@@ -732,7 +732,7 @@ class Schema {
                 $query->orderBy($sort->orderBy, !empty($sort->orderAsc));
             }
             if ($sort->exists("page")) {
-                $query->paginate($sort->page, $sort->amount);
+                $query->paginate($sort->getInt("page"), $sort->getInt("amount"));
             }
         } elseif (!$query->hasOrder() && $this->structure->hasID) {
             $query->orderBy($this->structure->idKey, true);

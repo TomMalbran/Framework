@@ -92,7 +92,7 @@ class ActionLog {
     public static function filter(Request $filters, Request $sort, array $mappings = []): array {
         $query = self::getFilterQuery($filters, $mappings);
         $query->orderBy("time", false);
-        $query->paginate($sort->page, $sort->amount);
+        $query->paginate($sort->getInt("page"), $sort->getInt("amount"));
         return self::request($query);
     }
 
