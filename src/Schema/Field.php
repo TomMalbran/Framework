@@ -74,7 +74,7 @@ class Field {
         $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : "middle";
         $this->date       = !empty($data["date"])     ? $data["date"]          : "";
         $this->hour       = !empty($data["hour"])     ? $data["hour"]          : "";
-        $this->default    = isset($data["default"])   ? $data["default"]       : "";
+        $this->default    = isset($data["default"])   ? $data["default"]       : null;
 
         $this->isID       = $this->type === self::ID;
         $this->isPrimary  = !empty($data["isPrimary"]);
