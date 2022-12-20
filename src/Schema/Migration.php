@@ -76,20 +76,24 @@ class Migration {
 
         // Create or update the Tables
         foreach ($schemas as $schemaKey => $schemaData) {
+            $didUpdate     = false;
             $structure     = new Structure($schemaKey, $schemaData);
             $schemaNames[] = $structure->table;
 
             if (!Arrays::contains($tableNames, $structure->table)) {
-                $didMigrate = $didMigrate || self::createTable($db, $structure);
+                $didUpdate = self::createTable($db, $structure);
             } else {
                 $schemaUpdates = !empty($updates[$structure->table]) ? $updates[$structure->table] : [];
-                $didMigrate    = $didMigrate || self::updateTable($db, $structure, $schemaUpdates, $canDelete);
+                $didUpdate     = self::updateTable($db, $structure, $schemaUpdates, $canDelete);
+            }
+            if ($didUpdate) {
+                $didMigrate = true;
             }
         }
 
         // Delete the Tables or show which to delete
-        $didMigrate = $didMigrate || self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
-        return $didMigrate;
+        $didDelete = self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
+        return $didMigrate || $didDelete;
     }
 
     /**
