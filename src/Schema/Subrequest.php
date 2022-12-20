@@ -44,7 +44,7 @@ class Subrequest {
         $this->idName    = !empty($data["idName"])  ? $data["idName"]  : $structure->idName;
 
         $this->hasWhere  = !empty($data["where"]);
-        $this->where     = !empty($data["where"])   ? $data["where"]   : null;
+        $this->where     = !empty($data["where"])   ? $data["where"]   : [];
 
         $this->hasOrder  = !empty($data["orderBy"]);
         $this->orderBy   = !empty($data["orderBy"]) ? $data["orderBy"] : "";
@@ -100,9 +100,9 @@ class Subrequest {
     /**
      * Returns the Values depending on the Data
      * @param array{} $row
-     * @return array{}
+     * @return mixed
      */
-    private function getValues(array $row): array {
+    private function getValues(array $row): mixed {
         if (empty($this->value)) {
             return $row;
         }
