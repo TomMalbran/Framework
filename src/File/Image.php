@@ -179,9 +179,9 @@ class Image {
             $yCorner   = 0;
 
             if ($imgWidth > $imgHeight) {
-                $height = $imgHeight * $width / $imgWidth;
+                $height = round($imgHeight * $width / $imgWidth);
             } else {
-                $width  = $imgWidth * $height / $imgHeight;
+                $width  = round($imgWidth * $height / $imgHeight);
             }
             break;
 
@@ -195,9 +195,9 @@ class Image {
                 $oldHeight = $imgHeight;
 
                 if ($imgWidth > $imgHeight) {
-                    $height = $imgHeight * $width / $imgWidth;
+                    $height = round($imgHeight * $width / $imgWidth);
                 } else {
-                    $width  = $imgWidth * $height / $imgHeight;
+                    $width  = round($imgWidth * $height / $imgHeight);
                 }
             } else {
                 $width     = $imgWidth;
