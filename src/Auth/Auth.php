@@ -107,9 +107,9 @@ class Auth {
     /**
      * Logins the given Credential
      * @param Model $credential
-     * @return void
+     * @return boolean
      */
-    public static function login(Model $credential): void {
+    public static function login(Model $credential): bool {
         self::setCredential($credential, 0, $credential->currentUser);
 
         Credential::updateLoginTime($credential->id);
@@ -118,13 +118,14 @@ class Auth {
         $path = Path::getTempPath($credential->id, false);
         File::emptyDir($path);
         Reset::delete($credential->id);
+        return true;
     }
 
     /**
      * Logouts the Current Credential
-     * @return void
+     * @return boolean
      */
-    public static function logout(): void {
+    public static function logout(): bool {
         ActionLog::endSession();
 
         self::$accessLevel  = Access::General();
@@ -133,6 +134,7 @@ class Auth {
         self::$adminID      = 0;
         self::$userID       = 0;
         self::$apiID        = 0;
+        return true;
     }
 
     /**
@@ -234,7 +236,7 @@ class Auth {
     public static function setCredential(Model $credential, int $adminID = 0, int $userID = 0): void {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
-        self::$accessLevel  = $credential->level;
+        self::$accessLevel  = !empty($credential->userLevel) ? $credential->userLevel : $credential->level;
         self::$adminID      = $adminID;
         self::$userID       = $userID;
 
@@ -250,8 +252,9 @@ class Auth {
      * @param integer $userID
      * @return void
      */
-    public static function setCurrentUser(int $userID): void {
-        self::$userID = $userID;
+    public static function setCurrentUser(int $userID, int $accessLevel): void {
+        self::$userID      = $userID;
+        self::$accessLevel = $accessLevel;
         ActionLog::endSession();
         ActionLog::startSession(self::$credentialID, true);
     }
