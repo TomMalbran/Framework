@@ -60,9 +60,9 @@ class Framework {
      * @param string  $basePath
      * @param string  $baseDir
      * @param boolean $logErrors
-     * @return void
+     * @return boolean
      */
-    public static function create(string $basePath, string $baseDir, bool $logErrors): void {
+    public static function create(string $basePath, string $baseDir, bool $logErrors): bool {
         self::$framePath = dirname(__FILE__, 2);
         self::$basePath  = $basePath;
         self::$baseDir   = $baseDir;
@@ -70,6 +70,7 @@ class Framework {
         if ($logErrors) {
             ErrorLog::init();
         }
+        return true;
     }
 
     /**
