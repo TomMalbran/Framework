@@ -110,4 +110,14 @@ class JSON {
         $value = Arrays::toArray($contents);
         return File::write($path, self::encode($value, true));
     }
+
+    /**
+     * Logs a JSON File
+     * @param string          $fileName
+     * @param string[]|string $contents
+     * @return boolean
+     */
+    public static function logFile(string $fileName, array|string $contents): bool {
+        return File::write($fileName, self::encode($contents, true));
+    }
 }
