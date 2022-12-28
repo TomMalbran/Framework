@@ -72,6 +72,15 @@ class Strings {
 
 
     /**
+     * Returns a char from an index
+     * @param integer $index
+     * @return string
+     */
+    public static function getLetter(int $index): string {
+        return chr($index + 65);
+    }
+
+    /**
      * Repeates the given Stirng the given times
      * @param string  $string
      * @param integer $times
