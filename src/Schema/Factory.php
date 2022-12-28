@@ -55,6 +55,15 @@ class Factory {
 
     /**
      * Gets the Schema
+     * @return array{}
+     */
+    public static function getData(): array {
+        self::load();
+        return self::$data;
+    }
+
+    /**
+     * Gets the Schema
      * @param string $key
      * @return Schema|null
      */
