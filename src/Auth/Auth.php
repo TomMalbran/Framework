@@ -89,7 +89,7 @@ class Auth {
      * @return boolean
      */
     public static function validateInternal(): bool {
-        self::$apiID       = "internal";
+        self::$apiID       = -1;
         self::$accessLevel = Access::API();
         return true;
     }
@@ -231,9 +231,9 @@ class Auth {
      * @param Model   $credential
      * @param integer $adminID    Optional.
      * @param integer $userID     Optional.
-     * @return void
+     * @return boolean
      */
-    public static function setCredential(Model $credential, int $adminID = 0, int $userID = 0): void {
+    public static function setCredential(Model $credential, int $adminID = 0, int $userID = 0): bool {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
         self::$accessLevel  = !empty($credential->userLevel) ? $credential->userLevel : $credential->level;
@@ -245,18 +245,21 @@ class Auth {
         if (!empty($timezone) && (empty($levels) || Arrays::contains($levels, $credential->level))) {
             DateTime::setTimezone($timezone);
         }
+        return true;
     }
 
     /**
      * Sets the Current User
      * @param integer $userID
-     * @return void
+     * @param integer $accessLevel
+     * @return boolean
      */
-    public static function setCurrentUser(int $userID, int $accessLevel): void {
+    public static function setCurrentUser(int $userID, int $accessLevel): bool {
         self::$userID      = $userID;
         self::$accessLevel = $accessLevel;
         ActionLog::endSession();
         ActionLog::startSession(self::$credentialID, true);
+        return true;
     }
 
     /**

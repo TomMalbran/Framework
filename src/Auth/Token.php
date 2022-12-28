@@ -42,7 +42,7 @@ class Token {
         foreach (self::$data as $tokenID => $value) {
             if ($value == $token) {
                 return new Model("tokenID", [
-                    "tokenID" => $tokenID,
+                    "tokenID" => (int)$tokenID,
                     "value"   => $value,
                 ]);
             }
