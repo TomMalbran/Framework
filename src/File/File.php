@@ -28,8 +28,8 @@ class File {
      * @return boolean
      */
     public static function exists(string ...$pathParts): bool {
-        $path = self::getPath(...$pathParts);
-        return !empty($path) && file_exists($path);
+        $fullPath = self::getPath(...$pathParts);
+        return !empty($fullPath) && file_exists($fullPath);
     }
 
 
@@ -39,14 +39,14 @@ class File {
      * @param string $path
      * @param string $fileName
      * @param string $tmpFile
-     * @return string
+     * @return boolean
      */
-    public static function upload(string $path, string $fileName, string $tmpFile): string {
-        $path = self::getPath($path, $fileName);
-        if (!empty($path)) {
-            move_uploaded_file($tmpFile, $path);
+    public static function upload(string $path, string $fileName, string $tmpFile): bool {
+        $fullPath = self::getPath($path, $fileName);
+        if (!empty($fullPath)) {
+            return move_uploaded_file($tmpFile, $fullPath);
         }
-        return $path;
+        return false;
     }
 
     /**
@@ -54,23 +54,23 @@ class File {
      * @param string          $path
      * @param string          $fileName
      * @param string[]|string $content
-     * @return string
+     * @return boolean
      */
-    public static function create(string $path, string $fileName, array|string $content): string {
-        $path = self::getPath($path, $fileName);
-        if (!empty($path)) {
-            self::write($path, Strings::join($content, "\n"));
+    public static function create(string $path, string $fileName, array|string $content): bool {
+        $fullPath = self::getPath($path, $fileName);
+        if (!empty($fullPath)) {
+            return self::write($fullPath, Strings::join($content, "\n"));
         }
-        return $path;
+        return false;
     }
 
     /**
-     * Creates a file with the given content
+     * Writes the given content in the given file
      * @param string $path
      * @param mixed  $content
-     * @return string
+     * @return boolean
      */
-    public static function write(string $path, mixed $content): string {
+    public static function write(string $path, mixed $content): bool {
         $result = file_put_contents($path, $content);
         return $result != false;
     }
@@ -81,9 +81,10 @@ class File {
      * @return string
      */
     public static function read(string ...$pathParts): string {
-        $path = self::getPath(...$pathParts);
-        if (!empty($path) && file_exists($path)) {
-            return file_get_contents($path);
+        $fullPath = self::getPath(...$pathParts);
+        if (!empty($fullPath) && file_exists($fullPath)) {
+            $result = file_get_contents($fullPath);
+            return $result != false ? $result : "";
         }
         return "";
     }
@@ -96,8 +97,7 @@ class File {
      */
     public static function move(string $fromPath, string $toPath): bool {
         if (!empty($fromPath) && !empty($toPath)) {
-            rename($fromPath, $toPath);
-            return true;
+            return rename($fromPath, $toPath);
         }
         return false;
     }
@@ -109,10 +109,9 @@ class File {
      * @return boolean
      */
     public static function delete(string $path, string $name = ""): bool {
-        $path = self::getPath($path, $name);
-        if (!empty($path) && file_exists($path)) {
-            unlink($path);
-            return true;
+        $fullPath = self::getPath($path, $name);
+        if (!empty($fullPath) && file_exists($fullPath)) {
+            return unlink($fullPath);
         }
         return false;
     }
