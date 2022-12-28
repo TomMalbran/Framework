@@ -3,7 +3,7 @@
         "table"  : "credentials",
         "fields" : {
             "CREDENTIAL_ID"  : { "type" : "id",      "name" : "credentialID"                   },
-            "currentUser"    : { "type" : "number"                                             },
+            "currentUser"    : { "type" : "number",                          "cantEdit" : true },
             "email"          : { "type" : "string"                                             },
             "firstName"      : { "type" : "string"                                             },
             "lastName"       : { "type" : "string"                                             },
