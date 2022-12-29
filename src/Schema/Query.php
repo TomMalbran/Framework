@@ -106,7 +106,15 @@ class Query {
             }
             break;
         case "LIKE":
-            $value = "%$value%";
+            $value = "%" . trim(strtolower($value)) . "%";
+            break;
+        case "STARTS":
+            $expression = "LIKE";
+            $value      = trim(strtolower($value)) . "%";
+            break;
+        case "ENDS":
+            $expression = "LIKE";
+            $value      = "%" . trim(strtolower($value));
             break;
         default:
         }
@@ -571,7 +579,7 @@ class Query {
     }
 
     /**
-     * Creates a new Query with an Order
+     * Creates a new Query between the given values
      * @param string  $column   Optional.
      * @param integer $fromTime Optional.
      * @param integer $toTime   Optional.
@@ -581,6 +589,20 @@ class Query {
         $query = new Query();
         if (!empty($column)) {
             $query->betweenTimes($column, $fromTime, $toTime);
+        }
+        return $query;
+    }
+
+    /**
+     * Creates a new Query with an Expression
+     * @param string $expression Optional.
+     * @param mixed  ...$values  Optional.
+     * @return Query
+     */
+    public static function createExp(string $expression = "", mixed ...$values): Query {
+        $query = new Query();
+        if (!empty($expression)) {
+            $query->addExp($expression, ...$values);
         }
         return $query;
     }
