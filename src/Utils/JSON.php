@@ -14,10 +14,10 @@ class JSON {
 
     /**
      * Returns true if the given value is a JSON object
-     * @param string|array $value
+     * @param mixed $value
      * @return boolean
      */
-    public static function isValid($value): bool {
+    public static function isValid(mixed $value): bool {
         if (is_string($value)) {
             json_decode($value);
             return json_last_error() == JSON_ERROR_NONE;
@@ -27,11 +27,11 @@ class JSON {
 
     /**
      * Encodes an Object as a string if it is not already encoded
-     * @param array|string $value
-     * @param boolean      $asPretty Optional.
+     * @param mixed   $value
+     * @param boolean $asPretty Optional.
      * @return string
      */
-    public static function encode($value, bool $asPretty = false): string {
+    public static function encode(mixed $value, bool $asPretty = false): string {
         if (self::isValid($value)) {
             return $value;
         }
@@ -40,11 +40,11 @@ class JSON {
 
     /**
      * Decodes a String if it is not already decoded
-     * @param array|string $value
-     * @param boolean      $asArray Optional.
+     * @param mixed   $value
+     * @param boolean $asArray Optional.
      * @return object|array
      */
-    public static function decode($value, bool $asArray = false): mixed {
+    public static function decode(mixed $value, bool $asArray = false): mixed {
         if (!self::isValid($value)) {
             return $value;
         }
@@ -99,11 +99,11 @@ class JSON {
 
     /**
      * Writes a JSON File
-     * @param string          $path
-     * @param string[]|string $contents
+     * @param string $path
+     * @param mixed  $contents
      * @return boolean
      */
-    public static function writeFile(string $path, array|string $contents): bool {
+    public static function writeFile(string $path, mixed $contents): bool {
         if (!File::exists($path)) {
             return false;
         }
@@ -113,11 +113,11 @@ class JSON {
 
     /**
      * Logs a JSON File
-     * @param string          $fileName
-     * @param string[]|string $contents
+     * @param string $fileName
+     * @param mixed  $contents
      * @return boolean
      */
-    public static function logFile(string $fileName, array|string $contents): bool {
+    public static function logFile(string $fileName, mixed $contents): bool {
         return File::write($fileName, self::encode($contents, true));
     }
 }
