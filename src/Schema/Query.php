@@ -193,6 +193,16 @@ class Query {
         return $this;
     }
 
+    /**
+     * Adds a param to the Query
+     * @param mixed $param
+     * @return Query
+     */
+    public function addParam(mixed $param): Query {
+        $this->params[] = $param;
+        return $this;
+    }
+
 
 
     /**
@@ -603,6 +613,19 @@ class Query {
         $query = new Query();
         if (!empty($expression)) {
             $query->addExp($expression, ...$values);
+        }
+        return $query;
+    }
+
+    /**
+     * Creates a new Query with a Param
+     * @param mixed|null $param Optional.
+     * @return Query
+     */
+    public static function createParam(mixed $param = null): Query {
+        $query = new Query();
+        if ($param !== null) {
+            $query->addParam($param);
         }
         return $query;
     }

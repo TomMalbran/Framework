@@ -17,6 +17,7 @@ class Join {
     public string $rightKey  = "";
     public string $and       = "";
     public string $andKey    = "";
+    public string $andValue  = "";
 
     /** @var Field[] */
     public array  $fields    = [];
@@ -45,6 +46,7 @@ class Join {
         $this->rightKey  = !empty($data["rightKey"]) ? $data["rightKey"]     : $key;
         $this->and       = !empty($data["and"])      ? "AND " . $data["and"] : "";
         $this->andKey    = !empty($data["andKey"])   ? $data["andKey"]       : "";
+        $this->andValue  = !empty($data["andValue"]) ? $data["andValue"]     : "";
 
         $this->hasPrefix = !empty($data["prefix"]);
         $this->prefix    = !empty($data["prefix"])   ? $data["prefix"]       : "";
@@ -113,6 +115,9 @@ class Join {
         $result = $this->and;
         if (!empty($this->andKey)) {
             $result .= "AND $asTable.{$this->andKey} = $asTable.{$this->andKey}";
+        }
+        if (!empty($this->andValue)) {
+            $result .= "AND $asTable.{$this->andValue} = ?";
         }
         return $result;
     }
