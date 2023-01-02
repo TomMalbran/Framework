@@ -35,6 +35,7 @@ class Framework {
 
     // The Directories
     const SourceDir     = "src";
+    const LogDir        = "logs";
 
     const DataDir       = "data";
     const MigrationsDir = "data/migrations";
@@ -199,6 +200,18 @@ class Framework {
     public static function saveData(string $file, array|string $contents): bool {
         $path = self::getPath(self::DataDir, "$file.json");
         return JSON::writeFile($path, $contents);
+    }
+
+    /**
+     * Logs a JSON File
+     * @param string $file
+     * @param mixed  $contents
+     * @return boolean
+     */
+    public static function logFile(string $file, mixed $contents): bool {
+        $path = self::getPath(self::LogDir);
+        File::createDir($path);
+        return File::write("$path/$file.json", JSON::encode($contents, true));
     }
 
 
