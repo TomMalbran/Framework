@@ -21,6 +21,7 @@ class Database {
     public string $database;
     public string $prefix;
     public string $email;
+    public string $charset;
     public bool   $persist;
 
 
@@ -41,8 +42,9 @@ class Database {
         $this->username = $config->username;
         $this->password = $config->password;
         $this->database = $config->database;
-        $this->prefix   = !empty($config->prefix) ? $config->prefix : "";
-        $this->email    = !empty($config->email)  ? $config->email  : "";
+        $this->prefix   = !empty($config->prefix)  ? $config->prefix  : "";
+        $this->email    = !empty($config->email)   ? $config->email   : "";
+        $this->charset  = !empty($config->charset) ? $config->charset : "";
         $this->persist  = $persist;
 
         $this->connect();
@@ -66,6 +68,9 @@ class Database {
     public function connect(): bool {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database);
         if (!$this->mysqli->connect_error) {
+            if (!empty($this->charset)) {
+                $this->mysqli->set_charset($this->charset);
+            }
             return true;
         }
         die("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}");
