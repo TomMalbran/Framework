@@ -299,6 +299,25 @@ class Strings {
         return $string;
     }
 
+    /**
+     * Merges 2 strings with the given glue when possible
+     * @param string $first
+     * @param string $second
+     * @param string $glue   Optional.
+     * @return string
+     */
+    public static function merge(string $first, string $second, string $glue = " "): string {
+        $result = "";
+        if (!empty($first) && !empty($second)) {
+            $result = "{$first}{$glue}{$second}";
+        } elseif (!empty($first)) {
+            $result = $first;
+        } elseif (!empty($second)) {
+            $result = $second;
+        }
+        return $result;
+    }
+
 
 
     /**
