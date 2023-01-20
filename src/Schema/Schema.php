@@ -554,10 +554,11 @@ class Schema {
      * @param Request      $request
      * @param array{}|null $extra        Optional.
      * @param integer      $credentialID Optional.
+     * @param Query|null   $orderQuery   Optional.
      * @return integer
      */
-    public function createWithOrder(Request $request, ?array $extra = null, int $credentialID = 0): int {
-        $this->ensurePosOrder(null, $request);
+    public function createWithOrder(Request $request, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): int {
+        $this->ensurePosOrder(null, $request, $orderQuery);
         return $this->create($request, $extra, $credentialID);
     }
 
@@ -567,11 +568,12 @@ class Schema {
      * @param Request       $request
      * @param array{}|null  $extra        Optional.
      * @param integer       $credentialID Optional.
+     * @param Query|null    $orderQuery   Optional.
      * @return boolean
      */
-    public function editWithOrder(Query|int $query, Request $request, ?array $extra = null, int $credentialID = 0): bool {
+    public function editWithOrder(Query|int $query, Request $request, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
-        $this->ensurePosOrder($model, $request);
+        $this->ensurePosOrder($model, $request, $orderQuery);
         return $this->edit($query, $request, $extra, $credentialID);
     }
 
@@ -579,12 +581,13 @@ class Schema {
      * Deletes and ensures the Order
      * @param Query|integer $query
      * @param integer       $credentialID Optional.
+     * @param Query|null    $orderQuery   Optional.
      * @return boolean
      */
-    public function deleteWithOrder(Query|int $query, int $credentialID = 0): bool {
+    public function deleteWithOrder(Query|int $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
         if ($this->delete($query, $credentialID)) {
-            $this->ensurePosOrder($model, null);
+            $this->ensurePosOrder($model, null, $orderQuery);
             return true;
         }
         return false;
@@ -610,12 +613,13 @@ class Schema {
      * Ensures that the order of the Elements is correct
      * @param Model|null   $model   Optional.
      * @param Request|null $request Optional.
+     * @param Query|null   $query   Optional.
      * @return boolean
      */
-    public function ensurePosOrder(?Model $model = null, ?Request $request = null): bool {
+    public function ensurePosOrder(?Model $model = null, ?Request $request = null, ?Query $query = null): bool {
         $oldPosition = !empty($model)   ? $model->position             : 0;
         $newPosition = !empty($request) ? $request->getInt("position") : 0;
-        $updPosition = $this->ensureOrder($oldPosition, $newPosition);
+        $updPosition = $this->ensureOrder($oldPosition, $newPosition, $query);
         if (!empty($request)) {
             $request->position = $updPosition;
         }
