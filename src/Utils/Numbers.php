@@ -262,14 +262,14 @@ class Numbers {
     public static function toPriceString(float $price): string {
         $millions = round($price / 1000000);
         if ($millions > 10) {
-            return "${$millions}m";
+            return "\${$millions}m";
         }
         $kilos = round($price / 1000);
         if ($kilos > 10) {
-            return "${$kilos}k";
+            return "\${$kilos}k";
         }
         $price = round($price);
-        return "${$price}";
+        return "\${$price}";
     }
 
     /**
