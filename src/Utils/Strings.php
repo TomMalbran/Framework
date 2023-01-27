@@ -81,6 +81,19 @@ class Strings {
     }
 
     /**
+     * Returns a number from a letter
+     * @param string $text
+     * @return integer
+     */
+    public static function getNumber(string $text): int {
+        $letter = self::toUpperCase(trim($text));
+        if (preg_match("/^[A-Z]$/g", $letter)) {
+            return ord($letter) - 65;
+        }
+        return 0;
+    }
+
+    /**
      * Repeates the given Stirng the given times
      * @param string  $string
      * @param integer $times
