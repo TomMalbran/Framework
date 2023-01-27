@@ -710,6 +710,7 @@ class Database {
      */
     public function createTable(string $table, array $fields, array $primary, array $keys): string {
         $tableName = $this->getTableName($table);
+        $charset   = !empty($this->charset) ? $this->charset : "utf8";
         $sql       = "CREATE TABLE $tableName (\n";
 
         foreach ($fields as $key => $type) {
@@ -719,7 +720,7 @@ class Database {
         foreach ($keys as $key) {
             $sql .= ",\n  KEY `$key` (`$key`)";
         }
-        $sql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+        $sql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=$charset";
 
         $this->query($sql);
         return $sql;
