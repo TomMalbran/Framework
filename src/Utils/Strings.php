@@ -169,12 +169,15 @@ class Strings {
 
     /**
      * Replaces in the String the search with the replace
-     * @param string          $string
-     * @param string[]|string $search
-     * @param string[]|string $replace
+     * @param string               $string
+     * @param string[]|string      $search
+     * @param string[]|string|null $replace Optional.
      * @return string
      */
-    public static function replace(string $string, array|string $search, array|string $replace): string {
+    public static function replace(string $string, array|string $search, array|string $replace = null): string {
+        if ($replace == null && is_array($search)) {
+            return str_replace(array_keys($search), array_values($search), $string);
+        }
         return str_replace($search, $replace, $string);
     }
 
