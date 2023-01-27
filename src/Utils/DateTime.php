@@ -29,10 +29,11 @@ class DateTime {
     /**
      * Sets the Time Zone in minutes
      * @param integer $timezone
-     * @return void
+     * @return integer
      */
-    public static function setTimezone(int $timezone): void {
+    public static function setTimezone(int $timezone): int {
         self::$timeDiff = (self::$serverDiff - $timezone) * 60;
+        return self::$timeDiff;
     }
 
     /**
