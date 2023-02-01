@@ -86,9 +86,9 @@ class Strings {
      * @return integer
      */
     public static function getNumber(string $text): int {
-        $letter = self::toUpperCase(trim($text));
-        if (preg_match("/^[A-Z]$/g", $letter)) {
-            return ord($letter) - 65;
+        $letter = strtoupper(trim($text));
+        if (preg_match('/^[A-Z]$/', $letter)) {
+            return ord($letter) - 64;
         }
         return 0;
     }
