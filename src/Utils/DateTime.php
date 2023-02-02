@@ -425,6 +425,36 @@ class DateTime {
         return "{$days}d";
     }
 
+    /**
+     * Returns the Minutes as a string
+     * @param integer $minutes
+     * @return string
+     */
+    public static function toMinString(int $minutes): string {
+        if ($minutes < 120) {
+            return "{$minutes}m";
+        }
+        $hours = floor($minutes / 60);
+        if ($hours < 72) {
+            return "{$hours}h";
+        }
+        $days = floor($minutes / (60 * 24));
+        return "{$days}d";
+    }
+
+    /**
+     * Returns the Seconds as a string
+     * @param integer $seconds
+     * @return string
+     */
+    public static function toSecString(int $seconds): string {
+        if ($seconds < 120) {
+            return "{$seconds}s";
+        }
+        $minutes = floor($seconds / 60);
+        return self::toMinString($minutes);
+    }
+
 
 
     /**
