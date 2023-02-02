@@ -362,7 +362,7 @@ class Credential {
     }
 
     /**
-     * Returns the Credentials  that contains the text and the given Levels
+     * Returns the Credentials that contains the text and the given Levels
      * @param string                 $text
      * @param integer                $amount       Optional.
      * @param integer[]|integer|null $level        Optional.
