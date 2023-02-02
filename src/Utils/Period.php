@@ -11,41 +11,47 @@ use Framework\Utils\DateTime;
  */
 class Period {
 
-    const Last7Days  = 3;
-    const Last15Days = 4;
-    const Last30Days = 5;
-    const Last60Days = 6;
-    const Last90Days = 7;
-    const LastYear   = 8;
-    const ThisWeek   = 9;
-    const ThisMonth  = 10;
-    const ThisYear   = 11;
-    const PastWeek   = 12;
-    const PastMonth  = 13;
-    const PastYear   = 14;
-    const AllPeriod  = 2;
-    const Custom     = 1;
+    const Today       = "today";
+    const Yesterday   = "yesterday";
+    const Last7Days   = "las7Days";
+    const Last15Days  = "last15Days";
+    const Last30Days  = "last30Days";
+    const Last60Days  = "last60Days";
+    const Last90Days  = "last90Days";
+    const Last120Days = "last120Days";
+    const LastYear    = "lastYear";
+    const ThisWeek    = "thisWeek";
+    const ThisMonth   = "thisMonth";
+    const ThisYear    = "thisYear";
+    const PastWeek    = "pastWeek";
+    const PastMonth   = "pastMonth";
+    const PastYear    = "pastYear";
+    const AllPeriod   = "allPeriod";
+    const Custom      = "custom";
 
-    public int $period   = 0;
-    public int $fromTime = 0;
-    public int $toTime   = 0;
+    public string $period   = "";
+    public int    $fromTime = 0;
+    public int    $toTime   = 0;
 
     /** @var array{} All the Period Names */
     public static array $names = [
-        self::Last7Days  => "Últimos 7 días",
-        self::Last15Days => "Últimos 15 días",
-        self::Last30Days => "Últimos 30 días",
-        self::Last60Days => "Últimos 60 días",
-        self::Last90Days => "Últimos 90 días",
-        self::LastYear   => "Último año",
-        self::ThisWeek   => "Esta semana",
-        self::ThisMonth  => "Este mes",
-        self::ThisYear   => "Este año",
-        self::PastWeek   => "La semana pasada",
-        self::PastMonth  => "El mes pasado",
-        self::PastYear   => "El año pasado",
-        self::AllPeriod  => "Todo el periodo",
-        self::Custom     => "Personalizado",
+        self::Today       => "Hoy",
+        self::Yesterday   => "Ayer",
+        self::Last7Days   => "Últimos 7 días",
+        self::Last15Days  => "Últimos 15 días",
+        self::Last30Days  => "Últimos 30 días",
+        self::Last60Days  => "Últimos 60 días",
+        self::Last90Days  => "Últimos 90 días",
+        self::Last120Days => "Últimos 120 días",
+        self::LastYear    => "Último año",
+        self::ThisWeek    => "Esta semana",
+        self::ThisMonth   => "Este mes",
+        self::ThisYear    => "Este año",
+        self::PastWeek    => "La semana pasada",
+        self::PastMonth   => "El mes pasado",
+        self::PastYear    => "El año pasado",
+        self::AllPeriod   => "Todo el periodo",
+        self::Custom      => "Personalizado",
     ];
 
 
@@ -88,6 +94,12 @@ class Period {
         $result = 0;
 
         switch ($this->period) {
+        case self::Today:
+            $result = mktime(0, 0, 0, $month, $day, $year);
+            break;
+        case self::Yesterday:
+            $result = mktime(0, 0, 0, $month, $day - 1, $year);
+            break;
         case self::Last7Days:
             $result = mktime(0, 0, 0, $month, $day - 7, $year);
             break;
@@ -102,6 +114,9 @@ class Period {
             break;
         case self::Last90Days:
             $result = mktime(0, 0, 0, $month, $day - 90, $year);
+            break;
+        case self::Last120Days:
+            $result = mktime(0, 0, 0, $month, $day - 120, $year);
             break;
         case self::LastYear:
             $result = mktime(0, 0, 0, $month, $day, $year - 1);
@@ -144,18 +159,21 @@ class Period {
         $result = 0;
 
         switch ($this->period) {
+        case self::Today:
         case self::Last7Days:
         case self::Last15Days:
         case self::Last30Days:
         case self::Last60Days:
         case self::Last90Days:
+        case self::Last120Days:
         case self::LastYear:
-            $result = mktime(23, 59, 59, $month, $day, $year);
-            break;
         case self::ThisWeek:
         case self::ThisMonth:
         case self::ThisYear:
             $result = mktime(23, 59, 59, $month, $day, $year);
+            break;
+        case self::Today:
+            $result = mktime(23, 59, 59, $month, $day - 1, $year);
             break;
         case self::PastWeek:
             $result = mktime(23, 59, 59, $month, $day - $date - 1, $year);
