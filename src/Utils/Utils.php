@@ -72,6 +72,15 @@ class Utils {
     }
 
     /**
+     * Returns true if the given color is valid
+     * @param string $color
+     * @return boolean
+     */
+    public static function isValidColor(string $color): bool {
+        return Strings::match($color, '/#([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?\b/');
+    }
+
+    /**
      * Returns true if the given CUIT is valid
      * @param string $value
      * @return boolean

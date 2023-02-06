@@ -410,6 +410,15 @@ class Request implements ArrayAccess {
     }
 
     /**
+     * Returns true if the given color is valid
+     * @param string $key
+     * @return boolean
+     */
+    public function isValidColor(string $key): bool {
+        return Utils::isValidColor($this->get($key));
+    }
+
+    /**
      * Returns true if the given CUIT is valid
      * @param string $key
      * @return boolean
