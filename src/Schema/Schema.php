@@ -594,6 +594,21 @@ class Schema {
     }
 
     /**
+     * Removes and ensures the Order
+     * @param Query|integer $query
+     * @param Query|null    $orderQuery Optional.
+     * @return boolean
+     */
+    public function removeWithOrder(Query|int $query, ?Query $orderQuery = null): bool {
+        $model = $this->getOne($query);
+        if ($this->remove($query)) {
+            $this->ensurePosOrder($model, null, $orderQuery);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Edits all the Positions
      * @param Request $request
      * @param integer $credentialID Optional.
