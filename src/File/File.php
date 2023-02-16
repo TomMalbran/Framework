@@ -43,8 +43,18 @@ class File {
      */
     public static function upload(string $path, string $fileName, string $tmpFile): bool {
         $fullPath = self::getPath($path, $fileName);
-        if (!empty($fullPath)) {
-            return move_uploaded_file($tmpFile, $fullPath);
+        return self::uploadPath($fullPath, $tmpFile);
+    }
+
+    /**
+     * Uplods the given file to the given path
+     * @param string $path
+     * @param string $tmpFile
+     * @return boolean
+     */
+    public static function uploadPath(string $path, string $tmpFile): bool {
+        if (!empty($path)) {
+            return move_uploaded_file($tmpFile, $path);
         }
         return false;
     }
