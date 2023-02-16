@@ -67,10 +67,14 @@ class Image {
      * @return int[]
      */
     public static function getSize(string $file): array {
-        if (file_exists($file)) {
-            return getimagesize($file);
+        if (!file_exists($file)) {
+            return [ 0, 0, 0 ];
         }
-        return [ 0, 0, 0 ];
+        $size = getimagesize($file);
+        if ($size == false) {
+            return [ 0, 0, 0 ];
+        }
+        return $size;
     }
 
     /**
@@ -118,7 +122,7 @@ class Image {
             return false;
         }
 
-        [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
+        [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
         if (!self::hasType($imgType)) {
             return false;
         }
@@ -165,7 +169,7 @@ class Image {
         int    $height,
         string $action
     ): bool {
-        [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
+        [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
         if (!self::hasType($imgType)) {
             return false;
         }
@@ -261,7 +265,7 @@ class Image {
         int    $cropWidth,
         int    $cropHeight
     ): bool {
-        [ $imgWidth, $imgHeight, $imgType ] = getimagesize($src);
+        [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
         if (!self::hasType($imgType)) {
             return false;
         }
