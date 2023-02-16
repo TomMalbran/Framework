@@ -42,16 +42,28 @@ class Media {
      * @param string $newPath
      * @return boolean
      */
-    private static function update(string $oldPath, string $newPath): bool {
+    public static function update(string $oldPath, string $newPath): bool {
         self::load();
-        $result = true;
-        foreach (self::$data as $table) {
-            $query = Query::create($table["field"], "=", $oldPath);
-            if (!self::$db->update($table["table"], [ $table["field"] => $newPath ], $query)) {
-                $result = false;
+        $result = 0;
+
+        foreach (self::$data as $field) {
+            $updated = false;
+            if (!empty($field["isJson"]) && $field["isJson"]) {
+                $query   = Query::create($field["field"], "LIKE", ":\"$oldPath\"");
+                $updated = self::$db->update($field["table"], [
+                    $field["field"] => Query::replace($field["field"], $oldPath, $newPath),
+                ], $query);
+            } else {
+                $query   = Query::create($field["field"], "=", $oldPath);
+                $updated = self::$db->update($field["table"], [
+                    $field["field"] => $newPath,
+                ], $query);
+            }
+            if ($updated) {
+                $result += 1;
             }
         }
-        return $result;
+        return $result > 0;
     }
 
 
