@@ -46,7 +46,7 @@ class ErrorLog {
 
 
     /**
-     * Returns an Error with the given Code
+     * Returns an Error with the given ID
      * @param integer $logID
      * @return Model
      */
@@ -78,7 +78,7 @@ class ErrorLog {
     }
 
     /**
-     * Returns all the Product Logs filtered by the given times
+     * Returns all the Errors filtered by the given times
      * @param Request $request
      * @return array{}[]
      */
@@ -88,7 +88,7 @@ class ErrorLog {
     }
 
     /**
-     * Returns the Total Actions Log with the given Filters
+     * Returns the Total Errors with the given Filters
      * @param Request $request
      * @return integer
      */
@@ -116,7 +116,7 @@ class ErrorLog {
 
 
     /**
-     * Handes the PHP Error
+     * Handles the PHP Error
      * @param integer $code
      * @param string  $description
      * @param string  $file
