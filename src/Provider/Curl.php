@@ -53,21 +53,18 @@ class Curl {
     /**
      * Executes a Read Request
      * @param string       $url
-     * @param string       $filename
+     * @param string       $filePath
      * @param array{}|null $headers  Optional.
      * @return boolean
      */
-    public static function read(string $url, string $filename, ?array $headers = null): bool {
-        $file    = fopen($filename, "wb");
+    public static function read(string $url, string $filePath, ?array $headers = null): bool {
+        $file    = fopen($filePath, "wb");
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_FILE            => $file,
             CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
-            CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_FOLLOWLOCATION  => true,
             CURLOPT_HTTPGET         => true,
-            CURLOPT_HEADER          => false,
-            CURLOPT_FORBID_REUSE    => true,
             CURLOPT_TIMEOUT         => 100,
             CURLOPT_CONNECTTIMEOUT  => 10,
             CURLOPT_LOW_SPEED_LIMIT => 512,
