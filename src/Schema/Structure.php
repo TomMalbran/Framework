@@ -37,6 +37,7 @@ class Structure {
     public bool $hasTimestamps  = false;
     public bool $hasUsers       = false;
     public bool $canCreate      = false;
+    public bool $canEdit        = false;
     public bool $canDelete      = false;
 
 
