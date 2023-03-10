@@ -1,6 +1,8 @@
 <?php
 namespace Framework\IO;
 
+use Framework\Utils\Strings;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Exception;
@@ -112,5 +114,60 @@ class SpreadsheetReader {
             return [];
         }
         return $row[0];
+    }
+
+    /**
+     * Returns the Header
+     * @return array{}[]
+     */
+    public function getHeader(): array {
+        $columns = [];
+        if (!$this->isValid()) {
+            return $columns;
+        }
+
+        $colAmount = $this->getHighestColumn();
+        $headerRow = $this->getRow(1, "A", $colAmount);
+
+        foreach ($headerRow as $key => $value) {
+            $columns[] = [
+                "key"   => $key,
+                "value" => $value,
+            ];
+        }
+        return $columns;
+    }
+
+    /**
+     * Returns the first and last values
+     * @param integer $amount
+     * @return array{}
+     */
+    public function getFirstAndLast(int $amount = 3): array {
+        $values = [ "first" => "", "last" => "" ];
+        if (!$this->isValid()) {
+            return $values;
+        }
+
+        $colAmount = $this->getHighestColumn();
+        $rowAmount = $this->getHighestRow();
+        $rows      = [
+            "first" => $this->getRow(2, "A", $colAmount),
+            "last"  => $this->getRow($rowAmount, "A", $colAmount),
+        ];
+
+        foreach ($rows as $index => $row) {
+            if (empty($row)) {
+                continue;
+            }
+            $fields = [];
+            for ($i = 0; $i < $amount; $i++) {
+                if (!empty($row[$i])) {
+                    $fields[] = $row[$i];
+                }
+            }
+            $values[$index] = Strings::join($fields, " - ");
+        }
+        return $values;
     }
 }
