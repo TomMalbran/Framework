@@ -70,9 +70,9 @@ class Container {
      * @param string  $className
      * @param boolean $save      Optional.
      * @param array{} $params    Optional.
-     * @return string|null
+     * @return object|null
      */
-    private static function buildObject(string $className, bool $save = false, array $params = []): ?string {
+    private static function buildObject(string $className, bool $save = false, array $params = []): ?object {
         $reflector = new ReflectionClass($className);
         $instances = [];
 
