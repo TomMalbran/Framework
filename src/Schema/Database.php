@@ -380,8 +380,8 @@ class Database {
 
         $statement->execute();
         if ($statement->error) {
-            $statement->close();
             trigger_error("Problem executing query: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
+            $statement->close();
             return null;
         }
 
