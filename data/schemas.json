@@ -33,6 +33,20 @@
         "canEdit"       : true,
         "canDelete"     : true
     },
+    "devices" : {
+        "table"  : "credentials_devices",
+        "fields" : {
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
+            "playerID"      : { "type" : "string",                          "isPrimary" : true }
+        },
+        "foreigns" : {
+            "CREDENTIAL_ID" : { "table" : "credentials" }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : true,
+        "canEdit"       : true,
+        "canDelete"     : false
+    },
     "resets" : {
         "table"  : "credentials_reset",
         "fields" : {
