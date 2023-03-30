@@ -91,10 +91,11 @@ class Config {
 
     /**
      * Returns a Config Property or null
-     * @param string $property
+     * @param string     $property
+     * @param mixed|null $default  Optional.
      * @return mixed
      */
-    public static function get(string $property): mixed {
+    public static function get(string $property, mixed $default = null): mixed {
         self::load();
 
         // Check if there is a property with the given value
@@ -121,7 +122,7 @@ class Config {
         }
 
         // We got nothing
-        return null;
+        return $default;
     }
 
     /**
