@@ -149,10 +149,20 @@ class Queue {
         $success = false;
         foreach ($email["sendToParts"] as $sendTo) {
             if (!empty($sendTo)) {
-                $success = Email::sendHTML($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
+                $success = Email::send($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
             }
         }
-        return self::schema()->edit($email["emailID"], [
+        return self::markAsSent($email["emailID"], $success);
+    }
+
+    /**
+     * Marks the Email as Sent
+     * @param integer $emailID
+     * @param boolean $success
+     * @return boolean
+     */
+    public static function markAsSent(int $emailID, bool $success): bool {
+        return self::schema()->edit($emailID, [
             "sentSuccess" => $success ? 1 : 0,
             "sentTime"    => time(),
         ]);
