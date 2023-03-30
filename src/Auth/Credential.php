@@ -681,6 +681,17 @@ class Credential {
     }
 
     /**
+     * Stops asking the Credential for Notifications
+     * @param integer $credentialID
+     * @return boolean
+     */
+    public static function dontAskNotifications(int $credentialID): bool {
+        return self::schema()->edit($credentialID, [
+            "askNotifications" => 0,
+        ]);
+    }
+
+    /**
      * Sets a Credential Value
      * @param integer $credentialID
      * @param string  $key

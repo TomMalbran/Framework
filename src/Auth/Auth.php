@@ -273,16 +273,17 @@ class Auth {
 
         // The general data
         $data = [
-            "accessLevel"   => self::$accessLevel,
-            "credentialID"  => self::$credentialID,
-            "adminID"       => self::$adminID,
-            "userID"        => self::$userID,
-            "email"         => self::$credential->email,
-            "name"          => self::$credential->credentialName,
-            "language"      => self::$credential->language,
-            "avatar"        => self::$credential->avatar,
-            "reqPassChange" => self::$credential->reqPassChange,
-            "loggedAsUser"  => !empty(self::$adminID),
+            "accessLevel"      => self::$accessLevel,
+            "credentialID"     => self::$credentialID,
+            "adminID"          => self::$adminID,
+            "userID"           => self::$userID,
+            "email"            => self::$credential->email,
+            "name"             => self::$credential->credentialName,
+            "language"         => self::$credential->language,
+            "avatar"           => self::$credential->avatar,
+            "reqPassChange"    => self::$credential->reqPassChange,
+            "askNotifications" => self::$credential->askNotifications,
+            "loggedAsUser"     => !empty(self::$adminID),
         ];
 
         // Add fields from the Config
