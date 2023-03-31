@@ -28,16 +28,16 @@ class Email {
     const Mailjet  = "Mailjet";
 
 
-    private static bool    $loaded   = false;
-    private static ?string $template = null;
+    private static bool      $loaded   = false;
+    private static ?string   $template = null;
 
-    private static string  $url      = "";
-    private static mixed   $config   = "";
-    private static mixed   $smtp     = null;
-    private static mixed   $google   = null;
+    private static string    $url      = "";
+    private static mixed     $config   = "";
+    private static mixed     $smtp     = null;
+    private static mixed     $google   = null;
 
-    private static mixed   $mandrill = null;
-    private static mixed   $mailjet  = null;
+    private static ?Mandrill $mandrill = null;
+    private static ?Mailjet  $mailjet  = null;
 
 
     /**
@@ -59,32 +59,30 @@ class Email {
     }
 
     /**
-     * Loads the Mandrill Client
-     * @return boolean
+     * Returns the Mandrill Client
+     * @return Mandrill
      */
-    private static function loadMandrill(): bool {
-        self::load();
+    private static function mandrill(): Mandrill {
         if (!empty(self::$mandrill)) {
-            return false;
+            return self::$mandrill;
         }
         $config = Config::get("mandrill");
         self::$mandrill = new Mandrill();
         self::$mandrill->setApiKey($config->key);
-        return true;
+        return self::$mandrill;
     }
 
     /**
-     * Loads the Mailjet Client
-     * @return boolean
+     * Returns the Mailjet Client
+     * @return Mailjet
      */
-    private static function loadMailjet(): bool {
-        self::load();
+    private static function mailjet(): Mailjet {
         if (!empty(self::$mailjet)) {
-            return false;
+            return self::$mailjet;
         }
         $config = Config::get("mailjet");
         self::$mailjet = new Mailjet($config->key, $config->secret);
-        return true;
+        return self::$mailjet;
     }
 
 
@@ -281,7 +279,6 @@ class Email {
         string $subject,
         string $body
     ): bool {
-        self::loadMandrill();
         $message = [
             "to"                  => [
                 [
@@ -307,7 +304,7 @@ class Email {
             "return_path_domain"  => null,
         ];
 
-        self::$mandrill->messages->send([
+        self::mandrill()->messages->send([
             "message" => $message,
             "async"   => false,
             "send_at" => date("Y-m-d H:i:s"),
@@ -331,8 +328,7 @@ class Email {
         string $subject,
         string $body
     ): bool {
-        self::loadMailjet();
-        $response = self::$mailjet->post(Resources::$Email, [
+        $response = self::mailjet()->post(Resources::$Email, [
             "body" => [
                 "FromEmail"  => $fromEmail ?: self::$config->email,
                 "FromName"   => $fromName  ?: self::$config->name,
