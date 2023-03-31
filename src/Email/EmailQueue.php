@@ -13,7 +13,7 @@ use Framework\Utils\JSON;
 /**
  * The Email Queue
  */
-class Queue {
+class EmailQueue {
 
     /**
      * Loads the Email Queue Schema
