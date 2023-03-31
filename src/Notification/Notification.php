@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Provider;
+namespace Framework\Notification;
 
 use Framework\Config\Config;
 use Framework\File\Path;
