@@ -73,6 +73,7 @@ class EmailQueue {
      */
     public static function getAllUnsent(): array {
         $query = Query::create("sentTime", "=", 0);
+        $query->orderBy("createdTime", false);
         return self::schema()->getAll($query);
     }
 
