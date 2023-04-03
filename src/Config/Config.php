@@ -159,7 +159,8 @@ class Config {
      */
     public static function getUrl(string ...$urlParts): string {
         $url  = self::get("url");
-        $path = File::getpath(...$urlParts);
+        $path = File::getPath(...$urlParts);
+        $path = File::removeFirstSlash($path);
         return $url . $path;
     }
 
