@@ -46,12 +46,13 @@ class Notification {
      * Send to All
      * @param string  $title
      * @param string  $body
-     * @param integer $type
-     * @param integer $id
+     * @param string  $url
+     * @param string  $type
+     * @param integer $dataID
      * @return string|null
      */
-    public static function sendToAll(string $title, string $body, int $type, int $id): ?string {
-        return self::send($title, $body, $type, $id, [
+    public static function sendToAll(string $title, string $body, string $url, string $type, int $dataID): ?string {
+        return self::send($title, $body, $type, $url, $dataID, [
             "included_segments" => [ "All" ],
         ]);
     }
@@ -60,16 +61,17 @@ class Notification {
      * Send to Some
      * @param string   $title
      * @param string   $body
-     * @param integer  $type
-     * @param integer  $id
+     * @param string   $url
+     * @param string   $type
+     * @param integer  $dataID
      * @param string[] $playerIDs
      * @return string|null
      */
-    public static function sendToSome(string $title, string $body, int $type, int $id, array $playerIDs): ?string {
+    public static function sendToSome(string $title, string $body, string $url, string $type, int $dataID, array $playerIDs): ?string {
         if (empty($playerIDs)) {
             return null;
         }
-        return self::send($title, $body, $type, $id, [
+        return self::send($title, $body, $url, $type, $dataID, [
             "include_player_ids" => $playerIDs,
         ]);
     }
@@ -78,13 +80,14 @@ class Notification {
      * Send to Some
      * @param string  $title
      * @param string  $body
-     * @param integer $type
-     * @param integer $id
+     * @param string  $url
+     * @param string  $type
+     * @param integer $dataID
      * @param string  $playerID
      * @return string|null
      */
-    public static function sendToOne(string $title, string $body, int $type, int $id, string $playerID): ?string {
-        return self::send($title, $body, $type, $id, [
+    public static function sendToOne(string $title, string $body, string $url, string $type, int $dataID, string $playerID): ?string {
+        return self::send($title, $body, $url, $type, $dataID, [
             "include_player_ids" => [ $playerID ],
         ]);
     }
@@ -93,14 +96,15 @@ class Notification {
      * Sends the Notification
      * @param string  $title
      * @param string  $body
-     * @param integer $type
-     * @param integer $id
+     * @param string  $url
+     * @param string  $type
+     * @param integer $dataID
      * @param array{} $params
      * @return string|null
      */
-    private static function send(string $title, string $body, int $type, int $id, array $params): ?string {
+    private static function send(string $title, string $body, string $url, string $type, int $dataID, array $params): ?string {
         self::load();
-        if (empty(self::$api)) {
+        if (empty(self::$api) || !self::$config->isActive) {
             return null;
         }
 
@@ -111,10 +115,14 @@ class Notification {
         $response = self::$api->notifications()->add([
             "headings"       => [ "en" => $title ],
             "contents"       => [ "en" => $body  ],
+            "url"            => Config::getUrl($url),
             "large_icon"     => $icon,
             "ios_badgeType"  => "Increase",
             "ios_badgeCount" => 1,
-            "data"           => [ "type" => $type, "id" => $id ],
+            "data"           => [
+                "type"   => $type,
+                "dataID" => $dataID,
+            ],
         ] + $params);
 
         if (empty($response["id"])) {
