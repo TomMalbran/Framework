@@ -4,6 +4,7 @@ namespace Framework\Email;
 use Framework\Framework;
 use Framework\Config\Config;
 use Framework\Config\Settings;
+use Framework\Provider\Google;
 use Framework\Utils\Strings;
 
 use Google\Client;
@@ -16,7 +17,6 @@ class EmailReader {
 
     private static bool    $loaded  = false;
     private static string  $url     = "";
-    private static mixed   $config  = null;
     private static mixed   $db      = null;
 
     private static ?Client $client  = null;
@@ -32,7 +32,6 @@ class EmailReader {
             return false;
         }
         self::$url    = Config::get("url");
-        self::$config = Config::get("google");
         self::$db     = Framework::getDatabase();
         self::$loaded = true;
         return true;
@@ -41,23 +40,18 @@ class EmailReader {
     /**
      * Loads the Email Client Config
      * @param string $redirectUri Optional.
-     * @return void
+     * @return boolean
      */
-    public static function loadClient(string $redirectUri = ""): void {
+    public static function loadClient(string $redirectUri = ""): bool {
         self::load();
 
         if (empty(self::$client)) {
-            self::$client = new Client([
-                "client_id"     => self::$config->client,
-                "client_secret" => self::$config->secret,
-                "access_type"   => "offline",
-                "scopes"        => Gmail::GMAIL_READONLY,
-            ]);
+            self::$client = Google::load(Gmail::GMAIL_READONLY);
 
             if (!empty($redirectUri)) {
                 self::$client->setPrompt("consent");
                 self::$client->setRedirectUri(self::$url . $redirectUri);
-                return;
+                return true;
             }
         }
 
@@ -69,8 +63,10 @@ class EmailReader {
                     self::$client->fetchAccessTokenWithRefreshToken(self::$client->getRefreshToken());
                 }
                 self::$service = new Gmail(self::$client);
+                return true;
             }
         }
+        return false;
     }
 
     /**
