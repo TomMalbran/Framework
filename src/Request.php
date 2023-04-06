@@ -14,6 +14,7 @@ use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 
 use ArrayAccess;
+use CURLFile;
 
 /**
  * The Request Wrapper
@@ -196,32 +197,35 @@ class Request implements ArrayAccess {
      * Sets the given key on the request data with the given value
      * @param string       $key
      * @param mixed|string $value Optional.
-     * @return void
+     * @return Request
      */
-    public function set(string $key, mixed $value = ""): void {
+    public function set(string $key, mixed $value = ""): Request {
         $this->request[$key] = $value;
+        return $this;
     }
 
     /**
      * Sets the data of the give object
      * @param mixed[] $object
-     * @return void
+     * @return Request
      */
-    public function setObject(array $object): void {
+    public function setObject(array $object): Request {
         foreach ($object as $key => $value) {
             $this->request[$key] = $value;
         }
+        return $this;
     }
 
     /**
      * Removes the request data at the given key
      * @param string $key
-     * @return void
+     * @return Request
      */
-    public function remove(string $key): void {
+    public function remove(string $key): Request {
         if ($this->exists($key)) {
             unset($this->request[$key]);
         }
+        return $this;
     }
 
 
@@ -818,20 +822,22 @@ class Request implements ArrayAccess {
 
     /**
      * Prints the Request
-     * @return void
+     * @return Request
      */
-    public function print(): void {
+    public function print(): Request {
         print("<pre>");
         print_r($this->request);
         print("</pre>");
+        return $this;
     }
 
     /**
      * Dumps the Request
-     * @return void
+     * @return Request
      */
-    public function dump(): void {
+    public function dump(): Request {
         var_dump($this->request);
+        return $this;
     }
 
     /**

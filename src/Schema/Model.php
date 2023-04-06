@@ -311,20 +311,22 @@ class Model implements ArrayAccess {
 
     /**
      * Prints the Model
-     * @return void
+     * @return Model
      */
-    public function print(): void {
+    public function print(): Model {
         print("<pre>");
         print_r($this->data);
         print("</pre>");
+        return $this;
     }
 
     /**
      * Dumps the Model
-     * @return void
+     * @return Model
      */
-    public function dump(): void {
+    public function dump(): Model {
         var_dump($this->data);
+        return $this;
     }
 
     /**
