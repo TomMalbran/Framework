@@ -165,6 +165,18 @@ class Config {
     }
 
     /**
+     * Returns the File Url adding the url parts at the end
+     * @param string ...$urlParts
+     * @return string
+     */
+    public static function getFileUrl(string ...$urlParts): string {
+        $url  = self::get("fileUrl", self::get("url"));
+        $path = File::getPath(...$urlParts);
+        $path = File::removeFirstSlash($path);
+        return $url . $path;
+    }
+
+    /**
      * Returns the Version split into the diferent parts
      * @return object
      */

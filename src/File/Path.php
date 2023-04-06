@@ -84,7 +84,7 @@ class Path {
     public static function getUrl(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
-            return Config::getUrl(Framework::FilesDir, $path, ...$pathParts);
+            return Config::getFileUrl(Framework::FilesDir, $path, ...$pathParts);
         }
         return "";
     }
@@ -126,7 +126,7 @@ class Path {
      * @return string
      */
     public static function getTempUrl(int $credentialID, string ...$pathParts): string {
-        return Config::getUrl(Framework::TempDir, $credentialID, ...$pathParts);
+        return Config::getFileUrl(Framework::TempDir, $credentialID, ...$pathParts);
     }
 
 
