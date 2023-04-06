@@ -23,7 +23,7 @@ class Server {
      * @return boolean
      */
     public static function isDevHost(): bool {
-        return Strings::startsWith($_SERVER["HTTP_HOST"], "dev.");
+        return self::hostStartsWith("dev.");
     }
 
     /**
@@ -31,7 +31,16 @@ class Server {
      * @return boolean
      */
     public static function isStageHost(): bool {
-        return Strings::startsWith($_SERVER["HTTP_HOST"], "stage.");
+        return self::hostStartsWith("stage.");
+    }
+
+    /**
+     * Returns true if the Host starts with the given prefix
+     * @param string $prefix
+     * @return boolean
+     */
+    public static function hostStartsWith(string $prefix): bool {
+        return Strings::startsWith($_SERVER["HTTP_HOST"], $prefix);
     }
 
 
