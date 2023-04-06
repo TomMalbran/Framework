@@ -25,9 +25,10 @@ class ErrorLog {
      * @return boolean
      */
     public static function init(): bool {
-        if (!self::$loaded) {
+        if (self::$loaded) {
             return false;
         }
+
         self::$loaded    = true;
         self::$framePath = Framework::getPath("src", "", true);
         self::$basePath  = Framework::getPath(Framework::SourceDir);
