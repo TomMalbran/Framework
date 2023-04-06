@@ -765,6 +765,18 @@ class Request implements ArrayAccess {
     }
 
     /**
+     * Returns the request file at the given key
+     * @param string $key
+     * @return CURLFile|null
+     */
+    public function getCurlFile(string $key): ?CURLFile {
+        if ($this->hasFile($key)) {
+            return curl_file_create($this->files[$key]["tmp_name"], $this->files[$key]["type"], $this->files[$key]["name"]);
+        }
+        return null;
+    }
+
+    /**
      * Returns true if the given key exists in the files data
      * @param string $key
      * @return boolean
