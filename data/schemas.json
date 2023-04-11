@@ -153,9 +153,7 @@
             "type"            : { "type" : "string"                           },
             "dataID"          : { "type" : "number"                           },
             "externalID"      : { "type" : "string"                           },
-            "sentTime"        : { "type" : "number"                           },
-            "emailTime"       : { "type" : "number"                           },
-            "emailStatus"     : { "type" : "number"                           }
+            "sentTime"        : { "type" : "number"                           }
         },
         "subrequests" : {
             "notificationCredentials" : {
