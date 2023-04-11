@@ -23,6 +23,7 @@
             "status"           : { "type" : "number",  "length"   : 3,         "noExists" : true },
             "observations"     : { "type" : "text",                            "noExists" : true },
             "sendEmails"       : { "type" : "boolean",                         "noExists" : true },
+            "sendEmailNotis"   : { "type" : "boolean",                         "noExists" : true },
             "timezone"         : { "type" : "number",  "isSigned" : true,      "cantEdit" : true },
             "currentLogin"     : { "type" : "date",                            "cantEdit" : true },
             "lastLogin"        : { "type" : "date",                            "cantEdit" : true },

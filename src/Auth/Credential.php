@@ -64,7 +64,7 @@ class Credential {
     }
 
     /**
-     * Returns the Credential with the given ID
+     * Returns the Name of the Credential with the given ID
      * @param integer $credentialID
      * @return string
      */
