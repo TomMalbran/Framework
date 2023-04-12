@@ -31,7 +31,7 @@ class ErrorLog {
 
         self::$loaded    = true;
         self::$framePath = Framework::getPath("src", "", true);
-        self::$basePath  = Framework::getPath(Framework::SourceDir);
+        self::$basePath  = Framework::getPath();
         set_error_handler("\\Framework\\Log\\ErrorLog::handler");
         return true;
     }
