@@ -48,6 +48,15 @@ class Path {
 
 
     /**
+     * Returns the base path used to store the files
+     * @return string
+     */
+    public static function getBasePath(): string {
+        self::load();
+        return self::$basePath;
+    }
+
+    /**
      * Returns the directory used to store the files
      * @param string $pathKey
      * @param string ...$pathParts
