@@ -88,9 +88,9 @@ class SpreadsheetWriter {
      * Downloads the Spreadsheet file
      * @param string  $name
      * @param boolean $withDate Optional.
-     * @return void
+     * @return SpreadsheetWriter
      */
-    public function download(string $name, bool $withDate = true): void {
+    public function download(string $name, bool $withDate = true): SpreadsheetWriter {
         $fileName = $this->getFileName($name, $withDate);
 
         header("Content-type: application/vnd.ms-excel");
@@ -101,15 +101,16 @@ class SpreadsheetWriter {
 
         $writer = IOFactory::createWriter($this->data, "Xls");
         $writer->save("php://output");
+        return $this;
     }
 
     /**
      * Downloads the Spreadsheet file as xlsx
      * @param string  $name
      * @param boolean $withDate Optional.
-     * @return void
+     * @return SpreadsheetWriter
      */
-    public function downloadXlsx(string $name, bool $withDate = true): void {
+    public function downloadXlsx(string $name, bool $withDate = true): SpreadsheetWriter {
         $fileName = $this->getFileName($name, $withDate);
 
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF16-LE; encoding=UTF16-LE");
@@ -119,15 +120,16 @@ class SpreadsheetWriter {
 
         $writer = IOFactory::createWriter($this->data, "Xlsx");
         $writer->save("php://output");
+        return $this;
     }
 
     /**
      * Downloads the Spreadsheet file as csv
      * @param string  $name
      * @param boolean $withDate Optional.
-     * @return void
+     * @return SpreadsheetWriter
      */
-    public function downloadCsv(string $name, bool $withDate = true): void {
+    public function downloadCsv(string $name, bool $withDate = true): SpreadsheetWriter {
         $fileName = $this->getFileName($name, $withDate);
 
         header("Content-Type: application/csv; charset=UTF16-LE; encoding=UTF16-LE");
@@ -137,5 +139,6 @@ class SpreadsheetWriter {
 
         $writer = IOFactory::createWriter($this->data, "Csv");
         $writer->save("php://output");
+        return $this;
     }
 }
