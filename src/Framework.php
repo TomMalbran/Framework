@@ -123,6 +123,18 @@ class Framework {
     }
 
     /**
+     * Returns the BasePath
+     * @param boolean $forFramework Optional.
+     * @return string
+     */
+    public static function getBasePath(bool $forFramework = false): string {
+        if ($forFramework) {
+            return self::$framePath;
+        }
+        return self::$basePath;
+    }
+
+    /**
      * Returns the BasePath with the given dir
      * @param string  $dir          Optional.
      * @param string  $file         Optional.
