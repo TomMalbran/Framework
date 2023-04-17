@@ -208,6 +208,18 @@ class NotificationQueue {
         return self::schema()->remove($query);
     }
 
+    /**
+     * Deletes the items older than 90 days
+     * @param integer $days Optional.
+     * @return boolean
+     */
+    public static function deleteOld(int $days = 90): bool {
+        $time  = time() - $days * 24 * 3600;
+        $query = Query::create("notification_queue.createdTime", "<", $time);
+        self::credentialSchema()->remove($query);
+        return self::schema()->remove($query);
+    }
+
 
 
     /**

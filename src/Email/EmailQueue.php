@@ -168,4 +168,15 @@ class EmailQueue {
             "sentTime"    => time(),
         ]);
     }
+
+    /**
+     * Deletes the items older than 90 days
+     * @param integer $days Optional.
+     * @return boolean
+     */
+    public static function deleteOld(int $days = 90): bool {
+        $time  = time() - $days * 24 * 3600;
+        $query = Query::create("createdTime", "<", $time);
+        return self::schema()->remove($query);
+    }
 }
