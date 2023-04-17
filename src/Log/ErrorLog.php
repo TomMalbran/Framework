@@ -30,8 +30,10 @@ class ErrorLog {
         }
 
         self::$loaded    = true;
-        self::$framePath = Framework::getPath("src", "", true);
-        self::$basePath  = Framework::getPath();
+        self::$framePath = Framework::getBasePath(true);
+        self::$basePath  = Framework::getBasePath(false);
+
+        register_shutdown_function("\\Framework\\Log\\ErrorLog::shutdown");
         set_error_handler("\\Framework\\Log\\ErrorLog::handler");
         return true;
     }
@@ -114,7 +116,30 @@ class ErrorLog {
         return false;
     }
 
+    /**
+     * Deletes the items older than 90 days
+     * @param integer $days Optional.
+     * @return boolean
+     */
+    public static function deleteOld(int $days = 90): bool {
+        $time  = time() - $days * 24 * 3600;
+        $query = Query::create("createdTime", "<", $time);
+        return self::schema()->remove($query);
+    }
 
+
+
+    /**
+     * Handles the PHP Shutdown
+     * @return boolean
+     */
+    public static function shutdown(): bool {
+        $error = error_get_last();
+        if (!is_null($error)) {
+            return self::handler($error["type"], $error["message"], $error["file"], $error["line"]);
+        }
+        return false;
+    }
 
     /**
      * Handles the PHP Error
@@ -166,7 +191,7 @@ class ErrorLog {
                 $schema->remove($query);
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -179,37 +204,37 @@ class ErrorLog {
         $level = 0;
 
         switch ($code) {
-            case E_PARSE:
-            case E_ERROR:
-            case E_CORE_ERROR:
-            case E_COMPILE_ERROR:
-            case E_USER_ERROR:
-                $error = "Fatal Error";
-                $level = LOG_ERR;
-                break;
-            case E_WARNING:
-            case E_USER_WARNING:
-            case E_COMPILE_WARNING:
-            case E_RECOVERABLE_ERROR:
-                $error = "Warning";
-                $level = LOG_WARNING;
-                break;
-            case E_NOTICE:
-            case E_USER_NOTICE:
-                $error = "Notice";
-                $log   = LOG_NOTICE;
-                break;
-            case E_STRICT:
-                $error = "Strict";
-                $level = LOG_NOTICE;
-                break;
-            case E_DEPRECATED:
-            case E_USER_DEPRECATED:
-                $error = "Deprecated";
-                $level = LOG_NOTICE;
-                break;
-            default:
-                break;
+        case E_PARSE:
+        case E_ERROR:
+        case E_CORE_ERROR:
+        case E_COMPILE_ERROR:
+        case E_USER_ERROR:
+            $error = "Fatal Error";
+            $level = LOG_ERR;
+            break;
+        case E_WARNING:
+        case E_USER_WARNING:
+        case E_COMPILE_WARNING:
+        case E_RECOVERABLE_ERROR:
+            $error = "Warning";
+            $level = LOG_WARNING;
+            break;
+        case E_NOTICE:
+        case E_USER_NOTICE:
+            $error = "Notice";
+            $log   = LOG_NOTICE;
+            break;
+        case E_STRICT:
+            $error = "Strict";
+            $level = LOG_NOTICE;
+            break;
+        case E_DEPRECATED:
+        case E_USER_DEPRECATED:
+            $error = "Deprecated";
+            $level = LOG_NOTICE;
+            break;
+        default:
+            break;
         }
         return [ $error, $level ];
     }
