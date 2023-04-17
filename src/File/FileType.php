@@ -10,7 +10,7 @@ use Framework\Utils\Strings;
 class FileType {
 
     /** @var string[] */
-    public static array $imageExts        = [ "jpg", "jpeg", "gif", "png", "ico", "avif" ];
+    public static array $imageExts        = [ "jpg", "jpeg", "gif", "png", "ico", "avif", "webp" ];
 
     /** @var string[] */
     public static array $pngExts          = [ "png" ];
