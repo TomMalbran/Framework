@@ -19,6 +19,7 @@ class File {
     public static function getPath(string ...$pathParts): string {
         $result = Strings::join($pathParts, "/");
         $result = Strings::replace($result, "//", "/");
+        $result = self::removeLastSlash($result);
         return $result;
     }
 
