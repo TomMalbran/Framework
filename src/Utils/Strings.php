@@ -182,6 +182,17 @@ class Strings {
     }
 
     /**
+     * Replaces in the String the pattern with the replace
+     * @param string          $string
+     * @param string[]|string $pattern
+     * @param string[]|string $replace
+     * @return string
+     */
+    public static function replacePattern(string $string, array|string $pattern, array|string $replace): string {
+        return preg_replace($pattern, $replace, $string);
+    }
+
+    /**
      * Removes the Needle from the start of the String
      * @param string $string
      * @param string $needle
