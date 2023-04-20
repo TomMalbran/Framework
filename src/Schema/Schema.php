@@ -565,13 +565,13 @@ class Schema {
     /**
      * Edits and ensures the Order
      * @param Query|integer $query
-     * @param Request       $request
+     * @param Request|null  $request
      * @param array{}|null  $extra        Optional.
      * @param integer       $credentialID Optional.
      * @param Query|null    $orderQuery   Optional.
      * @return boolean
      */
-    public function editWithOrder(Query|int $query, Request $request, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
+    public function editWithOrder(Query|int $query, ?Request $request = null, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
         $this->ensurePosOrder($model, $request, $orderQuery);
         return $this->edit($query, $request, $extra, $credentialID);
