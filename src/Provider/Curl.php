@@ -101,7 +101,7 @@ class Curl {
      * @param mixed|null   $body    Optional.
      * @return mixed
      */
-    private static function execute(string $url, ?array $headers = null, mixed $body = null): mixed {
+    public static function execute(string $url, ?array $headers = null, mixed $body = null): mixed {
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
