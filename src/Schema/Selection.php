@@ -114,14 +114,7 @@ class Selection {
                 $this->tables[] = $join->table;
             }
 
-            $table      = "{dbPrefix}{$join->table}";
-            $onTable    = $join->onTable ?: $mainKey;
-            $leftKey    = $join->leftKey;
-            $rightKey   = $join->rightKey;
-            $and        = $join->getAnd($asTable);
-            $expression = "LEFT JOIN $table AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey $and)";
-
-            $this->joins[]          = $expression;
+            $this->joins[]          = $join->getExpression($asTable, $mainKey);
             $this->keys[$join->key] = $asTable;
 
             if ($withSelects) {

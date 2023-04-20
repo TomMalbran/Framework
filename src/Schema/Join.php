@@ -9,27 +9,29 @@ use Framework\Utils\Arrays;
  */
 class Join {
 
-    public string $key       = "";
-    public string $table     = "";
-    public string $asTable   = "";
-    public string $onTable   = "";
-    public string $leftKey   = "";
-    public string $rightKey  = "";
-    public string $and       = "";
-    public string $andKey    = "";
-    public string $andValue  = "";
+    public string $key        = "";
+    public string $table      = "";
+    public string $asTable    = "";
+    public string $onTable    = "";
+    public string $leftKey    = "";
+    public string $rightKey   = "";
+    public string $and        = "";
+    public string $andKey     = "";
+    public string $andValue   = "";
+    public string $andTable   = "";
+    public bool   $andDeleted = false;
 
     /** @var Field[] */
-    public array  $fields    = [];
+    public array  $fields     = [];
 
     /** @var object[] */
-    public array  $merges    = [];
+    public array  $merges     = [];
 
     /** @var array{}[] */
-    public array  $defaults  = [];
+    public array  $defaults   = [];
 
-    public bool   $hasPrefix = false;
-    public string $prefix    = "";
+    public bool   $hasPrefix  = false;
+    public string $prefix     = "";
 
 
     /**
@@ -38,18 +40,20 @@ class Join {
      * @param array{} $data
      */
     public function __construct(string $key, array $data) {
-        $this->key       = $key;
-        $this->table     = $data["table"];
-        $this->asTable   = !empty($data["asTable"])  ? $data["asTable"]      : "";
-        $this->onTable   = !empty($data["onTable"])  ? $data["onTable"]      : "";
-        $this->leftKey   = !empty($data["leftKey"])  ? $data["leftKey"]      : $key;
-        $this->rightKey  = !empty($data["rightKey"]) ? $data["rightKey"]     : $key;
-        $this->and       = !empty($data["and"])      ? "AND " . $data["and"] : "";
-        $this->andKey    = !empty($data["andKey"])   ? $data["andKey"]       : "";
-        $this->andValue  = !empty($data["andValue"]) ? $data["andValue"]     : "";
+        $this->key        = $key;
+        $this->table      = $data["table"];
+        $this->asTable    = !empty($data["asTable"])    ? $data["asTable"]    : "";
+        $this->onTable    = !empty($data["onTable"])    ? $data["onTable"]    : "";
+        $this->leftKey    = !empty($data["leftKey"])    ? $data["leftKey"]    : $key;
+        $this->rightKey   = !empty($data["rightKey"])   ? $data["rightKey"]   : $key;
+        $this->and        = !empty($data["and"])        ? $data["and"]        : "";
+        $this->andKey     = !empty($data["andKey"])     ? $data["andKey"]     : "";
+        $this->andValue   = !empty($data["andValue"])   ? $data["andValue"]   : "";
+        $this->andTable   = !empty($data["andTable"])   ? $data["andTable"]   : "";
+        $this->andDeleted = !empty($data["andDeleted"]) ? $data["andDeleted"] : false;
 
-        $this->hasPrefix = !empty($data["prefix"]);
-        $this->prefix    = !empty($data["prefix"])   ? $data["prefix"]       : "";
+        $this->hasPrefix  = !empty($data["prefix"]);
+        $this->prefix     = !empty($data["prefix"])     ? $data["prefix"]   : "";
 
 
         // Creates the Fields
@@ -107,17 +111,42 @@ class Join {
     }
 
     /**
+     * Returns the Expression for the Query
+     * @param string $asTable
+     * @param string $mainKey
+     * @return string
+     */
+    public function getExpression(string $asTable, string $mainKey): string {
+        $table    = "{dbPrefix}{$this->table}";
+        $onTable  = $this->onTable ?: $mainKey;
+        $leftKey  = $this->leftKey;
+        $rightKey = $this->rightKey;
+        $and      = $this->getAnd($asTable);
+
+        return "LEFT JOIN $table AS $asTable ON (
+            $asTable.$leftKey = $onTable.$rightKey{$and}
+        )";
+    }
+
+    /**
      * Returns the And for the Query
      * @param string $asTable
      * @return string
      */
     public function getAnd(string $asTable): string {
-        $result = $this->and;
+        $onTable = $this->andTable ?: $asTable;
+        $result  = "";
+        if (!empty($this->and)) {
+            $result .= " AND {$this->and}";
+        }
         if (!empty($this->andKey)) {
-            $result .= "AND $asTable.{$this->andKey} = $asTable.{$this->andKey}";
+            $result .= " AND $asTable.{$this->andKey} = $onTable.{$this->andKey}";
         }
         if (!empty($this->andValue)) {
-            $result .= "AND $asTable.{$this->andValue} = ?";
+            $result .= " AND $asTable.{$this->andValue} = ?";
+        }
+        if ($this->andDeleted) {
+            $result .= " AND $asTable.isDeleted = 0";
         }
         return $result;
     }
