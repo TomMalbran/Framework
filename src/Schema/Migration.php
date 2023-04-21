@@ -37,11 +37,11 @@ class Migration {
      * @return boolean
      */
     private static function moveTables(Database $db, array $movements): bool {
-        $movement = Settings::getCore($db, "movement");
-        $last     = count($movements);
-        $didMove  = false;
+        $startMovement = Settings::getCore($db, "movement");
+        $lastMovement  = count($movements);
+        $didMove       = false;
 
-        for ($i = $movement; $i < $last; $i++) {
+        for ($i = $startMovement; $i < $lastMovement; $i++) {
             $oldName = $movements[$i]["old"];
             $newName = $movements[$i]["new"];
 
@@ -57,7 +57,7 @@ class Migration {
         } else {
             print("No <i>movements</i> required<br><br>");
         }
-        Settings::setCore($db, "movement", $last);
+        Settings::setCore($db, "movement", $lastMovement);
         return $didMove;
     }
 
