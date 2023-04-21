@@ -41,6 +41,16 @@ class Elements {
     }
 
     /**
+     * Remvoves an new Element
+     * @param string $key
+     * @return Elements
+     */
+    public function remove(string $key): Elements {
+        unset($this->elements[$key]);
+        return $this;
+    }
+
+    /**
      * Returns true if there is at least 1 Element, or the given Element exists
      * @param string[]|string|null $elements Optional.
      * @return boolean

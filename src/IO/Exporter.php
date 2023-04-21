@@ -95,6 +95,18 @@ class Exporter {
     }
 
     /**
+     * Removes multiple Headers
+     * @param array{} $headers
+     * @return Exporter
+     */
+    public function removeHeaders(array $headers): Exporter {
+        foreach ($headers as $key) {
+            $this->header->remove($key);
+        }
+        return $this;
+    }
+
+    /**
      * Writes the Header
      * @return Exporter
      */
