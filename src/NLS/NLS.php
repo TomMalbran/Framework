@@ -50,12 +50,12 @@ class NLS {
 
     /**
      * Returns a string from the data at the given index
-     * @param string  $key
-     * @param integer $index
-     * @param string  $lang  Optional.
+     * @param string         $key
+     * @param integer|string $index
+     * @param string         $lang  Optional.
      * @return string
      */
-    public static function getIndex(string $key, int $index, string $lang = "root"): string {
+    public static function getIndex(string $key, int|string $index, string $lang = "root"): string {
         $result = self::get($key, $lang);
         if (!empty($result[$index])) {
             return $result[$index];
