@@ -650,6 +650,24 @@ class DateTime {
     }
 
     /**
+     * Returns the amount of days in the Month for the given time
+     * @param integer $time Optional.
+     * @return string
+     */
+    public static function getMonthDays(int $time = 0): string {
+        return date("t", $time);
+    }
+
+    /**
+     * Returns the Month Number for the given time
+     * @param integer $time Optional.
+     * @return string
+     */
+    public static function getMonthNumber(int $time = 0): string {
+        return date("n", $time);
+    }
+
+    /**
      * Returns the Month and Year at the given month
      * @param integer $time
      * @param integer $length      Optional.
