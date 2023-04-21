@@ -8,6 +8,7 @@ use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Auth\Device;
 use Framework\Notification\Notification;
+use Framework\Utils\DateTime;
 
 /**
  * The Notification Queue
@@ -104,7 +105,7 @@ class NotificationQueue {
      */
     public static function getAllUnsent(): array {
         $query = Query::create("sentTime", "=", 0);
-        $query->add("createdTime", ">", time() - 3600);
+        $query->add("createdTime", ">", DateTime::getLastXHours(1));
         $query->orderBy("createdTime", false);
         return self::schema()->getAll($query);
     }
@@ -136,7 +137,7 @@ class NotificationQueue {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         $query->add("currentUser", "=", $currentUser);
         $query->add("isDiscarded", "=", 0);
-        $query->add("createdTime", ">", time() - 30 * 24 * 3600);
+        $query->add("createdTime", ">", DateTime::getLastXDays(30));
         $query->orderBy("createdTime", false);
         return self::credentialSchema()->getAll($query, $request);
     }
@@ -152,7 +153,7 @@ class NotificationQueue {
         $query->add("currentUser", "=", $currentUser);
         $query->add("isRead",      "=", 0);
         $query->add("isDiscarded", "=", 0);
-        $query->add("createdTime", ">", time() - 30 * 24 * 3600);
+        $query->add("createdTime", ">", DateTime::getLastXDays(30));
         return self::credentialSchema()->getTotal($query);
     }
 
@@ -214,7 +215,7 @@ class NotificationQueue {
      * @return boolean
      */
     public static function deleteOld(int $days = 90): bool {
-        $time  = time() - $days * 24 * 3600;
+        $time  = DateTime::getLastXDays($days);
         $query = Query::create("notification_queue.createdTime", "<", $time);
         self::credentialSchema()->remove($query);
         return self::schema()->remove($query);

@@ -7,6 +7,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
+use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 
 /**
@@ -122,7 +123,7 @@ class ErrorLog {
      * @return boolean
      */
     public static function deleteOld(int $days = 90): bool {
-        $time  = time() - $days * 24 * 3600;
+        $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::schema()->remove($query);
     }

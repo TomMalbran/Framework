@@ -4,6 +4,7 @@ namespace Framework\Auth;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
+use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 
 /**
@@ -91,7 +92,7 @@ class Reset {
         if (empty($schema)) {
             return false;
         }
-        $query = Query::create("time", "<", time() - 3 * 3600);
+        $query = Query::create("time", "<", DateTime::getLastXHours(3));
         $schema->remove($query);
         return true;
     }

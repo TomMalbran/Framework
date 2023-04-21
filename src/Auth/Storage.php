@@ -5,6 +5,7 @@ use Framework\Auth\Auth;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
+use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
 
 /**
@@ -230,7 +231,7 @@ class Storage {
         if (empty($schema)) {
             return false;
         }
-        $query  = Query::create("time", "<", time() - 24 * 3600);
+        $query  = Query::create("time", "<", DateTime::getLastXDays(1));
         return $schema->remove($query);
     }
 }

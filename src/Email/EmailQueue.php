@@ -8,6 +8,7 @@ use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Email\Email;
 use Framework\Utils\Arrays;
+use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
 
 /**
@@ -175,7 +176,7 @@ class EmailQueue {
      * @return boolean
      */
     public static function deleteOld(int $days = 90): bool {
-        $time  = time() - $days * 24 * 3600;
+        $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::schema()->remove($query);
     }
