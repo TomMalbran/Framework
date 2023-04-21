@@ -171,6 +171,20 @@ class Numbers {
         return $divisor == 0 ? 0 : self::round($numerator / $divisor, $decimals);
     }
 
+    /**
+     * Applies the Discount to the given Number
+     * @param float   $number
+     * @param integer $percent
+     * @return float
+     */
+    public static function applyDiscount(float $number, int $percent): float {
+        if (empty($percent)) {
+            return $number;
+        }
+        $discount = (100 - min(100, $percent)) / 100;
+        return $number * $discount;
+    }
+
 
 
     /**
