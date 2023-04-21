@@ -180,14 +180,12 @@
             "NOTIFICATION_ID" : {
                 "table"  : "notification_queue",
                 "fields" : {
-                    "title"       : { "type" : "string" },
-                    "body"        : { "type" : "string" },
-                    "type"        : { "type" : "number" },
-                    "dataID"      : { "type" : "number" },
-                    "externalID"  : { "type" : "number" },
-                    "sentTime"    : { "type" : "number" },
-                    "emailTime"   : { "type" : "number" },
-                    "emailStatus" : { "type" : "number" }
+                    "title"      : { "type" : "string" },
+                    "body"       : { "type" : "string" },
+                    "type"       : { "type" : "number" },
+                    "dataID"     : { "type" : "number" },
+                    "externalID" : { "type" : "number" },
+                    "sentTime"   : { "type" : "number" }
                 }
             },
             "CREDENTIAL_ID" : {
