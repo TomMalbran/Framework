@@ -47,14 +47,18 @@ class EmailQueue {
 
 
     /**
-     * Returns the Filter Query
+     * Returns the List Query
      * @param Request $request
      * @return Query
      */
-    private static function getFilterQuery(Request $request): Query {
-        $query = Query::createSearch([ "subject", "sendTo" ], $request->search);
-        $query->addIf("createdTime", ">", $request->fromTime);
-        $query->addIf("createdTime", "<", $request->toTime);
+    private static function createQuery(Request $request): Query {
+        $search   = $request->getString("search");
+        $fromTime = $request->toDayStart("fromDate");
+        $toTime   = $request->toDayEnd("toDate");
+
+        $query = Query::createSearch([ "sendTo", "subject", "sendTo" ], $search);
+        $query->addIf("createdTime", ">", $fromTime);
+        $query->addIf("createdTime", "<", $toTime);
         return $query;
     }
 
@@ -64,7 +68,7 @@ class EmailQueue {
      * @return array{}[]
      */
     public static function getAll(Request $request): array {
-        $query = self::getFilterQuery($request);
+        $query = self::createQuery($request);
         return self::schema()->getAll($query, $request);
     }
 
@@ -84,7 +88,7 @@ class EmailQueue {
      * @return integer
      */
     public static function getTotal(Request $request): int {
-        $query = self::getFilterQuery($request);
+        $query = self::createQuery($request);
         return self::schema()->getTotal($query);
     }
 

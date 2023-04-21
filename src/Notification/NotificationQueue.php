@@ -66,14 +66,18 @@ class NotificationQueue {
 
 
     /**
-     * Returns the Filter Query
+     * Returns the List Query
      * @param Request $request
      * @return Query
      */
-    private static function getFilterQuery(Request $request): Query {
-        $query = Query::createSearch([ "title", "body" ], $request->search);
-        $query->addIf("createdTime", ">", $request->fromTime);
-        $query->addIf("createdTime", "<", $request->toTime);
+    private static function createQuery(Request $request): Query {
+        $search   = $request->getString("search");
+        $fromTime = $request->toDayStart("fromDate");
+        $toTime   = $request->toDayEnd("toDate");
+
+        $query = Query::createSearch([ "title", "body" ], $search);
+        $query->addIf("createdTime", ">", $fromTime);
+        $query->addIf("createdTime", "<", $toTime);
         return $query;
     }
 
@@ -83,17 +87,17 @@ class NotificationQueue {
      * @return array{}[]
      */
     public static function getAll(Request $request): array {
-        $query = self::getFilterQuery($request);
+        $query = self::createQuery($request);
         return self::schema()->getAll($query, $request);
     }
 
     /**
-     * Returns the total Notifications from the Queue
+     * Returns the total amount of Notifications from the Queue
      * @param Request $request
      * @return integer
      */
     public static function getTotal(Request $request): int {
-        $query = self::getFilterQuery($request);
+        $query = self::createQuery($request);
         return self::schema()->getTotal($query);
     }
 

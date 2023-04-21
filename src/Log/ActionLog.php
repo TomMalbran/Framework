@@ -65,45 +65,47 @@ class ActionLog {
 
 
     /**
-     * Returns the Filter Query
-     * @param Request $filters
+     * Returns the List Query
+     * @param Request $request
      * @param array{} $mappings Optional.
      * @return Query
      */
-    private static function getFilterQuery(Request $filters, array $mappings = []): Query {
+    private static function createQuery(Request $request, array $mappings = []): Query {
+        $fromTime = $request->toDayStart("fromDate");
+        $toTime   = $request->toDayEnd("toDate");
+
         $query = new Query();
-        $query->addIf("CREDENTIAL_ID", "=", $filters->credentialID);
+        $query->addIf("CREDENTIAL_ID", "=", $request->credentialID);
         foreach ($mappings as $key => $value) {
-            $query->addIf($value, "=", $filters->get($key));
+            $query->addIf($value, "=", $request->get($key));
         }
 
-        $query->addIf("time", ">", $filters->fromTime);
-        $query->addIf("time", "<", $filters->toTime);
+        $query->addIf("time", ">", $fromTime);
+        $query->addIf("time", "<", $toTime);
         return $query;
     }
 
     /**
-     * Returns all the Actions Log filtered by the given filters
-     * @param Request $filters
-     * @param Request $sort
+     * Returns all the Actions Log items
+     * @param Request $request
      * @param array{} $mappings Optional.
      * @return array{}[]
      */
-    public static function filter(Request $filters, Request $sort, array $mappings = []): array {
-        $query = self::getFilterQuery($filters, $mappings);
+    public static function getAll(Request $request, array $mappings = []): array {
+        $query = self::createQuery($request, $mappings);
         $query->orderBy("time", false);
-        $query->paginate($sort->getInt("page"), $sort->getInt("amount"));
+        $query->paginate($request->getInt("page"), $request->getInt("amount"));
         return self::request($query);
     }
 
     /**
-     * Returns the Total Actions Log with the given Filters
-     * @param Request $filters
+     * Returns the total amount of Actions Log items
+     * @param Request $request
      * @param array{} $mappings Optional.
      * @return integer
      */
-    public static function getTotal(Request $filters, array $mappings = []): int {
-        $query = self::getFilterQuery($filters, $mappings);
+    public static function getTotal(Request $request, array $mappings = []): int {
+        $query = self::createQuery($request, $mappings);
         return self::getSessionsSchema()->getTotal($query);
     }
 
