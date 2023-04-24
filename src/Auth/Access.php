@@ -159,7 +159,7 @@ class Access {
             return Arrays::contains($group, $level);
         }
 
-        // Function "xxxs": Get the group xxx
+        // Function "Xxxs": Get the group xxx
         if (Strings::endsWith($function, "s")) {
             $groupName = Strings::stripEnd($function, "s");
             $group     = self::getGroup($groupName);

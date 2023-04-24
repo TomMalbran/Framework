@@ -219,8 +219,10 @@ class Auth {
      */
     public static function canLoginAs(Model $admin, Model $user): bool {
         return (
-            self::canLogin($admin) && !$user->isEmpty() && !$user->isDeleted &&
-            $admin->level > $user->level && Access::isAdminOrHigher($admin->level)
+            self::canLogin($admin) &&
+            !$user->isEmpty() &&
+            $admin->level > $user->level &&
+            Access::inAdmins($admin->level)
         );
     }
 
