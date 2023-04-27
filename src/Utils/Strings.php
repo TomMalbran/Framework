@@ -301,6 +301,15 @@ class Strings {
     }
 
     /**
+     * Split the String into Words
+     * @param string $string
+     * @return string[]
+     */
+    public static function splitToWords(string $string): array {
+        return preg_split('/(\.\.\.\s?|[-.?!,;:(){}\[\]\'"]\s?)|\s/', $string, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+    }
+
+    /**
      * Jois the given Strings using the given glue
      * @param string[]|string $string
      * @param string          $glue
