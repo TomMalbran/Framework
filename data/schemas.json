@@ -272,6 +272,13 @@
             "time"          : { "type" : "number"                          }
         },
         "joins" : {
+            "SESSION_ID" : {
+                "table"  : "log_sessions",
+                "prefix" : "session",
+                "fields" : {
+                    "time" : { "type" : "date" }
+                }
+            },
             "CREDENTIAL_ID" : {
                 "table"  : "credentials",
                 "prefix" : "credential",
@@ -281,9 +288,6 @@
                     "email"     : { "type" : "string"  }
                 }
             }
-        },
-        "foreigns" : {
-            "SESSION_ID" : { "table" : "log_sessions" }
         },
         "hasTimestamps" : false,
         "canCreate"     : false,

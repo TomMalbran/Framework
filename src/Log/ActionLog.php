@@ -7,6 +7,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
+use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
 
@@ -215,5 +216,20 @@ class ActionLog {
             "SESSION_ID"    => $sessionID,
         ]);
         return $result > 0;
+    }
+
+
+
+    /**
+     * Deletes the items older than 90 days
+     * @param integer $days Optional.
+     * @return boolean
+     */
+    public static function deleteOld(int $days = 90): bool {
+        $time  = DateTime::getLastXDays($days);
+        $query = Query::create("log_sessions.createdTime", "<", $time);
+        self::sessionSchema()->remove($query);
+        self::actionSchema()->remove($query);
+        return true;
     }
 }
