@@ -349,12 +349,15 @@ class Strings {
 
     /**
      * Returns true if the values are Equal
-     * @param string  $string
-     * @param string  $other
+     * @param mixed   $string
+     * @param mixed   $other
      * @param boolean $caseInsensitive Optional.
      * @return boolean
      */
-    public static function isEqual(string $string, string $other, bool $caseInsensitive = true): bool {
+    public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true): bool {
+        if (!self::isString($string) || !self::isString($other)) {
+            return $string == $other;
+        }
         if ($caseInsensitive) {
             return strtolower($string) === strtolower($other);
         }

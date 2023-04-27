@@ -39,31 +39,51 @@ class Arrays {
      * Returns true if the array contains the needle
      * @param mixed      $array
      * @param mixed      $needle
-     * @param mixed|null $key    Optional.
+     * @param mixed|null $key             Optional.
+     * @param boolean    $caseInsensitive Optional.
+     * @param boolean    $atLeastOne      Optional.
      * @return boolean
      */
-    public static function contains(mixed $array, mixed $needle, mixed $key = null): bool {
+    public static function contains(mixed $array, mixed $needle, mixed $key = null, bool $caseInsensitive = true, bool $atLeastOne = false): bool {
         $array = self::toArray($array);
 
         if (self::isArray($needle)) {
             $count = 0;
             foreach ($array as $row) {
                 foreach ($needle as $value) {
-                    if (($key === null && $row == $value) || ($key !== null && isset($row[$key]) && $row[$key] == $value)) {
+                    if (self::isEqualContains($key, $row, $value, $caseInsensitive)) {
                         $count++;
                         break;
                     }
                 }
             }
+            if ($atLeastOne) {
+                return $count > 0;
+            }
             return $count === count($needle);
         }
 
         foreach ($array as $row) {
-            if (($key === null && $row == $needle) || ($key !== null && isset($row[$key]) && $row[$key] == $needle)) {
+            if (self::isEqualContains($key, $row, $needle, $caseInsensitive)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Does the Contains compare
+     * @param mixed   $key
+     * @param mixed   $row
+     * @param mixed   $value
+     * @param boolean $caseInsensitive
+     * @return boolean
+     */
+    private static function isEqualContains(mixed $key, mixed $row, mixed $value, bool $caseInsensitive): bool {
+        if ($key === null) {
+            return Strings::isEqual($row, $value, $caseInsensitive);
+        }
+        return isset($row[$key]) && Strings::isEqual($row[$key], $value, $caseInsensitive);
     }
 
     /**
