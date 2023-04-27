@@ -387,7 +387,7 @@ class Schema {
 
 
     /**
-     * Returns all the Sorted Names
+     * Returns a Sorted Names Select array
      * @param string|null          $order    Optional.
      * @param boolean              $orderAsc Optional.
      * @param string[]|string|null $name     Optional.
@@ -402,7 +402,7 @@ class Schema {
     }
 
     /**
-     * Returns all the Sorted Names using the given Query
+     * Returns a Sorted Select array
      * @param Query|null           $query    Optional.
      * @param string|null          $order    Optional.
      * @param boolean              $orderAsc Optional.
@@ -412,13 +412,14 @@ class Schema {
      * @return array{}[]
      */
     public function getSortedSelect(?Query $query = null, ?string $order = null, bool $orderAsc = true, array|string $name = null, bool $useEmpty = false, ?string $extra = null): array {
+        $query = $this->generateQuery($query);
         $field = $this->structure->getOrder($order);
         $query->orderBy($field, $orderAsc);
         return $this->getSelect($query, null, $name, $useEmpty, $extra);
     }
 
     /**
-     * Returns a select of Schemas
+     * Returns a Select array
      * @param Query|null           $query      Optional.
      * @param string|null          $idName     Optional.
      * @param string[]|string|null $name       Optional.
