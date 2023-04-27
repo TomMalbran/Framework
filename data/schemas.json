@@ -250,7 +250,7 @@
                 "fields" : {
                     "firstName" : { "type" : "string", "mergeTo" : "name" },
                     "lastName"  : { "type" : "string", "mergeTo" : "name" },
-                    "email"     : { "type" : "string"  }
+                    "email"     : { "type" : "string"                     }
                 }
             }
         },
