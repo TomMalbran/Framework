@@ -66,8 +66,14 @@ class Subrequest {
         $query = Query::create($this->idKey, "IN", $ids);
 
         if ($this->hasWhere) {
-            $query->add($this->where[0], $this->where[1], $this->where[2]);
+            $total = count($this->where);
+            if ($total % 3 == 0) {
+                for ($i = 0; $i < $total; $i += 3) {
+                    $query->add($this->where[$i], $this->where[$i + 1], $this->where[$i + 2]);
+                }
+            }
         }
+
         if ($this->hasOrder) {
             $query->orderBy($this->orderBy, $this->isAsc);
         }
