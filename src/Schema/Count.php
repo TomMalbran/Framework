@@ -2,7 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Field;
-use Framework\Utils\Strings;
+use Framework\Schema\Query;
 use Framework\Utils\Numbers;
 
 /**
@@ -25,8 +25,8 @@ class Count {
     public string $type      = "";
     public bool   $noDeleted = false;
 
-    /** @var mixed|string */
-    public mixed  $where     = "";
+    /** @var mixed[] */
+    private array  $where    = [];
 
 
     /**
@@ -48,7 +48,7 @@ class Count {
         $this->onTable   = !empty($data["onTable"]) ? $data["onTable"]   : "";
         $this->leftKey   = !empty($data["leftKey"]) ? $data["leftKey"]   : $this->key;
         $this->type      = !empty($data["type"])    ? $data["type"]      : "";
-        $this->where     = !empty($data["where"])   ? $data["where"]     : "";
+        $this->where     = !empty($data["where"])   ? $data["where"]     : [];
         $this->noDeleted = !empty($data["noDeleted"]) && $data["noDeleted"];
     }
 
@@ -79,16 +79,19 @@ class Count {
         if (empty($this->where) && !$this->noDeleted) {
             return "";
         }
-        $result = "WHERE ";
+
+        $query = new Query();
         if ($this->noDeleted) {
-            $result .= "isDeleted = 0";
-            if (!empty($this->where)) {
-                $result .= " AND ";
+            $query->add("isDeleted", "=", 0);
+        }
+
+        $total = count($this->where);
+        if ($total % 3 == 0) {
+            for ($i = 0; $i < $total; $i += 3) {
+                $query->add($this->where[$i], $this->where[$i + 1], $this->where[$i + 2]);
             }
         }
-        if (!empty($this->where)) {
-            $result .= Strings::join($this->where, " ");
-        }
-        return $result;
+
+        return $query->getWhere(true);
     }
 }

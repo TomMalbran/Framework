@@ -17,8 +17,6 @@ class Subrequest {
     private string $idKey    = "";
     private string $idName   = "";
 
-    private bool   $hasWhere = false;
-
     /** @var mixed[] */
     private array  $where    = [];
 
@@ -37,21 +35,19 @@ class Subrequest {
      * @param array{}   $data
      */
     public function __construct(Schema $schema, Structure $structure, array $data) {
-        $this->schema    = $schema;
+        $this->schema   = $schema;
 
-        $this->name      = $data["name"];
-        $this->idKey     = !empty($data["idKey"])   ? $data["idKey"]   : $structure->idKey;
-        $this->idName    = !empty($data["idName"])  ? $data["idName"]  : $structure->idName;
+        $this->name     = $data["name"];
+        $this->idKey    = !empty($data["idKey"])   ? $data["idKey"]   : $structure->idKey;
+        $this->idName   = !empty($data["idName"])  ? $data["idName"]  : $structure->idName;
+        $this->where    = !empty($data["where"])   ? $data["where"]   : [];
 
-        $this->hasWhere  = !empty($data["where"]);
-        $this->where     = !empty($data["where"])   ? $data["where"]   : [];
+        $this->hasOrder = !empty($data["orderBy"]);
+        $this->orderBy  = !empty($data["orderBy"]) ? $data["orderBy"] : "";
+        $this->isAsc    = !empty($data["isAsc"])   ? $data["isAsc"]   : false;
 
-        $this->hasOrder  = !empty($data["orderBy"]);
-        $this->orderBy   = !empty($data["orderBy"]) ? $data["orderBy"] : "";
-        $this->isAsc     = !empty($data["isAsc"])   ? $data["isAsc"]   : false;
-
-        $this->field     = !empty($data["field"])   ? $data["field"]   : "";
-        $this->value     = !empty($data["value"])   ? $data["value"]   : null;
+        $this->field    = !empty($data["field"])   ? $data["field"]   : "";
+        $this->value    = !empty($data["value"])   ? $data["value"]   : null;
     }
 
 
@@ -62,22 +58,8 @@ class Subrequest {
      * @return array{}[]
      */
     public function request(array $result): array {
-        $ids   = Arrays::createArray($result, $this->idName);
-        $query = Query::create($this->idKey, "IN", $ids);
-
-        if ($this->hasWhere) {
-            $total = count($this->where);
-            if ($total % 3 == 0) {
-                for ($i = 0; $i < $total; $i += 3) {
-                    $query->add($this->where[$i], $this->where[$i + 1], $this->where[$i + 2]);
-                }
-            }
-        }
-
-        if ($this->hasOrder) {
-            $query->orderBy($this->orderBy, $this->isAsc);
-        }
-        $request   = !empty($ids) ? $this->schema->getAll($query) : [];
+        $query     = self::createQuery($result);
+        $request   = !empty($query) ? $this->schema->getAll($query) : [];
         $subResult = [];
 
         foreach ($request as $row) {
@@ -101,6 +83,31 @@ class Subrequest {
             }
         }
         return $result;
+    }
+
+    /**
+     * Does the Request with a Sub Request
+     * @param mixed[] $result
+     * @return Query|null
+     */
+    public function createQuery(array $result): ?Query {
+        $ids = Arrays::createArray($result, $this->idName);
+        if (empty($ids)) {
+            return null;
+        }
+        $query = Query::create($this->idKey, "IN", $ids);
+
+        $total = count($this->where);
+        if ($total % 3 == 0) {
+            for ($i = 0; $i < $total; $i += 3) {
+                $query->add($this->where[$i], $this->where[$i + 1], $this->where[$i + 2]);
+            }
+        }
+
+        if ($this->hasOrder) {
+            $query->orderBy($this->orderBy, $this->isAsc);
+        }
+        return $query;
     }
 
     /**
