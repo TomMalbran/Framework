@@ -4,6 +4,7 @@ namespace Framework\Auth;
 use Framework\Request;
 use Framework\Auth\Access;
 use Framework\Auth\Document;
+use Framework\NLS\NLS;
 use Framework\File\Path;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
@@ -508,6 +509,42 @@ class Credential {
      */
     public static function delete(int $credentialID): bool {
         return self::schema()->delete($credentialID);
+    }
+
+    /**
+     * Destroys the Credential
+     * @param integer $credentialID
+     * @return boolean
+     */
+    public static function destroy(int $credentialID): bool {
+        return self::schema()->edit($credentialID, [
+            "currentUser"      => 0,
+            "email"            => "mail@mail.com",
+            "firstName"        => NLS::get("GENERAL_NAME"),
+            "lastName"         => NLS::get("GENERAL_LAST_NAME"),
+            "phone"            => "",
+            "dni"              => "",
+            "cuit"             => "",
+            "taxID"            => "",
+            "address"          => "",
+            "birthDate"        => "",
+            "language"         => "",
+            "avatar"           => "",
+            "password"         => "",
+            "salt"             => "",
+            "reqPassChange"    => 0,
+            "passExpiration"   => 0,
+            "status"           => Status::Inactive(),
+            "observations"     => "",
+            "sendEmails"       => 0,
+            "sendEmailNotis"   => 0,
+            "timezone"         => 0,
+            "currentLogin"     => 0,
+            "lastLogin"        => 0,
+            "subscription"     => 0,
+            "askNotifications" => 0,
+            "isDeleted"        => 1,
+        ]);
     }
 
     /**
