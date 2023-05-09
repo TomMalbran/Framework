@@ -2,8 +2,8 @@
 namespace Framework\Schema;
 
 use Framework\Schema\Field;
-use Framework\Schema\Query;
 use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
 
 /**
  * The Database Count
@@ -80,18 +80,21 @@ class Count {
             return "";
         }
 
-        $query = new Query();
+        $query = [];
         if ($this->noDeleted) {
-            $query->add("isDeleted", "=", 0);
+            $query[] = "isDeleted = 0";
         }
 
         $total = count($this->where);
         if ($total % 3 == 0) {
             for ($i = 0; $i < $total; $i += 3) {
-                $query->add($this->where[$i], $this->where[$i + 1], $this->where[$i + 2]);
+                $query[] = "{$this->where[$i]} {$this->where[$i + 1]} {$this->where[$i + 2]}";
             }
         }
 
-        return $query->getWhere(true);
+        if (empty($query)) {
+            return "";
+        }
+        return "WHERE " . Strings::join($query, " AND ");
     }
 }
