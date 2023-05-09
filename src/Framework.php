@@ -22,6 +22,7 @@ class Framework {
 
     // The Data
     const RouteData     = "routes";
+    const DispatchData  = "dispatches";
     const SchemaData    = "schemas";
     const KeyData       = "keys";
     const AccessData    = "access";

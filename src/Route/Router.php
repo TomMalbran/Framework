@@ -16,14 +16,13 @@ class Router {
     const Namespace  = "App\\";
     const Controller = "App\\Controller\\";
 
-    private static bool  $loaded = false;
-
     /** @var array{}[] */
     private static array $data   = [];
+    private static bool  $loaded = false;
 
 
     /**
-     * Loads the Routes Data
+     * Loads the Router Data
      * @return boolean
      */
     public static function load(): bool {
@@ -93,13 +92,24 @@ class Router {
         if ($data->access == null) {
             return null;
         }
-
         $request = new Request($params);
-        if ($data->static) {
-            return call_user_func_array(self::Namespace . "{$data->module}::{$data->method}", [ $request ]);
+        return self::execute($data->static, $data->module, $data->method, $request);
+    }
+
+    /**
+     * Executes the given Method in the given Module
+     * @param boolean $isStatic
+     * @param string  $module
+     * @param string  $method
+     * @param mixed   ...$params
+     * @return mixed
+     */
+    public static function execute(bool $isStatic, string $module, string $method, mixed ...$params): mixed {
+        if ($isStatic) {
+            return call_user_func_array(self::Namespace . $module . "::" . $method, $params);
         }
 
-        $instance = Container::bind(self::Controller . $data->module);
-        return call_user_func_array([ $instance, $data->method ], [ $request ]);
+        $instance = Container::bind(self::Controller . $module);
+        return call_user_func_array([ $instance, $method ], $params);
     }
 }
