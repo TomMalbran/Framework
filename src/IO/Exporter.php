@@ -13,6 +13,7 @@ use Framework\Utils\Elements;
 class Exporter {
 
     private string            $fileName;
+    private string            $lang;
     private int               $total;
     private Elements          $header;
     private bool              $isCSV;
@@ -31,15 +32,17 @@ class Exporter {
      * @param integer $total
      * @param string  $title
      * @param string  $fileName
+     * @param string  $lang     Optional.
      */
-    public function __construct(int $total, string $title, string $fileName) {
+    public function __construct(int $total, string $title, string $fileName, string $lang = "root") {
         $this->fileName = $fileName;
+        $this->lang     = $lang;
         $this->total    = $total;
         $this->header   = new Elements();
 
         if ($total < 5000) {
             $this->isCSV  = false;
-            $this->writer = new SpreadsheetWriter($title);
+            $this->writer = new SpreadsheetWriter($title, $lang);
             $this->sheet  = $this->writer->addSheet();
         } else {
             $this->isCSV  = true;
@@ -48,7 +51,7 @@ class Exporter {
             if (ob_get_level()) {
                 ob_end_clean();
             }
-            $fileName = NLS::get($fileName);
+            $fileName = NLS::get($fileName, $lang);
             header("Content-Type: application/csv");
             header("Content-Disposition: attachment; filename=\"{$fileName}.csv\"");
             header("Pragma: no-cache");
@@ -112,10 +115,10 @@ class Exporter {
      */
     public function writeHeader(): Exporter {
         if ($this->isCSV) {
-            $values = NLS::getAll($this->header->getValues());
+            $values = NLS::getAll($this->header->getValues(), $this->lang);
             fputcsv($this->csv, $values);
         } else {
-            $this->sheet->setHeader($this->header);
+            $this->sheet->setHeader($this->header, $this->lang);
         }
         return $this;
     }
@@ -167,9 +170,9 @@ class Exporter {
 
     /**
      * Downloads the File
-     * @return void
+     * @return boolean
      */
-    public function download(): void {
+    public function download(): bool {
         if ($this->isCSV) {
             fclose($this->csv);
             flush();
@@ -178,5 +181,6 @@ class Exporter {
 
         $this->sheet->autoSizeColumns();
         $this->writer->download($this->fileName, true);
+        return true;
     }
 }

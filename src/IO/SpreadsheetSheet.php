@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\WorkSheet\WorkSheet;
 class SpreadsheetSheet {
 
     private WorkSheet $sheet;
+    private string    $lang;
     private int       $row;
     private ?Elements $header;
 
@@ -20,9 +21,11 @@ class SpreadsheetSheet {
     /**
      * Creates a new SpreadsheetSheet instance
      * @param WorkSheet $sheet
+     * @param string    $lang  Optional.
      */
-    public function __construct(WorkSheet $sheet) {
+    public function __construct(WorkSheet $sheet, string $lang = "root") {
         $this->sheet  = $sheet;
+        $this->lang   = $lang;
         $this->row    = 1;
         $this->header = null;
     }
@@ -37,7 +40,8 @@ class SpreadsheetSheet {
     public function setHeader(Elements $header): SpreadsheetSheet {
         $this->header = $header;
         $values = $header->getValues();
-        $this->writeHeader(NLS::getAll($values));
+        $header = NLS::getAll($values, $this->lang);
+        $this->writeHeader($header);
         return $this;
     }
 
@@ -56,11 +60,12 @@ class SpreadsheetSheet {
 
     /**
      * Adds the Header
-     * @param string ...$header
+     * @param string ...$values
      * @return SpreadsheetSheet
      */
-    public function addHeader(string ...$header): SpreadsheetSheet {
-        $this->writeHeader(NLS::getAll($header));
+    public function addHeader(string ...$values): SpreadsheetSheet {
+        $header = NLS::getAll($values, $this->lang);
+        $this->writeHeader($header);
         return $this;
     }
 

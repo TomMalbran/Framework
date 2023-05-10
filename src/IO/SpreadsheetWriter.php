@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class SpreadsheetWriter {
 
     private string      $title;
+    private string      $lang;
     private Spreadsheet $data;
     private int         $sheetNum;
 
@@ -24,9 +25,11 @@ class SpreadsheetWriter {
     /**
      * Creates a new SpreadsheetWriter instance
      * @param string $title
+     * @param string $lang  Optional.
      */
-    public function __construct(string $title) {
-        $this->title = NLS::get($title);
+    public function __construct(string $title, string $lang = "root") {
+        $this->title = NLS::get($title, $lang);
+        $this->lang  = $lang;
         $this->data  = new Spreadsheet();
         $this->data->getProperties()->setTitle($this->title);
 
@@ -50,8 +53,8 @@ class SpreadsheetWriter {
             $sheet = $this->data->createSheet($this->sheetNum);
         }
 
-        $sheet->setTitle(!empty($sheetName) ? NLS::get($sheetName) : $this->title);
-        $ssheet  = new SpreadsheetSheet($sheet);
+        $sheet->setTitle(!empty($sheetName) ? NLS::get($sheetName, $this->lang) : $this->title);
+        $ssheet  = new SpreadsheetSheet($sheet, $this->lang);
         $sheetID = $sheetID != null ? $sheetID : $this->sheetNum;
 
         $this->sheets[$sheetID] = $ssheet;
@@ -80,7 +83,7 @@ class SpreadsheetWriter {
      * @return string
      */
     public function getFileName(string $name, bool $withDate = true): string {
-        $result = NLS::get($name) . ($withDate ? "_" . date("Y-m-d") : "");
+        $result = NLS::get($name, $this->lang) . ($withDate ? "_" . date("Y-m-d") : "");
         return Strings::toLowerCase($result);
     }
 
