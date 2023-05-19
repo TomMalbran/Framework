@@ -158,10 +158,7 @@ class Config {
      * @return string
      */
     public static function getUrl(string ...$urlParts): string {
-        $url  = self::get("url");
-        $path = File::getPath(...$urlParts);
-        $path = File::removeFirstSlash($path);
-        return $url . $path;
+        return self::getUrlPath("url", ...$urlParts);
     }
 
     /**
@@ -170,7 +167,17 @@ class Config {
      * @return string
      */
     public static function getFileUrl(string ...$urlParts): string {
-        $url  = self::get("fileUrl", self::get("url"));
+        return self::getUrlPath("fileUrl", ...$urlParts);
+    }
+
+    /**
+     * Returns the Url using the given key and adding the url parts at the end
+     * @param string $urlKey
+     * @param string ...$urlParts
+     * @return string
+     */
+    public static function getUrlPath(string $urlKey, string ...$urlParts): string {
+        $url  = self::get($urlKey, self::get("url"));
         $path = File::getPath(...$urlParts);
         $path = File::removeFirstSlash($path);
         return $url . $path;
