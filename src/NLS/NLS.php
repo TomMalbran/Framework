@@ -67,6 +67,21 @@ class NLS {
     }
 
     /**
+     * Returns a string from the data
+     * @param string  $key
+     * @param string  $language    Optional.
+     * @param boolean $withDefault Optional.
+     * @return mixed
+     */
+    public static function getSelect(string $key, string $language = "root", bool $withDefault = true): mixed {
+        $result = self::get($key, $language, $withDefault);
+        if (Arrays::isArray($result)) {
+            return Arrays::createSelectFromMap($result);
+        }
+        return $key;
+    }
+
+    /**
      * Returns all the strings from the$key$keydata
      * @param string[] $keys
      * @param string   $language    Optional.
