@@ -104,6 +104,40 @@ class Curl {
         return !empty(curl_error($curl));
     }
 
+    /**
+     * Executes a Write Request
+     * @param string       $url
+     * @param string       $fileContent
+     * @param array{}|null $headers     Optional.
+     * @return mixed
+     */
+    public static function write(string $url, string $fileContent, ?array $headers = null): mixed {
+        $options = [
+            CURLOPT_URL             => $url,
+            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_POST            => true,
+            CURLOPT_POSTFIELDS      => $fileContent,
+            CURLOPT_TIMEOUT         => 100,
+            CURLOPT_CONNECTTIMEOUT  => 10,
+            CURLOPT_LOW_SPEED_LIMIT => 512,
+            CURLOPT_LOW_SPEED_TIME  => 120,
+        ];
+
+        // Set the Headers
+        if (!empty($headers)) {
+            $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
+        }
+
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
+        curl_exec($curl);
+        $output   = curl_exec($curl);
+        $response = json_decode($output, true);
+        curl_close($curl);
+        return $response;
+    }
+
 
 
     /**
