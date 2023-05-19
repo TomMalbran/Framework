@@ -30,6 +30,12 @@
             "subscription"     : { "type" : "number",  "length"   : 1,         "cantEdit" : true },
             "askNotifications" : { "type" : "boolean", "default"  : 1,         "cantEdit" : true }
         },
+        "expressions" : {
+            "fullName" : {
+                "expression" : "IF(credentials.lastName <> '' AND credentials.firstName <> '', CONCAT(credentials.firstName, ' ', credentials.lastName), IF(credentials.firstName <> '', credentials.firstName, credentials.lastName))",
+                "type"       : "string"
+            }
+        },
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
