@@ -116,12 +116,14 @@ class Credential {
 
     /**
      * Returns true if there is an Credential with the given Email
-     * @param string  $email
-     * @param integer $skipID Optional.
+     * @param string            $email
+     * @param integer           $skipID Optional.
+     * @param integer[]|integer $level  Optional.
      * @return boolean
      */
-    public static function emailExists(string $email, int $skipID = 0): bool {
-        $query = Query::create("email", "=", $email);
+    public static function emailExists(string $email, int $skipID = 0, array|int $level = 0): bool {
+        $query = empty($level) ? new Query() : self::createLevelQuery($level);
+        $query->add("email", "=", $email);
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
         return self::schema()->exists($query);
     }
