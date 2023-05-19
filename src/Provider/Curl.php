@@ -40,14 +40,24 @@ class Curl {
      * @param string       $url
      * @param array{}|null $params  Optional.
      * @param array{}|null $headers Optional.
+     * @param boolean      $asJson  Optional.
      * @return mixed
      */
-    public static function custom(string $request, string $url, ?array $params = null, ?array $headers = null): mixed {
+    public static function custom(string $request, string $url, ?array $params = null, ?array $headers = null, bool $asJson = false): mixed {
         $options = [
-            CURLOPT_URL            => self::parseUrl($url, $params),
+            CURLOPT_URL            => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CUSTOMREQUEST  => $request,
         ];
+
+        // Set the Params
+        if ($asJson) {
+            $options[CURLOPT_POSTFIELDS] = json_encode($params);
+        } else {
+            $options[CURLOPT_URL] = self::parseUrl($url, $params);
+        }
+
+        // Set the Headers
         if (!empty($headers)) {
             $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
         }
@@ -80,6 +90,8 @@ class Curl {
             CURLOPT_LOW_SPEED_LIMIT => 512,
             CURLOPT_LOW_SPEED_TIME  => 120,
         ];
+
+        // Set the Headers
         if (!empty($headers)) {
             $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
         }
@@ -120,7 +132,7 @@ class Curl {
             $options[CURLOPT_POSTFIELDS] = $body;
         }
 
-        // Set the Header
+        // Set the Headers
         if (!empty($headers)) {
             if (is_scalar($body)) {
                 $headers["Content-Length"] = strlen($body);
