@@ -106,6 +106,7 @@ class Query {
             }
             break;
         case "LIKE":
+        case "NOT LIKE":
             $value = "%" . trim(strtolower($value)) . "%";
             break;
         case "STARTS":
