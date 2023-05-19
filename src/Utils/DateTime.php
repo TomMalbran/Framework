@@ -753,9 +753,9 @@ class DateTime {
      */
     public static function toMinutes(?int $hours = null, ?int $minutes = null): int {
         if ($hours === null || $minutes === null) {
-            return date("H") * 60 + date("i");
+            return (int)date("H") * 60 + (int)date("i");
         }
-        return $hours + $minutes;
+        return $hours * 60 + $minutes;
     }
 
     /**
