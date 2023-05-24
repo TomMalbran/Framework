@@ -220,9 +220,16 @@ class NotificationQueue {
      */
     public static function deleteOld(int $days = 90): bool {
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("createdTime", "<", $time);
+        $query = Query::create("notification_queue.createdTime", "<", $time);
+        $ids   = self::schema()->getColumn($query, "NOTIFICATION_ID");
+        if (empty($ids)) {
+            return false;
+        }
+
+        $query = Query::create("NOTIFICATION_ID", "IN", $ids);
         self::credentialSchema()->remove($query);
-        return self::schema()->remove($query);
+        self::schema()->remove($query);
+        return true;
     }
 
 
