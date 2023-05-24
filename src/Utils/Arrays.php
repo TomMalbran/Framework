@@ -76,10 +76,10 @@ class Arrays {
      * @param mixed   $key
      * @param mixed   $row
      * @param mixed   $value
-     * @param boolean $caseInsensitive
+     * @param boolean $caseInsensitive Optional.
      * @return boolean
      */
-    private static function isEqualContains(mixed $key, mixed $row, mixed $value, bool $caseInsensitive): bool {
+    private static function isEqualContains(mixed $key, mixed $row, mixed $value, bool $caseInsensitive = true): bool {
         if ($key === null) {
             return Strings::isEqual($row, $value, $caseInsensitive);
         }
@@ -340,7 +340,7 @@ class Arrays {
 
 
     /**
-     * Creates a map using the given array
+     * Creates a Map using the given Array
      * @param mixed[]              $array
      * @param string               $key
      * @param string[]|string|null $value    Optional.
@@ -356,7 +356,7 @@ class Arrays {
     }
 
     /**
-     * Creates an sub array using the given array
+     * Creates an Array using the given Array
      * @param mixed[]              $array
      * @param string[]|string|null $value     Optional.
      * @param boolean              $skipEmpty Optional.
@@ -371,6 +371,25 @@ class Arrays {
                 continue;
             }
             $result[] = $elem;
+        }
+        return $result;
+    }
+
+    /**
+     * Creates an Sub-Array using the given Array
+     * @param mixed[] $array
+     * @param string  $idKey
+     * @param mixed   $idValue
+     * @param string  $key
+     * @param boolean $caseInsensitive Optional.
+     * @return mixed[]
+     */
+    public static function createSubArray(array $array, string $idKey, mixed $idValue, string $key, bool $caseInsensitive = true): array {
+        $result = [];
+        foreach ($array as $row) {
+            if (Strings::isEqual($row[$idKey], $idValue, $caseInsensitive)) {
+                $result[] = $row[$key];
+            }
         }
         return $result;
     }
