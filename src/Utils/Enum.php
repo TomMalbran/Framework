@@ -73,7 +73,7 @@ class Enum {
     }
 
     /**
-     * Returns all the Values
+     * Returns all the Keys
      * @return mixed[]
      */
     public static function getAll(): array {
@@ -82,6 +82,18 @@ class Enum {
             return $cache->constants;
         }
         return array_keys($cache->data);
+    }
+
+    /**
+     * Returns all the Values
+     * @return mixed[]
+     */
+    public static function getValues(): array {
+        $cache = self::load();
+        if ($cache->isConstant) {
+            return array_values($cache->constants);
+        }
+        return array_values($cache->data);
     }
 
     /**
