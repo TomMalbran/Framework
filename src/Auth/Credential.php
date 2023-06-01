@@ -86,6 +86,18 @@ class Credential {
         return self::requestOne($query, $complete);
     }
 
+    /**
+     * Returns the Credential with the given Access Token
+     * @param string  $accessToken
+     * @param boolean $complete    Optional.
+     * @return Model
+     */
+    public static function getByAccessToken(string $accessToken, bool $complete = true): Model {
+        $query = Query::create("accessToken", "=", $accessToken);
+        $query->add("tokenExpiration", ">", time());
+        return self::requestOne($query, $complete);
+    }
+
 
 
     /**
@@ -307,6 +319,8 @@ class Credential {
             if (!$complete) {
                 unset($fields["password"]);
                 unset($fields["salt"]);
+                unset($fields["accessToken"]);
+                unset($fields["tokenExpiration"]);
             }
             $result[] = $fields;
         }
@@ -536,6 +550,8 @@ class Credential {
             "salt"             => "",
             "reqPassChange"    => 0,
             "passExpiration"   => 0,
+            "accessToken"      => "",
+            "tokenExpiration"  => 0,
             "status"           => Status::Inactive(),
             "observations"     => "",
             "sendEmails"       => 0,
@@ -625,6 +641,30 @@ class Credential {
     }
 
     /**
+     * Sets the Credential Avatar
+     * @param integer $credentialID
+     * @param string  $avatar
+     * @return boolean
+     */
+    public static function setAvatar(int $credentialID, string $avatar): bool {
+        return self::schema()->edit($credentialID, [
+            "avatar" => $avatar,
+        ]);
+    }
+
+    /**
+     * Sets the Credential Level
+     * @param integer $credentialID
+     * @param integer $level
+     * @return boolean
+     */
+    public static function setLevel(int $credentialID, int $level): bool {
+        return self::schema()->edit($credentialID, [
+            "level" => $level,
+        ]);
+    }
+
+    /**
      * Sets the Credential Password
      * @param integer $credentialID
      * @param string  $password
@@ -665,33 +705,46 @@ class Credential {
         self::schema()->edit($credentialID, [
             "password"       => $hash["password"],
             "salt"           => $hash["salt"],
-            "passExpiration" => time() + 48 * 3600,
+            "passExpiration" => time() + $hours * 3600,
             "reqPassChange"  => 1,
         ]);
         return $password;
     }
 
     /**
-     * Sets the Credential Avatar
+     * Sets an Access Token to the given Credential
      * @param integer $credentialID
-     * @param string  $avatar
-     * @return boolean
+     * @param integer $hours        Optional.
+     * @return string
      */
-    public static function setAvatar(int $credentialID, string $avatar): bool {
-        return self::schema()->edit($credentialID, [
-            "avatar" => $avatar,
+    public static function setAccessToken(int $credentialID, int $hours = 4): string {
+        $expiration = $hours > 0 ? time() + $hours * 3600 : 0;
+        $credential = self::getOne($credentialID, true);
+        if ($credential->tokenExpiration > 0 && $credential->tokenExpiration < time()) {
+            $accessToken = Strings::randomCode(30, "lud");
+            self::schema()->edit($credentialID, [
+                "tokenExpiration" => $expiration,
+            ]);
+            return $credential->accessToken;
+        }
+
+        $accessToken = Strings::randomCode(30, "lud");
+        self::schema()->edit($credentialID, [
+            "accessToken"     => $accessToken,
+            "tokenExpiration" => $expiration,
         ]);
+        return $accessToken;
     }
 
     /**
-     * Sets the Credential Level
+     * Removes an Access Token of the given Credential
      * @param integer $credentialID
-     * @param integer $level
      * @return boolean
      */
-    public static function setLevel(int $credentialID, int $level): bool {
+    public static function removeAccessToken(int $credentialID): bool {
         return self::schema()->edit($credentialID, [
-            "level" => $level,
+            "accessToken"     => "",
+            "tokenExpiration" => 0,
         ]);
     }
 
@@ -846,20 +899,22 @@ class Credential {
 
 
     /**
-     * Seeds the Owner
+     * Seeds a Credential
      * @param Database $db
      * @param string   $firstName
      * @param string   $lastName
      * @param string   $email
      * @param string   $password
+     * @param integer  $level
      * @return boolean
      */
-    public static function seedOwner(
+    public static function seedCredential(
         Database $db,
         string $firstName,
         string $lastName,
         string $email,
-        string $password
+        string $password,
+        int $level
     ): bool {
         if (!$db->hasTable("credentials")) {
             return false;
@@ -875,17 +930,17 @@ class Credential {
                 "password"     => $hash["password"],
                 "salt"         => $hash["salt"],
                 "language"     => "es",
-                "level"        => Access::Owner(),
+                "level"        => $level,
                 "status"       => Status::Active(),
                 "lastLogin"    => time(),
                 "currentLogin" => time(),
                 "createdTime"  => time(),
             ]);
-            print("<br><i>Owner</i> created<br>");
+            print("<br><i>Credential</i> created<br>");
             return true;
         }
 
-        print("<br><i>Owner</i> already created<br>");
+        print("<br><i>Credential</i> already created<br>");
         return false;
     }
 }

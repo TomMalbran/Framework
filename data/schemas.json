@@ -20,6 +20,8 @@
             "salt"             : { "type" : "string",                          "cantEdit" : true },
             "reqPassChange"    : { "type" : "boolean",                         "cantEdit" : true },
             "passExpiration"   : { "type" : "date",                            "cantEdit" : true },
+            "accessToken"      : { "type" : "string",                          "cantEdit" : true },
+            "tokenExpiration"  : { "type" : "date",                            "cantEdit" : true },
             "status"           : { "type" : "number",  "length"   : 3,         "noExists" : true },
             "observations"     : { "type" : "text",                            "noExists" : true },
             "sendEmails"       : { "type" : "boolean",                         "noExists" : true },
