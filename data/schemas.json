@@ -309,9 +309,10 @@
             "code"        : { "type" : "number"                  },
             "error"       : { "type" : "string"                  },
             "level"       : { "type" : "number"                  },
-            "description" : { "type" : "text"                    },
+            "environment" : { "type" : "string"                  },
             "file"        : { "type" : "string"                  },
             "line"        : { "type" : "number"                  },
+            "description" : { "type" : "text"                    },
             "amount"      : { "type" : "number"                  },
             "isResolved"  : { "type" : "boolean"                 },
             "updatedTime" : { "type" : "date"                    }

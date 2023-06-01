@@ -150,26 +150,23 @@ class ErrorLog {
      * Handles the PHP Error
      * @param integer $code
      * @param string  $description
-     * @param string  $file
+     * @param string  $filePath
      * @param integer $line
      * @return boolean
      */
-    public static function handler(int $code, string $description, string $file = "", int $line = 0): bool {
-        [ $error, $level ] = self::mapErrorCode($code);
-        $schema      = self::schema();
-        $description = Strings::replace($description, [ "'", "`" ], "");
+    public static function handler(int $code, string $description, string $filePath = "", int $line = 0): bool {
+        [ $error, $level ] = self::getErrorCode($code);
 
-        if (Strings::contains($file, self::$framePath)) {
-            $fileName = Strings::replace($file, self::$framePath . "/", "Framework/");
-        } else {
-            $fileName = Strings::replace($file, self::$basePath . "/", "");
-        }
+        $environment = self::getEnvironment();
+        $filePath    = self::getFilePath($filePath);
+        $description = self::getDescription($description);
 
         $query = Query::create("code", "=", $code);
-        $query->add("description", "=", $description);
-        $query->addIf("file", "=", $fileName);
+        $query->addIf("file", "=", $filePath);
         $query->addIf("line", "=", $line);
+        $query->add("description", "=", $description);
 
+        $schema = self::schema();
         if ($schema->getTotal($query) > 0) {
             $query->orderBy("updatedTime", false)->limit(1);
             $schema->edit($query, [
@@ -181,9 +178,10 @@ class ErrorLog {
                 "code"        => $code,
                 "level"       => $level,
                 "error"       => $error,
-                "description" => $description,
-                "file"        => $fileName,
+                "environment" => $environment,
+                "file"        => $filePath,
                 "line"        => $line,
+                "description" => $description,
                 "amount"      => 1,
                 "isResolved"  => 0,
                 "updatedTime" => time(),
@@ -200,11 +198,11 @@ class ErrorLog {
     }
 
     /**
-     * Map an error code into an Error word, and log location.
+     * Maps an error code into an Error word, and log location.
      * @param integer $code
      * @return array{}
      */
-    public static function mapErrorCode(int $code): array {
+    private static function getErrorCode(int $code): array {
         $error = "";
         $level = 0;
 
@@ -242,5 +240,42 @@ class ErrorLog {
             break;
         }
         return [ $error, $level ];
+    }
+
+    /**
+     * Returns the Environment
+     * @return string
+     */
+    private static function getEnvironment(): string {
+        if (Strings::contains(self::$basePath, "public_html")) {
+            $environment = Strings::substringAfter(self::$basePath, "domains/");
+            $environment = Strings::substringBefore($environment, "/public_html");
+            return $environment;
+        }
+        return "localhost";
+    }
+
+    /**
+     * Returns the File Path
+     * @param string $filePath
+     * @return string
+     */
+    private static function getFilePath(string $filePath): string {
+        if (Strings::contains($filePath, self::$framePath)) {
+            return Strings::replace($filePath, self::$framePath . "/", "framework/");
+        }
+        return Strings::replace($filePath, self::$basePath . "/", "");
+    }
+
+    /**
+     * Parses and returns the Description
+     * @param string $description
+     * @return string
+     */
+    private function getDescription(string $description): string {
+        $description = Strings::replace($description, [ "'", "`" ], "");
+        $description = Strings::replace($description, self::$framePath . "/", "Framework/");
+        $description = Strings::replace($description, self::$basePath . "/", "");
+        return $description;
     }
 }
