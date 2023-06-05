@@ -272,7 +272,7 @@ class ErrorLog {
      * @param string $description
      * @return string
      */
-    private function getDescription(string $description): string {
+    private static function getDescription(string $description): string {
         $description = Strings::replace($description, [ "'", "`" ], "");
         $description = Strings::replace($description, self::$framePath . "/", "Framework/");
         $description = Strings::replace($description, self::$basePath . "/", "");
