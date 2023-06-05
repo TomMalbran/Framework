@@ -497,6 +497,28 @@ class Arrays {
         return $key ? "" : [];
     }
 
+    /**
+     * Returns the Values at the given id with the given key
+     * @param mixed[] $array
+     * @param string  $idKey
+     * @param mixed   $idValue
+     * @param string  $key     Optional.
+     * @param string  $glue    Optional.
+     * @return mixed
+     */
+    public static function findValues(array $array, string $idKey, mixed $idValue, string $key = "", string $glue = ""): mixed {
+        $result = [];
+        foreach ($array as $elem) {
+            if ($elem[$idKey] == $idValue) {
+                $result[] = $key ? $elem[$key] : $elem;
+            }
+        }
+        if (!empty($key) && !empty($glue)) {
+            return implode($glue, $result);
+        }
+        return $result;
+    }
+
 
 
     /**
