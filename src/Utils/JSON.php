@@ -75,16 +75,29 @@ class JSON {
 
 
     /**
+     * Creates the read response
+     * @param boolean $asArray Optional.
+     * @return object|array
+     */
+    private static function createRespose(bool $asArray = false): mixed {
+        return $asArray ? [] : new stdClass();
+    }
+
+    /**
      * Reads a JSON file
      * @param string  $path
      * @param boolean $asArray Optional.
      * @return object|array
      */
     public static function readFile(string $path, bool $asArray = false): mixed {
-        if (File::exists($path)) {
-            return self::decode(file_get_contents($path), $asArray);
+        if (!File::exists($path)) {
+            return self::createRespose($asArray);
         }
-        return $asArray ? [] : new stdClass();
+        $response = file_get_contents($path);
+        if (empty($response)) {
+            return self::createRespose($asArray);
+        }
+        return self::decode($response, $asArray);
     }
 
     /**
@@ -94,7 +107,34 @@ class JSON {
      * @return object|array
      */
     public static function readUrl(string $url, bool $asArray = false): mixed {
-        return self::decode(file_get_contents($url), $asArray);
+        $response = file_get_contents($url);
+        if (empty($response)) {
+            return self::createRespose($asArray);
+        }
+        return self::decode($response, $asArray);
+    }
+
+    /**
+     * Posts to a JSON url
+     * @param string  $url
+     * @param array{} $data
+     * @param boolean $asArray Optional.
+     * @return object|array
+     */
+    public static function postUrl(string $url, array $data, bool $asArray = false): mixed {
+        $options = [
+            "http" => [
+                "header"  => "Content-type: application/x-www-form-urlencoded\r\n",
+                "method"  => "POST",
+                "content" => http_build_query($data),
+            ],
+        ];
+        $context  = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
+        if (empty($response)) {
+            return self::createRespose($asArray);
+        }
+        return self::decode($response, $asArray);
     }
 
     /**
