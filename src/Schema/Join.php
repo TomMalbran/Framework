@@ -30,6 +30,9 @@ class Join {
     /** @var array{}[] */
     public array  $defaults   = [];
 
+    /** @var string[] */
+    public array  $orKeys    = [];
+
     public bool   $hasPrefix  = false;
     public string $prefix     = "";
 
@@ -48,6 +51,7 @@ class Join {
         $this->rightKey   = !empty($data["rightKey"])   ? $data["rightKey"]   : $key;
         $this->and        = !empty($data["and"])        ? $data["and"]        : "";
         $this->andKey     = !empty($data["andKey"])     ? $data["andKey"]     : "";
+        $this->orKeys     = !empty($data["orKeys"])     ? $data["orKeys"]     : [];
         $this->andValue   = !empty($data["andValue"])   ? $data["andValue"]   : "";
         $this->andTable   = !empty($data["andTable"])   ? $data["andTable"]   : "";
         $this->andDeleted = !empty($data["andDeleted"]) ? $data["andDeleted"] : false;
@@ -141,6 +145,13 @@ class Join {
         }
         if (!empty($this->andKey)) {
             $result .= " AND $asTable.{$this->andKey} = $onTable.{$this->andKey}";
+        }
+        if (!empty($this->orKeys)) {
+            $parts = [];
+            foreach ($this->orKeys as $orKey) {
+                $parts[] = "$asTable.{$orKey} = $onTable.{$orKey}";
+            }
+            $result .= " AND (" . implode(" OR ", $parts) . ")";
         }
         if (!empty($this->andValue)) {
             $result .= " AND $asTable.{$this->andValue} = ?";
