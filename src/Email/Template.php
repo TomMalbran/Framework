@@ -109,7 +109,7 @@ class Template {
         $request  = $db->getAll("email_templates");
         $emails   = Framework::loadData(Framework::EmailData);
         $siteName = Config::get("name");
-        $sendAs   = Config::get("smtpEmail");
+        $sendAs   = Config::get("emailEmail");
 
         if (empty($emails)) {
             return false;
