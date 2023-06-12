@@ -227,7 +227,7 @@ class ActionLog {
      */
     public static function deleteOld(int $days = 90): bool {
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("log_sessions.time", "<", $time);
+        $query = Query::create("time", "<", $time);
         self::sessionSchema()->remove($query);
         self::actionSchema()->remove($query);
         return true;
