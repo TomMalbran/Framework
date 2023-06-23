@@ -10,11 +10,8 @@ use Framework\Utils\Arrays;
  */
 class NLS {
 
-    /** @var boolean[] */
-    private static array $loaded = [];
-
     /** @var array{}{} */
-    private static array $data   = [];
+    private static array $data = [];
 
 
     /**
@@ -23,11 +20,17 @@ class NLS {
      * @return array{}
      */
     public static function load(string $language): array {
-        if (empty(self::$loaded[$language])) {
-            self::$loaded[$language] = true;
-            self::$data[$language]   = Framework::loadJSON(Framework::NLSDir, $language);
+        if (!empty(self::$data[$language])) {
+            return self::$data[$language];
         }
-        return self::$data[$language];
+
+        $data = Framework::loadJSON(Framework::NLSDir, $language);
+        if (!empty($data)) {
+            self::$data[$language] = $data;
+            return self::$data[$language];
+        }
+
+        return [];
     }
 
     /**
