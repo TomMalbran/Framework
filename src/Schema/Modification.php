@@ -98,11 +98,14 @@ class Modification {
         if ($this->structure->canDelete && empty($this->fields["isDeleted"])) {
             $this->fields["isDeleted"] = 0;
         }
-        if ($this->structure->hasTimestamps && empty($this->fields["createdTime"])) {
-            $this->fields["createdTime"] = time();
-        }
-        if ($this->structure->hasUsers && !empty($this->credentialID)) {
-            $this->fields["createdUser"] = $this->credentialID;
+
+        if ($this->structure->canCreate) {
+            if ($this->structure->hasTimestamps && empty($this->fields["createdTime"])) {
+                $this->fields["createdTime"] = time();
+            }
+            if ($this->structure->hasUsers && !empty($this->credentialID)) {
+                $this->fields["createdUser"] = $this->credentialID;
+            }
         }
         return $this;
     }
@@ -112,10 +115,14 @@ class Modification {
      * @return Modification
      */
     public function addModification(): Modification {
-        if ($this->structure->canEdit && $this->structure->hasTimestamps) {
+        if (!$this->structure->canEdit) {
+            return $this;
+        }
+
+        if ($this->structure->hasTimestamps) {
             $this->fields["modifiedTime"] = time();
         }
-        if ($this->structure->canEdit && $this->structure->hasUsers && !empty($this->credentialID)) {
+        if ($this->structure->hasUsers && !empty($this->credentialID)) {
             $this->fields["modifiedUser"] = $this->credentialID;
         }
         return $this;
