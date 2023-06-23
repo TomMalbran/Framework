@@ -13,6 +13,7 @@ class Query {
 
     public string $where     = "";
     public string $prefix    = "AND";
+    public string $oldPrefix = "";
     public bool   $addPrefix = false;
 
     public string $limit     = "";
@@ -237,6 +238,29 @@ class Query {
     }
 
     /**
+     * Starts an And expression
+     * @return Query
+     */
+    public function startAnd(): Query {
+        $prefix          = $this->getPrefix();
+        $this->where    .= "{$prefix}(";
+        $this->oldPrefix = $this->prefix;
+        $this->prefix    = "AND";
+        $this->addPrefix = false;
+        return $this;
+    }
+
+    /**
+     * Ends an And expression
+     * @return Query
+     */
+    public function endAnd(): Query {
+        $this->where .= ") ";
+        $this->prefix = $this->oldPrefix;
+        return $this;
+    }
+
+    /**
      * Adds an Or
      * @return Query
      */
@@ -253,6 +277,7 @@ class Query {
     public function startOr(): Query {
         $prefix          = $this->getPrefix();
         $this->where    .= "{$prefix}(";
+        $this->oldPrefix = $this->prefix;
         $this->prefix    = "OR";
         $this->addPrefix = false;
         return $this;
@@ -264,7 +289,7 @@ class Query {
      */
     public function endOr(): Query {
         $this->where .= ") ";
-        $this->prefix = "AND";
+        $this->prefix = $this->oldPrefix;
         return $this;
     }
 
