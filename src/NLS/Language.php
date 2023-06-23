@@ -61,10 +61,10 @@ class Language {
      * @return string
      */
     public static function getNLS(string $value): string {
-        if ($value != "root") {
+        self::load();
+        if ($value != "root" && !empty(self::$data[$value])) {
             return $value;
         }
-        self::load();
         foreach (self::$data as $index => $row) {
             if ($row["isRoot"]) {
                 return $index;
