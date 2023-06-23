@@ -356,6 +356,25 @@ class Arrays {
     }
 
     /**
+     * Creates a Map of Arrays using the given Array
+     * @param mixed[]              $array
+     * @param string               $key
+     * @param string[]|string|null $value    Optional.
+     * @param boolean              $useEmpty Optional.
+     * @return mixed[]
+     */
+    public static function createMapArray(array $array, string $key, array|string $value = null, bool $useEmpty = false): array {
+        $result = [];
+        foreach ($array as $row) {
+            if (empty($result[$row[$key]])) {
+                $result[$row[$key]] = [];
+            }
+            $result[$row[$key]][] = !empty($value) ? self::getValue($row, $value, " - ", "", $useEmpty) : $row;
+        }
+        return $result;
+    }
+
+    /**
      * Creates an Array using the given Array
      * @param mixed[]              $array
      * @param string[]|string|null $value     Optional.
