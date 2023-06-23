@@ -523,7 +523,7 @@ class DateTime {
     }
 
     /**
-     * Returns the time of the start of the month
+     * Returns the Time of the start of the Month
      * @param integer $time        Optional.
      * @param integer $monthDiff   Optional.
      * @param boolean $useTimeZone Optional.
@@ -536,7 +536,24 @@ class DateTime {
     }
 
     /**
-     * Add the given months to the given time
+     * Returns the Time of the Month at the given Day position
+     * @param integer $time        Optional.
+     * @param integer $dayPosition Optional.
+     * @param integer $weekDay     Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getMonthDayPos(int $time = 0, int $dayPosition = 0, int $weekDay = 0, bool $useTimeZone = false): int {
+        $time        = self::getMonthStart($time);
+        $thisWeekDay = self::getDayOfWeek($time);
+        $increase    = $thisWeekDay > $weekDay ? 7 : 0;
+        $days        = $dayPosition * 7 + $weekDay + $increase;
+        $result      = self::getWeekStart($time, $days);
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
+     * Add the given Months to the given Time
      * @param integer $time        Optional.
      * @param integer $monthDiff   Optional.
      * @param boolean $useTimeZone Optional.
@@ -544,12 +561,12 @@ class DateTime {
      */
     public static function addMonths(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(0, 0, 0, date("n", $time) + $monthDiff, date("j", $time), date("Y", $time));
+        $result = mktime(date("h", $time), date("i", $time), date("s", $time), date("n", $time) + $monthDiff, date("j", $time), date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the difference between 2 dates in Months
+     * Returns the difference between 2 times in Months
      * @param integer $time1
      * @param integer $time2
      * @return integer
@@ -559,7 +576,7 @@ class DateTime {
     }
 
     /**
-     * Returns the amount of days in the Month for the given time
+     * Returns the amount of days in the Month for the given Time
      * @param integer $time Optional.
      * @return string
      */
@@ -568,7 +585,7 @@ class DateTime {
     }
 
     /**
-     * Returns the Month Number for the given time
+     * Returns the Month Number for the given Time
      * @param integer $time Optional.
      * @return string
      */
@@ -577,7 +594,7 @@ class DateTime {
     }
 
     /**
-     * Returns the Month and Year at the given month
+     * Returns the Month and Year at the given Month
      * @param integer $time
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
@@ -588,7 +605,7 @@ class DateTime {
     }
 
     /**
-     * Returns the Month name at the given month
+     * Returns the Month name at the given Month
      * @param integer $month
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
@@ -620,7 +637,7 @@ class DateTime {
 
 
     /**
-     * Returns the time of the start of the week
+     * Returns the time of the start of the Week
      * @param integer $time        Optional.
      * @param integer $dayDiff     Optional.
      * @param boolean $useTimeZone Optional.
@@ -634,7 +651,7 @@ class DateTime {
     }
 
     /**
-     * Returns the difference between 2 dates in Weeks
+     * Returns the difference between 2 times in Weeks
      * @param integer $time1
      * @param integer $time2
      * @return integer
@@ -672,7 +689,7 @@ class DateTime {
     }
 
     /**
-     * Add the given Days to the given time
+     * Add the given Days to the given Time
      * @param integer $time        Optional.
      * @param integer $dayDiff     Optional.
      * @param boolean $useTimeZone Optional.
@@ -680,7 +697,7 @@ class DateTime {
      */
     public static function addDays(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(0, 0, 0, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
+        $result = $time + $dayDiff * 24 * 3600;
         return self::toServerTime($result, $useTimeZone);
     }
 
@@ -706,7 +723,7 @@ class DateTime {
     }
 
     /**
-     * Returns the Day name at the given day
+     * Returns the Day name at the given Day
      * @param integer $day
      * @return string
      */
@@ -736,7 +753,33 @@ class DateTime {
 
 
     /**
-     * Returns the difference between 2 dates in Minutes
+     * Add the given Hours to the given Time
+     * @param integer $time        Optional.
+     * @param integer $hourDiff    Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function addHours(int $time = 0, int $hourDiff = 0, bool $useTimeZone = false): int {
+        $time   = empty($time) ? time() : $time;
+        $result = $time + $hourDiff * 3600;
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
+     * Add the given Minutes to the given Time
+     * @param integer $time        Optional.
+     * @param integer $minuteDiff  Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function addMinutes(int $time = 0, int $minuteDiff = 0, bool $useTimeZone = false): int {
+        $time   = empty($time) ? time() : $time;
+        $result = $time + $minuteDiff * 60;
+        return self::toServerTime($result, $useTimeZone);
+    }
+
+    /**
+     * Returns the difference between 2 times in Minutes
      * @param integer $time1
      * @param integer $time2
      * @return integer
@@ -757,6 +800,18 @@ class DateTime {
         }
         return $hours * 60 + $minutes;
     }
+
+    /**
+     * Converts the Time to Minutes
+     * @param string $time
+     * @return integer
+     */
+    public static function timeToMinutes(string $time): int {
+        [ $hour, $minute ] = Strings::split($time, ":");
+        return self::toMinutes((int)$hour, (int)$minute);
+    }
+
+
 
     /**
      * Returns the amount of years between given date and today AKA the age
