@@ -156,4 +156,12 @@ class Errors {
     public function keys(): array {
         return array_keys($this->errors);
     }
+
+    /**
+     * Returns the amount of errors
+     * @return integer
+     */
+    public function getTotal(): int {
+        return count($this->errors);
+    }
 }
