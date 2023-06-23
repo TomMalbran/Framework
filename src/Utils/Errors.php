@@ -104,10 +104,20 @@ class Errors {
     /**
      * Merges the other Errors
      * @param Errors $errors
+     * @param string $prefix Optional.
+     * @param string $suffix Optional.
      * @return Errors
      */
-    public function merge(Errors $errors): Errors {
-        $this->errors += $errors->get();
+    public function merge(Errors $errors, string $prefix = "", string $suffix = ""): Errors {
+        if (empty($prefix) && empty($suffix)) {
+            $this->errors += $errors->get();
+            return $this;
+        }
+
+        $newErrors = $errors->get();
+        foreach ($newErrors as $key => $error) {
+            $this->errors["$prefix$key$suffix"] = $error;
+        }
         return $this;
     }
 
