@@ -735,6 +735,17 @@ class DateTime {
     }
 
     /**
+     * Returns the Day and Month and Year at the given Time
+     * @param integer $time
+     * @param integer $length      Optional.
+     * @param boolean $inUpperCase Optional.
+     * @return string
+     */
+    public static function getDayMonth(int $time, int $length = 0, bool $inUpperCase = false): string {
+        return date("d", $time) . " " . self::getMonth(date("n", $time), $length, $inUpperCase);
+    }
+
+    /**
      * Returns the Day of Week
      * @param integer      $time        Optional.
      * @param boolean      $startMonday Optional.
