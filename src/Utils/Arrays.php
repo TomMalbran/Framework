@@ -188,6 +188,16 @@ class Arrays {
     }
 
     /**
+     * Removes the first value from the array
+     * @param mixed[] $array
+     * @return mixed[]
+     */
+    public static function removeFirst(array $array): array {
+        array_shift($array);
+        return $array;
+    }
+
+    /**
      * Removes the given value from the array
      * @param mixed[] $array
      * @param mixed   $key
