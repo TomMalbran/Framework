@@ -221,4 +221,52 @@ class Period {
     public static function getSelect(): array {
         return Arrays::createSelectFromMap(self::$names);
     }
+
+
+
+    /**
+     * Returns the amount of days in the given Period
+     * @param string $period
+     * @return integer
+     */
+    public static function getDays(string $period): int {
+        $month = date("n");
+        $year  = date("Y");
+
+        switch ($period) {
+        case self::Today:
+            return 1;
+        case self::Yesterday:
+            return 1;
+        case self::Last7Days:
+            return 7;
+        case self::Last15Days:
+            return 15;
+        case self::Last30Days:
+            return 30;
+        case self::Last60Days:
+            return 60;
+        case self::Last90Days:
+            return 90;
+        case self::Last120Days:
+            return 120;
+        case self::LastYear:
+            return 365;
+        case self::ThisWeek:
+            return 7;
+        case self::ThisMonth:
+            return (int)date("t");
+        case self::ThisYear:
+            return 365 + (int)date("L");
+        case self::PastWeek:
+            return 7;
+        case self::PastMonth:
+            return (int)date("t", mktime(0, 0, 0, $month - 1, 1, $year));
+        case self::PastYear:
+            return 365 + (int)date("L", mktime(0, 0, 0, 1, 1, $year - 1));
+        case self::AllPeriod:
+        default:
+            return 0;
+        }
+    }
 }
