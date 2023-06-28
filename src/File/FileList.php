@@ -2,6 +2,7 @@
 namespace Framework\File;
 
 use Framework\File\FileType;
+use Framework\Utils\Arrays;
 
 /**
  * The FileList wrapper
@@ -20,9 +21,9 @@ class FileList {
      * @param string  $sourcePath
      * @param string  $sourceUrl
      * @param string  $thumbUrl
-     * @return void
+     * @return FileList
      */
-    public function add(string $name, string $path, bool $isDir, string $sourcePath, string $sourceUrl, string $thumbUrl): void {
+    public function add(string $name, string $path, bool $isDir, string $sourcePath, string $sourceUrl, string $thumbUrl): FileList {
         $isImage   = !$isDir && FileType::isImage($name);
         $imgWidth  = 0;
         $imgHeight = 0;
@@ -49,14 +50,15 @@ class FileList {
             "width"         => $imgWidth,
             "height"        => $imgHeight,
         ];
+        return $this;
     }
 
     /**
      * Adds the Go Back element
      * @param string $path
-     * @return void
+     * @return FileList
      */
-    public function addBack(string $path): void {
+    public function addBack(string $path): FileList {
         $dir = dirname($path);
         $this->list[] = [
             "name"      => "...",
@@ -67,6 +69,7 @@ class FileList {
             "isFile"    => true,
             "icon"      => "back",
         ];
+        return $this;
     }
 
 
@@ -84,7 +87,7 @@ class FileList {
      * @return array{}[]
      */
     public function getSorted(): array {
-        usort($this->list, function ($a, $b) {
+        return Arrays::sort($this->list, function ($a, $b) {
             // Back goes first
             if ($a["isBack"] && !$b["isBack"]) {
                 return -1;
@@ -104,7 +107,5 @@ class FileList {
             // If the type is the same sort by name
             return strnatcasecmp($a["name"], $b["name"]);
         });
-
-        return $this->list;
     }
 }
