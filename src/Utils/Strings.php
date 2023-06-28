@@ -220,6 +220,32 @@ class Strings {
         return $string;
     }
 
+    /**
+     * Adds the Needle to the start of the String if not there
+     * @param string $string
+     * @param string $needle
+     * @return string
+     */
+    public static function addPrefix(string $string, string $needle): string {
+        if (!self::startsWith($string, $needle)) {
+            return $needle . $string;
+        }
+        return $string;
+    }
+
+    /**
+     * Adds the Needle to the start of the String if not there
+     * @param string $string
+     * @param string $needle
+     * @return string
+     */
+    public static function addSuffix(string $string, string $needle): string {
+        if (!self::endsWith($string, $needle)) {
+            return $string . $needle;
+        }
+        return $string;
+    }
+
 
 
     /**
@@ -391,7 +417,7 @@ class Strings {
     }
 
     /**
-     * Transforms a String to Uppercase
+     * Transforms a String to LowerCase
      * @param string $string
      * @return string
      */
@@ -400,12 +426,21 @@ class Strings {
     }
 
     /**
-     * Transforms a String to Lowercase
+     * Transforms a String to UpperCase
      * @param string $string
      * @return string
      */
     public static function toUpperCase(string $string): string {
         return strtoupper($string);
+    }
+
+    /**
+     * Makes the first Character to LowerCase
+     * @param string $string
+     * @return string
+     */
+    public static function lowerCaseFirst(string $string): string {
+        return lcfirst($string);
     }
 
     /**
