@@ -466,7 +466,7 @@ class DateTime {
      */
     public static function getLastXMonths(int $months, int $time = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(0, 0, 0, date("n", $time) - $months, date("j", $time), date("Y", $time));
+        $result = mktime(0, 0, 0, (int)date("n", $time) - $months, date("j", $time), date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
 
@@ -531,7 +531,7 @@ class DateTime {
      */
     public static function getMonthStart(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(0, 0, 0, date("n", $time) + $monthDiff, 1, date("Y", $time));
+        $result = mktime(0, 0, 0, (int)date("n", $time) + $monthDiff, 1, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
 
@@ -561,7 +561,7 @@ class DateTime {
      */
     public static function addMonths(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(date("h", $time), date("i", $time), date("s", $time), date("n", $time) + $monthDiff, date("j", $time), date("Y", $time));
+        $result = mktime(date("h", $time), date("i", $time), date("s", $time), (int)date("n", $time) + $monthDiff, date("j", $time), date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
 
@@ -572,7 +572,7 @@ class DateTime {
      * @return integer
      */
     public static function getMonthsDiff(int $time1, int $time2): int {
-        return 12 * (date("Y", $time1) - date("Y", $time2)) + date("n", $time1) - date("n", $time2);
+        return 12 * ((int)date("Y", $time1) - (int)date("Y", $time2)) + (int)date("n", $time1) - (int)date("n", $time2);
     }
 
     /**
@@ -645,7 +645,7 @@ class DateTime {
      */
     public static function getWeekStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
         $time     = empty($time) ? time() : $time;
-        $startDay = date("j", $time) - date("w", $time);
+        $startDay = (int)date("j", $time) - (int)date("w", $time);
         $result   = mktime(0, 0, 0, date("n", $time), $startDay + $dayDiff, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
@@ -671,7 +671,7 @@ class DateTime {
      */
     public static function getDayStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(0, 0, 0, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
+        $result = mktime(0, 0, 0, date("n", $time), (int)date("j", $time) + $dayDiff, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
 
@@ -684,7 +684,7 @@ class DateTime {
      */
     public static function getDayEnd(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(23, 59, 59, date("n", $time), date("j", $time) + $dayDiff, date("Y", $time));
+        $result = mktime(23, 59, 59, date("n", $time), (int)date("j", $time) + $dayDiff, date("Y", $time));
         return self::toServerTime($result, $useTimeZone);
     }
 
