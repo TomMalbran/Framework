@@ -435,12 +435,21 @@ class Strings {
     }
 
     /**
-     * Makes the first Character to LowerCase
+     * Transforms the first Character to LowerCase
      * @param string $string
      * @return string
      */
     public static function lowerCaseFirst(string $string): string {
         return lcfirst($string);
+    }
+
+    /**
+     * Transforms the first Character to UpperCase
+     * @param string $string
+     * @return string
+     */
+    public static function upperCaseFirst(string $string): string {
+        return ucfirst($string);
     }
 
     /**
