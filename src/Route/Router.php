@@ -83,16 +83,15 @@ class Router {
 
     /**
      * Calls the given Route with the given params, if it exists
-     * @param string       $route
-     * @param array{}|null $params Optional.
+     * @param string  $route
+     * @param Request $request
      * @return Response|null
      */
-    public static function call(string $route, ?array $params = null): ?Response {
+    public static function call(string $route, Request $request): ?Response {
         $data = self::get($route);
         if ($data->access == null) {
             return null;
         }
-        $request = new Request($params);
         return self::execute($data->static, $data->module, $data->method, $request);
     }
 

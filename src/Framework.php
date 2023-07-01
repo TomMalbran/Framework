@@ -257,11 +257,11 @@ class Framework {
 
     /**
      * Requests an API function
-     * @param string       $route
-     * @param array{}|null $params Optional.
+     * @param string  $route
+     * @param array{} $params Optional.
      * @return Response
      */
-    public static function request(string $route, ?array $params = null): Response {
+    public static function request(string $route, array $params = []): Response {
         // The Route doesn't exists
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");
@@ -281,7 +281,8 @@ class Framework {
         }
 
         // Perform the Request
-        $response = Router::call($route, $params);
+        $request  = new Request($params, $_FILES);
+        $response = Router::call($route, $request);
 
         // Return an Empty Response
         if (empty($response)) {

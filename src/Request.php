@@ -30,11 +30,12 @@ class Request implements ArrayAccess {
 
     /**
      * Creates a new Request instance
-     * @param array{}|null $request Optional.
+     * @param array{} $request Optional.
+     * @param array{} $files   Optional.
      */
-    public function __construct(?array $request = null) {
-        $this->request = $request ?: $_REQUEST;
-        $this->files   = $_FILES;
+    public function __construct(array $request = [], array $files = []) {
+        $this->request = $request;
+        $this->files   = $files;
     }
 
 
