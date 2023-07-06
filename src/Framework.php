@@ -49,6 +49,7 @@ class Framework {
     const TempDir       = "temp";
 
     const NLSDir        = "nls";
+    const StringsDir    = "nls/strings";
 
     // Variables
     private static string   $framePath;

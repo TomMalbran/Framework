@@ -24,7 +24,7 @@ class NLS {
             return self::$data[$language];
         }
 
-        $data = Framework::loadJSON(Framework::NLSDir, $language);
+        $data = Framework::loadJSON(Framework::StringsDir, $language);
         if (!empty($data)) {
             self::$data[$language] = $data;
             return self::$data[$language];
