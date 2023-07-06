@@ -2,7 +2,6 @@
 namespace Framework\Auth;
 
 use Framework\Request;
-use Framework\Auth\Access;
 use Framework\Auth\Document;
 use Framework\NLS\NLS;
 use Framework\File\Path;
@@ -599,6 +598,18 @@ class Credential {
     public static function setCurrentUser(int $credentialID, int $userID): bool {
         return self::schema()->edit($credentialID, [
             "currentUser" => $userID,
+        ]);
+    }
+
+    /**
+     * Updates the Language for the given Credential
+     * @param integer $credentialID
+     * @param string  $language
+     * @return boolean
+     */
+    public static function setLanguage(int $credentialID, string $language): bool {
+        return self::schema()->edit($credentialID, [
+            "language" => $language,
         ]);
     }
 

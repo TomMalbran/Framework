@@ -93,7 +93,7 @@ class Framework {
 
         // Validate the Credential
         } elseif (!empty($request->jwt)) {
-            Auth::validateCredential($request->jwt, $request->timezone);
+            Auth::validateCredential($request->jwt, $request->langcode, $request->timezone);
         }
 
         // Perform the Request
@@ -239,6 +239,7 @@ class Framework {
             "route"    => !empty($request["route"])    ? $request["route"]         : "",
             "token"    => !empty($request["token"])    ? $request["token"]         : "",
             "jwt"      => !empty($request["jwt"])      ? $request["jwt"]           : "",
+            "langcode" => !empty($request["langcode"]) ? $request["langcode"]      : "",
             "timezone" => !empty($request["timezone"]) ? (int)$request["timezone"] : 0,
             "params"   => [],
         ];
@@ -249,6 +250,7 @@ class Framework {
             unset($request["route"]);
             unset($request["token"]);
             unset($request["jwt"]);
+            unset($request["langcode"]);
             unset($request["timezone"]);
             $result["params"] = $request;
         }

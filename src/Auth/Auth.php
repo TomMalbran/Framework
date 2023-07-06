@@ -25,6 +25,7 @@ class Auth {
 
     private static int    $accessLevel  = 0;
     private static ?Model $credential   = null;
+    private static ?Model $admin        = null;
     private static int    $credentialID = 0;
     private static int    $adminID      = 0;
     private static int    $userID       = 0;
@@ -34,10 +35,11 @@ class Auth {
     /**
      * Validates the Credential
      * @param string       $token
+     * @param string|null  $langcode Optional.
      * @param integer|null $timezone Optional.
      * @return boolean
      */
-    public static function validateCredential(string $token, ?int $timezone = null): bool {
+    public static function validateCredential(string $token, ?string $langcode = null, ?int $timezone = null): bool {
         Reset::deleteOld();
         Storage::deleteOld();
 
@@ -52,20 +54,48 @@ class Auth {
             return false;
         }
 
-        // Set the new Timezone if required
-        if (!empty($timezone)) {
-            $credentialID = !empty($data->adminID) ? $data->adminID : $data->credentialID;
-            Credential::setTimezone($credentialID, $timezone);
+        // Retrieve the Admin
+        $admin = Model::createEmpty();
+        if (!empty($data->admin)) {
+            $admin = Credential::getOne($data->adminID, true);
         }
 
+        // Set the new Language and Timezone if required
+        self::setLanguageTimezone($credential, $admin, $langcode, $timezone);
+
         // Set the Credential
-        self::setCredential($credential, $data->adminID, $credential->currentUser);
+        self::setCredential($credential, $admin, $credential->currentUser);
 
         // Start or reuse a log session
         if (self::isLoggedAsUser()) {
             ActionLog::startSession(self::$adminID);
         } else {
             ActionLog::startSession(self::$credentialID);
+        }
+        return true;
+    }
+
+    /**
+     * Sets the Language and Timezone if required
+     * @param Model        $credential
+     * @param Model        $admin
+     * @param string|null  $langcode
+     * @param integer|null $timezone
+     * @return boolean
+     */
+    private static function setLanguageTimezone(Model $credential, Model $admin, ?string $langcode = null, ?int $timezone = null): bool {
+        $model = $credential;
+        if (!$admin->isEmpty()) {
+            $model = $admin;
+        }
+
+        if (!empty($langcode) && !$model->has("language")) {
+            Credential::setLanguage($model->id, $langcode);
+            $model->language = $langcode;
+        }
+        if (!empty($timezone)) {
+            Credential::setTimezone($model->id, $timezone);
+            $model->timezone = $timezone;
         }
         return true;
     }
@@ -110,7 +140,7 @@ class Auth {
      * @return boolean
      */
     public static function login(Model $credential): bool {
-        self::setCredential($credential, 0, $credential->currentUser);
+        self::setCredential($credential, null, $credential->currentUser);
 
         Credential::updateLoginTime($credential->id);
         ActionLog::startSession($credential->id, true);
@@ -163,7 +193,7 @@ class Auth {
         $user  = Credential::getOne($credentialID, true);
 
         if (self::canLoginAs($admin, $user)) {
-            self::setCredential($user, $admin->id, $user->currentUser);
+            self::setCredential($user, $admin, $user->currentUser);
             return true;
         }
         return false;
@@ -177,12 +207,10 @@ class Auth {
         if (!self::isLoggedAsUser()) {
             return 0;
         }
-        $admin = Credential::getOne(self::$adminID, true);
-        $user  = self::$credential;
 
-        if (self::canLoginAs($admin, $user)) {
-            self::setCredential($admin);
-            return $user->id;
+        if (self::canLoginAs(self::$admin, self::$credential)) {
+            self::setCredential(self::$admin);
+            return self::$credential->id;
         }
         return 0;
     }
@@ -230,20 +258,25 @@ class Auth {
 
     /**
      * Sets the Credential
-     * @param Model   $credential
-     * @param integer $adminID    Optional.
-     * @param integer $userID     Optional.
+     * @param Model      $credential
+     * @param Model|null $admin      Optional.
+     * @param integer    $userID     Optional.
      * @return boolean
      */
-    public static function setCredential(Model $credential, int $adminID = 0, int $userID = 0): bool {
+    public static function setCredential(Model $credential, ?Model $admin = null, int $userID = 0): bool {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
         self::$accessLevel  = !empty($credential->userLevel) ? $credential->userLevel : $credential->level;
-        self::$adminID      = $adminID;
         self::$userID       = $userID;
 
-        $timezone = !empty($adminID) ? Credential::getOne($adminID)->timezone : $credential->timezone;
-        $levels   = Config::getArray("authTimezone");
+        $timezone = $credential->timezone;
+        if (!empty($admin)) {
+            self::$admin    = $admin;
+            self::$adminID  = $admin->id;
+            $timezone = $admin->timezone;
+        }
+
+        $levels = Config::getArray("authTimezone");
         if (!empty($timezone) && (empty($levels) || Arrays::contains($levels, $credential->level))) {
             DateTime::setTimezone($timezone);
         }
