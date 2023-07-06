@@ -46,10 +46,10 @@ class Microsoft {
             return "";
         }
 
-        [ $headb64, $bodyb64, $cryptob64 ] = $tokens;
-        $header    = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64));
-        $payload   = JWT::jsonDecode(JWT::urlsafeB64Decode($bodyb64));
-        $signature = JWT::urlsafeB64Decode($cryptob64);
+        [ $head64, $body64, $crypto64 ] = $tokens;
+        $header    = JWT::jsonDecode(JWT::urlsafeB64Decode($head64));
+        $payload   = JWT::jsonDecode(JWT::urlsafeB64Decode($body64));
+        $signature = JWT::urlsafeB64Decode($crypto64);
 
         if ($header === null || $payload === null || $signature === null) {
             return "";

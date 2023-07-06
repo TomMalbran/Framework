@@ -2,8 +2,6 @@
 namespace Framework\Utils;
 
 use IteratorAggregate;
-use ArrayIterator;
-use stdClass;
 use Traversable;
 
 /**

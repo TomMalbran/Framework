@@ -93,11 +93,11 @@ class ActionLog {
      * @return array{}[]
      */
     private static function request(Query $query): array {
-        $sessionIDs = self::sessionSchema()->getColumn($query, "SESSION_ID");
-        $querySess  = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", false);
-        $queryActs  = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", true);
-        $actions    = [];
-        $result     = [];
+        $sessionIDs   = self::sessionSchema()->getColumn($query, "SESSION_ID");
+        $querySession = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", false);
+        $queryActs    = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", true);
+        $actions      = [];
+        $result       = [];
 
         if (empty($sessionIDs)) {
             return [];
@@ -116,7 +116,7 @@ class ActionLog {
             ];
         }
 
-        $request = self::sessionSchema()->getMap($querySess);
+        $request = self::sessionSchema()->getMap($querySession);
         foreach ($request as $row) {
             $result[] = [
                 "sessionID"      => $row["sessionID"],

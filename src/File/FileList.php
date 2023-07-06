@@ -83,7 +83,7 @@ class FileList {
     }
 
     /**
-     * Sorts and restuns the List
+     * Sorts and returns the List
      * @return array{}[]
      */
     public function getSorted(): array {

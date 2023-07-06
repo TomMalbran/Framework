@@ -94,7 +94,7 @@ class Strings {
     }
 
     /**
-     * Repeates the given Stirng the given times
+     * Repeats the given String the given times
      * @param string  $string
      * @param integer $times
      * @return string
@@ -336,7 +336,7 @@ class Strings {
     }
 
     /**
-     * Jois the given Strings using the given glue
+     * Joins the given Strings using the given glue
      * @param string[]|string $string
      * @param string          $glue
      * @return string
@@ -349,7 +349,7 @@ class Strings {
     }
 
     /**
-     * Jois the given Strings keys using the given glue
+     * Joins the given Strings keys using the given glue
      * @param string[]|string $string
      * @param string          $glue
      * @return string
@@ -453,7 +453,7 @@ class Strings {
     }
 
     /**
-     * Transforms an Uppercase string with underscores to Camelcase
+     * Transforms an UpperCase string with underscores to CamelCase
      * @param string  $string
      * @param boolean $capitalizeFirst Optional.
      * @return string

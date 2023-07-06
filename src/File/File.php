@@ -36,7 +36,7 @@ class File {
 
 
     /**
-     * Uplods the given file to the given path
+     * Uploads the given file to the given path
      * @param string $path
      * @param string $fileName
      * @param string $tmpFile
@@ -48,7 +48,7 @@ class File {
     }
 
     /**
-     * Uplods the given file to the given path
+     * Uploads the given file to the given path
      * @param string $path
      * @param string $tmpFile
      * @return boolean

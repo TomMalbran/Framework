@@ -647,7 +647,7 @@ class Request implements ArrayAccess {
     }
 
     /**
-     * Parsea a Domain to try and return something like "domain.com"
+     * Parses a Domain to try and return something like "domain.com"
      * @param string $key
      * @return string
      */

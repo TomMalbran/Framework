@@ -208,7 +208,7 @@ class Encoding {
                         $cc2 = (($c1 & "\x3f") | "\x80");
                         $buf .= $cc1 . $cc2;
                     }
-                // it doesn't need convesion
+                // it doesn't need conversion
                 } else {
                     $buf .= $c1;
                 }
@@ -220,7 +220,7 @@ class Encoding {
 
 
     /**
-     * Cnonverts to Win-1252
+     * Converts to Win-1252
      * @param string $text
      * @return string
      */
@@ -238,7 +238,7 @@ class Encoding {
     }
 
     /**
-     * Cnonverts to ISO-8859
+     * Converts to ISO-8859
      * @param string $text
      * @return string
      */

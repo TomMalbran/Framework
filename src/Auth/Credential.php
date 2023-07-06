@@ -102,27 +102,27 @@ class Credential {
 
     /**
      * Returns true if there is an Credential with the given ID
-     * @param integer $crendentialID
+     * @param integer $credentialID
      * @return boolean
      */
-    public static function exists(int $crendentialID): bool {
-        return self::schema()->exists($crendentialID);
+    public static function exists(int $credentialID): bool {
+        return self::schema()->exists($credentialID);
     }
 
     /**
      * Returns true if there is an Credential with the given ID and Level(s)
-     * @param integer              $crendentialID
+     * @param integer              $credentialID
      * @param integer[]|integer    $level
-     * @param string[]|string|null $filter        Optional.
-     * @param mixed|integer        $value         Optional.
+     * @param string[]|string|null $filter       Optional.
+     * @param mixed|integer        $value        Optional.
      * @return boolean
      */
-    public static function existsWithLevel(int $crendentialID, array|int $level, array|string $filter = null, mixed $value = 1): bool {
+    public static function existsWithLevel(int $credentialID, array|int $level, array|string $filter = null, mixed $value = 1): bool {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return false;
         }
-        $query->add("CREDENTIAL_ID", "=", $crendentialID);
+        $query->add("CREDENTIAL_ID", "=", $credentialID);
         return self::schema()->exists($query);
     }
 
@@ -811,7 +811,7 @@ class Credential {
     }
 
     /**
-     * Creates a list of names and emais for the given array
+     * Creates a list of names and emails for the given array
      * @param array{}[] $data
      * @param string    $prefix     Optional.
      * @param boolean   $onlyActive Optional.

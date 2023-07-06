@@ -85,7 +85,7 @@ class NLS {
     }
 
     /**
-     * Returns all the strings from the$key$keydata
+     * Returns all the strings from the data
      * @param string[] $keys
      * @param string   $language    Optional.
      * @param boolean  $withDefault Optional.
@@ -148,7 +148,7 @@ class NLS {
     }
 
     /**
-     * Returns a formated string using the correct plural string
+     * Returns a formatted string using the correct plural string
      * @param string   $key
      * @param string[] $strings
      * @param boolean  $useOr       Optional.

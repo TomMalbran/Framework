@@ -143,7 +143,7 @@ class Enum {
 
         // For ARRAY
         if ($cache->isArray) {
-            // Function "getKey" or "getIndex": Return the index where the value is equalto the given one
+            // Function "getKey" or "getIndex": Return the index where the value is equal to the given one
             if ($function == "getKey" || $function == "getIndex") {
                 foreach ($cache->data as $index => $name) {
                     if (Strings::isEqual($name, $value)) {

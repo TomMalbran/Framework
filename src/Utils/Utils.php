@@ -224,7 +224,7 @@ class Utils {
     }
 
     /**
-     * Parsea a Domain to try and return something like "domain.com"
+     * Parses a Domain to try and return something like "domain.com"
      * @param string $domain
      * @return string
      */
@@ -242,7 +242,7 @@ class Utils {
     }
 
     /**
-     * Returns true if the gven domain or www.domain is delegated
+     * Returns true if the given domain or www.domain is delegated
      * @param string $domain
      * @param string $serverIP Optional.
      * @return boolean
@@ -255,7 +255,7 @@ class Utils {
     }
 
     /**
-     * Returns true if the gven domain is delegated
+     * Returns true if the given domain is delegated
      * @param string $domain
      * @param string $serverIP Optional.
      * @return boolean
@@ -272,11 +272,11 @@ class Utils {
 
     /**
      * Returns a WhatsApp url
-     * @param string $whtasapp
+     * @param string $whatsApp
      * @return string
      */
-    public static function getWhatsAppUrl(string $whtasapp): string {
-        return "https://wa.me/$whtasapp";
+    public static function getWhatsAppUrl(string $whatsApp): string {
+        return "https://wa.me/$whatsApp";
     }
 
     /**

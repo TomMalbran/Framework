@@ -4,7 +4,7 @@ namespace Framework\Schema;
 use Framework\Framework;
 use Framework\Schema\Schema;
 use Framework\Schema\Structure;
-use Framework\Schema\Subrequest;
+use Framework\Schema\SubRequest;
 use Framework\Schema\Migration;
 use Framework\Schema\Database;
 use Framework\Utils\Arrays;
@@ -76,8 +76,8 @@ class Factory {
             return self::$schemas[$key];
         }
         $structure  = self::getStructure($key);
-        $subrequest = self::getSubrequest($key);
-        self::$schemas[$key] = new Schema(self::$db, $structure, $subrequest);
+        $subRequest = self::getSubRequest($key);
+        self::$schemas[$key] = new Schema(self::$db, $structure, $subRequest);
         return self::$schemas[$key];
     }
 
@@ -94,11 +94,11 @@ class Factory {
     }
 
     /**
-     * Creates and Returns the Subrequests for the given Key
+     * Creates and Returns the SubRequests for the given Key
      * @param string $key
-     * @return Subrequest[]
+     * @return SubRequest[]
      */
-    public static function getSubrequest(string $key): array {
+    public static function getSubRequest(string $key): array {
         $data   = self::$data[$key];
         $result = [];
 
@@ -107,7 +107,7 @@ class Factory {
                 $structure    = self::getStructure($key);
                 $subStructure = self::getStructure($subKey);
                 $subSchema    = new Schema(self::$db, $subStructure);
-                $result[]     = new Subrequest($subSchema, $structure, $subData);
+                $result[]     = new SubRequest($subSchema, $structure, $subData);
             }
         }
         return $result;

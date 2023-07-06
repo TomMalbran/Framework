@@ -39,7 +39,7 @@ class Mustache {
             $config  = [ "extension" => ".html" ];
             $loaders = [];
 
-            // Main templates can either be in public or public/templaes
+            // Main templates can either be in public or public/templates
             if (File::exists($path, Framework::TemplatesDir)) {
                 $loaderPath = File::getPath($path, Framework::TemplatesDir);
                 $loaders["loader"] = new Mustache_Loader_FilesystemLoader($loaderPath, $config);

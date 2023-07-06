@@ -22,7 +22,7 @@ class Spam {
 
 
     /**
-     * Proection against multiple submits in a few seconds
+     * Protection against multiple submits in a few seconds
      * @return boolean
      */
     public static function protect(): bool {

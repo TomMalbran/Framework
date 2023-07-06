@@ -54,12 +54,12 @@ class SpreadsheetWriter {
         }
 
         $sheet->setTitle(!empty($sheetName) ? NLS::get($sheetName, $this->lang) : $this->title);
-        $ssheet  = new SpreadsheetSheet($sheet, $this->lang);
-        $sheetID = $sheetID != null ? $sheetID : $this->sheetNum;
+        $spreadsheet = new SpreadsheetSheet($sheet, $this->lang);
+        $sheetID     = $sheetID != null ? $sheetID : $this->sheetNum;
 
-        $this->sheets[$sheetID] = $ssheet;
+        $this->sheets[$sheetID] = $spreadsheet;
         $this->sheetNum += 1;
-        return $ssheet;
+        return $spreadsheet;
     }
 
     /**

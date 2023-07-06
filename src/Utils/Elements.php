@@ -41,7 +41,7 @@ class Elements {
     }
 
     /**
-     * Remvoves an new Element
+     * Removes an new Element
      * @param string $key
      * @return Elements
      */

@@ -127,9 +127,7 @@ class Join {
         $rightKey = $this->rightKey;
         $and      = $this->getAnd($asTable);
 
-        return "LEFT JOIN $table AS $asTable ON (
-            $asTable.$leftKey = $onTable.$rightKey{$and}
-        )";
+        return "LEFT JOIN $table AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey{$and})";
     }
 
     /**

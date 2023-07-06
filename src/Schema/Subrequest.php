@@ -7,9 +7,9 @@ use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 
 /**
- * The Schema Subrequests
+ * The Schema SubRequests
  */
-class Subrequest {
+class SubRequest {
 
     private Schema $schema;
 
@@ -29,7 +29,7 @@ class Subrequest {
 
 
     /**
-     * Creates a new Subrequest instance
+     * Creates a new SubRequest instance
      * @param Schema    $schema
      * @param Structure $structure
      * @param array{}   $data

@@ -101,7 +101,7 @@ class Structure {
         // Parse the Fields
         $idKey        = "";
         $primaryCount = 0;
-        $reqMasterkey = false;
+        $reqMasterKey = false;
         foreach ($data["fields"] as $key => $value) {
             if ($value["type"] == Field::ID) {
                 $data["fields"][$key]["isPrimary"] = true;
@@ -114,7 +114,7 @@ class Structure {
                 $idKey = $key;
             }
             if ($value["type"] == Field::Encrypt) {
-                $reqMasterkey = true;
+                $reqMasterKey = true;
             }
         }
         if ($primaryCount > 1) {
@@ -160,8 +160,8 @@ class Structure {
             }
         }
 
-        // Set the Masterkey
-        if ($reqMasterkey) {
+        // Set the Master Key
+        if ($reqMasterKey) {
             $this->masterKey = KeyChain::get($schemaKey);
         }
     }

@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Schema\Database;
+use Framework\Schema\Structure;
 use Framework\Schema\Field;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;

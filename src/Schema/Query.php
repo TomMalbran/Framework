@@ -309,30 +309,30 @@ class Query {
         $valueParts = $splitValue ? Strings::split($value, " ") : [ $value ];
         $valueParts = Arrays::removeEmpty($valueParts);
         $columns    = Arrays::toArray($column);
-        $multiparts = Arrays::length($valueParts) > 1;
-        $multicols  = Arrays::length($columns) > 1;
+        $multiParts = Arrays::length($valueParts) > 1;
+        $multiCols  = Arrays::length($columns) > 1;
         $isFirst    = true;
 
-        if ($multiparts) {
+        if ($multiParts) {
             $this->startParen();
         }
         foreach ($valueParts as $valuePart) {
             $valueSearch = $caseInsensitive ? Strings::toLowerCase($valuePart) : $valuePart;
-            if ($multiparts && !$isFirst) {
+            if ($multiParts && !$isFirst) {
                 $this->and();
             }
-            if ($multicols) {
+            if ($multiCols) {
                 $this->startOr();
             }
             foreach ($columns as $columnSearch) {
                 $this->add($columnSearch, $expression, $valueSearch);
             }
-            if ($multicols) {
+            if ($multiCols) {
                 $this->endOr();
             }
             $isFirst = false;
         }
-        if ($multiparts) {
+        if ($multiParts) {
             $this->endParen();
         }
         return $this;
@@ -704,7 +704,7 @@ class Query {
     }
 
     /**
-     * Method generates decrimental function call
+     * Method generates decremental function call
      * @param integer $amount Optional.
      * @return array{}
      */

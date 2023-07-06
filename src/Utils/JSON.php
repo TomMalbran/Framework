@@ -79,7 +79,7 @@ class JSON {
      * @param boolean $asArray Optional.
      * @return object|array
      */
-    private static function createRespose(bool $asArray = false): mixed {
+    private static function createResponse(bool $asArray = false): mixed {
         return $asArray ? [] : new stdClass();
     }
 
@@ -91,11 +91,11 @@ class JSON {
      */
     public static function readFile(string $path, bool $asArray = false): mixed {
         if (!File::exists($path)) {
-            return self::createRespose($asArray);
+            return self::createResponse($asArray);
         }
         $response = file_get_contents($path);
         if (empty($response)) {
-            return self::createRespose($asArray);
+            return self::createResponse($asArray);
         }
         return self::decode($response, $asArray);
     }
@@ -109,7 +109,7 @@ class JSON {
     public static function readUrl(string $url, bool $asArray = false): mixed {
         $response = file_get_contents($url);
         if (empty($response)) {
-            return self::createRespose($asArray);
+            return self::createResponse($asArray);
         }
         return self::decode($response, $asArray);
     }
@@ -132,7 +132,7 @@ class JSON {
         $context  = stream_context_create($options);
         $response = file_get_contents($url, false, $context);
         if (empty($response)) {
-            return self::createRespose($asArray);
+            return self::createResponse($asArray);
         }
         return self::decode($response, $asArray);
     }

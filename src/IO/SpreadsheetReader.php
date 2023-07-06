@@ -42,7 +42,7 @@ class SpreadsheetReader {
 
 
     /**
-     * Returns the Highet Sheet column, removing the empty ones
+     * Returns the Highest Sheet column, removing the empty ones
      * @return string
      */
     public function getHighestColumn(): string {
@@ -65,7 +65,7 @@ class SpreadsheetReader {
     }
 
     /**
-     * Returns the Highet Sheet row, removing the empty ones
+     * Returns the Highest Sheet row, removing the empty ones
      * @return integer
      */
     public function getHighestRow(): int {

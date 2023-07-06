@@ -991,18 +991,17 @@ class Database {
         }
 
         // Build the CREATEs for the keys.
-        foreach ($indexes as $keyname => $columns) {
+        foreach ($indexes as $keyName => $columns) {
             ksort($columns);
-            $result .= "," . $crlf . "  $keyname (" . Strings::join($columns, ", ") . ")";
+            $result .= "," . $crlf . "  $keyName (" . Strings::join($columns, ", ") . ")";
         }
 
-        // Now just get the comment and type... (MyISAM, etc.)
+        // Now just get the comment and type...
         $request = $this->query("
             SHOW TABLE STATUS
             LIKE '" . strtr($tableName, [ '_' => '\\_', '%' => '\\%' ]) . "'
         ");
 
-        // Probably MyISAM.... and it might have a comment.
         $result .= $crlf . ") ENGINE=" . (isset($request[0]["Type"]) ? $request[0]["Type"] : $request[0]["Engine"]);
         $result .= $request[0]["Comment"] != "" ? " COMMENT='" . $request[0]["Comment"] . "'" : "";
 

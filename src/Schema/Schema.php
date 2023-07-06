@@ -3,6 +3,7 @@ namespace Framework\Schema;
 
 use Framework\Request;
 use Framework\Schema\Database;
+use Framework\Schema\SubRequest;
 use Framework\Schema\Selection;
 use Framework\Schema\Modification;
 use Framework\Schema\Query;
@@ -18,20 +19,20 @@ class Schema {
     private Database  $db;
     private Structure $structure;
 
-    /** @var Subrequest[] */
-    private array     $subrequests;
+    /** @var SubRequest[] */
+    private array     $subRequests;
 
 
     /**
      * Creates a new Schema instance
      * @param Database     $db
      * @param Structure    $structure
-     * @param Subrequest[] $subrequests Optional.
+     * @param SubRequest[] $subRequests Optional.
      */
-    public function __construct(Database $db, Structure $structure, array $subrequests = []) {
+    public function __construct(Database $db, Structure $structure, array $subRequests = []) {
         $this->db          = $db;
         $this->structure   = $structure;
-        $this->subrequests = $subrequests;
+        $this->subRequests = $subRequests;
     }
 
     /**
@@ -197,8 +198,8 @@ class Schema {
         $selection->request($query);
 
         $result = $selection->resolve();
-        foreach ($this->subrequests as $subrequest) {
-            $result = $subrequest->request($result);
+        foreach ($this->subRequests as $subRequest) {
+            $result = $subRequest->request($result);
         }
         return $result;
     }
@@ -224,8 +225,8 @@ class Schema {
 
         $result = $selection->resolve(array_keys($selects));
         if ($withSubs) {
-            foreach ($this->subrequests as $subrequest) {
-                $result = $subrequest->request($result);
+            foreach ($this->subRequests as $subRequest) {
+                $result = $subRequest->request($result);
             }
         }
         return $result;

@@ -99,19 +99,19 @@ class Config {
         self::load();
 
         // Check if there is a property with the given value
-        $upperkey = Strings::camelCaseToUpperCase($property);
-        if (isset(self::$data[$upperkey])) {
-            return self::$data[$upperkey];
+        $upperKey = Strings::camelCaseToUpperCase($property);
+        if (isset(self::$data[$upperKey])) {
+            return self::$data[$upperKey];
         }
 
         // Try to get all the properties that start with the value as a prefix
         $found  = false;
         $result = new stdClass();
-        foreach (self::$data as $envkey => $value) {
-            $parts  = Strings::split($envkey, "_");
+        foreach (self::$data as $envKey => $value) {
+            $parts  = Strings::split($envKey, "_");
             $prefix = Strings::toLowerCase($parts[0]);
             if ($prefix == $property) {
-                $suffix = Strings::replace($envkey, "{$parts[0]}_", "");
+                $suffix = Strings::replace($envKey, "{$parts[0]}_", "");
                 $key    = Strings::upperCaseToCamelCase($suffix);
                 $found  = true;
                 $result->{$key} = $value;
@@ -184,7 +184,7 @@ class Config {
     }
 
     /**
-     * Returns the Version split into the diferent parts
+     * Returns the Version split into the different parts
      * @return object
      */
     public static function getVersion(): object {

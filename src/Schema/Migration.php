@@ -132,18 +132,18 @@ class Migration {
      * @return boolean
      */
     private static function deleteTables(Database $db, array $tableNames, array $schemaNames, bool $canDelete): bool {
-        $deleted = 0;
-        $prebr   = "<br>";
+        $deleted  = 0;
+        $preBreak = "<br>";
         foreach ($tableNames as $tableName) {
             if (!Arrays::contains($schemaNames, $tableName)) {
                 if ($canDelete) {
                     $db->deleteTable($tableName);
-                    print("{$prebr}Deleted table <i>$tableName</i><br>");
+                    print("{$preBreak}Deleted table <i>$tableName</i><br>");
                 } else {
-                    print("{$prebr}Delete table <i>$tableName</i> (manually)<br>");
+                    print("{$preBreak}Delete table <i>$tableName</i> (manually)<br>");
                 }
                 $deleted += 1;
-                $prebr    = "";
+                $preBreak = "";
             }
         }
         return $deleted > 0;

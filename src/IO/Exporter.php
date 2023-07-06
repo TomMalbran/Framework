@@ -86,7 +86,7 @@ class Exporter {
     }
 
     /**
-     * Adds a simgle Header
+     * Adds a single Header
      * @param string  $key
      * @param string  $value
      * @param boolean $condition Optional.
@@ -126,7 +126,7 @@ class Exporter {
 
 
     /**
-     * Starts a Chumk Export
+     * Starts a Chunk Export
      * @param Request $request
      * @return Exporter
      */

@@ -153,18 +153,18 @@ class Media {
     /**
      * Moves or Renames a Media Element
      * @param string $oldPath
-     * @param string $newpath
+     * @param string $newPath
      * @param string $oldName
      * @param string $newName
      * @return string
      */
-    private static function mv(string $oldPath, string $newpath, string $oldName, string $newName): string {
+    private static function mv(string $oldPath, string $newPath, string $oldName, string $newName): string {
         $oldRelPath = File::getPath($oldPath, $oldName);
-        $newRelPath = File::getPath($newpath, $newName);
+        $newRelPath = File::getPath($newPath, $newName);
         $oldSource  = Path::getPath("source", $oldPath, $oldName);
-        $newSource  = Path::getPath("source", $newpath, $newName);
+        $newSource  = Path::getPath("source", $newPath, $newName);
         $oldThumbs  = Path::getPath("thumbs", $oldPath, $oldName);
-        $newThumbs  = Path::getPath("thumbs", $newpath, $newName);
+        $newThumbs  = Path::getPath("thumbs", $newPath, $newName);
 
         if (!File::move($oldSource, $newSource)) {
             return null;
