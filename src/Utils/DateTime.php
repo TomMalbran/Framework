@@ -1,18 +1,13 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\NLS\NLS;
 use Framework\Utils\Strings;
 
 /**
  * Several Date Time functions
  */
 class DateTime {
-
-    /** @var string[] */
-    public static array $days = [ "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado" ];
-
-    /** @var string[] */
-    public static array $months = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ];
 
     /** @var array{} The Date Formats */
     public static array $formats = [
@@ -598,10 +593,11 @@ class DateTime {
      * @param integer $time
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
+     * @param string  $language    Optional.
      * @return string
      */
-    public static function getMonthYear(int $time, int $length = 0, bool $inUpperCase = false): string {
-        return self::getMonth(date("n", $time), $length, $inUpperCase) . " " . date("Y", $time);
+    public static function getMonthYear(int $time, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+        return self::getMonthName(date("n", $time), $length, $inUpperCase, $language) . " " . date("Y", $time);
     }
 
     /**
@@ -609,13 +605,11 @@ class DateTime {
      * @param integer $month
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
+     * @param string  $language    Optional.
      * @return string
      */
-    public static function getMonth(int $month, int $length = 0, bool $inUpperCase = false): string {
-        $result = "";
-        if ($month >= 1 && $month <= 12) {
-            $result = self::$months[$month - 1];
-        }
+    public static function getMonthName(int $month, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+        $result = NLS::getIndex("DATE_TIME_MONTHS", $month - 1, $language);
         if ($length > 0) {
             $result = Strings::substring($result, 0, $length);
         }
@@ -628,10 +622,11 @@ class DateTime {
     /**
      * Returns a short version of the Month
      * @param integer $month
+     * @param string  $language Optional.
      * @return string
      */
-    public static function getShortMonth(int $month): string {
-        return self::getMonth($month, 3, true);
+    public static function getShortMonth(int $month, string $language = ""): string {
+        return self::getMonthName($month, 3, true, $language);
     }
 
 
@@ -715,23 +710,31 @@ class DateTime {
      * Returns the Day name at the given Time
      * @param integer      $time     Optional.
      * @param integer|null $timeZone Optional.
+     * @param string       $language Optional.
      * @return string
      */
-    public static function getDay(int $time = 0, ?int $timeZone = null): string {
+    public static function getDay(int $time = 0, ?int $timeZone = null, string $language): string {
         $dayOfWeek = self::getDayOfWeek($time, false, $timeZone);
-        return self::getDayName($dayOfWeek);
+        return self::getDayName($dayOfWeek, $language);
     }
 
     /**
      * Returns the Day name at the given Day
      * @param integer $day
+     * @param integer $length      Optional.
+     * @param boolean $inUpperCase Optional.
+     * @param string  $language    Optional.
      * @return string
      */
-    public static function getDayName(int $day): string {
-        if (!empty(self::$days[$day])) {
-            return self::$days[$day];
+    public static function getDayName(int $day, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+        $result = NLS::getIndex("DATE_TIME_DAYS", $day, $language);
+        if ($length > 0) {
+            $result = Strings::substring($result, 0, $length);
         }
-        return "";
+        if ($inUpperCase) {
+            $result = Strings::toUpperCase($result);
+        }
+        return $result;
     }
 
     /**
@@ -739,10 +742,11 @@ class DateTime {
      * @param integer $time
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
+     * @param string  $language    Optional.
      * @return string
      */
-    public static function getDayMonth(int $time, int $length = 0, bool $inUpperCase = false): string {
-        return date("d", $time) . " " . self::getMonth(date("n", $time), $length, $inUpperCase);
+    public static function getDayMonth(int $time, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+        return date("d", $time) . " " . self::getMonthName(date("n", $time), $length, $inUpperCase);
     }
 
     /**
