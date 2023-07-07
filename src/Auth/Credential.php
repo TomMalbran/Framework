@@ -429,14 +429,15 @@ class Credential {
      * @param integer[]|integer    $level
      * @param string[]|string|null $filter Optional.
      * @param mixed|integer        $value  Optional.
-     * @return array{}[]
+     * @return array{}
      */
     public static function getEmailsForLevel(array|int $level, array|string $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
         if (empty($query)) {
             return [];
         }
-        return self::schema()->getColumn($query, "email");
+        $request = self::schema()->getAll($query);
+        return Arrays::createMap($request, "email", "language");
     }
 
 
