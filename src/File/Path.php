@@ -85,7 +85,15 @@ class Path {
     }
 
     /**
-     * Returns the path to be used in urls
+     * Returns the base url
+     * @return string
+     */
+    public static function getBaseUrl(): string {
+        return Config::getFileUrl(Framework::FilesDir);
+    }
+
+    /**
+     * Returns the url for the given path
      * @param string $pathKey
      * @param string ...$pathParts
      * @return string
