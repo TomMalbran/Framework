@@ -412,6 +412,7 @@ class Database {
         $expression = Strings::replace($expression, "\n", "");
         $params     = $query->params;
         $keys       = [];
+        $values     = [];
 
         foreach ($params as $key => $value) {
             if (is_string($key)) {
@@ -419,8 +420,13 @@ class Database {
             } else {
                 $keys[] = '/[?]/';
             }
+            if (is_string($value)) {
+                $values[] = "'$value'";
+            } else {
+                $values[] = $value;
+            }
         }
-        return preg_replace($keys, $params, $expression, 1);
+        return preg_replace($keys, $values, $expression, 1);
     }
 
     /**
