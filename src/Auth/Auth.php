@@ -8,6 +8,7 @@ use Framework\Auth\Reset;
 use Framework\Auth\Spam;
 use Framework\Auth\Storage;
 use Framework\Config\Config;
+use Framework\NLS\NLS;
 use Framework\File\Path;
 use Framework\File\File;
 use Framework\Log\ActionLog;
@@ -269,11 +270,17 @@ class Auth {
         self::$accessLevel  = !empty($credential->userLevel) ? $credential->userLevel : $credential->level;
         self::$userID       = $userID;
 
+        $language = $credential->language;
         $timezone = $credential->timezone;
         if (!empty($admin)) {
             self::$admin    = $admin;
             self::$adminID  = $admin->id;
+            $language = $admin->language;
             $timezone = $admin->timezone;
+        }
+
+        if (!empty($language)) {
+            NLS::setLanguage($language);
         }
 
         $levels = Config::getArray("authTimezone");
