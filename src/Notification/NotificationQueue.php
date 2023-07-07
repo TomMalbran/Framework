@@ -23,14 +23,6 @@ class NotificationQueue {
         return Factory::getSchema("notificationQueue");
     }
 
-    /**
-     * Loads the Notification Credentials Schema
-     * @return Schema
-     */
-    public static function credentialSchema(): Schema {
-        return Factory::getSchema("notificationCredentials");
-    }
-
 
 
     /**
@@ -143,7 +135,7 @@ class NotificationQueue {
         $query->add("isDiscarded", "=", 0);
         $query->add("createdTime", ">", DateTime::getLastXDays(30));
         $query->orderBy("createdTime", false);
-        return self::credentialSchema()->getAll($query, $request);
+        return self::schema()->getAll($query, $request);
     }
 
     /**
@@ -158,48 +150,40 @@ class NotificationQueue {
         $query->add("isRead",      "=", 0);
         $query->add("isDiscarded", "=", 0);
         $query->add("createdTime", ">", DateTime::getLastXDays(30));
-        return self::credentialSchema()->getTotal($query);
+        return self::schema()->getTotal($query);
     }
 
 
 
     /**
      * Adds a new Notification
+     * @param integer $credentialID
+     * @param integer $currentUser
      * @param string  $title
      * @param string  $body
      * @param string  $url
      * @param string  $type
      * @param integer $dataID
-     * @param array{} $credentials
-     * @return boolean
+     * @return integer
      */
     public static function add(
+        int $credentialID,
+        int $currentUser,
         string $title,
         string $body,
         string $url,
         string $type,
-        int $dataID,
-        array $credentials
-    ): bool {
-        if (empty($credentials)) {
-            return false;
-        }
-
-        $notificationID = self::schema()->create([
-            "title"  => $title,
-            "body"   => $body,
-            "url"    => $url,
-            "type"   => $type,
-            "dataID" => $dataID,
+        int $dataID
+    ): int {
+        return self::schema()->create([
+            "CREDENTIAL_ID" => $credentialID,
+            "currentUser"   => $currentUser,
+            "title"         => $title,
+            "body"          => $body,
+            "url"           => $url,
+            "type"          => $type,
+            "dataID"        => $dataID,
         ]);
-        foreach ($credentials as $credentialID => $currentUser) {
-            self::credentialSchema()->replace([
-                "NOTIFICATION_ID" => $notificationID,
-                "CREDENTIAL_ID"   => $credentialID,
-                "currentUser"     => $currentUser,
-            ]);
-        }
-        return true;
     }
 
     /**
@@ -209,7 +193,6 @@ class NotificationQueue {
      */
     public static function delete(int $notificationID): bool {
         $query = Query::create("NOTIFICATION_ID", "=", $notificationID);
-        self::credentialSchema()->remove($query);
         return self::schema()->remove($query);
     }
 
@@ -227,7 +210,6 @@ class NotificationQueue {
         }
 
         $query = Query::create("NOTIFICATION_ID", "IN", $ids);
-        self::credentialSchema()->remove($query);
         self::schema()->remove($query);
         return true;
     }
@@ -237,13 +219,11 @@ class NotificationQueue {
     /**
      * Marks the given Notification as read for the given Credential
      * @param integer $notificationID
-     * @param integer $credentialID
      * @return boolean
      */
-    public static function markAsRead(int $notificationID, int $credentialID): bool {
+    public static function markAsRead(int $notificationID): bool {
         $query = Query::create("NOTIFICATION_ID", "=", $notificationID);
-        $query->add("CREDENTIAL_ID", "=", $credentialID);
-        return self::credentialSchema()->edit($query, [
+        return self::schema()->edit($query, [
             "isRead" => 1,
         ]);
     }
@@ -251,13 +231,11 @@ class NotificationQueue {
     /**
      * Discards the given Notification for the given Credential
      * @param integer $notificationID
-     * @param integer $credentialID
      * @return boolean
      */
-    public static function discard(int $notificationID, int $credentialID): bool {
+    public static function discard(int $notificationID): bool {
         $query = Query::create("NOTIFICATION_ID", "=", $notificationID);
-        $query->add("CREDENTIAL_ID", "=", $credentialID);
-        return self::credentialSchema()->edit($query, [
+        return self::schema()->edit($query, [
             "isDiscarded" => 1,
         ]);
     }
@@ -273,9 +251,8 @@ class NotificationQueue {
         $result        = true;
 
         foreach ($notifications as $notification) {
-            $credentialIDs = array_keys($notification["credentials"]);
-            $playerIDs     = Device::getAllForCredentials($credentialIDs);
-            $externalID    = Notification::sendToSome(
+            $playerIDs  = Device::getAllForCredential($notification["credentialID"]);
+            $externalID = Notification::sendToSome(
                 $notification["title"],
                 $notification["body"],
                 $notification["url"],

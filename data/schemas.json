@@ -157,48 +157,20 @@
     "notificationQueue" : {
         "table"  : "notification_queue",
         "fields" : {
-            "NOTIFICATION_ID" : { "type" : "id",    "name" : "notificationID" },
-            "title"           : { "type" : "string"                           },
-            "body"            : { "type" : "string"                           },
-            "url"             : { "type" : "string"                           },
-            "type"            : { "type" : "string"                           },
-            "dataID"          : { "type" : "number"                           },
-            "externalID"      : { "type" : "string"                           },
-            "sentTime"        : { "type" : "number"                           }
-        },
-        "subrequests" : {
-            "notificationCredentials" : {
-                "name"  : "credentials",
-                "field" : "credentialID",
-                "value" : "credentialName"
-            }
-        },
-        "hasTimestamps" : true,
-        "canCreate"     : true,
-        "canEdit"       : false,
-        "canDelete"     : false
-    },
-    "notificationCredentials" : {
-        "table"  : "notification_credentials",
-        "fields" : {
-            "NOTIFICATION_ID" : { "type" : "number", "name" : "notificationID", "isPrimary" : true },
-            "CREDENTIAL_ID"   : { "type" : "number", "name" : "credentialID",   "isPrimary" : true },
-            "currentUser"     : { "type" : "number"                                                },
-            "isRead"          : { "type" : "boolean"                                               },
-            "isDiscarded"     : { "type" : "boolean"                                               }
+            "NOTIFICATION_ID" : { "type" : "id",     "name" : "notificationID" },
+            "CREDENTIAL_ID"   : { "type" : "number", "name" : "credentialID"   },
+            "currentUser"     : { "type" : "number"                            },
+            "title"           : { "type" : "string"                            },
+            "body"            : { "type" : "string"                            },
+            "url"             : { "type" : "string"                            },
+            "type"            : { "type" : "string"                            },
+            "dataID"          : { "type" : "number"                            },
+            "externalID"      : { "type" : "string"                            },
+            "sentTime"        : { "type" : "number"                            },
+            "isRead"          : { "type" : "boolean"                           },
+            "isDiscarded"     : { "type" : "boolean"                           }
         },
         "joins" : {
-            "NOTIFICATION_ID" : {
-                "table"  : "notification_queue",
-                "fields" : {
-                    "title"      : { "type" : "string" },
-                    "body"       : { "type" : "string" },
-                    "type"       : { "type" : "number" },
-                    "dataID"     : { "type" : "number" },
-                    "externalID" : { "type" : "number" },
-                    "sentTime"   : { "type" : "number" }
-                }
-            },
             "CREDENTIAL_ID" : {
                 "table"  : "credentials",
                 "prefix" : "credential",
@@ -208,8 +180,8 @@
                 }
             }
         },
-        "hasTimestamps" : false,
-        "canCreate"     : false,
+        "hasTimestamps" : true,
+        "canCreate"     : true,
         "canEdit"       : false,
         "canDelete"     : false
     },
