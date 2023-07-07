@@ -29,15 +29,15 @@ class Device {
     }
 
     /**
-     * Returns all the Devices for the given Credentials
-     * @param integer[] $credentialIDs
+     * Returns all the Devices for the given Credential
+     * @param integer[]|integer $credentialID
      * @return string[]
      */
-    public static function getAllForCredentials(array $credentialIDs): array {
-        if (empty($credentialIDs)) {
+    public static function getAllForCredential(array|int $credentialID): array {
+        if (empty($credentialID)) {
             return [];
         }
-        $query = Query::create("CREDENTIAL_ID", "IN", $credentialIDs);
+        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         return self::schema()->getColumn($query, "playerID");
     }
 
