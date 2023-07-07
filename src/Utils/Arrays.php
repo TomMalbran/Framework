@@ -16,6 +16,15 @@ class Arrays {
     }
 
     /**
+     * Returns true if the given value is an list
+     * @param mixed $array
+     * @return boolean
+     */
+    public static function isList(mixed $array): bool {
+        return is_array($array) && array_is_list($array);
+    }
+
+    /**
      * Returns true if the given value is a map
      * @param mixed $array
      * @return boolean
