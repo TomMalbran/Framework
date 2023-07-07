@@ -65,9 +65,9 @@ class Picture {
      * Prints the Picture
      * @param boolean $download Optional.
      * @param string  $name     Optional.
-     * @return void
+     * @return boolean
      */
-    public function print(bool $download = false, string $name = "image"): void {
+    public function print(bool $download = false, string $name = "image"): bool {
         $contentType = Image::getContentType($this->type);
 
         header("Content-Type: $contentType");
@@ -76,5 +76,6 @@ class Picture {
             header("Content-Disposition: attachment; filename=\"$name.$extension\"");
         }
         Image::createImage($this->type, $this->image);
+        return true;
     }
 }
