@@ -56,11 +56,11 @@ class Language {
     }
 
     /**
-     * Returns the Language for the NLS considering the root
+     * Returns a valid Language Code
      * @param string $value
      * @return string
      */
-    public static function getNLS(string $value): string {
+    public static function getCode(string $value): string {
         self::load();
         if ($value != "root" && !empty(self::$data[$value])) {
             return $value;

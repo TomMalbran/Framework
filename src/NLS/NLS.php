@@ -2,6 +2,7 @@
 namespace Framework\NLS;
 
 use Framework\Framework;
+use Framework\Config\Config;
 use Framework\NLS\Language;
 use Framework\Utils\Arrays;
 
@@ -11,23 +12,36 @@ use Framework\Utils\Arrays;
 class NLS {
 
     /** @var array{}{} */
-    private static array $data = [];
+    private static array  $data     = [];
+    private static string $language = "root";
+
+
+    /**
+     * Sets the Language
+     * @param string $language
+     * @return boolean
+     */
+    public static function setLanguage(string $language): bool {
+        self::$language = $language;
+        return true;
+    }
 
 
     /**
      * Loads an NLS Language
-     * @param string $language
      * @return array{}
      */
-    public static function load(string $language): array {
-        if (!empty(self::$data[$language])) {
-            return self::$data[$language];
+    private static function load(): array {
+        $langCode = Language::getCode(self::$language);
+
+        if (!empty(self::$data[$langCode])) {
+            return self::$data[$langCode];
         }
 
-        $data = Framework::loadJSON(Framework::StringsDir, $language);
+        $data = Framework::loadJSON(Framework::StringsDir, $langCode);
         if (!empty($data)) {
-            self::$data[$language] = $data;
-            return self::$data[$language];
+            self::$data[$langCode] = $data;
+            return self::$data[$langCode];
         }
 
         return [];
@@ -35,20 +49,18 @@ class NLS {
 
     /**
      * Returns a string from the data
-     * @param string  $key
-     * @param string  $language    Optional.
-     * @param boolean $withDefault Optional.
+     * @param string $key
+     * @param string $language Optional.
      * @return mixed
      */
-    public static function get(string $key, string $language = "root", bool $withDefault = true): mixed {
-        $nls  = Language::getNLS($language);
-        $data = self::load($nls);
+    public static function get(string $key, string $language = ""): mixed {
+        if (!empty($language)) {
+            self::setLanguage($language);
+        }
 
+        $data = self::load();
         if (!empty($data[$key])) {
             return $data[$key];
-        }
-        if ($withDefault && $nls != Language::getNLS("root")) {
-            return self::get($key);
         }
         return $key;
     }
@@ -57,12 +69,11 @@ class NLS {
      * Returns a string from the data at the given index
      * @param string         $key
      * @param integer|string $index
-     * @param string         $language    Optional.
-     * @param boolean        $withDefault Optional.
+     * @param string         $language Optional.
      * @return string
      */
-    public static function getIndex(string $key, int|string $index, string $language = "root", bool $withDefault = true): string {
-        $result = self::get($key, $language, $withDefault);
+    public static function getIndex(string $key, int|string $index, string $language = ""): string {
+        $result = self::get($key, $language);
         if (!empty($result[$index])) {
             return $result[$index];
         }
@@ -71,13 +82,12 @@ class NLS {
 
     /**
      * Returns a string from the data
-     * @param string  $key
-     * @param string  $language    Optional.
-     * @param boolean $withDefault Optional.
+     * @param string $key
+     * @param string $language Optional.
      * @return mixed
      */
-    public static function getSelect(string $key, string $language = "root", bool $withDefault = true): mixed {
-        $result = self::get($key, $language, $withDefault);
+    public static function getSelect(string $key, string $language = ""): mixed {
+        $result = self::get($key, $language);
         if (Arrays::isArray($result)) {
             return Arrays::createSelectFromMap($result);
         }
@@ -87,15 +97,14 @@ class NLS {
     /**
      * Returns all the strings from the data
      * @param string[] $keys
-     * @param string   $language    Optional.
-     * @param boolean  $withDefault Optional.
+     * @param string   $language Optional.
      * @return string[]
      */
-    public static function getAll(array $keys, string $language = "root", bool $withDefault = true): array {
+    public static function getAll(array $keys, string $language = ""): array {
         $result = [];
         foreach ($keys as $key) {
             if (!empty($key)) {
-                $result[] = self::get($key, $language, $withDefault);
+                $result[] = self::get($key, $language);
             }
         }
         return $result;
@@ -104,15 +113,28 @@ class NLS {
 
 
     /**
+     * Creates an url from the given arguments
+     * @param mixed[] $args
+     * @param string  $language Optional.
+     * @return string
+     */
+    public static function url(array $args, string $language = ""): string {
+        $result = [];
+        foreach ($args as $arg) {
+            $result[] = self::get($arg, $language);
+        }
+        return Config::getUrl(...$result);
+    }
+
+    /**
      * Returns a formatted string
      * @param string  $key
      * @param mixed[] $args
-     * @param string  $language    Optional.
-     * @param boolean $withDefault Optional.
+     * @param string  $language Optional.
      * @return string
      */
-    public static function format(string $key, array $args, string $language = "root", bool $withDefault = true): string {
-        $subject = self::get($key, $language, $withDefault);
+    public static function format(string $key, array $args, string $language = ""): string {
+        $subject = self::get($key, $language);
         return preg_replace_callback("/\{(\d+)\}/", function ($match) use ($args) {
             return $args[$match[1]] ?: "";
         }, $subject);
@@ -122,61 +144,57 @@ class NLS {
      * Format and Joins the given strings to form a sentence
      * @param string   $key
      * @param string[] $strings
-     * @param boolean  $useOr       Optional.
-     * @param string   $language    Optional.
-     * @param boolean  $withDefault Optional.
+     * @param boolean  $useOr    Optional.
+     * @param string   $language Optional.
      * @return string
      */
-    public static function formatJoin(string $key, array $strings, bool $useOr = false, string $language = "root", bool $withDefault = true): string {
-        $args = [ self::join($strings, $useOr, $language, $withDefault) ];
-        return self::format($key, $args, $language, $withDefault);
+    public static function formatJoin(string $key, array $strings, bool $useOr = false, string $language = ""): string {
+        $args = [ self::join($strings, $useOr, $language) ];
+        return self::format($key, $args, $language);
     }
 
     /**
      * Returns a formatted string using the correct plural string
      * @param string  $key
      * @param integer $count
-     * @param mixed[] $args        Optional.
-     * @param string  $language    Optional.
-     * @param boolean $withDefault Optional.
+     * @param mixed[] $args     Optional.
+     * @param string  $language Optional.
      * @return string
      */
-    public static function pluralize(string $key, int $count, array $args = [], string $language = "root", bool $withDefault = true): string {
+    public static function pluralize(string $key, int $count, array $args = [], string $language = ""): string {
         $suffix = $count === 1 ? "_SINGULAR" : "_PLURAL";
         $args   = array_merge([ $count ], $args);
-        return self::format($key . $suffix, $args, $language, $withDefault);
+        return self::format($key . $suffix, $args, $language);
     }
 
     /**
      * Returns a formatted string using the correct plural string
      * @param string   $key
      * @param string[] $strings
-     * @param boolean  $useOr       Optional.
-     * @param string   $language    Optional.
-     * @param boolean  $withDefault Optional.
+     * @param boolean  $useOr    Optional.
+     * @param string   $language Optional.
      * @return string
      */
-    public static function pluralizeList(string $key, array $strings, bool $useOr = false, string $language = "root", bool $withDefault = true): string {
+    public static function pluralizeList(string $key, array $strings, bool $useOr = false, string $language = ""): string {
         $suffix = count($strings) === 1 ? "_SINGULAR" : "_PLURAL";
-        $args   = [ self::join($strings, $useOr, $language, $withDefault) ];
-        return self::format($key . $suffix, $args, $language, $withDefault);
+        $args   = [ self::join($strings, $useOr, $language) ];
+        return self::format($key . $suffix, $args, $language);
     }
 
     /**
      * Joins the given strings to form a sentence
      * @param string[] $strings
-     * @param boolean  $useOr       Optional.
-     * @param string   $language    Optional.
-     * @param boolean  $withDefault Optional.
+     * @param boolean  $useOr    Optional.
+     * @param string   $language Optional.
      * @return string
      */
-    public static function join(array $strings, bool $useOr = false, string $language = "root", bool $withDefault = true): string {
+    public static function join(array $strings, bool $useOr = false, string $language = ""): string {
         $strings = array_values($strings);
         $count   = count($strings);
         if ($count === 1) {
             return $strings[0];
         }
-        $glue   = self::get($useOr ? "GENERAL_OR" : "GENERAL_AND", $language, $withDefault);
+        $glue   = self::get($useOr ? "GENERAL_OR" : "GENERAL_AND", $language);
         $result = $strings[0];
         for ($i = 1; $i < $count; $i++) {
             $result .= ($i < $count - 1 ? ", " : " $glue ") . $strings[$i];
