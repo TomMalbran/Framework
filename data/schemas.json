@@ -106,15 +106,18 @@
     "emailTemplates" : {
         "table"  : "email_templates",
         "fields" : {
-            "templateCode" : { "type" : "string", "isPrimary" : true, "cantEdit" : true },
-            "description"  : { "type" : "string",                     "cantEdit" : true },
-            "type"         : { "type" : "string"                                        },
-            "sendTo"       : { "type" : "json"                                          },
-            "sendAs"       : { "type" : "string"                                        },
-            "sendName"     : { "type" : "string"                                        },
-            "subject"      : { "type" : "string"                                        },
-            "message"      : { "type" : "text"                                          },
-            "position"     : { "type" : "number",                     "cantEdit" : true }
+            "TEMPLATE_ID"  : { "type" : "id",     "name"     : "templateID" },
+            "templateCode" : { "type" : "string", "cantEdit" : true         },
+            "language"     : { "type" : "string", "cantEdit" : true         },
+            "languageName" : { "type" : "string", "cantEdit" : true         },
+            "description"  : { "type" : "string", "cantEdit" : true         },
+            "type"         : { "type" : "string"                            },
+            "sendTo"       : { "type" : "json"                              },
+            "sendAs"       : { "type" : "string"                            },
+            "sendName"     : { "type" : "string"                            },
+            "subject"      : { "type" : "string"                            },
+            "message"      : { "type" : "text"                              },
+            "position"     : { "type" : "number", "cantEdit" : true         }
         },
         "hasTimestamps" : true,
         "canCreate"     : false,

@@ -4,6 +4,7 @@ namespace Framework\Email;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
+use Framework\NLS\Language;
 use Framework\Provider\Mustache;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
@@ -28,24 +29,39 @@ class Template {
 
 
     /**
-     * Returns an Email Template with the given Code
+     * Returns an Email Template for the Email Sender
      * @param string $templateCode
+     * @param string $language     Optional.
      * @return Model
      */
-    public static function getOne(string $templateCode): Model {
-        $query = Query::create("templateCode", "=", $templateCode);
+    public static function get(string $templateCode, string $language = "root"): Model {
+        $langCode = Language::getCode($language);
+        $query    = Query::create("templateCode", "=", $templateCode);
+        $query->add("language", "=", $langCode);
         return self::schema()->getOne($query);
     }
 
     /**
-     * Returns true if there is an Email Template with the given Code
-     * @param string $templateCode
+     * Returns an Email Template with the given ID
+     * @param integer $templateID
+     * @return Model
+     */
+    public static function getOne(int $templateID): Model {
+        $query = Query::create("TEMPLATE_ID", "=", $templateID);
+        return self::schema()->getOne($query);
+    }
+
+    /**
+     * Returns true if there is an Email Template with ID
+     * @param string $templateID
      * @return boolean
      */
-    public static function exists(string $templateCode): bool {
-        $query = Query::create("templateCode", "=", $templateCode);
+    public static function exists(string $templateID): bool {
+        $query = Query::create("TEMPLATE_ID", "=", $templateID);
         return self::schema()->exists($query);
     }
+
+
 
     /**
      * Returns all the Email Templates
@@ -66,13 +82,12 @@ class Template {
 
     /**
      * Edits the given Email Template
-     * @param string  $templateCode
+     * @param integer $templateID
      * @param Request $request
      * @return boolean
      */
-    public static function edit(string $templateCode, Request $request): bool {
-        $query = Query::create("templateCode", "=", $templateCode);
-        return self::schema()->edit($query, $request);
+    public static function edit(int $templateID, Request $request): bool {
+        return self::schema()->edit($templateID, $request);
     }
 
 
@@ -98,51 +113,80 @@ class Template {
      * Migrates the Email Templates
      * @param Database $db
      * @param boolean  $recreate Optional.
-     * @param boolean  $sandbox  Optional.
      * @return boolean
      */
-    public static function migrate(Database $db, bool $recreate = false, bool $sandbox = false): bool {
+    public static function migrate(Database $db, bool $recreate = false): bool {
         if (!$db->hasTable("email_templates")) {
             return false;
         }
 
-        $request  = $db->getAll("email_templates");
-        $emails   = Framework::loadData(Framework::EmailData);
-        $siteName = Config::get("name");
-        $sendAs   = Config::get("emailEmail");
+        $languages = Language::getAll();
+        $oldEmails = $db->getAll("email_templates");
 
-        if (empty($emails)) {
-            return false;
+        if ($recreate) {
+            print("<br>Removed <i>" . count($oldEmails) . " emails</i><br>");
+            $db->truncate("email_templates");
+            $oldEmails = [];
         }
 
+        $position = count($oldEmails);
+        foreach ($languages as $language => $languageName) {
+            $newEmails = Framework::loadJSON(Framework::EmailsDir, $language);
+            if (!empty($newEmails)) {
+                $position = self::migrateLanguage($db, $oldEmails, $newEmails, $language, $languageName, $position);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Migrates the Email Templates fo the given Language
+     * @param Database  $db
+     * @param array{}[] $oldEmails
+     * @param array{}[] $newEmails
+     * @param string    $language
+     * @param string    $languageName
+     * @param integer   $position
+     * @return integer
+     */
+    private static function migrateLanguage(
+        Database $db,
+        array $oldEmails,
+        array $newEmails,
+        string $language,
+        string $languageName,
+        int $position
+    ): int {
+        $siteName = Config::get("name");
+        $sendAs   = Config::get("emailEmail");
         $adds     = [];
         $deletes  = [];
         $codes    = [];
-        $position = $recreate ? 0 : count($request);
 
         // Adds the Email Templates
-        foreach ($emails as $templateCode => $data) {
+        foreach ($newEmails as $templateCode => $newEmail) {
             $found = false;
-            if (!$recreate) {
-                foreach ($request as $row) {
-                    if ($row["templateCode"] == $templateCode) {
-                        $found = true;
-                        break;
-                    }
+            foreach ($oldEmails as $oldEmail) {
+                if ($oldEmail["templateCode"] == $templateCode && $oldEmail["language"] == $language) {
+                    $found = true;
+                    break;
                 }
             }
+
             if (!$found) {
                 $position += 1;
-                $message   = Strings::join($data["message"], "\n\n");
+                $message   = Strings::join($newEmail["message"], "\n\n");
                 $codes[]   = $templateCode;
                 $adds[]    = [
                     "templateCode" => $templateCode,
-                    "description"  => $data["description"],
-                    "type"         => !empty($data["type"]) ? $data["type"] : "",
-                    "sendAs"       => !empty($data["sendAs"]) ? $data["sendAs"] : $sendAs,
+                    "language"     => $language,
+                    "languageName" => $languageName,
+                    "description"  => $newEmail["description"],
+                    "type"         => !empty($newEmail["type"]) ? $newEmail["type"] : "",
+                    "sendAs"       => !empty($newEmail["sendAs"]) ? $newEmail["sendAs"] : $sendAs,
                     "sendName"     => $siteName,
-                    "sendTo"       => !empty($data["sendTo"]) ? "\"{$data["sendTo"]}\"" : "",
-                    "subject"      => ($sandbox ? "PRUEBA - " : "") . Strings::replace($data["subject"], "[site]", $siteName),
+                    "sendTo"       => !empty($newEmail["sendTo"]) ? "\"{$newEmail["sendTo"]}\"" : "",
+                    "subject"      => Strings::replace($newEmail["subject"], "[site]", $siteName),
                     "message"      => Strings::replace($message, "[site]", $siteName),
                     "position"     => $position,
                 ];
@@ -150,26 +194,20 @@ class Template {
         }
 
         // Removes the Email Templates
-        if (!$recreate) {
-            foreach ($request as $row) {
-                $found = false;
-                foreach (array_keys($emails) as $templateCode) {
-                    if ($row["templateCode"] == $templateCode) {
-                        $found = true;
-                        break;
-                    }
+        foreach ($oldEmails as $oldEmail) {
+            $found = false;
+            foreach (array_keys($newEmails) as $templateCode) {
+                if ($oldEmail["templateCode"] == $templateCode && $oldEmail) {
+                    $found = true;
+                    break;
                 }
-                if (!$found) {
-                    $deletes[] = $row["templateCode"];
-                }
+            }
+            if (!$found) {
+                $deletes[] = $oldEmail["templateCode"];
             }
         }
 
         // Process the SQL
-        if ($recreate) {
-            print("<br>Removed <i>" . count($request) . " emails</i><br>");
-            $db->truncate("email_templates");
-        }
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " emails</i><br>");
             print(Strings::join($codes, ", ") . "<br>");
@@ -187,6 +225,6 @@ class Template {
             print("<br>No <i>emails</i> added or deleted <br>");
         }
 
-        return true;
+        return $position;
     }
 }

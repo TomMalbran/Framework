@@ -30,7 +30,6 @@ class Framework {
     const PathData      = "paths";
     const MediaData     = "media";
     const SettingsData  = "settings";
-    const EmailData     = "emails";
     const LanguageData  = "languages";
     const StatusData    = "status";
 
@@ -50,6 +49,7 @@ class Framework {
 
     const NLSDir        = "nls";
     const StringsDir    = "nls/strings";
+    const EmailsDir     = "nls/emails";
 
     // Variables
     private static string   $framePath;
@@ -303,13 +303,12 @@ class Framework {
      * @param Database $db
      * @param boolean  $canDelete Optional.
      * @param boolean  $recreate  Optional.
-     * @param boolean  $sandbox   Optional.
      * @return boolean
      */
-    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false, bool $sandbox = false): bool {
+    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false): bool {
         $factMigrated = Factory::migrate($db, $canDelete);
         $settMigrated = Settings::migrate($db);
-        $tempMigrated = Template::migrate($db, $recreate, $sandbox);
+        $tempMigrated = Template::migrate($db, $recreate);
         $pathMigrated = Path::ensurePaths();
         return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated;
     }
