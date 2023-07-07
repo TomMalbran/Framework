@@ -74,6 +74,15 @@ class Language {
     }
 
     /**
+     * Returns all the Languages
+     * @return array{}
+     */
+    public static function getAll(): array {
+        self::load();
+        return Arrays::createMap(self::$data, "key", "name");
+    }
+
+    /**
      * Creates a Select of Languages
      * @return array{}[]
      */
