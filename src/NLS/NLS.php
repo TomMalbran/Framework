@@ -29,10 +29,11 @@ class NLS {
 
     /**
      * Loads an NLS Language
+     * @param string $language
      * @return array{}
      */
-    private static function load(): array {
-        $langCode = Language::getCode(self::$language);
+    private static function load(string $language): array {
+        $langCode = Language::getCode($language);
 
         if (!empty(self::$data[$langCode])) {
             return self::$data[$langCode];
@@ -54,11 +55,11 @@ class NLS {
      * @return mixed
      */
     public static function get(string $key, string $language = ""): mixed {
-        if (!empty($language)) {
-            self::setLanguage($language);
+        if (empty($language)) {
+            $language = self::$language;
         }
 
-        $data = self::load();
+        $data = self::load($language);
         if (!empty($data[$key])) {
             return $data[$key];
         }
