@@ -181,6 +181,7 @@ class Utils {
      * @return string
      */
     public static function generateDomain(string $email): string {
+        /** spell-checker: disable */
         $domains = [
             /* Default domains included */
             "aol.com", "att.net", "comcast.net", "facebook.com", "fb.com", "gmail.com", "gmx.com", "googlemail.com",
@@ -203,6 +204,7 @@ class Utils {
             /* Special domain */
             "unbounce.com", "webadictos.net", "telefonica.com", "prueba.com", "tester.com", "demo.com",
         ];
+        /** spell-checker: enable */
 
         if (self::isValidEmail($email)) {
             $domain = Strings::substringAfter($email, "@");
