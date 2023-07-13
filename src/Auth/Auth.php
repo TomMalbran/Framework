@@ -57,7 +57,7 @@ class Auth {
 
         // Retrieve the Admin
         $admin = Model::createEmpty();
-        if (!empty($data->admin)) {
+        if (!empty($data->adminID)) {
             $admin = Credential::getOne($data->adminID, true);
         }
 
@@ -272,11 +272,14 @@ class Auth {
 
         $language = $credential->language;
         $timezone = $credential->timezone;
-        if (!empty($admin)) {
-            self::$admin    = $admin;
-            self::$adminID  = $admin->id;
+        if (!empty($admin) && !$admin->isEmpty()) {
+            self::$admin   = $admin;
+            self::$adminID = $admin->id;
             $language = $admin->language;
             $timezone = $admin->timezone;
+        } else {
+            self::$admin   = null;
+            self::$adminID = 0;
         }
 
         if (!empty($language)) {
@@ -325,7 +328,7 @@ class Auth {
             "avatar"           => self::$credential->avatar,
             "reqPassChange"    => self::$credential->reqPassChange,
             "askNotifications" => self::$credential->askNotifications,
-            "loggedAsUser"     => !empty(self::$adminID),
+            "loggedAsUser"     => self::isLoggedAsUser(),
         ];
 
         // Add fields from the Config
