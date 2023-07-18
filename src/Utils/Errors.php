@@ -11,6 +11,9 @@ class Errors {
     /** @var array{} */
     private array $errors = [];
 
+    /** @var array{} */
+    private array $counts = [];
+
 
     /**
      * Creates a new Errors instance
@@ -52,18 +55,16 @@ class Errors {
 
 
     /**
-     * Adds a new error
-     * @param string      $error
-     * @param string      $message
-     * @param string|null $value   Optional.
+     * Increases the Errors amount
+     * @param string  $section
+     * @param integer $amount
      * @return Errors
      */
-    public function add(string $error, string $message, ?string $value = null): Errors {
-        if (!empty($value)) {
-            $this->errors[$error] = [ $message, $value ];
-        } else {
-            $this->errors[$error] = $message;
+    public function incCount(string $section, int $amount = 1): Errors {
+        if (empty($this->counts[$section])) {
+            $this->counts[$section] = 0;
         }
+        $this->counts[$section] += $amount;
         return $this;
     }
 
@@ -87,6 +88,24 @@ class Errors {
         return $this;
     }
 
+
+
+    /**
+     * Adds a new error
+     * @param string      $error
+     * @param string      $message
+     * @param string|null $value   Optional.
+     * @return Errors
+     */
+    public function add(string $error, string $message, ?string $value = null): Errors {
+        if (!empty($value)) {
+            $this->errors[$error] = [ $message, $value ];
+        } else {
+            $this->errors[$error] = $message;
+        }
+        return $this;
+    }
+
     /**
      * Adds a new error if the condition is true
      * @param boolean $condition
@@ -99,6 +118,23 @@ class Errors {
             $this->add($error, $message);
         }
         return $this;
+    }
+
+    /**
+     * Adds a new error
+     * @param string      $section
+     * @param string      $error
+     * @param string      $message
+     * @param string|null $value   Optional.
+     * @return Errors
+     */
+    public function addFor(string $section, string $error, string $message, ?string $value = null): Errors {
+        if (empty($this->errors[$section])) {
+            $this->errors[$section] = 1;
+        } else {
+            $this->errors[$section] += 1;
+        }
+        return $this->add($error, $message, $value);
     }
 
     /**
@@ -119,6 +155,19 @@ class Errors {
             $this->errors["$prefix$key$suffix"] = $error;
         }
         return $this;
+    }
+
+    /**
+     * Merges the other Errors
+     * @param string $section
+     * @param Errors $errors
+     * @param string $prefix  Optional.
+     * @param string $suffix  Optional.
+     * @return Errors
+     */
+    public function mergeFor(string $section, Errors $errors, string $prefix = "", string $suffix = ""): Errors {
+        $this->incCount($section, $errors->getTotal());
+        return $this->merge($errors, $prefix, $suffix);
     }
 
 
@@ -146,7 +195,7 @@ class Errors {
      * @return array{}
      */
     public function get(): array {
-        return $this->errors;
+        return array_merge($this->errors, $this->counts);
     }
 
     /**
