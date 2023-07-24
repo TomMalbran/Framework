@@ -21,35 +21,36 @@ use Exception;
 class Framework {
 
     // The Data
-    const RouteData     = "routes";
-    const DispatchData  = "dispatches";
-    const SchemaData    = "schemas";
-    const KeyData       = "keys";
-    const AccessData    = "access";
-    const TokenData     = "tokens";
-    const PathData      = "paths";
-    const MediaData     = "media";
-    const SettingsData  = "settings";
-    const LanguageData  = "languages";
-    const StatusData    = "status";
+    const RouteData      = "routes";
+    const DispatchData   = "dispatches";
+    const SchemaData     = "schemas";
+    const MigrationsData = "migrations";
+    const KeyData        = "keys";
+    const AccessData     = "access";
+    const TokenData      = "tokens";
+    const PathData       = "paths";
+    const MediaData      = "media";
+    const SettingsData   = "settings";
+    const LanguageData   = "languages";
+    const StatusData     = "status";
 
     // The Directories
-    const SourceDir     = "src";
-    const LogDir        = "logs";
+    const SourceDir      = "src";
 
-    const DataDir       = "data";
-    const MigrationsDir = "data/migrations";
+    const DataDir        = "data";
+    const LogDir         = "data/logs";
+    const MigrationsDir  = "data/migrations";
 
-    const PublicDir     = "public";
-    const TemplatesDir  = "templates";
-    const PartialsDir   = "partials";
+    const PublicDir      = "public";
+    const TemplatesDir   = "templates";
+    const PartialsDir    = "partials";
 
-    const FilesDir      = "files";
-    const TempDir       = "temp";
+    const FilesDir       = "files";
+    const TempDir        = "temp";
 
-    const NLSDir        = "nls";
-    const StringsDir    = "nls/strings";
-    const EmailsDir     = "nls/emails";
+    const NLSDir         = "nls";
+    const StringsDir     = "nls/strings";
+    const EmailsDir      = "nls/emails";
 
     // Variables
     private static string   $framePath;

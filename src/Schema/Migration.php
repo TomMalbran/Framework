@@ -22,7 +22,7 @@ class Migration {
      * @return boolean
      */
     public static function migrate(Database $db, array $schemas, bool $canDelete = false): bool {
-        $migrations = Framework::loadData("migrations/migrations");
+        $migrations = Framework::loadData(Framework::MigrationsData);
 
         $moved    = self::moveTables($db, $migrations["movements"]);
         $migrated = self::migrateTables($db, $schemas, $migrations["updates"], $canDelete);
