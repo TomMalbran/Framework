@@ -528,7 +528,7 @@ class Arrays {
      */
     public static function findValue(array $array, string $idKey, mixed $idValue, string $key = ""): mixed {
         foreach ($array as $elem) {
-            if ($elem[$idKey] == $idValue) {
+            if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
                 return $key ? $elem[$key] : $elem;
             }
         }
@@ -547,7 +547,7 @@ class Arrays {
     public static function findValues(array $array, string $idKey, mixed $idValue, string $key = "", string $glue = ""): mixed {
         $result = [];
         foreach ($array as $elem) {
-            if ($elem[$idKey] == $idValue) {
+            if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
                 $result[] = $key ? $elem[$key] : $elem;
             }
         }
