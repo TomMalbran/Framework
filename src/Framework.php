@@ -304,13 +304,19 @@ class Framework {
      * @param Database $db
      * @param boolean  $canDelete Optional.
      * @param boolean  $recreate  Optional.
+     * @param boolean  $withPaths Optional.
      * @return boolean
      */
-    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false): bool {
+    public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false, bool $withPaths = true): bool {
         $factMigrated = Factory::migrate($db, $canDelete);
         $settMigrated = Settings::migrate($db);
         $tempMigrated = Template::migrate($db, $recreate);
-        $pathMigrated = Path::ensurePaths();
+
+        if ($withPaths) {
+            $pathMigrated = Path::ensurePaths();
+        } else {
+            $pathMigrated = true;
+        }
         return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated;
     }
 }
