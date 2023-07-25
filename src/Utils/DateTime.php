@@ -713,7 +713,7 @@ class DateTime {
      * @param string       $language Optional.
      * @return string
      */
-    public static function getDay(int $time = 0, ?int $timeZone = null, string $language): string {
+    public static function getDay(int $time = 0, ?int $timeZone = null, string $language = ""): string {
         $dayOfWeek = self::getDayOfWeek($time, false, $timeZone);
         return self::getDayName($dayOfWeek, $language);
     }
