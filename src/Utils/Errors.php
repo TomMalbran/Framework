@@ -98,6 +98,9 @@ class Errors {
      * @return Errors
      */
     public function add(string $error, string $message, ?string $value = null): Errors {
+        if (empty($message)) {
+            return $this;
+        }
         if (!empty($value)) {
             $this->errors[$error] = [ $message, $value ];
         } else {
@@ -166,6 +169,9 @@ class Errors {
      * @return Errors
      */
     public function mergeFor(string $section, Errors $errors, string $prefix = "", string $suffix = ""): Errors {
+        if (!$errors->has()) {
+            return $this;
+        }
         $this->incCount($section, $errors->getTotal());
         return $this->merge($errors, $prefix, $suffix);
     }
