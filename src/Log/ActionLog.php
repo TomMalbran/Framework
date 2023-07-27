@@ -58,8 +58,8 @@ class ActionLog {
             $query->addIf($value, "=", $request->get($key));
         }
 
-        $query->addIf("time", ">", $fromTime);
-        $query->addIf("time", "<", $toTime);
+        $query->addIf("createdTime", ">", $fromTime);
+        $query->addIf("createdTime", "<", $toTime);
         return $query;
     }
 
@@ -71,7 +71,7 @@ class ActionLog {
      */
     public static function getAll(Request $request, array $mappings = []): array {
         $query = self::createQuery($request, $mappings);
-        $query->orderBy("time", false);
+        $query->orderBy("createdTime", false);
         $query->paginate($request->getInt("page"), $request->getInt("amount"));
         return self::request($query);
     }
@@ -94,8 +94,8 @@ class ActionLog {
      */
     private static function request(Query $query): array {
         $sessionIDs   = self::sessionSchema()->getColumn($query, "SESSION_ID");
-        $querySession = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", false);
-        $queryActs    = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("time", true);
+        $querySession = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("createdTime", false);
+        $queryActs    = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("createdTime", true);
         $actions      = [];
         $result       = [];
 
@@ -109,10 +109,10 @@ class ActionLog {
                 $actions[$row["sessionID"]] = [];
             }
             $actions[$row["sessionID"]][] = [
-                "time"    => $row["time"],
-                "action"  => $row["action"],
-                "section" => $row["section"],
-                "dataID"  => !empty($row["dataID"]) ? JSON::decode($row["dataID"]) : "",
+                "module"      => $row["module"],
+                "action"      => $row["action"],
+                "dataID"      => !empty($row["dataID"]) ? JSON::decode($row["dataID"]) : "",
+                "createdTime" => $row["createdTime"],
             ];
         }
 
@@ -122,10 +122,10 @@ class ActionLog {
                 "sessionID"      => $row["sessionID"],
                 "credentialID"   => $row["credentialID"],
                 "credentialName" => $row["credentialName"],
-                "time"           => $row["time"],
                 "ip"             => $row["ip"],
                 "userAgent"      => $row["userAgent"],
                 "actions"        => !empty($actions[$row["sessionID"]]) ? $actions[$row["sessionID"]] : [],
+                "createdTime"    => $row["createdTime"],
             ];
         }
 
@@ -149,7 +149,6 @@ class ActionLog {
                 "USER_ID"       => Auth::getUserID(),
                 "ip"            => Server::getIP(),
                 "userAgent"     => Server::getUserAgent(),
-                "time"          => time(),
             ]);
             self::setSessionID($sessionID);
             return true;
@@ -169,16 +168,17 @@ class ActionLog {
 
     /**
      * Logs the given Action
-     * @param integer       $action
-     * @param integer       $section Optional.
-     * @param mixed|integer $dataID  Optional.
+     * @param string        $module
+     * @param string        $action
+     * @param mixed|integer $dataID Optional.
      * @return boolean
      */
-    public static function add(int $action, int $section = 0, mixed $dataID = 0): bool {
+    public static function add(string $module, string $action, mixed $dataID = 0): bool {
         $sessionID = self::getSessionID();
         if (empty($sessionID)) {
             return false;
         }
+
         $dataID = Arrays::toArray($dataID);
         foreach ($dataID as $index => $value) {
             $dataID[$index] = (int)$value;
@@ -188,10 +188,9 @@ class ActionLog {
             "SESSION_ID"    => $sessionID,
             "CREDENTIAL_ID" => Auth::getID(),
             "USER_ID"       => Auth::getUserID(),
+            "module"        => $module,
             "action"        => $action,
-            "section"       => $section,
             "dataID"        => JSON::encode($dataID),
-            "time"          => time(),
         ]);
         return true;
     }
@@ -227,7 +226,7 @@ class ActionLog {
      */
     public static function deleteOld(int $days = 90): bool {
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("time", "<", $time);
+        $query = Query::create("createdTime", "<", $time);
         self::sessionSchema()->remove($query);
         self::actionSchema()->remove($query);
         return true;

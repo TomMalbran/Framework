@@ -224,8 +224,7 @@
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
             "USER_ID"       : { "type" : "number", "name" : "userID"       },
             "ip"            : { "type" : "string"                          },
-            "userAgent"     : { "type" : "string"                          },
-            "time"          : { "type" : "number"                          }
+            "userAgent"     : { "type" : "string"                          }
         },
         "joins" : {
             "CREDENTIAL_ID" : {
@@ -238,8 +237,8 @@
                 }
             }
         },
-        "hasTimestamps" : false,
-        "canCreate"     : false,
+        "hasTimestamps" : true,
+        "canCreate"     : true,
         "canEdit"       : false,
         "canDelete"     : false
     },
@@ -250,17 +249,16 @@
             "SESSION_ID"    : { "type" : "number", "name" : "sessionID"    },
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
             "USER_ID"       : { "type" : "number", "name" : "userID"       },
-            "action"        : { "type" : "number"                          },
-            "section"       : { "type" : "number"                          },
-            "dataID"        : { "type" : "string"                          },
-            "time"          : { "type" : "number"                          }
+            "module"        : { "type" : "string"                          },
+            "action"        : { "type" : "string"                          },
+            "dataID"        : { "type" : "string"                          }
         },
         "joins" : {
             "SESSION_ID" : {
                 "table"  : "log_sessions",
                 "prefix" : "session",
                 "fields" : {
-                    "time" : { "type" : "date" }
+                    "createdTime" : { "type" : "date" }
                 }
             },
             "CREDENTIAL_ID" : {
@@ -269,12 +267,12 @@
                 "fields" : {
                     "firstName" : { "type" : "string", "mergeTo" : "name" },
                     "lastName"  : { "type" : "string", "mergeTo" : "name" },
-                    "email"     : { "type" : "string"  }
+                    "email"     : { "type" : "string"                     }
                 }
             }
         },
-        "hasTimestamps" : false,
-        "canCreate"     : false,
+        "hasTimestamps" : true,
+        "canCreate"     : true,
         "canEdit"       : false,
         "canDelete"     : false
     },
