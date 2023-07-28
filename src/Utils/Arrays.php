@@ -356,6 +356,15 @@ class Arrays {
         return $result;
     }
 
+    /**
+     * Returns the given array reversed
+     * @param mixed[] $array
+     * @return mixed[]
+     */
+    public static function reverse(array $array): array {
+        return array_reverse($array);
+    }
+
 
 
     /**
