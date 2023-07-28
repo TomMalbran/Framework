@@ -338,10 +338,10 @@ class Strings {
     /**
      * Joins the given Strings using the given glue
      * @param string[]|string $string
-     * @param string          $glue
+     * @param string          $glue   Optional.
      * @return string
      */
-    public static function join(array|string $string, string $glue): string {
+    public static function join(array|string $string, string $glue = ""): string {
         if (is_array($string)) {
             return implode($glue, $string);
         }
@@ -351,10 +351,10 @@ class Strings {
     /**
      * Joins the given Strings keys using the given glue
      * @param string[]|string $string
-     * @param string          $glue
+     * @param string          $glue   Optional.
      * @return string
      */
-    public static function joinKeys(array|string $string, string $glue): string {
+    public static function joinKeys(array|string $string, string $glue = ""): string {
         if (is_array($string)) {
             return implode($glue, array_keys($string));
         }
