@@ -190,9 +190,6 @@ class Curl {
 
         // Try to decode the response as a JSON
         $result = JSON::decode($response, true);
-        if (isset($result["data"])) {
-            return $result["data"];
-        }
         return $result;
     }
 
