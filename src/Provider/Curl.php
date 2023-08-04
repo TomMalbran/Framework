@@ -182,13 +182,10 @@ class Curl {
             return [];
         }
 
-        // Remove any possible warning after the response
-        $warning = "<br />\n<b>Warning</b>";
-        if (Strings::contains($response, $warning)) {
-            $response = Strings::substringBefore($response, $warning);
-        }
-
         // Try to decode the response as a JSON
+        if (!JSON::isValid($response)) {
+            return [ "error" => $response ];
+        }
         $result = JSON::decode($response, true);
         return $result;
     }
