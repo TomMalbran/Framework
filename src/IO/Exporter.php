@@ -6,6 +6,7 @@ use Framework\NLS\NLS;
 use Framework\IO\SpreadsheetWriter;
 use Framework\IO\SpreadsheetSheet;
 use Framework\Utils\Elements;
+use Framework\Utils\Strings;
 
 /**
  * The Exporter Wrapper
@@ -32,32 +33,24 @@ class Exporter {
      * @param integer $total
      * @param string  $title
      * @param string  $fileName
+     * @param integer $maxLines Optional.
      * @param string  $lang     Optional.
      */
-    public function __construct(int $total, string $title, string $fileName, string $lang = "root") {
+    public function __construct(int $total, string $title, string $fileName, int $maxLines = 5000, string $lang = "root") {
         $this->fileName = $fileName;
         $this->lang     = $lang;
         $this->total    = $total;
         $this->header   = new Elements();
 
-        if ($total < 5000) {
+        if ($total < $maxLines) {
             $this->isCSV  = false;
             $this->writer = new SpreadsheetWriter($title, $lang);
             $this->sheet  = $this->writer->addSheet();
         } else {
             $this->isCSV  = true;
             $this->csv    = fopen("php://output", "w");
-
-            if (ob_get_level()) {
-                ob_end_clean();
-            }
-            $fileName = NLS::get($fileName, $lang);
-            header("Content-Type: application/csv");
-            header("Content-Disposition: attachment; filename=\"{$fileName}.csv\"");
-            header("Pragma: no-cache");
-            header("Expires: 0");
-            flush();
         }
+        $this->start();
     }
 
 
@@ -167,6 +160,28 @@ class Exporter {
     }
 
 
+
+    /**
+     * Starts the Exporter
+     * @return boolean
+     */
+    private function start(): bool {
+        if (!$this->isCSV) {
+            return false;
+        }
+
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        $fileName = NLS::get($this->fileName, $this->lang) . "_" . date("Y-m-d");
+        header("Content-Type: application/csv");
+        header("Content-Disposition: attachment; filename=\"{$fileName}.csv\"");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        flush();
+        return true;
+    }
 
     /**
      * Downloads the File
