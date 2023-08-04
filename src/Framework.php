@@ -9,6 +9,7 @@ use Framework\Config\Settings;
 use Framework\Email\Template;
 use Framework\File\File;
 use Framework\File\Path;
+use Framework\File\MediaFile;
 use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
@@ -156,11 +157,11 @@ class Framework {
 
     /**
      * Returns the FilesPath with the given file
-     * @param string $file Optional.
+     * @param string ...$pathParts
      * @return string
      */
-    public static function getFilesPath(string $file = ""): string {
-        $path = File::getPath(self::$basePath, self::FilesDir, $file);
+    public static function getFilesPath(string ...$pathParts): string {
+        $path = File::getPath(self::$basePath, self::FilesDir, ...$pathParts);
         return File::removeLastSlash($path);
     }
 
@@ -313,10 +314,12 @@ class Framework {
         $tempMigrated = Template::migrate($db, $recreate);
 
         if ($withPaths) {
-            $pathMigrated = Path::ensurePaths();
+            $pathMigrated  = Path::ensurePaths();
+            $mediaMigrated = MediaFile::ensurePaths();
         } else {
-            $pathMigrated = true;
+            $pathMigrated  = true;
+            $mediaMigrated = true;
         }
-        return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated;
+        return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated || $mediaMigrated;
     }
 }

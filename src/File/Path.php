@@ -11,11 +11,10 @@ use Framework\Utils\Strings;
  */
 class Path {
 
-    private static bool   $loaded   = false;
-    private static string $basePath = "";
+    private static bool   $loaded = false;
 
     /** @var array{}[] */
-    private static array  $data     = [];
+    private static array  $data   = [];
 
 
     /**
@@ -26,9 +25,8 @@ class Path {
         if (self::$loaded) {
             return false;
         }
-        self::$loaded   = true;
-        self::$data     = Framework::loadData(Framework::PathData);
-        self::$basePath = Framework::getFilesPath();
+        self::$loaded = true;
+        self::$data   = Framework::loadData(Framework::PathData);
         return true;
     }
 
@@ -52,8 +50,7 @@ class Path {
      * @return string
      */
     public static function getBasePath(): string {
-        self::load();
-        return self::$basePath;
+        return Framework::getFilesPath();
     }
 
     /**
@@ -79,7 +76,7 @@ class Path {
     public static function getPath(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
-            return File::getPath(self::$basePath, $path, ...$pathParts);
+            return Framework::getFilesPath($path, ...$pathParts);
         }
         return "";
     }
@@ -163,14 +160,6 @@ class Path {
             $path = self::getPath($pathKey);
             if (File::createDir($path)) {
                 $paths[] = $pathKey;
-            }
-            if ($pathKey == "source" || $pathKey == "thumbs") {
-                foreach (self::$data["directories"] as $pathDir) {
-                    $path = self::getPath($pathKey, $pathDir);
-                    if (File::createDir($path)) {
-                        $paths[] = "$pathKey/$pathDir";
-                    }
-                }
             }
         }
 
