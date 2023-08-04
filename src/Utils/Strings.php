@@ -221,6 +221,19 @@ class Strings {
     }
 
     /**
+     * Removes the Needle from the start and end of the String
+     * @param string $string
+     * @param string $startNeedle
+     * @param string $endNeedle
+     * @return string
+     */
+    public static function stripStartEnd(string $string, string $startNeedle, string $endNeedle): string {
+        $result = self::stripStart($string, $startNeedle);
+        $result = self::stripEnd($result, $endNeedle);
+        return $result;
+    }
+
+    /**
      * Adds the Needle to the start of the String if not there
      * @param string $string
      * @param string $needle
