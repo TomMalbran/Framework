@@ -503,24 +503,36 @@ class Strings {
      * Returns a short version of the given string
      * @param string  $string
      * @param integer $length Optional.
+     * @param boolean $asUtf8 Optional.
      * @return string
      */
-    public static function makeShort(string $string, int $length = 30): string {
+    public static function makeShort(string $string, int $length = 30, bool $asUtf8 = true): string {
         $first = explode("\n", $string)[0];
-        if (strlen($first) > $length) {
-            return mb_substr($first, 0, $length, "utf-8") . "...";
+        if ($asUtf8) {
+            if (mb_strlen($first, "utf-8") > $length) {
+                return mb_substr($first, 0, $length - 3, "utf-8") . "...";
+            }
+            return $first;
         }
-        return $first;
+
+        $count  = $length;
+        $result = $first;
+        while (strlen($result) > $length) {
+            $result = mb_substr($result, 0, $count, "utf-8");
+            $count -= 1;
+        }
+        return $result;
     }
 
     /**
      * Returns true if the short version is different from the string
      * @param string  $string
      * @param integer $length Optional.
+     * @param boolean $asUtf8 Optional.
      * @return string
      */
-    public static function isShort(string $string, int $length = 30): string {
-        return self::makeShort($string, $length) !== $string;
+    public static function isShort(string $string, int $length = 30, bool $asUtf8 = true): string {
+        return self::makeShort($string, $length, $asUtf8) !== $string;
     }
 
 
