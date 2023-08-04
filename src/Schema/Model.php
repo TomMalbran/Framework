@@ -88,6 +88,17 @@ class Model implements ArrayAccess {
     }
 
     /**
+     * Gets the Data or the Default
+     * @param string     $key
+     * @param mixed|null $default Optional.
+     * @return mixed
+     */
+    public function getOr(string $key, mixed $default = null): mixed {
+        $value = $this->get($key);
+        return !empty($value) ? $value : $default;
+    }
+
+    /**
      * Returns the request data at the given key or the default
      * @param string  $key
      * @param integer $default Optional.
