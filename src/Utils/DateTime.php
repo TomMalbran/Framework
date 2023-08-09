@@ -822,8 +822,11 @@ class DateTime {
      * @return integer
      */
     public static function timeToMinutes(string $time): int {
-        [ $hour, $minute ] = Strings::split($time, ":");
-        return self::toMinutes((int)$hour, (int)$minute);
+        $parts = Strings::split($time, ":");
+        if (empty($parts) || count($parts) != 2) {
+            return 0;
+        }
+        return self::toMinutes((int)$parts[0], (int)$parts[1]);
     }
 
 
