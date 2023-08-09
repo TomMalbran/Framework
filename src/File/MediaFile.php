@@ -139,11 +139,12 @@ class MediaFile {
      * Returns all the Media Elements
      * @param string $mediaType Optional.
      * @param string $path      Optional.
+     * @param string $basePath  Optional.
      * @return array{}
      */
-    public static function getList(string $mediaType = "", string $path = ""): array {
-        $path   = !empty($path) && self::exists($path) ? $path : "";
-        $source = self::getPath($path);
+    public static function getList(string $mediaType = "", string $path = "", string $basePath = ""): array {
+        $path   = !empty($path) && self::exists($basePath, $path) ? $path : "";
+        $source = self::getPath($basePath, $path);
         $files  = File::getAllInDir($source);
         $source = File::addLastSlash($source);
         $list   = new FileList();
@@ -152,10 +153,10 @@ class MediaFile {
             $fileName = Strings::replace($file, $source, "");
             if (MediaType::isValid($mediaType, $file, $fileName)) {
                 $isDir      = FileType::isDir($file);
-                $sourcePath = self::getPath($path, $fileName);
-                $sourceUrl  = self::getUrl($path, $fileName);
-                $thumbUrl   = self::getThumbUrl($path, $fileName);
-                $filePath   = !empty($path) ? "{$path}/{$fileName}" : $fileName;
+                $sourcePath = self::getPath($basePath, $path, $fileName);
+                $sourceUrl  = self::getUrl($basePath, $path, $fileName);
+                $thumbUrl   = self::getThumbUrl($basePath, $path, $fileName);
+                $filePath   = File::getPath($path, $fileName);
                 $list->add($fileName, $filePath, $isDir, $sourcePath, $sourceUrl, $thumbUrl);
             }
         }
@@ -171,26 +172,25 @@ class MediaFile {
 
     /**
      * Creates a Directory
-     * @param string $path
-     * @param string $name
+     * @param string ...$pathParts
      * @return boolean
      */
-    public static function createDir(string $path, string $name): bool {
-        $source = self::getPath($path, $name);
-        $thumbs = self::getThumbPath($path, $name);
+    public static function createDir(string ...$pathParts): bool {
+        $source = self::getPath(...$pathParts);
+        $thumbs = self::getThumbPath(...$pathParts);
         return File::createDir($source) && File::createDir($thumbs);
     }
 
     /**
      * Uploads a File
      * @param Request $request
-     * @param string  $path
+     * @param string  ...$pathParts
      * @return boolean
      */
-    public static function uploadFile(Request $request, string $path): bool {
+    public static function uploadFile(Request $request, string ...$pathParts): bool {
         $fileName = $request->getFileName("file");
         $tmpFile  = $request->getTmpName("file");
-        $source   = self::getPath($path);
+        $source   = self::getPath(...$pathParts);
 
         if (!File::upload($source, $fileName, $tmpFile)) {
             return false;
@@ -199,21 +199,21 @@ class MediaFile {
             return true;
         }
 
-        $src = self::getPath($path, $fileName);
-        $dst = self::getThumbPath($path, $fileName);
+        $pathParts[] = $fileName;
+        $src = self::getPath(...$pathParts);
+        $dst = self::getThumbPath(...$pathParts);
         return Image::resize($src, $dst, 200, 200, Image::Resize);
     }
 
     /**
      * Deletes a Media Element
-     * @param string $path
-     * @param string $name
+     * @param string ...$pathParts
      * @return boolean
      */
-    public static function deletePath(string $path, string $name): bool {
-        $relPath = File::getPath($path, $name);
-        $source  = self::getPath($path, $name);
-        $thumbs  = self::getThumbPath($path, $name);
+    public static function deletePath(string ...$pathParts): bool {
+        $relPath = File::getPath(...$pathParts);
+        $source  = self::getPath(...$pathParts);
+        $thumbs  = self::getThumbPath(...$pathParts);
 
         if (!File::deleteDir($source) || !File::deleteDir($thumbs)) {
             return false;
