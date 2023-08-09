@@ -219,13 +219,13 @@ class Image {
             if ($yScale < $xScale) {
                 $oldWidth  = round($width  * $yScale);
                 $oldHeight = round($height * $yScale);
-                $xCorner   = ($imgWidth - $oldWidth) / 2;
+                $xCorner   = round(($imgWidth - $oldWidth) / 2);
                 $yCorner   = 0;
             } else {
                 $oldWidth  = round($width  * $xScale);
                 $oldHeight = round($height * $xScale);
                 $xCorner   = 0;
-                $yCorner   = ($imgHeight - $oldHeight) / 2;
+                $yCorner   = round(($imgHeight - $oldHeight) / 2);
             }
             break;
         }
