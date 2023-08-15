@@ -850,4 +850,13 @@ class DateTime {
         }
         return $result;
     }
+
+    /**
+     * Returns number as a String with a 0 in front
+     * @param integer $time
+     * @return string
+     */
+    public static function parseTime(int $time): string {
+        return $time < 10 ? `0{$time}` : (string)$time;
+    }
 }
