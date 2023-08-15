@@ -520,8 +520,14 @@ class Arrays {
      */
     public static function findIndex(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $index => $elem) {
-            if ($elem[$idKey] == $idValue) {
-                return $index;
+            if (is_object($elem)) {
+                if ($elem->$idKey == $idValue) {
+                    return $index;
+                }
+            } else {
+                if ($elem[$idKey] == $idValue) {
+                    return $index;
+                }
             }
         }
         return -1;
@@ -537,8 +543,14 @@ class Arrays {
      */
     public static function findValue(array $array, string $idKey, mixed $idValue, string $key = ""): mixed {
         foreach ($array as $elem) {
-            if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
-                return $key ? $elem[$key] : $elem;
+            if (is_object($elem)) {
+                if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
+                    return $key ? $elem->$key : $elem;
+                }
+            } else {
+                if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
+                    return $key ? $elem[$key] : $elem;
+                }
             }
         }
         return $key ? "" : [];
@@ -556,8 +568,14 @@ class Arrays {
     public static function findValues(array $array, string $idKey, mixed $idValue, string $key = "", string $glue = ""): mixed {
         $result = [];
         foreach ($array as $elem) {
-            if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
-                $result[] = $key ? $elem[$key] : $elem;
+            if (is_object($elem)) {
+                if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
+                    $result[] = $key ? $elem->$key : $elem;
+                }
+            } else {
+                if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
+                    $result[] = $key ? $elem[$key] : $elem;
+                }
             }
         }
         if (!empty($key) && !empty($glue)) {
