@@ -201,7 +201,7 @@ class Errors {
      * @return array{}
      */
     public function get(): array {
-        return array_merge($this->errors, $this->counts);
+        return $this->errors + $this->counts;
     }
 
     /**
