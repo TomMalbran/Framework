@@ -1,4 +1,5 @@
 <?php
+/* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET */
 namespace Framework\Provider;
 
 use Framework\Utils\JSON;
@@ -45,9 +46,14 @@ class Curl {
      */
     public static function custom(string $request, string $url, ?array $params = null, ?array $headers = null, bool $asJson = false): mixed {
         $options = [
-            CURLOPT_URL            => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST  => $request,
+            CURLOPT_URL             => $url,
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_CUSTOMREQUEST   => $request,
+            CURLOPT_TIMEOUT         => 100,
+            CURLOPT_CONNECTTIMEOUT  => 10,
+            CURLOPT_LOW_SPEED_LIMIT => 512,
+            CURLOPT_LOW_SPEED_TIME  => 120,
+            CURLOPT_ENCODING        => "identity",
         ];
 
         // Set the Params
