@@ -518,6 +518,21 @@ class Arrays {
     }
 
     /**
+     * Returns the last Value of the given array
+     * @param mixed[] $array
+     * @param string  $key   Optional.
+     * @return mixed
+     */
+    public static function getLast(array $array, string $key = ""): mixed {
+        if (empty($array)) {
+            return null;
+        }
+        $lastKey = array_key_last($array);
+        $value   = $array[$lastKey];
+        return !empty($key) ? self::getValue($value, $key) : $value;
+    }
+
+    /**
      * Returns the index at the given id key with the given is value
      * @param mixed[] $array
      * @param string  $idKey
