@@ -853,10 +853,10 @@ class DateTime {
 
     /**
      * Returns number as a String with a 0 in front
-     * @param integer $time
+     * @param integer|float $time
      * @return string
      */
-    public static function parseTime(int $time): string {
-        return $time < 10 ? `0{$time}` : (string)$time;
+    public static function parseTime(int|float $time): string {
+        return $time < 10 ? "0{$time}" : (string)$time;
     }
 }
