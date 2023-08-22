@@ -490,12 +490,18 @@ class Arrays {
 
 
     /**
-     * Returns the first Key of the given array
+     * Returns the first Value of the given array
      * @param mixed[] $array
+     * @param string  $key   Optional.
      * @return mixed
      */
-    public static function getFirst(array $array): mixed {
-        return !empty($array) ? $array[array_keys($array)[0]] : null;
+    public static function getFirst(array $array, string $key = ""): mixed {
+        if (empty($array)) {
+            return null;
+        }
+        $firstKey = array_key_first($array);
+        $value    = $array[$firstKey];
+        return !empty($key) ? self::getValue($value, $key) : $value;
     }
 
     /**
