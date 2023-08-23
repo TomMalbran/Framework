@@ -551,12 +551,20 @@ class DateTime {
      * Add the given Months to the given Time
      * @param integer $time        Optional.
      * @param integer $monthDiff   Optional.
+     * @param integer $day         Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addMonths(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
+    public static function addMonths(int $time = 0, int $monthDiff = 0, int $day = 0, bool $useTimeZone = false): int {
         $time   = empty($time) ? time() : $time;
-        $result = mktime(date("h", $time), date("i", $time), date("s", $time), (int)date("n", $time) + $monthDiff, date("j", $time), date("Y", $time));
+        $result = mktime(
+            date("h", $time),
+            date("i", $time),
+            date("s", $time),
+            (int)date("n", $time) + $monthDiff,
+            !empty($day) ? $day : date("j", $time),
+            date("Y", $time)
+        );
         return self::toServerTime($result, $useTimeZone);
     }
 
