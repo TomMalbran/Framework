@@ -250,7 +250,7 @@ class Auth {
         return (
             self::canLogin($admin) &&
             !$user->isEmpty() &&
-            $admin->level > $user->level &&
+            $admin->level >= $user->level &&
             Access::inAdmins($admin->level)
         );
     }
