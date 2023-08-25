@@ -1,6 +1,7 @@
 <?php
 namespace Framework\File;
 
+use Framework\File\File;
 use Framework\Utils\Arrays;
 
 /**
@@ -32,45 +33,44 @@ class Image {
 
     /**
      * Returns true if the given type is valid
-     * @param integer $type
+     * @param integer $fileType
      * @return boolean
      */
-    public static function hasType(int $type): bool {
-        return Arrays::contains(self::$imageTypes, $type);
+    public static function hasType(int $fileType): bool {
+        return Arrays::contains(self::$imageTypes, $fileType);
     }
 
     /**
      * Returns true if the Image type is invalid
-     * @param string $file
+     * @param string $fileName
      * @return boolean
      */
-    public static function isValidType(string $file): bool {
-        $type = self::getType($file);
+    public static function isValidType(string $fileName): bool {
+        $type = self::getType($fileName);
         return self::hasType($type);
     }
 
     /**
      * Returns the Type of the Image
-     * @param string $file
+     * @param string $fileName
      * @return integer
      */
-    public static function getType(string $file): int {
-        if (file_exists($file)) {
-            return exif_imagetype($file);
-        }
-        return 0;
+    public static function getType(string $fileName): int {
+        return exif_imagetype($fileName);
     }
 
     /**
      * Returns the Size of the Image as [ width, height, type ]
-     * @param string $file
+     * @param string ...$pathParts
      * @return int[]
      */
-    public static function getSize(string $file): array {
-        if (!file_exists($file)) {
+    public static function getSize(string ...$pathParts): array {
+        if (!File::exists(...$pathParts)) {
             return [ 0, 0, 0 ];
         }
-        $size = getimagesize($file);
+
+        $filePath = File::getPath(...$pathParts);
+        $size     = getimagesize($filePath);
         if ($size == false) {
             return [ 0, 0, 0 ];
         }
@@ -79,14 +79,16 @@ class Image {
 
     /**
      * Returns the Orientation for the given Image
-     * @param string $file
+     * @param string ...$pathParts
      * @return integer
      */
-    public static function getOrientation(string $file): int {
-        if (!file_exists($file)) {
+    public static function getOrientation(string ...$pathParts): int {
+        if (!File::exists(...$pathParts)) {
             return 0;
         }
-        $exif = @exif_read_data($file);
+
+        $filePath = File::getPath(...$pathParts);
+        $exif     = @exif_read_data($filePath);
         if ($exif !== false && !empty($exif["Orientation"])) {
             return $exif["Orientation"];
         }
