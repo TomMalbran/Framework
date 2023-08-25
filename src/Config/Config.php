@@ -140,6 +140,20 @@ class Config {
     }
 
     /**
+     * Returns a Config Property as a Float
+     * @param string $property
+     * @param float  $default  Optional.
+     * @return float
+     */
+    public static function getFloat(string $property, float $default = 0): float {
+        $value = Config::get($property);
+        if (!empty($value) && is_numeric($value)) {
+            return (float)$value;
+        }
+        return $default;
+    }
+
+    /**
      * Returns a Config Property as an Array
      * @param string $property
      * @return mixed[]
