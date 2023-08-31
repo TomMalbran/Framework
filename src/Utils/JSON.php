@@ -51,17 +51,6 @@ class JSON {
         return json_decode($value, $asArray);
     }
 
-
-
-    /**
-     * Converts an encoded JSON into a Coma Separated Value
-     * @param string $value
-     * @return string
-     */
-    public static function toCSV(string $value): string {
-        return Strings::join($value, ", ");
-    }
-
     /**
      * Converts a Coma Separated Value into an encoded JSON
      * @param string $value

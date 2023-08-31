@@ -7,6 +7,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
+use Framework\Utils\CSV;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -97,7 +98,7 @@ class Settings {
 
             $value = $row["value"];
             if ($row["type"] == SettingType::JSON) {
-                $value = JSON::toCSV($row["value"]);
+                $value = CSV::encode($row["value"]);
             }
             $result[$row["section"]][$row["variable"]] = $value;
         }
