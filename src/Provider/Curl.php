@@ -16,11 +16,12 @@ class Curl {
      * @param string       $url
      * @param array{}|null $params  Optional.
      * @param array{}|null $headers Optional.
+     * @param boolean      $asJson  Optional.
      * @return mixed
      */
-    public static function get(string $url, ?array $params = null, ?array $headers = null): mixed {
+    public static function get(string $url, ?array $params = null, ?array $headers = null, bool $asJson = true): mixed {
         $url = self::parseUrl($url, $params);
-        return self::execute($url, $headers);
+        return self::execute($url, $headers, null, $asJson);
     }
 
     /**
@@ -152,9 +153,10 @@ class Curl {
      * @param string       $url
      * @param array{}|null $headers Optional.
      * @param mixed|null   $body    Optional.
+     * @param boolean      $asJson  Optional.
      * @return mixed
      */
-    public static function execute(string $url, ?array $headers = null, mixed $body = null): mixed {
+    public static function execute(string $url, ?array $headers = null, mixed $body = null, bool $asJson = true): mixed {
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
@@ -171,6 +173,8 @@ class Curl {
         if (!empty($body)) {
             $options[CURLOPT_POST]       = true;
             $options[CURLOPT_POSTFIELDS] = $body;
+        } else {
+            $options[CURLOPT_ENCODING]   = "identity";
         }
 
         // Set the Headers
@@ -185,11 +189,16 @@ class Curl {
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         $response = curl_exec($curl);
-        if (empty($response)) {
-            return [];
+
+        // Return the Response as a String
+        if (!$asJson) {
+            return $response;
         }
 
         // Try to decode the response as a JSON
+        if (empty($response)) {
+            return [];
+        }
         if (!JSON::isValid($response)) {
             return [ "error" => $response ];
         }
@@ -216,6 +225,7 @@ class Curl {
                 $content[] = "$key=" . urlencode($value);
             }
         }
+
         $content = Strings::join($content, "&");
         if (!empty($content)) {
             $url .= "?$content";
