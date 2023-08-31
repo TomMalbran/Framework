@@ -2,6 +2,7 @@
 /* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET */
 namespace Framework\Provider;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -209,7 +210,7 @@ class Curl {
 
         $content = [];
         foreach ($params as $key => $value) {
-            if (is_array($value)) {
+            if (Arrays::isArray($value)) {
                 $content[] = "$key=" . urlencode(JSON::encode($value));
             } else {
                 $content[] = "$key=" . urlencode($value);

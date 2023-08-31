@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Arrays;
+
 /**
  * Several String Utils
  */
@@ -175,7 +177,7 @@ class Strings {
      * @return string
      */
     public static function replace(string $string, array|string $search, array|string $replace = null): string {
-        if ($replace === null && is_array($search)) {
+        if ($replace === null && Arrays::isArray($search)) {
             return str_replace(array_keys($search), array_values($search), $string);
         }
         return str_replace($search, $replace, $string);
@@ -322,9 +324,10 @@ class Strings {
      * @return string[]
      */
     public static function split(array|string $string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
-        if (is_array($string)) {
+        if (Arrays::isArray($string)) {
             return $string;
         }
+
         $content = !empty($string) ? explode($needle, $string) : [];
         if (!$trim) {
             return $content;
@@ -355,7 +358,7 @@ class Strings {
      * @return string
      */
     public static function join(array|string $string, string $glue = ""): string {
-        if (is_array($string)) {
+        if (Arrays::isArray($string)) {
             return implode($glue, $string);
         }
         return $string;
@@ -368,7 +371,7 @@ class Strings {
      * @return string
      */
     public static function joinKeys(array|string $string, string $glue = ""): string {
-        if (is_array($string)) {
+        if (Arrays::isArray($string)) {
             return implode($glue, array_keys($string));
         }
         return $string;

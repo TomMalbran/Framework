@@ -21,7 +21,7 @@ class Arrays {
      * @return boolean
      */
     public static function isList(mixed $array): bool {
-        return is_array($array) && array_is_list($array);
+        return self::isArray($array) && array_is_list($array);
     }
 
     /**
@@ -30,7 +30,7 @@ class Arrays {
      * @return boolean
      */
     public static function isMap(mixed $array): bool {
-        return is_array($array) && is_array(array_values($array)[0]);
+        return self::isArray($array) && self::isArray(array_values($array)[0]);
     }
 
 
@@ -41,7 +41,7 @@ class Arrays {
      * @return integer
      */
     public static function length(mixed $array): int {
-        return is_array($array) ? count($array) : 0;
+        return self::isArray($array) ? count($array) : 0;
     }
 
     /**
@@ -175,7 +175,7 @@ class Arrays {
      * @return mixed[]
      */
     public static function toArray(mixed $array): array {
-        return is_array($array) ? $array : [ $array ];
+        return self::isArray($array) ? $array : [ $array ];
     }
 
     /**
@@ -298,7 +298,7 @@ class Arrays {
     public static function extend(array &$array1, array &$array2): array {
         $result = $array1;
         foreach ($array2 as $key => &$value) {
-            if (is_array($value) && isset($result[$key]) && is_array($result[$key])) {
+            if (self::isArray($value) && isset($result[$key]) && self::isArray($result[$key])) {
                 $result[$key] = self::extend($result[$key], $value);
             } else {
                 $result[$key] = $value;
@@ -331,7 +331,7 @@ class Arrays {
      */
     public static function sortArray(array &$array, string $field, callable $callback): array {
         foreach ($array as $value) {
-            if (!empty($value[$field]) && is_array($value[$field])) {
+            if (!empty($value[$field]) && self::isArray($value[$field])) {
                 usort($value[$field], $callback);
             }
         }
@@ -629,7 +629,7 @@ class Arrays {
      */
     public static function getValue(mixed $array, array|string $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
         $result = $default;
-        if (is_array($key)) {
+        if (self::isArray($key)) {
             $values = [];
             foreach ($key as $id) {
                 $fullKey = self::getKey($id, $prefix);

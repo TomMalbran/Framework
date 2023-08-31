@@ -241,7 +241,7 @@ class Request implements ArrayAccess {
         if ($key === null) {
             return !empty($this->request);
         }
-        if (is_array($key)) {
+        if (Arrays::isArray($key)) {
             foreach ($key as $keyID) {
                 if (empty($this->request[$keyID])) {
                     return false;
@@ -261,7 +261,7 @@ class Request implements ArrayAccess {
      * @return boolean
      */
     public function exists(array|string $key): bool {
-        if (is_array($key)) {
+        if (Arrays::isArray($key)) {
             foreach ($key as $keyID) {
                 if (!isset($this->request[$keyID])) {
                     return false;

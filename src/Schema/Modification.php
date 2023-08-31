@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
 use Framework\Schema\Query;
+use Framework\Utils\Arrays;
 
 /**
  * The Modification Wrapper
@@ -46,7 +47,7 @@ class Modification {
             $this->fields = $fields;
         }
         if (!empty($extra)) {
-            if (is_array($extra)) {
+            if (Arrays::isArray($extra)) {
                 $this->fields = array_merge($this->fields, $extra);
             } else {
                 $this->credentialID = $extra;

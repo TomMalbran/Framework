@@ -2,6 +2,7 @@
 namespace Framework\Config;
 
 use Framework\Schema\Model;
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 
 /**
@@ -21,7 +22,7 @@ class SettingType {
      * @return integer
      */
     public static function get(mixed $value): int {
-        if (is_array($value)) {
+        if (Arrays::isArray($value)) {
             return self::JSON;
         }
         if (gettype($value) == "boolean") {

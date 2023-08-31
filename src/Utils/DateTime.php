@@ -84,7 +84,7 @@ class DateTime {
      * @return integer
      */
     public static function toTime(mixed $time, bool $useTimeZone = true): int {
-        if (is_string($time)) {
+        if (Strings::isString($time)) {
             $time = strtotime($time);
         }
         if (empty($time)) {
@@ -100,7 +100,7 @@ class DateTime {
      * @return integer
      */
     public static function toTimeZone(mixed $time, ?int $timeZone = null): int {
-        if (is_string($time)) {
+        if (Strings::isString($time)) {
             $time = strtotime($time);
         }
         if (empty($time)) {

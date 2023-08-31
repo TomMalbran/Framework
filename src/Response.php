@@ -2,6 +2,7 @@
 namespace Framework;
 
 use Framework\Schema\Model;
+use Framework\Utils\Arrays;
 use Framework\Utils\Errors;
 use Framework\Utils\JSON;
 
@@ -150,7 +151,7 @@ class Response {
      * @return Response
      */
     public static function error(Errors|string $error, Model|array|null $data = null): Response {
-        if (is_array($error)) {
+        if (Arrays::isArray($error)) {
             return new Response([
                 "errors" => $error,
                 "data"   => self::createData($data),

@@ -119,7 +119,7 @@ class SubRequest {
         if (empty($this->value)) {
             return $row;
         }
-        if (is_array($this->value)) {
+        if (Arrays::isArray($this->value)) {
             $result = [];
             foreach ($this->value as $value) {
                 $result[$value] = $row[$value];
