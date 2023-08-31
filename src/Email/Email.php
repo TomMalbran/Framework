@@ -30,14 +30,13 @@ class Email {
 
     private static bool      $loaded   = false;
     private static ?string   $template = null;
-
     private static string    $url      = "";
-    private static mixed     $config   = "";
-    private static mixed     $smtp     = null;
-    private static mixed     $google   = null;
+    private static mixed     $config   = null;
 
     private static ?Mandrill $mandrill = null;
     private static ?Mailjet  $mailjet  = null;
+    private static mixed     $smtp     = null;
+    private static mixed     $google   = null;
 
 
     /**
@@ -50,16 +49,26 @@ class Email {
         }
         self::$loaded   = true;
         self::$template = Framework::loadFile(Framework::DataDir, "email.html");
-
         self::$url      = Config::get("url");
         self::$config   = Config::get("email");
-        self::$smtp     = Config::get("smtp");
-        self::$google   = Config::get("google");
         return true;
     }
 
     /**
-     * Returns the Mandrill Client
+     * Returns the PHPMailer
+     * @return PHPMailer
+     */
+    private static function smtp(): PHPMailer {
+        if (!empty(self::$smtp)) {
+            return new PHPMailer();
+        }
+        self::$smtp   = Config::get("smtp");
+        self::$google = Config::get("google");
+        return new PHPMailer();
+    }
+
+    /**
+     * Loads the Mandrill Client
      * @return Mandrill
      */
     private static function mandrill(): Mandrill {
@@ -73,7 +82,7 @@ class Email {
     }
 
     /**
-     * Returns the Mailjet Client
+     * Loads the Mailjet Client
      * @return Mailjet
      */
     private static function mailjet(): Mailjet {
@@ -136,7 +145,8 @@ class Email {
             "message"  => $message,
         ]);
 
-        switch (self::$config->provider) {
+        $provider = self::$config->provider ?: "smtp";
+        switch ($provider) {
         case self::Mandrill:
             return self::sendMandrill($toEmail, $fromEmail, $fromName, $subject, $body);
         case self::Mailjet:
@@ -185,7 +195,7 @@ class Email {
     /**
      * Sends the Email with SMTP
      * @param string $toEmail
-     * @param string $from
+     * @param string $fromEmail
      * @param string $fromName
      * @param string $subject
      * @param string $body
@@ -194,14 +204,13 @@ class Email {
      */
     public static function sendSMTP(
         string $toEmail,
-        string $from,
+        string $fromEmail,
         string $fromName,
         string $subject,
         string $body,
         string $attachment = ""
     ): bool {
-        $email = new PHPMailer();
-
+        $email = self::smtp();
         $email->isSMTP();
         $email->isHTML(true);
         $email->clearAllRecipients();
@@ -242,8 +251,8 @@ class Email {
         $email->Body     = $body;
 
         $email->addAddress($toEmail);
-        if (!empty($from)) {
-            $email->addReplyTo($from, $fromName ?: self::$config->name);
+        if (!empty($fromEmail)) {
+            $email->addReplyTo($fromEmail, $fromName ?: self::$config->name);
         } elseif (!empty(self::$smtp->replyTo)) {
             $email->addReplyTo(self::$smtp->replyTo, self::$config->name);
         }
@@ -279,33 +288,31 @@ class Email {
         string $subject,
         string $body
     ): bool {
-        $message = [
-            "to"                  => [
-                [
-                    "email" => $toEmail,
-                    "type"  => "to",
-                ],
-            ],
-            "from_email"          => $fromEmail ?: self::$config->email,
-            "from_name"           => $fromName  ?: self::$config->name,
-            "subject"             => $subject,
-            "html"                => $body,
-            "important"           => false,
-            "track_opens"         => true,
-            "track_clicks"        => true,
-            "auto_text"           => false,
-            "auto_html"           => true,
-            "inline_css"          => null,
-            "url_strip_qs"        => null,
-            "preserve_recipients" => null,
-            "view_content_link"   => null,
-            "tracking_domain"     => null,
-            "signing_domain"      => null,
-            "return_path_domain"  => null,
-        ];
-
         self::mandrill()->messages->send([
-            "message" => $message,
+            "message" => [
+                "to"                  => [
+                    [
+                        "email" => $toEmail,
+                        "type"  => "to",
+                    ],
+                ],
+                "from_email"          => $fromEmail ?: self::$config->email,
+                "from_name"           => $fromName  ?: self::$config->name,
+                "subject"             => $subject,
+                "html"                => $body,
+                "important"           => false,
+                "track_opens"         => true,
+                "track_clicks"        => true,
+                "auto_text"           => false,
+                "auto_html"           => true,
+                "inline_css"          => null,
+                "url_strip_qs"        => null,
+                "preserve_recipients" => null,
+                "view_content_link"   => null,
+                "tracking_domain"     => null,
+                "signing_domain"      => null,
+                "return_path_domain"  => null,
+            ],
             "async"   => false,
             "send_at" => date("Y-m-d H:i:s"),
         ]);
