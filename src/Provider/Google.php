@@ -42,10 +42,10 @@ class Google {
     /**
      * Returns the Email from the given Token
      * @param string $accessToken
-     * @param string $idToken
+     * @param string $idToken     Optional.
      * @return string
      */
-    public static function getAuthEmail(string $accessToken, string $idToken): string {
+    public static function getAuthEmail(string $accessToken, string $idToken = ""): string {
         self::load();
         if (!empty($accessToken)) {
             self::$client->setAccessToken($accessToken);
