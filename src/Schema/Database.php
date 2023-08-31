@@ -19,7 +19,6 @@ class Database {
     public string $username;
     public string $password;
     public string $database;
-    public string $prefix;
     public string $email;
     public string $charset;
     public bool   $persist;
@@ -42,7 +41,6 @@ class Database {
         $this->username = $config->username;
         $this->password = $config->password;
         $this->database = $config->database;
-        $this->prefix   = !empty($config->prefix)  ? $config->prefix  : "";
         $this->email    = !empty($config->email)   ? $config->email   : "";
         $this->charset  = !empty($config->charset) ? $config->charset : "";
         $this->persist  = $persist;
@@ -127,7 +125,7 @@ class Database {
      */
     public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
         $selection  = Strings::join($columns, ", ");
-        $expression = "SELECT $selection FROM {dbPrefix}$table ";
+        $expression = "SELECT $selection FROM $table ";
         $params     = [];
 
         if (!empty($query)) {
@@ -207,7 +205,7 @@ class Database {
      * @return integer
      */
     public function getTotal(string $table, Query $query): int {
-        $expression = "SELECT COUNT(*) AS cnt FROM `{dbPrefix}$table` " . $query->get();
+        $expression = "SELECT COUNT(*) AS cnt FROM `$table` " . $query->get();
         $request    = $this->query($expression, $query);
 
         if (isset($request[0]["cnt"])) {
@@ -224,7 +222,7 @@ class Database {
      * @return integer
      */
     public function getSum(string $table, string $column, Query $query): int {
-        $expression = "SELECT COALESCE(SUM($column), 0) AS sum FROM `{dbPrefix}$table` "  . $query->get();
+        $expression = "SELECT COALESCE(SUM($column), 0) AS sum FROM `$table` "  . $query->get();
         $request    = $this->query($expression, $query);
 
         if (isset($request[0]["sum"])) {
@@ -244,7 +242,7 @@ class Database {
      */
     public function insert(string $table, array $fields, string $method = "INSERT"): int {
         $bindParams  = [];
-        $expression  = "$method INTO `{dbPrefix}$table` ";
+        $expression  = "$method INTO `$table` ";
         $expression .= $this->buildInsertHeader($fields);
         $expression .= $this->buildTableData($fields, $bindParams, true);
         $statement   = $this->processQuery($expression, $bindParams);
@@ -262,7 +260,7 @@ class Database {
      */
     public function batch(string $table, array $fields, string $method = "REPLACE"): bool {
         $bindParams  = [];
-        $expression  = "$method INTO `{dbPrefix}$table` ";
+        $expression  = "$method INTO `$table` ";
         $expression .= $this->buildInsertHeader($fields[0]);
 
         $rows = [];
@@ -286,7 +284,7 @@ class Database {
      */
     public function update(string $table, array $fields, Query $query): bool {
         $bindParams  = [];
-        $expression  = "UPDATE `{dbPrefix}$table` SET ";
+        $expression  = "UPDATE `$table` SET ";
         $expression .= $this->buildTableData($fields, $bindParams, false);
         $expression .= " " . $query->get();
         $bindParams  = array_merge($bindParams, $query->params);
@@ -315,7 +313,7 @@ class Database {
      * @return boolean
      */
     public function delete(string $table, Query $query): bool {
-        $expression = "DELETE FROM `{dbPrefix}$table` " . $query->get();
+        $expression = "DELETE FROM `$table` " . $query->get();
         $statement  = $this->processQuery($expression, $query->params);
         return $this->closeQuery($statement);
     }
@@ -326,7 +324,7 @@ class Database {
      * @return boolean
      */
     public function deleteAll(string $table): bool {
-        $expression = "DELETE FROM `{dbPrefix}$table`";
+        $expression = "DELETE FROM `$table`";
         $statement  = $this->processQuery($expression, []);
         return $this->closeQuery($statement);
     }
@@ -337,7 +335,7 @@ class Database {
      * @return boolean
      */
     public function truncate(string $table): bool {
-        $expression = "TRUNCATE TABLE `{dbPrefix}$table`";
+        $expression = "TRUNCATE TABLE `$table`";
         $statement  = $this->processQuery($expression, []);
         return $this->closeQuery($statement);
     }
@@ -360,16 +358,15 @@ class Database {
      * @return mysqli_stmt
      */
     private function processQuery(string $expression, array $bindParams = []): mysqli_stmt {
-        $expression = Strings::replace(trim($expression), "{dbPrefix}", $this->prefix);
-        $query      = Strings::replace($expression, "\n", "");
-        $statement  = $this->mysqli->prepare($expression);
+        $query     = Strings::replace(trim($expression), "\n", "");
+        $statement = $this->mysqli->prepare($expression);
 
         if (!$statement) {
             trigger_error("Problem preparing query: {$this->mysqli->error} ($query)", E_USER_ERROR);
             return null;
         }
 
-        if (is_array($bindParams) && !empty($bindParams)) {
+        if (Arrays::isArray($bindParams) && !empty($bindParams)) {
             $params = [ "" ]; // Create the empty 0 index
             foreach ($bindParams as $value) {
                 $params[0] .= $this->determineType($value);
@@ -408,19 +405,18 @@ class Database {
      * @return string
      */
     public function interpolateQuery(string $expression, Query $query): string {
-        $expression = Strings::replace(trim($expression), "{dbPrefix}", $this->prefix);
-        $expression = Strings::replace($expression, "\n", "");
+        $expression = Strings::replace(trim($expression), "\n", "");
         $params     = $query->params;
         $keys       = [];
         $values     = [];
 
         foreach ($params as $key => $value) {
-            if (is_string($key)) {
+            if (Strings::isString($key)) {
                 $keys[] = '/:' . $key . '/';
             } else {
                 $keys[] = '/[?]/';
             }
-            if (is_string($value)) {
+            if (Strings::isString($value)) {
                 $values[] = "'$value'";
             } else {
                 $values[] = $value;
@@ -530,7 +526,7 @@ class Database {
                 $result .= "`$column` = ";
             }
 
-            if (!is_array($value)) {
+            if (!Arrays::isArray($value)) {
                 $result .= "?, ";
                 $bindParams[] = $value;
             } else {
@@ -574,35 +570,18 @@ class Database {
 
 
     /**
-     * Returns the Table Name
-     * @param string $name
-     * @return string
-     */
-    public function getTableName(string $name): string {
-        if (!Strings::startsWith($name, $this->prefix)) {
-            return $this->prefix . $name;
-        }
-        return $name;
-    }
-
-    /**
      * Returns an array with all the tables
-     * @param string[]|null $filter     Optional.
-     * @param boolean       $withPrefix Optional.
+     * @param string[]|null $filter Optional.
      * @return string[]
      */
-    public function getTables(?array $filter = null, bool $withPrefix = true): array {
+    public function getTables(?array $filter = null): array {
         $request = $this->query("SHOW TABLES FROM `$this->database`");
         $result  = [];
 
         foreach ($request as $row) {
             foreach ($row as $value) {
                 if ((!empty($filter) && !Arrays::contains($filter, $value)) || empty($filter)) {
-                    if (!$withPrefix) {
-                        $result[] =  Strings::replace($value, $this->prefix, "");
-                    } else {
-                        $result[] = $value;
-                    }
+                    $result[] = $value;
                 }
             }
         }
@@ -611,24 +590,22 @@ class Database {
 
     /**
      * Returns an array with all the tables
-     * @param string $table
+     * @param string $tableName
      * @return boolean
      */
-    public function hasTable(string $table): bool {
-        $tableName = $this->getTableName($table);
-        $request   = $this->query("SHOW TABLES LIKE '$tableName'");
+    public function hasTable(string $tableName): bool {
+        $request = $this->query("SHOW TABLES LIKE '$tableName'");
         return !empty($request);
     }
 
     /**
      * Returns the Table Primary Keys
-     * @param string $table
+     * @param string $tableName
      * @return string[]
      */
-    public function getPrimaryKeys(string $table): array {
-        $tableName = $this->getTableName($table);
-        $request   = $this->query("SHOW KEYS FROM `$tableName`");
-        $result    = [];
+    public function getPrimaryKeys(string $tableName): array {
+        $request = $this->query("SHOW KEYS FROM `$tableName`");
+        $result  = [];
 
         foreach ($request as $row) {
             if ($row["Key_name"] == "PRIMARY") {
@@ -640,12 +617,11 @@ class Database {
 
     /**
      * Returns the Table Primary Key with Auto Increment
-     * @param string $table
+     * @param string $tableName
      * @return string
      */
-    public function getAutoIncrement(string $table): string {
-        $tableName = $this->getTableName($table);
-        $request   = $this->query("SELECT *
+    public function getAutoIncrement(string $tableName): string {
+        $request = $this->query("SELECT *
             FROM INFORMATION_SCHEMA.COLUMNS
             WHERE TABLE_NAME = '$tableName'
                 AND DATA_TYPE = 'int'
@@ -662,21 +638,19 @@ class Database {
 
     /**
      * Returns the Table Keys
-     * @param string $table
+     * @param string $tableName
      * @return string[]
      */
-    public function getTableKeys(string $table): array {
-        $tableName = $this->getTableName($table);
+    public function getTableKeys(string $tableName): array {
         return $this->query("SHOW INDEXES IN `$tableName`");
     }
 
     /**
      * Returns the Table Fields
-     * @param string $table
+     * @param string $tableName
      * @return string[]
      */
-    public function getTableFields(string $table): array {
-        $tableName = $this->getTableName($table);
+    public function getTableFields(string $tableName): array {
         return $this->query("SHOW FIELDS FROM `$tableName`");
     }
 
@@ -684,40 +658,37 @@ class Database {
 
     /**
      * Returns true if a Table exists
-     * @param string $table
+     * @param string $tableName
      * @return string
      */
-    public function tableExists(string $table): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "SHOW TABLES LIKE '$tableName'";
-        $result    = $this->query($sql);
+    public function tableExists(string $tableName): string {
+        $sql    = "SHOW TABLES LIKE '$tableName'";
+        $result = $this->query($sql);
         return !empty($result);
     }
 
     /**
      * Returns true if a Table exists
-     * @param string $table
+     * @param string $tableName
      * @return string
      */
-    public function tableIsEmpty(string $table): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "SELECT COUNT(*) AS count FROM $tableName";
-        $result    = $this->query($sql);
+    public function tableIsEmpty(string $tableName): string {
+        $sql    = "SELECT COUNT(*) AS count FROM $tableName";
+        $result = $this->query($sql);
         return empty($result) || $result[0]["count"] == 0;
     }
 
     /**
      * Creates a Table
-     * @param string    $table
+     * @param string    $tableName
      * @param array{}[] $fields
      * @param string[]  $primary
      * @param string[]  $keys
      * @return string
      */
-    public function createTable(string $table, array $fields, array $primary, array $keys): string {
-        $tableName = $this->getTableName($table);
-        $charset   = !empty($this->charset) ? $this->charset : "utf8";
-        $sql       = "CREATE TABLE $tableName (\n";
+    public function createTable(string $tableName, array $fields, array $primary, array $keys): string {
+        $charset = !empty($this->charset) ? $this->charset : "utf8";
+        $sql     = "CREATE TABLE $tableName (\n";
 
         foreach ($fields as $key => $type) {
             $sql .= "  `$key` " . $type . ",\n";
@@ -734,87 +705,80 @@ class Database {
 
     /**
      * Renames a Table
-     * @param string $oldTable
-     * @param string $newTable
+     * @param string $oldTableName
+     * @param string $newTableName
      * @return string
      */
-    public function renameTable(string $oldTable, string $newTable): string {
-        $oldName = $this->getTableName($oldTable);
-        $newName = $this->getTableName($newTable);
-        $sql     = "ALTER TABLE `$oldName` RENAME `$newName`";
+    public function renameTable(string $oldTableName, string $newTableName): string {
+        $sql = "ALTER TABLE `$oldTableName` RENAME `$newTableName`";
         $this->query($sql);
         return $sql;
     }
 
     /**
      * Deletes a Table
-     * @param string $table
+     * @param string $tableName
      * @return string
      */
-    public function deleteTable(string $table): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "DROP TABLE `$tableName`";
+    public function deleteTable(string $tableName): string {
+        $sql = "DROP TABLE `$tableName`";
         $this->query($sql);
         return $sql;
     }
 
     /**
      * Renames a Column from the Table
-     * @param string      $table
+     * @param string      $tableName
      * @param string      $column
      * @param string      $type
      * @param string|null $afterColumn Optional.
      * @return string
      */
-    public function addColumn(string $table, string $column, string $type, ?string $afterColumn = null): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName ADD COLUMN `$column` $type ";
-        $sql      .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
+    public function addColumn(string $tableName, string $column, string $type, ?string $afterColumn = null): string {
+        $sql  = "ALTER TABLE $tableName ADD COLUMN `$column` $type ";
+        $sql .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;
     }
 
     /**
      * Renames a Column from the Table
-     * @param string $table
+     * @param string $tableName
      * @param string $oldColumn
      * @param string $newColumn
      * @param string $type
      * @return string
      */
-    public function renameColumn(string $table, string $oldColumn, string $newColumn, string $type): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName CHANGE `$oldColumn` `$newColumn` $type";
+    public function renameColumn(string $tableName, string $oldColumn, string $newColumn, string $type): string {
+        $sql = "ALTER TABLE $tableName CHANGE `$oldColumn` `$newColumn` $type";
         $this->query($sql);
         return $sql;
     }
 
     /**
      * Updates a Column from the Table
-     * @param string      $table
+     * @param string      $tableName
      * @param string      $column
      * @param string      $type
      * @param string|null $afterColumn Optional.
      * @return string
      */
-    public function updateColumn(string $table, string $column, string $type, ?string $afterColumn = null): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName MODIFY COLUMN `$column` $type ";
-        $sql      .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
+    public function updateColumn(string $tableName, string $column, string $type, ?string $afterColumn = null): string {
+        $sql  = "ALTER TABLE $tableName MODIFY COLUMN `$column` $type ";
+        $sql .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;
     }
 
     /**
      * Deletes a Column from the Table
-     * @param string  $table
+     * @param string  $tableName
      * @param string  $column
-     * @param boolean $execute Optional.
+     * @param boolean $execute   Optional.
      * @return string
      */
-    public function deleteColumn(string $table, string $column, bool $execute = true): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName DROP COLUMN `$column`";
+    public function deleteColumn(string $tableName, string $column, bool $execute = true): string {
+        $sql = "ALTER TABLE $tableName DROP COLUMN `$column`";
         if ($execute) {
             $this->query($sql);
         }
@@ -823,39 +787,36 @@ class Database {
 
     /**
      * Updates the Primary Keys on the Table
-     * @param string   $table
+     * @param string   $tableName
      * @param string[] $primary
      * @return string
      */
-    public function updatePrimary(string $table, array $primary): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName DROP PRIMARY KEY, ";
-        $sql      .= "ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
+    public function updatePrimary(string $tableName, array $primary): string {
+        $sql  = "ALTER TABLE $tableName DROP PRIMARY KEY, ";
+        $sql .= "ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
         $this->query($sql);
         return $sql;
     }
 
     /**
      * Drops the Primary Keys on the Table
-     * @param string $table
+     * @param string $tableName
      * @return string
      */
-    public function dropPrimary(string $table): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "ALTER TABLE $tableName DROP PRIMARY KEY";
+    public function dropPrimary(string $tableName): string {
+        $sql = "ALTER TABLE $tableName DROP PRIMARY KEY";
         $this->query($sql);
         return $sql;
     }
 
     /**
      * Creates an Index on the Table
-     * @param string $table
+     * @param string $tableName
      * @param string $key
      * @return string
      */
-    public function createIndex(string $table, string $key): string {
-        $tableName = $this->getTableName($table);
-        $sql       = "CREATE INDEX $key ON $tableName($key)";
+    public function createIndex(string $tableName, string $key): string {
+        $sql = "CREATE INDEX $key ON $tableName($key)";
         $this->query($sql);
         return $sql;
     }
@@ -864,11 +825,11 @@ class Database {
 
     /**
      * Dumps the entire database
-     * @param string[]|null $filter Optional.
-     * @param mixed|null    $fp     Optional.
-     * @return void
+     * @param string[]   $filter Optional.
+     * @param mixed|null $fp     Optional.
+     * @return boolean
      */
-    public function dump(?array $filter = null, mixed $fp = null): void {
+    public function dump(array $filter = [], mixed $fp = null): bool {
         $crlf = "\r\n";
 
         // SQL Dump Header
@@ -920,20 +881,22 @@ class Database {
             }
         }
         $this->write($fp, $crlf . "# Done" . $crlf);
+        return true;
     }
 
     /**
      * Writes the content in a file or prints them in the screen
      * @param mixed  $fp
      * @param string $content
-     * @return void
+     * @return boolean
      */
-    private function write(mixed $fp, string $content): void {
+    private function write(mixed $fp, string $content): bool {
         if (!empty($fp)) {
             fwrite($fp, $content);
         } else {
             print($content);
         }
+        return true;
     }
 
     /**

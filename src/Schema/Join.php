@@ -21,6 +21,9 @@ class Join {
     public string $andTable   = "";
     public bool   $andDeleted = false;
 
+    public bool   $hasPrefix  = false;
+    public string $prefix     = "";
+
     /** @var Field[] */
     public array  $fields     = [];
 
@@ -32,9 +35,6 @@ class Join {
 
     /** @var string[] */
     public array  $orKeys    = [];
-
-    public bool   $hasPrefix  = false;
-    public string $prefix     = "";
 
 
     /**
@@ -71,7 +71,7 @@ class Join {
             }
         }
 
-        // Creates the Merges
+        // Creates the Merges and Defaults
         foreach ($this->fields as $field) {
             if (!empty($field->mergeTo)) {
                 if (empty($this->merges[$field->mergeTo])) {
@@ -83,11 +83,13 @@ class Join {
                 }
                 $this->merges[$field->mergeTo]->fields[] = $field->prefixName;
             }
+
             if (!empty($field->defaultTo)) {
-                if (empty($this->defaults[$field->defaultTo])) {
-                    $this->defaults[$field->defaultTo] = [];
+                $defaultKey = $this->hasPrefix ? $this->prefix . ucfirst($field->defaultTo) : $field->defaultTo;
+                if (empty($this->defaults[$defaultKey])) {
+                    $this->defaults[$defaultKey] = [];
                 }
-                $this->defaults[$field->defaultTo][] = $field->prefixName;
+                $this->defaults[$defaultKey][] = $field->prefixName;
             }
         }
     }
@@ -121,13 +123,12 @@ class Join {
      * @return string
      */
     public function getExpression(string $asTable, string $mainKey): string {
-        $table    = "{dbPrefix}{$this->table}";
         $onTable  = $this->onTable ?: $mainKey;
         $leftKey  = $this->leftKey;
         $rightKey = $this->rightKey;
         $and      = $this->getAnd($asTable);
 
-        return "LEFT JOIN $table AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey{$and})";
+        return "LEFT JOIN `{$this->table}` AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey{$and})";
     }
 
     /**

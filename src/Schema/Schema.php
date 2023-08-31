@@ -3,9 +3,11 @@ namespace Framework\Schema;
 
 use Framework\Request;
 use Framework\Schema\Database;
+use Framework\Schema\Structure;
 use Framework\Schema\SubRequest;
 use Framework\Schema\Selection;
 use Framework\Schema\Modification;
+use Framework\Schema\Field;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
@@ -118,7 +120,7 @@ class Schema {
      * @return array{}[]
      */
     public function getQuery(string $expression, array $params = []): array {
-        $expression = Strings::replace($expression, "{table}", "{dbPrefix}{$this->structure->table}");
+        $expression = Strings::replace($expression, "{table}", $this->structure->table);
         $request    = $this->db->query($expression, $params);
         return $request;
     }
@@ -130,7 +132,7 @@ class Schema {
      * @return array{}[]
      */
     public function getData(Query $query, string $expression): array {
-        $expression = Strings::replace($expression, "{table}", "{dbPrefix}{$this->structure->table}");
+        $expression = Strings::replace($expression, "{table}", $this->structure->table);
         $request    = $this->db->getData($expression, $query);
         return $request;
     }
@@ -299,7 +301,7 @@ class Schema {
      * @return array{}
      */
     public function getStats(Query $query, string $select): array {
-        $select  = Strings::replace($select, "{table}", "{dbPrefix}{$this->structure->table}");
+        $select  = Strings::replace($select, "{table}", $this->structure->table);
         $request = $this->db->query("$select " . $query->get(), $query);
 
         if (!empty($request[0])) {

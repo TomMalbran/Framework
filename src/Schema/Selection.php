@@ -137,7 +137,7 @@ class Selection {
             $joinKey    = chr($this->index++);
             $key        = $count->key;
             $what       = $count->isSum ? "SUM($count->mult * $count->value)" : "COUNT(*)";
-            $table      = "{dbPrefix}{$count->table}";
+            $table      = $count->table;
             $groupKey   = "$table.{$count->key}";
             $asKey      = $count->asKey;
             $onTable    = $count->onTable ?: $this->structure->table;
@@ -167,7 +167,7 @@ class Selection {
         $selects    = Strings::join($this->selects, ", ");
         $joins      = Strings::join($this->joins, " ");
         $where      = $query->get();
-        $expression = "SELECT $selects FROM {dbPrefix}$mainKey AS $mainKey $joins $where";
+        $expression = "SELECT $selects FROM $mainKey AS $mainKey $joins $where";
 
         foreach ([ "FROM", "LEFT JOIN", "WHERE", "ORDER BY", "LIMIT" ] as $key) {
             $expression = Strings::replace($expression, $key, "\n$key");
