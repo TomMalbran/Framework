@@ -37,14 +37,11 @@ class SettingType {
      * @return mixed
      */
     public static function parseValue(Model|array $data): mixed {
-        switch ($data["type"]) {
-        case self::Binary:
-            return !empty($data["value"]);
-        case self::JSON:
-            return JSON::decode($data["value"]);
-        default:
-            return $data["value"];
-        }
+        return match ($data["type"]) {
+            self::Binary => !empty($data["value"]),
+            self::JSON   => JSON::decode($data["value"]),
+            default      => $data["value"],
+        };
     }
 
     /**
@@ -54,13 +51,10 @@ class SettingType {
      * @return mixed
      */
     public static function encodeValue(int $type, mixed $value): mixed {
-        switch ($type) {
-        case self::Binary:
-            return !empty($value) ? 1 : 0;
-        case self::JSON:
-            return JSON::encode($value);
-        default:
-            return $value;
-        }
+        return match ($type) {
+            self::Binary => !empty($value) ? 1 : 0,
+            self::JSON   => JSON::encode($value),
+            default      => $value,
+        };
     }
 }

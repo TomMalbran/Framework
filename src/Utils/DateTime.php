@@ -134,14 +134,11 @@ class DateTime {
      * @return integer
      */
     public static function toDay(string $string, string $type = "start", bool $useTimeZone = true): int {
-        switch ($type) {
-        case "start":
-            return self::toDayStart($string, $useTimeZone);
-        case "end":
-            return self::toDayEnd($string, $useTimeZone);
-        default:
-            return self::toDayMiddle($string, $useTimeZone);
-        }
+        return match ($type) {
+            "start" => self::toDayStart($string, $useTimeZone),
+            "end"   => self::toDayEnd($string, $useTimeZone),
+            default => self::toDayMiddle($string, $useTimeZone),
+        };
     }
 
     /**

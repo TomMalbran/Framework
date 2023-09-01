@@ -24,20 +24,14 @@ class Subscription extends Enum {
      * @return integer
      */
     public static function fromString(string $status): int {
-        switch ($status) {
-        case "subscribed":
-            return self::Subscribed;
-        case "unsubscribed":
-            return self::Unsubscribed;
-        case "cleaned":
-            return self::Cleaned;
-        case "pending":
-            return self::Pending;
-        case "transactional":
-            return self::Transactional;
-        case "archived":
-            return self::Archived;
-        }
-        return self::None;
+        return match ($status) {
+            "subscribed"    => self::Subscribed,
+            "unsubscribed"  => self::Unsubscribed,
+            "cleaned"       => self::Cleaned,
+            "pending"       => self::Pending,
+            "transactional" => self::Transactional,
+            "archived"      => self::Archived,
+            default         => self::None,
+        };
     }
 }

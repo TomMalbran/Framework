@@ -91,57 +91,26 @@ class Period {
         $date   = date("N");
         $month  = date("n");
         $year   = date("Y");
-        $result = 0;
 
-        switch ($this->period) {
-        case self::Today:
-            $result = mktime(0, 0, 0, $month, $day, $year);
-            break;
-        case self::Yesterday:
-            $result = mktime(0, 0, 0, $month, $day - 1, $year);
-            break;
-        case self::Last7Days:
-            $result = mktime(0, 0, 0, $month, $day - 7, $year);
-            break;
-        case self::Last15Days:
-            $result = mktime(0, 0, 0, $month, $day - 15, $year);
-            break;
-        case self::Last30Days:
-            $result = mktime(0, 0, 0, $month, $day - 30, $year);
-            break;
-        case self::Last60Days:
-            $result = mktime(0, 0, 0, $month, $day - 60, $year);
-            break;
-        case self::Last90Days:
-            $result = mktime(0, 0, 0, $month, $day - 90, $year);
-            break;
-        case self::Last120Days:
-            $result = mktime(0, 0, 0, $month, $day - 120, $year);
-            break;
-        case self::LastYear:
-            $result = mktime(0, 0, 0, $month, $day, $year - 1);
-            break;
-        case self::ThisWeek:
-            $result = mktime(0, 0, 0, $month, $day - $date, $year);
-            break;
-        case self::ThisMonth:
-            $result = mktime(0, 0, 0, $month, 1, $year);
-            break;
-        case self::ThisYear:
-            $result = mktime(0, 0, 0, 1, 1, $year);
-            break;
-        case self::PastWeek:
-            $result = mktime(0, 0, 0, $month, $day - $date - 7, $year);
-            break;
-        case self::PastMonth:
-            $result = mktime(0, 0, 0, $month - 1, 1, $year);
-            break;
-        case self::PastYear:
-            $result = mktime(0, 0, 0, 1, 1, $year - 1);
-            break;
-        case self::AllPeriod:
-        default:
-        }
+        $result = match ($this->period) {
+            self::Today       => mktime(0, 0, 0, $month, $day, $year),
+            self::Yesterday   => mktime(0, 0, 0, $month, $day - 1, $year),
+            self::Last7Days   => mktime(0, 0, 0, $month, $day - 7, $year),
+            self::Last15Days  => mktime(0, 0, 0, $month, $day - 15, $year),
+            self::Last30Days  => mktime(0, 0, 0, $month, $day - 30, $year),
+            self::Last60Days  => mktime(0, 0, 0, $month, $day - 60, $year),
+            self::Last90Days  => mktime(0, 0, 0, $month, $day - 90, $year),
+            self::Last120Days => mktime(0, 0, 0, $month, $day - 120, $year),
+            self::LastYear    => mktime(0, 0, 0, $month, $day, $year - 1),
+            self::ThisWeek    => mktime(0, 0, 0, $month, $day - $date, $year),
+            self::ThisMonth   => mktime(0, 0, 0, $month, 1, $year),
+            self::ThisYear    => mktime(0, 0, 0, 1, 1, $year),
+            self::PastWeek    => mktime(0, 0, 0, $month, $day - $date - 7, $year),
+            self::PastMonth   => mktime(0, 0, 0, $month - 1, 1, $year),
+            self::PastYear    => mktime(0, 0, 0, 1, 1, $year - 1),
+            self::AllPeriod   => 0,
+            default           => 0,
+        };
 
         return DateTime::toServerTime($result);
     }
@@ -233,40 +202,24 @@ class Period {
         $month = date("n");
         $year  = date("Y");
 
-        switch ($period) {
-        case self::Today:
-            return 1;
-        case self::Yesterday:
-            return 1;
-        case self::Last7Days:
-            return 7;
-        case self::Last15Days:
-            return 15;
-        case self::Last30Days:
-            return 30;
-        case self::Last60Days:
-            return 60;
-        case self::Last90Days:
-            return 90;
-        case self::Last120Days:
-            return 120;
-        case self::LastYear:
-            return 365;
-        case self::ThisWeek:
-            return 7;
-        case self::ThisMonth:
-            return (int)date("t");
-        case self::ThisYear:
-            return 365 + (int)date("L");
-        case self::PastWeek:
-            return 7;
-        case self::PastMonth:
-            return (int)date("t", mktime(0, 0, 0, $month - 1, 1, $year));
-        case self::PastYear:
-            return 365 + (int)date("L", mktime(0, 0, 0, 1, 1, $year - 1));
-        case self::AllPeriod:
-        default:
-            return 0;
-        }
+        return match ($period) {
+            self::Today       => 1,
+            self::Yesterday   => 1,
+            self::Last7Days   => 7,
+            self::Last15Days  => 15,
+            self::Last30Days  => 30,
+            self::Last60Days  => 60,
+            self::Last90Days  => 90,
+            self::Last120Days => 120,
+            self::LastYear    => 365,
+            self::ThisWeek    => 7,
+            self::ThisMonth   => (int)date("t"),
+            self::ThisYear    => 365 + (int)date("L"),
+            self::PastWeek    => 7,
+            self::PastMonth   => (int)date("t", mktime(0, 0, 0, $month - 1, 1, $year)),
+            self::PastYear    => 365 + (int)date("L", mktime(0, 0, 0, 1, 1, $year - 1)),
+            self::AllPeriod   => 0,
+            default           => 0,
+        };
     }
 }

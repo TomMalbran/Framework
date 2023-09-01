@@ -135,17 +135,11 @@ class Image {
         imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $imgWidth, $imgHeight, $imgWidth, $imgHeight);
 
         // Fix Orientation
-        switch ($orientation) {
-        case 3:
-            $dstImage = imagerotate($dstImage, 180, 0);
-            break;
-        case 6:
-            $dstImage = imagerotate($dstImage, -90, 0);
-            break;
-        case 8:
-            $dstImage = imagerotate($dstImage, 90, 0);
-            break;
-        }
+        $dstImage = match ($orientation) {
+            3 => imagerotate($dstImage, 180, 0),
+            6 => imagerotate($dstImage, -90, 0),
+            8 => imagerotate($dstImage, 90, 0),
+        };
 
         // Create the Image
         self::createImage($imgType, $dstImage, $dst);

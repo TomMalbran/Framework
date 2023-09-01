@@ -431,19 +431,13 @@ class Database {
      * @return string The parameter type.
      */
     private function determineType(mixed $item): string {
-        switch (gettype($item)) {
-        case "NULL":
-        case "string":
-            return "s";
-        case "boolean":
-        case "integer":
-            return "i";
-        case "blob":
-            return "b";
-        case "double":
-            return "d";
-        }
-        return "";
+        return match (gettype($item)) {
+            "NULL", "string"     => "s",
+            "boolean", "integer" => "i",
+            "blob"               => "b",
+            "double"             => "d",
+            default              => "",
+        };
     }
 
     /**
