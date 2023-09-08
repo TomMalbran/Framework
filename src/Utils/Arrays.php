@@ -652,6 +652,20 @@ class Arrays {
     }
 
     /**
+     * Returns one value as an array
+     * @param mixed  $array
+     * @param string $key
+     * @return array{}|mixed[]
+     */
+    public static function getValueArray(mixed $array, string $key): array {
+        $value = self::getValue($array, $key);
+        if (empty($value) || !self::isArray($value)) {
+            return [];
+        }
+        return $value;
+    }
+
+    /**
      * Returns the first Value that is not empty in the given keys
      * @param mixed      $array
      * @param string[]   $keys
