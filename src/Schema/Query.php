@@ -184,6 +184,25 @@ class Query {
     }
 
     /**
+     * Adds an expression as an and where the column is between the given values
+     * @param string  $column
+     * @param integer $from
+     * @param integer $to
+     * @return Query
+     */
+    public function addBetween(string $column, int $from, int $to): Query {
+        if (!empty($from) && !empty($to)) {
+            $this->add($column, ">=", $from);
+            $this->add($column, "<=", $to);
+        } elseif (!empty($from)) {
+            $this->add($column, ">=", $from);
+        } elseif (!empty($to)) {
+            $this->add($column, "<=", $to);
+        }
+        return $this;
+    }
+
+    /**
      * Adds an expression as NULL
      * @param string  $column
      * @param Request $request
@@ -191,7 +210,7 @@ class Query {
      */
     public function addPeriod(string $column, Request $request): Query {
         $period = new Period($request);
-        $this->betweenTimes($column, $period->fromTime, $period->toTime);
+        $this->addBetween($column, $period->fromTime, $period->toTime);
         return $this;
     }
 
@@ -334,25 +353,6 @@ class Query {
         }
         if ($multiParts) {
             $this->endParen();
-        }
-        return $this;
-    }
-
-    /**
-     * Adds an expression as an and where the column is between the given times
-     * @param string  $column
-     * @param integer $fromTime
-     * @param integer $toTime
-     * @return Query
-     */
-    public function betweenTimes(string $column, int $fromTime, int $toTime): Query {
-        if (!empty($fromTime) && !empty($toTime)) {
-            $this->add($column, ">=", $fromTime);
-            $this->add($column, "<=", $toTime);
-        } elseif (!empty($fromTime)) {
-            $this->add($column, ">=", $fromTime);
-        } elseif (!empty($toTime)) {
-            $this->add($column, "<=", $toTime);
         }
         return $this;
     }
@@ -616,15 +616,15 @@ class Query {
 
     /**
      * Creates a new Query between the given values
-     * @param string  $column   Optional.
-     * @param integer $fromTime Optional.
-     * @param integer $toTime   Optional.
+     * @param string  $column Optional.
+     * @param integer $from   Optional.
+     * @param integer $to     Optional.
      * @return Query
      */
-    public static function createBetween(string $column = "", int $fromTime = 0, int $toTime = 0): Query {
+    public static function createBetween(string $column = "", int $from = 0, int $to = 0): Query {
         $query = new Query();
         if (!empty($column)) {
-            $query->betweenTimes($column, $fromTime, $toTime);
+            $query->addBetween($column, $from, $to);
         }
         return $query;
     }
