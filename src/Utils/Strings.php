@@ -276,26 +276,30 @@ class Strings {
 
     /**
      * Returns a Substring from the Needle to the end
-     * @param string $string
-     * @param string $needle
+     * @param string  $string
+     * @param string  $needle
+     * @param boolean $useFirst Optional.
      * @return string
      */
-    public static function substringAfter(string $string, string $needle): string {
+    public static function substringAfter(string $string, string $needle, bool $useFirst = false): string {
         if (self::contains($string, $needle)) {
-            return substr($string, strrpos($string, $needle) + strlen($needle));
+            $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
+            return substr($string, $position + strlen($needle));
         }
         return $string;
     }
 
     /**
      * Returns a Substring from the start to the Needle
-     * @param string $string
-     * @param string $needle
+     * @param string  $string
+     * @param string  $needle
+     * @param boolean $useFirst Optional.
      * @return string
      */
-    public static function substringBefore(string $string, string $needle): string {
+    public static function substringBefore(string $string, string $needle, bool $useFirst = true): string {
         if (self::contains($string, $needle)) {
-            return substr($string, 0, strpos($string, $needle));
+            $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
+            return substr($string, 0, $position);
         }
         return $string;
     }
