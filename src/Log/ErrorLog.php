@@ -7,6 +7,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
+use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 
@@ -160,6 +161,7 @@ class ErrorLog {
         $environment = self::getEnvironment();
         $filePath    = self::getFilePath($filePath);
         $description = self::getDescription($description);
+        [ $description, $backtrace ] = self::getBacktrace($description);
 
         $query = Query::create("code", "=", $code);
         $query->addIf("file", "=", $filePath);
@@ -182,6 +184,7 @@ class ErrorLog {
                 "file"        => $filePath,
                 "line"        => $line,
                 "description" => $description,
+                "backtrace"   => $backtrace,
                 "amount"      => 1,
                 "isResolved"  => 0,
                 "updatedTime" => time(),
@@ -277,5 +280,41 @@ class ErrorLog {
         $description = Strings::replace($description, self::$framePath . "/", "Framework/");
         $description = Strings::replace($description, self::$basePath . "/", "");
         return $description;
+    }
+
+    /**
+     * Parses and returns the Backtrace
+     * @param string $description
+     * @return string[]
+     */
+    private static function getBacktrace(string $description): array {
+        if (Strings::contains($description, "Stack trace")) {
+            [ $description, $stacktrace ] = Strings::split($description, "Stack trace:\n");
+
+            $trace     = Strings::split($stacktrace, "\n");
+            $trace     = Arrays::reverse($trace);
+            $backtrace = "";
+            $index     = 1;
+            foreach ($trace as $item) {
+                if (Strings::startsWith($item, "#") && !Strings::contains($item, "{main}")) {
+                    $backtrace .= "#{$index}- " . Strings::substringAfter($item, " ", true) . "\n";
+                    $index     += 1;
+                }
+            }
+            return [ $description, $backtrace ];
+        }
+
+        $trace     = debug_backtrace();
+        $backtrace = "";
+        $index     = 1;
+        for ($i = count($trace) - 1; $i >= 2; $i--) {
+            $item       = $trace[$i];
+            $backtrace .= "#{$index}- ";
+            $backtrace .= (!empty($item["file"]) ? self::getFilePath($item["file"]) : "<unknown file>") . " ";
+            $backtrace .= "(". ($item["line"] ?? "<unknown line>") . ") ";
+            $backtrace .= " -> {$item["function"]}()" . "\n";
+            $index     += 1;
+        }
+        return [ $description, $backtrace ];
     }
 }
