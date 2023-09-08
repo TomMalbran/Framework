@@ -155,6 +155,8 @@ class Field {
         case self::JSON:
         case self::CSV:
         case self::HTML:
+            $result = "mediumtext NULL";
+            break;
         case self::Text:
             $result = "text NULL";
             break;
