@@ -609,6 +609,7 @@ class Credential {
      * @return boolean
      */
     public static function setLanguage(int $credentialID, string $language): bool {
+        $language = Strings::substringBefore($language, "-");
         return self::schema()->edit($credentialID, [
             "language" => $language,
         ]);
