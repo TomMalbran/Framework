@@ -107,19 +107,28 @@ class ErrorLog {
     }
 
     /**
-     * Marks an Error as Resolved
-     * @param integer $logID
+     * Marks the given Error(s) as Resolved
+     * @param integer[]|integer $logID
      * @return boolean
      */
-    public static function markResolved(int $logID): bool {
-        $schema = self::schema();
-        if ($schema->exists($logID)) {
-            $schema->edit($logID, [
-                "isResolved" => 1,
-            ]);
-            return true;
-        }
-        return false;
+    public static function markResolved(array|int $logID): bool {
+        $logIDs = Arrays::toArray($logID);
+        $query  = Query::create("LOG_ID", "IN", $logIDs);
+        self::schema()->edit($query, [
+            "isResolved" => 1,
+        ]);
+        return true;
+    }
+
+    /**
+     * Deletes the given Error(s)
+     * @param integer[]|integer $logID
+     * @return boolean
+     */
+    public static function delete(array|int $logID): bool {
+        $logIDs = Arrays::toArray($logID);
+        $query  = Query::create("LOG_ID", "IN", $logIDs);
+        return self::schema()->remove($query);
     }
 
     /**
