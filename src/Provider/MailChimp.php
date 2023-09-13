@@ -1,8 +1,9 @@
 <?php
-namespace Framework\Email;
+namespace Framework\Provider;
 
 use Framework\Config\Config;
 use Framework\Email\WhiteList;
+use Framework\Email\Subscription;
 use Framework\Utils\Arrays;
 
 use DrewM\MailChimp\MailChimp as MailChimpAPI;
