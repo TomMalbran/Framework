@@ -1,5 +1,5 @@
 <?php
-/* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET */
+/* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET, USERPWD */
 namespace Framework\Provider;
 
 use Framework\Utils\Arrays;
@@ -14,27 +14,29 @@ class Curl {
     /**
      * Executes a GET Request
      * @param string       $url
-     * @param array{}|null $params  Optional.
-     * @param array{}|null $headers Optional.
-     * @param boolean      $asJson  Optional.
+     * @param array{}|null $params   Optional.
+     * @param array{}|null $headers  Optional.
+     * @param boolean      $asJson   Optional.
+     * @param string       $userPass Optional.
      * @return mixed
      */
-    public static function get(string $url, ?array $params = null, ?array $headers = null, bool $asJson = true): mixed {
+    public static function get(string $url, ?array $params = null, ?array $headers = null, bool $asJson = true, string $userPass = ""): mixed {
         $url = self::parseUrl($url, $params);
-        return self::execute($url, $headers, null, $asJson);
+        return self::execute($url, $headers, null, $asJson, $userPass);
     }
 
     /**
      * Executes a POST Request
      * @param string       $url
-     * @param array{}|null $params  Optional.
-     * @param array{}|null $headers Optional.
-     * @param boolean      $asJson  Optional.
+     * @param array{}|null $params   Optional.
+     * @param array{}|null $headers  Optional.
+     * @param boolean      $asJson   Optional.
+     * @param string       $userPass Optional.
      * @return mixed
      */
-    public static function post(string $url, ?array $params = null, ?array $headers = null, bool $asJson = false): mixed {
+    public static function post(string $url, ?array $params = null, ?array $headers = null, bool $asJson = false, string $userPass = ""): mixed {
         $body = $asJson ? json_encode($params) : $params;
-        return self::execute($url, $headers, $body);
+        return self::execute($url, $headers, $body, true, $userPass);
     }
 
     /**
@@ -151,12 +153,13 @@ class Curl {
     /**
      * Executes the Request
      * @param string       $url
-     * @param array{}|null $headers Optional.
-     * @param mixed|null   $body    Optional.
-     * @param boolean      $asJson  Optional.
+     * @param array{}|null $headers  Optional.
+     * @param mixed|null   $body     Optional.
+     * @param boolean      $asJson   Optional.
+     * @param string       $userPass Optional.
      * @return mixed
      */
-    public static function execute(string $url, ?array $headers = null, mixed $body = null, bool $asJson = true): mixed {
+    public static function execute(string $url, ?array $headers = null, mixed $body = null, bool $asJson = true, string $userPass = ""): mixed {
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
@@ -183,6 +186,11 @@ class Curl {
                 $headers["Content-Length"] = strlen($body);
             }
             $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
+        }
+
+        // Set the Password
+        if (!empty($userPass)) {
+            $options[CURLOPT_USERPWD] = $userPass;
         }
 
         // Execute the Curl

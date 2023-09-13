@@ -6,6 +6,7 @@ use Framework\Request;
 use Framework\Config\Config;
 use Framework\Email\WhiteList;
 use Framework\Provider\Mustache;
+use Framework\Provider\Mailjet;
 use Framework\Provider\SendGrid;
 use Framework\File\Path;
 use Framework\Schema\Model;
@@ -15,10 +16,7 @@ use Framework\Utils\JSON;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
-
 use MailchimpTransactional\ApiClient as Mandrill;
-use Mailjet\Client as Mailjet;
-use Mailjet\Resources as MailjetResources;
 
 /**
  * The Email Provider
@@ -37,7 +35,6 @@ class Email {
     private static mixed     $config   = null;
 
     private static ?Mandrill $mandrill = null;
-    private static ?Mailjet  $mailjet  = null;
     private static mixed     $smtp     = null;
     private static mixed     $google   = null;
 
@@ -82,19 +79,6 @@ class Email {
         self::$mandrill = new Mandrill();
         self::$mandrill->setApiKey($config->key);
         return self::$mandrill;
-    }
-
-    /**
-     * Loads the Mailjet Client
-     * @return Mailjet
-     */
-    private static function mailjet(): Mailjet {
-        if (!empty(self::$mailjet)) {
-            return self::$mailjet;
-        }
-        $config = Config::get("mailjet");
-        self::$mailjet = new Mailjet($config->key, $config->secret);
-        return self::$mailjet;
     }
 
 
@@ -156,7 +140,7 @@ class Email {
         case self::Mandrill:
             return self::sendMandrill($toEmail, $fromEmail, $fromName, $subject, $body);
         case self::Mailjet:
-            return self::sendMailjet($toEmail, $fromEmail, $fromName, $subject, $body);
+            return Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
         case self::SendGrid:
             return SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
         default:
@@ -325,38 +309,6 @@ class Email {
             "send_at" => date("Y-m-d H:i:s"),
         ]);
         return true;
-    }
-
-    /**
-     * Sends the Email with Mailjet
-     * @param string $toEmail
-     * @param string $fromEmail
-     * @param string $fromName
-     * @param string $subject
-     * @param string $body
-     * @return boolean
-     */
-    public static function sendMailjet(
-        string $toEmail,
-        string $fromEmail,
-        string $fromName,
-        string $subject,
-        string $body
-    ): bool {
-        $response = self::mailjet()->post(MailjetResources::$Email, [
-            "body" => [
-                "FromEmail"  => $fromEmail ?: self::$config->email,
-                "FromName"   => $fromName  ?: self::$config->name,
-                "Recipients" => [
-                    [
-                        "Email" => $toEmail,
-                    ],
-                ],
-                "Subject"    => $subject,
-                "Html-part"  => $body,
-            ],
-        ]);
-        return $response->success();
     }
 
 
