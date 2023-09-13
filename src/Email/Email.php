@@ -14,9 +14,13 @@ use Framework\Utils\JSON;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
+
 use MailchimpTransactional\ApiClient as Mandrill;
 use Mailjet\Client as Mailjet;
-use Mailjet\Resources;
+use Mailjet\Resources as MailjetResources;
+use SendGrid;
+use SendGrid\Mail\Mail as SendGridMail;
+use Exception;
 
 /**
  * The Email Provider
@@ -26,6 +30,7 @@ class Email {
     const SMTP     = "SMTP";
     const Mandrill = "Mandrill";
     const Mailjet  = "Mailjet";
+    const SendGrid = "SendGrid";
 
 
     private static bool      $loaded   = false;
@@ -35,6 +40,7 @@ class Email {
 
     private static ?Mandrill $mandrill = null;
     private static ?Mailjet  $mailjet  = null;
+    private static ?SendGrid $sendGrid = null;
     private static mixed     $smtp     = null;
     private static mixed     $google   = null;
 
@@ -94,6 +100,19 @@ class Email {
         return self::$mailjet;
     }
 
+    /**
+     * Loads the SendGrid Client
+     * @return SendGrid
+     */
+    private static function sendGrid(): SendGrid {
+        if (!empty(self::$sendGrid)) {
+            return self::$sendGrid;
+        }
+        $config = Config::get("sendGrid");
+        self::$sendGrid = new SendGrid($config->key, $config->secret);
+        return self::$sendGrid;
+    }
+
 
 
     /**
@@ -151,6 +170,8 @@ class Email {
             return self::sendMandrill($toEmail, $fromEmail, $fromName, $subject, $body);
         case self::Mailjet:
             return self::sendMailjet($toEmail, $fromEmail, $fromName, $subject, $body);
+        case self::SendGrid:
+            return self::sendSendGrid($toEmail, $fromEmail, $fromName, $subject, $body);
         default:
             return self::sendSMTP($toEmail, $fromEmail, $fromName, $subject, $body);
         }
@@ -335,7 +356,7 @@ class Email {
         string $subject,
         string $body
     ): bool {
-        $response = self::mailjet()->post(Resources::$Email, [
+        $response = self::mailjet()->post(MailjetResources::$Email, [
             "body" => [
                 "FromEmail"  => $fromEmail ?: self::$config->email,
                 "FromName"   => $fromName  ?: self::$config->name,
@@ -349,6 +370,36 @@ class Email {
             ],
         ]);
         return $response->success();
+    }
+
+    /**
+     * Sends the Email with SendGrid
+     * @param string $toEmail
+     * @param string $fromEmail
+     * @param string $fromName
+     * @param string $subject
+     * @param string $body
+     * @return boolean
+     */
+    public static function sendSendGrid(
+        string $toEmail,
+        string $fromEmail,
+        string $fromName,
+        string $subject,
+        string $body
+    ): bool {
+        $email = new SendGridMail();
+        $email->addTo($toEmail);
+        $email->setFrom($fromEmail ?: self::$config->email, $fromName ?: self::$config->name);
+        $email->setSubject($subject);
+        $email->addContent("text/html", $body);
+
+        try {
+            self::sendGrid()->send($email);
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
     }
 
 
