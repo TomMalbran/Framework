@@ -2,21 +2,18 @@
 namespace Framework\Notification;
 
 use Framework\Config\Config;
+use Framework\Provider\Curl;
 use Framework\File\Path;
-
-use OneSignal\Config as OneSignalConfig;
-use OneSignal\OneSignal as OneSignalAPI;
-use Symfony\Component\HttpClient\Psr18Client;
-use Nyholm\Psr7\Factory\Psr17Factory;
 
 /**
  * The Notification Provider
  */
 class Notification {
 
-    private static bool          $loaded = false;
-    private static mixed         $config = null;
-    private static ?OneSignalAPI $api    = null;
+    public const BaseUrl = "https://onesignal.com/api/v1";
+
+    private static bool  $loaded = false;
+    private static mixed $config = null;
 
 
     /**
@@ -27,16 +24,9 @@ class Notification {
         if (self::$loaded) {
             return false;
         }
+
         self::$loaded = true;
         self::$config = Config::get("onesignal");
-
-        if (!empty(self::$config->appId) && !empty(self::$config->restKey)) {
-            $config         = new OneSignalConfig(self::$config->appId, self::$config->restKey);
-            $httpClient     = new Psr18Client();
-            $requestFactory = new Psr17Factory();
-            $streamFactory  = new Psr17Factory();
-            self::$api      = new OneSignalAPI($config, $httpClient, $requestFactory, $streamFactory);
-        }
         return true;
     }
 
@@ -104,7 +94,7 @@ class Notification {
      */
     private static function send(string $title, string $body, string $url, string $type, int $dataID, array $params): ?string {
         self::load();
-        if (empty(self::$api) || !self::$config->isActive) {
+        if (!self::$config->isActive) {
             return null;
         }
 
@@ -112,7 +102,9 @@ class Notification {
         if (!empty(self::$config->icon)) {
             $icon = Path::getUrl("framework", self::$config->icon);
         }
-        $response = self::$api->notifications()->add([
+
+        $data = [
+            "app_id"         => self::$config->appId,
             "headings"       => [ "en" => $title ],
             "contents"       => [ "en" => $body  ],
             "url"            => Config::getUrl($url),
@@ -123,7 +115,13 @@ class Notification {
                 "type"   => $type,
                 "dataID" => $dataID,
             ],
-        ] + $params);
+        ] + $params;
+
+        $headers = [
+            "Content-Type"  => "application/json; charset=utf-8",
+            "Authorization" => "Basic " . self::$config->restKey,
+        ];
+        $response = Curl::post(self::BaseUrl . "/notifications", $data, $headers);
 
         if (empty($response["id"])) {
             return null;

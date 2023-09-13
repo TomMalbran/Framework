@@ -22,9 +22,6 @@
         "drewm/mailchimp-api": "^2.5",
         "mailchimp/transactional": "^1.0",
         "mailjet/mailjet-apiv3-php": "^1.5",
-        "norkunas/onesignal-php-api": "^2.9",
-        "symfony/http-client": "^6.2",
-        "nyholm/psr7": "^1.5"
     },
     "suggest" : {
         "mustache/mustache": "Used for Rendering templates",
@@ -35,10 +32,7 @@
         "mailchimp/transactional": "Used for Mailing with Mandrill",
         "mailjet/mailjet-apiv3-php": "Used for Mailing with Mailjet",
         "google/apiclient": "Used to for Google and Gmail",
-        "phpoffice/phpspreadsheet": "Used to Import/Export data",
-        "norkunas/onesignal-php-api": "Used for App Notifications",
-        "symfony/http-client": "Used for App Notifications",
-        "nyholm/psr7": "Used for App Notifications"
+        "phpoffice/phpspreadsheet": "Used to Import/Export data"
     },
     "autoload": {
         "psr-4": {
