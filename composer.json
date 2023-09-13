@@ -21,8 +21,7 @@
         "phpoffice/phpspreadsheet": "^1.25",
         "drewm/mailchimp-api": "^2.5",
         "mailchimp/transactional": "^1.0",
-        "mailjet/mailjet-apiv3-php": "^1.5",
-        "sendgrid/sendgrid": "^8.0"
+        "mailjet/mailjet-apiv3-php": "^1.5"
     },
     "suggest" : {
         "mustache/mustache": "Used for Rendering templates",
@@ -32,7 +31,6 @@
         "drewm/mailchimp-api": "Used for Mailing with MailChimp",
         "mailchimp/transactional": "Used for Mailing with Mandrill",
         "mailjet/mailjet-apiv3-php": "Used for Mailing with Mailjet",
-        "sendgrid/sendgrid": "Used for Mailing with SendGrid",
         "google/apiclient": "Used to for Google and Gmail",
         "phpoffice/phpspreadsheet": "Used to Import/Export data"
     },
