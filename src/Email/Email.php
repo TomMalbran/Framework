@@ -6,6 +6,7 @@ use Framework\Request;
 use Framework\Config\Config;
 use Framework\Email\WhiteList;
 use Framework\Provider\Mustache;
+use Framework\Provider\SMTP;
 use Framework\Provider\Mandrill;
 use Framework\Provider\Mailjet;
 use Framework\Provider\SendGrid;
@@ -13,10 +14,6 @@ use Framework\File\Path;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\OAuth;
-use League\OAuth2\Client\Provider\Google;
 
 /**
  * The Email Provider
@@ -34,9 +31,6 @@ class Email {
     private static string  $url      = "";
     private static mixed   $config   = null;
 
-    private static mixed   $smtp     = null;
-    private static mixed   $google   = null;
-
 
     /**
      * Loads the Email Config
@@ -51,19 +45,6 @@ class Email {
         self::$url      = Config::get("url");
         self::$config   = Config::get("email");
         return true;
-    }
-
-    /**
-     * Returns the PHPMailer
-     * @return PHPMailer
-     */
-    private static function smtp(): PHPMailer {
-        if (!empty(self::$smtp)) {
-            return new PHPMailer();
-        }
-        self::$smtp   = Config::get("smtp");
-        self::$google = Config::get("google");
-        return new PHPMailer();
     }
 
 
@@ -129,7 +110,7 @@ class Email {
         case self::SendGrid:
             return SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
         default:
-            return self::sendSMTP($toEmail, $fromEmail, $fromName, $subject, $body);
+            return SMTP::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
         }
         return false;
     }
@@ -165,127 +146,6 @@ class Email {
         $message = "Backup de la base de datos al dia: " . date("d M Y, H:i:s");
 
         return self::send($sendTo, "", "", $subject, $message, false, $attachment);
-    }
-
-
-
-    /**
-     * Sends the Email with SMTP
-     * @param string $toEmail
-     * @param string $fromEmail
-     * @param string $fromName
-     * @param string $subject
-     * @param string $body
-     * @param string $attachment Optional.
-     * @return boolean
-     */
-    public static function sendSMTP(
-        string $toEmail,
-        string $fromEmail,
-        string $fromName,
-        string $subject,
-        string $body,
-        string $attachment = ""
-    ): bool {
-        $email = self::smtp();
-        $email->isSMTP();
-        $email->isHTML(true);
-        $email->clearAllRecipients();
-        $email->clearReplyTos();
-
-        $email->Timeout     = 10;
-        $email->Host        = self::$smtp->host;
-        $email->Port        = self::$smtp->port;
-        $email->SMTPSecure  = self::$smtp->secure;
-        $email->SMTPAuth    = true;
-        $email->SMTPAutoTLS = false;
-
-        $username = !empty(self::$smtp->username) ? self::$smtp->username : self::$config->email;
-        if (self::$smtp->useOauth) {
-            $email->SMTPAuth = true;
-            $email->AuthType = "XOAUTH2";
-
-            $provider = new Google([
-                "clientId"     => self::$google->client,
-                "clientSecret" => self::$google->secret,
-            ]);
-            $email->setOAuth(new OAuth([
-                "provider"     => $provider,
-                "clientId"     => self::$google->client,
-                "clientSecret" => self::$google->secret,
-                "refreshToken" => self::$smtp->refreshToken,
-                "userName"     => $username,
-            ]));
-        } else {
-            $email->Username = $username;
-            $email->Password = self::$smtp->password;
-        }
-
-        $email->CharSet  = "UTF-8";
-        $email->From     = self::$config->email;
-        $email->FromName = $fromName ?: self::$config->name;
-        $email->Subject  = $subject;
-        $email->Body     = $body;
-
-        $email->addAddress($toEmail);
-        if (!empty($fromEmail)) {
-            $email->addReplyTo($fromEmail, $fromName ?: self::$config->name);
-        } elseif (!empty(self::$smtp->replyTo)) {
-            $email->addReplyTo(self::$smtp->replyTo, self::$config->name);
-        }
-
-        if (!empty($attachment)) {
-            $email->AddAttachment($attachment);
-        }
-        if (self::$smtp->showErrors) {
-            $email->SMTPDebug = 3;
-        }
-
-        $result = $email->send();
-        if (self::$smtp->showErrors && !$result) {
-            echo "Message could not be sent.";
-            echo "Email Error: " . $email->ErrorInfo;
-        }
-        return $result;
-    }
-
-
-
-    /**
-     * Returns the Google Auth Url
-     * @param string $redirectUri
-     * @return string
-     */
-    public static function getAuthUrl(string $redirectUri): string {
-        self::load();
-
-        $options  = [ "scope" => [ "https://mail.google.com/" ]];
-        $provider = new Google([
-            "clientId"     => self::$google->client,
-            "clientSecret" => self::$google->secret,
-            "redirectUri"  => self::$url . $redirectUri,
-            "accessType"   => "offline",
-        ]);
-        return $provider->getAuthorizationUrl($options);
-    }
-
-    /**
-     * Returns the Google Refresh Token
-     * @param string $redirectUri
-     * @param string $code
-     * @return string
-     */
-    public static function getAuthToken(string $redirectUri, string $code): string {
-        self::load();
-
-        $provider = new Google([
-            "clientId"     => self::$google->client,
-            "clientSecret" => self::$google->secret,
-            "redirectUri"  => self::$url . $redirectUri,
-            "accessType"   => "offline",
-        ]);
-        $token = $provider->getAccessToken("authorization_code", [ "code" => $code ]);
-        return $token->getRefreshToken();
     }
 
 
