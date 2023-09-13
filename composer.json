@@ -19,8 +19,7 @@
         "league/oauth2-google": "^4.0",
         "google/apiclient": "^2.12",
         "phpoffice/phpspreadsheet": "^1.25",
-        "drewm/mailchimp-api": "^2.5",
-        "mailchimp/transactional": "^1.0"
+        "drewm/mailchimp-api": "^2.5"
     },
     "suggest" : {
         "mustache/mustache": "Used for Rendering templates",

@@ -6,6 +6,7 @@ use Framework\Request;
 use Framework\Config\Config;
 use Framework\Email\WhiteList;
 use Framework\Provider\Mustache;
+use Framework\Provider\Mandrill;
 use Framework\Provider\Mailjet;
 use Framework\Provider\SendGrid;
 use Framework\File\Path;
@@ -16,7 +17,6 @@ use Framework\Utils\JSON;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
-use MailchimpTransactional\ApiClient as Mandrill;
 
 /**
  * The Email Provider
@@ -29,14 +29,13 @@ class Email {
     const SendGrid = "SendGrid";
 
 
-    private static bool      $loaded   = false;
-    private static ?string   $template = null;
-    private static string    $url      = "";
-    private static mixed     $config   = null;
+    private static bool    $loaded   = false;
+    private static ?string $template = null;
+    private static string  $url      = "";
+    private static mixed   $config   = null;
 
-    private static ?Mandrill $mandrill = null;
-    private static mixed     $smtp     = null;
-    private static mixed     $google   = null;
+    private static mixed   $smtp     = null;
+    private static mixed   $google   = null;
 
 
     /**
@@ -65,20 +64,6 @@ class Email {
         self::$smtp   = Config::get("smtp");
         self::$google = Config::get("google");
         return new PHPMailer();
-    }
-
-    /**
-     * Loads the Mandrill Client
-     * @return Mandrill
-     */
-    private static function mandrill(): Mandrill {
-        if (!empty(self::$mandrill)) {
-            return self::$mandrill;
-        }
-        $config = Config::get("mandrill");
-        self::$mandrill = new Mandrill();
-        self::$mandrill->setApiKey($config->key);
-        return self::$mandrill;
     }
 
 
@@ -138,7 +123,7 @@ class Email {
 
         switch ($provider) {
         case self::Mandrill:
-            return self::sendMandrill($toEmail, $fromEmail, $fromName, $subject, $body);
+            return Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
         case self::Mailjet:
             return Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
         case self::SendGrid:
@@ -262,53 +247,6 @@ class Email {
             echo "Email Error: " . $email->ErrorInfo;
         }
         return $result;
-    }
-
-    /**
-     * Sends the Email with Mandrill
-     * @param string $toEmail
-     * @param string $fromEmail
-     * @param string $fromName
-     * @param string $subject
-     * @param string $body
-     * @return boolean
-     */
-    public static function sendMandrill(
-        string $toEmail,
-        string $fromEmail,
-        string $fromName,
-        string $subject,
-        string $body
-    ): bool {
-        self::mandrill()->messages->send([
-            "message" => [
-                "to"                  => [
-                    [
-                        "email" => $toEmail,
-                        "type"  => "to",
-                    ],
-                ],
-                "from_email"          => $fromEmail ?: self::$config->email,
-                "from_name"           => $fromName  ?: self::$config->name,
-                "subject"             => $subject,
-                "html"                => $body,
-                "important"           => false,
-                "track_opens"         => true,
-                "track_clicks"        => true,
-                "auto_text"           => false,
-                "auto_html"           => true,
-                "inline_css"          => null,
-                "url_strip_qs"        => null,
-                "preserve_recipients" => null,
-                "view_content_link"   => null,
-                "tracking_domain"     => null,
-                "signing_domain"      => null,
-                "return_path_domain"  => null,
-            ],
-            "async"   => false,
-            "send_at" => date("Y-m-d H:i:s"),
-        ]);
-        return true;
     }
 
 

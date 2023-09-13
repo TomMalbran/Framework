@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d84939999e5bf4f047fda7a1ed0fc321",
+    "content-hash": "15e47640c5302b30d1e9ece6071ebb0a",
     "packages": [],
     "packages-dev": [
         {
@@ -881,60 +881,6 @@
                 }
             ],
             "time": "2022-12-08T12:29:14+00:00"
-        },
-        {
-            "name": "mailchimp/transactional",
-            "version": "1.0.50",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mailchimp/mailchimp-transactional-php.git",
-                "reference": "701b00f538f36a2a5b138f880ab5eebbfeff4b7d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mailchimp/mailchimp-transactional-php/zipball/701b00f538f36a2a5b138f880ab5eebbfeff4b7d",
-                "reference": "701b00f538f36a2a5b138f880ab5eebbfeff4b7d",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "guzzlehttp/guzzle": "^6.4 || ^7.2",
-                "php": ">=7.2"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "~2.12",
-                "phpunit/phpunit": "^7",
-                "squizlabs/php_codesniffer": "~2.6"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MailchimpTransactional\\": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "proprietary"
-            ],
-            "authors": [
-                {
-                    "name": "Mailchimp",
-                    "homepage": "https://github.com/mailchimp/mailchimp-transactional-php"
-                }
-            ],
-            "homepage": "http://swagger.io",
-            "keywords": [
-                "api",
-                "php",
-                "sdk",
-                "swagger"
-            ],
-            "support": {
-                "source": "https://github.com/mailchimp/mailchimp-transactional-php/tree/v1.0.50"
-            },
-            "time": "2022-11-07T20:12:03+00:00"
         },
         {
             "name": "markbaker/complex",
