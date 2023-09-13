@@ -18,7 +18,7 @@ class Microsoft {
      * Creates the Microsoft Provider
      * @return boolean
      */
-    public static function load(): bool {
+    private static function load(): bool {
         if (self::$loaded) {
             return true;
         }
@@ -27,6 +27,7 @@ class Microsoft {
         self::$config = Config::get("microsoft");
         return false;
     }
+
 
 
     /**

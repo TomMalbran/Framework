@@ -21,7 +21,7 @@ class Google {
      * @param string $scopes Optional.
      * @return Client
      */
-    public static function load(string $scopes = ""): Client {
+    private static function load(string $scopes = ""): Client {
         if (self::$loaded) {
             return self::$client;
         }
@@ -37,6 +37,7 @@ class Google {
         ]);
         return self::$client;
     }
+
 
 
     /**

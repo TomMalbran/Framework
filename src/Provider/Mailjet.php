@@ -19,7 +19,7 @@ class Mailjet {
      * Creates the Mailjet Provider
      * @return boolean
      */
-    public static function load(): bool {
+    private static function load(): bool {
         if (self::$loaded) {
             return true;
         }
@@ -29,6 +29,7 @@ class Mailjet {
         self::$apiSecret = Config::get("mailjetSecret");
         return false;
     }
+
 
 
     /**

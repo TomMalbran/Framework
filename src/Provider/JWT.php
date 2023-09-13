@@ -24,7 +24,7 @@ class JWT {
      * Loads the JWT Config
      * @return boolean
      */
-    public static function load(): bool {
+    private static function load(): bool {
         if (self::$loaded) {
             return false;
         }

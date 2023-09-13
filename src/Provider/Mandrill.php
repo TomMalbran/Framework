@@ -18,7 +18,7 @@ class Mandrill {
      * Creates the Mandrill Provider
      * @return boolean
      */
-    public static function load(): bool {
+    private static function load(): bool {
         if (self::$loaded) {
             return true;
         }
@@ -27,6 +27,7 @@ class Mandrill {
         self::$apiKey = Config::get("mandrillKey");
         return false;
     }
+
 
 
     /**

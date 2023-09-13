@@ -22,7 +22,7 @@ class MailChimp {
      * Creates the MailChimp Provider
      * @return boolean
      */
-    public static function load(): bool {
+    private static function load(): bool {
         if (self::$loaded) {
             return false;
         }
@@ -40,7 +40,7 @@ class MailChimp {
      * Returns the Last Error
      * @return mixed
      */
-    public static function getLastError(): mixed {
+    private static function getLastError(): mixed {
         if (self::$api) {
             return self::$api->getLastError();
         }
@@ -51,7 +51,7 @@ class MailChimp {
      * Returns the Last Response
      * @return mixed
      */
-    public static function getLastResponse(): mixed {
+    private static function getLastResponse(): mixed {
         if (self::$api) {
             return self::$api->getLastResponse();
         }

@@ -18,7 +18,7 @@ class SendGrid {
      * Creates the SendGrid Provider
      * @return boolean
      */
-    public static function load(): bool {
+    private static function load(): bool {
         if (self::$loaded) {
             return true;
         }
@@ -27,6 +27,7 @@ class SendGrid {
         self::$apiKey = Config::get("sendGridKey");
         return false;
     }
+
 
 
     /**
