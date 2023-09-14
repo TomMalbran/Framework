@@ -13,32 +13,32 @@ use Framework\Utils\Strings;
  */
 class Structure {
 
-    public string $masterKey    = "";
+    public string $masterKey   = "";
 
-    public string $table        = "";
-    public bool   $hasID        = false;
-    public string $idKey        = "";
-    public string $idName       = "";
-    public string $name         = "";
-
-    /** @var Field[] */
-    public array $fields        = [];
+    public string $table       = "";
+    public bool   $hasID       = false;
+    public string $idKey       = "";
+    public string $idName      = "";
+    public string $name        = "";
 
     /** @var Field[] */
-    public array $expressions   = [];
+    public array $fields       = [];
+
+    /** @var Field[] */
+    public array $expressions  = [];
 
     /** @var Join[] */
-    public array $joins         = [];
+    public array $joins        = [];
 
     /** @var Count[] */
-    public array $counts        = [];
+    public array $counts       = [];
 
-    public bool $hasPositions   = false;
-    public bool $hasTimestamps  = false;
-    public bool $hasUsers       = false;
-    public bool $canCreate      = false;
-    public bool $canEdit        = false;
-    public bool $canDelete      = false;
+    public bool $hasPositions  = false;
+    public bool $hasTimestamps = false;
+    public bool $hasUsers      = false;
+    public bool $canCreate     = false;
+    public bool $canEdit       = false;
+    public bool $canDelete     = false;
 
 
     /**
@@ -135,6 +135,17 @@ class Structure {
             $this->fields[] = $field;
         }
 
+        // Parse the Expressions
+        if (!empty($data["expressions"])) {
+            foreach ($data["expressions"] as $key => $value) {
+                if (Arrays::isArray($value)) {
+                    $this->expressions[$value["expression"]] = new Field($key, $value);
+                } else {
+                    $this->expressions[$value] = new Field($key, []);
+                }
+            }
+        }
+
         // Create the Joins
         if (!empty($data["joins"])) {
             foreach ($data["joins"] as $key => $value) {
@@ -146,17 +157,6 @@ class Structure {
         if (!empty($data["counts"])) {
             foreach ($data["counts"] as $key => $value) {
                 $this->counts[] = new Count($key, $value);
-            }
-        }
-
-        // Parse the Expressions
-        if (!empty($data["expressions"])) {
-            foreach ($data["expressions"] as $key => $value) {
-                if (Arrays::isArray($value)) {
-                    $this->expressions[$value["expression"]] = new Field($key, $value);
-                } else {
-                    $this->expressions[$value] = new Field($key, []);
-                }
             }
         }
 
