@@ -10,19 +10,17 @@ use Framework\Utils\Strings;
  */
 class Count {
 
-    public string $index     = "";
-    public string $table     = "";
+    public Field  $field;
     public string $key       = "";
     public bool   $isSum     = false;
     public bool   $isCount   = false;
     public string $value     = "";
     public int    $mult      = 1;
 
-    public string $asKey     = "";
+    public string $table     = "";
     public string $onTable   = "";
     public string $leftKey   = "";
     public string $rightKey  = "";
-    public string $type      = "";
     public bool   $noDeleted = false;
 
     /** @var mixed[] */
@@ -35,47 +33,49 @@ class Count {
      * @param array{} $data
      */
     public function __construct(string $key, array $data) {
-        $this->index     = "count-{$key}";
-        $this->table     = $data["table"];
-        $this->key       = $data["key"];
+        $this->field     = new Field($key, $data);
+        $this->key       = $key;
 
         $this->isSum     = !empty($data["isSum"]) && $data["isSum"];
         $this->isCount   = empty($data["isSum"])  || !$data["isSum"];
-        $this->value     = !empty($data["value"])   ? $data["value"]     : "";
-        $this->mult      = !empty($data["mult"])    ? (int)$data["mult"] : 1;
+        $this->value     = !empty($data["value"])    ? $data["value"]     : "";
+        $this->mult      = !empty($data["mult"])     ? (int)$data["mult"] : 1;
 
-        $this->asKey     = !empty($data["asKey"])   ? $data["asKey"]     : "";
-        $this->onTable   = !empty($data["onTable"]) ? $data["onTable"]   : "";
-        $this->leftKey   = !empty($data["leftKey"]) ? $data["leftKey"]   : $this->key;
-        $this->type      = !empty($data["type"])    ? $data["type"]      : "";
-        $this->where     = !empty($data["where"])   ? $data["where"]     : [];
+        $this->table     = $data["table"];
+        $this->onTable   = !empty($data["onTable"])  ? $data["onTable"]   : "";
+        $this->rightKey  = !empty($data["rightKey"]) ? $data["rightKey"]  : $data["key"];
+        $this->leftKey   = !empty($data["leftKey"])  ? $data["leftKey"]   : $data["key"];
+        $this->where     = !empty($data["where"])    ? $data["where"]     : [];
         $this->noDeleted = !empty($data["noDeleted"]) && $data["noDeleted"];
     }
 
 
 
     /**
-     * Returns the Count Value
-     * @param array{} $data
-     * @return mixed
+     * Returns the Expression for the Query
+     * @param string $asTable
+     * @param string $mainKey
+     * @return string
      */
-    public function getValue(array $data): mixed {
-        $key    = $this->asKey;
-        $result = !empty($data[$key]) ? $data[$key] : 0;
-
-        if ($this->type == Field::Float) {
-            $result = Numbers::toFloat($result, 3);
-        } elseif ($this->type == Field::Price) {
-            $result = Numbers::fromCents($result);
-        }
-        return $result;
+    public function getExpression(string $asTable, string $mainKey): string {
+        $key        = $this->key;
+        $what       = $this->isSum ? "SUM({$this->mult} * {$this->value})" : "COUNT(*)";
+        $table      = $this->table;
+        $onTable    = $this->onTable ?: $mainKey;
+        $leftKey    = $this->leftKey;
+        $rightKey   = $this->rightKey;
+        $groupKey   = "$table.$rightKey";
+        $where      = $this->getWhere();
+        $select     = "SELECT $groupKey, $what AS $key FROM $table $where GROUP BY $groupKey";
+        $expression = "LEFT JOIN ($select) AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey)";
+        return $expression;
     }
 
     /**
      * Returns the Count Where
      * @return string
      */
-    public function getWhere(): string {
+    private function getWhere(): string {
         if (empty($this->where) && !$this->noDeleted) {
             return "";
         }
@@ -96,5 +96,33 @@ class Count {
             return "";
         }
         return "WHERE " . Strings::join($query, " AND ");
+    }
+
+    /**
+     * Returns the Count select name
+     * @param string $joinKey
+     * @return string
+     */
+    public function getSelect(string $joinKey): string {
+        return "$joinKey.{$this->key}";
+    }
+
+
+
+    /**
+     * Returns the Count Value
+     * @param array{} $data
+     * @return mixed
+     */
+    public function getValue(array $data): mixed {
+        $key    = $this->key;
+        $result = !empty($data[$key]) ? $data[$key] : 0;
+
+        if ($this->field->type == Field::Float) {
+            $result = Numbers::toFloat($result, $this->field->decimals);
+        } elseif ($this->field->type == Field::Price) {
+            $result = Numbers::fromCents($result);
+        }
+        return $result;
     }
 }

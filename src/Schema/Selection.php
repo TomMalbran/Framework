@@ -133,22 +133,13 @@ class Selection {
      * @return Selection
      */
     public function addCounts(): Selection {
-        foreach ($this->structure->counts as $count) {
-            $joinKey    = chr($this->index++);
-            $key        = $count->key;
-            $what       = $count->isSum ? "SUM($count->mult * $count->value)" : "COUNT(*)";
-            $table      = $count->table;
-            $groupKey   = "$table.{$count->key}";
-            $asKey      = $count->asKey;
-            $onTable    = $count->onTable ?: $this->structure->table;
-            $leftKey    = $count->leftKey;
-            $where      = $count->getWhere();
-            $select     = "SELECT $groupKey, $what AS $asKey FROM $table $where GROUP BY $groupKey";
-            $expression = "LEFT JOIN ($select) AS $joinKey ON ($joinKey.$leftKey = $onTable.$key)";
+        $mainKey = $this->structure->table;
 
-            $this->joins[]             = $expression;
-            $this->selects[]           = "$joinKey.$asKey";
-            $this->keys[$count->index] = $joinKey;
+        foreach ($this->structure->counts as $count) {
+            $asTable                 = chr($this->index++);
+            $this->joins[]           = $count->getExpression($asTable, $mainKey);
+            $this->selects[]         = $count->getSelect($asTable);
+            $this->keys[$count->key] = $asTable;
         }
         return $this;
     }
@@ -220,11 +211,10 @@ class Selection {
 
             if (!$found) {
                 foreach ($this->structure->counts as $count) {
-                    if (!empty($this->keys[$count->index])) {
-                        $joinKey = $this->keys[$count->index];
-                        $field   = $count->asKey;
-                        if ($column === $field) {
-                            $query->updateColumn($column, "$joinKey.{$field}");
+                    if (!empty($this->keys[$count->key])) {
+                        $joinKey = $this->keys[$count->key];
+                        if ($column === $count->key) {
+                            $query->updateColumn($column, "$joinKey.{$count->key}");
                             $found = true;
                             break;
                         }
@@ -277,7 +267,7 @@ class Selection {
 
             // Parse the Counts
             foreach ($this->structure->counts as $count) {
-                $fields[$count->asKey] = $count->getValue($row);
+                $fields[$count->key] = $count->getValue($row);
             }
 
             // Parse the Extras
