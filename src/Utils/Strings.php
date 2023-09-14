@@ -236,6 +236,28 @@ class Strings {
     }
 
     /**
+     * Pads left the String with the given string to the given length
+     * @param string  $string
+     * @param integer $length
+     * @param string  $needle
+     * @return string
+     */
+    public static function padLeft(string $string, int $length, string $needle = " "): string {
+        return str_pad($string, $length, $needle, STR_PAD_LEFT);
+    }
+
+    /**
+     * Pads right the String with the given string to the given length
+     * @param string  $string
+     * @param integer $length
+     * @param string  $needle
+     * @return string
+     */
+    public static function padRight(string $string, int $length, string $needle = " "): string {
+        return str_pad($string, $length, $needle, STR_PAD_RIGHT);
+    }
+
+    /**
      * Adds the Needle to the start of the String if not there
      * @param string $string
      * @param string $needle
