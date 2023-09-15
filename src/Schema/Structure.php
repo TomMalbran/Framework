@@ -41,9 +41,11 @@ class Structure {
     public bool $hasPositions  = false;
     public bool $hasTimestamps = false;
     public bool $hasUsers      = false;
+    public bool $hasEncrypt    = false;
     public bool $canCreate     = false;
     public bool $canEdit       = false;
     public bool $canDelete     = false;
+    public bool $canRemove     = false;
 
 
     /**
@@ -55,12 +57,13 @@ class Structure {
         $this->key           = $schemaKey;
         $this->name          = !empty($data["name"]) ? $data["name"] : "";
         $this->table         = $data["table"];
-        $this->hasPositions  = !empty($data["hasPositions"])  && $data["hasPositions"];
-        $this->hasTimestamps = !empty($data["hasTimestamps"]) && $data["hasTimestamps"];
-        $this->hasUsers      = !empty($data["hasUsers"])      && $data["hasUsers"];
+        $this->hasPositions  = !empty($data["hasPositions"]);
+        $this->hasTimestamps = !empty($data["hasTimestamps"]);
+        $this->hasUsers      = !empty($data["hasUsers"]);
         $this->canCreate     = $data["canCreate"];
         $this->canEdit       = $data["canEdit"];
         $this->canDelete     = $data["canDelete"];
+        $this->canRemove     = !empty($data["canRemove"]);
 
         // Add additional Fields
         if ($this->hasPositions) {
@@ -142,7 +145,7 @@ class Structure {
             $this->fields[] = $field;
         }
 
-        // Parse the Expressions
+        // Create the Expressions
         if (!empty($data["expressions"])) {
             foreach ($data["expressions"] as $key => $value) {
                 if (Arrays::isArray($value)) {
@@ -174,7 +177,8 @@ class Structure {
 
         // Set the Master Key
         if ($reqMasterKey) {
-            $this->masterKey = KeyChain::get($schemaKey);
+            $this->hasEncrypt = true;
+            $this->masterKey  = KeyChain::get($schemaKey);
         }
     }
 

@@ -555,30 +555,30 @@ class Schema {
 
     /**
      * Creates and ensures the Order
-     * @param Request      $request
-     * @param array{}|null $extra        Optional.
-     * @param integer      $credentialID Optional.
-     * @param Query|null   $orderQuery   Optional.
+     * @param Request|array{} $fields
+     * @param array{}|null    $extra        Optional.
+     * @param integer         $credentialID Optional.
+     * @param Query|null      $orderQuery   Optional.
      * @return integer
      */
-    public function createWithOrder(Request $request, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): int {
-        $this->ensurePosOrder(null, $request, $orderQuery);
-        return $this->create($request, $extra, $credentialID);
+    public function createWithOrder(Request|array $fields, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): int {
+        $this->ensurePosOrder(null, $fields, $orderQuery);
+        return $this->create($fields, $extra, $credentialID);
     }
 
     /**
      * Edits and ensures the Order
-     * @param Query|integer $query
-     * @param Request|null  $request
-     * @param array{}|null  $extra        Optional.
-     * @param integer       $credentialID Optional.
-     * @param Query|null    $orderQuery   Optional.
+     * @param Query|integer        $query
+     * @param Request|array{}      $fields
+     * @param array{}|integer|null $extra        Optional.
+     * @param integer              $credentialID Optional.
+     * @param Query|null           $orderQuery   Optional.
      * @return boolean
      */
-    public function editWithOrder(Query|int $query, ?Request $request = null, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
+    public function editWithOrder(Query|int $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
-        $this->ensurePosOrder($model, $request, $orderQuery);
-        return $this->edit($query, $request, $extra, $credentialID);
+        $this->ensurePosOrder($model, $fields, $orderQuery);
+        return $this->edit($query, $fields, $extra, $credentialID);
     }
 
     /**
@@ -630,17 +630,25 @@ class Schema {
 
     /**
      * Ensures that the order of the Elements is correct
-     * @param Model|null   $model   Optional.
-     * @param Request|null $request Optional.
-     * @param Query|null   $query   Optional.
+     * @param Model|null           $model  Optional.
+     * @param Request|array{}|null $fields Optional.
+     * @param Query|null           $query  Optional.
      * @return boolean
      */
-    public function ensurePosOrder(?Model $model = null, ?Request $request = null, ?Query $query = null): bool {
-        $oldPosition = !empty($model)   ? $model->position             : 0;
-        $newPosition = !empty($request) ? $request->getInt("position") : 0;
-        $updPosition = $this->ensureOrder($oldPosition, $newPosition, $query);
+    public function ensurePosOrder(?Model $model = null, Request|array $fields = null, ?Query $query = null): bool {
+        $oldPosition = !empty($model) ? $model->position : 0;
+        $newPosition = 0;
+        if (!empty($fields)) {
+            if ($fields instanceof Request) {
+                $newPosition = $fields->getInt("position");
+            } elseif (!empty($fields["position"])) {
+                $newPosition = (int)$fields["position"];
+            }
+        }
+
+        $updatedPosition = $this->ensureOrder($oldPosition, $newPosition, $query);
         if (!empty($request)) {
-            $request->position = $updPosition;
+            $request->position = $updatedPosition;
         }
         return true;
     }

@@ -45,6 +45,7 @@ class Field {
     public bool   $isKey      = false;
     public bool   $isName     = false;
     public bool   $isUnique   = false;
+    public bool   $forOrder   = false;
     public bool   $noExists   = false;
     public bool   $noEmpty    = false;
     public bool   $isSigned   = false;
@@ -82,6 +83,7 @@ class Field {
         $this->isKey      = !empty($data["isKey"]);
         $this->isName     = !empty($data["isName"]);
         $this->isUnique   = !empty($data["isUnique"]);
+        $this->forOrder   = !empty($data["forOrder"]);
         $this->noExists   = !empty($data["noExists"]);
         $this->noEmpty    = !empty($data["noEmpty"]);
         $this->isSigned   = !empty($data["isSigned"]);
@@ -275,7 +277,6 @@ class Field {
             $result[$key]           = $number;
             $result["{$key}Date"]   = !empty($number) ? date("d-m-Y",     $number) : "";
             $result["{$key}Full"]   = !empty($number) ? date("d-m-Y H:i", $number) : "";
-            $result["{$key}ISO"]    = !empty($number) ? date("Y-m-d H:i", $number) : "";
             break;
         case self::JSON:
             $result[$key]           = JSON::decode($text, true);
