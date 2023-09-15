@@ -13,13 +13,15 @@ use Framework\Utils\Strings;
  */
 class Structure {
 
+    public string $key         = "";
     public string $masterKey   = "";
+    public string $name        = "";
 
     public string $table       = "";
     public bool   $hasID       = false;
     public string $idKey       = "";
     public string $idName      = "";
-    public string $name        = "";
+    public string $nameKey     = "";
 
     /** @var Field[] */
     public array $fields       = [];
@@ -32,6 +34,9 @@ class Structure {
 
     /** @var Count[] */
     public array $counts       = [];
+
+    /** @var string[] */
+    public array $subRequests  = [];
 
     public bool $hasPositions  = false;
     public bool $hasTimestamps = false;
@@ -47,6 +52,8 @@ class Structure {
      * @param array{} $data
      */
     public function __construct(string $schemaKey, array $data) {
+        $this->key           = $schemaKey;
+        $this->name          = !empty($data["name"]) ? $data["name"] : "";
         $this->table         = $data["table"];
         $this->hasPositions  = !empty($data["hasPositions"])  && $data["hasPositions"];
         $this->hasTimestamps = !empty($data["hasTimestamps"]) && $data["hasTimestamps"];
@@ -130,7 +137,7 @@ class Structure {
                 $this->idName = $field->name;
             }
             if ($field->isName) {
-                $this->name = $field->type == Field::Text ? "{$field->key}Short" : $field->key;
+                $this->nameKey = $field->type == Field::Text ? "{$field->key}Short" : $field->key;
             }
             $this->fields[] = $field;
         }
@@ -158,6 +165,11 @@ class Structure {
             foreach ($data["counts"] as $key => $value) {
                 $this->counts[] = new Count($key, $value);
             }
+        }
+
+        // Create the SubRequests
+        if (!empty($data["subrequests"])) {
+            $this->subRequests = array_keys($data["subrequests"]);
         }
 
         // Set the Master Key
@@ -190,6 +202,6 @@ class Structure {
         if (!empty($field)) {
             return $field;
         }
-        return $this->hasPositions ? "position" : $this->name;
+        return $this->hasPositions ? "position" : $this->nameKey;
     }
 }

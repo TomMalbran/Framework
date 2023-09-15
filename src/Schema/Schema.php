@@ -321,7 +321,7 @@ class Schema {
         $query   = $this->generateQuery($query);
         $request = $this->request($query);
         $idKey   = $idName ?: $this->structure->idName;
-        $nameKey = $name   ?: $this->structure->name;
+        $nameKey = $name   ?: $this->structure->nameKey;
         $ids     = [];
         $result  = [];
 
@@ -444,7 +444,7 @@ class Schema {
         $selection->addJoins();
         $selection->request($query);
         $request   = $selection->resolve();
-        return Arrays::createSelect($request, $idName ?: $this->structure->idName, $name ?: $this->structure->name, $useEmpty, $extra, true);
+        return Arrays::createSelect($request, $idName ?: $this->structure->idName, $name ?: $this->structure->nameKey, $useEmpty, $extra, true);
     }
 
 

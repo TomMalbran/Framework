@@ -44,6 +44,7 @@ class Field {
     public bool   $isPrimary  = false;
     public bool   $isKey      = false;
     public bool   $isName     = false;
+    public bool   $isUnique   = false;
     public bool   $noExists   = false;
     public bool   $noEmpty    = false;
     public bool   $isSigned   = false;
@@ -68,7 +69,7 @@ class Field {
     public function __construct(string $key, array $data, string $prefix = "") {
         $this->key        = $key;
 
-        $this->type       = !empty($data["type"])     ? $data["type"]          : Field::String;
+        $this->type       = !empty($data["type"])     ? $data["type"]          : self::String;
         $this->length     = !empty($data["length"])   ? (int)$data["length"]   : 0;
         $this->decimals   = !empty($data["decimals"]) ? (int)$data["decimals"] : 3;
         $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : "middle";
@@ -80,6 +81,7 @@ class Field {
         $this->isPrimary  = !empty($data["isPrimary"]);
         $this->isKey      = !empty($data["isKey"]);
         $this->isName     = !empty($data["isName"]);
+        $this->isUnique   = !empty($data["isUnique"]);
         $this->noExists   = !empty($data["noExists"]);
         $this->noEmpty    = !empty($data["noEmpty"]);
         $this->isSigned   = !empty($data["isSigned"]);
