@@ -7,7 +7,7 @@ use Framework\Utils\Strings;
 use Framework\Utils\Period;
 
 /**
- * The Database Query
+ * The Schema Query
  */
 class Query {
 

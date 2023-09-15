@@ -6,7 +6,7 @@ use Framework\Utils\Arrays;
 use ArrayAccess;
 
 /**
- * The Database Model
+ * The Schema Model
  */
 class Model implements ArrayAccess {
 

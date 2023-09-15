@@ -5,7 +5,7 @@ use Framework\Schema\Field;
 use Framework\Utils\Arrays;
 
 /**
- * The Database Join
+ * The Schema Join
  */
 class Join {
 

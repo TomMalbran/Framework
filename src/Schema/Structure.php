@@ -9,7 +9,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Database Structure
+ * The Schema Structure
  */
 class Structure {
 

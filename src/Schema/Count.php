@@ -6,7 +6,7 @@ use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 /**
- * The Database Count
+ * The Schema Count
  */
 class Count {
 

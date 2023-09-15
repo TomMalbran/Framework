@@ -5,7 +5,7 @@ use Framework\Framework;
 use Framework\Utils\Strings;
 
 /**
- * The Keys Data
+ * The Schema Keys Data
  */
 class KeyChain {
 

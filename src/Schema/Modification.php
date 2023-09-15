@@ -8,7 +8,7 @@ use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 
 /**
- * The Modification Wrapper
+ * The Schema Modification
  */
 class Modification {
 

@@ -14,7 +14,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Database Schema
+ * The Schema
  */
 class Schema {
 

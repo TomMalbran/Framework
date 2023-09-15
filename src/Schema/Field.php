@@ -9,7 +9,7 @@ use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 /**
- * The Database Field
+ * The Schema Field
  */
 class Field {
 

@@ -8,7 +8,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Selection wrapper
+ * The Schema Selection
  */
 class Selection {
 
