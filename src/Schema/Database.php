@@ -214,23 +214,6 @@ class Database {
         return 0;
     }
 
-    /**
-     * Returns the Sums of the given column in the given table
-     * @param string $table
-     * @param string $column
-     * @param Query  $query
-     * @return integer
-     */
-    public function getSum(string $table, string $column, Query $query): int {
-        $expression = "SELECT COALESCE(SUM($column), 0) AS sum FROM `$table` "  . $query->get();
-        $request    = $this->query($expression, $query);
-
-        if (isset($request[0]["sum"])) {
-            return (int)$request[0]["sum"];
-        }
-        return 0;
-    }
-
 
 
     /**

@@ -276,25 +276,6 @@ class Schema {
     }
 
     /**
-     * Gets a Sum using the Joins
-     * @param Query  $query
-     * @param string $column
-     * @return integer
-     */
-    public function getSum(Query $query, string $column): int {
-        $query     = $this->generateQuery($query);
-        $selection = new Selection($this->db, $this->structure);
-        $selection->addSelects("SUM($column) AS cnt");
-        $selection->addJoins(false);
-
-        $request = $selection->request($query);
-        if (isset($request[0]["cnt"])) {
-            return (int)$request[0]["cnt"];
-        }
-        return 0;
-    }
-
-    /**
      * Returns the first line of the given query
      * @param Query  $query
      * @param string $select
