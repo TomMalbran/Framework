@@ -258,14 +258,13 @@ class Schema {
     /**
      * Gets a Total using the Joins
      * @param Query|null $query       Optional.
-     * @param string     $column      Optional.
      * @param boolean    $withDeleted Optional.
      * @return integer
      */
-    public function getTotal(?Query $query = null, string $column = "*", bool $withDeleted = true): int {
+    public function getTotal(?Query $query = null, bool $withDeleted = true): int {
         $query     = $this->generateQuery($query, $withDeleted);
         $selection = new Selection($this->db, $this->structure);
-        $selection->addSelects("COUNT($column) AS cnt");
+        $selection->addSelects("COUNT(*) AS cnt");
         $selection->addJoins(false);
 
         $request = $selection->request($query);
@@ -278,12 +277,12 @@ class Schema {
     /**
      * Returns the first line of the given query
      * @param Query  $query
-     * @param string $select
+     * @param string $expression
      * @return array{}
      */
-    public function getStats(Query $query, string $select): array {
-        $select  = Strings::replace($select, "{table}", $this->structure->table);
-        $request = $this->db->query("$select " . $query->get(), $query);
+    public function getStats(Query $query, string $expression): array {
+        $expression = Strings::replace($expression, "{table}", $this->structure->table);
+        $request    = $this->db->query("$expression " . $query->get(), $query);
 
         if (!empty($request[0])) {
             return $request[0];

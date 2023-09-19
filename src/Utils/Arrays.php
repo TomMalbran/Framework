@@ -1,18 +1,39 @@
 <?php
 namespace Framework\Utils;
 
+use ArrayAccess;
+use stdClass;
+
 /**
  * Several Array Utils
  */
 class Arrays {
 
     /**
-     * Returns true if the given value is an array
-     * @param mixed $array
+     * Returns true if the given value is an Array
+     * @param mixed $value
      * @return boolean
      */
-    public static function isArray(mixed $array): bool {
-        return is_array($array);
+    public static function isArray(mixed $value): bool {
+        return is_array($value);
+    }
+
+    /**
+     * Returns true if the given value is an Array or ArrayAccess
+     * @param mixed $value
+     * @return boolean
+     */
+    public static function isArrayLike(mixed $value): bool {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
+
+    /**
+     * Returns true if the given value is an Object
+     * @param mixed $value
+     * @return boolean
+     */
+    public static function isObject(mixed $value): bool {
+        return is_object($value);
     }
 
     /**
@@ -184,7 +205,7 @@ class Arrays {
      * @return mixed
      */
     public static function toObject(?array $array = null): mixed {
-        return !empty($array) ? $array : new \stdClass();
+        return !empty($array) ? $array : new stdClass();
     }
 
     /**
@@ -541,11 +562,11 @@ class Arrays {
      */
     public static function findIndex(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $index => $elem) {
-            if (is_object($elem)) {
+            if (self::isObject($elem)) {
                 if ($elem->$idKey == $idValue) {
                     return $index;
                 }
-            } else {
+            } elseif (self::isArrayLike($elem)) {
                 if ($elem[$idKey] == $idValue) {
                     return $index;
                 }
@@ -564,11 +585,11 @@ class Arrays {
      */
     public static function findValue(array $array, string $idKey, mixed $idValue, string $key = ""): mixed {
         foreach ($array as $elem) {
-            if (is_object($elem)) {
+            if (self::isObject($elem)) {
                 if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
                     return $key ? $elem->$key : $elem;
                 }
-            } else {
+            } elseif (self::isArrayLike($elem)) {
                 if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
                     return $key ? $elem[$key] : $elem;
                 }
@@ -589,14 +610,16 @@ class Arrays {
     public static function findValues(array $array, string $idKey, mixed $idValue, string $key = "", string $glue = ""): mixed {
         $result = [];
         foreach ($array as $elem) {
-            if (is_object($elem)) {
+            if (self::isObject($elem)) {
                 if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
                     $result[] = $key ? $elem->$key : $elem;
                 }
-            } else {
+            } elseif (self::isArrayLike($elem)) {
                 if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
                     $result[] = $key ? $elem[$key] : $elem;
                 }
+            } else {
+                $result[] = $elem;
             }
         }
         if (!empty($key) && !empty($glue)) {

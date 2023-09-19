@@ -45,7 +45,7 @@ class Field {
     public bool   $isKey      = false;
     public bool   $isName     = false;
     public bool   $isUnique   = false;
-    public bool   $forOrder   = false;
+    public bool   $isParent   = false;
     public bool   $noExists   = false;
     public bool   $noEmpty    = false;
     public bool   $isSigned   = false;
@@ -83,7 +83,7 @@ class Field {
         $this->isKey      = !empty($data["isKey"]);
         $this->isName     = !empty($data["isName"]);
         $this->isUnique   = !empty($data["isUnique"]);
-        $this->forOrder   = !empty($data["forOrder"]);
+        $this->isParent   = !empty($data["isParent"]);
         $this->noExists   = !empty($data["noExists"]);
         $this->noEmpty    = !empty($data["noEmpty"]);
         $this->isSigned   = !empty($data["isSigned"]);

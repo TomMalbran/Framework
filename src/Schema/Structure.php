@@ -21,6 +21,7 @@ class Structure {
     public bool   $hasID       = false;
     public string $idKey       = "";
     public string $idName      = "";
+    public string $idType      = "";
     public string $nameKey     = "";
 
     /** @var Field[] */
@@ -28,6 +29,9 @@ class Structure {
 
     /** @var Field[] */
     public array $expressions  = [];
+
+    /** @var Field[] */
+    public array $processed    = [];
 
     /** @var Join[] */
     public array $joins        = [];
@@ -41,6 +45,7 @@ class Structure {
     public bool $hasPositions  = false;
     public bool $hasTimestamps = false;
     public bool $hasUsers      = false;
+    public bool $hasFilters    = false;
     public bool $hasEncrypt    = false;
     public bool $canCreate     = false;
     public bool $canEdit       = false;
@@ -60,6 +65,7 @@ class Structure {
         $this->hasPositions  = !empty($data["hasPositions"]);
         $this->hasTimestamps = !empty($data["hasTimestamps"]);
         $this->hasUsers      = !empty($data["hasUsers"]);
+        $this->hasFilters    = !empty($data["hasFilters"]);
         $this->canCreate     = $data["canCreate"];
         $this->canEdit       = $data["canEdit"];
         $this->canDelete     = $data["canDelete"];
@@ -138,6 +144,7 @@ class Structure {
                 $this->hasID  = true;
                 $this->idKey  = $field->key;
                 $this->idName = $field->name;
+                $this->idType = $field->type == Field::ID ? "int" : $field->type;
             }
             if ($field->isName) {
                 $this->nameKey = $field->type == Field::Text ? "{$field->key}Short" : $field->key;
@@ -153,6 +160,13 @@ class Structure {
                 } else {
                     $this->expressions[$value] = new Field($key, []);
                 }
+            }
+        }
+
+        // Create the Processed
+        if (!empty($data["processed"])) {
+            foreach ($data["processed"] as $key => $value) {
+                $this->processed[] = new Field($key, $value);
             }
         }
 
@@ -172,7 +186,9 @@ class Structure {
 
         // Create the SubRequests
         if (!empty($data["subrequests"])) {
-            $this->subRequests = array_keys($data["subrequests"]);
+            foreach ($data["subrequests"] as $value) {
+                $this->subRequests[] = $value["name"];
+            }
         }
 
         // Set the Master Key

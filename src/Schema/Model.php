@@ -4,11 +4,12 @@ namespace Framework\Schema;
 use Framework\Utils\Arrays;
 
 use ArrayAccess;
+use JsonSerializable;
 
 /**
  * The Schema Model
  */
-class Model implements ArrayAccess {
+class Model implements ArrayAccess, JsonSerializable {
 
     private bool   $empty   = true;
     private string $idKey   = "";
@@ -385,5 +386,13 @@ class Model implements ArrayAccess {
      */
     public function offsetUnset(mixed $key): void {
         unset($this->data[$key]);
+    }
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed {
+        return $this->toArray();
     }
 }
