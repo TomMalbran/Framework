@@ -321,11 +321,11 @@ class Schema {
 
     /**
      * Selects the given column from a single table and returns the entire column
-     * @param Query  $query
-     * @param string $column
+     * @param Query|null $query
+     * @param string     $column
      * @return string[]
      */
-    public function getColumn(Query $query, string $column): array {
+    public function getColumn(?Query $query, string $column): array {
         $columnName = Strings::substringAfter($column, ".");
         $query      = $this->generateQuery($query);
         $selection  = new Selection($this->db, $this->structure);
