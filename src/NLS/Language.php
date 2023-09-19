@@ -34,15 +34,15 @@ class Language {
     /**
      * Returns the Language Value from a Language Name
      * @param string $langName
-     * @return string
+     * @return array{}|null
      */
-    public static function getOne(string $langName): string {
+    public static function getOne(string $langName): ?array {
         self::load();
         $name = Strings::toLowerCase($langName);
         if (isset(self::$data[$name])) {
             return self::$data[$name];
         }
-        return 0;
+        return null;
     }
 
     /**

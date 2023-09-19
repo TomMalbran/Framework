@@ -70,7 +70,7 @@ class Migration {
      * @return boolean
      */
     private static function migrateTables(Database $db, array $schemas, array $updates, bool $canDelete = false): bool {
-        $tableNames  = $db->getTables(null, false);
+        $tableNames  = $db->getTables();
         $schemaNames = [];
         $didMigrate  = false;
 

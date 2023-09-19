@@ -338,9 +338,9 @@ class Database {
      * Process a mysqli query
      * @param string  $expression
      * @param mixed[] $bindParams Optional.
-     * @return mysqli_stmt
+     * @return mysqli_stmt|null
      */
-    private function processQuery(string $expression, array $bindParams = []): mysqli_stmt {
+    private function processQuery(string $expression, array $bindParams = []): ?mysqli_stmt {
         $query     = Strings::replace(trim($expression), "\n", "");
         $statement = $this->mysqli->prepare($expression);
 
@@ -826,10 +826,6 @@ class Database {
 
         // Dump each table
         foreach ($tables as $table) {
-            if (function_exists("apache_reset_timeout")) {
-                apache_reset_timeout();
-            }
-
             $this->write(
                 $fp,
                 $crlf .

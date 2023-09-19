@@ -262,10 +262,10 @@ class MediaFile {
         $newThumbs  = self::getThumbPath($newPath, $newName);
 
         if (!File::move($oldSource, $newSource)) {
-            return null;
+            return false;
         }
         if (FileType::isImage($oldName) && !File::move($oldThumbs, $newThumbs)) {
-            return null;
+            return false;
         }
 
         return self::update($oldRelPath, $newRelPath);

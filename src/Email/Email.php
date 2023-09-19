@@ -112,7 +112,6 @@ class Email {
         default:
             return SMTP::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
         }
-        return false;
     }
 
     /**
@@ -133,19 +132,6 @@ class Email {
             $success = self::send($email, $template->sendAs, $template->sendName, $subject, $message);
         }
         return $success;
-    }
-
-    /**
-     * Sends the Backup to the Backup account
-     * @param string $sendTo
-     * @param string $attachment
-     * @return boolean
-     */
-    public static function sendBackup(string $sendTo, string $attachment): bool {
-        $subject = Config::get("name") . ": Database Backup";
-        $message = "Backup de la base de datos al dia: " . date("d M Y, H:i:s");
-
-        return self::send($sendTo, "", "", $subject, $message, false, $attachment);
     }
 
 

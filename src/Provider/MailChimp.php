@@ -82,7 +82,7 @@ class MailChimp {
     public static function getAllSubscribers(int $count = 100, int $offset = 0): array {
         self::load();
         if (!self::$api) {
-            return null;
+            return [];
         }
         $route  = self::getSubscribersRoute();
         $result = self::$api->get($route, [
@@ -486,7 +486,7 @@ class MailChimp {
     public static function getContent(string $mailChimpID): array {
         self::load();
         if (!self::$api) {
-            return false;
+            return [];
         }
         $result = self::$api->get("campaigns/{$mailChimpID}/content");
         return $result;

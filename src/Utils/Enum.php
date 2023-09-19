@@ -111,6 +111,7 @@ class Enum {
         if ($cache->isMap) {
             return Arrays::createSelect($cache->data, "key", "name");
         }
+        return [];
     }
 
 
@@ -199,7 +200,7 @@ class Enum {
             // Function "getXxx": Get the value at the given key depending on the function
             $key = $function;
             if (Strings::startsWith($function, "get")) {
-                $key    = Strings::stripStart($function, "get", "");
+                $key    = Strings::stripStart($function, "get");
                 $key[0] = Strings::toLowerCase($key[0]);
             }
 

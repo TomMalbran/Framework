@@ -33,9 +33,9 @@ class Credential {
      * @param integer[]|integer    $level
      * @param string[]|string|null $filter Optional.
      * @param mixed|integer        $value  Optional.
-     * @return Query
+     * @return Query|null
      */
-    private static function createLevelQuery(array|int $level, array|string $filter = null, mixed $value = 1): Query {
+    private static function createLevelQuery(array|int $level, array|string $filter = null, mixed $value = 1): ?Query {
         $levels = Arrays::toArray($level);
         if (empty($levels)) {
             return null;

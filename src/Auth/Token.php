@@ -12,7 +12,7 @@ class Token {
 
     private static bool  $loaded = false;
 
-    /** @var array{}[] */
+    /** @var string[] */
     private static array $data   = [];
 
 

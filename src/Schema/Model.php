@@ -268,7 +268,7 @@ class Model implements ArrayAccess, JsonSerializable {
      * Returns true if the Model is equal to the Request
      * @param Model    $other
      * @param string[] $fields
-     * @param string[] $subFields Optional.
+     * @param array{}  $subFields Optional.
      * @return boolean
      */
     public function isEqualTo(Model $other, array $fields, array $subFields = []): bool {

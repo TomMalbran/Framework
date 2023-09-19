@@ -338,9 +338,9 @@ class File {
      * Creates a new zip archive and adds the given files/directories
      * @param string          $name
      * @param string[]|string $files
-     * @return ZipArchive
+     * @return ZipArchive|null
      */
-    public static function createZip(string $name, array|string $files): ZipArchive {
+    public static function createZip(string $name, array|string $files): ?ZipArchive {
         $zip   = new ZipArchive();
         $files = Arrays::toArray($files);
 

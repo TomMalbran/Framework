@@ -111,7 +111,7 @@ class Exporter {
             $values = NLS::getAll($this->header->getValues(), $this->lang);
             fputcsv($this->csv, $values);
         } else {
-            $this->sheet->setHeader($this->header, $this->lang);
+            $this->sheet->setHeader($this->header);
         }
         return $this;
     }
