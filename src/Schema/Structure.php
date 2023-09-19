@@ -155,11 +155,7 @@ class Structure {
         // Create the Expressions
         if (!empty($data["expressions"])) {
             foreach ($data["expressions"] as $key => $value) {
-                if (Arrays::isArray($value)) {
-                    $this->expressions[$value["expression"]] = new Field($key, $value);
-                } else {
-                    $this->expressions[$value] = new Field($key, []);
-                }
+                $this->expressions[$value["expression"]] = new Field($key, $value);
             }
         }
 
