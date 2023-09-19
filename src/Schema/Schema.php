@@ -617,18 +617,10 @@ class Schema {
      */
     public function ensurePosOrder(?Model $model = null, Request|array $fields = null, ?Query $query = null): bool {
         $oldPosition = !empty($model) ? $model->position : 0;
-        $newPosition = 0;
+        $newPosition = !empty($fields["position"]) ? (int)$fields["position"] : 0;
+        $updPosition = $this->ensureOrder($oldPosition, $newPosition, $query);
         if (!empty($fields)) {
-            if ($fields instanceof Request) {
-                $newPosition = $fields->getInt("position");
-            } elseif (!empty($fields["position"])) {
-                $newPosition = (int)$fields["position"];
-            }
-        }
-
-        $updatedPosition = $this->ensureOrder($oldPosition, $newPosition, $query);
-        if (!empty($request)) {
-            $request->position = $updatedPosition;
+            $fields["position"] = $updPosition;
         }
         return true;
     }
