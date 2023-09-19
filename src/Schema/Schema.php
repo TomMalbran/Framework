@@ -66,12 +66,12 @@ class Schema {
 
     /**
      * Returns the Model with the given ID or Query
-     * @param Query|integer $query
-     * @param boolean       $withDeleted Optional.
-     * @param boolean       $decrypted   Optional.
+     * @param Query|integer|string $query
+     * @param boolean              $withDeleted Optional.
+     * @param boolean              $decrypted   Optional.
      * @return Model
      */
-    public function getOne(Query|int $query, bool $withDeleted = true, bool $decrypted = false): Model {
+    public function getOne(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): Model {
         $query   = $this->generateQueryID($query, $withDeleted)->limit(1);
         $request = $this->request($query, $decrypted);
         return $this->getModel($request);
@@ -91,22 +91,22 @@ class Schema {
 
     /**
      * Selects the given column from a single table and returns a single value
-     * @param Query|integer $query
-     * @param string        $column
+     * @param Query|integer|string $query
+     * @param string               $column
      * @return mixed
      */
-    public function getValue(Query|int $query, string $column): mixed {
+    public function getValue(Query|int|string $query, string $column): mixed {
         $query = $this->generateQueryID($query, false)->limit(1);
         return $this->db->getValue($this->structure->table, $column, $query);
     }
 
     /**
      * Returns true if there is a Schema with the given ID
-     * @param Query|integer $query
-     * @param boolean       $withDeleted Optional.
+     * @param Query|integer|string $query
+     * @param boolean              $withDeleted Optional.
      * @return boolean
      */
-    public function exists(Query|int $query, bool $withDeleted = true): bool {
+    public function exists(Query|int|string $query, bool $withDeleted = true): bool {
         $query = $this->generateQueryID($query, $withDeleted);
         return $this->getTotal($query) == 1;
     }
@@ -460,14 +460,14 @@ class Schema {
 
     /**
      * Edits the Schema
-     * @param Query|integer        $query
+     * @param Query|integer|string $query
      * @param Request|array{}      $fields
      * @param array{}|integer|null $extra        Optional.
      * @param integer              $credentialID Optional.
      * @param boolean              $skipEmpty    Optional.
      * @return boolean
      */
-    public function edit(Query|int $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, bool $skipEmpty = false): bool {
+    public function edit(Query|int|string $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, bool $skipEmpty = false): bool {
         $query        = $this->generateQueryID($query, false);
         $modification = new Modification($this->db, $this->structure);
         $modification->addFields($fields, $extra, $credentialID, $skipEmpty);
@@ -479,12 +479,12 @@ class Schema {
 
     /**
      * Updates a single value increasing it by the given amount
-     * @param Query|integer $query
-     * @param string        $column
-     * @param integer       $amount
+     * @param Query|integer|string $query
+     * @param string               $column
+     * @param integer              $amount
      * @return boolean
      */
-    public function increase(Query|int $query, string $column, int $amount): bool {
+    public function increase(Query|int|string $query, string $column, int $amount): bool {
         $query = $this->generateQueryID($query, false);
         return $this->db->increase($this->structure->table, $column, $amount, $query);
     }
@@ -500,11 +500,11 @@ class Schema {
 
     /**
      * Deletes the given Schema
-     * @param Query|integer $query
-     * @param integer       $credentialID Optional.
+     * @param Query|integer|string $query
+     * @param integer              $credentialID Optional.
      * @return boolean
      */
-    public function delete(Query|int $query, int $credentialID = 0): bool {
+    public function delete(Query|int|string $query, int $credentialID = 0): bool {
         $query = $this->generateQueryID($query, false);
         if ($this->structure->canDelete && $this->exists($query)) {
             $this->edit($query, [ "isDeleted" => 1 ], $credentialID);
@@ -515,10 +515,10 @@ class Schema {
 
     /**
      * Removes the given Schema
-     * @param Query|integer $query
+     * @param Query|integer|string $query
      * @return boolean
      */
-    public function remove(Query|int $query): bool {
+    public function remove(Query|int|string $query): bool {
         $query = $this->generateQueryID($query, false);
         return $this->db->delete($this->structure->table, $query);
     }
@@ -548,14 +548,14 @@ class Schema {
 
     /**
      * Edits and ensures the Order
-     * @param Query|integer        $query
+     * @param Query|integer|string $query
      * @param Request|array{}      $fields
      * @param array{}|integer|null $extra        Optional.
      * @param integer              $credentialID Optional.
      * @param Query|null           $orderQuery   Optional.
      * @return boolean
      */
-    public function editWithOrder(Query|int $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
+    public function editWithOrder(Query|int|string $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
         $this->ensurePosOrder($model, $fields, $orderQuery);
         return $this->edit($query, $fields, $extra, $credentialID);
@@ -563,12 +563,12 @@ class Schema {
 
     /**
      * Deletes and ensures the Order
-     * @param Query|integer $query
-     * @param integer       $credentialID Optional.
-     * @param Query|null    $orderQuery   Optional.
+     * @param Query|integer|string $query
+     * @param integer              $credentialID Optional.
+     * @param Query|null           $orderQuery   Optional.
      * @return boolean
      */
-    public function deleteWithOrder(Query|int $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
+    public function deleteWithOrder(Query|int|string $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
         if ($this->delete($query, $credentialID)) {
             $this->ensurePosOrder($model, null, $orderQuery);
@@ -579,11 +579,11 @@ class Schema {
 
     /**
      * Removes and ensures the Order
-     * @param Query|integer $query
-     * @param Query|null    $orderQuery Optional.
+     * @param Query|integer|string $query
+     * @param Query|null           $orderQuery Optional.
      * @return boolean
      */
-    public function removeWithOrder(Query|int $query, ?Query $orderQuery = null): bool {
+    public function removeWithOrder(Query|int|string $query, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
         if ($this->remove($query)) {
             $this->ensurePosOrder($model, null, $orderQuery);
@@ -718,11 +718,11 @@ class Schema {
 
     /**
      * Generates a Query with the ID or returns the Query
-     * @param Query|integer $query
-     * @param boolean       $withDeleted Optional.
+     * @param Query|integer|string $query
+     * @param boolean              $withDeleted Optional.
      * @return Query
      */
-    private function generateQueryID(Query|int $query, bool $withDeleted = true): Query {
+    private function generateQueryID(Query|int|string $query, bool $withDeleted = true): Query {
         if (!($query instanceof Query)) {
             $query = Query::create($this->structure->idKey, "=", $query);
         }
