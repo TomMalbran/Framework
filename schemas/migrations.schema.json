@@ -1,0 +1,30 @@
+{
+    "title"      : "Migrations",
+    "type"       : "object",
+    "required"   : [ "movements", "updates" ],
+    "properties" : {
+        "movements" : { "$ref": "#/$defs/movements" },
+        "updates"   : {
+            "type" : "object",
+            "propertyNames" : {
+                "pattern" : "^[a-z][a-z_]*[a-z]$"
+            },
+            "patternProperties" : {
+                "^[a-z][a-z_]*[a-z]*$" : { "$ref": "#/$defs/movements" }
+            }
+        }
+    },
+    "$defs": {
+        "movements" : {
+            "type"  : "array",
+            "items" : {
+                "type"       : "object",
+                "required"   : [ "old", "new" ],
+                "properties" : {
+                    "old" : { "type" : "string" },
+                    "new" : { "type" : "string" }
+                }
+            }
+        }
+    }
+}

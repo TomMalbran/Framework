@@ -1,0 +1,24 @@
+{
+    "title"      : "Status",
+    "type"       : "object",
+    "required"   : [ "values", "groups" ],
+    "properties" : {
+        "values" : {
+            "type" : "object",
+            "patternProperties" : {
+                "^[A-Za-z]*$" : {
+                    "type" : "number"
+                }
+            }
+        },
+        "groups" : {
+            "type" : "object",
+            "patternProperties" : {
+                "^[A-Za-z]*$" : {
+                    "type"  : "array",
+                    "items" : { "type" : "string" }
+                }
+            }
+        }
+    }
+}

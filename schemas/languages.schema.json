@@ -1,0 +1,15 @@
+{
+    "title" : "Languages",
+    "type"  : "object",
+    "patternProperties" : {
+        "^[a-z][a-z]$" : {
+            "type"       : "object",
+            "required"   : [ "key", "name", "isRoot" ],
+            "properties" : {
+                "key"    : { "type" : "string"  },
+                "name"   : { "type" : "string"  },
+                "isRoot" : { "type" : "boolean" }
+            }
+        }
+    }
+}
