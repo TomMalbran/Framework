@@ -85,9 +85,9 @@ class Router {
      * Calls the given Route with the given params, if it exists
      * @param string  $route
      * @param Request $request
-     * @return Response|null
+     * @return mixed
      */
-    public static function call(string $route, Request $request): ?Response {
+    public static function call(string $route, Request $request): mixed {
         $data = self::get($route);
         if ($data->access == null) {
             return null;

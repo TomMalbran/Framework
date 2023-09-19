@@ -107,7 +107,7 @@ class Framework {
             return true;
         } catch (Exception $e) {
             http_response_code(400);
-            die($e->getMessage());
+            print($e->getMessage());
             return false;
         }
     }
@@ -290,7 +290,7 @@ class Framework {
         $response = Router::call($route, $request);
 
         // Return an Empty Response
-        if (empty($response)) {
+        if (empty($response) || !($response instanceof Response)) {
             return Response::empty();
         }
 
