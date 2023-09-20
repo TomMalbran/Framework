@@ -19,7 +19,6 @@ class Database {
     public string $username;
     public string $password;
     public string $database;
-    public string $email;
     public string $charset;
     public bool   $persist;
 
@@ -31,8 +30,6 @@ class Database {
      *    username  Database username
      *    password  Database password
      *    database  Database name
-     *    prefix    Table prefix
-     *    email     Dump email
      * ].
      * @param boolean $persist True to persist the connection. Defaults to false.
      */
@@ -41,7 +38,6 @@ class Database {
         $this->username = $config->username;
         $this->password = $config->password;
         $this->database = $config->database;
-        $this->email    = !empty($config->email)   ? $config->email   : "";
         $this->charset  = !empty($config->charset) ? $config->charset : "";
         $this->persist  = $persist;
 
