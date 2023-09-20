@@ -10,7 +10,7 @@ use Framework\Schema\Query;
 /**
  * The Email White List
  */
-class WhiteList {
+class EmailWhiteList {
 
     /**
      * Loads the Email WhiteList Schema

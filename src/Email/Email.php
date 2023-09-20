@@ -4,7 +4,7 @@ namespace Framework\Email;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
-use Framework\Email\WhiteList;
+use Framework\Email\EmailWhiteList;
 use Framework\Provider\Mustache;
 use Framework\Provider\SMTP;
 use Framework\Provider\Mandrill;
@@ -58,7 +58,7 @@ class Email {
         if (!self::$config->isActive) {
             return false;
         }
-        if (!empty(self::$config->useWhiteList) && !WhiteList::emailExists($toEmail)) {
+        if (!empty(self::$config->useWhiteList) && !EmailWhiteList::emailExists($toEmail)) {
             return false;
         }
         return true;

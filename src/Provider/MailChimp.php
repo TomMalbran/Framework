@@ -2,7 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\Config\Config;
-use Framework\Email\WhiteList;
+use Framework\Email\EmailWhiteList;
 use Framework\Utils\Arrays;
 
 use DrewM\MailChimp\MailChimp as MailChimpAPI;
@@ -388,7 +388,7 @@ class MailChimp {
 
         $conditions = [];
         foreach ($emails as $email) {
-            if (self::$config->useWhiteList && !WhiteList::emailExists($email)) {
+            if (self::$config->useWhiteList && !EmailWhiteList::emailExists($email)) {
                 continue;
             }
             $conditions[] = [
