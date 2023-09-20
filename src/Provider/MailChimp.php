@@ -3,7 +3,6 @@ namespace Framework\Provider;
 
 use Framework\Config\Config;
 use Framework\Email\WhiteList;
-use Framework\Email\Subscription;
 use Framework\Utils\Arrays;
 
 use DrewM\MailChimp\MailChimp as MailChimpAPI;
@@ -109,16 +108,16 @@ class MailChimp {
     }
 
     /**
-     * Returns the Subscriber with the given email
+     * Returns the Subscriber status for the given email
      * @param string $email
-     * @return integer
+     * @return string
      */
-    public static function getSubscriberStatus(string $email): int {
+    public static function getSubscriberStatus(string $email): string {
         $subscriber = self::getSubscriber($email);
         if (empty($subscriber) || !self::$api->success()) {
-            return 0;
+            return "";
         }
-        return Subscription::fromString($subscriber["status"]);
+        return $subscriber["status"];
     }
 
     /**

@@ -397,10 +397,9 @@ class Credential {
 
         foreach ($request as $row) {
             $result[] = [
-                "id"           => $row["credentialID"],
-                "title"        => self::getName($row),
-                "email"        => $row["email"],
-                "subscription" => $row["subscription"],
+                "id"    => $row["credentialID"],
+                "title" => self::getName($row),
+                "email" => $row["email"],
             ];
         }
         return $result;
@@ -559,7 +558,6 @@ class Credential {
             "timezone"         => 0,
             "currentLogin"     => 0,
             "lastLogin"        => 0,
-            "subscription"     => 0,
             "askNotifications" => 0,
             "isDeleted"        => 1,
         ]);
@@ -774,18 +772,6 @@ class Credential {
     }
 
     /**
-     * Sets the Credential Subscription
-     * @param integer $credentialID
-     * @param integer $subscription
-     * @return boolean
-     */
-    public static function setSubscription(int $credentialID, int $subscription): bool {
-        return self::schema()->edit($credentialID, [
-            "subscription" => $subscription,
-        ]);
-    }
-
-    /**
      * Stops asking the Credential for Notifications
      * @param integer $credentialID
      * @return boolean
@@ -849,7 +835,6 @@ class Credential {
                 "credentialID"   => $id,
                 "credentialName" => self::getName($row, $prefix),
                 "email"          => Arrays::getValue($row, "email", "", $prefix),
-                "subscription"   => Arrays::getValue($row, "subscription", "", $prefix, true, 0),
             ];
             $ids[] = $id;
         }
