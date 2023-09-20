@@ -6,7 +6,7 @@ use Framework\Route\Router;
 use Framework\Auth\Auth;
 use Framework\Config\Config;
 use Framework\Config\Settings;
-use Framework\Email\Template;
+use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\Path;
 use Framework\File\MediaFile;
@@ -311,7 +311,7 @@ class Framework {
     public static function migrate(Database $db, bool $canDelete = false, bool $recreate = false, bool $withPaths = true): bool {
         $factMigrated = Factory::migrate($db, $canDelete);
         $settMigrated = Settings::migrate($db);
-        $tempMigrated = Template::migrate($db, $recreate);
+        $tempMigrated = EmailTemplate::migrate($db, $recreate);
 
         if ($withPaths) {
             $pathMigrated  = Path::ensurePaths();

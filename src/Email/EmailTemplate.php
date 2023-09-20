@@ -16,7 +16,7 @@ use Framework\Utils\Strings;
 /**
  * The Email Templates
  */
-class Template {
+class EmailTemplate {
 
     /**
      * Loads the Email Templates Schema
