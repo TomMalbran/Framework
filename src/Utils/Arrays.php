@@ -642,15 +642,15 @@ class Arrays {
 
     /**
      * Returns one or multiple values as a string
-     * @param mixed           $array
-     * @param string[]|string $key
-     * @param string          $glue     Optional.
-     * @param string          $prefix   Optional.
-     * @param boolean         $useEmpty Optional.
-     * @param mixed|string    $default  Optional.
+     * @param ArrayAccess|array{} $array
+     * @param string[]|string     $key
+     * @param string              $glue     Optional.
+     * @param string              $prefix   Optional.
+     * @param boolean             $useEmpty Optional.
+     * @param mixed|string        $default  Optional.
      * @return mixed
      */
-    public static function getValue(mixed $array, array|string $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
+    public static function getValue(ArrayAccess|array $array, array|string $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
         $result = $default;
         if (self::isArray($key)) {
             $values = [];
