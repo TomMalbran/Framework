@@ -61,14 +61,14 @@ class Database {
      */
     public function connect(): bool {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database);
-        if (!$this->mysqli->connect_error) {
-            if (!empty($this->charset)) {
-                $this->mysqli->set_charset($this->charset);
-            }
-            return true;
+        if ($this->mysqli->connect_error) {
+            trigger_error("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}", E_USER_ERROR);
+            return false;
         }
-        die("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}");
-        return false;
+        if (!empty($this->charset)) {
+            $this->mysqli->set_charset($this->charset);
+        }
+        return true;
     }
 
     /**
@@ -346,16 +346,21 @@ class Database {
         }
 
         if (Arrays::isArray($bindParams) && !empty($bindParams)) {
-            $params = [ "" ]; // Create the empty 0 index
+            $params = [ "" ];
             foreach ($bindParams as $value) {
                 $params[0] .= $this->determineType($value);
                 array_push($params, $value);
             }
-            call_user_func_array([ $statement, "bind_param" ], $this->refValues($params));
+
+            $values = $this->refValues($params);
+            if (!$statement->bind_param(...$values)) {
+                trigger_error("Problem binding param: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
+                return null;
+            }
         }
 
         $statement->execute();
-        if ($statement->error) {
+        if (!empty($statement->error)) {
             trigger_error("Problem executing query: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
             $statement->close();
             return null;
@@ -420,19 +425,16 @@ class Database {
     }
 
     /**
-     * This is required for PHP 5.3+
+     * Creates a reference of each value
      * @param string[] $array
      * @return string[]
      */
     private function refValues(array $array): array {
-        if (strnatcmp(phpversion(), "5.3") >= 0) {
-            $refs = [];
-            for ($i = 0; $i < count($array); $i++) {
-                $refs[$i] = & $array[$i];
-            }
-            return $refs;
+        $refs = [];
+        for ($i = 0; $i < count($array); $i++) {
+            $refs[$i] = & $array[$i];
         }
-        return $array;
+        return $refs;
     }
 
     /**
@@ -456,7 +458,7 @@ class Database {
             $row[$field->name] = null;
             $parameters[]      = & $row[$field->name];
         }
-        call_user_func_array([ $statement, "bind_result" ], $parameters);
+        $statement->bind_result(...$parameters);
 
         $statement->store_result();
         while ($statement->fetch()) {
