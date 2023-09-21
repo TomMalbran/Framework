@@ -90,6 +90,19 @@ class Schema {
     }
 
     /**
+     * Returns the Row with the given ID or Query
+     * @param Query|integer|string $query
+     * @param boolean              $withDeleted Optional.
+     * @param boolean              $decrypted   Optional.
+     * @return array{}
+     */
+    public function getRow(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): array {
+        $query   = $this->generateQueryID($query, $withDeleted)->limit(1);
+        $request = $this->request($query, $decrypted);
+        return !empty($request[0]) ? $request[0] : [];
+    }
+
+    /**
      * Selects the given column from a single table and returns a single value
      * @param Query|integer|string $query
      * @param string               $column
