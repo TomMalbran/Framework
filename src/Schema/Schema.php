@@ -13,6 +13,8 @@ use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
+use ArrayAccess;
+
 /**
  * The Schema
  */
@@ -623,17 +625,17 @@ class Schema {
 
     /**
      * Ensures that the order of the Elements is correct
-     * @param Model|null           $model  Optional.
-     * @param Request|array{}|null $fields Optional.
-     * @param Query|null           $query  Optional.
+     * @param ArrayAccess|array{}|null $oldFields
+     * @param ArrayAccess|array{}|null $newFields
+     * @param Query|null               $query     Optional.
      * @return boolean
      */
-    public function ensurePosOrder(?Model $model = null, Request|array $fields = null, ?Query $query = null): bool {
-        $oldPosition = !empty($model) ? $model->position : 0;
-        $newPosition = !empty($fields["position"]) ? (int)$fields["position"] : 0;
+    public function ensurePosOrder(ArrayAccess|array|null $oldFields, ArrayAccess|array|null $newFields, ?Query $query = null): bool {
+        $oldPosition = !empty($oldFields["position"]) ? (int)$oldFields["position"] : 0;
+        $newPosition = !empty($newFields["position"]) ? (int)$newFields["position"] : 0;
         $updPosition = $this->ensureOrder($oldPosition, $newPosition, $query);
-        if (!empty($fields)) {
-            $fields["position"] = $updPosition;
+        if (!empty($newFields)) {
+            $newFields["position"] = $updPosition;
         }
         return true;
     }
