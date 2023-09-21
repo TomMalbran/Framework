@@ -7,13 +7,14 @@ use Framework\NLS\NLS;
 use Framework\File\Path;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
-use Framework\Schema\Database;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Utils\Status;
 use Framework\Utils\Utils;
+
+use ArrayAccess;
 
 /**
  * The Auth Credential
@@ -843,11 +844,11 @@ class Credential {
 
     /**
      * Returns a parsed Name for the given Credential
-     * @param Model|array{} $data
-     * @param string        $prefix Optional.
+     * @param ArrayAccess|array{} $data
+     * @param string              $prefix Optional.
      * @return string
      */
-    public static function getName(Model|array $data, string $prefix = ""): string {
+    public static function getName(ArrayAccess|array $data, string $prefix = ""): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
@@ -864,12 +865,12 @@ class Credential {
 
     /**
      * Returns a parsed Phone for the given Credential
-     * @param Model|array{} $data
-     * @param string        $prefix   Optional.
-     * @param boolean       $withPlus Optional.
+     * @param ArrayAccess|array{} $data
+     * @param string              $prefix   Optional.
+     * @param boolean             $withPlus Optional.
      * @return string
      */
-    public static function getPhone(Model|array $data, string $prefix = "", bool $withPlus = false): string {
+    public static function getPhone(ArrayAccess|array $data, string $prefix = "", bool $withPlus = false): string {
         $phone     = Arrays::getValue($data, "phone",     "", $prefix);
         $cellphone = Arrays::getValue($data, "cellphone", "", $prefix);
         $iddRoot   = Arrays::getValue($data, "iddRoot",   "", $prefix);
@@ -885,60 +886,12 @@ class Credential {
 
     /**
      * Returns a WhatsApp url
-     * @param Model|array{} $data
-     * @param string        $prefix Optional.
+     * @param ArrayAccess|array{} $data
+     * @param string              $prefix Optional.
      * @return string
      */
-    public static function getWhatsAppUrl(Model|array $data, string $prefix = ""): string {
+    public static function getWhatsAppUrl(ArrayAccess|array $data, string $prefix = ""): string {
         $whatsapp = self::getPhone($data, $prefix, false);
         return Utils::getWhatsAppUrl($whatsapp);
-    }
-
-
-
-    /**
-     * Seeds a Credential
-     * @param Database $db
-     * @param string   $firstName
-     * @param string   $lastName
-     * @param string   $email
-     * @param string   $password
-     * @param integer  $level
-     * @return boolean
-     */
-    public static function seedCredential(
-        Database $db,
-        string $firstName,
-        string $lastName,
-        string $email,
-        string $password,
-        int $level
-    ): bool {
-        if (!$db->hasTable("credentials")) {
-            return false;
-        }
-
-        $query = Query::create("email", "=", $email);
-        if (!$db->exists("credentials", $query)) {
-            $hash = self::createHash($password);
-            $db->insert("credentials", [
-                "firstName"    => $firstName,
-                "lastName"     => $lastName,
-                "email"        => $email,
-                "password"     => $hash["password"],
-                "salt"         => $hash["salt"],
-                "language"     => "es",
-                "level"        => $level,
-                "status"       => Status::Active(),
-                "lastLogin"    => time(),
-                "currentLogin" => time(),
-                "createdTime"  => time(),
-            ]);
-            print("<br><i>Credential</i> created<br>");
-            return true;
-        }
-
-        print("<br><i>Credential</i> already created<br>");
-        return false;
     }
 }
