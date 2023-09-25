@@ -1,6 +1,7 @@
 <?php
 namespace Framework\IO;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -50,18 +51,18 @@ class SpreadsheetReader {
             return "";
         }
 
-        $colTotal = $this->sheet->getHighestColumn();
-        $colMin   = ord("A");
-        $colAmt   = ord($colTotal) - $colMin;
-        $firstRow = $this->getRow(1, "A", $colTotal);
+        $colTotal  = $this->sheet->getHighestColumn();
+        $colMin    = ord("A");
+        $colAmount = ord($colTotal) - $colMin;
+        $firstRow  = $this->getRow(1, "A", $colTotal);
 
-        for ($i = $colAmt; $i >= 0; $i--) {
+        for ($i = $colAmount; $i >= 0; $i--) {
             if (!empty($firstRow[$i])) {
                 break;
             }
-            $colAmt--;
+            $colAmount -= 1;
         }
-        return chr($colAmt + $colMin);
+        return chr($colAmount + $colMin);
     }
 
     /**
@@ -73,17 +74,18 @@ class SpreadsheetReader {
             return 0;
         }
 
-        $colAmt = $this->getHighestColumn();
-        $rowAmt = $this->sheet->getHighestRow();
+        $colAmount = $this->getHighestColumn();
+        $rowAmount = $this->sheet->getHighestRow();
 
-        for ($i = $rowAmt; $i >= 0; $i--) {
-            $row = $this->getRow($i, "A", $colAmt);
+        for ($i = $rowAmount; $i > 0; $i--) {
+            $row = $this->getRow($i, "A", $colAmount);
+            $row = Arrays::removeEmpty($row);
             if (!empty($row)) {
                 break;
             }
-            $rowAmt--;
+            $rowAmount -= 1;
         }
-        return $rowAmt;
+        return $rowAmount;
     }
 
     /**
@@ -144,7 +146,10 @@ class SpreadsheetReader {
      * @return array{}
      */
     public function getFirstAndLast(int $amount = 3): array {
-        $values = [ "first" => "", "last" => "" ];
+        $values = [
+            "first" => "",
+            "last"  => "",
+        ];
         if (!$this->isValid()) {
             return $values;
         }
