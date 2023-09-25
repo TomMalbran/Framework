@@ -319,13 +319,22 @@ class Query {
      * @param string          $expression      Optional.
      * @param boolean         $caseInsensitive Optional.
      * @param boolean         $splitValue      Optional.
+     * @param boolean         $matchAny        Optional.
      * @return Query
      */
-    public function search(array|string $column, mixed $value, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
+    public function search(
+        array|string $column,
+        mixed        $value,
+        string       $expression = "LIKE",
+        bool         $caseInsensitive = true,
+        bool         $splitValue = false,
+        bool         $matchAny = false,
+    ): Query {
         if (empty($value)) {
             return $this;
         }
-        $valueParts = $splitValue ? Strings::split($value, " ") : [ $value ];
+
+        $valueParts = $splitValue ? Strings::split($value, " ") : Arrays::toArray($value);
         $valueParts = Arrays::removeEmpty($valueParts);
         $columns    = Arrays::toArray($column);
         $multiParts = Arrays::length($valueParts) > 1;
@@ -338,7 +347,11 @@ class Query {
         foreach ($valueParts as $valuePart) {
             $valueSearch = $caseInsensitive ? Strings::toLowerCase($valuePart) : $valuePart;
             if ($multiParts && !$isFirst) {
-                $this->and();
+                if ($matchAny) {
+                    $this->or();
+                } else {
+                    $this->and();
+                }
             }
             if ($multiCols) {
                 $this->startOr();
@@ -604,12 +617,20 @@ class Query {
      * @param string               $expression      Optional.
      * @param boolean              $caseInsensitive Optional.
      * @param boolean              $splitValue      Optional.
+     * @param boolean              $matchAny        Optional.
      * @return Query
      */
-    public static function createSearch(array|string $column = null, mixed $value = null, string $expression = "LIKE", bool $caseInsensitive = true, bool $splitValue = false): Query {
+    public static function createSearch(
+        array|string $column = null,
+        mixed        $value = null,
+        string       $expression = "LIKE",
+        bool         $caseInsensitive = true,
+        bool         $splitValue = false,
+        bool         $matchAny = false,
+    ): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {
-            $query->search($column, $value, $expression, $caseInsensitive, $splitValue);
+            $query->search($column, $value, $expression, $caseInsensitive, $splitValue, $matchAny);
         }
         return $query;
     }
