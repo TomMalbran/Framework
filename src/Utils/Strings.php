@@ -379,28 +379,32 @@ class Strings {
 
     /**
      * Joins the given Strings using the given glue
-     * @param string[]|string $string
-     * @param string          $glue   Optional.
+     * @param string[]|string $value
+     * @param string          $glue      Optional.
+     * @param boolean         $skipEmpty Optional.
      * @return string
      */
-    public static function join(array|string $string, string $glue = ""): string {
-        if (Arrays::isArray($string)) {
-            return implode($glue, $string);
+    public static function join(array|string $value, string $glue = "", bool $skipEmpty = false): string {
+        if (!Arrays::isArray($value)) {
+            return $value;
         }
-        return $string;
+        if ($skipEmpty) {
+            $value = Arrays::removeEmpty($value);
+        }
+        return implode($glue, $value);
     }
 
     /**
      * Joins the given Strings keys using the given glue
-     * @param string[]|string $string
-     * @param string          $glue   Optional.
+     * @param string[]|string $value
+     * @param string          $glue  Optional.
      * @return string
      */
-    public static function joinKeys(array|string $string, string $glue = ""): string {
-        if (Arrays::isArray($string)) {
-            return implode($glue, array_keys($string));
+    public static function joinKeys(array|string $value, string $glue = ""): string {
+        if (!Arrays::isArray($value)) {
+            return $value;
         }
-        return $string;
+        return implode($glue, array_keys($value));
     }
 
     /**
