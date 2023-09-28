@@ -23,14 +23,17 @@ class Model implements ArrayAccess, JsonSerializable {
      * Creates a new Model instance
      * @param string  $idKey Optional.
      * @param array{} $data  Optional.
+     * @param integer $id    Optional.
      */
-    public function __construct(string $idKey = "", array $data = []) {
+    public function __construct(string $idKey = "", array $data = [], int $id = 0) {
         $this->idKey = $idKey;
         $this->data  = $data;
         $this->empty = empty($data);
 
         if (!empty($idKey) && isset($data[$idKey])) {
             $this->idValue = $data[$idKey];
+        } elseif (!empty($id)) {
+            $this->idValue = $id;
         }
     }
 
