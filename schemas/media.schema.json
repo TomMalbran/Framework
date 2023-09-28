@@ -3,12 +3,15 @@
     "type"       : "object",
     "properties" : {
         "updates" : {
-            "type"       : "object",
-            "required"   : [ "table", "field" ],
-            "properties" : {
-                "table"  : { "type" : "string"  },
-                "field"  : { "type" : "string"  },
-                "isJson" : { "type" : "boolean" }
+            "type"  : "array",
+            "items" : {
+                "type"       : "object",
+                "required"   : [ "table", "field" ],
+                "properties" : {
+                    "table"  : { "type" : "string"  },
+                    "field"  : { "type" : "string"  },
+                    "isJson" : { "type" : "boolean" }
+                }
             }
         },
         "paths" : {
