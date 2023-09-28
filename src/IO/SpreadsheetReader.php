@@ -141,14 +141,16 @@ class SpreadsheetReader {
     }
 
     /**
-     * Returns the first and last values
+     * Returns some data
      * @param integer $amount
      * @return array{}
      */
-    public function getFirstAndLast(int $amount = 3): array {
+    public function getData(int $amount = 3): array {
         $values = [
-            "first" => "",
-            "last"  => "",
+            "columns" => $this->getHeader(),
+            "amount"  => $this->getHighestRow(),
+            "first"   => "",
+            "last"    => "",
         ];
         if (!$this->isValid()) {
             return $values;
