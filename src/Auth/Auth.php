@@ -382,6 +382,17 @@ class Auth {
         return self::$accessLevel;
     }
 
+    /**
+     * Returns the path used to store the temp files
+     * @return string
+     */
+    public static function getTempPath(): string {
+        if (empty(self::$credentialID)) {
+            return "";
+        }
+        return Path::getTempPath(self::$credentialID);
+    }
+
 
 
     /**
