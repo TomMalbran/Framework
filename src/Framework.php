@@ -13,6 +13,7 @@ use Framework\File\MediaFile;
 use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
+use Framework\Schema\Generator;
 use Framework\Utils\JSON;
 use Exception;
 
@@ -52,6 +53,7 @@ class Framework {
     const NLSDir         = "nls";
     const StringsDir     = "nls/strings";
     const EmailsDir      = "nls/emails";
+    const SchemasDir     = "src/Schema";
 
     // Variables
     private static string   $framePath;
@@ -312,6 +314,7 @@ class Framework {
         $factMigrated = Factory::migrate($db, $canDelete);
         $settMigrated = Settings::migrate($db);
         $tempMigrated = EmailTemplate::migrate($db, $recreate);
+        $genMigrated  = Generator::migrate();
 
         if ($withPaths) {
             $pathMigrated  = Path::ensurePaths();
@@ -320,6 +323,6 @@ class Framework {
             $pathMigrated  = true;
             $mediaMigrated = true;
         }
-        return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated || $mediaMigrated;
+        return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated || $mediaMigrated || $genMigrated;
     }
 }

@@ -43,12 +43,14 @@
                 "canRemove"     : { "type" : "boolean"             }
             },
             "required" : [
+                "name",
                 "table",
                 "fields",
                 "hasTimestamps",
                 "canCreate",
                 "canEdit",
-                "canDelete"
+                "canDelete",
+                "canRemove"
             ]
         }
     },
@@ -56,7 +58,7 @@
         "fields" : {
             "type" : "object",
             "patternProperties" : {
-                "^[a-z][A-Za-z]*$" : {
+                "^[A-Za-z_]*$" : {
                     "type"       : "object",
                     "required"   : [ "type" ],
                     "properties" : {

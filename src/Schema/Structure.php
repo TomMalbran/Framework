@@ -144,7 +144,7 @@ class Structure {
                 $this->hasID  = true;
                 $this->idKey  = $field->key;
                 $this->idName = $field->name;
-                $this->idType = $field->type == Field::ID ? "int" : $field->type;
+                $this->idType = $field->type;
             }
             if ($field->isName) {
                 $this->nameKey = $field->type == Field::Text ? "{$field->key}Short" : $field->key;
