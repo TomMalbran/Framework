@@ -14,26 +14,30 @@ use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 
 use ArrayAccess;
+use ArrayIterator;
+use IteratorAggregate;
+use Traversable;
+use JsonSerializable;
 use CURLFile;
 
 /**
  * The Request Wrapper
  */
-class Request implements ArrayAccess {
+class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
-    /** @var array{} */
-    private array $request;
+    /** @var ArrayAccess|array{} */
+    private ArrayAccess|array $request;
 
-    /** @var array{} */
-    private array $files;
+    /** @var ArrayAccess|array{} */
+    private ArrayAccess|array $files;
 
 
     /**
      * Creates a new Request instance
-     * @param array{} $request Optional.
-     * @param array{} $files   Optional.
+     * @param ArrayAccess|array{} $request Optional.
+     * @param ArrayAccess|array{} $files   Optional.
      */
-    public function __construct(array $request = [], array $files = []) {
+    public function __construct(ArrayAccess|array $request = [], ArrayAccess|array $files = []) {
         $this->request = $request;
         $this->files   = $files;
     }
@@ -563,14 +567,6 @@ class Request implements ArrayAccess {
 
 
     /**
-     * Returns the request as an array
-     * @return array{}
-     */
-    public function toArray(): array {
-        return $this->request;
-    }
-
-    /**
      * Converts the request data on the given key to binary
      * @param string  $key
      * @param integer $default Optional.
@@ -826,10 +822,10 @@ class Request implements ArrayAccess {
 
 
     /**
-     * Dumps the Request
-     * @return array{}
+     * Returns the Request data
+     * @return ArrayAccess|array{}
      */
-    public function toObject(): array {
+    public function toArray(): ArrayAccess|array {
         return $this->request;
     }
 
@@ -898,5 +894,21 @@ class Request implements ArrayAccess {
      */
     public function offsetUnset(mixed $key): void {
         unset($this->request[$key]);
+    }
+
+    /**
+     * Implements the Iterator Aggregate Interface
+     * @return Traversable
+     */
+    public function getIterator(): Traversable {
+        return new ArrayIterator($this->request);
+    }
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed {
+        return $this->request;
     }
 }
