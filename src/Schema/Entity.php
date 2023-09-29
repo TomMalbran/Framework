@@ -156,7 +156,10 @@ class Entity implements ArrayAccess, JsonSerializable {
      * @return mixed
      */
     public function offsetGet(mixed $key): mixed {
-        return $this->$key;
+        if (property_exists($this, $key)) {
+            return $this->$key;
+        }
+        return null;
     }
 
     /**
@@ -166,7 +169,9 @@ class Entity implements ArrayAccess, JsonSerializable {
      * @return void
      */
     public function offsetSet(mixed $key, mixed $value): void {
-        $this->$key = $value;
+        if (property_exists($this, $key)) {
+            $this->$key = $value;
+        }
     }
 
     /**
@@ -184,7 +189,9 @@ class Entity implements ArrayAccess, JsonSerializable {
      * @return void
      */
     public function offsetUnset(mixed $key): void {
-        unset($this->$key);
+        if (property_exists($this, $key)) {
+            unset($this->$key);
+        }
     }
 
     /**
