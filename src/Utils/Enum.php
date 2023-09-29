@@ -2,6 +2,7 @@
 namespace Framework\Utils;
 
 use Framework\Utils\Arrays;
+use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 use ReflectionClass;
@@ -98,18 +99,18 @@ class Enum {
 
     /**
      * Creates a Select for the Enum
-     * @return mixed[]
+     * @return Select[]
      */
     public static function getSelect(): array {
         $cache = self::load();
         if ($cache->isConstant) {
-            return Arrays::createSelectFromMap($cache->constants);
+            return Select::createFromMap($cache->constants);
         }
         if ($cache->isArray) {
-            return Arrays::createSelectFromMap($cache->data);
+            return Select::createFromMap($cache->data);
         }
         if ($cache->isMap) {
-            return Arrays::createSelect($cache->data, "key", "name");
+            return Select::create($cache->data, "key", "name");
         }
         return [];
     }

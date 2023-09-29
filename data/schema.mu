@@ -267,16 +267,13 @@ class {{name}}Schema {
     /**
      * Returns a select of {{name}} Entities{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
-     * @return array{}[]
+     * @return Select[]
      */
     public static function getSelect({{{parentsDefList}}}): array {
         {{#hasParents}}
         $query = self::createParentQuery({{parentsList}});
-        return self::schema()->getSortedSelect($query);
         {{/hasParents}}
-        {{^hasParents}}
-        return self::schema()->getSortedNames();
-        {{/hasParents}}
+        return self::schema()->getSelect({{#hasParents}}$query{{/hasParents}});
     }
 
 {{/hasSelect}}

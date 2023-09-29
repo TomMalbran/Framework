@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Config\Config;
 use Framework\NLS\Language;
 use Framework\Utils\Arrays;
+use Framework\Utils\Select;
 
 /**
  * The Internalization Strings
@@ -85,14 +86,14 @@ class NLS {
      * Returns a string from the data
      * @param string $key
      * @param string $language Optional.
-     * @return mixed
+     * @return Select[]
      */
-    public static function getSelect(string $key, string $language = ""): mixed {
+    public static function getSelect(string $key, string $language = ""): array {
         $result = self::get($key, $language);
         if (Arrays::isArray($result)) {
-            return Arrays::createSelectFromMap($result);
+            return Select::createFromMap($result);
         }
-        return $key;
+        return [];
     }
 
     /**

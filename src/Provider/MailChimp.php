@@ -3,7 +3,7 @@ namespace Framework\Provider;
 
 use Framework\Config\Config;
 use Framework\Email\EmailWhiteList;
-use Framework\Utils\Arrays;
+use Framework\Utils\Select;
 
 use DrewM\MailChimp\MailChimp as MailChimpAPI;
 
@@ -215,7 +215,7 @@ class MailChimp {
 
     /**
      * Returns a list of Templates
-     * @return array{}
+     * @return Select[]
      */
     public static function getTemplates(): array {
         self::load();
@@ -223,7 +223,7 @@ class MailChimp {
             return [];
         }
         $data = self::$api->get("templates");
-        return Arrays::createSelect($data["templates"], "id", "name");
+        return Select::create($data["templates"], "id", "name");
     }
 
     /**

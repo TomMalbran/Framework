@@ -3,6 +3,7 @@ namespace Framework\NLS;
 
 use Framework\Framework;
 use Framework\Utils\Arrays;
+use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 /**
@@ -84,11 +85,11 @@ class Language {
 
     /**
      * Creates a Select of Languages
-     * @return array{}[]
+     * @return Select[]
      */
     public static function getSelect(): array {
         self::load();
-        return Arrays::createSelect(self::$data, "key", "name");
+        return Select::create(self::$data, "key", "name");
     }
 
 

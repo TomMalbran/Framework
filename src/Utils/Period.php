@@ -185,10 +185,10 @@ class Period {
 
     /**
      * Returns a select of Periods
-     * @return array{}[]
+     * @return Select[]
      */
     public static function getSelect(): array {
-        return Arrays::createSelectFromMap(self::$names);
+        return Select::createFromMap(self::$names);
     }
 
 

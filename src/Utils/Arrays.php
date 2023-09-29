@@ -462,52 +462,6 @@ class Arrays {
         return $result;
     }
 
-    /**
-     * Creates a select using the given array
-     * @param mixed[]         $array
-     * @param string          $keyName
-     * @param string[]|string $valName
-     * @param boolean         $useEmpty Optional.
-     * @param string|null     $extra    Optional.
-     * @param boolean         $distinct Optional.
-     * @return mixed[]
-     */
-    public static function createSelect(array $array, string $keyName, array|string $valName, bool $useEmpty = false, ?string $extra = null, bool $distinct = false): array {
-        $result = [];
-        $keys   = [];
-
-        foreach ($array as $row) {
-            $key   = $row[$keyName];
-            $value = self::getValue($row, $valName, " - ", "", $useEmpty);
-            if (($distinct && in_array($key, $keys)) || (!$useEmpty && empty($value))) {
-                continue;
-            }
-            $fields = [ "key" => $key, "value" => $value ];
-            if ($extra) {
-                $fields[$extra] = self::getValue($row, $extra);
-            }
-            $result[] = $fields;
-            $keys[]   = $key;
-        }
-        return $result;
-    }
-
-    /**
-     * Creates a select using the given array
-     * @param mixed[] $array
-     * @return mixed[]
-     */
-    public static function createSelectFromMap(array $array): array {
-        $result = [];
-        foreach ($array as $key => $value) {
-            $result[] = [
-                "key"   => $key,
-                "value" => $value,
-            ];
-        }
-        return $result;
-    }
-
 
 
     /**

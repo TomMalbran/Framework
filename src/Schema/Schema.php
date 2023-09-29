@@ -11,6 +11,7 @@ use Framework\Schema\Field;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
+use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 use ArrayAccess;
@@ -179,28 +180,6 @@ class Schema {
     }
 
     /**
-     * Returns the expression of the Query
-     * @param Query|null   $query     Optional.
-     * @param Request|null $sort      Optional.
-     * @param array{}|null $selects   Optional.
-     * @param boolean      $decrypted Optional.
-     * @return string
-     */
-    public function getExpression(?Query $query = null, ?Request $sort = null, ?array $selects = null, bool $decrypted = false): string {
-        $query     = $this->generateQuerySort($query, $sort);
-        $selection = new Selection($this->db, $this->structure);
-        $selection->addFields($decrypted);
-        $selection->addExpressions();
-        if (!empty($selects)) {
-            $selection->addSelects(array_values($selects));
-        }
-        $selection->addJoins();
-        $selection->addCounts();
-        $expression = $selection->getExpression($query);
-        return $this->db->interpolateQuery($expression, $query);
-    }
-
-    /**
      * Requests data to the database
      * @param Query|null $query     Optional.
      * @param boolean    $decrypted Optional.
@@ -224,53 +203,6 @@ class Schema {
 
 
     /**
-     * Selects the given column from a single table and returns the entire column
-     * @param Query   $query
-     * @param array{} $selects
-     * @param boolean $decrypted Optional.
-     * @param boolean $withSubs  Optional.
-     * @return array{}[]
-     */
-    public function getColumns(Query $query, array $selects, bool $decrypted = false, bool $withSubs = false): array {
-        $query     = $this->generateQuery($query);
-        $selection = new Selection($this->db, $this->structure);
-        $selection->addFields($decrypted);
-        $selection->addExpressions();
-        $selection->addSelects(array_values($selects));
-        $selection->addJoins();
-        $selection->request($query);
-
-        $result = $selection->resolve(array_keys($selects));
-        if ($withSubs) {
-            foreach ($this->subRequests as $subRequest) {
-                $result = $subRequest->request($result);
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Selects the given Data
-     * @param Query    $query
-     * @param string[] $selects
-     * @param boolean  $withFields Optional.
-     * @return array{}[]
-     */
-    public function getSome(Query $query, array $selects, bool $withFields = false): array {
-        $query     = $this->generateQuery($query);
-        $selection = new Selection($this->db, $this->structure);
-        $selection->addSelects($selects);
-        $selection->addJoins();
-        $selection->addCounts();
-        if ($withFields) {
-            $selection->addFields();
-            $selection->addExpressions();
-        }
-        $selection->request($query);
-        return $selection->resolve();
-    }
-
-    /**
      * Gets a Total using the Joins
      * @param Query|null $query       Optional.
      * @param boolean    $withDeleted Optional.
@@ -287,6 +219,29 @@ class Schema {
             return (int)$request[0]["cnt"];
         }
         return 0;
+    }
+
+    /**
+     * Selects the given column from a single table and returns the entire column
+     * @param Query|null $query
+     * @param string     $column
+     * @return string[]
+     */
+    public function getColumn(?Query $query, string $column): array {
+        $columnName = Strings::substringAfter($column, ".");
+        $query      = $this->generateQuery($query);
+        $selection  = new Selection($this->db, $this->structure);
+        $selection->addSelects($column, true);
+        $selection->addJoins();
+
+        $request = $selection->request($query);
+        $result  = [];
+        foreach ($request as $row) {
+            if (!empty($row[$columnName]) && !Arrays::contains($result, $row[$columnName])) {
+                $result[] = $row[$columnName];
+            }
+        }
+        return $result;
     }
 
     /**
@@ -335,26 +290,49 @@ class Schema {
     }
 
     /**
-     * Selects the given column from a single table and returns the entire column
-     * @param Query|null $query
-     * @param string     $column
-     * @return string[]
+     * Returns a Select array
+     * @param Query|null           $query      Optional.
+     * @param string|null          $orderKey   Optional.
+     * @param boolean              $orderAsc   Optional.
+     * @param string|null          $idName     Optional.
+     * @param string[]|string|null $nameKey    Optional.
+     * @param string|null          $extraKey   Optional.
+     * @param boolean              $useEmpty   Optional.
+     * @param string|null          $distinctID Optional.
+     * @return Select[]
      */
-    public function getColumn(?Query $query, string $column): array {
-        $columnName = Strings::substringAfter($column, ".");
-        $query      = $this->generateQuery($query);
-        $selection  = new Selection($this->db, $this->structure);
-        $selection->addSelects($column, true);
-        $selection->addJoins();
-
-        $request = $selection->request($query);
-        $result  = [];
-        foreach ($request as $row) {
-            if (!empty($row[$columnName]) && !Arrays::contains($result, $row[$columnName])) {
-                $result[] = $row[$columnName];
-            }
+    public function getSelect(
+        ?Query $query = null,
+        ?string $orderKey = null,
+        bool $orderAsc = true,
+        ?string $idName = null,
+        array|string $nameKey = null,
+        ?string $extraKey = null,
+        bool $useEmpty = false,
+        ?string $distinctID = null
+    ): array {
+        $query = $this->generateQuery($query);
+        if (!$query->hasOrder()) {
+            $field = $this->structure->getOrder($orderKey);
+            $query->orderBy($field, $orderAsc);
         }
-        return $result;
+
+        $selection = new Selection($this->db, $this->structure);
+        if ($distinctID !== null) {
+            $selection->addSelects("DISTINCT($distinctID)");
+        } elseif ($idName !== null) {
+            $selection->addSelects("DISTINCT($idName)");
+        }
+
+        $selection->addFields();
+        $selection->addExpressions();
+        $selection->addJoins();
+        $selection->request($query);
+        $request   = $selection->resolve();
+
+        $keyName = $idName  ?: $this->structure->idName;
+        $valName = $nameKey ?: $this->structure->nameKey;
+        return Select::create($request, $keyName, $valName, $useEmpty, $extraKey, true);
     }
 
     /**
@@ -367,6 +345,7 @@ class Schema {
         if (!$this->structure->hasPositions) {
             return 0;
         }
+
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects("position", true);
         $selection->addJoins(false);
@@ -382,64 +361,26 @@ class Schema {
         return 1;
     }
 
-
-
     /**
-     * Returns a Sorted Names Select array
-     * @param string|null          $order    Optional.
-     * @param boolean              $orderAsc Optional.
-     * @param string[]|string|null $name     Optional.
-     * @param boolean              $useEmpty Optional.
-     * @param string|null          $extra    Optional.
-     * @return array{}[]
+     * Returns the expression of the Query
+     * @param Query|null   $query     Optional.
+     * @param Request|null $sort      Optional.
+     * @param array{}|null $selects   Optional.
+     * @param boolean      $decrypted Optional.
+     * @return string
      */
-    public function getSortedNames(?string $order = null, bool $orderAsc = true, array|string $name = null, bool $useEmpty = false, ?string $extra = null): array {
-        $field = $this->structure->getOrder($order);
-        $query = Query::createOrderBy($field, $orderAsc);
-        return $this->getSelect($query, null, $name, $useEmpty, $extra);
-    }
-
-    /**
-     * Returns a Sorted Select array
-     * @param Query|null           $query    Optional.
-     * @param string|null          $order    Optional.
-     * @param boolean              $orderAsc Optional.
-     * @param string[]|string|null $name     Optional.
-     * @param boolean              $useEmpty Optional.
-     * @param string|null          $extra    Optional.
-     * @return array{}[]
-     */
-    public function getSortedSelect(?Query $query = null, ?string $order = null, bool $orderAsc = true, array|string $name = null, bool $useEmpty = false, ?string $extra = null): array {
-        $query = $this->generateQuery($query);
-        $field = $this->structure->getOrder($order);
-        $query->orderBy($field, $orderAsc);
-        return $this->getSelect($query, null, $name, $useEmpty, $extra);
-    }
-
-    /**
-     * Returns a Select array
-     * @param Query|null           $query      Optional.
-     * @param string|null          $idName     Optional.
-     * @param string[]|string|null $name       Optional.
-     * @param boolean              $useEmpty   Optional.
-     * @param string|null          $extra      Optional.
-     * @param string|null          $distinctID Optional.
-     * @return array{}[]
-     */
-    public function getSelect(?Query $query = null, ?string $idName = null, array|string $name = null, bool $useEmpty = false, ?string $extra = null, ?string $distinctID = null): array {
-        $query     = $this->generateQuery($query);
+    public function getExpression(?Query $query = null, ?Request $sort = null, ?array $selects = null, bool $decrypted = false): string {
+        $query     = $this->generateQuerySort($query, $sort);
         $selection = new Selection($this->db, $this->structure);
-        if ($distinctID !== null) {
-            $selection->addSelects("DISTINCT($distinctID)");
-        } elseif ($idName != null) {
-            $selection->addSelects("DISTINCT($idName)");
-        }
-        $selection->addFields();
+        $selection->addFields($decrypted);
         $selection->addExpressions();
+        if (!empty($selects)) {
+            $selection->addSelects(array_values($selects));
+        }
         $selection->addJoins();
-        $selection->request($query);
-        $request   = $selection->resolve();
-        return Arrays::createSelect($request, $idName ?: $this->structure->idName, $name ?: $this->structure->nameKey, $useEmpty, $extra, true);
+        $selection->addCounts();
+        $expression = $selection->getExpression($query);
+        return $this->db->interpolateQuery($expression, $query);
     }
 
 
