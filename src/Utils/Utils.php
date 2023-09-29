@@ -10,6 +10,23 @@ use Framework\Utils\Strings;
 class Utils {
 
     /**
+     * Parses a Full Name into a First and Last Name
+     * @param string $fullName
+     * @return string[]
+     */
+    public static function parseName(string $fullName): array {
+        $nameParts = Strings::split($fullName, " ");
+        if (count($nameParts) > 1) {
+            $lastName  = array_pop($nameParts);
+            $firstName = Strings::join($nameParts, " ");
+        } else {
+            $firstName = $fullName;
+            $lastName  = "";
+        }
+        return [ $firstName, $lastName ];
+    }
+
+    /**
      * Returns true if the given email is valid
      * @param string $email
      * @return boolean
