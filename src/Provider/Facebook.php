@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\Config\Config;
+use Framework\Utils\Utils;
 
 /**
  * The Facebook Provider
@@ -31,24 +32,47 @@ class Facebook {
 
 
     /**
-     * Returns the Email from the given Token
+     * Returns the Account from the given Token
      * @param string $accessToken
-     * @return string
+     * @return array{}
      */
-    public static function getAuthEmail(string $accessToken): string {
+    public static function getAuthAccount(string $accessToken): array {
         self::load();
         if (empty($accessToken)) {
-            return "";
+            return [];
         }
 
         $response = Curl::get(self::BaseUrl . "/me", [
-            "fields"       => "email",
+            "fields"       => "email,name,first_name,last_name",
             "access_token" => $accessToken,
         ]);
-
         if (empty($response["email"])) {
-            return "";
+            return [];
         }
-        return $response["email"];
+
+        $firstName = !empty($response["first_name"]) ? $response["first_name"] : "";
+        $lastName  = !empty($response["last_name"])  ? $response["last_name"]  : "";
+        if (empty($firstName) && empty($lastName) && !empty($response["name"])) {
+            [ $firstName, $lastName ] = Utils::parseName($response["name"]);
+        }
+
+        return [
+            "email"     => $response["email"],
+            "firstName" => $firstName,
+            "lastName"  => $lastName,
+        ];
+    }
+
+    /**
+     * Returns the Email from the given Token
+     * @param string $idToken
+     * @return string
+     */
+    public static function getAuthEmail(string $idToken): string {
+        $account = self::getAuthAccount($idToken);
+        if (!empty($account["email"])) {
+            return $account["email"];
+        }
+        return "";
     }
 }

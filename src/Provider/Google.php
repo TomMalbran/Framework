@@ -41,29 +41,45 @@ class Google {
 
 
     /**
+     * Returns the Data from the given Token
+     * @param string $accessToken
+     * @param string $idToken     Optional.
+     * @return array{}
+     */
+    public static function getAuthAccount(string $accessToken, string $idToken = ""): array {
+        self::load();
+        if (!empty($accessToken)) {
+            self::$client->setAccessToken($accessToken);
+            $oauth   = new Oauth2(self::$client);
+            $account = $oauth->userinfo->get();
+            return [
+                "email"     => $account["email"],
+                "firstName" => $account["givenName"],
+                "lastName"  => $account["familyName"],
+            ];
+        }
+
+        if (!empty($idToken)) {
+            $result = self::$client->verifyIdToken($idToken);
+            return [
+                "email" => $result["email"],
+            ];
+        }
+
+        return [];
+    }
+
+    /**
      * Returns the Email from the given Token
      * @param string $accessToken
      * @param string $idToken     Optional.
      * @return string
      */
     public static function getAuthEmail(string $accessToken, string $idToken = ""): string {
-        self::load();
-        if (!empty($accessToken)) {
-            self::$client->setAccessToken($accessToken);
-            $oauth   = new Oauth2(self::$client);
-            $account = $oauth->userinfo->get();
-            if (!empty($account["email"])) {
-                return $account["email"];
-            }
+        $account = self::getAuthAccount($accessToken, $idToken);
+        if (!empty($account["email"])) {
+            return $account["email"];
         }
-
-        if (!empty($idToken)) {
-            $result = self::$client->verifyIdToken($idToken);
-            if (!empty($result["email"])) {
-                return $result["email"];
-            }
-        }
-
         return "";
     }
 }

@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\Config\Config;
+use Framework\Utils\Utils;
 
 use Firebase\JWT\JWT;
 
@@ -31,20 +32,19 @@ class Microsoft {
 
 
     /**
-     * Returns the Email from the given Token
+     * Returns the Account from the given Token
      * @param string $idToken
-     * @return string
+     * @return array{}
      */
-    public static function getAuthEmail(string $idToken): string {
+    public static function getAuthAccount(string $idToken): array {
         self::load();
         if (empty($idToken)) {
-            return "";
+            return [];
         }
-
 
         $tokens = explode(".", $idToken);
         if (count($tokens) != 3) {
-            return "";
+            return [];
         }
 
         [ $head64, $body64, $crypto64 ] = $tokens;
@@ -53,14 +53,37 @@ class Microsoft {
         $signature = JWT::urlsafeB64Decode($crypto64);
 
         if ($header === null || $payload === null || $signature === null) {
-            return "";
+            return [];
         }
         if ($payload->aud !== self::$config->client) {
-            return "";
+            return [];
         }
         if ($payload->exp < time()) {
-            return "";
+            return [];
         }
-        return $payload->email;
+        if (empty($payload->email) || empty($payload->name)) {
+            return [];
+        }
+
+        // Split the Name
+        [ $firstName, $lastName ] = Utils::parseName($payload->name);
+        return [
+            "email"     => $payload->email,
+            "firstName" => $firstName,
+            "lastName"  => $lastName,
+        ];
+    }
+
+    /**
+     * Returns the Email from the given Token
+     * @param string $idToken
+     * @return string
+     */
+    public static function getAuthEmail(string $idToken): string {
+        $account = self::getAuthAccount($idToken);
+        if (!empty($account["email"])) {
+            return $account["email"];
+        }
+        return "";
     }
 }
