@@ -177,7 +177,6 @@ class Auth {
         return (
             !$credential->isEmpty() &&
             !$credential->isDeleted &&
-            !empty($credential->password) &&
             Status::isActive($credential->status)
         );
     }

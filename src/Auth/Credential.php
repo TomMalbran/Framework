@@ -481,12 +481,12 @@ class Credential {
 
     /**
      * Creates a new Credential
-     * @param Request      $request
-     * @param integer      $level
-     * @param boolean|null $reqPassChange Optional.
+     * @param Request|array{} $request
+     * @param integer         $level
+     * @param boolean|null    $reqPassChange Optional.
      * @return integer
      */
-    public static function create(Request $request, int $level, ?bool $reqPassChange = null): int {
+    public static function create(Request|array $request, int $level, ?bool $reqPassChange = null): int {
         $fields = self::getFields($request, $level, $reqPassChange);
         return self::schema()->create($request, $fields + [
             "lastLogin"    => time(),
@@ -496,14 +496,14 @@ class Credential {
 
     /**
      * Edits the given Credential
-     * @param integer      $credentialID
-     * @param Request      $request
-     * @param integer      $level         Optional.
-     * @param boolean|null $reqPassChange Optional.
-     * @param boolean      $skipEmpty     Optional.
+     * @param integer         $credentialID
+     * @param Request|array{} $request
+     * @param integer         $level         Optional.
+     * @param boolean|null    $reqPassChange Optional.
+     * @param boolean         $skipEmpty     Optional.
      * @return boolean
      */
-    public static function edit(int $credentialID, Request $request, int $level = 0, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
+    public static function edit(int $credentialID, Request|array $request, int $level = 0, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
         $fields = self::getFields($request, $level, $reqPassChange);
         return self::schema()->edit($credentialID, $request, $fields, 0, $skipEmpty);
     }
@@ -566,15 +566,15 @@ class Credential {
 
     /**
      * Parses the data and returns the fields
-     * @param Request      $request
-     * @param integer      $level         Optional.
-     * @param boolean|null $reqPassChange Optional.
+     * @param Request|array{} $request
+     * @param integer         $level         Optional.
+     * @param boolean|null    $reqPassChange Optional.
      * @return array{}[]
      */
-    private static function getFields(Request $request, int $level = 0, ?bool $reqPassChange = null): array {
+    private static function getFields(Request|array $request, int $level = 0, ?bool $reqPassChange = null): array {
         $result = [];
-        if ($request->has("password")) {
-            $hash = self::createHash($request->password);
+        if (!empty($request["password"])) {
+            $hash = self::createHash($request["password"]);
             $result["password"] = $hash["password"];
             $result["salt"]     = $hash["salt"];
         }
