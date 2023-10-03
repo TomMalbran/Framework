@@ -106,6 +106,7 @@ class {{name}}Schema {
     }
 
 
+
 {{#hasID}}
     /**
      * Returns the {{name}} Entity with the given ID
@@ -190,36 +191,6 @@ class {{name}}Schema {
 
 {{/hasID}}
     /**
-     * Returns an array of {{name}} Entities
-     * @param Query|null $query Optional.
-     * @param Request|null $sort Optional.{{#hasEncrypt}}
-     * @param boolean $decrypted Optional.{{/hasEncrypt}}
-     * @return {{name}}Entity[]
-     */
-    protected static function getEntityList(?Query $query = null, ?Request $sort = null{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): array {
-        $list   = self::schema()->getAll($query, $sort{{#hasEncrypt}}, $decrypted{{/hasEncrypt}});
-        $result = [];
-        foreach ($list as $row) {
-            $entity = new {{name}}Entity($row);
-            {{#hasProcessed}}
-            $entity = static::postProcess($entity);
-            {{/hasProcessed}}
-            $result[] = $entity;
-        }
-        return $result;
-    }
-
-    /**
-     * Gets a Total number of {{name}} Entities
-     * @param Query|null $query Optional.{{#canDelete}}
-     * @param boolean $withDeleted Optional.{{/canDelete}}
-     * @return integer
-     */
-    protected static function getEntityTotal(?Query $query = null{{#canDelete}}, bool $withDeleted = true{{/canDelete}}): int {
-        return self::schema()->getTotal($query{{#canDelete}}, $withDeleted{{/canDelete}});
-    }
-
-    /**
      * Returns a list of {{name}} Entities{{#hasFilters}}
      * @param Request $request{{/hasFilters}}{{^hasFilters}}
      * @param Request|null $request Optional.{{/hasFilters}}{{#parents}}
@@ -243,6 +214,26 @@ class {{name}}Schema {
     }
 
     /**
+     * Returns an array of {{name}} Entities
+     * @param Query|null $query Optional.
+     * @param Request|null $sort Optional.{{#hasEncrypt}}
+     * @param boolean $decrypted Optional.{{/hasEncrypt}}
+     * @return {{name}}Entity[]
+     */
+    protected static function getEntityList(?Query $query = null, ?Request $sort = null{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): array {
+        $list   = self::schema()->getAll($query, $sort{{#hasEncrypt}}, $decrypted{{/hasEncrypt}});
+        $result = [];
+        foreach ($list as $row) {
+            $entity = new {{name}}Entity($row);
+            {{#hasProcessed}}
+            $entity = static::postProcess($entity);
+            {{/hasProcessed}}
+            $result[] = $entity;
+        }
+        return $result;
+    }
+
+    /**
      * Gets a Total number of {{name}} Entities{{#hasFilters}}
      * @param Request $request{{/hasFilters}}{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
@@ -261,6 +252,16 @@ class {{name}}Schema {
         {{/hasParents}}
         {{/hasFilters}}
         return self::getEntityTotal({{#hasMainQuery}}$query{{/hasMainQuery}});
+    }
+
+    /**
+     * Gets a Total number of {{name}} Entities
+     * @param Query|null $query Optional.{{#canDelete}}
+     * @param boolean $withDeleted Optional.{{/canDelete}}
+     * @return integer
+     */
+    protected static function getEntityTotal(?Query $query = null{{#canDelete}}, bool $withDeleted = true{{/canDelete}}): int {
+        return self::schema()->getTotal($query{{#canDelete}}, $withDeleted{{/canDelete}});
     }
 
 {{#hasSelect}}
