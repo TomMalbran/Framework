@@ -1,10 +1,11 @@
 <?php
 namespace Framework;
 
-use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\Errors;
 use Framework\Utils\JSON;
+
+use ArrayAccess;
 
 /**
  * The Response wrapper
@@ -88,12 +89,12 @@ class Response {
 
     /**
      * Returns the given data
-     * @param Model|array{}|null $data Optional.
+     * @param ArrayAccess|array{}|null $data Optional.
      * @return Response
      */
-    public static function data(Model|array|null $data = null): Response {
+    public static function data(ArrayAccess|array|null $data = null): Response {
         return new Response([
-            "data" => self::createData($data),
+            "data" => $data,
         ]);
     }
 
@@ -120,41 +121,41 @@ class Response {
 
     /**
      * Returns a success response
-     * @param string             $success
-     * @param Model|array{}|null $data    Optional.
+     * @param string                   $success
+     * @param ArrayAccess|array{}|null $data    Optional.
      * @return Response
      */
-    public static function success(string $success, Model|array|null $data = null): Response {
+    public static function success(string $success, ArrayAccess|array|null $data = null): Response {
         return new Response([
             "success" => $success,
-            "data"    => self::createData($data),
+            "data"    => $data,
         ]);
     }
 
     /**
      * Returns a warning response
-     * @param string             $warning
-     * @param Model|array{}|null $data    Optional.
+     * @param string                   $warning
+     * @param ArrayAccess|array{}|null $data    Optional.
      * @return Response
      */
-    public static function warning(string $warning, Model|array|null $data = null): Response {
+    public static function warning(string $warning, ArrayAccess|array|null $data = null): Response {
         return new Response([
             "warning" => $warning,
-            "data"    => self::createData($data),
+            "data"    => $data,
         ]);
     }
 
     /**
      * Returns an error response
-     * @param Errors|string      $error
-     * @param Model|array{}|null $data  Optional.
+     * @param Errors|string            $error
+     * @param ArrayAccess|array{}|null $data  Optional.
      * @return Response
      */
-    public static function error(Errors|string $error, Model|array|null $data = null): Response {
+    public static function error(Errors|string $error, ArrayAccess|array|null $data = null): Response {
         if (Arrays::isArray($error)) {
             return new Response([
                 "errors" => $error,
-                "data"   => self::createData($data),
+                "data"   => $data,
             ]);
         }
 
@@ -162,32 +163,18 @@ class Response {
             if ($error->has("global")) {
                 return new Response([
                     "error" => $error->global,
-                    "data"  => self::createData($data),
+                    "data"  => $data,
                 ]);
             }
             return new Response([
                 "errors" => $error->get(),
-                "data"   => self::createData($data),
+                "data"   => $data,
             ]);
         }
 
         return new Response([
             "error" => $error,
-            "data"  => self::createData($data),
+            "data"  => $data,
         ]);
-    }
-
-
-
-    /**
-     * Returns the Data depending on the type
-     * @param Model|array{}|null $data Optional.
-     * @return mixed
-     */
-    private static function createData(Model|array|null $data = null): mixed {
-        if ($data != null && $data instanceof Model) {
-            return $data->toObject();
-        }
-        return $data;
     }
 }
