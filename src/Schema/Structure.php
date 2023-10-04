@@ -5,7 +5,6 @@ use Framework\Schema\KeyChain;
 use Framework\Schema\Field;
 use Framework\Schema\Join;
 use Framework\Schema\Count;
-use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -39,7 +38,7 @@ class Structure {
     /** @var Count[] */
     public array $counts       = [];
 
-    /** @var string[] */
+    /** @var array<string,string> */
     public array $subRequests  = [];
 
     public bool $hasPositions  = false;
@@ -183,7 +182,8 @@ class Structure {
         // Create the SubRequests
         if (!empty($data["subrequests"])) {
             foreach ($data["subrequests"] as $value) {
-                $this->subRequests[] = $value["name"];
+                $type = !empty($value["type"]) ? $value["type"] : "";
+                $this->subRequests[$value["name"]] = $type;
             }
         }
 

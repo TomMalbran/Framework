@@ -8,8 +8,10 @@ use Framework\Schema\Entity;
  */
 class {{name}}Entity extends Entity {
 
-{{#attributes}}
-    public {{type}} ${{name}} = {{{default}}};
+{{#attributes}}{{#subType}}
+
+    /** @var {{subType}}Entity[] */
+{{/subType}}    public {{type}} ${{name}} = {{{default}}};
 {{/attributes}}
 
 }

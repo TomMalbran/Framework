@@ -66,7 +66,9 @@ class Generator {
         $fileName    = "{$structure->name}Schema.php";
         $idType      = self::getFieldType($structure->idType);
         $parents     = self::getFieldList($structure, "isParent");
+        $subTypes    = self::getSubTypes($structure->subRequests);
         $editParents = $structure->hasPositions ? $parents : [];
+
         $contents    = Mustache::render(self::$schemaText, [
             "name"            => $structure->name,
             "schemaName"      => $structure->key,
@@ -90,6 +92,9 @@ class Generator {
             "canBatch"        => $structure->canEdit && !$structure->hasTimestamps,
             "canDelete"       => $structure->canDelete,
             "canRemove"       => $structure->canRemove,
+            "processEntity"   => !empty($subTypes) || !empty($structure->processed),
+            "subTypes"        => $subTypes,
+            "hasProcessed"    => !empty($structure->processed),
             "uniques"         => self::getFieldList($structure, "isUnique"),
             "parents"         => $parents,
             "editParents"     => $editParents,
@@ -100,18 +105,36 @@ class Generator {
             "hasParents"      => !empty($parents),
             "hasEditParents"  => $structure->hasPositions && !empty($parents),
             "hasMainQuery"    => $structure->hasFilters || !empty($parents),
-            "hasProcessed"    => !empty($structure->processed),
         ]);
+
         $contents = self::alignParams($contents);
         $contents = Strings::replace($contents, "(, ", "(");
         return File::create(self::$writePath, $fileName, $contents);
     }
 
     /**
+     * Returns the Sub Types from the Sub Requests
+     * @param array{} $subRequests
+     * @return array{}[]
+     */
+    private static function getSubTypes(array $subRequests): array {
+        $result = [];
+        foreach ($subRequests as $name => $type) {
+            if (!empty($type)) {
+                $result[] = [
+                    "name" => $name,
+                    "type" => $type,
+                ];
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Returns a list of Fields with the given property
      * @param Structure $structure
      * @param string    $property
-     * @return array{}
+     * @return array{}[]
      */
     private static function getFieldList(Structure $structure, string $property): array {
         $result = [];
@@ -262,8 +285,8 @@ class Generator {
         foreach ($structure->processed as $field) {
             self::addAttribute($result, $field);
         }
-        foreach ($structure->subRequests as $key) {
-            $result[] = self::getTypeData($key, "array");
+        foreach ($structure->subRequests as $key => $type) {
+            $result[] = self::getTypeData($key, "array", $type);
         }
         return $result;
     }
@@ -329,12 +352,14 @@ class Generator {
      * Returns the Type and Default
      * @param string $name
      * @param string $type
+     * @param string $subType
      * @return object
      */
-    private static function getTypeData(string $name, string $type): object {
+    private static function getTypeData(string $name, string $type, string $subType = ""): object {
         return (object)[
             "name"    => $name,
             "type"    => $type,
+            "subType" => $subType,
             "default" => self::getDefault($type),
         ];
     }
@@ -363,6 +388,7 @@ class Generator {
                 "type"    => Strings::padRight($attribute->type, $typeLength),
                 "name"    => Strings::padRight($attribute->name, $nameLength),
                 "default" => $attribute->default,
+                "subType" => $attribute->subType,
             ];
             $parsed[$attribute->name] = true;
         }

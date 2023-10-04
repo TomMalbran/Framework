@@ -1,7 +1,8 @@
 <?php
 namespace App\Schema;
 
-use App\Schema\{{name}}Entity;
+use App\Schema\{{name}}Entity;{{#subTypes}}
+use App\Schema\{{type}}Entity;{{/subTypes}}
 
 use Framework\Request;
 use Framework\Schema\Factory;
@@ -19,6 +20,28 @@ class {{name}}Schema {
      */
     public static function schema(): Schema {
         return Factory::getSchema("{{schemaName}}");
+    }
+
+    /**
+     * Constructs the {{name}} Entity
+     * @param array{} $data
+     * @return {{name}}Entity
+     */
+    protected static function constructEntity(array $data): {{name}}Entity {
+        $entity = new {{name}}Entity($data);
+        {{#processEntity}}
+        if (!$entity->isEmpty()) {
+            {{#subTypes}}
+            foreach ($entity->{{name}} as $index => $subEntity) {
+                $entity->{{name}}[$index] = new {{type}}Entity($subEntity);
+            }
+            {{/subTypes}}
+            {{#hasProcessed}}
+            $entity = static::postProcess($entity);
+            {{/hasProcessed}}
+        }
+        {{/processEntity}}
+        return $entity;
     }
 
 {{#hasFilters}}
@@ -167,14 +190,8 @@ class {{name}}Schema {
      * @return {{name}}Entity
      */
     protected static function getEntity(Query $query{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{name}}Entity {
-        $row    = self::schema()->getRow($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
-        $entity = new {{name}}Entity($row);
-        {{#hasProcessed}}
-        if (!$entity->isEmpty()) {
-            $entity = static::postProcess($entity);
-        }
-        {{/hasProcessed}}
-        return $entity;
+        $data = self::schema()->getRow($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
+        return self::constructEntity($data);
     }
 
 
@@ -223,12 +240,8 @@ class {{name}}Schema {
     protected static function getEntityList(?Query $query = null, ?Request $sort = null{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): array {
         $list   = self::schema()->getAll($query, $sort{{#hasEncrypt}}, $decrypted{{/hasEncrypt}});
         $result = [];
-        foreach ($list as $row) {
-            $entity = new {{name}}Entity($row);
-            {{#hasProcessed}}
-            $entity = static::postProcess($entity);
-            {{/hasProcessed}}
-            $result[] = $entity;
+        foreach ($list as $data) {
+            $result[] = self::constructEntity($data);
         }
         return $result;
     }
