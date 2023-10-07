@@ -462,6 +462,22 @@ class Arrays {
         return $result;
     }
 
+    /**
+     * Returns only the requested Fields of the Map
+     * @param array{} $array
+     * @param string  ...$fields
+     * @return array{}
+     */
+    public static function reduceMap(array $array, string ...$fields): array {
+        $result = [];
+        foreach ($fields as $field) {
+            if (isset($array[$field])) {
+                $result[$field] = $array[$field];
+            }
+        }
+        return $result;
+    }
+
 
 
     /**
