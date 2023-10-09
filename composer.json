@@ -17,7 +17,6 @@
         "mustache/mustache": "^2.14",
         "phpmailer/phpmailer": "^6.7",
         "league/oauth2-google": "^4.0",
-        "google/apiclient": "^2.12",
         "phpoffice/phpspreadsheet": "^1.25",
         "drewm/mailchimp-api": "^2.5"
     },
@@ -27,7 +26,6 @@
         "phpmailer/phpmailer": "Used for Mailing with SMTP",
         "league/oauth2-google": "Used for Mailing with Gmail",
         "drewm/mailchimp-api": "Used for Mailing with MailChimp",
-        "google/apiclient": "Used to for Google and Gmail",
         "phpoffice/phpspreadsheet": "Used to Import/Export data"
     },
     "autoload": {

@@ -3,39 +3,29 @@ namespace Framework\Provider;
 
 use Framework\Config\Config;
 
-use Google\Client;
-use Google\Service\Oauth2;
-
 /**
  * The Google Provider
  */
 class Google {
 
-    private static bool    $loaded = false;
-    private static mixed   $config = null;
-    private static ?Client $client = null;
+    const BaseUrl = "https://www.googleapis.com/oauth2/v1/";
+
+    private static bool  $loaded = false;
+    private static mixed $config = null;
 
 
     /**
      * Creates the Google Provider
-     * @param string $scopes Optional.
-     * @return Client
+     * @return boolean
      */
-    private static function load(string $scopes = ""): Client {
+    private static function load(): bool {
         if (self::$loaded) {
-            return self::$client;
+            return true;
         }
 
         self::$loaded = true;
         self::$config = Config::get("google");
-
-        self::$client = new Client([
-            "client_id"     => self::$config->client,
-            "client_secret" => self::$config->secret,
-            "access_type"   => "offline",
-            "scopes"        => $scopes,
-        ]);
-        return self::$client;
+        return false;
     }
 
 
@@ -43,40 +33,35 @@ class Google {
     /**
      * Returns the Data from the given Token
      * @param string $accessToken
-     * @param string $idToken     Optional.
      * @return array{}
      */
-    public static function getAuthAccount(string $accessToken, string $idToken = ""): array {
+    public static function getAuthAccount(string $accessToken): array {
         self::load();
-        if (!empty($accessToken)) {
-            self::$client->setAccessToken($accessToken);
-            $oauth   = new Oauth2(self::$client);
-            $account = $oauth->userinfo->get();
-            return [
-                "email"     => $account["email"],
-                "firstName" => $account["givenName"],
-                "lastName"  => $account["familyName"],
-            ];
+        if (empty($accessToken)) {
+            return [];
         }
 
-        if (!empty($idToken)) {
-            $result = self::$client->verifyIdToken($idToken);
-            return [
-                "email" => $result["email"],
-            ];
+        $response = Curl::post(self::BaseUrl . "userinfo", null, [
+            "Authorization" => "Bearer $accessToken",
+        ]);
+        if (empty($response["email"])) {
+            return [];
         }
 
-        return [];
+        return [
+            "email"     => $response["email"],
+            "firstName" => $response["given_name"],
+            "lastName"  => $response["family_name"],
+        ];
     }
 
     /**
      * Returns the Email from the given Token
      * @param string $accessToken
-     * @param string $idToken     Optional.
      * @return string
      */
-    public static function getAuthEmail(string $accessToken, string $idToken = ""): string {
-        $account = self::getAuthAccount($accessToken, $idToken);
+    public static function getAuthEmail(string $accessToken): string {
+        $account = self::getAuthAccount($accessToken);
         if (!empty($account["email"])) {
             return $account["email"];
         }
