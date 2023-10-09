@@ -8,7 +8,7 @@ use Framework\Config\Config;
  */
 class Mailjet {
 
-    const BaseUrl = "https://api.mailjet.com/v3.1";
+    const BaseUrl = "https://api.mailjet.com/v3.1/";
 
     private static bool   $loaded    = false;
     private static string $apiKey    = "";
@@ -50,7 +50,8 @@ class Mailjet {
     ): bool {
         self::load();
 
-        $data = [
+        $url    = self::BaseUrl . "send";
+        $params = [
             "Messages" => [
 				[
 					"From"     => [
@@ -69,7 +70,7 @@ class Mailjet {
             "Content-Type" => "application/json",
         ];
         $userPass = self::$apiKey . ":" . self::$apiSecret;
-        $response = Curl::post(self::BaseUrl . "/send", $data, $headers, true, $userPass);
+        $response = Curl::post($url, $params, $headers, $userPass, jsonBody: true);
 
         if (!empty($response["Messages"][0])) {
             return $response["Messages"][0]["Status"] == "success";

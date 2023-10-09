@@ -35,14 +35,14 @@ class MercadoPago {
      * Does a GET Request
      * @param string       $route
      * @param array{}|null $request
-     * @param boolean      $asJson
+     * @param boolean      $jsonResponse
      * @return mixed
      */
-    private static function get(string $route, ?array $request, bool $asJson = true): mixed {
+    private static function get(string $route, ?array $request, bool $jsonResponse = true): mixed {
         self::load();
         return Curl::get(self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$accessToken,
-        ], $asJson);
+        ], jsonResponse: $jsonResponse);
     }
 
     /**
@@ -56,7 +56,7 @@ class MercadoPago {
         return Curl::post(self::BaseUrl . $route, $request, [
             "content-type"  => "application/json",
             "Authorization" => "Bearer " . self::$accessToken,
-        ], true);
+        ], jsonBody: true);
     }
 
 

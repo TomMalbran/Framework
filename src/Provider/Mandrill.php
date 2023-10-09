@@ -8,7 +8,7 @@ use Framework\Config\Config;
  */
 class Mandrill {
 
-    const BaseUrl = "https://mandrillapp.com/api/1.0";
+    const BaseUrl = "https://mandrillapp.com/api/1.0/";
 
     private static bool   $loaded = false;
     private static string $apiKey = "";
@@ -48,10 +48,11 @@ class Mandrill {
     ): bool {
         self::load();
 
+        $url     = self::BaseUrl . "messages/send.json";
         $headers = [
             "Content-Type" => "application/json",
         ];
-        $data = [
+        $params = [
             "key"     => self::$apiKey,
             "message" => [
                 "to"                  => [
@@ -80,7 +81,7 @@ class Mandrill {
             "async"   => false,
             "send_at" => date("Y-m-d H:i:s"),
         ];
-        $response = Curl::post(self::BaseUrl . "/messages/send.json", $data, $headers, true);
+        $response = Curl::post($url, $params, $headers, jsonBody: true);
 
         if (empty($response["status"])) {
             return $response["status"] === "sent";

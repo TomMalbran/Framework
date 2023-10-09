@@ -8,7 +8,7 @@ use Framework\Config\Config;
  */
 class SendGrid {
 
-    const BaseUrl = "https://api.sendgrid.com/v3";
+    const BaseUrl = "https://api.sendgrid.com/v3/";
 
     private static bool   $loaded = false;
     private static string $apiKey = "";
@@ -48,11 +48,12 @@ class SendGrid {
     ): bool {
         self::load();
 
+        $url     = self::BaseUrl . "mail/send";
         $headers = [
             "Content-Type"  => "application/json",
             "Authorization" => "Bearer " . self::$apiKey,
         ];
-        $data = [
+        $params = [
             "personalizations" => [[ "to" => [[ "email" => $toEmail ]] ]],
             "from"             => [ "email" => $fromEmail, "name" => $fromName ],
             "subject"          => $subject,
@@ -63,7 +64,7 @@ class SendGrid {
                 ],
             ],
         ];
-        $response = Curl::post(self::BaseUrl . "/mail/send", $data, $headers, true);
+        $response = Curl::post($url, $params, $headers, jsonBody: true);
 
         return empty($response);
     }
