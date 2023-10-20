@@ -498,7 +498,7 @@ class Schema {
      * @return integer
      */
     public function createWithOrder(Request|array $fields, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): int {
-        $this->ensurePosOrder(null, $fields, $orderQuery);
+        $fields["position"] = $this->ensurePosOrder(null, $fields, $orderQuery);
         return $this->create($fields, $extra, $credentialID);
     }
 
@@ -513,7 +513,7 @@ class Schema {
      */
     public function editWithOrder(Query|int|string $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $model = $this->getOne($query);
-        $this->ensurePosOrder($model, $fields, $orderQuery);
+        $fields["position"] = $this->ensurePosOrder($model, $fields, $orderQuery);
         return $this->edit($query, $fields, $extra, $credentialID);
     }
 
@@ -569,16 +569,13 @@ class Schema {
      * @param ArrayAccess|array{}|null $oldFields
      * @param ArrayAccess|array{}|null $newFields
      * @param Query|null               $query     Optional.
-     * @return boolean
+     * @return integer
      */
-    public function ensurePosOrder(ArrayAccess|array|null $oldFields, ArrayAccess|array|null $newFields, ?Query $query = null): bool {
+    public function ensurePosOrder(ArrayAccess|array|null $oldFields, ArrayAccess|array|null $newFields, ?Query $query = null): int {
         $oldPosition = !empty($oldFields["position"]) ? (int)$oldFields["position"] : 0;
         $newPosition = !empty($newFields["position"]) ? (int)$newFields["position"] : 0;
         $updPosition = $this->ensureOrder($oldPosition, $newPosition, $query);
-        if (!empty($newFields)) {
-            $newFields["position"] = $updPosition;
-        }
-        return true;
+        return $updPosition;
     }
 
     /**
