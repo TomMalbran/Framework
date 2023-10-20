@@ -13,7 +13,7 @@ class DateTime {
     public static array $formats = [
         "time"          => "H:i",
         "dashes"        => "d-m-Y",
-        "dashesReverse" => "Y-d-m",
+        "dashesReverse" => "Y-m-d",
         "dashesTime"    => "d-m-Y H:i",
     ];
 
