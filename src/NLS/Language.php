@@ -2,6 +2,7 @@
 namespace Framework\NLS;
 
 use Framework\Framework;
+use Framework\NLS\LanguageEntity;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -11,10 +12,13 @@ use Framework\Utils\Strings;
  */
 class Language {
 
-    private static bool  $loaded = false;
+    private static bool $loaded = false;
 
-    /** @var array{}[] */
-    private static array $data   = [];
+    private static ?LanguageEntity $root = null;
+
+    /** @var LanguageEntity[] */
+    private static array $languages = [];
+
 
 
     /**
@@ -25,26 +29,24 @@ class Language {
         if (self::$loaded) {
             return false;
         }
+
+        $data = Framework::loadData(Framework::LanguageData);
+        foreach ($data as $key => $elem) {
+            $entity = new LanguageEntity($elem);
+            self::$languages[$key] = $entity;
+            if ($entity->isRoot) {
+                self::$root = $entity;
+            }
+        }
+        if (empty(self::$root)) {
+            self::$root = Arrays::getFirst(self::$languages);
+        }
+
         self::$loaded = true;
-        self::$data   = Framework::loadData(Framework::LanguageData);
         return true;
     }
 
 
-
-    /**
-     * Returns the Language Value from a Language Name
-     * @param string $langName
-     * @return array{}|null
-     */
-    public static function getOne(string $langName): ?array {
-        self::load();
-        $name = Strings::toLowerCase($langName);
-        if (isset(self::$data[$name])) {
-            return self::$data[$name];
-        }
-        return null;
-    }
 
     /**
      * Returns true if the given Language Value is valid for the given Group
@@ -53,25 +55,44 @@ class Language {
      */
     public static function isValid(string $value): bool {
         self::load();
-        return Arrays::containsKey(self::$data, $value);
+        return Arrays::containsKey(self::$languages, $value);
+    }
+
+    /**
+     * Returns the Language Value from a Language Name
+     * @param string $langName
+     * @return LanguageEntity|null
+     */
+    public static function getOne(string $langName): ?LanguageEntity {
+        self::load();
+        $isoCode = Strings::toLowerCase($langName);
+        if (isset(self::$languages[$isoCode])) {
+            return self::$languages[$isoCode];
+        }
+        return null;
     }
 
     /**
      * Returns a valid Language Code
-     * @param string $value
+     * @param string $langName
      * @return string
      */
-    public static function getCode(string $value): string {
+    public static function getCode(string $langName): string {
         self::load();
-        if ($value != "root" && !empty(self::$data[$value])) {
-            return $value;
+        $isoCode = Strings::toLowerCase($langName);
+        if ($isoCode != "root" && !empty(self::$languages[$isoCode])) {
+            return $isoCode;
         }
-        foreach (self::$data as $index => $row) {
-            if ($row["isRoot"]) {
-                return $index;
-            }
-        }
-        return Arrays::getFirstKey(self::$data);
+        return self::$root->key;
+    }
+
+    /**
+     * Returns the Language Root Code
+     * @return string
+     */
+    public static function getRootCode(): string {
+        self::load();
+        return self::$root->key;
     }
 
     /**
@@ -80,7 +101,7 @@ class Language {
      */
     public static function getAll(): array {
         self::load();
-        return Arrays::createMap(self::$data, "key", "name");
+        return Arrays::createMap(self::$languages, "key", "name");
     }
 
     /**
@@ -89,7 +110,7 @@ class Language {
      */
     public static function getSelect(): array {
         self::load();
-        return Select::create(self::$data, "key", "name");
+        return Select::create(self::$languages, "key", "name");
     }
 
 
@@ -101,19 +122,20 @@ class Language {
      * @return mixed
      */
     public static function __callStatic(string $function, array $arguments) {
+        self::load();
         $value = !empty($arguments[0]) ? $arguments[0] : "";
 
         // Function "isXxx": isSpanish("es") => true, isSpanish("en") => false
         if (Strings::startsWith($function, "is")) {
             $languageName = Strings::stripStart($function, "is");
             $language     = self::getOne($value);
-            return !empty($language) && Strings::isEqual($language["name"], $languageName);
+            return !empty($language) && Strings::isEqual($language->name, $languageName);
         }
 
         // Function "xxx": Spanish() => "es"
-        foreach (self::$data as $index => $row) {
-            if (Strings::isEqual($row["name"], $function)) {
-                return $index;
+        foreach (self::$languages as $isoCode => $language) {
+            if (Strings::isEqual($language->name, $function)) {
+                return $isoCode;
             }
         }
 
