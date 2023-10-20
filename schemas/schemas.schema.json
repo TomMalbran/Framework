@@ -79,7 +79,7 @@
                         "noEmpty"   : { "type" : "boolean"      },
                         "isSigned"  : { "type" : "boolean"      },
                         "noPrefix"  : { "type" : "boolean"      },
-                        "canEdit"   : { "type" : "boolean"      },
+                        "cantEdit"  : { "type" : "boolean"      },
                         "mergeTo"   : { "type" : "string"       },
                         "defaultTo" : { "type" : "string"       }
                     }
