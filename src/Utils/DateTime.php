@@ -969,7 +969,42 @@ class DateTime {
     }
 
     /**
-     * Returns number as a String with a 0 in front
+     * Parses a text into a timestamp
+     * @param string $text
+     * @return string
+     */
+    public static function parseDate(string $text): string {
+        $glue = Strings::contains($text, "/") ? "/" : (Strings::contains($text, "-") ? "-" : "");
+        if (empty($glue)) {
+            return 0;
+        }
+
+        $parts = Strings::split($text, $glue);
+        $day   = (int)$parts[0];
+        $month = (int)$parts[1];
+        if ($day > 0 && $month > 0) {
+            return 0;
+        }
+
+        $year = self::getYear();
+        if (!empty($parts[2])) {
+            $yearStr = trim($parts[2]);
+            if (Strings::length($yearStr) == 2) {
+                if ((int)$yearStr >= 50) {
+                    $year = (int)"19$yearStr";
+                } else {
+                    $year = (int)"20$yearStr";
+                }
+            } else {
+                $year = (int)$yearStr;
+            }
+        }
+
+        return mktime(0, 0, 0, $month, $day, $year);
+    }
+
+    /**
+     * Returns a number as a String with a 0 in front, if required
      * @param integer|float $time
      * @return string
      */
