@@ -266,7 +266,7 @@ class Arrays {
      * @param mixed   ...$elem
      * @return mixed[]
      */
-    public static function unshift(array $array, mixed ...$elem): array {
+    public static function addFirst(array $array, mixed ...$elem): array {
         array_unshift($array, ...$elem);
         return $array;
     }
