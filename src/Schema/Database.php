@@ -26,10 +26,11 @@ class Database {
     /**
      * Creates a new Database instance
      * @param mixed   $config  Object[
-     *    host      Usually localhost
-     *    username  Database username
-     *    password  Database password
-     *    database  Database name
+     *    host     Usually localhost
+     *    username Database username
+     *    password Database password
+     *    database Database name
+     *    charset  Database charset
      * ].
      * @param boolean $persist True to persist the connection. Defaults to false.
      */
