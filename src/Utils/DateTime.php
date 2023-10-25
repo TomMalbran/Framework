@@ -971,9 +971,9 @@ class DateTime {
     /**
      * Parses a text into a timestamp
      * @param string $text
-     * @return string
+     * @return integer
      */
-    public static function parseDate(string $text): string {
+    public static function parseDate(string $text): int {
         $glue = Strings::contains($text, "/") ? "/" : (Strings::contains($text, "-") ? "-" : "");
         if (empty($glue)) {
             return 0;
