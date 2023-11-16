@@ -43,6 +43,24 @@ class Select implements ArrayAccess, JsonSerializable {
     }
 
     /**
+     * Returns true if there is an Extra Value
+     * @return boolean
+     */
+    public function hasExtra(): bool {
+        return !empty($this->extraValue);
+    }
+
+    /**
+     * Returns the Extra Value
+     * @return mixed
+     */
+    public function getExtra(): mixed {
+        return $this->extraValue;
+    }
+
+
+
+    /**
      * Implements the Array Access Interface
      * @param mixed $key
      * @return mixed
