@@ -258,7 +258,31 @@ class Arrays {
         return $result;
     }
 
+    /**
+     * Removes the duplicate entries from the given array
+     * @param mixed[] $array
+     * @return mixed[]
+     */
+    public static function removeDuplicates(array $array): array {
+        $result = [];
+        foreach ($array as $value) {
+            if (!self::contains($result, $value)) {
+                $result[] = $value;
+            }
+        }
+        return $result;
+    }
 
+
+
+    /**
+     * Merges the given Arrays
+     * @param mixed[] ...$arrays
+     * @return mixed[]
+     */
+    public static function merge(array ...$arrays): array {
+        return array_merge(...$arrays);
+    }
 
     /**
      * Adds the given element to the start of the Array
@@ -337,6 +361,8 @@ class Arrays {
     public static function sort(array &$array, ?callable $callback = null): array {
         if (empty($callback)) {
             sort($array);
+        } elseif (self::isMap($array)) {
+            uasort($array, $callback);
         } else {
             usort($array, $callback);
         }
@@ -521,6 +547,22 @@ class Arrays {
         $lastKey = array_key_last($array);
         $value   = $array[$lastKey];
         return !empty($key) ? self::getValue($value, $key) : $value;
+    }
+
+    /**
+     * Returns the index of the given needle
+     * @param mixed[] $array
+     * @param mixed   $needle
+     * @param boolean $caseInsensitive
+     * @return integer
+     */
+    public static function getIndex(array $array, mixed $needle, bool $caseInsensitive = false): int {
+        foreach ($array as $index => $elem) {
+            if (Strings::isEqual($elem, $needle, $caseInsensitive)) {
+                return $index;
+            }
+        }
+        return -1;
     }
 
     /**
