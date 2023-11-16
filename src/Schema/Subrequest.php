@@ -24,6 +24,7 @@ class SubRequest {
     private string $orderBy  = "";
     private bool   $isAsc    = false;
 
+    private bool   $asArray  = false;
     private string $field    = "";
     private mixed  $value    = null;
 
@@ -46,6 +47,7 @@ class SubRequest {
         $this->orderBy  = !empty($data["orderBy"]) ? $data["orderBy"] : "";
         $this->isAsc    = !empty($data["isAsc"])   ? $data["isAsc"]   : false;
 
+        $this->asArray  = !empty($data["asArray"]);
         $this->field    = !empty($data["field"])   ? $data["field"]   : "";
         $this->value    = !empty($data["value"])   ? $data["value"]   : null;
     }
@@ -67,11 +69,22 @@ class SubRequest {
             if (empty($subResult[$name])) {
                 $subResult[$name] = [];
             }
-            if (!empty($this->field)) {
-                $subResult[$name][$row[$this->field]] = $this->getValues($row);
-            } else {
+
+            if (empty($this->field)) {
                 $subResult[$name][] = $this->getValues($row);
+                continue;
             }
+
+            $field = $row[$this->field];
+            if (!$this->asArray) {
+                $subResult[$name][$field] = $this->getValues($row);
+                continue;
+            }
+
+            if (empty($subResult[$name][$field])) {
+                $subResult[$name][$field] = [];
+            }
+            $subResult[$name][$field][] = $this->getValues($row);
         }
 
         foreach ($result as $index => $row) {

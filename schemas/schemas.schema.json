@@ -159,6 +159,7 @@
                         "where"   : { "type" : "array"   },
                         "orderBy" : { "type" : "string"  },
                         "isAsc"   : { "type" : "boolean" },
+                        "asArray" : { "type" : "boolean" },
                         "field"   : { "type" : "string"  },
                         "value"   : {                    }
                     }
