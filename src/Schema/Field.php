@@ -209,7 +209,7 @@ class Field {
             $result = $request->toCents($this->name);
             break;
         case self::Date:
-            if (!empty($this->date)) {
+            if (!empty($this->date) && $request->has($this->date)) {
                 $result = $request->toDay($this->date, $this->dateType, true);
             } elseif (Numbers::isValid($request->get($this->name))) {
                 $result = $request->getInt($this->name);
