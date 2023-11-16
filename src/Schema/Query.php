@@ -691,6 +691,20 @@ class Query {
         return $query;
     }
 
+    /**
+     * Creates a new Query with a Pagination
+     * @param integer $page   Optional.
+     * @param integer $amount Optional.
+     * @return Query
+     */
+    public static function createPaginate(int $page = 0, int $amount = 0): Query {
+        $query = new Query();
+        if (!empty($page) && !empty($amount)) {
+            $query->paginate($page, $amount);
+        }
+        return $query;
+    }
+
 
 
     /**
