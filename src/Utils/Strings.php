@@ -395,7 +395,7 @@ class Strings {
     }
 
     /**
-     * Joins the given Strings keys using the given glue
+     * Joins the given String keys using the given glue
      * @param string[]|string $value
      * @param string          $glue  Optional.
      * @return string
@@ -405,6 +405,21 @@ class Strings {
             return $value;
         }
         return implode($glue, array_keys($value));
+    }
+
+    /**
+     * Joins the given String values using the given glue
+     * @param string[]|string $value
+     * @param string          $key
+     * @param string          $glue  Optional.
+     * @return string
+     */
+    public static function joinValues(array|string $value, string $key, string $glue = ""): string {
+        if (!Arrays::isArray($value)) {
+            return $value;
+        }
+        $value = Arrays::createArray($value, $key);
+        return implode($glue, $value);
     }
 
     /**
