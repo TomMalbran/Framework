@@ -982,7 +982,7 @@ class DateTime {
         $parts = Strings::split($text, $glue);
         $day   = (int)$parts[0];
         $month = (int)$parts[1];
-        if ($day > 0 && $month > 0) {
+        if (empty($day) || empty($month)) {
             return 0;
         }
 
