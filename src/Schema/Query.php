@@ -73,10 +73,12 @@ class Query {
      * @param string                 $column
      * @param string                 $expression
      * @param mixed[]|integer|string $value
+     * @param boolean                $caseSensitive Optional.
      * @return Query
      */
-    public function add(string $column, string $expression, array|int|string $value): Query {
+    public function add(string $column, string $expression, array|int|string $value, bool $caseSensitive = false): Query {
         $prefix = $this->getPrefix();
+        $suffix = $caseSensitive ? "BINARY" : "";
         $binds  = "?";
 
         switch ($expression) {
@@ -122,7 +124,7 @@ class Query {
         }
         $values = Arrays::toArray($value);
 
-        $this->where    .= "{$prefix} {$column} {$expression} {$binds} ";
+        $this->where    .= "{$prefix} {$column} {$expression} {$suffix} {$binds} ";
         $this->params    = array_merge($this->params, $values);
         $this->columns[] = $column;
         return $this;
