@@ -150,18 +150,23 @@ class ErrorLog {
      */
     public static function shutdown(): bool {
         $error = error_get_last();
-        if (!is_null($error)) {
-            return self::handler($error["type"], $error["message"], $error["file"], $error["line"]);
+        if (is_null($error)) {
+            return false;
         }
-        return false;
+        return self::handler(
+            $error["type"],
+            $error["message"],
+            $error["file"],
+            $error["line"],
+        );
     }
 
     /**
      * Handles the PHP Error
      * @param integer $code
      * @param string  $description
-     * @param string  $filePath
-     * @param integer $line
+     * @param string  $filePath    Optional.
+     * @param integer $line        Optional.
      * @return boolean
      */
     public static function handler(int $code, string $description, string $filePath = "", int $line = 0): bool {
@@ -237,7 +242,7 @@ class ErrorLog {
         case E_NOTICE:
         case E_USER_NOTICE:
             $error = "Notice";
-            $log   = LOG_NOTICE;
+            $level = LOG_NOTICE;
             break;
         case E_STRICT:
             $error = "Strict";
