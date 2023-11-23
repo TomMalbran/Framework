@@ -7,6 +7,7 @@ use Framework\Utils\Strings;
 
 use mysqli;
 use mysqli_stmt;
+use mysqli_sql_exception;
 
 /**
  * The mysqli Database Wrapper
@@ -226,7 +227,11 @@ class Database {
         $expression .= $this->buildInsertHeader($fields);
         $expression .= $this->buildTableData($fields, $bindParams, true);
         $statement   = $this->processQuery($expression, $bindParams);
-        $result      = $statement->affected_rows > 0 ? $statement->insert_id : -1;
+
+        if (empty($statement)) {
+            return 0;
+        }
+        $result = $statement->affected_rows > 0 ? $statement->insert_id : -1;
         $statement->close();
         return $result;
     }
@@ -338,44 +343,49 @@ class Database {
      * @return mysqli_stmt|null
      */
     private function processQuery(string $expression, array $bindParams = []): ?mysqli_stmt {
-        $query     = Strings::replace(trim($expression), "\n", "");
-        $statement = $this->mysqli->prepare($expression);
-
-        if (!$statement) {
-            trigger_error("Problem preparing query: {$this->mysqli->error} ($query)", E_USER_ERROR);
-            return null;
-        }
-
-        if (Arrays::isArray($bindParams) && !empty($bindParams)) {
-            $params = [ "" ];
-            foreach ($bindParams as $value) {
-                $params[0] .= $this->determineType($value);
-                array_push($params, $value);
-            }
-
-            $values = $this->refValues($params);
-            if (!$statement->bind_param(...$values)) {
-                trigger_error("Problem binding param: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
+        try {
+            $query     = Strings::replace(trim($expression), "\n", "");
+            $statement = $this->mysqli->prepare($expression);
+            if (!$statement) {
                 return null;
             }
-        }
 
-        $statement->execute();
-        if (!empty($statement->error)) {
-            trigger_error("Problem executing query: {$statement->error} {$this->mysqli->error} ($query)", E_USER_ERROR);
-            $statement->close();
+            if (Arrays::isArray($bindParams) && !empty($bindParams)) {
+                $params = [ "" ];
+                foreach ($bindParams as $value) {
+                    $params[0] .= $this->determineType($value);
+                    array_push($params, $value);
+                }
+
+                $values = $this->refValues($params);
+                if (!$statement->bind_param(...$values)) {
+                    return null;
+                }
+            }
+
+            if (!$statement->execute()) {
+                $statement->close();
+                return null;
+            }
+            return $statement;
+
+        // Catch any MySQL Error and throw it to the Error Log
+        } catch (mysqli_sql_exception $e) {
+            $message = $e->getMessage();
+            trigger_error("MySQL Error: $message.\n\n$query", E_USER_ERROR);
             return null;
         }
-
-        return $statement;
     }
 
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
-     * @param mysqli_stmt $statement
+     * @param mysqli_stmt|null $statement
      * @return boolean
      */
-    private function closeQuery(mysqli_stmt $statement): bool {
+    private function closeQuery(?mysqli_stmt $statement): bool {
+        if ($statement === null) {
+            return false;
+        }
         $result = $statement->affected_rows > 0;
         $statement->close();
         return $result;
@@ -440,10 +450,13 @@ class Database {
 
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
-     * @param mysqli_stmt $statement
+     * @param mysqli_stmt|null $statement
      * @return array{}[]
      */
-    private function dynamicBindResults(mysqli_stmt $statement): array {
+    private function dynamicBindResults(?mysqli_stmt $statement): array {
+        if ($statement === null) {
+            return [];
+        }
         $parameters = [];
         $results    = [];
         $meta       = $statement->result_metadata();
@@ -883,7 +896,7 @@ class Database {
 
         foreach ($request as $row) {
             // Make the CREATE for this column.
-            $result .= "  " . $row["Field"] . " " . $row["Type"] . ($row["Null"] != "YES" ? " NOT NULL" : "");
+            $result .= "  {$row["Field"]} {$row["Type"]}" . ($row["Null"] != "YES" ? " NOT NULL" : "");
 
             // Add a default...?
             if (isset($row["Default"])) {
@@ -896,7 +909,7 @@ class Database {
             }
 
             // And now any extra information. (such as auto_increment.)
-            $result .= ($row["Extra"] != "" ? " " . $row["Extra"] : "") . "," . $crlf;
+            $result .= ($row["Extra"] != "" ? " {$row["Extra"]}" : "") . ",$crlf";
         }
 
         // Take off the last comma.
@@ -911,11 +924,11 @@ class Database {
             if ($row["Key_name"] == "PRIMARY") {
                 $row["Key_name"] = "PRIMARY KEY";
             } elseif (empty($row["Non_unique"])) {
-                $row["Key_name"] = "UNIQUE " . $row["Key_name"];
+                $row["Key_name"] = "UNIQUE {$row["Key_name"]}";
             } elseif ($row["Comment"] == "FULLTEXT" || (isset($row["Index_type"]) && $row["Index_type"] == "FULLTEXT")) {
-                $row["Key_name"] = "FULLTEXT " . $row["Key_name"];
+                $row["Key_name"] = "FULLTEXT {$row["Key_name"]}";
             } else {
-                $row["Key_name"] = "KEY " . $row["Key_name"];
+                $row["Key_name"] = "KEY {$row["Key_name"]}";
             }
 
             // Is this the first column in the index?
@@ -934,7 +947,7 @@ class Database {
         // Build the CREATEs for the keys.
         foreach ($indexes as $keyName => $columns) {
             ksort($columns);
-            $result .= "," . $crlf . "  $keyName (" . Strings::join($columns, ", ") . ")";
+            $result .= ",$crlf $keyName (" . Strings::join($columns, ", ") . ")";
         }
 
         // Now just get the comment and type...
@@ -964,7 +977,7 @@ class Database {
             $start  += 250;
 
             if (!empty($request)) {
-                $result .= "INSERT INTO `$tableName`" . $crlf . "\t(`" . Strings::joinKeys($request[0], "`, `") . "`) $crlf VALUES ";
+                $result .= "INSERT INTO `$tableName` $crlf\t(`" . Strings::joinKeys($request[0], "`, `") . "`) $crlf VALUES ";
 
                 foreach ($request as $index => $row) {
                     $fieldList = [];
@@ -981,10 +994,10 @@ class Database {
                     $result .= "(" . Strings::join($fieldList, ", ") . ")";
 
                     if ($index < count($request) - 1) {
-                        $result .= "," . $crlf . "\t";
+                        $result .= ",$crlf\t";
                     }
                 }
-                $result .= ";" . $crlf;
+                $result .= ";$crlf";
             }
         } while (!empty($request));
 
