@@ -34,7 +34,10 @@ class Join {
     public array  $defaults   = [];
 
     /** @var string[] */
-    public array  $orKeys    = [];
+    public array  $andKeys    = [];
+
+    /** @var string[] */
+    public array  $orKeys     = [];
 
 
     /**
@@ -51,6 +54,7 @@ class Join {
         $this->rightKey   = !empty($data["rightKey"])   ? $data["rightKey"]   : $key;
         $this->and        = !empty($data["and"])        ? $data["and"]        : "";
         $this->andKey     = !empty($data["andKey"])     ? $data["andKey"]     : "";
+        $this->andKeys    = !empty($data["andKeys"])    ? $data["andKeys"]    : [];
         $this->orKeys     = !empty($data["orKeys"])     ? $data["orKeys"]     : [];
         $this->andValue   = !empty($data["andValue"])   ? $data["andValue"]   : "";
         $this->andTable   = !empty($data["andTable"])   ? $data["andTable"]   : "";
@@ -139,11 +143,19 @@ class Join {
     public function getAnd(string $asTable): string {
         $onTable = $this->andTable ?: $asTable;
         $result  = "";
+
         if (!empty($this->and)) {
             $result .= " AND {$this->and}";
         }
         if (!empty($this->andKey)) {
             $result .= " AND $asTable.{$this->andKey} = $onTable.{$this->andKey}";
+        }
+        if (!empty($this->andKeys)) {
+            $parts = [];
+            foreach ($this->andKeys as $orKey) {
+                $parts[] = "$asTable.{$orKey} = $onTable.{$orKey}";
+            }
+            $result .= " AND " . implode(" AND ", $parts);
         }
         if (!empty($this->orKeys)) {
             $parts = [];
