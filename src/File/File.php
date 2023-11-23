@@ -93,11 +93,25 @@ class File {
      */
     public static function read(string ...$pathParts): string {
         $fullPath = self::getPath(...$pathParts);
-        if (!empty($fullPath) && file_exists($fullPath)) {
-            $result = file_get_contents($fullPath);
-            return $result != false ? $result : "";
+        if (empty($fullPath) || !file_exists($fullPath)) {
+            return "";
         }
-        return "";
+        $result = file_get_contents($fullPath);
+        return $result !== false ? $result : "";
+    }
+
+    /**
+     * Reads the contents of a url
+     * @param string $fileUrl
+     * @return string
+     */
+    public static function readUrl(string $fileUrl): string {
+        if (empty($fileUrl)) {
+            return "";
+        }
+        $fileUrl = str_replace(" ", "%20", $fileUrl);
+        $result  = file_get_contents($fileUrl);
+        return $result !== false ? $result : "";
     }
 
     /**
