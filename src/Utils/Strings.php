@@ -448,14 +448,21 @@ class Strings {
      * @param mixed   $string
      * @param mixed   $other
      * @param boolean $caseInsensitive Optional.
+     * @param boolean $trimValues      Optional.
      * @return boolean
      */
-    public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true): bool {
+    public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true, bool $trimValues = true): bool {
         if (!self::isString($string) || !self::isString($other)) {
             return $string == $other;
         }
+
         if ($caseInsensitive) {
-            return strtolower($string) === strtolower($other);
+            $string = strtolower($string);
+            $other  = strtolower($other);
+        }
+        if ($trimValues) {
+            $string = trim($string);
+            $other  = trim($other);
         }
         return $string === $other;
     }
