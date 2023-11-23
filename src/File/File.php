@@ -266,18 +266,30 @@ class File {
 
     /**
      * Returns all the Files inside the given path
-     * @param string $path
+     * @param string  $path
+     * @param boolean $recursive Optional.
      * @return string[]
      */
-    public static function getFilesInDir(string $path): array {
+    public static function getFilesInDir(string $path, bool $recursive = false): array {
         $result = [];
-        if (!empty($path)) {
+        if (empty($path)) {
+            return $result;
+        }
+        if (is_dir($path)) {
             $files = scandir($path);
             foreach ($files as $file) {
-                if ($file != "." && $file != ".." && !is_dir("$path/$file")) {
+                if ($file == "." || $file == "..") {
+                    continue;
+                }
+                if ($recursive) {
+                    $response = self::getFilesInDir("$path/$file", true);
+                    $result   = array_merge($result, $response);
+                } else {
                     $result[] = $file;
                 }
             }
+        } else {
+            $result[] = $path;
         }
         return $result;
     }
