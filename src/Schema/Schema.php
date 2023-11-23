@@ -11,6 +11,7 @@ use Framework\Schema\Field;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
+use Framework\Utils\Search;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -261,32 +262,18 @@ class Schema {
     }
 
     /**
-     * Returns the search results
+     * Returns the Search results
      * @param Query                $query
      * @param string[]|string|null $name   Optional.
      * @param string|null          $idName Optional.
-     * @return array{}[]
+     * @return Search[]
      */
     public function getSearch(Query $query, array|string $name = null, ?string $idName = null): array {
         $query   = $this->generateQuery($query);
         $request = $this->request($query);
         $idKey   = $idName ?: $this->structure->idName;
         $nameKey = $name   ?: $this->structure->nameKey;
-        $ids     = [];
-        $result  = [];
-
-        foreach ($request as $row) {
-            $id = $row[$idKey];
-            if (!in_array($id, $ids)) {
-                $result[] = [
-                    "id"    => $id,
-                    "title" => Arrays::getValue($row, $nameKey),
-                    "data"  => $row,
-                ];
-                $ids[] = $id;
-            }
-        }
-        return $result;
+        return Search::create($request, $idKey, $nameKey);
     }
 
     /**

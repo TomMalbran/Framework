@@ -8,6 +8,8 @@ use Framework\Request;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
+use Framework\Utils\Search;{{#hasSelect}}
+use Framework\Utils\Select;{{/hasSelect}}
 
 /**
  * The {{name}} Schema
@@ -277,9 +279,20 @@ class {{name}}Schema {
         return self::schema()->getTotal($query{{#canDelete}}, $withDeleted{{/canDelete}});
     }
 
+    /**
+     * Returns the Search results of {{name}} Entities
+     * @param Query $query
+     * @param string[]|string|null $name Optional.
+     * @param string|null $idName Optional.
+     * @return Search[]
+     */
+    public static function getSearch(Query $query, array|string $name = null, ?string $idName = null): array {
+        return self::schema()->getSearch($query, $name, $idName);
+    }
+
 {{#hasSelect}}
     /**
-     * Returns a select of {{name}} Entities{{#parents}}
+     * Returns a Select of {{name}} Entities{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
      * @return Select[]
      */
@@ -291,7 +304,6 @@ class {{name}}Schema {
     }
 
 {{/hasSelect}}
-
 
 {{#canCreate}}
 
