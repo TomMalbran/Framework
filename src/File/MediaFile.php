@@ -62,9 +62,10 @@ class MediaFile {
         self::load();
         $result = 0;
 
-        if (!empty(self::$data["updates"])) {
+        if (empty(self::$data["updates"])) {
             return false;
         }
+
         foreach (self::$data["updates"] as $field) {
             $updated = false;
             if (!empty($field["isJson"]) && $field["isJson"]) {
@@ -120,7 +121,7 @@ class MediaFile {
      * @return string
      */
     public static function getThumbUrl(string ...$pathParts): string {
-        return Config::getFileUrl(Framework::FilesDir, self::Source, self::$id, ...$pathParts);
+        return Config::getFileUrl(Framework::FilesDir, self::Thumbs, self::$id, ...$pathParts);
     }
 
     /**
