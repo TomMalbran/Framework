@@ -3,6 +3,7 @@ namespace Framework\File;
 
 use Framework\File\File;
 use Framework\Utils\Arrays;
+use Framework\Utils\Strings;
 
 /**
  * The Image Utils
@@ -57,6 +58,17 @@ class Image {
      */
     public static function getType(string $fileName): int {
         return exif_imagetype($fileName);
+    }
+
+    /**
+     * Returns the Mime Type of the Image
+     * @param string $fileUrl
+     * @return string
+     */
+    public static function getMimeType(string $fileUrl): string {
+        $fileUrl   = Strings::encodeUrl($fileUrl);
+        $imageType = exif_imagetype($fileUrl);
+        return image_type_to_mime_type($imageType);
     }
 
     /**
