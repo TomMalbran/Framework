@@ -109,7 +109,7 @@ class File {
         if (empty($fileUrl)) {
             return "";
         }
-        $fileUrl = str_replace(" ", "%20", $fileUrl);
+        $fileUrl = Strings::encodeUrl($fileUrl);
         $result  = file_get_contents($fileUrl);
         return $result !== false ? $result : "";
     }

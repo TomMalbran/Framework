@@ -644,6 +644,15 @@ class Strings {
     }
 
     /**
+     * Encodes the url
+     * @param string $url
+     * @return string
+     */
+    public static function encodeUrl(string $url): string {
+        return str_replace(" ", "%20", $url);
+    }
+
+    /**
      * Sanitizes a String
      * @param string  $string
      * @param boolean $lowercase Optional.
