@@ -18,6 +18,7 @@ class Curl {
      * @param array{}|null $headers      Optional.
      * @param string       $userPass     Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $returnError  Optional.
      * @return mixed
      */
     public static function get(
@@ -26,9 +27,10 @@ class Curl {
         ?array $headers = null,
         string $userPass = "",
         bool $jsonResponse = true,
+        bool $returnError = false,
     ): mixed {
         $url = self::parseUrl($url, $params);
-        return self::execute($url, $headers, null, $userPass, $jsonResponse);
+        return self::execute($url, $headers, null, $userPass, $jsonResponse, $returnError);
     }
 
     /**
@@ -40,6 +42,7 @@ class Curl {
      * @param boolean      $jsonBody     Optional.
      * @param boolean      $urlBody      Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $returnError  Optional.
      * @return mixed
      */
     public static function post(
@@ -50,6 +53,7 @@ class Curl {
         bool $jsonBody = false,
         bool $urlBody = false,
         bool $jsonResponse = true,
+        bool $returnError = false,
     ): mixed {
         $body = $params;
         if ($jsonBody) {
@@ -57,7 +61,7 @@ class Curl {
         } elseif ($urlBody) {
             $body = self::parseParams($params);
         }
-        return self::execute($url, $headers, $body, $userPass, $jsonResponse);
+        return self::execute($url, $headers, $body, $userPass, $jsonResponse, $returnError);
     }
 
     /**
@@ -69,6 +73,7 @@ class Curl {
      * @param string       $userPass     Optional.
      * @param boolean      $jsonBody     Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $returnError  Optional.
      * @return mixed
      */
     public static function custom(
@@ -79,9 +84,11 @@ class Curl {
         string $userPass = "",
         bool $jsonBody = false,
         bool $jsonResponse = true,
+        bool $returnError = false,
     ): mixed {
         $options = [
             CURLOPT_URL             => $url,
+            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_CUSTOMREQUEST   => $request,
             CURLOPT_TIMEOUT         => 100,
@@ -93,7 +100,7 @@ class Curl {
 
         // Set the Params
         if ($jsonBody) {
-            $options[CURLOPT_POSTFIELDS] = json_encode($params);
+            $options[CURLOPT_POSTFIELDS] = JSON::encode($params);
         } else {
             $options[CURLOPT_URL] = self::parseUrl($url, $params);
         }
@@ -109,16 +116,7 @@ class Curl {
         }
 
         // Execute the Curl
-        $curl = curl_init();
-        curl_setopt_array($curl, $options);
-        $output = curl_exec($curl);
-        curl_close($curl);
-
-        // Return the Response as a String
-        if (!$jsonResponse) {
-            return $output;
-        }
-        return json_decode($output, true);
+        return self::executeCurl($options, $jsonResponse, $returnError);
     }
 
     /**
@@ -200,14 +198,16 @@ class Curl {
      * @param mixed|null   $body         Optional.
      * @param string       $userPass     Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $returnError  Optional.
      * @return mixed
      */
-    public static function execute(
+    private static function execute(
         string $url,
         ?array $headers = null,
         mixed $body = null,
         string $userPass = "",
         bool $jsonResponse = true,
+        bool $returnError = false,
     ): mixed {
         $options = [
             CURLOPT_URL             => $url,
@@ -243,10 +243,30 @@ class Curl {
         }
 
         // Execute the Curl
+        return self::executeCurl($options, $jsonResponse, $returnError);
+    }
+
+    /**
+     * Executes the CURL
+     * @param array{} $options
+     * @param boolean $jsonResponse
+     * @param boolean $returnError
+     * @return mixed
+     */
+    private static function executeCURL(array $options, bool $jsonResponse, bool $returnError): mixed {
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         $response = curl_exec($curl);
         curl_close($curl);
+
+        // Return the Error
+        if ($returnError && $response === false) {
+            $error = curl_errno($curl) . ": " . curl_error($curl);
+            if (!$jsonResponse) {
+                return $error;
+            }
+            return [ "error" => $error ];
+        }
 
         // Return the Response as a String
         if (!$jsonResponse) {
