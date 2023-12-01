@@ -15,47 +15,126 @@ class Select implements ArrayAccess, JsonSerializable {
     public string|int $key;
     public string     $value;
 
-    private string    $extraKey   = "";
-    private mixed     $extraValue = null;
+    /** @var array<string,mixed> */
+    private array     $extras = [];
 
 
     /**
      * Creates a new Select instance
-     * @param string|integer $key
-     * @param string         $value
+     * @param string|integer      $key
+     * @param string              $value
+     * @param array<string,mixed> $extras Optional.
      */
-    public function __construct(string|int $key, string $value) {
-        $this->id    = (int)$key;
-        $this->key   = $key;
-        $this->value = $value;
+    public function __construct(string|int $key, string $value, array $extras = []) {
+        $this->id     = (int)$key;
+        $this->key    = $key;
+        $this->value  = $value;
+        $this->extras = $extras;
     }
 
     /**
-     * Sets the Extra key and value
+     * Set an Extra key and value
      * @param string $key
      * @param mixed  $value
      * @return Select
      */
     public function setExtra(string $key, mixed $value): Select {
-        $this->extraKey   = $key;
-        $this->extraValue = $value;
+        $this->extras[$key] = $value;
         return $this;
     }
 
     /**
      * Returns true if there is an Extra Value
+     * @param string $key Optional.
      * @return boolean
      */
-    public function hasExtra(): bool {
-        return !empty($this->extraValue);
+    public function hasExtra(string $key = ""): bool {
+        if (empty($key)) {
+            return !empty($this->extras);
+        }
+        return array_key_exists($key, $this->extras);
     }
 
     /**
      * Returns the Extra Value
+     * @param string $key
      * @return mixed
      */
-    public function getExtra(): mixed {
-        return $this->extraValue;
+    public function getExtra(string $key): mixed {
+        if (array_key_exists($key, $this->extras)) {
+            return $this->extras[$key];
+        }
+        return null;
+    }
+
+
+
+    /**
+     * Returns true if the key exists
+     * @param mixed $key
+     * @return boolean
+     */
+    public function has(mixed $key): bool {
+        return property_exists($this, $key) || array_key_exists($key, $this->extras);
+    }
+
+    /**
+     * Returns the Data
+     * @param mixed $key
+     * @return mixed
+     */
+    public function get(mixed $key): mixed {
+        if (property_exists($this, $key)) {
+            return $this->$key;
+        }
+        if (!empty($this->extras[$key])) {
+            return $this->extras[$key];
+        }
+        return null;
+    }
+
+    /**
+     * Sets the Data
+     * @param mixed $key
+     * @param mixed $value
+     * @return void
+     */
+    public function set(mixed $key, mixed $value): void {
+        if (property_exists($this, $key)) {
+            $this->$key = $value;
+        } elseif (array_key_exists($key, $this->extras)) {
+            $this->extras[$key] = $value;
+        }
+    }
+
+
+
+    /**
+     * Implements the Object exists
+     * @param string $key
+     * @return boolean
+     */
+    public function __isset(string $key): bool {
+        return $this->has($key);
+    }
+
+    /**
+     * Implements the Object Get
+     * @param string $key
+     * @return mixed
+     */
+    public function __get(string $key): mixed {
+        return $this->get($key);
+    }
+
+    /**
+     * Implements the Object Set
+     * @param string $key
+     * @param mixed  $value
+     * @return void
+     */
+    public function __set(string $key, mixed $value): void {
+        $this->set($key, $value);
     }
 
 
@@ -63,16 +142,19 @@ class Select implements ArrayAccess, JsonSerializable {
     /**
      * Implements the Array Access Interface
      * @param mixed $key
+     * @return boolean
+     */
+    public function offsetExists(mixed $key): bool {
+        return $this->has($key);
+    }
+
+    /**
+     * Implements the Array Access Interface
+     * @param mixed $key
      * @return mixed
      */
     public function offsetGet(mixed $key): mixed {
-        if ($key === $this->extraKey) {
-            return $this->extraValue;
-        }
-        if (property_exists($this, $key)) {
-            return $this->$key;
-        }
-        return null;
+        return $this->get($key);
     }
 
     /**
@@ -82,20 +164,7 @@ class Select implements ArrayAccess, JsonSerializable {
      * @return void
      */
     public function offsetSet(mixed $key, mixed $value): void {
-        if ($key === $this->extraKey) {
-            $this->extraValue = $value;
-        } elseif (property_exists($this, $key)) {
-            $this->$key = $value;
-        }
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return boolean
-     */
-    public function offsetExists(mixed $key): bool {
-        return $key === $this->extraKey || property_exists($this, $key);
+        $this->set($key, $value);
     }
 
     /**
@@ -104,11 +173,10 @@ class Select implements ArrayAccess, JsonSerializable {
      * @return void
      */
     public function offsetUnset(mixed $key): void {
-        if ($key === $this->extraKey) {
-            $this->extraKey   = "";
-            $this->extraValue = null;
-        } elseif (property_exists($this, $key)) {
+        if (property_exists($this, $key)) {
             unset($this->$key);
+        } elseif (!empty($this->extras[$key])) {
+            unset($this->extras[$key]);
         }
     }
 
@@ -121,8 +189,8 @@ class Select implements ArrayAccess, JsonSerializable {
             "key"   => $this->key,
             "value" => $this->value,
         ];
-        if (!empty($this->extraKey)) {
-            $result[$this->extraKey] = $this->extraValue;
+        foreach ($this->extras as $key => $value) {
+            $result[$key] = $value;
         }
         return $result;
     }
