@@ -20,9 +20,9 @@ class Search implements ArrayAccess, JsonSerializable {
      * Creates a new Search instance
      * @param integer|string $id
      * @param string         $title
-     * @param mixed          $data
+     * @param mixed          $data  Optional.
      */
-    public function __construct(int|string $id, string $title, mixed $data) {
+    public function __construct(int|string $id, string $title, mixed $data = []) {
         $this->id    = (int)$id;
         $this->title = $title;
         $this->data  = $data;
