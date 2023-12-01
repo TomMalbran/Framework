@@ -47,13 +47,14 @@
         "table"  : "credentials_devices",
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
-            "playerID"      : { "type" : "string",                          "isPrimary" : true }
+            "userAgent"     : { "type" : "string",                          "isPrimary" : true },
+            "playerID"      : { "type" : "string"                                              }
         },
         "foreigns" : {
             "CREDENTIAL_ID" : { "table" : "credentials" }
         },
         "hasTimestamps" : true,
-        "canCreate"     : true,
+        "canCreate"     : false,
         "canEdit"       : true,
         "canDelete"     : false
     },

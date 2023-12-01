@@ -4,6 +4,7 @@ namespace Framework\Auth;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
+use Framework\Utils\Server;
 
 /**
  * The Credential Devices
@@ -52,6 +53,7 @@ class Device {
     public static function add(int $credentialID, string $playerID): bool {
         return self::schema()->replace([
             "CREDENTIAL_ID" => $credentialID,
+            "userAgent"     => Server::getUserAgent(),
             "playerID"      => $playerID,
         ]);
     }
