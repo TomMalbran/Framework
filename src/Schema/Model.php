@@ -140,7 +140,7 @@ class Model implements ArrayAccess, JsonSerializable {
 
 
     /**
-     * Returns true if the key exists
+     * Implements the Object exists
      * @param string $key
      * @return boolean
      */
@@ -163,7 +163,7 @@ class Model implements ArrayAccess, JsonSerializable {
 
 
     /**
-     * Sets the Data
+     * Implements the Object Set
      * @param string $key
      * @param mixed  $value
      * @return void
@@ -357,6 +357,15 @@ class Model implements ArrayAccess, JsonSerializable {
     /**
      * Implements the Array Access Interface
      * @param mixed $key
+     * @return boolean
+     */
+    public function offsetExists(mixed $key): bool {
+        return array_key_exists($key, $this->data);
+    }
+
+    /**
+     * Implements the Array Access Interface
+     * @param mixed $key
      * @return mixed
      */
     public function offsetGet(mixed $key): mixed {
@@ -371,15 +380,6 @@ class Model implements ArrayAccess, JsonSerializable {
      */
     public function offsetSet(mixed $key, mixed $value): void {
         $this->set($key, $value);
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return boolean
-     */
-    public function offsetExists(mixed $key): bool {
-        return array_key_exists($key, $this->data);
     }
 
     /**
