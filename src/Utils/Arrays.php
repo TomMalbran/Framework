@@ -361,10 +361,10 @@ class Arrays {
     public static function sort(array &$array, ?callable $callback = null): array {
         if (empty($callback)) {
             sort($array);
+        } elseif (self::isList($array)) {
+            usort($array, $callback);
         } elseif (self::isMap($array)) {
             uasort($array, $callback);
-        } else {
-            usort($array, $callback);
         }
         return $array;
     }

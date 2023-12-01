@@ -87,7 +87,7 @@ class FileList {
      * @return array{}[]
      */
     public function getSorted(): array {
-        $result = Arrays::sort($this->list, function ($a, $b) {
+        return Arrays::sort($this->list, function ($a, $b) {
             // Back goes first
             if ($a["isBack"] && !$b["isBack"]) {
                 return -1;
@@ -107,6 +107,5 @@ class FileList {
             // If the type is the same sort by name
             return strnatcasecmp($a["name"], $b["name"]);
         });
-        return array_values($result);
     }
 }
