@@ -83,7 +83,21 @@ class Image {
 
         $filePath = File::getPath(...$pathParts);
         $size     = getimagesize($filePath);
-        if ($size == false) {
+        if ($size === false) {
+            return [ 0, 0, 0 ];
+        }
+        return $size;
+    }
+
+    /**
+     * Returns the Size of the Image as [ width, height, type ]
+     * @param string $fileUrl
+     * @return int[]
+     */
+    public static function getSizeFromUrl(string $fileUrl): array {
+        $fileUrl = Strings::encodeUrl($fileUrl);
+        $size    = getimagesize($fileUrl);
+        if ($size === false) {
             return [ 0, 0, 0 ];
         }
         return $size;
