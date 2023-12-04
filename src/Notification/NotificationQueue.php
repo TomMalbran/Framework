@@ -197,11 +197,11 @@ class NotificationQueue {
     }
 
     /**
-     * Deletes the items older than 90 days
+     * Deletes the items older than 30 days
      * @param integer $days Optional.
      * @return boolean
      */
-    public static function deleteOld(int $days = 90): bool {
+    public static function deleteOld(int $days = 30): bool {
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("notification_queue.createdTime", "<", $time);
         $ids   = self::schema()->getColumn($query, "NOTIFICATION_ID");
