@@ -18,7 +18,7 @@ class MediaType {
 
 
     /**
-     * Returns true if the given file is a Directory
+     * Returns true if the given file is valid for the given type
      * @param string $type
      * @param string $file
      * @param string $name
