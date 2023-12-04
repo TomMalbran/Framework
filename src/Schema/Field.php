@@ -3,8 +3,9 @@ namespace Framework\Schema;
 
 use Framework\Request;
 use Framework\File\Path;
-use Framework\Utils\JSON;
 use Framework\Utils\Arrays;
+use Framework\Utils\CSV;
+use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
@@ -227,8 +228,10 @@ class Field {
             }
             break;
         case self::JSON:
-        case self::CSV:
             $result = $request->toJSON($this->name);
+            break;
+        case self::CSV:
+            $result = $request->toCSV($this->name);
             break;
         case self::Encrypt:
             if (!empty($masterKey)) {
@@ -283,7 +286,7 @@ class Field {
             break;
         case self::CSV:
             $result[$key]           = $text;
-            $result["{$key}Parts"]  = JSON::decode($text, true);
+            $result["{$key}Parts"]  = !empty($text) ? CSV::decode($text, true) : [];
             $result["{$key}Count"]  = Arrays::length($result["{$key}Parts"]);
             break;
         case self::HTML:
