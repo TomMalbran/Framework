@@ -3,6 +3,7 @@ namespace Framework\Schema;
 
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
+use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
 use mysqli;
@@ -372,7 +373,11 @@ class Database {
         // Catch any MySQL Error and throw it to the Error Log
         } catch (mysqli_sql_exception $e) {
             $message = $e->getMessage();
-            trigger_error("MySQL Error: $message.\n\n$query", E_USER_ERROR);
+            $error   = "MySQL Error: $message.\n\n$query";
+            if (Server::isLocalHost()) {
+                die($error);
+            }
+            trigger_error($error, E_USER_ERROR);
             return null;
         }
     }
