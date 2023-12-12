@@ -194,6 +194,7 @@ class Migration {
             $type = $field->getType();
             if ($rename) {
                 $update    = true;
+                $found     = true;
                 $renames[] = [
                     "key"  => $tableKey,
                     "new"  => $field->key,
@@ -202,6 +203,7 @@ class Migration {
             } elseif (!$found) {
                 $update = true;
                 if ($field->isID && !empty($autoKey)) {
+                    $found         = true;
                     $primaryKeys[] = $field->key;
                     $renames[]     = [
                         "key"  => $autoKey,
@@ -225,6 +227,7 @@ class Migration {
                     }
                 }
             }
+
             if (!$found) {
                 if ($field->isID) {
                     $dropPrimary   = true;
