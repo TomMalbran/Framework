@@ -171,14 +171,17 @@
             "isRead"          : { "type" : "boolean"                           },
             "isDiscarded"     : { "type" : "boolean"                           }
         },
+        "expressions" : {
+            "credentialName" : {
+                "expression" : "IF(credentials.lastName <> '' AND credentials.firstName <> '', CONCAT(credentials.firstName, ' ', credentials.lastName), IF(credentials.firstName <> '', credentials.firstName, credentials.lastName))",
+                "type"       : "string"
+            }
+        },
         "joins" : {
             "CREDENTIAL_ID" : {
-                "table"  : "credentials",
-                "prefix" : "credential",
-                "fields" : {
-                    "firstName" : { "type" : "string", "mergeTo" : "name" },
-                    "lastName"  : { "type" : "string", "mergeTo" : "name" }
-                }
+                "table"     : "credentials",
+                "prefix"    : "credential",
+                "fieldKeys" : [ "firstName", "lastName" ]
             }
         },
         "hasTimestamps" : true,
