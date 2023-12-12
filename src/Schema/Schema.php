@@ -266,10 +266,11 @@ class Schema {
      * @param Query                $query
      * @param string[]|string|null $name   Optional.
      * @param string|null          $idName Optional.
+     * @param integer              $limit  Optional.
      * @return Search[]
      */
-    public function getSearch(Query $query, array|string $name = null, ?string $idName = null): array {
-        $query   = $this->generateQuery($query);
+    public function getSearch(Query $query, array|string $name = null, ?string $idName = null, int $limit = 0): array {
+        $query   = $this->generateQuery($query)->limitIf($limit);
         $request = $this->request($query);
         $idKey   = $idName ?: $this->structure->idName;
         $nameKey = $name   ?: $this->structure->nameKey;
