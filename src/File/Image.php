@@ -5,6 +5,9 @@ use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
+use Imagick;
+use Exception;
+
 /**
  * The Image Utils
  */
@@ -14,6 +17,8 @@ class Image {
     const Resize  = "resize";
     const Maximum = "maximum";
     const Thumb   = "thumb";
+
+
 
     /** @var int[] The image types */
     private static array $imageTypes = [ 1, 2, 3, 15, 16 ];
@@ -384,5 +389,37 @@ class Image {
      */
     public static function destroy(mixed $image): bool {
         return imagedestroy($image);
+    }
+
+
+
+    /**
+     * Creates a Thumbnail using ImageMagick
+     * @param string  $src
+     * @param string  $dst
+     * @param integer $width
+     * @param integer $height
+     * @param string  $action
+     * @return boolean
+     */
+    public static function thumbnail(
+        string $src,
+        string $dst,
+        int    $width,
+        int    $height,
+        string $action
+    ): bool {
+        $bestFit = $action === self::Maximum;
+        $fill    = $action === self::Thumb;
+
+        try {
+            $image = new Imagick($src);
+            $image->thumbnailImage($width, $height, $bestFit, $fill);
+            $image->writeImage($dst);
+            return true;
+        } catch (Exception $e) {
+            trigger_error("Imagick Error: " . $e->getMessage(), E_USER_ERROR);
+            return false;
+        }
     }
 }
