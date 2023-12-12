@@ -67,7 +67,10 @@ class NotificationQueue {
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "title", "body" ], $search);
+        $query = Query::createSearch([
+            "title", "body",
+            "CONCAT(credentials.firstName, ' ', credentials.lastName)",
+        ], $search);
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
         return $query;
