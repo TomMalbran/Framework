@@ -79,6 +79,8 @@ class Config {
                 $value = false;
             } elseif (Strings::startsWith($value, "\"")) {
                 $value = Strings::replace($value, "\"", "");
+            } elseif (Strings::contains($value, ".")) {
+                $value = (float)$value;
             } else {
                 $value = (int)$value;
             }
