@@ -524,12 +524,12 @@ class DateTime {
 
     /**
      * Returns the time minus x days
-     * @param integer $days
+     * @param float   $days
      * @param integer $time        Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXDays(int $days, int $time = 0, bool $useTimeZone = false): int {
+    public static function getLastXDays(float $days, int $time = 0, bool $useTimeZone = false): int {
         $time   = self::getTime($time);
         $result = $time - $days * 24 * 3600;
         return self::toServerTime($result, $useTimeZone);
@@ -537,12 +537,12 @@ class DateTime {
 
     /**
      * Returns the time minus x hours
-     * @param integer $hours
+     * @param float   $hours
      * @param integer $time        Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXHours(int $hours, int $time = 0, bool $useTimeZone = false): int {
+    public static function getLastXHours(float $hours, int $time = 0, bool $useTimeZone = false): int {
         $time   = self::getTime($time);
         $result = $time - $hours * 3600;
         return self::toServerTime($result, $useTimeZone);
@@ -550,12 +550,12 @@ class DateTime {
 
     /**
      * Returns the time minus x minutes
-     * @param integer $minutes
+     * @param float   $minutes
      * @param integer $time        Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXMinutes(int $minutes, int $time = 0, bool $useTimeZone = false): int {
+    public static function getLastXMinutes(float $minutes, int $time = 0, bool $useTimeZone = false): int {
         $time   = self::getTime($time);
         $result = $time - $minutes * 60;
         return self::toServerTime($result, $useTimeZone);
