@@ -32,7 +32,7 @@ class JWT {
 
         self::$loaded    = true;
         self::$secretKey = Config::get("authKey");
-        self::$shortTerm = Config::getInt("authHours")  * 3600;
+        self::$shortTerm = Config::getFloat("authHours") * 3600;
         return true;
     }
 
