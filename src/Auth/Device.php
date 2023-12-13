@@ -12,7 +12,7 @@ use Framework\Utils\Server;
 class Device {
 
     /**
-     * Loads the Reset Schema
+     * Loads the Devices Schema
      * @return Schema
      */
     public static function schema(): Schema {
@@ -20,14 +20,6 @@ class Device {
     }
 
 
-
-    /**
-     * Returns all the Devices
-     * @return array{}[]
-     */
-    public static function getAll(): array {
-        return self::schema()->getAll();
-    }
 
     /**
      * Returns all the Devices for the given Credential
