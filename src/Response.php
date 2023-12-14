@@ -25,12 +25,16 @@ class Response {
     }
 
     /**
-     * Adds a Token
-     * @param string $token
+     * Adds the Tokens
+     * @param string $jwt
+     * @param string $refreshToken
      * @return Response
      */
-    public function addToken(string $token): Response {
-        $this->data["jwt"] = $token;
+    public function addTokens(string $jwt, string $refreshToken): Response {
+        $this->data["jwt"] = $jwt;
+        if (!empty($refreshToken)) {
+            $this->data["refreshToken"] = $refreshToken;
+        }
         return $this;
     }
 

@@ -97,8 +97,8 @@ class Framework {
             Auth::validateAPI($request->token);
 
         // Validate the Credential
-        } elseif (!empty($request->jwt)) {
-            Auth::validateCredential($request->jwt, $request->langcode, $request->timezone);
+        } elseif (!empty($request->jwt) || !empty($request->refreshToken)) {
+            Auth::validateCredential($request->jwt, $request->refreshToken, $request->langcode, $request->timezone);
         }
 
         // Perform the Request
@@ -241,12 +241,13 @@ class Framework {
     public static function getRequest(): object {
         $request = $_REQUEST;
         $result  = [
-            "route"    => !empty($request["route"])    ? $request["route"]         : "",
-            "token"    => !empty($request["token"])    ? $request["token"]         : "",
-            "jwt"      => !empty($request["jwt"])      ? $request["jwt"]           : "",
-            "langcode" => !empty($request["langcode"]) ? $request["langcode"]      : "",
-            "timezone" => !empty($request["timezone"]) ? (int)$request["timezone"] : 0,
-            "params"   => [],
+            "route"        => !empty($request["route"])        ? $request["route"]         : "",
+            "token"        => !empty($request["token"])        ? $request["token"]         : "",
+            "jwt"          => !empty($request["jwt"])          ? $request["jwt"]           : "",
+            "refreshToken" => !empty($request["refreshToken"]) ? $request["refreshToken"]  : "",
+            "langcode"     => !empty($request["langcode"])     ? $request["langcode"]      : "",
+            "timezone"     => !empty($request["timezone"])     ? (int)$request["timezone"] : 0,
+            "params"       => [],
         ];
 
         if (!empty($request["params"])) {
@@ -255,6 +256,7 @@ class Framework {
             unset($request["route"]);
             unset($request["token"]);
             unset($request["jwt"]);
+            unset($request["refreshToken"]);
             unset($request["langcode"]);
             unset($request["timezone"]);
             $result["params"] = $request;
@@ -297,8 +299,7 @@ class Framework {
         }
 
         // Add the Token and return the Response
-        $token = Auth::getToken();
-        $response->addToken($token);
+        $response->addTokens(Auth::getToken(), Auth::getRefreshToken());
         return $response;
     }
 

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Auth\AuthToken;
 use Framework\Auth\Access;
 use Framework\Auth\Credential;
 use Framework\Auth\Token;
@@ -12,7 +13,6 @@ use Framework\NLS\NLS;
 use Framework\File\Path;
 use Framework\File\File;
 use Framework\Log\ActionLog;
-use Framework\Provider\JWT;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
@@ -23,6 +23,9 @@ use Framework\Utils\Strings;
  * The Auth
  */
 class Auth {
+
+    private static string $refreshToken = "";
+    private static bool   $sendRefresh  = false;
 
     private static int    $accessLevel  = 0;
     private static ?Model $credential   = null;
@@ -35,30 +38,41 @@ class Auth {
 
     /**
      * Validates the Credential
-     * @param string       $token
-     * @param string|null  $langcode Optional.
-     * @param integer|null $timezone Optional.
+     * @param string       $jwtToken
+     * @param string       $refreshToken Optional.
+     * @param string|null  $langcode     Optional.
+     * @param integer|null $timezone     Optional.
      * @return boolean
      */
-    public static function validateCredential(string $token, ?string $langcode = null, ?int $timezone = null): bool {
+    public static function validateCredential(string $jwtToken, string $refreshToken = "", ?string $langcode = null, ?int $timezone = null): bool {
         Reset::deleteOld();
         Storage::deleteOld();
+        AuthToken::deleteOld();
 
-        if (!JWT::isValid($token)) {
+        // Validate the tokens
+        if (!AuthToken::isValid($jwtToken, $refreshToken)) {
             return false;
         }
 
         // Retrieve the Token data
-        $data       = JWT::getData($token);
-        $credential = Credential::getOne($data->credentialID, true);
+        [ $credentialID, $adminID ] = AuthToken::getCredentials($jwtToken, $refreshToken);
+        $credential = Credential::getOne($credentialID, true);
         if ($credential->isEmpty() || $credential->isDeleted) {
             return false;
         }
 
         // Retrieve the Admin
         $admin = Model::createEmpty();
-        if (!empty($data->adminID)) {
-            $admin = Credential::getOne($data->adminID, true);
+        if (!empty($adminID)) {
+            $admin = Credential::getOne($adminID, true);
+        }
+
+        // Update the Refresh Token
+        self::$refreshToken = $refreshToken;
+        $newRefreshToken = AuthToken::updateRefreshToken($refreshToken);
+        if (!empty($newRefreshToken) && $newRefreshToken !== $refreshToken) {
+            self::$refreshToken = $newRefreshToken;
+            self::$sendRefresh  = true;
         }
 
         // Set the new Language and Timezone if required
@@ -141,6 +155,7 @@ class Auth {
      * @return boolean
      */
     public static function login(Model $credential): bool {
+        $isNew = self::$credentialID !== $credential->id;
         self::setCredential($credential, null, $credential->currentUser);
 
         Credential::updateLoginTime($credential->id);
@@ -149,6 +164,11 @@ class Auth {
         $path = Path::getTempPath($credential->id, false);
         File::emptyDir($path);
         Reset::delete($credential->id);
+
+        if ($isNew) {
+            self::$refreshToken = AuthToken::createRefreshToken($credential->id);
+            self::$sendRefresh  = true;
+        }
         return true;
     }
 
@@ -157,8 +177,11 @@ class Auth {
      * @return boolean
      */
     public static function logout(): bool {
+        AuthToken::deleteRefreshToken(self::$refreshToken);
         ActionLog::endSession();
 
+        self::$refreshToken = "";
+        self::$sendRefresh  = false;
         self::$accessLevel  = Access::General();
         self::$credential   = null;
         self::$credentialID = 0;
@@ -336,7 +359,18 @@ class Auth {
             $data[$field] = self::$credential->get($field);
         }
 
-        return JWT::create(time(), $data);
+        return AuthToken::createJWT($data);
+    }
+
+    /**
+     * Returns the Refresh Token
+     * @return string
+     */
+    public static function getRefreshToken(): string {
+        if (!self::hasCredential() || !self::$sendRefresh) {
+            return "";
+        }
+        return self::$refreshToken;
     }
 
 

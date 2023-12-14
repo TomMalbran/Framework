@@ -7,6 +7,7 @@
     "properties" : {
         "credentials"       : {},
         "devices"           : {},
+        "refreshTokens"     : {},
         "resets"            : {},
         "spam"              : {},
         "storage"           : {},

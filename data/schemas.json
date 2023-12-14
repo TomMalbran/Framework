@@ -58,6 +58,22 @@
         "canEdit"       : true,
         "canDelete"     : false
     },
+    "refreshTokens" : {
+        "table"  : "credentials_refresh_tokens",
+        "fields" : {
+            "CREDENTIAL_ID"   : { "type" : "number", "name" : "credentialID"                    },
+            "refreshToken"   : { "type" : "string",                         "isPrimary" : true },
+            "userAgent"      : { "type" : "string"                                             },
+            "expirationTime" : { "type" : "date"                                               }
+        },
+        "foreigns" : {
+            "CREDENTIAL_ID" : { "table" : "credentials" }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : true,
+        "canEdit"       : true,
+        "canDelete"     : false
+    },
     "resets" : {
         "table"  : "credentials_reset",
         "fields" : {
