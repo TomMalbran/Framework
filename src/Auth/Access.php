@@ -57,7 +57,7 @@ class Access {
         if (isset(self::$levels[$name])) {
             return self::$levels[$name];
         }
-        return 0;
+        return -1;
     }
 
     /**
@@ -150,7 +150,7 @@ class Access {
         if (Strings::startsWith($function, "is")) {
             $accessName  = Strings::stripStart($function, "is");
             $accessLevel = self::getOne($accessName);
-            if (!empty($accessLevel)) {
+            if ($accessLevel != -1) {
                 return $level == $accessLevel;
             }
 
