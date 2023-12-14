@@ -2,7 +2,6 @@
 namespace Framework\Auth;
 
 use Framework\Request;
-use Framework\Auth\Document;
 use Framework\NLS\NLS;
 use Framework\File\Path;
 use Framework\Schema\Factory;
@@ -141,25 +140,14 @@ class Credential {
     }
 
     /**
-     * Returns true if there is an Credential with the given DNI
-     * @param string  $dni
+     * Returns true if there is an Credential with the given Value for the given Field
+     * @param string  $field
+     * @param mixed   $value
      * @param integer $skipID Optional.
      * @return boolean
      */
-    public static function dniExists(string $dni, int $skipID = 0): bool {
-        $query = Query::create("dni", "=", $dni);
-        $query->addIf("CREDENTIAL_ID", "<>", $skipID);
-        return self::schema()->exists($query);
-    }
-
-    /**
-     * Returns true if there is an Credential with the given CUIT
-     * @param string  $cuit
-     * @param integer $skipID Optional.
-     * @return boolean
-     */
-    public static function cuitExists(string $cuit, int $skipID = 0): bool {
-        $query = Query::create("cuit", "=", $cuit);
+    public static function fieldExists(string $field, mixed $value, int $skipID = 0): bool {
+        $query = Query::create($field, "=", $value);
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
         return self::schema()->exists($query);
     }
@@ -310,7 +298,6 @@ class Credential {
         foreach ($request as $row) {
             $fields = $row;
             $fields["credentialName"] = self::getName($row);
-            $fields["document"]       = Document::forCredential($row);
 
             if (!empty($row["avatar"]) && Path::exists("avatars", $row["avatar"])) {
                 $fields["avatarFile"] = $row["avatar"];
@@ -539,9 +526,6 @@ class Credential {
             "firstName"        => NLS::get("GENERAL_NAME"),
             "lastName"         => NLS::get("GENERAL_LAST_NAME"),
             "phone"            => "",
-            "dni"              => "",
-            "cuit"             => "",
-            "taxID"            => "",
             "address"          => "",
             "birthDate"        => "",
             "language"         => "",
