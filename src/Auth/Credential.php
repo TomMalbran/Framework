@@ -526,8 +526,6 @@ class Credential {
             "firstName"        => NLS::get("GENERAL_NAME"),
             "lastName"         => NLS::get("GENERAL_LAST_NAME"),
             "phone"            => "",
-            "address"          => "",
-            "birthDate"        => "",
             "language"         => "",
             "avatar"           => "",
             "password"         => "",

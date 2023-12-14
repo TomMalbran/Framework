@@ -8,8 +8,6 @@
             "firstName"        : { "type" : "string"                                             },
             "lastName"         : { "type" : "string"                                             },
             "phone"            : { "type" : "string",                          "noExists" : true },
-            "address"          : { "type" : "string"                                             },
-            "birthDate"        : { "type" : "string"                                             },
             "language"         : { "type" : "string"                                             },
             "avatar"           : { "type" : "string",                          "cantEdit" : true },
             "level"            : { "type" : "number",                          "cantEdit" : true },
