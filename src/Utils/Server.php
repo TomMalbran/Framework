@@ -102,4 +102,37 @@ class Server {
     public static function getUserAgent(): string {
         return $_SERVER["HTTP_USER_AGENT"];
     }
+
+    /**
+     * Returns the Platform from an User Agent
+     * @param string $userAgent
+     * @return string
+     */
+    public static function getPlatform(string $userAgent): string {
+        if (Strings::contains($userAgent, "iPad")) {
+            return "iPad";
+        }
+        if (Strings::contains($userAgent, "Android")) {
+            return "Android";
+        }
+        if (Strings::contains($userAgent, "Firefox")) {
+            return "FireFox";
+        }
+        if (Strings::contains($userAgent, "MSIE") || Strings::contains($userAgent, "Trident")) {
+            return "IE";
+        }
+        if (Strings::contains($userAgent, "Chrome")) {
+            return "Chrome";
+        }
+        if (Strings::contains($userAgent, "Safari")) {
+            return "Safari";
+        }
+        if (Strings::contains($userAgent, "AIR")) {
+            return "Air";
+        }
+        if (Strings::contains($userAgent, "Fluid")) {
+            return "Fluid";
+        }
+        return "Unknown";
+    }
 }
