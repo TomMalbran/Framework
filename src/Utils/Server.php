@@ -109,30 +109,37 @@ class Server {
      * @return string
      */
     public static function getPlatform(string $userAgent): string {
-        if (Strings::contains($userAgent, "iPad")) {
-            return "iPad";
+        $result = [];
+
+        if (Strings::contains($userAgent, "Macintosh")) {
+            $result[] = "MacOS";
+        } elseif (Strings::contains($userAgent, "Windows")) {
+            $result[] = "Windows";
+        } elseif (Strings::contains($userAgent, "iPhone")) {
+            $result[] = "iPhone";
+        } elseif (Strings::contains($userAgent, "iPad")) {
+            $result[] = "iPad";
+        } elseif (Strings::contains($userAgent, "Android")) {
+            $result[] = "Android";
         }
-        if (Strings::contains($userAgent, "Android")) {
-            return "Android";
-        }
+
         if (Strings::contains($userAgent, "Firefox")) {
-            return "FireFox";
+            $result[] = "FireFox";
+        } elseif (Strings::contains($userAgent, "MSIE") || Strings::contains($userAgent, "Trident")) {
+            $result[] = "IE";
+        } elseif (Strings::contains($userAgent, "Chrome")) {
+            $result[] = "Chrome";
+        } elseif (Strings::contains($userAgent, "Safari")) {
+            $result[] = "Safari";
+        } elseif (Strings::contains($userAgent, "AIR")) {
+            $result[] = "Air";
+        } elseif (Strings::contains($userAgent, "Fluid")) {
+            $result[] = "Fluid";
         }
-        if (Strings::contains($userAgent, "MSIE") || Strings::contains($userAgent, "Trident")) {
-            return "IE";
+
+        if (empty($result)) {
+            $result[] = "Unknown";
         }
-        if (Strings::contains($userAgent, "Chrome")) {
-            return "Chrome";
-        }
-        if (Strings::contains($userAgent, "Safari")) {
-            return "Safari";
-        }
-        if (Strings::contains($userAgent, "AIR")) {
-            return "Air";
-        }
-        if (Strings::contains($userAgent, "Fluid")) {
-            return "Fluid";
-        }
-        return "Unknown";
+        return Strings::join($result, " ");
     }
 }
