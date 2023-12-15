@@ -142,8 +142,14 @@
             "sendTo"       : { "type" : "csv"                       },
             "subject"      : { "type" : "string"                    },
             "message"      : { "type" : "text"                      },
-            "sentSuccess"  : { "type" : "boolean"                   },
+            "emailResult"  : { "type" : "string"                    },
             "sentTime"     : { "type" : "date"                      }
+        },
+        "expressions" : {
+            "isError" : {
+                "expression" : "IF(emailResult <> 'Sent', 1, 0)",
+                "type"       : "boolean"
+            }
         },
         "hasTimestamps" : true,
         "canCreate"     : true,

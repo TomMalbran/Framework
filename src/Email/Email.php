@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Config\Config;
 use Framework\Email\EmailWhiteList;
+use Framework\Email\EmailResult;
 use Framework\Provider\Mustache;
 use Framework\Provider\SMTP;
 use Framework\Provider\Mandrill;
@@ -14,6 +15,7 @@ use Framework\File\Path;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
+use Framework\Utils\Utils;
 
 /**
  * The Email Provider
@@ -50,31 +52,22 @@ class Email {
 
 
     /**
-     * Returns true if is possible to send the email
-     * @param string $toEmail
-     * @return boolean
-     */
-    public static function canSend(string $toEmail): bool {
-        if (!self::$config->isActive) {
-            return false;
-        }
-        if (!empty(self::$config->useWhiteList) && !EmailWhiteList::emailExists($toEmail)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Sends an Email
      * @param string $toEmail
      * @param string $subject
      * @param string $message
-     * @return boolean
+     * @return string
      */
-    public static function send(string $toEmail, string $subject, string $message): bool {
+    public static function send(string $toEmail, string $subject, string $message): string {
         self::load();
-        if (!self::canSend($toEmail)) {
-            return false;
+        if (!self::$config->isActive) {
+            return EmailResult::InactiveSend;
+        }
+        if (!empty(self::$config->useWhiteList) && !EmailWhiteList::emailExists($toEmail)) {
+            return EmailResult::WhiteListFilter;
+        }
+        if (!Utils::isValidEmail($toEmail)) {
+            return EmailResult::InvalidEmail;
         }
 
         $logo = "";
@@ -94,12 +87,13 @@ class Email {
         $fromEmail = self::$config->email;
         $fromName  = self::$config->name;
 
-        return match ($provider) {
+        $wasSent   = match ($provider) {
             self::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
             self::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
             self::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
             default        => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
         };
+        return $wasSent ? EmailResult::Sent : EmailResult::ProviderError;
     }
 
     /**
@@ -108,18 +102,18 @@ class Email {
      * @param string[]|string $sendTo
      * @param string|null     $message  Optional.
      * @param string|null     $subject  Optional.
-     * @return boolean
+     * @return string
      */
-    public static function sendTemplate(Model $template, array|string $sendTo, ?string $message = null, ?string $subject = null): bool {
+    public static function sendTemplate(Model $template, array|string $sendTo, ?string $message = null, ?string $subject = null): string {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
-        $success = false;
+        $result  = EmailResult::NoEmails;
 
         foreach ($sendTo as $email) {
-            $success = self::send($email, $subject, $message);
+            $result = self::send($email, $subject, $message);
         }
-        return $success;
+        return $result;
     }
 
 

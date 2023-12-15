@@ -7,6 +7,7 @@ use Framework\Schema\Schema;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Email\Email;
+use Framework\Email\EmailResult;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
@@ -56,7 +57,7 @@ class EmailQueue {
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "sendTo", "subject", "sendTo" ], $search);
+        $query = Query::createSearch([ "sendTo", "subject", "message" ], $search);
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
         return $query;
@@ -116,7 +117,7 @@ class EmailQueue {
             "sendTo"       => JSON::encode($sendTo),
             "subject"      => $subject,
             "message"      => $message,
-            "sentSuccess"  => 0,
+            "emailResult"  => EmailResult::NotProcessed,
             "sentTime"     => 0,
         ]);
 
@@ -150,24 +151,24 @@ class EmailQueue {
      * @return boolean
      */
     public static function send(Model|array $email): bool {
-        $success = false;
+        $emailResult = EmailResult::NoEmails;
         foreach ($email["sendToParts"] as $sendTo) {
             if (!empty($sendTo)) {
-                $success = Email::send($sendTo, $email["subject"], $email["message"]);
+                $emailResult = Email::send($sendTo, $email["subject"], $email["message"]);
             }
         }
-        return self::markAsSent($email["emailID"], $success);
+        return self::markAsSent($email["emailID"], $emailResult);
     }
 
     /**
      * Marks the Email as Sent
      * @param integer $emailID
-     * @param boolean $success
+     * @param string  $emailResult
      * @return boolean
      */
-    public static function markAsSent(int $emailID, bool $success): bool {
+    public static function markAsSent(int $emailID, string $emailResult): bool {
         return self::schema()->edit($emailID, [
-            "sentSuccess" => $success ? 1 : 0,
+            "emailResult" => $emailResult,
             "sentTime"    => time(),
         ]);
     }
