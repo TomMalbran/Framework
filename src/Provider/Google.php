@@ -10,8 +10,8 @@ class Google {
 
     const BaseUrl = "https://www.googleapis.com/oauth2/v1/";
 
-    private static bool  $loaded = false;
-    private static mixed $config = null;
+    private static bool   $loaded = false;
+    private static object $config;
 
 
     /**
@@ -24,7 +24,7 @@ class Google {
         }
 
         self::$loaded = true;
-        self::$config = Config::get("google");
+        self::$config = Config::getObject("google");
         return false;
     }
 

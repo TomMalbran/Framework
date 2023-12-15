@@ -157,7 +157,7 @@ class EmailTemplate {
         string $languageName,
         int $position
     ): int {
-        $siteName = Config::get("name");
+        $siteName = Config::getString("name");
         $adds     = [];
         $deletes  = [];
         $codes    = [];

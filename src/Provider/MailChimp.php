@@ -12,9 +12,9 @@ use DrewM\MailChimp\MailChimp as MailChimpAPI;
  */
 class MailChimp {
 
-    private static bool          $loaded = false;
-    private static mixed         $config = null;
-    private static ?MailChimpAPI $api    = null;
+    private static bool         $loaded = false;
+    private static object       $config;
+    private static MailChimpAPI $api;
 
 
     /**
@@ -26,7 +26,7 @@ class MailChimp {
             return false;
         }
         self::$loaded = true;
-        self::$config = Config::get("mailchimp");
+        self::$config = Config::getObject("mailchimp");
 
         if (self::$config->active && !empty(self::$config->key)) {
             self::$api = new MailChimpAPI(self::$config->key);

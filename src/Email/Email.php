@@ -31,7 +31,7 @@ class Email {
     private static bool    $loaded   = false;
     private static ?string $template = null;
     private static string  $url      = "";
-    private static mixed   $config   = null;
+    private static object  $config;
 
 
     /**
@@ -44,8 +44,8 @@ class Email {
         }
         self::$loaded   = true;
         self::$template = Framework::loadFile(Framework::DataDir, "email.html");
-        self::$url      = Config::get("url");
-        self::$config   = Config::get("email");
+        self::$url      = Config::getString("url");
+        self::$config   = Config::getObject("email");
         return true;
     }
 
@@ -125,7 +125,7 @@ class Email {
      * @return boolean
      */
     public static function isCaptchaValid(Request $request, bool $withScore = false): bool {
-        $recaptchaSecret = Config::get("recaptchaSecret");
+        $recaptchaSecret = Config::getString("recaptchaSecret");
         if (!$request->has("g-recaptcha-response") || empty($recaptchaSecret)) {
             return false;
         }

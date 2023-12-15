@@ -24,7 +24,7 @@ class SendGrid {
         }
 
         self::$loaded = true;
-        self::$apiKey = Config::get("sendGridKey");
+        self::$apiKey = Config::getString("sendGridKey");
         return false;
     }
 

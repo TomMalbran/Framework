@@ -26,8 +26,8 @@ class MercadoPago {
         }
 
         self::$loaded       = true;
-        self::$accessToken = Config::get("mpAccessToken");
-        self::$signature   = Config::get("mpSignature");
+        self::$accessToken = Config::getString("mpAccessToken");
+        self::$signature   = Config::getString("mpSignature");
         return false;
     }
 

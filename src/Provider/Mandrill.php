@@ -24,7 +24,7 @@ class Mandrill {
         }
 
         self::$loaded = true;
-        self::$apiKey = Config::get("mandrillKey");
+        self::$apiKey = Config::getString("mandrillKey");
         return false;
     }
 

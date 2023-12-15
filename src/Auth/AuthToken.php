@@ -39,8 +39,8 @@ class AuthToken {
         JWT::$leeway = 1000;
 
         self::$loaded     = true;
-        self::$useRefresh = Config::get("authUseRefresh");
-        self::$secretKey  = Config::get("authKey");
+        self::$useRefresh = Config::getBoolean("authUseRefresh");
+        self::$secretKey  = Config::getString("authKey");
         self::$shortTerm  = Config::getFloat("authHours") * 3600;
         self::$longTerm   = Config::getFloat("authDays") * 24 * 3600;
         return true;

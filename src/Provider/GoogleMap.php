@@ -26,8 +26,8 @@ class GoogleMap {
         }
 
         self::$loaded   = true;
-        self::$isActive = Config::get("googleMapIsActive");
-        self::$apiKey   = Config::get("googleMapKey");
+        self::$isActive = Config::getBoolean("googleMapIsActive");
+        self::$apiKey   = Config::getString("googleMapKey");
         return false;
     }
 

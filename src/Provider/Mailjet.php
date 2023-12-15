@@ -25,8 +25,8 @@ class Mailjet {
         }
 
         self::$loaded    = true;
-        self::$apiKey    = Config::get("mailjetKey");
-        self::$apiSecret = Config::get("mailjetSecret");
+        self::$apiKey    = Config::getString("mailjetKey");
+        self::$apiSecret = Config::getString("mailjetSecret");
         return false;
     }
 

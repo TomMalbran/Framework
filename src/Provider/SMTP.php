@@ -14,8 +14,8 @@ class SMTP {
 
     private static bool   $loaded = false;
     private static string $url    = "";
-    private static mixed  $config = null;
-    private static mixed  $google = null;
+    private static object $config;
+    private static object $google;
 
 
     /**
@@ -28,9 +28,9 @@ class SMTP {
         }
 
         self::$loaded = true;
-        self::$url    = Config::get("url");
-        self::$config = Config::get("smtp");
-        self::$google = Config::get("google");
+        self::$url    = Config::getString("url");
+        self::$config = Config::getObject("smtp");
+        self::$google = Config::getObject("google");
         return false;
     }
 

@@ -11,8 +11,8 @@ use Firebase\JWT\JWT;
  */
 class Microsoft {
 
-    private static bool  $loaded = false;
-    private static mixed $config = null;
+    private static bool   $loaded = false;
+    private static object $config;
 
 
     /**
@@ -25,7 +25,7 @@ class Microsoft {
         }
 
         self::$loaded = true;
-        self::$config = Config::get("microsoft");
+        self::$config = Config::getObject("microsoft");
         return false;
     }
 

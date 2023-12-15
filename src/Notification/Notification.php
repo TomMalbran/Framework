@@ -12,8 +12,8 @@ class Notification {
 
     public const BaseUrl = "https://onesignal.com/api/v1";
 
-    private static bool  $loaded = false;
-    private static mixed $config = null;
+    private static bool   $loaded = false;
+    private static object $config;
 
 
     /**
@@ -26,7 +26,7 @@ class Notification {
         }
 
         self::$loaded = true;
-        self::$config = Config::get("onesignal");
+        self::$config = Config::getObject("onesignal");
         return true;
     }
 

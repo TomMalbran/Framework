@@ -122,7 +122,7 @@ class Framework {
      */
     public static function getDatabase(): Database {
         if (empty(self::$db)) {
-            $config   = Config::get("db");
+            $config   = Config::getObject("db");
             self::$db = new Database($config);
         }
         return self::$db;

@@ -11,8 +11,8 @@ class Facebook {
 
     const BaseUrl = "https://graph.facebook.com/v16.0/";
 
-    private static bool  $loaded = false;
-    private static mixed $config = null;
+    private static bool   $loaded = false;
+    private static object $config;
 
 
     /**
@@ -25,7 +25,7 @@ class Facebook {
         }
 
         self::$loaded = true;
-        self::$config = Config::get("meta");
+        self::$config = Config::getObject("meta");
         return false;
     }
 
