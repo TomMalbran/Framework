@@ -125,8 +125,6 @@
             "description"  : { "type" : "string", "cantEdit" : true         },
             "type"         : { "type" : "string"                            },
             "sendTo"       : { "type" : "json"                              },
-            "sendAs"       : { "type" : "string"                            },
-            "sendName"     : { "type" : "string"                            },
             "subject"      : { "type" : "string"                            },
             "message"      : { "type" : "text"                              },
             "position"     : { "type" : "number", "cantEdit" : true         }
@@ -142,8 +140,6 @@
             "EMAIL_ID"     : { "type" : "id",    "name" : "emailID" },
             "templateCode" : { "type" : "string"                    },
             "sendTo"       : { "type" : "csv"                       },
-            "sendAs"       : { "type" : "string"                    },
-            "sendName"     : { "type" : "string"                    },
             "subject"      : { "type" : "string"                    },
             "message"      : { "type" : "text"                      },
             "sentSuccess"  : { "type" : "boolean"                   },

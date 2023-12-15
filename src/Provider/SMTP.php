@@ -92,16 +92,14 @@ class SMTP {
         }
 
         $email->CharSet  = "UTF-8";
-        $email->From     = self::$config->email;
-        $email->FromName = $fromName ?: self::$config->name;
+        $email->From     = $fromEmail;
+        $email->FromName = $fromName;
         $email->Subject  = $subject;
         $email->Body     = $body;
 
         $email->addAddress($toEmail);
-        if (!empty($fromEmail)) {
-            $email->addReplyTo($fromEmail, $fromName ?: self::$config->name);
-        } elseif (!empty(self::$config->replyTo)) {
-            $email->addReplyTo(self::$config->replyTo, self::$config->name);
+        if (!empty(self::$config->replyTo)) {
+            $email->addReplyTo(self::$config->replyTo, $fromName);
         }
 
         if (!empty($attachment)) {

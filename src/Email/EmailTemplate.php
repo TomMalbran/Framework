@@ -158,7 +158,6 @@ class EmailTemplate {
         int $position
     ): int {
         $siteName = Config::get("name");
-        $sendAs   = Config::get("emailEmail");
         $adds     = [];
         $deletes  = [];
         $codes    = [];
@@ -183,8 +182,6 @@ class EmailTemplate {
                     "languageName" => $languageName,
                     "description"  => $newEmail["description"],
                     "type"         => !empty($newEmail["type"]) ? $newEmail["type"] : "",
-                    "sendAs"       => !empty($newEmail["sendAs"]) ? $newEmail["sendAs"] : $sendAs,
-                    "sendName"     => $siteName,
                     "sendTo"       => !empty($newEmail["sendTo"]) ? "\"{$newEmail["sendTo"]}\"" : "",
                     "subject"      => Strings::replace($newEmail["subject"], "[site]", $siteName),
                     "message"      => Strings::replace($message, "[site]", $siteName),

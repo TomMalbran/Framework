@@ -114,8 +114,6 @@ class EmailQueue {
         $emailID = self::schema()->create([
             "templateCode" => $template->id,
             "sendTo"       => JSON::encode($sendTo),
-            "sendAs"       => $template->sendAs   ?: "",
-            "sendName"     => $template->sendName ?: "",
             "subject"      => $subject,
             "message"      => $message,
             "sentSuccess"  => 0,
@@ -155,7 +153,7 @@ class EmailQueue {
         $success = false;
         foreach ($email["sendToParts"] as $sendTo) {
             if (!empty($sendTo)) {
-                $success = Email::send($sendTo, $email["sendAs"], $email["sendName"], $email["subject"], $email["message"]);
+                $success = Email::send($sendTo, $email["subject"], $email["message"]);
             }
         }
         return self::markAsSent($email["emailID"], $success);

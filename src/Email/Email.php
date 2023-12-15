@@ -67,19 +67,11 @@ class Email {
     /**
      * Sends an Email
      * @param string $toEmail
-     * @param string $fromEmail
-     * @param string $fromName
      * @param string $subject
      * @param string $message
      * @return boolean
      */
-    public static function send(
-        string $toEmail,
-        string $fromEmail,
-        string $fromName,
-        string $subject,
-        string $message
-    ): bool {
+    public static function send(string $toEmail, string $subject, string $message): bool {
         self::load();
         if (!self::canSend($toEmail)) {
             return false;
@@ -99,8 +91,8 @@ class Email {
         ]);
 
         $provider  = self::$config->provider ?: "smtp";
-        $fromEmail = $fromEmail ?: self::$config->email;
-        $fromName  = $fromName  ?: self::$config->name;
+        $fromEmail = self::$config->email;
+        $fromName  = self::$config->name;
 
         switch ($provider) {
         case self::Mandrill:
@@ -129,7 +121,7 @@ class Email {
         $success = false;
 
         foreach ($sendTo as $email) {
-            $success = self::send($email, $template->sendAs, $template->sendName, $subject, $message);
+            $success = self::send($email, $subject, $message);
         }
         return $success;
     }
