@@ -286,7 +286,7 @@ class Field {
             break;
         case self::CSV:
             $result[$key]           = $text;
-            $result["{$key}Parts"]  = !empty($text) ? CSV::decode($text, true) : [];
+            $result["{$key}Parts"]  = !empty($text) ? JSON::decode($text, true) : [];
             $result["{$key}Count"]  = Arrays::length($result["{$key}Parts"]);
             break;
         case self::HTML:
