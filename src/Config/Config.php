@@ -128,13 +128,34 @@ class Config {
     }
 
     /**
+     * Returns a Config Property as a Boolean
+     * @param string $property
+     * @return boolean
+     */
+    public static function getBoolean(string $property): bool {
+        $value = self::get($property);
+        return !empty($value);
+    }
+
+    /**
+     * Returns a Config Property as a String
+     * @param string $property
+     * @param string $default  Optional.
+     * @return string
+     */
+    public static function getString(string $property, string $default = ""): string {
+        $value = self::get($property);
+        return !empty($value) ? (string)$value : $default;
+    }
+
+    /**
      * Returns a Config Property as an Int
      * @param string  $property
      * @param integer $default  Optional.
      * @return integer
      */
     public static function getInt(string $property, int $default = 0): int {
-        $value = Config::get($property);
+        $value = self::get($property);
         if (!empty($value) && is_numeric($value)) {
             return (int)$value;
         }
@@ -148,11 +169,21 @@ class Config {
      * @return float
      */
     public static function getFloat(string $property, float $default = 0): float {
-        $value = Config::get($property);
+        $value = self::get($property);
         if (!empty($value) && is_numeric($value)) {
             return (float)$value;
         }
         return $default;
+    }
+
+    /**
+     * Returns a Config Property as an Object
+     * @param string $property
+     * @return object
+     */
+    public static function getObject(string $property): object {
+        $value = self::get($property);
+        return !empty($value) ? (object)$value : (object)[];
     }
 
     /**
@@ -161,7 +192,7 @@ class Config {
      * @return mixed[]
      */
     public static function getArray(string $property): array {
-        $value = Config::get($property);
+        $value = self::get($property);
         if (!empty($value)) {
             return Strings::split($value, ",");
         }
