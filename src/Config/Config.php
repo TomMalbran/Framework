@@ -6,8 +6,6 @@ use Framework\File\File;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
-use stdClass;
-
 /**
  * The Config Data
  */
@@ -97,7 +95,7 @@ class Config {
      * @param mixed|null $default  Optional.
      * @return mixed
      */
-    public static function get(string $property, mixed $default = null): mixed {
+    private static function get(string $property, mixed $default = null): mixed {
         self::load();
 
         // Check if there is a property with the given value
@@ -108,7 +106,7 @@ class Config {
 
         // Try to get all the properties that start with the value as a prefix
         $found  = false;
-        $result = new stdClass();
+        $result = [];
         foreach (self::$data as $envKey => $value) {
             $parts  = Strings::split($envKey, "_");
             $prefix = Strings::toLowerCase($parts[0]);
@@ -116,7 +114,7 @@ class Config {
                 $suffix = Strings::replace($envKey, "{$parts[0]}_", "");
                 $key    = Strings::upperCaseToCamelCase($suffix);
                 $found  = true;
-                $result->{$key} = $value;
+                $result[$key] = $value;
             }
         }
         if ($found) {
