@@ -94,16 +94,12 @@ class Email {
         $fromEmail = self::$config->email;
         $fromName  = self::$config->name;
 
-        switch ($provider) {
-        case self::Mandrill:
-            return Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
-        case self::Mailjet:
-            return Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
-        case self::SendGrid:
-            return SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
-        default:
-            return SMTP::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body);
-        }
+        return match ($provider) {
+            self::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
+            self::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
+            self::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
+            default        => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
+        };
     }
 
     /**
