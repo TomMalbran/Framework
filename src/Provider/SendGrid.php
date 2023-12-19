@@ -35,6 +35,7 @@ class SendGrid {
      * @param string $toEmail
      * @param string $fromEmail
      * @param string $fromName
+     * @param string $replyTo
      * @param string $subject
      * @param string $body
      * @return boolean
@@ -43,6 +44,7 @@ class SendGrid {
         string $toEmail,
         string $fromEmail,
         string $fromName,
+        string $replyTo,
         string $subject,
         string $body
     ): bool {
@@ -55,7 +57,10 @@ class SendGrid {
         ];
         $params = [
             "personalizations" => [[ "to" => [[ "email" => $toEmail ]] ]],
-            "from"             => [ "email" => $fromEmail, "name" => $fromName ],
+            "from"             => [
+                "email" => $fromEmail,
+                "name"  => $fromName,
+            ],
             "subject"          => $subject,
             "content"          => [
                 [
@@ -64,6 +69,12 @@ class SendGrid {
                 ],
             ],
         ];
+        if (!empty($replyTo)) {
+            $params["reply_to"] = [
+                "email" => $replyTo,
+                "name"  => $fromName,
+            ];
+        }
         $response = Curl::post($url, $params, $headers, jsonBody: true);
 
         return empty($response);

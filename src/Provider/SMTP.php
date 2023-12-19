@@ -41,6 +41,7 @@ class SMTP {
      * @param string $toEmail
      * @param string $fromEmail
      * @param string $fromName
+     * @param string $replyTo
      * @param string $subject
      * @param string $body
      * @param string $attachment Optional.
@@ -50,6 +51,7 @@ class SMTP {
         string $toEmail,
         string $fromEmail,
         string $fromName,
+        string $replyTo,
         string $subject,
         string $body,
         string $attachment = ""
@@ -98,8 +100,8 @@ class SMTP {
         $email->Body     = $body;
 
         $email->addAddress($toEmail);
-        if (!empty(self::$config->replyTo)) {
-            $email->addReplyTo(self::$config->replyTo, $fromName);
+        if (!empty($replyTo)) {
+            $email->addReplyTo($replyTo, $fromName);
         }
 
         if (!empty($attachment)) {

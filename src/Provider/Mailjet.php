@@ -37,6 +37,7 @@ class Mailjet {
      * @param string $toEmail
      * @param string $fromEmail
      * @param string $fromName
+     * @param string $replyTo
      * @param string $subject
      * @param string $body
      * @return boolean
@@ -45,30 +46,34 @@ class Mailjet {
         string $toEmail,
         string $fromEmail,
         string $fromName,
+        string $replyTo,
         string $subject,
         string $body
     ): bool {
         self::load();
 
-        $url    = self::BaseUrl . "send";
-        $params = [
-            "Messages" => [
-				[
-					"From"     => [
-						"Email" => $fromEmail,
-						"Name"  => $fromName,
-					],
-					"To"       => [
-						[ "Email" => $toEmail ],
-					],
-					"Subject"  => $subject,
-					"HTMLPart" => $body,
-                ],
-		    ],
+        $message = [
+            "From"     => [
+                "Email" => $fromEmail,
+                "Name"  => $fromName,
+            ],
+            "To"       => [
+                [ "Email" => $toEmail ],
+            ],
+            "Subject"  => $subject,
+            "HTMLPart" => $body,
         ];
-        $headers = [
-            "Content-Type" => "application/json",
-        ];
+        if (!empty($replyTo)) {
+            $message["ReplyTo"] = [
+                "Email" => $replyTo,
+                "Name"  => $fromName,
+            ];
+        }
+
+        $url      = self::BaseUrl . "send";
+        $headers  = [ "Content-Type" => "application/json" ];
+        $params   = [ "Messages" => [ $message ] ];
+
         $userPass = self::$apiKey . ":" . self::$apiSecret;
         $response = Curl::post($url, $params, $headers, $userPass, jsonBody: true);
 

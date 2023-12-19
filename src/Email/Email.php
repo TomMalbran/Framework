@@ -86,12 +86,13 @@ class Email {
         $provider  = self::$config->provider ?: "smtp";
         $fromEmail = self::$config->email;
         $fromName  = self::$config->name;
+        $replyTo   = self::$config->replyTo ?: "";
 
         $wasSent   = match ($provider) {
-            self::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
-            self::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
-            self::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
-            default        => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $subject, $body),
+            self::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            self::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            self::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            default        => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
         };
         return $wasSent ? EmailResult::Sent : EmailResult::ProviderError;
     }
