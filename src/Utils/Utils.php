@@ -10,24 +10,17 @@ use Framework\Utils\Strings;
 class Utils {
 
     /**
-     * Parses a Full Name into a First and Last Name
+     * Returns true if the given Full Name is valid
      * @param string $fullName
-     * @return string[]
+     * @return boolean
      */
-    public static function parseName(string $fullName): array {
-        $nameParts = Strings::split($fullName, " ");
-        if (count($nameParts) > 1) {
-            $lastName  = array_pop($nameParts);
-            $firstName = Strings::join($nameParts, " ");
-        } else {
-            $firstName = $fullName;
-            $lastName  = "";
-        }
-        return [ $firstName, $lastName ];
+    public static function isValidFullName(string $fullName): bool {
+        $nameParts = Strings::split(trim($fullName), " ");
+        return count($nameParts) > 1;
     }
 
     /**
-     * Returns true if the given email is valid
+     * Returns true if the given Email is valid
      * @param string $email
      * @return boolean
      */
@@ -36,7 +29,7 @@ class Utils {
     }
 
     /**
-     * Returns true if the given password is valid
+     * Returns true if the given Password is valid
      * @param string  $password
      * @param string  $checkSets Optional.
      * @param integer $minLength Optional.
@@ -62,7 +55,7 @@ class Utils {
     }
 
     /**
-     * Returns true if the given domain is valid
+     * Returns true if the given Domain is valid
      * @param string $domain
      * @return boolean
      */
@@ -71,7 +64,7 @@ class Utils {
     }
 
     /**
-     * Returns true if the given username is valid
+     * Returns true if the given Username is valid
      * @param string $username
      * @return boolean
      */
@@ -80,7 +73,7 @@ class Utils {
     }
 
     /**
-     * Returns true if the given name is valid
+     * Returns true if the given Name is valid
      * @param string $name
      * @return boolean
      */
@@ -89,7 +82,7 @@ class Utils {
     }
 
     /**
-     * Returns true if the given color is valid
+     * Returns true if the given Color is valid
      * @param string $color
      * @return boolean
      */
@@ -144,6 +137,23 @@ class Utils {
     }
 
 
+
+    /**
+     * Parses a Full Name into a First and Last Name
+     * @param string $fullName
+     * @return string[]
+     */
+    public static function parseName(string $fullName): array {
+        $nameParts = Strings::split(trim($fullName), " ");
+        if (count($nameParts) > 1) {
+            $lastName  = array_pop($nameParts);
+            $firstName = Strings::join($nameParts, " ");
+        } else {
+            $firstName = $fullName;
+            $lastName  = "";
+        }
+        return [ $firstName, $lastName ];
+    }
 
     /**
      * Parses the given CUIT if it has 11 chars
