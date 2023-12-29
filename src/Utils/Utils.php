@@ -309,11 +309,11 @@ class Utils {
     }
 
     /**
-     * Returns true if is a valid Zoom url
+     * Returns true if is a valid Url
      * @param string $url
      * @return boolean
      */
-    public static function isValidZoom(string $url): bool {
-        return Strings::startsWith($url, "https://us02web.zoom.us/j/");
+    public static function isValidUrl(string $url): bool {
+        return Strings::startsWith($url, "https://");
     }
 }

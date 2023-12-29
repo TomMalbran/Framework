@@ -446,12 +446,12 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given Zoom Link is valid
+     * Returns true if the given Url is valid
      * @param string $key
      * @return boolean
      */
-    public function isValidZoom(string $key): bool {
-        return Utils::isValidZoom($this->get($key));
+    public function isValidUrl(string $key): bool {
+        return Utils::isValidUrl($this->get($key));
     }
 
     /**
