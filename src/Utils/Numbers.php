@@ -89,23 +89,25 @@ class Numbers {
      * Returns a number using the right format
      * @param integer|float $number
      * @param integer       $decimals
+     * @param integer       $maxForDecimals Optional.
      * @return string
      */
-    public static function formatInt(int|float $number, int $decimals = 0): string {
+    public static function formatInt(int|float $number, int $decimals = 0, int $maxForDecimals = 1000): string {
         $float = $decimals > 0 ? self::toFloat($number, $decimals) : $number;
-        return self::formatFloat($float, $decimals);
+        return self::formatFloat($float, $decimals, $maxForDecimals);
     }
 
     /**
      * Returns a number using the right format
      * @param integer|float $number
      * @param integer       $decimals
+     * @param integer       $maxForDecimals Optional.
      * @return string
      */
-    public static function formatFloat(int|float $number, int $decimals): string {
+    public static function formatFloat(int|float $number, int $decimals, int $maxForDecimals = 1000): string {
         $float = floatval($number);
         if (!empty($float)) {
-            $decimals = $float < 1000 && !is_int($number) ? $decimals : 0;
+            $decimals = (empty($maxForDecimals) || $float < $maxForDecimals) && !is_int($number) ? $decimals : 0;
             return number_format($float, $decimals, ",", ".");
         }
         return "";
@@ -250,11 +252,12 @@ class Numbers {
     /**
      * Returns a price using the right format
      * @param integer|float $price
-     * @param integer       $decimals Optional.
+     * @param integer       $decimals       Optional.
+     * @param integer       $maxForDecimals Optional.
      * @return string
      */
-    public static function formatPrice(int|float $price, int $decimals = 2): string {
-        return self::formatFloat($price, $decimals);
+    public static function formatPrice(int|float $price, int $decimals = 2, int $maxForDecimals = 1000): string {
+        return self::formatFloat($price, $decimals, $maxForDecimals);
     }
 
     /**
