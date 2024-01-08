@@ -129,9 +129,9 @@
             "message"      : { "type" : "text"                              },
             "position"     : { "type" : "number", "cantEdit" : true         }
         },
-        "hasTimestamps" : true,
+        "hasTimestamps" : false,
         "canCreate"     : false,
-        "canEdit"       : true,
+        "canEdit"       : false,
         "canDelete"     : false
     },
     "emailQueue" : {
