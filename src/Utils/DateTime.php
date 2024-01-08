@@ -17,18 +17,46 @@ class DateTime {
         "dashesTime"    => "d-m-Y H:i",
     ];
 
-    public static int $serverDiff = -180;
-    public static int $timeDiff   = 0;
+    /** @var float[] */
+    public static array $stackZones = [];
+    public static float $serverZone = -3;
+    public static float $timeDiff   = 0;
 
 
 
     /**
      * Sets the Time Zone in minutes
-     * @param integer $timeZone
-     * @return integer
+     * @param float $timeZone
+     * @return float
      */
-    public static function setTimeZone(int $timeZone): int {
-        self::$timeDiff = (self::$serverDiff - $timeZone) * 60;
+    public static function setTimeZone(float $timeZone): float {
+        self::$stackZones = [ $timeZone ];
+        self::$timeDiff   = self::$serverZone - $timeZone;
+        return self::$timeDiff;
+    }
+
+    /**
+     * Pushes a Time Zone
+     * @param float $timeZone
+     * @return float
+     */
+    public static function pushTimeZone(float $timeZone): float {
+        self::$stackZones[] = $timeZone;
+        self::$timeDiff     = self::$serverZone - $timeZone;
+        return self::$timeDiff;
+    }
+
+    /**
+     * Pops a Time Zone
+     * @return float
+     */
+    public static function popTimeZone(): float {
+        if (count(self::$stackZones) > 1) {
+            $timeZone = array_pop(self::$stackZones);
+        } else {
+            $timeZone = self::$stackZones[0];
+        }
+        self::$timeDiff = self::$serverZone - $timeZone;
         return self::$timeDiff;
     }
 
@@ -40,7 +68,7 @@ class DateTime {
      */
     public static function toUserTime(int $value, bool $useTimeZone = true): int {
         if (!empty($value) && $useTimeZone) {
-            return $value - self::$timeDiff;
+            return $value - (self::$timeDiff * 3600);
         }
         return $value;
     }
@@ -53,7 +81,7 @@ class DateTime {
      */
     public static function toServerTime(int $value, bool $useTimeZone = true): int {
         if (!empty($value) && $useTimeZone) {
-            return $value + self::$timeDiff;
+            return $value + (self::$timeDiff * 3600);
         }
         return $value;
     }
@@ -96,11 +124,11 @@ class DateTime {
 
     /**
      * Returns the given time using the given Time Zone
-     * @param mixed        $time
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time
+     * @param float|null $timeZone Optional.
      * @return integer
      */
-    public static function toTimeZone(mixed $time, ?int $timeZone = null): int {
+    public static function toTimeZone(mixed $time, ?float $timeZone = null): int {
         if (Strings::isString($time)) {
             $time = strtotime($time);
         }
@@ -108,8 +136,8 @@ class DateTime {
             return 0;
         }
         if ($timeZone !== null) {
-            $timeDiff = (self::$serverDiff - $timeZone) * 60;
-            return $time - $timeDiff;
+            $timeDiff = self::$serverZone - $timeZone;
+            return $time - ($timeDiff * 3600);
         }
         return $time;
     }
@@ -329,22 +357,22 @@ class DateTime {
 
     /**
      * Returns true if the given Time is in the future
-     * @param mixed        $time
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time
+     * @param float|null $timeZone Optional.
      * @return boolean
      */
-    public static function isFutureTime(mixed $time, ?int $timeZone = null): bool {
+    public static function isFutureTime(mixed $time, ?float $timeZone = null): bool {
         $seconds = self::toTimeZone($time, $timeZone);
         return $seconds > time();
     }
 
      /**
      * Returns true if the given Time is today
-     * @param mixed        $time
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time
+     * @param float|null $timeZone Optional.
      * @return boolean
      */
-    public static function isToday(mixed $time, ?int $timeZone = null): bool {
+    public static function isToday(mixed $time, ?float $timeZone = null): bool {
         $seconds = self::toTimeZone($time, $timeZone);
         return date("d-m-Y", $seconds) == date("d-m-Y");
     }
@@ -374,12 +402,12 @@ class DateTime {
 
     /**
      * Formats the Time using the given Time Zone
-     * @param mixed        $time
-     * @param string       $format
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time
+     * @param string     $format
+     * @param float|null $timeZone Optional.
      * @return string
      */
-    public static function format(mixed $time, string $format, ?int $timeZone = null): string {
+    public static function format(mixed $time, string $format, ?float $timeZone = null): string {
         $seconds = self::toTimeZone($time, $timeZone);
         if (empty($seconds)) {
             return "";
@@ -389,12 +417,12 @@ class DateTime {
 
     /**
      * Returns the Time as a string
-     * @param mixed        $time
-     * @param string       $format
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time
+     * @param string     $format
+     * @param float|null $timeZone Optional.
      * @return string
      */
-    public static function toString(mixed $time, string $format, ?int $timeZone = null): string {
+    public static function toString(mixed $time, string $format, ?float $timeZone = null): string {
         if (!empty(self::$formats[$format])) {
             return self::format($time, self::$formats[$format], $timeZone);
         }
@@ -403,21 +431,21 @@ class DateTime {
 
     /**
      * Returns the Time as a ISO date string
-     * @param mixed        $time
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time     Optional.
+     * @param float|null $timeZone Optional.
      * @return string
      */
-    public static function toISOString(mixed $time, ?int $timeZone = null): string {
+    public static function toISOString(mixed $time, ?float $timeZone = null): string {
         return self::format($time, "c", $timeZone);
     }
 
     /**
      * Returns the Time as a UTC date string
-     * @param mixed        $time
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time
+     * @param float|null $timeZone Optional.
      * @return string
      */
-    public static function toUTCString(mixed $time, ?int $timeZone = null): string {
+    public static function toUTCString(mixed $time, ?float $timeZone = null): string {
         return Strings::replace(self::format($time, "c", $timeZone), "-03:00", "Z");
     }
 
@@ -597,11 +625,11 @@ class DateTime {
 
     /**
      * Returns true if the given time is the current month
-     * @param integer      $time     Optional.
-     * @param integer|null $timeZone Optional.
+     * @param integer    $time     Optional.
+     * @param float|null $timeZone Optional.
      * @return integer
      */
-    public static function isCurrentMonth(int $time = 0, ?int $timeZone = null): int {
+    public static function isCurrentMonth(int $time = 0, ?float $timeZone = null): int {
         $time    = self::getTime($time);
         $seconds = self::toTimeZone($time, $timeZone);
         return (self::getYear() == self::getYear($seconds) && self::getMonth() == self::getMonth($seconds));
@@ -767,12 +795,12 @@ class DateTime {
 
     /**
      * Returns the Day of Week
-     * @param integer      $time        Optional.
-     * @param boolean      $startMonday Optional.
-     * @param integer|null $timeZone    Optional.
+     * @param integer    $time        Optional.
+     * @param boolean    $startMonday Optional.
+     * @param float|null $timeZone    Optional.
      * @return integer
      */
-    public static function getDayOfWeek(int $time = 0, bool $startMonday = false, ?int $timeZone = null): int {
+    public static function getDayOfWeek(int $time = 0, bool $startMonday = false, ?float $timeZone = null): int {
         $time    = self::getTime($time);
         $seconds = self::toTimeZone($time, $timeZone);
         if ($startMonday) {
@@ -838,14 +866,14 @@ class DateTime {
 
     /**
      * Returns the Day name at the given Time
-     * @param integer      $time     Optional.
-     * @param integer|null $timeZone Optional.
-     * @param string       $language Optional.
+     * @param integer    $time     Optional.
+     * @param float|null $timeZone Optional.
+     * @param string     $language Optional.
      * @return string
      */
-    public static function getDayText(int $time = 0, ?int $timeZone = null, string $language = ""): string {
+    public static function getDayText(int $time = 0, ?float $timeZone = null, string $language = ""): string {
         $dayOfWeek = self::getDayOfWeek($time, false, $timeZone);
-        return self::getDayName($dayOfWeek, $language);
+        return self::getDayName($dayOfWeek, 0, false, $language);
     }
 
     /**
@@ -921,39 +949,47 @@ class DateTime {
 
     /**
      * Converts Hours and Minutes to Minutes
-     * @param integer|null $hours
-     * @param integer|null $minutes
+     * @param integer|null $hours    Optional.
+     * @param integer|null $minutes  Optional.
+     * @param float|null   $timeZone Optional.
      * @return integer
      */
-    public static function toMinutes(?int $hours = null, ?int $minutes = null): int {
+    public static function toMinutes(?int $hours = null, ?int $minutes = null, ?float $timeZone = null): int {
         if ($hours === null || $minutes === null) {
-            return (int)date("H") * 60 + (int)date("i");
+            $result = (int)date("H") * 60 + (int)date("i");
+        } else {
+            $result = $hours * 60 + $minutes;
         }
-        return $hours * 60 + $minutes;
+        if (!empty($timeZone)) {
+            $timeDiff = self::$serverZone - $timeZone;
+            $result  -= ($timeDiff * 60);
+        }
+        return $result;
     }
 
     /**
      * Converts the Time to Minutes
-     * @param string $time
+     * @param string     $time
+     * @param float|null $timeZone Optional.
      * @return integer
      */
-    public static function timeToMinutes(string $time): int {
+    public static function timeToMinutes(string $time, ?float $timeZone = null): int {
         $parts = Strings::split($time, ":");
         if (empty($parts) || count($parts) != 2) {
             return 0;
         }
-        return self::toMinutes((int)$parts[0], (int)$parts[1]);
+        return self::toMinutes((int)$parts[0], (int)$parts[1], $timeZone);
     }
 
 
 
     /**
      * Returns the amount of years between given date and today AKA the age
-     * @param mixed        $time
-     * @param integer|null $timeZone Optional.
+     * @param mixed      $time
+     * @param float|null $timeZone Optional.
      * @return integer
      */
-    public static function getAge(mixed $time, ?int $timeZone = null): int {
+    public static function getAge(mixed $time, ?float $timeZone = null): int {
         $seconds  = self::toTimeZone($time, $timeZone);
         if (empty($seconds)) {
             return 0;
@@ -1010,5 +1046,19 @@ class DateTime {
      */
     public static function parseTime(int|float $time): string {
         return $time < 10 ? "0{$time}" : (string)$time;
+    }
+
+    /**
+     * Parses the Time Zone
+     * @param float $timeZone
+     * @return string
+     */
+    public static function parseTimeZone(float $timeZone): string {
+        $sign    = $timeZone < 0 ? "-" : "+";
+        $time    = abs($timeZone * 60);
+        $hours   = floor($time / 60);
+        $minutes = $time - $hours * 60;
+
+        return "GMT $sign$hours:" . self::parseTime($minutes);
     }
 }
