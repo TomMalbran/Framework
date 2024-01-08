@@ -60,6 +60,8 @@ class Email {
      */
     public static function send(string $toEmail, string $subject, string $message): string {
         self::load();
+
+        // Return some possible errors
         if (!self::$config->isActive) {
             return EmailResult::InactiveSend;
         }
@@ -70,6 +72,7 @@ class Email {
             return EmailResult::InvalidEmail;
         }
 
+        // Create the template
         $logo = "";
         if (!empty(self::$config->logo)) {
             $logo = self::$config->logo;
@@ -83,12 +86,18 @@ class Email {
             "message"  => $message,
         ]);
 
+        // Configure the variables
         $provider  = self::$config->provider ?: "smtp";
         $fromEmail = self::$config->email;
         $fromName  = self::$config->name;
-        $replyTo   = self::$config->replyTo ?: "";
+        $replyTo   = "";
 
-        $wasSent   = match ($provider) {
+        if (!empty(self::$config->replyTo)) {
+            $replyTo = self::$config->replyTo;
+        }
+
+        // Try to send the email
+        $wasSent = match ($provider) {
             self::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
             self::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
             self::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
