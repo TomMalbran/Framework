@@ -409,6 +409,10 @@ class Image {
         int    $height,
         string $action
     ): bool {
+        if (!class_exists("Imagick")) {
+            return self::resize($src, $dst, $width, $height, self::Thumb);
+        }
+
         $bestFit = $action === self::Maximum;
         $fill    = $action === self::Thumb;
 
