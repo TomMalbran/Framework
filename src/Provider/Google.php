@@ -51,7 +51,7 @@ class Google {
         return [
             "email"     => $response["email"],
             "firstName" => $response["given_name"],
-            "lastName"  => $response["family_name"],
+            "lastName"  => !empty($response["family_name"]) ? $response["family_name"] : "",
         ];
     }
 
