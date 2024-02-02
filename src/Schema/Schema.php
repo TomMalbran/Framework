@@ -631,8 +631,9 @@ class Schema {
             $updated = true;
         }
         if (empty($newValue) && !empty($oldValue)) {
-            $newQuery = new Query($query);
-            $newQuery->orderBy($this->structure->getOrder(), true)->limit(1);
+            $newQuery = $this->generateQuery($query, true);
+            $newQuery->orderBy($this->structure->getOrder(), true);
+            $newQuery->limit(1);
             $this->edit($newQuery, [ $field => 1 ]);
             $updated = true;
         }
