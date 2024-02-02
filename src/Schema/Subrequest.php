@@ -65,6 +65,10 @@ class SubRequest {
         $subResult = [];
 
         foreach ($request as $row) {
+            if (empty($row[$this->idName])) {
+                continue;
+            }
+
             $name = $row[$this->idName];
             if (empty($subResult[$name])) {
                 $subResult[$name] = [];
