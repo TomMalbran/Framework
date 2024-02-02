@@ -66,6 +66,14 @@ class Schema {
         return Query::encrypt($value, $this->structure->masterKey);
     }
 
+    /**
+     * Returns true if a Table exists
+     * @return boolean
+     */
+    public function tableExists(): bool {
+        return $this->db->tableExists($this->structure->table);
+    }
+
 
 
     /**
