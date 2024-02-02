@@ -88,7 +88,6 @@ class Curl {
     ): mixed {
         $options = [
             CURLOPT_URL             => $url,
-            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_CUSTOMREQUEST   => $request,
             CURLOPT_TIMEOUT         => 100,
@@ -131,7 +130,6 @@ class Curl {
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_FILE            => $file,
-            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
             CURLOPT_FOLLOWLOCATION  => true,
             CURLOPT_HTTPGET         => true,
             CURLOPT_TIMEOUT         => 100,
@@ -164,7 +162,6 @@ class Curl {
     public static function write(string $url, string $fileContent, ?array $headers = null): mixed {
         $options = [
             CURLOPT_URL             => $url,
-            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_POST            => true,
             CURLOPT_POSTFIELDS      => $fileContent,
@@ -211,7 +208,6 @@ class Curl {
     ): mixed {
         $options = [
             CURLOPT_URL             => $url,
-            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_HEADER          => false,
             CURLOPT_FORBID_REUSE    => true,
