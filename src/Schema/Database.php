@@ -653,9 +653,9 @@ class Database {
     /**
      * Returns true if a Table exists
      * @param string $tableName
-     * @return string
+     * @return boolean
      */
-    public function tableExists(string $tableName): string {
+    public function tableExists(string $tableName): bool {
         $sql    = "SHOW TABLES LIKE '$tableName'";
         $result = $this->query($sql);
         return !empty($result);
@@ -664,9 +664,9 @@ class Database {
     /**
      * Returns true if a Table exists
      * @param string $tableName
-     * @return string
+     * @return boolean
      */
-    public function tableIsEmpty(string $tableName): string {
+    public function tableIsEmpty(string $tableName): bool {
         $sql    = "SELECT COUNT(*) AS count FROM $tableName";
         $result = $this->query($sql);
         return empty($result) || $result[0]["count"] == 0;
