@@ -292,6 +292,20 @@
         "canEdit"       : false,
         "canDelete"     : false
     },
+    "logDevices" : {
+        "table"  : "log_devices",
+        "fields" : {
+            "LOG_ID"        : { "type" : "id",     "name" : "logID"        },
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
+            "userAgent"     : { "type" : "string"                          },
+            "playerID"      : { "type" : "string"                          },
+            "wasAdded"      : { "type" : "boolean"                         }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : true,
+        "canEdit"       : false,
+        "canDelete"     : false
+    },
     "logErrors" : {
         "table"  : "log_errors",
         "fields" : {

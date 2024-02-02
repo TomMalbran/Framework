@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Log\DeviceLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
@@ -43,11 +44,13 @@ class Device {
      * @return boolean
      */
     public static function add(int $credentialID, string $playerID): bool {
-        return self::schema()->replace([
+        $result = self::schema()->replace([
             "CREDENTIAL_ID" => $credentialID,
             "userAgent"     => Server::getUserAgent(),
             "playerID"      => $playerID,
         ]);
+        DeviceLog::added($credentialID, $playerID);
+        return $result;
     }
 
     /**
@@ -59,6 +62,8 @@ class Device {
     public static function remove(int $credentialID, string $playerID): bool {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         $query->add("playerID", "=", $playerID);
-        return self::schema()->remove($query);
+        $result = self::schema()->remove($query);
+        DeviceLog::removed($credentialID, $playerID);
+        return $result;
     }
 }

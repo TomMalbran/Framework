@@ -19,6 +19,7 @@
         "logIDs"            : {},
         "logSessions"       : {},
         "logActions"        : {},
+        "logDevices"        : {},
         "logErrors"         : {}
     },
     "patternProperties" : {
