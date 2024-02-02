@@ -191,7 +191,8 @@ class Strings {
      * @return string
      */
     public static function replacePattern(string $string, array|string $pattern, array|string $replace): string {
-        return preg_replace($pattern, $replace, $string);
+        $result = preg_replace($pattern, $replace, $string);
+        return !empty($result) ? $result : "";
     }
 
     /**
