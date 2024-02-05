@@ -27,14 +27,18 @@ class Status {
         if (self::$loaded) {
             return false;
         }
-        self::$loaded = true;
+
         $data = Framework::loadData(Framework::StatusData);
+        if (empty($data)) {
+            $data = Framework::loadJSON(Framework::DataDir, Framework::StatusData, true);
+        }
 
         // Store the Values
         foreach ($data["values"] as $statusName => $statusValue) {
             $name = Strings::toLowerCase($statusName);
             self::$values[$name] = $statusValue;
         }
+
         // Store the Groups
         foreach ($data["groups"] as $groupName => $statusNames) {
             $gName = Strings::toLowerCase($groupName);
@@ -46,6 +50,8 @@ class Status {
                 }
             }
         }
+
+        self::$loaded = true;
         return true;
     }
 

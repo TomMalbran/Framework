@@ -1,0 +1,9 @@
+{
+    "values" : {
+        "Active"   : 1,
+        "Inactive" : 2
+    },
+    "groups" : {
+        "general" : [ "Active", "Inactive" ]
+    }
+}
