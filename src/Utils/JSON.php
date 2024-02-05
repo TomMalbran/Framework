@@ -5,8 +5,6 @@ use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
-use stdClass;
-
 /**
  * The JSON Utils
  */
@@ -42,7 +40,7 @@ class JSON {
      * Decodes a String if it is not already decoded
      * @param mixed   $value
      * @param boolean $asArray Optional.
-     * @return object|array
+     * @return array{}|object
      */
     public static function decode(mixed $value, bool $asArray = false): mixed {
         if (!self::isValid($value)) {
@@ -66,19 +64,19 @@ class JSON {
     /**
      * Creates the read response
      * @param boolean $asArray Optional.
-     * @return object|array
+     * @return array{}|object
      */
     private static function createResponse(bool $asArray = false): mixed {
-        return $asArray ? [] : new stdClass();
+        return $asArray ? [] : (object)[];
     }
 
     /**
      * Reads a JSON file
      * @param string  $path
      * @param boolean $asArray Optional.
-     * @return object|array
+     * @return array{}|object
      */
-    public static function readFile(string $path, bool $asArray = false): mixed {
+    public static function readFile(string $path, bool $asArray = false): array|object {
         if (!File::exists($path)) {
             return self::createResponse($asArray);
         }
@@ -93,9 +91,9 @@ class JSON {
      * Reads a JSON url
      * @param string  $url
      * @param boolean $asArray Optional.
-     * @return object|array
+     * @return array{}|object
      */
-    public static function readUrl(string $url, bool $asArray = false): mixed {
+    public static function readUrl(string $url, bool $asArray = false): array|object {
         $response = file_get_contents($url);
         if (empty($response)) {
             return self::createResponse($asArray);
@@ -108,9 +106,9 @@ class JSON {
      * @param string  $url
      * @param array{} $data
      * @param boolean $asArray Optional.
-     * @return object|array
+     * @return array{}|object
      */
-    public static function postUrl(string $url, array $data, bool $asArray = false): mixed {
+    public static function postUrl(string $url, array $data, bool $asArray = false): array|object {
         $options = [
             "http" => [
                 "header"  => "Content-type: application/x-www-form-urlencoded\r\n",

@@ -2,7 +2,6 @@
 namespace Framework\Utils;
 
 use ArrayAccess;
-use stdClass;
 
 /**
  * Several Array Utils
@@ -205,7 +204,7 @@ class Arrays {
      * @return mixed
      */
     public static function toObject(?array $array = null): mixed {
-        return !empty($array) ? $array : new stdClass();
+        return !empty($array) ? $array : (object)[];
     }
 
     /**
