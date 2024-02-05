@@ -16,12 +16,12 @@ class Migration {
 
     /**
      * Migrates the Tables
-     * @param Database  $db
      * @param array{}[] $schemas
      * @param boolean   $canDelete Optional.
      * @return boolean
      */
-    public static function migrate(Database $db, array $schemas, bool $canDelete = false): bool {
+    public static function migrate(array $schemas, bool $canDelete = false): bool {
+        $db         = Framework::getDatabase();
         $migrations = Framework::loadData(Framework::MigrationsData);
 
         $moved    = self::moveTables($db, $migrations["movements"]);

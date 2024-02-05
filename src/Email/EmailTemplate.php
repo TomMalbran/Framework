@@ -111,10 +111,10 @@ class EmailTemplate {
 
     /**
      * Migrates the Email Templates
-     * @param Database $db
      * @return boolean
      */
-    public static function migrate(Database $db): bool {
+    public static function migrate(): bool {
+        $db = Framework::getDatabase();
         if (!$db->hasTable("email_templates")) {
             return false;
         }

@@ -271,13 +271,14 @@ class Settings {
 
     /**
      * Migrates the Settings
-     * @param Database $db
      * @return boolean
      */
-    public static function migrate(Database $db): bool {
+    public static function migrate(): bool {
+        $db = Framework::getDatabase();
         if (!$db->hasTable("settings")) {
             return false;
         }
+
         $settings  = Framework::loadData(Framework::SettingsData);
         $request   = $db->getAll("settings");
 

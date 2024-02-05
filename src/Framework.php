@@ -305,15 +305,14 @@ class Framework {
 
     /**
      * Runs the Migrations for all the Framework
-     * @param Database $db
-     * @param boolean  $canDelete Optional.
-     * @param boolean  $withPaths Optional.
+     * @param boolean $canDelete Optional.
+     * @param boolean $withPaths Optional.
      * @return boolean
      */
-    public static function migrate(Database $db, bool $canDelete = false, bool $withPaths = true): bool {
-        $factMigrated = Factory::migrate($db, $canDelete);
-        $settMigrated = Settings::migrate($db);
-        $tempMigrated = EmailTemplate::migrate($db);
+    public static function migrate(bool $canDelete = false, bool $withPaths = true): bool {
+        $factMigrated = Factory::migrate($canDelete);
+        $settMigrated = Settings::migrate();
+        $tempMigrated = EmailTemplate::migrate();
         $genMigrated  = Generator::migrate();
 
         if ($withPaths) {
