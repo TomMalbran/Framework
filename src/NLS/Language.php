@@ -31,6 +31,10 @@ class Language {
         }
 
         $data = Framework::loadData(Framework::LanguageData);
+        if (empty($data)) {
+            $data = Framework::loadJSON(Framework::DataDir, Framework::LanguageData, true);
+        }
+
         foreach ($data as $key => $elem) {
             $entity = new LanguageEntity($elem);
             self::$languages[$key] = $entity;

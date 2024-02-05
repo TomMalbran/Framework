@@ -35,8 +35,9 @@ class Factory {
         if (self::$loaded) {
             return false;
         }
+
         $schemas = Framework::loadData(Framework::SchemaData);
-        $frame   = Framework::loadJSON("data", Framework::SchemaData, true);
+        $frame   = Framework::loadJSON(Framework::DataDir, Framework::SchemaData, true);
 
         self::$loaded = true;
         self::$db     = Framework::getDatabase();
