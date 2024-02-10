@@ -60,30 +60,39 @@ class MediaFile {
      */
     public static function update(string $oldPath, string $newPath): bool {
         self::load();
-        $result = 0;
-
         if (empty(self::$data["updates"])) {
-            return false;
+            return true;
         }
 
-        foreach (self::$data["updates"] as $field) {
-            $updated = false;
-            if (!empty($field["isJson"]) && $field["isJson"]) {
-                $query   = Query::create($field["field"], "LIKE", ":\"$oldPath\"");
-                $updated = self::$db->update($field["table"], [
-                    $field["field"] => Query::replace($field["field"], $oldPath, $newPath),
-                ], $query);
-            } else {
-                $query   = Query::create($field["field"], "=", $oldPath);
-                $updated = self::$db->update($field["table"], [
-                    $field["field"] => $newPath,
-                ], $query);
-            }
-            if ($updated) {
-                $result += 1;
+        $files = [
+            [
+                "old" => $oldPath,
+                "new" => $newPath,
+            ],
+            [
+                "old" => File::addFirstSlash($oldPath),
+                "new" => File::addFirstSlash($newPath),
+            ],
+        ];
+
+        foreach ($files as $file) {
+            foreach (self::$data["updates"] as $field) {
+                $old = $file["old"];
+                $new = $file["new"];
+                if (!empty($field["isJson"]) && $field["isJson"]) {
+                    $query = Query::create($field["field"], "LIKE", ":\"$old\"");
+                    self::$db->update($field["table"], [
+                        $field["field"] => Query::replace($field["field"], $old, $new),
+                    ], $query);
+                } else {
+                    $query = Query::create($field["field"], "=", $old);
+                    self::$db->update($field["table"], [
+                        $field["field"] => $new,
+                    ], $query);
+                }
             }
         }
-        return $result > 0;
+        return true;
     }
 
 
