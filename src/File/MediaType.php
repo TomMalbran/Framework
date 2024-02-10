@@ -14,6 +14,7 @@ class MediaType {
     const Video = "video";
     const Audio = "audio";
     const PDF   = "pdf";
+    const Text  = "text";
     const File  = "file";
 
 
@@ -38,6 +39,9 @@ class MediaType {
             return true;
         }
         if ($type == self::Audio && FileType::isAudio($name)) {
+            return true;
+        }
+        if ($type == self::Text && FileType::isText($name)) {
             return true;
         }
         if ($type == self::PDF && FileType::isPDF($name)) {
