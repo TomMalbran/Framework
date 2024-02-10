@@ -306,6 +306,23 @@
         "canEdit"       : false,
         "canDelete"     : false
     },
+    "logProviders" : {
+        "name"   : "ProviderLog",
+        "table"  : "log_providers",
+        "fields" : {
+            "LOG_ID"   : { "type" : "id",     "name" : "logID" },
+            "provider" : { "type" : "string"                   },
+            "type"     : { "type" : "string"                   },
+            "url"      : { "type" : "text"                     },
+            "request"  : { "type" : "json"                     },
+            "response" : { "type" : "json"                     },
+            "isError"  : { "type" : "boolean"                  }
+        },
+        "hasTimestamps" : true,
+        "canCreate"     : true,
+        "canEdit"       : true,
+        "canDelete"     : false
+    },
     "logErrors" : {
         "table"  : "log_errors",
         "fields" : {

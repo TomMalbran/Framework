@@ -20,6 +20,7 @@
         "logSessions"       : {},
         "logActions"        : {},
         "logDevices"        : {},
+        "logProviders"      : {},
         "logErrors"         : {}
     },
     "patternProperties" : {
