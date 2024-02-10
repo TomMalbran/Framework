@@ -28,7 +28,7 @@ class FileType {
     public static array $codeExts         = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
 
     /** @var string[] */
-    public static array $textExts         = [ "txt", "csv", "log", "rtf" ];
+    public static array $textExts         = [ "txt", "csv", "log", "rtf", "json" ];
 
     /** @var string[] */
     public static array $documentExts     = [ "doc", "docx", "odt", "ott" ];
