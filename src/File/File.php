@@ -36,6 +36,34 @@ class File {
 
 
     /**
+     * Reads the contents of a file
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function read(string ...$pathParts): string {
+        $fullPath = self::getPath(...$pathParts);
+        if (empty($fullPath) || !file_exists($fullPath)) {
+            return "";
+        }
+        $result = file_get_contents($fullPath);
+        return $result !== false ? $result : "";
+    }
+
+    /**
+     * Reads the contents of a url
+     * @param string $fileUrl
+     * @return string
+     */
+    public static function readUrl(string $fileUrl): string {
+        if (empty($fileUrl)) {
+            return "";
+        }
+        $fileUrl = Strings::encodeUrl($fileUrl);
+        $result  = file_get_contents($fileUrl);
+        return $result !== false ? $result : "";
+    }
+
+    /**
      * Uploads the given file to the given path
      * @param string $path
      * @param string $fileName
@@ -87,31 +115,17 @@ class File {
     }
 
     /**
-     * Reads the contents of a file
-     * @param string ...$pathParts
-     * @return string
-     */
-    public static function read(string ...$pathParts): string {
-        $fullPath = self::getPath(...$pathParts);
-        if (empty($fullPath) || !file_exists($fullPath)) {
-            return "";
-        }
-        $result = file_get_contents($fullPath);
-        return $result !== false ? $result : "";
-    }
-
-    /**
-     * Reads the contents of a url
+     * Writes the content from the given Url in the given file
+     * @param string $path
      * @param string $fileUrl
-     * @return string
+     * @return boolean
      */
-    public static function readUrl(string $fileUrl): string {
-        if (empty($fileUrl)) {
-            return "";
+    public static function writeFromUrl(string $path, string $fileUrl): bool {
+        $content = self::readUrl($fileUrl);
+        if ($content === false) {
+            return false;
         }
-        $fileUrl = Strings::encodeUrl($fileUrl);
-        $result  = file_get_contents($fileUrl);
-        return $result !== false ? $result : "";
+        return self::write($path, $content);
     }
 
     /**
