@@ -226,6 +226,9 @@ class File {
      * @return string
      */
     public static function getExtension(string $name): string {
+        if (Strings::contains($name, "?")) {
+            $name = Strings::substringBefore($name, "?");
+        }
         return pathinfo($name, PATHINFO_EXTENSION);
     }
 
