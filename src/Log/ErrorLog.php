@@ -51,7 +51,7 @@ class ErrorLog {
 
 
     /**
-     * Returns an Error with the given ID
+     * Returns an Error Log item with the given ID
      * @param integer $logID
      * @return Model
      */
@@ -60,7 +60,7 @@ class ErrorLog {
     }
 
     /**
-     * Returns true if the given Error exists
+     * Returns true if the given Error Log item exists
      * @param integer $logID
      * @return boolean
      */
