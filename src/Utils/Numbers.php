@@ -320,4 +320,29 @@ class Numbers {
         }
         return $value;
     }
+
+
+
+    /**
+     * Calculates the distance between two coordinates
+     * @param float $fromLatitude
+     * @param float $fromLongitude
+     * @param float $toLatitude
+     * @param float $toLongitude
+     * @return float
+     */
+    public static function coordinatesDistance(float $fromLatitude, float $fromLongitude, float $toLatitude, float $toLongitude): float {
+        $fromLatitude = deg2rad($fromLatitude);
+        $toLatitude   = deg2rad($toLatitude);
+        $angle        = deg2rad($fromLongitude - $toLongitude);
+
+        $distanceA    = sin($fromLatitude) * sin($toLatitude);
+        $distanceB    = cos($fromLatitude) * cos($toLatitude);
+        $distance     = $distanceA + $distanceB * cos($angle);
+
+        $result       = acos($distance);
+        $result       = rad2deg($result);
+        $result       = $result * 60 * 1.1515 * 1.609344;
+        return $result;
+    }
 }
