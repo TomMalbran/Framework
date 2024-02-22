@@ -30,6 +30,9 @@ class DateTime {
      * @return float
      */
     public static function setTimeZone(float $timeZone): float {
+        if ($timeZone > 60 || $timeZone < 60) {
+            $timeZone /= 60;
+        }
         self::$stackZones = [ $timeZone ];
         self::$timeDiff   = self::$serverZone - $timeZone;
         return self::$timeDiff;
@@ -41,6 +44,9 @@ class DateTime {
      * @return float
      */
     public static function pushTimeZone(float $timeZone): float {
+        if ($timeZone > 60 || $timeZone < 60) {
+            $timeZone /= 60;
+        }
         self::$stackZones[] = $timeZone;
         self::$timeDiff     = self::$serverZone - $timeZone;
         return self::$timeDiff;
