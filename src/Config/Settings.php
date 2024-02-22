@@ -50,6 +50,16 @@ class Settings {
     }
 
     /**
+     * Returns a single Setting as a String
+     * @param string $preference
+     * @return string
+     */
+    public static function getString(string $preference): string {
+        $result = self::get($preference);
+        return $result !== null ? (string)$result : "";
+    }
+
+    /**
      * Returns a single Setting as an Integer
      * @param string $preference
      * @return integer
