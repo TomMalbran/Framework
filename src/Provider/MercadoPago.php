@@ -187,7 +187,7 @@ class MercadoPago {
      * @param array{}  $payer          Optional.
      * @param float    $marketplaceFee Optional.
      * @param string   $accessToken    Optional.
-     * @return object
+     * @return array{}
      */
     public static function createPaymentUrl(
         string $reference,
@@ -195,7 +195,7 @@ class MercadoPago {
         array $payer = [],
         float $marketplaceFee = 0,
         string $accessToken = "",
-    ): object {
+    ): array {
         self::load($accessToken);
 
         $itemList = [];
@@ -231,15 +231,7 @@ class MercadoPago {
             ];
         }
 
-        $result = self::post("/checkout/preferences", $fields);
-        if (empty($result["id"])) {
-            return (object)[];
-        }
-
-        return (object)[
-            "id"  => $result["id"],
-            "url" => $result["init_point"],
-        ];
+        return self::post("/checkout/preferences", $fields);
     }
 
     /**
