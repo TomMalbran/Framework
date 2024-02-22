@@ -149,13 +149,11 @@ class EmailTemplate {
     ): int {
         $siteName = Config::getString("name");
         $updates  = [];
-        $codes    = [];
 
         // Adds the Email Templates
         foreach ($templates as $templateCode => $template) {
             $position += 1;
             $message   = Strings::join($template["message"], "\n\n");
-            $codes[]   = $templateCode;
             $updates[] = [
                 "templateCode" => $templateCode,
                 "language"     => $language,
@@ -172,7 +170,6 @@ class EmailTemplate {
         // Process the SQL
         if (!empty($updates)) {
             print("<br>Updated <i>" . count($updates) . " emails</i> for language <i>$languageName</i><br>");
-            print(Strings::join($codes, ", ") . "<br>");
             $db->batch("email_templates", $updates);
         }
 
