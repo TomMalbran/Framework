@@ -67,6 +67,14 @@ class Select implements ArrayAccess, JsonSerializable {
         return null;
     }
 
+    /**
+     * Returns all the Extra Values
+     * @return array<string,mixed>
+     */
+    public function getExtras(): array {
+        return $this->extras;
+    }
+
 
 
     /**
