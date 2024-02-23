@@ -3,6 +3,7 @@ namespace Framework\IO;
 
 use Framework\NLS\NLS;
 use Framework\IO\SpreadsheetSheet;
+use Framework\Utils\Elements;
 use Framework\Utils\Strings;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -11,15 +12,17 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 /**
  * The Spreadsheet Writer
  */
-class SpreadsheetWriter {
+class SpreadsheetWriter implements ExporterWriter {
 
-    private string      $title;
-    private string      $lang;
-    private Spreadsheet $data;
-    private int         $sheetNum;
+    private string           $title;
+    private string           $lang;
+    private Spreadsheet      $data;
+    private SpreadsheetSheet $sheet;
+    private int              $sheetNum;
 
     /** @var SpreadsheetSheet[] */
-    private array       $sheets;
+    private array            $sheets;
+
 
 
     /**
@@ -35,6 +38,7 @@ class SpreadsheetWriter {
 
         $this->sheets   = [];
         $this->sheetNum = 0;
+        $this->addSheet();
     }
 
 
@@ -59,6 +63,7 @@ class SpreadsheetWriter {
 
         $this->sheets[$sheetID] = $spreadsheet;
         $this->sheetNum += 1;
+        $this->sheet     = $spreadsheet;
         return $spreadsheet;
     }
 
@@ -72,6 +77,45 @@ class SpreadsheetWriter {
             return $this->sheets[$sheetID];
         }
         return null;
+    }
+
+
+
+    /**
+     * Writes the Header
+     * @param Elements $header
+     * @return SpreadsheetWriter
+     */
+    public function writeHeader(Elements $header): SpreadsheetWriter {
+        if ($this->sheet) {
+            $this->sheet->setHeader($header);
+        }
+        return $this;
+    }
+
+    /**
+     * Writes a Line
+     * @param array{} $line
+     * @return SpreadsheetWriter
+     */
+    public function writeLine(array $line): SpreadsheetWriter {
+        if ($this->sheet) {
+            $this->sheet->setLine($line);
+        }
+        return $this;
+    }
+
+    /**
+     * Downloads the File
+     * @param string $fileName
+     * @return SpreadsheetWriter
+     */
+    public function downloadFile(string $fileName): SpreadsheetWriter {
+        if ($this->sheet) {
+            $this->sheet->autoSizeColumns();
+        }
+        $this->download($fileName, false);
+        return $this;
     }
 
 

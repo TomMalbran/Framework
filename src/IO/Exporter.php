@@ -3,24 +3,21 @@ namespace Framework\IO;
 
 use Framework\Request;
 use Framework\NLS\NLS;
+use Framework\IO\ExporterWriter;
 use Framework\IO\SpreadsheetWriter;
-use Framework\IO\SpreadsheetSheet;
+use Framework\IO\CSVWriter;
+use Framework\IO\XLSXWriter;
 use Framework\Utils\Elements;
-use Framework\Utils\Strings;
 
 /**
  * The Exporter Wrapper
  */
 class Exporter {
 
-    private string            $fileName;
-    private string            $lang;
-    private int               $total;
-    private Elements          $header;
-    private bool              $isCSV;
-    private SpreadsheetWriter $writer;
-    private SpreadsheetSheet  $sheet;
-    private mixed             $csv;
+    private string         $fileName;
+    private int            $total;
+    private Elements       $header;
+    private ExporterWriter $writer;
 
     private int $requests = 0;
     private int $perPage  = 2000;
@@ -37,20 +34,17 @@ class Exporter {
      * @param string  $lang     Optional.
      */
     public function __construct(int $total, string $title, string $fileName, int $maxLines = 5000, string $lang = "root") {
-        $this->fileName = $fileName;
-        $this->lang     = $lang;
+        $this->fileName = NLS::get($fileName, $lang) . "_" . date("Y-m-d");
         $this->total    = $total;
         $this->header   = new Elements();
 
-        if ($total < $maxLines) {
-            $this->isCSV  = false;
+        if (empty($maxLines)) {
+            $this->writer = new XLSXWriter($title, $this->fileName, $lang);
+        } elseif ($total < $maxLines) {
             $this->writer = new SpreadsheetWriter($title, $lang);
-            $this->sheet  = $this->writer->addSheet();
         } else {
-            $this->isCSV  = true;
-            $this->csv    = fopen("php://output", "w");
+            $this->writer = new CSVWriter($this->fileName, $lang);
         }
-        $this->start();
     }
 
 
@@ -107,12 +101,7 @@ class Exporter {
      * @return Exporter
      */
     public function writeHeader(): Exporter {
-        if ($this->isCSV) {
-            $values = NLS::getAll($this->header->getValues(), $this->lang);
-            fputcsv($this->csv, $values);
-        } else {
-            $this->sheet->setHeader($this->header);
-        }
+        $this->writer->writeHeader($this->header);
         return $this;
     }
 
@@ -146,41 +135,8 @@ class Exporter {
      */
     public function writeLine(array $line): Exporter {
         $this->line += 1;
-
-        if ($this->isCSV) {
-            $parsed = $this->header->parseValues($line);
-            fputcsv($this->csv, $parsed);
-            if ($this->line % 100 == 0) {
-                flush();
-            }
-        } else {
-            $this->sheet->setLine($line);
-        }
+        $this->writer->writeLine($line);
         return $this;
-    }
-
-
-
-    /**
-     * Starts the Exporter
-     * @return boolean
-     */
-    private function start(): bool {
-        if (!$this->isCSV) {
-            return false;
-        }
-
-        if (ob_get_level()) {
-            ob_end_clean();
-        }
-
-        $fileName = NLS::get($this->fileName, $this->lang) . "_" . date("Y-m-d");
-        header("Content-Type: application/csv");
-        header("Content-Disposition: attachment; filename=\"{$fileName}.csv\"");
-        header("Pragma: no-cache");
-        header("Expires: 0");
-        flush();
-        return true;
     }
 
     /**
@@ -188,14 +144,7 @@ class Exporter {
      * @return boolean
      */
     public function download(): bool {
-        if ($this->isCSV) {
-            fclose($this->csv);
-            flush();
-            die();
-        }
-
-        $this->sheet->autoSizeColumns();
-        $this->writer->download($this->fileName, true);
+        $this->writer->downloadFile($this->fileName);
         return true;
     }
 }
