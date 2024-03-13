@@ -15,6 +15,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
 use Framework\Utils\JSON;
+use Framework\Utils\Server;
 use Exception;
 
 /**
@@ -141,6 +142,17 @@ class Framework {
     }
 
     /**
+     * Returns the Private BasePath
+     * @return string
+     */
+    public static function getPrivatePath(): string {
+        if (Server::isLocalHost()) {
+            return self::$basePath;
+        }
+        return dirname(self::$basePath);
+    }
+
+    /**
      * Returns the BasePath with the given dir
      * @param string  $dir          Optional.
      * @param string  $file         Optional.
@@ -148,13 +160,10 @@ class Framework {
      * @return string
      */
     public static function getPath(string $dir = "", string $file = "", bool $forFramework = false): string {
-        $path = "";
         if ($forFramework) {
-            $path = File::getPath(self::$framePath, $dir, $file);
-        } else {
-            $path = File::getPath(self::$basePath, self::$baseDir, $dir, $file);
+            return File::getPath(self::$framePath, $dir, $file);
         }
-        return File::removeLastSlash($path);
+        return File::getPath(self::$basePath, self::$baseDir, $dir, $file);
     }
 
     /**
@@ -163,8 +172,7 @@ class Framework {
      * @return string
      */
     public static function getFilesPath(string ...$pathParts): string {
-        $path = File::getPath(self::$basePath, self::FilesDir, ...$pathParts);
-        return File::removeLastSlash($path);
+        return File::getPath(self::$basePath, self::FilesDir, ...$pathParts);
     }
 
     /**
