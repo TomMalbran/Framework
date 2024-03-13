@@ -57,10 +57,11 @@ class Framework {
     const SchemasDir     = "src/Schema";
 
     // Variables
-    private static string   $framePath;
-    private static string   $basePath;
-    private static string   $baseDir;
-    private static Database $db;
+    private static string    $framePath;
+    private static string    $basePath;
+    private static string    $baseDir;
+    private static Database  $db;
+    private static ?Response $response = null;
 
 
     /**
@@ -310,6 +311,26 @@ class Framework {
         $response->addTokens(Auth::getToken(), Auth::getRefreshToken());
         return $response;
     }
+
+    /**
+     * Stores a Response
+     * @param Response|null $response Optional.
+     * @return boolean
+     */
+    public static function setResponse(?Response $response = null): bool {
+        self::$response = $response;
+        return true;
+    }
+
+    /**
+     * Returns the stored Response
+     * @return Response|null
+     */
+    public static function getResponse(): ?Response {
+        return self::$response;
+    }
+
+
 
     /**
      * Runs the Migrations for all the Framework
