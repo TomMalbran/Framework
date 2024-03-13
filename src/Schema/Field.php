@@ -304,8 +304,8 @@ class Field {
             break;
         case self::File:
             $result[$key]           = $text;
-            $result["{$key}Url"]    = !empty($text) ? Path::getUrl("source", $text) : "";
-            $result["{$key}Thumb"]  = !empty($text) ? Path::getUrl("thumbs", $text) : "";
+            $result["{$key}Url"]    = !empty($text) ? Path::getUrl("source", "0", $text) : "";
+            $result["{$key}Thumb"]  = !empty($text) ? Path::getUrl("thumbs", "0", $text) : "";
             break;
         default:
             $result[$key]           = $text;
