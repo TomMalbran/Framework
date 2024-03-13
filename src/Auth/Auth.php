@@ -380,6 +380,9 @@ class Auth {
      * @return Model
      */
     public static function getCredential(): Model {
+        if (empty(self::$credential)) {
+            return Model::createEmpty();
+        }
         return self::$credential;
     }
 
