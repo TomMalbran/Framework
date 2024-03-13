@@ -67,13 +67,15 @@ class SMTP {
 
         $email->Timeout     = 10;
         $email->Host        = self::$config->host;
-        $email->Port        = self::$config->port;
-        $email->SMTPSecure  = self::$config->secure;
+        $email->Port        = self::$config->port   ?: 25;
+        $email->SMTPSecure  = self::$config->secure ?: "";
         $email->SMTPAuth    = true;
         $email->SMTPAutoTLS = false;
 
-        $username = !empty(self::$config->username) ? self::$config->username : self::$config->email;
-        if (self::$config->useOauth) {
+        $username   = !empty(self::$config->username) ? self::$config->username : self::$config->email;
+        $showErrors = !empty(self::$config->showErrors);
+
+        if (!empty(self::$config->useOauth)) {
             $email->SMTPAuth = true;
             $email->AuthType = "XOAUTH2";
 
@@ -103,16 +105,17 @@ class SMTP {
         if (!empty($replyTo)) {
             $email->addReplyTo($replyTo, $fromName);
         }
-
         if (!empty($attachment)) {
             $email->AddAttachment($attachment);
         }
-        if (self::$config->showErrors) {
+
+        if ($showErrors) {
             $email->SMTPDebug = 3;
         }
 
         $result = $email->send();
-        if (self::$config->showErrors && !$result) {
+
+        if ($showErrors && !$result) {
             echo "Message could not be sent.";
             echo "Email Error: " . $email->ErrorInfo;
         }

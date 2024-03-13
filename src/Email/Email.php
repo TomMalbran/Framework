@@ -87,7 +87,7 @@ class Email {
         ]);
 
         // Configure the variables
-        $provider  = self::$config->provider ?: "smtp";
+        $provider  = self::$config->provider ?: "SMTP";
         $fromEmail = self::$config->email;
         $fromName  = self::$config->name;
         $replyTo   = "";
