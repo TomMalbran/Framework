@@ -10,7 +10,7 @@ class {{name}}Entity extends Entity {
 
 {{#attributes}}{{#subType}}
 
-    /** @var {{subType}}Entity[] */
+    /** @var {{{subType}}} */
 {{/subType}}    public {{type}} ${{name}} = {{{default}}};
 {{/attributes}}
 

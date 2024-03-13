@@ -120,7 +120,7 @@ class Generator {
     private static function getSubTypes(array $subRequests): array {
         $result = [];
         foreach ($subRequests as $name => $type) {
-            if (!empty($type)) {
+            if (!empty($type) && !Strings::contains($type, "<", "[")) {
                 $result[] = [
                     "name" => $name,
                     "type" => $type,
@@ -286,6 +286,9 @@ class Generator {
             self::addAttribute($result, $field);
         }
         foreach ($structure->subRequests as $key => $type) {
+            if (!empty($type) && !Strings::contains($type, "<", "[")) {
+                $type .= "Entity[]";
+            }
             $result[] = self::getTypeData($key, "array", $type);
         }
         return $result;
