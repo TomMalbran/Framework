@@ -51,7 +51,7 @@ class Container {
         self::$keys[] = $key;
         if (count(self::$keys) > 1000) {
             print_r(self::$keys);
-            die();
+            exit();
         }
 
         if (!array_key_exists($key, self::$instances)) {
