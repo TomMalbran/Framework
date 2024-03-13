@@ -446,6 +446,15 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns true if the given Phone is valid
+     * @param string $key
+     * @return boolean
+     */
+    public function isValidPhone(string $key): bool {
+        return Utils::isValidPhone($this->get($key));
+    }
+
+    /**
      * Returns true if the given Url is valid
      * @param string $key
      * @return boolean
@@ -625,7 +634,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Removes spaces and dashes in the CUIT
+     * Removes spaces and dots in the CUIT
      * @param string $key
      * @return string
      */
@@ -634,12 +643,21 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Removes spaces and dashes in the DNI
+     * Removes spaces and dots in the DNI
      * @param string $key
      * @return string
      */
     public function dniToNumber(string $key): string {
         return Utils::dniToNumber($this->get($key));
+    }
+
+    /**
+     * Removes spaces, dashes and parenthesis in the Phone
+     * @param string $key
+     * @return string
+     */
+    public function phoneToNumber(string $key): string {
+        return Utils::phoneToNumber($this->get($key));
     }
 
     /**

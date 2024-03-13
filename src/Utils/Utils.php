@@ -133,7 +133,17 @@ class Utils {
         if ($length < 6 || $length > 9) {
             return false;
         }
-        return is_numeric((int)$dni);
+        return is_numeric($dni);
+    }
+
+    /**
+     * Returns true if the given Phone is valid
+     * @param string $value
+     * @return boolean
+     */
+    public static function isValidPhone(string $value): bool {
+        $phone = self::phoneToNumber($value);
+        return is_numeric($phone);
     }
 
 
@@ -168,7 +178,7 @@ class Utils {
     }
 
     /**
-     * Removes spaces and dashes in the CUIT
+     * Removes spaces and dots in the CUIT
      * @param string $value
      * @return string
      */
@@ -177,12 +187,21 @@ class Utils {
     }
 
     /**
-     * Removes spaces and dashes in the CUIT
+     * Removes spaces and dots in the DNI
      * @param string $value
      * @return string
      */
     public static function dniToNumber(string $value): string {
         return Strings::replace($value, [ " ", "." ], "");
+    }
+
+    /**
+     * Removes spaces, dashes and parenthesis in the Phone
+     * @param string $value
+     * @return string
+     */
+    public static function phoneToNumber(string $value): string {
+        return Strings::replace($value, [ " ", "-", "(", ")" ], "");
     }
 
     /**
