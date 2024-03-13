@@ -27,13 +27,18 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String contains the given Needle
+     * Returns true if the given String contains the given Needles
      * @param string $string
-     * @param string $needle
+     * @param string ...$needles
      * @return boolean
      */
-    public static function contains(string $string, string $needle): bool {
-        return strstr($string, $needle) !== FALSE;
+    public static function contains(string $string, string ...$needles): bool {
+        foreach ($needles as $needle) {
+            if (strstr($string, $needle) !== FALSE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
