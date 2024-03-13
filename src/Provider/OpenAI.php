@@ -306,16 +306,19 @@ class OpenAI {
      * Returns the total tokens of a Run
      * @param string $threadID
      * @param string $runID
-     * @return integer[]
+     * @return object
      */
-    public static function getRunTokens(string $threadID, string $runID): array {
+    public static function getRunData(string $threadID, string $runID): object {
         $request = self::get("/threads/$threadID/runs/$runID");
         if (empty($request["usage"])) {
-            return [ 0, 0 ];
+            return (object)[];
         }
-        return [
-            $request["usage"]["prompt_tokens"],
-            $request["usage"]["completion_tokens"],
+
+        return (object)[
+            "runTime"      => $request["completed_at"] - $request["started_at"],
+            "fileIDs"      => Strings::join($request["file_ids"], ", "),
+            "inputTokens"  => $request["usage"]["prompt_tokens"],
+            "outputTokens" => $request["usage"]["completion_tokens"],
         ];
     }
 

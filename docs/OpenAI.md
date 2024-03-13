@@ -258,3 +258,17 @@ curl -X DELETE "https://api.openai.com/v1/assistants/asst_abc123" \
     "deleted": true
 }
 ```
+
+
+## Corridas
+
+**Docs:** https://platform.openai.com/docs/api-reference/runs/getRun
+
+
+Se pueden obtener los datos con:
+
+```bash
+curl https://api.openai.com/v1/threads/thread_abc123/runs/run_abc123 \
+    -H "Authorization: Bearer $OPENAI_API_KEY" \
+    -H "OpenAI-Beta: assistants=v1"
+```
