@@ -189,6 +189,20 @@ class Strings {
     }
 
     /**
+     * Replaces in the start of the String the search with the replace
+     * @param string $string
+     * @param string $search
+     * @param string $replace
+     * @return string
+     */
+    public static function replaceStart(string $string, string $search, string $replace): string {
+        if (self::startsWith($string, $search)) {
+            return substr_replace($string, $replace, 0, strlen($replace));
+        }
+        return $string;
+    }
+
+    /**
      * Replaces in the String the pattern with the replace
      * @param string          $string
      * @param string[]|string $pattern
