@@ -4,7 +4,6 @@ namespace Framework\Schema;
 use Framework\Request;
 use Framework\File\Path;
 use Framework\Utils\Arrays;
-use Framework\Utils\CSV;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -131,9 +130,13 @@ class Field {
             $result  = "tinyint(1) unsigned NOT NULL";
             $default = 0;
             break;
+        case self::Price:
+            $sign    = $this->isSigned ? "" : " unsigned";
+            $result  = "bigint(20)$sign NOT NULL";
+            $default = 0;
+            break;
         case self::Number:
         case self::Float:
-        case self::Price:
         case self::Date:
         case self::Hour:
             $length = $this->length ?: 10;
