@@ -45,10 +45,12 @@ class Reset {
     /**
      * Returns true if the given code exists
      * @param string $code
+     * @param string $email Optional.
      * @return boolean
      */
-    public static function codeExists(string $code): bool {
+    public static function codeExists(string $code, string $email = ""): bool {
         $query = Query::create("code", "=", $code);
+        $query->addIf("email", "=", $email);
         return self::schema()->exists($query);
     }
 
@@ -56,12 +58,13 @@ class Reset {
 
     /**
      * Creates and saves a recover code for the given Credential
-     * @param integer $credentialID Optional.
-     * @param string  $email        Optional.
+     * @param integer $credentialID  Optional.
+     * @param string  $email         Optional.
+     * @param string  $availableSets Optional.
      * @return string
      */
-    public static function create(int $credentialID = 0, string $email = ""): string {
-        $code = Strings::randomCode(6, "ud");
+    public static function create(int $credentialID = 0, string $email = "", string $availableSets = "ud"): string {
+        $code = Strings::randomCode(6, $availableSets);
         self::schema()->replace([
             "CREDENTIAL_ID" => $credentialID,
             "email"         => $email,
