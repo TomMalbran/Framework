@@ -1021,15 +1021,25 @@ class DateTime {
             return 0;
         }
 
-        $parts = Strings::split($text, $glue);
-        $day   = (int)$parts[0];
-        $month = (int)$parts[1];
-        if (empty($day) || empty($month)) {
+        $parts  = Strings::split($text, $glue);
+        $amount = count($parts);
+        $part0  = (int)$parts[0];
+        $part1  = $amount > 1 ? (int)$parts[1] : 0;
+        $part2  = $amount > 2 ? (int)$parts[2] : 0;
+
+        if (empty($part0) || empty($part1)) {
             return 0;
         }
 
-        $year = self::getYear();
-        if (!empty($parts[2])) {
+        $year  = self::getYear();
+        $month = $part1;
+        $day   = $part0;
+
+        if ($amount == 3 && $part0 > 1000) {
+            $year  = $part0;
+            $month = $part1;
+            $day   = $part2;
+        } elseif (!empty($part2)) {
             $yearStr = trim($parts[2]);
             if (Strings::length($yearStr) == 2) {
                 if ((int)$yearStr >= 50) {
