@@ -141,10 +141,10 @@ class Exporter {
 
     /**
      * Downloads the File
-     * @return boolean
+     * @return never
      */
-    public function download(): bool {
+    public function download(): never {
         $this->writer->downloadFile($this->fileName);
-        return true;
+        exit();
     }
 }

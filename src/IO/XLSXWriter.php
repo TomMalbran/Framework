@@ -6,7 +6,9 @@ use Framework\IO\ExporterWriter;
 use Framework\Utils\Elements;
 
 use OpenSpout\Writer\XLSX\Writer;
+use OpenSpout\Writer\XLSX\Options;
 use OpenSpout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Style\Style;
 
 /**
  * The XLSX Writer
@@ -29,8 +31,11 @@ class XLSXWriter implements ExporterWriter {
         $this->title = NLS::get($title, $lang);
         $this->lang  = $lang;
 
-        $this->writer = new Writer();
-        $this->writer->openToBrowser($fileName);
+        $options = new Options();
+        $options->DEFAULT_ROW_STYLE = new Style();
+
+        $this->writer = new Writer($options);
+        $this->writer->openToBrowser("$fileName.xlsx");
 
         $sheet = $this->writer->getCurrentSheet();
         $sheet->setName($this->title);
