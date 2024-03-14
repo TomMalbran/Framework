@@ -345,4 +345,38 @@ class Numbers {
         $result       = $result * 60 * 1.1515 * 1.609344;
         return $result;
     }
+
+    /**
+     * Calculates the Expression
+     * @param string $expression
+     * @return integer|float
+     */
+    public static function calcExpression(string $expression): int|float {
+        // Sanitize the input
+        $expression = preg_replace("/[^0-9.,+\-*\/()%]/", "", $expression);
+
+        // Convert percentages to decimal
+        $expression = preg_replace("/([+-])([0-9]{1})(%)/", "*(1\$1.0\$2)", $expression);
+        $expression = preg_replace("/([+-])([0-9]+)(%)/", "*(1\$1.\$2)", $expression);
+        $expression = preg_replace("/([0-9]{1})(%)/", ".0\$1", $expression);
+        $expression = preg_replace("/([0-9]+)(%)/", ".\$1", $expression);
+
+        // Fix some errors
+        $expression = preg_replace("/,/", ".", $expression);
+        $expression = preg_replace("/\.+/", ".", $expression);
+        $expression = preg_replace("/\(\)/", "", $expression);
+        $expression = preg_replace("/\+\-/", "-", $expression);
+        $expression = preg_replace("/--/", "+", $expression);
+        $expression = preg_replace("/([+\-*\/])[+\-*\/]+/", "$1", $expression);
+
+        // Calculate
+        if (empty($expression)) {
+            return 0;
+        }
+        try {
+            return @eval("return $expression;");
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
 }
