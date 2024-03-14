@@ -41,6 +41,7 @@ class Framework {
     const SourceDir      = "src";
 
     const DataDir        = "data";
+    const TemplateDir    = "data/templates";
     const LogDir         = "data/logs";
     const MigrationsDir  = "data/migrations";
 
