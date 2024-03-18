@@ -1011,16 +1011,51 @@ class DateTime {
     }
 
     /**
-     * Parses a text into a timestamp
+     * Returns a number as a String with a 0 in front, if required
+     * @param integer|float $time
+     * @return string
+     */
+    public static function parseTime(int|float $time): string {
+        return $time < 10 ? "0{$time}" : (string)$time;
+    }
+
+    /**
+     * Parses the Time Zone
+     * @param float $timeZone
+     * @return string
+     */
+    public static function parseTimeZone(float $timeZone): string {
+        $sign    = $timeZone < 0 ? "-" : "+";
+        $time    = abs($timeZone * 60);
+        $hours   = floor($time / 60);
+        $minutes = $time - $hours * 60;
+
+        return "GMT $sign$hours:" . self::parseTime($minutes);
+    }
+
+
+
+    /**
+     * Parses a text into a Timestamp
      * @param string $text
+     * @param string $language Optional.
      * @return integer
      */
-    public static function parseDate(string $text): int {
+    public static function parseDate(string $text, string $language = ""): int {
         $glue = Strings::contains($text, "/") ? "/" : (Strings::contains($text, "-") ? "-" : "");
-        if (empty($glue)) {
-            return 0;
+        if (!empty($glue)) {
+            return self::parseDateGlue($text, $glue);
         }
+        return self::parseDateLang($text, $language);
+    }
 
+    /**
+     * Parses a text with the given glue into a Timestamp
+     * @param string $text
+     * @param string $glue
+     * @return integer
+     */
+    private static function parseDateGlue(string $text, string $glue): int {
         $parts  = Strings::split($text, $glue);
         $amount = count($parts);
         $part0  = (int)$parts[0];
@@ -1056,25 +1091,52 @@ class DateTime {
     }
 
     /**
-     * Returns a number as a String with a 0 in front, if required
-     * @param integer|float $time
-     * @return string
+     * Parses a text with a language into a Timestamp
+     * @param string $text
+     * @param string $language
+     * @return integer
      */
-    public static function parseTime(int|float $time): string {
-        return $time < 10 ? "0{$time}" : (string)$time;
-    }
+    public static function parseDateLang(string $text, string $language): int {
+        $year  = self::getYear();
+        $month = 0;
+        $day   = 0;
 
-    /**
-     * Parses the Time Zone
-     * @param float $timeZone
-     * @return string
-     */
-    public static function parseTimeZone(float $timeZone): string {
-        $sign    = $timeZone < 0 ? "-" : "+";
-        $time    = abs($timeZone * 60);
-        $hours   = floor($time / 60);
-        $minutes = $time - $hours * 60;
+        $numbers = Strings::getAllMatches($text, "!\d+!");
+        if (empty($numbers)) {
+            return 0;
+        }
 
-        return "GMT $sign$hours:" . self::parseTime($minutes);
+        $monthNames = NLS::get("DATE_TIME_MONTHS", $language);
+        foreach ($monthNames as $index => $monthName) {
+            if (Strings::containsCaseInsensitive($text, $monthName)) {
+                $month = $index + 1;
+                break;
+            }
+        }
+        if (empty($month)) {
+            return 0;
+        }
+
+        foreach ($numbers as $number) {
+            if ($number <= 0) {
+                continue;
+            }
+            if (empty($day) && $number <= 31) {
+                $day = $number;
+            } elseif ($number >= 1000) {
+                $year = $number;
+            } elseif ($number >= 100) {
+                $year = (int)"1$number";
+            } elseif ($number >= 50) {
+                $year = (int)"19$number";
+            } else {
+                $year = (int)"20$number";
+            }
+        }
+        if (empty($day)) {
+            return 0;
+        }
+
+        return mktime(0, 0, 0, $month, $day, $year);
     }
 }
