@@ -27,7 +27,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String contains the given Needles
+     * Returns true if the given String contains all of the given Needles
      * @param string $string
      * @param string ...$needles
      * @return boolean
@@ -42,13 +42,19 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String matches the given Pattern
+     * Returns true if the given String contains all of the given Needles in Case Insensitive
      * @param string $string
-     * @param string $pattern
+     * @param string ...$needles
      * @return boolean
      */
-    public static function match(string $string, string $pattern): bool {
-        return preg_match($pattern, $string);
+    public static function containsCaseInsensitive(string $string, string ...$needles): bool {
+        $string = strtolower($string);
+        foreach ($needles as $needle) {
+            if (strstr($string, strtolower($needle)) !== FALSE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -74,6 +80,33 @@ class Strings {
             return true;
         }
         return substr($string, -$length) === $needle;
+    }
+
+    /**
+     * Returns true if the given String matches the given Pattern
+     * @param string $string
+     * @param string $pattern
+     * @return boolean
+     */
+    public static function match(string $string, string $pattern): bool {
+        return preg_match($pattern, $string);
+    }
+
+    /**
+     * Returns all the matches for the Pattern in the given String as an array
+     * @param string $string
+     * @param string $pattern
+     * @return mixed[]
+     */
+    public static function getAllMatches(string $string, string $pattern): array {
+        preg_match_all($pattern, $string, $matches);
+        if (empty($matches)) {
+            return [];
+        }
+        if (count($matches) === 1 && !empty($matches[0])) {
+            return $matches[0];
+        }
+        return $matches;
     }
 
 
