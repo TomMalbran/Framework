@@ -115,7 +115,9 @@ class Join {
             $result[$merge->key] = Arrays::getValue($data, $merge->fields, $merge->glue);
         }
         foreach ($this->defaults as $key => $fields) {
-            $result[$key] = Arrays::getAnyValue($data, $fields, "");
+            if (empty($result[$key])) {
+                $result[$key] = Arrays::getAnyValue($data, $fields, "");
+            }
         }
         return $result;
     }
