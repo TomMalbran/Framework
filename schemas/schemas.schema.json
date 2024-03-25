@@ -155,8 +155,9 @@
             "patternProperties" : {
                 "^[a-z][A-Za-z]*$" : {
                     "type"       : "object",
-                    "required"   : [ "name" ],
+                    "required"   : [ "type", "name" ],
                     "properties" : {
+                        "type"    : { "type" : "string"  },
                         "name"    : { "type" : "string"  },
                         "idKey"   : { "type" : "string"  },
                         "idName"  : { "type" : "string"  },

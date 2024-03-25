@@ -13,6 +13,7 @@ class SubRequest {
 
     private Schema $schema;
 
+    private string $type     = "";
     private string $name     = "";
     private string $idKey    = "";
     private string $idName   = "";
@@ -39,6 +40,7 @@ class SubRequest {
         $this->schema   = $schema;
 
         $this->name     = $data["name"];
+        $this->type     = !empty($data["type"])    ? $data["type"]    : "";
         $this->idKey    = !empty($data["idKey"])   ? $data["idKey"]   : $structure->idKey;
         $this->idName   = !empty($data["idName"])  ? $data["idName"]  : $structure->idName;
         $this->where    = !empty($data["where"])   ? $data["where"]   : [];
