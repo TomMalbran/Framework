@@ -25,8 +25,8 @@ class Generator {
      */
     public static function migrate(): bool {
         self::$writePath  = Framework::getPath(Framework::SchemasDir);
-        self::$schemaText = Framework::loadFile(Framework::DataDir, "schema.mu");
-        self::$entityText = Framework::loadFile(Framework::DataDir, "entity.mu");
+        self::$schemaText = Framework::loadFile(Framework::TemplateDir, "Schema.mu");
+        self::$entityText = Framework::loadFile(Framework::TemplateDir, "Entity.mu");
 
         $schemas = Factory::getData();
         $created = 0;
@@ -70,6 +70,7 @@ class Generator {
         $editParents = $structure->hasPositions ? $parents : [];
 
         $contents    = Mustache::render(self::$schemaText, [
+            "namespace"       => Framework::Namespace,
             "name"            => $structure->name,
             "schemaName"      => $structure->key,
             "hasID"           => $structure->hasID,
@@ -155,6 +156,7 @@ class Generator {
         $param   = "\${$field->name}";
         $type    = self::getFieldType($field->type);
         $default = self::getDefault($type);
+
         return [
             "fieldKey"     => $field->key,
             "fieldText"    => Strings::upperCaseFirst($field->name),
@@ -245,6 +247,7 @@ class Generator {
         $fileName   = "{$structure->name}Entity.php";
         $attributes = self::getAttributes($structure);
         $contents   = Mustache::render(self::$entityText, [
+            "namespace"  => Framework::Namespace,
             "name"       => $structure->name,
             "attributes" => self::parseAttributes($attributes),
         ]);

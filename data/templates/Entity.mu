@@ -1,5 +1,5 @@
 <?php
-namespace App\Schema;
+namespace {{namespace}}Schema;
 
 use Framework\Schema\Entity;
 

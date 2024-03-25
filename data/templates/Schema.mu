@@ -1,8 +1,8 @@
 <?php
-namespace App\Schema;
+namespace {{namespace}}Schema;
 
-use App\Schema\{{name}}Entity;{{#subTypes}}
-use App\Schema\{{type}}Entity;{{/subTypes}}
+use {{namespace}}Schema\{{name}}Entity;{{#subTypes}}
+use {{namespace}}Schema\{{type}}Entity;{{/subTypes}}
 
 use Framework\Request;
 use Framework\Schema\Factory;

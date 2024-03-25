@@ -6,6 +6,7 @@ use Framework\Route\Router;
 use Framework\Auth\Auth;
 use Framework\Config\Config;
 use Framework\Config\Settings;
+use Framework\Route\Dispatches;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\Path;
@@ -22,6 +23,8 @@ use Exception;
  * The FrameWork Service
  */
 class Framework {
+
+    const Namespace      = "App\\";
 
     // The Data
     const RouteData      = "routes";
