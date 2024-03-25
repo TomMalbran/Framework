@@ -5,7 +5,6 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Route\Container;
 use Framework\Auth\Access;
-use Framework\Response;
 use Framework\Utils\Strings;
 
 /**
@@ -13,7 +12,6 @@ use Framework\Utils\Strings;
  */
 class Router {
 
-    const Namespace  = "App\\";
     const Controller = "App\\Controller\\";
 
     /** @var array{}[] */
@@ -105,7 +103,7 @@ class Router {
      */
     public static function execute(bool $isStatic, string $module, string $method, mixed ...$params): mixed {
         if ($isStatic) {
-            return call_user_func_array(self::Namespace . $module . "::" . $method, $params);
+            return call_user_func_array(Framework::Namespace . $module . "::" . $method, $params);
         }
 
         $instance = Container::bind(self::Controller . $module);
