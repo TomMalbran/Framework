@@ -59,6 +59,7 @@ class Framework {
     const StringsDir     = "nls/strings";
     const EmailsDir      = "nls/emails";
     const SchemasDir     = "src/Schema";
+    const SystemDir      = "src/System";
 
     // Variables
     private static string    $framePath;
@@ -347,6 +348,7 @@ class Framework {
         $settMigrated = Settings::migrate();
         $tempMigrated = EmailTemplate::migrate();
         $genMigrated  = Generator::migrate();
+        $disMigrated  = Dispatches::migrate();
 
         if ($withPaths) {
             $pathMigrated  = Path::ensurePaths();
@@ -355,6 +357,10 @@ class Framework {
             $pathMigrated  = true;
             $mediaMigrated = true;
         }
-        return $factMigrated || $settMigrated || $tempMigrated || $pathMigrated || $mediaMigrated || $genMigrated;
+
+        return (
+            $factMigrated || $settMigrated || $tempMigrated ||
+            $pathMigrated || $mediaMigrated || $genMigrated || $disMigrated
+        );
     }
 }

@@ -1,0 +1,32 @@
+{
+    "title" : "Dispatches",
+    "type"  : "object",
+    "propertyNames" : {
+        "pattern" : "^[a-z][A-Za-z0-9]*$"
+    },
+    "patternProperties" : {
+        "^[a-z][A-Za-z0-9]*$" : {
+            "type"       : "object",
+            "required"   : [ "params", "dispatches" ],
+            "properties": {
+                "params" : {
+                    "type" : "object",
+                    "propertyNames" : {
+                        "pattern" : "^[a-z][A-Za-z0-9]*$"
+                    },
+                    "patternProperties" : {
+                        "^[a-z][A-Za-z0-9]*$" : {
+                            "type" : "string"
+                        }
+                    }
+                },
+                "dispatches" : {
+                    "type" : "array",
+                    "items" : {
+                        "type" : "string"
+                    }
+                }
+            }
+        }
+    }
+}
