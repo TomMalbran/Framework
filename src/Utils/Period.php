@@ -12,7 +12,7 @@ class Period {
 
     const Today       = "today";
     const Yesterday   = "yesterday";
-    const Last7Days   = "las7Days";
+    const Last7Days   = "last7Days";
     const Last15Days  = "last15Days";
     const Last30Days  = "last30Days";
     const Last60Days  = "last60Days";
@@ -140,7 +140,7 @@ class Period {
         case self::ThisYear:
             $result = mktime(23, 59, 59, $month, $day, $year);
             break;
-        case self::Today:
+        case self::Yesterday:
             $result = mktime(23, 59, 59, $month, $day - 1, $year);
             break;
         case self::PastWeek:
