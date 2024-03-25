@@ -277,12 +277,14 @@ class DateTime {
      * Returns true if the given hour is Valid
      * @param string         $string
      * @param integer[]|null $minutes Optional.
+     * @param integer        $minHour Optional.
+     * @param integer        $maxHour Optional.
      * @return boolean
      */
-    public static function isValidHour(string $string, ?array $minutes = null): bool {
+    public static function isValidHour(string $string, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
         $parts = Strings::split($string, ":");
         return (
-            isset($parts[0]) && Numbers::isValid($parts[0], 0, 23) &&
+            isset($parts[0]) && Numbers::isValid($parts[0], $minHour, $maxHour) &&
             isset($parts[1]) && Numbers::isValid($parts[1], 0, 59) &&
             (empty($minutes) || Arrays::contains($minutes, $parts[1]))
         );

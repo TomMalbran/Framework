@@ -495,12 +495,14 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the given hour is Valid
-     * @param string|null   $key
-     * @param string[]|null $minutes Optional.
+     * @param string|null    $key
+     * @param integer[]|null $minutes Optional.
+     * @param integer        $minHour Optional.
+     * @param integer        $maxHour Optional.
      * @return boolean
      */
-    public function isValidHour(?string $key, ?array $minutes = null): bool {
-        return DateTime::isValidHour($this->get($key), $minutes);
+    public function isValidHour(?string $key, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
+        return DateTime::isValidHour($this->get($key), $minutes, $minHour, $maxHour);
     }
 
     /**
