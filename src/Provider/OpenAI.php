@@ -279,6 +279,31 @@ class OpenAI {
 
 
     /**
+     * Creates a Thread Run
+     * @param string $assistantID
+     * @param string $message
+     * @return string[]
+     */
+    public static function createRun(string $assistantID, string $message): array {
+        $request = self::post("/threads/runs", [
+            "assistant_id" => $assistantID,
+            "thread"       => [
+                "messages" => [
+                    [
+                        "role"    => "user",
+                        "content" => $message,
+                    ],
+                ],
+            ],
+        ]);
+
+        if (empty($request["id"])) {
+            return [ "", "" ];
+        }
+        return [ $request["id"], $request["thread_id"] ];
+    }
+
+    /**
      * Starts a Thread Run
      * @param string $threadID
      * @param string $assistantID
@@ -331,5 +356,23 @@ class OpenAI {
     public static function cancelRun(string $threadID, string $runID): string {
         $request = self::post("/threads/$threadID/runs/$runID/cancel");
         return !empty($request["id"]);
+    }
+
+
+
+    /**
+     * Transcribes an Audio
+     * @param string $fileContent
+     * @param string $fileName
+     * @param string $language
+     * @return string
+     */
+    public static function transcribeAudio(string $fileContent, string $fileName, string $language): string {
+        $request = self::upload("/audio/transcriptions", [
+            "file"     => new CURLStringFile($fileContent, $fileName),
+            "model"    => "whisper-1",
+            "language" => $language,
+        ]);
+        return !empty($request["text"]) ? $request["text"] : "";
     }
 }
