@@ -416,7 +416,7 @@ class Credential {
      * @param integer[]|integer    $level
      * @param string[]|string|null $filter Optional.
      * @param mixed|integer        $value  Optional.
-     * @return array{}
+     * @return array<string,string>
      */
     public static function getEmailsForLevel(array|int $level, array|string $filter = null, mixed $value = 1): array {
         $query = self::createLevelQuery($level, $filter, $value);
