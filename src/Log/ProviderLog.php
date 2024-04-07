@@ -54,7 +54,7 @@ class ProviderLog {
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "provider", "action", "request", "response" ], $request->search);
+        $query = Query::createSearch([ "provider", "type", "request", "response" ], $request->search);
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
         return $query;
@@ -85,15 +85,15 @@ class ProviderLog {
     /**
      * Adds a Hook
      * @param string  $provider
-     * @param string  $action
+     * @param string  $type
      * @param object  $data
      * @param boolean $isError  Optional.
      * @return integer
      */
-    public static function addHook(string $provider, string $action, object $data, bool $isError = false): int {
+    public static function addHook(string $provider, string $type, object $data, bool $isError = false): int {
         return self::schema()->create([
             "provider" => $provider,
-            "action"   => $action,
+            "type"     => $type,
             "url"      => Server::getFullUrl(),
             "request"  => JSON::encode($data),
             "response" => "{}",
@@ -104,17 +104,17 @@ class ProviderLog {
     /**
      * Adds a Request
      * @param string  $provider
-     * @param string  $action
+     * @param string  $type
      * @param string  $url
      * @param array{} $request
      * @param array{} $response Optional.
      * @param boolean $isError  Optional.
      * @return integer
      */
-    public static function addRequest(string $provider, string $action, string $url, array $request, array $response = [], bool $isError = false): int {
+    public static function addRequest(string $provider, string $type, string $url, array $request, array $response = [], bool $isError = false): int {
         return self::schema()->create([
             "provider" => $provider,
-            "action"   => $action,
+            "type"     => $type,
             "url"      => $url,
             "request"  => JSON::encode($request),
             "response" => JSON::encode($response),
