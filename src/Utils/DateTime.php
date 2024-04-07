@@ -511,6 +511,27 @@ class DateTime {
     }
 
     /**
+     * Returns the Seconds as an hours string
+     * @param integer $seconds
+     * @return string
+     */
+    public static function toHourString(int $seconds): string {
+        $secsInMinute = 60;
+        $secsInHour   = 60 * $secsInMinute;
+
+        $hours        = floor($seconds / $secsInHour);
+
+        $minSeconds   = $seconds % $secsInHour;
+        $mins         = floor($minSeconds / $secsInMinute);
+        $minsStr      = self::parseTime($mins);
+
+        $secs         = $seconds % $secsInMinute;
+        $secsStr      = self::parseTime($secs);
+
+        return "{$hours}:{$minsStr}:{$secsStr} hs";
+    }
+
+    /**
      * Returns the Minutes as a string
      * @param integer $minutes
      * @return string
