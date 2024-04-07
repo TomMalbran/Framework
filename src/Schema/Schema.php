@@ -379,6 +379,18 @@ class Schema {
         return $this->db->interpolateQuery($expression, $query);
     }
 
+    /**
+     * Returns the expression of the data Query
+     * @param Query  $query
+     * @param string $expression
+     * @return string
+     */
+    public function getDataExpression(Query $query, string $expression): string {
+        $expression  = Strings::replace($expression, "{table}", $this->structure->table);
+        $expression .= $query->get();
+        return $this->db->interpolateQuery($expression, $query);
+    }
+
 
 
     /**
