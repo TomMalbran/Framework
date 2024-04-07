@@ -12,6 +12,37 @@ use Framework\Utils\Strings;
 class Curl {
 
     /**
+     * Executes a Request
+     * @param string       $method
+     * @param string       $url
+     * @param array{}|null $params       Optional.
+     * @param array{}|null $headers      Optional.
+     * @param string       $userPass     Optional.
+     * @param boolean      $jsonBody     Optional.
+     * @param boolean      $urlBody      Optional.
+     * @param boolean      $jsonResponse Optional.
+     * @param boolean      $returnError  Optional.
+     * @return mixed
+     */
+    public static function execute(
+        string $method,
+        string $url,
+        ?array $params = null,
+        ?array $headers = null,
+        string $userPass = "",
+        bool $jsonBody = false,
+        bool $urlBody = false,
+        bool $jsonResponse = true,
+        bool $returnError = false,
+    ): mixed {
+        return match ($method) {
+            "GET"   => self::get($url, $params, $headers, $userPass, $jsonBody, $returnError),
+            "POST"  => self::post($url, $params, $headers, $userPass, $jsonBody, $urlBody, $jsonResponse, $returnError),
+            default => self::custom($method, $url, $params, $headers, $userPass, $jsonBody, $jsonResponse, $returnError),
+        };
+    }
+
+    /**
      * Executes a GET Request
      * @param string       $url
      * @param array{}|null $params       Optional.
@@ -30,7 +61,7 @@ class Curl {
         bool $returnError = false,
     ): mixed {
         $url = self::parseUrl($url, $params);
-        return self::execute($url, $headers, null, $userPass, $jsonResponse, $returnError);
+        return self::executeRequest("GET", $url, $headers, null, $userPass, $jsonResponse, $returnError);
     }
 
     /**
@@ -61,7 +92,7 @@ class Curl {
         } elseif ($urlBody) {
             $body = self::parseParams($params);
         }
-        return self::execute($url, $headers, $body, $userPass, $jsonResponse, $returnError);
+        return self::executeRequest("POST", $url, $headers, $body, $userPass, $jsonResponse, $returnError);
     }
 
     /**
@@ -190,6 +221,7 @@ class Curl {
 
     /**
      * Executes the Request
+     * @param string       $method
      * @param string       $url
      * @param array{}|null $headers      Optional.
      * @param mixed|null   $body         Optional.
@@ -198,7 +230,8 @@ class Curl {
      * @param boolean      $returnError  Optional.
      * @return mixed
      */
-    private static function execute(
+    private static function executeRequest(
+        string $method,
         string $url,
         ?array $headers = null,
         mixed $body = null,
@@ -218,11 +251,13 @@ class Curl {
         ];
 
         // Set the Body
-        if (!empty($body)) {
-            $options[CURLOPT_POST]       = true;
-            $options[CURLOPT_POSTFIELDS] = $body;
+        if ($method == "POST") {
+            $options[CURLOPT_POST] = true;
+            if (!empty($body)) {
+                $options[CURLOPT_POSTFIELDS] = $body;
+            }
         } else {
-            $options[CURLOPT_ENCODING]   = "identity";
+            $options[CURLOPT_ENCODING] = "identity";
         }
 
         // Set the Headers
