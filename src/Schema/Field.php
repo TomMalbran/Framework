@@ -4,6 +4,7 @@ namespace Framework\Schema;
 use Framework\Request;
 use Framework\File\Path;
 use Framework\Utils\Arrays;
+use Framework\Utils\CSV;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -289,7 +290,7 @@ class Field {
             break;
         case self::CSV:
             $result[$key]           = $text;
-            $result["{$key}Parts"]  = !empty($text) ? JSON::decode($text, true) : [];
+            $result["{$key}Parts"]  = !empty($text) ? CSV::decode($text) : [];
             $result["{$key}Count"]  = Arrays::length($result["{$key}Parts"]);
             break;
         case self::HTML:
