@@ -230,7 +230,7 @@ class Strings {
      */
     public static function replaceStart(string $string, string $search, string $replace): string {
         if (self::startsWith($string, $search)) {
-            return substr_replace($string, $replace, 0, strlen($replace));
+            return substr_replace($string, $replace, 0, strlen($search));
         }
         return $string;
     }
