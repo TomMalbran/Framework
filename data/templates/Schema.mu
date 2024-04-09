@@ -150,7 +150,7 @@ class {{name}}Schema {
     }
 
 {{/hasID}}
-{{#nameKey}}
+{{#hasName}}
     /**
      * Returns the {{name}} Entity the given Name
      * @param string ${{nameKey}}{{#parents}}
@@ -165,7 +165,7 @@ class {{name}}Schema {
         return self::getEntity($query);
     }
 
-{{/nameKey}}
+{{/hasName}}
 {{#uniques}}
     /**
      * Returns the {{name}} Entity with the given {{fieldText}}

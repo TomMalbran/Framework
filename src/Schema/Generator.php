@@ -65,6 +65,7 @@ class Generator {
     private static function createSchema(Structure $structure): bool {
         $fileName    = "{$structure->name}Schema.php";
         $idType      = self::getFieldType($structure->idType);
+        $uniques     = self::getFieldList($structure, "isUnique");
         $parents     = self::getFieldList($structure, "isParent");
         $subTypes    = self::getSubTypes($structure->subRequests);
         $editParents = $structure->hasPositions ? $parents : [];
@@ -81,6 +82,7 @@ class Generator {
             "idText"          => Strings::upperCaseFirst($structure->idName),
             "editType"        => $structure->hasID ? "Query|$idType" : "Query",
             "editDocType"     => $structure->hasID ? "Query|" . self::getDocType($idType) : "Query",
+            "hasName"         => !empty($structure->nameKey) && !Arrays::contains($uniques, $structure->nameKey, "fieldName"),
             "nameKey"         => $structure->nameKey,
             "hasSelect"       => !empty($structure->nameKey),
             "hasPositions"    => $structure->hasPositions,
@@ -96,7 +98,7 @@ class Generator {
             "processEntity"   => !empty($subTypes) || !empty($structure->processed),
             "subTypes"        => $subTypes,
             "hasProcessed"    => !empty($structure->processed),
-            "uniques"         => self::getFieldList($structure, "isUnique"),
+            "uniques"         => $uniques,
             "parents"         => $parents,
             "editParents"     => $editParents,
             "parentsList"     => self::joinFields($parents, "fieldParam"),
@@ -159,6 +161,7 @@ class Generator {
 
         return [
             "fieldKey"     => $field->key,
+            "fieldName"    => $field->name,
             "fieldText"    => Strings::upperCaseFirst($field->name),
             "fieldDoc"     => self::getDocType($type) . " $param",
             "fieldParam"   => $param,
