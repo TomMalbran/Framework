@@ -41,7 +41,7 @@ class Google {
             return [];
         }
 
-        $response = Curl::post(self::BaseUrl . "userinfo", null, [
+        $response = Curl::get(self::BaseUrl . "userinfo", null, [
             "Authorization" => "Bearer $accessToken",
         ]);
         if (empty($response["email"])) {
