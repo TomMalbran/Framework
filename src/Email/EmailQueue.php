@@ -152,7 +152,7 @@ class EmailQueue {
      */
     public static function send(Model|array $email): bool {
         $emailResult = EmailResult::NoEmails;
-        foreach ($email["sendToParts"] as $sendTo) {
+        foreach ($email["sendTo"] as $sendTo) {
             if (!empty($sendTo)) {
                 $emailResult = Email::send($sendTo, $email["subject"], $email["message"]);
             }

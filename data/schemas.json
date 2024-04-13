@@ -139,7 +139,7 @@
         "fields" : {
             "EMAIL_ID"     : { "type" : "id",    "name" : "emailID" },
             "templateCode" : { "type" : "string"                    },
-            "sendTo"       : { "type" : "csv"                       },
+            "sendTo"       : { "type" : "json"                      },
             "subject"      : { "type" : "string"                    },
             "message"      : { "type" : "text"                      },
             "emailResult"  : { "type" : "string"                    },
