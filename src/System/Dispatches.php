@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Route;
+namespace Framework\System;
 
 use Framework\Framework;
 use Framework\File\File;
@@ -49,9 +49,7 @@ class Dispatches {
             "hasUses"     => !empty($uses),
             "dispatchers" => self::getDispatchers(),
         ]);
-
-        File::createDir($writePath);
-        File::create($writePath, "Dispatcher.php", $contents);
+        File::create($writePath, "Dispatcher.php", $contents, true);
 
         print("<br>Generated the <i>Dispatcher</i><br>");
         return true;

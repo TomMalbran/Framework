@@ -6,7 +6,6 @@ use Framework\Route\Router;
 use Framework\Auth\Auth;
 use Framework\Config\Config;
 use Framework\Config\Settings;
-use Framework\Route\Dispatches;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\Path;
@@ -15,6 +14,7 @@ use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
+use Framework\System\Dispatches;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
 use Exception;
@@ -344,23 +344,17 @@ class Framework {
      * @return boolean
      */
     public static function migrate(bool $canDelete = false, bool $withPaths = true): bool {
-        $factMigrated = Factory::migrate($canDelete);
-        $settMigrated = Settings::migrate();
-        $tempMigrated = EmailTemplate::migrate();
-        $genMigrated  = Generator::migrate();
-        $disMigrated  = Dispatches::migrate();
+        Factory::migrate($canDelete);
+        Settings::migrate();
+        EmailTemplate::migrate();
+        Generator::migrate();
+
+        Dispatches::migrate();
 
         if ($withPaths) {
-            $pathMigrated  = Path::ensurePaths();
-            $mediaMigrated = MediaFile::ensurePaths();
-        } else {
-            $pathMigrated  = true;
-            $mediaMigrated = true;
+            Path::ensurePaths();
+            MediaFile::ensurePaths();
         }
-
-        return (
-            $factMigrated || $settMigrated || $tempMigrated ||
-            $pathMigrated || $mediaMigrated || $genMigrated || $disMigrated
-        );
+        return true;
     }
 }
