@@ -345,14 +345,12 @@ class Framework {
      * @return boolean
      */
     public static function migrate(bool $canDelete = false, bool $withPaths = true): bool {
+        self::generate();
+
         Factory::migrate($canDelete);
         Settings::migrate();
         EmailTemplate::migrate();
         Generator::migrate();
-
-        self::generateSystemPath();
-        SignalCode::generate();
-        StatusCode::generate();
 
         if ($withPaths) {
             Path::ensurePaths();
@@ -362,13 +360,18 @@ class Framework {
     }
 
     /**
-     * Generates the System Path
+     * Generates the System Codes
      * @return boolean
      */
-    private static function generateSystemPath(): bool {
+    private static function generate(): bool {
         $systemPath = Framework::getPath(Framework::SystemDir);
         File::createDir($systemPath);
         File::emptyDir($systemPath);
+
+        SignalCode::generate();
+        StatusCode::generate();
+
+        print("<br>");
         return true;
     }
 }

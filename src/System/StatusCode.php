@@ -11,8 +11,8 @@ use Framework\Utils\Strings;
  */
 class StatusCode {
 
-    const Active   = 1;
-    const Inactive = 2;
+    const Active   = "Active";
+    const Inactive = "Inactive";
 
 
 
@@ -37,7 +37,7 @@ class StatusCode {
         ]);
         File::create($writePath, "Status.php", $contents);
 
-        print("<br>Generated the <i>Status</i><br>");
+        print("Generated the <i>Status</i><br>");
         return true;
     }
 

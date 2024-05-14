@@ -18,7 +18,7 @@ class SignalCode {
      */
     public static function generate(): bool {
         $data = Framework::loadData(Framework::SignalData, false);
-        if (empty($data)) {
+        if (empty((array)$data)) {
             return false;
         }
 
@@ -34,7 +34,7 @@ class SignalCode {
         ]);
         File::create($writePath, "Signal.php", $contents);
 
-        print("<br>Generated the <i>Signal</i><br>");
+        print("Generated the <i>Signal</i><br>");
         return true;
     }
 

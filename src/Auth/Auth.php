@@ -200,7 +200,7 @@ class Auth {
         return (
             !$credential->isEmpty() &&
             !$credential->isDeleted &&
-            $credential->status !== StatusCode::Active
+            $credential->status === StatusCode::Active
         );
     }
 
