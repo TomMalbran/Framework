@@ -8,7 +8,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
-use Framework\System\Statuses;
+use Framework\System\StatusCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
@@ -219,7 +219,7 @@ class Credential {
         if (empty($query)) {
             return [];
         }
-        $query->add("status", "=", Statuses::Active);
+        $query->add("status", "=", StatusCode::Active);
         return self::request($query, false, $sort);
     }
 
@@ -534,7 +534,7 @@ class Credential {
             "passExpiration"   => 0,
             "accessToken"      => "",
             "tokenExpiration"  => 0,
-            "status"           => Statuses::Inactive,
+            "status"           => StatusCode::Inactive,
             "observations"     => "",
             "sendEmails"       => 0,
             "sendEmailNotis"   => 0,
@@ -806,7 +806,7 @@ class Credential {
         foreach ($data as $row) {
             if ($onlyActive) {
                 $status = Arrays::getValue($row, "status", "", $prefix);
-                if ($status !== Statuses::Active) {
+                if ($status !== StatusCode::Active) {
                     continue;
                 }
             }

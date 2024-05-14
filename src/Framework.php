@@ -15,7 +15,7 @@ use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
 use Framework\System\Dispatches;
-use Framework\System\Statuses;
+use Framework\System\StatusCode;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
 use Exception;
@@ -351,7 +351,7 @@ class Framework {
         Generator::migrate();
 
         Dispatches::migrate();
-        Statuses::migrate();
+        StatusCode::generate();
 
         if ($withPaths) {
             Path::ensurePaths();
