@@ -95,14 +95,19 @@ class File {
      * @param string          $path
      * @param string          $fileName
      * @param string[]|string $content
+     * @param boolean         $createDir Optional.
      * @return boolean
      */
-    public static function create(string $path, string $fileName, array|string $content): bool {
+    public static function create(string $path, string $fileName, array|string $content, bool $createDir = false): bool {
         $fullPath = self::getPath($path, $fileName);
-        if (!empty($fullPath)) {
-            return self::write($fullPath, Strings::join($content, "\n"));
+        if (empty($fullPath)) {
+            return false;
         }
-        return false;
+
+        if ($createDir) {
+            self::createDir($path);
+        }
+        return self::write($fullPath, Strings::join($content, "\n"));
     }
 
     /**
