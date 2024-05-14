@@ -204,6 +204,7 @@
                 "csv",
                 "html",
                 "text",
+                "longtext",
                 "encrypt",
                 "file"
             ]

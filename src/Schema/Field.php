@@ -15,21 +15,22 @@ use Framework\Utils\Strings;
 class Field {
 
     // The Types
-    const ID      = "id";
-    const Boolean = "boolean";
-    const Binary  = "binary";
-    const Number  = "number";
-    const Float   = "float";
-    const Price   = "price";
-    const Date    = "date";
-    const Hour    = "hour";
-    const String  = "string";
-    const JSON    = "json";
-    const CSV     = "csv";
-    const HTML    = "html";
-    const Text    = "text";
-    const Encrypt = "encrypt";
-    const File    = "file";
+    const ID       = "id";
+    const Boolean  = "boolean";
+    const Binary   = "binary";
+    const Number   = "number";
+    const Float    = "float";
+    const Price    = "price";
+    const Date     = "date";
+    const Hour     = "hour";
+    const String   = "string";
+    const JSON     = "json";
+    const CSV      = "csv";
+    const HTML     = "html";
+    const Text     = "text";
+    const LongText = "longtext";
+    const Encrypt  = "encrypt";
+    const File     = "file";
 
     // The Data
     public string $key        = "";
@@ -169,6 +170,9 @@ class Field {
         case self::Text:
             $result = "text NULL";
             break;
+        case self::LongText:
+            $result = "longtext NULL";
+            break;
         case self::Encrypt:
             $length = $this->length ?: 255;
             $result = "varbinary($length) NOT NULL";
@@ -298,6 +302,7 @@ class Field {
             $result["{$key}Html"]   = Strings::toHtml($text);
             break;
         case self::Text:
+        case self::LongText:
             $result[$key]           = $text;
             break;
         case self::Encrypt:
