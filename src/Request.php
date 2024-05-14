@@ -8,7 +8,6 @@ use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
-use Framework\Utils\Status;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
@@ -470,16 +469,6 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      */
     public function isValidPosition(string $key): bool {
         return !$this->has($key) || $this->isNumeric($key, 0);
-    }
-
-    /**
-     * Returns true if the given Status is valid
-     * @param string $key
-     * @param string $groupName Optional.
-     * @return boolean
-     */
-    public function isValidStatus(string $key, string $groupName = "general"): bool {
-        return Status::isValid($this->get($key), $groupName);
     }
 
 

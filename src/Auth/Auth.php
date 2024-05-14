@@ -14,9 +14,9 @@ use Framework\File\Path;
 use Framework\File\File;
 use Framework\Log\ActionLog;
 use Framework\Schema\Model;
+use Framework\System\Statuses;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
-use Framework\Utils\Status;
 use Framework\Utils\Strings;
 
 /**
@@ -200,7 +200,7 @@ class Auth {
         return (
             !$credential->isEmpty() &&
             !$credential->isDeleted &&
-            Status::isActive($credential->status)
+            $credential->status !== Statuses::Active
         );
     }
 

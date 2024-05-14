@@ -4,6 +4,6 @@
         "Inactive" : 2
     },
     "groups" : {
-        "general" : [ "Active", "Inactive" ]
+        "General" : [ "Active", "Inactive" ]
     }
 }
