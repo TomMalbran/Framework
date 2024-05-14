@@ -323,8 +323,9 @@ class Curl {
      */
     private static function parseUrl(string $url, ?array $params = null): string {
         $content = self::parseParams($params);
+        $prefix  = Strings::contains($url, "?") ? "&" : "?";
         if (!empty($content)) {
-            $url .= "?$content";
+            $url .= $prefix . $content;
         }
         return $url;
     }

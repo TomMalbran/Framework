@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\Config\Config;
+use Framework\Provider\Curl;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
