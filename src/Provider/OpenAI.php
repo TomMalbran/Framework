@@ -365,14 +365,31 @@ class OpenAI {
      * @param string $fileContent
      * @param string $fileName
      * @param string $language
-     * @return string
+     * @return object
      */
-    public static function transcribeAudio(string $fileContent, string $fileName, string $language): string {
-        $request = self::upload("/audio/transcriptions", [
-            "file"     => new CURLStringFile($fileContent, $fileName),
-            "model"    => "whisper-1",
-            "language" => $language,
+    public static function transcribeAudio(string $fileContent, string $fileName, string $language): object {
+        $timeStart = microtime(true);
+        $request   = self::upload("/audio/transcriptions", [
+            "file"            => new CURLStringFile($fileContent, $fileName),
+            "model"           => "whisper-1",
+            "language"        => $language,
+            "response_format" => "verbose_json",
         ]);
-        return !empty($request["text"]) ? $request["text"] : "";
+        $timeEnd   = microtime(true);
+        if (empty($request["text"])) {
+            return (object)[];
+        }
+
+        $tokens = 0;
+        foreach ($request["segments"] as $segment) {
+            $tokens += count($segment["tokens"]);
+        }
+        return  (object)[
+            "text"     => $request["text"],
+            "language" => $request["language"],
+            "duration" => ceil($request["duration"]),
+            "tokens"   => $tokens,
+            "runTime"  => round(($timeEnd - $timeStart) / 60),
+        ];
     }
 }
