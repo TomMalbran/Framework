@@ -183,7 +183,7 @@ class Utils {
      * @return string
      */
     public static function cuitToNumber(string $value): string {
-        return Strings::replace($value, [ " ", "-" ], "");
+        return Strings::toNumber($value);
     }
 
     /**
@@ -192,7 +192,7 @@ class Utils {
      * @return string
      */
     public static function dniToNumber(string $value): string {
-        return Strings::replace($value, [ " ", "." ], "");
+        return Strings::toNumber($value);
     }
 
     /**
@@ -201,7 +201,7 @@ class Utils {
      * @return string
      */
     public static function phoneToNumber(string $value): string {
-        return Strings::replace($value, [ " ", "-", "(", ")" ], "");
+        return Strings::toNumber($value);
     }
 
     /**

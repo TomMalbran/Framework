@@ -208,6 +208,15 @@ class Strings {
 
 
     /**
+     * Removes all non numbers from the String
+     * @param string $value
+     * @return string
+     */
+    public static function toNumber(string $value): string {
+        return self::replacePattern($value, '/[^0-9]/', "");
+    }
+
+    /**
      * Replaces in the String the search with the replace
      * @param string               $string
      * @param string[]|string      $search
