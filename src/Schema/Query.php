@@ -653,6 +653,20 @@ class Query {
     }
 
     /**
+     * Creates a new Query with a Period
+     * @param string       $column  Optional.
+     * @param Request|null $request Optional.
+     * @return Query
+     */
+    public static function createPeriod(string $column = "", ?Request $request = null): Query {
+        $query = new Query();
+        if (!empty($column) && !empty($request)) {
+            $query->addPeriod($column, $request);
+        }
+        return $query;
+    }
+
+    /**
      * Creates a new Query with an Expression
      * @param string $expression Optional.
      * @param mixed  ...$values  Optional.
