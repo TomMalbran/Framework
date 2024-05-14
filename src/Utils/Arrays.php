@@ -112,6 +112,9 @@ class Arrays {
         if ($key === null) {
             return Strings::isEqual($row, $value, $caseInsensitive);
         }
+        if (self::isObject($row)) {
+            return isset($row->$key) && Strings::isEqual($row->$key, $value, $caseInsensitive);
+        }
         return isset($row[$key]) && Strings::isEqual($row[$key], $value, $caseInsensitive);
     }
 
