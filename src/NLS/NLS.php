@@ -129,6 +129,21 @@ class NLS {
     }
 
     /**
+     * Creates an url from the given arguments
+     * @param string  $urlKey
+     * @param mixed[] $args
+     * @param string  $language Optional.
+     * @return string
+     */
+    public static function urlPath(string $urlKey, array $args, string $language = ""): string {
+        $result = [];
+        foreach ($args as $arg) {
+            $result[] = self::get($arg, $language);
+        }
+        return Config::getUrlPath($urlKey, ...$result);
+    }
+
+    /**
      * Returns a formatted string
      * @param string  $key
      * @param mixed[] $args
