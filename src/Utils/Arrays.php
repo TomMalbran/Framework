@@ -449,6 +449,24 @@ class Arrays {
     }
 
     /**
+     * Creates a Map of Dictionaries using the given Array
+     * @param mixed[] $array
+     * @param string  $key
+     * @param string  ...$values
+     * @return mixed[]
+     */
+    public static function createMapDict(array $array, string $key, string ...$values): array {
+        $result = [];
+        foreach ($array as $row) {
+            $result[$row[$key]] = [];
+            foreach ($values as $value) {
+                $result[$row[$key]][$value] = isset($row[$value]) ? $row[$value] : "";
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Creates an Array using the given Array
      * @param mixed[]              $array
      * @param string[]|string|null $value     Optional.
