@@ -14,7 +14,7 @@ use Framework\Log\ErrorLog;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
-use Framework\System\Dispatches;
+use Framework\System\SignalCode;
 use Framework\System\StatusCode;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
@@ -29,17 +29,17 @@ class Framework {
 
     // The Data
     const RouteData      = "routes";
-    const DispatchData   = "dispatches";
     const SchemaData     = "schemas";
     const MigrationsData = "migrations";
     const KeyData        = "keys";
+    const SignalData     = "signals";
+    const StatusData     = "status";
     const AccessData     = "access";
     const TokenData      = "tokens";
     const PathData       = "paths";
     const MediaData      = "media";
     const SettingsData   = "settings";
     const LanguageData   = "languages";
-    const StatusData     = "status";
 
     // The Directories
     const SourceDir      = "src";
@@ -350,13 +350,25 @@ class Framework {
         EmailTemplate::migrate();
         Generator::migrate();
 
-        Dispatches::migrate();
+        self::generateSystemPath();
+        SignalCode::generate();
         StatusCode::generate();
 
         if ($withPaths) {
             Path::ensurePaths();
             MediaFile::ensurePaths();
         }
+        return true;
+    }
+
+    /**
+     * Generates the System Path
+     * @return boolean
+     */
+    private static function generateSystemPath(): bool {
+        $systemPath = Framework::getPath(Framework::SystemDir);
+        File::createDir($systemPath);
+        File::emptyDir($systemPath);
         return true;
     }
 }

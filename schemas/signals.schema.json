@@ -1,5 +1,5 @@
 {
-    "title" : "Dispatches",
+    "title" : "Signals",
     "type"  : "object",
     "propertyNames" : {
         "pattern" : "^[a-z][A-Za-z0-9]*$"
@@ -7,7 +7,7 @@
     "patternProperties" : {
         "^[a-z][A-Za-z0-9]*$" : {
             "type"       : "object",
-            "required"   : [ "params", "dispatches" ],
+            "required"   : [ "params", "triggers" ],
             "properties": {
                 "params" : {
                     "type" : "object",
@@ -20,7 +20,7 @@
                         }
                     }
                 },
-                "dispatches" : {
+                "triggers" : {
                     "type" : "array",
                     "items" : {
                         "type" : "string"

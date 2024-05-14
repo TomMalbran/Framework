@@ -7,21 +7,21 @@ use {{namespace}}Schema\{{.}};{{/uses}}
 {{/hasUses}}
 
 /**
- * The Dispatcher
+ * The Signal
  */
-class Dispatcher {
-{{#dispatchers}}
+class Signal {
+{{#signals}}
 
     /**
-     * Dispatches the {{event}} Event{{#params}}
+     * Triggers the {{event}} Signal{{#params}}
      * @param {{docType}} ${{name}}{{/params}}
      * @return boolean
      */
     public static function {{event}}({{#params}}{{^isFirst}}, {{/isFirst}}{{type}} ${{name}}{{/params}}): bool {
-        {{#dispatches}}
+        {{#triggers}}
         \{{namespace}}{{.}}({{#params}}{{^isFirst}}, {{/isFirst}}${{name}}{{/params}});
-        {{/dispatches}}
+        {{/triggers}}
         return true;
     }
-{{/dispatchers}}
+{{/signals}}
 }
