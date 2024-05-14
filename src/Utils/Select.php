@@ -239,13 +239,26 @@ class Select implements ArrayAccess, JsonSerializable {
 
     /**
      * Creates a select using the given array
+     * @param string[] $array
+     * @return Select[]
+     */
+    public static function createFromList(array $array): array {
+        $result = [];
+        foreach ($array as $value) {
+            $result[] = new Select($value, $value);
+        }
+        return $result;
+    }
+
+    /**
+     * Creates a select using the given array
      * @param mixed[] $array
      * @return Select[]
      */
     public static function createFromMap(array $array): array {
         $result = [];
         foreach ($array as $key => $value) {
-            $result[] = new Select($key, $value);
+            $result[] = new Select((string)$key, $value);
         }
         return $result;
     }
