@@ -9,40 +9,35 @@ use Framework\Utils\Select;
  * The Status
  */
 class Status {
-
 {{#statuses}}
 {{#addSpace}}
 
+    // {{group}}: {{statuses}}
 {{/addSpace}}
-    const {{constant}} = {{value}};
+    const {{constant}} = "{{name}}";
 {{/statuses}}
 
 
 
     /**
-     * Returns the Status Value from a Status Name
-     * @param string $name
-     * @return integer
+     * Returns true if the Name of the given Status
+     * @param string $value
+     * @param string $isoCode Optional.
+     * @return string
      */
-    public static function getValue(string $name): int {
-        return match ($name) {
-            {{#statuses}}
-            self::{{constant}} => {{value}},
-            {{/statuses}}
-            default => 0,
-        };
+    public static function getName(string $value, string $isoCode = ""): string {
+        return NLS::getIndex("SELECT_STATUS", $value, $isoCode);
     }
-
 
 
 {{#statuses}}
 
     /**
      * Returns true if the given value is the Status {{name}}
-     * @param integer $value
+     * @param string $value
      * @return boolean
      */
-    public static function is{{name}}(int $value): bool {
+    public static function is{{name}}(string $value): bool {
         return self::{{name}} === $value;
     }
 {{/statuses}}
@@ -51,23 +46,23 @@ class Status {
 {{#groups}}
 
     /**
-     * Returns true if the given value is in the Status Group {{name}}
-     * @param integer $value
+     * Returns true if the given value is one of: {{statuses}}
+     * @param string $value
      * @return boolean
      */
-    public static function isValid{{name}}(int $value): bool {
+    public static function isValid{{name}}(string $value): bool {
         return Arrays::contains([ {{values}} ], $value);
     }
 
     /**
-     * Returns a Select for the Status Group {{name}}
+     * Returns a Select for the values: {{statuses}}
      * @param string $isoCode Optional.
      * @return Select[]
      */
     public static function get{{name}}Select(string $isoCode = ""): array {
         $result = [];
         foreach ([ {{values}} ] as $status) {
-            $name     = NLS::getIndex("SELECT_STATUS", $status, $isoCode);
+            $name     = self::getName($status, $isoCode);
             $result[] = new Select($status, $name);
         }
         return $result;

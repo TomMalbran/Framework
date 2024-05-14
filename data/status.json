@@ -1,9 +1,3 @@
 {
-    "values" : {
-        "Active"   : 1,
-        "Inactive" : 2
-    },
-    "groups" : {
-        "General" : [ "Active", "Inactive" ]
-    }
+    "General" : [ "Active", "Inactive" ]
 }

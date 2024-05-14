@@ -21,12 +21,10 @@ class StatusCode {
      * @return boolean
      */
     public static function generate(): bool {
-        $data = Framework::loadData(Framework::StatusData, false);
-        if (empty($data)) {
-            $data = Framework::loadJSON(Framework::DataDir, Framework::StatusData, true, false);
-        }
-        if (empty($data) || empty($data->values)) {
-            return false;
+        $data    = Framework::loadJSON(Framework::DataDir, Framework::StatusData, true);
+        $appData = Framework::loadData(Framework::StatusData);
+        if (!empty($appData)) {
+            $data = array_merge($data, $appData);
         }
 
         $writePath = Framework::getPath(Framework::SystemDir);
@@ -45,26 +43,35 @@ class StatusCode {
 
     /**
      * Generates the Statues data
-     * @param object $data
+     * @param array{} $data
      * @return array{}[]
      */
-    private static function getStatues(object $data): array {
+    private static function getStatues(array $data): array {
         $result    = [];
+        $used      = [];
         $maxLength = 0;
-        $nextGroup = 0;
+        $lastGroup = "";
 
-        foreach ($data->values as $name => $value) {
-            $maxLength = max($maxLength, Strings::length($name));
-            $addSpace  = $value > $nextGroup + 10;
-            if ($addSpace) {
-                $nextGroup = floor($value / 10) * 10;
+        foreach ($data as $group => $values) {
+            foreach ($values as $name) {
+                if (!empty($used[$name])) {
+                    continue;
+                }
+
+                $maxLength = max($maxLength, Strings::length($name));
+                $addSpace  = $group !== $lastGroup;
+                if ($addSpace) {
+                    $lastGroup = $group;
+                }
+
+                $result[] = [
+                    "addSpace" => $addSpace,
+                    "group"    => $group,
+                    "statuses" => Strings::join($values, ", "),
+                    "name"     => $name,
+                ];
+                $used[$name] = true;
             }
-
-            $result[] = [
-                "name"     => $name,
-                "value"    => $value,
-                "addSpace" => $addSpace,
-            ];
         }
         foreach ($result as $index => $status) {
             $result[$index]["constant"] = Strings::padRight($status["name"], $maxLength);
@@ -75,25 +82,17 @@ class StatusCode {
 
     /**
      * Generates the Groups data
-     * @param object $data
+     * @param array{} $data
      * @return array{}[]
      */
-    private static function getGroups(object $data): array {
+    private static function getGroups(array $data): array {
         $result = [];
-        foreach ($data->groups as $name => $values) {
-            $statues = [];
-            foreach ($values as $value) {
-                if (isset($data->values->$value)) {
-                    $statues[] = $data->values->$value;
-                }
-            }
-            if (empty($statues)) {
-                continue;
-            }
-
+        foreach ($data as $name => $values) {
             $result[] = [
-                "name"   => $name,
-                "values" => Strings::join($statues, ", "),
+                "name"     => $name,
+                "values"   => "self::" . Strings::join($values, ", self::"),
+                "statuses" => Strings::join($values, ", "),
+
             ];
         }
 

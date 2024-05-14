@@ -17,7 +17,7 @@
             "passExpiration"   : { "type" : "date",                            "cantEdit" : true },
             "accessToken"      : { "type" : "string",                          "cantEdit" : true },
             "tokenExpiration"  : { "type" : "date",                            "cantEdit" : true },
-            "status"           : { "type" : "number",  "length"   : 3,         "noExists" : true },
+            "status"           : { "type" : "string",                          "noExists" : true },
             "observations"     : { "type" : "text",                            "noExists" : true },
             "sendEmails"       : { "type" : "boolean",                         "noExists" : true },
             "sendEmailNotis"   : { "type" : "boolean",                         "noExists" : true },
