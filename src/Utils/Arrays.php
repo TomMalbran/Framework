@@ -365,7 +365,7 @@ class Arrays {
             sort($array);
         } elseif (self::isList($array)) {
             usort($array, $callback);
-        } elseif (self::isMap($array)) {
+        } else {
             uasort($array, $callback);
         }
         return $array;
