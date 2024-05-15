@@ -5,17 +5,16 @@ use Framework\Response;
 use Framework\Route\Router;
 use Framework\Auth\Auth;
 use Framework\Config\Config;
-use Framework\Config\Settings;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\Path;
 use Framework\File\MediaFile;
 use Framework\Log\ErrorLog;
+use Framework\System\Code;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
-use Framework\System\SignalCode;
-use Framework\System\StatusCode;
+use Framework\System\SettingCode;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
 use Exception;
@@ -345,7 +344,7 @@ class Framework {
      * @return boolean
      */
     public static function migrate(bool $canDelete = false, bool $withPaths = true): bool {
-        self::generate();
+        Code::generate();
 
         Factory::migrate($canDelete);
         Settings::migrate();
@@ -356,22 +355,6 @@ class Framework {
             Path::ensurePaths();
             MediaFile::ensurePaths();
         }
-        return true;
-    }
-
-    /**
-     * Generates the System Codes
-     * @return boolean
-     */
-    private static function generate(): bool {
-        $systemPath = Framework::getPath(Framework::SystemDir);
-        File::createDir($systemPath);
-        File::emptyDir($systemPath);
-
-        SignalCode::generate();
-        StatusCode::generate();
-
-        print("<br>");
         return true;
     }
 }

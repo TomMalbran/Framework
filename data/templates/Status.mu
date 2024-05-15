@@ -1,5 +1,5 @@
 <?php
-namespace {{namespace}}System;
+namespace {{codeSpace}};
 
 use Framework\NLS\NLS;
 use Framework\Utils\Arrays;

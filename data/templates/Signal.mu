@@ -1,9 +1,9 @@
 <?php
-namespace {{namespace}}System;
+namespace {{codeSpace}};
 {{#hasUses}}
 
 {{#uses}}
-use {{namespace}}Schema\{{.}};{{/uses}}
+use {{nameSpace}}Schema\{{.}};{{/uses}}
 {{/hasUses}}
 
 /**
@@ -19,7 +19,7 @@ class Signal {
      */
     public static function {{event}}({{#params}}{{^isFirst}}, {{/isFirst}}{{type}} ${{name}}{{/params}}): bool {
         {{#triggers}}
-        \{{namespace}}{{.}}({{#params}}{{^isFirst}}, {{/isFirst}}${{name}}{{/params}});
+        \{{nameSpace}}{{.}}({{#params}}{{^isFirst}}, {{/isFirst}}${{name}}{{/params}});
         {{/triggers}}
         return true;
     }

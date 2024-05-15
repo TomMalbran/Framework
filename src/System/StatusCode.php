@@ -2,8 +2,6 @@
 namespace Framework\System;
 
 use Framework\Framework;
-use Framework\File\File;
-use Framework\Provider\Mustache;
 use Framework\Utils\Strings;
 
 /**
@@ -17,28 +15,20 @@ class StatusCode {
 
 
     /**
-     * Generates the Class
-     * @return boolean
+     * Returns the Code variables
+     * @return array{}
      */
-    public static function generate(): bool {
+    public static function getCode(): array {
         $data    = Framework::loadJSON(Framework::DataDir, Framework::StatusData, true);
         $appData = Framework::loadData(Framework::StatusData);
         if (!empty($appData)) {
             $data = array_merge($data, $appData);
         }
 
-        $writePath = Framework::getPath(Framework::SystemDir);
-        $template  = Framework::loadFile(Framework::TemplateDir, "Status.mu");
-
-        $contents  = Mustache::render($template, [
-            "namespace" => Framework::Namespace,
-            "statuses"  => self::getStatues($data),
-            "groups"    => self::getGroups($data),
-        ]);
-        File::create($writePath, "Status.php", $contents);
-
-        print("Generated the <i>Status</i><br>");
-        return true;
+        return [
+            "statuses" => self::getStatues($data),
+            "groups"   => self::getGroups($data),
+        ];
     }
 
     /**

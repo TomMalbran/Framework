@@ -2,8 +2,6 @@
 namespace Framework\System;
 
 use Framework\Framework;
-use Framework\File\File;
-use Framework\Provider\Mustache;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -13,29 +11,21 @@ use Framework\Utils\Strings;
 class SignalCode {
 
     /**
-     * Generates the Class
-     * @return boolean
+     * Returns the Code variables
+     * @return array{}
      */
-    public static function generate(): bool {
+    public static function getCode(): array {
         $data = Framework::loadData(Framework::SignalData, false);
         if (empty((array)$data)) {
-            return false;
+            return [];
         }
 
-        $writePath = Framework::getPath(Framework::SystemDir);
-        $template  = Framework::loadFile(Framework::TemplateDir, "Signal.mu");
-
-        $uses      = self::getUses($data);
-        $contents  = Mustache::render($template, [
-            "namespace" => Framework::Namespace,
-            "uses"      => $uses,
-            "hasUses"   => !empty($uses),
-            "signals"   => self::getSignals($data),
-        ]);
-        File::create($writePath, "Signal.php", $contents);
-
-        print("Generated the <i>Signal</i><br>");
-        return true;
+        $uses = self::getUses($data);
+        return [
+            "uses"    => $uses,
+            "hasUses" => !empty($uses),
+            "signals" => self::getSignals($data),
+        ];
     }
 
     /**
