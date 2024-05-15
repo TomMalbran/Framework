@@ -208,7 +208,7 @@
             "section"  : { "type" : "string", "isPrimary" : true },
             "variable" : { "type" : "string", "isPrimary" : true },
             "value"    : { "type" : "text"                       },
-            "type"     : { "type" : "number", "length"    : 1    }
+            "type"     : { "type" : "string"                     }
         },
         "hasTimestamps" : true,
         "canCreate"     : false,

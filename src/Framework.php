@@ -347,7 +347,7 @@ class Framework {
         Code::generate();
 
         Factory::migrate($canDelete);
-        Settings::migrate();
+        SettingCode::migrate();
         EmailTemplate::migrate();
         Generator::migrate();
 

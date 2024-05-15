@@ -2,10 +2,10 @@
 namespace Framework\Schema;
 
 use Framework\Framework;
-use Framework\Config\Settings;
 use Framework\File\File;
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
+use Framework\System\SettingCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -37,7 +37,7 @@ class Migration {
      * @return boolean
      */
     private static function moveTables(Database $db, array $movements): bool {
-        $startMovement = Settings::getCore($db, "movement");
+        $startMovement = SettingCode::getCore($db, "movement");
         $lastMovement  = count($movements);
         $didMove       = false;
 
@@ -57,7 +57,7 @@ class Migration {
         } else {
             print("No <i>movements</i> required<br><br>");
         }
-        Settings::setCore($db, "movement", $lastMovement);
+        SettingCode::setCore($db, "movement", $lastMovement);
         return $didMove;
     }
 
@@ -363,9 +363,10 @@ class Migration {
      * @return boolean
      */
     private static function extraMigrations(Database $db): bool {
-        $migration = Settings::getCore($db, "migration");
+        $migration = SettingCode::getCore($db, "migration");
         $path      = Framework::getPath(Framework::MigrationsDir);
 
+        SettingCode::setCore($db, "migration", $migration);
         if (!File::exists($path)) {
             print("<br>No <i>migrations</i> required<br>");
             return false;
@@ -395,7 +396,7 @@ class Migration {
             }
         }
 
-        Settings::setCore($db, "migration", $last);
+        SettingCode::setCore($db, "migration", $last);
         return true;
     }
 }

@@ -8,7 +8,7 @@
         "^[a-z][A-Za-z0-9]*$" : {
             "type"       : "object",
             "required"   : [ "params", "triggers" ],
-            "properties": {
+            "properties" : {
                 "params" : {
                     "type" : "object",
                     "propertyNames" : {
