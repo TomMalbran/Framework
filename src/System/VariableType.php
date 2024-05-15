@@ -70,11 +70,11 @@ class VariableType {
 
     /**
      * Encodes the Settings Value for the Database
-     * @param integer $type
-     * @param mixed   $value
+     * @param string $type
+     * @param mixed  $value
      * @return string
      */
-    public static function encodeValue(int $type, mixed $value): string {
+    public static function encodeValue(string $type, mixed $value): string {
         return match ($type) {
             self::Boolean => !empty($value) ? "1" : "0",
             self::Array   => JSON::encode($value),

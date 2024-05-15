@@ -54,7 +54,7 @@ class Setting {
 
 {{/isFirst}}
     /**
-     * Returns the value of the Setting {{prefix}}{{name}}
+     * Returns the value of "{{title}}"
      * @return {{docType}}
      */
     public static function {{getter}}{{prefix}}{{name}}(): {{type}} {
@@ -77,7 +77,7 @@ class Setting {
     }
 
     /**
-     * Sets the value of the Setting {{prefix}}{{name}}
+     * Sets the value of "{{title}}"
      * @param {{docType}} $value
      * @return boolean
      */

@@ -364,12 +364,16 @@ class SettingCode {
         foreach ($data as $section => $variables) {
             foreach ($variables as $variable => $value) {
                 $isGeneral = Strings::isEqual($section, self::General);
+                $prefix    = !$isGeneral ? Strings::upperCaseFirst($section) : "";
+                $title     = Strings::camelCaseToTitle($variable);
                 $type      = VariableType::get($value);
+
                 $result[]  = [
                     "isFirst"   => $isFirst,
                     "section"   => $section,
                     "variable"  => $variable,
-                    "prefix"    => !$isGeneral ? Strings::upperCaseFirst($section) : "",
+                    "prefix"    => $prefix,
+                    "title"     => !empty($prefix) ? "$prefix $title" : $title,
                     "name"      => Strings::upperCaseFirst($variable),
                     "type"      => VariableType::getType($type),
                     "docType"   => VariableType::getDocType($type),

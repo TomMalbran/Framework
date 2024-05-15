@@ -60,12 +60,17 @@ class Strings {
     /**
      * Returns true if the given String starts with the given Needle
      * @param string $string
-     * @param string $needle
+     * @param string ...$needles
      * @return boolean
      */
-    public static function startsWith(string $string, string $needle): bool {
-        $length = strlen($needle);
-        return substr($string, 0, $length) === $needle;
+    public static function startsWith(string $string, string ...$needles): bool {
+        foreach ($needles as $needle) {
+            $length = strlen($needle);
+            if (substr($string, 0, $length) === $needle) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -583,6 +588,17 @@ class Strings {
     }
 
     /**
+     * Transforms an UpperCase string with underscores to Title
+     * @param string  $string
+     * @return string
+     */
+    public static function upperCaseToTitle(string $string): string {
+        $result = ucwords(strtolower($string), "_");
+        $result = str_replace("_", " ", $result);
+        return $result;
+    }
+
+    /**
      * Transforms an UpperCase string with underscores to CamelCase
      * @param string  $string
      * @param boolean $capitalizeFirst Optional.
@@ -606,6 +622,18 @@ class Strings {
         $parts  = preg_split('/(?=[A-Z])/', $string);
         $result = implode("_", $parts);
         $result = strtoupper($result);
+        return $result;
+    }
+
+    /**
+     * Transforms an CamelCase string to Title
+     * @param string $string
+     * @return string
+     */
+    public static function camelCaseToTitle(string $string): string {
+        $parts  = preg_split('/(?=[A-Z])/', $string);
+        $result = implode(" ", $parts);
+        $result = ucfirst($result);
         return $result;
     }
 
