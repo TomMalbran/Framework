@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 
 /**
  * The SendGrid Provider
@@ -24,7 +24,7 @@ class SendGrid {
         }
 
         self::$loaded = true;
-        self::$apiKey = Config::getString("sendGridKey");
+        self::$apiKey = ConfigCode::getString("sendGridKey");
         return false;
     }
 

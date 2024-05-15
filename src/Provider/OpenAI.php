@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -29,7 +29,7 @@ class OpenAI {
         if (self::$loaded) {
             return true;
         }
-        self::$apiKey = Config::getString("openAiKey");
+        self::$apiKey = ConfigCode::getString("openAiKey");
         return true;
     }
 

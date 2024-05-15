@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 
 /**
  * The Mandrill Provider
@@ -24,7 +24,7 @@ class Mandrill {
         }
 
         self::$loaded = true;
-        self::$apiKey = Config::getString("mandrillKey");
+        self::$apiKey = ConfigCode::getString("mandrillKey");
         return false;
     }
 

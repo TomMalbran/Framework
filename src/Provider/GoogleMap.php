@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\Utils\Arrays;
 
 /**
@@ -26,8 +26,8 @@ class GoogleMap {
         }
 
         self::$loaded   = true;
-        self::$isActive = Config::getBoolean("googleMapIsActive");
-        self::$apiKey   = Config::getString("googleMapKey");
+        self::$isActive = ConfigCode::getBoolean("googleMapIsActive");
+        self::$apiKey   = ConfigCode::getString("googleMapKey");
         return false;
     }
 

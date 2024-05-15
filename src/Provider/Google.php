@@ -10,24 +10,6 @@ class Google {
 
     const BaseUrl = "https://www.googleapis.com/oauth2/v1/";
 
-    private static bool   $loaded = false;
-    private static object $config;
-
-
-    /**
-     * Creates the Google Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        self::$loaded = true;
-        self::$config = Config::getObject("google");
-        return false;
-    }
-
 
 
     /**
@@ -36,7 +18,6 @@ class Google {
      * @return array{}
      */
     public static function getAuthAccount(string $accessToken): array {
-        self::load();
         if (empty($accessToken)) {
             return [];
         }

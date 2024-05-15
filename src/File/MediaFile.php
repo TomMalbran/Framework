@@ -3,7 +3,7 @@ namespace Framework\File;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\File\File;
 use Framework\File\Image;
 use Framework\File\FileType;
@@ -121,7 +121,7 @@ class MediaFile {
      * @return string
      */
     public static function getUrl(string ...$pathParts): string {
-        return Config::getFileUrl(Framework::FilesDir, self::Source, self::$id, ...$pathParts);
+        return ConfigCode::getUrl("fileUrl", Framework::FilesDir, self::Source, self::$id, ...$pathParts);
     }
 
     /**
@@ -130,7 +130,7 @@ class MediaFile {
      * @return string
      */
     public static function getThumbUrl(string ...$pathParts): string {
-        return Config::getFileUrl(Framework::FilesDir, self::Thumbs, self::$id, ...$pathParts);
+        return ConfigCode::getUrl("fileUrl", Framework::FilesDir, self::Thumbs, self::$id, ...$pathParts);
     }
 
     /**

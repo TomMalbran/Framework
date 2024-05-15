@@ -2,10 +2,10 @@
 namespace Framework\Schema;
 
 use Framework\Framework;
+use Framework\System\SettingCode;
 use Framework\File\File;
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
-use Framework\System\SettingCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 

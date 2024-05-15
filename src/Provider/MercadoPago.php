@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\Provider\Curl;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
@@ -35,7 +35,7 @@ class MercadoPago {
             return true;
         }
 
-        $config = Config::getObject("mp");
+        $config = ConfigCode::getObject("mp");
 
         self::$loaded       = true;
         self::$clientID     = $config->clientId;
@@ -45,10 +45,10 @@ class MercadoPago {
         self::$backUrl      = $config->backUrl;
 
         if (!empty($config->redirectPath)) {
-            self::$redirectUrl = Config::getUrl($config->redirectPath);
+            self::$redirectUrl = ConfigCode::getUrl("url", $config->redirectPath);
         }
         if (!empty($config->notificationPath)) {
-            self::$notificationUrl = Config::getUrl($config->notificationPath);
+            self::$notificationUrl = ConfigCode::getUrl("url", $config->notificationPath);
         }
 
         if (!empty($accessToken)) {

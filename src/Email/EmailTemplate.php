@@ -3,7 +3,7 @@ namespace Framework\Email;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\NLS\Language;
 use Framework\Provider\Mustache;
 use Framework\Schema\Factory;
@@ -147,7 +147,7 @@ class EmailTemplate {
         string $languageName,
         int $position
     ): int {
-        $siteName = Config::getString("name");
+        $siteName = ConfigCode::getString("name");
         $updates  = [];
 
         // Adds the Email Templates

@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\Utils\Utils;
 
 use Firebase\JWT\JWT;
@@ -25,7 +25,7 @@ class Microsoft {
         }
 
         self::$loaded = true;
-        self::$config = Config::getObject("microsoft");
+        self::$config = ConfigCode::getObject("microsoft");
         return false;
     }
 

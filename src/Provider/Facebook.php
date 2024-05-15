@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
 use Framework\Utils\Utils;
 
 /**
@@ -11,24 +10,6 @@ class Facebook {
 
     const BaseUrl = "https://graph.facebook.com/v16.0/";
 
-    private static bool   $loaded = false;
-    private static object $config;
-
-
-    /**
-     * Creates the Facebook Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        self::$loaded = true;
-        self::$config = Config::getObject("meta");
-        return false;
-    }
-
 
 
     /**
@@ -37,7 +18,6 @@ class Facebook {
      * @return array{}
      */
     public static function getAuthAccount(string $accessToken): array {
-        self::load();
         if (empty($accessToken)) {
             return [];
         }

@@ -2,7 +2,7 @@
 namespace Framework\File;
 
 use Framework\Framework;
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
@@ -86,7 +86,7 @@ class Path {
      * @return string
      */
     public static function getBaseUrl(): string {
-        return Config::getFileUrl(Framework::FilesDir);
+        return ConfigCode::getUrl("fileUrl", Framework::FilesDir);
     }
 
     /**
@@ -98,7 +98,7 @@ class Path {
     public static function getUrl(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
-            return Config::getFileUrl(Framework::FilesDir, $path, ...$pathParts);
+            return ConfigCode::getUrl("fileUrl", Framework::FilesDir, $path, ...$pathParts);
         }
         return "";
     }
@@ -140,7 +140,7 @@ class Path {
      * @return string
      */
     public static function getTempUrl(int $credentialID, string ...$pathParts): string {
-        return Config::getFileUrl(Framework::TempDir, $credentialID, ...$pathParts);
+        return ConfigCode::getUrl("fileUrl", Framework::TempDir, $credentialID, ...$pathParts);
     }
 
 

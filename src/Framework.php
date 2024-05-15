@@ -3,18 +3,18 @@ namespace Framework;
 
 use Framework\Response;
 use Framework\Route\Router;
+use Framework\System\Code;
+use Framework\System\ConfigCode;
+use Framework\System\SettingCode;
 use Framework\Auth\Auth;
-use Framework\Config\Config;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\Path;
 use Framework\File\MediaFile;
 use Framework\Log\ErrorLog;
-use Framework\System\Code;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
-use Framework\System\SettingCode;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
 use Exception;
@@ -129,7 +129,7 @@ class Framework {
      */
     public static function getDatabase(): Database {
         if (empty(self::$db)) {
-            $config   = Config::getObject("db");
+            $config   = ConfigCode::getObject("db");
             self::$db = new Database($config);
         }
         return self::$db;

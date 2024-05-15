@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\OAuth;
@@ -28,9 +28,9 @@ class SMTP {
         }
 
         self::$loaded = true;
-        self::$url    = Config::getString("url");
-        self::$config = Config::getObject("smtp");
-        self::$google = Config::getObject("google");
+        self::$url    = ConfigCode::getString("url");
+        self::$config = ConfigCode::getObject("smtp");
+        self::$google = ConfigCode::getObject("google");
         return false;
     }
 

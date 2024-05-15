@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\Email\EmailWhiteList;
 use Framework\Utils\Select;
 
@@ -26,7 +26,7 @@ class MailChimp {
             return false;
         }
         self::$loaded = true;
-        self::$config = Config::getObject("mailchimp");
+        self::$config = ConfigCode::getObject("mailchimp");
 
         if (self::$config->active && !empty(self::$config->key)) {
             self::$api = new MailChimpAPI(self::$config->key);

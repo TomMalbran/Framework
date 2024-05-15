@@ -1,20 +1,28 @@
 <?php
-namespace Framework\Config;
+namespace Framework\System;
 
 use Framework\Framework;
+use Framework\System\VariableType;
 use Framework\File\File;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
 /**
- * The Config Data
+ * The Config Code
  */
-class Config {
+class ConfigCode {
 
     private static bool  $loaded = false;
 
     /** @var array{}[] */
     private static array $data   = [];
+
+    /** @var string[] */
+    private static array $defaults = [
+        "DB", "AUTH", "EMAIL", "SMTP", "MAILJET", "MANDRILL", "SEND_GRID",
+        "MAILCHIMP", "ONESIGNAL", "OPEN_AI"
+    ];
+
 
 
     /**
@@ -60,9 +68,10 @@ class Config {
         $result   = [];
 
         foreach ($lines as $line) {
-            if (empty(trim($line))) {
+            if (empty(trim($line)) || Strings::startsWith($line, "#")) {
                 continue;
             }
+
             $parts = Strings::split($line, " = ");
             if (count($parts) != 2) {
                 continue;
@@ -126,16 +135,6 @@ class Config {
     }
 
     /**
-     * Returns a Config Property as a Boolean
-     * @param string $property
-     * @return boolean
-     */
-    public static function getBoolean(string $property): bool {
-        $value = self::get($property);
-        return !empty($value);
-    }
-
-    /**
      * Returns a Config Property as a String
      * @param string $property
      * @param string $default  Optional.
@@ -144,6 +143,16 @@ class Config {
     public static function getString(string $property, string $default = ""): string {
         $value = self::get($property);
         return !empty($value) ? (string)$value : $default;
+    }
+
+    /**
+     * Returns a Config Property as a Boolean
+     * @param string $property
+     * @return boolean
+     */
+    public static function getBoolean(string $property): bool {
+        $value = self::get($property);
+        return !empty($value);
     }
 
     /**
@@ -198,64 +207,78 @@ class Config {
     }
 
     /**
-     * Returns the Url adding the url parts at the end
-     * @param string ...$urlParts
-     * @return string
-     */
-    public static function getUrl(string ...$urlParts): string {
-        return self::getUrlPath("url", ...$urlParts);
-    }
-
-    /**
-     * Returns the File Url adding the url parts at the end
-     * @param string ...$urlParts
-     * @return string
-     */
-    public static function getFileUrl(string ...$urlParts): string {
-        return self::getUrlPath("fileUrl", ...$urlParts);
-    }
-
-    /**
      * Returns the Url using the given key and adding the url parts at the end
      * @param string $urlKey
      * @param string ...$urlParts
      * @return string
      */
-    public static function getUrlPath(string $urlKey, string ...$urlParts): string {
+    public static function getUrl(string $urlKey, string ...$urlParts): string {
         $url  = self::get($urlKey, self::get("url"));
         $path = File::getPath(...$urlParts);
         $path = File::removeFirstSlash($path);
         return $url . $path;
     }
 
+
+
     /**
-     * Returns the Version split into the different parts
-     * @return object
+     * Returns the Code variables
+     * @return array{}
      */
-    public static function getVersion(): object {
-        $version = self::get("version");
-        if (empty($version)) {
-            return (object)[
-                "version" => "",
-                "build"   => "",
-                "full"    => "",
-            ];
+    public static function getCode(): array {
+        self::load();
+        if (empty(self::$data)) {
+            return [];
         }
-        $parts = Strings::split($version, "-");
-        return (object)[
-            "version" => $parts[0],
-            "build"   => $parts[1],
-            "full"    => $version,
+
+        [ $properties, $urls ] = self::getProperties();
+        return [
+            "urls"       => $urls,
+            "properties" => $properties,
         ];
     }
 
     /**
-     * Returns true if a Property exists
-     * @param string $property
-     * @return boolean
+     * Returns the Config Properties for the generator
+     * @return mixed[]
      */
-    public static function has(string $property): bool {
-        $value = self::get($property);
-        return isset($value);
+    private static function getProperties(): array {
+        $properties = [];
+        $urls       = [];
+
+        foreach (self::$data as $envKey => $value) {
+            if (Strings::startsWith($envKey, ...self::$defaults)) {
+                continue;
+            }
+
+            $property = Strings::upperCaseToCamelCase($envKey);
+            $title    = Strings::upperCaseToTitle($envKey);
+            $name     = Strings::upperCaseFirst($property);
+
+            if (Strings::endsWith($envKey, "URL")) {
+                $urls[] = [
+                    "property" => $property,
+                    "name"     => $name,
+                    "title"    => $title,
+                ];
+                continue;
+            }
+
+            $type         = VariableType::get($value);
+            $properties[] = [
+                "property"  => $property,
+                "name"      => $name,
+                "title"     => $title,
+                "type"      => VariableType::getType($type),
+                "docType"   => VariableType::getDocType($type),
+                "getter"    => $type === VariableType::Boolean ? "is" : "get",
+                "isString"  => $type === VariableType::String,
+                "isBoolean" => $type === VariableType::Boolean,
+                "isInteger" => $type === VariableType::Integer,
+                "isFloat"   => $type === VariableType::Float,
+                "isArray"   => $type === VariableType::Array,
+            ];
+        }
+        return [ $properties, $urls ];
     }
 }

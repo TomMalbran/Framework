@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 
 /**
  * The Mailjet Provider
@@ -25,8 +25,8 @@ class Mailjet {
         }
 
         self::$loaded    = true;
-        self::$apiKey    = Config::getString("mailjetKey");
-        self::$apiSecret = Config::getString("mailjetSecret");
+        self::$apiKey    = ConfigCode::getString("mailjetKey");
+        self::$apiSecret = ConfigCode::getString("mailjetSecret");
         return false;
     }
 

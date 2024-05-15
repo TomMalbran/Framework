@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Notification;
 
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\Provider\Curl;
 use Framework\File\Path;
 
@@ -26,7 +26,7 @@ class Notification {
         }
 
         self::$loaded = true;
-        self::$config = Config::getObject("onesignal");
+        self::$config = ConfigCode::getObject("onesignal");
         return true;
     }
 
@@ -107,7 +107,7 @@ class Notification {
             "app_id"         => self::$config->appId,
             "headings"       => [ "en" => $title ],
             "contents"       => [ "en" => $body  ],
-            "url"            => Config::getUrl($url),
+            "url"            => ConfigCode::getUrl("url", $url),
             "large_icon"     => $icon,
             "ios_badgeType"  => "Increase",
             "ios_badgeCount" => 1,

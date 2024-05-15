@@ -2,10 +2,11 @@
 namespace Framework\System;
 
 use Framework\Framework;
-use Framework\Provider\Mustache;
+use Framework\System\ConfigCode;
 use Framework\System\SettingCode;
 use Framework\System\SignalCode;
 use Framework\System\StatusCode;
+use Framework\Provider\Mustache;
 use Framework\File\File;
 
 /**
@@ -26,6 +27,7 @@ class Code {
         File::createDir($writePath);
         File::emptyDir($writePath);
 
+        self::generateOne("Config",  ConfigCode::getCode());
         self::generateOne("Setting", SettingCode::getCode());
         self::generateOne("Signal",  SignalCode::getCode());
         self::generateOne("Status",  StatusCode::getCode());

@@ -3,7 +3,7 @@ namespace Framework\Email;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Config\Config;
+use Framework\System\ConfigCode;
 use Framework\Email\EmailWhiteList;
 use Framework\Email\EmailResult;
 use Framework\Provider\Mustache;
@@ -44,8 +44,8 @@ class Email {
         }
         self::$loaded   = true;
         self::$template = Framework::loadFile(Framework::DataDir, "email.html");
-        self::$url      = Config::getString("url");
-        self::$config   = Config::getObject("email");
+        self::$url      = ConfigCode::getString("url");
+        self::$config   = ConfigCode::getObject("email");
         return true;
     }
 
@@ -135,7 +135,7 @@ class Email {
      * @return boolean
      */
     public static function isCaptchaValid(Request $request, bool $withScore = false): bool {
-        $recaptchaSecret = Config::getString("recaptchaSecret");
+        $recaptchaSecret = ConfigCode::getString("recaptchaSecret");
         if (!$request->has("g-recaptcha-response") || empty($recaptchaSecret)) {
             return false;
         }

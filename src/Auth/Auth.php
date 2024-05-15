@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\System\ConfigCode;
+use Framework\System\StatusCode;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Access;
 use Framework\Auth\Credential;
@@ -8,13 +10,11 @@ use Framework\Auth\Token;
 use Framework\Auth\Reset;
 use Framework\Auth\Spam;
 use Framework\Auth\Storage;
-use Framework\Config\Config;
 use Framework\NLS\NLS;
 use Framework\File\Path;
 use Framework\File\File;
 use Framework\Log\ActionLog;
 use Framework\Schema\Model;
-use Framework\System\StatusCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
@@ -308,7 +308,7 @@ class Auth {
             NLS::setLanguage($language);
         }
 
-        $levels = Config::getArray("authTimezone");
+        $levels = ConfigCode::getArray("authTimezone");
         if (!empty($timezone) && (empty($levels) || Arrays::contains($levels, $credential->level))) {
             DateTime::setTimezone($timezone);
         }
@@ -354,7 +354,7 @@ class Auth {
         ];
 
         // Add fields from the Config
-        $fields = Config::getArray("authFields");
+        $fields = ConfigCode::getArray("authFields");
         foreach ($fields as $field) {
             $data[$field] = self::$credential->get($field);
         }
