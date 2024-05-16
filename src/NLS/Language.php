@@ -116,34 +116,4 @@ class Language {
         self::load();
         return Select::create(self::$languages, "key", "name");
     }
-
-
-
-    /**
-     * Returns a value depending on the call name
-     * @param string $function
-     * @param array  $arguments
-     * @return mixed
-     */
-    public static function __callStatic(string $function, array $arguments) {
-        self::load();
-        $value = !empty($arguments[0]) ? $arguments[0] : "";
-
-        // Function "isXxx": isSpanish("es") => true, isSpanish("en") => false
-        if (Strings::startsWith($function, "is")) {
-            $languageName = Strings::stripStart($function, "is");
-            $language     = self::getOne($value);
-            return !empty($language) && Strings::isEqual($language->name, $languageName);
-        }
-
-        // Function "xxx": Spanish() => "es"
-        foreach (self::$languages as $isoCode => $language) {
-            if (Strings::isEqual($language->name, $function)) {
-                return $isoCode;
-            }
-        }
-
-        // Function "xxx": ES() => {}
-        return self::getOne($function);
-    }
 }
