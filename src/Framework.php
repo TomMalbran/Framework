@@ -290,16 +290,16 @@ class Framework {
             return Response::error("GENERAL_ERROR_PATH");
         }
 
-        // Grab the Access Level for the given Route
-        $accessLevel = Router::getAccess($route);
+        // Grab the Access Name for the given Route
+        $accessName = Router::getAccessName($route);
 
         // The route requires login and the user is Logged Out
-        if (Auth::requiresLogin($accessLevel)) {
+        if (Auth::requiresLogin($accessName)) {
             return Response::logout();
         }
 
-        // The Provided Access Level is lower than the Required One
-        if (!Auth::grant($accessLevel)) {
+        // The Provided Access Name is lower than the Required One
+        if (!Auth::grant($accessName)) {
             return Response::error("GENERAL_ERROR_PATH");
         }
 

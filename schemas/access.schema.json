@@ -1,0 +1,20 @@
+{
+    "title" : "Settings",
+    "type"  : "object",
+    "propertyNames" : {
+        "pattern" : "^[A-Z][A-Za-z]*$"
+    },
+    "patternProperties" : {
+        "^[A-Z][A-Za-z]*$" : {
+            "type"          : "object",
+            "propertyNames" : {
+                "pattern" : "^[A-Z][A-Za-z]*$"
+            },
+            "patternProperties" : {
+                "^[A-Z][A-Za-z]*$" : {
+                    "type" : "integer"
+                }
+            }
+        }
+    }
+}

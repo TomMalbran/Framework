@@ -4,7 +4,6 @@ namespace Framework\Route;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Route\Container;
-use Framework\Auth\Access;
 use Framework\Utils\Strings;
 
 /**
@@ -68,13 +67,13 @@ class Router {
     }
 
     /**
-     * Returns the Access Level for the given Route, if it exists
+     * Returns the Access Name for the given Route, if it exists
      * @param string $route
-     * @return integer
+     * @return string
      */
-    public static function getAccess(string $route): int {
+    public static function getAccessName(string $route): string {
         $data = self::get($route);
-        return Access::getOne($data->access);
+        return $data->access;
     }
 
 
@@ -90,23 +89,13 @@ class Router {
         if ($data->access == null) {
             return null;
         }
-        return self::execute($data->static, $data->module, $data->method, $request);
-    }
 
-    /**
-     * Executes the given Method in the given Module
-     * @param boolean $isStatic
-     * @param string  $module
-     * @param string  $method
-     * @param mixed   ...$params
-     * @return mixed
-     */
-    public static function execute(bool $isStatic, string $module, string $method, mixed ...$params): mixed {
-        if ($isStatic) {
-            return call_user_func_array(Framework::Namespace . $module . "::" . $method, $params);
+        if ($data->static) {
+            $callable = Framework::Namespace . $data->module . "::" . $data->method;
+            return call_user_func_array($callable, [ $request ]);
         }
 
-        $instance = Container::bind(self::Controller . $module);
-        return call_user_func_array([ $instance, $method ], $params);
+        $instance = Container::bind(self::Controller . $data->module);
+        return call_user_func_array([ $instance, $data->method ], [ $request ]);
     }
 }

@@ -40,18 +40,12 @@ class StatusCode {
         $result    = [];
         $used      = [];
         $maxLength = 0;
-        $lastGroup = "";
 
         foreach ($data as $group => $values) {
+            $addSpace = true;
             foreach ($values as $name) {
                 if (!empty($used[$name])) {
                     continue;
-                }
-
-                $maxLength = max($maxLength, Strings::length($name));
-                $addSpace  = $group !== $lastGroup;
-                if ($addSpace) {
-                    $lastGroup = $group;
                 }
 
                 $result[] = [
@@ -61,6 +55,8 @@ class StatusCode {
                     "name"     => $name,
                 ];
                 $used[$name] = true;
+                $maxLength   = max($maxLength, Strings::length($name));
+                $addSpace    = false;
             }
         }
         foreach ($result as $index => $status) {

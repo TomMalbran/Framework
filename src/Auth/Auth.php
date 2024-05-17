@@ -1,10 +1,10 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\System\AccessCode;
 use Framework\System\ConfigCode;
 use Framework\System\StatusCode;
 use Framework\Auth\AuthToken;
-use Framework\Auth\Access;
 use Framework\Auth\Credential;
 use Framework\Auth\Token;
 use Framework\Auth\Reset;
@@ -123,7 +123,7 @@ class Auth {
     public static function validateAPI(string $token): bool {
         if (Token::isValid($token)) {
             self::$apiID       = Token::getOne($token)->id;
-            self::$accessLevel = Access::API();
+            self::$accessLevel = AccessCode::getLevel(AccessCode::API);
             return true;
         }
         return false;
@@ -135,7 +135,7 @@ class Auth {
      */
     public static function validateInternal(): bool {
         self::$apiID       = -1;
-        self::$accessLevel = Access::API();
+        self::$accessLevel = AccessCode::getLevel(AccessCode::API);
         return true;
     }
 
@@ -182,7 +182,7 @@ class Auth {
 
         self::$refreshToken = "";
         self::$sendRefresh  = false;
-        self::$accessLevel  = Access::General();
+        self::$accessLevel  = AccessCode::getLevel(AccessCode::General);
         self::$credential   = null;
         self::$credentialID = 0;
         self::$adminID      = 0;
@@ -273,7 +273,7 @@ class Auth {
             self::canLogin($admin) &&
             !$user->isEmpty() &&
             $admin->level >= $user->level &&
-            Access::inAdmins($admin->level)
+            AccessCode::inGroup(AccessCode::Admin, $admin->level)
         );
     }
 
@@ -476,29 +476,26 @@ class Auth {
 
     /**
      * Returns true if the user has that level
-     * @param integer $requested
+     * @param string $accessName
      * @return boolean
      */
-    public static function grant(int $requested): bool {
-        return Access::grant(self::$accessLevel, $requested);
+    public static function requiresLogin(string $accessName): bool {
+        return $accessName !== AccessCode::General && !self::isLoggedIn();
     }
 
     /**
      * Returns true if the user has that level
-     * @param integer $requested
+     * @param string $accessName
      * @return boolean
      */
-    public static function requiresLogin(int $requested): bool {
-        return !Access::isGeneral($requested) && !self::isLoggedIn();
-    }
-
-    /**
-     * Returns a value depending on the call name
-     * @param string $function
-     * @param array  $arguments
-     * @return mixed
-     */
-    public static function __callStatic(string $function, array $arguments) {
-        return Access::$function(self::$accessLevel);
+    public static function grant(string $accessName): bool {
+        $requestedLevel = AccessCode::getLevel($accessName);
+        if (AccessCode::inGroup(AccessCode::API, self::$accessLevel)) {
+            return (
+                AccessCode::inGroup(AccessCode::API, $requestedLevel) ||
+                AccessCode::inGroup(AccessCode::General, $requestedLevel)
+            );
+        }
+        return self::$accessLevel >= $requestedLevel;
     }
 }

@@ -27,6 +27,7 @@ class Setting {
     }
 
 
+
 {{#sections}}
     /**
      * Returns all the Settings for {{name}}

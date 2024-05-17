@@ -2,6 +2,7 @@
 namespace Framework\System;
 
 use Framework\Framework;
+use Framework\System\AccessCode;
 use Framework\System\ConfigCode;
 use Framework\System\SettingCode;
 use Framework\System\SignalCode;
@@ -27,6 +28,7 @@ class Code {
         File::createDir($writePath);
         File::emptyDir($writePath);
 
+        self::generateOne("Access",  AccessCode::getCode());
         self::generateOne("Config",  ConfigCode::getCode());
         self::generateOne("Setting", SettingCode::getCode());
         self::generateOne("Signal",  SignalCode::getCode());
