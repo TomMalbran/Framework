@@ -570,6 +570,15 @@ class Strings {
     }
 
     /**
+     * Transforms a String to TitleCase
+     * @param string $string
+     * @return string
+     */
+    public static function toTitleCase(string $string): string {
+        return ucfirst(strtolower($string));
+    }
+
+    /**
      * Transforms the first Character to LowerCase
      * @param string $string
      * @return string
@@ -589,7 +598,7 @@ class Strings {
 
     /**
      * Transforms an UpperCase string with underscores to Title
-     * @param string  $string
+     * @param string $string
      * @return string
      */
     public static function upperCaseToTitle(string $string): string {
