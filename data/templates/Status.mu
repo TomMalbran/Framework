@@ -9,24 +9,35 @@ use Framework\Utils\Select;
  * The Status
  */
 class Status {
-{{#statuses}}
-{{#addSpace}}
 
-    // {{group}}: {{statuses}}
-{{/addSpace}}
+{{#statuses}}
     const {{constant}} = "{{name}}";
 {{/statuses}}
 
 
 
     /**
-     * Returns true if the Name of the given Status
+     * Returns the Name of the given Status
      * @param string $value
      * @param string $isoCode Optional.
      * @return string
      */
     public static function getName(string $value, string $isoCode = ""): string {
         return NLS::getIndex("SELECT_STATUS", $value, $isoCode);
+    }
+
+    /**
+     * Returns the Color of the given Status
+     * @param string $value
+     * @return string
+     */
+    public static function getColor(string $value): string {
+        return match ($value) {
+        {{#statuses}}
+            self::{{constant}} => "{{color}}",
+        {{/statuses}}
+            default => "gray",
+        };
     }
 
 
