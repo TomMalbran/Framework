@@ -1,6 +1,8 @@
 <?php
 namespace {{namespace}}Schema;
 
+{{#hasStatus}}use {{namespace}}System\Status;
+{{/hasStatus}}
 use {{namespace}}Schema\{{name}}Entity;{{#subTypes}}
 use {{namespace}}Schema\{{type}}Entity;{{/subTypes}}
 
@@ -38,6 +40,10 @@ class {{name}}Schema {
                 $entity->{{name}}[$index] = new {{type}}Entity($subEntity);
             }
             {{/subTypes}}
+            {{#hasStatus}}
+            $entity->statusName  = Status::getName($entity->status);
+            $entity->statusColor = Status::getColor($entity->status);
+            {{/hasStatus}}
             {{#hasProcessed}}
             $entity = static::postProcess($entity);
             {{/hasProcessed}}

@@ -41,6 +41,7 @@ class Structure {
     /** @var array<string,string> */
     public array $subRequests  = [];
 
+    public bool $hasStatus     = false;
     public bool $hasPositions  = false;
     public bool $hasTimestamps = false;
     public bool $hasUsers      = false;
@@ -61,6 +62,7 @@ class Structure {
         $this->key           = $schemaKey;
         $this->name          = !empty($data["name"]) ? $data["name"] : "";
         $this->table         = $data["table"];
+        $this->hasStatus     = !empty($data["hasStatus"]);
         $this->hasPositions  = !empty($data["hasPositions"]);
         $this->hasTimestamps = !empty($data["hasTimestamps"]);
         $this->hasUsers      = !empty($data["hasUsers"]);
@@ -71,6 +73,13 @@ class Structure {
         $this->canRemove     = !empty($data["canRemove"]);
 
         // Add additional Fields
+        if ($this->hasStatus) {
+            $data["fields"]["status"] = [
+                "type"    => Field::String,
+                "noEmpty" => true,
+                "default" => "",
+            ];
+        }
         if ($this->hasPositions) {
             $data["fields"]["position"] = [
                 "type"    => Field::Number,

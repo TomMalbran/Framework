@@ -95,7 +95,7 @@ class Generator {
             "canBatch"        => $structure->canEdit && !$structure->hasTimestamps,
             "canDelete"       => $structure->canDelete,
             "canRemove"       => $structure->canRemove,
-            "processEntity"   => !empty($subTypes) || !empty($structure->processed),
+            "processEntity"   => !empty($subTypes) || !empty($structure->processed) || $structure->hasStatus,
             "subTypes"        => $subTypes,
             "hasProcessed"    => !empty($structure->processed),
             "uniques"         => $uniques,
@@ -108,6 +108,7 @@ class Generator {
             "hasParents"      => !empty($parents),
             "hasEditParents"  => $structure->hasPositions && !empty($parents),
             "hasMainQuery"    => $structure->hasFilters || !empty($parents),
+            "hasStatus"       => $structure->hasStatus,
         ]);
 
         $contents = self::alignParams($contents);
@@ -271,6 +272,13 @@ class Generator {
         foreach ($structure->fields as $field) {
             self::addAttribute($result, $field);
         }
+        if ($structure->hasStatus) {
+            $result[] = self::getTypeData("statusName", "string");
+            $result[] = self::getTypeData("statusColor", "string");
+        }
+        foreach ($structure->processed as $field) {
+            self::addAttribute($result, $field);
+        }
         foreach ($structure->expressions as $field) {
             self::addAttribute($result, $field);
         }
@@ -287,9 +295,6 @@ class Generator {
         }
         foreach ($structure->counts as $count) {
             self::addAttribute($result, $count->field);
-        }
-        foreach ($structure->processed as $field) {
-            self::addAttribute($result, $field);
         }
         foreach ($structure->subRequests as $key => $type) {
             if (!empty($type) && !Strings::contains($type, "<", "[")) {
