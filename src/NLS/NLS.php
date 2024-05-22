@@ -207,10 +207,15 @@ class NLS {
      */
     public static function join(array $strings, bool $useOr = false, string $language = ""): string {
         $strings = array_values($strings);
-        $count   = count($strings);
+        if (empty($strings)) {
+            return "";
+        }
+
+        $count = count($strings);
         if ($count === 1) {
             return $strings[0];
         }
+
         $glue   = self::get($useOr ? "GENERAL_OR" : "GENERAL_AND", $language);
         $result = $strings[0];
         for ($i = 1; $i < $count; $i++) {
