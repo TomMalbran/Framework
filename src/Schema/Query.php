@@ -113,11 +113,13 @@ class Query {
             $value = "%" . trim(strtolower($value)) . "%";
             break;
         case "STARTS":
-            $expression = "LIKE";
+        case "NOT STARTS":
+            $expression = Strings::replace($expression, "STARTS", "LIKE");
             $value      = trim(strtolower($value)) . "%";
             break;
         case "ENDS":
-            $expression = "LIKE";
+        case "NOT ENDS":
+            $expression = Strings::replace($expression, "ENDS", "LIKE");
             $value      = "%" . trim(strtolower($value));
             break;
         default:
