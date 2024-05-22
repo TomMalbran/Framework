@@ -27,7 +27,7 @@ class Auth {
     private static string $refreshToken = "";
     private static bool   $sendRefresh  = false;
 
-    private static int    $accessLevel  = 0;
+    private static string $accessName   = "";
     private static ?Model $credential   = null;
     private static ?Model $admin        = null;
     private static int    $credentialID = 0;
@@ -122,8 +122,8 @@ class Auth {
      */
     public static function validateAPI(string $token): bool {
         if (Token::isValid($token)) {
-            self::$apiID       = Token::getOne($token)->id;
-            self::$accessLevel = AccessCode::getLevel(AccessCode::API);
+            self::$apiID      = Token::getOne($token)->id;
+            self::$accessName = AccessCode::API;
             return true;
         }
         return false;
@@ -134,8 +134,8 @@ class Auth {
      * @return boolean
      */
     public static function validateInternal(): bool {
-        self::$apiID       = -1;
-        self::$accessLevel = AccessCode::getLevel(AccessCode::API);
+        self::$apiID      = -1;
+        self::$accessName = AccessCode::API;
         return true;
     }
 
@@ -182,7 +182,7 @@ class Auth {
 
         self::$refreshToken = "";
         self::$sendRefresh  = false;
-        self::$accessLevel  = AccessCode::getLevel(AccessCode::General);
+        self::$accessName   = AccessCode::General;
         self::$credential   = null;
         self::$credentialID = 0;
         self::$adminID      = 0;
@@ -272,8 +272,8 @@ class Auth {
         return (
             self::canLogin($admin) &&
             !$user->isEmpty() &&
-            $admin->level >= $user->level &&
-            AccessCode::inGroup(AccessCode::Admin, $admin->level)
+            AccessCode::getLevel($admin->access) >= AccessCode::getLevel($user->access) &&
+            AccessCode::inGroup(AccessCode::Admin, $admin->access)
         );
     }
 
@@ -289,7 +289,7 @@ class Auth {
     public static function setCredential(Model $credential, ?Model $admin = null, int $userID = 0): bool {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
-        self::$accessLevel  = !empty($credential->userLevel) ? $credential->userLevel : $credential->level;
+        self::$accessName   = !empty($credential->userAccess) ? $credential->userAccess : $credential->access;
         self::$userID       = $userID;
 
         $language = $credential->language;
@@ -308,8 +308,8 @@ class Auth {
             NLS::setLanguage($language);
         }
 
-        $levels = ConfigCode::getArray("authTimezone");
-        if (!empty($timezone) && (empty($levels) || Arrays::contains($levels, $credential->level))) {
+        $accesses = ConfigCode::getArray("authTimezone");
+        if (!empty($timezone) && (empty($accesses) || Arrays::contains($accesses, $credential->access))) {
             DateTime::setTimezone($timezone);
         }
         return true;
@@ -318,12 +318,12 @@ class Auth {
     /**
      * Sets the Current User
      * @param integer $userID
-     * @param integer $accessLevel
+     * @param string  $accessName
      * @return boolean
      */
-    public static function setCurrentUser(int $userID, int $accessLevel): bool {
-        self::$userID      = $userID;
-        self::$accessLevel = $accessLevel;
+    public static function setCurrentUser(int $userID, string $accessName): bool {
+        self::$userID     = $userID;
+        self::$accessName = $accessName;
         ActionLog::endSession();
         ActionLog::startSession(self::$credentialID, true);
         return true;
@@ -340,7 +340,7 @@ class Auth {
 
         // The general data
         $data = [
-            "accessLevel"      => self::$accessLevel,
+            "accessName"       => self::$accessName,
             "credentialID"     => self::$credentialID,
             "adminID"          => self::$adminID,
             "userID"           => self::$userID,
@@ -411,11 +411,11 @@ class Auth {
     }
 
     /**
-     * Returns the Access Level
-     * @return integer
+     * Returns the Access Name
+     * @return string
      */
-    public static function getAccessLevel(): int {
-        return self::$accessLevel;
+    public static function getAccessName(): string {
+        return self::$accessName;
     }
 
     /**
@@ -475,7 +475,7 @@ class Auth {
     }
 
     /**
-     * Returns true if the user has that level
+     * Returns true if the current Auth requires login
      * @param string $accessName
      * @return boolean
      */
@@ -484,18 +484,20 @@ class Auth {
     }
 
     /**
-     * Returns true if the user has that level
+     * Returns true if the user has that Access
      * @param string $accessName
      * @return boolean
      */
     public static function grant(string $accessName): bool {
-        $requestedLevel = AccessCode::getLevel($accessName);
-        if (AccessCode::inGroup(AccessCode::API, self::$accessLevel)) {
+        if (AccessCode::inGroup(AccessCode::API, self::$accessName)) {
             return (
-                AccessCode::inGroup(AccessCode::API, $requestedLevel) ||
-                AccessCode::inGroup(AccessCode::General, $requestedLevel)
+                AccessCode::inGroup(AccessCode::API, $accessName) ||
+                AccessCode::inGroup(AccessCode::General, $accessName)
             );
         }
-        return self::$accessLevel >= $requestedLevel;
+
+        $currentLevel   = AccessCode::getLevel(self::$accessName);
+        $requestedLevel = AccessCode::getLevel($accessName);
+        return $currentLevel >= $requestedLevel;
     }
 }

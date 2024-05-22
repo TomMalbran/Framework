@@ -10,7 +10,7 @@
             "phone"            : { "type" : "string",                          "noExists" : true },
             "language"         : { "type" : "string"                                             },
             "avatar"           : { "type" : "string",                          "cantEdit" : true },
-            "level"            : { "type" : "number",                          "cantEdit" : true },
+            "access"           : { "type" : "string",                          "cantEdit" : true },
             "password"         : { "type" : "string",                          "cantEdit" : true },
             "salt"             : { "type" : "string",                          "cantEdit" : true },
             "reqPassChange"    : { "type" : "boolean",                         "cantEdit" : true },

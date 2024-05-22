@@ -20,11 +20,8 @@ class AccessCode {
     /** @var array<string,string[]> */
     private static array $groups = [];
 
-    /** @var array<string,integer[]> */
-    private static array $groupLevels = [];
-
     /** @var array<string,integer> */
-    private static array $levels = [];
+    private static array $accesses = [];
 
 
 
@@ -39,24 +36,14 @@ class AccessCode {
         self::$loaded = true;
         $data = Framework::loadData(Framework::AccessData);
 
-        // Store the groups and levels
+        // Store the groups and accesses
         foreach ($data as $groupName => $accessData) {
             self::$groups[$groupName] = [];
             foreach ($accessData as $accessName => $accessLevel) {
-                self::$groups[$groupName][]      = $accessName;
-                self::$groupLevels[$groupName][] = $accessLevel;
-                self::$levels[$accessName]       = $accessLevel;
+                self::$groups[$groupName][]  = $accessName;
+                self::$accesses[$accessName] = $accessLevel;
             }
         }
-        // foreach ($data as $groupName => $accessData) {
-        //     $gName = Strings::toLowerCase($groupName);
-        //     self::$groups[$gName] = [];
-        //     foreach ($accessData as $accessName => $accessLevel) {
-        //         $aName = Strings::toLowerCase($accessName);
-        //         self::$groups[$gName][] = $accessLevel;
-        //         self::$levels[$aName]   = $accessLevel;
-        //     }
-        // }
         return true;
     }
 
@@ -69,25 +56,24 @@ class AccessCode {
      */
     public static function getLevel(string $accessName): int {
         self::load();
-        if (isset(self::$levels[$accessName])) {
-            return self::$levels[$accessName];
+        if (isset(self::$accesses[$accessName])) {
+            return self::$accesses[$accessName];
         }
         return -1;
     }
 
     /**
-     * Returns the Access Levels inside the Admin Group
-     * @param string  $groupName
-     * @param integer $level
+     * Returns true if the Access is inside the given Group
+     * @param string $groupName
+     * @param string $accessName
      * @return boolean
      */
-    public static function inGroup(string $groupName, int $level): bool {
+    public static function inGroup(string $groupName, string $accessName): bool {
         self::load();
-        if (!isset(self::$groupLevels[$groupName])) {
+        if (!isset(self::$groups[$groupName])) {
             return false;
         }
-        $levels = self::$groupLevels[$groupName];
-        return Arrays::contains($levels, $level);
+        return Arrays::contains(self::$groups[$groupName], $accessName);
     }
 
 
@@ -98,21 +84,21 @@ class AccessCode {
      */
     public static function getCode(): array {
         self::load();
-        if (empty(self::$levels)) {
+        if (empty(self::$accesses)) {
             return [];
         }
 
         return [
-            "levels" => self::getLevels(),
-            "groups" => self::getGroups(),
+            "accesses" => self::getAccesses(),
+            "groups"   => self::getGroups(),
         ];
     }
 
     /**
-     * Returns the Access Levels for the generator
+     * Returns the Access Accesses for the generator
      * @return mixed[]
      */
-    private static function getLevels(): array {
+    private static function getAccesses(): array {
         $result    = [];
         $maxLength = 0;
 
@@ -123,7 +109,7 @@ class AccessCode {
                     "addSpace" => $addSpace,
                     "group"    => $groupName,
                     "name"     => $accessName,
-                    "level"    => self::$levels[$accessName],
+                    "level"    => self::$accesses[$accessName],
                 ];
                 $maxLength = max($maxLength, Strings::length($accessName));
                 $addSpace  = false;
@@ -143,15 +129,10 @@ class AccessCode {
     private static function getGroups(): array {
         $result = [];
         foreach (self::$groups as $groupName => $accesses) {
-            $levels = [];
-            foreach ($accesses as $accessName) {
-                $levels[] = self::$levels[$accessName];
-            }
-
             $result[] = [
                 "name"     => $groupName,
                 "accesses" => Strings::join($accesses, ", "),
-                "levels"   => Strings::join($levels, ", "),
+                "values"   => "self::" . Strings::join($accesses, ", self::"),
             ];
         }
         return $result;
