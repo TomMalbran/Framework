@@ -72,9 +72,9 @@ class Status {
      */
     public static function get{{name}}Select(string $isoCode = ""): array {
         $result = [];
-        foreach ([ {{values}} ] as $status) {
-            $name     = self::getName($status, $isoCode);
-            $result[] = new Select($status, $name);
+        foreach ([ {{values}} ] as $value) {
+            $name     = self::getName($value, $isoCode);
+            $result[] = new Select($value, $name);
         }
         return $result;
     }

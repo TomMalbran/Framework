@@ -68,8 +68,8 @@ class StatusCode {
         foreach ($groups as $name => $values) {
             $result[] = [
                 "name"     => $name,
-                "values"   => "self::" . Strings::join($values, ", self::"),
                 "statuses" => Strings::join($values, ", "),
+                "values"   => "self::" . Strings::join($values, ", self::"),
             ];
         }
         return $result;
