@@ -813,7 +813,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
         if ($this->hasFile($key)) {
             return File::hasExtension($_FILES[$key]["name"], $extensions);
         }
-        return false;
+        return File::hasExtension($this->get($key), $extensions);
     }
 
     /**
