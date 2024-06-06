@@ -181,6 +181,7 @@ class ErrorLog {
         $query->addIf("file", "=", $filePath);
         $query->addIf("line", "=", $line);
         $query->add("description", "=", $description);
+        $query->add("backtrace",   "=", $backtrace);
 
         $schema = self::schema();
         if ($schema->getTotal($query) > 0) {
