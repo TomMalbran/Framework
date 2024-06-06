@@ -27,7 +27,7 @@ class Auth {
     private static string $refreshToken = "";
     private static bool   $sendRefresh  = false;
 
-    private static string $accessName   = "";
+    private static string $accessName   = AccessCode::General;
     private static ?Model $credential   = null;
     private static ?Model $admin        = null;
     private static int    $credentialID = 0;
