@@ -135,6 +135,18 @@ class ProviderLog {
     }
 
     /**
+     * Adds an Error as a Response to a Log entry
+     * @param integer $logID
+     * @param string  $error
+     * @return boolean
+     */
+    public static function setError(int $logID, string $error): bool {
+        return self::schema()->edit($logID, [
+            "response" => JSON::encode([ "error" => $error ]),
+        ]);
+    }
+
+    /**
      * Deletes the items older than 15 days
      * @param integer $days Optional.
      * @return boolean
