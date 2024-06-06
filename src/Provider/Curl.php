@@ -36,7 +36,7 @@ class Curl {
         bool $returnError = false,
     ): mixed {
         return match ($method) {
-            "GET"   => self::get($url, $params, $headers, $userPass, $jsonBody, $returnError),
+            "GET"   => self::get($url, $params, $headers, $userPass, $jsonResponse, $returnError),
             "POST"  => self::post($url, $params, $headers, $userPass, $jsonBody, $urlBody, $jsonResponse, $returnError),
             default => self::custom($method, $url, $params, $headers, $userPass, $jsonBody, $jsonResponse, $returnError),
         };
