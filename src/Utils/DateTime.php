@@ -274,6 +274,17 @@ class DateTime {
     }
 
     /**
+     * Returns true if the given day is Valid
+     * @param string|integer $value
+     * @param boolean        $withHolidays Optional.
+     * @return boolean
+     */
+    public static function isValidDay(string|int $value, bool $withHolidays = false): bool {
+        $totalDays = $withHolidays ? 7 : 6;
+        return (int)$value >= 0 && (int)$value <= $totalDays;
+    }
+
+    /**
      * Returns true if the given hour is Valid
      * @param string         $string
      * @param integer[]|null $minutes Optional.
@@ -1169,166 +1180,5 @@ class DateTime {
         }
 
         return mktime(0, 0, 0, $month, $day, $year);
-    }
-
-
-
-    /**
-     * Returns the Schedule as a string
-     * @param array{}[] $periods
-     * @param boolean   $allDays  Optional.
-     * @param string    $timeZone Optional.
-     * @param string    $isoCode  Optional.
-     * @return array{}
-     */
-    public static function getScheduleList(array $periods, bool $allDays, string $timeZone = "", string $isoCode = ""): array {
-        if (empty($periods)) {
-            return [];
-        }
-
-        $schedules = [];
-        $days      = [];
-        foreach ($periods as $period) {
-            foreach ($period["days"] as $day) {
-                $weekTime = self::getWeekStart(0, $day, true);
-                $weekDate = self::toString($weekTime, "dashes");
-                $fromTime = self::toTimeHour($weekDate, $period["from"]);
-                $fromHour = self::toString($fromTime, "time");
-                $toTime   = self::toTimeHour($weekDate, $period["to"]);
-                $toHour   = self::toString($toTime, "time");
-                $id       = "$fromHour-$toHour";
-
-                if (empty($schedules[$id])) {
-                    $schedules[$id] = [
-                        "fromHour" => $fromHour,
-                        "toHour"   => $toHour,
-                        "numbers"  => [],
-                        "times"    => [],
-                        "days"     => [],
-                    ];
-                }
-                $schedules[$id]["numbers"][] = (int)$day;
-                $schedules[$id]["times"][]   = $fromTime;
-                $days[(int)$day] = 1;
-            }
-        }
-        $schedules = array_values($schedules);
-
-        if ($allDays && count($days) < 7) {
-            $numbers = [];
-            for ($i = 0; $i < 7; $i++) {
-                if (empty($days[$i])) {
-                    $numbers[] = $i;
-                }
-            }
-            $schedules[] = [
-                "fromHour" => "",
-                "toHour"   => "",
-                "numbers"  => $numbers,
-                "times"    => [],
-                "days"     => [],
-            ];
-        }
-
-        foreach ($schedules as $id => $elem) {
-            sort($schedules[$id]["times"]);
-            sort($schedules[$id]["numbers"]);
-            if (!empty($elem["times"])) {
-                foreach ($elem["times"] as $index => $dayTime) {
-                    $schedules[$id]["days"][$index] = self::getDayText($dayTime, language: $isoCode);
-                }
-            } else {
-                foreach ($elem["numbers"] as $index => $dayNumber) {
-                    $schedules[$id]["days"][$index] = self::getDayName($dayNumber, language: $isoCode);
-                }
-            }
-        }
-
-        $zone = "";
-        if (!empty($timeZone)) {
-            $zone = self::parseTimeZone((float)$timeZone);
-            $zone = " ($zone)";
-        }
-
-        $result = [];
-        foreach ($schedules as $elem) {
-            $days   = "";
-            $amount = count($elem["days"]);
-            if ($amount === 7) {
-                $days = NLS::get("DATE_TIME_ALL_DAYS", $isoCode);
-            } elseif ($amount === 1) {
-                $days = $elem["days"][0];
-            } elseif ($amount === 2) {
-                $days = NLS::join($elem["days"], false, $isoCode);
-            } else {
-                $parts = [];
-                $count = 0;
-                while ($count < $amount) {
-                    $first = $count;
-                    $last  = $count;
-                    for ($i = $count + 1; $i < $amount; $i++) {
-                        if ($elem["numbers"][$i] - 1 !== $elem["numbers"][$last]) {
-                            break;
-                        }
-                        $last = $i;
-                    }
-                    if ($last - $first > 1) {
-                        $parts[] = NLS::format("DATE_TIME_SOME_DAYS", [
-                            $elem["days"][$first],
-                            $elem["days"][$last],
-                        ], $isoCode);
-                        $count = $last + 1;
-                    } else {
-                        $parts[] = $elem["days"][$first];
-                        $count++;
-                    }
-                    $days = NLS::join($parts, false, $isoCode);
-                }
-            }
-
-            $time = "";
-            if (empty($elem["fromHour"])) {
-                $time = NLS::get("DATE_TIME_NO_HOURS", $isoCode);
-            } else {
-                $toHour = $elem["toHour"];
-                if ($toHour === "00:00") {
-                    $toHour = "24:00";
-                }
-                $time = NLS::format("DATE_TIME_HOURS", [ $elem["fromHour"], $toHour ], $isoCode);
-            }
-
-            $result[] = [
-                "days" => $days,
-                "time" => $time,
-                "zone" => $zone,
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns the Schedule as a string
-     * @param array{}[] $periods
-     * @param string    $timeZone Optional.
-     * @param string    $isoCode  Optional.
-     * @return string
-     */
-    public static function getScheduleText(array $periods, string $timeZone = "", string $isoCode = ""): string {
-        $list = self::getScheduleList($periods, false, $timeZone, $isoCode);
-        if (empty($list)) {
-            return "";
-        }
-
-        $result = [];
-        foreach ($list as $elem) {
-            $result[] = NLS::format("DATE_TIME_SCHEDULE", [
-                $elem["days"],
-                $elem["time"],
-                $elem["zone"],
-            ], $isoCode);
-        }
-
-        return NLS::join($result, false, $isoCode);
     }
 }
