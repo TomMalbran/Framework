@@ -131,9 +131,6 @@ class JSON {
      * @return boolean
      */
     public static function writeFile(string $path, mixed $contents): bool {
-        if (!File::exists($path)) {
-            return false;
-        }
         $value = Arrays::toArray($contents);
         return File::write($path, self::encode($value, true));
     }
