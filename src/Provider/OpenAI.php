@@ -43,7 +43,7 @@ class OpenAI {
         self::load();
         return Curl::get(self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
-            "OpenAI-Beta"   => "assistants=v1",
+            "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
     }
 
@@ -58,7 +58,7 @@ class OpenAI {
         return Curl::post(self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
             "Content-Type"  => "application/json",
-            "OpenAI-Beta"   => "assistants=v1",
+            "OpenAI-Beta"   => "assistants=v2",
         ], jsonBody: true, jsonResponse: true);
     }
 
@@ -73,7 +73,7 @@ class OpenAI {
         return Curl::post(self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
             "Content-Type"  => "multipart/form-data",
-            "OpenAI-Beta"   => "assistants=v1",
+            "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
     }
 
@@ -88,7 +88,7 @@ class OpenAI {
         return Curl::custom("DELETE", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
             "Content-Type"  => "application/json",
-            "OpenAI-Beta"   => "assistants=v1",
+            "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
     }
 
@@ -153,12 +153,73 @@ class OpenAI {
 
 
     /**
+     * Creates a Vector Store
+     * @param string $name
+     * @return string
+     */
+    public static function createVectorStore(string $name): string {
+        $request = self::post("/vector_stores", [
+            "name" => $name,
+        ]);
+        return !empty($request["id"]) ? $request["id"] : "";
+    }
+
+    /**
+     * Edits a Vector Store
+     * @param string $vectoreStoreID
+     * @param string $name
+     * @return string
+     */
+    public static function editVectorStore(string $vectoreStoreID, string $name): string {
+        $request = self::post("/vector_stores/$vectoreStoreID", [
+            "name" => $name,
+        ]);
+        return !empty($request["id"]) ? $request["id"] : "";
+    }
+
+    /**
+     * Deletes a Vector Store
+     * @param string $vectoreStoreID
+     * @return string
+     */
+    public static function deleteVectorStore(string $vectoreStoreID): string {
+        $request = self::delete("/vector_stores/$vectoreStoreID");
+        return !empty($request["id"]) ? $request["id"] : "";
+    }
+
+    /**
+     * Creates a Vector Store File
+     * @param string $vectoreStoreID
+     * @param string $fileID
+     * @return string
+     */
+    public static function createVectorFile(string $vectoreStoreID, string $fileID): string {
+        $request = self::post("/vector_stores/$vectoreStoreID/files", [
+            "file_id" => $fileID,
+        ]);
+        return !empty($request["id"]) ? $request["id"] : "";
+    }
+
+    /**
+     * Deletes a Vector Store File
+     * @param string $vectoreStoreID
+     * @param string $fileID
+     * @return string
+     */
+    public static function deleteVectorFile(string $vectoreStoreID, string $fileID): string {
+        $request = self::delete("/vector_stores/$vectoreStoreID/files/$fileID");
+        return !empty($request["id"]) ? $request["id"] : "";
+    }
+
+
+
+    /**
      * Creates a new Assistant
-     * @param string   $name
-     * @param string   $model
-     * @param string   $description
-     * @param string   $instructions
-     * @param string[] $fileIDs      Optional.
+     * @param string $name
+     * @param string $model
+     * @param string $description
+     * @param string $instructions
+     * @param string $vectorStoreID
      * @return string
      */
     public static function createAssistant(
@@ -166,27 +227,27 @@ class OpenAI {
         string $model,
         string $description,
         string $instructions,
-        array $fileIDs = [],
+        string $vectorStoreID,
     ): string {
         $request = self::post("/assistants", [
-            "name"         => $name,
-            "model"        => $model,
-            "description"  => $description,
-            "instructions" => $instructions,
-            "file_ids"     => $fileIDs,
-            "tools"        => [[ "type" => "retrieval" ]],
+            "name"           => $name,
+            "model"          => $model,
+            "description"    => $description,
+            "instructions"   => $instructions,
+            "tools"          => [[ "type" => "file_search" ]],
+            "tool_resources" => [ "file_search" => [ "vector_store_ids" => [ $vectorStoreID ]]],
         ]);
         return !empty($request["id"]) ? $request["id"] : "";
     }
 
     /**
      * Edits an Assistant
-     * @param string   $assistantID
-     * @param string   $name
-     * @param string   $model
-     * @param string   $description
-     * @param string   $instructions
-     * @param string[] $fileIDs      Optional.
+     * @param string $assistantID
+     * @param string $name
+     * @param string $model
+     * @param string $description
+     * @param string $instructions
+     * @param string $vectorStoreID
      * @return string
      */
     public static function editAssistant(
@@ -195,15 +256,15 @@ class OpenAI {
         string $model,
         string $description,
         string $instructions,
-        array $fileIDs = [],
+        string $vectorStoreID,
     ): string {
         $request = self::post("/assistants/$assistantID", [
-            "name"         => $name,
-            "model"        => $model,
-            "description"  => $description,
-            "instructions" => $instructions,
-            "file_ids"     => $fileIDs,
-            "tools"        => [[ "type" => "retrieval" ]],
+            "name"           => $name,
+            "model"          => $model,
+            "description"    => $description,
+            "instructions"   => $instructions,
+            "tools"          => [[ "type" => "file_search" ]],
+            "tool_resources" => [ "file_search" => [ "vector_store_ids" => [ $vectorStoreID ]]],
         ]);
         return !empty($request["id"]) ? $request["id"] : "";
     }
@@ -246,24 +307,37 @@ class OpenAI {
     /**
      * Returns the last Message in a Thread
      * @param string $threadID
-     * @return string
+     * @return string[]
      */
-    public static function getLastMessage(string $threadID): string {
+    public static function getLastMessage(string $threadID): array {
         $request = self::get("/threads/$threadID/messages", [
             "limit" => 1,
             "order" => "desc",
         ]);
         if (empty($request["data"][0])) {
-            return "";
+            return [ "", "" ];
         }
 
-        $message = [];
+        $messages = [];
+        $fileIDs  = [];
         foreach ($request["data"][0]["content"] as $content) {
             if ($content["type"] === "text") {
-                $message[] = $content["text"]["value"];
+                $message = $content["text"]["value"];
+                if (!empty($content["text"]["annotations"])) {
+                    foreach ($content["text"]["annotations"] as $annotation) {
+                        $message = Strings::replace($message, $annotation["text"], "");
+                        if (!empty($annotation["file_citation"]["file_id"])) {
+                            $fileIDs[] = $annotation["file_citation"]["file_id"];
+                        }
+                    }
+                }
+                $messages[] = $message;
             }
         }
-        return Strings::join($message, "\n");
+        return [
+            Strings::join($messages, "\n"),
+            Strings::join($fileIDs, ", "),
+        ];
     }
 
     /**
@@ -305,13 +379,17 @@ class OpenAI {
 
     /**
      * Starts a Thread Run
-     * @param string $threadID
-     * @param string $assistantID
+     * @param string  $threadID
+     * @param string  $assistantID
+     * @param string  $instructions
+     * @param boolean $requiresFiles Optional.
      * @return string
      */
-    public static function startRun(string $threadID, string $assistantID): string {
+    public static function startRun(string $threadID, string $assistantID, string $instructions, bool $requiresFiles = false): string {
         $request = self::post("/threads/$threadID/runs", [
             "assistant_id" => $assistantID,
+            "instructions" => $instructions,
+            "tool_choice"  => $requiresFiles ? "required" : "auto",
         ]);
         return !empty($request["id"]) ? $request["id"] : "";
     }
@@ -341,7 +419,6 @@ class OpenAI {
 
         return (object)[
             "runTime"      => $request["completed_at"] - $request["started_at"],
-            "fileIDs"      => Strings::join($request["file_ids"], ", "),
             "inputTokens"  => $request["usage"]["prompt_tokens"],
             "outputTokens" => $request["usage"]["completion_tokens"],
         ];
