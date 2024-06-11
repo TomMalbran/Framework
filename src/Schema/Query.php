@@ -812,4 +812,14 @@ class Query {
     public static function replace(string $column, string $value, string $replace): array {
         return self::func("REPLACE($column, ?, ?)", [ $value, $replace ]);
     }
+
+    /**
+     * Method generates a GREATEST function call
+     * @param string  $column
+     * @param integer $value
+     * @return array{}
+     */
+    public static function greatest(string $column, int $value): array {
+        return self::func("GREATEST($column, ?)", [ $value ]);
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Auth\Auth;
 use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -24,6 +25,8 @@ class Database {
     public string $database;
     public string $charset;
     public bool   $persist;
+
+    public bool $skipTime     = false;
 
 
     /**
@@ -100,9 +103,12 @@ class Database {
      * @return array{}[]
      */
     public function query(string $expression, Query|array $params = []): array {
+        $startTime = microtime(true);
         $binds     = $params instanceof Query ? $params->params : $params;
         $statement = $this->processQuery($expression, $binds);
-        return $this->dynamicBindResults($statement);
+        $result    = $this->dynamicBindResults($statement);
+        $this->processTime($startTime, $expression, $binds);
+        return $result;
     }
 
     /**
@@ -561,6 +567,59 @@ class Database {
             $result .= ")";
         }
         return $result;
+    }
+
+    /**
+     * Process a elapsed time and saves it if it last more than 5 seconds
+     * @param float   $startTime
+     * @param string  $expression
+     * @param array{} $params
+     * @return boolean
+     */
+    protected function processTime(float $startTime, string $expression, array $params): bool {
+        $time = microtime(true) - $startTime;
+        if ($time < 3 || $this->skipTime) {
+            return false;
+        }
+
+        $this->skipTime = true;
+        if (!$this->tableExists("log_queries")) {
+            return false;
+        }
+
+        $bindKeys = [];
+        foreach ($params as $key) {
+            $bindKeys[] = '/[?]/';
+        }
+        $expression  = preg_replace("/ +/", " ", $expression);
+        $expression  = preg_replace($bindKeys, $params, $expression, 1);
+        $elapsedTime = (int)floor($time);
+
+        $query = Query::create("expression", "=", $expression);
+        if ($this->getTotal("log_queries", $query) > 0) {
+            $query->orderBy("updatedTime", false)->limit(1);
+            $this->update("log_queries", [
+                "amount"      => Query::inc(1),
+                "elapsedTime" => Query::greatest("elapsedTime", $elapsedTime),
+                "totalTime"   => Query::inc($elapsedTime),
+                "updatedTime" => time(),
+                "updatedUser" => Auth::getID(),
+            ], $query);
+        } else {
+            $this->insert("log_queries", [
+                "expression"  => $expression,
+                "elapsedTime" => $elapsedTime,
+                "totalTime"   => $elapsedTime,
+                "amount"      => 1,
+                "isResolved"  => 0,
+                "updatedTime" => time(),
+                "createdTime" => time(),
+                "createdUser" => Auth::getID(),
+                "updatedUser" => Auth::getID(),
+            ]);
+        }
+        $this->skipTime = false;
+        return true;
     }
 
 

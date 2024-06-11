@@ -323,6 +323,24 @@
         "canEdit"       : true,
         "canDelete"     : false
     },
+    "logQueries" : {
+        "table"  : "log_queries",
+        "fields" : {
+            "LOG_ID"      : { "type" : "id",   "name" : "logID" },
+            "expression"  : { "type" : "text"                   },
+            "amount"      : { "type" : "number"                 },
+            "isResolved"  : { "type" : "boolean"                },
+            "elapsedTime" : { "type" : "number"                 },
+            "totalTime"   : { "type" : "number"                 },
+            "updatedTime" : { "type" : "number"                 },
+            "updatedUser" : { "type" : "number"                 }
+        },
+        "hasUsers"      : true,
+        "hasTimestamps" : true,
+        "canCreate"     : true,
+        "canEdit"       : false,
+        "canDelete"     : false
+    },
     "logErrors" : {
         "table"  : "log_errors",
         "fields" : {

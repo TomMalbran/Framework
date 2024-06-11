@@ -21,6 +21,7 @@
         "logActions"        : {},
         "logDevices"        : {},
         "logProviders"      : {},
+        "logQueries"        : {},
         "logErrors"         : {}
     },
     "patternProperties" : {
