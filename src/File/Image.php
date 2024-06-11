@@ -422,7 +422,12 @@ class Image {
             $image->writeImage($dst);
             return true;
         } catch (Exception $e) {
-            trigger_error("Imagick Error: " . $e->getMessage(), E_USER_ERROR);
+            $error = $e->getMessage();
+            if (Strings::contains($error, "Not a JPEG")) {
+                return self::resize($src, $dst, $width, $height, $action);
+            }
+
+            trigger_error("Imagick Error: " . $error, E_USER_ERROR);
             return false;
         }
     }
