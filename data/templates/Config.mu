@@ -7,6 +7,26 @@ use Framework\System\ConfigCode;
  * The Config
  */
 class Config {
+
+    /**
+     * Returns true if the Environment is "Local"
+     * @return boolean
+     */
+    public static function isLocal(): bool {
+        return ConfigCode::getEnvironment() === "local";
+    }
+{{#environments}}
+
+    /**
+     * Returns true if the Environment is "{{name}}"
+     * @return boolean
+     */
+    public static function is{{name}}(): bool {
+        return ConfigCode::getEnvironment() === "{{environment}}";
+    }
+{{/environments}}
+
+
 {{#urls}}
 
     /**

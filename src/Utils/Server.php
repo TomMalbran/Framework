@@ -19,22 +19,6 @@ class Server {
     }
 
     /**
-     * Returns true if running on a Dev host
-     * @return boolean
-     */
-    public static function isDevHost(): bool {
-        return self::hostStartsWith("dev.");
-    }
-
-    /**
-     * Returns true if running on a Stage host
-     * @return boolean
-     */
-    public static function isStageHost(): bool {
-        return self::hostStartsWith("stage.");
-    }
-
-    /**
      * Returns true if the Host starts with the given prefix
      * @param string $prefix
      * @return boolean

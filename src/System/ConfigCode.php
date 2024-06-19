@@ -12,15 +12,19 @@ use Framework\Utils\Strings;
  */
 class ConfigCode {
 
-    private static bool  $loaded = false;
+    private static bool   $loaded      = false;
+    private static string $environment = "local";
 
     /** @var array{}[] */
     private static array $data   = [];
 
     /** @var string[] */
+    private static array $environments = [ "dev", "stage", "production" ];
+
+    /** @var string[] */
     private static array $defaults = [
         "DB", "AUTH", "EMAIL", "SMTP", "MAILJET", "MANDRILL", "SEND_GRID",
-        "MAILCHIMP", "ONESIGNAL", "OPEN_AI"
+        "MAILCHIMP", "ONESIGNAL", "OPEN_AI",
     ];
 
 
@@ -33,21 +37,24 @@ class ConfigCode {
         if (self::$loaded) {
             return false;
         }
-        $path    = Framework::getPath();
-        $data    = self::loadENV($path, ".env");
-        $replace = [];
 
-        if (Server::isDevHost()) {
-            if (File::exists($path, ".env.dev")) {
-                $replace = self::loadENV($path, ".env.dev");
-            }
-        } elseif (Server::isStageHost()) {
-            if (File::exists($path, ".env.stage")) {
-                $replace = self::loadENV($path, ".env.stage");
-            }
-        } elseif (!Server::isLocalHost()) {
-            if (File::exists($path, ".env.production")) {
-                $replace = self::loadENV($path, ".env.production");
+        $path       = Framework::getPath();
+        $data       = self::loadENV($path, ".env");
+
+        $currentUrl = Server::getUrl();
+        $currentUrl = File::addLastSlash($currentUrl);
+        $replace    = [];
+
+        foreach (self::$environments as $environment) {
+            if (File::exists($path, ".env.$environment")) {
+                $values = self::loadENV($path, ".env.$environment");
+                foreach ($values as $key => $value) {
+                    if (Strings::endsWith($key, "URL") && $value == $currentUrl) {
+                        self::$environment = $environment;
+                        $replace = $values;
+                        break 2;
+                    }
+                }
             }
         }
 
@@ -97,6 +104,15 @@ class ConfigCode {
     }
 
 
+
+    /**
+     * Returns the Config Environment
+     * @return string
+     */
+    public static function getEnvironment(): string {
+        self::load();
+        return self::$environment;
+    }
 
     /**
      * Returns a Config Property or null
@@ -233,9 +249,25 @@ class ConfigCode {
 
         [ $properties, $urls ] = self::getProperties();
         return [
-            "urls"       => $urls,
-            "properties" => $properties,
+            "environments" => self::getEnvironments(),
+            "urls"         => $urls,
+            "properties"   => $properties,
         ];
+    }
+
+    /**
+     * Returns the Config getEnvironments for the generator
+     * @return mixed[]
+     */
+    private static function getEnvironments(): array {
+        $result = [];
+        foreach (self::$environments as $environment) {
+            $result[] = [
+                "name"        => Strings::upperCaseFirst($environment),
+                "environment" => $environment,
+            ];
+        }
+        return $result;
     }
 
     /**
