@@ -319,6 +319,20 @@ class Utils {
 
 
     /**
+     * Returns an Avatar url
+     * @param string $url
+     * @param string $email
+     * @return string
+     */
+    public static function getAvatarUrl(string $url, string $email): string {
+        if (!empty($url)) {
+            return $url;
+        }
+        $username = md5($email);
+        return "https://gravatar.com/avatar/$username?default=mp";
+    }
+
+    /**
      * Returns a WhatsApp url
      * @param string $whatsApp
      * @return string
