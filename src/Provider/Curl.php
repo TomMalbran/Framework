@@ -1,5 +1,5 @@
 <?php
-/* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET, USERPWD */
+/* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET, USERPWD, HEADERFUNCTION */
 namespace Framework\Provider;
 
 use Framework\Utils\Arrays;
@@ -21,6 +21,7 @@ class Curl {
      * @param boolean      $jsonBody     Optional.
      * @param boolean      $urlBody      Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $withHeaders  Optional.
      * @param boolean      $returnError  Optional.
      * @return mixed
      */
@@ -33,12 +34,13 @@ class Curl {
         bool $jsonBody = false,
         bool $urlBody = false,
         bool $jsonResponse = true,
+        bool $withHeaders = false,
         bool $returnError = false,
     ): mixed {
         return match ($method) {
-            "GET"   => self::get($url, $params, $headers, $userPass, $jsonResponse, $returnError),
-            "POST"  => self::post($url, $params, $headers, $userPass, $jsonBody, $urlBody, $jsonResponse, $returnError),
-            default => self::custom($method, $url, $params, $headers, $userPass, $jsonBody, $jsonResponse, $returnError),
+            "GET"   => self::get($url, $params, $headers, $userPass, $jsonResponse, $withHeaders, $returnError),
+            "POST"  => self::post($url, $params, $headers, $userPass, $jsonBody, $urlBody, $jsonResponse, $withHeaders, $returnError),
+            default => self::custom($method, $url, $params, $headers, $userPass, $jsonBody, $jsonResponse, $withHeaders, $returnError),
         };
     }
 
@@ -49,6 +51,7 @@ class Curl {
      * @param array{}|null $headers      Optional.
      * @param string       $userPass     Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $withHeaders  Optional.
      * @param boolean      $returnError  Optional.
      * @return mixed
      */
@@ -58,10 +61,11 @@ class Curl {
         ?array $headers = null,
         string $userPass = "",
         bool $jsonResponse = true,
+        bool $withHeaders = false,
         bool $returnError = false,
     ): mixed {
         $url = self::parseUrl($url, $params);
-        return self::executeRequest("GET", $url, $headers, null, $userPass, $jsonResponse, $returnError);
+        return self::executeRequest("GET", $url, $headers, null, $userPass, $jsonResponse, $withHeaders, $returnError);
     }
 
     /**
@@ -73,6 +77,7 @@ class Curl {
      * @param boolean      $jsonBody     Optional.
      * @param boolean      $urlBody      Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $withHeaders  Optional.
      * @param boolean      $returnError  Optional.
      * @return mixed
      */
@@ -84,6 +89,7 @@ class Curl {
         bool $jsonBody = false,
         bool $urlBody = false,
         bool $jsonResponse = true,
+        bool $withHeaders = false,
         bool $returnError = false,
     ): mixed {
         $body = $params;
@@ -92,7 +98,7 @@ class Curl {
         } elseif ($urlBody) {
             $body = self::parseParams($params);
         }
-        return self::executeRequest("POST", $url, $headers, $body, $userPass, $jsonResponse, $returnError);
+        return self::executeRequest("POST", $url, $headers, $body, $userPass, $jsonResponse, $withHeaders, $returnError);
     }
 
     /**
@@ -104,6 +110,7 @@ class Curl {
      * @param string       $userPass     Optional.
      * @param boolean      $jsonBody     Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $withHeaders  Optional.
      * @param boolean      $returnError  Optional.
      * @return mixed
      */
@@ -115,6 +122,7 @@ class Curl {
         string $userPass = "",
         bool $jsonBody = false,
         bool $jsonResponse = true,
+        bool $withHeaders = false,
         bool $returnError = false,
     ): mixed {
         $options = [
@@ -146,7 +154,7 @@ class Curl {
         }
 
         // Execute the Curl
-        return self::executeCurl($options, $jsonResponse, $returnError);
+        return self::executeCurl($options, $jsonResponse, $withHeaders, $returnError);
     }
 
     /**
@@ -227,6 +235,7 @@ class Curl {
      * @param mixed|null   $body         Optional.
      * @param string       $userPass     Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param boolean      $withHeaders  Optional.
      * @param boolean      $returnError  Optional.
      * @return mixed
      */
@@ -237,6 +246,7 @@ class Curl {
         mixed $body = null,
         string $userPass = "",
         bool $jsonResponse = true,
+        bool $withHeaders = false,
         bool $returnError = false,
     ): mixed {
         $options = [
@@ -274,45 +284,66 @@ class Curl {
         }
 
         // Execute the Curl
-        return self::executeCurl($options, $jsonResponse, $returnError);
+        return self::executeCurl($options, $jsonResponse, $withHeaders, $returnError);
     }
 
     /**
      * Executes the CURL
      * @param array{} $options
      * @param boolean $jsonResponse
+     * @param boolean $withHeaders
      * @param boolean $returnError
      * @return mixed
      */
-    private static function executeCURL(array $options, bool $jsonResponse, bool $returnError): mixed {
+    private static function executeCurl(array $options, bool $jsonResponse, bool $withHeaders, bool $returnError): mixed {
+        // Get the Headers
+        $headers = [];
+        if ($withHeaders) {
+            $options[CURLOPT_HEADERFUNCTION] = function($curl, $header) use (&$headers) {
+                $parts = Strings::split($header, ":");
+                if (count($parts) == 2) {
+                    $headers[strtolower(trim($parts[0]))] = trim($parts[1]);
+                }
+                return strlen($header);
+            };
+        }
+
+        // Execute the Curl
         $curl = curl_init();
         curl_setopt_array($curl, $options);
-        $response = curl_exec($curl);
+        $result = curl_exec($curl);
         curl_close($curl);
 
+
         // Return the Error
-        if ($returnError && $response === false) {
+        if ($returnError && $result === false) {
             $error = curl_errno($curl) . ": " . curl_error($curl);
-            if (!$jsonResponse) {
-                return $error;
+            if ($withHeaders) {
+                return [ "error" => $error, "headers" => $headers ];
             }
-            return [ "error" => $error ];
+            if ($jsonResponse) {
+                return [ "error" => $error ];
+            }
+            return $error;
         }
 
-        // Return the Response as a String
-        if (!$jsonResponse) {
-            return $response;
+        // Get the Response
+        $response = $result;
+        if ($jsonResponse) {
+            if (empty($result)) {
+                $response = [];
+            } elseif (!JSON::isValid($result)) {
+                $response = [ "error" => $result ];
+            } else {
+                $response = JSON::decode($result, true);
+            }
         }
 
-        // Try to decode the response as a JSON
-        if (empty($response)) {
-            return [];
+        // Return the Response
+        if ($withHeaders) {
+            return [ "response" => $response, "headers" => $headers ];
         }
-        if (!JSON::isValid($response)) {
-            return [ "error" => $response ];
-        }
-        $result = JSON::decode($response, true);
-        return $result;
+        return $response;
     }
 
     /**
