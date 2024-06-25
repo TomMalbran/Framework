@@ -13,12 +13,20 @@ class TimeTable {
 
     /**
      * Validates the Time Tables and returns the values as a JSON
-     * @param array{}[] $timeTables
-     * @param Errors    $errors
-     * @param boolean   $withHolidays Optional.
+     * @param array{}[]     $timeTables
+     * @param Errors        $errors
+     * @param boolean       $withHolidays Optional.
+     * @param string        $fieldKey     Optional.
+     * @param callable|null $callback     Optional.
      * @return string
      */
-    public static function validate(array $timeTables, Errors $errors, bool $withHolidays = false): string {
+    public static function validate(
+        array $timeTables,
+        Errors $errors,
+        bool $withHolidays = false,
+        string $fieldKey = "timeTables",
+        ?callable $callback = null
+    ): string {
         $result = [];
 
         foreach ($timeTables as $index => $timeTable) {
@@ -29,21 +37,21 @@ class TimeTable {
 
             foreach ($timeTable["days"] as $day) {
                 if (!DateTime::isValidDay($day, $withHolidays)) {
-                    $errors->add("timeTables-$index-days", "GENERAL_ERROR_PERIOD_DAYS_INVALID");
+                    $errors->add("$fieldKey-$index-days", "GENERAL_ERROR_PERIOD_DAYS_INVALID");
                     $hasError = true;
                     break;
                 }
             }
             if (empty($timeTable["from"]) || !DateTime::isValidHour($timeTable["from"])) {
-                $errors->add("timeTables-$index-from", "GENERAL_ERROR_PERIOD_FROM_TIME");
+                $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TIME");
                 $hasError = true;
             }
             if (empty($timeTable["to"]) || !DateTime::isValidHour($timeTable["to"])) {
-                $errors->add("timeTables-$index-to", "GENERAL_ERROR_PERIOD_TO_TIME");
+                $errors->add("$fieldKey-$index-to", "GENERAL_ERROR_PERIOD_TO_TIME");
                 $hasError = true;
             }
             if (!empty($timeTable["from"]) && !empty($timeTable["to"]) && !DateTime::isValidHourPeriod($timeTable["from"], $timeTable["to"], true)) {
-                $errors->add("timeTables-$index-from", "GENERAL_ERROR_PERIOD_FROM_TO");
+                $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TO");
                 $hasError = true;
             }
 
@@ -54,6 +62,10 @@ class TimeTable {
                     "from" => $timeTable["from"],
                     "to"   => $timeTable["to"],
                 ];
+            }
+
+            if ($callback !== null) {
+                $callback($timeTable, $index);
             }
         }
 
