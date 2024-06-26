@@ -316,15 +316,13 @@ class Schema {
         $selection = new Selection($this->db, $this->structure);
         if ($distinctID !== null) {
             $selection->addSelects("DISTINCT($distinctID)");
-        } elseif ($idName !== null) {
-            $selection->addSelects("DISTINCT($idName)");
         }
 
         $selection->addFields();
         $selection->addExpressions();
         $selection->addJoins();
         $selection->request($query);
-        $request   = $selection->resolve();
+        $request = $selection->resolve();
 
         $keyName = $idName  ?: $this->structure->idName;
         $valName = $nameKey ?: $this->structure->nameKey;
