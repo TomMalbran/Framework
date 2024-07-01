@@ -187,6 +187,21 @@ class Numbers {
         return $number * $discount;
     }
 
+    /**
+     * Returns the Greatest Common Divisor
+     * @param integer|float $a
+     * @param integer|float $b
+     * @return integer|float
+     */
+    public static function getCommonDivisor(int|float $a, int|float $b): int|float {
+        while ($b != 0) {
+            $m = $a % $b;
+            $a = $b;
+            $b = $m;
+        }
+        return $a;
+    }
+
 
 
     /**
