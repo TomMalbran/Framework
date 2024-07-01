@@ -120,7 +120,7 @@ class Modification {
             return $this;
         }
 
-        if ($this->structure->hasTimestamps) {
+        if ($this->structure->hasTimestamps && empty($this->fields["modifiedTime"])) {
             $this->fields["modifiedTime"] = time();
         }
         if ($this->structure->hasUsers && !empty($this->credentialID)) {
