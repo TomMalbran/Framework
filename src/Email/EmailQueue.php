@@ -161,7 +161,21 @@ class EmailQueue {
     }
 
     /**
-     * Marks the Email as Sent
+     * Marks the given Email(s) as Not Sent
+     * @param integer[]|integer $emailID
+     * @return boolean
+     */
+    public static function markAsNotSent(array|int $emailID): bool {
+        $emailIDs = Arrays::toArray($emailID);
+        $query    = Query::create("EMAIL_ID", "IN", $emailIDs);
+        return self::schema()->edit($query, [
+            "emailResult" => EmailResult::NotProcessed,
+            "sentTime"    => 0,
+        ]);
+    }
+
+    /**
+     * Marks the given Email as Sent
      * @param integer $emailID
      * @param string  $emailResult
      * @return boolean
