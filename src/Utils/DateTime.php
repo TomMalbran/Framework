@@ -986,13 +986,17 @@ class DateTime {
     }
 
     /**
-     * Returns the difference between 2 times in Minutes
-     * @param integer $time1
-     * @param integer $time2
+     * Add the given Time to the given Time
+     * @param integer $time        Optional.
+     * @param string  $timeDiff    Optional.
+     * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getMinsDiff(int $time1, int $time2): int {
-        return floor(abs($time1 - $time2) / 60);
+    public static function addTime(int $time = 0, string $timeDiff = "", bool $useTimeZone = false): int {
+        $time    = self::getTime($time);
+        $minutes = self::timeToMinutes($timeDiff);
+        $result  = $time + $minutes * 60;
+        return self::toServerTime($result, $useTimeZone);
     }
 
     /**
@@ -1027,6 +1031,27 @@ class DateTime {
             return 0;
         }
         return self::toMinutes((int)$parts[0], (int)$parts[1], $timeZone);
+    }
+
+    /**
+     * Converts the Minutes to a Time
+     * @param integer $minutes
+     * @return string
+     */
+    public static function minutesToTime(int $minutes): string {
+        $hours = floor($minutes / 60);
+        $mins  = $minutes - $hours * 60;
+        return self::parseTime($hours) . ":" . self::parseTime($mins);
+    }
+
+    /**
+     * Returns the difference between 2 times in Minutes
+     * @param integer $time1
+     * @param integer $time2
+     * @return integer
+     */
+    public static function getMinsDiff(int $time1, int $time2): int {
+        return floor(abs($time1 - $time2) / 60);
     }
 
 
