@@ -824,7 +824,7 @@ class DateTime {
      * @return integer
      */
     public static function getWeeksDiff(int $time1, int $time2): int {
-        return floor(($time1 - $time2) / (7 * 24 * 3600));
+        return floor(abs($time1 - $time2) / (7 * 24 * 3600));
     }
 
 
@@ -909,7 +909,7 @@ class DateTime {
      * @return integer
      */
     public static function getDaysDiff(int $time1, int $time2): int {
-        return floor(($time1 - $time2) / (24 * 3600));
+        return floor(abs($time1 - $time2) / (24 * 3600));
     }
 
     /**
@@ -992,7 +992,7 @@ class DateTime {
      * @return integer
      */
     public static function getMinsDiff(int $time1, int $time2): int {
-        return floor(($time1 - $time2) / 60);
+        return floor(abs($time1 - $time2) / 60);
     }
 
     /**
