@@ -298,6 +298,18 @@ class Arrays {
     }
 
     /**
+     * Adds the given element at the given position
+     * @param mixed[] $array
+     * @param integer $position
+     * @param mixed   ...$elem
+     * @return mixed[]
+     */
+    public static function addAt(array $array, int $position, mixed ...$elem): array {
+        array_splice($array, $position, 0, $elem);
+        return $array;
+    }
+
+    /**
      * Slices an Array from the index the amount of items
      * @param mixed[]      $array
      * @param integer      $from
