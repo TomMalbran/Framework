@@ -267,7 +267,7 @@
             "USER_ID"       : { "type" : "number", "name" : "userID"       },
             "module"        : { "type" : "string"                          },
             "action"        : { "type" : "string"                          },
-            "dataID"        : { "type" : "string"                          }
+            "dataID"        : { "type" : "text"                            }
         },
         "joins" : {
             "SESSION_ID" : {
