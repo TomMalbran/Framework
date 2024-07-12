@@ -34,6 +34,7 @@ class Auth {
     private static int    $adminID      = 0;
     private static int    $userID       = 0;
     private static int    $apiID        = 0;
+    private static string $apiToken     = "";
 
 
     /**
@@ -49,7 +50,13 @@ class Auth {
         Storage::deleteOld();
         AuthToken::deleteOld();
 
-        // Validate the tokens
+        // Validate the API Token
+        $apiToken = AuthToken::getAPIToken($jwtToken);
+        if (!empty($apiToken)) {
+            return self::validateAPI($apiToken);
+        }
+
+        // Validate the Credential Tokens
         if (!AuthToken::isValid($jwtToken, $refreshToken)) {
             return false;
         }
@@ -123,6 +130,7 @@ class Auth {
     public static function validateAPI(string $token): bool {
         if (Token::isValid($token)) {
             self::$apiID      = Token::getOne($token)->id;
+            self::$apiToken   = $token;
             self::$accessName = AccessCode::API;
             return true;
         }
@@ -334,6 +342,15 @@ class Auth {
      * @return string
      */
     public static function getToken(): string {
+        // Create a Special API Token
+        if (self::hasAPI()) {
+            return AuthToken::createJWT([
+                "apiID"    => self::$apiID,
+                "apiToken" => self::$apiToken,
+            ]);
+        }
+
+        // Check if there is a Credential
         if (!self::hasCredential()) {
             return "";
         }

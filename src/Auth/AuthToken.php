@@ -88,6 +88,17 @@ class AuthToken {
     }
 
     /**
+     * Returns the API Token for the given JWT
+     * @param string $jwtToken
+     * @return string
+     */
+    public static function getAPIToken(string $jwtToken): string {
+        self::load();
+        $jwtData = self::getJWT($jwtToken);
+        return !empty($jwtData->apiToken) ? $jwtData->apiToken : "";
+    }
+
+    /**
      * Returns the Credentials for the given Refresh Token or JWT
      * @param string $jwtToken
      * @param string $refreshToken
