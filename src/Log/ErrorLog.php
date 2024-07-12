@@ -172,7 +172,6 @@ class ErrorLog {
     public static function handler(int $code, string $description, string $filePath = "", int $line = 0): bool {
         [ $error, $level ] = self::getErrorCode($code);
 
-        $environment = self::getEnvironment();
         $filePath    = self::getFilePath($filePath);
         $description = self::getDescription($description);
         [ $description, $backtrace ] = self::getBacktrace($description);
@@ -195,7 +194,7 @@ class ErrorLog {
                 "code"        => $code,
                 "level"       => $level,
                 "error"       => $error,
-                "environment" => $environment,
+                "environment" => Framework::getEnvironment(),
                 "file"        => $filePath,
                 "line"        => $line,
                 "description" => $description,
@@ -258,19 +257,6 @@ class ErrorLog {
             break;
         }
         return [ $error, $level ];
-    }
-
-    /**
-     * Returns the Environment
-     * @return string
-     */
-    private static function getEnvironment(): string {
-        if (Strings::contains(self::$basePath, "public_html")) {
-            $environment = Strings::substringAfter(self::$basePath, "domains/");
-            $environment = Strings::substringBefore($environment, "/public_html");
-            return $environment;
-        }
-        return "localhost";
     }
 
     /**

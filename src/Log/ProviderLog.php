@@ -71,7 +71,7 @@ class ProviderLog {
     }
 
     /**
-     * Returns the total amount of Error Log items
+     * Returns the total amount of Provider Log items
      * @param Request $request
      * @return integer
      */

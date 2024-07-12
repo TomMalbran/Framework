@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Schema;
 
-use Framework\Auth\Auth;
 use Framework\Schema\Query;
+use Framework\Log\QueryLog;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
@@ -26,7 +26,7 @@ class Database {
     public string $charset;
     public bool   $persist;
 
-    public bool $skipTime     = false;
+    public bool $skipLog = false;
 
 
     /**
@@ -578,48 +578,14 @@ class Database {
      */
     protected function processTime(float $startTime, string $expression, array $params): bool {
         $time = microtime(true) - $startTime;
-        if ($time < 3 || $this->skipTime) {
+        if ($time < 3 || $this->skipLog) {
             return false;
         }
 
-        $this->skipTime = true;
-        if (!$this->tableExists("log_queries")) {
-            return false;
-        }
-
-        $bindKeys = [];
-        foreach ($params as $key) {
-            $bindKeys[] = '/[?]/';
-        }
-        $expression  = preg_replace("/ +/", " ", $expression);
-        $expression  = preg_replace($bindKeys, $params, $expression, 1);
-        $elapsedTime = (int)floor($time);
-
-        $query = Query::create("expression", "=", $expression);
-        if ($this->getTotal("log_queries", $query) > 0) {
-            $query->orderBy("updatedTime", false)->limit(1);
-            $this->update("log_queries", [
-                "amount"      => Query::inc(1),
-                "elapsedTime" => Query::greatest("elapsedTime", $elapsedTime),
-                "totalTime"   => Query::inc($elapsedTime),
-                "updatedTime" => time(),
-                "updatedUser" => Auth::getID(),
-            ], $query);
-        } else {
-            $this->insert("log_queries", [
-                "expression"  => $expression,
-                "elapsedTime" => $elapsedTime,
-                "totalTime"   => $elapsedTime,
-                "amount"      => 1,
-                "isResolved"  => 0,
-                "updatedTime" => time(),
-                "createdTime" => time(),
-                "createdUser" => Auth::getID(),
-                "updatedUser" => Auth::getID(),
-            ]);
-        }
-        $this->skipTime = false;
-        return true;
+        $this->skipLog = true;
+        $result = QueryLog::createOrEdit($time, $expression, $params);
+        $this->skipLog = false;
+        return $result;
     }
 
 

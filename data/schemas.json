@@ -328,6 +328,7 @@
         "fields" : {
             "LOG_ID"      : { "type" : "id",   "name" : "logID" },
             "expression"  : { "type" : "text"                   },
+            "environment" : { "type" : "string"                 },
             "amount"      : { "type" : "number"                 },
             "isResolved"  : { "type" : "boolean"                },
             "elapsedTime" : { "type" : "number"                 },

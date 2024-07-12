@@ -17,6 +17,7 @@ use Framework\Schema\Database;
 use Framework\Schema\Generator;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
+use Framework\Utils\Strings;
 use Exception;
 
 /**
@@ -133,6 +134,20 @@ class Framework {
             self::$db = new Database($config);
         }
         return self::$db;
+    }
+
+    /**
+     * Returns the Environment
+     * @return string
+     */
+    public static function getEnvironment(): string {
+        $basePath = self::getBasePath(false);
+        if (Strings::contains($basePath, "public_html")) {
+            $environment = Strings::substringAfter($basePath, "domains/");
+            $environment = Strings::substringBefore($environment, "/public_html");
+            return $environment;
+        }
+        return "localhost";
     }
 
     /**
