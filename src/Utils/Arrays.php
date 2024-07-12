@@ -686,36 +686,61 @@ class Arrays {
 
     /**
      * Returns one or multiple values as a string
-     * @param ArrayAccess|array{} $array
-     * @param string[]|string     $key
-     * @param string              $glue     Optional.
-     * @param string              $prefix   Optional.
-     * @param boolean             $useEmpty Optional.
-     * @param mixed|string        $default  Optional.
+     * @param mixed           $array
+     * @param string[]|string $key
+     * @param string          $glue     Optional.
+     * @param string          $prefix   Optional.
+     * @param boolean         $useEmpty Optional.
+     * @param mixed|string    $default  Optional.
      * @return mixed
      */
-    public static function getValue(ArrayAccess|array $array, array|string $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
+    public static function getValue(mixed $array, array|string $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
         $result = $default;
         if (self::isArray($key)) {
             $values = [];
             foreach ($key as $id) {
                 $fullKey = self::getKey($id, $prefix);
-                if ($useEmpty && isset($array[$fullKey])) {
-                    $values[] = $array[$fullKey];
-                } elseif (!$useEmpty && !empty($array[$fullKey])) {
-                    $values[] = $array[$fullKey];
+                $value   = self::getOneValue($array, $fullKey, $useEmpty);
+                if ($value !== null) {
+                    $values[] = $value;
                 }
             }
             $result = implode($glue, $values);
         } else {
             $fullKey = self::getKey($key, $prefix);
-            if ($useEmpty && isset($array[$fullKey])) {
-                $result = $array[$fullKey];
-            } elseif (!$useEmpty && !empty($array[$fullKey])) {
-                $result = $array[$fullKey];
+            $value   = self::getOneValue($array, $fullKey, $useEmpty);
+            if ($value !== null) {
+                $result = $value;
             }
         }
         return $result;
+    }
+
+    /**
+     * Returns one value
+     * @param mixed      $array
+     * @param string     $key
+     * @param boolean    $useEmpty Optional.
+     * @param mixed|null $default  Optional.
+     * @return mixed
+     */
+    public static function getOneValue(mixed $array, string $key, bool $useEmpty = false, mixed $default = null): mixed {
+        if (self::isObject($array)) {
+            if ($useEmpty && isset($array->$key)) {
+                return $array->$key;
+            }
+            if (!$useEmpty && !empty($array->$key)) {
+                return $array->$key;
+            }
+        }
+
+        if ($useEmpty && isset($array[$key])) {
+            return $array[$key];
+        }
+        if (!$useEmpty && !empty($array[$key])) {
+            return $array[$key];
+        }
+        return $default;
     }
 
     /**

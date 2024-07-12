@@ -220,7 +220,7 @@ class Select implements ArrayAccess, JsonSerializable {
         $keys   = [];
 
         foreach ($array as $row) {
-            $key   = $row[$keyName];
+            $key   = Arrays::getValue($row, $keyName);
             $value = Arrays::getValue($row, $valName, " - ", "", $useEmpty);
             if (($distinct && Arrays::contains($keys, $key)) || (!$useEmpty && empty($value))) {
                 continue;
