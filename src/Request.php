@@ -547,11 +547,12 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the given week day is valid
-     * @param string $key
+     * @param string  $key
+     * @param boolean $startMonday Optional.
      * @return boolean
      */
-    public function isValidWeekDay(string $key): bool {
-        return DateTime::isValidWeekDay($this->getInt($key));
+    public function isValidWeekDay(string $key, bool $startMonday = false): bool {
+        return DateTime::isValidWeekDay($this->getInt($key), $startMonday);
     }
 
     /**
@@ -722,6 +723,26 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      */
     public function toDayEnd(string $key, bool $useTimezone = true): int {
         return DateTime::toDayEnd($this->get($key), $useTimezone);
+    }
+
+    /**
+     * Returns the given integer as a time of the start of the day
+     * @param string  $key
+     * @param boolean $useTimezone Optional.
+     * @return integer
+     */
+    public function getDayStart(string $key, bool $useTimezone = true): int {
+        return DateTime::getDayStart($this->getInt($key), $useTimezone);
+    }
+
+    /**
+     * Returns the given integer as a time of the end of the day
+     * @param string  $key
+     * @param boolean $useTimezone Optional.
+     * @return integer
+     */
+    public function getDayEnd(string $key, bool $useTimezone = true): int {
+        return DateTime::getDayEnd($this->getInt($key), $useTimezone);
     }
 
 

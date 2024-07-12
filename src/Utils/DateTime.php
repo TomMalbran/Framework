@@ -15,6 +15,8 @@ class DateTime {
         "dashes"        => "d-m-Y",
         "dashesReverse" => "Y-m-d",
         "dashesTime"    => "d-m-Y H:i",
+        "slashes"       => "d/m/Y",
+        "slashesTime"   => "d/m/Y H:i",
     ];
 
     /** @var float[] */
@@ -362,9 +364,13 @@ class DateTime {
     /**
      * Returns true if the given week day is valid
      * @param integer $weekDay
+     * @param boolean $startMonday Optional.
      * @return boolean
      */
-    public static function isValidWeekDay(int $weekDay): bool {
+    public static function isValidWeekDay(int $weekDay, bool $startMonday = false): bool {
+        if ($startMonday) {
+            return Numbers::isValid($weekDay, 1, 7);
+        }
         return Numbers::isValid($weekDay, 0, 6);
     }
 
