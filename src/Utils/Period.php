@@ -82,6 +82,14 @@ class Period {
     }
 
     /**
+     * Returns true if the Period is empty
+     * @return boolean
+     */
+    public function isEmpty(): bool {
+        return $this->fromTime === 0 && $this->toTime === 0;
+    }
+
+    /**
      * Returns the From Time depending on the period
      * @return integer
      */
