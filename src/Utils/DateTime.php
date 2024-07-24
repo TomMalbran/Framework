@@ -646,6 +646,52 @@ class DateTime {
 
 
     /**
+     * Returns the time plus x months
+     * @param integer $months
+     * @param integer $time        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getNextXMonths(int $months, int $time = 0, bool $useTimeZone = false): int {
+        return self::getLastXMonths(-$months, $time, $useTimeZone);
+    }
+
+    /**
+     * Returns the time plus x days
+     * @param float   $days
+     * @param integer $time        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getNextXDays(float $days, int $time = 0, bool $useTimeZone = false): int {
+        return self::getLastXDays(-$days, $time, $useTimeZone);
+    }
+
+    /**
+     * Returns the time plus x hours
+     * @param float   $hours
+     * @param integer $time        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getNextXHours(float $hours, int $time = 0, bool $useTimeZone = false): int {
+        return self::getLastXHours(-$hours, $time, $useTimeZone);
+    }
+
+    /**
+     * Returns the time plus x minutes
+     * @param float   $minutes
+     * @param integer $time        Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function getNextXMinutes(float $minutes, int $time = 0, bool $useTimeZone = false): int {
+        return self::getLastXMinutes(-$minutes, $time, $useTimeZone);
+    }
+
+
+
+    /**
      * Returns the Year for the given Time
      * @param integer $time Optional.
      * @return integer
