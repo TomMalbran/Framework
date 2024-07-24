@@ -13,7 +13,7 @@
         "ext-curl": "*"
     },
     "require-dev": {
-        "firebase/php-jwt": "^6.3",
+        "firebase/php-jwt": "^6.10",
         "mustache/mustache": "^2.14",
         "phpmailer/phpmailer": "^6.7",
         "league/oauth2-google": "^4.0",
