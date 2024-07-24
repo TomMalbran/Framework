@@ -289,6 +289,17 @@ class File {
     }
 
     /**
+     * Returns all the Directories inside the given path
+     * @param string $path
+     * @return string[]
+     */
+    public static function getDirectoriesInDir(string $path): array {
+        $result = self::getAllInDir($path);
+        $result = array_filter($result, fn($file) => is_dir($file));
+        return $result;
+    }
+
+    /**
      * Returns all the Files inside the given path
      * @param string  $path
      * @param boolean $recursive Optional.
