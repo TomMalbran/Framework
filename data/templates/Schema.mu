@@ -202,6 +202,16 @@ class {{name}}Schema {
         return self::constructEntity($data);
     }
 
+    /**
+     * Returns a value of the {{name}} Entity with the given Query
+     * @param Query $query
+     * @param string $column
+     * @return mixed
+     */
+    protected static function getEntityValue(Query $query, string $column): mixed {
+        return self::schema()->getValue($query, $column);
+    }
+
 
 
 {{#hasID}}
