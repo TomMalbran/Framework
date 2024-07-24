@@ -163,6 +163,17 @@ class Framework {
     }
 
     /**
+     * Returns the FTP BasePath
+     * @return string
+     */
+    public static function getFTPPath(): string {
+        if (Server::isLocalHost()) {
+            return self::$basePath;
+        }
+        return dirname(self::$basePath) . "/public_ftp";
+    }
+
+    /**
      * Returns the Private BasePath
      * @return string
      */
