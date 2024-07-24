@@ -54,7 +54,7 @@ class ProviderLog {
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "provider", "type", "request", "response" ], $request->search);
+        $query = Query::createSearch([ "provider", "type", "url", "request", "response" ], $request->search);
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
         return $query;
@@ -97,6 +97,7 @@ class ProviderLog {
             "url"      => Server::getFullUrl(),
             "request"  => JSON::encode($data),
             "response" => "{}",
+            "headers"  => "{}",
             "isError"  => $isError ? 1 : 0,
         ]);
     }
@@ -108,14 +109,24 @@ class ProviderLog {
      * @param string  $url
      * @param array{} $request
      * @param array{} $response Optional.
+     * @param array{} $headers  Optional.
      * @param boolean $isError  Optional.
      * @return integer
      */
-    public static function addRequest(string $provider, string $type, string $url, array $request, array $response = [], bool $isError = false): int {
+    public static function addRequest(
+        string $provider,
+        string $type,
+        string $url,
+        array $request,
+        array $response = [],
+        array $headers = [],
+        bool $isError = false,
+    ): int {
         return self::schema()->create([
             "provider" => $provider,
             "type"     => $type,
             "url"      => $url,
+            "headers"  => JSON::encode($headers),
             "request"  => JSON::encode($request),
             "response" => JSON::encode($response),
             "isError"  => $isError ? 1 : 0,

@@ -314,6 +314,7 @@
             "provider" : { "type" : "string"                   },
             "type"     : { "type" : "string"                   },
             "url"      : { "type" : "text"                     },
+            "headers"  : { "type" : "json"                     },
             "request"  : { "type" : "json"                     },
             "response" : { "type" : "json"                     },
             "isError"  : { "type" : "boolean"                  }
