@@ -279,11 +279,13 @@ class DateTime {
      * Returns true if the given day is Valid
      * @param string|integer $value
      * @param boolean        $withHolidays Optional.
+     * @param boolean        $startMonday  Optional.
      * @return boolean
      */
-    public static function isValidDay(string|int $value, bool $withHolidays = false): bool {
-        $totalDays = $withHolidays ? 7 : 6;
-        return (int)$value >= 0 && (int)$value <= $totalDays;
+    public static function isValidDay(string|int $value, bool $withHolidays = false, bool $startMonday = false): bool {
+        $minValue = $startMonday ? 1 : 0;
+        $maxValue = ($withHolidays ? 7 : 6) + $minValue;
+        return (int)$value >= $minValue && (int)$value <= $maxValue;
     }
 
     /**
@@ -857,12 +859,13 @@ class DateTime {
      * Returns the time of the start of the Week
      * @param integer $time        Optional.
      * @param integer $dayDiff     Optional.
+     * @param boolean $startMonday Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getWeekStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+    public static function getWeekStart(int $time = 0, int $dayDiff = 0, bool $startMonday = false, bool $useTimeZone = false): int {
         $time     = self::getTime($time);
-        $startDay = self::getDay($time) - self::getDayOfWeek($time);
+        $startDay = self::getDay($time) - self::getDayOfWeek($time, $startMonday);
         $month    = self::getMonth($time);
         $year     = self::getYear($time);
         $result   = self::createTime($startDay + $dayDiff, $month, $year);
@@ -966,26 +969,30 @@ class DateTime {
 
     /**
      * Returns the Day name at the given Time
-     * @param integer    $time     Optional.
-     * @param float|null $timeZone Optional.
-     * @param string     $language Optional.
+     * @param integer    $time        Optional.
+     * @param boolean    $startMonday Optional.
+     * @param float|null $timeZone    Optional.
+     * @param string     $language    Optional.
      * @return string
      */
-    public static function getDayText(int $time = 0, ?float $timeZone = null, string $language = ""): string {
-        $dayOfWeek = self::getDayOfWeek($time, false, $timeZone);
-        return self::getDayName($dayOfWeek, 0, false, $language);
+    public static function getDayText(int $time = 0, bool $startMonday = false, ?float $timeZone = null, string $language = ""): string {
+        $dayOfWeek = self::getDayOfWeek($time, $startMonday, $timeZone);
+        return self::getDayName($dayOfWeek, $startMonday, language: $language);
     }
 
     /**
      * Returns the Day name at the given Day
      * @param integer $day
+     * @param boolean $startMonday Optional.
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
      * @param string  $language    Optional.
      * @return string
      */
-    public static function getDayName(int $day, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
-        $result = NLS::getIndex("DATE_TIME_DAYS", $day, $language);
+    public static function getDayName(int $day, bool $startMonday = false, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+        $key    = $startMonday ? "DATE_TIME_DAYS_MONDAY" : "DATE_TIME_DAYS";
+        $result = NLS::getIndex($key, $day, $language);
+
         if ($length > 0) {
             $result = Strings::substring($result, 0, $length);
         }
