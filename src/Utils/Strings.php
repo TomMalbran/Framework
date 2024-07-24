@@ -752,6 +752,22 @@ class Strings {
     }
 
     /**
+     * Replaces the URLs in an HTML String
+     * @param string $string
+     * @param string $url
+     * @return string
+     */
+    public static function replaceUrls(string $string, string $url): string {
+        $result = $string;
+        foreach ([ "img", "source", "audio" ] as $tag) {
+            $pattern     = "/<{$tag} (.*?)src=\"(.*?)\"/i";
+            $replacement = "<{$tag} $1src=\"{$url}/$2\"";
+            $result      = preg_replace($pattern, $replacement, $result);
+        }
+        return $result;
+    }
+
+    /**
      * Sanitizes a String
      * @param string  $string
      * @param boolean $lowercase Optional.
