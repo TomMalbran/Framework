@@ -73,10 +73,22 @@ class Status {
     public static function get{{name}}Select(string $isoCode = ""): array {
         $result = [];
         foreach ([ {{values}} ] as $value) {
-            $name     = self::getName($value, $isoCode);
-            $result[] = new Select($value, $name);
+            $result[] = self::getSelect($value, $isoCode);
         }
         return $result;
     }
 {{/groups}}
+
+
+    /**
+     * Returns a Select for the given value
+     * @param string $value
+     * @param string $isoCode Optional.
+     * @return Select
+     */
+    private static function getSelect(string $value, string $isoCode): Select {
+        $name  = self::getName($value, $isoCode);
+        $color = self::getColor($value);
+        return new Select($value, $name, [ "color" => $color ]);
+    }
 }
