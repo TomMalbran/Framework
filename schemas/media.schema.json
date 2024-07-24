@@ -6,11 +6,11 @@
             "type"  : "array",
             "items" : {
                 "type"       : "object",
-                "required"   : [ "table", "field" ],
+                "required"   : [ "table", "field", "replace" ],
                 "properties" : {
-                    "table"  : { "type" : "string"  },
-                    "field"  : { "type" : "string"  },
-                    "isJson" : { "type" : "boolean" }
+                    "table"   : { "type" : "string"  },
+                    "field"   : { "type" : "string"  },
+                    "replace" : { "type" : "boolean" }
                 }
             }
         },

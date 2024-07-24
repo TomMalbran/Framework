@@ -79,8 +79,8 @@ class MediaFile {
             foreach (self::$data["updates"] as $field) {
                 $old = $file["old"];
                 $new = $file["new"];
-                if (!empty($field["isJson"]) && $field["isJson"]) {
-                    $query = Query::create($field["field"], "LIKE", ":\"$old\"");
+                if (!empty($field["replace"]) && $field["replace"]) {
+                    $query = Query::create($field["field"], "LIKE", "\"$old\"");
                     self::$db->update($field["table"], [
                         $field["field"] => Query::replace($field["field"], $old, $new),
                     ], $query);
