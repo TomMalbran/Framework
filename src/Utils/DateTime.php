@@ -1073,7 +1073,7 @@ class DateTime {
         }
         if (!empty($timeZone)) {
             $timeDiff = self::$serverZone - $timeZone;
-            $result  -= ($timeDiff * 60);
+            $result  += $timeDiff * 60;
         }
         return $result;
     }
