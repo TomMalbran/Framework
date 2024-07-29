@@ -88,7 +88,7 @@ class TimeTable {
             return false;
         }
 
-        $weekDay = DateTime::getDayOfWeek($startMonday);
+        $weekDay = DateTime::getDayOfWeek(0, $startMonday);
         $now     = DateTime::toMinutes();
 
         foreach ($timeTables as $timeTable) {
@@ -118,8 +118,8 @@ class TimeTable {
         }
 
         $result  = 0;
-        $weekDay = DateTime::getDayOfWeek($startMonday);
         $now     = DateTime::toMinutes();
+        $weekDay = DateTime::getDayOfWeek(0, $startMonday);
 
         foreach ($timeTables as $timeTable) {
             if (!Arrays::contains($timeTable["days"], $weekDay)) {
@@ -263,6 +263,9 @@ class TimeTable {
                     $first = $count;
                     $last  = $count;
                     for ($i = $count + 1; $i < $amount; $i++) {
+                        if ($elem["numbers"][$i] === $maxDay) {
+                            break;
+                        }
                         if ($elem["numbers"][$i] - 1 !== $elem["numbers"][$last]) {
                             break;
                         }
