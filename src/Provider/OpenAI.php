@@ -153,6 +153,16 @@ class OpenAI {
 
 
     /**
+     * Lists all the Vector Store
+     * @param string $name
+     * @return array{}[]
+     */
+    public static function getAllVectorStores(): array {
+        $request = self::get("/vector_stores");
+        return !empty($request["data"]) ? $request["data"] : [];
+    }
+
+    /**
      * Creates a Vector Store
      * @param string $name
      * @return string
@@ -353,14 +363,16 @@ class OpenAI {
 
 
     /**
-     * Creates a Thread Run
-     * @param string $assistantID
-     * @param string $message
+     * Creates a Thread and a Run
+     * @param string  $assistantID
+     * @param string  $message
+     * @param boolean $requiresFiles Optional.
      * @return string[]
      */
-    public static function createRun(string $assistantID, string $message): array {
+    public static function createRun(string $assistantID, string $message, bool $requiresFiles = false): array {
         $request = self::post("/threads/runs", [
             "assistant_id" => $assistantID,
+            "tool_choice"  => $requiresFiles ? "required" : "auto",
             "thread"       => [
                 "messages" => [
                     [
