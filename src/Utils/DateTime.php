@@ -1234,7 +1234,7 @@ class DateTime {
 
         $monthNames = NLS::get("DATE_TIME_MONTHS", $language);
         foreach ($monthNames as $index => $monthName) {
-            if (Strings::containsCaseInsensitive($text, $monthName)) {
+            if (Strings::containsCaseInsensitive($text, $monthName, Strings::substring($monthName, 0, 3))) {
                 $month = $index + 1;
                 break;
             }
