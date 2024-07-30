@@ -121,13 +121,17 @@ class DateTime {
      * @return integer
      */
     public static function toTime(mixed $time, bool $useTimeZone = true): int {
+        $timeStamp = 0;
         if (Strings::isString($time)) {
-            $time = strtotime($time);
+            $timeStamp = strtotime($time);
+        } else {
+            $timeStamp = (int)$time;
         }
-        if (empty($time)) {
+
+        if (empty($timeStamp)) {
             return 0;
         }
-        return self::toServerTime($time, $useTimeZone);
+        return self::toServerTime($timeStamp, $useTimeZone);
     }
 
     /**
@@ -137,30 +141,34 @@ class DateTime {
      * @return integer
      */
     public static function toTimeZone(mixed $time, ?float $timeZone = null): int {
+        $timeStamp = 0;
         if (Strings::isString($time)) {
-            $time = strtotime($time);
+            $timeStamp = strtotime($time);
+        } else {
+            $timeStamp = (int)$time;
         }
-        if (empty($time)) {
+
+        if (empty($timeStamp)) {
             return 0;
         }
         if ($timeZone !== null) {
             $timeDiff = self::$serverZone - $timeZone;
-            return $time - ($timeDiff * 3600);
+            return $timeStamp - ($timeDiff * 3600);
         }
-        return $time;
+        return $timeStamp;
     }
 
     /**
-     * Returns a time
-     * @param integer $time
+     * Returns a Time Stamp
+     * @param integer $timeStamp
      * @return integer
      */
-    public static function getTime(int $time = 0): int {
-        return !empty($time) ? $time : time();
+    public static function getTime(int $timeStamp = 0): int {
+        return !empty($timeStamp) ? $timeStamp : time();
     }
 
     /**
-     * Creates a time
+     * Creates a Time Stamp
      * @param integer $day
      * @param integer $month
      * @param integer $year
@@ -258,10 +266,10 @@ class DateTime {
      * @return integer
      */
     public static function fromMonthYear(?int $month = null, ?int $year = null, bool $useTimeZone = false): int {
-        $month = !empty($month) ? $month : self::getMonth();
-        $year  = !empty($year)  ? $year  : self::getYear();
-        $time  = self::createTime(1, $month, $year);
-        return self::toTime($time, $useTimeZone);
+        $month     = !empty($month) ? $month : self::getMonth();
+        $year      = !empty($year)  ? $year  : self::getYear();
+        $timeStamp = self::createTime(1, $month, $year);
+        return self::toTime($timeStamp, $useTimeZone);
     }
 
 
@@ -327,12 +335,12 @@ class DateTime {
      * @return boolean
      */
     public static function isValidHourPeriod(string $fromHour, string $toHour, bool $allow24 = false): bool {
-        $date     = date("d-m-Y");
-        $time     = self::toDayStart($date);
-        $fromTime = self::toTimeHour($date, $fromHour);
-        $toTime   = self::toTimeHour($date, $toHour);
+        $date      = date("d-m-Y");
+        $timeStamp = self::toDayStart($date);
+        $fromTime  = self::toTimeHour($date, $fromHour);
+        $toTime    = self::toTimeHour($date, $toHour);
 
-        if ($allow24 && $fromTime > 0 && $toTime === $time) {
+        if ($allow24 && $fromTime > 0 && $toTime === $timeStamp) {
             return true;
         }
         if ($fromTime !== 0 && $toTime !== 0 && $fromTime < $toTime) {
@@ -386,8 +394,8 @@ class DateTime {
      * @return boolean
      */
     public static function isFutureDate(string $date, string $type = "middle", bool $useTimeZone = true): bool {
-        $time = self::toDay($date, $type, $useTimeZone);
-        return self::isFutureTime($time);
+        $timeStamp = self::toDay($date, $type, $useTimeZone);
+        return self::isFutureTime($timeStamp);
     }
 
     /**
@@ -397,8 +405,8 @@ class DateTime {
      * @return boolean
      */
     public static function isFutureTime(mixed $time, ?float $timeZone = null): bool {
-        $seconds = self::toTimeZone($time, $timeZone);
-        return $seconds > time();
+        $timeStamp = self::toTimeZone($time, $timeZone);
+        return $timeStamp > time();
     }
 
      /**
@@ -408,19 +416,19 @@ class DateTime {
      * @return boolean
      */
     public static function isToday(mixed $time, ?float $timeZone = null): bool {
-        $seconds = self::toTimeZone($time, $timeZone);
-        return date("d-m-Y", $seconds) == date("d-m-Y");
+        $timeStamp = self::toTimeZone($time, $timeZone);
+        return date("d-m-Y", $timeStamp) == date("d-m-Y");
     }
 
     /**
      * Returns true if the given Time is between the from and to Times
-     * @param integer $time
+     * @param integer $timeStamp
      * @param integer $fromTime
      * @param integer $toTime
      * @return boolean
      */
-    public static function isBetween(int $time, int $fromTime, int $toTime): bool {
-        return $time >= $fromTime && $time <= $toTime;
+    public static function isBetween(int $timeStamp, int $fromTime, int $toTime): bool {
+        return $timeStamp >= $fromTime && $timeStamp <= $toTime;
     }
 
     /**
@@ -443,11 +451,11 @@ class DateTime {
      * @return string
      */
     public static function format(mixed $time, string $format, ?float $timeZone = null): string {
-        $seconds = self::toTimeZone($time, $timeZone);
-        if (empty($seconds)) {
+        $timeStamp = self::toTimeZone($time, $timeZone);
+        if (empty($timeStamp)) {
             return "";
         }
-        return date($format, $seconds);
+        return date($format, $timeStamp);
     }
 
     /**
@@ -591,241 +599,241 @@ class DateTime {
 
 
     /**
-     * Returns the time minus x months
+     * Returns the Time Stamp minus x months
      * @param integer $months
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXMonths(int $months, int $time = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $day    = self::getDay($time);
-        $month  = self::getMonth($time) - $months;
-        $year   = self::getYear($time);
-        $result = self::createTime($day, $month, $year);
+    public static function getLastXMonths(int $months, int $timeStamp = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $day       = self::getDay($timeStamp);
+        $month     = self::getMonth($timeStamp) - $months;
+        $year      = self::getYear($timeStamp);
+        $result    = self::createTime($day, $month, $year);
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the time minus x days
+     * Returns the Time Stamp minus x days
      * @param float   $days
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXDays(float $days, int $time = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $result = $time - $days * 24 * 3600;
+    public static function getLastXDays(float $days, int $timeStamp = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = $timeStamp - $days * 24 * 3600;
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the time minus x hours
+     * Returns the Time Stamp minus x hours
      * @param float   $hours
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXHours(float $hours, int $time = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $result = $time - $hours * 3600;
+    public static function getLastXHours(float $hours, int $timeStamp = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = $timeStamp - $hours * 3600;
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the time minus x minutes
+     * Returns the Time Stamp minus x minutes
      * @param float   $minutes
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXMinutes(float $minutes, int $time = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $result = $time - $minutes * 60;
+    public static function getLastXMinutes(float $minutes, int $timeStamp = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = $timeStamp - $minutes * 60;
         return self::toServerTime($result, $useTimeZone);
     }
 
 
 
     /**
-     * Returns the time plus x months
+     * Returns the Time Stamp plus x months
      * @param integer $months
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getNextXMonths(int $months, int $time = 0, bool $useTimeZone = false): int {
-        return self::getLastXMonths(-$months, $time, $useTimeZone);
+    public static function getNextXMonths(int $months, int $timeStamp = 0, bool $useTimeZone = false): int {
+        return self::getLastXMonths(-$months, $timeStamp, $useTimeZone);
     }
 
     /**
-     * Returns the time plus x days
+     * Returns the Time Stamp plus x days
      * @param float   $days
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getNextXDays(float $days, int $time = 0, bool $useTimeZone = false): int {
-        return self::getLastXDays(-$days, $time, $useTimeZone);
+    public static function getNextXDays(float $days, int $timeStamp = 0, bool $useTimeZone = false): int {
+        return self::getLastXDays(-$days, $timeStamp, $useTimeZone);
     }
 
     /**
-     * Returns the time plus x hours
+     * Returns the Time Stamp plus x hours
      * @param float   $hours
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getNextXHours(float $hours, int $time = 0, bool $useTimeZone = false): int {
-        return self::getLastXHours(-$hours, $time, $useTimeZone);
+    public static function getNextXHours(float $hours, int $timeStamp = 0, bool $useTimeZone = false): int {
+        return self::getLastXHours(-$hours, $timeStamp, $useTimeZone);
     }
 
     /**
-     * Returns the time plus x minutes
+     * Returns the Time Stamp plus x minutes
      * @param float   $minutes
-     * @param integer $time        Optional.
+     * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getNextXMinutes(float $minutes, int $time = 0, bool $useTimeZone = false): int {
-        return self::getLastXMinutes(-$minutes, $time, $useTimeZone);
+    public static function getNextXMinutes(float $minutes, int $timeStamp = 0, bool $useTimeZone = false): int {
+        return self::getLastXMinutes(-$minutes, $timeStamp, $useTimeZone);
     }
 
 
 
     /**
-     * Returns the Year for the given Time
-     * @param integer $time Optional.
+     * Returns the Year for the given Time Stamp
+     * @param integer $timeStamp Optional.
      * @return integer
      */
-    public static function getYear(int $time = 0): int {
-        $time = self::getTime($time);
-        return (int)date("Y", $time);
+    public static function getYear(int $timeStamp = 0): int {
+        $timeStamp = self::getTime($timeStamp);
+        return (int)date("Y", $timeStamp);
     }
 
     /**
-     * Returns the Month for the given Time
-     * @param integer $time    Optional.
-     * @param boolean $zeroPad Optional.
+     * Returns the Month for the given Time Stamp
+     * @param integer $timeStamp Optional.
+     * @param boolean $zeroPad   Optional.
      * @return integer|string
      */
-    public static function getMonth(int $time = 0, bool $zeroPad = false): int|string {
-        $time  = self::getTime($time);
-        $month = (int)date("n", $time);
+    public static function getMonth(int $timeStamp = 0, bool $zeroPad = false): int|string {
+        $timeStamp = self::getTime($timeStamp);
+        $month     = (int)date("n", $timeStamp);
         return $zeroPad ? self::parseTime($month) : $month;
     }
 
     /**
-     * Returns the amount of days in the Month for the given Time
-     * @param integer $time Optional.
+     * Returns the amount of days in the Month for the given Time Stamp
+     * @param integer $timeStamp Optional.
      * @return integer
      */
-    public static function getMonthDays(int $time = 0): int {
-        $time = self::getTime($time);
-        return (int)date("t", $time);
+    public static function getMonthDays(int $timeStamp = 0): int {
+        $timeStamp = self::getTime($timeStamp);
+        return (int)date("t", $timeStamp);
     }
 
     /**
      * Returns true if the given time is the current month
-     * @param integer    $time     Optional.
-     * @param float|null $timeZone Optional.
+     * @param integer    $timeStamp Optional.
+     * @param float|null $timeZone  Optional.
      * @return integer
      */
-    public static function isCurrentMonth(int $time = 0, ?float $timeZone = null): int {
-        $time    = self::getTime($time);
-        $seconds = self::toTimeZone($time, $timeZone);
-        return (self::getYear() == self::getYear($seconds) && self::getMonth() == self::getMonth($seconds));
+    public static function isCurrentMonth(int $timeStamp = 0, ?float $timeZone = null): int {
+        $timeStamp = self::getTime($timeStamp);
+        $timeStamp = self::toTimeZone($timeStamp, $timeZone);
+        return (self::getYear() == self::getYear($timeStamp) && self::getMonth() == self::getMonth($timeStamp));
     }
 
     /**
-     * Returns the Time of the start of the Month
-     * @param integer $time        Optional.
+     * Returns the Time Stamp of the start of the Month
+     * @param integer $timeStamp   Optional.
      * @param integer $monthDiff   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getMonthStart(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $month  = self::getMonth($time) + $monthDiff;
-        $year   = self::getYear($time);
-        $result = self::createTime(1, $month, $year);
+    public static function getMonthStart(int $timeStamp = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $month     = self::getMonth($timeStamp) + $monthDiff;
+        $year      = self::getYear($timeStamp);
+        $result    = self::createTime(1, $month, $year);
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the Time of the end of the Month
-     * @param integer $time        Optional.
+     * Returns the Time Stamp of the end of the Month
+     * @param integer $timeStamp   Optional.
      * @param integer $monthDiff   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getMonthEnd(int $time = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
-        $result = self::getMonthStart($time, $monthDiff + 1) - 1;
+    public static function getMonthEnd(int $timeStamp = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
+        $result = self::getMonthStart($timeStamp, $monthDiff + 1) - 1;
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the Time of the Month at the given Day position
-     * @param integer $time        Optional.
+     * Returns the Time Stamp of the Month at the given Day position
+     * @param integer $timeStamp   Optional.
      * @param integer $dayPosition Optional.
      * @param integer $weekDay     Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getMonthDayPos(int $time = 0, int $dayPosition = 0, int $weekDay = 0, bool $useTimeZone = false): int {
-        $time        = self::getMonthStart($time);
-        $thisWeekDay = self::getDayOfWeek($time);
+    public static function getMonthDayPos(int $timeStamp = 0, int $dayPosition = 0, int $weekDay = 0, bool $useTimeZone = false): int {
+        $timeStamp   = self::getMonthStart($timeStamp);
+        $thisWeekDay = self::getDayOfWeek($timeStamp);
         $increase    = $thisWeekDay > $weekDay ? 7 : 0;
         $days        = $dayPosition * 7 + $weekDay + $increase;
-        $result      = self::getWeekStart($time, $days);
+        $result      = self::getWeekStart($timeStamp, $days);
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Add the given Months to the given Time
-     * @param integer $time        Optional.
+     * Add the given Months to the given Time Stamp
+     * @param integer $timeStamp   Optional.
      * @param integer $monthDiff   Optional.
      * @param integer $day         Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addMonths(int $time = 0, int $monthDiff = 0, int $day = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $result = self::createTime(
-            !empty($day) ? $day : self::getDay($time),
-            self::getMonth($time) + $monthDiff,
-            self::getYear($time),
-            date("h", $time),
-            date("i", $time),
-            date("s", $time),
+    public static function addMonths(int $timeStamp = 0, int $monthDiff = 0, int $day = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = self::createTime(
+            !empty($day) ? $day : self::getDay($timeStamp),
+            self::getMonth($timeStamp) + $monthDiff,
+            self::getYear($timeStamp),
+            date("h", $timeStamp),
+            date("i", $timeStamp),
+            date("s", $timeStamp),
         );
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the difference between 2 times in Months
-     * @param integer $time1
-     * @param integer $time2
+     * Returns the difference between 2 Time Stamps in Months
+     * @param integer $timeStamp1
+     * @param integer $timeStamp2
      * @return integer
      */
-    public static function getMonthsDiff(int $time1, int $time2): int {
-        return 12 * ((int)self::getYear($time1) - (int)self::getYear($time2)) + self::getMonth($time1) - self::getMonth($time2);
+    public static function getMonthsDiff(int $timeStamp1, int $timeStamp2): int {
+        return 12 * ((int)self::getYear($timeStamp1) - (int)self::getYear($timeStamp2)) + self::getMonth($timeStamp1) - self::getMonth($timeStamp2);
     }
 
     /**
-     * Returns the Month and Year at the given Month
-     * @param integer $time
+     * Returns the Month and Year for the given Time Stamp
+     * @param integer $timeStamp
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
      * @param string  $language    Optional.
      * @return string
      */
-    public static function getMonthYear(int $time, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
-        return self::getMonthName(self::getMonth($time), $length, $inUpperCase, $language) . " " . self::getYear($time);
+    public static function getMonthYear(int $timeStamp, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+        return self::getMonthName(self::getMonth($timeStamp), $length, $inUpperCase, $language) . " " . self::getYear($timeStamp);
     }
 
     /**
-     * Returns the Month name at the given Month
+     * Returns the Month name for the given Month
      * @param integer $month
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
@@ -856,127 +864,127 @@ class DateTime {
 
 
     /**
-     * Returns the time of the start of the Week
-     * @param integer $time        Optional.
+     * Returns the Time Stamp of the start of the Week
+     * @param integer $timeStamp   Optional.
      * @param integer $dayDiff     Optional.
      * @param boolean $startMonday Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getWeekStart(int $time = 0, int $dayDiff = 0, bool $startMonday = false, bool $useTimeZone = false): int {
-        $time     = self::getTime($time);
-        $startDay = self::getDay($time) - self::getDayOfWeek($time, $startMonday);
-        $month    = self::getMonth($time);
-        $year     = self::getYear($time);
-        $result   = self::createTime($startDay + $dayDiff, $month, $year);
+    public static function getWeekStart(int $timeStamp = 0, int $dayDiff = 0, bool $startMonday = false, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $startDay  = self::getDay($timeStamp) - self::getDayOfWeek($timeStamp, $startMonday);
+        $month     = self::getMonth($timeStamp);
+        $year      = self::getYear($timeStamp);
+        $result    = self::createTime($startDay + $dayDiff, $month, $year);
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the difference between 2 times in Weeks
-     * @param integer $time1
-     * @param integer $time2
+     * Returns the difference between 2 Time Stamps in Weeks
+     * @param integer $timeStamp1
+     * @param integer $timeStamp2
      * @return integer
      */
-    public static function getWeeksDiff(int $time1, int $time2): int {
-        return floor(abs($time1 - $time2) / (7 * 24 * 3600));
+    public static function getWeeksDiff(int $timeStamp1, int $timeStamp2): int {
+        return floor(abs($timeStamp1 - $timeStamp2) / (7 * 24 * 3600));
     }
 
 
 
     /**
-     * Returns the Day for the given Time
-     * @param integer $time    Optional.
-     * @param boolean $zeroPad Optional.
+     * Returns the Day for the given Time Stamp
+     * @param integer $timeStamp Optional.
+     * @param boolean $zeroPad   Optional.
      * @return integer|string
      */
-    public static function getDay(int $time = 0, bool $zeroPad = false): int|string {
-        $time = self::getTime($time);
-        $day  = (int)date("j", $time);
+    public static function getDay(int $timeStamp = 0, bool $zeroPad = false): int|string {
+        $timeStamp = self::getTime($timeStamp);
+        $day       = (int)date("j", $timeStamp);
         return $zeroPad ? self::parseTime($day) : $day;
     }
 
     /**
-     * Returns the Day of Week
-     * @param integer    $time        Optional.
+     * Returns the Day of Week of the given Time Stamp
+     * @param integer    $timeStamp   Optional.
      * @param boolean    $startMonday Optional.
      * @param float|null $timeZone    Optional.
      * @return integer
      */
-    public static function getDayOfWeek(int $time = 0, bool $startMonday = false, ?float $timeZone = null): int {
-        $time    = self::getTime($time);
-        $seconds = self::toTimeZone($time, $timeZone);
+    public static function getDayOfWeek(int $timeStamp = 0, bool $startMonday = false, ?float $timeZone = null): int {
+        $timeStamp = self::getTime($timeStamp);
+        $timeStamp = self::toTimeZone($timeStamp, $timeZone);
         if ($startMonday) {
-            return (int)date("N", $seconds);
+            return (int)date("N", $timeStamp);
         }
-        return (int)date("w", $seconds);
+        return (int)date("w", $timeStamp);
     }
 
     /**
-     * Returns the time of the start of the day
-     * @param integer $time        Optional.
+     * Returns the Time Stamp of the start of the day
+     * @param integer $timeStamp   Optional.
      * @param integer $dayDiff     Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getDayStart(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $day    = self::getDay($time) + $dayDiff;
-        $month  = self::getMonth($time);
-        $year   = self::getYear($time);
-        $result = self::createTime($day, $month, $year);
+    public static function getDayStart(int $timeStamp = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $day       = self::getDay($timeStamp) + $dayDiff;
+        $month     = self::getMonth($timeStamp);
+        $year      = self::getYear($timeStamp);
+        $result    = self::createTime($day, $month, $year);
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the time of the end of the day
-     * @param integer $time        Optional.
+     * Returns the Time Stamp of the end of the day
+     * @param integer $timeStamp   Optional.
      * @param integer $dayDiff     Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getDayEnd(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $day    = self::getDay($time) + $dayDiff;
-        $month  = self::getMonth($time);
-        $year   = self::getYear($time);
-        $result = self::createTime($day, $month, $year, 23, 59, 59);
+    public static function getDayEnd(int $timeStamp = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $day       = self::getDay($timeStamp) + $dayDiff;
+        $month     = self::getMonth($timeStamp);
+        $year      = self::getYear($timeStamp);
+        $result    = self::createTime($day, $month, $year, 23, 59, 59);
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Add the given Days to the given Time
-     * @param integer $time        Optional.
+     * Add the given Days to the given Time Stamp
+     * @param integer $timeStamp   Optional.
      * @param integer $dayDiff     Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addDays(int $time = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $result = $time + $dayDiff * 24 * 3600;
+    public static function addDays(int $timeStamp = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = $timeStamp + $dayDiff * 24 * 3600;
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Returns the difference between 2 dates in Days
-     * @param integer $time1
-     * @param integer $time2
+     * Returns the difference between 2 Time Stamps in Days
+     * @param integer $timeStamp1
+     * @param integer $timeStamp2
      * @return integer
      */
-    public static function getDaysDiff(int $time1, int $time2): int {
-        return floor(abs($time1 - $time2) / (24 * 3600));
+    public static function getDaysDiff(int $timeStamp1, int $timeStamp2): int {
+        return floor(abs($timeStamp1 - $timeStamp2) / (24 * 3600));
     }
 
     /**
-     * Returns the Day name at the given Time
-     * @param integer    $time        Optional.
+     * Returns the Day name at the given Time Stamp
+     * @param integer    $timeStamp   Optional.
      * @param boolean    $startMonday Optional.
      * @param float|null $timeZone    Optional.
      * @param string     $language    Optional.
      * @return string
      */
-    public static function getDayText(int $time = 0, bool $startMonday = false, ?float $timeZone = null, string $language = ""): string {
-        $dayOfWeek = self::getDayOfWeek($time, $startMonday, $timeZone);
+    public static function getDayText(int $timeStamp = 0, bool $startMonday = false, ?float $timeZone = null, string $language = ""): string {
+        $dayOfWeek = self::getDayOfWeek($timeStamp, $startMonday, $timeZone);
         return self::getDayName($dayOfWeek, $startMonday, language: $language);
     }
 
@@ -1003,63 +1011,63 @@ class DateTime {
     }
 
     /**
-     * Returns the Day and Month and Year at the given Time
-     * @param integer $time
+     * Returns the Day and Month for the given Time Stamp
+     * @param integer $timeStamp
      * @param integer $length      Optional.
      * @param boolean $inUpperCase Optional.
      * @param string  $language    Optional.
      * @return string
      */
-    public static function getDayMonth(int $time, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
-        $day   = self::getDay($time, true);
-        $month = self::getMonth($time);
+    public static function getDayMonth(int $timeStamp, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+        $day   = self::getDay($timeStamp, true);
+        $month = self::getMonth($timeStamp);
         return "$day " . self::getMonthName($month, $length, $inUpperCase, $language);
     }
 
 
 
     /**
-     * Add the given Hours to the given Time
-     * @param integer $time        Optional.
+     * Adds the given Hours to the given Time Stamp
+     * @param integer $timeStamp   Optional.
      * @param integer $hourDiff    Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addHours(int $time = 0, int $hourDiff = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $result = $time + $hourDiff * 3600;
+    public static function addHours(int $timeStamp = 0, int $hourDiff = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = $timeStamp + $hourDiff * 3600;
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Add the given Minutes to the given Time
-     * @param integer $time        Optional.
+     * Adds the given Minutes to the given Time Stamp
+     * @param integer $timeStamp   Optional.
      * @param integer $minuteDiff  Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addMinutes(int $time = 0, int $minuteDiff = 0, bool $useTimeZone = false): int {
-        $time   = self::getTime($time);
-        $result = $time + $minuteDiff * 60;
+    public static function addMinutes(int $timeStamp = 0, int $minuteDiff = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = $timeStamp + $minuteDiff * 60;
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Add the given Time to the given Time
-     * @param integer $time        Optional.
+     * Adds the given Time to the given Time Stamp
+     * @param integer $timeStamp   Optional.
      * @param string  $timeDiff    Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function addTime(int $time = 0, string $timeDiff = "", bool $useTimeZone = false): int {
-        $time    = self::getTime($time);
-        $minutes = self::timeToMinutes($timeDiff);
-        $result  = $time + $minutes * 60;
+    public static function addTime(int $timeStamp = 0, string $timeDiff = "", bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $minutes   = self::timeToMinutes($timeDiff);
+        $result    = $timeStamp + $minutes * 60;
         return self::toServerTime($result, $useTimeZone);
     }
 
     /**
-     * Converts Hours and Minutes to Minutes
+     * Converts an Hour and Minute to Minutes
      * @param integer|null $hours    Optional.
      * @param integer|null $minutes  Optional.
      * @param float|null   $timeZone Optional.
@@ -1079,7 +1087,19 @@ class DateTime {
     }
 
     /**
-     * Converts the Time to Minutes
+     * Converts a Time Stamp to Minutes
+     * @param string     $timeStamp
+     * @param float|null $timeZone  Optional.
+     * @return integer
+     */
+    public static function timeStampToMinutes(string $timeStamp, ?float $timeZone = null): int {
+        $hours   = (int)date("H", $timeStamp);
+        $minutes = (int)date("i", $timeStamp);
+        return self::toMinutes($hours, $minutes, $timeZone);
+    }
+
+    /**
+     * Converts a Time to Minutes
      * @param string     $time
      * @param float|null $timeZone Optional.
      * @return integer
@@ -1104,13 +1124,13 @@ class DateTime {
     }
 
     /**
-     * Returns the difference between 2 times in Minutes
-     * @param integer $time1
-     * @param integer $time2
+     * Returns the difference between 2 Time Stamps in Minutes
+     * @param integer $timeStamp1
+     * @param integer $timeStamp2
      * @return integer
      */
-    public static function getMinsDiff(int $time1, int $time2): int {
-        return floor(abs($time1 - $time2) / 60);
+    public static function getMinsDiff(int $timeStamp1, int $timeStamp2): int {
+        return floor(abs($timeStamp1 - $timeStamp2) / 60);
     }
 
 
@@ -1122,15 +1142,15 @@ class DateTime {
      * @return integer
      */
     public static function getAge(mixed $time, ?float $timeZone = null): int {
-        $seconds  = self::toTimeZone($time, $timeZone);
-        if (empty($seconds)) {
+        $timeStamp = self::toTimeZone($time, $timeZone);
+        if (empty($timeStamp)) {
             return 0;
         }
 
         $thisYear = self::getYear();
-        $thatYear = self::getYear($seconds);
+        $thatYear = self::getYear($timeStamp);
         $result   = $thisYear - $thatYear;
-        if ($seconds > time()) {
+        if ($timeStamp > time()) {
             $result += 1;
         }
         return $result;
@@ -1162,7 +1182,7 @@ class DateTime {
 
 
     /**
-     * Parses a text into a Timestamp
+     * Parses a text into a Time Stamp
      * @param string $text
      * @param string $language Optional.
      * @return integer
@@ -1176,7 +1196,7 @@ class DateTime {
     }
 
     /**
-     * Parses a text with the given glue into a Timestamp
+     * Parses a text with the given glue into a Time Stamp
      * @param string $text
      * @param string $glue
      * @return integer
@@ -1217,7 +1237,7 @@ class DateTime {
     }
 
     /**
-     * Parses a text with a language into a Timestamp
+     * Parses a text with a language into a Time Stamp
      * @param string $text
      * @param string $language
      * @return integer
