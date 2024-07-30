@@ -79,17 +79,18 @@ class TimeTable {
     /**
      * Returns true if the Time Tables are in the Current time
      * @param array{}[] $timeTables
+     * @param integer   $timeStamp   Optional.
      * @param boolean   $startMonday Optional.
      * @param integer   $minuteGap   Optional.
      * @return boolean
      */
-    public static function isCurrent(array $timeTables, bool $startMonday = false, int $minuteGap = 0): bool {
+    public static function isCurrent(array $timeTables, int $timeStamp = 0, bool $startMonday = false, int $minuteGap = 0): bool {
         if (empty($timeTables)) {
             return false;
         }
 
-        $weekDay = DateTime::getDayOfWeek(0, $startMonday);
-        $now     = DateTime::toMinutes();
+        $weekDay = DateTime::getDayOfWeek($timeStamp, $startMonday);
+        $now     = DateTime::timeStampToMinutes($timeStamp);
 
         foreach ($timeTables as $timeTable) {
             if (!Arrays::contains($timeTable["days"], $weekDay)) {
@@ -109,17 +110,18 @@ class TimeTable {
     /**
      * Returns the end time of the current day for the given Time Tables
      * @param array{}[] $timeTables
+     * @param integer   $timeStamp   Optional.
      * @param boolean   $startMonday Optional.
      * @return integer
      */
-    public static function getCurrentEndTime(array $timeTables, bool $startMonday = false): int {
+    public static function getCurrentEndTime(array $timeTables, int $timeStamp = 0, bool $startMonday = false): int {
         if (empty($timeTables)) {
             return 0;
         }
 
         $result  = 0;
-        $now     = DateTime::toMinutes();
-        $weekDay = DateTime::getDayOfWeek(0, $startMonday);
+        $weekDay = DateTime::getDayOfWeek($timeStamp, $startMonday);
+        $now     = DateTime::timeStampToMinutes($timeStamp);
 
         foreach ($timeTables as $timeTable) {
             if (!Arrays::contains($timeTable["days"], $weekDay)) {
@@ -285,16 +287,16 @@ class TimeTable {
                 }
             }
 
-            $time   = "";
-            $toHour = $elem["toHour"];
+            $timeText = "";
+            $toHour   = $elem["toHour"];
             if ($toHour === "00:00") {
                 $toHour = "24:00";
             }
 
             if (empty($elem["fromHour"])) {
-                $time = NLS::get("TIME_TABLE_NO_HOURS", $isoCode);
+                $timeText = NLS::get("TIME_TABLE_NO_HOURS", $isoCode);
             } else {
-                $time = NLS::format("TIME_TABLE_HOURS", [ $elem["fromHour"], $toHour ], $isoCode);
+                $timeText = NLS::format("TIME_TABLE_HOURS", [ $elem["fromHour"], $toHour ], $isoCode);
             }
 
             $result[] = [
@@ -302,7 +304,7 @@ class TimeTable {
                 "fromHour" => $elem["fromHour"],
                 "toHour"   => $toHour,
                 "daysText" => $daysText,
-                "timeText" => $time,
+                "timeText" => $timeText,
                 "zone"     => $zone,
             ];
         }
