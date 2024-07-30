@@ -154,7 +154,6 @@ class OpenAI {
 
     /**
      * Lists all the Vector Store
-     * @param string $name
      * @return array{}[]
      */
     public static function getAllVectorStores(): array {
@@ -176,12 +175,12 @@ class OpenAI {
 
     /**
      * Edits a Vector Store
-     * @param string $vectoreStoreID
+     * @param string $vectorStoreID
      * @param string $name
      * @return string
      */
-    public static function editVectorStore(string $vectoreStoreID, string $name): string {
-        $request = self::post("/vector_stores/$vectoreStoreID", [
+    public static function editVectorStore(string $vectorStoreID, string $name): string {
+        $request = self::post("/vector_stores/$vectorStoreID", [
             "name" => $name,
         ]);
         return !empty($request["id"]) ? $request["id"] : "";
@@ -189,22 +188,22 @@ class OpenAI {
 
     /**
      * Deletes a Vector Store
-     * @param string $vectoreStoreID
+     * @param string $vectorStoreID
      * @return string
      */
-    public static function deleteVectorStore(string $vectoreStoreID): string {
-        $request = self::delete("/vector_stores/$vectoreStoreID");
+    public static function deleteVectorStore(string $vectorStoreID): string {
+        $request = self::delete("/vector_stores/$vectorStoreID");
         return !empty($request["id"]) ? $request["id"] : "";
     }
 
     /**
      * Creates a Vector Store File
-     * @param string $vectoreStoreID
+     * @param string $vectorStoreID
      * @param string $fileID
      * @return string
      */
-    public static function createVectorFile(string $vectoreStoreID, string $fileID): string {
-        $request = self::post("/vector_stores/$vectoreStoreID/files", [
+    public static function createVectorFile(string $vectorStoreID, string $fileID): string {
+        $request = self::post("/vector_stores/$vectorStoreID/files", [
             "file_id" => $fileID,
         ]);
         return !empty($request["id"]) ? $request["id"] : "";
@@ -212,12 +211,12 @@ class OpenAI {
 
     /**
      * Deletes a Vector Store File
-     * @param string $vectoreStoreID
+     * @param string $vectorStoreID
      * @param string $fileID
      * @return string
      */
-    public static function deleteVectorFile(string $vectoreStoreID, string $fileID): string {
-        $request = self::delete("/vector_stores/$vectoreStoreID/files/$fileID");
+    public static function deleteVectorFile(string $vectorStoreID, string $fileID): string {
+        $request = self::delete("/vector_stores/$vectorStoreID/files/$fileID");
         return !empty($request["id"]) ? $request["id"] : "";
     }
 
