@@ -170,11 +170,12 @@ class ActionLog {
      * Logs the given Action
      * @param string        $module
      * @param string        $action
-     * @param mixed|integer $dataID Optional.
+     * @param mixed|integer $dataID       Optional.
+     * @param integer       $credentialID Optional.
      * @return boolean
      */
-    public static function add(string $module, string $action, mixed $dataID = 0): bool {
-        $sessionID = self::getSessionID();
+    public static function add(string $module, string $action, mixed $dataID = 0, int $credentialID = 0): bool {
+        $sessionID = self::getSessionID($credentialID);
         if (empty($sessionID)) {
             return false;
         }
@@ -197,10 +198,12 @@ class ActionLog {
 
     /**
      * Returns the Session ID for the current Credential
+     * @param integer $credentialID Optional.
      * @return integer
      */
-    public static function getSessionID(): int {
-        $query = Query::create("CREDENTIAL_ID", "=", Auth::getID());
+    public static function getSessionID(int $credentialID = 0): int {
+        $id    = !empty($credentialID) ? $credentialID : Auth::getID();
+        $query = Query::create("CREDENTIAL_ID", "=", $id);
         return (int)self::idSchema()->getValue($query, "SESSION_ID");
     }
 
