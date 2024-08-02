@@ -2,8 +2,8 @@
 namespace {{codeSpace}};
 {{#hasUses}}
 
-{{#uses}}
-use {{nameSpace}}Schema\{{.}};{{/uses}}
+{{#uses}}use {{nameSpace}}Schema\{{.}};
+{{/uses}}
 {{/hasUses}}
 
 /**
