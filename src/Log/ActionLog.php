@@ -9,6 +9,7 @@ use Framework\Schema\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
+use Framework\Utils\Numbers;
 use Framework\Utils\Server;
 
 /**
@@ -135,13 +136,54 @@ class ActionLog {
 
 
     /**
-     * Starts a Log Session
+     * Returns the Credential ID for the current User
+     * @param integer $credentialID Optional.
+     * @return integer
+     */
+    private static function getCredentialID(int $credentialID = 0): int {
+        if (!empty($credentialID)) {
+            return $credentialID;
+        }
+        if (Auth::isLoggedAsUser()) {
+            return Auth::getAdminID();
+        }
+        return Auth::getID();
+    }
+
+    /**
+     * Returns the Session ID for the current Credential
      * @param integer $credentialID
-     * @param boolean $destroy      Optional.
+     * @return integer
+     */
+    private static function getSessionID(int $credentialID): int {
+        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        return (int)self::idSchema()->getValue($query, "SESSION_ID");
+    }
+
+    /**
+     * Sets the given Session ID for the current Credential
+     * @param integer $credentialID
+     * @param integer $sessionID
      * @return boolean
      */
-    public static function startSession(int $credentialID, bool $destroy = false): bool {
-        $sessionID = self::getSessionID();
+    private static function setSessionID(int $credentialID, int $sessionID): bool {
+        $result = self::idSchema()->replace([
+            "CREDENTIAL_ID" => $credentialID,
+            "SESSION_ID"    => $sessionID,
+        ]);
+        return $result > 0;
+    }
+
+
+
+    /**
+     * Starts a Log Session
+     * @param boolean $destroy Optional.
+     * @return boolean
+     */
+    public static function startSession(bool $destroy = false): bool {
+        $credentialID = self::getCredentialID();
+        $sessionID    = self::getSessionID($credentialID);
 
         if ($destroy || empty($sessionID)) {
             $sessionID = self::sessionSchema()->create([
@@ -150,7 +192,7 @@ class ActionLog {
                 "ip"            => Server::getIP(),
                 "userAgent"     => Server::getUserAgent(),
             ]);
-            self::setSessionID($sessionID);
+            self::setSessionID($credentialID, $sessionID);
             return true;
         }
         return false;
@@ -161,10 +203,9 @@ class ActionLog {
      * @return boolean
      */
     public static function endSession(): bool {
-        return self::setSessionID();
+        $credentialID = self::getCredentialID();
+        return self::setSessionID($credentialID, 0);
     }
-
-
 
     /**
      * Logs the given Action
@@ -175,49 +216,26 @@ class ActionLog {
      * @return boolean
      */
     public static function add(string $module, string $action, mixed $dataID = 0, int $credentialID = 0): bool {
-        $sessionID = self::getSessionID($credentialID);
+        $credentialID = self::getCredentialID($credentialID);
+        $sessionID    = self::getSessionID($credentialID);
         if (empty($sessionID)) {
             return false;
         }
 
         $dataID = Arrays::toArray($dataID);
         foreach ($dataID as $index => $value) {
-            $dataID[$index] = (int)$value;
+            $dataID[$index] = Numbers::isValid($value) ? (int)$value : $value;
         }
 
         self::actionSchema()->create([
             "SESSION_ID"    => $sessionID,
-            "CREDENTIAL_ID" => Auth::getID(),
+            "CREDENTIAL_ID" => $credentialID,
             "USER_ID"       => Auth::getUserID(),
             "module"        => $module,
             "action"        => $action,
             "dataID"        => JSON::encode($dataID),
         ]);
         return true;
-    }
-
-    /**
-     * Returns the Session ID for the current Credential
-     * @param integer $credentialID Optional.
-     * @return integer
-     */
-    public static function getSessionID(int $credentialID = 0): int {
-        $id    = !empty($credentialID) ? $credentialID : Auth::getID();
-        $query = Query::create("CREDENTIAL_ID", "=", $id);
-        return (int)self::idSchema()->getValue($query, "SESSION_ID");
-    }
-
-    /**
-     * Sets the given Session ID for the current Credential
-     * @param integer $sessionID Optional.
-     * @return boolean
-     */
-    public static function setSessionID(int $sessionID = 0): bool {
-        $result = self::idSchema()->replace([
-            "CREDENTIAL_ID" => Auth::getID(),
-            "SESSION_ID"    => $sessionID,
-        ]);
-        return $result > 0;
     }
 
 

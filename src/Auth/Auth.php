@@ -89,11 +89,7 @@ class Auth {
         self::setCredential($credential, $admin, $credential->currentUser);
 
         // Start or reuse a log session
-        if (self::isLoggedAsUser()) {
-            ActionLog::startSession(self::$adminID);
-        } else {
-            ActionLog::startSession(self::$credentialID);
-        }
+        ActionLog::startSession();
         return true;
     }
 
@@ -167,7 +163,7 @@ class Auth {
         self::setCredential($credential, null, $credential->currentUser);
 
         Credential::updateLoginTime($credential->id);
-        ActionLog::startSession($credential->id, true);
+        ActionLog::startSession(true);
 
         $path = Path::getTempPath($credential->id, false);
         File::emptyDir($path);
@@ -333,7 +329,7 @@ class Auth {
         self::$userID     = $userID;
         self::$accessName = $accessName;
         ActionLog::endSession();
-        ActionLog::startSession(self::$credentialID, true);
+        ActionLog::startSession(true);
         return true;
     }
 
