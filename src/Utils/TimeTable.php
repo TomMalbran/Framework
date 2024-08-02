@@ -146,11 +146,19 @@ class TimeTable {
      * @param array{}[] $timeTables
      * @param boolean   $allDays     Optional.
      * @param boolean   $startMonday Optional.
+     * @param string    $closedText  Optional.
      * @param string    $timeZone    Optional.
      * @param string    $isoCode     Optional.
      * @return array{}
      */
-    public static function getList(array $timeTables, bool $allDays = false, bool $startMonday = false, string $timeZone = "", string $isoCode = ""): array {
+    public static function getList(
+        array $timeTables,
+        bool $allDays = false,
+        bool $startMonday = false,
+        string $closedText = "TIME_TABLE_NO_HOURS",
+        string $timeZone = "",
+        string $isoCode = "",
+    ): array {
         if (empty($timeTables) && !$allDays) {
             return [];
         }
@@ -294,7 +302,7 @@ class TimeTable {
             }
 
             if (empty($elem["fromHour"])) {
-                $timeText = NLS::get("TIME_TABLE_NO_HOURS", $isoCode);
+                $timeText = NLS::get($closedText, $isoCode);
             } else {
                 $timeText = NLS::format("TIME_TABLE_HOURS", [ $elem["fromHour"], $toHour ], $isoCode);
             }
