@@ -163,7 +163,7 @@ class Framework {
     }
 
     /**
-     * Returns the FTP BasePath
+     * Returns the FTP Path
      * @return string
      */
     public static function getFTPPath(): string {
@@ -174,7 +174,7 @@ class Framework {
     }
 
     /**
-     * Returns the Private BasePath
+     * Returns the Private Path
      * @return string
      */
     public static function getPrivatePath(): string {
@@ -185,7 +185,7 @@ class Framework {
     }
 
     /**
-     * Returns the BasePath with the given dir
+     * Returns the Base Path with the given dir
      * @param string  $dir          Optional.
      * @param string  $file         Optional.
      * @param boolean $forFramework Optional.
@@ -199,13 +199,24 @@ class Framework {
     }
 
     /**
-     * Returns the FilesPath with the given file
+     * Returns the FilesPath with the given path parts
      * @param string ...$pathParts
      * @return string
      */
     public static function getFilesPath(string ...$pathParts): string {
         return File::getPath(self::$basePath, self::FilesDir, ...$pathParts);
     }
+
+    /**
+     * Returns the Internal Files Path with the given path parts
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function getInternalFilesPath(string ...$pathParts): string {
+        return File::getPath(self::$framePath, self::FilesDir, ...$pathParts);
+    }
+
+
 
     /**
      * Loads a File from the App or defaults to the Framework

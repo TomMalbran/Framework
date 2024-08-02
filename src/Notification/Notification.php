@@ -1,9 +1,9 @@
 <?php
 namespace Framework\Notification;
 
+use Framework\Framework;
 use Framework\System\ConfigCode;
 use Framework\Provider\Curl;
-use Framework\File\Path;
 
 /**
  * The Notification Provider
@@ -100,7 +100,7 @@ class Notification {
 
         $icon = "";
         if (!empty(self::$config->icon)) {
-            $icon = Path::getUrl("framework", self::$config->icon);
+            $icon = Framework::getInternalFilesPath(self::$config->icon);
         }
 
         $data = [
