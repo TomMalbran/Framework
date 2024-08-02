@@ -104,4 +104,34 @@ class GoogleMap {
             "longitude" => $address["geometry"]["location"]["lng"],
         ];
     }
+
+    /**
+     * Calculates the distance between two locations using Google Maps API
+     * @param float $latitude1
+     * @param float $longitude1
+     * @param float $latitude2
+     * @param float $longitude2
+     * @return float|null
+     */
+    public static function calculateDistance(float $latitude1, float $longitude1, float $latitude2, float $longitude2): ?float {
+        self::load();
+        if (!self::$isActive) {
+            return null;
+        }
+
+        $params = [
+            "key"          => self::$apiKey,
+            "origins"      => "$latitude1,$longitude1",
+            "destinations" => "$latitude2,$longitude2",
+            "units"        => "metric",
+        ];
+
+        $url = self::BaseUrl . "distancematrix/json";
+        $response = Curl::get($url, $params);
+
+        if (empty($response["rows"][0]["elements"][0]["distance"]["value"])) {
+            return null;
+        }
+        return $response["rows"][0]["elements"][0]["distance"]["value"] / 1000;
+    }
 }
