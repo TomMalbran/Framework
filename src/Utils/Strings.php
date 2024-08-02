@@ -579,6 +579,18 @@ class Strings {
     }
 
     /**
+     * Transforms a String to CamelCase
+     * @param string $string
+     * @return string
+     */
+    public static function toCamelCase(string $string): string {
+        $result = preg_replace("/[.:;-_]+/", "", $string);
+        $result = ucwords($result);
+        $result = str_replace(" ", "", $result);
+        return lcfirst($result);
+    }
+
+    /**
      * Transforms the first Character to LowerCase
      * @param string $string
      * @return string
