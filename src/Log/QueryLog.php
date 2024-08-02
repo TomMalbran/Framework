@@ -85,12 +85,12 @@ class QueryLog {
 
     /**
      * Creates or edits a Query
-     * @param integer $time
+     * @param float   $time
      * @param string  $expression
      * @param array{} $params
      * @return boolean
      */
-    public static function createOrEdit(int $time, string $expression, array $params): bool {
+    public static function createOrEdit(float $time, string $expression, array $params): bool {
         if (!self::schema()->tableExists()) {
             return false;
         }
