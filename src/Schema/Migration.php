@@ -4,6 +4,7 @@ namespace Framework\Schema;
 use Framework\Framework;
 use Framework\System\SettingCode;
 use Framework\File\File;
+use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Structure;
 use Framework\Utils\Arrays;
@@ -16,13 +17,13 @@ class Migration {
 
     /**
      * Migrates the Tables
-     * @param array{}[] $schemas
-     * @param boolean   $canDelete Optional.
+     * @param boolean $canDelete Optional.
      * @return boolean
      */
-    public static function migrate(array $schemas, bool $canDelete = false): bool {
+    public static function migrateData(bool $canDelete = false): bool {
         $db         = Framework::getDatabase();
         $migrations = Framework::loadData(Framework::MigrationsData);
+        $schemas    = Factory::getData();
 
         $moved    = self::moveTables($db, $migrations["movements"]);
         $migrated = self::migrateTables($db, $schemas, $migrations["updates"], $canDelete);

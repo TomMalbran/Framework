@@ -20,10 +20,10 @@ class Generator {
 
 
     /**
-     * Generates the Classes
+     * Generates the Code for the Schemas
      * @return boolean
      */
-    public static function migrate(): bool {
+    public static function generateCode(): bool {
         self::$writePath  = Framework::getPath(Framework::SchemasDir);
         self::$schemaText = Framework::loadFile(Framework::TemplateDir, "Schema.mu");
         self::$entityText = Framework::loadFile(Framework::TemplateDir, "Entity.mu");

@@ -5,7 +5,6 @@ use Framework\Framework;
 use Framework\Schema\Schema;
 use Framework\Schema\Structure;
 use Framework\Schema\SubRequest;
-use Framework\Schema\Migration;
 use Framework\Schema\Database;
 use Framework\Utils\Arrays;
 
@@ -112,17 +111,5 @@ class Factory {
             }
         }
         return $result;
-    }
-
-
-
-    /**
-     * Performs a Migration on the Schema
-     * @param boolean $canDelete Optional.
-     * @return boolean
-     */
-    public static function migrate(bool $canDelete = false): bool {
-        self::load();
-        return Migration::migrate(self::$data, $canDelete);
     }
 }

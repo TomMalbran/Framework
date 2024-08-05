@@ -179,10 +179,10 @@ class SettingCode {
 
 
     /**
-     * Migrates the Settings
+     * Migrates the Settings data
      * @return boolean
      */
-    public static function migrate(): bool {
+    public static function migrateData(): bool {
         $db = Framework::getDatabase();
         if (!$db->hasTable("settings")) {
             return false;

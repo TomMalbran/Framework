@@ -12,7 +12,7 @@ use Framework\File\File;
 use Framework\File\Path;
 use Framework\File\MediaFile;
 use Framework\Log\ErrorLog;
-use Framework\Schema\Factory;
+use Framework\Schema\Migration;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
 use Framework\Utils\JSON;
@@ -375,23 +375,35 @@ class Framework {
 
 
     /**
-     * Runs the Migrations for all the Framework
-     * @param boolean $canDelete Optional.
-     * @param boolean $withPaths Optional.
+     * Generates the Codes for the Framework
      * @return boolean
      */
-    public static function migrate(bool $canDelete = false, bool $withPaths = true): bool {
-        Code::generate();
+    public static function generateCode(): bool {
+        Code::generateCode();
+        Generator::generateCode();
+        return true;
+    }
 
-        Factory::migrate($canDelete);
-        SettingCode::migrate();
-        EmailTemplate::migrate();
-        Generator::migrate();
+    /**
+     * Migrates the Data for the Framework
+     * @param boolean $canDelete Optional.
+     * @return boolean
+     */
+    public static function migrateData(bool $canDelete = false): bool {
+        Migration::migrateData($canDelete);
+        SettingCode::migrateData();
+        EmailTemplate::migrateData();
+        return true;
+    }
 
-        if ($withPaths) {
-            Path::ensurePaths();
-            MediaFile::ensurePaths();
-        }
+
+    /**
+     * Ensures that the Paths are created for the Framework
+     * @return boolean
+     */
+    public static function ensurePaths(): bool {
+        Path::ensurePaths();
+        MediaFile::ensurePaths();
         return true;
     }
 }

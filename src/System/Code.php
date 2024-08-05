@@ -23,7 +23,7 @@ class Code {
      * Generates all the System Codes
      * @return boolean
      */
-    public static function generate(): bool {
+    public static function generateCode(): bool {
         $writePath = Framework::getPath(Framework::SystemDir);
         File::createDir($writePath);
         File::emptyDir($writePath);
