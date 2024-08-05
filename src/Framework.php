@@ -16,7 +16,6 @@ use Framework\Schema\Migration;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
 use Framework\Utils\JSON;
-use Framework\Utils\Server;
 use Framework\Utils\Strings;
 use Exception;
 
@@ -55,6 +54,7 @@ class Framework {
 
     const FilesDir       = "files";
     const TempDir        = "temp";
+    const FTPDir         = "public_ftp";
 
     const NLSDir         = "nls";
     const StringsDir     = "nls/strings";
@@ -153,35 +153,17 @@ class Framework {
     /**
      * Returns the BasePath
      * @param boolean $forFramework Optional.
+     * @param boolean $forBackend   Optional.
      * @return string
      */
-    public static function getBasePath(bool $forFramework = false): string {
+    public static function getBasePath(bool $forFramework = false, bool $forBackend = false): string {
         if ($forFramework) {
             return self::$framePath;
         }
+        if ($forBackend) {
+            return Path::parsePath(self::$basePath, self::$baseDir);
+        }
         return self::$basePath;
-    }
-
-    /**
-     * Returns the FTP Path
-     * @return string
-     */
-    public static function getFTPPath(): string {
-        if (Server::isLocalHost()) {
-            return self::$basePath;
-        }
-        return dirname(self::$basePath) . "/public_ftp";
-    }
-
-    /**
-     * Returns the Private Path
-     * @return string
-     */
-    public static function getPrivatePath(): string {
-        if (Server::isLocalHost()) {
-            return self::$basePath;
-        }
-        return dirname(self::$basePath);
     }
 
     /**
@@ -193,27 +175,9 @@ class Framework {
      */
     public static function getPath(string $dir = "", string $file = "", bool $forFramework = false): string {
         if ($forFramework) {
-            return File::getPath(self::$framePath, $dir, $file);
+            return Path::parsePath(self::$framePath, $dir, $file);
         }
-        return File::getPath(self::$basePath, self::$baseDir, $dir, $file);
-    }
-
-    /**
-     * Returns the FilesPath with the given path parts
-     * @param string ...$pathParts
-     * @return string
-     */
-    public static function getFilesPath(string ...$pathParts): string {
-        return File::getPath(self::$basePath, self::FilesDir, ...$pathParts);
-    }
-
-    /**
-     * Returns the Internal Files Path with the given path parts
-     * @param string ...$pathParts
-     * @return string
-     */
-    public static function getInternalFilesPath(string ...$pathParts): string {
-        return File::getPath(self::$framePath, self::FilesDir, ...$pathParts);
+        return Path::parsePath(self::$basePath, self::$baseDir, $dir, $file);
     }
 
 

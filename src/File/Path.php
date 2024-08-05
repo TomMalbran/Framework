@@ -4,6 +4,7 @@ namespace Framework\File;
 use Framework\Framework;
 use Framework\System\ConfigCode;
 use Framework\File\File;
+use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
 /**
@@ -46,12 +47,133 @@ class Path {
 
 
     /**
-     * Returns the base path used to store the files
+     * Returns the path used to store the files
+     * @param string ...$pathParts
      * @return string
      */
-    public static function getBasePath(): string {
-        return Framework::getFilesPath();
+    public static function parsePath(string ...$pathParts): string {
+        $result = Strings::join($pathParts, "/");
+        while (Strings::contains($result, "//")) {
+            $result = Strings::replace($result, "//", "/");
+        }
+        $result = self::removeLastSlash($result);
+        return $result;
     }
+
+    /**
+     * Adds the last slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function addLastSlash(string $path): string {
+        if (!Strings::endsWith($path, "/")) {
+            return "$path/";
+        }
+        return $path;
+    }
+
+    /**
+     * Adds the first slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function addFirstSlash(string $path): string {
+        if (!Strings::startsWith($path, "/")) {
+            return "/$path";
+        }
+        return $path;
+    }
+
+    /**
+     * Removes the last slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function removeLastSlash(string $path): string {
+        return Strings::stripEnd($path, "/");
+    }
+
+    /**
+     * Removes the first slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function removeFirstSlash(string $path): string {
+        return Strings::stripStart($path, "/");
+    }
+
+
+
+    /**
+     * Returns the base path used to store the files
+     * @param boolean $forFramework Optional.
+     * @param boolean $forBackend   Optional.
+     * @param boolean $forPrivate   Optional.
+     * @return string
+     */
+    public static function getBasePath(bool $forFramework = false, bool $forBackend = false, bool $forPrivate = false): string {
+        $result = Framework::getBasePath($forFramework, $forBackend);
+        if ($forPrivate && !Server::isLocalHost()) {
+            return dirname($result);
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Private Path
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function forPrivate(string ...$pathParts): string {
+        $basePath = self::getBasePath(forPrivate: true);
+        return self::parsePath($basePath, ...$pathParts);
+    }
+
+    /**
+     * Returns the FTP Path
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function forFTP(string ...$pathParts): string {
+        $basePath = self::getBasePath(forPrivate: true);
+        return self::parsePath($basePath, Framework::FTPDir, ...$pathParts);
+    }
+
+    /**
+     * Returns the FilesPath with the given path parts
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function forFiles(string ...$pathParts): string {
+        $basePath = self::getBasePath();
+        return self::parsePath($basePath, Framework::FilesDir, ...$pathParts);
+    }
+
+    /**
+     * Returns the Internal Files Path with the given path parts
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function forInternalFiles(string ...$pathParts): string {
+        $basePath = self::getBasePath(forBackend: true);
+        return self::parsePath($basePath, Framework::FilesDir, ...$pathParts);
+    }
+
+    /**
+     * Returns the path used to store the files
+     * @param string $pathKey
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function forPathKey(string $pathKey, string ...$pathParts): string {
+        $path = self::get($pathKey);
+        if (!empty($path)) {
+            return self::forFiles($path, ...$pathParts);
+        }
+        return "";
+    }
+
+
 
     /**
      * Returns the directory used to store the files
@@ -62,21 +184,7 @@ class Path {
     public static function getDir(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
-            return File::getPath(Framework::FilesDir, $path, ...$pathParts);
-        }
-        return "";
-    }
-
-    /**
-     * Returns the path used to store the files
-     * @param string $pathKey
-     * @param string ...$pathParts
-     * @return string
-     */
-    public static function getPath(string $pathKey, string ...$pathParts): string {
-        $path = self::get($pathKey);
-        if (!empty($path)) {
-            return Framework::getFilesPath($path, ...$pathParts);
+            return self::parsePath(Framework::FilesDir, $path, ...$pathParts);
         }
         return "";
     }
@@ -110,7 +218,7 @@ class Path {
      * @return boolean
      */
     public static function exists(string $pathKey, string ...$pathParts): bool {
-        $path = self::getPath($pathKey, ...$pathParts);
+        $path = self::forPathKey($pathKey, ...$pathParts);
         return File::exists($path);
     }
 
@@ -123,7 +231,7 @@ class Path {
      * @return string
      */
     public static function getTempPath(int $credentialID, bool $create = true): string {
-        $path   = self::getPath(Framework::TempDir, $credentialID);
+        $path   = self::forPathKey(Framework::TempDir, $credentialID);
         $exists = File::exists($path);
 
         if (!$exists && $create) {
@@ -157,7 +265,7 @@ class Path {
             return false;
         }
         foreach (array_keys(self::$data["paths"]) as $pathKey) {
-            $path = self::getPath($pathKey);
+            $path = self::forPathKey($pathKey);
             if (File::createDir($path)) {
                 $paths[] = $pathKey;
             }

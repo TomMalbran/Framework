@@ -4,6 +4,7 @@ namespace Framework\System;
 use Framework\Framework;
 use Framework\System\VariableType;
 use Framework\File\File;
+use Framework\File\Path;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
@@ -42,7 +43,7 @@ class ConfigCode {
         $data       = self::loadENV($path, ".env");
 
         $currentUrl = Server::getUrl();
-        $currentUrl = File::addLastSlash($currentUrl);
+        $currentUrl = Path::addLastSlash($currentUrl);
         $replace    = [];
 
         foreach (self::$environments as $environment) {
@@ -230,8 +231,8 @@ class ConfigCode {
      */
     public static function getUrl(string $urlKey, string ...$urlParts): string {
         $url  = self::get($urlKey, self::get("url"));
-        $path = File::getPath(...$urlParts);
-        $path = File::removeFirstSlash($path);
+        $path = Path::parsePath(...$urlParts);
+        $path = Path::removeFirstSlash($path);
         return $url . $path;
     }
 

@@ -70,8 +70,8 @@ class MediaFile {
                 "new" => $newPath,
             ],
             [
-                "old" => File::addFirstSlash($oldPath),
-                "new" => File::addFirstSlash($newPath),
+                "old" => Path::addFirstSlash($oldPath),
+                "new" => Path::addFirstSlash($newPath),
             ],
         ];
 
@@ -103,7 +103,7 @@ class MediaFile {
      * @return string
      */
     public static function getPath(string ...$pathParts): string {
-        return Framework::getFilesPath(self::Source, self::$id, ...$pathParts);
+        return Path::forFiles(self::Source, self::$id, ...$pathParts);
     }
 
     /**
@@ -112,7 +112,7 @@ class MediaFile {
      * @return string
      */
     private static function getThumbPath(string ...$pathParts): string {
-        return Framework::getFilesPath(self::Thumbs, self::$id, ...$pathParts);
+        return Path::forFiles(self::Thumbs, self::$id, ...$pathParts);
     }
 
     /**
@@ -156,7 +156,7 @@ class MediaFile {
         $path   = !empty($path) && self::exists($basePath, $path) ? $path : "";
         $source = self::getPath($basePath, $path);
         $files  = File::getAllInDir($source);
-        $source = File::addLastSlash($source);
+        $source = Path::addLastSlash($source);
         $list   = new FileList();
 
         foreach ($files as $file) {
@@ -166,7 +166,7 @@ class MediaFile {
                 $sourcePath = self::getPath($basePath, $path, $fileName);
                 $sourceUrl  = self::getUrl($basePath, $path, $fileName);
                 $thumbUrl   = self::getThumbUrl($basePath, $path, $fileName);
-                $filePath   = File::getPath($path, $fileName);
+                $filePath   = Path::parsePath($path, $fileName);
                 $list->add($fileName, $filePath, $isDir, $sourcePath, $sourceUrl, $thumbUrl);
             }
         }
@@ -176,7 +176,7 @@ class MediaFile {
 
         return [
             "list" => $list->getSorted(),
-            "path" => File::removeFirstSlash($path),
+            "path" => Path::removeFirstSlash($path),
         ];
     }
 
@@ -221,7 +221,7 @@ class MediaFile {
      * @return boolean
      */
     public static function deletePath(string ...$pathParts): bool {
-        $relPath = File::getPath(...$pathParts);
+        $relPath = Path::parsePath(...$pathParts);
         $source  = self::getPath(...$pathParts);
         $thumbs  = self::getThumbPath(...$pathParts);
 
@@ -264,8 +264,8 @@ class MediaFile {
      * @return boolean
      */
     private static function updatePath(string $oldPath, string $newPath, string $oldName, string $newName): bool {
-        $oldRelPath = File::removeFirstSlash(File::getPath($oldPath, $oldName));
-        $newRelPath = File::removeFirstSlash(File::getPath($newPath, $newName));
+        $oldRelPath = Path::removeFirstSlash(Path::parsePath($oldPath, $oldName));
+        $newRelPath = Path::removeFirstSlash(Path::parsePath($newPath, $newName));
         $oldSource  = self::getPath($oldPath, $oldName);
         $newSource  = self::getPath($newPath, $newName);
         $oldThumbs  = self::getThumbPath($oldPath, $oldName);
@@ -298,19 +298,19 @@ class MediaFile {
         }
 
         foreach ($paths as $pathDir) {
-            $path = Framework::getFilesPath($pathDir);
+            $path = Path::forFiles($pathDir);
             if (File::createDir($path)) {
                 $result[] = $pathDir;
             }
 
-            $path = Framework::getFilesPath($pathDir, $id);
+            $path = Path::forFiles($pathDir, $id);
             if (File::createDir($path)) {
                 $result[] = "$pathDir/$id";
             }
 
             if (!empty(self::$data["directories"])) {
                 foreach (self::$data["directories"] as $directory) {
-                    $path = Framework::getFilesPath($pathDir, $id, $directory);
+                    $path = Path::forFiles($pathDir, $id, $directory);
                     if (File::createDir($path)) {
                         $result[] = "$pathDir/$id/$directory";
                     }
