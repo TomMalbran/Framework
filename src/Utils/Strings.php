@@ -843,4 +843,20 @@ class Strings {
         preg_match($emojis, $string, $matches);
         return !empty($matches);
     }
+
+    /**
+     * Converts the Encoding from HTML to UTF8 of the given String
+     * @param string $string
+     * @return string
+     */
+    public static function convertEncoding(string $string): string {
+        return mb_encode_numericentity(
+            htmlspecialchars_decode(
+                htmlentities($string, ENT_NOQUOTES, "UTF-8", false),
+                ENT_NOQUOTES
+            ),
+            [ 0x80, 0x10FFFF, 0, ~0 ],
+            "UTF-8"
+        );
+    }
 }
