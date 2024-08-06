@@ -89,18 +89,18 @@ class TimeTable {
             return false;
         }
 
-        $weekDay = DateTime::getDayOfWeek($timeStamp, $startMonday);
-        $now     = DateTime::timeStampToMinutes($timeStamp);
+        $weekDay    = DateTime::getDayOfWeek($timeStamp, $startMonday);
+        $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
 
         foreach ($timeTables as $timeTable) {
             if (!Arrays::contains($timeTable["days"], $weekDay)) {
                 continue;
             }
 
-            $from = DateTime::timeToMinutes($timeTable["from"]);
-            $to   = DateTime::timeToMinutes($timeTable["to"]) - $minuteGap;
+            $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
+            $toMinutes   = DateTime::timeToMinutes($timeTable["to"]) - $minuteGap;
 
-            if ($now >= $from && $now <= $to) {
+            if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
                 return true;
             }
         }
@@ -119,19 +119,20 @@ class TimeTable {
             return 0;
         }
 
-        $result  = 0;
-        $weekDay = DateTime::getDayOfWeek($timeStamp, $startMonday);
-        $now     = DateTime::timeStampToMinutes($timeStamp);
+        $result     = 0;
+        $weekDay    = DateTime::getDayOfWeek($timeStamp, $startMonday);
+        $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
 
         foreach ($timeTables as $timeTable) {
             if (!Arrays::contains($timeTable["days"], $weekDay)) {
                 continue;
             }
 
-            $from = DateTime::timeToMinutes($timeTable["from"]);
-            $to   = DateTime::timeToMinutes($timeTable["to"]);
-            if ($now >= $from && $now <= $to) {
-                $result = DateTime::getDayStart() + $to * 60;
+            $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
+            $toMinutes   = DateTime::timeToMinutes($timeTable["to"]);
+            if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
+                $result = DateTime::getDayStart($timeStamp);
+                $result = DateTime::addMinutes($result, $toMinutes);
                 break;
             }
         }
