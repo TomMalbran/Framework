@@ -22,6 +22,19 @@ class File {
         return !empty($fullPath) && file_exists($fullPath);
     }
 
+    /**
+     * Returns the modified time of a file
+     * @param string ...$pathParts
+     * @return integer
+     */
+    public static function getModifiedTime(string ...$pathParts): int {
+        $fullPath = Path::parsePath(...$pathParts);
+        if (empty($fullPath) || !file_exists($fullPath)) {
+            return 0;
+        }
+        return filemtime($fullPath);
+    }
+
 
 
     /**
