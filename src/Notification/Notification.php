@@ -12,8 +12,11 @@ class Notification {
 
     public const BaseUrl = "https://onesignal.com/api/v1";
 
-    private static bool   $loaded = false;
-    private static object $config;
+    private static bool   $loaded   = false;
+    private static bool   $isActive = false;
+    private static string $icon     = "";
+    private static string $appID    = "";
+    private static string $restKey  = "";
 
 
     /**
@@ -25,8 +28,12 @@ class Notification {
             return false;
         }
 
-        self::$loaded = true;
-        self::$config = ConfigCode::getObject("onesignal");
+        self::$loaded   = true;
+        self::$isActive = ConfigCode::getBoolean("notificationIsActive");
+        self::$icon     = ConfigCode::getString("notificationIcon");
+
+        self::$appID    = ConfigCode::getString("onesignalAppId");
+        self::$restKey  = ConfigCode::getString("onesignalRestKey");
         return true;
     }
 
@@ -94,17 +101,17 @@ class Notification {
      */
     private static function send(string $title, string $body, string $url, string $type, int $dataID, array $params): ?string {
         self::load();
-        if (!self::$config->isActive) {
+        if (!self::$isActive) {
             return null;
         }
 
         $icon = "";
-        if (!empty(self::$config->icon)) {
-            $icon = Path::forInternalFiles(self::$config->icon);
+        if (!empty(self::$icon)) {
+            $icon = Path::forInternalFiles(self::$icon);
         }
 
         $data = [
-            "app_id"         => self::$config->appId,
+            "app_id"         => self::$appID,
             "headings"       => [ "en" => $title ],
             "contents"       => [ "en" => $body  ],
             "url"            => ConfigCode::getUrl("url", $url),
@@ -119,7 +126,7 @@ class Notification {
 
         $headers = [
             "Content-Type"  => "application/json; charset=utf-8",
-            "Authorization" => "Basic " . self::$config->restKey,
+            "Authorization" => "Basic " . self::$restKey,
         ];
         $response = Curl::post(self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
 
