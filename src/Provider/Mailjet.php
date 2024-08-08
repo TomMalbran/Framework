@@ -80,6 +80,6 @@ class Mailjet {
         if (!empty($response["Messages"][0])) {
             return $response["Messages"][0]["Status"] == "success";
         }
-        return $response["email"];
+        return false;
     }
 }
