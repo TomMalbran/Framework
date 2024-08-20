@@ -74,6 +74,15 @@ class Schema {
         return $this->db->tableExists($this->structure->table);
     }
 
+    /**
+     * Returns true if the Schema has a Primary Key
+     * @return boolean
+     */
+    public function hasPrimaryKey(): bool {
+        $keys = $this->db->getPrimaryKeys($this->structure->table);
+        return !empty($keys);
+    }
+
 
 
     /**

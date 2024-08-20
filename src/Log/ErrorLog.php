@@ -170,6 +170,11 @@ class ErrorLog {
      * @return boolean
      */
     public static function handler(int $code, string $description, string $filePath = "", int $line = 0): bool {
+        $schema = self::schema();
+        if (!$schema->hasPrimaryKey()) {
+            return false;
+        }
+
         [ $error, $level ] = self::getErrorCode($code);
 
         $filePath    = self::getFilePath($filePath);
