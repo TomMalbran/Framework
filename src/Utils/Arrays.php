@@ -65,6 +65,22 @@ class Arrays {
     }
 
     /**
+     * Returns the max value of the given array
+     * @param mixed $array
+     * @return integer
+     */
+    public static function max(mixed $array): int {
+        $length = self::length($array);
+        if ($length > 1) {
+            return max(...$array);
+        }
+        if ($length === 1) {
+            return (int)$array[0];
+        }
+        return !empty($array) ? (int)$array : 0;
+    }
+
+    /**
      * Returns true if the array contains the needle
      * @param mixed      $array
      * @param mixed      $needle
