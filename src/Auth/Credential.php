@@ -299,7 +299,7 @@ class Credential {
             $fields = $row;
             $fields["credentialName"] = self::getName($row);
 
-            if (!empty($row["avatar"]) && Path::exists("avatars", $row["avatar"])) {
+            if (!empty($row["avatar"])) {
                 $fields["avatarFile"] = $row["avatar"];
                 $fields["avatar"]     = Path::getUrl("avatars", $row["avatar"]);
             }
