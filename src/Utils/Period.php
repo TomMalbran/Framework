@@ -82,6 +82,16 @@ class Period {
     }
 
     /**
+     * Creates a new Period instance from the given Period
+     * @param string $period
+     * @return Period
+     */
+    public static function createFromPeriod(string $period): Period {
+        $data = new Request([ "period" => $period ]);
+        return new Period($data);
+    }
+
+    /**
      * Returns true if the Period is empty
      * @return boolean
      */
@@ -168,6 +178,14 @@ class Period {
         }
 
         return DateTime::toServerTime($result);
+    }
+
+    /**
+     * Returns the amount of days in the Period
+     * @return integer
+     */
+    public function getDaysAmount(): int {
+        return self::getDays($this->period);
     }
 
 
