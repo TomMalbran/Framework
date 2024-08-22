@@ -1233,6 +1233,10 @@ class DateTime {
             }
         }
 
+        if ($year > 2100) {
+            return 0;
+        }
+
         return mktime(0, 0, 0, $month, $day, $year);
     }
 
@@ -1279,7 +1283,8 @@ class DateTime {
                 $year = (int)"20$number";
             }
         }
-        if (empty($day)) {
+
+        if (empty($day) || $year > 2100) {
             return 0;
         }
 
