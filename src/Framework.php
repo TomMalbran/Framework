@@ -151,6 +151,14 @@ class Framework {
     }
 
     /**
+     * Returns the BaseDir
+     * @return string
+     */
+    public static function getBaseDir(): string {
+        return self::$baseDir;
+    }
+
+    /**
      * Returns the BasePath
      * @param boolean $forFramework Optional.
      * @param boolean $forBackend   Optional.
@@ -359,7 +367,6 @@ class Framework {
         EmailTemplate::migrateData();
         return true;
     }
-
 
     /**
      * Ensures that the Paths are created for the Framework

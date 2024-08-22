@@ -176,6 +176,16 @@ class Path {
 
 
     /**
+     * Returns the directory used for the internal files
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function getInternalDir(string ...$pathParts): string {
+        $baseDir = Framework::getBaseDir();
+        return self::parsePath($baseDir, Framework::FilesDir, ...$pathParts);
+    }
+
+    /**
      * Returns the directory used to store the files
      * @param string $pathKey
      * @param string ...$pathParts
@@ -189,12 +199,24 @@ class Path {
         return "";
     }
 
+
+
     /**
      * Returns the base url
      * @return string
      */
     public static function getBaseUrl(): string {
         return ConfigCode::getUrl("fileUrl", Framework::FilesDir);
+    }
+
+    /**
+     * Returns the url for the given internal path
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function getInternalUrl(string ...$pathParts): string {
+        $baseDir = Framework::getBaseDir();
+        return ConfigCode::getUrl("url", $baseDir, Framework::FilesDir, ...$pathParts);
     }
 
     /**

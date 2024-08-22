@@ -80,7 +80,7 @@ class Email {
         $body = Mustache::render(self::$template, [
             "url"      => self::$url,
             "name"     => self::$config->name,
-            "files"    => Path::forInternalFiles(),
+            "files"    => Path::getInternalUrl(),
             "logo"     => $logo,
             "siteName" => self::$config->name,
             "message"  => $message,
