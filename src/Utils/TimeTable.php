@@ -140,6 +140,42 @@ class TimeTable {
         return $result;
     }
 
+    /**
+     * Returns the next start time for the given Time Tables
+     * @param array{}[] $timeTables
+     * @param integer   $timeStamp   Optional.
+     * @param boolean   $startMonday Optional.
+     * @return integer
+     */
+    public static function getNextStartTime(array $timeTables, int $timeStamp = 0, bool $startMonday = false): int {
+        if (empty($timeTables)) {
+            return 0;
+        }
+
+        $maxDay    = $startMonday ? 8 : 7;
+        $weekStart = DateTime::getWeekStart($timeStamp, 0, $startMonday, false);
+        $result    = 0;
+
+        foreach ($timeTables as $timeTable) {
+            $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
+
+            foreach ($timeTable["days"] as $day) {
+                if ($day >= $maxDay) {
+                    continue;
+                }
+
+                $newTime = DateTime::addDays($weekStart, $day);
+                $newTime = DateTime::addMinutes($newTime, $fromMinutes);
+
+                if ($newTime >= time() && ($result === 0 || $newTime <= $result)) {
+                    $result = $newTime;
+                }
+            }
+        }
+
+        return $result;
+    }
+
 
 
     /**
