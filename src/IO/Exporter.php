@@ -4,9 +4,9 @@ namespace Framework\IO;
 use Framework\Request;
 use Framework\NLS\NLS;
 use Framework\IO\ExporterWriter;
+use Framework\IO\XLSXWriter;
 use Framework\IO\SpreadsheetWriter;
 use Framework\IO\CSVWriter;
-use Framework\IO\XLSXWriter;
 use Framework\Utils\Elements;
 
 /**
@@ -26,7 +26,7 @@ class Exporter {
 
 
     /**
-     * Creates a new Spreadsheet instance
+     * Creates a new Exporter instance
      * @param integer $total
      * @param string  $title
      * @param string  $fileName
@@ -38,9 +38,9 @@ class Exporter {
         $this->total    = $total;
         $this->header   = new Elements();
 
-        if (empty($maxLines)) {
+        if (XLSXWriter::isAvailable()) {
             $this->writer = new XLSXWriter($title, $this->fileName, $lang);
-        } elseif ($total < $maxLines) {
+        } elseif (SpreadsheetWriter::isAvailable($total, $maxLines)) {
             $this->writer = new SpreadsheetWriter($title, $lang);
         } else {
             $this->writer = new CSVWriter($this->fileName, $lang);

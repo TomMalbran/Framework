@@ -41,6 +41,16 @@ class SpreadsheetWriter implements ExporterWriter {
         $this->addSheet();
     }
 
+    /**
+     * Returns true if the SpreadsheetWriter is available
+     * @param integer $total
+     * @param integer $maxLines Optional.
+     * @return boolean
+     */
+    public static function isAvailable(int $total, int $maxLines = 5000): bool {
+        return class_exists(Spreadsheet::class) && $total < $maxLines;
+    }
+
 
 
     /**

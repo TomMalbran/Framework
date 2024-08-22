@@ -41,6 +41,14 @@ class XLSXWriter implements ExporterWriter {
         $sheet->setName($this->title);
     }
 
+    /**
+     * Returns true if the XLSXWriter is available
+     * @return boolean
+     */
+    public static function isAvailable(): bool {
+        return class_exists(Writer::class);
+    }
+
 
 
     /**
