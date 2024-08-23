@@ -1088,13 +1088,14 @@ class DateTime {
 
     /**
      * Converts a Time Stamp to Minutes
-     * @param string     $timeStamp
+     * @param integer    $timeStamp
      * @param float|null $timeZone  Optional.
      * @return integer
      */
-    public static function timeStampToMinutes(string $timeStamp, ?float $timeZone = null): int {
-        $hours   = (int)date("H", $timeStamp);
-        $minutes = (int)date("i", $timeStamp);
+    public static function timeStampToMinutes(int $timeStamp, ?float $timeZone = null): int {
+        $timeStamp = self::getTime($timeStamp);
+        $hours     = (int)date("H", $timeStamp);
+        $minutes   = (int)date("i", $timeStamp);
         return self::toMinutes($hours, $minutes, $timeZone);
     }
 
