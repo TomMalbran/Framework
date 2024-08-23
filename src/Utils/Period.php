@@ -101,9 +101,10 @@ class Period {
 
     /**
      * Returns the From Time depending on the period
+     * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public function getFromTime(): int {
+    public function getFromTime(bool $useTimeZone = true): int {
         $day    = date("j");
         $date   = date("N");
         $month  = date("n");
@@ -129,14 +130,15 @@ class Period {
             default           => 0,
         };
 
-        return DateTime::toServerTime($result);
+        return DateTime::toServerTime($result, $useTimeZone);
     }
 
     /**
      * Returns the To Time depending on the period
+     * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public function getToTime(): int {
+    public function getToTime(bool $useTimeZone = true): int {
         $month  = date("n");
         $day    = date("j");
         $date   = date("N");
@@ -177,7 +179,7 @@ class Period {
         default:
         }
 
-        return DateTime::toServerTime($result);
+        return DateTime::toServerTime($result, $useTimeZone);
     }
 
     /**
