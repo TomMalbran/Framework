@@ -1,20 +1,28 @@
 <?php
 namespace Framework\IO;
 
+use Framework\IO\ImporterReader;
+use Framework\IO\ImporterData;
 use Framework\Utils\Arrays;
+use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+
 use Exception;
+use Iterator;
 
 /**
  * The Spreadsheet Reader
  */
-class SpreadsheetReader {
+class SpreadsheetReader implements ImporterReader, Iterator {
 
     private ?Worksheet $sheet;
-    private ?string    $columns;
+
+    private int        $index   = 0;
+    private int        $rows    = 0;
+    private string     $columns = "";
 
 
     /**
@@ -33,11 +41,80 @@ class SpreadsheetReader {
     }
 
     /**
-     * Returns true if the Sheet is valid
+     * Returns true if the SpreadsheetReader is available
+     * @return boolean
+     */
+    public static function isAvailable(): bool {
+        return class_exists(Worksheet::class);
+    }
+
+
+
+    /**
+     * Returns true if the Reader is valid
      * @return boolean
      */
     public function isValid(): bool {
         return $this->sheet !== null;
+    }
+
+    /**
+     * Returns some data
+     * @param integer $amount
+     * @return ImporterData
+     */
+    public function getData(int $amount = 3): ImporterData {
+        $data = new ImporterData(
+            columns: $this->getHeader(),
+            amount:  1,
+            first:   "",
+            last:    "",
+        );
+        if (!$this->isValid()) {
+            return $data;
+        }
+
+        $colAmount = $this->getHighestColumn();
+        $rowAmount = $this->getHighestRow();
+        $rows      = [
+            "first" => $this->getRow(2, "A", $colAmount),
+            "last"  => $this->getRow($rowAmount, "A", $colAmount),
+        ];
+
+        foreach ($rows as $index => $row) {
+            if (empty($row)) {
+                continue;
+            }
+            $fields = [];
+            for ($i = 0; $i < $amount; $i++) {
+                if (!empty($row[$i])) {
+                    $fields[] = $row[$i];
+                }
+            }
+            $data->$index = Strings::join($fields, " - ");
+        }
+
+        $data->amount = $rowAmount;
+        return $data;
+    }
+
+    /**
+     * Returns the Header
+     * @return Select[]
+     */
+    public function getHeader(): array {
+        $columns = [];
+        if (!$this->isValid()) {
+            return $columns;
+        }
+
+        $colAmount = $this->getHighestColumn();
+        $headerRow = $this->getRow(1, "A", $colAmount);
+
+        foreach ($headerRow as $key => $value) {
+            $columns[] = new Select($key + 1, $value);
+        }
+        return $columns;
     }
 
 
@@ -46,7 +123,7 @@ class SpreadsheetReader {
      * Returns the Highest Sheet column, removing the empty ones
      * @return string
      */
-    public function getHighestColumn(): string {
+    private function getHighestColumn(): string {
         if (empty($this->sheet)) {
             return "";
         }
@@ -69,7 +146,7 @@ class SpreadsheetReader {
      * Returns the Highest Sheet row, removing the empty ones
      * @return integer
      */
-    public function getHighestRow(): int {
+    private function getHighestRow(): int {
         if (empty($this->sheet)) {
             return 0;
         }
@@ -91,90 +168,69 @@ class SpreadsheetReader {
     /**
      * Returns the Row from the current Sheet
      * @param integer $row
-     * @param string  $from Optional.
-     * @param string  $to   Optional.
+     * @param string  $from
+     * @param string  $to
      * @return mixed[]
      */
-    public function getRow(int $row, string $from = "A", string $to = ""): array {
-        if (empty($this->sheet)) {
-            return [];
-        }
-
-        if (empty($to)) {
-            if (empty($this->columns)) {
-                $this->columns = $this->getHighestColumn();
-            }
-            $to = $this->columns;
-        }
-        if (empty($from) || empty($to)) {
+    private function getRow(int $row, string $from, string $to): array {
+        if (!$this->isValid() || (empty($from) && empty($to))) {
             return [];
         }
 
         try {
-            $row = $this->sheet->rangeToArray("{$from}{$row}:{$to}{$row}", null, true, false);
+            $row = $this->sheet->rangeToArray(
+                "{$from}{$row}:{$to}{$row}",
+                nullValue: "",
+                calculateFormulas: true,
+                formatData: false,
+            );
         } catch (Exception $e) {
             return [];
         }
         return $row[0];
     }
 
+
+
     /**
-     * Returns the Header
-     * @return array{}[]
+     * Starts the Iterator
+     * @return void
      */
-    public function getHeader(): array {
-        $columns = [];
-        if (!$this->isValid()) {
-            return $columns;
-        }
-
-        $colAmount = $this->getHighestColumn();
-        $headerRow = $this->getRow(1, "A", $colAmount);
-
-        foreach ($headerRow as $key => $value) {
-            $columns[] = [
-                "key"   => $key,
-                "value" => $value,
-            ];
-        }
-        return $columns;
+    public function rewind(): void {
+        $this->index   = 2;
+        $this->rows    = $this->getHighestRow();
+        $this->columns = $this->getHighestColumn();
     }
 
     /**
-     * Returns some data
-     * @param integer $amount
-     * @return array{}
+     * Returns the current Row
+     * @return mixed[]
      */
-    public function getData(int $amount = 3): array {
-        $values = [
-            "columns" => $this->getHeader(),
-            "amount"  => $this->getHighestRow(),
-            "first"   => "",
-            "last"    => "",
-        ];
-        if (!$this->isValid()) {
-            return $values;
-        }
+    public function current(): array {
+        return $this->getRow($this->index, "A", $this->columns);
+    }
 
-        $colAmount = $this->getHighestColumn();
-        $rowAmount = $this->getHighestRow();
-        $rows      = [
-            "first" => $this->getRow(2, "A", $colAmount),
-            "last"  => $this->getRow($rowAmount, "A", $colAmount),
-        ];
+    /**
+     * Returns the current Key
+     * @return integer
+     */
+    public function key(): int {
+        return $this->index;
+    }
 
-        foreach ($rows as $index => $row) {
-            if (empty($row)) {
-                continue;
-            }
-            $fields = [];
-            for ($i = 0; $i < $amount; $i++) {
-                if (!empty($row[$i])) {
-                    $fields[] = $row[$i];
-                }
-            }
-            $values[$index] = Strings::join($fields, " - ");
-        }
-        return $values;
+    /**
+     * Moves to the next Row
+     * @return void
+     */
+    public function next(): void {
+        $this->index++;
+    }
+
+    /**
+     * Returns true if the current Row is valid
+     * @return boolean
+     */
+    public function valid(): bool {
+        return $this->index < $this->rows;
     }
 }

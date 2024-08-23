@@ -6,8 +6,7 @@ use Framework\Utils\Elements;
 /**
  * The Exporter Writer
  */
-interface ExporterWriter
-{
+interface ExporterWriter {
 
     /**
      * Writes the Header

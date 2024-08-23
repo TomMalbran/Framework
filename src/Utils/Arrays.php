@@ -788,22 +788,4 @@ class Arrays {
         }
         return $default;
     }
-
-    /**
-     * Returns the Field Value using the given Columns and Key
-     * @param array{} $fields
-     * @param array{} $columns
-     * @param string  $key
-     * @param boolean $splitResult Optional.
-     * @return string[]|string
-     */
-    public static function getImportValue(array $fields, array $columns, string $key, bool $splitResult = false): array|string {
-        $result = "";
-        if (!isset($columns[$key]) || !isset($fields[$columns[$key]])) {
-            $result = "";
-        } elseif (!empty($fields[$columns[$key]]) || $fields[$columns[$key]] === "0") {
-            $result = $fields[$columns[$key]];
-        }
-        return $splitResult ? Strings::split($result, ",", true, true) : $result;
-    }
 }
