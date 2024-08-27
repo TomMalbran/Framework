@@ -153,6 +153,7 @@ class TimeTable {
         }
 
         $maxDay    = $startMonday ? 8 : 7;
+        $timeStamp = DateTime::getTime($timeStamp);
         $weekStart = DateTime::getWeekStart($timeStamp, 0, $startMonday, false);
         $result    = 0;
 
@@ -167,7 +168,7 @@ class TimeTable {
                 $newTime = DateTime::addDays($weekStart, $day);
                 $newTime = DateTime::addMinutes($newTime, $fromMinutes);
 
-                if ($newTime >= time() && ($result === 0 || $newTime <= $result)) {
+                if ($newTime >= $timeStamp && ($result === 0 || $newTime <= $result)) {
                     $result = $newTime;
                 }
             }
