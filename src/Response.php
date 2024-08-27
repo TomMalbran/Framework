@@ -127,11 +127,13 @@ class Response {
      * Returns a success response
      * @param string                   $success
      * @param ArrayAccess|array{}|null $data    Optional.
+     * @param string                   $param   Optional.
      * @return Response
      */
-    public static function success(string $success, ArrayAccess|array|null $data = null): Response {
+    public static function success(string $success, ArrayAccess|array|null $data = null, string $param = ""): Response {
         return new Response([
             "success" => $success,
+            "param"   => $param,
             "data"    => $data,
         ]);
     }
@@ -140,11 +142,13 @@ class Response {
      * Returns a warning response
      * @param string                   $warning
      * @param ArrayAccess|array{}|null $data    Optional.
+     * @param string                   $param   Optional.
      * @return Response
      */
-    public static function warning(string $warning, ArrayAccess|array|null $data = null): Response {
+    public static function warning(string $warning, ArrayAccess|array|null $data = null, string $param = ""): Response {
         return new Response([
             "warning" => $warning,
+            "param"   => $param,
             "data"    => $data,
         ]);
     }
@@ -153,9 +157,10 @@ class Response {
      * Returns an error response
      * @param Errors|string            $error
      * @param ArrayAccess|array{}|null $data  Optional.
+     * @param string                   $param Optional.
      * @return Response
      */
-    public static function error(Errors|string $error, ArrayAccess|array|null $data = null): Response {
+    public static function error(Errors|string $error, ArrayAccess|array|null $data = null, string $param = ""): Response {
         if (Arrays::isArray($error)) {
             return new Response([
                 "errors" => $error,
@@ -167,6 +172,7 @@ class Response {
             if ($error->has("global")) {
                 return new Response([
                     "error" => $error->global,
+                    "param" => $param,
                     "data"  => $data,
                 ]);
             }
@@ -178,6 +184,7 @@ class Response {
 
         return new Response([
             "error" => $error,
+            "param" => $param,
             "data"  => $data,
         ]);
     }
