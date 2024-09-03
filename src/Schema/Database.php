@@ -748,6 +748,50 @@ class Database {
     }
 
     /**
+     * Returns true if a Column exists
+     * @param string $tableName
+     * @param string $column
+     * @return boolean
+     */
+    public function columnExists(string $tableName, string $column): bool {
+        $type = $this->getColumnType($tableName, $column);
+        return !empty($type);
+    }
+
+    /**
+     * Returns the Column Type
+     * @param string $tableName
+     * @param string $column
+     * @return string
+     */
+    public function getColumnType(string $tableName, string $column): string {
+        $sql    = "SHOW COLUMNS FROM $tableName LIKE '$column'";
+        $result = $this->query($sql);
+        return !empty($result) ? $this->parseColumnType($result[0]) : "";
+    }
+
+    /**
+     * Parses the Column Type
+     * @param array{} $data
+     * @return string
+     */
+    public function parseColumnType(array $data): string {
+        $result = $data["Type"];
+        if ($data["Null"] === "NO") {
+            $result .= " NOT NULL";
+        } else {
+            $result .= " NULL";
+        }
+        if ($data["Default"] !== NULL) {
+            $result .= " DEFAULT '{$data["Default"]}'";
+        }
+        if (!empty($data["Extra"])) {
+            $result .= " " . Strings::toUpperCase($data["Extra"]);
+        }
+        return $result;
+    }
+
+    /**
      * Renames a Column from the Table
      * @param string      $tableName
      * @param string      $column
@@ -767,11 +811,15 @@ class Database {
      * @param string $tableName
      * @param string $oldColumn
      * @param string $newColumn
-     * @param string $type
+     * @param string $type      Optional.
      * @return string
      */
-    public function renameColumn(string $tableName, string $oldColumn, string $newColumn, string $type): string {
-        $sql = "ALTER TABLE $tableName CHANGE `$oldColumn` `$newColumn` $type";
+    public function renameColumn(string $tableName, string $oldColumn, string $newColumn, string $type = ""): string {
+        if (empty($type)) {
+            $sql = "ALTER TABLE $tableName RENAME COLUMN `$oldColumn` TO `$newColumn`";
+        } else {
+            $sql = "ALTER TABLE $tableName CHANGE `$oldColumn` `$newColumn` $type";
+        }
         $this->query($sql);
         return $sql;
     }

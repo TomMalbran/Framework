@@ -22,19 +22,21 @@ class Migration {
      */
     public static function migrateData(bool $canDelete = false): bool {
         $db         = Framework::getDatabase();
-        $migrations = Framework::loadData(Framework::MigrationsData);
+        $migrations = Framework::loadData(Framework::MigrationsData, false);
         $schemas    = Factory::getData();
 
-        $moved    = self::moveTables($db, $migrations["movements"]);
-        $migrated = self::migrateTables($db, $schemas, $migrations["updates"], $canDelete);
+        $moved    = self::moveTables($db, $migrations->movements);
+        $renamed  = self::renameColumns($db, $migrations->renames);
+
+        $migrated = self::migrateTables($db, $schemas, $canDelete);
         $extras   = self::extraMigrations($db);
-        return $moved || $migrated || $extras;
+        return $moved || $renamed || $migrated || $extras;
     }
 
     /**
      * Moves the Tables
-     * @param Database  $db
-     * @param array{}[] $movements
+     * @param Database $db
+     * @param object[] $movements
      * @return boolean
      */
     private static function moveTables(Database $db, array $movements): bool {
@@ -43,12 +45,12 @@ class Migration {
         $didMove       = false;
 
         for ($i = $startMovement; $i < $lastMovement; $i++) {
-            $oldName = $movements[$i]["old"];
-            $newName = $movements[$i]["new"];
+            $fromName = $movements[$i]->from;
+            $toName   = $movements[$i]->to;
 
-            if ($db->tableExists($oldName)) {
-                $db->renameTable($oldName, $newName);
-                print("Renamed table <i>$oldName</i> to <b>$newName</b><br>");
+            if ($db->tableExists($fromName)) {
+                $db->renameTable($fromName, $toName);
+                print("Renamed table <i>$fromName</i> to <b>$toName</b><br>");
                 $didMove = true;
             }
         }
@@ -63,14 +65,52 @@ class Migration {
     }
 
     /**
+     * Renames the Table Columns
+     * @param Database $db
+     * @param object[] $renames
+     * @return boolean
+     */
+    private static function renameColumns(Database $db, array $renames): bool {
+        $startRename = SettingCode::getCore($db, "rename");
+        $lastRename  = count($renames);
+        $didRename   = false;
+
+        for ($i = $startRename; $i < $lastRename; $i++) {
+            $table    = $renames[$i]->table;
+            $fromName = $renames[$i]->from;
+            $toName   = $renames[$i]->to;
+
+            if (!$db->tableExists($table)) {
+                continue;
+            }
+
+            $type = $db->getColumnType($table, $fromName);
+            if (empty($type)) {
+                continue;
+            }
+
+            $db->renameColumn($table, $fromName, $toName, $type);
+            print("Renamed column <i>$fromName</i> to <b>$toName</b> in table <u>$table</u><br>");
+            $didRename = true;
+        }
+
+        if ($didRename) {
+            print("<br>");
+        } else {
+            print("No <i>column renames</i> required<br><br>");
+        }
+        SettingCode::setCore($db, "rename", $lastRename);
+        return $didRename;
+    }
+
+    /**
      * Migrates the Tables
      * @param Database  $db
      * @param array{}[] $schemas
-     * @param array{}[] $updates
      * @param boolean   $canDelete Optional.
      * @return boolean
      */
-    private static function migrateTables(Database $db, array $schemas, array $updates, bool $canDelete = false): bool {
+    private static function migrateTables(Database $db, array $schemas, bool $canDelete = false): bool {
         $tableNames  = $db->getTables();
         $schemaNames = [];
         $didMigrate  = false;
@@ -84,8 +124,7 @@ class Migration {
             if (!Arrays::contains($tableNames, $structure->table)) {
                 $didUpdate = self::createTable($db, $structure);
             } else {
-                $schemaUpdates = !empty($updates[$structure->table]) ? $updates[$structure->table] : [];
-                $didUpdate     = self::updateTable($db, $structure, $schemaUpdates, $canDelete);
+                $didUpdate = self::updateTable($db, $structure, $canDelete);
             }
             if ($didUpdate) {
                 $didMigrate = true;
@@ -154,15 +193,15 @@ class Migration {
      * Updates the Table
      * @param Database  $db
      * @param Structure $structure
-     * @param array{}[] $updates
      * @param boolean   $canDelete
      * @return boolean
      */
-    private static function updateTable(Database $db, Structure $structure, array $updates, bool $canDelete): bool {
+    private static function updateTable(Database $db, Structure $structure, bool $canDelete): bool {
         $autoKey     = $db->getAutoIncrement($structure->table);
         $primaryKeys = $db->getPrimaryKeys($structure->table);
         $tableKeys   = $db->getTableKeys($structure->table);
         $tableFields = $db->getTableFields($structure->table);
+        $tableFields = Arrays::createMap($tableFields, "Field");
         $update      = false;
         $adds        = [];
         $drops       = [];
@@ -180,8 +219,7 @@ class Migration {
         foreach ($structure->fields as $field) {
             $found  = false;
             $rename = false;
-            foreach ($tableFields as $tableField) {
-                $tableKey = $tableField["Field"];
+            foreach (array_keys($tableFields) as $tableKey) {
                 if (Strings::isEqual($field->key, $tableKey) && $field->key !== $tableKey) {
                     $rename = true;
                     break;
@@ -206,26 +244,12 @@ class Migration {
                 if ($field->isID && !empty($autoKey)) {
                     $found         = true;
                     $primaryKeys[] = $field->key;
+                    $renamed[]     = $autoKey;
                     $renames[]     = [
                         "key"  => $autoKey,
                         "new"  => $field->key,
                         "type" => $type,
                     ];
-                } else {
-                    foreach ($updates as $update) {
-                        if ($update["new"] == $field->key) {
-                            $primaryKeys[] = $field->key;
-                            $renamed[]     = $update["old"];
-                            $renames[]     = [
-                                "key"  => $update["old"],
-                                "new"  => $field->key,
-                                "type" => $type,
-                            ];
-                            $prev  = $update["new"];
-                            $found = true;
-                            break;
-                        }
-                    }
                 }
             }
 
@@ -244,40 +268,16 @@ class Migration {
             $prev = $field->key;
         }
 
-        // Remove Columns
-        foreach ($tableFields as $tableField) {
-            $tableKey = $tableField["Field"];
-            $found    = false;
-            foreach ($structure->fields as $field) {
-                if (Strings::isEqual($field->key, $tableKey) || Arrays::contains($renamed, $tableKey)) {
-                    $found = true;
-                }
-            }
-            if (!$found) {
-                $update  = true;
-                $drops[] = $tableKey;
-            }
-        }
-
         // Modify Columns
         $newPrev = "";
         foreach ($structure->fields as $field) {
             $oldPrev = "";
-            foreach ($tableFields as $tableField) {
-                if ($field->key === $tableField["Field"]) {
-                    $oldData = $tableField["Type"];
-                    if ($tableField["Null"] === "NO") {
-                        $oldData .= " NOT NULL";
-                    } else {
-                        $oldData .= " NULL";
-                    }
-                    if ($tableField["Default"] !== NULL) {
-                        $oldData .= " DEFAULT '{$tableField["Default"]}'";
-                    }
-                    if (!empty($tableField["Extra"])) {
-                        $oldData .= " " . Strings::toUpperCase($tableField["Extra"]);
-                    }
-                    $newData = $field->getType();
+            foreach ($tableFields as $tableKey => $tableField) {
+                if ($field->key === $tableKey) {
+                    $oldData   = $db->parseColumnType($tableField);
+                    $hasLength = Strings::contains($oldData, "(");
+                    $newData   = $field->getType($hasLength);
+
                     if ($newData !== $oldData || $newPrev !== $oldPrev) {
                         $update     = true;
                         $modifies[] = [
@@ -291,6 +291,20 @@ class Migration {
                 $oldPrev = $tableField["Field"];
             }
             $newPrev = $field->key;
+        }
+
+        // Remove Columns
+        foreach ($tableFields as $tableKey => $tableField) {
+            $found = false;
+            foreach ($structure->fields as $field) {
+                if (Strings::isEqual($field->key, $tableKey) || Arrays::contains($renamed, $tableKey)) {
+                    $found = true;
+                }
+            }
+            if (!$found) {
+                $update  = true;
+                $drops[] = $tableKey;
+            }
         }
 
         // Update the Table Primary Keys and Index Keys
