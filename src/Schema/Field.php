@@ -117,33 +117,43 @@ class Field {
 
     /**
      * Returns the Field Type from the Data
+     * @param boolean $withLength Optional.
      * @return string
      */
-    public function getType(): string {
-        $result  = "unknown";
-        $default = null;
+    public function getType(bool $withLength = true): string {
+        $type       = "unknown";
+        $length     = 0;
+        $attributes = "";
+        $default    = null;
 
         switch ($this->type) {
         case self::ID:
-            $result = "int(10) unsigned NOT NULL AUTO_INCREMENT";
+            $type       = "int";
+            $length     = 10;
+            $attributes = "unsigned NOT NULL AUTO_INCREMENT";
             break;
         case self::Binary:
         case self::Boolean:
-            $result  = "tinyint(1) unsigned NOT NULL";
-            $default = 0;
+            $type       = "tinyint";
+            $length     = 1;
+            $attributes = "unsigned NOT NULL";
+            $default    = 0;
             break;
         case self::Price:
-            $sign    = $this->isSigned ? "" : " unsigned";
-            $result  = "bigint(20)$sign NOT NULL";
-            $default = 0;
+            $type       = "bigint";
+            $length     = 20;
+            $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
+            $default    = 0;
             break;
         case self::Number:
         case self::Float:
         case self::Date:
         case self::Hour:
-            $length = $this->length ?: 10;
-            $sign   = $this->isSigned ? "" : " unsigned";
-            $type   = "int";
+            $type       = "int";
+            $length     = $this->length ?: 10;
+            $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
+            $default    = 0;
+
             if ($length < 3) {
                 $type = "tinyint";
             } elseif ($length < 5) {
@@ -153,30 +163,40 @@ class Field {
             } elseif ($length > 10) {
                 $type = "bigint";
             }
-            $result  = "$type($length)$sign NOT NULL";
-            $default = 0;
             break;
         case self::String:
         case self::File:
-            $length  = $this->length ?: 255;
-            $result  = "varchar($length) NOT NULL";
-            $default = "";
+            $type       = "varchar";
+            $length     = $this->length ?: 255;
+            $attributes = "NOT NULL";
+            $default    = "";
             break;
         case self::JSON:
         case self::CSV:
         case self::HTML:
-            $result = "mediumtext NULL";
+            $type       = "mediumtext";
+            $attributes = "NULL";
             break;
         case self::Text:
-            $result = "text NULL";
+            $type       = "text";
+            $attributes = "NULL";
             break;
         case self::LongText:
-            $result = "longtext NULL";
+            $type       = "longtext";
+            $attributes = "NULL";
             break;
         case self::Encrypt:
-            $length = $this->length ?: 255;
-            $result = "varbinary($length) NOT NULL";
+            $type       = "varbinary";
+            $length     = $this->length ?: 255;
+            $attributes = "NOT NULL";
             break;
+        }
+
+        $result = $type;
+        if ($withLength && $length > 0) {
+            $result = "{$type}({$length}) $attributes";
+        } elseif (!empty($attributes)) {
+            $result = "$type $attributes";
         }
 
         if ($result !== "unknown") {
