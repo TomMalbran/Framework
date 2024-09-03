@@ -4,6 +4,7 @@ namespace Framework\File;
 use Framework\Framework;
 use Framework\System\ConfigCode;
 use Framework\File\File;
+use Framework\File\FileType;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
@@ -274,6 +275,29 @@ class Path {
     }
 
 
+
+    /**
+     * Ensures that all the directories are created
+     * @param string $pathKey
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function ensureDir(string $pathKey, string ...$pathParts): string {
+        $path        = trim(self::parsePath(...$pathParts));
+        $pathParts   = Strings::split($path, "/");
+        $totalParts  = count($pathParts);
+        $partialPath = [];
+
+        if (!FileType::isDir($path)) {
+            $totalParts - 1;
+        }
+        for ($i = 0; $i < $totalParts; $i++) {
+            $partialPath[] = $pathParts[$i];
+            $fullPath      = self::forPathKey($pathKey, ...$partialPath);
+            File::createDir($fullPath);
+        }
+        return self::forPathKey($pathKey, ...$pathParts);
+    }
 
     /**
      * Ensures that the Paths are created
