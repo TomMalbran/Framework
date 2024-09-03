@@ -1209,35 +1209,69 @@ class DateTime {
         $part1  = $amount > 1 ? (int)$parts[1] : 0;
         $part2  = $amount > 2 ? (int)$parts[2] : 0;
 
+        // We need at least 2 parts
         if (empty($part0) || empty($part1)) {
             return 0;
         }
 
-        $year  = self::getYear();
-        $month = $part1;
+        // Start with the current year and the given month and day
         $day   = $part0;
+        $month = $part1;
+        $year  = self::getYear();
 
+        // Invert the order
         if ($amount == 3 && $part0 > 1000) {
-            $year  = $part0;
-            $month = $part1;
             $day   = $part2;
-        } elseif (!empty($part2)) {
-            $yearStr = trim($parts[2]);
-            if (Strings::length($yearStr) == 2) {
-                if ((int)$yearStr >= 50) {
-                    $year = (int)"19$yearStr";
-                } else {
-                    $year = (int)"20$yearStr";
+            $month = $part1;
+            $year  = $part0;
+        } else {
+            // Handle invalid months
+            if ($month > 12) {
+                $monthStr = (string)$month;
+                switch (Strings::length($monthStr)) {
+                case 3:
+                    $month = (int)Strings::substring($monthStr, 0, 1);
+                    $part2 = Strings::substring($monthStr, 1, 3);
+                    break;
+                case 4:
+                    $month = (int)Strings::substring($monthStr, 0, 2);
+                    $part2 = Strings::substring($monthStr, 2, 4);
+                    break;
+                case 5:
+                    $month = (int)Strings::substring($monthStr, 0, 1);
+                    $year  = (int)Strings::substring($monthStr, 1, 5);
+                    $part2 = 0;
+                    break;
+                case 6:
+                    $month = (int)Strings::substring($monthStr, 0, 2);
+                    $year  = (int)Strings::substring($monthStr, 2, 6);
+                    $part2 = 0;
+                    break;
+                default:
                 }
-            } else {
-                $year = (int)$yearStr;
+            }
+
+            // Handle the Year
+            if (!empty($part2)) {
+                $yearStr = trim((string)$part2);
+                if (Strings::length($yearStr) == 2) {
+                    if ((int)$yearStr >= 50) {
+                        $year = (int)"19$yearStr";
+                    } else {
+                        $year = (int)"20$yearStr";
+                    }
+                } else {
+                    $year = (int)$yearStr;
+                }
             }
         }
 
-        if ($year > 2100) {
+        // Something is still wrong
+        if ($month > 12 || $year > 2100) {
             return 0;
         }
 
+        // Return the Time Stamp
         return mktime(0, 0, 0, $month, $day, $year);
     }
 
