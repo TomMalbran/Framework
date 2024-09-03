@@ -347,6 +347,6 @@ class Utils {
      * @return boolean
      */
     public static function isValidUrl(string $url): bool {
-        return Strings::startsWith($url, "https://");
+        return Strings::startsWith($url, "http://", "https://");
     }
 }
