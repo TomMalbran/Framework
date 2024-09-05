@@ -128,7 +128,7 @@ class DateTime {
             $timeStamp = (int)$time;
         }
 
-        if (empty($timeStamp)) {
+        if (empty($timeStamp) || $timeStamp > 4294967295) {
             return 0;
         }
         return self::toServerTime($timeStamp, $useTimeZone);
