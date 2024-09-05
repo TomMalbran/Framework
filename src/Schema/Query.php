@@ -323,6 +323,7 @@ class Query {
      * @param string          $expression      Optional.
      * @param boolean         $caseInsensitive Optional.
      * @param boolean         $splitValue      Optional.
+     * @param string          $splitText       Optional.
      * @param boolean         $matchAny        Optional.
      * @return Query
      */
@@ -332,13 +333,14 @@ class Query {
         string       $expression = "LIKE",
         bool         $caseInsensitive = true,
         bool         $splitValue = false,
+        string       $splitText = " ",
         bool         $matchAny = false,
     ): Query {
         if (empty($value)) {
             return $this;
         }
 
-        $valueParts = $splitValue ? Strings::split($value, " ") : Arrays::toArray($value);
+        $valueParts = $splitValue ? Strings::split($value, $splitText) : Arrays::toArray($value);
         $valueParts = Arrays::removeEmpty($valueParts);
         $columns    = Arrays::toArray($column);
         $multiParts = Arrays::length($valueParts) > 1;
@@ -621,6 +623,7 @@ class Query {
      * @param string               $expression      Optional.
      * @param boolean              $caseInsensitive Optional.
      * @param boolean              $splitValue      Optional.
+     * @param string               $splitText       Optional.
      * @param boolean              $matchAny        Optional.
      * @return Query
      */
@@ -630,11 +633,12 @@ class Query {
         string       $expression = "LIKE",
         bool         $caseInsensitive = true,
         bool         $splitValue = false,
+        string       $splitText = " ",
         bool         $matchAny = false,
     ): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {
-            $query->search($column, $value, $expression, $caseInsensitive, $splitValue, $matchAny);
+            $query->search($column, $value, $expression, $caseInsensitive, $splitValue, $splitText, $matchAny);
         }
         return $query;
     }
