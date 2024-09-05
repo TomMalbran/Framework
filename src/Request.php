@@ -574,7 +574,11 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function toBinary(string $key, int $default = 1): int {
-        return $this->has($key) ? $default : 0;
+        if (!$this->has($key)) {
+            return 0;
+        }
+        $value = $this->get($key);
+        return $value === "true" || $value === "1" || $value === 1 ? $default : 0;
     }
 
     /**
