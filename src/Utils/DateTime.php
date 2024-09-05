@@ -989,6 +989,20 @@ class DateTime {
     }
 
     /**
+     * Returns the Day and Hour for the given Time Stamp
+     * @param integer    $timeStamp
+     * @param boolean    $startMonday Optional.
+     * @param float|null $timeZone    Optional.
+     * @param string     $language    Optional.
+     * @return string
+     */
+    public static function getDayHour(int $timeStamp = 0, bool $startMonday = false, ?float $timeZone = null, string $language = ""): string {
+        $dayName = self::getDayText($timeStamp, $startMonday, $timeZone, $language);
+        $hour    = self::toString($timeStamp, "time", $timeZone);
+        return NLS::format("DATE_DAY_HOUR", [ $dayName, $hour ], $language);
+    }
+
+    /**
      * Returns the Day name at the given Day
      * @param integer $day
      * @param boolean $startMonday Optional.
