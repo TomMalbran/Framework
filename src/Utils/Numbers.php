@@ -61,6 +61,15 @@ class Numbers {
     }
 
     /**
+     * Returns a number with the given length
+     * @param integer $length Optional.
+     * @return integer
+     */
+    public static function random(int $length = 8): int {
+        return (int)rand(pow(10, $length - 1), pow(10, $length) - 1);
+    }
+
+    /**
      * Returns the given number as an integer using the given decimals
      * @param integer|float $number
      * @param integer       $decimals
