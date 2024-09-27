@@ -155,21 +155,24 @@ class TimeTable {
         $maxDay    = $startMonday ? 8 : 7;
         $timeStamp = DateTime::getTime($timeStamp);
         $weekStart = DateTime::getWeekStart($timeStamp, 0, $startMonday, false);
+        $weeks     = [ 0, 7 ];
         $result    = 0;
 
-        foreach ($timeTables as $timeTable) {
-            $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
+        foreach ($weeks as $week) {
+            foreach ($timeTables as $timeTable) {
+                $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
 
-            foreach ($timeTable["days"] as $day) {
-                if ($day >= $maxDay) {
-                    continue;
-                }
+                foreach ($timeTable["days"] as $day) {
+                    if ($day >= $maxDay) {
+                        continue;
+                    }
 
-                $newTime = DateTime::addDays($weekStart, $day);
-                $newTime = DateTime::addMinutes($newTime, $fromMinutes);
+                    $newTime = DateTime::addDays($weekStart, $day + $week);
+                    $newTime = DateTime::addMinutes($newTime, $fromMinutes);
 
-                if ($newTime >= $timeStamp && ($result === 0 || $newTime <= $result)) {
-                    $result = $newTime;
+                    if ($newTime >= $timeStamp && ($result === 0 || $newTime <= $result)) {
+                        $result = $newTime;
+                    }
                 }
             }
         }
