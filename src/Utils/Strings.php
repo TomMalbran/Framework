@@ -600,10 +600,12 @@ class Strings {
      * @return string
      */
     public static function toCamelCase(string $string): string {
-        $result = preg_replace("/[.:;-_]+/", "", $string);
+        $result = preg_replace("/[\.:;\-_]+/", " ", $string);
+        $result = strtolower($result);
         $result = ucwords($result);
         $result = str_replace(" ", "", $result);
-        return lcfirst($result);
+        $result = lcfirst($result);
+        return $result;
     }
 
     /**
