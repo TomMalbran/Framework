@@ -276,12 +276,16 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given key exists ans is true
+     * Returns true if the given key exists and is active
      * @param string $key
      * @return boolean
      */
-    public function isTrue(string $key): bool {
-        return !empty($this->request[$key]) && $this->request[$key] === "true";
+    public function isActive(string $key): bool {
+        if (empty($this->request[$key])) {
+            return false;
+        }
+        $value = $this->request[$key];
+        return $value === "true" || $value == 1;
     }
 
 
