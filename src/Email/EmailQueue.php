@@ -60,6 +60,7 @@ class EmailQueue {
         $query = Query::createSearch([ "sendTo", "subject", "message" ], $search);
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
+        $query->addIf("dataID",      "=", $request->dataID);
         return $query;
     }
 
@@ -102,9 +103,10 @@ class EmailQueue {
      * @param string|null     $message  Optional.
      * @param string|null     $subject  Optional.
      * @param boolean         $sendNow  Optional.
+     * @param integer         $dataID   Optional.
      * @return boolean
      */
-    public static function add(Model $template, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false): bool {
+    public static function add(Model $template, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false, int $dataID = 0): bool {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
@@ -119,6 +121,7 @@ class EmailQueue {
             "message"      => $message,
             "emailResult"  => EmailResult::NotProcessed,
             "sentTime"     => 0,
+            "dataID"       => $dataID,
         ]);
 
         if (!$sendNow) {

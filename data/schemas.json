@@ -143,7 +143,8 @@
             "subject"      : { "type" : "string"                    },
             "message"      : { "type" : "text"                      },
             "emailResult"  : { "type" : "string"                    },
-            "sentTime"     : { "type" : "date"                      }
+            "sentTime"     : { "type" : "date"                      },
+            "dataID"       : { "type" : "number"                    }
         },
         "expressions" : {
             "isError" : {
