@@ -114,6 +114,22 @@ class Strings {
         return $matches;
     }
 
+    /**
+     * Returns true if the given String if created with only the given Needle
+     * @param string $string
+     * @param string $needle
+     * @return boolean
+     */
+    public static function onlyOneCharacter(string $string, string $needle): bool {
+        $chars = str_split($string);
+        foreach ($chars as $char) {
+            if ($char !== $needle) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 
     /**
