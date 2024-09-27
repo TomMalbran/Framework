@@ -319,6 +319,26 @@ class Utils {
 
 
     /**
+     * Returns true if is a valid Url
+     * @param string $url
+     * @return boolean
+     */
+    public static function isValidUrl(string $url): bool {
+        return Strings::startsWith($url, "http://", "https://");
+    }
+
+    /**
+     * Encodes the given Url
+     * @param string $url
+     * @return string
+     */
+    public static function encodeUrl(string $url): string {
+        return preg_replace_callback("/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function ($match) {
+            return rawurlencode($match[0]);
+        }, $url);
+    }
+
+    /**
      * Returns an Avatar url
      * @param string $url
      * @param string $email
@@ -339,14 +359,5 @@ class Utils {
      */
     public static function getWhatsAppUrl(string $whatsApp): string {
         return "https://wa.me/$whatsApp";
-    }
-
-    /**
-     * Returns true if is a valid Url
-     * @param string $url
-     * @return boolean
-     */
-    public static function isValidUrl(string $url): bool {
-        return Strings::startsWith($url, "http://", "https://");
     }
 }
