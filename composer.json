@@ -1,6 +1,7 @@
 {
     "name": "tommalbran/framework",
     "description": "My personal framework",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Tomás Malbrán",
@@ -15,11 +16,11 @@
     "require-dev": {
         "firebase/php-jwt": "^6.10",
         "mustache/mustache": "^2.14",
-        "phpmailer/phpmailer": "^6.7",
+        "phpmailer/phpmailer": "^6.9",
         "league/oauth2-google": "^4.0",
-        "phpoffice/phpspreadsheet": "^1.25",
+        "phpoffice/phpspreadsheet": "^3.3",
         "drewm/mailchimp-api": "^2.5",
-        "openspout/openspout": "^4.23"
+        "openspout/openspout": "^4.26"
     },
     "suggest" : {
         "mustache/mustache": "Used for Rendering templates",
