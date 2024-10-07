@@ -410,13 +410,21 @@ class Image {
         int    $height,
         string $action
     ): bool {
+        $bestFit = $action === self::Maximum;
+        $fill    = $action === self::Thumb;
+
+        // Do not resize if the image is smaller than the requested size
+        [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
+        if ($bestFit && $imgWidth <= $width && $imgHeight <= $height) {
+            return true;
+        }
+
+        // Use the normal resize if Imagick is not available
         if (!class_exists("Imagick")) {
             return self::resize($src, $dst, $width, $height, $action);
         }
 
-        $bestFit = $action === self::Maximum;
-        $fill    = $action === self::Thumb;
-
+        // Try to resize with Imagick
         try {
             $image = new Imagick($src);
             $image->thumbnailImage($width, $height, $bestFit, $fill);
@@ -424,10 +432,13 @@ class Image {
             return true;
         } catch (Exception $e) {
             $error = $e->getMessage();
+
+            // Try to resize with GD if there is an error with JPEG
             if (Strings::contains($error, "Not a JPEG")) {
                 return self::resize($src, $dst, $width, $height, $action);
             }
 
+            // Log the error
             trigger_error("Imagick Error: " . $error, E_USER_ERROR);
             return false;
         }
