@@ -582,7 +582,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
             return 0;
         }
         $value = $this->get($key);
-        return $value === "true" || $value === "1" || $value === 1 ? $default : 0;
+        return $value === true || $value === 1 || $value === "true" || $value === "1" ? $default : 0;
     }
 
     /**
