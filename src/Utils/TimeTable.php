@@ -249,13 +249,15 @@ class TimeTable {
                     $numbers[] = $i;
                 }
             }
-            $schedules[] = [
-                "fromHour" => "",
-                "toHour"   => "",
-                "numbers"  => $numbers,
-                "times"    => [],
-                "days"     => [],
-            ];
+            if (!empty($numbers)) {
+                $schedules[] = [
+                    "fromHour" => "",
+                    "toHour"   => "",
+                    "numbers"  => $numbers,
+                    "times"    => [],
+                    "days"     => [],
+                ];
+            }
         }
 
         foreach ($schedules as $id => $elem) {
