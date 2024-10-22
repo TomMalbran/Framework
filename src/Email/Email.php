@@ -53,19 +53,20 @@ class Email {
 
     /**
      * Sends an Email
-     * @param string $toEmail
-     * @param string $subject
-     * @param string $message
+     * @param string  $toEmail
+     * @param string  $subject
+     * @param string  $message
+     * @param boolean $sendAlways
      * @return string
      */
-    public static function send(string $toEmail, string $subject, string $message): string {
+    public static function send(string $toEmail, string $subject, string $message, bool $sendAlways): string {
         self::load();
 
         // Return some possible errors
         if (!self::$config->isActive) {
             return EmailResult::InactiveSend;
         }
-        if (!empty(self::$config->useWhiteList) && !EmailWhiteList::emailExists($toEmail)) {
+        if (!$sendAlways && !empty(self::$config->useWhiteList) && !EmailWhiteList::emailExists($toEmail)) {
             return EmailResult::WhiteListFilter;
         }
         if (!Utils::isValidEmail($toEmail)) {
@@ -110,18 +111,25 @@ class Email {
      * Sends the given Template Email
      * @param Model           $template
      * @param string[]|string $sendTo
-     * @param string|null     $message  Optional.
-     * @param string|null     $subject  Optional.
+     * @param string|null     $message    Optional.
+     * @param string|null     $subject    Optional.
+     * @param boolean         $sendAlways Optional.
      * @return string
      */
-    public static function sendTemplate(Model $template, array|string $sendTo, ?string $message = null, ?string $subject = null): string {
+    public static function sendTemplate(
+        Model $template,
+        array|string $sendTo,
+        ?string $message = null,
+        ?string $subject = null,
+        bool $sendAlways = false,
+    ): string {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
         $result  = EmailResult::NoEmails;
 
         foreach ($sendTo as $email) {
-            $result = self::send($email, $subject, $message);
+            $result = self::send($email, $subject, $message, $sendAlways);
         }
         return $result;
     }

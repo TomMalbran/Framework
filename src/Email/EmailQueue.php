@@ -65,7 +65,7 @@ class EmailQueue {
     }
 
     /**
-     * Returns all the Emails from the Queue
+     * Returns all the Queued Emails
      * @param Request $request
      * @return array{}[]
      */
@@ -75,17 +75,18 @@ class EmailQueue {
     }
 
     /**
-     * Returns all the not sent Emails from the Queue
+     * Returns all the not sent Queued Emails in the last hour
      * @return array{}[]
      */
     public static function getAllUnsent(): array {
         $query = Query::create("sentTime", "=", 0);
+        $query->add("createdTime", ">", DateTime::getLastXHours(1));
         $query->orderBy("createdTime", false);
         return self::schema()->getAll($query);
     }
 
     /**
-     * Returns the total amount of Emails from the Queue
+     * Returns the total amount of Queued Emails
      * @param Request $request
      * @return integer
      */
@@ -128,7 +129,7 @@ class EmailQueue {
             return true;
         }
         $email = self::getOne($emailID);
-        return self::send($email);
+        return self::send($email, $sendNow);
     }
 
 
@@ -141,7 +142,7 @@ class EmailQueue {
         $emails = self::getAllUnsent();
         $result = true;
         foreach ($emails as $email) {
-            if (!self::send($email)) {
+            if (!self::send($email, false)) {
                 $result = false;
             }
         }
@@ -151,13 +152,19 @@ class EmailQueue {
     /**
      * Sends the given Email
      * @param Model|array{} $email
+     * @param boolean       $sendAlways
      * @return boolean
      */
-    public static function send(Model|array $email): bool {
+    public static function send(Model|array $email, bool $sendAlways): bool {
         $emailResult = EmailResult::NoEmails;
         foreach ($email["sendTo"] as $sendTo) {
             if (!empty($sendTo)) {
-                $emailResult = Email::send($sendTo, $email["subject"], $email["message"]);
+                $emailResult = Email::send(
+                    $sendTo,
+                    $email["subject"],
+                    $email["message"],
+                    $sendAlways,
+                );
             }
         }
         return self::markAsSent($email["emailID"], $emailResult);
