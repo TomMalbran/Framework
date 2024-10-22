@@ -83,12 +83,12 @@ class Image {
      * @return int[]
      */
     public static function getSize(string ...$pathParts): array {
-        if (!File::exists(...$pathParts)) {
+        $filePath = Path::parsePath(...$pathParts);
+        if (!File::exists($filePath) || !FileType::isImage($filePath)) {
             return [ 0, 0, 0 ];
         }
 
-        $filePath = Path::parsePath(...$pathParts);
-        $size     = getimagesize($filePath);
+        $size = getimagesize($filePath);
         if ($size === false) {
             return [ 0, 0, 0 ];
         }
@@ -125,6 +125,42 @@ class Image {
             return $exif["Orientation"];
         }
         return 0;
+    }
+
+    /**
+     * Returns true if the Image has Transparency
+     * @param string ...$pathParts
+     * @return boolean
+     */
+    public static function hasTransparency(string ...$pathParts): bool {
+        $filePath = Path::parsePath(...$pathParts);
+        if (!File::exists($filePath) || !FileType::isPNG($filePath)) {
+            return false;
+        }
+
+        $imgData = imagecreatefrompng($filePath);
+        $width   = imagesx($imgData);
+        $height  = imagesy($imgData);
+
+        if ($width > 50 || $height > 50) {
+            $thumb = imagecreatetruecolor(10, 10);
+            imagealphablending($thumb, FALSE);
+            imagecopyresized($thumb, $imgData, 0, 0, 0, 0, 10, 10, $width, $height);
+
+            $imgData = $thumb;
+            $width   = imagesx($imgData);
+            $height  = imagesy($imgData);
+        }
+
+        for ($i = 0; $i < $width; $i++) {
+            for ($j = 0; $j < $height; $j++) {
+                $rgba = imagecolorat($imgData, $i, $j);
+                if (($rgba & 0x7F000000) >> 24) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

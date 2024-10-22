@@ -2,6 +2,7 @@
 namespace Framework\File;
 
 use Framework\File\FileType;
+use Framework\File\Image;
 use Framework\Utils\Arrays;
 
 /**
@@ -24,12 +25,9 @@ class FileList {
      * @return FileList
      */
     public function add(string $name, string $path, bool $isDir, string $sourcePath, string $sourceUrl, string $thumbUrl): FileList {
-        $isImage   = !$isDir && FileType::isImage($name);
-        $imgWidth  = 0;
-        $imgHeight = 0;
-        if ($isImage && file_exists($sourcePath)) {
-            [ $imgWidth, $imgHeight ] = getimagesize($sourcePath);
-        }
+        $isImage = !$isDir && FileType::isImage($name);
+        [ $imgWidth, $imgHeight ] = Image::getSize($sourcePath);
+
         $this->list[] = [
             "name"          => $name,
             "path"          => $path,
@@ -38,7 +36,7 @@ class FileList {
             "isBack"        => false,
             "isDir"         => $isDir,
             "isImage"       => $isImage,
-            "isTransparent" => $isImage && FileType::isPNG($name),
+            "isTransparent" => Image::hasTransparency($sourcePath),
             "isFile"        => !$isImage,
             "isPDF"         => FileType::isPDF($name),
             "isAudio"       => FileType::isAudio($name),
