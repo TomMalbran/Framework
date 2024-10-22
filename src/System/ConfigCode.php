@@ -24,7 +24,7 @@ class ConfigCode {
 
     /** @var string[] */
     private static array $defaults = [
-        "DB", "AUTH", "EMAIL", "SMTP",
+        "DB", "AUTH", "SMTP",
         "MAILJET", "MANDRILL", "SEND_GRID", "MAILCHIMP",
         "NOTIFICATION", "ONESIGNAL",
     ];
