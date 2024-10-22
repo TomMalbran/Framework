@@ -56,7 +56,7 @@
     "refreshTokens" : {
         "table"  : "credentials_refresh_tokens",
         "fields" : {
-            "CREDENTIAL_ID"   : { "type" : "number", "name" : "credentialID"                    },
+            "CREDENTIAL_ID"  : { "type" : "number", "name" : "credentialID"                    },
             "refreshToken"   : { "type" : "string",                         "isPrimary" : true },
             "userAgent"      : { "type" : "string"                                             },
             "expirationTime" : { "type" : "date"                                               }

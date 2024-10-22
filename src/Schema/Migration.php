@@ -58,7 +58,7 @@ class Migration {
         if ($didMove) {
             print("<br>");
         } else {
-            print("No <i>movements</i> required<br><br>");
+            print("No <i>movements</i> required<br>");
         }
         SettingCode::setCore($db, "movement", $lastMovement);
         return $didMove;

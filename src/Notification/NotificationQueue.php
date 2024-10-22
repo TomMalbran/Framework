@@ -99,7 +99,7 @@ class NotificationQueue {
 
 
     /**
-     * Returns the Unset Notifications for the given Type
+     * Returns the Unset Notifications in the last hour
      * @return array{}[]
      */
     public static function getAllUnsent(): array {
