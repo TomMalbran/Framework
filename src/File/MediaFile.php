@@ -274,8 +274,14 @@ class MediaFile {
         if (!File::move($oldSource, $newSource)) {
             return false;
         }
-        if (FileType::isImage($oldName) && !File::move($oldThumbs, $newThumbs)) {
-            return false;
+        if (FileType::isImage($oldName)) {
+            if (!File::exists($oldThumbs)) {
+                if (!Image::resize($oldSource, $oldThumbs, 200, 200, Image::Resize)) {
+                    return false;
+                }
+            } elseif (!File::move($oldThumbs, $newThumbs)) {
+                return false;
+            }
         }
 
         return self::update($oldRelPath, $newRelPath);
