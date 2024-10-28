@@ -70,6 +70,7 @@ class Framework {
     private static ?Response $response = null;
 
 
+
     /**
      * Sets the Basic data
      * @param string  $basePath
@@ -189,6 +190,39 @@ class Framework {
     }
 
 
+
+    /**
+     * Finds the Classes in the given Directory
+     * @param string  $dir         Optional.
+     * @param boolean $skipIgnored Optional.
+     * @return array<string,string>
+     */
+    public static function findClasses(string $dir = "", bool $skipIgnored = false): array {
+        $sourcePath = Framework::getPath(Framework::SourceDir);
+        $basePath   = Framework::getPath(Framework::SourceDir, $dir);
+        $files      = File::getFilesInDir($basePath, true);
+        $result     = [];
+
+        foreach ($files as $file) {
+            if (!Strings::endsWith($file, ".php")) {
+                continue;
+            }
+
+            // Skip some ignored directories
+            if ($skipIgnored && Strings::contains($file, "/Schema/", "/System/")) {
+                continue;
+            }
+
+            $className = Strings::replace($file, [ $sourcePath, ".php" ], "");
+            $className = Strings::substringAfter($className, "/", true);
+            $className = Strings::replace($className, "/", "\\");
+            $className = "\\" . Framework::Namespace . $className;
+
+            $classKey  = Strings::substringAfter($className, "\\");
+            $result[$classKey] = $className;
+        }
+        return $result;
+    }
 
     /**
      * Loads a File from the App or defaults to the Framework
