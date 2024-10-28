@@ -364,6 +364,7 @@ class Auth {
             "reqPassChange"    => self::$credential->reqPassChange,
             "askNotifications" => self::$credential->askNotifications,
             "loggedAsUser"     => self::isLoggedAsUser(),
+            "isAdmin"          => self::isAdmin(),
         ];
 
         // Add fields from the Config
@@ -474,6 +475,14 @@ class Auth {
      */
     public static function hasAPI(): bool {
         return !empty(self::$apiID);
+    }
+
+    /**
+     * Returns true or false if the current used is actually an admin
+     * @return boolean
+     */
+    public static function isAdmin(): bool {
+        return AccessCode::inGroup(AccessCode::Admin, self::$credential->access);
     }
 
 
