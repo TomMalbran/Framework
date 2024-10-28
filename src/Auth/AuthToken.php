@@ -260,6 +260,21 @@ class AuthToken {
     }
 
     /**
+     * Deletes all the Refresh Tokens for the given Credential
+     * @param integer $credentialID
+     * @return boolean
+     */
+    public static function deleteAllForCredential(int $credentialID): bool {
+        self::load();
+        if (!self::$useRefresh || empty($credentialID)) {
+            return false;
+        }
+
+        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        return self::schema()->remove($query);
+    }
+
+    /**
      * Deletes the old Refresh Tokens
      * @return boolean
      */
