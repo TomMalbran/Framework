@@ -15,13 +15,18 @@ class Response {
     /** @var array{} */
     private array $data;
 
+    private bool $withTokens = true;
+
+
 
     /**
      * Creates a new Response instance
-     * @param array{} $data Optional.
+     * @param array{} $data       Optional.
+     * @param boolean $withTokens Optional.
      */
-    public function __construct(array $data = []) {
-        $this->data = $data;
+    public function __construct(array $data = [], bool $withTokens = true) {
+        $this->data       = $data;
+        $this->withTokens = $withTokens;
     }
 
     /**
@@ -31,6 +36,10 @@ class Response {
      * @return Response
      */
     public function addTokens(string $jwt, string $refreshToken): Response {
+        if (!$this->withTokens) {
+            return $this;
+        }
+
         $this->data["jwt"] = $jwt;
         if (!empty($refreshToken)) {
             $this->data["refreshToken"] = $refreshToken;
@@ -76,10 +85,11 @@ class Response {
 
     /**
      * Returns an empty result
+     * @param boolean $withTokens Optional.
      * @return Response
      */
-    public static function empty(): Response {
-        return new Response();
+    public static function empty(bool $withTokens = true): Response {
+        return new Response(withTokens: $withTokens);
     }
 
     /**
