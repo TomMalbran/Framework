@@ -675,9 +675,13 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * Returns the given strings as a time
      * @param string  $key
      * @param boolean $useTimezone Optional.
+     * @param boolean $skipEmpty   Optional.
      * @return integer
      */
-    public function toTime(string $key, bool $useTimezone = true): int {
+    public function toTime(string $key, bool $useTimezone = true, bool $skipEmpty = false): int {
+        if ($skipEmpty && !$this->has($key)) {
+            return 0;
+        }
         return DateTime::toTime($this->get($key), $useTimezone);
     }
 
@@ -686,9 +690,13 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * @param string  $dateKey
      * @param string  $hourKey
      * @param boolean $useTimezone Optional.
+     * @param boolean $skipEmpty   Optional.
      * @return integer
      */
-    public function toTimeHour(string $dateKey, string $hourKey, bool $useTimezone = true): int {
+    public function toTimeHour(string $dateKey, string $hourKey, bool $useTimezone = true, bool $skipEmpty = false): int {
+        if ($skipEmpty && (!$this->has($dateKey) || !$this->has($hourKey))) {
+            return 0;
+        }
         return DateTime::toTimeHour($this->get($dateKey), $this->get($hourKey), $useTimezone);
     }
 
