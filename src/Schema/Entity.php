@@ -37,9 +37,10 @@ class Entity implements ArrayAccess, JsonSerializable {
      * @return string[]
      */
     public function getProperties(): array {
-        $reflect = new ReflectionClass($this);
-        $props   = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
-        $result  = [];
+        $reflection = new ReflectionClass($this);
+        $props      = $reflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+        $result     = [];
+
         foreach ($props as $prop) {
             $result[] = $prop->getName();
         }

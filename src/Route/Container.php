@@ -73,15 +73,15 @@ class Container {
      * @return object|null
      */
     private static function buildObject(string $className, bool $save = false, array $params = []): ?object {
-        $reflector = new ReflectionClass($className);
-        $instances = [];
+        $reflection = new ReflectionClass($className);
+        $instances  = [];
 
-        if (!$reflector->isInstantiable()) {
+        if (!$reflection->isInstantiable()) {
             return null;
         }
 
-        if ($reflector->getConstructor() !== null) {
-            $constructor = $reflector->getConstructor();
+        if ($reflection->getConstructor() !== null) {
+            $constructor = $reflection->getConstructor();
             $parameters  = $constructor->getParameters();
 
             foreach ($parameters as $parameter) {
@@ -96,6 +96,6 @@ class Container {
             }
         }
 
-        return $reflector->newInstanceArgs(array_merge($instances, $params));
+        return $reflection->newInstanceArgs(array_merge($instances, $params));
     }
 }
