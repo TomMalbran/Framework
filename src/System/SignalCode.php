@@ -5,6 +5,11 @@ use Framework\Framework;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionUnionType;
+use Throwable;
+
 /**
  * The Signal Code
  */
@@ -15,83 +20,124 @@ class SignalCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $data = Framework::loadData(Framework::SignalData, false);
-        if (empty((array)$data)) {
-            return [];
+        $classes = Framework::findClasses(skipIgnored: true);
+        $signals = [];
+        $uses    = [];
+
+        foreach ($classes as $className) {
+            try {
+                $reflection = new ReflectionClass($className);
+            } catch (Throwable $e) {
+                continue;
+            }
+
+            $methods = $reflection->getMethods();
+            foreach ($methods as $method) {
+                $attributes = $method->getAttributes(Listener::class);
+                if (empty($attributes)) {
+                    continue;
+                }
+
+                $attribute = $attributes[0];
+                $listener  = $attribute->newInstance();
+
+                foreach ($listener->triggers as $trigger) {
+                    $params = self::getParams($method, $uses);
+
+                    if (empty($signals[$trigger])) {
+                        $signals[$trigger] = [
+                            "event"    => $trigger,
+                            "params"   => $params,
+                            "triggers" => [],
+                        ];
+                    } else {
+                        if (count($params) > count($signals[$trigger]["params"])) {
+                            $signals[$trigger]["params"] = $params;
+                        }
+                    }
+
+                    $triggerClass = "{$className}::{$method->getName()}";
+                    $signals[$trigger]["triggers"][] = [
+                        "name"   => $triggerClass,
+                        "params" => $params,
+                    ];
+                }
+            }
         }
 
-        $uses = self::getUses($data);
+        $signals = array_values($signals);
+        $signals = Arrays::sort($signals, function ($a, $b) {
+            return $a["event"] <=> $b["event"];
+        });
+
         return [
-            "uses"    => $uses,
+            "uses"    => array_keys($uses),
             "hasUses" => !empty($uses),
-            "signals" => self::getSignals($data),
+            "signals" => $signals,
         ];
     }
 
     /**
-     * Generates the Signals data
-     * @param object $data
+     * Generates the Params of the Method
+     * @param ReflectionMethod $method
+     * @param array{}          $uses
      * @return array{}[]
      */
-    private static function getSignals(object $data): array {
-        $result = [];
-        foreach ($data as $event => $signal) {
-            if (empty($signal->params)) {
-                continue;
+    private static function getParams(ReflectionMethod $method, array &$uses): array {
+        $parameters = $method->getParameters();
+        $params     = [];
+        $typeLength = 0;
+
+        foreach ($parameters as $parameter) {
+            $paramName = $parameter->getName();
+            $paramType = $parameter->getType();
+            $types     = [];
+
+            if ($paramType instanceof ReflectionUnionType) {
+                $types = $paramType->getTypes();
+            } else {
+                $types = [ $paramType ];
             }
 
-            $params     = [];
-            $typeLength = 0;
-            foreach ($signal->params as $name => $type) {
-                $realType = match ($type) {
-                    "int[]" => "array",
-                    default => $type,
-                };
-                $docType = match ($type) {
+            $typeNames = [];
+            $docTypes  = [];
+            foreach ($types as $type) {
+                $name = $type ? $type->getName() : "mixed";
+                if (!$type->isBuiltin()) {
+                    $uses[$name] = 1;
+                    $name = Strings::substringAfter($name, "\\");
+                }
+
+                $docType = match ($name) {
                     "int"   => "integer",
-                    "int[]" => "integer[]",
                     "bool"  => "boolean",
-                    default => $type,
+                    default => $name,
                 };
-                $typeLength = max($typeLength, Strings::length($docType));
+                if (Strings::endsWith($paramName, "IDs")) {
+                    $docType = "integer[]";
+                }
 
-                $params[] = [
-                    "isFirst" => false,
-                    "name"    => $name,
-                    "type"    => $realType,
-                    "docType" => $docType,
-                ];
+                $typeNames[] = $name;
+                $docTypes[]  = $docType;
             }
-            foreach ($params as $index => $param) {
-                $params[$index]["docType"] = Strings::padRight($param["docType"], $typeLength);
-            }
-            $params[0]["isFirst"] = true;
 
-            $result[] = [
-                "event"    => $event,
-                "params"   => $params,
-                "triggers" => $signal->triggers,
+            $typeName   = Strings::join($typeNames, "|");
+            $docType    = Strings::join($docTypes, "|");
+            $typeLength = max($typeLength, Strings::length($docType));
+
+            $params[] = [
+                "isFirst" => false,
+                "name"    => $parameter->getName(),
+                "type"    => $typeName,
+                "docType" => $docType,
             ];
         }
-        return $result;
-    }
 
-    /**
-     * Generates the Uses data
-     * @param object $data
-     * @return string[]
-     */
-    private static function getUses(object $data): array {
-        $result = [];
-        foreach ($data as $signal) {
-            if (!empty($signal->params)) {
-                foreach ($signal->params as $type) {
-                    if (Strings::endsWith($type, "Entity") && !Arrays::contains($result, $type)) {
-                        $result[] = $type;
-                    }
-                }
-            }
+        foreach ($params as $index => $param) {
+            $params[$index]["docType"] = Strings::padRight($param["docType"], $typeLength);
         }
-        return $result;
+        $params[0]["isFirst"] = true;
+
+        return $params;
     }
 }

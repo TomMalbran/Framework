@@ -31,7 +31,6 @@ class Framework {
     const SchemaData     = "schemas";
     const MigrationsData = "migrations";
     const KeyData        = "keys";
-    const SignalData     = "signals";
     const StatusData     = "status";
     const AccessData     = "access";
     const TokenData      = "tokens";

@@ -2,7 +2,7 @@
 namespace {{codeSpace}};
 {{#hasUses}}
 
-{{#uses}}use {{nameSpace}}Schema\{{.}};
+{{#uses}}use {{.}};
 {{/uses}}
 {{/hasUses}}
 
@@ -19,7 +19,7 @@ class Signal {
      */
     public static function {{event}}({{#params}}{{^isFirst}}, {{/isFirst}}{{type}} ${{name}}{{/params}}): bool {
         {{#triggers}}
-        \{{nameSpace}}{{.}}({{#params}}{{^isFirst}}, {{/isFirst}}${{name}}{{/params}});
+        {{name}}({{#params}}{{^isFirst}}, {{/isFirst}}${{name}}{{/params}});
         {{/triggers}}
         return true;
     }
