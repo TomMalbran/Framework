@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Route;
 
+use App\System\Router as SystemRouter;
+
 use Framework\Framework;
 use Framework\Request;
 use Framework\Route\Container;
@@ -26,9 +28,20 @@ class Router {
         if (self::$loaded) {
             return false;
         }
-        self::$loaded = true;
+
         self::$data   = Framework::loadData(Framework::RouteData);
+        self::$loaded = true;
         return true;
+    }
+
+    /**
+     * Returns true if the System Router has the route
+     * @param string $route
+     * @return boolean
+     */
+    public static function hasSystemRoute(string $route): bool {
+        /** @disregard P1009 */
+        return class_exists(SystemRouter::class) && SystemRouter::has($route);
     }
 
 
@@ -62,6 +75,10 @@ class Router {
      * @return boolean
      */
     public static function has(string $route): bool {
+        if (self::hasSystemRoute($route)) {
+            return true;
+        }
+
         $data = self::get($route);
         return $data->access != null;
     }
@@ -72,6 +89,11 @@ class Router {
      * @return string
      */
     public static function getAccessName(string $route): string {
+        if (self::hasSystemRoute($route)) {
+            /** @disregard P1009 */
+            return SystemRouter::getAccessName($route);
+        }
+
         $data = self::get($route);
         return $data->access;
     }
@@ -85,6 +107,11 @@ class Router {
      * @return mixed
      */
     public static function call(string $route, Request $request): mixed {
+        if (self::hasSystemRoute($route)) {
+            /** @disregard P1009 */
+            return SystemRouter::call($route, $request);
+        }
+
         $data = self::get($route);
         if ($data->access == null) {
             return null;

@@ -7,6 +7,7 @@ use Framework\System\ConfigCode;
 use Framework\System\SettingCode;
 use Framework\System\SignalCode;
 use Framework\System\StatusCode;
+use Framework\System\RouterCode;
 use Framework\Provider\Mustache;
 use Framework\File\File;
 
@@ -33,6 +34,7 @@ class Code {
         self::generateOne("Setting", SettingCode::getCode());
         self::generateOne("Signal",  SignalCode::getCode());
         self::generateOne("Status",  StatusCode::getCode());
+        self::generateOne("Router",  RouterCode::getCode());
 
         print("<br>");
         return true;
