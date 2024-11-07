@@ -11,12 +11,14 @@ class DateTime {
 
     /** @var array{} The Date Formats */
     public static array $formats = [
-        "time"          => "H:i",
-        "dashes"        => "d-m-Y",
-        "dashesReverse" => "Y-m-d",
-        "dashesTime"    => "d-m-Y H:i",
-        "slashes"       => "d/m/Y",
-        "slashesTime"   => "d/m/Y H:i",
+        "time"           => "H:i",
+        "dashes"         => "d-m-Y",
+        "dashesReverse"  => "Y-m-d",
+        "dashesTime"     => "d-m-Y H:i",
+        "dashesSeconds"  => "d-m-Y H:i:s",
+        "slashes"        => "d/m/Y",
+        "slashesTime"    => "d/m/Y H:i",
+        "slashesSeconds" => "d/m/Y H:i:s",
     ];
 
     /** @var float[] */
