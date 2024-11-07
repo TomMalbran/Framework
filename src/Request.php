@@ -814,7 +814,11 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      */
     public function getCurlFile(string $key): ?CURLFile {
         if ($this->hasFile($key)) {
-            return curl_file_create($this->files[$key]["tmp_name"], $this->files[$key]["type"], $this->files[$key]["name"]);
+            return curl_file_create(
+                $this->files[$key]["tmp_name"],
+                $this->files[$key]["type"],
+                $this->files[$key]["name"],
+            );
         }
         return null;
     }
