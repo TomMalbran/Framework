@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore NOQUOTES
 namespace Framework\Utils;
 
 use Framework\Utils\Arrays;
