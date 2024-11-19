@@ -1154,20 +1154,22 @@ class DateTime {
 
     /**
      * Returns the amount of years between given date and today AKA the age
-     * @param mixed      $time
-     * @param float|null $timeZone Optional.
+     * @param mixed      $thisTime
+     * @param mixed|null $otherTime Optional.
+     * @param float|null $timeZone  Optional.
      * @return integer
      */
-    public static function getAge(mixed $time, ?float $timeZone = null): int {
-        $timeStamp = self::toTimeZone($time, $timeZone);
-        if (empty($timeStamp)) {
+    public static function getAge(mixed $thisTime, mixed $otherTime = null, ?float $timeZone = null): int {
+        $thisTimeStamp  = self::toTimeZone($thisTime, $timeZone);
+        $otherTimeStamp = !empty($otherTime) ? self::toTimeZone($otherTime, $timeZone) : time();
+        if (empty($thisTimeStamp)) {
             return 0;
         }
 
-        $thisYear = self::getYear();
-        $thatYear = self::getYear($timeStamp);
-        $result   = $thisYear - $thatYear;
-        if ($timeStamp > time()) {
+        $thisYear  = self::getYear($thisTimeStamp);
+        $otherYear = self::getYear($otherTimeStamp);
+        $result    = $otherYear - $thisYear;
+        if ($thisTimeStamp > $otherTimeStamp) {
             $result += 1;
         }
         return $result;
