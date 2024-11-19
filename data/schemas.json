@@ -147,6 +147,10 @@
             "dataID"       : { "type" : "number"                    }
         },
         "expressions" : {
+            "isPending" : {
+                "expression" : "IF(emailResult = 'NotProcessed', 1, 0)",
+                "type"       : "boolean"
+            },
             "isError" : {
                 "expression" : "IF(emailResult <> 'Sent', 1, 0)",
                 "type"       : "boolean"
