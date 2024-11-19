@@ -8,6 +8,7 @@ use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Email\Email;
 use Framework\Email\EmailResult;
+use Framework\System\ConfigCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
@@ -82,6 +83,7 @@ class EmailQueue {
         $query = Query::create("sentTime", "=", 0);
         $query->add("createdTime", ">", DateTime::getLastXHours(1));
         $query->orderBy("createdTime", false);
+        $query->limitIf(ConfigCode::getInt("emailLimit"));
         return self::schema()->getAll($query);
     }
 
