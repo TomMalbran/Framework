@@ -26,10 +26,10 @@ class Numbers {
         if (!is_numeric($number)) {
             return false;
         }
-        if ($min != null && $number < $min) {
+        if ($min !== null && $number < $min) {
             return false;
         }
-        if ($max != null && $number > $max) {
+        if ($max !== null && $number > $max) {
             return false;
         }
         return true;
