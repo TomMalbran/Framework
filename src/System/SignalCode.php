@@ -50,10 +50,8 @@ class SignalCode {
                             "params"   => $params,
                             "triggers" => [],
                         ];
-                    } else {
-                        if (count($params) > count($signals[$trigger]["params"])) {
-                            $signals[$trigger]["params"] = $params;
-                        }
+                    } elseif (count($params) > count($signals[$trigger]["params"])) {
+                        $signals[$trigger]["params"] = $params;
                     }
 
                     $triggerClass = "{$className}::{$method->getName()}";
