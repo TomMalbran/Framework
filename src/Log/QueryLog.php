@@ -156,11 +156,11 @@ class QueryLog {
     }
 
     /**
-     * Deletes the items older than 15 days
+     * Deletes the items older than 60 days
      * @param integer $days Optional.
      * @return boolean
      */
-    public static function deleteOld(int $days = 90): bool {
+    public static function deleteOld(int $days = 60): bool {
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::schema()->remove($query);
