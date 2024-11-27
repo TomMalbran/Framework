@@ -142,7 +142,7 @@ class Schema {
      */
     public function exists(Query|int|string $query, bool $withDeleted = true): bool {
         $query = $this->generateQueryID($query, $withDeleted);
-        return $this->getTotal($query) == 1;
+        return $this->getTotal($query) > 0;
     }
 
 
