@@ -236,12 +236,22 @@ class Arrays {
     }
 
     /**
-     * Removes the first value from the array
+     * Removes the First value from the array
      * @param mixed[] $array
      * @return mixed[]
      */
     public static function removeFirst(array $array): array {
         array_shift($array);
+        return $array;
+    }
+
+    /**
+     * Removes the Last value from the array
+     * @param mixed[] $array
+     * @return mixed[]
+     */
+    public static function removeLast(array $array): array {
+        array_pop($array);
         return $array;
     }
 
