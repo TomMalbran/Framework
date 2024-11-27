@@ -197,6 +197,21 @@ class Numbers {
     }
 
     /**
+     * Applies the Increment to the given Number
+     * @param integer|float $number
+     * @param integer|float $percent
+     * @return integer|float
+     */
+    public static function applyIncrement(int|float $number, int|float $percent): int|float {
+        if (empty($percent)) {
+            return $number;
+        }
+        $percent   = self::clamp($percent, 0, 100);
+        $increment = $percent / (100 - $percent);
+        return $number + $number * $increment;
+    }
+
+    /**
      * Returns the Greatest Common Divisor
      * @param integer|float $a
      * @param integer|float $b
