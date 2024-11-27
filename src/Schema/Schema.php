@@ -243,20 +243,22 @@ class Schema {
      * Selects the given column from a single table and returns the entire column
      * @param Query|null $query
      * @param string     $column
+     * @param string     $columnKey Optional.
      * @return string[]
      */
-    public function getColumn(?Query $query, string $column): array {
-        $columnName = Strings::substringAfter($column, ".");
-        $query      = $this->generateQuery($query);
-        $selection  = new Selection($this->db, $this->structure);
+    public function getColumn(?Query $query, string $column, string $columnKey = ""): array {
+        $columnKey = empty($columnKey) ? Strings::substringAfter($column, ".") : $columnKey;
+
+        $query     = $this->generateQuery($query);
+        $selection = new Selection($this->db, $this->structure);
         $selection->addSelects($column, true);
         $selection->addJoins();
 
         $request = $selection->request($query);
         $result  = [];
         foreach ($request as $row) {
-            if (!empty($row[$columnName]) && !Arrays::contains($result, $row[$columnName])) {
-                $result[] = $row[$columnName];
+            if (!empty($row[$columnKey]) && !Arrays::contains($result, $row[$columnKey])) {
+                $result[] = $row[$columnKey];
             }
         }
         return $result;
