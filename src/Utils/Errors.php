@@ -2,6 +2,7 @@
 namespace Framework\Utils;
 
 use Framework\Utils\Arrays;
+use Framework\Utils\Strings;
 
 /**
  * The Errors wrapper
@@ -187,9 +188,16 @@ class Errors {
         if ($error === null) {
             return !empty($this->errors);
         }
+
         $errors = Arrays::toArray($error);
-        foreach ($errors as $err) {
-            if (!empty($this->errors[$err])) {
+        foreach ($errors as $errorKey) {
+            if (Strings::contains($errorKey, "-")) {
+                foreach (array_keys($this->errors) as $key) {
+                    if (Strings::startsWith($key, $errorKey)) {
+                        return true;
+                    }
+                }
+            } elseif (!empty($this->errors[$errorKey])) {
                 return true;
             }
         }
