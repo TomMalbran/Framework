@@ -66,11 +66,27 @@ class Importer implements Iterator {
 
     /**
      * Sets the Columns
-     * @param array{} ...$columns
+     * @param array{} ...$columnsList
      * @return Importer
      */
-    public function setColumns(array ...$columns): Importer {
-        $this->columns = array_merge(...$columns);
+    public function setColumns(array ...$columnsList): Importer {
+        foreach ($columnsList as $columns) {
+            foreach ($columns as $key => $index) {
+                $this->columns[$key] = $index;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Sets the Column Names
+     * @param string ...$columnsKeys
+     * @return Importer
+     */
+    public function setColumnNames(string ...$columnsKeys): Importer {
+        foreach ($columnsKeys as $index => $key) {
+            $this->columns[$key] = $index + 1;
+        }
         return $this;
     }
 
