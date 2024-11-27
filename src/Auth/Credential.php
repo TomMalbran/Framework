@@ -614,8 +614,7 @@ class Credential {
      * @return boolean
      */
     public static function updateLoginTime(int $credentialID): bool {
-        $query   = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $current = self::schema()->getValue($query, "currentLogin");
+        $current = self::getValue($credentialID, "currentLogin");
         return self::schema()->edit($credentialID, [
             "lastLogin"    => $current,
             "currentLogin" => time(),
@@ -763,6 +762,17 @@ class Credential {
         return self::schema()->edit($credentialID, [
             "askNotifications" => 0,
         ]);
+    }
+
+    /**
+     * Gets a Credential Value
+     * @param integer $credentialID
+     * @param string  $key
+     * @return mixed
+     */
+    public static function getValue(int $credentialID, string $key): mixed {
+        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        return self::schema()->getValue($query, $key);
     }
 
     /**
