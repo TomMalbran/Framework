@@ -279,7 +279,9 @@
                 "table"  : "log_sessions",
                 "prefix" : "session",
                 "fields" : {
-                    "createdTime" : { "type" : "date" }
+                    "createdTime" : { "type" : "date"   },
+                    "ip"          : { "type" : "string" },
+                    "userAgent"   : { "type" : "string" }
                 }
             },
             "CREDENTIAL_ID" : {

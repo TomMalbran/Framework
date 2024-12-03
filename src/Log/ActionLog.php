@@ -72,9 +72,38 @@ class ActionLog {
      */
     public static function getAll(Request $request, array $mappings = []): array {
         $query = self::createQuery($request, $mappings);
-        $query->orderBy("createdTime", false);
+        $query->orderBy("log_sessions.createdTime", false);
+        $query->orderBy("log_sessions.SESSION_ID", false);
+        $query->orderBy("log_actions.createdTime", false);
         $query->paginate($request->getInt("page"), $request->getInt("amount"));
-        return self::request($query);
+
+        $request   = self::actionSchema()->getMap($query);
+        $result    = [];
+        $lastIndex = -1;
+
+        foreach ($request as $row) {
+            if ($lastIndex < 0 || $result[$lastIndex]["sessionID"] != $row["sessionID"]) {
+                $result[] = [
+                    "sessionID"      => $row["sessionID"],
+                    "credentialID"   => $row["credentialID"],
+                    "credentialName" => $row["credentialName"],
+                    "ip"             => $row["sessionIp"],
+                    "userAgent"      => $row["sessionUserAgent"],
+                    "createdTime"    => $row["sessionCreatedTime"],
+                    "actions"        => [],
+                    "isLast"         => false,
+                ];
+                $lastIndex += 1;
+            }
+            $result[$lastIndex]["actions"][] = [
+                "module"      => $row["module"],
+                "action"      => $row["action"],
+                "dataID"      => !empty($row["dataID"]) ? JSON::decode($row["dataID"]) : "",
+                "createdTime" => $row["createdTime"],
+            ];
+        }
+        $result[$lastIndex]["isLast"] = true;
+        return $result;
     }
 
     /**
@@ -86,51 +115,6 @@ class ActionLog {
     public static function getTotal(Request $request, array $mappings = []): int {
         $query = self::createQuery($request, $mappings);
         return self::sessionSchema()->getTotal($query);
-    }
-
-    /**
-     * Returns the Actions Log using the given Query
-     * @param Query $query
-     * @return array{}[]
-     */
-    private static function request(Query $query): array {
-        $sessionIDs   = self::sessionSchema()->getColumn($query, "SESSION_ID");
-        $querySession = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("createdTime", false);
-        $queryActs    = Query::create("SESSION_ID", "IN", $sessionIDs)->orderBy("createdTime", true);
-        $actions      = [];
-        $result       = [];
-
-        if (empty($sessionIDs)) {
-            return [];
-        }
-
-        $request = self::actionSchema()->getMap($queryActs);
-        foreach ($request as $row) {
-            if (empty($actions[$row["sessionID"]])) {
-                $actions[$row["sessionID"]] = [];
-            }
-            $actions[$row["sessionID"]][] = [
-                "module"      => $row["module"],
-                "action"      => $row["action"],
-                "dataID"      => !empty($row["dataID"]) ? JSON::decode($row["dataID"]) : "",
-                "createdTime" => $row["createdTime"],
-            ];
-        }
-
-        $request = self::sessionSchema()->getMap($querySession);
-        foreach ($request as $row) {
-            $result[] = [
-                "sessionID"      => $row["sessionID"],
-                "credentialID"   => $row["credentialID"],
-                "credentialName" => $row["credentialName"],
-                "ip"             => $row["ip"],
-                "userAgent"      => $row["userAgent"],
-                "actions"        => !empty($actions[$row["sessionID"]]) ? $actions[$row["sessionID"]] : [],
-                "createdTime"    => $row["createdTime"],
-            ];
-        }
-
-        return $result;
     }
 
 
