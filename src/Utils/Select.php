@@ -207,15 +207,22 @@ class Select implements ArrayAccess, JsonSerializable {
 
     /**
      * Creates a select using the given array
-     * @param mixed[]         $array
-     * @param string          $keyName
-     * @param string[]|string $valName
-     * @param boolean         $useEmpty Optional.
-     * @param string|null     $extraKey Optional.
-     * @param boolean         $distinct Optional.
+     * @param mixed[]              $array
+     * @param string               $keyName
+     * @param string[]|string      $valName
+     * @param boolean              $useEmpty Optional.
+     * @param string[]|string|null $extraKey Optional.
+     * @param boolean              $distinct Optional.
      * @return Select[]
      */
-    public static function create(array $array, string $keyName, array|string $valName, bool $useEmpty = false, ?string $extraKey = null, bool $distinct = false): array {
+    public static function create(
+        array $array,
+        string $keyName,
+        array|string $valName,
+        bool $useEmpty = false,
+        array|string $extraKey = null,
+        bool $distinct = false,
+    ): array {
         $result = [];
         $keys   = [];
 
@@ -227,8 +234,11 @@ class Select implements ArrayAccess, JsonSerializable {
             }
 
             $item = new Select($key, $value);
-            if ($extraKey) {
-                $item->setExtra($extraKey, Arrays::getValue($row, $extraKey));
+            if (!empty($extraKey)) {
+                $extraKeys = Arrays::toArray($extraKey);
+                foreach ($extraKeys as $extraKey) {
+                    $item->setExtra($extraKey, Arrays::getValue($row, $extraKey));
+                }
             }
 
             $result[] = $item;

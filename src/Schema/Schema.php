@@ -303,7 +303,7 @@ class Schema {
      * @param boolean              $orderAsc   Optional.
      * @param string|null          $idName     Optional.
      * @param string[]|string|null $nameKey    Optional.
-     * @param string|null          $extraKey   Optional.
+     * @param string[]|string|null $extraKey   Optional.
      * @param boolean              $useEmpty   Optional.
      * @param string|null          $distinctID Optional.
      * @return Select[]
@@ -314,7 +314,7 @@ class Schema {
         bool $orderAsc = true,
         ?string $idName = null,
         array|string $nameKey = null,
-        ?string $extraKey = null,
+        array|string $extraKey = null,
         bool $useEmpty = false,
         ?string $distinctID = null
     ): array {
