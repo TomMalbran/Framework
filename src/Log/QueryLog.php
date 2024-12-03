@@ -10,6 +10,7 @@ use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
+use Framework\Utils\Strings;
 
 /**
  * The Query Log
@@ -87,7 +88,7 @@ class QueryLog {
      * Creates or edits a Query
      * @param float   $time
      * @param string  $expression
-     * @param array{} $params
+     * @param mixed[] $params
      * @return boolean
      */
     public static function createOrEdit(float $time, string $expression, array $params): bool {
@@ -95,13 +96,12 @@ class QueryLog {
             return false;
         }
 
-        $bindKeys = [];
-        foreach ($params as $key) {
-            $bindKeys[] = '/[?]/';
-        }
-        $expression  = preg_replace("/ +/", " ", $expression);
-        $expression  = preg_replace($bindKeys, $params, $expression, 1);
         $elapsedTime = (int)floor($time);
+        $expression  = Strings::replacePattern($expression, "/ +/", " ");
+        foreach ($params as $param) {
+            $value      = Strings::isString($param) ? "'$param'" : $param;
+            $expression = Strings::replacePattern($expression, "/[?]/", $value, 1);
+        }
 
         $query = Query::create("expression", "=", $expression);
         if (self::schema()->getTotal($query) > 0) {

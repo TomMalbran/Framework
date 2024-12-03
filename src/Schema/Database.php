@@ -573,7 +573,7 @@ class Database {
      * Process a elapsed time and saves it if it last more than 5 seconds
      * @param float   $startTime
      * @param string  $expression
-     * @param array{} $params
+     * @param mixed[] $params
      * @return boolean
      */
     protected function processTime(float $startTime, string $expression, array $params): bool {
