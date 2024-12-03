@@ -22,7 +22,7 @@ class Facebook {
             return [];
         }
 
-        $response = Curl::get(self::BaseUrl . "/me", [
+        $response = Curl::execute("GET", self::BaseUrl . "/me", [
             "fields"       => "email,name,first_name,last_name",
             "access_token" => $accessToken,
         ]);

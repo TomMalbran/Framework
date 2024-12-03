@@ -90,7 +90,7 @@ class Mandrill {
             "async"   => false,
             "send_at" => date("Y-m-d H:i:s"),
         ];
-        $response = Curl::post($url, $params, $headers, jsonBody: true);
+        $response = Curl::execute("POST", $url, $params, $headers, jsonBody: true);
 
         if (empty($response["status"])) {
             return $response["status"] === "sent";

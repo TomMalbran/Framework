@@ -22,7 +22,7 @@ class Google {
             return [];
         }
 
-        $response = Curl::get(self::BaseUrl . "userinfo", null, [
+        $response = Curl::execute("GET", self::BaseUrl . "userinfo", null, [
             "Authorization" => "Bearer $accessToken",
         ]);
         if (empty($response["email"])) {

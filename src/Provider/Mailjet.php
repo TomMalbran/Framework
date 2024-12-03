@@ -75,7 +75,7 @@ class Mailjet {
         $params   = [ "Messages" => [ $message ] ];
 
         $userPass = self::$apiKey . ":" . self::$apiSecret;
-        $response = Curl::post($url, $params, $headers, $userPass, jsonBody: true);
+        $response = Curl::execute("POST", $url, $params, $headers, $userPass, jsonBody: true);
 
         if (!empty($response["Messages"][0])) {
             return $response["Messages"][0]["Status"] == "success";

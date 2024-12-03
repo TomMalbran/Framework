@@ -128,7 +128,7 @@ class Notification {
             "Content-Type"  => "application/json; charset=utf-8",
             "Authorization" => "Basic " . self::$restKey,
         ];
-        $response = Curl::post(self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
+        $response = Curl::execute("POST", self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
 
         if (empty($response["id"])) {
             return null;

@@ -41,7 +41,7 @@ class OpenAI {
      */
     private static function get(string $route, ?array $request = null): mixed {
         self::load();
-        return Curl::get(self::BaseUrl . $route, $request, [
+        return Curl::execute("GET", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
@@ -55,7 +55,7 @@ class OpenAI {
      */
     private static function post(string $route, ?array $request = null): mixed {
         self::load();
-        return Curl::post(self::BaseUrl . $route, $request, [
+        return Curl::execute("POST", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
             "Content-Type"  => "application/json",
             "OpenAI-Beta"   => "assistants=v2",
@@ -70,7 +70,7 @@ class OpenAI {
      */
     private static function upload(string $route, ?array $request = null): mixed {
         self::load();
-        return Curl::post(self::BaseUrl . $route, $request, [
+        return Curl::execute("POST", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
             "Content-Type"  => "multipart/form-data",
             "OpenAI-Beta"   => "assistants=v2",
@@ -85,7 +85,7 @@ class OpenAI {
      */
     private static function delete(string $route, ?array $request = null): mixed {
         self::load();
-        return Curl::custom("DELETE", self::BaseUrl . $route, $request, [
+        return Curl::execute("DELETE", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$apiKey,
             "Content-Type"  => "application/json",
             "OpenAI-Beta"   => "assistants=v2",

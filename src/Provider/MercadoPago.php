@@ -66,7 +66,7 @@ class MercadoPago {
      */
     private static function get(string $route, ?array $request = null, bool $jsonResponse = true): mixed {
         self::load();
-        return Curl::get(self::BaseUrl . $route, $request, [
+        return Curl::execute("GET", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . self::$accessToken,
         ], jsonResponse: $jsonResponse);
     }
@@ -80,7 +80,7 @@ class MercadoPago {
      */
     private static function post(string $route, array $request, array $headers = []): mixed {
         self::load();
-        return Curl::post(self::BaseUrl . $route, $request, Arrays::merge([
+        return Curl::execute("POST", self::BaseUrl . $route, $request, Arrays::merge([
             "content-type"  => "application/json",
             "Authorization" => "Bearer " . self::$accessToken,
         ], $headers), jsonBody: true);
@@ -94,7 +94,7 @@ class MercadoPago {
      */
     private static function put(string $route, array $request): mixed {
         self::load();
-        return Curl::custom("PUT", self::BaseUrl . $route, $request, [
+        return Curl::execute("PUT", self::BaseUrl . $route, $request, [
             "content-type"  => "application/json",
             "Authorization" => "Bearer " . self::$accessToken,
         ], jsonBody: true);

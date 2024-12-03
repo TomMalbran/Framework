@@ -84,7 +84,7 @@ class GoogleMap {
         }
 
         $url      = self::BaseUrl . "geocode/json";
-        $response = Curl::get($url, $params);
+        $response = Curl::execute("GET", $url, $params);
 
         if (empty($response["results"][0])) {
             return [];
@@ -127,7 +127,7 @@ class GoogleMap {
         ];
 
         $url = self::BaseUrl . "distancematrix/json";
-        $response = Curl::get($url, $params);
+        $response = Curl::execute("GET", $url, $params);
 
         if (empty($response["rows"][0]["elements"][0]["distance"]["value"])) {
             return null;

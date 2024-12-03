@@ -75,7 +75,7 @@ class SendGrid {
                 "name"  => $fromName,
             ];
         }
-        $response = Curl::post($url, $params, $headers, jsonBody: true);
+        $response = Curl::execute("POST", $url, $params, $headers, jsonBody: true);
 
         return empty($response);
     }
