@@ -66,7 +66,7 @@ class SpreadsheetReader implements ImporterReader, Iterator {
     public function getData(int $amount = 3): ImporterData {
         $data = new ImporterData(
             columns: $this->getHeader(),
-            amount:  1,
+            amount:  0,
             first:   "",
             last:    "",
         );
