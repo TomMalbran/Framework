@@ -13,10 +13,10 @@ use Framework\Utils\Strings;
  */
 class Path {
 
-    private static bool   $loaded = false;
+    private static bool  $loaded = false;
 
     /** @var array{}[] */
-    private static array  $data   = [];
+    private static array $data   = [];
 
 
     /**
@@ -250,7 +250,7 @@ class Path {
     /**
      * Returns the path used to store the temp files
      * @param integer $credentialID
-     * @param boolean $create
+     * @param boolean $create       Optional.
      * @return string
      */
     public static function getTempPath(int $credentialID, bool $create = true): string {
