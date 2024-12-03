@@ -623,6 +623,18 @@ class Arrays {
         return -1;
     }
 
+
+    /**
+     * Returns true if there is an item with the given id key with the given is value
+     * @param mixed[] $array
+     * @param string  $idKey
+     * @param mixed   $idValue
+     * @return boolean
+     */
+    public static function hasValue(array $array, string $idKey, mixed $idValue): bool {
+        return self::findIndex($array, $idKey, $idValue) !== -1;
+    }
+
     /**
      * Returns the index at the given id key with the given is value
      * @param mixed[] $array
