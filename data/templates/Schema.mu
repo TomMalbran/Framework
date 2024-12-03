@@ -116,7 +116,7 @@ class {{name}}Schema {
      * @param integer $skipID Optional.
      * @return boolean
      */
-    public static function {{fieldKey}}Exists({{fieldArg}}{{{parentsDefList}}}, int $skipID = 0): bool {
+    public static function {{fieldName}}Exists({{fieldArg}}{{{parentsDefList}}}, int $skipID = 0): bool {
         $query = Query::create("{{fieldKey}}", "=", {{fieldParam}});
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
