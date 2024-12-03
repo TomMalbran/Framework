@@ -28,8 +28,8 @@
         "^[a-z][A-Za-z]*$" : {
             "type"       : "object",
             "properties" : {
-                "name"          : { "type" : "string"              },
-                "table"         : { "type" : "string"              },
+                "name"          : { "$ref" : "#/$defs/name"        },
+                "table"         : { "$ref" : "#/$defs/table"       },
                 "fields"        : { "$ref" : "#/$defs/fields"      },
                 "expressions"   : { "$ref" : "#/$defs/expressions" },
                 "processed"     : { "$ref" : "#/$defs/fields"      },
@@ -61,19 +61,20 @@
     },
     "$defs": {
         "fields" : {
-            "type" : "object",
-            "patternProperties" : {
-                "^[A-Za-z_]*$" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
+                "^(?!type$)(?!code$)[A-Za-z_]*$" : {
                     "type"       : "object",
                     "required"   : [ "type" ],
                     "properties" : {
                         "type"      : { "$ref" : "#/$defs/type" },
-                        "name"      : { "type" : "string"       },
+                        "name"      : { "$ref" : "#/$defs/name" },
                         "length"    : { "type" : "number"       },
                         "decimals"  : { "type" : "number"       },
-                        "dateType"  : { "type" : "string"       },
-                        "date"      : { "type" : "string"       },
-                        "hour"      : { "type" : "string"       },
+                        "dateType"  : { "$ref" : "#/$defs/name" },
+                        "date"      : { "$ref" : "#/$defs/name" },
+                        "hour"      : { "$ref" : "#/$defs/name" },
                         "default"   : {                         },
                         "isPrimary" : { "type" : "boolean"      },
                         "isKey"     : { "type" : "boolean"      },
@@ -85,37 +86,39 @@
                         "isSigned"  : { "type" : "boolean"      },
                         "noPrefix"  : { "type" : "boolean"      },
                         "cantEdit"  : { "type" : "boolean"      },
-                        "mergeTo"   : { "type" : "string"       },
-                        "defaultTo" : { "type" : "string"       }
+                        "mergeTo"   : { "$ref" : "#/$defs/name" },
+                        "defaultTo" : { "$ref" : "#/$defs/name" }
                     }
                 }
             }
         },
         "expressions" : {
-            "type" : "object",
-            "patternProperties" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
                 "^[a-z][A-Za-z]*$" : {
                     "type"       : "object",
-                    "required"   : [ "type", "expression" ],
+                    "required"   : [ "expression", "type" ],
                     "properties" : {
-                        "type"       : { "$ref" : "#/$defs/type" },
-                        "expression" : { "type" : "string"       }
+                        "expression" : { "type" : "string"       },
+                        "type"       : { "$ref" : "#/$defs/type" }
                     }
                 }
             }
         },
         "joins" : {
-            "type" : "object",
-            "patternProperties" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
                 "^[A-Za-z_]*$" : {
                     "type"       : "object",
                     "required"   : [ "table" ],
                     "properties" : {
-                        "table"      : { "type" : "string"          },
-                        "asTable"    : { "type" : "string"          },
-                        "onTable"    : { "type" : "string"          },
-                        "leftKey"    : { "type" : "string"          },
-                        "rightKey"   : { "type" : "string"          },
+                        "table"      : { "$ref" : "#/$defs/table"   },
+                        "asTable"    : { "$ref" : "#/$defs/table"   },
+                        "onTable"    : { "$ref" : "#/$defs/table"   },
+                        "leftKey"    : { "$ref" : "#/$defs/name"    },
+                        "rightKey"   : { "$ref" : "#/$defs/name"    },
                         "and"        : { "type" : "string"          },
                         "andKey"     : { "type" : "string"          },
                         "andKeys"    : { "$ref" : "#/$defs/strings" },
@@ -123,7 +126,7 @@
                         "andValue"   : { "type" : "string"          },
                         "andTable"   : { "type" : "string"          },
                         "andDeleted" : { "type" : "boolean"         },
-                        "prefix"     : { "type" : "string"          },
+                        "prefix"     : { "$ref" : "#/$defs/name"    },
                         "fields"     : { "$ref" : "#/$defs/fields"  },
                         "fieldKeys"  : { "$ref" : "#/$defs/strings" },
                         "mergeGlue"  : { "type" : "string"          }
@@ -132,57 +135,60 @@
             }
         },
         "counts" : {
-            "type"              : "object",
-            "patternProperties" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
                 "^[a-z][A-Za-z]*$" : {
                     "type"       : "object",
                     "required"   : [ "table", "type" ],
                     "properties" : {
-                        "table"     : { "type" : "string"       },
-                        "type"      : { "$ref" : "#/$defs/type" },
-                        "isSum"     : { "type" : "boolean"      },
-                        "value"     : { "type" : "string"       },
-                        "mult"      : { "type" : "number"       },
-                        "onTable"   : { "type" : "string"       },
-                        "rightKey"  : { "type" : "string"       },
-                        "leftKey"   : { "type" : "string"       },
-                        "where"     : { "type" : "array"        },
-                        "noDeleted" : { "type" : "boolean"      }
+                        "table"     : { "$ref" : "#/$defs/table" },
+                        "type"      : { "$ref" : "#/$defs/type"  },
+                        "isSum"     : { "type" : "boolean"       },
+                        "value"     : { "type" : "string"        },
+                        "mult"      : { "type" : "number"        },
+                        "onTable"   : { "$ref" : "#/$defs/table" },
+                        "rightKey"  : { "$ref" : "#/$defs/name"  },
+                        "leftKey"   : { "$ref" : "#/$defs/name"  },
+                        "where"     : { "type" : "array"         },
+                        "noDeleted" : { "type" : "boolean"       }
                     }
                 }
             }
         },
         "subrequests" : {
-            "type"              : "object",
-            "patternProperties" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
                 "^[a-z][A-Za-z]*$" : {
                     "type"       : "object",
                     "required"   : [ "type", "name" ],
                     "properties" : {
-                        "type"    : { "type" : "string"  },
-                        "name"    : { "type" : "string"  },
-                        "idKey"   : { "type" : "string"  },
-                        "idName"  : { "type" : "string"  },
-                        "where"   : { "type" : "array"   },
-                        "orderBy" : { "type" : "string"  },
-                        "isAsc"   : { "type" : "boolean" },
-                        "asArray" : { "type" : "boolean" },
-                        "field"   : { "type" : "string"  },
-                        "value"   : {                    }
+                        "type"    : { "type" : "string"       },
+                        "name"    : { "$ref" : "#/$defs/name" },
+                        "idKey"   : { "$ref" : "#/$defs/name" },
+                        "idName"  : { "$ref" : "#/$defs/name" },
+                        "where"   : { "type" : "array"        },
+                        "orderBy" : { "$ref" : "#/$defs/name" },
+                        "isAsc"   : { "type" : "boolean"      },
+                        "asArray" : { "type" : "boolean"      },
+                        "field"   : { "$ref" : "#/$defs/name" },
+                        "value"   : {                         }
                     }
                 }
             }
         },
         "foreigns" : {
-            "type"              : "object",
-            "patternProperties" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
                 "^[A-Za-z_]*$" : {
                     "type"       : "object",
                     "required"   : [ "table" ],
                     "properties" : {
-                        "table"    : { "type" : "string" },
-                        "leftKey"  : { "type" : "string" },
-                        "rightKey" : { "type" : "string" }
+                        "table"    : { "$ref" : "#/$defs/table" },
+                        "leftKey"  : { "$ref" : "#/$defs/name"  },
+                        "rightKey" : { "$ref" : "#/$defs/name"  }
                     }
                 }
             }
@@ -190,6 +196,14 @@
         "strings" : {
             "type"  : "array",
             "items" : { "type" : "string" }
+        },
+        "name" : {
+            "type"    : "string",
+            "pattern" : "^[A-Za-z_]*$"
+        },
+        "table" : {
+            "type"    : "string",
+            "pattern" : "^[a-z][a-z_]*[a-z]$"
         },
         "type" : {
             "enum" : [
