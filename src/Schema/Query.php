@@ -510,7 +510,7 @@ class Query {
     public function get(bool $addWhere = true): string {
         $result  = $this->getWhere($addWhere);
         $result .= $this->getOrderLimit();
-        return preg_replace("!\s+!", " ", $result);
+        return Strings::replacePattern($result, "!\s+!", " ");
     }
 
     /**

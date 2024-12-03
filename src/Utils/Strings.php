@@ -267,14 +267,15 @@ class Strings {
     }
 
     /**
-     * Replaces in the String the pattern with the replace
+     * Replaces in the String the pattern with the replacement
      * @param string          $string
      * @param string[]|string $pattern
-     * @param string[]|string $replace
+     * @param string[]|string $replacement
+     * @param integer         $limit       Optional.
      * @return string
      */
-    public static function replacePattern(string $string, array|string $pattern, array|string $replace): string {
-        $result = preg_replace($pattern, $replace, $string);
+    public static function replacePattern(string $string, array|string $pattern, array|string $replacement, int $limit = -1): string {
+        $result = preg_replace($pattern, $replacement, $string, $limit);
         return !empty($result) ? $result : "";
     }
 
@@ -601,7 +602,7 @@ class Strings {
      * @return string
      */
     public static function toCamelCase(string $string): string {
-        $result = preg_replace("/[\.:;\-_]+/", " ", $string);
+        $result = self::replacePattern($string, "/[\.:;\-_]+/", " ");
         $result = strtolower($result);
         $result = ucwords($result);
         $result = str_replace(" ", "", $result);
@@ -793,7 +794,7 @@ class Strings {
         foreach ([ "img", "source", "audio" ] as $tag) {
             $pattern     = "/<{$tag} (.*?)src=\"(.*?)\"/i";
             $replacement = "<{$tag} $1src=\"{$url}/$2\"";
-            $result      = preg_replace($pattern, $replacement, $result);
+            $result      = self::replacePattern($result, $pattern, $replacement);
         }
         return $result;
     }
@@ -812,13 +813,13 @@ class Strings {
             "â€”", "â€“", ",", "<", ".", ">", "/", "?",
         ];
         $clean = trim(str_replace($strip, "", strip_tags($string)));
-        $clean = preg_replace('/\s+/', "-", $clean);
+        $clean = self::replacePattern($clean, '/\s+/', "-");
 
         if ($anal) {
             $tilde = [ "á", "é", "í", "ó", "ú", "ü", "ñ", "Á", "É", "Í", "Ó", "Ú", "Ü", "Ñ" ];
             $with  = [ "a", "e", "i", "o", "u", "u", "n", "A", "E", "I", "O", "U", "U", "N" ];
             $clean = str_replace($tilde, $with, $clean);
-            $clean = preg_replace("/[^a-zA-Z0-9\-]/", "", $clean);
+            $clean = self::replacePattern($clean, "/[^a-zA-Z0-9\-]/", "");
         }
         if ($lowercase) {
             return function_exists("mb_strtolower") ? mb_strtolower($clean, "UTF-8") : strtolower($clean);

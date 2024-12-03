@@ -430,7 +430,7 @@ class Database {
                 $values[] = $value;
             }
         }
-        return preg_replace($keys, $values, $expression, 1);
+        return Strings::replacePattern($expression, $keys, $values, 1);
     }
 
     /**

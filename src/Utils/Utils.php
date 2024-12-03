@@ -172,7 +172,7 @@ class Utils {
      */
     public static function parseCUIT(string $value): string {
         if (Strings::length($value) == 11) {
-            return preg_replace("/^(\d{2})(\d{8})(\d{1})$/", "$1-$2-$3", $value);
+            return Strings::replacePattern($value, "/^(\d{2})(\d{8})(\d{1})$/", "$1-$2-$3");
         }
         return $value;
     }
