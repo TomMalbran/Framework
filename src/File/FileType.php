@@ -1,4 +1,6 @@
 <?php
+// spell-checker: ignore  msvideo, binhex, compactpro, coreldraw, troff, macbinary, xbitmap, pkix, msdownload, msexcel, flac, gtar, pjpeg, mpegurl
+// spell-checker: ignore  quicktime, powerpoint, msword, photoshop, realaudio, realvideo, stuffit, smil, vcard, videolan, wbxml, wmlc, xspf, scriptzsh
 namespace Framework\File;
 
 use Framework\File\File;
