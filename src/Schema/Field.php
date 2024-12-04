@@ -40,6 +40,7 @@ class Field {
     public string $dateType   = "";
     public string $date       = "";
     public string $hour       = "";
+    public string $path       = "";
     public mixed  $default    = null;
 
     public bool   $isID       = false;
@@ -78,6 +79,7 @@ class Field {
         $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : "middle";
         $this->date       = !empty($data["date"])     ? $data["date"]          : "";
         $this->hour       = !empty($data["hour"])     ? $data["hour"]          : "";
+        $this->path       = !empty($data["path"])     ? $data["path"]          : "";
         $this->default    = isset($data["default"])   ? $data["default"]       : null;
 
         $this->isID       = $this->type === self::ID;
@@ -330,8 +332,12 @@ class Field {
             break;
         case self::File:
             $result[$key]           = $text;
-            $result["{$key}Url"]    = !empty($text) ? Path::getUrl("source", "0", $text) : "";
-            $result["{$key}Thumb"]  = !empty($text) ? Path::getUrl("thumbs", "0", $text) : "";
+            if (!empty($this->path)) {
+                $result["{$key}Url"]   = !empty($text) ? Path::getUrl($this->path, $text) : "";
+            } else {
+                $result["{$key}Url"]   = !empty($text) ? Path::getUrl("source", "0", $text) : "";
+                $result["{$key}Thumb"] = !empty($text) ? Path::getUrl("thumbs", "0", $text) : "";
+            }
             break;
         default:
             $result[$key]           = $text;
