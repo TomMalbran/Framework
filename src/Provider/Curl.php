@@ -18,6 +18,7 @@ class Curl {
      * @param array{}|null $params       Optional.
      * @param array{}|null $headers      Optional.
      * @param string       $userPass     Optional.
+     * @param boolean      $isCustom     Optional.
      * @param boolean      $jsonBody     Optional.
      * @param boolean      $urlBody      Optional.
      * @param boolean      $jsonResponse Optional.
@@ -32,6 +33,7 @@ class Curl {
         ?array $params = null,
         ?array $headers = null,
         string $userPass = "",
+        bool $isCustom = false,
         bool $jsonBody = false,
         bool $urlBody = false,
         bool $jsonResponse = true,
@@ -49,9 +51,13 @@ class Curl {
             CURLOPT_LOW_SPEED_TIME  => 120,
         ];
 
-        // Set the Url and Body
-        switch ($method) {
-        case "POST":
+        // GET Requests
+        if (!$isCustom && $method === "GET") {
+            $options[CURLOPT_URL]      = self::parseUrl($url, $params);
+            $options[CURLOPT_ENCODING] = "identity";
+
+        // POST Requests
+        } elseif (!$isCustom && $method === "POST") {
             $options[CURLOPT_POST] = true;
             $options[CURLOPT_URL]  = $url;
 
@@ -68,14 +74,9 @@ class Curl {
             if (!empty($headers) && is_scalar($body)) {
                 $headers["Content-Length"] = strlen($body);
             }
-            break;
 
-        case "GET":
-            $options[CURLOPT_URL]      = self::parseUrl($url, $params);
-            $options[CURLOPT_ENCODING] = "identity";
-            break;
-
-        default: // Custom
+        // Custom Requests
+        } else {
             $options[CURLOPT_CUSTOMREQUEST] = $method;
             $options[CURLOPT_ENCODING]      = "identity";
 
