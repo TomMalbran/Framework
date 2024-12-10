@@ -114,7 +114,7 @@ class ActionLog {
      */
     public static function getTotal(Request $request, array $mappings = []): int {
         $query = self::createQuery($request, $mappings);
-        return self::sessionSchema()->getTotal($query);
+        return self::actionSchema()->getTotal($query);
     }
 
 
