@@ -24,6 +24,7 @@ class Curl {
      * @param boolean      $jsonResponse Optional.
      * @param boolean      $withHeaders  Optional.
      * @param boolean      $returnError  Optional.
+     * @param boolean      $disableSSL   Optional.
      * @param integer      $timeout      Optional.
      * @return mixed
      */
@@ -39,6 +40,7 @@ class Curl {
         bool $jsonResponse = true,
         bool $withHeaders = false,
         bool $returnError = false,
+        bool $disableSSL = false,
         int $timeout = 100,
     ): mixed {
         $options = [
@@ -50,6 +52,10 @@ class Curl {
             CURLOPT_LOW_SPEED_LIMIT => 512,
             CURLOPT_LOW_SPEED_TIME  => 120,
         ];
+        if ($disableSSL) {
+            $options[CURLOPT_SSL_VERIFYPEER] = false;
+            $options[CURLOPT_SSL_VERIFYHOST] = false;
+        }
 
         // GET Requests
         if (!$isCustom && $method === "GET") {
