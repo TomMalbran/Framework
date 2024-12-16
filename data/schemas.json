@@ -308,6 +308,10 @@
             "playerID"      : { "type" : "string"                          },
             "wasAdded"      : { "type" : "boolean"                         }
         },
+        "foreigns" : {
+            "CREDENTIAL_ID" : { "table" : "credentials"         },
+            "playerID"      : { "table" : "credentials_devices" }
+        },
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
