@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Numbers;
 use ArrayAccess;
 
 /**
@@ -441,6 +442,23 @@ class Arrays {
             }
         }
         return $result;
+    }
+
+    /**
+     * Returns the average of the elements of the given array
+     * @param mixed[]     $array
+     * @param integer     $decimals Optional.
+     * @param string|null $key      Optional.
+     * @return float
+     */
+    public static function average(array $array, int $decimals = 0, ?string $key = null): float {
+        $total = self::length($array);
+        if ($total === 0) {
+            return 0;
+        }
+
+        $sum = self::sum($array, $key);
+        return Numbers::divide($sum, $total, $decimals);
     }
 
     /**
