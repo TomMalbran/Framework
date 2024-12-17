@@ -81,7 +81,10 @@ class EmailQueue {
      */
     public static function getAllUnsent(): array {
         $query = Query::create("sentTime", "=", 0);
+        $query->startOr();
         $query->add("createdTime", ">", DateTime::getLastXHours(1));
+        $query->add("sendTime", ">", DateTime::getLastXHours(1));
+        $query->endOr();
         $query->orderBy("createdTime", false);
         $query->limitIf(ConfigCode::getInt("emailLimit"));
         return self::schema()->getAll($query);
@@ -123,6 +126,7 @@ class EmailQueue {
             "subject"      => $subject,
             "message"      => $message,
             "emailResult"  => EmailResult::NotProcessed,
+            "sendTime"     => time(),
             "sentTime"     => 0,
             "dataID"       => $dataID,
         ]);
@@ -182,6 +186,7 @@ class EmailQueue {
         $query    = Query::create("EMAIL_ID", "IN", $emailIDs);
         return self::schema()->edit($query, [
             "emailResult" => EmailResult::NotProcessed,
+            "sendTime"    => time(),
             "sentTime"    => 0,
         ]);
     }
