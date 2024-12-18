@@ -169,7 +169,7 @@ class Framework {
             return self::$framePath;
         }
         if ($forBackend) {
-            return Path::parsePath(self::$basePath, self::$baseDir);
+            return File::parsePath(self::$basePath, self::$baseDir);
         }
         return self::$basePath;
     }
@@ -183,9 +183,9 @@ class Framework {
      */
     public static function getPath(string $dir = "", string $file = "", bool $forFramework = false): string {
         if ($forFramework) {
-            return Path::parsePath(self::$framePath, $dir, $file);
+            return File::parsePath(self::$framePath, $dir, $file);
         }
-        return Path::parsePath(self::$basePath, self::$baseDir, $dir, $file);
+        return File::parsePath(self::$basePath, self::$baseDir, $dir, $file);
     }
 
 

@@ -48,64 +48,6 @@ class Path {
 
 
     /**
-     * Returns the path used to store the files
-     * @param string ...$pathParts
-     * @return string
-     */
-    public static function parsePath(string ...$pathParts): string {
-        $result = Strings::join($pathParts, "/");
-        while (Strings::contains($result, "//")) {
-            $result = Strings::replace($result, "//", "/");
-        }
-        $result = self::removeLastSlash($result);
-        return $result;
-    }
-
-    /**
-     * Adds the last slash for dir processing functions
-     * @param string $path
-     * @return string
-     */
-    public static function addLastSlash(string $path): string {
-        if (!Strings::endsWith($path, "/")) {
-            return "$path/";
-        }
-        return $path;
-    }
-
-    /**
-     * Adds the first slash for dir processing functions
-     * @param string $path
-     * @return string
-     */
-    public static function addFirstSlash(string $path): string {
-        if (!Strings::startsWith($path, "/")) {
-            return "/$path";
-        }
-        return $path;
-    }
-
-    /**
-     * Removes the last slash for dir processing functions
-     * @param string $path
-     * @return string
-     */
-    public static function removeLastSlash(string $path): string {
-        return Strings::stripEnd($path, "/");
-    }
-
-    /**
-     * Removes the first slash for dir processing functions
-     * @param string $path
-     * @return string
-     */
-    public static function removeFirstSlash(string $path): string {
-        return Strings::stripStart($path, "/");
-    }
-
-
-
-    /**
      * Returns the base path used to store the files
      * @param boolean $forFramework Optional.
      * @param boolean $forBackend   Optional.
@@ -127,7 +69,7 @@ class Path {
      */
     public static function forPrivate(string ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
-        return self::parsePath($basePath, ...$pathParts);
+        return File::parsePath($basePath, ...$pathParts);
     }
 
     /**
@@ -137,7 +79,7 @@ class Path {
      */
     public static function forFTP(string ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
-        return self::parsePath($basePath, Framework::FTPDir, ...$pathParts);
+        return File::parsePath($basePath, Framework::FTPDir, ...$pathParts);
     }
 
     /**
@@ -147,7 +89,7 @@ class Path {
      */
     public static function forFiles(string ...$pathParts): string {
         $basePath = self::getBasePath();
-        return self::parsePath($basePath, Framework::FilesDir, ...$pathParts);
+        return File::parsePath($basePath, Framework::FilesDir, ...$pathParts);
     }
 
     /**
@@ -157,7 +99,7 @@ class Path {
      */
     public static function forInternalFiles(string ...$pathParts): string {
         $basePath = self::getBasePath(forBackend: true);
-        return self::parsePath($basePath, Framework::FilesDir, ...$pathParts);
+        return File::parsePath($basePath, Framework::FilesDir, ...$pathParts);
     }
 
     /**
@@ -183,7 +125,7 @@ class Path {
      */
     public static function getInternalDir(string ...$pathParts): string {
         $baseDir = Framework::getBaseDir();
-        return self::parsePath($baseDir, Framework::FilesDir, ...$pathParts);
+        return File::parsePath($baseDir, Framework::FilesDir, ...$pathParts);
     }
 
     /**
@@ -195,7 +137,7 @@ class Path {
     public static function getDir(string $pathKey, string ...$pathParts): string {
         $path = self::get($pathKey);
         if (!empty($path)) {
-            return self::parsePath(Framework::FilesDir, $path, ...$pathParts);
+            return File::parsePath(Framework::FilesDir, $path, ...$pathParts);
         }
         return "";
     }
@@ -234,17 +176,6 @@ class Path {
         return "";
     }
 
-    /**
-     * Returns true if given file exists
-     * @param string $pathKey
-     * @param string ...$pathParts
-     * @return boolean
-     */
-    public static function exists(string $pathKey, string ...$pathParts): bool {
-        $path = self::forPathKey($pathKey, ...$pathParts);
-        return File::exists($path);
-    }
-
 
 
     /**
@@ -275,29 +206,6 @@ class Path {
     }
 
 
-
-    /**
-     * Ensures that all the directories are created
-     * @param string $pathKey
-     * @param string ...$pathParts
-     * @return string
-     */
-    public static function ensureDir(string $pathKey, string ...$pathParts): string {
-        $path        = trim(self::parsePath(...$pathParts));
-        $pathParts   = Strings::split($path, "/");
-        $totalParts  = count($pathParts);
-        $partialPath = [];
-
-        if (!FileType::isDir($path)) {
-            $totalParts - 1;
-        }
-        for ($i = 0; $i < $totalParts; $i++) {
-            $partialPath[] = $pathParts[$i];
-            $fullPath      = self::forPathKey($pathKey, ...$partialPath);
-            File::createDir($fullPath);
-        }
-        return self::forPathKey($pathKey, ...$pathParts);
-    }
 
     /**
      * Ensures that the Paths are created

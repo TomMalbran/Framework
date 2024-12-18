@@ -1,7 +1,6 @@
 <?php
 namespace Framework\File;
 
-use Framework\File\Path;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -13,12 +12,70 @@ use ZipArchive;
 class File {
 
     /**
+     * Returns the path used to store the files
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function parsePath(string ...$pathParts): string {
+        $result = Strings::join($pathParts, "/");
+        while (Strings::contains($result, "//")) {
+            $result = Strings::replace($result, "//", "/");
+        }
+        $result = self::removeLastSlash($result);
+        return $result;
+    }
+
+    /**
+     * Adds the last slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function addLastSlash(string $path): string {
+        if (!Strings::endsWith($path, "/")) {
+            return "$path/";
+        }
+        return $path;
+    }
+
+    /**
+     * Adds the first slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function addFirstSlash(string $path): string {
+        if (!Strings::startsWith($path, "/")) {
+            return "/$path";
+        }
+        return $path;
+    }
+
+    /**
+     * Removes the last slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function removeLastSlash(string $path): string {
+        return Strings::stripEnd($path, "/");
+    }
+
+    /**
+     * Removes the first slash for dir processing functions
+     * @param string $path
+     * @return string
+     */
+    public static function removeFirstSlash(string $path): string {
+        return Strings::stripStart($path, "/");
+    }
+
+
+
+    /**
      * Returns true if given file exists
      * @param string ...$pathParts
      * @return boolean
      */
     public static function exists(string ...$pathParts): bool {
-        $fullPath = Path::parsePath(...$pathParts);
+        $fullPath = self::parsePath(...$pathParts);
         return !empty($fullPath) && file_exists($fullPath);
     }
 
@@ -28,7 +85,7 @@ class File {
      * @return integer
      */
     public static function getModifiedTime(string ...$pathParts): int {
-        $fullPath = Path::parsePath(...$pathParts);
+        $fullPath = self::parsePath(...$pathParts);
         if (empty($fullPath) || !file_exists($fullPath)) {
             return 0;
         }
@@ -43,7 +100,7 @@ class File {
      * @return string
      */
     public static function read(string ...$pathParts): string {
-        $fullPath = Path::parsePath(...$pathParts);
+        $fullPath = self::parsePath(...$pathParts);
         if (empty($fullPath) || !file_exists($fullPath)) {
             return "";
         }
@@ -73,7 +130,7 @@ class File {
      * @return boolean
      */
     public static function upload(string $path, string $fileName, string $tmpFile): bool {
-        $fullPath = Path::parsePath($path, $fileName);
+        $fullPath = self::parsePath($path, $fileName);
         return self::uploadPath($fullPath, $tmpFile);
     }
 
@@ -99,7 +156,7 @@ class File {
      * @return boolean
      */
     public static function create(string $path, string $fileName, array|string $content, bool $createDir = false): bool {
-        $fullPath = Path::parsePath($path, $fileName);
+        $fullPath = self::parsePath($path, $fileName);
         if (empty($fullPath)) {
             return false;
         }
@@ -155,7 +212,7 @@ class File {
      * @return boolean
      */
     public static function delete(string $path, string $name = ""): bool {
-        $fullPath = Path::parsePath($path, $name);
+        $fullPath = self::parsePath($path, $name);
         if (!empty($fullPath) && file_exists($fullPath)) {
             return unlink($fullPath);
         }
@@ -238,7 +295,7 @@ class File {
         $files = scandir($path);
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
-                $result[] = Path::parsePath($path, $file);
+                $result[] = self::parsePath($path, $file);
             }
         }
         return $result;
@@ -306,6 +363,29 @@ class File {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Ensures that all the directories are created
+     * @param string $basePath
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function ensureDir(string $basePath, string ...$pathParts): string {
+        $path        = trim(self::parsePath(...$pathParts));
+        $pathParts   = Strings::split($path, "/");
+        $totalParts  = count($pathParts);
+        $partialPath = [];
+
+        if (!is_dir($path)) {
+            $totalParts - 1;
+        }
+        for ($i = 0; $i < $totalParts; $i++) {
+            $partialPath[] = $pathParts[$i];
+            $fullPath      = self::parsePath($basePath, ...$partialPath);
+            self::createDir($fullPath);
+        }
+        return self::parsePath($basePath, ...$pathParts);
     }
 
     /**

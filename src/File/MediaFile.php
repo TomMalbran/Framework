@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\System\ConfigCode;
 use Framework\File\File;
+use Framework\File\Path;
 use Framework\File\Image;
 use Framework\File\FileType;
 use Framework\Schema\Database;
@@ -70,8 +71,8 @@ class MediaFile {
                 "new" => $newPath,
             ],
             [
-                "old" => Path::addFirstSlash($oldPath),
-                "new" => Path::addFirstSlash($newPath),
+                "old" => File::addFirstSlash($oldPath),
+                "new" => File::addFirstSlash($newPath),
             ],
         ];
 
@@ -156,7 +157,7 @@ class MediaFile {
         $path   = !empty($path) && self::exists($basePath, $path) ? $path : "";
         $source = self::getPath($basePath, $path);
         $files  = File::getAllInDir($source);
-        $source = Path::addLastSlash($source);
+        $source = File::addLastSlash($source);
         $list   = new FileList();
 
         foreach ($files as $file) {
@@ -166,7 +167,7 @@ class MediaFile {
                 $sourcePath = self::getPath($basePath, $path, $fileName);
                 $sourceUrl  = self::getUrl($basePath, $path, $fileName);
                 $thumbUrl   = self::getThumbUrl($basePath, $path, $fileName);
-                $filePath   = Path::parsePath($path, $fileName);
+                $filePath   = File::parsePath($path, $fileName);
                 $list->add($fileName, $filePath, $isDir, $sourcePath, $sourceUrl, $thumbUrl);
             }
         }
@@ -176,7 +177,7 @@ class MediaFile {
 
         return [
             "list" => $list->getSorted(),
-            "path" => Path::removeFirstSlash($path),
+            "path" => File::removeFirstSlash($path),
         ];
     }
 
@@ -221,7 +222,7 @@ class MediaFile {
      * @return boolean
      */
     public static function deletePath(string ...$pathParts): bool {
-        $relPath = Path::parsePath(...$pathParts);
+        $relPath = File::parsePath(...$pathParts);
         $source  = self::getPath(...$pathParts);
         $thumbs  = self::getThumbPath(...$pathParts);
 
@@ -264,8 +265,8 @@ class MediaFile {
      * @return boolean
      */
     private static function updatePath(string $oldPath, string $newPath, string $oldName, string $newName): bool {
-        $oldRelPath = Path::removeFirstSlash(Path::parsePath($oldPath, $oldName));
-        $newRelPath = Path::removeFirstSlash(Path::parsePath($newPath, $newName));
+        $oldRelPath = File::removeFirstSlash(File::parsePath($oldPath, $oldName));
+        $newRelPath = File::removeFirstSlash(File::parsePath($newPath, $newName));
         $oldSource  = self::getPath($oldPath, $oldName);
         $newSource  = self::getPath($newPath, $newName);
         $oldThumbs  = self::getThumbPath($oldPath, $oldName);

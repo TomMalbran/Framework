@@ -1,7 +1,6 @@
 <?php
 namespace Framework\File;
 
-use Framework\File\Path;
 use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -83,7 +82,7 @@ class Image {
      * @return int[]
      */
     public static function getSize(string ...$pathParts): array {
-        $filePath = Path::parsePath(...$pathParts);
+        $filePath = File::parsePath(...$pathParts);
         if (!File::exists($filePath) || !FileType::isImage($filePath)) {
             return [ 0, 0, 0 ];
         }
@@ -119,7 +118,7 @@ class Image {
             return 0;
         }
 
-        $filePath = Path::parsePath(...$pathParts);
+        $filePath = File::parsePath(...$pathParts);
         $exif     = @exif_read_data($filePath);
         if ($exif !== false && !empty($exif["Orientation"])) {
             return $exif["Orientation"];
@@ -133,7 +132,7 @@ class Image {
      * @return boolean
      */
     public static function hasTransparency(string ...$pathParts): bool {
-        $filePath = Path::parsePath(...$pathParts);
+        $filePath = File::parsePath(...$pathParts);
         if (!File::exists($filePath) || !FileType::isPNG($filePath)) {
             return false;
         }
