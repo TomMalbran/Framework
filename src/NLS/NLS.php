@@ -6,6 +6,7 @@ use Framework\System\ConfigCode;
 use Framework\NLS\Language;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
+use Framework\Utils\Strings;
 
 /**
  * The Internalization Strings
@@ -152,9 +153,9 @@ class NLS {
      */
     public static function format(string $key, array $args, string $language = ""): string {
         $subject = self::get($key, $language);
-        return preg_replace_callback("/\{(\d+)\}/", function ($match) use ($args) {
+        return Strings::replaceCallback($subject, "/\{(\d+)\}/", function ($match) use ($args) {
             return $args[$match[1]] ?: "";
-        }, $subject);
+        });
     }
 
     /**

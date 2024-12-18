@@ -333,9 +333,9 @@ class Utils {
      * @return string
      */
     public static function encodeUrl(string $url): string {
-        return preg_replace_callback("/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function ($match) {
+        return Strings::replaceCallback($url, "/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function ($match) {
             return rawurlencode($match[0]);
-        }, $url);
+        });
     }
 
     /**

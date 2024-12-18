@@ -280,6 +280,19 @@ class Strings {
     }
 
     /**
+     * Replaces in the String the pattern using the callback
+     * @param string          $string
+     * @param string[]|string $pattern
+     * @param callable        $callback
+     * @param integer         $limit    Optional.
+     * @return string
+     */
+    public static function replaceCallback(string $string, array|string $pattern, callable $callback, int $limit = -1): string {
+        $result = preg_replace_callback($pattern, $callback, $string, $limit);
+        return !empty($result) ? $result : "";
+    }
+
+    /**
      * Removes the Needle from the start of the String
      * @param string $string
      * @param string $needle
