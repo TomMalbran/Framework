@@ -292,6 +292,8 @@ class Strings {
         return !empty($result) ? $result : "";
     }
 
+
+
     /**
      * Removes the Needle from the start of the String
      * @param string $string
@@ -803,13 +805,15 @@ class Strings {
      * @return string
      */
     public static function replaceUrls(string $string, string $url): string {
-        $result = $string;
-        foreach ([ "img", "source", "audio" ] as $tag) {
-            $pattern     = "/<{$tag} (.*?)src=\"(.*?)\"/i";
-            $replacement = "<{$tag} $1src=\"{$url}/$2\"";
-            $result      = self::replacePattern($result, $pattern, $replacement);
-        }
-        return $result;
+        $regex = '/<(img|audio|video)([^>]*?)src=["\']((?!https?:\/\/|\/\/|data:)[^"\']+)["\']([^>]*?)>/i';
+        return self::replaceCallback($string, $regex, function ($matches) use ($url) {
+            $tag          = $matches[1];
+            $beforeSrc    = $matches[2];
+            $relativePath = $matches[3];
+            $afterSrc     = $matches[4];
+            $absolutePath = "$url/{$relativePath}";
+            return "<$tag{$beforeSrc}src=\"$absolutePath\"{$afterSrc}>";
+        });
     }
 
     /**
