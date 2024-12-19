@@ -35,6 +35,15 @@ class Auth {
     private static string $apiToken     = "";
 
 
+
+    /**
+     * Returns true if the Auth Login is disabled
+     * @return boolean
+     */
+    public static function isLoginDisabled(): bool {
+        return ConfigCode::getBoolean("authIsDisabled");
+    }
+
     /**
      * Validates the Credential
      * @param string       $jwtToken
