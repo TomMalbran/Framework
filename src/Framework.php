@@ -11,9 +11,9 @@ use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ErrorLog;
-use Framework\Schema\Migration;
 use Framework\Schema\Database;
 use Framework\Schema\Generator;
+use Framework\Schema\Migration;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 use Exception;
@@ -32,7 +32,6 @@ class Framework {
     const KeyData        = "keys";
     const StatusData     = "status";
     const AccessData     = "access";
-    const TokenData      = "tokens";
     const FilesData      = "files";
     const SettingsData   = "settings";
     const LanguageData   = "languages";

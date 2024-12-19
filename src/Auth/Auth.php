@@ -6,7 +6,6 @@ use Framework\System\ConfigCode;
 use Framework\System\StatusCode;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
-use Framework\Auth\Token;
 use Framework\Auth\Reset;
 use Framework\Auth\Spam;
 use Framework\Auth\Storage;
@@ -33,7 +32,6 @@ class Auth {
     private static int    $credentialID = 0;
     private static int    $adminID      = 0;
     private static int    $userID       = 0;
-    private static int    $apiID        = 0;
     private static string $apiToken     = "";
 
 
@@ -119,13 +117,20 @@ class Auth {
     }
 
     /**
+     * Returns the API Token
+     * @return string
+     */
+    public static function getApiToken(): string {
+        return ConfigCode::getString("authApiToken");
+    }
+
+    /**
      * Validates and Sets the auth as API
      * @param string $token
      * @return boolean
      */
     public static function validateAPI(string $token): bool {
-        if (Token::isValid($token)) {
-            self::$apiID      = Token::getOne($token)->id;
+        if ($token === self::getApiToken()) {
             self::$apiToken   = $token;
             self::$accessName = AccessCode::API;
             return true;
@@ -138,7 +143,6 @@ class Auth {
      * @return boolean
      */
     public static function validateInternal(): bool {
-        self::$apiID      = -1;
         self::$accessName = AccessCode::API;
         return true;
     }
@@ -191,7 +195,6 @@ class Auth {
         self::$credentialID = 0;
         self::$adminID      = 0;
         self::$userID       = 0;
-        self::$apiID        = 0;
         return true;
     }
 
@@ -338,10 +341,10 @@ class Auth {
      * @return string
      */
     public static function getToken(): string {
-        // Create a Special API Token
+        // Create an API Token
         if (self::hasAPI()) {
             return AuthToken::createJWT([
-                "apiID"    => self::$apiID,
+                "isAPI"    => true,
                 "apiToken" => self::$apiToken,
             ]);
         }
@@ -450,7 +453,7 @@ class Auth {
      * @return boolean
      */
     public static function isLoggedIn(): bool {
-        return !empty(self::$credentialID) || !empty(self::$apiID);
+        return self::hasCredential() || self::hasAPI();
     }
 
     /**
@@ -474,7 +477,7 @@ class Auth {
      * @return boolean
      */
     public static function hasAPI(): bool {
-        return !empty(self::$apiID);
+        return self::$accessName === AccessCode::API;
     }
 
     /**
