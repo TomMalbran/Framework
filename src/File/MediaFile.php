@@ -3,11 +3,10 @@ namespace Framework\File;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\System\ConfigCode;
 use Framework\File\File;
-use Framework\File\Path;
-use Framework\File\Image;
+use Framework\File\FilePath;
 use Framework\File\FileType;
+use Framework\File\Image;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;
@@ -16,10 +15,6 @@ use Framework\Utils\Strings;
  * The Media Files
  */
 class MediaFile {
-
-    const Source = "source";
-    const Thumbs = "thumbs";
-
 
     private static bool      $loaded = false;
     private static ?Database $db     = null;
@@ -39,7 +34,7 @@ class MediaFile {
         }
         self::$loaded = true;
         self::$db     = Framework::getDatabase();
-        self::$data   = Framework::loadData(Framework::MediaData);
+        self::$data   = Framework::loadData(Framework::FilesData);
         return true;
     }
 
@@ -61,7 +56,7 @@ class MediaFile {
      */
     public static function update(string $oldPath, string $newPath): bool {
         self::load();
-        if (empty(self::$data["updates"])) {
+        if (empty(self::$data["media"])) {
             return true;
         }
 
@@ -77,7 +72,7 @@ class MediaFile {
         ];
 
         foreach ($files as $file) {
-            foreach (self::$data["updates"] as $field) {
+            foreach (self::$data["media"] as $field) {
                 $old = $file["old"];
                 $new = $file["new"];
                 if (!empty($field["replace"]) && $field["replace"]) {
@@ -104,7 +99,7 @@ class MediaFile {
      * @return string
      */
     public static function getPath(string ...$pathParts): string {
-        return Path::forFiles(self::Source, self::$id, ...$pathParts);
+        return FilePath::getPath(FilePath::Source, self::$id, ...$pathParts);
     }
 
     /**
@@ -113,7 +108,7 @@ class MediaFile {
      * @return string
      */
     private static function getThumbPath(string ...$pathParts): string {
-        return Path::forFiles(self::Thumbs, self::$id, ...$pathParts);
+        return FilePath::getPath(FilePath::Thumbs, self::$id, ...$pathParts);
     }
 
     /**
@@ -122,7 +117,7 @@ class MediaFile {
      * @return string
      */
     public static function getUrl(string ...$pathParts): string {
-        return ConfigCode::getUrl("fileUrl", Framework::FilesDir, self::Source, self::$id, ...$pathParts);
+        return FilePath::getUrl(FilePath::Source, self::$id, ...$pathParts);
     }
 
     /**
@@ -131,7 +126,7 @@ class MediaFile {
      * @return string
      */
     public static function getThumbUrl(string ...$pathParts): string {
-        return ConfigCode::getUrl("fileUrl", Framework::FilesDir, self::Thumbs, self::$id, ...$pathParts);
+        return FilePath::getUrl(FilePath::Thumbs, self::$id, ...$pathParts);
     }
 
     /**
@@ -286,60 +281,5 @@ class MediaFile {
         }
 
         return self::update($oldRelPath, $newRelPath);
-    }
-
-
-
-    /**
-     * Creates the paths for the given ID
-     * @param integer $id Optional.
-     * @return string[]
-     */
-    public static function createPaths(int $id = 0): array {
-        self::load();
-        $result = [];
-        $paths  = [ self::Source, self::Thumbs ];
-
-        if (!empty(self::$data["paths"])) {
-            $paths = array_merge($paths, self::$data["paths"]);
-        }
-
-        foreach ($paths as $pathDir) {
-            $path = Path::forFiles($pathDir);
-            if (File::createDir($path)) {
-                $result[] = $pathDir;
-            }
-
-            $path = Path::forFiles($pathDir, $id);
-            if (File::createDir($path)) {
-                $result[] = "$pathDir/$id";
-            }
-
-            if (!empty(self::$data["directories"])) {
-                foreach (self::$data["directories"] as $directory) {
-                    $path = Path::forFiles($pathDir, $id, $directory);
-                    if (File::createDir($path)) {
-                        $result[] = "$pathDir/$id/$directory";
-                    }
-                }
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Ensures that the Paths are created
-     * @return boolean
-     */
-    public static function ensurePaths(): bool {
-        $paths = self::createPaths();
-
-        if (!empty($paths)) {
-            print("<br>Added <i>" . count($paths) . " media</i><br>");
-            print(Strings::join($paths, ", ") . "<br>");
-        } else {
-            print("<br>No <i>media</i> added<br>");
-        }
-        return true;
     }
 }

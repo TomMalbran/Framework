@@ -8,8 +8,9 @@ use Framework\System\SettingCode;
 use Framework\System\SignalCode;
 use Framework\System\StatusCode;
 use Framework\System\RouterCode;
-use Framework\Provider\Mustache;
 use Framework\File\File;
+use Framework\File\FilePath;
+use Framework\Provider\Mustache;
 
 /**
  * The Code
@@ -35,6 +36,7 @@ class Code {
         self::generateOne("Signal",  SignalCode::getCode());
         self::generateOne("Status",  StatusCode::getCode());
         self::generateOne("Router",  RouterCode::getCode());
+        self::generateOne("Path",    FilePath::getCode());
 
         print("<br>");
         return true;

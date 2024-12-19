@@ -2,7 +2,7 @@
 namespace Framework\Schema;
 
 use Framework\Request;
-use Framework\File\Path;
+use Framework\File\FilePath;
 use Framework\Utils\Arrays;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;
@@ -333,10 +333,10 @@ class Field {
         case self::File:
             $result[$key]           = $text;
             if (!empty($this->path)) {
-                $result["{$key}Url"]   = !empty($text) ? Path::getUrl($this->path, $text) : "";
+                $result["{$key}Url"]   = !empty($text) ? FilePath::getUrl($this->path, $text) : "";
             } else {
-                $result["{$key}Url"]   = !empty($text) ? Path::getUrl("source", "0", $text) : "";
-                $result["{$key}Thumb"] = !empty($text) ? Path::getUrl("thumbs", "0", $text) : "";
+                $result["{$key}Url"]   = !empty($text) ? FilePath::getUrl(FilePath::Source, "0", $text) : "";
+                $result["{$key}Thumb"] = !empty($text) ? FilePath::getUrl(FilePath::Thumbs, "0", $text) : "";
             }
             break;
         default:

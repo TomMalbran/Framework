@@ -11,8 +11,8 @@ use Framework\Auth\Reset;
 use Framework\Auth\Spam;
 use Framework\Auth\Storage;
 use Framework\NLS\NLS;
-use Framework\File\Path;
 use Framework\File\File;
+use Framework\File\FilePath;
 use Framework\Log\ActionLog;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
@@ -165,7 +165,7 @@ class Auth {
         Credential::updateLoginTime($credential->id);
         ActionLog::startSession(true);
 
-        $path = Path::getTempPath($credential->id, false);
+        $path = FilePath::getTempPath($credential->id, false);
         File::emptyDir($path);
         Reset::delete($credential->id);
 
@@ -440,7 +440,7 @@ class Auth {
         if (empty(self::$credentialID)) {
             return "";
         }
-        return Path::getTempPath(self::$credentialID);
+        return FilePath::getTempPath(self::$credentialID);
     }
 
 

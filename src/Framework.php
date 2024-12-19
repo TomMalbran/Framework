@@ -9,8 +9,7 @@ use Framework\System\SettingCode;
 use Framework\Auth\Auth;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
-use Framework\File\Path;
-use Framework\File\MediaFile;
+use Framework\File\FilePath;
 use Framework\Log\ErrorLog;
 use Framework\Schema\Migration;
 use Framework\Schema\Database;
@@ -34,8 +33,7 @@ class Framework {
     const StatusData     = "status";
     const AccessData     = "access";
     const TokenData      = "tokens";
-    const PathData       = "paths";
-    const MediaData      = "media";
+    const FilesData      = "files";
     const SettingsData   = "settings";
     const LanguageData   = "languages";
 
@@ -52,7 +50,6 @@ class Framework {
     const PartialsDir    = "partials";
 
     const FilesDir       = "files";
-    const TempDir        = "temp";
     const FTPDir         = "public_ftp";
 
     const NLSDir         = "nls";
@@ -406,8 +403,7 @@ class Framework {
      * @return boolean
      */
     public static function ensurePaths(): bool {
-        Path::ensurePaths();
-        MediaFile::ensurePaths();
+        FilePath::ensurePaths();
         return true;
     }
 }

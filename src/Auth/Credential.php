@@ -4,7 +4,7 @@ namespace Framework\Auth;
 use Framework\Request;
 use Framework\System\StatusCode;
 use Framework\NLS\NLS;
-use Framework\File\Path;
+use Framework\File\FilePath;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Model;
@@ -301,7 +301,7 @@ class Credential {
 
             if (!empty($row["avatar"])) {
                 $fields["avatarFile"] = $row["avatar"];
-                $fields["avatar"]     = Path::getUrl("avatars", $row["avatar"]);
+                $fields["avatar"]     = FilePath::getUrl("avatars", $row["avatar"]);
             }
             if (!$complete) {
                 unset($fields["password"]);

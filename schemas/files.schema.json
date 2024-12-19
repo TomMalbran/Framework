@@ -1,8 +1,17 @@
 {
-    "title"      : "Media",
+    "title"      : "Files",
     "type"       : "object",
+    "required"   : [ "paths", "directories", "media" ],
     "properties" : {
-        "updates" : {
+        "paths" : {
+            "type"  : "array",
+            "items" : { "type" : "string" }
+        },
+        "directories" : {
+            "type"  : "array",
+            "items" : { "type" : "string" }
+        },
+        "media" : {
             "type"  : "array",
             "items" : {
                 "type"       : "object",
@@ -13,14 +22,7 @@
                     "replace" : { "type" : "boolean" }
                 }
             }
-        },
-        "paths" : {
-            "type"  : "array",
-            "items" : { "type" : "string" }
-        },
-        "directories" : {
-            "type"  : "array",
-            "items" : { "type" : "string" }
         }
-    }
+    },
+    "additionalProperties" : false
 }

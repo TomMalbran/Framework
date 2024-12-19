@@ -3,7 +3,7 @@ namespace Framework\Notification;
 
 use Framework\System\ConfigCode;
 use Framework\Provider\Curl;
-use Framework\File\Path;
+use Framework\File\FilePath;
 
 /**
  * The Notification Provider
@@ -107,7 +107,7 @@ class Notification {
 
         $icon = "";
         if (!empty(self::$icon)) {
-            $icon = Path::forInternalFiles(self::$icon);
+            $icon = FilePath::getInternalPath(self::$icon);
         }
 
         $data = [

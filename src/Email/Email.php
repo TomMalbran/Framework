@@ -12,7 +12,7 @@ use Framework\Provider\Mandrill;
 use Framework\Provider\Mailjet;
 use Framework\Provider\SendGrid;
 use Framework\Schema\Model;
-use Framework\File\Path;
+use Framework\File\FilePath;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
@@ -81,7 +81,7 @@ class Email {
         $body = Mustache::render(self::$template, [
             "url"      => self::$url,
             "name"     => self::$config->name,
-            "files"    => Path::getInternalUrl(),
+            "files"    => FilePath::getInternalUrl(),
             "logo"     => $logo,
             "siteName" => self::$config->name,
             "message"  => $message,
