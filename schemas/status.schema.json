@@ -33,5 +33,6 @@
                 }
             }
         }
-    }
+    },
+    "additionalProperties" : false
 }

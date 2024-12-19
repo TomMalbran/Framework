@@ -11,7 +11,8 @@
                 "properties" : {
                     "from" : { "type" : "string" },
                     "to"   : { "type" : "string" }
-                }
+                },
+                "additionalProperties" : false
             }
         },
         "renames" : {
@@ -23,8 +24,10 @@
                     "table" : { "type" : "string" },
                     "from"  : { "type" : "string" },
                     "to"    : { "type" : "string" }
-                }
+                },
+                "additionalProperties" : false
             }
         }
-    }
+    },
+    "additionalProperties" : false
 }
