@@ -721,6 +721,10 @@ class Strings {
      * @return string
      */
     public static function makeShort(string $string, int $length = 30, bool $asUtf8 = true): string {
+        if (empty($length)) {
+            return $string;
+        }
+
         $first = explode("\n", $string)[0];
         if ($asUtf8) {
             if (mb_strlen($first, "utf-8") > $length) {
