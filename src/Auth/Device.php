@@ -23,6 +23,16 @@ class Device {
 
 
     /**
+     * Checks if the Credential has at least one Device
+     * @param integer $credentialID
+     * @return boolean
+     */
+    public static function has(int $credentialID): bool {
+        $devices = self::getAllForCredential($credentialID);
+        return !empty($devices);
+    }
+
+    /**
      * Returns all the Devices for the given Credential
      * @param integer[]|integer $credentialID
      * @return string[]
