@@ -4,6 +4,7 @@ namespace Framework\Notification;
 use Framework\System\ConfigCode;
 use Framework\Provider\Curl;
 use Framework\File\FilePath;
+use Framework\Utils\Strings;
 
 /**
  * The Notification Provider
@@ -110,11 +111,16 @@ class Notification {
             $icon = FilePath::getInternalPath(self::$icon);
         }
 
+        $fullUrl = $url;
+        if (!Strings::startsWith($url, "http")) {
+            $fullUrl = ConfigCode::getUrl("url", $url);
+        }
+
         $data = [
             "app_id"         => self::$appID,
             "headings"       => [ "en" => $title ],
             "contents"       => [ "en" => $body  ],
-            "url"            => ConfigCode::getUrl("url", $url),
+            "url"            => $fullUrl,
             "large_icon"     => $icon,
             "ios_badgeType"  => "Increase",
             "ios_badgeCount" => 1,
