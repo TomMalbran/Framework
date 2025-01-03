@@ -195,12 +195,10 @@ class Query {
      * @return Query
      */
     public function addBetween(string $column, int $from, int $to): Query {
-        if (!empty($from) && !empty($to)) {
+        if (!empty($from)) {
             $this->add($column, ">=", $from);
-            $this->add($column, "<=", $to);
-        } elseif (!empty($from)) {
-            $this->add($column, ">=", $from);
-        } elseif (!empty($to)) {
+        }
+        if (!empty($to)) {
             $this->add($column, "<=", $to);
         }
         return $this;
