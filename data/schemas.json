@@ -242,11 +242,11 @@
     "logSessions" : {
         "table"  : "log_sessions",
         "fields" : {
-            "SESSION_ID"    : { "type" : "id",     "name" : "sessionID"    },
-            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
-            "USER_ID"       : { "type" : "number", "name" : "userID"       },
-            "ip"            : { "type" : "string"                          },
-            "userAgent"     : { "type" : "string"                          }
+            "SESSION_ID"    : { "type" : "id",     "name" : "sessionID"                    },
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isKey" : true },
+            "USER_ID"       : { "type" : "number", "name" : "userID"                       },
+            "ip"            : { "type" : "string"                                          },
+            "userAgent"     : { "type" : "string"                                          }
         },
         "joins" : {
             "CREDENTIAL_ID" : {
@@ -267,13 +267,13 @@
     "logActions" : {
         "table"  : "log_actions",
         "fields" : {
-            "ACTION_ID"     : { "type" : "id",     "name" : "actionID"     },
-            "SESSION_ID"    : { "type" : "number", "name" : "sessionID"    },
-            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
-            "USER_ID"       : { "type" : "number", "name" : "userID"       },
-            "module"        : { "type" : "string"                          },
-            "action"        : { "type" : "string"                          },
-            "dataID"        : { "type" : "text"                            }
+            "ACTION_ID"     : { "type" : "id",     "name" : "actionID"                     },
+            "SESSION_ID"    : { "type" : "number", "name" : "sessionID",    "isKey" : true },
+            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isKey" : true },
+            "USER_ID"       : { "type" : "number", "name" : "userID"                       },
+            "module"        : { "type" : "string"                                          },
+            "action"        : { "type" : "string"                                          },
+            "dataID"        : { "type" : "text"                                            }
         },
         "joins" : {
             "SESSION_ID" : {
