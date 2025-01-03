@@ -10,7 +10,7 @@ use Framework\File\FilePath;
  */
 class Notification {
 
-    public const BaseUrl = "https://onesignal.com/api/v1";
+    public const BaseUrl = "https://api.onesignal.com";
 
     private static bool   $loaded   = false;
     private static bool   $isActive = false;
