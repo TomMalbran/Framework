@@ -169,6 +169,22 @@ class Arrays {
     }
 
     /**
+     * Returns true if the arrays are Equal with the given keys
+     * @param array{}  $array
+     * @param array{}  $other
+     * @param string[] $keys
+     * @return boolean
+     */
+    public static function isEqualWithKeys(array $array, array $other, array $keys): bool {
+        foreach ($keys as $key) {
+            if (!isset($array[$key]) || !isset($other[$key]) || $array[$key] !== $other[$key]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns true if the arrays intersect
      * @param mixed[] $array
      * @param mixed[] $other
