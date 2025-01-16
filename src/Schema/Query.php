@@ -599,15 +599,16 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string     $column     Optional.
-     * @param string     $expression Optional.
-     * @param mixed|null $value      Optional.
+     * @param string     $column        Optional.
+     * @param string     $expression    Optional.
+     * @param mixed|null $value         Optional.
+     * @param boolean    $caseSensitive Optional.
      * @return Query
      */
-    public static function create(string $column = "", string $expression = "", mixed $value = null): Query {
+    public static function create(string $column = "", string $expression = "", mixed $value = null, bool $caseSensitive = false): Query {
         $query = new Query();
         if (!empty($column)) {
-            $query->add($column, $expression, $value);
+            $query->add($column, $expression, $value, $caseSensitive);
         }
         return $query;
     }
