@@ -276,9 +276,7 @@ class Query {
      * @return Query
      */
     public function endAnd(): Query {
-        $this->where .= ") ";
-        $this->prefix = $this->oldPrefix;
-        return $this;
+        return $this->endAndOr();
     }
 
     /**
@@ -309,7 +307,23 @@ class Query {
      * @return Query
      */
     public function endOr(): Query {
-        $this->where .= ") ";
+        return $this->endAndOr();
+    }
+
+    /**
+     * Ends an And o Or expression
+     * @return Query
+     */
+    public function endAndOr(): Query {
+        if (Strings::endsWith($this->where, "AND (")) {
+            $this->where = Strings::stripEnd($this->where, "AND (");
+        } elseif (Strings::endsWith($this->where, "OR (")) {
+            $this->where = Strings::stripEnd($this->where, "OR (");
+        } elseif (Strings::endsWith($this->where, "(")) {
+            $this->where = Strings::stripEnd($this->where, "(");
+        } else {
+            $this->where .= ") ";
+        }
         $this->prefix = $this->oldPrefix;
         return $this;
     }
