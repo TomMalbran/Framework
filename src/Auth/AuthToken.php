@@ -57,21 +57,6 @@ class AuthToken {
 
 
     /**
-     * Hack to create an initial Refresh Token if the JWT Token is valid
-     * @param string $jwtToken
-     * @param string $refreshToken
-     * @return string
-     */
-    public static function createInitial(string $jwtToken, string $refreshToken): string {
-        self::load();
-        $jwtData = self::getJWT($jwtToken);
-        if (!self::$useRefresh || !empty($refreshToken) || empty($jwtData->credentialID)) {
-            return "";
-        }
-        return self::createRefreshToken($jwtData->credentialID);
-    }
-
-    /**
      * Returns true if the Refresh Token or the JWT Token is valid
      * @param string $jwtToken
      * @param string $refreshToken
@@ -79,12 +64,15 @@ class AuthToken {
      */
     public static function isValid(string $jwtToken, string $refreshToken): bool {
         self::load();
-        if (self::$useRefresh) {
-            return !self::getOne($refreshToken)->isEmpty();
+        $jwtData = self::getJWT($jwtToken);
+        if (empty($jwtData)) {
+            return false;
         }
 
-        $jwtData = self::getJWT($jwtToken);
-        return !empty($jwtData);
+        if (self::$useRefresh && !empty($refreshToken)) {
+            return !self::getOne($refreshToken)->isEmpty();
+        }
+        return false;
     }
 
     /**
