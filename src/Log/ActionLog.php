@@ -102,7 +102,10 @@ class ActionLog {
                 "createdTime" => $row["createdTime"],
             ];
         }
-        $result[$lastIndex]["isLast"] = true;
+
+        if ($lastIndex >= 0) {
+            $result[$lastIndex]["isLast"] = true;
+        }
         return $result;
     }
 
