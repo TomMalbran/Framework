@@ -241,7 +241,7 @@ class DateTime {
     public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
         $result = self::toTime($string, $useTimeZone);
         if (!empty($result)) {
-            return $result + 12 * 3600;
+            return $result + 12 * 3600 - self::$serverZone * 3600;
         }
         return 0;
     }
