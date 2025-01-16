@@ -584,6 +584,30 @@ class Credential {
     }
 
     /**
+     * Sets the Credential Access
+     * @param integer $credentialID
+     * @param string  $access
+     * @return boolean
+     */
+    public static function setAccess(int $credentialID, string $access): bool {
+        return self::schema()->edit($credentialID, [
+            "access" => $access,
+        ]);
+    }
+
+    /**
+     * Sets the Credential Email
+     * @param integer $credentialID
+     * @param string  $email
+     * @return boolean
+     */
+    public static function setEmail(int $credentialID, string $email): bool {
+        return self::schema()->edit($credentialID, [
+            "email" => $email,
+        ]);
+    }
+
+    /**
      * Updates the Language for the given Credential
      * @param integer $credentialID
      * @param string  $language
@@ -609,31 +633,6 @@ class Credential {
     }
 
     /**
-     * Updates the login time for the given Credential
-     * @param integer $credentialID
-     * @return boolean
-     */
-    public static function updateLoginTime(int $credentialID): bool {
-        $current = self::getValue($credentialID, "currentLogin");
-        return self::schema()->edit($credentialID, [
-            "lastLogin"    => $current,
-            "currentLogin" => time(),
-        ]);
-    }
-
-    /**
-     * Sets the Credential Email
-     * @param integer $credentialID
-     * @param string  $email
-     * @return boolean
-     */
-    public static function setEmail(int $credentialID, string $email): bool {
-        return self::schema()->edit($credentialID, [
-            "email" => $email,
-        ]);
-    }
-
-    /**
      * Sets the Credential Avatar
      * @param integer $credentialID
      * @param string  $avatar
@@ -646,14 +645,14 @@ class Credential {
     }
 
     /**
-     * Sets the Credential Access
+     * Sets the Credential Appearance
      * @param integer $credentialID
-     * @param string  $access
+     * @param string  $appearance
      * @return boolean
      */
-    public static function setAccess(int $credentialID, string $access): bool {
+    public static function setAppearance(int $credentialID, string $appearance): bool {
         return self::schema()->edit($credentialID, [
-            "access" => $access,
+            "appearance" => $appearance,
         ]);
     }
 
@@ -761,6 +760,19 @@ class Credential {
     public static function dontAskNotifications(int $credentialID): bool {
         return self::schema()->edit($credentialID, [
             "askNotifications" => 0,
+        ]);
+    }
+
+    /**
+     * Updates the login time for the given Credential
+     * @param integer $credentialID
+     * @return boolean
+     */
+    public static function updateLoginTime(int $credentialID): bool {
+        $current = self::getValue($credentialID, "currentLogin");
+        return self::schema()->edit($credentialID, [
+            "lastLogin"    => $current,
+            "currentLogin" => time(),
         ]);
     }
 

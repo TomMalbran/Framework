@@ -332,6 +332,21 @@ class Auth {
     }
 
     /**
+     * Updates the Credential
+     * @return boolean
+     */
+    public static function updateCredential(): bool {
+        if (!empty(self::$credentialID)) {
+            $credential = Credential::getOne(self::$credentialID, true);
+            if (!$credential->isEmpty()) {
+                self::$credential = $credential;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Sets the Current User
      * @param integer $userID
      * @param string  $accessName
@@ -373,6 +388,7 @@ class Auth {
             "name"             => self::$credential->credentialName,
             "language"         => self::$credential->language,
             "avatar"           => self::$credential->avatar,
+            "appearance"       => self::$credential->appearance,
             "reqPassChange"    => self::$credential->reqPassChange,
             "askNotifications" => self::$credential->askNotifications,
             "loggedAsUser"     => self::isLoggedAsUser(),
