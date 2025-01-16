@@ -213,8 +213,12 @@ class Framework {
             $className = Strings::replace($className, "/", "\\");
             $className = "\\" . Framework::Namespace . $className;
 
-            $classKey  = Strings::substringAfter($className, "\\");
-            $result[$classKey] = $className;
+            if (empty($dir)) {
+                $result[] = $className;
+            } else {
+                $classKey = Strings::substringAfter($className, "\\");
+                $result[$classKey] = $className;
+            }
         }
         return $result;
     }
