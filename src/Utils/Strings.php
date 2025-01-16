@@ -710,7 +710,10 @@ class Strings {
      * @return string
      */
     public static function removeHtml(string $string): string {
-        return strip_tags($string);
+        $result = strip_tags($string, "<style>");
+        $styles = substr($result, strpos($result, "<style"), strpos($result, "</style>") + strlen("</style>"));
+        $result = str_replace($styles, "", $result);
+        return $result;
     }
 
     /**
