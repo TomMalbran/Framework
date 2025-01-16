@@ -24,7 +24,7 @@ class Strings {
      * @return integer
      */
     public static function length(string $string): int {
-        return strlen($string);
+        return mb_strlen($string, "UTF-8");
     }
 
     /**
