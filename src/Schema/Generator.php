@@ -50,7 +50,7 @@ class Generator {
         }
 
         if ($created > 0) {
-            print("<br>Generated <i>$created schemas</i><br>");
+            print("<br>Generated the <i>$created Schema</i> codes<br>");
         }
         return $created > 0;
     }

@@ -38,7 +38,6 @@ class Code {
         self::generateOne("Router",  RouterCode::getCode());
         self::generateOne("Path",    FilePath::getCode());
 
-        print("<br>");
         return true;
     }
 
