@@ -20,7 +20,6 @@ class Exporter {
     private ExporterWriter $writer;
 
     private int $requests = 0;
-    private int $perPage  = 2000;
     private int $page     = 0;
     private int $line     = 0;
 
@@ -108,15 +107,16 @@ class Exporter {
 
 
     /**
-     * Starts a Chunk Export
+     * Starts a Chunk to Export
      * @param Request $request
+     * @param integer $perPage Optional.
      * @return Exporter
      */
-    public function startChunk(Request $request): Exporter {
-        $request->amount = $this->perPage;
+    public function startChunk(Request $request, int $perPage = 2000): Exporter {
+        $request->amount = $perPage;
         $request->page   = $this->page;
         $this->page     += 1;
-        $this->requests += $this->perPage;
+        $this->requests += $perPage;
         return $this;
     }
 
