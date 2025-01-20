@@ -215,7 +215,6 @@
                 "float",
                 "price",
                 "date",
-                "hour",
                 "string",
                 "json",
                 "csv",

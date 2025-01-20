@@ -22,7 +22,6 @@ class Field {
     const Float    = "float";
     const Price    = "price";
     const Date     = "date";
-    const Hour     = "hour";
     const String   = "string";
     const JSON     = "json";
     const CSV      = "csv";
@@ -150,7 +149,6 @@ class Field {
         case self::Number:
         case self::Float:
         case self::Date:
-        case self::Hour:
             $type       = "int";
             $length     = $this->length ?: 10;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
@@ -240,21 +238,18 @@ class Field {
             $result = $request->toCents($this->name);
             break;
         case self::Date:
-            if (!empty($this->date) && $request->has($this->date)) {
+            if (!empty($this->date) && !empty($this->hour)) {
+                $result = $request->toTimeHour($this->date, $this->hour, true);
+            } elseif (!empty($this->date)) {
                 $result = $request->toDay($this->date, $this->dateType, true);
             } elseif (Numbers::isValid($request->get($this->name))) {
                 $result = $request->getInt($this->name);
+            } elseif ($request->has("{$this->name}Date") && $request->has("{$this->name}Hour")) {
+                $result = $request->toTimeHour("{$this->name}Date", "{$this->name}Hour", true);
             } elseif ($request->has("{$this->name}Date")) {
                 $result = $request->toDay("{$this->name}Date", $this->dateType, true);
             } else {
                 $result = $request->toDay($this->name, $this->dateType, true);
-            }
-            break;
-        case self::Hour:
-            if (!empty($this->date) && !empty($this->hour)) {
-                $result = $request->toTimeHour($this->date, $this->hour, true);
-            } elseif ($request->has("{$this->name}Date") && $request->has("{$this->name}Hour")) {
-                $result = $request->toTimeHour("{$this->name}Date", "{$this->name}Hour", true);
             }
             break;
         case self::JSON:
@@ -306,7 +301,6 @@ class Field {
             $result["{$key}Cents"]  = $number;
             break;
         case self::Date:
-        case self::Hour:
             $result[$key]           = $number;
             $result["{$key}Date"]   = !empty($number) ? date("d-m-Y",     $number) : "";
             $result["{$key}Full"]   = !empty($number) ? date("d-m-Y H:i", $number) : "";
