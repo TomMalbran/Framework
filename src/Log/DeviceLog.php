@@ -19,7 +19,7 @@ class DeviceLog {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("logDevices");
+        return Factory::getSchema("LogDevice");
     }
 
 

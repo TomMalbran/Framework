@@ -23,7 +23,7 @@ class EmailTemplate {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("emailTemplates");
+        return Factory::getSchema("EmailTemplate");
     }
 
 

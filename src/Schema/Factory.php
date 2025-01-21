@@ -44,6 +44,7 @@ class Factory {
         foreach ($schemas as $key => $data) {
             if (!empty($frame[$key])) {
                 self::$data[$key] = Arrays::extend($frame[$key], $data);
+                self::$data[$key]["fromFramework"] = true;
             } else {
                 self::$data[$key] = $data;
             }
@@ -75,6 +76,7 @@ class Factory {
         if (!empty(self::$schemas[$key])) {
             return self::$schemas[$key];
         }
+
         $structure  = self::getStructure($key);
         $subRequest = self::getSubRequest($key);
         self::$schemas[$key] = new Schema(self::$db, $structure, $subRequest);

@@ -23,7 +23,7 @@ class EmailQueue {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("emailQueue");
+        return Factory::getSchema("EmailQueue");
     }
 
 

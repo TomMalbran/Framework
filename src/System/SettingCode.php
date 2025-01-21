@@ -24,7 +24,7 @@ class SettingCode {
      * @return Schema
      */
     private static function schema(): Schema {
-        return Factory::getSchema("settings");
+        return Factory::getSchema("Settings");
     }
 
 

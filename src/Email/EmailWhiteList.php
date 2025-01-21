@@ -17,7 +17,7 @@ class EmailWhiteList {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("emailWhiteList");
+        return Factory::getSchema("EmailWhiteList");
     }
 
 

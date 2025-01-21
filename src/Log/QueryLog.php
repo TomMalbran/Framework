@@ -22,7 +22,7 @@ class QueryLog {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("logQueries");
+        return Factory::getSchema("LogQuery");
     }
 
 

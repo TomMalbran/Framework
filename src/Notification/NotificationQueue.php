@@ -20,7 +20,7 @@ class NotificationQueue {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("notificationQueue");
+        return Factory::getSchema("NotificationQueue");
     }
 
 

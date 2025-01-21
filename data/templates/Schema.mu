@@ -23,7 +23,7 @@ class {{name}}Schema {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("{{schemaName}}");
+        return Factory::getSchema("{{name}}");
     }
 
     /**

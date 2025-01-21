@@ -51,7 +51,7 @@ class AuthToken {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("refreshTokens");
+        return Factory::getSchema("CredentialRefreshToken");
     }
 
 

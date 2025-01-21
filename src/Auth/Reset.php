@@ -17,7 +17,7 @@ class Reset {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("resets");
+        return Factory::getSchema("CredentialReset");
     }
 
 

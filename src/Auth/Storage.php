@@ -26,7 +26,7 @@ class Storage {
      * @param boolean $forAPI Optional.
      */
     public function __construct(string $bucket, bool $forAPI = false) {
-        $this->schema = Factory::getSchema("storage");
+        $this->schema = Factory::getSchema("CredentialStorage");
         $this->bucket = $bucket;
 
         $query = Query::create("bucket", "=", $bucket);
@@ -227,7 +227,7 @@ class Storage {
      * @return boolean
      */
     public static function deleteOld(): bool {
-        $schema = Factory::getSchema("storage");
+        $schema = Factory::getSchema("CredentialStorage");
         if (empty($schema)) {
             return false;
         }

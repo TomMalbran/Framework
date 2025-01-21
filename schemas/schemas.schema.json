@@ -2,33 +2,32 @@
     "title" : "Schemas",
     "type"  : "object",
     "propertyNames" : {
-        "pattern" : "^[a-z][A-Za-z]*$"
+        "pattern" : "^[A-Z][A-Za-z]*$"
     },
     "properties" : {
-        "credentials"       : {},
-        "devices"           : {},
-        "refreshTokens"     : {},
-        "resets"            : {},
-        "spam"              : {},
-        "storage"           : {},
-        "emailTemplates"    : {},
-        "emailQueue"        : {},
-        "emailWhiteList"    : {},
-        "notificationQueue" : {},
-        "settings"          : {},
-        "logIDs"            : {},
-        "logSessions"       : {},
-        "logActions"        : {},
-        "logDevices"        : {},
-        "logProviders"      : {},
-        "logQueries"        : {},
-        "logErrors"         : {}
+        "Credential"             : {},
+        "CredentialDevice"       : {},
+        "CredentialRefreshToken" : {},
+        "CredentialReset"        : {},
+        "CredentialSpam"         : {},
+        "CredentialStorage"      : {},
+        "EmailTemplate"          : {},
+        "EmailQueue"             : {},
+        "EmailWhiteList"         : {},
+        "NotificationQueue"      : {},
+        "Settings"               : {},
+        "LogID"                  : {},
+        "LogSession"             : {},
+        "LogAction"              : {},
+        "LogDevice"              : {},
+        "LogQuery"               : {},
+        "LogError"               : {}
     },
     "patternProperties" : {
-        "^[a-z][A-Za-z]*$" : {
-            "type"       : "object",
-            "properties" : {
-                "name"          : { "$ref" : "#/$defs/name"        },
+        "^[A-Z][A-Za-z]*$" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "properties"           : {
                 "table"         : { "$ref" : "#/$defs/table"       },
                 "fields"        : { "$ref" : "#/$defs/fields"      },
                 "expressions"   : { "$ref" : "#/$defs/expressions" },
@@ -48,7 +47,6 @@
                 "canRemove"     : { "type" : "boolean"             }
             },
             "required" : [
-                "name",
                 "table",
                 "fields",
                 "hasTimestamps",
@@ -59,7 +57,7 @@
             ]
         }
     },
-    "$defs": {
+    "$defs" : {
         "fields" : {
             "type"                 : "object",
             "additionalProperties" : false,
@@ -107,30 +105,24 @@
                 }
             }
         },
-        "joins" : {
+        "subrequests" : {
             "type"                 : "object",
             "additionalProperties" : false,
             "patternProperties"    : {
-                "^[A-Za-z_]*$" : {
+                "^[A-Z][A-Za-z]*$" : {
                     "type"       : "object",
-                    "required"   : [ "table" ],
+                    "required"   : [ "name" ],
                     "properties" : {
-                        "table"      : { "$ref" : "#/$defs/table"   },
-                        "asTable"    : { "$ref" : "#/$defs/table"   },
-                        "onTable"    : { "$ref" : "#/$defs/table"   },
-                        "leftKey"    : { "$ref" : "#/$defs/name"    },
-                        "rightKey"   : { "$ref" : "#/$defs/name"    },
-                        "and"        : { "type" : "string"          },
-                        "andKey"     : { "type" : "string"          },
-                        "andKeys"    : { "$ref" : "#/$defs/strings" },
-                        "orKeys"     : { "$ref" : "#/$defs/strings" },
-                        "andValue"   : { "type" : "string"          },
-                        "andTable"   : { "type" : "string"          },
-                        "andDeleted" : { "type" : "boolean"         },
-                        "prefix"     : { "$ref" : "#/$defs/name"    },
-                        "fields"     : { "$ref" : "#/$defs/fields"  },
-                        "fieldKeys"  : { "$ref" : "#/$defs/strings" },
-                        "mergeGlue"  : { "type" : "string"          }
+                        "type"    : { "type" : "string"       },
+                        "name"    : { "$ref" : "#/$defs/name" },
+                        "idKey"   : { "$ref" : "#/$defs/name" },
+                        "idName"  : { "$ref" : "#/$defs/name" },
+                        "where"   : { "type" : "array"        },
+                        "orderBy" : { "$ref" : "#/$defs/name" },
+                        "isAsc"   : { "type" : "boolean"      },
+                        "asArray" : { "type" : "boolean"      },
+                        "field"   : { "$ref" : "#/$defs/name" },
+                        "value"   : {                         }
                     }
                 }
             }
@@ -157,24 +149,30 @@
                 }
             }
         },
-        "subrequests" : {
+        "joins" : {
             "type"                 : "object",
             "additionalProperties" : false,
             "patternProperties"    : {
-                "^[a-z][A-Za-z]*$" : {
+                "^[A-Za-z_]*$" : {
                     "type"       : "object",
-                    "required"   : [ "type", "name" ],
+                    "required"   : [ "table" ],
                     "properties" : {
-                        "type"    : { "type" : "string"       },
-                        "name"    : { "$ref" : "#/$defs/name" },
-                        "idKey"   : { "$ref" : "#/$defs/name" },
-                        "idName"  : { "$ref" : "#/$defs/name" },
-                        "where"   : { "type" : "array"        },
-                        "orderBy" : { "$ref" : "#/$defs/name" },
-                        "isAsc"   : { "type" : "boolean"      },
-                        "asArray" : { "type" : "boolean"      },
-                        "field"   : { "$ref" : "#/$defs/name" },
-                        "value"   : {                         }
+                        "table"      : { "$ref" : "#/$defs/table"   },
+                        "asTable"    : { "$ref" : "#/$defs/table"   },
+                        "onTable"    : { "$ref" : "#/$defs/table"   },
+                        "leftKey"    : { "$ref" : "#/$defs/name"    },
+                        "rightKey"   : { "$ref" : "#/$defs/name"    },
+                        "and"        : { "type" : "string"          },
+                        "andKey"     : { "type" : "string"          },
+                        "andKeys"    : { "$ref" : "#/$defs/strings" },
+                        "orKeys"     : { "$ref" : "#/$defs/strings" },
+                        "andValue"   : { "type" : "string"          },
+                        "andTable"   : { "type" : "string"          },
+                        "andDeleted" : { "type" : "boolean"         },
+                        "prefix"     : { "$ref" : "#/$defs/name"    },
+                        "fields"     : { "$ref" : "#/$defs/fields"  },
+                        "fieldKeys"  : { "$ref" : "#/$defs/strings" },
+                        "mergeGlue"  : { "type" : "string"          }
                     }
                 }
             }

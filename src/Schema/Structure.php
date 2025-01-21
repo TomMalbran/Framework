@@ -14,7 +14,6 @@ class Structure {
 
     public string $key         = "";
     public string $masterKey   = "";
-    public string $name        = "";
 
     public string $table       = "";
     public bool   $hasID       = false;
@@ -60,7 +59,6 @@ class Structure {
      */
     public function __construct(string $schemaKey, array $data) {
         $this->key           = $schemaKey;
-        $this->name          = !empty($data["name"]) ? $data["name"] : "";
         $this->table         = $data["table"];
         $this->hasStatus     = !empty($data["hasStatus"]);
         $this->hasPositions  = !empty($data["hasPositions"]);
@@ -190,8 +188,8 @@ class Structure {
 
         // Create the SubRequests
         if (!empty($data["subrequests"])) {
-            foreach ($data["subrequests"] as $value) {
-                $type = !empty($value["type"]) ? $value["type"] : "";
+            foreach ($data["subrequests"] as $key => $value) {
+                $type = !empty($value["type"]) ? $value["type"] : $key;
                 $this->subRequests[$value["name"]] = $type;
             }
         }

@@ -45,7 +45,7 @@ class ErrorLog {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("logErrors");
+        return Factory::getSchema("LogError");
     }
 
 

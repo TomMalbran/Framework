@@ -25,7 +25,7 @@ class Credential {
      * @return Schema
      */
     private static function schema(): Schema {
-        return Factory::getSchema("credentials");
+        return Factory::getSchema("Credential");
     }
 
     /**

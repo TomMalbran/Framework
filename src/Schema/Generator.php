@@ -35,7 +35,7 @@ class Generator {
         File::emptyDir(self::$writePath);
 
         foreach ($schemas as $schemaKey => $schemaData) {
-            if (empty($schemaData["name"])) {
+            if (!empty($schemaData["fromFramework"])) {
                 continue;
             }
 
@@ -63,7 +63,7 @@ class Generator {
      * @return boolean
      */
     private static function createSchema(Structure $structure): bool {
-        $fileName    = "{$structure->name}Schema.php";
+        $fileName    = "{$structure->key}Schema.php";
         $idType      = self::getFieldType($structure->idType);
         $uniques     = self::getFieldList($structure, "isUnique");
         $parents     = self::getFieldList($structure, "isParent");
@@ -72,8 +72,7 @@ class Generator {
 
         $contents    = Mustache::render(self::$schemaText, [
             "namespace"       => Framework::Namespace,
-            "name"            => $structure->name,
-            "schemaName"      => $structure->key,
+            "name"            => $structure->key,
             "hasID"           => $structure->hasID,
             "idKey"           => $structure->idKey,
             "idName"          => $structure->idName,
@@ -118,7 +117,7 @@ class Generator {
 
     /**
      * Returns the Sub Types from the Sub Requests
-     * @param array{} $subRequests
+     * @param array<string,string> $subRequests
      * @return array{}[]
      */
     private static function getSubTypes(array $subRequests): array {
@@ -248,11 +247,11 @@ class Generator {
      * @return boolean
      */
     private static function createEntity(Structure $structure): bool {
-        $fileName   = "{$structure->name}Entity.php";
+        $fileName   = "{$structure->key}Entity.php";
         $attributes = self::getAttributes($structure);
         $contents   = Mustache::render(self::$entityText, [
             "namespace"  => Framework::Namespace,
-            "name"       => $structure->name,
+            "name"       => $structure->key,
             "attributes" => self::parseAttributes($attributes),
         ]);
         return File::create(self::$writePath, $fileName, $contents);

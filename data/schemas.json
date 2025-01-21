@@ -1,5 +1,5 @@
 {
-    "credentials" : {
+    "Credential" : {
         "table"  : "credentials",
         "fields" : {
             "CREDENTIAL_ID"    : { "type" : "id",      "name" : "credentialID"                   },
@@ -37,9 +37,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : true
+        "canDelete"     : true,
+        "canRemove"     : false
     },
-    "devices" : {
+    "CredentialDevice" : {
         "table"  : "credentials_devices",
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
@@ -52,9 +53,10 @@
         "hasTimestamps" : true,
         "canCreate"     : false,
         "canEdit"       : true,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "refreshTokens" : {
+    "CredentialRefreshToken" : {
         "table"  : "credentials_refresh_tokens",
         "fields" : {
             "CREDENTIAL_ID"  : { "type" : "number", "name" : "credentialID"                    },
@@ -68,9 +70,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "resets" : {
+    "CredentialReset" : {
         "table"  : "credentials_reset",
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
@@ -84,9 +87,10 @@
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "spam" : {
+    "CredentialSpam" : {
         "table"  : "credentials_spam",
         "fields" : {
             "ip"   : { "type" : "string", "isPrimary" : true },
@@ -95,9 +99,10 @@
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "storage" : {
+    "CredentialStorage" : {
         "table"  : "credentials_storage",
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
@@ -111,12 +116,13 @@
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
 
 
 
-    "emailTemplates" : {
+    "EmailTemplate" : {
         "table"  : "email_templates",
         "fields" : {
             "TEMPLATE_ID"  : { "type" : "id",     "name"     : "templateID" },
@@ -133,9 +139,10 @@
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "emailQueue" : {
+    "EmailQueue" : {
         "table"  : "email_queue",
         "fields" : {
             "EMAIL_ID"     : { "type" : "id",    "name" : "emailID" },
@@ -161,9 +168,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "emailWhiteList" : {
+    "EmailWhiteList" : {
         "table"  : "email_white_list",
         "fields" : {
             "EMAIL_ID"    : { "type" : "id",    "name" : "emailID" },
@@ -173,9 +181,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "notificationQueue" : {
+    "NotificationQueue" : {
         "table"  : "notification_queue",
         "fields" : {
             "NOTIFICATION_ID" : { "type" : "id",     "name" : "notificationID" },
@@ -207,9 +216,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "settings" : {
+    "Settings" : {
         "table"  : "settings",
         "fields" : {
             "section"  : { "type" : "string", "isPrimary" : true },
@@ -220,12 +230,13 @@
         "hasTimestamps" : true,
         "canCreate"     : false,
         "canEdit"       : true,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
 
 
 
-    "logIDs" : {
+    "LogID" : {
         "table"  : "log_ids",
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
@@ -238,9 +249,10 @@
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "logSessions" : {
+    "LogSession" : {
         "table"  : "log_sessions",
         "fields" : {
             "SESSION_ID"    : { "type" : "id",     "name" : "sessionID"                    },
@@ -263,9 +275,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "logActions" : {
+    "LogAction" : {
         "table"  : "log_actions",
         "fields" : {
             "ACTION_ID"     : { "type" : "id",     "name" : "actionID"                     },
@@ -299,9 +312,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "logDevices" : {
+    "LogDevice" : {
         "table"  : "log_devices",
         "fields" : {
             "LOG_ID"        : { "type" : "id",     "name" : "logID"        },
@@ -317,9 +331,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "logQueries" : {
+    "LogQuery" : {
         "table"  : "log_queries",
         "fields" : {
             "LOG_ID"      : { "type" : "id",   "name" : "logID" },
@@ -336,9 +351,10 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     },
-    "logErrors" : {
+    "LogError" : {
         "table"  : "log_errors",
         "fields" : {
             "LOG_ID"      : { "type" : "id",    "name" : "logID" },
@@ -357,6 +373,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false
+        "canDelete"     : false,
+        "canRemove"     : false
     }
 }

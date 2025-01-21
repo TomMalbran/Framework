@@ -22,7 +22,7 @@ class ActionLog {
      * @return Schema
      */
     public static function idSchema(): Schema {
-        return Factory::getSchema("logIDs");
+        return Factory::getSchema("LogID");
     }
 
     /**
@@ -30,7 +30,7 @@ class ActionLog {
      * @return Schema
      */
     public static function sessionSchema(): Schema {
-        return Factory::getSchema("logSessions");
+        return Factory::getSchema("LogSession");
     }
 
     /**
@@ -38,7 +38,7 @@ class ActionLog {
      * @return Schema
      */
     public static function actionSchema(): Schema {
-        return Factory::getSchema("logActions");
+        return Factory::getSchema("LogAction");
     }
 
 

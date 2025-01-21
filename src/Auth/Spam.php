@@ -16,7 +16,7 @@ class Spam {
      * @return Schema
      */
     public static function schema(): Schema {
-        return Factory::getSchema("spam");
+        return Factory::getSchema("CredentialSpam");
     }
 
 
