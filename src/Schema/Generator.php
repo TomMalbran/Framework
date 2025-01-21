@@ -319,7 +319,6 @@ class Generator {
             $result[] = self::getTypeData($key, "bool");
             break;
         case Field::ID:
-        case Field::Binary:
         case Field::Number:
             $result[] = self::getTypeData($key, "int");
             break;
@@ -334,7 +333,6 @@ class Generator {
             $result[] = self::getTypeData("{$key}Cents", "int");
             break;
         case Field::Date:
-        case Field::Hour:
             $result[] = self::getTypeData($key, "int");
             $result[] = self::getTypeData("{$key}Date", "string");
             $result[] = self::getTypeData("{$key}Full", "string");
@@ -420,7 +418,7 @@ class Generator {
     private static function getFieldType(string $type): string {
         return match ($type) {
             Field::Boolean => "bool",
-            Field::ID, Field::Binary, Field::Number, Field::Date, Field::Hour => "int",
+            Field::ID, Field::Number, Field::Date => "int",
             Field::Float, Field::Price => "float",
             default => "string",
         };

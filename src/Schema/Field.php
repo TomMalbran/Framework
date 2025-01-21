@@ -17,7 +17,6 @@ class Field {
     // The Types
     const ID       = "id";
     const Boolean  = "boolean";
-    const Binary   = "binary";
     const Number   = "number";
     const Float    = "float";
     const Price    = "price";
@@ -133,7 +132,6 @@ class Field {
             $length     = 10;
             $attributes = "unsigned NOT NULL AUTO_INCREMENT";
             break;
-        case self::Binary:
         case self::Boolean:
             $type       = "tinyint";
             $length     = 1;
@@ -222,7 +220,6 @@ class Field {
         case self::ID:
             break;
         case self::Boolean:
-        case self::Binary:
             $result = $request->toBinary($this->name);
             break;
         case self::String:
@@ -286,7 +283,6 @@ class Field {
             $result[$key]           = !empty($data[$key]);
             break;
         case self::ID:
-        case self::Binary:
         case self::Number:
             $result[$key]           = $number;
             break;

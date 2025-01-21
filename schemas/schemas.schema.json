@@ -210,7 +210,6 @@
             "enum" : [
                 "id",
                 "boolean",
-                "binary",
                 "number",
                 "float",
                 "price",
