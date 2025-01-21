@@ -61,7 +61,7 @@
             "type"                 : "object",
             "additionalProperties" : false,
             "patternProperties"    : {
-                "^(?!type$)(?!code$)[A-Za-z_]*$" : {
+                "^(?!type$)(?!code$)([A-Z_]*|[a-z][A-Za-z1-9]*)$" : {
                     "type"       : "object",
                     "required"   : [ "type" ],
                     "properties" : {

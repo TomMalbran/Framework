@@ -35,19 +35,25 @@ class Factory {
             return false;
         }
 
-        $schemas = Framework::loadData(Framework::SchemaData);
-        $frame   = Framework::loadJSON(Framework::DataDir, Framework::SchemaData, true);
-
         self::$loaded = true;
         self::$db     = Framework::getDatabase();
 
+        $schemas      = Framework::loadData(Framework::SchemaData);
+        $frameSchemas = Framework::loadJSON(Framework::DataDir, Framework::SchemaData, true);
+
         foreach ($schemas as $key => $data) {
-            if (!empty($frame[$key])) {
-                self::$data[$key] = Arrays::extend($frame[$key], $data);
-                self::$data[$key]["fromFramework"] = true;
+            if (empty($frameSchemas[$key])) {
+                self::$data[$key] = $data;
+            }
+        }
+
+        foreach ($frameSchemas as $key => $data) {
+            if (!empty($schemas[$key])) {
+                self::$data[$key] = Arrays::extend($data, $schemas[$key]);
             } else {
                 self::$data[$key] = $data;
             }
+            self::$data[$key]["fromFramework"] = true;
         }
         return true;
     }
