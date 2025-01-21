@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\System\ConfigCode;
 use Framework\Utils\JSON;
 
 use Redis as RedisClient;
@@ -11,8 +12,8 @@ use Exception;
  */
 class Redis {
 
-    private static bool        $disabled = false;
     private static bool        $loaded   = false;
+    private static bool        $disabled = false;
     private static RedisClient $client;
 
 
@@ -21,9 +22,18 @@ class Redis {
      * @return boolean
      */
     private static function load(): bool {
-        if (self::$loaded || self::$disabled) {
+        if (self::$disabled) {
+            return false;
+        }
+        if (self::$loaded) {
             return true;
         }
+
+        if (!ConfigCode::getBoolean("redisIsActive")) {
+            self::$disabled = true;
+            return false;
+        }
+
         if (!extension_loaded("redis")) {
             self::$disabled = true;
             return false;
