@@ -102,23 +102,6 @@
         "canDelete"     : false,
         "canRemove"     : false
     },
-    "CredentialStorage" : {
-        "table"  : "credentials_storage",
-        "fields" : {
-            "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
-            "bucket"        : { "type" : "string",                          "isPrimary" : true },
-            "data"          : { "type" : "string"                                              },
-            "time"          : { "type" : "number"                                              }
-        },
-        "foreigns" : {
-            "CREDENTIAL_ID" : { "table" : "credentials" }
-        },
-        "hasTimestamps" : false,
-        "canCreate"     : false,
-        "canEdit"       : false,
-        "canDelete"     : false,
-        "canRemove"     : false
-    },
 
 
 

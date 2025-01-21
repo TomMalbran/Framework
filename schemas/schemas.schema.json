@@ -10,7 +10,6 @@
         "CredentialRefreshToken" : {},
         "CredentialReset"        : {},
         "CredentialSpam"         : {},
-        "CredentialStorage"      : {},
         "EmailTemplate"          : {},
         "EmailQueue"             : {},
         "EmailWhiteList"         : {},

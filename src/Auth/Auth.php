@@ -8,7 +8,6 @@ use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Reset;
 use Framework\Auth\Spam;
-use Framework\Auth\Storage;
 use Framework\NLS\NLS;
 use Framework\File\File;
 use Framework\File\FilePath;
@@ -54,7 +53,6 @@ class Auth {
      */
     public static function validateCredential(string $jwtToken, string $refreshToken = "", ?string $langcode = null, ?int $timezone = null): bool {
         Reset::deleteOld();
-        Storage::deleteOld();
         AuthToken::deleteOld();
 
         // Validate the API Token
