@@ -1,7 +1,8 @@
 {
-    "title" : "Schemas",
-    "type"  : "object",
-    "propertyNames" : {
+    "title"                : "Schemas",
+    "type"                 : "object",
+    "additionalProperties" : false,
+    "propertyNames"        : {
         "pattern" : "^[A-Z][A-Za-z]*$"
     },
     "properties" : {
@@ -27,10 +28,9 @@
             "type"                 : "object",
             "additionalProperties" : false,
             "properties"           : {
-                "table"         : { "$ref" : "#/$defs/table"       },
                 "fields"        : { "$ref" : "#/$defs/fields"      },
+                "processed"     : { "$ref" : "#/$defs/processed"   },
                 "expressions"   : { "$ref" : "#/$defs/expressions" },
-                "processed"     : { "$ref" : "#/$defs/fields"      },
                 "joins"         : { "$ref" : "#/$defs/joins"       },
                 "counts"        : { "$ref" : "#/$defs/counts"      },
                 "subrequests"   : { "$ref" : "#/$defs/subrequests" },
@@ -46,7 +46,6 @@
                 "canRemove"     : { "type" : "boolean"             }
             },
             "required" : [
-                "table",
                 "fields",
                 "hasTimestamps",
                 "canCreate",
@@ -62,30 +61,45 @@
             "additionalProperties" : false,
             "patternProperties"    : {
                 "^(?!type$)(?!code$)([A-Z_]*|[a-z][A-Za-z1-9]*)$" : {
-                    "type"       : "object",
-                    "required"   : [ "type" ],
-                    "properties" : {
-                        "type"      : { "$ref" : "#/$defs/type" },
-                        "name"      : { "$ref" : "#/$defs/name" },
-                        "length"    : { "type" : "number"       },
-                        "decimals"  : { "type" : "number"       },
-                        "dateType"  : { "$ref" : "#/$defs/name" },
-                        "date"      : { "$ref" : "#/$defs/name" },
-                        "hour"      : { "$ref" : "#/$defs/name" },
-                        "path"      : { "$ref" : "#/$defs/name" },
-                        "default"   : {                         },
-                        "isPrimary" : { "type" : "boolean"      },
-                        "isKey"     : { "type" : "boolean"      },
-                        "isName"    : { "type" : "boolean"      },
-                        "isUnique"  : { "type" : "boolean"      },
-                        "isParent"  : { "type" : "boolean"      },
-                        "noExists"  : { "type" : "boolean"      },
-                        "noEmpty"   : { "type" : "boolean"      },
-                        "isSigned"  : { "type" : "boolean"      },
-                        "noPrefix"  : { "type" : "boolean"      },
-                        "cantEdit"  : { "type" : "boolean"      },
-                        "mergeTo"   : { "$ref" : "#/$defs/name" },
-                        "defaultTo" : { "$ref" : "#/$defs/name" }
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "type" ],
+                    "properties"           : {
+                        "type"      : { "$ref" : "#/$defs/type"  },
+                        "name"      : { "$ref" : "#/$defs/field" },
+                        "length"    : { "type" : "number"        },
+                        "decimals"  : { "type" : "number"        },
+                        "dateType"  : { "$ref" : "#/$defs/field" },
+                        "date"      : { "$ref" : "#/$defs/field" },
+                        "hour"      : { "$ref" : "#/$defs/field" },
+                        "path"      : { "$ref" : "#/$defs/field" },
+                        "default"   : {                          },
+                        "isPrimary" : { "type" : "boolean"       },
+                        "isKey"     : { "type" : "boolean"       },
+                        "isName"    : { "type" : "boolean"       },
+                        "isUnique"  : { "type" : "boolean"       },
+                        "isParent"  : { "type" : "boolean"       },
+                        "noExists"  : { "type" : "boolean"       },
+                        "noEmpty"   : { "type" : "boolean"       },
+                        "isSigned"  : { "type" : "boolean"       },
+                        "noPrefix"  : { "type" : "boolean"       },
+                        "cantEdit"  : { "type" : "boolean"       },
+                        "mergeTo"   : { "$ref" : "#/$defs/field" },
+                        "defaultTo" : { "$ref" : "#/$defs/field" }
+                    }
+                }
+            }
+        },
+        "processed" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
+                "^[a-z][A-Za-z]*$" : {
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "type" ],
+                    "properties"           : {
+                        "type" : { "$ref" : "#/$defs/type" }
                     }
                 }
             }
@@ -95,9 +109,10 @@
             "additionalProperties" : false,
             "patternProperties"    : {
                 "^[a-z][A-Za-z]*$" : {
-                    "type"       : "object",
-                    "required"   : [ "expression", "type" ],
-                    "properties" : {
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "expression", "type" ],
+                    "properties"           : {
                         "expression" : { "type" : "string"       },
                         "type"       : { "$ref" : "#/$defs/type" }
                     }
@@ -109,19 +124,20 @@
             "additionalProperties" : false,
             "patternProperties"    : {
                 "^[A-Z][A-Za-z]*$" : {
-                    "type"       : "object",
-                    "required"   : [ "name" ],
-                    "properties" : {
-                        "type"    : { "type" : "string"       },
-                        "name"    : { "$ref" : "#/$defs/name" },
-                        "idKey"   : { "$ref" : "#/$defs/name" },
-                        "idName"  : { "$ref" : "#/$defs/name" },
-                        "where"   : { "type" : "array"        },
-                        "orderBy" : { "$ref" : "#/$defs/name" },
-                        "isAsc"   : { "type" : "boolean"      },
-                        "asArray" : { "type" : "boolean"      },
-                        "field"   : { "$ref" : "#/$defs/name" },
-                        "value"   : {                         }
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "name" ],
+                    "properties"           : {
+                        "type"    : { "type" : "string"        },
+                        "name"    : { "$ref" : "#/$defs/field" },
+                        "idKey"   : { "$ref" : "#/$defs/field" },
+                        "idName"  : { "$ref" : "#/$defs/field" },
+                        "where"   : { "type" : "array"         },
+                        "orderBy" : { "$ref" : "#/$defs/field" },
+                        "isAsc"   : { "type" : "boolean"       },
+                        "asArray" : { "type" : "boolean"       },
+                        "field"   : { "$ref" : "#/$defs/field" },
+                        "value"   : {                          }
                     }
                 }
             }
@@ -131,19 +147,21 @@
             "additionalProperties" : false,
             "patternProperties"    : {
                 "^[a-z][A-Za-z]*$" : {
-                    "type"       : "object",
-                    "required"   : [ "table", "type" ],
-                    "properties" : {
-                        "table"     : { "$ref" : "#/$defs/table" },
-                        "type"      : { "$ref" : "#/$defs/type"  },
-                        "isSum"     : { "type" : "boolean"       },
-                        "value"     : { "type" : "string"        },
-                        "mult"      : { "type" : "number"        },
-                        "onTable"   : { "$ref" : "#/$defs/table" },
-                        "rightKey"  : { "$ref" : "#/$defs/name"  },
-                        "leftKey"   : { "$ref" : "#/$defs/name"  },
-                        "where"     : { "type" : "array"         },
-                        "noDeleted" : { "type" : "boolean"       }
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "schema", "type" ],
+                    "properties"           : {
+                        "schema"    : { "$ref" : "#/$defs/schema" },
+                        "type"      : { "$ref" : "#/$defs/type"   },
+                        "isSum"     : { "type" : "boolean"        },
+                        "key"       : { "type" : "string"         },
+                        "value"     : { "type" : "string"         },
+                        "mult"      : { "type" : "number"         },
+                        "onSchema"  : { "$ref" : "#/$defs/schema" },
+                        "rightKey"  : { "$ref" : "#/$defs/field"  },
+                        "leftKey"   : { "$ref" : "#/$defs/field"  },
+                        "where"     : { "type" : "array"          },
+                        "noDeleted" : { "type" : "boolean"        }
                     }
                 }
             }
@@ -153,22 +171,23 @@
             "additionalProperties" : false,
             "patternProperties"    : {
                 "^[A-Za-z_]*$" : {
-                    "type"       : "object",
-                    "required"   : [ "table" ],
-                    "properties" : {
-                        "table"      : { "$ref" : "#/$defs/table"   },
-                        "asTable"    : { "$ref" : "#/$defs/table"   },
-                        "onTable"    : { "$ref" : "#/$defs/table"   },
-                        "leftKey"    : { "$ref" : "#/$defs/name"    },
-                        "rightKey"   : { "$ref" : "#/$defs/name"    },
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "schema" ],
+                    "properties"           : {
+                        "schema"     : { "$ref" : "#/$defs/schema"  },
+                        "onSchema"   : { "$ref" : "#/$defs/schema"  },
+                        "asSchema"   : { "$ref" : "#/$defs/schema"  },
+                        "leftKey"    : { "$ref" : "#/$defs/field"   },
+                        "rightKey"   : { "$ref" : "#/$defs/field"   },
+                        "andSchema"  : { "$ref" : "#/$defs/schema"  },
                         "and"        : { "type" : "string"          },
                         "andKey"     : { "type" : "string"          },
                         "andKeys"    : { "$ref" : "#/$defs/strings" },
                         "orKeys"     : { "$ref" : "#/$defs/strings" },
                         "andValue"   : { "type" : "string"          },
-                        "andTable"   : { "type" : "string"          },
                         "andDeleted" : { "type" : "boolean"         },
-                        "prefix"     : { "$ref" : "#/$defs/name"    },
+                        "prefix"     : { "$ref" : "#/$defs/field"   },
                         "fields"     : { "$ref" : "#/$defs/fields"  },
                         "fieldKeys"  : { "$ref" : "#/$defs/strings" },
                         "mergeGlue"  : { "type" : "string"          }
@@ -181,12 +200,13 @@
             "additionalProperties" : false,
             "patternProperties"    : {
                 "^[A-Za-z_]*$" : {
-                    "type"       : "object",
-                    "required"   : [ "table" ],
-                    "properties" : {
-                        "table"    : { "$ref" : "#/$defs/table" },
-                        "leftKey"  : { "$ref" : "#/$defs/name"  },
-                        "rightKey" : { "$ref" : "#/$defs/name"  }
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "schema" ],
+                    "properties"           : {
+                        "schema"   : { "$ref" : "#/$defs/schema" },
+                        "leftKey"  : { "$ref" : "#/$defs/field"  },
+                        "rightKey" : { "$ref" : "#/$defs/field"  }
                     }
                 }
             }
@@ -195,13 +215,13 @@
             "type"  : "array",
             "items" : { "type" : "string" }
         },
-        "name" : {
+        "schema" : {
             "type"    : "string",
-            "pattern" : "^[A-Za-z_]*$"
+            "pattern" : "^[A-Z][A-Za-z]*$"
         },
-        "table" : {
+        "field" : {
             "type"    : "string",
-            "pattern" : "^[a-z][a-z_]*[a-z]$"
+            "pattern" : "^([A-Z]+[A-Z_]*[A-Z]+|[a-z][A-Za-z_]*)$"
         },
         "type" : {
             "enum" : [

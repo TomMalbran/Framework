@@ -29,14 +29,14 @@ class KeyChain {
     }
 
     /**
-     * Returns the Master Key with the given key
-     * @param string $key
+     * Returns the Master Key with the given Schema
+     * @param string $schema
      * @return string
      */
-    public static function get(string $key): string {
+    public static function get(string $schema): string {
         self::load();
-        if (!empty(self::$data[$key])) {
-            return base64_encode(hash("sha256", self::$data[$key], true));
+        if (!empty(self::$data[$schema])) {
+            return base64_encode(hash("sha256", self::$data[$schema], true));
         }
         return "";
     }
@@ -50,8 +50,8 @@ class KeyChain {
     public static function recreate(): array {
         self::load();
         $data = [];
-        foreach (array_keys(self::$data) as $key) {
-            $data[$key] = Strings::randomCode(64, "luds");
+        foreach (array_keys(self::$data) as $schema) {
+            $data[$schema] = Strings::randomCode(64, "luds");
         }
         self::$data = $data;
         return $data;

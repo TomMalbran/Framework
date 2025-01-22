@@ -69,7 +69,7 @@ class NotificationQueue {
 
         $query = Query::createSearch([
             "title", "body",
-            "CONCAT(credentials.firstName, ' ', credentials.lastName)",
+            "CONCAT(credential.firstName, ' ', credential.lastName)",
         ], $search);
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);

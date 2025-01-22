@@ -7,6 +7,7 @@ use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\File\FileType;
 use Framework\File\Image;
+use Framework\Schema\Factory;
 use Framework\Schema\Database;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;
@@ -73,16 +74,17 @@ class MediaFile {
 
         foreach ($files as $file) {
             foreach (self::$data["media"] as $field) {
-                $old = $file["old"];
-                $new = $file["new"];
+                $table = Factory::getTableName($field["schema"]);
+                $old   = $file["old"];
+                $new   = $file["new"];
                 if (!empty($field["replace"]) && $field["replace"]) {
                     $query = Query::create($field["field"], "LIKE", "\"$old\"");
-                    self::$db->update($field["table"], [
+                    self::$db->update($table, [
                         $field["field"] => Query::replace($field["field"], $old, $new),
                     ], $query);
                 } else {
                     $query = Query::create($field["field"], "=", $old);
-                    self::$db->update($field["table"], [
+                    self::$db->update($table, [
                         $field["field"] => $new,
                     ], $query);
                 }

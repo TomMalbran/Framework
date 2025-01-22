@@ -22,7 +22,7 @@ class ActionLog {
      * @return Schema
      */
     public static function idSchema(): Schema {
-        return Factory::getSchema("LogID");
+        return Factory::getSchema("LogIdentifier");
     }
 
     /**
@@ -72,9 +72,9 @@ class ActionLog {
      */
     public static function getAll(Request $request, array $mappings = []): array {
         $query = self::createQuery($request, $mappings);
-        $query->orderBy("log_sessions.createdTime", false);
-        $query->orderBy("log_sessions.SESSION_ID", false);
-        $query->orderBy("log_actions.createdTime", false);
+        $query->orderBy("log_session.createdTime", false);
+        $query->orderBy("log_session.SESSION_ID", false);
+        $query->orderBy("log_action.createdTime", false);
         $query->paginate($request->getInt("page"), $request->getInt("amount"));
 
         $request   = self::actionSchema()->getMap($query);

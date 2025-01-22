@@ -131,7 +131,7 @@ class Database {
      */
     public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
         $selection  = Strings::join($columns, ", ");
-        $expression = "SELECT $selection FROM $table ";
+        $expression = "SELECT $selection FROM `$table` ";
         $params     = [];
 
         if (!empty($query)) {
@@ -694,7 +694,7 @@ class Database {
      * @return boolean
      */
     public function tableIsEmpty(string $tableName): bool {
-        $sql    = "SELECT COUNT(*) AS count FROM $tableName";
+        $sql    = "SELECT COUNT(*) AS count FROM `$tableName`";
         $result = $this->query($sql);
         return empty($result) || $result[0]["count"] == 0;
     }
@@ -709,7 +709,7 @@ class Database {
      */
     public function createTable(string $tableName, array $fields, array $primary, array $keys): string {
         $charset = !empty($this->charset) ? $this->charset : "utf8";
-        $sql     = "CREATE TABLE $tableName (\n";
+        $sql     = "CREATE TABLE `$tableName` (\n";
 
         foreach ($fields as $key => $type) {
             $sql .= "  `$key` " . $type . ",\n";
@@ -765,7 +765,7 @@ class Database {
      * @return string
      */
     public function getColumnType(string $tableName, string $column): string {
-        $sql    = "SHOW COLUMNS FROM $tableName LIKE '$column'";
+        $sql    = "SHOW COLUMNS FROM `$tableName` LIKE '$column'";
         $result = $this->query($sql);
         return !empty($result) ? $this->parseColumnType($result[0]) : "";
     }
@@ -800,7 +800,7 @@ class Database {
      * @return string
      */
     public function addColumn(string $tableName, string $column, string $type, ?string $afterColumn = null): string {
-        $sql  = "ALTER TABLE $tableName ADD COLUMN `$column` $type ";
+        $sql  = "ALTER TABLE `$tableName` ADD COLUMN `$column` $type ";
         $sql .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;
@@ -816,9 +816,9 @@ class Database {
      */
     public function renameColumn(string $tableName, string $oldColumn, string $newColumn, string $type = ""): string {
         if (empty($type)) {
-            $sql = "ALTER TABLE $tableName RENAME COLUMN `$oldColumn` TO `$newColumn`";
+            $sql = "ALTER TABLE `$tableName` RENAME COLUMN `$oldColumn` TO `$newColumn`";
         } else {
-            $sql = "ALTER TABLE $tableName CHANGE `$oldColumn` `$newColumn` $type";
+            $sql = "ALTER TABLE `$tableName` CHANGE `$oldColumn` `$newColumn` $type";
         }
         $this->query($sql);
         return $sql;
@@ -833,7 +833,7 @@ class Database {
      * @return string
      */
     public function updateColumn(string $tableName, string $column, string $type, ?string $afterColumn = null): string {
-        $sql  = "ALTER TABLE $tableName MODIFY COLUMN `$column` $type ";
+        $sql  = "ALTER TABLE `$tableName` MODIFY COLUMN `$column` $type ";
         $sql .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;
@@ -847,7 +847,7 @@ class Database {
      * @return string
      */
     public function deleteColumn(string $tableName, string $column, bool $execute = true): string {
-        $sql = "ALTER TABLE $tableName DROP COLUMN `$column`";
+        $sql = "ALTER TABLE `$tableName` DROP COLUMN `$column`";
         if ($execute) {
             $this->query($sql);
         }
@@ -861,7 +861,7 @@ class Database {
      * @return string
      */
     public function updatePrimary(string $tableName, array $primary): string {
-        $sql  = "ALTER TABLE $tableName DROP PRIMARY KEY, ";
+        $sql  = "ALTER TABLE `$tableName` DROP PRIMARY KEY, ";
         $sql .= "ADD PRIMARY KEY (" . Strings::join($primary, ", ") . ")";
         $this->query($sql);
         return $sql;
@@ -873,7 +873,7 @@ class Database {
      * @return string
      */
     public function dropPrimary(string $tableName): string {
-        $sql = "ALTER TABLE $tableName DROP PRIMARY KEY";
+        $sql = "ALTER TABLE `$tableName` DROP PRIMARY KEY";
         $this->query($sql);
         return $sql;
     }
@@ -885,7 +885,7 @@ class Database {
      * @return string
      */
     public function createIndex(string $tableName, string $key): string {
-        $sql = "CREATE INDEX $key ON $tableName($key)";
+        $sql = "CREATE INDEX `$key` ON `$tableName`(`$key`)";
         $this->query($sql);
         return $sql;
     }
@@ -1053,7 +1053,7 @@ class Database {
         $start  = 0;
 
         do {
-            $request = $this->query("SELECT /*!40001 SQL_NO_CACHE */ * FROM $tableName LIMIT $start, 250");
+            $request = $this->query("SELECT /*!40001 SQL_NO_CACHE */ * FROM `$tableName` LIMIT $start, 250");
             $start  += 250;
 
             if (!empty($request)) {

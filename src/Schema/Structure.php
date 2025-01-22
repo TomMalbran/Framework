@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Schema\Factory;
 use Framework\Schema\KeyChain;
 use Framework\Schema\Field;
 use Framework\Schema\Join;
@@ -12,7 +13,7 @@ use Framework\Utils\Strings;
  */
 class Structure {
 
-    public string $key         = "";
+    public string $schema      = "";
     public string $masterKey   = "";
 
     public string $table       = "";
@@ -54,12 +55,12 @@ class Structure {
 
     /**
      * Creates a new Structure instance
-     * @param string  $schemaKey
+     * @param string  $schema
      * @param array{} $data
      */
-    public function __construct(string $schemaKey, array $data) {
-        $this->key           = $schemaKey;
-        $this->table         = $data["table"];
+    public function __construct(string $schema, array $data) {
+        $this->schema        = $schema;
+        $this->table         = Factory::getTableName($schema);
         $this->hasStatus     = !empty($data["hasStatus"]);
         $this->hasPositions  = !empty($data["hasPositions"]);
         $this->hasTimestamps = !empty($data["hasTimestamps"]);
@@ -197,7 +198,7 @@ class Structure {
         // Set the Master Key
         if ($reqMasterKey) {
             $this->hasEncrypt = true;
-            $this->masterKey  = KeyChain::get($schemaKey);
+            $this->masterKey  = KeyChain::get($schema);
         }
     }
 
@@ -226,5 +227,14 @@ class Structure {
             return $field;
         }
         return $this->hasPositions ? "position" : $this->nameKey;
+    }
+
+    /**
+     * Replaces the Table in the Expression
+     * @param string $expression
+     * @return string
+     */
+    public function replaceTable(string $expression): string {
+        return Strings::replace($expression, "{table}", "`{$this->table}`");
     }
 }

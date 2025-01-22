@@ -1,6 +1,5 @@
 {
     "Credential" : {
-        "table"  : "credentials",
         "fields" : {
             "CREDENTIAL_ID"    : { "type" : "id",      "name" : "credentialID"                   },
             "currentUser"      : { "type" : "number",                          "cantEdit" : true },
@@ -30,7 +29,7 @@
         },
         "expressions" : {
             "fullName" : {
-                "expression" : "IF(credentials.lastName <> '' AND credentials.firstName <> '', CONCAT(credentials.firstName, ' ', credentials.lastName), IF(credentials.firstName <> '', credentials.firstName, credentials.lastName))",
+                "expression" : "IF(credential.lastName <> '' AND credential.firstName <> '', CONCAT(credential.firstName, ' ', credential.lastName), IF(credential.firstName <> '', credential.firstName, credential.lastName))",
                 "type"       : "string"
             }
         },
@@ -41,14 +40,13 @@
         "canRemove"     : false
     },
     "CredentialDevice" : {
-        "table"  : "credentials_devices",
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
             "userAgent"     : { "type" : "string",                          "isPrimary" : true },
             "playerID"      : { "type" : "string"                                              }
         },
         "foreigns" : {
-            "CREDENTIAL_ID" : { "table" : "credentials" }
+            "CREDENTIAL_ID" : { "schema" : "Credential" }
         },
         "hasTimestamps" : true,
         "canCreate"     : false,
@@ -57,7 +55,6 @@
         "canRemove"     : false
     },
     "CredentialRefreshToken" : {
-        "table"  : "credentials_refresh_tokens",
         "fields" : {
             "CREDENTIAL_ID"  : { "type" : "number", "name" : "credentialID"                    },
             "refreshToken"   : { "type" : "string",                         "isPrimary" : true },
@@ -65,7 +62,7 @@
             "expirationTime" : { "type" : "date"                                               }
         },
         "foreigns" : {
-            "CREDENTIAL_ID" : { "table" : "credentials" }
+            "CREDENTIAL_ID" : { "schema" : "Credential" }
         },
         "hasTimestamps" : true,
         "canCreate"     : true,
@@ -74,7 +71,6 @@
         "canRemove"     : false
     },
     "CredentialReset" : {
-        "table"  : "credentials_reset",
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
             "email"         : { "type" : "string",                          "isPrimary" : true },
@@ -82,7 +78,7 @@
             "time"          : { "type" : "number"                                              }
         },
         "foreigns" : {
-            "CREDENTIAL_ID" : { "table" : "credentials" }
+            "CREDENTIAL_ID" : { "schema" : "Credential" }
         },
         "hasTimestamps" : false,
         "canCreate"     : false,
@@ -91,7 +87,6 @@
         "canRemove"     : false
     },
     "CredentialSpam" : {
-        "table"  : "credentials_spam",
         "fields" : {
             "ip"   : { "type" : "string", "isPrimary" : true },
             "time" : { "type" : "number"                     }
@@ -106,7 +101,6 @@
 
 
     "EmailTemplate" : {
-        "table"  : "email_templates",
         "fields" : {
             "TEMPLATE_ID"  : { "type" : "id",     "name"     : "templateID" },
             "templateCode" : { "type" : "string", "cantEdit" : true         },
@@ -126,7 +120,6 @@
         "canRemove"     : false
     },
     "EmailQueue" : {
-        "table"  : "email_queue",
         "fields" : {
             "EMAIL_ID"     : { "type" : "id",    "name" : "emailID" },
             "templateCode" : { "type" : "string"                    },
@@ -155,7 +148,6 @@
         "canRemove"     : false
     },
     "EmailWhiteList" : {
-        "table"  : "email_white_list",
         "fields" : {
             "EMAIL_ID"    : { "type" : "id",    "name" : "emailID" },
             "email"       : { "type" : "string"                    },
@@ -168,7 +160,6 @@
         "canRemove"     : false
     },
     "NotificationQueue" : {
-        "table"  : "notification_queue",
         "fields" : {
             "NOTIFICATION_ID" : { "type" : "id",     "name" : "notificationID" },
             "CREDENTIAL_ID"   : { "type" : "number", "name" : "credentialID"   },
@@ -185,13 +176,13 @@
         },
         "expressions" : {
             "credentialName" : {
-                "expression" : "IF(credentials.lastName <> '' AND credentials.firstName <> '', CONCAT(credentials.firstName, ' ', credentials.lastName), IF(credentials.firstName <> '', credentials.firstName, credentials.lastName))",
+                "expression" : "IF(credential.lastName <> '' AND credential.firstName <> '', CONCAT(credential.firstName, ' ', credential.lastName), IF(credential.firstName <> '', credential.firstName, credential.lastName))",
                 "type"       : "string"
             }
         },
         "joins" : {
             "CREDENTIAL_ID" : {
-                "table"     : "credentials",
+                "schema"    : "Credential",
                 "prefix"    : "credential",
                 "fieldKeys" : [ "firstName", "lastName" ]
             }
@@ -203,7 +194,6 @@
         "canRemove"     : false
     },
     "Settings" : {
-        "table"  : "settings",
         "fields" : {
             "section"  : { "type" : "string", "isPrimary" : true },
             "variable" : { "type" : "string", "isPrimary" : true },
@@ -219,15 +209,14 @@
 
 
 
-    "LogID" : {
-        "table"  : "log_ids",
+    "LogIdentifier" : {
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isPrimary" : true },
             "SESSION_ID"    : { "type" : "number", "name" : "sessionID"                        }
         },
         "foreigns" : {
-            "CREDENTIAL_ID" : { "table" : "credentials"  },
-            "SESSION_ID"    : { "table" : "log_sessions" }
+            "CREDENTIAL_ID" : { "schema" : "Credential" },
+            "SESSION_ID"    : { "schema" : "LogSession" }
         },
         "hasTimestamps" : false,
         "canCreate"     : false,
@@ -236,7 +225,6 @@
         "canRemove"     : false
     },
     "LogSession" : {
-        "table"  : "log_sessions",
         "fields" : {
             "SESSION_ID"    : { "type" : "id",     "name" : "sessionID"                    },
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID", "isKey" : true },
@@ -246,7 +234,7 @@
         },
         "joins" : {
             "CREDENTIAL_ID" : {
-                "table"  : "credentials",
+                "schema" : "Credential",
                 "prefix" : "credential",
                 "fields" : {
                     "firstName" : { "type" : "string", "mergeTo" : "name" },
@@ -262,7 +250,6 @@
         "canRemove"     : false
     },
     "LogAction" : {
-        "table"  : "log_actions",
         "fields" : {
             "ACTION_ID"     : { "type" : "id",     "name" : "actionID"                     },
             "SESSION_ID"    : { "type" : "number", "name" : "sessionID",    "isKey" : true },
@@ -274,7 +261,7 @@
         },
         "joins" : {
             "SESSION_ID" : {
-                "table"  : "log_sessions",
+                "schema" : "LogSession",
                 "prefix" : "session",
                 "fields" : {
                     "createdTime" : { "type" : "date"   },
@@ -283,7 +270,7 @@
                 }
             },
             "CREDENTIAL_ID" : {
-                "table"  : "credentials",
+                "schema" : "Credential",
                 "prefix" : "credential",
                 "fields" : {
                     "firstName" : { "type" : "string", "mergeTo" : "name" },
@@ -299,7 +286,6 @@
         "canRemove"     : false
     },
     "LogDevice" : {
-        "table"  : "log_devices",
         "fields" : {
             "LOG_ID"        : { "type" : "id",     "name" : "logID"        },
             "CREDENTIAL_ID" : { "type" : "number", "name" : "credentialID" },
@@ -308,8 +294,8 @@
             "wasAdded"      : { "type" : "boolean"                         }
         },
         "foreigns" : {
-            "CREDENTIAL_ID" : { "table" : "credentials"         },
-            "playerID"      : { "table" : "credentials_devices" }
+            "CREDENTIAL_ID" : { "schema" : "Credential"       },
+            "playerID"      : { "schema" : "CredentialDevice" }
         },
         "hasTimestamps" : true,
         "canCreate"     : true,
@@ -318,7 +304,6 @@
         "canRemove"     : false
     },
     "LogQuery" : {
-        "table"  : "log_queries",
         "fields" : {
             "LOG_ID"      : { "type" : "id",   "name" : "logID" },
             "expression"  : { "type" : "text"                   },
@@ -338,7 +323,6 @@
         "canRemove"     : false
     },
     "LogError" : {
-        "table"  : "log_errors",
         "fields" : {
             "LOG_ID"      : { "type" : "id",    "name" : "logID" },
             "code"        : { "type" : "number"                  },

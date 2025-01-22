@@ -7,6 +7,7 @@ use Framework\Schema\Structure;
 use Framework\Schema\SubRequest;
 use Framework\Schema\Database;
 use Framework\Utils\Arrays;
+use Framework\Utils\Strings;
 
 /**
  * The Schema Factory
@@ -119,5 +120,14 @@ class Factory {
             }
         }
         return $result;
+    }
+
+    /**
+     * Gets the Table Name for the Schema
+     * @param string $schema
+     * @return string
+     */
+    public static function getTableName(string $schema): string {
+        return Strings::pascalCaseToSnakeCase($schema);
     }
 }

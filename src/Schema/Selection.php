@@ -159,7 +159,7 @@ class Selection {
         $selects    = Strings::join($this->selects, ", ");
         $joins      = Strings::join($this->joins, " ");
         $where      = $query->get();
-        $expression = "SELECT $selects FROM $mainKey AS $mainKey $joins $where";
+        $expression = "SELECT $selects FROM `$mainKey` $joins $where";
 
         foreach ([ "FROM", "LEFT JOIN", "WHERE", "ORDER BY", "LIMIT" ] as $key) {
             $expression = Strings::replace($expression, $key, "\n$key");

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Schema\Factory;
 use Framework\Schema\Field;
 use Framework\Utils\Arrays;
 
@@ -9,35 +10,36 @@ use Framework\Utils\Arrays;
  */
 class Join {
 
-    public string $key        = "";
-    public string $table      = "";
-    public string $asTable    = "";
-    public string $onTable    = "";
-    public string $leftKey    = "";
-    public string $rightKey   = "";
-    public string $and        = "";
-    public string $andKey     = "";
-    public string $andValue   = "";
-    public string $andTable   = "";
-    public bool   $andDeleted = false;
+    public string  $key        = "";
+    public string  $table      = "";
 
-    public bool   $hasPrefix  = false;
-    public string $prefix     = "";
+    public string  $asTable    = "";
+    private string $onTable    = "";
+    private string $leftKey    = "";
+    private string $rightKey   = "";
+    private string $andTable   = "";
+    private string $and        = "";
+    private string $andKey     = "";
+    private string $andValue   = "";
+    private bool   $andDeleted = false;
+
+    private bool   $hasPrefix  = false;
+    private string $prefix     = "";
 
     /** @var Field[] */
-    public array  $fields     = [];
+    public array   $fields     = [];
 
     /** @var object[] */
-    public array  $merges     = [];
+    public array   $merges     = [];
 
     /** @var array{}[] */
-    public array  $defaults   = [];
+    public array   $defaults   = [];
 
     /** @var string[] */
-    public array  $andKeys    = [];
+    private array  $andKeys    = [];
 
     /** @var string[] */
-    public array  $orKeys     = [];
+    private array  $orKeys     = [];
 
 
     /**
@@ -47,17 +49,17 @@ class Join {
      */
     public function __construct(string $key, array $data) {
         $this->key        = $key;
-        $this->table      = $data["table"];
-        $this->asTable    = !empty($data["asTable"])    ? $data["asTable"]    : "";
-        $this->onTable    = !empty($data["onTable"])    ? $data["onTable"]    : "";
+        $this->table      = Factory::getTableName($data["schema"]);
+        $this->asTable    = !empty($data["asSchema"])   ? Factory::getTableName($data["asSchema"]) : "";
+        $this->onTable    = !empty($data["onSchema"])   ? Factory::getTableName($data["onSchema"]) : "";
         $this->leftKey    = !empty($data["leftKey"])    ? $data["leftKey"]    : $key;
         $this->rightKey   = !empty($data["rightKey"])   ? $data["rightKey"]   : $key;
+        $this->andTable   = !empty($data["andSchema"])  ? Factory::getTableName($data["andSchema"]) : "";
         $this->and        = !empty($data["and"])        ? $data["and"]        : "";
         $this->andKey     = !empty($data["andKey"])     ? $data["andKey"]     : "";
         $this->andKeys    = !empty($data["andKeys"])    ? $data["andKeys"]    : [];
         $this->orKeys     = !empty($data["orKeys"])     ? $data["orKeys"]     : [];
         $this->andValue   = !empty($data["andValue"])   ? $data["andValue"]   : "";
-        $this->andTable   = !empty($data["andTable"])   ? $data["andTable"]   : "";
         $this->andDeleted = !empty($data["andDeleted"]) ? $data["andDeleted"] : false;
 
         $this->hasPrefix  = !empty($data["prefix"]);
@@ -134,7 +136,7 @@ class Join {
         $rightKey = $this->rightKey;
         $and      = $this->getAnd($asTable);
 
-        return "LEFT JOIN `{$this->table}` AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey{$and})";
+        return "LEFT JOIN `{$this->table}` AS `$asTable` ON ($asTable.$leftKey = $onTable.$rightKey{$and})";
     }
 
     /**

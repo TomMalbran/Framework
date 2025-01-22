@@ -1,28 +1,39 @@
 {
-    "title"      : "Files",
-    "type"       : "object",
-    "required"   : [ "paths", "directories", "media" ],
-    "properties" : {
+    "title"                : "Files",
+    "type"                 : "object",
+    "additionalProperties" : false,
+    "required"             : [ "paths", "directories", "media" ],
+    "properties"           : {
         "paths" : {
             "type"  : "array",
-            "items" : { "type" : "string" }
+            "items" : {
+                "type" : "string"
+            }
         },
         "directories" : {
             "type"  : "array",
-            "items" : { "type" : "string" }
+            "items" : {
+                "type" : "string"
+            }
         },
         "media" : {
             "type"  : "array",
             "items" : {
-                "type"       : "object",
-                "required"   : [ "table", "field", "replace" ],
-                "properties" : {
-                    "table"   : { "type" : "string"  },
-                    "field"   : { "type" : "string"  },
+                "type"                 : "object",
+                "additionalProperties" : false,
+                "required"             : [ "schema", "field", "replace" ],
+                "properties"           : {
+                    "schema"  : {
+                        "type"    : "string",
+                        "pattern" : "^[A-Z][A-Za-z]*$"
+                    },
+                    "field"   : {
+                        "type"    : "string",
+                        "pattern" : "^[a-z][A-Za-z]*$"
+                    },
                     "replace" : { "type" : "boolean" }
                 }
             }
         }
-    },
-    "additionalProperties" : false
+    }
 }

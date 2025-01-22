@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Schema\Factory;
 use Framework\Schema\Field;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -11,20 +12,19 @@ use Framework\Utils\Strings;
 class Count {
 
     public Field  $field;
-    public string $key       = "";
-    public bool   $isSum     = false;
-    public bool   $isCount   = false;
-    public string $value     = "";
-    public int    $mult      = 1;
+    private bool   $isSum     = false;
+    public string  $key       = "";
+    private string $value     = "";
+    private int    $mult      = 1;
 
-    public string $table     = "";
-    public string $onTable   = "";
-    public string $leftKey   = "";
-    public string $rightKey  = "";
-    public bool   $noDeleted = false;
+    private string $table     = "";
+    private string $onTable   = "";
+    private string $leftKey   = "";
+    private string $rightKey  = "";
+    private bool   $noDeleted = false;
 
     /** @var mixed[] */
-    private array  $where    = [];
+    private array  $where     = [];
 
 
     /**
@@ -37,12 +37,11 @@ class Count {
         $this->key       = $key;
 
         $this->isSum     = !empty($data["isSum"]) && $data["isSum"];
-        $this->isCount   = empty($data["isSum"])  || !$data["isSum"];
         $this->value     = !empty($data["value"])    ? $data["value"]     : "";
         $this->mult      = !empty($data["mult"])     ? (int)$data["mult"] : 1;
 
-        $this->table     = $data["table"];
-        $this->onTable   = !empty($data["onTable"])  ? $data["onTable"]   : "";
+        $this->table     = Factory::getTableName($data["schema"]);
+        $this->onTable   = !empty($data["onSchema"]) ? Factory::getTableName($data["onSchema"]) : "";
         $this->rightKey  = !empty($data["rightKey"]) ? $data["rightKey"]  : $data["key"];
         $this->leftKey   = !empty($data["leftKey"])  ? $data["leftKey"]   : $data["key"];
         $this->where     = !empty($data["where"])    ? $data["where"]     : [];

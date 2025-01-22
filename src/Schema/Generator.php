@@ -63,7 +63,7 @@ class Generator {
      * @return boolean
      */
     private static function createSchema(Structure $structure): bool {
-        $fileName    = "{$structure->key}Schema.php";
+        $fileName    = "{$structure->schema}Schema.php";
         $idType      = self::getFieldType($structure->idType);
         $uniques     = self::getFieldList($structure, "isUnique");
         $parents     = self::getFieldList($structure, "isParent");
@@ -72,7 +72,7 @@ class Generator {
 
         $contents    = Mustache::render(self::$schemaText, [
             "namespace"       => Framework::Namespace,
-            "name"            => $structure->key,
+            "name"            => $structure->schema,
             "hasID"           => $structure->hasID,
             "idKey"           => $structure->idKey,
             "idName"          => $structure->idName,
@@ -247,11 +247,11 @@ class Generator {
      * @return boolean
      */
     private static function createEntity(Structure $structure): bool {
-        $fileName   = "{$structure->key}Entity.php";
+        $fileName   = "{$structure->schema}Entity.php";
         $attributes = self::getAttributes($structure);
         $contents   = Mustache::render(self::$entityText, [
             "namespace"  => Framework::Namespace,
-            "name"       => $structure->key,
+            "name"       => $structure->schema,
             "attributes" => self::parseAttributes($attributes),
         ]);
         return File::create(self::$writePath, $fileName, $contents);

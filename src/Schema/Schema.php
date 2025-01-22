@@ -154,7 +154,7 @@ class Schema {
      * @return array{}[]
      */
     public function getQuery(string $expression, array $params = []): array {
-        $expression = Strings::replace($expression, "{table}", $this->structure->table);
+        $expression = $this->structure->replaceTable($expression);
         $request    = $this->db->query($expression, $params);
         return $request;
     }
@@ -166,7 +166,7 @@ class Schema {
      * @return array{}[]
      */
     public function getData(Query $query, string $expression): array {
-        $expression = Strings::replace($expression, "{table}", $this->structure->table);
+        $expression = $this->structure->replaceTable($expression);
         $request    = $this->db->getData($expression, $query);
         return $request;
     }
@@ -271,7 +271,7 @@ class Schema {
      * @return array{}
      */
     public function getStats(Query $query, string $expression): array {
-        $expression = Strings::replace($expression, "{table}", $this->structure->table);
+        $expression = $this->structure->replaceTable($expression);
         $request    = $this->db->query("$expression " . $query->get(), $query);
 
         if (!empty($request[0])) {
@@ -395,7 +395,7 @@ class Schema {
      * @return string
      */
     public function getDataExpression(Query $query, string $expression): string {
-        $expression  = Strings::replace($expression, "{table}", $this->structure->table);
+        $expression  = $this->structure->replaceTable($expression);
         $expression .= $query->get();
         return $this->db->interpolateQuery($expression, $query);
     }
