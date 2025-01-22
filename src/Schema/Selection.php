@@ -41,6 +41,7 @@ class Selection {
     public function __construct(Database $db, Structure $structure) {
         $this->db        = $db;
         $this->structure = $structure;
+        $this->tables    = [ $structure->table ];
     }
 
 
@@ -107,7 +108,7 @@ class Selection {
         $mainKey = $this->structure->table;
 
         foreach ($this->structure->joins as $join) {
-            if ($join->asTable) {
+            if (!empty($join->asTable)) {
                 $asTable = $join->asTable;
             } elseif (Arrays::contains($this->tables, $join->table)) {
                 $asTable = chr($this->index++);
