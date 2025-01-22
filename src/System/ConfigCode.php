@@ -284,7 +284,7 @@ class ConfigCode {
             }
 
             $property = Strings::upperCaseToCamelCase($envKey);
-            $title    = Strings::upperCaseToTitle($envKey);
+            $title    = Strings::upperCaseToPascalCase($envKey);
             $name     = Strings::upperCaseFirst($property);
 
             if (Strings::endsWith($envKey, "URL")) {

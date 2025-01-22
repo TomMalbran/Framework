@@ -585,47 +585,6 @@ class Strings {
     }
 
     /**
-     * Transforms a String to LowerCase
-     * @param string $string
-     * @return string
-     */
-    public static function toLowerCase(string $string): string {
-        return strtolower($string);
-    }
-
-    /**
-     * Transforms a String to UpperCase
-     * @param string $string
-     * @return string
-     */
-    public static function toUpperCase(string $string): string {
-        return strtoupper($string);
-    }
-
-    /**
-     * Transforms a String to TitleCase
-     * @param string $string
-     * @return string
-     */
-    public static function toTitleCase(string $string): string {
-        return ucfirst(strtolower($string));
-    }
-
-    /**
-     * Transforms a String to CamelCase
-     * @param string $string
-     * @return string
-     */
-    public static function toCamelCase(string $string): string {
-        $result = self::replacePattern($string, "/[\.:;\-_]+/", " ");
-        $result = strtolower($result);
-        $result = ucwords($result);
-        $result = str_replace(" ", "", $result);
-        $result = lcfirst($result);
-        return $result;
-    }
-
-    /**
      * Transforms the first Character to LowerCase
      * @param string $string
      * @return string
@@ -644,18 +603,59 @@ class Strings {
     }
 
     /**
-     * Transforms an UpperCase string with underscores to Title
+     * Transforms a String to LowerCase
      * @param string $string
      * @return string
      */
-    public static function upperCaseToTitle(string $string): string {
+    public static function toLowerCase(string $string): string {
+        return strtolower($string);
+    }
+
+    /**
+     * Transforms a String to UpperCase
+     * @param string $string
+     * @return string
+     */
+    public static function toUpperCase(string $string): string {
+        return strtoupper($string);
+    }
+
+    /**
+     * Transforms a String to PascalCase
+     * @param string $string
+     * @return string
+     */
+    public static function toPascalCase(string $string): string {
+        return ucfirst(strtolower($string));
+    }
+
+    /**
+     * Transforms a String to CamelCase
+     * @param string $string
+     * @return string
+     */
+    public static function toCamelCase(string $string): string {
+        $result = self::replacePattern($string, "/[\.:;\-_]+/", " ");
+        $result = strtolower($result);
+        $result = ucwords($result);
+        $result = str_replace(" ", "", $result);
+        $result = lcfirst($result);
+        return $result;
+    }
+
+    /**
+     * Transforms an UpperCase string to PascalCase
+     * @param string $string
+     * @return string
+     */
+    public static function upperCaseToPascalCase(string $string): string {
         $result = ucwords(strtolower($string), "_");
         $result = str_replace("_", " ", $result);
         return $result;
     }
 
     /**
-     * Transforms an UpperCase string with underscores to CamelCase
+     * Transforms an UpperCase string to CamelCase
      * @param string  $string
      * @param boolean $capitalizeFirst Optional.
      * @return string
@@ -670,7 +670,7 @@ class Strings {
     }
 
     /**
-     * Transforms an CamelCase string to UpperCase with underscores
+     * Transforms a CamelCase string to UpperCase
      * @param string $string
      * @return string
      */
@@ -682,15 +682,24 @@ class Strings {
     }
 
     /**
-     * Transforms an CamelCase string to Title
+     * Transforms a CamelCase string to PascalCase
      * @param string $string
      * @return string
      */
-    public static function camelCaseToTitle(string $string): string {
+    public static function camelCaseToPascalCase(string $string): string {
         $parts  = preg_split('/(?=[A-Z])/', $string);
         $result = implode(" ", $parts);
         $result = ucfirst($result);
         return $result;
+    }
+
+    /**
+     * Transforms a PascalCase string to SnakeCase
+     * @param string $string
+     * @return string
+     */
+    public static function pascalCaseToSnakeCase(string $string): string {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
     }
 
 
