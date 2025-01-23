@@ -95,17 +95,30 @@ class Field {
         $this->mergeTo    = !empty($data["mergeTo"])   ? $data["mergeTo"]   : "";
         $this->defaultTo  = !empty($data["defaultTo"]) ? $data["defaultTo"] : "";
 
-        $this->hasName    = !empty($data["name"]);
-        $this->name       = !empty($data["name"]) ? $data["name"] : $key;
+        $this->hasName    = Strings::isUpperCase($key);
+        $this->name       = $this->getFieldName();
         $this->prefix     = $prefix;
         $this->prefixName = $this->getFieldKey();
     }
 
     /**
-     * Creates a Field with a Prefix
+     * Returns a Field Name transforming it if is Upper Case
      * @return string
      */
-    public function getFieldKey(): string {
+    private function getFieldName(): string {
+        $result = $this->key;
+        if ($this->hasName) {
+            $result = Strings::upperCaseToCamelCase($this->key);
+            $result = Strings::replaceEnd($result, "Id", "ID");
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a Field Key with a Prefix
+     * @return string
+     */
+    private function getFieldKey(): string {
         $result = $this->name;
         if (!empty($this->prefix) && !$this->noPrefix) {
             $result = $this->prefix . ucfirst($this->name);

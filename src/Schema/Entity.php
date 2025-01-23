@@ -87,7 +87,7 @@ class Entity implements ArrayAccess, JsonSerializable {
      * @return array{}
      */
     public function toArray(array $extraData = []): array {
-        $result  = [];
+        $result = [];
         foreach ($this->getProperties() as $property) {
             $result[$property] = $this->$property;
         }

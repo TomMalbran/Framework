@@ -5,24 +5,6 @@
     "propertyNames"        : {
         "pattern" : "^[A-Z][A-Za-z]*$"
     },
-    "properties" : {
-        "Credential"             : {},
-        "CredentialDevice"       : {},
-        "CredentialRefreshToken" : {},
-        "CredentialReset"        : {},
-        "CredentialSpam"         : {},
-        "EmailTemplate"          : {},
-        "EmailQueue"             : {},
-        "EmailWhiteList"         : {},
-        "NotificationQueue"      : {},
-        "Settings"               : {},
-        "LogID"                  : {},
-        "LogSession"             : {},
-        "LogAction"              : {},
-        "LogDevice"              : {},
-        "LogQuery"               : {},
-        "LogError"               : {}
-    },
     "patternProperties" : {
         "^[A-Z][A-Za-z]*$" : {
             "type"                 : "object",
@@ -45,14 +27,16 @@
                 "canDelete"     : { "type" : "boolean"             },
                 "canRemove"     : { "type" : "boolean"             }
             },
-            "required" : [
-                "fields",
-                "hasTimestamps",
-                "canCreate",
-                "canEdit",
-                "canDelete",
-                "canRemove"
-            ]
+            "dependentRequired" : {
+                "fields" : [
+                    "fields",
+                    "hasTimestamps",
+                    "canCreate",
+                    "canEdit",
+                    "canDelete",
+                    "canRemove"
+                ]
+            }
         }
     },
     "$defs" : {
@@ -66,8 +50,8 @@
                     "required"             : [ "type" ],
                     "properties"           : {
                         "type"      : { "$ref" : "#/$defs/type"  },
-                        "name"      : { "$ref" : "#/$defs/field" },
                         "length"    : { "type" : "number"        },
+                        "isSigned"  : { "type" : "boolean"       },
                         "decimals"  : { "type" : "number"        },
                         "dateType"  : { "$ref" : "#/$defs/field" },
                         "date"      : { "$ref" : "#/$defs/field" },
@@ -81,11 +65,7 @@
                         "isParent"  : { "type" : "boolean"       },
                         "noExists"  : { "type" : "boolean"       },
                         "noEmpty"   : { "type" : "boolean"       },
-                        "isSigned"  : { "type" : "boolean"       },
-                        "noPrefix"  : { "type" : "boolean"       },
-                        "cantEdit"  : { "type" : "boolean"       },
-                        "mergeTo"   : { "$ref" : "#/$defs/field" },
-                        "defaultTo" : { "$ref" : "#/$defs/field" }
+                        "cantEdit"  : { "type" : "boolean"       }
                     }
                 }
             }
@@ -170,27 +150,45 @@
             "type"                 : "object",
             "additionalProperties" : false,
             "patternProperties"    : {
-                "^[A-Za-z_]*$" : {
+                "^([A-Z_]*|[a-z][A-Za-z0-9]*)$" : {
                     "type"                 : "object",
                     "additionalProperties" : false,
                     "required"             : [ "schema" ],
                     "properties"           : {
-                        "schema"     : { "$ref" : "#/$defs/schema"  },
-                        "onSchema"   : { "$ref" : "#/$defs/schema"  },
-                        "asSchema"   : { "$ref" : "#/$defs/schema"  },
-                        "leftKey"    : { "$ref" : "#/$defs/field"   },
-                        "rightKey"   : { "$ref" : "#/$defs/field"   },
-                        "andSchema"  : { "$ref" : "#/$defs/schema"  },
-                        "and"        : { "type" : "string"          },
-                        "andKey"     : { "type" : "string"          },
-                        "andKeys"    : { "$ref" : "#/$defs/strings" },
-                        "orKeys"     : { "$ref" : "#/$defs/strings" },
-                        "andValue"   : { "type" : "string"          },
-                        "andDeleted" : { "type" : "boolean"         },
-                        "prefix"     : { "$ref" : "#/$defs/field"   },
-                        "fields"     : { "$ref" : "#/$defs/fields"  },
-                        "fieldKeys"  : { "$ref" : "#/$defs/strings" },
-                        "mergeGlue"  : { "type" : "string"          }
+                        "schema"     : { "$ref" : "#/$defs/schema"     },
+                        "onSchema"   : { "$ref" : "#/$defs/schema"     },
+                        "asSchema"   : { "$ref" : "#/$defs/schema"     },
+                        "leftKey"    : { "$ref" : "#/$defs/field"      },
+                        "rightKey"   : { "$ref" : "#/$defs/field"      },
+                        "andSchema"  : { "$ref" : "#/$defs/schema"     },
+                        "and"        : { "type" : "string"             },
+                        "andKey"     : { "type" : "string"             },
+                        "andKeys"    : { "$ref" : "#/$defs/strings"    },
+                        "orKeys"     : { "$ref" : "#/$defs/strings"    },
+                        "andValue"   : { "type" : "string"             },
+                        "andDeleted" : { "type" : "boolean"            },
+                        "prefix"     : { "$ref" : "#/$defs/field"      },
+                        "fields"     : { "$ref" : "#/$defs/joinFields" },
+                        "fieldKeys"  : { "$ref" : "#/$defs/strings"    },
+                        "mergeGlue"  : { "type" : "string"             }
+                    }
+                }
+            }
+        },
+        "joinFields" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "patternProperties"    : {
+                "^(?!type$)(?!code$)([A-Z_]*|[a-z][A-Za-z0-9]*)$" : {
+                    "type"                 : "object",
+                    "additionalProperties" : false,
+                    "required"             : [ "type" ],
+                    "properties"           : {
+                        "type"      : { "$ref" : "#/$defs/type"  },
+                        "decimals"  : { "type" : "number"        },
+                        "noPrefix"  : { "type" : "boolean"       },
+                        "mergeTo"   : { "$ref" : "#/$defs/field" },
+                        "defaultTo" : { "$ref" : "#/$defs/field" }
                     }
                 }
             }
@@ -199,7 +197,7 @@
             "type"                 : "object",
             "additionalProperties" : false,
             "patternProperties"    : {
-                "^[A-Za-z_]*$" : {
+                "^([A-Z_]*|[a-z][A-Za-z0-9]*)$" : {
                     "type"                 : "object",
                     "additionalProperties" : false,
                     "required"             : [ "schema" ],
@@ -221,7 +219,7 @@
         },
         "field" : {
             "type"    : "string",
-            "pattern" : "^([A-Z]+[A-Z_]*[A-Z]+|[a-z][A-Za-z_]*)$"
+            "pattern" : "^([A-Z]+[A-Z_]*[A-Z]+|[a-z][A-Za-z0-9]*)$"
         },
         "type" : {
             "enum" : [
