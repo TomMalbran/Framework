@@ -626,6 +626,15 @@ class Strings {
     }
 
     /**
+     * Returns true if a String is UpperCase
+     * @param string $string
+     * @return boolean
+     */
+    public static function isUpperCase(string $string): bool {
+        return preg_match('/^[A-Z_]+$/', $string) === 1;
+    }
+
+    /**
      * Transforms a String to UpperCase
      * @param string $string
      * @return string
