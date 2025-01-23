@@ -267,6 +267,20 @@ class Strings {
     }
 
     /**
+     * Replaces in the end of the String the search with the replace
+     * @param string $string
+     * @param string $search
+     * @param string $replace
+     * @return string
+     */
+    public static function replaceEnd(string $string, string $search, string $replace): string {
+        if (self::endsWith($string, $search)) {
+            return substr_replace($string, $replace, -strlen($search));
+        }
+        return $string;
+    }
+
+    /**
      * Replaces in the String the pattern with the replacement
      * @param string          $string
      * @param string[]|string $pattern
