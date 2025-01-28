@@ -185,19 +185,6 @@ class Schema {
     }
 
     /**
-     * Returns a map of Schemas
-     * @param Query|null   $query     Optional.
-     * @param Request|null $sort      Optional.
-     * @param boolean      $decrypted Optional.
-     * @return array{}[]
-     */
-    public function getMap(?Query $query = null, ?Request $sort = null, bool $decrypted = false): array {
-        $query   = $this->generateQuerySort($query, $sort);
-        $request = $this->request($query, $decrypted);
-        return Arrays::createMap($request, $this->structure->idName);
-    }
-
-    /**
      * Requests data to the database
      * @param Query|null $query     Optional.
      * @param boolean    $decrypted Optional.

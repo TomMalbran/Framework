@@ -77,7 +77,7 @@ class ActionLog {
         $query->orderBy("log_action.createdTime", false);
         $query->paginate($request->getInt("page"), $request->getInt("amount"));
 
-        $request   = self::actionSchema()->getMap($query);
+        $request   = self::actionSchema()->getAll($query);
         $result    = [];
         $lastIndex = -1;
 
