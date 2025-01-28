@@ -65,6 +65,7 @@ class Generator {
     private static function createSchema(Structure $structure): bool {
         $fileName    = "{$structure->schema}Schema.php";
         $idType      = self::getFieldType($structure->idType);
+        $fields      = self::getAllFields($structure);
         $uniques     = self::getFieldList($structure, "isUnique");
         $parents     = self::getFieldList($structure, "isParent");
         $subTypes    = self::getSubTypes($structure->subRequests);
@@ -97,12 +98,15 @@ class Generator {
             "processEntity"   => !empty($subTypes) || !empty($structure->processed) || $structure->hasStatus,
             "subTypes"        => $subTypes,
             "hasProcessed"    => !empty($structure->processed),
+            "fields"          => $fields,
+            "fieldsList"      => self::joinFields($fields, "fieldArgDefault", ", "),
+            "fieldsEditList"  => self::joinFields($fields, "fieldArgNull", ", "),
             "uniques"         => $uniques,
             "parents"         => $parents,
             "editParents"     => $editParents,
             "parentsList"     => self::joinFields($parents, "fieldParam"),
             "parentsArgList"  => self::joinFields($parents, "fieldArg"),
-            "parentsDefList"  => self::joinFields($parents, "fieldDefault", ", "),
+            "parentsDefList"  => self::joinFields($parents, "fieldArgDefault", ", "),
             "parentsEditList" => self::joinFields($editParents, "fieldArg", ", "),
             "hasParents"      => !empty($parents),
             "hasEditParents"  => $structure->hasPositions && !empty($parents),
@@ -134,6 +138,22 @@ class Generator {
     }
 
     /**
+     * Returns a list of all the Fields to set
+     * @param Structure $structure
+     * @return array{}[]
+     */
+    private static function getAllFields(Structure $structure): array {
+        $skipKeys = [ "createdTime", "createdUser", "modifiedTime", "modifiedUser", "isDeleted" ];
+        $result   = [];
+        foreach ($structure->fields as $field) {
+            if (!$field->isID && !Arrays::contains($skipKeys, $field->key)) {
+                $result[] = self::getField($field);
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Returns a list of Fields with the given property
      * @param Structure $structure
      * @param string    $property
@@ -155,18 +175,21 @@ class Generator {
      * @return array{}
      */
     private static function getField(Field $field): array {
-        $param   = "\${$field->name}";
         $type    = self::getFieldType($field->type);
         $default = self::getDefault($type);
+        $param   = "\${$field->name}";
 
         return [
-            "fieldKey"     => $field->key,
-            "fieldName"    => $field->name,
-            "fieldText"    => Strings::upperCaseFirst($field->name),
-            "fieldDoc"     => self::getDocType($type) . " $param",
-            "fieldParam"   => $param,
-            "fieldArg"     => "$type $param",
-            "fieldDefault" => "$type $param = $default",
+            "fieldKey"        => $field->key,
+            "fieldName"       => $field->name,
+            "fieldText"       => Strings::upperCaseFirst($field->name),
+            "fieldDoc"        => self::getDocType($type) . " $param",
+            "fieldDocNull"    => self::getDocType($type) . "|null $param",
+            "fieldParam"      => $param,
+            "fieldArg"        => "$type $param",
+            "fieldArgDefault" => "$type $param = $default",
+            "fieldArgNull"    => "?$type $param = null",
+            "defaultValue"    => $default,
         ];
     }
 
@@ -405,7 +428,6 @@ class Generator {
         }
         return $result;
     }
-
 
 
 

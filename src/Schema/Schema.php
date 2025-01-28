@@ -519,6 +519,9 @@ class Schema {
      * @return integer
      */
     public function createWithOrder(Request|array $fields, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): int {
+        if (!empty($extra["position"])) {
+            $fields["position"] = $extra["position"];
+        }
         $fields["position"] = $this->ensurePosOrder(null, $fields, $orderQuery);
         return $this->create($fields, $extra, $credentialID);
     }
