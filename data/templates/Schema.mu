@@ -256,7 +256,7 @@ class {{name}}Schema {
      * @return {{name}}Entity[]
      */
     protected static function getEntityList(?Query $query = null, ?Request $sort = null{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): array {
-        $list   = self::schema()->getAll($query, $sort{{#hasEncrypt}}, $decrypted{{/hasEncrypt}});
+        $list   = self::schema()->getAll($query, $sort{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         $result = [];
         foreach ($list as $data) {
             $result[] = self::constructEntity($data);

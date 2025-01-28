@@ -101,10 +101,11 @@ class Selection {
 
     /**
      * Adds the Joins
-     * @param boolean $withSelects Optional.
+     * @param string[] $extraJoins  Optional.
+     * @param boolean  $withSelects Optional.
      * @return Selection
      */
-    public function addJoins(bool $withSelects = true): Selection {
+    public function addJoins(array $extraJoins = [], bool $withSelects = true): Selection {
         $mainKey = $this->structure->table;
 
         foreach ($this->structure->joins as $join) {
@@ -125,6 +126,9 @@ class Selection {
                     $this->selects[] = "$asTable.{$field->key} AS $field->prefixName";
                 }
             }
+        }
+        foreach ($extraJoins as $extraJoin) {
+            $this->joins[] = $extraJoin;
         }
         return $this;
     }

@@ -94,7 +94,7 @@ class Schema {
      */
     public function getOne(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): Model {
         $query   = $this->generateQueryID($query, $withDeleted)->limit(1);
-        $request = $this->request($query, $decrypted);
+        $request = $this->request($query, decrypted: $decrypted);
         return $this->getModel($request);
     }
 
@@ -119,7 +119,7 @@ class Schema {
      */
     public function getRow(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): array {
         $query   = $this->generateQueryID($query, $withDeleted)->limit(1);
-        $request = $this->request($query, $decrypted);
+        $request = $this->request($query, decrypted: $decrypted);
         return !empty($request[0]) ? $request[0] : [];
     }
 
@@ -175,30 +175,41 @@ class Schema {
      * Returns an array of Schemas
      * @param Query|null   $query     Optional.
      * @param Request|null $sort      Optional.
+     * @param array{}      $selects   Optional.
+     * @param string[]     $joins     Optional.
      * @param boolean      $decrypted Optional.
      * @return array{}[]
      */
-    public function getAll(?Query $query = null, ?Request $sort = null, bool $decrypted = false): array {
+    public function getAll(
+        ?Query $query = null,
+        ?Request $sort = null,
+        array $selects = [],
+        array $joins = [],
+        bool $decrypted = false,
+    ): array {
         $query   = $this->generateQuerySort($query, $sort);
-        $request = $this->request($query, $decrypted);
+        $request = $this->request($query, $selects, $joins, $decrypted);
         return $request;
     }
 
     /**
      * Requests data to the database
      * @param Query|null $query     Optional.
+     * @param array{}    $selects   Optional.
+     * @param string[]   $joins     Optional.
      * @param boolean    $decrypted Optional.
      * @return array{}[]
      */
-    private function request(?Query $query = null, bool $decrypted = false): array {
+    private function request(?Query $query = null, array $selects = [], array $joins = [], bool $decrypted = false): array {
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields($decrypted);
         $selection->addExpressions();
-        $selection->addJoins();
+        $selection->addSelects(array_values($selects));
+        $selection->addJoins($joins);
         $selection->addCounts();
         $selection->request($query);
 
-        $result = $selection->resolve();
+        $result = $selection->resolve(array_keys($selects));
         foreach ($this->subRequests as $subRequest) {
             $result = $subRequest->request($result);
         }
@@ -217,7 +228,7 @@ class Schema {
         $query     = $this->generateQuery($query, $withDeleted);
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects("COUNT(*) AS cnt");
-        $selection->addJoins(false);
+        $selection->addJoins(withSelects: false);
 
         $request = $selection->request($query);
         if (isset($request[0]["cnt"])) {
@@ -340,7 +351,7 @@ class Schema {
 
         $selection = new Selection($this->db, $this->structure);
         $selection->addSelects("position", true);
-        $selection->addJoins(false);
+        $selection->addJoins(withSelects: false);
 
         $query = $this->generateQuery($query, $withDeleted);
         $query->orderBy("position", false);
@@ -357,20 +368,26 @@ class Schema {
      * Returns the expression of the Query
      * @param Query|null   $query     Optional.
      * @param Request|null $sort      Optional.
-     * @param array{}|null $selects   Optional.
+     * @param array{}      $selects   Optional.
+     * @param string[]     $joins     Optional.
      * @param boolean      $decrypted Optional.
      * @return string
      */
-    public function getExpression(?Query $query = null, ?Request $sort = null, ?array $selects = null, bool $decrypted = false): string {
+    public function getExpression(
+        ?Query $query = null,
+        ?Request $sort = null,
+        array $selects = [],
+        array $joins = [],
+        bool $decrypted = false,
+    ): string {
         $query     = $this->generateQuerySort($query, $sort);
         $selection = new Selection($this->db, $this->structure);
         $selection->addFields($decrypted);
         $selection->addExpressions();
-        if (!empty($selects)) {
-            $selection->addSelects(array_values($selects));
-        }
-        $selection->addJoins();
+        $selection->addSelects(array_values($selects));
+        $selection->addJoins($joins);
         $selection->addCounts();
+
         $expression = $selection->getExpression($query);
         return $this->db->interpolateQuery($expression, $query);
     }
