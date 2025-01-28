@@ -452,20 +452,6 @@ class Schema {
         return $modification->update($query);
     }
 
-
-
-    /**
-     * Updates a single value increasing it by the given amount
-     * @param Query|integer|string $query
-     * @param string               $column
-     * @param integer              $amount
-     * @return boolean
-     */
-    public function increase(Query|int|string $query, string $column, int $amount): bool {
-        $query = $this->generateQueryID($query, false);
-        return $this->db->increase($this->structure->table, $column, $amount, $query);
-    }
-
     /**
      * Batches the Schema
      * @param array{}[] $fields
@@ -630,12 +616,12 @@ class Schema {
             $newQuery = $this->generateQuery($query);
             $newQuery->add("position",  ">",  $oldPosition);
             $newQuery->add("position",  "<=", $newPosition);
-            $this->increase($newQuery, "position", -1);
+            $this->db->update($this->structure->table, [ "position" => Query::inc(-1) ], $query);
         } else {
             $newQuery = $this->generateQuery($query);
             $newQuery->add("position",  ">=", $newPosition);
             $newQuery->add("position",  "<",  $oldPosition);
-            $this->increase($newQuery, "position", 1);
+            $this->db->update($this->structure->table, [ "position" => Query::inc(1) ], $query);
         }
         return $updatedPosition;
     }

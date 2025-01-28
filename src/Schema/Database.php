@@ -266,8 +266,6 @@ class Database {
         return $this->closeQuery($statement);
     }
 
-
-
     /**
      * Updates the content of the database based on the query and given fields
      * @param string    $table
@@ -284,20 +282,6 @@ class Database {
         $statement   = $this->processQuery($expression, $bindParams);
         return $this->closeQuery($statement);
     }
-
-    /**
-     * Updates a single value increasing it by the given amount
-     * @param string  $table
-     * @param string  $column
-     * @param integer $amount
-     * @param Query   $query
-     * @return boolean
-     */
-    public function increase(string $table, string $column, int $amount, Query $query): bool {
-        return $this->update($table, [ $column => Query::inc($amount) ], $query);
-    }
-
-
 
     /**
      * Deletes from the given table

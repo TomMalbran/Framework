@@ -393,6 +393,19 @@ class {{name}}Schema {
         return self::schema()->edit($query, $fields ?? [], $extras{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
         {{/hasPositions}}
     }
+
+    /**
+     * Increments a value in a {{name}} Entity
+     * @param {{editDocType}} $query
+     * @param string $column
+     * @param integer $amount Optional.
+     * @return boolean
+     */
+    protected static function increaseEntity({{editType}} $query, string $column, int $amount = 1): bool {
+        return self::schema()->edit($query, [
+            $column => Query::inc($amount),
+        ]{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+    }
 {{/canEdit}}
 {{#canBatch}}
 
