@@ -276,13 +276,22 @@ class Arrays {
      * Removes the given value from the array
      * @param mixed[] $array
      * @param mixed   $key
+     * @param string  $idKey Optional.
      * @return mixed[]
      */
-    public static function removeValue(array $array, mixed $key): array {
+    public static function removeValue(array $array, mixed $key, string $idKey = ""): array {
         $result = [];
-        foreach ($array as $value) {
-            if ($value != $key) {
-                $result[] = $value;
+        foreach ($array as $elem) {
+            $shouldAdd = false;
+            if (self::isObject($elem)) {
+                $shouldAdd = !empty($elem->$idKey) && $elem->$idKey != $key;
+            } elseif (self::isArrayLike($elem)) {
+                $shouldAdd = !empty($elem[$idKey]) && $elem[$idKey] != $key;
+            } else {
+                $shouldAdd = $elem != $key;
+            }
+            if ($shouldAdd) {
+                $result[] = $elem;
             }
         }
         return $result;
