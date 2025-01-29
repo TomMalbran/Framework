@@ -183,14 +183,9 @@ class SettingCode {
      * @return boolean
      */
     public static function migrateData(): bool {
-        $db = Framework::getDatabase();
-        if (!$db->hasTable("settings")) {
-            return false;
-        }
-
         $settings  = Framework::loadData(Framework::SettingsData);
         $query     = Query::create("section", "<>", self::Core);
-        $request   = $db->getAll("settings", "*", $query);
+        $request   = self::schema()->getAll($query);
 
         $variables = [];
         $adds      = [];
@@ -268,7 +263,7 @@ class SettingCode {
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " settings</i><br>");
             print(Strings::join($variables, ", ") . "<br>");
-            $db->batch("settings", $adds);
+            self::schema()->batch($adds);
             $didUpdate = true;
         }
 
@@ -277,7 +272,7 @@ class SettingCode {
             foreach ($renames as $row) {
                 $query = Query::create("section", "=", $row["section"]);
                 $query->add("variable", "=", $row["variable"]);
-                $db->update("settings", $row["fields"], $query);
+                self::schema()->edit($query, $row["fields"]);
             }
             $didUpdate = true;
         }
@@ -287,7 +282,7 @@ class SettingCode {
             foreach ($modifies as $row) {
                 $query = Query::create("section", "=", $row["section"]);
                 $query->add("variable", "=", $row["variable"]);
-                $db->update("settings", [ "type" => $row["type"] ], $query);
+                self::schema()->edit($query, [ "type" => $row["type"] ]);
             }
             $didUpdate = true;
         }
@@ -298,7 +293,7 @@ class SettingCode {
             foreach ($deletes as $row) {
                 $query = Query::create("section", "=", $row[0]);
                 $query->add("variable", "=", $row[1]);
-                $db->delete("settings", $query);
+                self::schema()->remove($query);
                 $variables[] = $row[0] . "_" . $row[1];
             }
             print(Strings::join($variables, ", ") . "<br>");

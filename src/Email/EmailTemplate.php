@@ -8,7 +8,6 @@ use Framework\NLS\Language;
 use Framework\Provider\Mustache;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
-use Framework\Schema\Database;
 use Framework\Schema\Model;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;
@@ -116,18 +115,14 @@ class EmailTemplate {
      * @return boolean
      */
     public static function migrateData(): bool {
-        $db = Framework::getDatabase();
-        if (!$db->hasTable("email_templates")) {
-            return false;
-        }
-        $db->truncate("email_templates");
+        self::schema()->truncate();
 
         $position  = 0;
         $languages = Language::getAll();
         foreach ($languages as $language => $languageName) {
             $templates = Framework::loadJSON(Framework::EmailsDir, $language);
             if (!empty($templates)) {
-                $position = self::migrateLanguage($db, $templates, $language, $languageName, $position);
+                $position = self::migrateLanguage($templates, $language, $languageName, $position);
             }
         }
         return true;
@@ -135,20 +130,13 @@ class EmailTemplate {
 
     /**
      * Migrates the Email Templates for the given Language
-     * @param Database  $db
      * @param array{}[] $templates
      * @param string    $language
      * @param string    $languageName
      * @param integer   $position
      * @return integer
      */
-    private static function migrateLanguage(
-        Database $db,
-        array $templates,
-        string $language,
-        string $languageName,
-        int $position
-    ): int {
+    private static function migrateLanguage(array $templates, string $language, string $languageName, int $position): int {
         $siteName = ConfigCode::getString("name");
         $updates  = [];
 
@@ -172,7 +160,7 @@ class EmailTemplate {
         // Process the SQL
         if (!empty($updates)) {
             print("<br>Updated <i>" . count($updates) . " emails</i> for language <i>$languageName</i><br>");
-            $db->batch("email_templates", $updates);
+            self::schema()->batch($updates);
         }
 
         return $position;

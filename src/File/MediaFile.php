@@ -8,7 +8,6 @@ use Framework\File\FilePath;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Schema\Factory;
-use Framework\Schema\Database;
 use Framework\Schema\Assign;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;
@@ -18,12 +17,11 @@ use Framework\Utils\Strings;
  */
 class MediaFile {
 
-    private static bool      $loaded = false;
-    private static ?Database $db     = null;
-    private static int       $id     = 0;
+    private static bool  $loaded = false;
+    private static int   $id     = 0;
 
     /** @var array{}[] */
-    private static array     $data   = [];
+    private static array $data   = [];
 
 
     /**
@@ -34,8 +32,8 @@ class MediaFile {
         if (self::$loaded) {
             return false;
         }
+
         self::$loaded = true;
-        self::$db     = Framework::getDatabase();
         self::$data   = Framework::loadData(Framework::FilesData);
         return true;
     }
@@ -73,21 +71,23 @@ class MediaFile {
             ],
         ];
 
-        foreach ($files as $file) {
-            foreach (self::$data["media"] as $field) {
-                $table = Factory::getTableName($field["schema"]);
-                $old   = $file["old"];
-                $new   = $file["new"];
-                if (!empty($field["replace"]) && $field["replace"]) {
+        foreach (self::$data["media"] as $field) {
+            $schema = Factory::getSchema($field["schema"]);
+
+            foreach ($files as $file) {
+                $old = $file["old"];
+                $new = $file["new"];
+
+                if (!empty($field["replace"])) {
                     $query = Query::create($field["field"], "LIKE", "\"$old\"");
-                    self::$db->update($table, [
+                    $schema->edit($query, [
                         $field["field"] => Assign::replace($old, $new),
-                    ], $query);
+                    ]);
                 } else {
                     $query = Query::create($field["field"], "=", $old);
-                    self::$db->update($table, [
+                    $schema->edit($query, [
                         $field["field"] => $new,
-                    ], $query);
+                    ]);
                 }
             }
         }
