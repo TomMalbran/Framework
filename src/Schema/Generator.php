@@ -86,6 +86,7 @@ class Generator {
             "nameKey"         => $structure->nameKey,
             "hasSelect"       => !empty($structure->nameKey),
             "hasPositions"    => $structure->hasPositions,
+            "hasTimestamps"   => $structure->hasTimestamps,
             "hasUsers"        => $structure->hasUsers,
             "hasFilters"      => $structure->hasFilters,
             "hasEncrypt"      => $structure->hasEncrypt,

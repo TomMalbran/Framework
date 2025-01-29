@@ -329,19 +329,25 @@ class {{name}}Schema {
     /**
      * Creates a new {{name}} Entity
      * @param Request|null $fieldData Optional.{{#fields}}
-     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasUsers}}
+     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasTimestamps}}
+     * @param integer $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
-     * @param array{} $extras Optional.
      * @return integer
      */
-    protected static function createEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}, array $extras = []): int {
+    protected static function createEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): int {
+        $extras = [];
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
             $extras["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
+        {{#hasTimestamps}}
+        if (!empty($createdTime)) {
+            $extras["createdTime"] = $createdTime;
+        }
+        {{/hasTimestamps}}
         {{#hasUsers}}
-        if (empty($createdUser)) {
+        if (!empty($createdUser)) {
             $createdUser = Auth::getID();
         }
         {{/hasUsers}}
@@ -374,7 +380,7 @@ class {{name}}Schema {
         }
         {{/fields}}
         {{#hasUsers}}
-        if (empty($createdUser)) {
+        if (!empty($createdUser)) {
             $createdUser = Auth::getID();
         }
         {{/hasUsers}}
@@ -388,18 +394,24 @@ class {{name}}Schema {
      * @param {{editDocType}} $query
      * @param Request|null $fieldData Optional.{{#fields}}
      * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasUsers}}
-     * @param integer $modifiedUser Optional.{{/hasUsers}}
-     * @param array{} $extras Optional.
+     * @param integer $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
+     * @param boolean|null $isDeleted Optional.{{/canDelete}}
      * @return boolean
      */
-    protected static function editEntity({{editType}} $query, ?Request $fieldData = null{{{fieldsEditList}}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}, array $extras = []): bool {
+    protected static function editEntity({{editType}} $query, ?Request $fieldData = null{{{fieldsEditList}}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}): bool {
+        $extras = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
             $extras["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
+        {{#canDelete}}
+        if ($isDeleted !== null) {
+            $extras["isDeleted"] = $isDeleted;
+        }
+        {{/canDelete}}
         {{#hasUsers}}
-        if (empty($modifiedUser)) {
+        if (!empty($modifiedUser)) {
             $modifiedUser = Auth::getID();
         }
         {{/hasUsers}}
@@ -425,7 +437,7 @@ class {{name}}Schema {
      */
     protected static function increaseEntity({{editType}} $query, string $column, int $amount = 1{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
         {{#hasUsers}}
-        if (empty($modifiedUser)) {
+        if (!empty($modifiedUser)) {
             $modifiedUser = Auth::getID();
         }
 
@@ -460,7 +472,7 @@ class {{name}}Schema {
      */
     protected static function deleteEntity({{editType}} $query{{parentsEditList}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
         {{#hasUsers}}
-        if (empty($modifiedUser)) {
+        if (!empty($modifiedUser)) {
             $modifiedUser = Auth::getID();
         }
 
