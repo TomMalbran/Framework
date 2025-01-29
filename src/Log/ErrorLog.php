@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
+use Framework\Schema\Assign;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
@@ -191,7 +192,7 @@ class ErrorLog {
         if ($schema->getTotal($query) > 0) {
             $query->orderBy("updatedTime", false)->limit(1);
             $schema->edit($query, [
-                "amount"      => Query::inc(1),
+                "amount"      => Assign::increase(1),
                 "updatedTime" => time(),
             ]);
         } else {

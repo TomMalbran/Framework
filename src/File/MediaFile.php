@@ -9,6 +9,7 @@ use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Schema\Factory;
 use Framework\Schema\Database;
+use Framework\Schema\Assign;
 use Framework\Schema\Query;
 use Framework\Utils\Strings;
 
@@ -80,7 +81,7 @@ class MediaFile {
                 if (!empty($field["replace"]) && $field["replace"]) {
                     $query = Query::create($field["field"], "LIKE", "\"$old\"");
                     self::$db->update($table, [
-                        $field["field"] => Query::replace($field["field"], $old, $new),
+                        $field["field"] => Assign::replace($old, $new),
                     ], $query);
                 } else {
                     $query = Query::create($field["field"], "=", $old);

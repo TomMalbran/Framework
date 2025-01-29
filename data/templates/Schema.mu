@@ -11,6 +11,7 @@ use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
 use Framework\Schema\Query;
+use Framework\Schema\Assign;
 use Framework\Utils\Search;{{#hasSelect}}
 use Framework\Utils\Select;{{/hasSelect}}
 
@@ -373,7 +374,7 @@ class {{name}}Schema {
      * Edits a {{name}} Entity
      * @param {{editDocType}} $query
      * @param Request|null $fields Optional.{{#fields}}
-     * @param {{fieldDocNull}} Optional.{{/fields}}
+     * @param {{fieldDocEdit}} Optional.{{/fields}}
      * @param array{} $extras Optional.
      * @return boolean
      */
@@ -403,7 +404,7 @@ class {{name}}Schema {
      */
     protected static function increaseEntity({{editType}} $query, string $column, int $amount = 1): bool {
         return self::schema()->edit($query, [
-            $column => Query::inc($amount),
+            $column => Assign::increase($amount),
         ]{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
     }
 {{/canEdit}}

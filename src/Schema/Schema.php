@@ -8,6 +8,7 @@ use Framework\Schema\SubRequest;
 use Framework\Schema\Selection;
 use Framework\Schema\Modification;
 use Framework\Schema\Field;
+use Framework\Schema\Assign;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
@@ -60,10 +61,10 @@ class Schema {
     /**
      * Encrypts the given Value
      * @param string $value
-     * @return array{}
+     * @return Assign
      */
-    public function encrypt(string $value): array {
-        return Query::encrypt($value, $this->structure->masterKey);
+    public function encrypt(string $value): Assign {
+        return Assign::encrypt($value, $this->structure->masterKey);
     }
 
     /**
@@ -614,14 +615,14 @@ class Schema {
         }
         if ($newPosition > $oldPosition) {
             $newQuery = $this->generateQuery($query);
-            $newQuery->add("position",  ">",  $oldPosition);
-            $newQuery->add("position",  "<=", $newPosition);
-            $this->db->update($this->structure->table, [ "position" => Query::inc(-1) ], $query);
+            $newQuery->add("position", ">",  $oldPosition);
+            $newQuery->add("position", "<=", $newPosition);
+            $this->db->update($this->structure->table, [ "position" => Assign::decrease(1) ], $query);
         } else {
             $newQuery = $this->generateQuery($query);
-            $newQuery->add("position",  ">=", $newPosition);
-            $newQuery->add("position",  "<",  $oldPosition);
-            $this->db->update($this->structure->table, [ "position" => Query::inc(1) ], $query);
+            $newQuery->add("position", ">=", $newPosition);
+            $newQuery->add("position", "<",  $oldPosition);
+            $this->db->update($this->structure->table, [ "position" => Assign::increase(1) ], $query);
         }
         return $updatedPosition;
     }

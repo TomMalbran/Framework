@@ -6,6 +6,7 @@ use Framework\Request;
 use Framework\Auth\Auth;
 use Framework\Schema\Factory;
 use Framework\Schema\Schema;
+use Framework\Schema\Assign;
 use Framework\Schema\Query;
 use Framework\Schema\Model;
 use Framework\Utils\Arrays;
@@ -107,9 +108,9 @@ class QueryLog {
         if (self::schema()->getTotal($query) > 0) {
             $query->orderBy("updatedTime", false)->limit(1);
             self::schema()->edit($query, [
-                "amount"      => Query::inc(1),
-                "elapsedTime" => Query::greatest("elapsedTime", $elapsedTime),
-                "totalTime"   => Query::inc($elapsedTime),
+                "amount"      => Assign::increase(1),
+                "elapsedTime" => Assign::greatest($elapsedTime),
+                "totalTime"   => Assign::increase($elapsedTime),
                 "updatedTime" => time(),
                 "updatedUser" => Auth::getID(),
             ]);

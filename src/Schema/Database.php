@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Schema;
 
+use Framework\Schema\Assign;
 use Framework\Schema\Query;
 use Framework\Log\QueryLog;
 use Framework\Utils\Arrays;
@@ -496,9 +497,9 @@ class Database {
 
     /**
      * Process the table data for building the query for inserting or updating
-     * @param array{}[] $fields
-     * @param mixed[]   $bindParams
-     * @param boolean   $isInsert
+     * @param array<string,mixed> $fields
+     * @param mixed[]             $bindParams
+     * @param boolean             $isInsert
      * @return string
      */
     private function buildTableData(array $fields, array &$bindParams, bool $isInsert): string {
@@ -512,37 +513,41 @@ class Database {
                 $result .= "`$column` = ";
             }
 
-            if (!Arrays::isArray($value)) {
-                $result .= "?, ";
-                $bindParams[] = $value;
-            } else {
-                $key = key($value);
-                $val = $value[$key];
-                switch ($key) {
-                case "[E]":
-                    $result .= "`$val`, ";
+            if ($value instanceof Assign) {
+                switch ($value->type) {
+                case "equal":
+                    $result .= "`{$value->column}`, ";
                     break;
-                case "[I]":
-                    $result .= $column . $val . ", ";
+                case "not":
+                    $result .= "!`{$value->column}`, ";
                     break;
-                case "[F]":
-                    $result .= $val[0] . ", ";
-                    if (!empty($val[1])) {
-                        foreach ($val[1] as $v) {
-                            $bindParams[] = $v;
-                        }
-                    }
+                case "increase":
+                    $result .= "`$column` + ?, ";
                     break;
-                case "[N]":
-                    if ($val == null) {
-                        $result .= "!$column, ";
-                    } else {
-                        $result .= "!$val, ";
-                    }
+                case "decrease":
+                    $result .= "`$column` - ?, ";
+                    break;
+                case "uuid":
+                    $result .= "UUID(), ";
+                    break;
+                case "encrypt":
+                    $result .= "AES_ENCRYPT(?, ?), ";
+                    break;
+                case "replace":
+                    $result .= "REPLACE(`$column`, ?, ?), ";
+                    break;
+                case "greatest":
+                    $result .= "GREATEST(`$column`, ?), ";
                     break;
                 default:
                     die("Wrong operation");
                 }
+                foreach ($value->params as $param) {
+                    $bindParams[] = $param;
+                }
+            } else {
+                $result      .= "?, ";
+                $bindParams[] = $value;
             }
         }
 

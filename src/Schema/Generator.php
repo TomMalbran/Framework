@@ -100,7 +100,7 @@ class Generator {
             "hasProcessed"    => !empty($structure->processed),
             "fields"          => $fields,
             "fieldsList"      => self::joinFields($fields, "fieldArgDefault", ", "),
-            "fieldsEditList"  => self::joinFields($fields, "fieldArgNull", ", "),
+            "fieldsEditList"  => self::joinFields($fields, "fieldArgEdit", ", "),
             "uniques"         => $uniques,
             "parents"         => $parents,
             "editParents"     => $editParents,
@@ -176,6 +176,7 @@ class Generator {
      */
     private static function getField(Field $field): array {
         $type    = self::getFieldType($field->type);
+        $docType = self::getDocType($type);
         $default = self::getDefault($type);
         $param   = "\${$field->name}";
 
@@ -183,12 +184,12 @@ class Generator {
             "fieldKey"        => $field->key,
             "fieldName"       => $field->name,
             "fieldText"       => Strings::upperCaseFirst($field->name),
-            "fieldDoc"        => self::getDocType($type) . " $param",
-            "fieldDocNull"    => self::getDocType($type) . "|null $param",
+            "fieldDoc"        => "$docType $param",
+            "fieldDocEdit"    => "Assign|$docType|null $param",
             "fieldParam"      => $param,
             "fieldArg"        => "$type $param",
             "fieldArgDefault" => "$type $param = $default",
-            "fieldArgNull"    => "?$type $param = null",
+            "fieldArgEdit"    => "Assign|$type|null $param = null",
             "defaultValue"    => $default,
         ];
     }

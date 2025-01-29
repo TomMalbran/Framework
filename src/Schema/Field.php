@@ -3,6 +3,7 @@ namespace Framework\Schema;
 
 use Framework\Request;
 use Framework\File\FilePath;
+use Framework\Schema\Assign;
 use Framework\Utils\Arrays;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;
@@ -271,7 +272,7 @@ class Field {
         case self::Encrypt:
             if (!empty($masterKey)) {
                 $value  = $request->get($this->name);
-                $result = Query::encrypt($value, $masterKey);
+                $result = Assign::encrypt($value, $masterKey);
             }
             break;
         default:
