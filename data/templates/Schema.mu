@@ -329,24 +329,31 @@ class {{name}}Schema {
     /**
      * Creates a new {{name}} Entity
      * @param Request|null $fieldData Optional.{{#fields}}
-     * @param {{fieldDoc}} Optional.{{/fields}}
+     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasUsers}}
+     * @param integer $createdUser Optional.{{/hasUsers}}
      * @param array{} $extras Optional.
      * @return integer
      */
-    protected static function createEntity(?Request $fieldData = null{{{fieldsList}}}, array $extras = []): int {
+    protected static function createEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}, array $extras = []): int {
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
             $extras["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
+        {{#hasUsers}}
+        if (empty($createdUser)) {
+            $createdUser = Auth::getID();
+        }
+        {{/hasUsers}}
+
         {{#hasPositions}}
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->createWithOrder($fieldData ?? [], $extras{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        return self::schema()->createWithOrder($fieldData ?? [], $extras{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->create($fieldData ?? [], $extras{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        return self::schema()->create($fieldData ?? [], $extras{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
         {{/hasPositions}}
     }
 {{/canCreate}}
@@ -355,17 +362,23 @@ class {{name}}Schema {
     /**
      * Replaces the {{name}} Entity
      * @param Request|null $fieldData Optional.{{#fields}}
-     * @param {{fieldDoc}} Optional.{{/fields}}
+     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasUsers}}
+     * @param integer $createdUser Optional.{{/hasUsers}}
      * @param array{} $extras Optional.
      * @return boolean
      */
-    protected static function replaceEntity(?Request $fieldData = null{{{fieldsList}}}, array $extras = []): bool {
+    protected static function replaceEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}, array $extras = []): bool {
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
             $extras["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
-        return self::schema()->replace($fieldData ?? [], $extras{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        {{#hasUsers}}
+        if (empty($createdUser)) {
+            $createdUser = Auth::getID();
+        }
+        {{/hasUsers}}
+        return self::schema()->replace($fieldData ?? [], $extras{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
     }
 {{/canReplace}}
 {{#canEdit}}
@@ -374,24 +387,31 @@ class {{name}}Schema {
      * Edits a {{name}} Entity
      * @param {{editDocType}} $query
      * @param Request|null $fieldData Optional.{{#fields}}
-     * @param {{fieldDocEdit}} Optional.{{/fields}}
+     * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasUsers}}
+     * @param integer $modifiedUser Optional.{{/hasUsers}}
      * @param array{} $extras Optional.
      * @return boolean
      */
-    protected static function editEntity({{editType}} $query, ?Request $fieldData = null{{{fieldsEditList}}}, array $extras = []): bool {
+    protected static function editEntity({{editType}} $query, ?Request $fieldData = null{{{fieldsEditList}}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}, array $extras = []): bool {
         {{#fields}}
         if ({{fieldParam}} !== null) {
             $extras["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
+        {{#hasUsers}}
+        if (empty($modifiedUser)) {
+            $modifiedUser = Auth::getID();
+        }
+        {{/hasUsers}}
+
         {{#hasPositions}}
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->editWithOrder($query, $fieldData ?? [], $extras{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        return self::schema()->editWithOrder($query, $fieldData ?? [], $extras{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->edit($query, $fieldData ?? [], $extras{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        return self::schema()->edit($query, $fieldData ?? [], $extras{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
     }
 
@@ -399,13 +419,20 @@ class {{name}}Schema {
      * Increments a value in a {{name}} Entity
      * @param {{editDocType}} $query
      * @param string $column
-     * @param integer $amount Optional.
+     * @param integer $amount Optional.{{#hasUsers}}
+     * @param integer $modifiedUser Optional.{{/hasUsers}}
      * @return boolean
      */
-    protected static function increaseEntity({{editType}} $query, string $column, int $amount = 1): bool {
+    protected static function increaseEntity({{editType}} $query, string $column, int $amount = 1{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
+        {{#hasUsers}}
+        if (empty($modifiedUser)) {
+            $modifiedUser = Auth::getID();
+        }
+
+        {{/hasUsers}}
         return self::schema()->edit($query, [
             $column => Assign::increase($amount),
-        ]{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
     }
 {{/canEdit}}
 {{#canBatch}}
@@ -427,18 +454,25 @@ class {{name}}Schema {
     /**
      * Deletes the {{name}} Entity
      * @param {{editDocType}} $query{{#editParents}}
-     * @param {{fieldDoc}}{{/editParents}}
+     * @param {{fieldDoc}}{{/editParents}}{{#hasUsers}}
+     * @param integer $modifiedUser Optional.{{/hasUsers}}
      * @return boolean
      */
-    protected static function deleteEntity({{editType}} $query{{parentsEditList}}): bool {
+    protected static function deleteEntity({{editType}} $query{{parentsEditList}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
+        {{#hasUsers}}
+        if (empty($modifiedUser)) {
+            $modifiedUser = Auth::getID();
+        }
+
+        {{/hasUsers}}
         {{#hasPositions}}
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->deleteWithOrder($query{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        return self::schema()->deleteWithOrder($query{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->delete($query{{#hasUsers}}, credentialID: Auth::getID(){{/hasUsers}});
+        return self::schema()->delete($query{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
     }
 {{/canDelete}}
