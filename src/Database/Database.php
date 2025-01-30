@@ -1,8 +1,8 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
-use Framework\Schema\Assign;
-use Framework\Schema\Query;
+use Framework\Database\Assign;
+use Framework\Database\Query;
 use Framework\Log\QueryLog;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;

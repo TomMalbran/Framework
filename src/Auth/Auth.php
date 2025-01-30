@@ -12,7 +12,7 @@ use Framework\NLS\NLS;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
-use Framework\Schema\Model;
+use Framework\Database\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;

@@ -7,9 +7,9 @@ use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\File\FileType;
 use Framework\File\Image;
-use Framework\Schema\Factory;
-use Framework\Schema\Assign;
-use Framework\Schema\Query;
+use Framework\Database\Factory;
+use Framework\Database\Assign;
+use Framework\Database\Query;
 use Framework\Utils\Strings;
 
 /**

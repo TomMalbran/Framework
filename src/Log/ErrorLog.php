@@ -3,11 +3,11 @@ namespace Framework\Log;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Schema\Factory;
-use Framework\Schema\Schema;
-use Framework\Schema\Assign;
-use Framework\Schema\Query;
-use Framework\Schema\Model;
+use Framework\Database\Factory;
+use Framework\Database\Schema;
+use Framework\Database\Assign;
+use Framework\Database\Query;
+use Framework\Database\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;

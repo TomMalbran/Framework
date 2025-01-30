@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Request;
 use Framework\Utils\Arrays;
@@ -7,7 +7,7 @@ use Framework\Utils\Strings;
 use Framework\Utils\Period;
 
 /**
- * The Schema Query
+ * The Database Query
  */
 class Query {
 

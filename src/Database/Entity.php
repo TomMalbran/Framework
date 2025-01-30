@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Utils\Arrays;
 

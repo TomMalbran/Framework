@@ -1,11 +1,11 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\Utils\Strings;
 
 /**
- * The Schema Keys Data
+ * The Database Keys
  */
 class KeyChain {
 

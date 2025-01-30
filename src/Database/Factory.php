@@ -1,11 +1,11 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Framework;
-use Framework\Schema\Schema;
-use Framework\Schema\Structure;
-use Framework\Schema\SubRequest;
-use Framework\Schema\Database;
+use Framework\Database\Schema;
+use Framework\Database\Structure;
+use Framework\Database\SubRequest;
+use Framework\Database\Database;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 

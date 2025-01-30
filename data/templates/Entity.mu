@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}}Schema;
 
-use Framework\Schema\Entity;
+use Framework\Database\Entity;
 
 /**
  * The {{name}} Entity

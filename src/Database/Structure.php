@@ -1,11 +1,11 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
-use Framework\Schema\Factory;
-use Framework\Schema\KeyChain;
-use Framework\Schema\Field;
-use Framework\Schema\Join;
-use Framework\Schema\Count;
+use Framework\Database\Factory;
+use Framework\Database\KeyChain;
+use Framework\Database\Field;
+use Framework\Database\Join;
+use Framework\Database\Count;
 use Framework\Utils\Strings;
 
 /**

@@ -1,10 +1,10 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Request;
-use Framework\Schema\Database;
-use Framework\Schema\Structure;
-use Framework\Schema\Query;
+use Framework\Database\Database;
+use Framework\Database\Structure;
+use Framework\Database\Query;
 use Framework\Utils\Arrays;
 
 /**

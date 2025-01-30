@@ -2,9 +2,9 @@
 namespace Framework\Auth;
 
 use Framework\Log\DeviceLog;
-use Framework\Schema\Factory;
-use Framework\Schema\Schema;
-use Framework\Schema\Query;
+use Framework\Database\Factory;
+use Framework\Database\Schema;
+use Framework\Database\Query;
 use Framework\Utils\Server;
 
 /**

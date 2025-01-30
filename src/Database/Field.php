@@ -1,9 +1,9 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Request;
 use Framework\File\FilePath;
-use Framework\Schema\Assign;
+use Framework\Database\Assign;
 use Framework\Utils\Arrays;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;

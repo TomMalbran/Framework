@@ -3,9 +3,9 @@ namespace Framework\Log;
 
 use Framework\Request;
 use Framework\Auth\Auth;
-use Framework\Schema\Factory;
-use Framework\Schema\Schema;
-use Framework\Schema\Query;
+use Framework\Database\Factory;
+use Framework\Database\Schema;
+use Framework\Database\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;

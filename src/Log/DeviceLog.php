@@ -2,10 +2,10 @@
 namespace Framework\Log;
 
 use Framework\Request;
-use Framework\Schema\Factory;
-use Framework\Schema\Schema;
-use Framework\Schema\Query;
-use Framework\Schema\Model;
+use Framework\Database\Factory;
+use Framework\Database\Schema;
+use Framework\Database\Query;
+use Framework\Database\Model;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
 

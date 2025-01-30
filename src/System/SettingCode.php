@@ -3,10 +3,10 @@ namespace Framework\System;
 
 use Framework\Framework;
 use Framework\System\VariableType;
-use Framework\Schema\Factory;
-use Framework\Schema\Schema;
-use Framework\Schema\Database;
-use Framework\Schema\Query;
+use Framework\Database\Factory;
+use Framework\Database\Schema;
+use Framework\Database\Database;
+use Framework\Database\Query;
 use Framework\Utils\Strings;
 
 /**

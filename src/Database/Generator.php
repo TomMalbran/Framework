@@ -1,16 +1,16 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\File\File;
-use Framework\Schema\Structure;
-use Framework\Schema\Field;
+use Framework\Database\Structure;
+use Framework\Database\Field;
 use Framework\Provider\Mustache;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Graph Generator
+ * The Schema Generator
  */
 class Generator {
 

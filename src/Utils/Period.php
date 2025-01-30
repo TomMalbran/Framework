@@ -2,7 +2,7 @@
 namespace Framework\Utils;
 
 use Framework\Request;
-use Framework\Schema\Model;
+use Framework\Database\Model;
 use Framework\Utils\DateTime;
 
 /**

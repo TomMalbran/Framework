@@ -1,8 +1,8 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
-use Framework\Schema\Factory;
-use Framework\Schema\Field;
+use Framework\Database\Factory;
+use Framework\Database\Field;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 

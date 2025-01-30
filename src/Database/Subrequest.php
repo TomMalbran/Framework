@@ -1,9 +1,9 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
-use Framework\Schema\Schema;
-use Framework\Schema\Structure;
-use Framework\Schema\Query;
+use Framework\Database\Schema;
+use Framework\Database\Structure;
+use Framework\Database\Query;
 use Framework\Utils\Arrays;
 
 /**

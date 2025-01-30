@@ -1,16 +1,16 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Request;
-use Framework\Schema\Database;
-use Framework\Schema\Structure;
-use Framework\Schema\SubRequest;
-use Framework\Schema\Selection;
-use Framework\Schema\Modification;
-use Framework\Schema\Field;
-use Framework\Schema\Assign;
-use Framework\Schema\Query;
-use Framework\Schema\Model;
+use Framework\Database\Database;
+use Framework\Database\Structure;
+use Framework\Database\SubRequest;
+use Framework\Database\Selection;
+use Framework\Database\Modification;
+use Framework\Database\Field;
+use Framework\Database\Assign;
+use Framework\Database\Query;
+use Framework\Database\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
 use Framework\Utils\Select;

@@ -1,8 +1,8 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 /**
- * The Schema Assign
+ * The Database Assign
  */
 class Assign {
 

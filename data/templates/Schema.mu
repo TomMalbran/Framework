@@ -8,10 +8,10 @@ use {{namespace}}Schema\{{type}}Entity;{{/subTypes}}
 
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
-use Framework\Schema\Factory;
-use Framework\Schema\Schema;
-use Framework\Schema\Query;
-use Framework\Schema\Assign;
+use Framework\Database\Factory;
+use Framework\Database\Schema;
+use Framework\Database\Query;
+use Framework\Database\Assign;
 use Framework\Utils\Search;{{#hasSelect}}
 use Framework\Utils\Select;{{/hasSelect}}
 

@@ -1,9 +1,9 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
-use Framework\Schema\Database;
-use Framework\Schema\Structure;
-use Framework\Schema\Field;
+use Framework\Database\Database;
+use Framework\Database\Structure;
+use Framework\Database\Field;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 

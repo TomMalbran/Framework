@@ -1,17 +1,17 @@
 <?php
-namespace Framework\Schema;
+namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\System\SettingCode;
 use Framework\File\File;
-use Framework\Schema\Factory;
-use Framework\Schema\Database;
-use Framework\Schema\Structure;
+use Framework\Database\Factory;
+use Framework\Database\Database;
+use Framework\Database\Structure;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Schema Migration
+ * The Database Migration
  */
 class Migration {
 

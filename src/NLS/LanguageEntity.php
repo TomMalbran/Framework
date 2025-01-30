@@ -1,7 +1,7 @@
 <?php
 namespace Framework\NLS;
 
-use Framework\Schema\Entity;
+use Framework\Database\Entity;
 
 /**
  * The Language Entity
