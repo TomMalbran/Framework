@@ -245,7 +245,7 @@ class Strings {
      * @param string[]|string|null $replace Optional.
      * @return string
      */
-    public static function replace(string $string, array|string $search, array|string $replace = null): string {
+    public static function replace(string $string, array|string $search, array|string|null $replace = null): string {
         if ($replace === null && Arrays::isArray($search)) {
             return str_replace(array_keys($search), array_values($search), $string);
         }

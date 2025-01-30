@@ -505,7 +505,7 @@ class Arrays {
      * @param boolean              $useEmpty Optional.
      * @return mixed[]
      */
-    public static function createMap(array $array, string $key, array|string $value = null, bool $useEmpty = false): array {
+    public static function createMap(array $array, string $key, array|string|null $value = null, bool $useEmpty = false): array {
         $result = [];
         foreach ($array as $row) {
             $result[$row[$key]] = !empty($value) ? self::getValue($row, $value, " - ", "", $useEmpty) : $row;
@@ -521,7 +521,7 @@ class Arrays {
      * @param boolean              $useEmpty Optional.
      * @return mixed[]
      */
-    public static function createMapArray(array $array, string $key, array|string $value = null, bool $useEmpty = false): array {
+    public static function createMapArray(array $array, string $key, array|string|null $value = null, bool $useEmpty = false): array {
         $result = [];
         foreach ($array as $row) {
             if (empty($result[$row[$key]])) {
@@ -558,7 +558,7 @@ class Arrays {
      * @param boolean              $distinct  Optional.
      * @return mixed[]
      */
-    public static function createArray(array $array, array|string $value = null, bool $skipEmpty = false, bool $distinct = false): array {
+    public static function createArray(array $array, array|string|null $value = null, bool $skipEmpty = false, bool $distinct = false): array {
         $result = [];
         foreach ($array as $row) {
             $elem = !empty($value) ? self::getValue($row, $value) : $row;
