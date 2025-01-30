@@ -36,6 +36,10 @@ class Server {
      * @return string
      */
     public static function getUrl(bool $useForwarded = false): string {
+        if (empty($_SERVER["HTTP_HOST"])) {
+            return "";
+        }
+
         $ssl      = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on";
         $sp       = Strings::toLowerCase($_SERVER["SERVER_PROTOCOL"]);
         $protocol = substr($sp, 0, strpos($sp, "/")) . ($ssl ? "s" : "");
