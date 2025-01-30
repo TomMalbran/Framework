@@ -5,28 +5,19 @@ use Framework\Request;
 use Framework\System\StatusCode;
 use Framework\NLS\NLS;
 use Framework\File\FilePath;
-use Framework\Database\Factory;
-use Framework\Database\Schema;
-use Framework\Database\Model;
 use Framework\Database\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
+use Framework\Schema\CredentialSchema;
+use Framework\Schema\CredentialEntity;
 
 use ArrayAccess;
 
 /**
  * The Auth Credential
  */
-class Credential {
-
-    /**
-     * Loads the Credential Schema
-     * @return Schema
-     */
-    private static function schema(): Schema {
-        return Factory::getSchema("Credential");
-    }
+class Credential extends CredentialSchema {
 
     /**
      * Creates a Access Query
@@ -56,9 +47,9 @@ class Credential {
      * Returns the Credential with the given ID
      * @param integer $credentialID
      * @param boolean $complete     Optional.
-     * @return Model
+     * @return CredentialEntity
      */
-    public static function getOne(int $credentialID, bool $complete = false): Model {
+    public static function getByID(int $credentialID, bool $complete = false): CredentialEntity {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         return self::requestOne($query, $complete);
     }
@@ -78,9 +69,9 @@ class Credential {
      * Returns the Credential with the given Email
      * @param string  $email
      * @param boolean $complete Optional.
-     * @return Model
+     * @return CredentialEntity
      */
-    public static function getByEmail(string $email, bool $complete = true): Model {
+    public static function getByEmail(string $email, bool $complete = true): CredentialEntity {
         $query = Query::create("email", "=", $email);
         return self::requestOne($query, $complete);
     }
@@ -89,24 +80,15 @@ class Credential {
      * Returns the Credential with the given Access Token
      * @param string  $accessToken
      * @param boolean $complete    Optional.
-     * @return Model
+     * @return CredentialEntity
      */
-    public static function getByAccessToken(string $accessToken, bool $complete = true): Model {
+    public static function getByAccessToken(string $accessToken, bool $complete = true): CredentialEntity {
         $query = Query::create("accessToken", "=", $accessToken);
         $query->add("tokenExpiration", ">", time());
         return self::requestOne($query, $complete);
     }
 
 
-
-    /**
-     * Returns true if there is an Credential with the given ID
-     * @param integer $credentialID
-     * @return boolean
-     */
-    public static function exists(int $credentialID): bool {
-        return self::schema()->exists($credentialID);
-    }
 
     /**
      * Returns true if there is an Credential with the given ID and Access(s)
@@ -122,7 +104,7 @@ class Credential {
             return false;
         }
         $query->add("CREDENTIAL_ID", "=", $credentialID);
-        return self::schema()->exists($query);
+        return self::entityExists($query);
     }
 
     /**
@@ -136,7 +118,7 @@ class Credential {
         $query = empty($access) ? new Query() : self::createAccessQuery($access);
         $query->add("email", "=", $email);
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
-        return self::schema()->exists($query);
+        return self::entityExists($query);
     }
 
     /**
@@ -149,7 +131,7 @@ class Credential {
     public static function fieldExists(string $field, mixed $value, int $skipID = 0): bool {
         $query = Query::create($field, "=", $value);
         $query->addIf("CREDENTIAL_ID", "<>", $skipID);
-        return self::schema()->exists($query);
+        return self::entityExists($query);
     }
 
 
@@ -248,14 +230,14 @@ class Credential {
      * @return array{}[]
      */
     public static function getAllCreateTimes(int $fromTime, string $access = ""): array {
-        $query   = Query::create("createdTime", ">=", $fromTime);
+        $query = Query::create("createdTime", ">=", $fromTime);
         $query->addIf("access", "=", $access);
 
-        $request = self::schema()->getAll($query);
-        $result  = [];
+        $list   = self::getEntityList($query);
+        $result = [];
 
-        foreach ($request as $row) {
-            $result[$row["credentialID"]] = $row["createdTime"];
+        foreach ($list as $elem) {
+            $result[$elem->credentialID] = $elem->createdTime;
         }
         return $result;
     }
@@ -266,7 +248,7 @@ class Credential {
      * @return integer
      */
     public static function getTotal(?Query $query = null): int {
-        return self::schema()->getTotal($query);
+        return self::getEntityTotal($query);
     }
 
     /**
@@ -281,7 +263,7 @@ class Credential {
         if (empty($query)) {
             return 0;
         }
-        return self::schema()->getTotal($query);
+        return self::getEntityTotal($query);
     }
 
     /**
@@ -289,27 +271,26 @@ class Credential {
      * @param Query|null   $query    Optional.
      * @param boolean      $complete Optional.
      * @param Request|null $sort     Optional.
-     * @return array{}[]
+     * @return CredentialEntity[]
      */
     private static function request(?Query $query = null, bool $complete = false, ?Request $sort = null): array {
-        $request = self::schema()->getAll($query, $sort);
-        $result  = [];
+        $list   = self::getEntityList($query, $sort);
+        $result = [];
 
-        foreach ($request as $row) {
-            $fields = $row;
-            $fields["credentialName"] = self::getName($row);
+        foreach ($list as $elem) {
+            $elem->credentialName = self::getName($elem);
 
-            if (!empty($row["avatar"])) {
-                $fields["avatarFile"] = $row["avatar"];
-                $fields["avatar"]     = FilePath::getUrl("avatars", $row["avatar"]);
+            if (!empty($elem->avatar)) {
+                $elem->avatarFile = $elem->avatar;
+                $elem->avatar     = FilePath::getUrl("avatars", $elem->avatar);
             }
             if (!$complete) {
-                unset($fields["password"]);
-                unset($fields["salt"]);
-                unset($fields["accessToken"]);
-                unset($fields["tokenExpiration"]);
+                unset($elem->password);
+                unset($elem->salt);
+                unset($elem->accessToken);
+                unset($elem->tokenExpiration);
             }
-            $result[] = $fields;
+            $result[] = $elem;
         }
         return $result;
     }
@@ -318,11 +299,11 @@ class Credential {
      * Requests a single row from the database
      * @param Query|null $query    Optional.
      * @param boolean    $complete Optional.
-     * @return Model
+     * @return CredentialEntity
      */
-    private static function requestOne(?Query $query = null, bool $complete = false): Model {
-        $request = self::request($query, $complete);
-        return self::schema()->getModel($request);
+    private static function requestOne(?Query $query = null, bool $complete = false): CredentialEntity {
+        $list = self::request($query, $complete);
+        return $list[0];
     }
 
 
@@ -380,14 +361,14 @@ class Credential {
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
         $query->limit($amount);
 
-        $request = self::schema()->getAll($query);
-        $result  = [];
+        $list   = self::getEntityList($query);
+        $result = [];
 
-        foreach ($request as $row) {
+        foreach ($list as $elem) {
             $result[] = [
-                "id"    => $row["credentialID"],
-                "title" => self::getName($row),
-                "email" => $row["email"],
+                "id"    => $elem->credentialID,
+                "title" => self::getName($elem),
+                "email" => $elem->email,
             ];
         }
         return $result;
@@ -399,13 +380,13 @@ class Credential {
      * @return array{}[]
      */
     private static function requestSelect(?Query $query = null): array {
-        $request = self::schema()->getAll($query);
-        $result  = [];
+        $list   = self::getEntityList($query);
+        $result = [];
 
-        foreach ($request as $row) {
+        foreach ($list as $elem) {
             $result[] = [
-                "key"   => $row["credentialID"],
-                "value" => self::getName($row),
+                "key"   => $elem->credentialID,
+                "value" => self::getName($elem),
             ];
         }
         return $result;
@@ -423,21 +404,22 @@ class Credential {
         if (empty($query)) {
             return [];
         }
-        $request = self::schema()->getAll($query);
-        return Arrays::createMap($request, "email", "language");
+
+        $list = self::getEntityList($query);
+        return Arrays::createMap($list, "email", "language");
     }
 
 
 
     /**
      * Returns true if the given password is correct for the given Credential ID
-     * @param Model|integer $credential
-     * @param string        $password
+     * @param CredentialEntity|integer $credential
+     * @param string                   $password
      * @return boolean
      */
-    public static function isPasswordCorrect(Model|int $credential, string $password): bool {
-        if (!($credential instanceof Model)) {
-            $credential = self::getOne($credential, true);
+    public static function isPasswordCorrect(CredentialEntity|int $credential, string $password): bool {
+        if (!($credential instanceof CredentialEntity)) {
+            $credential = self::getByID($credential, true);
         }
         if ($credential->passExpiration > 0 && $credential->passExpiration < time()) {
             return false;
@@ -461,7 +443,7 @@ class Credential {
         $query->addIf("CREDENTIAL_ID", "=", $credentialID);
         $query->addIf("email",         "=", $email);
         $query->endOr();
-        return self::schema()->getValue($query, "reqPassChange") == 1;
+        return self::getEntityValue($query, "reqPassChange") == 1;
     }
 
 
@@ -475,10 +457,9 @@ class Credential {
      */
     public static function create(Request|array $request, string $access, ?bool $reqPassChange = null): int {
         $fields = self::getFields($request, $access, $reqPassChange);
-        return self::schema()->create($request, $fields + [
-            "lastLogin"    => time(),
-            "currentLogin" => time(),
-        ]);
+        $fields["lastLogin"]    = time();
+        $fields["currentLogin"] = time();
+        return self::createEntity($request, ...$fields);
     }
 
     /**
@@ -492,7 +473,7 @@ class Credential {
      */
     public static function edit(int $credentialID, Request|array $request, string $access = "", ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
         $fields = self::getFields($request, $access, $reqPassChange);
-        return self::schema()->edit($credentialID, $request, $fields, 0, $skipEmpty);
+        return self::schema()->edit($credentialID, $request, $fields, skipEmpty: $skipEmpty);
     }
 
     /**
@@ -502,7 +483,7 @@ class Credential {
      * @return boolean
      */
     public static function update(int $credentialID, array $fields): bool {
-        return self::schema()->edit($credentialID, $fields);
+        return self::editEntity($credentialID, ...$fields);
     }
 
     /**
@@ -511,7 +492,7 @@ class Credential {
      * @return boolean
      */
     public static function delete(int $credentialID): bool {
-        return self::schema()->delete($credentialID);
+        return self::deleteEntity($credentialID);
     }
 
     /**
@@ -520,30 +501,31 @@ class Credential {
      * @return boolean
      */
     public static function destroy(int $credentialID): bool {
-        return self::schema()->edit($credentialID, [
-            "currentUser"      => 0,
-            "email"            => "mail@mail.com",
-            "firstName"        => NLS::get("GENERAL_NAME"),
-            "lastName"         => NLS::get("GENERAL_LAST_NAME"),
-            "phone"            => "",
-            "language"         => "",
-            "avatar"           => "",
-            "password"         => "",
-            "salt"             => "",
-            "reqPassChange"    => 0,
-            "passExpiration"   => 0,
-            "accessToken"      => "",
-            "tokenExpiration"  => 0,
-            "status"           => StatusCode::Inactive,
-            "observations"     => "",
-            "sendEmails"       => 0,
-            "sendEmailNotis"   => 0,
-            "timezone"         => 0,
-            "currentLogin"     => 0,
-            "lastLogin"        => 0,
-            "askNotifications" => 0,
-            "isDeleted"        => 1,
-        ]);
+        return self::editEntity(
+            $credentialID,
+            currentUser:      0,
+            email:            "mail@mail.com",
+            firstName:        NLS::get("GENERAL_NAME"),
+            lastName:         NLS::get("GENERAL_LAST_NAME"),
+            phone:            "",
+            language:         "",
+            avatar:           "",
+            password:         "",
+            salt:             "",
+            reqPassChange:    0,
+            passExpiration:   0,
+            accessToken:      "",
+            tokenExpiration:  0,
+            status:           StatusCode::Inactive,
+            observations:     "",
+            sendEmails:       0,
+            sendEmailNotis:   0,
+            timezone:         0,
+            currentLogin:     0,
+            lastLogin:        0,
+            askNotifications: 0,
+            isDeleted:        1,
+        );
     }
 
     /**
@@ -578,9 +560,7 @@ class Credential {
      * @return boolean
      */
     public static function setCurrentUser(int $credentialID, int $userID): bool {
-        return self::schema()->edit($credentialID, [
-            "currentUser" => $userID,
-        ]);
+        return self::editEntity($credentialID, currentUser: $userID);
     }
 
     /**
@@ -590,9 +570,7 @@ class Credential {
      * @return boolean
      */
     public static function setAccess(int $credentialID, string $access): bool {
-        return self::schema()->edit($credentialID, [
-            "access" => $access,
-        ]);
+        return self::editEntity($credentialID, access: $access);
     }
 
     /**
@@ -602,9 +580,7 @@ class Credential {
      * @return boolean
      */
     public static function setEmail(int $credentialID, string $email): bool {
-        return self::schema()->edit($credentialID, [
-            "email" => $email,
-        ]);
+        return self::editEntity($credentialID, email: $email);
     }
 
     /**
@@ -615,9 +591,7 @@ class Credential {
      */
     public static function setLanguage(int $credentialID, string $language): bool {
         $language = Strings::substringBefore($language, "-");
-        return self::schema()->edit($credentialID, [
-            "language" => $language,
-        ]);
+        return self::editEntity($credentialID, language: $language);
     }
 
     /**
@@ -627,9 +601,7 @@ class Credential {
      * @return boolean
      */
     public static function setTimezone(int $credentialID, int $timezone): bool {
-        return self::schema()->edit($credentialID, [
-            "timezone" => $timezone,
-        ]);
+        return self::editEntity($credentialID, timezone: $timezone);
     }
 
     /**
@@ -639,9 +611,7 @@ class Credential {
      * @return boolean
      */
     public static function setAvatar(int $credentialID, string $avatar): bool {
-        return self::schema()->edit($credentialID, [
-            "avatar" => $avatar,
-        ]);
+        return self::editEntity($credentialID, avatar: $avatar);
     }
 
     /**
@@ -651,9 +621,7 @@ class Credential {
      * @return boolean
      */
     public static function setAppearance(int $credentialID, string $appearance): bool {
-        return self::schema()->edit($credentialID, [
-            "appearance" => $appearance,
-        ]);
+        return self::editEntity($credentialID, appearance: $appearance);
     }
 
     /**
@@ -664,25 +632,24 @@ class Credential {
      */
     public static function setPassword(int $credentialID, string $password): array {
         $hash = self::createHash($password);
-        self::schema()->edit($credentialID, [
-            "password"       => $hash["password"],
-            "salt"           => $hash["salt"],
-            "passExpiration" => 0,
-            "reqPassChange"  => 0,
-        ]);
+        self::editEntity(
+            $credentialID,
+            password:       $hash["password"],
+            salt:           $hash["salt"],
+            passExpiration: 0,
+            reqPassChange:  0,
+        );
         return $hash;
     }
 
     /**
      * Sets the require password change for the given Credential
      * @param integer $credentialID
-     * @param boolean $require
+     * @param boolean $reqPassChange
      * @return boolean
      */
-    public static function setReqPassChange(int $credentialID, bool $require): bool {
-        return self::schema()->edit($credentialID, [
-            "reqPassChange" => $require ? 1 : 0,
-        ]);
+    public static function setReqPassChange(int $credentialID, bool $reqPassChange): bool {
+        return self::editEntity($credentialID, reqPassChange: $reqPassChange);
     }
 
     /**
@@ -694,12 +661,13 @@ class Credential {
     public static function setTempPass(int $credentialID, int $hours = 48): string {
         $password = Strings::randomCode(10, "lud");
         $hash     = self::createHash($password);
-        self::schema()->edit($credentialID, [
-            "password"       => $hash["password"],
-            "salt"           => $hash["salt"],
-            "passExpiration" => time() + $hours * 3600,
-            "reqPassChange"  => 1,
-        ]);
+        self::editEntity(
+            $credentialID,
+            password:       $hash["password"],
+            salt:           $hash["salt"],
+            passExpiration: time() + $hours * 3600,
+            reqPassChange:  true,
+        );
         return $password;
     }
 
@@ -711,20 +679,20 @@ class Credential {
      */
     public static function setAccessToken(int $credentialID, int $hours = 4): string {
         $expiration = $hours > 0 ? time() + $hours * 3600 : 0;
-        $credential = self::getOne($credentialID, true);
+        $credential = self::getByID($credentialID, true);
+
         if ($credential->tokenExpiration > 0 && $credential->tokenExpiration < time()) {
             $accessToken = Strings::randomCode(30, "lud");
-            self::schema()->edit($credentialID, [
-                "tokenExpiration" => $expiration,
-            ]);
+            self::editEntity($credentialID, tokenExpiration: $expiration);
             return $credential->accessToken;
         }
 
         $accessToken = Strings::randomCode(30, "lud");
-        self::schema()->edit($credentialID, [
-            "accessToken"     => $accessToken,
-            "tokenExpiration" => $expiration,
-        ]);
+        self::editEntity(
+            $credentialID,
+            accessToken:     $accessToken,
+            tokenExpiration: $expiration,
+        );
         return $accessToken;
     }
 
@@ -734,10 +702,11 @@ class Credential {
      * @return boolean
      */
     public static function removeAccessToken(int $credentialID): bool {
-        return self::schema()->edit($credentialID, [
-            "accessToken"     => "",
-            "tokenExpiration" => 0,
-        ]);
+        return self::editEntity(
+            $credentialID,
+            accessToken:     "",
+            tokenExpiration: 0,
+        );
     }
 
     /**
@@ -747,9 +716,7 @@ class Credential {
      * @return boolean
      */
     public static function setStatus(int $credentialID, int $status): bool {
-        return self::schema()->edit($credentialID, [
-            "status" => $status,
-        ]);
+        return self::editEntity($credentialID, status: $status);
     }
 
     /**
@@ -758,9 +725,7 @@ class Credential {
      * @return boolean
      */
     public static function dontAskNotifications(int $credentialID): bool {
-        return self::schema()->edit($credentialID, [
-            "askNotifications" => 0,
-        ]);
+        return self::editEntity($credentialID, askNotifications: false);
     }
 
     /**
@@ -770,10 +735,11 @@ class Credential {
      */
     public static function updateLoginTime(int $credentialID): bool {
         $current = self::getValue($credentialID, "currentLogin");
-        return self::schema()->edit($credentialID, [
-            "lastLogin"    => $current,
-            "currentLogin" => time(),
-        ]);
+        return self::editEntity(
+            $credentialID,
+            lastLogin:    $current,
+            currentLogin: time(),
+        );
     }
 
     /**
@@ -784,7 +750,7 @@ class Credential {
      */
     public static function getValue(int $credentialID, string $key): mixed {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        return self::schema()->getValue($query, $key);
+        return self::getEntityValue($query, $key);
     }
 
     /**
@@ -795,9 +761,7 @@ class Credential {
      * @return boolean
      */
     public static function setValue(int $credentialID, string $key, mixed $value): bool {
-        return self::schema()->edit($credentialID, [
-            $key => $value,
-        ]);
+        return self::editEntity($credentialID, ...[ $key => $value ]);
     }
 
 
@@ -812,38 +776,6 @@ class Credential {
         $salt = !empty($salt) ? $salt : Strings::random(50);
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
         return [ "password" => $hash, "salt" => $salt ];
-    }
-
-    /**
-     * Creates a list of names and emails for the given array
-     * @param array{}[] $data
-     * @param string    $prefix     Optional.
-     * @param boolean   $onlyActive Optional.
-     * @return array{}[]
-     */
-    public static function createEmailList(array $data, string $prefix = "", bool $onlyActive = false): array {
-        $result = [];
-        $ids    = [];
-
-        foreach ($data as $row) {
-            if ($onlyActive) {
-                $status = Arrays::getValue($row, "status", "", $prefix);
-                if ($status !== StatusCode::Active) {
-                    continue;
-                }
-            }
-            $id = Arrays::getAnyValue($row, [ "credentialID", "id", "{$prefix}ID" ]);
-            if (Arrays::contains($ids, $id)) {
-                continue;
-            }
-            $result[] = [
-                "credentialID"   => $id,
-                "credentialName" => self::getName($row, $prefix),
-                "email"          => Arrays::getValue($row, "email", "", $prefix),
-            ];
-            $ids[] = $id;
-        }
-        return $result;
     }
 
     /**

@@ -2,25 +2,14 @@
 namespace Framework\Auth;
 
 use Framework\Log\DeviceLog;
-use Framework\Database\Factory;
-use Framework\Database\Schema;
 use Framework\Database\Query;
 use Framework\Utils\Server;
+use Framework\Schema\CredentialDeviceSchema;
 
 /**
  * The Credential Devices
  */
-class Device {
-
-    /**
-     * Loads the Devices Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("CredentialDevice");
-    }
-
-
+class Device extends CredentialDeviceSchema {
 
     /**
      * Checks if the Credential has at least one Device
@@ -41,8 +30,9 @@ class Device {
         if (empty($credentialID)) {
             return [];
         }
+
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        return self::schema()->getColumn($query, "playerID");
+        return self::getEntityColumn($query, "playerID");
     }
 
 
@@ -54,11 +44,11 @@ class Device {
      * @return boolean
      */
     public static function add(int $credentialID, string $playerID): bool {
-        $result = self::schema()->replace([
-            "CREDENTIAL_ID" => $credentialID,
-            "userAgent"     => Server::getUserAgent(),
-            "playerID"      => $playerID,
-        ]);
+        $result = self::replaceEntity(
+            credentialID: $credentialID,
+            userAgent:    Server::getUserAgent(),
+            playerID:     $playerID,
+        );
         DeviceLog::added($credentialID, $playerID);
         return $result;
     }
@@ -72,7 +62,7 @@ class Device {
     public static function remove(int $credentialID, string $playerID): bool {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         $query->add("playerID", "=", $playerID);
-        $result = self::schema()->remove($query);
+        $result = self::removeEntity($query);
         DeviceLog::removed($credentialID, $playerID);
         return $result;
     }

@@ -12,10 +12,10 @@ use Framework\NLS\NLS;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
-use Framework\Database\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
+use Framework\Schema\CredentialEntity;
 
 /**
  * The Auth
@@ -26,12 +26,13 @@ class Auth {
     private static bool   $sendRefresh  = false;
 
     private static string $accessName   = AccessCode::General;
-    private static ?Model $credential   = null;
-    private static ?Model $admin        = null;
     private static int    $credentialID = 0;
     private static int    $adminID      = 0;
     private static int    $userID       = 0;
     private static string $apiToken     = "";
+
+    private static ?CredentialEntity $credential = null;
+    private static ?CredentialEntity $admin      = null;
 
 
 
@@ -68,15 +69,15 @@ class Auth {
 
         // Retrieve the Token data
         [ $credentialID, $adminID ] = AuthToken::getCredentials($jwtToken, $refreshToken);
-        $credential = Credential::getOne($credentialID, true);
+        $credential = Credential::getByID($credentialID, true);
         if ($credential->isEmpty() || $credential->isDeleted) {
             return false;
         }
 
         // Retrieve the Admin
-        $admin = Model::createEmpty();
+        $admin = new CredentialEntity();
         if (!empty($adminID)) {
-            $admin = Credential::getOne($adminID, true);
+            $admin = Credential::getByID($adminID, true);
         }
 
         // Update the Refresh Token
@@ -100,13 +101,13 @@ class Auth {
 
     /**
      * Sets the Language and Timezone if required
-     * @param Model        $credential
-     * @param Model        $admin
-     * @param string|null  $langcode
-     * @param integer|null $timezone
+     * @param CredentialEntity $credential
+     * @param CredentialEntity $admin
+     * @param string|null      $langcode
+     * @param integer|null     $timezone
      * @return boolean
      */
-    private static function setLanguageTimezone(Model $credential, Model $admin, ?string $langcode = null, ?int $timezone = null): bool {
+    private static function setLanguageTimezone(CredentialEntity $credential, CredentialEntity $admin, ?string $langcode = null, ?int $timezone = null): bool {
         $model = $credential;
         if (!$admin->isEmpty()) {
             $model = $admin;
@@ -166,10 +167,10 @@ class Auth {
 
     /**
      * Logins the given Credential
-     * @param Model $credential
+     * @param CredentialEntity $credential
      * @return boolean
      */
-    public static function login(Model $credential): bool {
+    public static function login(CredentialEntity $credential): bool {
         $isNew = self::$credentialID !== $credential->id;
         self::setCredential($credential, null, $credential->currentUser);
 
@@ -207,10 +208,10 @@ class Auth {
 
     /**
      * Returns true if the Credential can login
-     * @param Model $credential
+     * @param CredentialEntity $credential
      * @return boolean
      */
-    public static function canLogin(Model $credential): bool {
+    public static function canLogin(CredentialEntity $credential): bool {
         return (
             !$credential->isEmpty() &&
             !$credential->isDeleted &&
@@ -227,7 +228,7 @@ class Auth {
      */
     public static function loginAs(int $credentialID): bool {
         $admin = self::$credential;
-        $user  = Credential::getOne($credentialID, true);
+        $user  = Credential::getByID($credentialID, true);
 
         if (self::canLoginAs($admin, $user)) {
             self::setCredential($user, $admin, $user->currentUser);
@@ -255,9 +256,9 @@ class Auth {
     /**
      * Returns the Credential to Login from the given Email
      * @param string $email
-     * @return Model
+     * @return CredentialEntity
      */
-    public static function getLoginCredential(string $email): Model {
+    public static function getLoginCredential(string $email): CredentialEntity {
         $parts = Strings::split($email, "|");
         $user  = null;
 
@@ -278,11 +279,11 @@ class Auth {
 
     /**
      * Returns true if the Admin can login as the User
-     * @param Model $admin
-     * @param Model $user
+     * @param CredentialEntity $admin
+     * @param CredentialEntity $user
      * @return boolean
      */
-    public static function canLoginAs(Model $admin, Model $user): bool {
+    public static function canLoginAs(CredentialEntity $admin, CredentialEntity $user): bool {
         return (
             self::canLogin($admin) &&
             !$user->isEmpty() &&
@@ -295,12 +296,12 @@ class Auth {
 
     /**
      * Sets the Credential
-     * @param Model      $credential
-     * @param Model|null $admin      Optional.
-     * @param integer    $userID     Optional.
+     * @param CredentialEntity      $credential
+     * @param CredentialEntity|null $admin      Optional.
+     * @param integer               $userID     Optional.
      * @return boolean
      */
-    public static function setCredential(Model $credential, ?Model $admin = null, int $userID = 0): bool {
+    public static function setCredential(CredentialEntity $credential, ?CredentialEntity $admin = null, int $userID = 0): bool {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
         self::$accessName   = !empty($credential->userAccess) ? $credential->userAccess : $credential->access;
@@ -335,7 +336,7 @@ class Auth {
      */
     public static function updateCredential(): bool {
         if (!empty(self::$credentialID)) {
-            $credential = Credential::getOne(self::$credentialID, true);
+            $credential = Credential::getByID(self::$credentialID, true);
             if (!$credential->isEmpty()) {
                 self::$credential = $credential;
                 return true;
@@ -417,11 +418,11 @@ class Auth {
 
     /**
      * Returns the Credential Model
-     * @return Model
+     * @return CredentialEntity
      */
-    public static function getCredential(): Model {
+    public static function getCredential(): CredentialEntity {
         if (empty(self::$credential)) {
-            return Model::createEmpty();
+            return new CredentialEntity();
         }
         return self::$credential;
     }

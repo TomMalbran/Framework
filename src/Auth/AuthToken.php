@@ -1,13 +1,10 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Auth\RefreshToken;
 use Framework\System\ConfigCode;
-use Framework\Database\Factory;
-use Framework\Database\Schema;
-use Framework\Database\Model;
-use Framework\Database\Query;
 use Framework\Utils\Server;
-use Framework\Utils\Strings;
+use Framework\Schema\CredentialRefreshTokenEntity;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -24,7 +21,8 @@ class AuthToken {
     private static string $secretKey  = "";
     private static int    $shortTerm  = 0;
     private static int    $longTerm   = 0;
-    private static Model  $tokenData;
+
+    private static CredentialRefreshTokenEntity $tokenData;
 
 
 
@@ -44,14 +42,6 @@ class AuthToken {
         self::$shortTerm  = ConfigCode::getFloat("authHours") * 3600;
         self::$longTerm   = ConfigCode::getFloat("authDays") * 24 * 3600;
         return true;
-    }
-
-    /**
-     * Loads the Refresh Tokens Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("CredentialRefreshToken");
     }
 
 
@@ -147,15 +137,14 @@ class AuthToken {
     /**
      * Returns true if the given Refresh Token exists
      * @param string $refreshToken
-     * @return Model
+     * @return CredentialRefreshTokenEntity
      */
-    private static function getOne(string $refreshToken): Model {
+    private static function getOne(string $refreshToken): CredentialRefreshTokenEntity {
         if (!empty(self::$tokenData) && self::$tokenData->refreshToken === $refreshToken) {
             return self::$tokenData;
         }
 
-        $query = Query::create("refreshToken", "=", $refreshToken);
-        self::$tokenData = self::schema()->getOne($query);
+        self::$tokenData = RefreshToken::get($refreshToken);
         return self::$tokenData;
     }
 
@@ -169,16 +158,14 @@ class AuthToken {
             return [];
         }
 
-        $query  = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $query->orderBy("createdTime", true);
-        $list   = self::schema()->getAll($query);
+        $list   = RefreshToken::getAllForCredential($credentialID);
         $result = [];
 
         foreach ($list as $elem) {
             $result[] = [
-                "refreshToken" => $elem["refreshToken"],
-                "platform"     => Server::getPlatform($elem["userAgent"]),
-                "time"         => $elem["createdTime"],
+                "refreshToken" => $elem->refreshToken,
+                "platform"     => Server::getPlatform($elem->userAgent),
+                "time"         => $elem->createdTime,
             ];
         }
         return $result;
@@ -197,14 +184,7 @@ class AuthToken {
             return "";
         }
 
-        $refreshToken = Strings::randomCode(20);
-        self::schema()->create([
-            "CREDENTIAL_ID"  => $credentialID,
-            "userAgent"      => Server::getUserAgent(),
-            "refreshToken"   => $refreshToken,
-            "expirationTime" => time() + self::$longTerm,
-        ]);
-        return $refreshToken;
+        return RefreshToken::create($credentialID, self::$longTerm);
     }
 
     /**
@@ -219,17 +199,11 @@ class AuthToken {
         }
 
         $token = self::getOne($refreshToken);
-        if ($token->isEmpty() || $token->modificationTime < time() - 24 * 3600) {
+        if ($token->isEmpty() || $token->modifiedTime < time() - 24 * 3600) {
             return "";
         }
 
-        $query           = Query::create("refreshToken", "=", $refreshToken);
-        $newRefreshToken = Strings::randomCode(20);
-        self::schema()->edit($query, [
-            "refreshToken"   => $newRefreshToken,
-            "expirationTime" => time() + self::$longTerm,
-        ]);
-        return $newRefreshToken;
+        return RefreshToken::recreate($refreshToken, self::$longTerm);
     }
 
     /**
@@ -243,8 +217,7 @@ class AuthToken {
             return false;
         }
 
-        $query = Query::create("refreshToken", "=", $refreshToken);
-        return self::schema()->remove($query);
+        return RefreshToken::remove($refreshToken);
     }
 
     /**
@@ -258,8 +231,7 @@ class AuthToken {
             return false;
         }
 
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        return self::schema()->remove($query);
+        return RefreshToken::removeAll($credentialID);
     }
 
     /**
@@ -272,7 +244,6 @@ class AuthToken {
             return false;
         }
 
-        $query = Query::create("expirationTime", "<", time() - self::$longTerm);
-        return self::schema()->remove($query);
+        return RefreshToken::removeOld(self::$longTerm);
     }
 }

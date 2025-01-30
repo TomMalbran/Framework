@@ -27,6 +27,12 @@
             "lastLogin"        : { "type" : "date",                       "cantEdit" : true },
             "askNotifications" : { "type" : "boolean", "default"  : 1,    "cantEdit" : true }
         },
+        "processed" : {
+            "adminID"        : { "type" : "number" },
+            "userAccess"     : { "type" : "string" },
+            "credentialName" : { "type" : "string" },
+            "avatarFile"     : { "type" : "string" }
+        },
         "expressions" : {
             "fullName" : {
                 "expression" : "IF(credential.lastName <> '' AND credential.firstName <> '', CONCAT(credential.firstName, ' ', credential.lastName), IF(credential.firstName <> '', credential.firstName, credential.lastName))",
@@ -52,7 +58,7 @@
         "canCreate"     : false,
         "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "CredentialRefreshToken" : {
         "fields" : {
@@ -68,7 +74,7 @@
         "canCreate"     : true,
         "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "CredentialReset" : {
         "fields" : {
@@ -82,9 +88,9 @@
         },
         "hasTimestamps" : false,
         "canCreate"     : false,
-        "canEdit"       : false,
+        "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "CredentialSpam" : {
         "fields" : {
@@ -93,9 +99,9 @@
         },
         "hasTimestamps" : false,
         "canCreate"     : false,
-        "canEdit"       : false,
+        "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
 
 

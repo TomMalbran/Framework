@@ -1,48 +1,36 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\Database\Factory;
-use Framework\Database\Schema;
 use Framework\Database\Query;
 use Framework\Utils\Server;
+use Framework\Schema\CredentialSpamSchema;
 
 /**
  * The Auth Spam
  */
-class Spam {
-
-    /**
-     * Loads the Spam Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("CredentialSpam");
-    }
-
-
+class Spam extends CredentialSpamSchema {
 
     /**
      * Protection against multiple submits in a few seconds
      * @return boolean
      */
     public static function protect(): bool {
-        $schema = self::schema();
-        $ip     = Server::getIP();
+        $ip = Server::getIP();
 
         // Delete old entries
-        $schema->remove(Query::create("time", "<", time() - 1)->add("ip", "=", $ip));
-        $schema->remove(Query::create("time", "<", time() - 3));
+        self::removeEntity(Query::create("time", "<", time() - 1)->add("ip", "=", $ip));
+        self::removeEntity(Query::create("time", "<", time() - 3));
 
         // Check if there is still an entry for the given ip
-        if ($schema->exists(Query::create("ip", "=", $ip))) {
+        if (self::entityExists(Query::create("ip", "=", $ip))) {
             return true;
         }
 
         // Add a new entry
-        $schema->replace([
-            "ip"   => $ip,
-            "time" => time(),
-        ]);
+        self::replaceEntity(
+            ip:   $ip,
+            time: time(),
+        );
         return false;
     }
 
@@ -51,7 +39,8 @@ class Spam {
      * @return boolean
      */
     public static function reset(): bool {
-        $ip = Server::getIP();
-        return self::schema()->remove(Query::create("ip", "=", $ip));
+        $ip    = Server::getIP();
+        $query = Query::create("ip", "=", $ip);
+        return self::removeEntity($query);
     }
 }

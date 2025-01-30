@@ -1,26 +1,15 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\Database\Factory;
-use Framework\Database\Schema;
 use Framework\Database\Query;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
+use Framework\Schema\CredentialResetSchema;
 
 /**
  * The Auth Reset
  */
-class Reset {
-
-    /**
-     * Loads the Reset Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("CredentialReset");
-    }
-
-
+class Reset extends CredentialResetSchema {
 
     /**
      * Returns the Credential ID for the given Code
@@ -29,7 +18,7 @@ class Reset {
      */
     public static function getCredentialID(string $code): int {
         $query = Query::create("code", "=", $code);
-        return self::schema()->getValue($query, "CREDENTIAL_ID");
+        return (int)self::getEntityValue($query, "CREDENTIAL_ID");
     }
 
     /**
@@ -39,7 +28,7 @@ class Reset {
      */
     public static function getEmail(string $code): string {
         $query = Query::create("code", "=", $code);
-        return self::schema()->getValue($query, "email");
+        return self::getEntityValue($query, "email");
     }
 
     /**
@@ -51,7 +40,7 @@ class Reset {
     public static function codeExists(string $code, string $email = ""): bool {
         $query = Query::create("code", "=", $code);
         $query->addIf("email", "=", $email);
-        return self::schema()->exists($query);
+        return self::entityExists($query);
     }
 
 
@@ -65,12 +54,12 @@ class Reset {
      */
     public static function create(int $credentialID = 0, string $email = "", string $availableSets = "ud"): string {
         $code = Strings::randomCode(6, $availableSets);
-        self::schema()->replace([
-            "CREDENTIAL_ID" => $credentialID,
-            "email"         => $email,
-            "code"          => $code,
-            "time"          => time(),
-        ]);
+        self::replaceEntity(
+            credentialID: $credentialID,
+            email:        $email,
+            code:         $code,
+            time:         time(),
+        );
         return $code;
     }
 
@@ -83,7 +72,7 @@ class Reset {
     public static function delete(int $credentialID = 0, string $email = ""): bool {
         $query = Query::createIf("CREDENTIAL_ID", "=", $credentialID);
         $query->addIf("email", "=", $email);
-        return self::schema()->remove($query);
+        return self::removeEntity($query);
     }
 
     /**
@@ -91,12 +80,7 @@ class Reset {
      * @return boolean
      */
     public static function deleteOld(): bool {
-        $schema = self::schema();
-        if (empty($schema)) {
-            return false;
-        }
         $query = Query::create("time", "<", DateTime::getLastXHours(3));
-        $schema->remove($query);
-        return true;
+        return self::removeEntity($query);
     }
 }
