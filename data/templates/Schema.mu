@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}}Schema;
 
-{{#hasStatus}}use {{namespace}}System\Status;
+{{#hasStatus}}use {{appNamespace}}System\Status;
 {{/hasStatus}}
 use {{namespace}}Schema\{{name}}Entity;{{#subTypes}}
 use {{namespace}}Schema\{{type}}Entity;{{/subTypes}}
@@ -10,8 +10,8 @@ use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Factory;
 use Framework\Database\Schema;
-use Framework\Database\Query;
-use Framework\Database\Assign;
+use Framework\Database\Query;{{#canEdit}}
+use Framework\Database\Assign;{{/canEdit}}
 use Framework\Utils\Search;{{#hasSelect}}
 use Framework\Utils\Select;{{/hasSelect}}
 

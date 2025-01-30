@@ -4,5 +4,8 @@
 **/node_modules
 **/vendor
 
+# generated files
+src/Schema
+
 # misc
 .DS_Store

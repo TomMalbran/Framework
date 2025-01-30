@@ -14,6 +14,7 @@ use Framework\Utils\Strings;
  */
 class Generator {
 
+    private static string $namespace;
     private static string $writePath;
     private static string $schemaText;
     private static string $entityText;
@@ -24,7 +25,35 @@ class Generator {
      * @return boolean
      */
     public static function generateCode(): bool {
-        self::$writePath  = Framework::getPath(Framework::SchemasDir);
+        print("<br><b>SCHEMA CODES</b><br>");
+
+        self::$namespace = Framework::Namespace;
+        self::$writePath = Framework::getPath(Framework::SchemasDir);
+        self::generate(false);
+
+        self::$namespace = "Framework\\";
+        self::$writePath = Framework::getPath(Framework::SchemasDir, forFramework: true);
+        self::generate(true);
+        return true;
+    }
+
+    /**
+     * Generates the Code for the Schemas Internally
+     * @return boolean
+     */
+    public static function generateInternal(): bool {
+        self::$namespace = "Framework\\";
+        self::$writePath = Framework::getPath(Framework::SchemasDir);
+        return self::generate(true);
+    }
+
+
+    /**
+     * Does the Generation
+     * @param boolean $forFramework
+     * @return boolean
+     */
+    private static function generate(bool $forFramework): bool {
         self::$schemaText = Framework::loadFile(Framework::TemplateDir, "Schema.mu");
         self::$entityText = Framework::loadFile(Framework::TemplateDir, "Entity.mu");
 
@@ -35,7 +64,8 @@ class Generator {
         File::emptyDir(self::$writePath);
 
         foreach ($schemas as $schemaKey => $schemaData) {
-            if (!empty($schemaData["fromFramework"])) {
+            $fromFramework = $schemaData["fromFramework"] ?? false;
+            if (($forFramework && !$fromFramework) || (!$forFramework && $fromFramework)) {
                 continue;
             }
 
@@ -49,9 +79,8 @@ class Generator {
             $created += 1;
         }
 
-        if ($created > 0) {
-            print("<br>Generated the <i>$created Schema</i> codes<br>");
-        }
+        $name = $forFramework ? "Framework" : "App";
+        print("Generated the <i>$name</i> codes -> $created schemas<br>");
         return $created > 0;
     }
 
@@ -72,7 +101,8 @@ class Generator {
         $editParents = $structure->hasPositions ? $parents : [];
 
         $contents    = Mustache::render(self::$schemaText, [
-            "namespace"       => Framework::Namespace,
+            "appNamespace"    => Framework::Namespace,
+            "namespace"       => self::$namespace,
             "name"            => $structure->schema,
             "hasID"           => $structure->hasID,
             "idKey"           => $structure->idKey,
@@ -275,7 +305,7 @@ class Generator {
         $fileName   = "{$structure->schema}Entity.php";
         $attributes = self::getAttributes($structure);
         $contents   = Mustache::render(self::$entityText, [
-            "namespace"  => Framework::Namespace,
+            "namespace"  => self::$namespace,
             "name"       => $structure->schema,
             "attributes" => self::parseAttributes($attributes),
         ]);

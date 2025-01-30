@@ -26,6 +26,8 @@ class Code {
      * @return boolean
      */
     public static function generateCode(): bool {
+        print("<br><b>FRAMEWORK CODES</b><br>");
+
         $writePath = Framework::getPath(Framework::SystemDir);
         File::createDir($writePath);
         File::emptyDir($writePath);
