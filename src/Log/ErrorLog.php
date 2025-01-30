@@ -3,19 +3,17 @@ namespace Framework\Log;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Database\Factory;
-use Framework\Database\Schema;
 use Framework\Database\Assign;
 use Framework\Database\Query;
-use Framework\Database\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
+use Framework\Schema\LogErrorSchema;
 
 /**
  * The Errors Log
  */
-class ErrorLog {
+class ErrorLog extends LogErrorSchema {
 
     private static bool   $loaded    = false;
     private static string $framePath = "";
@@ -41,42 +39,14 @@ class ErrorLog {
         return true;
     }
 
-    /**
-     * Loads the Error Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("LogError");
-    }
-
 
 
     /**
-     * Returns an Error Log item with the given ID
-     * @param integer $logID
-     * @return Model
-     */
-    public static function getOne(int $logID): Model {
-        return self::schema()->getOne($logID);
-    }
-
-    /**
-     * Returns true if the given Error Log item exists
-     * @param integer $logID
-     * @return boolean
-     */
-    public static function exists(int $logID): bool {
-        return self::schema()->exists($logID);
-    }
-
-
-
-    /**
-     * Returns the List Query
+     * Creates the List Query
      * @param Request $request
      * @return Query
      */
-    private static function createQuery(Request $request): Query {
+    protected static function createListQuery(Request $request): Query {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
@@ -88,26 +58,6 @@ class ErrorLog {
     }
 
     /**
-     * Returns all the Error Log items
-     * @param Request $request
-     * @return array{}[]
-     */
-    public static function getAll(Request $request): array {
-        $query = self::createQuery($request);
-        return self::schema()->getAll($query, $request);
-    }
-
-    /**
-     * Returns the total amount of Error Log items
-     * @param Request $request
-     * @return integer
-     */
-    public static function getTotal(Request $request): int {
-        $query = self::createQuery($request);
-        return self::schema()->getTotal($query);
-    }
-
-    /**
      * Marks the given Error(s) as Resolved
      * @param integer[]|integer $logID
      * @return boolean
@@ -115,10 +65,7 @@ class ErrorLog {
     public static function markResolved(array|int $logID): bool {
         $logIDs = Arrays::toArray($logID);
         $query  = Query::create("LOG_ID", "IN", $logIDs);
-        self::schema()->edit($query, [
-            "isResolved" => 1,
-        ]);
-        return true;
+        return self::editEntity($query, isResolved: true);
     }
 
     /**
@@ -129,7 +76,7 @@ class ErrorLog {
     public static function delete(array|int $logID): bool {
         $logIDs = Arrays::toArray($logID);
         $query  = Query::create("LOG_ID", "IN", $logIDs);
-        return self::schema()->remove($query);
+        return self::removeEntity($query);
     }
 
     /**
@@ -140,7 +87,7 @@ class ErrorLog {
     public static function deleteOld(int $days = 90): bool {
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
-        return self::schema()->remove($query);
+        return self::removeEntity($query);
     }
 
 
@@ -151,7 +98,7 @@ class ErrorLog {
      */
     public static function shutdown(): bool {
         $error = error_get_last();
-        if (is_null($error)) {
+        if ($error === null) {
             return false;
         }
         return self::handler(
@@ -171,8 +118,7 @@ class ErrorLog {
      * @return boolean
      */
     public static function handler(int $code, string $description, string $filePath = "", int $line = 0): bool {
-        $schema = self::schema();
-        if (!$schema->hasPrimaryKey()) {
+        if (!self::schema()->hasPrimaryKey()) {
             return false;
         }
 
@@ -188,33 +134,33 @@ class ErrorLog {
         $query->add("description", "=", $description);
         $query->add("backtrace",   "=", $backtrace);
 
-        $schema = self::schema();
-        if ($schema->getTotal($query) > 0) {
+        if (self::getEntityTotal($query) > 0) {
             $query->orderBy("updatedTime", false)->limit(1);
-            $schema->edit($query, [
-                "amount"      => Assign::increase(1),
-                "updatedTime" => time(),
-            ]);
+            self::editEntity(
+                $query,
+                amount:      Assign::increase(1),
+                updatedTime: time(),
+            );
         } else {
-            $schema->create([
-                "code"        => $code,
-                "level"       => $level,
-                "error"       => $error,
-                "environment" => Framework::getEnvironment(),
-                "file"        => $filePath,
-                "line"        => $line,
-                "description" => $description,
-                "backtrace"   => $backtrace,
-                "amount"      => 1,
-                "isResolved"  => 0,
-                "updatedTime" => time(),
-            ]);
+            self::createEntity(
+                code:        $code,
+                level:       $level,
+                error:       $error,
+                environment: Framework::getEnvironment(),
+                file:        $filePath,
+                line:        $line,
+                description: $description,
+                backtrace:   $backtrace,
+                amount:      1,
+                isResolved:  0,
+                updatedTime: time(),
+            );
 
-            $total = $schema->getTotal();
+            $total = self::getEntityTotal();
             if ($total > self::$maxLog) {
                 $query = Query::createOrderBy("updatedTime", false);
                 $query->limit($total - self::$maxLog);
-                $schema->remove($query);
+                self::removeEntity($query);
             }
         }
         return true;

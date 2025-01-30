@@ -209,28 +209,14 @@
 
 
 
-    "LogIdentifier" : {
-        "fields" : {
-            "CREDENTIAL_ID" : { "type" : "number", "isPrimary" : true },
-            "SESSION_ID"    : { "type" : "number"                     }
-        },
-        "foreigns" : {
-            "CREDENTIAL_ID" : { "schema" : "Credential" },
-            "SESSION_ID"    : { "schema" : "LogSession" }
-        },
-        "hasTimestamps" : false,
-        "canCreate"     : false,
-        "canEdit"       : false,
-        "canDelete"     : false,
-        "canRemove"     : false
-    },
     "LogSession" : {
         "fields" : {
-            "SESSION_ID"    : { "type" : "id"     },
+            "SESSION_ID"    : { "type" : "id"                     },
             "CREDENTIAL_ID" : { "type" : "number", "isKey" : true },
-            "USER_ID"       : { "type" : "number" },
-            "ip"            : { "type" : "string" },
-            "userAgent"     : { "type" : "string" }
+            "USER_ID"       : { "type" : "number"                 },
+            "ip"            : { "type" : "string"                 },
+            "userAgent"     : { "type" : "string"                 },
+            "isOpen"        : { "type" : "boolean"                }
         },
         "joins" : {
             "CREDENTIAL_ID" : {
@@ -245,9 +231,9 @@
         },
         "hasTimestamps" : true,
         "canCreate"     : true,
-        "canEdit"       : false,
+        "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "LogAction" : {
         "fields" : {
@@ -283,7 +269,7 @@
         "canCreate"     : true,
         "canEdit"       : false,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "LogDevice" : {
         "fields" : {
@@ -297,11 +283,12 @@
             "CREDENTIAL_ID" : { "schema" : "Credential"       },
             "playerID"      : { "schema" : "CredentialDevice" }
         },
+        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "LogQuery" : {
         "fields" : {
@@ -315,12 +302,13 @@
             "updatedTime" : { "type" : "number"  },
             "updatedUser" : { "type" : "number"  }
         },
+        "hasFilters"    : true,
         "hasUsers"      : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
-        "canEdit"       : false,
+        "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "LogError" : {
         "fields" : {
@@ -337,10 +325,11 @@
             "isResolved"  : { "type" : "boolean" },
             "updatedTime" : { "type" : "date"    }
         },
+        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
-        "canEdit"       : false,
+        "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     }
 }
