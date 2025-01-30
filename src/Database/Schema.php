@@ -619,17 +619,21 @@ class Schema {
         if ($isEdit && $newPosition > $nextPosition) {
             $updatedPosition = $nextPosition - 1;
         }
+
+        $newQuery = $this->generateQuery($query);
         if ($newPosition > $oldPosition) {
-            $newQuery = $this->generateQuery($query);
             $newQuery->add("position", ">",  $oldPosition);
             $newQuery->add("position", "<=", $newPosition);
-            $this->db()->update($this->structure->table, [ "position" => Assign::decrease(1) ], $query);
+            $assign = Assign::decrease(1);
         } else {
-            $newQuery = $this->generateQuery($query);
             $newQuery->add("position", ">=", $newPosition);
             $newQuery->add("position", "<",  $oldPosition);
-            $this->db()->update($this->structure->table, [ "position" => Assign::increase(1) ], $query);
+            $assign = Assign::increase(1);
         }
+
+        $this->db()->update($this->structure->table, [
+            "position" => $assign,
+        ], $newQuery);
         return $updatedPosition;
     }
 
