@@ -214,6 +214,16 @@ class {{name}}Schema {
         return self::schema()->getValue($query, $column);
     }
 
+    /**
+     * Returns a list of values the {{name}} Entity with the given Query
+     * @param Query $query
+     * @param string $column
+     * @return mixed[]
+     */
+    protected static function getEntityColumn(Query $query, string $column): array {
+        return self::schema()->getColumn($query, $column);
+    }
+
 
 
 {{#hasID}}
@@ -223,7 +233,7 @@ class {{name}}Schema {
      * @return int[]
      */
     public static function get{{idText}}s(?Query $query = null): array {
-        return self::schema()->getColumn($query, "{{idKey}}");
+        return self::getEntityColumn($query, "{{idKey}}");
     }
 
 {{/hasID}}
@@ -246,8 +256,7 @@ class {{name}}Schema {
         $query = self::createParentQuery({{parentsList}});
         {{/hasParents}}
         {{/hasFilters}}
-        $result = self::getEntityList({{#hasMainQuery}}$query, {{/hasMainQuery}}sort: $request);
-        return $result;
+        return self::getEntityList({{#hasMainQuery}}$query, {{/hasMainQuery}}sort: $request);
     }
 
     /**
@@ -370,10 +379,10 @@ class {{name}}Schema {
      * @param Request|null $fieldData Optional.{{#fields}}
      * @param {{fieldDoc}} Optional.{{/fields}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
-     * @param array{} $extras Optional.
      * @return boolean
      */
-    protected static function replaceEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}, array $extras = []): bool {
+    protected static function replaceEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
+        $extras = [];
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
             $extras["{{fieldKey}}"] = {{fieldParam}};

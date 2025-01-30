@@ -18,6 +18,7 @@ class Structure {
 
     public string $table       = "";
     public bool   $hasID       = false;
+    public bool   $hasAutoInc  = false;
     public string $idKey       = "";
     public string $idName      = "";
     public string $idType      = "";
@@ -147,6 +148,9 @@ class Structure {
         // Create the Fields
         foreach ($data["fields"] as $key => $value) {
             $field = new Field($key, $value);
+            if ($field->type == Field::ID) {
+                $this->hasAutoInc = true;
+            }
             if ($key == $idKey) {
                 $this->hasID  = true;
                 $this->idKey  = $field->key;
