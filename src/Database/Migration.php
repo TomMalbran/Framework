@@ -40,7 +40,7 @@ class Migration {
      * @return boolean
      */
     private static function moveTables(Database $db, array $movements): bool {
-        $startMovement = SettingCode::getCore($db, "movement");
+        $startMovement = SettingCode::getCore("movement");
         $lastMovement  = count($movements);
         $didMove       = false;
 
@@ -56,11 +56,11 @@ class Migration {
         }
 
         if ($didMove) {
+            SettingCode::setCore("movement", $lastMovement);
             print("<br>");
         } else {
             print("No <i>movements</i> required<br>");
         }
-        SettingCode::setCore($db, "movement", $lastMovement);
         return $didMove;
     }
 
@@ -71,7 +71,7 @@ class Migration {
      * @return boolean
      */
     private static function renameColumns(Database $db, array $renames): bool {
-        $startRename = SettingCode::getCore($db, "rename");
+        $startRename = SettingCode::getCore("rename");
         $lastRename  = count($renames);
         $didRename   = false;
 
@@ -95,11 +95,11 @@ class Migration {
         }
 
         if ($didRename) {
+            SettingCode::setCore("rename", $lastRename);
             print("<br>");
         } else {
             print("No <i>column renames</i> required<br><br>");
         }
-        SettingCode::setCore($db, "rename", $lastRename);
         return $didRename;
     }
 
@@ -378,10 +378,10 @@ class Migration {
      * @return boolean
      */
     private static function extraMigrations(Database $db): bool {
-        $migration = SettingCode::getCore($db, "migration");
+        $migration = SettingCode::getCore("migration");
         $path      = Framework::getPath(Framework::MigrationsDir);
 
-        SettingCode::setCore($db, "migration", $migration);
+        SettingCode::setCore("migration", $migration);
         if (!File::exists($path)) {
             print("<br>No <i>migrations</i> required<br>");
             return false;
@@ -411,7 +411,7 @@ class Migration {
             }
         }
 
-        SettingCode::setCore($db, "migration", $last);
+        SettingCode::setCore("migration", $last);
         return true;
     }
 }

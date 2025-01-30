@@ -2,30 +2,19 @@
 namespace Framework\System;
 
 use Framework\Framework;
+use Framework\Schema\SettingsEntity;
 use Framework\System\VariableType;
-use Framework\Database\Factory;
-use Framework\Database\Schema;
-use Framework\Database\Database;
 use Framework\Database\Query;
 use Framework\Utils\Strings;
+use Framework\Schema\SettingsSchema;
 
 /**
  * The Setting Code
  */
-class SettingCode {
+class SettingCode extends SettingsSchema {
 
     const Core    = "Core";
     const General = "General";
-
-
-
-    /**
-     * Loads the Settings Schemas
-     * @return Schema
-     */
-    private static function schema(): Schema {
-        return Factory::getSchema("Settings");
-    }
 
 
 
@@ -38,7 +27,7 @@ class SettingCode {
     public static function get(string $section, string $variable): string {
         $query = Query::create("section", "=", $section);
         $query->add("variable", "=", $variable);
-        return self::schema()->getValue($query, "value");
+        return self::getEntityValue($query, "value");
     }
 
     /**
@@ -51,57 +40,55 @@ class SettingCode {
     public static function set(string $section, string $variable, string $value): bool {
         $query = Query::create("section", "=", $section);
         $query->add("variable", "=", $variable);
-        $model = self::schema()->getOne($query);
-        if ($model->isEmpty()) {
+
+        $elem = self::getEntity($query);
+        if ($elem->isEmpty()) {
             return false;
         }
 
-        $result = self::schema()->replace([
-            "section"      => $section,
-            "variable"     => $variable,
-            "value"        => $value,
-            "type"         => $model->type,
-            "modifiedTime" => time(),
-        ]);
+        $result = self::replaceEntity(
+            section:      $section,
+            variable:     $variable,
+            value:        $value,
+            variableType: $elem->variableType,
+        );
         return $result > 0;
     }
 
     /**
      * Returns a Core Setting
-     * @param Database $db
-     * @param string   $variable
+     * @param string $variable
      * @return integer
      */
-    public static function getCore(Database $db, string $variable): int {
-        if (!$db->tableExists("settings")) {
+    public static function getCore(string $variable): int {
+        if (!self::schema()->tableExists()) {
             return 0;
         }
-        $query  = Query::create("section", "=", self::Core);
+
+        $query = Query::create("section", "=", self::Core);
         $query->add("variable", "=", $variable);
 
-        $result = $db->getValue("settings", "value", $query);
+        $result = self::getEntityValue($query, "value");
         return !empty($result) ? $result : 0;
     }
 
     /**
      * Sets a Core Preference
-     * @param Database $db
-     * @param string   $variable
-     * @param integer  $value
+     * @param string  $variable
+     * @param integer $value
      * @return boolean
      */
-    public static function setCore(Database $db, string $variable, int $value): bool {
-        if (!$db->tableExists("settings")) {
+    public static function setCore(string $variable, int $value): bool {
+        if (!self::schema()->tableExists()) {
             return false;
         }
-        $result = $db->insert("settings", [
-            "section"      => self::Core,
-            "variable"     => $variable,
-            "value"        => $value,
-            "type"         => VariableType::Integer,
-            "modifiedTime" => time(),
-        ], "REPLACE");
-        return $result > 0;
+
+        return self::replaceEntity(
+            section:      self::Core,
+            variable:     $variable,
+            value:        $value,
+            variableType: VariableType::Integer,
+        );
     }
 
 
@@ -113,17 +100,15 @@ class SettingCode {
      * @return array{}|object
      */
     public static function getAll(?string $section = null, bool $asObject = false): array|object {
-        $query   = Query::createIf("section", "=", $section);
-        $request = self::schema()->getAll($query);
-        $result  = [];
+        $query  = Query::createIf("section", "=", $section);
+        $list   = self::getEntityList($query);
+        $result = [];
 
-        foreach ($request as $row) {
-            if (empty($result[$row["section"]])) {
-                $result[$row["section"]] = [];
+        foreach ($list as $elem) {
+            if (empty($result[$elem->section])) {
+                $result[$elem->section] = [];
             }
-
-            $value = $row["value"];
-            $result[$row["section"]][$row["variable"]] = $value;
+            $result[$elem->section][$elem->variable] = $elem->value;
         }
 
         if (!empty($section)) {
@@ -138,20 +123,20 @@ class SettingCode {
      * @return boolean
      */
     public static function saveAll(array $data): bool {
-        $request = self::schema()->getAll();
-        $batch   = [];
+        $list  = self::getEntityList();
+        $batch = [];
 
-        foreach ($request as $row) {
-            $variable = "{$row["section"]}-{$row["variable"]}";
+        foreach ($list as $elem) {
+            $variable = "{$elem->section}-{$elem->variable}";
             if (!isset($data[$variable])) {
                 continue;
             }
 
             $batch[] = [
-                "section"      => $row["section"],
-                "variable"     => $row["variable"],
-                "value"        => VariableType::encodeValue($row["type"], $data[$variable]),
-                "type"         => $row["type"],
+                "section"      => $elem->section,
+                "variable"     => $elem->variable,
+                "value"        => VariableType::encodeValue($elem->variableType, $data[$variable]),
+                "variableType" => $elem->variableType,
                 "modifiedTime" => time(),
             ];
         }
@@ -159,7 +144,7 @@ class SettingCode {
         if (empty($batch)) {
             return false;
         }
-        return self::schema()->batch($batch);
+        return self::batchEntities($batch);
     }
 
     /**
@@ -185,7 +170,7 @@ class SettingCode {
     public static function migrateData(): bool {
         $settings  = Framework::loadData(Framework::SettingsData);
         $query     = Query::create("section", "<>", self::Core);
-        $request   = self::schema()->getAll($query);
+        $list      = self::getEntityList($query);
 
         $variables = [];
         $adds      = [];
@@ -196,30 +181,30 @@ class SettingCode {
         // Add/Update Settings
         foreach ($settings as $section => $data) {
             foreach ($data as $variable => $value) {
-                $found = false;
-                $type  = VariableType::get($value);
+                $found        = false;
+                $variableType = VariableType::get($value);
 
-                foreach ($request as $row) {
-                    if ($row["section"] === $section && $row["variable"] === $variable) {
-                        if ($row["type"] !== $type) {
+                foreach ($list as $elem) {
+                    if ($elem->section === $section && $elem->variable === $variable) {
+                        if ($elem->variableType !== $variableType) {
                             $modifies[] = [
-                                "section"  => $row["section"],
-                                "variable" => $row["variable"],
-                                "type"     => $type,
+                                "section"      => $elem->section,
+                                "variable"     => $elem->variable,
+                                "variableType" => $variableType,
                             ];
                         }
                         $found = true;
                         break;
                     }
 
-                    if (Strings::isEqual($row["section"], $section) && Strings::isEqual($row["variable"], $variable)) {
+                    if (Strings::isEqual($elem->section, $section) && Strings::isEqual($elem->variable, $variable)) {
                         $renames[] = [
-                            "section"  => $row["section"],
-                            "variable" => $row["variable"],
+                            "section"  => $elem->section,
+                            "variable" => $elem->variable,
                             "fields"   => [
-                                "section"  => $section,
-                                "variable" => $variable,
-                                "type"     => $type,
+                                "section"      => $section,
+                                "variable"     => $variable,
+                                "variableType" => $variableType,
                             ],
                         ];
                         $found = true;
@@ -232,29 +217,31 @@ class SettingCode {
                     $fields      = [
                         "section"      => $section,
                         "variable"     => $variable,
-                        "value"        => VariableType::encodeValue($type, $value),
-                        "type"         => $type,
+                        "value"        => VariableType::encodeValue($variableType, $value),
+                        "variableType" => $variableType,
                         "modifiedTime" => time(),
                     ];
-                    $adds[]      = $fields;
-                    $request[]   = $fields;
+                    $list[] = new SettingsEntity($fields);
+                    $adds[] = $fields;
                 }
             }
         }
 
         // Remove Settings
-        foreach ($request as $row) {
+        foreach ($list as $elem) {
             $found = false;
             foreach ($settings as $section => $data) {
                 foreach ($data as $variable => $value) {
-                    if (Strings::isEqual($row["section"], $section) && Strings::isEqual($row["variable"], $variable)) {
+                    if (Strings::isEqual($elem->section, $section) &&
+                        Strings::isEqual($elem->variable, $variable)
+                    ) {
                         $found = true;
                         break 2;
                     }
                 }
             }
             if (!$found) {
-                $deletes[] = [ $row["section"], $row["variable"] ];
+                $deletes[] = [ $elem->section, $elem->variable ];
             }
         }
 
@@ -263,26 +250,26 @@ class SettingCode {
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " settings</i><br>");
             print(Strings::join($variables, ", ") . "<br>");
-            self::schema()->batch($adds);
+            self::batchEntities($adds);
             $didUpdate = true;
         }
 
         if (!empty($renames)) {
             print("<br>Renamed <i>" . count($renames) . " settings</i><br>");
-            foreach ($renames as $row) {
-                $query = Query::create("section", "=", $row["section"]);
-                $query->add("variable", "=", $row["variable"]);
-                self::schema()->edit($query, $row["fields"]);
+            foreach ($renames as $rename) {
+                $query = Query::create("section", "=", $rename["section"]);
+                $query->add("variable", "=", $rename["variable"]);
+                self::editEntity($query, ...$rename["fields"]);
             }
             $didUpdate = true;
         }
 
         if (!empty($modifies)) {
             print("<br>Modified <i>" . count($modifies) . " settings</i><br>");
-            foreach ($modifies as $row) {
-                $query = Query::create("section", "=", $row["section"]);
-                $query->add("variable", "=", $row["variable"]);
-                self::schema()->edit($query, [ "type" => $row["type"] ]);
+            foreach ($modifies as $modify) {
+                $query = Query::create("section", "=", $modify["section"]);
+                $query->add("variable", "=", $modify["variable"]);
+                self::editEntity($query, variableType: $modify["variableType"]);
             }
             $didUpdate = true;
         }
@@ -290,11 +277,11 @@ class SettingCode {
         if (!empty($deletes)) {
             print("<br>Deleted <i>" . count($deletes) . " settings</i><br>");
             $variables = [];
-            foreach ($deletes as $row) {
-                $query = Query::create("section", "=", $row[0]);
-                $query->add("variable", "=", $row[1]);
-                self::schema()->remove($query);
-                $variables[] = $row[0] . "_" . $row[1];
+            foreach ($deletes as $delete) {
+                $query = Query::create("section", "=", $delete[0]);
+                $query->add("variable", "=", $delete[1]);
+                self::removeEntity($query);
+                $variables[] = $delete[0] . "_" . $delete[1];
             }
             print(Strings::join($variables, ", ") . "<br>");
             $didUpdate = true;
@@ -358,30 +345,30 @@ class SettingCode {
 
         foreach ($data as $section => $variables) {
             foreach ($variables as $variable => $value) {
-                $isGeneral = Strings::isEqual($section, self::General);
-                $prefix    = !$isGeneral ? Strings::upperCaseFirst($section) : "";
-                $title     = Strings::camelCaseToPascalCase($variable);
-                $type      = VariableType::get($value);
+                $isGeneral    = Strings::isEqual($section, self::General);
+                $prefix       = !$isGeneral ? Strings::upperCaseFirst($section) : "";
+                $title        = Strings::camelCaseToPascalCase($variable);
+                $variableType = VariableType::get($value);
 
-                $result[]  = [
-                    "isFirst"   => $isFirst,
-                    "section"   => $section,
-                    "variable"  => $variable,
-                    "prefix"    => $prefix,
-                    "title"     => !empty($prefix) ? "$prefix $title" : $title,
-                    "name"      => Strings::upperCaseFirst($variable),
-                    "type"      => VariableType::getType($type),
-                    "docType"   => VariableType::getDocType($type),
-                    "getter"    => $type === VariableType::Boolean ? "is" : "get",
-                    "isBoolean" => $type === VariableType::Boolean,
-                    "isInteger" => $type === VariableType::Integer,
-                    "isFloat"   => $type === VariableType::Float,
-                    "isString"  => $type === VariableType::String,
-                    "isArray"   => $type === VariableType::Array,
+                $result[] = [
+                    "isFirst"      => $isFirst,
+                    "section"      => $section,
+                    "variable"     => $variable,
+                    "prefix"       => $prefix,
+                    "title"        => !empty($prefix) ? "$prefix $title" : $title,
+                    "name"         => Strings::upperCaseFirst($variable),
+                    "variableType" => VariableType::getType($variableType),
+                    "docType"      => VariableType::getDocType($variableType),
+                    "getter"       => $variableType === VariableType::Boolean ? "is" : "get",
+                    "isBoolean"    => $variableType === VariableType::Boolean,
+                    "isInteger"    => $variableType === VariableType::Integer,
+                    "isFloat"      => $variableType === VariableType::Float,
+                    "isString"     => $variableType === VariableType::String,
+                    "isArray"      => $variableType === VariableType::Array,
                 ];
 
                 $isFirst = false;
-                if ($type === VariableType::Array) {
+                if ($variableType === VariableType::Array) {
                     $hasJSON = true;
                 }
             }

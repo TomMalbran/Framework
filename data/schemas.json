@@ -195,16 +195,16 @@
     },
     "Settings" : {
         "fields" : {
-            "section"  : { "type" : "string", "isPrimary" : true },
-            "variable" : { "type" : "string", "isPrimary" : true },
-            "value"    : { "type" : "text"                       },
-            "type"     : { "type" : "string"                     }
+            "section"      : { "type" : "string", "isPrimary" : true },
+            "variable"     : { "type" : "string", "isPrimary" : true },
+            "value"        : { "type" : "text"                       },
+            "variableType" : { "type" : "string"                     }
         },
         "hasTimestamps" : true,
         "canCreate"     : false,
         "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
 
 
