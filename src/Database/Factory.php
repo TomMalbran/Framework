@@ -5,7 +5,6 @@ use Framework\Framework;
 use Framework\Database\Schema;
 use Framework\Database\Structure;
 use Framework\Database\SubRequest;
-use Framework\Database\Database;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -14,17 +13,16 @@ use Framework\Utils\Strings;
  */
 class Factory {
 
-    private static bool      $loaded     = false;
-    private static ?Database $db         = null;
+    private static bool  $loaded     = false;
 
     /** @var array{}[] */
-    private static array     $data       = [];
+    private static array $data       = [];
 
     /** @var Structure[] */
-    private static array     $structures = [];
+    private static array $structures = [];
 
     /** @var Schema[] */
-    private static array     $schemas    = [];
+    private static array $schemas    = [];
 
 
     /**
@@ -37,7 +35,6 @@ class Factory {
         }
 
         self::$loaded = true;
-        self::$db     = Framework::getDatabase();
 
         $schemas      = Framework::loadData(Framework::SchemaData);
         $frameSchemas = Framework::loadJSON(Framework::DataDir, Framework::SchemaData, true);
@@ -86,7 +83,7 @@ class Factory {
 
         $structure  = self::getStructure($key);
         $subRequest = self::getSubRequest($key);
-        self::$schemas[$key] = new Schema(self::$db, $structure, $subRequest);
+        self::$schemas[$key] = new Schema($structure, $subRequest);
         return self::$schemas[$key];
     }
 
@@ -115,7 +112,7 @@ class Factory {
             foreach ($data["subrequests"] as $subKey => $subData) {
                 $structure    = self::getStructure($key);
                 $subStructure = self::getStructure($subKey);
-                $subSchema    = new Schema(self::$db, $subStructure);
+                $subSchema    = new Schema($subStructure);
                 $result[]     = new SubRequest($subSchema, $structure, $subData);
             }
         }
