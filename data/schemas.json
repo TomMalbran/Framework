@@ -141,11 +141,12 @@
                 "type"       : "boolean"
             }
         },
+        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
-        "canEdit"       : false,
+        "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "EmailWhiteList" : {
         "fields" : {
@@ -157,7 +158,7 @@
         "canCreate"     : true,
         "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "NotificationQueue" : {
         "fields" : {
@@ -187,11 +188,12 @@
                 "fieldKeys" : [ "firstName", "lastName" ]
             }
         },
+        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
-        "canEdit"       : false,
+        "canEdit"       : true,
         "canDelete"     : false,
-        "canRemove"     : false
+        "canRemove"     : true
     },
     "Settings" : {
         "fields" : {

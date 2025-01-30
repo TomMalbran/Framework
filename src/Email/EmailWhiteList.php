@@ -2,43 +2,13 @@
 namespace Framework\Email;
 
 use Framework\Request;
-use Framework\Database\Factory;
-use Framework\Database\Schema;
-use Framework\Database\Model;
 use Framework\Database\Query;
+use Framework\Schema\EmailWhiteListSchema;
 
 /**
  * The Email White List
  */
-class EmailWhiteList {
-
-    /**
-     * Loads the Email WhiteList Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("EmailWhiteList");
-    }
-
-
-
-    /**
-     * Returns an Email from the White List with the given ID
-     * @param integer $emailID
-     * @return Model
-     */
-    public static function getOne(int $emailID): Model {
-        return self::schema()->getOne($emailID);
-    }
-
-    /**
-     * Returns true if the given Email exists in the White List
-     * @param integer $emailID
-     * @return boolean
-     */
-    public static function exists(int $emailID): bool {
-        return self::schema()->exists($emailID);
-    }
+class EmailWhiteList extends EmailWhiteListSchema {
 
     /**
      * Returns true if the given Email exists in the White List
@@ -49,26 +19,7 @@ class EmailWhiteList {
     public static function emailExists(string $email, int $skipID = 0): bool {
         $query = Query::create("email", "=", $email);
         $query->addIf("EMAIL_ID", "<>", $skipID);
-        return self::schema()->exists($query);
-    }
-
-
-
-    /**
-     * Returns all the Emails in the White List
-     * @param Request $request
-     * @return array{}[]
-     */
-    public static function getAll(Request $request): array {
-        return self::schema()->getAll(null, $request);
-    }
-
-    /**
-     * Returns the total amount of Emails in the White List
-     * @return integer
-     */
-    public static function getTotal(): int {
-        return self::schema()->getTotal();
+        return self::entityExists($query);
     }
 
 
@@ -79,7 +30,7 @@ class EmailWhiteList {
      * @return boolean
      */
     public static function add(Request $request): bool {
-        return self::schema()->create($request);
+        return self::createEntity($request);
     }
 
     /**
@@ -89,7 +40,7 @@ class EmailWhiteList {
      * @return boolean
      */
     public static function edit(int $emailID, Request $request): bool {
-        return self::schema()->edit($emailID, $request);
+        return self::editEntity($emailID, $request);
     }
 
     /**
@@ -98,6 +49,6 @@ class EmailWhiteList {
      * @return boolean
      */
     public static function remove(int $emailID): bool {
-        return self::schema()->remove($emailID);
+        return self::removeEntity($emailID);
     }
 }

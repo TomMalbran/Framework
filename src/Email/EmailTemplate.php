@@ -2,91 +2,30 @@
 namespace Framework\Email;
 
 use Framework\Framework;
-use Framework\Request;
 use Framework\System\ConfigCode;
 use Framework\NLS\Language;
 use Framework\Provider\Mustache;
-use Framework\Database\Factory;
-use Framework\Database\Schema;
-use Framework\Database\Model;
 use Framework\Database\Query;
 use Framework\Utils\Strings;
+use Framework\Schema\EmailTemplateSchema;
+use Framework\Schema\EmailTemplateEntity;
 
 /**
  * The Email Templates
  */
-class EmailTemplate {
-
-    /**
-     * Loads the Email Templates Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("EmailTemplate");
-    }
-
-
+class EmailTemplate extends EmailTemplateSchema {
 
     /**
      * Returns an Email Template for the Email Sender
      * @param string $templateCode
      * @param string $language     Optional.
-     * @return Model
+     * @return EmailTemplateEntity
      */
-    public static function get(string $templateCode, string $language = "root"): Model {
+    public static function get(string $templateCode, string $language = "root"): EmailTemplateEntity {
         $langCode = Language::getCode($language);
         $query    = Query::create("templateCode", "=", $templateCode);
         $query->add("language", "=", $langCode);
-        return self::schema()->getOne($query);
-    }
-
-    /**
-     * Returns an Email Template with the given ID
-     * @param integer $templateID
-     * @return Model
-     */
-    public static function getOne(int $templateID): Model {
-        $query = Query::create("TEMPLATE_ID", "=", $templateID);
-        return self::schema()->getOne($query);
-    }
-
-    /**
-     * Returns true if there is an Email Template with ID
-     * @param string $templateID
-     * @return boolean
-     */
-    public static function exists(string $templateID): bool {
-        $query = Query::create("TEMPLATE_ID", "=", $templateID);
-        return self::schema()->exists($query);
-    }
-
-
-
-    /**
-     * Returns all the Email Templates
-     * @param Request|null $request Optional.
-     * @return array{}[]
-     */
-    public static function getAll(?Request $request = null): array {
-        return self::schema()->getAll(null, $request);
-    }
-
-    /**
-     * Returns the total amount of Email Templates
-     * @return integer
-     */
-    public static function getTotal(): int {
-        return self::schema()->getTotal();
-    }
-
-    /**
-     * Edits the given Email Template
-     * @param integer $templateID
-     * @param Request $request
-     * @return boolean
-     */
-    public static function edit(int $templateID, Request $request): bool {
-        return self::schema()->edit($templateID, $request);
+        return self::getEntity($query);
     }
 
 
@@ -107,8 +46,6 @@ class EmailTemplate {
         }
         return $result;
     }
-
-
 
     /**
      * Migrates the Email Templates data

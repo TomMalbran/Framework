@@ -5,28 +5,23 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\System\ConfigCode;
 use Framework\Email\EmailWhiteList;
+use Framework\Email\EmailProvider;
 use Framework\Email\EmailResult;
 use Framework\Provider\Mustache;
 use Framework\Provider\SMTP;
 use Framework\Provider\Mandrill;
 use Framework\Provider\Mailjet;
 use Framework\Provider\SendGrid;
-use Framework\Database\Model;
 use Framework\File\FilePath;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
+use Framework\Schema\EmailTemplateEntity;
 
 /**
  * The Email Provider
  */
 class Email {
-
-    const SMTP     = "SMTP";
-    const Mandrill = "Mandrill";
-    const Mailjet  = "Mailjet";
-    const SendGrid = "SendGrid";
-
 
     private static bool    $loaded   = false;
     private static ?string $template = null;
@@ -57,9 +52,9 @@ class Email {
      * @param string  $subject
      * @param string  $message
      * @param boolean $sendAlways
-     * @return string
+     * @return EmailResult
      */
-    public static function send(string $toEmail, string $subject, string $message, bool $sendAlways): string {
+    public static function send(string $toEmail, string $subject, string $message, bool $sendAlways): EmailResult {
         self::load();
 
         // Return some possible errors
@@ -88,7 +83,7 @@ class Email {
         ]);
 
         // Configure the variables
-        $provider  = self::$config->provider ?: "SMTP";
+        $provider  = EmailProvider::from(self::$config->provider ?? "");
         $fromEmail = self::$config->email;
         $fromName  = self::$config->name;
         $replyTo   = "";
@@ -99,30 +94,30 @@ class Email {
 
         // Try to send the email
         $wasSent = match ($provider) {
-            self::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
-            self::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
-            self::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
-            default        => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            EmailProvider::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            EmailProvider::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            EmailProvider::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            default                 => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
         };
         return $wasSent ? EmailResult::Sent : EmailResult::ProviderError;
     }
 
     /**
      * Sends the given Template Email
-     * @param Model           $template
-     * @param string[]|string $sendTo
-     * @param string|null     $message    Optional.
-     * @param string|null     $subject    Optional.
-     * @param boolean         $sendAlways Optional.
-     * @return string
+     * @param EmailTemplateEntity $template
+     * @param string[]|string     $sendTo
+     * @param string|null         $message    Optional.
+     * @param string|null         $subject    Optional.
+     * @param boolean             $sendAlways Optional.
+     * @return EmailResult
      */
     public static function sendTemplate(
-        Model $template,
+        EmailTemplateEntity $template,
         array|string $sendTo,
         ?string $message = null,
         ?string $subject = null,
         bool $sendAlways = false,
-    ): string {
+    ): EmailResult {
         $sendTo  = Arrays::toArray($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
