@@ -2,7 +2,6 @@
 namespace Framework\Utils;
 
 use Framework\Request;
-use Framework\Database\Model;
 use Framework\Utils\DateTime;
 
 /**
@@ -57,9 +56,9 @@ class Period {
 
     /**
      * Creates a new Period instance
-     * @param Request|Model $data
+     * @param Request $data
      */
-    public function __construct(Request|Model $data) {
+    public function __construct(Request $data) {
         $this->period = self::Custom;
 
         if ($data->has("fromDate")) {

@@ -417,7 +417,7 @@ class Auth {
 
 
     /**
-     * Returns the Credential Model
+     * Returns the Credential Entity
      * @return CredentialEntity
      */
     public static function getCredential(): CredentialEntity {

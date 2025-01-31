@@ -11,7 +11,6 @@ use Framework\Database\Modification;
 use Framework\Database\Field;
 use Framework\Database\Assign;
 use Framework\Database\Query;
-use Framework\Database\Model;
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
 use Framework\Utils\Select;
@@ -93,28 +92,14 @@ class Schema {
 
 
     /**
-     * Returns the Model with the given ID or Query
+     * Returns true if there is a Row with the given ID or Query
      * @param Query|integer|string $query
      * @param boolean              $withDeleted Optional.
-     * @param boolean              $decrypted   Optional.
-     * @return Model
+     * @return boolean
      */
-    public function getOne(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): Model {
-        $query   = $this->generateQueryID($query, $withDeleted)->limit(1);
-        $request = $this->request($query, decrypted: $decrypted);
-        return $this->getModel($request);
-    }
-
-    /**
-     * Creates a new Model using the given Data
-     * @param array{}|null $request Optional.
-     * @return Model
-     */
-    public function getModel(?array $request = null): Model {
-        if (!empty($request[0])) {
-            return new Model($this->structure->idName, $request[0]);
-        }
-        return new Model($this->structure->idName);
+    public function exists(Query|int|string $query, bool $withDeleted = true): bool {
+        $query = $this->generateQueryID($query, $withDeleted);
+        return $this->getTotal($query) > 0;
     }
 
     /**

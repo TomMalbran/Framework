@@ -1,8 +1,6 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Utils\Arrays;
-
 use ArrayAccess;
 use JsonSerializable;
 use ReflectionClass;
@@ -50,7 +48,7 @@ class Entity implements ArrayAccess, JsonSerializable {
 
 
     /**
-     * Returns true if the Model is Empty
+     * Returns true if the Entity is Empty
      * @return boolean
      */
     public function isEmpty(): bool {
@@ -93,41 +91,6 @@ class Entity implements ArrayAccess, JsonSerializable {
         }
         return $result + $extraData;
     }
-
-    /**
-     * Returns the Data as a Model
-     * @param array{} $extraData
-     * @return Model
-     */
-    public function toModel(array $extraData = []): Model {
-        $array = $this->toArray($extraData);
-        $id    = !empty($array["id"]) ? $array["id"] : 0;
-        return new Model("", $array, $id);
-    }
-
-    /**
-     * Returns all the Data as an Object
-     * @param array{} $extraData
-     * @return mixed
-     */
-    public function toObject(array $extraData = []): mixed {
-        return Arrays::toObject($this->toArray($extraData));
-    }
-
-    /**
-     * Returns only the requested Fields
-     * @param string ...$fields
-     * @return array{}
-     */
-    public function toFields(string ...$fields): array {
-        $result = [];
-        foreach ($fields as $field) {
-            $result[$field] = $this->$field;
-        }
-        return $result;
-    }
-
-
 
     /**
      * Prints the Entity
