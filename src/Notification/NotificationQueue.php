@@ -116,7 +116,7 @@ class NotificationQueue extends NotificationQueueSchema {
      * @param string  $title
      * @param string  $body
      * @param string  $url
-     * @param string  $type
+     * @param string  $dataType
      * @param integer $dataID
      * @return integer
      */
@@ -126,7 +126,7 @@ class NotificationQueue extends NotificationQueueSchema {
         string $title,
         string $body,
         string $url,
-        string $type,
+        string $dataType,
         int $dataID
     ): int {
         return self::createEntity(
@@ -135,7 +135,7 @@ class NotificationQueue extends NotificationQueueSchema {
             title:        $title,
             body:         $body,
             url:          $url,
-            type:         $type,
+            dataType:     $dataType,
             dataID:       $dataID,
         );
     }
@@ -206,7 +206,7 @@ class NotificationQueue extends NotificationQueueSchema {
                 $elem->title,
                 $elem->body,
                 $elem->url,
-                $elem->type,
+                $elem->dataType,
                 $elem->dataID,
                 $playerIDs
             );

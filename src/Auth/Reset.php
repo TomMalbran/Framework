@@ -13,32 +13,32 @@ class Reset extends CredentialResetSchema {
 
     /**
      * Returns the Credential ID for the given Code
-     * @param string $code
+     * @param string $resetCode
      * @return integer
      */
-    public static function getCredentialID(string $code): int {
-        $query = Query::create("code", "=", $code);
+    public static function getCredentialID(string $resetCode): int {
+        $query = Query::create("resetCode", "=", $resetCode);
         return (int)self::getEntityValue($query, "CREDENTIAL_ID");
     }
 
     /**
      * Returns the Email for the given Code
-     * @param string $code
+     * @param string $resetCode
      * @return string
      */
-    public static function getEmail(string $code): string {
-        $query = Query::create("code", "=", $code);
+    public static function getEmail(string $resetCode): string {
+        $query = Query::create("resetCode", "=", $resetCode);
         return self::getEntityValue($query, "email");
     }
 
     /**
-     * Returns true if the given code exists
-     * @param string $code
-     * @param string $email Optional.
+     * Returns true if the given Reset Code exists
+     * @param string $resetCode
+     * @param string $email     Optional.
      * @return boolean
      */
-    public static function codeExists(string $code, string $email = ""): bool {
-        $query = Query::create("code", "=", $code);
+    public static function codeExists(string $resetCode, string $email = ""): bool {
+        $query = Query::create("resetCode", "=", $resetCode);
         $query->addIf("email", "=", $email);
         return self::entityExists($query);
     }
@@ -46,21 +46,21 @@ class Reset extends CredentialResetSchema {
 
 
     /**
-     * Creates and saves a recover code for the given Credential
+     * Creates and saves a Reset Code for the given Credential
      * @param integer $credentialID  Optional.
      * @param string  $email         Optional.
      * @param string  $availableSets Optional.
      * @return string
      */
     public static function create(int $credentialID = 0, string $email = "", string $availableSets = "ud"): string {
-        $code = Strings::randomCode(6, $availableSets);
+        $resetCode = Strings::randomCode(6, $availableSets);
         self::replaceEntity(
             credentialID: $credentialID,
             email:        $email,
-            code:         $code,
+            resetCode:    $resetCode,
             time:         time(),
         );
-        return $code;
+        return $resetCode;
     }
 
     /**

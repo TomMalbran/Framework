@@ -55,17 +55,6 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Returns the Name of the Credential with the given ID
-     * @param integer $credentialID
-     * @return string
-     */
-    public static function getOneName(int $credentialID): string {
-        $query      = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $credential = self::requestOne($query);
-        return self::getName($credential);
-    }
-
-    /**
      * Returns the Credential with the given Email
      * @param string  $email
      * @param boolean $complete Optional.
@@ -285,10 +274,10 @@ class Credential extends CredentialSchema {
                 $elem->avatar     = FilePath::getUrl("avatars", $elem->avatar);
             }
             if (!$complete) {
-                unset($elem->password);
-                unset($elem->salt);
-                unset($elem->accessToken);
-                unset($elem->tokenExpiration);
+                $elem->password        = "";
+                $elem->salt            = "";
+                $elem->accessToken     = "";
+                $elem->tokenExpiration = 0;
             }
             $result[] = $elem;
         }

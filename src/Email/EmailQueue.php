@@ -71,7 +71,7 @@ class EmailQueue extends EmailQueueSchema {
             return false;
         }
         $emailID = self::createEntity(
-            templateCode: $template->id,
+            templateCode: $template->templateCode,
             sendTo:       JSON::encode($sendTo),
             subject:      $subject,
             message:      $message,

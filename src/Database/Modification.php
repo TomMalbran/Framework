@@ -17,7 +17,6 @@ class Modification {
 
     /** @var array{} */
     private array $fields;
-    private int   $credentialID;
 
 
     /**
@@ -28,33 +27,42 @@ class Modification {
     public function __construct(Database $db, Structure $structure) {
         $this->db        = $db;
         $this->structure = $structure;
+        $this->fields    = [];
     }
 
 
+    /**
+     * Returns the Fields
+     * @return array{}
+     */
+    public function getFields(): array {
+        return $this->fields;
+    }
+
+    /**
+     * Sets a Field
+     * @param string $key
+     * @param mixed  $value
+     * @return Modification
+     */
+    public function setField(string $key, mixed $value): Modification {
+        $this->fields[$key] = $value;
+        return $this;
+    }
 
     /**
      * Adds all the Fields
-     * @param Request|array{}      $fields
-     * @param array{}|integer|null $extra        Optional.
-     * @param integer              $credentialID Optional.
-     * @param boolean              $skipEmpty    Optional.
+     * @param Request|null $request
+     * @param array{}      $fields    Optional.
+     * @param boolean      $skipEmpty Optional.
      * @return Modification
      */
-    public function addFields(Request|array $fields, array|int $extra = null, int $credentialID = 0, bool $skipEmpty = false): Modification {
-        if ($fields instanceof Request) {
-            $this->fields = $this->parseFields($fields, $skipEmpty);
-        } else {
-            $this->fields = $fields;
+    public function addFields(?Request $request, array $fields = [], bool $skipEmpty = false): Modification {
+        if ($request !== null) {
+            $this->fields = $this->parseFields($request, $skipEmpty);
         }
-        if (!empty($extra)) {
-            if (Arrays::isArray($extra)) {
-                $this->fields = array_merge($this->fields, $extra);
-            } else {
-                $this->credentialID = $extra;
-            }
-        }
-        if (!empty($credentialID)) {
-            $this->credentialID = $credentialID;
+        if (!empty($fields)) {
+            $this->fields = array_merge($this->fields, $fields);
         }
         return $this;
     }
@@ -93,9 +101,10 @@ class Modification {
 
     /**
      * Adds the Creation Fields
+     * @param integer $credentialID Optional.
      * @return Modification
      */
-    public function addCreation(): Modification {
+    public function addCreation(int $credentialID = 0): Modification {
         if ($this->structure->canDelete && empty($this->fields["isDeleted"])) {
             $this->fields["isDeleted"] = 0;
         }
@@ -104,8 +113,8 @@ class Modification {
             if ($this->structure->hasTimestamps && empty($this->fields["createdTime"])) {
                 $this->fields["createdTime"] = time();
             }
-            if ($this->structure->hasUsers && !empty($this->credentialID)) {
-                $this->fields["createdUser"] = $this->credentialID;
+            if ($this->structure->hasUsers && !empty($credentialID)) {
+                $this->fields["createdUser"] = $credentialID;
             }
         }
         return $this;
@@ -113,9 +122,10 @@ class Modification {
 
     /**
      * Adds the Modification Fields
+     * @param integer $credentialID Optional.
      * @return Modification
      */
-    public function addModification(): Modification {
+    public function addModification(int $credentialID = 0): Modification {
         if (!$this->structure->canEdit) {
             return $this;
         }
@@ -123,8 +133,8 @@ class Modification {
         if ($this->structure->hasTimestamps && empty($this->fields["modifiedTime"])) {
             $this->fields["modifiedTime"] = time();
         }
-        if ($this->structure->hasUsers && !empty($this->credentialID)) {
-            $this->fields["modifiedUser"] = $this->credentialID;
+        if ($this->structure->hasUsers && !empty($credentialID)) {
+            $this->fields["modifiedUser"] = $credentialID;
         }
         return $this;
     }

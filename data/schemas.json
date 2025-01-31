@@ -80,7 +80,7 @@
         "fields" : {
             "CREDENTIAL_ID" : { "type" : "number", "isPrimary" : true },
             "email"         : { "type" : "string", "isPrimary" : true },
-            "code"          : { "type" : "string"                     },
+            "resetCode"     : { "type" : "string"                     },
             "time"          : { "type" : "number"                     }
         },
         "foreigns" : {
@@ -113,8 +113,6 @@
             "language"     : { "type" : "string", "cantEdit" : true },
             "languageName" : { "type" : "string", "cantEdit" : true },
             "description"  : { "type" : "string", "cantEdit" : true },
-            "type"         : { "type" : "string"                    },
-            "sendTo"       : { "type" : "json"                      },
             "subject"      : { "type" : "string"                    },
             "message"      : { "type" : "text"                      },
             "position"     : { "type" : "number", "cantEdit" : true }
@@ -174,7 +172,7 @@
             "title"           : { "type" : "string"  },
             "body"            : { "type" : "string"  },
             "url"             : { "type" : "string"  },
-            "type"            : { "type" : "string"  },
+            "dataType"        : { "type" : "string"  },
             "dataID"          : { "type" : "number"  },
             "externalID"      : { "type" : "string"  },
             "sentTime"        : { "type" : "number"  },
@@ -321,9 +319,9 @@
     "LogError" : {
         "fields" : {
             "LOG_ID"      : { "type" : "id"      },
-            "code"        : { "type" : "number"  },
-            "error"       : { "type" : "string"  },
-            "level"       : { "type" : "number"  },
+            "errorCode"   : { "type" : "number"  },
+            "errorText"   : { "type" : "string"  },
+            "errorLevel"  : { "type" : "number"  },
             "environment" : { "type" : "string"  },
             "file"        : { "type" : "string"  },
             "line"        : { "type" : "number"  },

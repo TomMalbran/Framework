@@ -2,11 +2,11 @@
 namespace Framework\System;
 
 use Framework\Framework;
-use Framework\Schema\SettingsEntity;
 use Framework\System\VariableType;
 use Framework\Database\Query;
 use Framework\Utils\Strings;
 use Framework\Schema\SettingsSchema;
+use Framework\Schema\SettingsEntity;
 
 /**
  * The Setting Code
@@ -351,20 +351,20 @@ class SettingCode extends SettingsSchema {
                 $variableType = VariableType::get($value);
 
                 $result[] = [
-                    "isFirst"      => $isFirst,
-                    "section"      => $section,
-                    "variable"     => $variable,
-                    "prefix"       => $prefix,
-                    "title"        => !empty($prefix) ? "$prefix $title" : $title,
-                    "name"         => Strings::upperCaseFirst($variable),
-                    "variableType" => VariableType::getType($variableType),
-                    "docType"      => VariableType::getDocType($variableType),
-                    "getter"       => $variableType === VariableType::Boolean ? "is" : "get",
-                    "isBoolean"    => $variableType === VariableType::Boolean,
-                    "isInteger"    => $variableType === VariableType::Integer,
-                    "isFloat"      => $variableType === VariableType::Float,
-                    "isString"     => $variableType === VariableType::String,
-                    "isArray"      => $variableType === VariableType::Array,
+                    "isFirst"   => $isFirst,
+                    "section"   => $section,
+                    "variable"  => $variable,
+                    "prefix"    => $prefix,
+                    "title"     => !empty($prefix) ? "$prefix $title" : $title,
+                    "name"      => Strings::upperCaseFirst($variable),
+                    "type"      => VariableType::getType($variableType),
+                    "docType"   => VariableType::getDocType($variableType),
+                    "getter"    => $variableType === VariableType::Boolean ? "is" : "get",
+                    "isBoolean" => $variableType === VariableType::Boolean,
+                    "isInteger" => $variableType === VariableType::Integer,
+                    "isFloat"   => $variableType === VariableType::Float,
+                    "isString"  => $variableType === VariableType::String,
+                    "isArray"   => $variableType === VariableType::Array,
                 ];
 
                 $isFirst = false;

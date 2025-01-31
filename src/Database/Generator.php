@@ -123,7 +123,7 @@ class Generator {
             "canCreate"       => $structure->canCreate,
             "canEdit"         => $structure->canEdit,
             "canReplace"      => $structure->canEdit && !$structure->hasAutoInc,
-            "canBatch"        => $structure->canEdit && !$structure->hasAutoInc,
+            "canBatch"        => $structure->canEdit,
             "canDelete"       => $structure->canDelete,
             "canRemove"       => $structure->canRemove,
             "processEntity"   => !empty($subTypes) || !empty($structure->processed) || $structure->hasStatus,
@@ -305,9 +305,11 @@ class Generator {
         $fileName   = "{$structure->schema}Entity.php";
         $attributes = self::getAttributes($structure);
         $contents   = Mustache::render(self::$entityText, [
-            "namespace"  => self::$namespace,
-            "name"       => $structure->schema,
-            "attributes" => self::parseAttributes($attributes),
+            "appNamespace" => Framework::Namespace,
+            "namespace"    => self::$namespace,
+            "name"         => $structure->schema,
+            "subTypes"     => self::getSubTypes($structure->subRequests),
+            "attributes"   => self::parseAttributes($attributes),
         ]);
         return File::create(self::$writePath, $fileName, $contents);
     }

@@ -126,17 +126,6 @@ class Schema {
         return $this->db()->getValue($this->structure->table, $column, $query);
     }
 
-    /**
-     * Returns true if there is a Schema with the given ID
-     * @param Query|integer|string $query
-     * @param boolean              $withDeleted Optional.
-     * @return boolean
-     */
-    public function exists(Query|int|string $query, bool $withDeleted = true): bool {
-        $query = $this->generateQueryID($query, $withDeleted);
-        return $this->getTotal($query) > 0;
-    }
-
 
 
     /**
@@ -153,13 +142,18 @@ class Schema {
 
     /**
      * Process the given expression using a Query
-     * @param Query  $query
-     * @param string $expression
-     * @return array{}[]
+     * @param Query   $query
+     * @param string  $expression
+     * @param boolean $singleLine Optional.
+     * @return array{}
      */
-    public function getData(Query $query, string $expression): array {
+    public function getData(Query $query, string $expression, bool $singleLine = false): array {
         $expression = $this->structure->replaceTable($expression);
         $request    = $this->db()->getData($expression, $query);
+
+        if ($singleLine && !empty($request[0])) {
+            return $request[0];
+        }
         return $request;
     }
 
@@ -172,13 +166,7 @@ class Schema {
      * @param boolean      $decrypted Optional.
      * @return array{}[]
      */
-    public function getAll(
-        ?Query $query = null,
-        ?Request $sort = null,
-        array $selects = [],
-        array $joins = [],
-        bool $decrypted = false,
-    ): array {
+    public function getAll(?Query $query = null, ?Request $sort = null, array $selects = [], array $joins = [], bool $decrypted = false): array {
         $query   = $this->generateQuerySort($query, $sort);
         $request = $this->request($query, $selects, $joins, $decrypted);
         return $request;
@@ -252,22 +240,6 @@ class Schema {
             }
         }
         return $result;
-    }
-
-    /**
-     * Returns the first line of the given query
-     * @param Query  $query
-     * @param string $expression
-     * @return array{}
-     */
-    public function getStats(Query $query, string $expression): array {
-        $expression = $this->structure->replaceTable($expression);
-        $request    = $this->db()->query("$expression " . $query->get(), $query);
-
-        if (!empty($request[0])) {
-            return $request[0];
-        }
-        return [];
     }
 
     /**
@@ -400,47 +372,48 @@ class Schema {
 
     /**
      * Creates a new Schema
-     * @param Request|array{}      $fields
-     * @param array{}|integer|null $extra        Optional.
-     * @param integer              $credentialID Optional.
+     * @param Request|null $request      Optional.
+     * @param array{}      $fields       Optional.
+     * @param integer      $credentialID Optional.
      * @return integer
      */
-    public function create(Request|array $fields, array|int $extra = null, int $credentialID = 0): int {
+    public function create(?Request $request = null, array $fields = [], int $credentialID = 0): int {
         $modification = new Modification($this->db(), $this->structure);
-        $modification->addFields($fields, $extra, $credentialID);
-        $modification->addCreation();
+        $modification->addFields($request, $fields);
+        $modification->addCreation($credentialID);
         $modification->addModification();
         return $modification->insert();
     }
 
     /**
      * Replaces the Schema
-     * @param Request|array{}      $fields
-     * @param array{}|integer|null $extra        Optional.
-     * @param integer              $credentialID Optional.
+     * @param Request|null $request      Optional.
+     * @param array{}      $fields       Optional.
+     * @param integer      $credentialID Optional.
      * @return integer
      */
-    public function replace(Request|array $fields, array|int $extra = null, int $credentialID = 0): int {
+    public function replace(?Request $request = null, array $fields = [], int $credentialID = 0): int {
         $modification = new Modification($this->db(), $this->structure);
-        $modification->addFields($fields, $extra, $credentialID);
-        $modification->addModification();
+        $modification->addFields($request, $fields);
+        $modification->addModification($credentialID);
         return $modification->replace();
     }
 
     /**
      * Edits the Schema
      * @param Query|integer|string $query
-     * @param Request|array{}      $fields
-     * @param array{}|integer|null $extra        Optional.
+     * @param Request|null         $request      Optional.
+     * @param array{}              $fields       Optional.
      * @param integer              $credentialID Optional.
      * @param boolean              $skipEmpty    Optional.
      * @return boolean
      */
-    public function edit(Query|int|string $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, bool $skipEmpty = false): bool {
-        $query        = $this->generateQueryID($query, false);
+    public function edit(Query|int|string $query, ?Request $request = null, array $fields = [], int $credentialID = 0, bool $skipEmpty = false): bool {
         $modification = new Modification($this->db(), $this->structure);
-        $modification->addFields($fields, $extra, $credentialID, $skipEmpty);
-        $modification->addModification();
+        $modification->addFields($request, $fields, $skipEmpty);
+        $modification->addModification($credentialID);
+
+        $query = $this->generateQueryID($query, false);
         return $modification->update($query);
     }
 
@@ -462,7 +435,7 @@ class Schema {
     public function delete(Query|int|string $query, int $credentialID = 0): bool {
         $query = $this->generateQueryID($query, false);
         if ($this->structure->canDelete && $this->exists($query)) {
-            $this->edit($query, [ "isDeleted" => 1 ], $credentialID);
+            $this->edit($query, null, [ "isDeleted" => 1 ], $credentialID);
             return true;
         }
         return false;
@@ -490,33 +463,46 @@ class Schema {
 
     /**
      * Creates and ensures the Order
-     * @param Request|array{} $fields
-     * @param array{}|null    $extra        Optional.
-     * @param integer         $credentialID Optional.
-     * @param Query|null      $orderQuery   Optional.
+     * @param Request|null $request
+     * @param array{}      $fields       Optional.
+     * @param integer      $credentialID Optional.
+     * @param Query|null   $orderQuery   Optional.
      * @return integer
      */
-    public function createWithOrder(Request|array $fields, ?array $extra = null, int $credentialID = 0, ?Query $orderQuery = null): int {
-        if (!empty($extra["position"])) {
-            $fields["position"] = $extra["position"];
-        }
-        $fields["position"] = $this->ensurePosOrder(null, $fields, $orderQuery);
-        return $this->create($fields, $extra, $credentialID);
+    public function createWithOrder(?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
+        $modification = new Modification($this->db(), $this->structure);
+        $modification->addFields($request, $fields);
+        $modification->addCreation($credentialID);
+        $modification->addModification();
+
+        $newPosition = $this->ensurePosOrder(null, $modification->getFields(), $orderQuery);
+        $modification->setField("position", $newPosition);
+        return $modification->insert();
     }
 
     /**
      * Edits and ensures the Order
      * @param Query|integer|string $query
-     * @param Request|array{}      $fields
-     * @param array{}|integer|null $extra        Optional.
+     * @param Request|null         $request
+     * @param array{}              $fields       Optional.
      * @param integer              $credentialID Optional.
      * @param Query|null           $orderQuery   Optional.
      * @return boolean
      */
-    public function editWithOrder(Query|int|string $query, Request|array $fields, array|int $extra = null, int $credentialID = 0, ?Query $orderQuery = null): bool {
-        $model = $this->getOne($query);
-        $fields["position"] = $this->ensurePosOrder($model, $fields, $orderQuery);
-        return $this->edit($query, $fields, $extra, $credentialID);
+    public function editWithOrder(Query|int|string $query, ?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): bool {
+        $modification = new Modification($this->db(), $this->structure);
+        $modification->addFields($request, $fields);
+        $modification->addModification($credentialID);
+
+        $fields = $modification->getFields();
+        if (isset($fields["position"])) {
+            $elem        = $this->getRow($query);
+            $newPosition = $this->ensurePosOrder($elem, $fields, $orderQuery);
+            $modification->setField("position", $newPosition);
+        }
+
+        $query = $this->generateQueryID($query, false);
+        return $modification->update($query);
     }
 
     /**
@@ -527,9 +513,9 @@ class Schema {
      * @return boolean
      */
     public function deleteWithOrder(Query|int|string $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
-        $model = $this->getOne($query);
+        $elem = $this->getRow($query);
         if ($this->delete($query, $credentialID)) {
-            $this->ensurePosOrder($model, null, $orderQuery);
+            $this->ensurePosOrder($elem, null, $orderQuery);
             return true;
         }
         return false;
@@ -542,28 +528,12 @@ class Schema {
      * @return boolean
      */
     public function removeWithOrder(Query|int|string $query, ?Query $orderQuery = null): bool {
-        $model = $this->getOne($query);
+        $elem = $this->getRow($query);
         if ($this->remove($query)) {
-            $this->ensurePosOrder($model, null, $orderQuery);
+            $this->ensurePosOrder($elem, null, $orderQuery);
             return true;
         }
         return false;
-    }
-
-    /**
-     * Edits all the Positions
-     * @param Request $request
-     * @param integer $credentialID Optional.
-     * @return boolean
-     */
-    public function editPositions(Request $request, int $credentialID = 0): bool {
-        $result = true;
-        foreach ($request->getArray("ids") as $index => $id) {
-            if (!$this->edit($id, [ "position" => $index + 1 ], $credentialID)) {
-                $result = false;
-            }
-        }
-        return $result;
     }
 
     /**
@@ -637,14 +607,14 @@ class Schema {
             $newQuery = new Query($query);
             $newQuery->add($this->structure->idKey, "<>", $id);
             $newQuery->add($field, "=", 1);
-            $this->edit($newQuery, [ $field => 0 ]);
+            $this->edit($newQuery, null, [ $field => 0 ]);
             $updated = true;
         }
         if (empty($newValue) && !empty($oldValue)) {
             $newQuery = $this->generateQuery($query, true);
             $newQuery->orderBy($this->structure->getOrder(), true);
             $newQuery->limit(1);
-            $this->edit($newQuery, [ $field => 1 ]);
+            $this->edit($newQuery, null, [ $field => 1 ]);
             $updated = true;
         }
         return $updated;

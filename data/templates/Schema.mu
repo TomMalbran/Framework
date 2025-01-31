@@ -3,8 +3,9 @@ namespace {{namespace}}Schema;
 
 {{#hasStatus}}use {{appNamespace}}System\Status;
 {{/hasStatus}}
-use {{namespace}}Schema\{{name}}Entity;{{#subTypes}}
-use {{namespace}}Schema\{{type}}Entity;{{/subTypes}}
+{{#subTypes}}use {{appNamespace}}Schema\{{type}}Entity;
+{{/subTypes}}
+use {{namespace}}Schema\{{name}}Entity;
 
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
@@ -337,22 +338,22 @@ class {{name}}Schema {
 
     /**
      * Creates a new {{name}} Entity
-     * @param Request|null $fieldData Optional.{{#fields}}
+     * @param Request|null $entityRequest Optional.{{#fields}}
      * @param {{fieldDoc}} Optional.{{/fields}}{{#hasTimestamps}}
      * @param integer $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
      * @return integer
      */
-    protected static function createEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): int {
-        $extras = [];
+    protected static function createEntity(?Request $entityRequest = null{{{fieldsList}}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): int {
+        $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
-            $extras["{{fieldKey}}"] = {{fieldParam}};
+            $entityFields["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
         {{#hasTimestamps}}
         if (!empty($createdTime)) {
-            $extras["createdTime"] = $createdTime;
+            $entityFields["createdTime"] = $createdTime;
         }
         {{/hasTimestamps}}
         {{#hasUsers}}
@@ -365,10 +366,10 @@ class {{name}}Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->createWithOrder($fieldData ?? [], $extras{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::schema()->createWithOrder($entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->create($fieldData ?? [], $extras{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::schema()->create($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
         {{/hasPositions}}
     }
 {{/canCreate}}
@@ -376,16 +377,16 @@ class {{name}}Schema {
 
     /**
      * Replaces the {{name}} Entity
-     * @param Request|null $fieldData Optional.{{#fields}}
+     * @param Request|null $entityRequest Optional.{{#fields}}
      * @param {{fieldDoc}} Optional.{{/fields}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
      * @return boolean
      */
-    protected static function replaceEntity(?Request $fieldData = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
-        $extras = [];
+    protected static function replaceEntity(?Request $entityRequest = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
+        $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
-            $extras["{{fieldKey}}"] = {{fieldParam}};
+            $entityFields["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
         {{#hasUsers}}
@@ -393,7 +394,7 @@ class {{name}}Schema {
             $createdUser = Auth::getID();
         }
         {{/hasUsers}}
-        return self::schema()->replace($fieldData ?? [], $extras{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::schema()->replace($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
     }
 {{/canReplace}}
 {{#canEdit}}
@@ -401,22 +402,22 @@ class {{name}}Schema {
     /**
      * Edits a {{name}} Entity
      * @param {{editDocType}} $query
-     * @param Request|null $fieldData Optional.{{#fields}}
+     * @param Request|null $entityRequest Optional.{{#fields}}
      * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasUsers}}
      * @param integer $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
      * @param boolean|null $isDeleted Optional.{{/canDelete}}
      * @return boolean
      */
-    protected static function editEntity({{editType}} $query, ?Request $fieldData = null{{{fieldsEditList}}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}): bool {
-        $extras = [];
+    protected static function editEntity({{editType}} $query, ?Request $entityRequest = null{{{fieldsEditList}}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}): bool {
+        $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $extras["{{fieldKey}}"] = {{fieldParam}};
+            $entityFields["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
         {{#canDelete}}
         if ($isDeleted !== null) {
-            $extras["isDeleted"] = $isDeleted;
+            $entityFields["isDeleted"] = $isDeleted;
         }
         {{/canDelete}}
         {{#hasUsers}}
@@ -429,10 +430,10 @@ class {{name}}Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->editWithOrder($query, $fieldData ?? [], $extras{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+        return self::schema()->editWithOrder($query, $entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->edit($query, $fieldData ?? [], $extras{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+        return self::schema()->edit($query, $entityRequest, $entityFields{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
     }
 
@@ -451,7 +452,7 @@ class {{name}}Schema {
         }
 
         {{/hasUsers}}
-        return self::schema()->edit($query, [
+        return self::schema()->edit($query, null, [
             $column => Assign::increase($amount),
         ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
     }

@@ -111,24 +111,24 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Handles the PHP Error
-     * @param integer $code
+     * @param integer $errorCode
      * @param string  $description
      * @param string  $filePath    Optional.
      * @param integer $line        Optional.
      * @return boolean
      */
-    public static function handler(int $code, string $description, string $filePath = "", int $line = 0): bool {
+    public static function handler(int $errorCode, string $description, string $filePath = "", int $line = 0): bool {
         if (!self::schema()->hasPrimaryKey()) {
             return false;
         }
 
-        [ $error, $level ] = self::getErrorCode($code);
+        [ $errorText, $errorLevel ] = self::parseErrorCode($errorCode);
 
         $filePath    = self::getFilePath($filePath);
         $description = self::getDescription($description);
         [ $description, $backtrace ] = self::getBacktrace($description);
 
-        $query = Query::create("code", "=", $code);
+        $query = Query::create("errorCode", "=", $errorCode);
         $query->addIf("file", "=", $filePath);
         $query->addIf("line", "=", $line);
         $query->add("description", "=", $description);
@@ -143,9 +143,9 @@ class ErrorLog extends LogErrorSchema {
             );
         } else {
             self::createEntity(
-                code:        $code,
-                level:       $level,
-                error:       $error,
+                errorCode:   $errorCode,
+                errorText:   $errorText,
+                errorLevel:  $errorLevel,
                 environment: Framework::getEnvironment(),
                 file:        $filePath,
                 line:        $line,
@@ -167,48 +167,48 @@ class ErrorLog extends LogErrorSchema {
     }
 
     /**
-     * Maps an error code into an Error word, and log location.
-     * @param integer $code
+     * Maps an Error Code into an Error word, and log location.
+     * @param integer $errorCode
      * @return array{}
      */
-    private static function getErrorCode(int $code): array {
-        $error = "";
-        $level = 0;
+    private static function parseErrorCode(int $errorCode): array {
+        $errorText  = "";
+        $errorLevel = 0;
 
-        switch ($code) {
+        switch ($errorCode) {
         case E_PARSE:
         case E_ERROR:
         case E_CORE_ERROR:
         case E_COMPILE_ERROR:
         case E_USER_ERROR:
-            $error = "Fatal Error";
-            $level = LOG_ERR;
+            $errorText  = "Fatal Error";
+            $errorLevel = LOG_ERR;
             break;
         case E_WARNING:
         case E_USER_WARNING:
         case E_COMPILE_WARNING:
         case E_RECOVERABLE_ERROR:
-            $error = "Warning";
-            $level = LOG_WARNING;
+            $errorText  = "Warning";
+            $errorLevel = LOG_WARNING;
             break;
         case E_NOTICE:
         case E_USER_NOTICE:
-            $error = "Notice";
-            $level = LOG_NOTICE;
+            $errorText  = "Notice";
+            $errorLevel = LOG_NOTICE;
             break;
         case E_STRICT:
-            $error = "Strict";
-            $level = LOG_NOTICE;
+            $errorText  = "Strict";
+            $errorLevel = LOG_NOTICE;
             break;
         case E_DEPRECATED:
         case E_USER_DEPRECATED:
-            $error = "Deprecated";
-            $level = LOG_NOTICE;
+            $errorText  = "Deprecated";
+            $errorLevel = LOG_NOTICE;
             break;
         default:
             break;
         }
-        return [ $error, $level ];
+        return [ $errorText, $errorLevel ];
     }
 
     /**

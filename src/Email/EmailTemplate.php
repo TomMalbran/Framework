@@ -86,8 +86,6 @@ class EmailTemplate extends EmailTemplateSchema {
                 "language"     => $language,
                 "languageName" => $languageName,
                 "description"  => $template["description"],
-                "type"         => !empty($template["type"]) ? $template["type"] : "",
-                "sendTo"       => !empty($template["sendTo"]) ? "\"{$template["sendTo"]}\"" : "",
                 "subject"      => Strings::replace($template["subject"], "[site]", $siteName),
                 "message"      => Strings::replace($message, "[site]", $siteName),
                 "position"     => $position,

@@ -87,7 +87,7 @@ class ActionLog extends LogActionSchema {
      * @param array{} $mappings Optional.
      * @return integer
      */
-    public static function getTotalAmount(Request $request, array $mappings = []): int {
+    public static function getAmount(Request $request, array $mappings = []): int {
         $query = self::createQuery($request, $mappings);
         return self::getEntityTotal($query);
     }

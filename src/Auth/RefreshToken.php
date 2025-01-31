@@ -28,7 +28,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return CredentialRefreshTokenEntity[]
      */
     public static function getAllForCredential(int $credentialID): array {
-        $query = Query::create("credentialID", "=", $credentialID);
+        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         $query->orderBy("createdTime", true);
         return self::getEntityList($query);
     }
@@ -86,7 +86,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return boolean
      */
     public static function removeAll(int $credentialID): bool {
-        $query = Query::create("credentialID", "=", $credentialID);
+        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         return self::removeEntity($query);
     }
 

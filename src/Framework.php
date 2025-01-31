@@ -384,8 +384,8 @@ class Framework {
      * @return boolean
      */
     public static function generateCode(): bool {
-        Code::generateCode();
         Generator::generateCode();
+        Code::generateCode();
         return true;
     }
 
