@@ -26,7 +26,7 @@ class Code {
      * @return boolean
      */
     public static function generateCode(): bool {
-        print("<br><b>FRAMEWORK CODES</b><br>");
+        print("\nFRAMEWORK CODES\n");
 
         $writePath = Framework::getPath(Framework::SystemDir);
         File::createDir($writePath);
@@ -62,7 +62,7 @@ class Code {
         ]);
 
         File::create($writePath, "$name.php", $contents);
-        print("Generated the <i>$name</i> code<br>");
+        print("- Generated the $name code\n");
         return true;
     }
 }

@@ -25,7 +25,7 @@ class Generator {
      * @return boolean
      */
     public static function generateCode(): bool {
-        print("<br><b>SCHEMA CODES</b><br>");
+        print("\nSCHEMA CODES\n");
 
         self::$namespace = Framework::Namespace;
         self::$writePath = Framework::getPath(Framework::SchemasDir);
@@ -80,7 +80,7 @@ class Generator {
         }
 
         $name = $forFramework ? "Framework" : "App";
-        print("Generated the <i>$name</i> codes -> $created schemas<br>");
+        print("- Generated the $name codes -> $created schemas\n");
         return $created > 0;
     }
 
