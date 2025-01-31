@@ -59,7 +59,7 @@ class SpreadsheetWriter implements ExporterWriter {
      * @param string|integer|null $sheetID   Optional.
      * @return SpreadsheetSheet
      */
-    public function addSheet(string $sheetName = "", string|int $sheetID = null): SpreadsheetSheet {
+    public function addSheet(string $sheetName = "", string|int|null $sheetID = null): SpreadsheetSheet {
         $count = $this->data->getSheetCount();
         if ($this->sheetNum < $count) {
             $sheet = $this->data->getSheet($this->sheetNum);

@@ -237,7 +237,7 @@ class Selection {
      * @param string[]|string|null $extras Optional.
      * @return array{}[]
      */
-    public function resolve(array|string $extras = null): array {
+    public function resolve(array|string|null $extras = null): array {
         $result = [];
 
         foreach ($this->request as $row) {

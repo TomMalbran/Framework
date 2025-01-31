@@ -641,13 +641,13 @@ class Query {
      * @return Query
      */
     public static function createSearch(
-        array|string $column = null,
-        mixed        $value = null,
-        string       $expression = "LIKE",
-        bool         $caseInsensitive = true,
-        bool         $splitValue = false,
-        string       $splitText = " ",
-        bool         $matchAny = false,
+        array|string|null $column = null,
+        mixed $value = null,
+        string $expression = "LIKE",
+        bool $caseInsensitive = true,
+        bool $splitValue = false,
+        string $splitText = " ",
+        bool $matchAny = false,
     ): Query {
         $query = new Query();
         if (!empty($column) && !empty($value)) {

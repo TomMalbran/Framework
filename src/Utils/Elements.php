@@ -55,7 +55,7 @@ class Elements {
      * @param string[]|string|null $elements Optional.
      * @return boolean
      */
-    public function has(array|string $elements = null): bool {
+    public function has(array|string|null $elements = null): bool {
         if ($elements == null) {
             return !empty($this->elements);
         }

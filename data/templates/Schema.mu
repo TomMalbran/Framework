@@ -314,7 +314,7 @@ class {{name}}Schema {
      * @param integer $limit Optional.
      * @return Search[]
      */
-    public static function getSearch(Query $query, array|string $name = null, ?string $idName = null, int $limit = 0): array {
+    public static function getSearch(Query $query, array|string|null $name = null, ?string $idName = null, int $limit = 0): array {
         return self::schema()->getSearch($query, $name, $idName, $limit);
     }
 

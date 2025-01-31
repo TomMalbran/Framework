@@ -37,7 +37,7 @@ class Map implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
      * @param boolean              $useEmpty Optional.
      * @return Map
      */
-    public static function create(Map|array $array, string $key, array|string $value = null, bool $useEmpty = false): Map {
+    public static function create(Map|array $array, string $key, array|string|null $value = null, bool $useEmpty = false): Map {
         $result = [];
         foreach ($array as $row) {
             $result[$row[$key]] = !empty($value) ? Arrays::getValue($row, $value, " - ", "", $useEmpty) : $row;
@@ -53,7 +53,7 @@ class Map implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
      * @param boolean              $useEmpty Optional.
      * @return Map
      */
-    public static function createArrays(Map|array $array, string $key, array|string $value = null, bool $useEmpty = false): Map {
+    public static function createArrays(Map|array $array, string $key, array|string|null $value = null, bool $useEmpty = false): Map {
         $result = [];
         foreach ($array as $row) {
             if (empty($result[$row[$key]])) {

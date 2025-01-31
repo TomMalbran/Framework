@@ -240,7 +240,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * @param integer|null         $index Optional.
      * @return boolean
      */
-    public function has(array|string $key = null, ?int $index = null): bool {
+    public function has(array|string|null $key = null, ?int $index = null): bool {
         if ($key === null) {
             return !empty($this->request);
         }

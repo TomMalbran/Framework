@@ -26,7 +26,7 @@ class Credential extends CredentialSchema {
      * @param mixed|integer        $value  Optional.
      * @return Query|null
      */
-    private static function createAccessQuery(array|string $access, array|string $filter = null, mixed $value = 1): ?Query {
+    private static function createAccessQuery(array|string $access, array|string|null $filter = null, mixed $value = 1): ?Query {
         $accesses = Arrays::toArray($access);
         if (empty($accesses)) {
             return null;
@@ -98,7 +98,7 @@ class Credential extends CredentialSchema {
      * @param mixed|integer        $value        Optional.
      * @return boolean
      */
-    public static function existsWithAccess(int $credentialID, array|string $access, array|string $filter = null, mixed $value = 1): bool {
+    public static function existsWithAccess(int $credentialID, array|string $access, array|string|null $filter = null, mixed $value = 1): bool {
         $query = self::createAccessQuery($access, $filter, $value);
         if (empty($query)) {
             return false;
@@ -323,7 +323,7 @@ class Credential extends CredentialSchema {
      * @param mixed|integer        $value  Optional.
      * @return array{}[]
      */
-    public static function getSelectForAccess(array|string $access, array|string $filter = null, mixed $value = 1): array {
+    public static function getSelectForAccess(array|string $access, array|string|null $filter = null, mixed $value = 1): array {
         $query = self::createAccessQuery($access, $filter, $value);
         if (empty($query)) {
             return [];
@@ -355,7 +355,7 @@ class Credential extends CredentialSchema {
      * @param boolean                $splitText    Optional.
      * @return array{}[]
      */
-    public static function search(string $text, int $amount = 10, array|string $access = null, array|int $credentialID = null, bool $splitText = true): array {
+    public static function search(string $text, int $amount = 10, array|string|null $access = null, array|int|null $credentialID = null, bool $splitText = true): array {
         $query = Query::createSearch([ "firstName", "lastName", "email" ], $text, "LIKE", true, $splitText);
         $query->addIf("access",         "IN", Arrays::toArray($access),        $access !== null);
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
@@ -399,7 +399,7 @@ class Credential extends CredentialSchema {
      * @param mixed|integer        $value  Optional.
      * @return array<string,string>
      */
-    public static function getEmailsForAccess(array|string $access, array|string $filter = null, mixed $value = 1): array {
+    public static function getEmailsForAccess(array|string $access, array|string|null $filter = null, mixed $value = 1): array {
         $query = self::createAccessQuery($access, $filter, $value);
         if (empty($query)) {
             return [];

@@ -184,7 +184,7 @@ class Errors {
      * @param string[]|string|null $error Optional.
      * @return boolean
      */
-    public function has(array|string $error = null): bool {
+    public function has(array|string|null $error = null): bool {
         if ($error === null) {
             return !empty($this->errors);
         }

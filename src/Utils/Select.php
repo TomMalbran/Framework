@@ -220,7 +220,7 @@ class Select implements ArrayAccess, JsonSerializable {
         string $keyName,
         array|string $valName,
         bool $useEmpty = false,
-        array|string $extraKey = null,
+        array|string|null $extraKey = null,
         bool $distinct = false,
     ): array {
         $result = [];

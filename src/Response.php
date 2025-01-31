@@ -65,20 +65,22 @@ class Response {
 
     /**
      * Prints the Data
-     * @return void
+     * @return Response
      */
-    public function print(): void {
+    public function print(): Response {
         print($this->toString());
+        return $this;
     }
 
     /**
      * Prints the Data Data
-     * @return void
+     * @return Response
      */
-    public function printData(): void {
+    public function printData(): Response {
         if (!empty($this->data["data"])) {
             print(JSON::encode($this->data["data"], true));
         }
+        return $this;
     }
 
 

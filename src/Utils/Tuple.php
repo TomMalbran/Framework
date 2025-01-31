@@ -65,7 +65,7 @@ class Tuple implements IteratorAggregate {
      * @param string[]|string|null $items Optional.
      * @return boolean
      */
-    public function has(array|string $items = null): bool {
+    public function has(array|string|null $items = null): bool {
         if ($items == null) {
             return !empty($this->items);
         }

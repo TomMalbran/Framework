@@ -278,7 +278,7 @@ class Schema {
      * @param integer              $limit  Optional.
      * @return Search[]
      */
-    public function getSearch(Query $query, array|string $name = null, ?string $idName = null, int $limit = 0): array {
+    public function getSearch(Query $query, array|string|null $name = null, ?string $idName = null, int $limit = 0): array {
         $query   = $this->generateQuery($query)->limitIf($limit);
         $request = $this->request($query);
         $idKey   = $idName ?: $this->structure->idName;
@@ -303,8 +303,8 @@ class Schema {
         ?string $orderKey = null,
         bool $orderAsc = true,
         ?string $idName = null,
-        array|string $nameKey = null,
-        array|string $extraKey = null,
+        array|string|null $nameKey = null,
+        array|string|null $extraKey = null,
         bool $useEmpty = false,
         ?string $distinctID = null
     ): array {
