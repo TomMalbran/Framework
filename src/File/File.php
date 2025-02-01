@@ -26,6 +26,22 @@ class File {
     }
 
     /**
+     * Returns the path used to store the files
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function parseUrl(string ...$pathParts): string {
+        $protocols = [ "http://", "https://" ];
+        foreach ($protocols as $protocol) {
+            if (Strings::startsWith($pathParts[0], $protocol)) {
+                $pathParts[0] = Strings::substringAfter($pathParts[0], $protocol);
+                return $protocol . self::parsePath(...$pathParts);
+            }
+        }
+        return self::parsePath(...$pathParts);
+    }
+
+    /**
      * Adds the last slash for dir processing functions
      * @param string $path
      * @return string
