@@ -381,9 +381,6 @@ class Generator {
         case Field::Float:
             $result[] = self::getTypeData($key, "float");
             break;
-        case Field::Price:
-            $result[] = self::getTypeData($key, "float");
-            break;
         case Field::Date:
             $result[] = self::getTypeData($key, "int");
             $result[] = self::getTypeData("{$key}Date", "string");
@@ -470,7 +467,7 @@ class Generator {
         return match ($type) {
             Field::Boolean => "bool",
             Field::ID, Field::Number, Field::Date => "int",
-            Field::Float, Field::Price => "float",
+            Field::Float => "float",
             default => "string",
         };
     }

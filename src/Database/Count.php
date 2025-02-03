@@ -119,8 +119,6 @@ class Count {
 
         if ($this->field->type == Field::Float) {
             $result = Numbers::toFloat($result, $this->field->decimals);
-        } elseif ($this->field->type == Field::Price) {
-            $result = Numbers::fromCents($result);
         }
         return $result;
     }

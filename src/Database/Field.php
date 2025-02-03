@@ -35,7 +35,7 @@ class Field {
     public string $key        = "";
     public string $type       = "";
     public int    $length     = 0;
-    public int    $decimals   = 3;
+    public int    $decimals   = 2;
     public string $dateType   = "";
     public string $date       = "";
     public string $hour       = "";
@@ -152,14 +152,13 @@ class Field {
             $attributes = "unsigned NOT NULL";
             $default    = 0;
             break;
-        case self::Price:
+        case self::Float:
             $type       = "bigint";
             $length     = 20;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
             $default    = 0;
             break;
         case self::Number:
-        case self::Float:
         case self::Date:
             $type       = "int";
             $length     = $this->length ?: 10;

@@ -227,7 +227,6 @@
                 "boolean",
                 "number",
                 "float",
-                "price",
                 "date",
                 "string",
                 "json",
