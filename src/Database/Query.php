@@ -244,7 +244,8 @@ class Query {
      * @return Query
      */
     public function endParen(): Query {
-        $this->where .= ") ";
+        $this->where    .= ") ";
+        $this->addPrefix = true;
         return $this;
     }
 
@@ -324,7 +325,9 @@ class Query {
         } else {
             $this->where .= ") ";
         }
-        $this->prefix = $this->oldPrefix;
+
+        $this->prefix    = $this->oldPrefix;
+        $this->addPrefix = true;
         return $this;
     }
 
