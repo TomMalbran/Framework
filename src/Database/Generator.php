@@ -380,13 +380,9 @@ class Generator {
             break;
         case Field::Float:
             $result[] = self::getTypeData($key, "float");
-            $result[] = self::getTypeData("{$key}Format", "string");
-            $result[] = self::getTypeData("{$key}Int", "int");
             break;
         case Field::Price:
             $result[] = self::getTypeData($key, "float");
-            $result[] = self::getTypeData("{$key}Format", "string");
-            $result[] = self::getTypeData("{$key}Cents", "int");
             break;
         case Field::Date:
             $result[] = self::getTypeData($key, "int");

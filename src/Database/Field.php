@@ -302,13 +302,9 @@ class Field {
             break;
         case self::Float:
             $result[$key]           = Numbers::toFloat($number, $this->decimals);
-            $result["{$key}Format"] = Numbers::formatInt($number, $this->decimals);
-            $result["{$key}Int"]    = $number;
             break;
         case self::Price:
             $result[$key]           = Numbers::fromCents($number);
-            $result["{$key}Format"] = Numbers::formatCents($number);
-            $result["{$key}Cents"]  = $number;
             break;
         case self::Date:
             $result[$key]           = $number;
