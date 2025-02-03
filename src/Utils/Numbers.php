@@ -99,11 +99,12 @@ class Numbers {
      * @param integer|float $number
      * @param integer       $decimals
      * @param integer       $maxForDecimals Optional.
+     * @param string        $default        Optional.
      * @return string
      */
-    public static function formatInt(int|float $number, int $decimals = 0, int $maxForDecimals = 1000): string {
+    public static function formatInt(int|float $number, int $decimals = 0, int $maxForDecimals = 1000, string $default = ""): string {
         $float = $decimals > 0 ? self::toFloat($number, $decimals) : $number;
-        return self::formatFloat($float, $decimals, $maxForDecimals);
+        return self::formatFloat($float, $decimals, $maxForDecimals, $default);
     }
 
     /**
@@ -111,15 +112,16 @@ class Numbers {
      * @param integer|float $number
      * @param integer       $decimals
      * @param integer       $maxForDecimals Optional.
+     * @param string        $default        Optional.
      * @return string
      */
-    public static function formatFloat(int|float $number, int $decimals, int $maxForDecimals = 1000): string {
+    public static function formatFloat(int|float $number, int $decimals, int $maxForDecimals = 1000, string $default = ""): string {
         $float = floatval($number);
         if (!empty($float)) {
             $decimals = (empty($maxForDecimals) || $float < $maxForDecimals) && !is_int($number) ? $decimals : 0;
             return number_format($float, $decimals, ",", ".");
         }
-        return "";
+        return $default;
     }
 
 
@@ -293,10 +295,11 @@ class Numbers {
      * @param integer|float $price
      * @param integer       $decimals       Optional.
      * @param integer       $maxForDecimals Optional.
+     * @param string        $default        Optional.
      * @return string
      */
-    public static function formatPrice(int|float $price, int $decimals = 2, int $maxForDecimals = 1000): string {
-        return self::formatFloat($price, $decimals, $maxForDecimals);
+    public static function formatPrice(int|float $price, int $decimals = 2, int $maxForDecimals = 1000, string $default = "0"): string {
+        return self::formatFloat($price, $decimals, $maxForDecimals, $default);
     }
 
     /**
