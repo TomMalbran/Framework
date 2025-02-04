@@ -2,9 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Framework;
-use Framework\Database\Schema;
 use Framework\Database\Structure;
-use Framework\Database\SubRequest;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -21,8 +19,6 @@ class Factory {
     /** @var Structure[] */
     private static array $structures = [];
 
-    /** @var Schema[] */
-    private static array $schemas    = [];
 
 
     /**
@@ -59,7 +55,7 @@ class Factory {
 
 
     /**
-     * Gets the Schema
+     * Gets the Schema data
      * @return array{}
      */
     public static function getData(): array {
@@ -68,55 +64,16 @@ class Factory {
     }
 
     /**
-     * Gets the Schema
-     * @param string $key
-     * @return Schema|null
-     */
-    public static function getSchema(string $key): ?Schema {
-        self::load();
-        if (empty(self::$data[$key])) {
-            return null;
-        }
-        if (!empty(self::$schemas[$key])) {
-            return self::$schemas[$key];
-        }
-
-        $structure  = self::getStructure($key);
-        $subRequest = self::getSubRequest($key);
-        self::$schemas[$key] = new Schema($structure, $subRequest);
-        return self::$schemas[$key];
-    }
-
-    /**
      * Creates and Returns the Structure for the given Key
-     * @param string $key
+     * @param string $schema
      * @return Structure
      */
-    public static function getStructure(string $key): Structure {
-        if (empty(self::$structures[$key])) {
-            self::$structures[$key] = new Structure($key, self::$data[$key]);
+    public static function getStructure(string $schema): Structure {
+        self::load();
+        if (empty(self::$structures[$schema])) {
+            self::$structures[$schema] = new Structure($schema, self::$data[$schema]);
         }
-        return self::$structures[$key];
-    }
-
-    /**
-     * Creates and Returns the SubRequests for the given Key
-     * @param string $key
-     * @return SubRequest[]
-     */
-    public static function getSubRequest(string $key): array {
-        $data   = self::$data[$key];
-        $result = [];
-
-        if (!empty($data["subrequests"])) {
-            foreach ($data["subrequests"] as $subKey => $subData) {
-                $structure    = self::getStructure($key);
-                $subStructure = self::getStructure($subKey);
-                $subSchema    = new Schema($subStructure);
-                $result[]     = new SubRequest($subSchema, $structure, $subData);
-            }
-        }
-        return $result;
+        return self::$structures[$schema];
     }
 
     /**

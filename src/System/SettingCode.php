@@ -61,7 +61,7 @@ class SettingCode extends SettingsSchema {
      * @return integer
      */
     public static function getCore(string $variable): int {
-        if (!self::schema()->tableExists()) {
+        if (!self::tableExists()) {
             return 0;
         }
 
@@ -79,7 +79,7 @@ class SettingCode extends SettingsSchema {
      * @return boolean
      */
     public static function setCore(string $variable, int $value): bool {
-        if (!self::schema()->tableExists()) {
+        if (!self::tableExists()) {
             return false;
         }
 

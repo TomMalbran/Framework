@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\Schema;
 use Framework\Database\Structure;
 use Framework\Database\Query;
 use Framework\Utils\Arrays;
@@ -11,10 +10,11 @@ use Framework\Utils\Arrays;
  */
 class SubRequest {
 
-    private Schema $schema;
+    private Structure $structure;
 
-    private string $type     = "";
-    private string $name     = "";
+    public  string $type     = "";
+    public  string $name     = "";
+
     private string $idKey    = "";
     private string $idName   = "";
 
@@ -32,26 +32,27 @@ class SubRequest {
 
     /**
      * Creates a new SubRequest instance
-     * @param Schema    $schema
      * @param Structure $structure
      * @param array{}   $data
+     * @param string    $idKey
+     * @param string    $idName
      */
-    public function __construct(Schema $schema, Structure $structure, array $data) {
-        $this->schema   = $schema;
+    public function __construct(Structure $structure, array $data, string $idKey, string $idName) {
+        $this->structure = $structure;
 
-        $this->name     = $data["name"];
-        $this->type     = !empty($data["type"])    ? $data["type"]    : "";
-        $this->idKey    = !empty($data["idKey"])   ? $data["idKey"]   : $structure->idKey;
-        $this->idName   = !empty($data["idName"])  ? $data["idName"]  : $structure->idName;
-        $this->where    = !empty($data["where"])   ? $data["where"]   : [];
+        $this->name      = $data["name"];
+        $this->type      = !empty($data["type"])    ? $data["type"]    : $structure->schema;
+        $this->idKey     = !empty($data["idKey"])   ? $data["idKey"]   : $idKey;
+        $this->idName    = !empty($data["idName"])  ? $data["idName"]  : $idName;
+        $this->where     = !empty($data["where"])   ? $data["where"]   : [];
 
-        $this->hasOrder = !empty($data["orderBy"]);
-        $this->orderBy  = !empty($data["orderBy"]) ? $data["orderBy"] : "";
-        $this->isAsc    = !empty($data["isAsc"])   ? $data["isAsc"]   : false;
+        $this->hasOrder  = !empty($data["orderBy"]);
+        $this->orderBy   = !empty($data["orderBy"]) ? $data["orderBy"] : "";
+        $this->isAsc     = !empty($data["isAsc"])   ? $data["isAsc"]   : false;
 
-        $this->asArray  = !empty($data["asArray"]);
-        $this->field    = !empty($data["field"])   ? $data["field"]   : "";
-        $this->value    = !empty($data["value"])   ? $data["value"]   : null;
+        $this->asArray   = !empty($data["asArray"]);
+        $this->field     = !empty($data["field"])   ? $data["field"]   : "";
+        $this->value     = !empty($data["value"])   ? $data["value"]   : null;
     }
 
 
@@ -62,8 +63,8 @@ class SubRequest {
      * @return array{}[]
      */
     public function request(array $result): array {
-        $query     = self::createQuery($result);
-        $request   = !empty($query) ? $this->schema->getAll($query) : [];
+        $query     = $this->createQuery($result);
+        $request   = $this->getData($query);
         $subResult = [];
 
         foreach ($request as $row) {
@@ -105,11 +106,30 @@ class SubRequest {
     }
 
     /**
+     * Returns the Data from the Query
+     * @param Query|null $query
+     * @return array{}[]
+     */
+    private function getData(?Query $query): array {
+        if ($query === null) {
+            return [];
+        }
+
+        $selection = new Selection($this->structure);
+        $selection->addFields();
+        $selection->addExpressions();
+        $selection->addJoins();
+        $selection->addCounts();
+        $selection->request($query);
+        return $selection->resolve();
+    }
+
+    /**
      * Does the Request with a Sub Request
      * @param mixed[] $result
      * @return Query|null
      */
-    public function createQuery(array $result): ?Query {
+    private function createQuery(array $result): ?Query {
         $ids = Arrays::createArray($result, $this->idName);
         if (empty($ids)) {
             return null;
@@ -125,6 +145,11 @@ class SubRequest {
 
         if ($this->hasOrder) {
             $query->orderBy($this->orderBy, $this->isAsc);
+        }
+
+        if ($this->structure->canDelete) {
+            $isDeleted = $this->structure->getKey("isDeleted");
+            $query->add($isDeleted, "=", 0);
         }
         return $query;
     }

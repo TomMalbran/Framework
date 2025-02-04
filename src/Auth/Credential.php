@@ -462,7 +462,7 @@ class Credential extends CredentialSchema {
      */
     public static function edit(int $credentialID, Request|array $request, string $access = "", ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
         $fields = self::getFields($request, $access, $reqPassChange);
-        return self::schema()->edit($credentialID, $request, $fields, skipEmpty: $skipEmpty);
+        return self::editEntityData($credentialID, $request, $fields, skipEmpty: $skipEmpty);
     }
 
     /**

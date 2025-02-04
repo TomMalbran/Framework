@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\Database;
+use Framework\Framework;
 use Framework\Database\Structure;
 use Framework\Database\Field;
 use Framework\Utils\Arrays;
@@ -12,7 +12,6 @@ use Framework\Utils\Strings;
  */
 class Selection {
 
-    private Database  $db;
     private Structure $structure;
 
     private int $index   = 66;
@@ -35,11 +34,9 @@ class Selection {
 
     /**
      * Creates a new Selection instance
-     * @param Database  $db
      * @param Structure $structure
      */
-    public function __construct(Database $db, Structure $structure) {
-        $this->db        = $db;
+    public function __construct(Structure $structure) {
         $this->structure = $structure;
         $this->tables    = [ $structure->table ];
     }
@@ -178,7 +175,7 @@ class Selection {
      */
     public function request(Query $query): array {
         $expression    = $this->getExpression($query);
-        $this->request = $this->db->query($expression, $query);
+        $this->request = Framework::getDatabase()->query($expression, $query);
         return $this->request;
     }
 

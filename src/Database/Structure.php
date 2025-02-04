@@ -39,7 +39,7 @@ class Structure {
     /** @var Count[] */
     public array $counts       = [];
 
-    /** @var array<string,string> */
+    /** @var SubRequest[] */
     public array $subRequests  = [];
 
     public bool $hasStatus     = false;
@@ -194,8 +194,8 @@ class Structure {
         // Create the SubRequests
         if (!empty($data["subrequests"])) {
             foreach ($data["subrequests"] as $key => $value) {
-                $type = !empty($value["type"]) ? $value["type"] : $key;
-                $this->subRequests[$value["name"]] = $type;
+                $subStructure = Factory::getStructure($key);
+                $this->subRequests[] = new SubRequest($subStructure, $value, $this->idKey, $this->idName);
             }
         }
 

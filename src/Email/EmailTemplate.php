@@ -52,7 +52,7 @@ class EmailTemplate extends EmailTemplateSchema {
      * @return boolean
      */
     public static function migrateData(): bool {
-        self::schema()->truncate();
+        self::truncateData();
 
         $position  = 0;
         $languages = Language::getAll();
@@ -95,7 +95,7 @@ class EmailTemplate extends EmailTemplateSchema {
         // Process the SQL
         if (!empty($updates)) {
             print("<br>Updated <i>" . count($updates) . " emails</i> for language <i>$languageName</i><br>");
-            self::schema()->batch($updates);
+            self::batchEntities($updates);
         }
 
         return $position;

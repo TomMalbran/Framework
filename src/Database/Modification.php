@@ -1,18 +1,16 @@
 <?php
 namespace Framework\Database;
 
+use Framework\Framework;
 use Framework\Request;
-use Framework\Database\Database;
 use Framework\Database\Structure;
 use Framework\Database\Query;
-use Framework\Utils\Arrays;
 
 /**
  * The Schema Modification
  */
 class Modification {
 
-    private Database  $db;
     private Structure $structure;
 
     /** @var array{} */
@@ -21,11 +19,9 @@ class Modification {
 
     /**
      * Creates a new Modification instance
-     * @param Database  $db
      * @param Structure $structure
      */
-    public function __construct(Database $db, Structure $structure) {
-        $this->db        = $db;
+    public function __construct(Structure $structure) {
         $this->structure = $structure;
         $this->fields    = [];
     }
@@ -146,7 +142,10 @@ class Modification {
      * @return integer
      */
     public function insert(): int {
-        return $this->db->insert($this->structure->table, $this->fields);
+        return Framework::getDatabase()->insert(
+            $this->structure->table,
+            $this->fields,
+        );
     }
 
     /**
@@ -154,7 +153,11 @@ class Modification {
      * @return integer
      */
     public function replace(): int {
-        return $this->db->insert($this->structure->table, $this->fields, "REPLACE");
+        return Framework::getDatabase()->insert(
+            $this->structure->table,
+            $this->fields,
+            "REPLACE",
+        );
     }
 
     /**
@@ -163,6 +166,10 @@ class Modification {
      * @return boolean
      */
     public function update(Query $query): bool {
-        return $this->db->update($this->structure->table, $this->fields, $query);
+        return Framework::getDatabase()->update(
+            $this->structure->table,
+            $this->fields,
+            $query,
+        );
     }
 }

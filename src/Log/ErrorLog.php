@@ -118,7 +118,7 @@ class ErrorLog extends LogErrorSchema {
      * @return boolean
      */
     public static function handler(int $errorCode, string $description, string $filePath = "", int $line = 0): bool {
-        if (!self::schema()->hasPrimaryKey()) {
+        if (!self::hasPrimaryKey()) {
             return false;
         }
 

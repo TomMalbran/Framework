@@ -9,25 +9,18 @@ use {{namespace}}Schema\{{name}}Entity;
 
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
-use Framework\Database\Factory;
 use Framework\Database\Schema;
 use Framework\Database\Query;{{#canEdit}}
-use Framework\Database\Assign;{{/canEdit}}
-use Framework\Utils\Search;{{#hasSelect}}
+use Framework\Database\Assign;{{/canEdit}}{{#hasSelect}}
 use Framework\Utils\Select;{{/hasSelect}}
 
 /**
  * The {{name}} Schema
  */
-class {{name}}Schema {
+class {{name}}Schema extends Schema {
 
-    /**
-     * Loads the {{name}} Schema
-     * @return Schema
-     */
-    public static function schema(): Schema {
-        return Factory::getSchema("{{name}}");
-    }
+    const Name = "{{name}}";
+
 
     /**
      * Constructs the {{name}} Entity
@@ -53,6 +46,19 @@ class {{name}}Schema {
         }
         {{/processEntity}}
         return $entity;
+    }
+
+    /**
+     * Constructs a list of {{name}} Entities
+     * @param array{}[] $list
+     * @return {{name}}Entity[]
+     */
+    protected static function constructEntities(array $list): array {
+        $result = [];
+        foreach ($list as $data) {
+            $result[] = self::constructEntity($data);
+        }
+        return $result;
     }
 
 {{#hasFilters}}
@@ -107,7 +113,7 @@ class {{name}}Schema {
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
         {{/parents}}
-        return self::schema()->exists($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}});
+        return self::entityExists($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}});
     }
 
 {{/hasID}}
@@ -125,20 +131,10 @@ class {{name}}Schema {
         $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
         {{/parents}}
         $query->addIf("{{idKey}}", "<>", $skipID);
-        return self::schema()->exists($query);
+        return self::entityExists($query);
     }
 
 {{/uniques}}
-    /**
-     * Returns true if there is an {{name}} Entity with the given Query
-     * @param Query $query{{#hasDeleted}}
-     * @param boolean $withDeleted Optional.{{/hasDeleted}}
-     * @return boolean
-     */
-    public static function entityExists(Query $query{{#hasDeleted}}, bool $withDeleted = true{{/hasDeleted}}): bool {
-        return self::schema()->exists($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}});
-    }
-
 
 
 {{#hasID}}
@@ -201,28 +197,8 @@ class {{name}}Schema {
      * @return {{name}}Entity
      */
     protected static function getEntity(Query $query{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{name}}Entity {
-        $data = self::schema()->getRow($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
+        $data = self::getEntityData($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
-    }
-
-    /**
-     * Returns a value of the {{name}} Entity with the given Query
-     * @param Query $query
-     * @param string $column
-     * @return mixed
-     */
-    protected static function getEntityValue(Query $query, string $column): mixed {
-        return self::schema()->getValue($query, $column);
-    }
-
-    /**
-     * Returns a list of values the {{name}} Entity with the given Query
-     * @param Query $query
-     * @param string $column
-     * @return mixed[]
-     */
-    protected static function getEntityColumn(Query $query, string $column): array {
-        return self::schema()->getColumn($query, $column);
     }
 
 
@@ -268,12 +244,8 @@ class {{name}}Schema {
      * @return {{name}}Entity[]
      */
     protected static function getEntityList(?Query $query = null, ?Request $sort = null{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): array {
-        $list   = self::schema()->getAll($query, $sort{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
-        $result = [];
-        foreach ($list as $data) {
-            $result[] = self::constructEntity($data);
-        }
-        return $result;
+        $list = self::getEntitiesData($query, $sort{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
+        return self::constructEntities($list);
     }
 
     /**
@@ -297,28 +269,6 @@ class {{name}}Schema {
         return self::getEntityTotal({{#hasMainQuery}}$query{{/hasMainQuery}});
     }
 
-    /**
-     * Gets a Total number of {{name}} Entities
-     * @param Query|null $query Optional.{{#canDelete}}
-     * @param boolean $withDeleted Optional.{{/canDelete}}
-     * @return integer
-     */
-    protected static function getEntityTotal(?Query $query = null{{#canDelete}}, bool $withDeleted = true{{/canDelete}}): int {
-        return self::schema()->getTotal($query{{#canDelete}}, $withDeleted{{/canDelete}});
-    }
-
-    /**
-     * Returns the Search results of {{name}} Entities
-     * @param Query $query
-     * @param string[]|string|null $name Optional.
-     * @param string|null $idName Optional.
-     * @param integer $limit Optional.
-     * @return Search[]
-     */
-    public static function getSearch(Query $query, array|string|null $name = null, ?string $idName = null, int $limit = 0): array {
-        return self::schema()->getSearch($query, $name, $idName, $limit);
-    }
-
 {{#hasSelect}}
     /**
      * Returns a Select of {{name}} Entities{{#parents}}
@@ -329,7 +279,7 @@ class {{name}}Schema {
         {{#hasParents}}
         $query = self::createParentQuery({{parentsList}});
         {{/hasParents}}
-        return self::schema()->getSelect({{#hasParents}}$query{{/hasParents}});
+        return self::getEntitySelect({{#hasParents}}$query{{/hasParents}});
     }
 
 {{/hasSelect}}
@@ -366,10 +316,10 @@ class {{name}}Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->createWithOrder($entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::createEntityWithOrder($entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->create($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::createEntityData($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
         {{/hasPositions}}
     }
 {{/canCreate}}
@@ -394,7 +344,7 @@ class {{name}}Schema {
             $createdUser = Auth::getID();
         }
         {{/hasUsers}}
-        return self::schema()->replace($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::replaceEntityData($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
     }
 {{/canReplace}}
 {{#canEdit}}
@@ -430,10 +380,10 @@ class {{name}}Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->editWithOrder($query, $entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+        return self::editEntityWithOrder($query, $entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->edit($query, $entityRequest, $entityFields{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+        return self::editEntityData($query, $entityRequest, $entityFields{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
     }
 
@@ -452,25 +402,11 @@ class {{name}}Schema {
         }
 
         {{/hasUsers}}
-        return self::schema()->edit($query, null, [
+        return self::editEntityData($query, null, [
             $column => Assign::increase($amount),
         ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
     }
 {{/canEdit}}
-{{#canBatch}}
-
-    /**
-     * Batches the {{name}} Entities
-     * @param array{}[] $fields
-     * @return boolean
-     */
-    protected static function batchEntities(array $fields): bool {
-        if (empty($fields)) {
-            return false;
-        }
-        return self::schema()->batch($fields);
-    }
-{{/canBatch}}
 {{#canDelete}}
 
     /**
@@ -491,10 +427,10 @@ class {{name}}Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->deleteWithOrder($query{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+        return self::deleteEntityWithOrder($query{{#hasEditParents}}, orderQuery: $orderQuery{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->delete($query{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+        return self::deleteEntityData($query{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
     }
 {{/canDelete}}
@@ -511,10 +447,10 @@ class {{name}}Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->removeWithOrder($query{{#hasEditParents}}, $orderQuery{{/hasEditParents}});
+        return self::removeEntityWithOrder($query{{#hasEditParents}}, $orderQuery{{/hasEditParents}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::schema()->remove($query);
+        return self::removeEntityData($query);
         {{/hasPositions}}
     }
 {{/canRemove}}
@@ -531,7 +467,7 @@ class {{name}}Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::schema()->ensurePosOrder($entity, $fields{{#hasEditParents}}, $orderQuery{{/hasEditParents}});
+        return self::ensureEntityOrder($entity, $fields{{#hasEditParents}}, $orderQuery{{/hasEditParents}});
     }
 {{/hasPositions}}
 }

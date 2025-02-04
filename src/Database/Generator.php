@@ -20,6 +20,7 @@ class Generator {
     private static string $entityText;
 
 
+
     /**
      * Generates the Code for the Schemas
      * @return boolean
@@ -46,7 +47,6 @@ class Generator {
         self::$writePath = Framework::getPath(Framework::SchemasDir);
         return self::generate(true);
     }
-
 
     /**
      * Does the Generation
@@ -123,7 +123,6 @@ class Generator {
             "canCreate"       => $structure->canCreate,
             "canEdit"         => $structure->canEdit,
             "canReplace"      => $structure->canEdit && !$structure->hasAutoInc,
-            "canBatch"        => $structure->canEdit,
             "canDelete"       => $structure->canDelete,
             "canRemove"       => $structure->canRemove,
             "processEntity"   => !empty($subTypes) || !empty($structure->processed) || $structure->hasStatus,
@@ -152,16 +151,16 @@ class Generator {
 
     /**
      * Returns the Sub Types from the Sub Requests
-     * @param array<string,string> $subRequests
+     * @param SubRequest[] $subRequests
      * @return array{}[]
      */
     private static function getSubTypes(array $subRequests): array {
         $result = [];
-        foreach ($subRequests as $name => $type) {
-            if (!empty($type) && !Strings::contains($type, "<", "[")) {
+        foreach ($subRequests as $subRequest) {
+            if (!Strings::contains($subRequest->type, "<", "[")) {
                 $result[] = [
-                    "name" => $name,
-                    "type" => $type,
+                    "name" => $subRequest->name,
+                    "type" => $subRequest->type,
                 ];
             }
         }
@@ -352,11 +351,12 @@ class Generator {
         foreach ($structure->counts as $count) {
             self::addAttribute($result, $count->field);
         }
-        foreach ($structure->subRequests as $key => $type) {
-            if (!empty($type) && !Strings::contains($type, "<", "[")) {
+        foreach ($structure->subRequests as $subRequest) {
+            $type = $subRequest->type;
+            if (!Strings::contains($type, "<", "[")) {
                 $type .= "Entity[]";
             }
-            $result[] = self::getTypeData($key, "array", $type);
+            $result[] = self::getTypeData($subRequest->name, "array", $type);
         }
         return $result;
     }
