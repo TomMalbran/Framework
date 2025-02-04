@@ -93,6 +93,19 @@ class Entity implements ArrayAccess, JsonSerializable {
     }
 
     /**
+     * Returns only the requested Fields
+     * @param string ...$fields
+     * @return array{}
+     */
+    public function toFields(string ...$fields): array {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[$field] = $this->$field;
+        }
+        return $result;
+    }
+
+    /**
      * Prints the Entity
      * @return Entity
      */
