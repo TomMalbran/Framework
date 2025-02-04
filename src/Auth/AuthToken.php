@@ -15,12 +15,11 @@ use Exception;
  */
 class AuthToken {
 
-    private static bool   $loaded     = false;
-    private static bool   $useRefresh = false;
-    private static string $algorithm  = "HS256";
-    private static string $secretKey  = "";
-    private static int    $shortTerm  = 0;
-    private static int    $longTerm   = 0;
+    private static bool   $loaded    = false;
+    private static string $algorithm = "HS256";
+    private static string $secretKey = "";
+    private static int    $shortTerm = 0;
+    private static int    $longTerm  = 0;
 
     private static CredentialRefreshTokenEntity $tokenData;
 
@@ -36,91 +35,93 @@ class AuthToken {
         }
         JWT::$leeway = 1000;
 
-        self::$loaded     = true;
-        self::$useRefresh = ConfigCode::getBoolean("authUseRefresh");
-        self::$secretKey  = ConfigCode::getString("authKey");
-        self::$shortTerm  = ConfigCode::getFloat("authHours") * 3600;
-        self::$longTerm   = ConfigCode::getFloat("authDays") * 24 * 3600;
+        self::$loaded    = true;
+        self::$secretKey = ConfigCode::getString("authKey");
+        self::$shortTerm = ConfigCode::getFloat("authHours") * 3600;
+        self::$longTerm  = ConfigCode::getFloat("authDays") * 24 * 3600;
         return true;
     }
 
 
 
     /**
-     * Returns true if the Refresh Token or the JWT Token is valid
-     * @param string $jwtToken
+     * Returns the API Token for the given JWT
+     * @param string $accessToken
+     * @return string
+     */
+    public static function getAPIToken(string $accessToken): string {
+        $accessData = self::getAccessToken($accessToken);
+        return !empty($accessData->apiToken) ? $accessData->apiToken : "";
+    }
+
+
+    /**
+     * Returns true if the Refresh Token or the Access Token is valid
+     * @param string $accessToken
      * @param string $refreshToken
      * @return boolean
      */
-    public static function isValid(string $jwtToken, string $refreshToken): bool {
+    public static function isValid(string $accessToken, string $refreshToken): bool {
         self::load();
-        $jwtData = self::getJWT($jwtToken);
-        if (empty($jwtData)) {
-            return false;
-        }
-
-        if (self::$useRefresh && !empty($refreshToken)) {
+        if (!empty($refreshToken)) {
             return !self::getOne($refreshToken)->isEmpty();
         }
-        return false;
-    }
-
-    /**
-     * Returns the API Token for the given JWT
-     * @param string $jwtToken
-     * @return string
-     */
-    public static function getAPIToken(string $jwtToken): string {
-        self::load();
-        $jwtData = self::getJWT($jwtToken);
-        return !empty($jwtData->apiToken) ? $jwtData->apiToken : "";
+        return self::isValidAccessToken($accessToken);
     }
 
     /**
      * Returns the Credentials for the given Refresh Token or JWT
-     * @param string $jwtToken
+     * @param string $accessToken
      * @param string $refreshToken
      * @return integer[]
      */
-    public static function getCredentials(string $jwtToken, string $refreshToken): array {
-        self::load();
-        $jwtData = self::getJWT($jwtToken);
-        if (!empty($jwtData->credentialID)) {
-            return [ $jwtData->credentialID, $jwtData->adminID ];
+    public static function getCredentials(string $accessToken, string $refreshToken): array {
+        $accessData = self::getAccessToken($accessToken);
+        if (!empty($accessData->credentialID)) {
+            return [ $accessData->credentialID, $accessData->adminID ];
         }
 
-        if (self::$useRefresh) {
-            $credentialID = self::getOne($refreshToken)->credentialID;
-            if (!empty($credentialID)) {
-                return [ $credentialID, 0 ];
-            }
+        $refresh = self::getOne($refreshToken);
+        if (!empty($refresh->credentialID)) {
+            return [ $refresh->credentialID, 0 ];
         }
+
         return [ 0, 0 ];
     }
 
 
 
     /**
-     * Returns the JWT Token Data
-     * @param string $token
-     * @return object
+     * Returns true if the given Access Token is valid
+     * @param string $accessToken
+     * @return boolean
      */
-    public static function getJWT(string $token): object {
-        self::load();
-        try {
-            $decode = JWT::decode($token, new Key(self::$secretKey, self::$algorithm));
-        } catch (Exception $e) {
-            return (object)[];
-        }
-        return (object)$decode->data;
+    public static function isValidAccessToken(string $accessToken): bool {
+        $accessData = self::getAccessToken($accessToken);
+        return !empty($accessData);
     }
 
     /**
-     * Creates a JWT Token
+     * Returns the data of the Access Token
+     * @param string $accessToken
+     * @return object
+     */
+    public static function getAccessToken(string $accessToken): object {
+        self::load();
+        try {
+            $jwt = JWT::decode($accessToken, new Key(self::$secretKey, self::$algorithm));
+        } catch (Exception $e) {
+            return (object)[];
+        }
+        return (object)$jwt->data;
+    }
+
+    /**
+     * Creates an Access Token
      * @param array{} $data
      * @return string
      */
-    public static function createJWT(array $data): string {
+    public static function createAccessToken(array $data): string {
         self::load();
         $time  = time();
         $token = [
@@ -180,26 +181,23 @@ class AuthToken {
      */
     public static function createRefreshToken(int $credentialID): string {
         self::load();
-        if (!self::$useRefresh) {
-            return "";
-        }
-
         return RefreshToken::create($credentialID, self::$longTerm);
     }
 
     /**
      * Updates a Refresh Token
+     * @param string $accessToken
      * @param string $refreshToken
      * @return string
      */
-    public static function updateRefreshToken(string $refreshToken): string {
+    public static function updateRefreshToken(string $accessToken, string $refreshToken): string {
         self::load();
-        if (!self::$useRefresh) {
+        if (self::isValidAccessToken($accessToken)) {
             return "";
         }
 
-        $token = self::getOne($refreshToken);
-        if ($token->isEmpty() || $token->modifiedTime < time() - 24 * 3600) {
+        $currentToken = self::getOne($refreshToken);
+        if ($currentToken->isEmpty() || $currentToken->modifiedTime > time() - 24 * 3600) {
             return "";
         }
 
@@ -213,7 +211,7 @@ class AuthToken {
      */
     public static function deleteRefreshToken(string $refreshToken): bool {
         self::load();
-        if (!self::$useRefresh || empty($refreshToken)) {
+        if (empty($refreshToken)) {
             return false;
         }
 
@@ -227,7 +225,7 @@ class AuthToken {
      */
     public static function deleteAllForCredential(int $credentialID): bool {
         self::load();
-        if (!self::$useRefresh || empty($credentialID)) {
+        if (empty($credentialID)) {
             return false;
         }
 
@@ -240,10 +238,6 @@ class AuthToken {
      */
     public static function deleteOld(): bool {
         self::load();
-        if (!self::$useRefresh) {
-            return false;
-        }
-
         return RefreshToken::removeOld(self::$longTerm);
     }
 }

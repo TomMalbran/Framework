@@ -46,29 +46,29 @@ class Auth {
 
     /**
      * Validates the Credential
-     * @param string       $jwtToken
+     * @param string       $accessToken
      * @param string       $refreshToken Optional.
      * @param string|null  $langcode     Optional.
      * @param integer|null $timezone     Optional.
      * @return boolean
      */
-    public static function validateCredential(string $jwtToken, string $refreshToken = "", ?string $langcode = null, ?int $timezone = null): bool {
+    public static function validateCredential(string $accessToken, string $refreshToken = "", ?string $langcode = null, ?int $timezone = null): bool {
         Reset::deleteOld();
         AuthToken::deleteOld();
 
         // Validate the API Token
-        $apiToken = AuthToken::getAPIToken($jwtToken);
+        $apiToken = AuthToken::getAPIToken($accessToken);
         if (!empty($apiToken)) {
             return self::validateAPI($apiToken);
         }
 
         // Validate the Credential Tokens
-        if (!AuthToken::isValid($jwtToken, $refreshToken)) {
+        if (!AuthToken::isValid($accessToken, $refreshToken)) {
             return false;
         }
 
         // Retrieve the Token data
-        [ $credentialID, $adminID ] = AuthToken::getCredentials($jwtToken, $refreshToken);
+        [ $credentialID, $adminID ] = AuthToken::getCredentials($accessToken, $refreshToken);
         $credential = Credential::getByID($credentialID, true);
         if ($credential->isEmpty() || $credential->isDeleted) {
             return false;
@@ -82,7 +82,7 @@ class Auth {
 
         // Update the Refresh Token
         self::$refreshToken = $refreshToken;
-        $newRefreshToken = AuthToken::updateRefreshToken($refreshToken);
+        $newRefreshToken = AuthToken::updateRefreshToken($accessToken, $refreshToken);
         if (!empty($newRefreshToken) && $newRefreshToken !== $refreshToken) {
             self::$refreshToken = $newRefreshToken;
             self::$sendRefresh  = true;
@@ -360,13 +360,13 @@ class Auth {
     }
 
     /**
-     * Creates and returns the JWT token
+     * Creates and returns the Access token
      * @return string
      */
-    public static function getToken(): string {
+    public static function getAccessToken(): string {
         // Create an API Token
         if (self::hasAPI()) {
-            return AuthToken::createJWT([
+            return AuthToken::createAccessToken([
                 "isAPI"    => true,
                 "apiToken" => self::$apiToken,
             ]);
@@ -400,7 +400,7 @@ class Auth {
             $data[$field] = self::$credential->get($field);
         }
 
-        return AuthToken::createJWT($data);
+        return AuthToken::createAccessToken($data);
     }
 
     /**

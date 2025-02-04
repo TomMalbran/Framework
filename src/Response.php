@@ -31,16 +31,16 @@ class Response {
 
     /**
      * Adds the Tokens
-     * @param string $jwt
+     * @param string $accessToken
      * @param string $refreshToken
      * @return Response
      */
-    public function addTokens(string $jwt, string $refreshToken): Response {
+    public function addTokens(string $accessToken, string $refreshToken): Response {
         if (!$this->withTokens) {
             return $this;
         }
 
-        $this->data["jwt"] = $jwt;
+        $this->data["accessToken"] = $accessToken;
         if (!empty($refreshToken)) {
             $this->data["refreshToken"] = $refreshToken;
         }
