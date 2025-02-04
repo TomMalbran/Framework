@@ -105,14 +105,15 @@ class Select implements ArrayAccess, JsonSerializable {
      * Sets the Data
      * @param mixed $key
      * @param mixed $value
-     * @return void
+     * @return Select
      */
-    public function set(mixed $key, mixed $value): void {
+    public function set(mixed $key, mixed $value): Select {
         if (property_exists($this, $key)) {
             $this->$key = $value;
         } elseif (array_key_exists($key, $this->extras)) {
             $this->extras[$key] = $value;
         }
+        return $this;
     }
 
 
