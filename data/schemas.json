@@ -177,7 +177,8 @@
             "externalID"      : { "type" : "string"  },
             "sentTime"        : { "type" : "number"  },
             "isRead"          : { "type" : "boolean" },
-            "isDiscarded"     : { "type" : "boolean" }
+            "isDiscarded"     : { "type" : "boolean" },
+            "isError"         : { "type" : "boolean" }
         },
         "expressions" : {
             "credentialName" : {

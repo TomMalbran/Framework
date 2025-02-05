@@ -55,6 +55,7 @@ class NotificationQueue extends NotificationQueueSchema {
      */
     public static function getAllUnsent(): array {
         $query = Query::create("sentTime", "=", 0);
+        $query->add("isError", "=", 0);
         $query->add("createdTime", ">", DateTime::getLastXHours(1));
         $query->orderBy("createdTime", false);
         return self::getEntityList($query);
@@ -210,11 +211,18 @@ class NotificationQueue extends NotificationQueueSchema {
                 $elem->dataID,
                 $playerIDs
             );
+
             if (!empty($externalID)) {
                 self::editEntity(
                     $elem->notificationID,
                     sentTime:   time(),
                     externalID: $externalID,
+                );
+            } else {
+                self::editEntity(
+                    $elem->notificationID,
+                    sentTime: time(),
+                    isError:  true,
                 );
             }
         }
