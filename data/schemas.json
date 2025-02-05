@@ -187,9 +187,12 @@
         },
         "joins" : {
             "CREDENTIAL_ID" : {
-                "schema"    : "Credential",
-                "prefix"    : "credential",
-                "fieldKeys" : [ "firstName", "lastName" ]
+                "schema" : "Credential",
+                "prefix" : "credential",
+                "fields" : {
+                    "firstName" : { "type" : "string" },
+                    "lastName"  : { "type" : "string" }
+                }
             }
         },
         "hasFilters"    : true,

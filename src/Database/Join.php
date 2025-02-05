@@ -67,18 +67,10 @@ class Join {
 
 
         // Creates the Fields
-        if (!empty($data["fields"])) {
-            foreach ($data["fields"] as $key => $value) {
-                $this->fields[] = new Field($key, $value, $this->prefix);
-            }
-        } elseif (!empty($data["fieldKeys"])) {
-            foreach ($data["fieldKeys"] as $key) {
-                $this->fields[] = new Field($key, [ "type" => Field::String ], $this->prefix);
-            }
-        }
+        foreach ($data["fields"] as $key => $value) {
+            $field = new Field($key, $value, $this->prefix);
+            $this->fields[] = $field;
 
-        // Creates the Merges and Defaults
-        foreach ($this->fields as $field) {
             if (!empty($field->mergeTo)) {
                 if (empty($this->merges[$field->mergeTo])) {
                     $this->merges[$field->mergeTo] = (object)[
