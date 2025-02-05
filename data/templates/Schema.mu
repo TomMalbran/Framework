@@ -394,7 +394,7 @@ class {{name}}Schema extends Schema {
         }
         {{/hasTimestamps}}
         {{#hasUsers}}
-        if (!empty($createdUser)) {
+        if (empty($createdUser)) {
             $createdUser = Auth::getID();
         }
         {{/hasUsers}}
@@ -427,7 +427,7 @@ class {{name}}Schema extends Schema {
         }
         {{/fields}}
         {{#hasUsers}}
-        if (!empty($createdUser)) {
+        if (empty($createdUser)) {
             $createdUser = Auth::getID();
         }
         {{/hasUsers}}
@@ -458,7 +458,7 @@ class {{name}}Schema extends Schema {
         }
         {{/canDelete}}
         {{#hasUsers}}
-        if (!empty($modifiedUser)) {
+        if (empty($modifiedUser)) {
             $modifiedUser = Auth::getID();
         }
         {{/hasUsers}}
@@ -484,7 +484,7 @@ class {{name}}Schema extends Schema {
      */
     protected static function increaseEntity({{editType}} $query, {{column}} $column, int $amount = 1{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
         {{#hasUsers}}
-        if (!empty($modifiedUser)) {
+        if (empty($modifiedUser)) {
             $modifiedUser = Auth::getID();
         }
 
@@ -505,7 +505,7 @@ class {{name}}Schema extends Schema {
      */
     protected static function deleteEntity({{editType}} $query{{parentsEditList}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
         {{#hasUsers}}
-        if (!empty($modifiedUser)) {
+        if (empty($modifiedUser)) {
             $modifiedUser = Auth::getID();
         }
 
