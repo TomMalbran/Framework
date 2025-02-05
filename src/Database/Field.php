@@ -36,7 +36,7 @@ class Field {
     public string $type       = "";
     public int    $length     = 0;
     public int    $decimals   = 2;
-    public string $dateType   = "";
+    public string $dateType   = "middle";
     public string $date       = "";
     public string $hour       = "";
     public string $path       = "";
@@ -73,13 +73,13 @@ class Field {
         $this->key        = $key;
 
         $this->type       = !empty($data["type"])     ? $data["type"]          : self::String;
-        $this->length     = !empty($data["length"])   ? (int)$data["length"]   : 0;
-        $this->decimals   = !empty($data["decimals"]) ? (int)$data["decimals"] : 3;
-        $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : "middle";
-        $this->date       = !empty($data["date"])     ? $data["date"]          : "";
-        $this->hour       = !empty($data["hour"])     ? $data["hour"]          : "";
-        $this->path       = !empty($data["path"])     ? $data["path"]          : "";
-        $this->default    = isset($data["default"])   ? $data["default"]       : null;
+        $this->length     = !empty($data["length"])   ? (int)$data["length"]   : $this->length;
+        $this->decimals   = !empty($data["decimals"]) ? (int)$data["decimals"] : $this->decimals;
+        $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : $this->dateType;
+        $this->date       = !empty($data["date"])     ? $data["date"]          : $this->date;
+        $this->hour       = !empty($data["hour"])     ? $data["hour"]          : $this->hour;
+        $this->path       = !empty($data["path"])     ? $data["path"]          : $this->path;
+        $this->default    = isset($data["default"])   ? $data["default"]       : $this->default;
 
         $this->isID       = $this->type === self::ID;
         $this->isPrimary  = !empty($data["isPrimary"]);
