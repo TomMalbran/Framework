@@ -138,6 +138,16 @@ class {{name}}Schema extends Schema {
     }
 
 {{/uniques}}
+    /**
+     * Returns true if there is an {{name}} Entity with the given Query
+     * @param Query $query{{#hasDeleted}}
+     * @param boolean $withDeleted Optional.{{/hasDeleted}}
+     * @return boolean
+     */
+    public static function entityExists(Query $query{{#hasDeleted}}, bool $withDeleted = true{{/hasDeleted}}): bool {
+        return self::getEntityTotal($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}}) > 0;
+    }
+
 
 
 {{#hasID}}

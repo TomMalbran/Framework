@@ -78,17 +78,6 @@ class Schema {
 
 
     /**
-     * Returns true if there is a Row with the given ID or Query
-     * @param Query|integer|string $query
-     * @param boolean              $withDeleted Optional.
-     * @return boolean
-     */
-    public static function entityExists(Query|int|string $query, bool $withDeleted = true): bool {
-        $query = self::generateQueryID($query, $withDeleted);
-        return self::getEntityTotal($query) > 0;
-    }
-
-    /**
      * Returns the Data of an Entity with the given ID or Query
      * @param Query|integer|string $query
      * @param boolean              $withDeleted Optional.
