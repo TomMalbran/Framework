@@ -166,24 +166,32 @@
     },
     "NotificationQueue" : {
         "fields" : {
-            "NOTIFICATION_ID" : { "type" : "id"      },
-            "CREDENTIAL_ID"   : { "type" : "number"  },
-            "currentUser"     : { "type" : "number"  },
-            "title"           : { "type" : "string"  },
-            "body"            : { "type" : "string"  },
-            "url"             : { "type" : "string"  },
-            "dataType"        : { "type" : "string"  },
-            "dataID"          : { "type" : "number"  },
-            "externalID"      : { "type" : "string"  },
-            "sentTime"        : { "type" : "number"  },
-            "isRead"          : { "type" : "boolean" },
-            "isDiscarded"     : { "type" : "boolean" },
-            "isError"         : { "type" : "boolean" }
+            "NOTIFICATION_ID"    : { "type" : "id"      },
+            "CREDENTIAL_ID"      : { "type" : "number"  },
+            "currentUser"        : { "type" : "number"  },
+            "title"              : { "type" : "string"  },
+            "body"               : { "type" : "string"  },
+            "url"                : { "type" : "string"  },
+            "dataType"           : { "type" : "string"  },
+            "dataID"             : { "type" : "number"  },
+            "notificationResult" : { "type" : "string"  },
+            "externalID"         : { "type" : "string"  },
+            "sentTime"           : { "type" : "number"  },
+            "isRead"             : { "type" : "boolean" },
+            "isDiscarded"        : { "type" : "boolean" }
         },
         "expressions" : {
             "credentialName" : {
                 "expression" : "IF(credential.lastName <> '' AND credential.firstName <> '', CONCAT(credential.firstName, ' ', credential.lastName), IF(credential.firstName <> '', credential.firstName, credential.lastName))",
                 "type"       : "string"
+            },
+            "isPending" : {
+                "expression" : "IF(notificationResult = 'NotProcessed', 1, 0)",
+                "type"       : "boolean"
+            },
+            "isError" : {
+                "expression" : "IF(notificationResult <> 'Sent', 1, 0)",
+                "type"       : "boolean"
             }
         },
         "joins" : {

@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\Database\Query;
 use Framework\Auth\Device;
 use Framework\Notification\Notification;
+use Framework\Notification\NotificationResult;
 use Framework\Utils\DateTime;
 use Framework\Schema\NotificationQueueSchema;
 use Framework\Schema\NotificationQueueEntity;
@@ -54,8 +55,7 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return NotificationQueueEntity[]
      */
     public static function getAllUnsent(): array {
-        $query = Query::create("sentTime", "=", 0);
-        $query->add("isError", "=", 0);
+        $query = Query::create("notificationResult", "=", NotificationResult::NotProcessed->name);
         $query->add("createdTime", ">", DateTime::getLastXHours(1));
         $query->orderBy("createdTime", false);
         return self::getEntityList($query);
@@ -131,13 +131,14 @@ class NotificationQueue extends NotificationQueueSchema {
         int $dataID
     ): int {
         return self::createEntity(
-            credentialID: $credentialID,
-            currentUser:  $currentUser,
-            title:        $title,
-            body:         $body,
-            url:          $url,
-            dataType:     $dataType,
-            dataID:       $dataID,
+            credentialID:       $credentialID,
+            currentUser:        $currentUser,
+            title:              $title,
+            body:               $body,
+            url:                $url,
+            dataType:           $dataType,
+            dataID:             $dataID,
+            notificationResult: NotificationResult::NotProcessed->name,
         );
     }
 
@@ -202,29 +203,32 @@ class NotificationQueue extends NotificationQueueSchema {
         $result = true;
 
         foreach ($list as $elem) {
-            $playerIDs  = Device::getAllForCredential($elem->credentialID);
-            $externalID = Notification::sendToSome(
-                $elem->title,
-                $elem->body,
-                $elem->url,
-                $elem->dataType,
-                $elem->dataID,
-                $playerIDs
-            );
+            $notificationResult = NotificationResult::Sent;
+            $playerIDs          = Device::getAllForCredential($elem->credentialID);
+            $externalID         = "";
 
-            if (!empty($externalID)) {
-                self::editEntity(
-                    $elem->notificationID,
-                    sentTime:   time(),
-                    externalID: $externalID,
-                );
+            if (empty($playerIDs)) {
+                $notificationResult = NotificationResult::NoDevices;
             } else {
-                self::editEntity(
-                    $elem->notificationID,
-                    sentTime: time(),
-                    isError:  true,
+                $externalID = Notification::sendToSome(
+                    $elem->title,
+                    $elem->body,
+                    $elem->url,
+                    $elem->dataType,
+                    $elem->dataID,
+                    $playerIDs
                 );
+                if (empty($externalID)) {
+                    $notificationResult = NotificationResult::ProviderError;
+                }
             }
+
+            self::editEntity(
+                $elem->notificationID,
+                notificationResult: $notificationResult->name,
+                externalID:         $externalID,
+                sentTime:           time(),
+            );
         }
         return $result;
     }
