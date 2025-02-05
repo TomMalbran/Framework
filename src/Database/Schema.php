@@ -430,9 +430,8 @@ class Schema {
      */
     protected static function deleteEntityData(Query|int|string $query, int $credentialID = 0): bool {
         $query = self::generateQueryID($query, false);
-        if (self::structure()->canDelete && self::entityExists($query)) {
-            self::editEntityData($query, null, [ "isDeleted" => 1 ], $credentialID);
-            return true;
+        if (self::structure()->canDelete) {
+            return self::editEntityData($query, null, [ "isDeleted" => 1 ], $credentialID);
         }
         return false;
     }
