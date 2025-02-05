@@ -11,6 +11,7 @@ use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use Framework\Schema\CredentialSchema;
 use Framework\Schema\CredentialEntity;
+use Framework\Schema\CredentialColumn;
 
 use ArrayAccess;
 
@@ -432,7 +433,7 @@ class Credential extends CredentialSchema {
         $query->addIf("CREDENTIAL_ID", "=", $credentialID);
         $query->addIf("email",         "=", $email);
         $query->endOr();
-        return self::getEntityValue($query, "reqPassChange") == 1;
+        return self::getEntityValue($query, CredentialColumn::ReqPassChange) == 1;
     }
 
 
@@ -723,7 +724,7 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function updateLoginTime(int $credentialID): bool {
-        $current = self::getValue($credentialID, "currentLogin");
+        $current = self::getValue($credentialID, CredentialColumn::CurrentLogin);
         return self::editEntity(
             $credentialID,
             lastLogin:    $current,
@@ -733,24 +734,24 @@ class Credential extends CredentialSchema {
 
     /**
      * Gets a Credential Value
-     * @param integer $credentialID
-     * @param string  $key
+     * @param integer          $credentialID
+     * @param CredentialColumn $column
      * @return mixed
      */
-    public static function getValue(int $credentialID, string $key): mixed {
+    public static function getValue(int $credentialID, CredentialColumn $column): mixed {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        return self::getEntityValue($query, $key);
+        return self::getEntityValue($query, $column);
     }
 
     /**
      * Sets a Credential Value
-     * @param integer $credentialID
-     * @param string  $key
-     * @param mixed   $value
+     * @param integer          $credentialID
+     * @param CredentialColumn $column
+     * @param mixed            $value
      * @return boolean
      */
-    public static function setValue(int $credentialID, string $key, mixed $value): bool {
-        return self::editEntity($credentialID, ...[ $key => $value ]);
+    public static function setValue(int $credentialID, CredentialColumn $column, mixed $value): bool {
+        return self::editEntity($credentialID, ...[ $column->base() => $value ]);
     }
 
 

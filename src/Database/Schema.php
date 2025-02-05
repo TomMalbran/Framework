@@ -23,7 +23,6 @@ class Schema {
 
     const Name = "";
 
-
     /**
      * Returns the Database
      * @return Database
@@ -39,6 +38,8 @@ class Schema {
     private static function structure(): Structure {
         return Factory::getStructure(static::Name);
     }
+
+
 
     /**
      * Returns true if a Table exists
@@ -88,17 +89,6 @@ class Schema {
     }
 
     /**
-     * Selects the given column from a single table and returns a single value
-     * @param Query|integer|string $query
-     * @param string               $column
-     * @return mixed
-     */
-    protected static function getEntityValue(Query|int|string $query, string $column): mixed {
-        $query = self::generateQueryID($query, false)->limit(1);
-        return self::db()->getValue(self::structure()->table, $column, $query);
-    }
-
-    /**
      * Returns the Data of an Entity with the given ID or Query
      * @param Query|integer|string $query
      * @param boolean              $withDeleted Optional.
@@ -112,22 +102,32 @@ class Schema {
     }
 
     /**
+     * Selects the given column from a single table and returns a single value
+     * @param Query  $query
+     * @param string $column
+     * @return mixed
+     */
+    protected static function getValueData(Query $query, string $column): mixed {
+        return self::db()->getValue(self::structure()->table, $column, $query);
+    }
+
+    /**
      * Selects the given column from a single table and returns the entire column
      * @param Query|null $query
      * @param string     $column
      * @param string     $columnKey Optional.
      * @return string[]
      */
-    protected static function getEntityColumn(?Query $query, string $column, string $columnKey = ""): array {
-        $columnKey = empty($columnKey) ? Strings::substringAfter($column, ".") : $columnKey;
-
+    protected static function getColumnData(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
         $selection = new Selection(self::structure());
         $selection->addSelects($column, true);
         $selection->addJoins();
 
-        $request = $selection->request($query);
-        $result  = [];
+        $columnKey = !empty($columnKey) ? $columnKey : Strings::substringAfter($column, ".");
+        $request   = $selection->request($query);
+        $result    = [];
+
         foreach ($request as $row) {
             if (!empty($row[$columnKey]) && !Arrays::contains($result, $row[$columnKey])) {
                 $result[] = $row[$columnKey];
@@ -137,7 +137,7 @@ class Schema {
     }
 
     /**
-     * Gets a Total using the Joins
+     * Returns a Total using the Joins
      * @param Query|null $query       Optional.
      * @param boolean    $withDeleted Optional.
      * @return integer
@@ -157,35 +157,35 @@ class Schema {
 
     /**
      * Returns a Select array
-     * @param Query|null           $query      Optional.
-     * @param string|null          $orderKey   Optional.
-     * @param boolean              $orderAsc   Optional.
-     * @param string|null          $idName     Optional.
-     * @param string[]|string|null $nameKey    Optional.
-     * @param string[]|string|null $extraKey   Optional.
-     * @param boolean              $useEmpty   Optional.
-     * @param string|null          $distinctID Optional.
+     * @param Query|null           $query       Optional.
+     * @param string|null          $orderColumn Optional.
+     * @param boolean              $orderAsc    Optional.
+     * @param string|null          $idColumn    Optional.
+     * @param string[]|string|null $nameColumn  Optional.
+     * @param string[]|string|null $extraColumn Optional.
+     * @param boolean              $useEmpty    Optional.
+     * @param string|null          $distinctID  Optional.
      * @return Select[]
      */
-    protected static function getEntitySelect(
+    protected static function getSelectData(
         ?Query $query = null,
-        ?string $orderKey = null,
+        ?string $orderColumn = null,
         bool $orderAsc = true,
-        ?string $idName = null,
-        array|string|null $nameKey = null,
-        array|string|null $extraKey = null,
+        ?string $idColumn = null,
+        array|string|null $nameColumn = null,
+        array|string|null $extraColumn = null,
+        ?string $distinctColumn = null,
         bool $useEmpty = false,
-        ?string $distinctID = null
     ): array {
         $query = self::generateQuery($query);
         if (!$query->hasOrder()) {
-            $field = self::structure()->getOrder($orderKey);
+            $field = self::structure()->getOrder($orderColumn);
             $query->orderBy($field, $orderAsc);
         }
 
         $selection = new Selection(self::structure());
-        if ($distinctID !== null) {
-            $selection->addSelects("DISTINCT($distinctID)");
+        if ($distinctColumn !== null) {
+            $selection->addSelects("DISTINCT($distinctColumn)");
         }
 
         $selection->addFields();
@@ -194,24 +194,29 @@ class Schema {
         $selection->request($query);
         $request = $selection->resolve();
 
-        $keyName = $idName  ?: self::structure()->idName;
-        $valName = $nameKey ?: self::structure()->nameKey;
-        return Select::create($request, $keyName, $valName, $useEmpty, $extraKey, true);
+        $keyName = $idColumn ?: self::structure()->idName;
+        $valName = !empty($nameColumn) ? $nameColumn : self::structure()->nameKey;
+        return Select::create($request, $keyName, $valName, $useEmpty, $extraColumn, true);
     }
 
     /**
      * Returns the Search results
      * @param Query                $query
-     * @param string[]|string|null $name   Optional.
-     * @param string|null          $idName Optional.
-     * @param integer              $limit  Optional.
+     * @param string|null          $idColumn   Optional.
+     * @param string[]|string|null $nameColumn Optional.
+     * @param integer              $limit      Optional.
      * @return Search[]
      */
-    public static function getEntitySearch(Query $query, array|string|null $name = null, ?string $idName = null, int $limit = 0): array {
+    public static function getSearchData(
+        Query $query,
+        ?string $idColumn = null,
+        array|string|null $nameColumn = null,
+        int $limit = 0,
+    ): array {
         $query   = self::generateQuery($query)->limitIf($limit);
         $request = self::requestData($query);
-        $idKey   = $idName ?: self::structure()->idName;
-        $nameKey = $name   ?: self::structure()->nameKey;
+        $idKey   = !empty($idColumn)   ? $idColumn   : self::structure()->idName;
+        $nameKey = !empty($nameColumn) ? $nameColumn : self::structure()->nameKey;
         return Search::create($request, $idKey, $nameKey);
     }
 

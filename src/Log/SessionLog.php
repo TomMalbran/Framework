@@ -6,6 +6,7 @@ use Framework\Database\Query;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
 use Framework\Schema\LogSessionSchema;
+use Framework\Schema\LogSessionColumn;
 
 /**
  * The Sessions Log
@@ -20,7 +21,7 @@ class SessionLog extends LogSessionSchema {
     public static function getID(int $credentialID): int {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         $query->add("isOpen", "=", 1);
-        return (int)self::getEntityValue($query, "SESSION_ID");
+        return (int)self::getEntityValue($query, LogSessionColumn::SessionID);
     }
 
 

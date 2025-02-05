@@ -5,6 +5,7 @@ use Framework\Database\Query;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 use Framework\Schema\CredentialResetSchema;
+use Framework\Schema\CredentialResetColumn;
 
 /**
  * The Auth Reset
@@ -18,7 +19,7 @@ class Reset extends CredentialResetSchema {
      */
     public static function getCredentialID(string $resetCode): int {
         $query = Query::create("resetCode", "=", $resetCode);
-        return (int)self::getEntityValue($query, "CREDENTIAL_ID");
+        return (int)self::getEntityValue($query, CredentialResetColumn::CredentialID);
     }
 
     /**
@@ -28,7 +29,7 @@ class Reset extends CredentialResetSchema {
      */
     public static function getEmail(string $resetCode): string {
         $query = Query::create("resetCode", "=", $resetCode);
-        return self::getEntityValue($query, "email");
+        return self::getEntityValue($query, CredentialResetColumn::Email);
     }
 
     /**

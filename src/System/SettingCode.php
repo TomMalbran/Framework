@@ -7,6 +7,7 @@ use Framework\Database\Query;
 use Framework\Utils\Strings;
 use Framework\Schema\SettingsSchema;
 use Framework\Schema\SettingsEntity;
+use Framework\Schema\SettingsColumn;
 
 /**
  * The Setting Code
@@ -27,7 +28,7 @@ class SettingCode extends SettingsSchema {
     public static function get(string $section, string $variable): string {
         $query = Query::create("section", "=", $section);
         $query->add("variable", "=", $variable);
-        return self::getEntityValue($query, "value");
+        return self::getEntityValue($query, SettingsColumn::Value);
     }
 
     /**
@@ -65,10 +66,7 @@ class SettingCode extends SettingsSchema {
             return 0;
         }
 
-        $query = Query::create("section", "=", self::Core);
-        $query->add("variable", "=", $variable);
-
-        $result = self::getEntityValue($query, "value");
+        $result = self::get(self::Core, $variable);
         return !empty($result) ? $result : 0;
     }
 
@@ -123,8 +121,7 @@ class SettingCode extends SettingsSchema {
      * @return boolean
      */
     public static function saveAll(array $data): bool {
-        $list  = self::getEntityList();
-        $batch = [];
+        $list = self::getEntityList();
 
         foreach ($list as $elem) {
             $variable = "{$elem->section}-{$elem->variable}";
@@ -132,19 +129,14 @@ class SettingCode extends SettingsSchema {
                 continue;
             }
 
-            $batch[] = [
-                "section"      => $elem->section,
-                "variable"     => $elem->variable,
-                "value"        => VariableType::encodeValue($elem->variableType, $data[$variable]),
-                "variableType" => $elem->variableType,
-                "modifiedTime" => time(),
-            ];
+            self::replaceEntity(
+                section:      $elem->section,
+                variable:     $elem->variable,
+                value:        VariableType::encodeValue($elem->variableType, $data[$variable]),
+                variableType: $elem->variableType,
+            );
         }
-
-        if (empty($batch)) {
-            return false;
-        }
-        return self::batchEntities($batch);
+        return true;
     }
 
     /**

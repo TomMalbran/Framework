@@ -5,14 +5,17 @@ namespace {{namespace}}Schema;
 {{/hasStatus}}
 {{#subTypes}}use {{appNamespace}}Schema\{{type}}Entity;
 {{/subTypes}}
-use {{namespace}}Schema\{{name}}Entity;
+use {{namespace}}Schema\{{entity}};
+use {{namespace}}Schema\{{column}};
 
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
 use Framework\Database\Query;{{#canEdit}}
-use Framework\Database\Assign;{{/canEdit}}{{#hasSelect}}
-use Framework\Utils\Select;{{/hasSelect}}
+use Framework\Database\Assign;{{/canEdit}}
+use Framework\Utils\Arrays;
+use Framework\Utils\Search;
+use Framework\Utils\Select;
 
 /**
  * The {{name}} Schema
@@ -25,10 +28,10 @@ class {{name}}Schema extends Schema {
     /**
      * Constructs the {{name}} Entity
      * @param array{} $data
-     * @return {{name}}Entity
+     * @return {{entity}}
      */
-    protected static function constructEntity(array $data): {{name}}Entity {
-        $entity = new {{name}}Entity($data);
+    protected static function constructEntity(array $data): {{entity}} {
+        $entity = new {{entity}}($data);
         {{#processEntity}}
         if (!$entity->isEmpty()) {
             {{#subTypes}}
@@ -51,7 +54,7 @@ class {{name}}Schema extends Schema {
     /**
      * Constructs a list of {{name}} Entities
      * @param array{}[] $list
-     * @return {{name}}Entity[]
+     * @return {{entity}}[]
      */
     protected static function constructEntities(array $list): array {
         $result = [];
@@ -90,10 +93,10 @@ class {{name}}Schema extends Schema {
 {{#hasProcessed}}
     /**
      * Post Process the Result
-     * @param {{name}}Entity $entity
-     * @return {{name}}Entity
+     * @param {{entity}} $entity
+     * @return {{entity}}
      */
-    protected static function postProcess({{name}}Entity $entity): {{name}}Entity {
+    protected static function postProcess({{entity}} $entity): {{entity}} {
         return $entity;
     }
 
@@ -144,9 +147,9 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}} Optional.{{/parents}}{{#canDelete}}
      * @param boolean $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param boolean $decrypted Optional.{{/hasEncrypt}}
-     * @return {{name}}Entity
+     * @return {{entity}}
      */
-    public static function getByID({{idType}} ${{idName}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{name}}Entity {
+    public static function getByID({{idType}} ${{idName}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
         $query = Query::create("{{idKey}}", "=", ${{idName}});
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
@@ -160,9 +163,9 @@ class {{name}}Schema extends Schema {
      * Returns the {{name}} Entity the given Name
      * @param string ${{nameKey}}{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
-     * @return {{name}}Entity
+     * @return {{entity}}
      */
-    public static function getByName(string ${{nameKey}}{{{parentsDefList}}}): {{name}}Entity {
+    public static function getByName(string ${{nameKey}}{{{parentsDefList}}}): {{entity}} {
         $query = Query::create("{{nameKey}}", "=", ${{nameKey}});
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
@@ -178,9 +181,9 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}} Optional.{{/parents}}{{#canDelete}}
      * @param boolean $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param boolean $decrypted Optional.{{/hasEncrypt}}
-     * @return {{name}}Entity
+     * @return {{entity}}
      */
-    public static function getBy{{fieldText}}({{fieldArg}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{name}}Entity {
+    public static function getBy{{fieldText}}({{fieldArg}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
         $query = Query::create("{{fieldKey}}", "=", {{fieldParam}});
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
@@ -194,11 +197,31 @@ class {{name}}Schema extends Schema {
      * @param Query $query{{#canDelete}}
      * @param boolean $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param boolean $decrypted Optional.{{/hasEncrypt}}
-     * @return {{name}}Entity
+     * @return {{entity}}
      */
-    protected static function getEntity(Query $query{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{name}}Entity {
+    protected static function getEntity(Query $query{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
         $data = self::getEntityData($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
+    }
+
+    /**
+     * Selects the given column from a single table and returns a single value
+     * @param Query $query
+     * @param {{column}} $column
+     * @return mixed
+     */
+    protected static function getEntityValue(Query $query, {{column}} $column): mixed {
+        return self::getValueData($query, $column->base());
+    }
+
+    /**
+     * Selects the given column from a single table and returns the entire column
+     * @param Query $query
+     * @param {{column}} $column
+     * @return string[]
+     */
+    protected static function getEntityColumn(Query $query, {{column}} $column): array {
+        return self::getColumnData($query, $column->value, $column->key());
     }
 
 
@@ -210,7 +233,7 @@ class {{name}}Schema extends Schema {
      * @return int[]
      */
     public static function get{{idText}}s(?Query $query = null): array {
-        return self::getEntityColumn($query, "{{idKey}}");
+        return self::getColumnData($query, "{{idKey}}");
     }
 
 {{/hasID}}
@@ -219,7 +242,7 @@ class {{name}}Schema extends Schema {
      * @param Request $request{{/hasFilters}}{{^hasFilters}}
      * @param Request|null $request Optional.{{/hasFilters}}{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
-     * @return {{name}}Entity[]
+     * @return {{entity}}[]
      */
     public static function getList({{#hasFilters}}Request $request{{/hasFilters}}{{^hasFilters}}?Request $request = null{{/hasFilters}}{{{parentsDefList}}}): array {
         {{#hasFilters}}
@@ -241,7 +264,7 @@ class {{name}}Schema extends Schema {
      * @param Query|null $query Optional.
      * @param Request|null $sort Optional.{{#hasEncrypt}}
      * @param boolean $decrypted Optional.{{/hasEncrypt}}
-     * @return {{name}}Entity[]
+     * @return {{entity}}[]
      */
     protected static function getEntityList(?Query $query = null, ?Request $sort = null{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): array {
         $list = self::getEntitiesData($query, $sort{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
@@ -249,7 +272,7 @@ class {{name}}Schema extends Schema {
     }
 
     /**
-     * Gets a Total number of {{name}} Entities{{#hasFilters}}
+     * Returns a Total number of {{name}} Entities{{#hasFilters}}
      * @param Request $request{{/hasFilters}}{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
      * @return integer
@@ -269,6 +292,8 @@ class {{name}}Schema extends Schema {
         return self::getEntityTotal({{#hasMainQuery}}$query{{/hasMainQuery}});
     }
 
+
+
 {{#hasSelect}}
     /**
      * Returns a Select of {{name}} Entities{{#parents}}
@@ -279,10 +304,72 @@ class {{name}}Schema extends Schema {
         {{#hasParents}}
         $query = self::createParentQuery({{parentsList}});
         {{/hasParents}}
-        return self::getEntitySelect({{#hasParents}}$query{{/hasParents}});
+        return self::getSelectData({{#hasParents}}$query{{/hasParents}});
     }
 
 {{/hasSelect}}
+    /**
+     * Returns a Select of {{name}} Entities
+     * @param Query|null $query Optional.
+     * @param {{column}}|null $orderColumn Optional.
+     * @param boolean $orderAsc Optional.
+     * @param {{column}}|null $idColumn Optional.
+     * @param {{column}}[]|{{column}}|null $nameColumn Optional.
+     * @param {{column}}[]|{{column}}|null $extraColumn Optional.
+     * @param {{column}}|null $distinctColumn Optional.
+     * @param boolean $useEmpty Optional.
+     * @return Select[]
+     */
+    protected static function getEntitySelect(
+        ?Query $query = null,
+        ?{{column}} $orderColumn = null,
+        bool $orderAsc = true,
+        ?{{column}} $idColumn = null,
+        array|{{column}}|null $nameColumn = null,
+        array|{{column}}|null $extraColumn = null,
+        ?{{column}} $distinctColumn = null,
+        bool $useEmpty = false,
+    ): array {
+        $orderKey    = !empty($orderColumn)    ? $orderColumn->key()    : null;
+        $idKey       = !empty($idColumn)       ? $idColumn->key()       : null;
+        $distinctKey = !empty($distinctColumn) ? $distinctColumn->value : null;
+
+        $nameKey     = !empty($nameColumn)  ? Arrays::toArray($nameColumn)  : [];
+        $extraKey    = !empty($extraColumn) ? Arrays::toArray($extraColumn) : [];
+
+        foreach ($nameKey as $index => $column) {
+            $nameKey[$index] = $column->key();
+        }
+        foreach ($extraKey as $index => $column) {
+            $extraKey[$index] = $column->key();
+        }
+
+        return self::getSelectData($query, $orderKey, $orderAsc, $idKey, $nameKey, $extraKey, $distinctKey, $useEmpty);
+    }
+
+    /**
+     * Returns the Search results for the {{name}} Entities
+     * @param Query $query
+     * @param {{column}}|null $idColumn Optional.
+     * @param {{column}}[]|{{column}}|null $nameColumn Optional.
+     * @param integer $limit Optional.
+     * @return Search[]
+     */
+    public static function getEntitySearch(
+        Query $query,
+        ?{{column}} $idColumn = null,
+        array|{{column}}|null $nameColumn = null,
+        int $limit = 0,
+    ): array {
+        $idKey   = !empty($idColumn)   ? $idColumn->key()             : null;
+        $nameKey = !empty($nameColumn) ? Arrays::toArray($nameColumn) : [];
+        foreach ($nameKey as $index => $column) {
+            $nameKey[$index] = $column->key();
+        }
+
+        return self::getSearchData($query, $idKey, $nameKey, $limit);
+    }
+
 
 {{#canCreate}}
 
@@ -390,12 +477,12 @@ class {{name}}Schema extends Schema {
     /**
      * Increments a value in a {{name}} Entity
      * @param {{editDocType}} $query
-     * @param string $column
+     * @param {{column}} $column
      * @param integer $amount Optional.{{#hasUsers}}
      * @param integer $modifiedUser Optional.{{/hasUsers}}
      * @return boolean
      */
-    protected static function increaseEntity({{editType}} $query, string $column, int $amount = 1{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
+    protected static function increaseEntity({{editType}} $query, {{column}} $column, int $amount = 1{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
         {{#hasUsers}}
         if (!empty($modifiedUser)) {
             $modifiedUser = Auth::getID();
@@ -403,7 +490,7 @@ class {{name}}Schema extends Schema {
 
         {{/hasUsers}}
         return self::editEntityData($query, null, [
-            $column => Assign::increase($amount),
+            $column->base() => Assign::increase($amount),
         ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
     }
 {{/canEdit}}
@@ -458,12 +545,12 @@ class {{name}}Schema extends Schema {
 
     /**
      * Ensures that the order of the Elements is correct
-     * @param {{name}}Entity|null $entity
+     * @param {{entity}}|null $entity
      * @param Request|array{}|null $fields{{#parents}}
      * @param {{fieldDoc}}{{/parents}}
      * @return boolean
      */
-    protected static function ensurePosOrder(?{{name}}Entity $entity, Request|array|null $fields{{parentsEditList}}): bool {
+    protected static function ensurePosOrder(?{{entity}} $entity, Request|array|null $fields{{parentsEditList}}): bool {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}

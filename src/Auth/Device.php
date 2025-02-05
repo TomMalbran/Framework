@@ -5,6 +5,7 @@ use Framework\Log\DeviceLog;
 use Framework\Database\Query;
 use Framework\Utils\Server;
 use Framework\Schema\CredentialDeviceSchema;
+use Framework\Schema\CredentialDeviceColumn;
 
 /**
  * The Credential Devices
@@ -32,7 +33,7 @@ class Device extends CredentialDeviceSchema {
         }
 
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        return self::getEntityColumn($query, "playerID");
+        return self::getEntityColumn($query, CredentialDeviceColumn::PlayerID);
     }
 
 

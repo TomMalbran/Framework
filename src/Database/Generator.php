@@ -16,8 +16,10 @@ class Generator {
 
     private static string $namespace;
     private static string $writePath;
-    private static string $schemaText;
-    private static string $entityText;
+
+    private static string $schemaTemplate;
+    private static string $entityTemplate;
+    private static string $columnTemplate;
 
 
 
@@ -54,8 +56,9 @@ class Generator {
      * @return boolean
      */
     private static function generate(bool $forFramework): bool {
-        self::$schemaText = Framework::loadFile(Framework::TemplateDir, "Schema.mu");
-        self::$entityText = Framework::loadFile(Framework::TemplateDir, "Entity.mu");
+        self::$schemaTemplate = Framework::loadFile(Framework::TemplateDir, "Schema.mu");
+        self::$entityTemplate = Framework::loadFile(Framework::TemplateDir, "Entity.mu");
+        self::$columnTemplate = Framework::loadFile(Framework::TemplateDir, "Column.mu");
 
         $schemas = Factory::getData();
         $created = 0;
@@ -74,6 +77,9 @@ class Generator {
                 continue;
             }
             if (!self::createEntity($structure)) {
+                continue;
+            }
+            if (!self::createColumn($structure)) {
                 continue;
             }
             $created += 1;
@@ -100,10 +106,12 @@ class Generator {
         $subTypes    = self::getSubTypes($structure->subRequests);
         $editParents = $structure->hasPositions ? $parents : [];
 
-        $contents    = Mustache::render(self::$schemaText, [
+        $contents    = Mustache::render(self::$schemaTemplate, [
             "appNamespace"    => Framework::Namespace,
             "namespace"       => self::$namespace,
             "name"            => $structure->schema,
+            "column"          => "{$structure->schema}Column",
+            "entity"          => "{$structure->schema}Entity",
             "hasID"           => $structure->hasID,
             "idKey"           => $structure->idKey,
             "idName"          => $structure->idName,
@@ -303,7 +311,7 @@ class Generator {
     private static function createEntity(Structure $structure): bool {
         $fileName   = "{$structure->schema}Entity.php";
         $attributes = self::getAttributes($structure);
-        $contents   = Mustache::render(self::$entityText, [
+        $contents   = Mustache::render(self::$entityTemplate, [
             "appNamespace" => Framework::Namespace,
             "namespace"    => self::$namespace,
             "name"         => $structure->schema,
@@ -452,6 +460,87 @@ class Generator {
                 "subType" => $attribute->subType,
             ];
             $parsed[$attribute->name] = true;
+        }
+        return $result;
+    }
+
+
+
+    /**
+     * Creates the Column file
+     * @param Structure $structure
+     * @return boolean
+     */
+    private static function createColumn(Structure $structure): bool {
+        $fileName = "{$structure->schema}Column.php";
+        $contents = Mustache::render(self::$columnTemplate, [
+            "namespace" => self::$namespace,
+            "name"      => $structure->schema,
+            "columns"   => self::getColumns($structure),
+        ]);
+        return File::create(self::$writePath, $fileName, $contents);
+    }
+
+    /**
+     * Returns the Field columns for the Column
+     * @param Structure $structure
+     * @return array{}
+     */
+    private static function getColumns(Structure $structure): array {
+        $addSpace = true;
+        $result   = [];
+
+        foreach ($structure->fields as $field) {
+            $result[] = [
+                "name"     => Strings::upperCaseFirst($field->name),
+                "value"    => "{$structure->table}.{$field->key}",
+                "addSpace" => false,
+            ];
+            if ($field->type === Field::File) {
+                $result[] = [
+                    "name"     => Strings::upperCaseFirst("{$field->name}Url"),
+                    "value"    => "{$field->name}Url",
+                    "addSpace" => false,
+                ];
+            }
+        }
+
+        foreach ($structure->expressions as $expression) {
+            $result[] = [
+                "name"     => Strings::upperCaseFirst($expression->prefixName),
+                "value"    => $expression->key,
+                "addSpace" => $addSpace,
+            ];
+            $addSpace = false;
+        }
+
+        foreach ($structure->joins as $join) {
+            $addSpace = true;
+            foreach ($join->fields as $field) {
+                $table    = $join->asTable ?: $join->table;
+                $result[] = [
+                    "name"     => Strings::upperCaseFirst($field->prefixName),
+                    "value"    => "{$table}.{$field->name}",
+                    "addSpace" => $addSpace,
+                ];
+                $addSpace = false;
+            }
+            foreach ($join->merges as $merge) {
+                $result[] = [
+                    "name"     => Strings::upperCaseFirst($merge->key),
+                    "value"    => $merge->key,
+                    "addSpace" => false,
+                ];
+            }
+        }
+
+
+        $nameLength = 0;
+        foreach ($result as $index => $column) {
+            $nameLength = max($nameLength, Strings::length($column["name"]));
+        }
+        foreach ($result as $index => $column) {
+            $result[$index]["name"] = Strings::padRight($column["name"], $nameLength);
         }
         return $result;
     }
