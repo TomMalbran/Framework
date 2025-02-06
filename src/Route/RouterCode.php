@@ -1,5 +1,5 @@
 <?php
-namespace Framework\System;
+namespace Framework\Route;
 
 use Framework\Framework;
 use Framework\Route\Route;

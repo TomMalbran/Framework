@@ -7,9 +7,9 @@ use Framework\System\ConfigCode;
 use Framework\System\SettingCode;
 use Framework\System\SignalCode;
 use Framework\System\StatusCode;
-use Framework\System\RouterCode;
 use Framework\File\File;
 use Framework\File\FilePath;
+use Framework\Route\RouterCode;
 use Framework\Provider\Mustache;
 
 /**
@@ -28,35 +28,37 @@ class Code {
     public static function generateCode(): bool {
         print("\nFRAMEWORK CODES\n");
 
-        $writePath = Framework::getPath(Framework::SystemDir);
+        $writePath    = Framework::getPath(Framework::SystemDir);
+        $internalPath = Framework::getPath(Framework::RouteDir, forFramework: true);
+
         File::createDir($writePath);
         File::emptyDir($writePath);
 
-        self::generateOne("Access",  AccessCode::getCode());
-        self::generateOne("Config",  ConfigCode::getCode());
-        self::generateOne("Setting", SettingCode::getCode());
-        self::generateOne("Signal",  SignalCode::getCode());
-        self::generateOne("Status",  StatusCode::getCode());
-        self::generateOne("Router",  RouterCode::getCode());
-        self::generateOne("Path",    FilePath::getCode());
+        self::generateOne($writePath, "Access",  AccessCode::getCode());
+        self::generateOne($writePath, "Config",  ConfigCode::getCode());
+        self::generateOne($writePath, "Setting", SettingCode::getCode());
+        self::generateOne($writePath, "Signal",  SignalCode::getCode());
+        self::generateOne($writePath, "Status",  StatusCode::getCode());
+        self::generateOne($writePath, "Path",    FilePath::getCode());
 
+        self::generateOne($internalPath, "Router", RouterCode::getCode());
         return true;
     }
 
     /**
      * Generates a single System Code
+     * @param string  $writePath
      * @param string  $name
      * @param array{} $data
      * @return boolean
      */
-    private static function generateOne(string $name, array $data): bool {
+    private static function generateOne(string $writePath, string $name, array $data): bool {
         if (empty($data)) {
             return false;
         }
 
-        $writePath = Framework::getPath(Framework::SystemDir);
-        $template  = Framework::loadFile(Framework::TemplateDir, "$name.mu");
-        $contents  = Mustache::render($template, $data + [
+        $template = Framework::loadFile(Framework::TemplateDir, "$name.mu");
+        $contents = Mustache::render($template, $data + [
             "nameSpace" => Framework::Namespace,
             "codeSpace" => Framework::Namespace . self::Namespace,
         ]);

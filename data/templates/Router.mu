@@ -1,5 +1,5 @@
 <?php
-namespace {{codeSpace}};
+namespace Framework\Route;
 
 use Framework\Request;
 
@@ -30,6 +30,7 @@ class Router {
 
             {{/addSpace}}
         {{/routes}}
+
             default => "",
         };
     }
@@ -48,6 +49,7 @@ class Router {
 
             {{/addSpace}}
         {{/routes}}
+
             default => "",
         };
     }

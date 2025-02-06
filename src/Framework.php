@@ -56,6 +56,7 @@ class Framework {
     const StringsDir     = "nls/strings";
     const EmailsDir      = "nls/emails";
     const SchemasDir     = "src/Schema";
+    const RouteDir       = "src/Route";
     const SystemDir      = "src/System";
 
     // Variables
