@@ -22,7 +22,7 @@ use Framework\Utils\Select;
  */
 class {{name}}Schema extends Schema {
 
-    const Name = "{{name}}";
+    const Schema = "{{name}}";
 
 
     /**

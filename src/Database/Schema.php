@@ -21,7 +21,7 @@ use ArrayAccess;
  */
 class Schema {
 
-    const Name = "";
+    const Schema = "";
 
     /**
      * Returns the Database
@@ -36,7 +36,7 @@ class Schema {
      * @return Structure
      */
     private static function structure(): Structure {
-        return Factory::getStructure(static::Name);
+        return Factory::getStructure(static::Schema);
     }
 
 
