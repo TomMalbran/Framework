@@ -18,7 +18,6 @@
         "mustache/mustache": "^2.14",
         "phpmailer/phpmailer": "^6.9",
         "league/oauth2-google": "^4.0",
-        "phpoffice/phpspreadsheet": "^3.3",
         "drewm/mailchimp-api": "^2.5",
         "openspout/openspout": "^4.26"
     },
@@ -28,7 +27,7 @@
         "phpmailer/phpmailer": "Used for Mailing with SMTP",
         "league/oauth2-google": "Used for Mailing with Gmail",
         "drewm/mailchimp-api": "Used for Mailing with MailChimp",
-        "phpoffice/phpspreadsheet": "Used to Import/Export data"
+        "openspout/openspout": "Used to Import/Export XLSX data"
     },
     "autoload": {
         "psr-4": {

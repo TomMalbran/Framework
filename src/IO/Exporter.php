@@ -5,7 +5,6 @@ use Framework\Request;
 use Framework\NLS\NLS;
 use Framework\IO\ExporterWriter;
 use Framework\IO\XLSXWriter;
-use Framework\IO\SpreadsheetWriter;
 use Framework\IO\CSVWriter;
 use Framework\Utils\Elements;
 
@@ -29,18 +28,15 @@ class Exporter {
      * @param integer $total
      * @param string  $title
      * @param string  $fileName
-     * @param integer $maxLines Optional.
      * @param string  $lang     Optional.
      */
-    public function __construct(int $total, string $title, string $fileName, int $maxLines = 5000, string $lang = "root") {
+    public function __construct(int $total, string $title, string $fileName, string $lang = "root") {
         $this->fileName = NLS::get($fileName, $lang) . "_" . date("Y-m-d");
         $this->total    = $total;
         $this->header   = new Elements();
 
         if (XLSXWriter::isAvailable()) {
             $this->writer = new XLSXWriter($title, $this->fileName, $lang);
-        } elseif (SpreadsheetWriter::isAvailable($total, $maxLines)) {
-            $this->writer = new SpreadsheetWriter($title, $lang);
         } else {
             $this->writer = new CSVWriter($this->fileName, $lang);
         }

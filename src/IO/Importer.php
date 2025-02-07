@@ -5,7 +5,6 @@ use Framework\IO\ImporterReader;
 use Framework\IO\ImporterData;
 use Framework\IO\ImporterRow;
 use Framework\IO\XLSXReader;
-use Framework\IO\SpreadsheetReader;
 use Framework\Utils\Select;
 
 use Iterator;
@@ -32,8 +31,6 @@ class Importer implements Iterator {
 
         if (XLSXReader::isAvailable()) {
             $this->reader = new XLSXReader($path);
-        } elseif (SpreadsheetReader::isAvailable()) {
-            $this->reader = new SpreadsheetReader($path);
         } else {
             // $this->reader = new CSVReader($path);
         }
