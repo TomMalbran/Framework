@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Core;
 
+use Framework\System\Access;
+
 use Attribute;
 
 /**
@@ -10,15 +12,16 @@ use Attribute;
 class Route {
 
     public string $route;
-    public string $access;
+    public Access $access;
+
 
 
     /**
      * The Route Attribute
      * @param string $route
-     * @param string $access
+     * @param Access $access
      */
-    public function __construct(string $route, string $access) {
+    public function __construct(string $route, Access $access) {
         $this->route  = $route;
         $this->access = $access;
     }

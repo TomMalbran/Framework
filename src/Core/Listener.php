@@ -13,6 +13,7 @@ class Listener {
     public array $triggers = [];
 
 
+
     /**
      * The Listener Attribute
      * @param string ...$trigger

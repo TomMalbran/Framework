@@ -13,7 +13,6 @@ use Framework\Log\ErrorLog;
 use Framework\Database\Database;
 use Framework\Database\Generator;
 use Framework\Database\Migration;
-use Framework\System\Access;
 use Framework\System\Router;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
@@ -342,7 +341,6 @@ class Framework {
 
         // Grab the Access Name for the given Route
         $accessName = Router::getAccessName($route);
-        $accessName = Access::from($accessName);
 
         // The route requires login and the user is Logged Out
         if (Auth::requiresLogin($accessName)) {

@@ -3,6 +3,7 @@ namespace {{codeSpace}};
 
 use Framework\Request;
 use Framework\Response;
+use Framework\System\Access;
 
 /**
  * The Router
@@ -15,29 +16,29 @@ class Router {
      * @return boolean
      */
     public static function has(string $route): bool {
-        return self::getAccessName($route) !== "";
+        return self::getAccessName($route) !== Access::None;
     }
 
     /**
      * Returns the Access Name for the given Route, if it exists
      * @param string $route
-     * @return string
+     * @return Access
      */
-    public static function getAccessName(string $route): string {
+    public static function getAccessName(string $route): Access {
     {{#hasRoutes}}
         return match ($route) {
         {{#routes}}
-            {{{route}}} => "{{access}}",
+            {{{route}}} => Access::{{access}},
             {{#addSpace}}
 
             {{/addSpace}}
         {{/routes}}
 
-            default => "",
+            default => Access::None,
         };
     {{/hasRoutes}}
     {{^hasRoutes}}
-        return "";
+        return Access::None;
     {{/hasRoutes}}
     }
 

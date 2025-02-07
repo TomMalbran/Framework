@@ -65,12 +65,12 @@ class RouterCode {
                     "method"     => $methodName,
                     "hasRequest" => $params > 0,
                     "route"      => $route->route,
-                    "access"     => $route->access,
+                    "access"     => $route->access->name,
                     "addSpace"   => false,
                 ];
 
                 // Add the Test Route
-                $testMethods[$method->getName()] = $route->access;
+                $testMethods[$method->getName()] = $route->access->name;
                 if (empty($baseRoute)) {
                     $baseRoute = Strings::substringBefore($route->route, "/", false);
                 }
