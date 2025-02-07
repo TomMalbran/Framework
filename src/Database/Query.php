@@ -134,13 +134,13 @@ class Query {
 
     /**
      * Adds an expression as an and if the value is not empty
-     * @param string       $column
-     * @param string       $expression
-     * @param mixed        $value
-     * @param boolean|null $condition  Optional.
+     * @param string                      $column
+     * @param string                      $expression
+     * @param mixed[]|integer|string|null $value
+     * @param boolean|null                $condition  Optional.
      * @return Query
      */
-    public function addIf(string $column, string $expression, mixed $value, ?bool $condition = null): Query {
+    public function addIf(string $column, string $expression, array|int|string|null $value, ?bool $condition = null): Query {
         if ($condition !== null && $condition) {
             $this->add($column, $expression, $value);
         } elseif ($condition === null && !empty($value)) {
@@ -602,13 +602,13 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string     $column        Optional.
-     * @param string     $expression    Optional.
-     * @param mixed|null $value         Optional.
-     * @param boolean    $caseSensitive Optional.
+     * @param string                      $column        Optional.
+     * @param string                      $expression    Optional.
+     * @param mixed[]|integer|string|null $value         Optional.
+     * @param boolean                     $caseSensitive Optional.
      * @return Query
      */
-    public static function create(string $column = "", string $expression = "", mixed $value = null, bool $caseSensitive = false): Query {
+    public static function create(string $column = "", string $expression = "", array|int|string|null $value = null, bool $caseSensitive = false): Query {
         $query = new Query();
         if (!empty($column)) {
             $query->add($column, $expression, $value, $caseSensitive);
@@ -618,13 +618,13 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string       $column     Optional.
-     * @param string       $expression Optional.
-     * @param mixed|null   $value      Optional.
-     * @param boolean|null $condition  Optional.
+     * @param string                      $column     Optional.
+     * @param string                      $expression Optional.
+     * @param mixed[]|integer|string|null $value      Optional.
+     * @param boolean|null                $condition  Optional.
      * @return Query
      */
-    public static function createIf(string $column = "", string $expression = "", mixed $value = null, ?bool $condition = null): Query {
+    public static function createIf(string $column = "", string $expression = "", array|int|string|null $value = null, ?bool $condition = null): Query {
         $query = new Query();
         if (!empty($column)) {
             $query->addIf($column, $expression, $value, $condition);
