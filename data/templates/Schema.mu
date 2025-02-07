@@ -386,18 +386,24 @@ class {{name}}Schema extends Schema {
     /**
      * Creates a new {{name}} Entity
      * @param Request|null $entityRequest Optional.{{#fields}}
-     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasTimestamps}}
+     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasStatus}}
+     * @param Status|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
      * @param integer $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
      * @return integer
      */
-    protected static function createEntity(?Request $entityRequest = null{{{fieldsList}}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): int {
+    protected static function createEntity(?Request $entityRequest = null{{{fieldsList}}}{{#hasStatus}}, ?Status $status = null{{/hasStatus}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): int {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
             $entityFields["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
+        {{#hasStatus}}
+        if ($status !== null) {
+            $entityFields["status"] = $status->name;
+        }
+        {{/hasStatus}}
         {{#hasTimestamps}}
         if (!empty($createdTime)) {
             $entityFields["createdTime"] = $createdTime;
@@ -425,17 +431,23 @@ class {{name}}Schema extends Schema {
     /**
      * Replaces the {{name}} Entity
      * @param Request|null $entityRequest Optional.{{#fields}}
-     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasUsers}}
+     * @param {{fieldDoc}} Optional.{{/fields}}{{#hasStatus}}
+     * @param Status|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
      * @return boolean
      */
-    protected static function replaceEntity(?Request $entityRequest = null{{{fieldsList}}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
+    protected static function replaceEntity(?Request $entityRequest = null{{{fieldsList}}}{{#hasStatus}}, ?Status $status = null{{/hasStatus}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== {{{defaultValue}}}) {
             $entityFields["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
+        {{#hasStatus}}
+        if ($status !== null) {
+            $entityFields["status"] = $status->name;
+        }
+        {{/hasStatus}}
         {{#hasUsers}}
         if (empty($createdUser)) {
             $createdUser = Auth::getID();
@@ -450,18 +462,24 @@ class {{name}}Schema extends Schema {
      * Edits a {{name}} Entity
      * @param {{editDocType}} $query
      * @param Request|null $entityRequest Optional.{{#fields}}
-     * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasUsers}}
+     * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasStatus}}
+     * @param Status|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param integer $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
      * @param boolean|null $isDeleted Optional.{{/canDelete}}
      * @return boolean
      */
-    protected static function editEntity({{editType}} $query, ?Request $entityRequest = null{{{fieldsEditList}}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}): bool {
+    protected static function editEntity({{editType}} $query, ?Request $entityRequest = null{{{fieldsEditList}}}{{#hasStatus}}, ?Status $status = null{{/hasStatus}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
             $entityFields["{{fieldKey}}"] = {{fieldParam}};
         }
         {{/fields}}
+        {{#hasStatus}}
+        if ($status !== null) {
+            $entityFields["status"] = $status->name;
+        }
+        {{/hasStatus}}
         {{#canDelete}}
         if ($isDeleted !== null) {
             $entityFields["isDeleted"] = $isDeleted;

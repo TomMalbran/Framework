@@ -45,6 +45,8 @@ class Generator {
      * @return boolean
      */
     public static function generateInternal(): bool {
+        print("\nSCHEMA CODES\n");
+
         self::$namespace = "Framework\\";
         self::$writePath = Framework::getPath(Framework::SchemasDir);
         return self::generate(true);
@@ -125,6 +127,7 @@ class Generator {
             "hasSelect"       => !empty($structure->nameKey),
             "hasPositions"    => $structure->hasPositions,
             "hasTimestamps"   => $structure->hasTimestamps,
+            "hasStatus"       => $structure->hasStatus,
             "hasUsers"        => $structure->hasUsers,
             "hasFilters"      => $structure->hasFilters,
             "hasEncrypt"      => $structure->hasEncrypt,
@@ -150,7 +153,6 @@ class Generator {
             "hasParents"      => !empty($parents),
             "hasEditParents"  => $structure->hasPositions && !empty($parents),
             "hasMainQuery"    => $structure->hasFilters || !empty($parents),
-            "hasStatus"       => $structure->hasStatus,
         ]);
 
         $contents = self::alignParams($contents);
@@ -184,10 +186,15 @@ class Generator {
     private static function getAllFields(Structure $structure): array {
         $skipKeys = [ "createdTime", "createdUser", "modifiedTime", "modifiedUser", "isDeleted" ];
         $result   = [];
+
         foreach ($structure->fields as $field) {
-            if (!$field->isID && !Arrays::contains($skipKeys, $field->key)) {
-                $result[] = self::getField($field);
+            if ($field->isID || Arrays::contains($skipKeys, $field->key)) {
+                continue;
             }
+            if ($structure->hasStatus && $field->key === "status") {
+                continue;
+            }
+            $result[] = self::getField($field);
         }
         return $result;
     }
