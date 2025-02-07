@@ -706,16 +706,6 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Sets the Credential Status
-     * @param integer $credentialID
-     * @param Status  $status
-     * @return boolean
-     */
-    public static function setStatus(int $credentialID, Status $status): bool {
-        return self::editEntity($credentialID, status: $status);
-    }
-
-    /**
      * Stops asking the Credential for Notifications
      * @param integer $credentialID
      * @return boolean
@@ -736,6 +726,26 @@ class Credential extends CredentialSchema {
             lastLogin:    $current,
             currentLogin: time(),
         );
+    }
+
+    /**
+     * Sets the Credential Progress
+     * @param integer $credentialID
+     * @param integer $value
+     * @return boolean
+     */
+    public static function setProgress(int $credentialID, int $value): bool {
+        return self::editEntity($credentialID, progressValue: $value);
+    }
+
+    /**
+     * Sets the Credential Status
+     * @param integer $credentialID
+     * @param Status  $status
+     * @return boolean
+     */
+    public static function setStatus(int $credentialID, Status $status): bool {
+        return self::editEntity($credentialID, status: $status);
     }
 
     /**

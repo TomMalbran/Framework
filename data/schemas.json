@@ -24,7 +24,8 @@
             "timezone"         : { "type" : "number",  "isSigned" : true, "cantEdit" : true },
             "currentLogin"     : { "type" : "date",                       "cantEdit" : true },
             "lastLogin"        : { "type" : "date",                       "cantEdit" : true },
-            "askNotifications" : { "type" : "boolean", "default"  : 1,    "cantEdit" : true }
+            "askNotifications" : { "type" : "boolean", "default"  : 1,    "cantEdit" : true },
+            "progressValue"    : { "type" : "number",                     "cantEdit" : true }
         },
         "processed" : {
             "adminID"        : { "type" : "number" },
