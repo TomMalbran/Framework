@@ -139,6 +139,7 @@ class ErrorLog extends LogErrorSchema {
             self::editEntity(
                 $query,
                 amount:      Assign::increase(1),
+                isResolved:  false,
                 updatedTime: time(),
             );
         } else {
@@ -152,7 +153,7 @@ class ErrorLog extends LogErrorSchema {
                 description: $description,
                 backtrace:   $backtrace,
                 amount:      1,
-                isResolved:  0,
+                isResolved:  false,
                 updatedTime: time(),
             );
 
