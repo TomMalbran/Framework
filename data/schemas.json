@@ -17,7 +17,6 @@
             "passExpiration"   : { "type" : "date",                       "cantEdit" : true },
             "accessToken"      : { "type" : "string",                     "cantEdit" : true },
             "tokenExpiration"  : { "type" : "date",                       "cantEdit" : true },
-            "status"           : { "type" : "string",                     "noExists" : true },
             "observations"     : { "type" : "text",                       "noExists" : true },
             "sendEmails"       : { "type" : "boolean",                    "noExists" : true },
             "sendEmailNotis"   : { "type" : "boolean",                    "noExists" : true },
@@ -31,7 +30,8 @@
             "adminID"        : { "type" : "number" },
             "userAccess"     : { "type" : "string" },
             "credentialName" : { "type" : "string" },
-            "avatarFile"     : { "type" : "string" }
+            "avatarFile"     : { "type" : "string" },
+            "accessName"     : { "type" : "string" }
         },
         "expressions" : {
             "fullName" : {
@@ -39,6 +39,7 @@
                 "type"       : "string"
             }
         },
+        "hasStatus"     : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
