@@ -1,5 +1,5 @@
 <?php
-namespace Framework\System;
+namespace Framework\Core;
 
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -60,7 +60,7 @@ class VariableType {
      */
     public static function getDocType(string $type): string {
         return match ($type) {
-            self::Array   => "array{}",
+            self::Array   => "string[]",
             self::Boolean => "boolean",
             self::Integer => "integer",
             self::Float   => "float",

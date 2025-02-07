@@ -1,5 +1,5 @@
 <?php
-namespace Framework\System;
+namespace Framework\Core;
 
 use Attribute;
 
