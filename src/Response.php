@@ -95,6 +95,15 @@ class Response {
     }
 
     /**
+     * Returns the given exit code
+     * @param integer $exitCode
+     * @return Response
+     */
+    public static function exit(int $exitCode): Response {
+        return new Response([ "result" => $exitCode ], false);
+    }
+
+    /**
      * Returns the given result
      * @param array{} $result Optional.
      * @return Response

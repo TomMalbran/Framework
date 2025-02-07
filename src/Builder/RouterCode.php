@@ -24,7 +24,6 @@ class RouterCode {
         $testRoutes  = [];
 
         foreach ($classes as $className) {
-            // Try to Reflect the Class
             try {
                 $reflection = new ReflectionClass($className);
             } catch (Throwable $e) {
