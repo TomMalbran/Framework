@@ -1,5 +1,5 @@
 <?php
-namespace Framework\System;
+namespace Framework\Builder;
 
 use Framework\Framework;
 use Framework\Utils\Strings;
@@ -8,11 +8,6 @@ use Framework\Utils\Strings;
  * The Status Code
  */
 class StatusCode {
-
-    const Active   = "Active";
-    const Inactive = "Inactive";
-
-
 
     /**
      * Returns the Code variables

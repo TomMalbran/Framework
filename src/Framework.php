@@ -2,10 +2,10 @@
 namespace Framework;
 
 use Framework\Response;
-use Framework\System\Code;
 use Framework\System\ConfigCode;
 use Framework\System\SettingCode;
 use Framework\Auth\Auth;
+use Framework\Builder\Builder;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\FilePath;
@@ -392,7 +392,7 @@ class Framework {
      */
     public static function generateCode(): bool {
         Generator::generateCode();
-        Code::generateCode();
+        Builder::generateCode();
         return true;
     }
 

@@ -1,21 +1,21 @@
 <?php
-namespace Framework\System;
+namespace Framework\Builder;
 
 use Framework\Framework;
-use Framework\System\AccessCode;
-use Framework\System\ConfigCode;
-use Framework\System\SettingCode;
-use Framework\System\SignalCode;
-use Framework\System\StatusCode;
+use Framework\Builder\AccessCode;
+use Framework\Builder\ConfigCode;
+use Framework\Builder\RouterCode;
+use Framework\Builder\SettingCode;
+use Framework\Builder\SignalCode;
+use Framework\Builder\StatusCode;
 use Framework\File\File;
 use Framework\File\FilePath;
-use Framework\Route\RouterCode;
 use Framework\Provider\Mustache;
 
 /**
- * The Code
+ * The Builder
  */
-class Code {
+class Builder {
 
     const Namespace = "System";
 
@@ -28,20 +28,18 @@ class Code {
     public static function generateCode(): bool {
         print("\nFRAMEWORK CODES\n");
 
-        $writePath    = Framework::getPath(Framework::SystemDir);
-        $internalPath = Framework::getPath(Framework::RouteDir, forFramework: true);
-
+        $writePath = Framework::getPath(Framework::SystemDir, forFramework: true);
         File::createDir($writePath);
         File::emptyDir($writePath);
 
         self::generateOne($writePath, "Access",  AccessCode::getCode());
         self::generateOne($writePath, "Config",  ConfigCode::getCode());
+        self::generateOne($writePath, "Router",  RouterCode::getCode());
         self::generateOne($writePath, "Setting", SettingCode::getCode());
         self::generateOne($writePath, "Signal",  SignalCode::getCode());
         self::generateOne($writePath, "Status",  StatusCode::getCode());
         self::generateOne($writePath, "Path",    FilePath::getCode());
 
-        self::generateOne($internalPath, "Router", RouterCode::getCode());
         return true;
     }
 
@@ -60,7 +58,7 @@ class Code {
         $template = Framework::loadFile(Framework::TemplateDir, "$name.mu");
         $contents = Mustache::render($template, $data + [
             "nameSpace" => Framework::Namespace,
-            "codeSpace" => Framework::Namespace . self::Namespace,
+            "codeSpace" => "Framework\\" . self::Namespace,
         ]);
 
         File::create($writePath, "$name.php", $contents);

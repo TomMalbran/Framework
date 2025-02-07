@@ -3,6 +3,7 @@ require_once __DIR__ . "/vendor/autoload.php";
 
 use Framework\Framework;
 use Framework\Database\Generator;
+use Framework\Builder\Builder;
 
 /**
  * Runs the Code Generation
@@ -16,6 +17,7 @@ function main() {
     // Generate the code
     Framework::create(__DIR__, "", false);
     Generator::generateInternal();
+    Builder::generateCode();
 }
 
 main();

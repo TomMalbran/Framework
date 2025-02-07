@@ -1,7 +1,8 @@
 <?php
-namespace Framework\System;
+namespace Framework\Builder;
 
 use Framework\Framework;
+use Framework\Core\Listener;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -68,6 +69,9 @@ class SignalCode {
             return $a["event"] <=> $b["event"];
         });
 
+        if (empty($signals)) {
+            return [];
+        }
         return [
             "uses"    => array_keys($uses),
             "hasUses" => !empty($uses),

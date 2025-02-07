@@ -6,6 +6,7 @@
 
 # generated files
 src/Schema
+src/System
 
 # misc
 .DS_Store

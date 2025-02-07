@@ -1,8 +1,8 @@
 <?php
-namespace Framework\Route;
+namespace Framework\Builder;
 
 use Framework\Framework;
-use Framework\Route\Route;
+use Framework\Core\Route;
 use Framework\Utils\Strings;
 
 use ReflectionClass;
@@ -94,7 +94,8 @@ class RouterCode {
         }
 
         return [
-            "routes" => $routes,
+            "hasRoutes" => !empty($routes),
+            "routes"    => $routes,
         ];
     }
 }
