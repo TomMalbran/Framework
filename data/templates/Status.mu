@@ -8,31 +8,51 @@ use Framework\Utils\Select;
 /**
  * The Status
  */
-class Status {
+enum Status {
 
+    case None;
 {{#statuses}}
-    const {{constant}} = "{{name}}";
+    case {{name}};
 {{/statuses}}
 
 
 
     /**
+     * Creates a Status from a String
+     * @param Status|string $value
+     * @param Status        $default Optional.
+     * @return Status
+     */
+    public static function from(Status|string $value, Status $default = self::None): Status {
+        if ($value instanceof Status) {
+            return $value;
+        }
+        foreach (self::cases() as $case) {
+            if ($case->name === $value) {
+                return $case;
+            }
+        }
+        return $default;
+    }
+
+    /**
      * Returns the Name of the given Status
-     * @param string $value
-     * @param string $isoCode Optional.
+     * @param Status|string $value
+     * @param string        $isoCode Optional.
      * @return string
      */
-    public static function getName(string $value, string $isoCode = ""): string {
+    public static function getName(Status|string $value, string $isoCode = ""): string {
+        $value = ($value instanceof Status) ? $value->name : $value;
         return NLS::getIndex("SELECT_STATUS", $value, $isoCode);
     }
 
     /**
      * Returns the Color of the given Status
-     * @param string $value
+     * @param Status|string $value
      * @return string
      */
-    public static function getColor(string $value): string {
-        return match ($value) {
+    public static function getColor(Status|string $value): string {
+        return match (self::from($value)) {
         {{#statuses}}
             self::{{constant}} => "{{color}}",
         {{/statuses}}
@@ -40,16 +60,30 @@ class Status {
         };
     }
 
+    /**
+     * Returns a Select for the given value
+     * @param Status|string $value
+     * @param string        $isoCode Optional.
+     * @return Select
+     */
+    private static function getSelect(Status|string $value, string $isoCode): Select {
+        $status = self::from($value);
+        $key    = $status->name;
+        $name   = self::getName($value, $isoCode);
+        $color  = self::getColor($value);
+        return new Select($key, $name, [ "color" => $color ]);
+    }
+
 
 {{#statuses}}
 
     /**
      * Returns true if the given value is the Status {{name}}
-     * @param string $value
+     * @param Status|string $value
      * @return boolean
      */
-    public static function is{{name}}(string $value): bool {
-        return self::{{name}} === $value;
+    public static function is{{name}}(Status|string $value): bool {
+        return self::{{name}} === self::from($value);
     }
 {{/statuses}}
 
@@ -58,11 +92,11 @@ class Status {
 
     /**
      * Returns true if the given value is one of: {{statuses}}
-     * @param string $value
+     * @param Status|string $value
      * @return boolean
      */
-    public static function isValid{{name}}(string $value): bool {
-        return Arrays::contains([ {{values}} ], $value);
+    public static function isValid{{name}}(Status|string $value): bool {
+        return Arrays::contains([ {{values}} ], self::from($value));
     }
 
     /**
@@ -72,23 +106,10 @@ class Status {
      */
     public static function get{{name}}Select(string $isoCode = ""): array {
         $result = [];
-        foreach ([ {{values}} ] as $value) {
-            $result[] = self::getSelect($value, $isoCode);
+        foreach ([ {{values}} ] as $status) {
+            $result[] = self::getSelect($status, $isoCode);
         }
         return $result;
     }
 {{/groups}}
-
-
-    /**
-     * Returns a Select for the given value
-     * @param string $value
-     * @param string $isoCode Optional.
-     * @return Select
-     */
-    private static function getSelect(string $value, string $isoCode): Select {
-        $name  = self::getName($value, $isoCode);
-        $color = self::getColor($value);
-        return new Select($value, $name, [ "color" => $color ]);
-    }
 }

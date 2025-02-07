@@ -2,10 +2,10 @@
 namespace Framework\Auth;
 
 use Framework\Request;
-use Framework\System\StatusCode;
 use Framework\NLS\NLS;
 use Framework\File\FilePath;
 use Framework\Database\Query;
+use Framework\System\Status;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -192,7 +192,7 @@ class Credential extends CredentialSchema {
         if (empty($query)) {
             return [];
         }
-        $query->add("status", "=", StatusCode::Active);
+        $query->add("status", "=", Status::Active->name);
         return self::request($query, false, $sort);
     }
 
@@ -510,7 +510,7 @@ class Credential extends CredentialSchema {
             passExpiration:   0,
             accessToken:      "",
             tokenExpiration:  0,
-            status:           StatusCode::Inactive,
+            status:           Status::Inactive->name,
             observations:     "",
             sendEmails:       0,
             sendEmailNotis:   0,

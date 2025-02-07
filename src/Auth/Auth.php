@@ -3,7 +3,6 @@ namespace Framework\Auth;
 
 use Framework\System\AccessCode;
 use Framework\System\ConfigCode;
-use Framework\System\StatusCode;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Reset;
@@ -13,6 +12,7 @@ use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
 use Framework\Utils\Arrays;
+use Framework\System\Status;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 use Framework\Schema\CredentialEntity;
@@ -215,7 +215,7 @@ class Auth {
         return (
             !$credential->isEmpty() &&
             !$credential->isDeleted &&
-            $credential->status === StatusCode::Active
+            Status::isActive($credential->status)
         );
     }
 
