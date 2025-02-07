@@ -126,7 +126,7 @@ class Query {
         }
         $values = Arrays::toArray($value);
 
-        $this->where    .= "{$prefix} {$column} {$expression} {$suffix} {$binds} ";
+        $this->where    .= "$prefix $column $expression $suffix $binds ";
         $this->params    = array_merge($this->params, $values);
         $this->columns[] = $column;
         return $this;
@@ -182,7 +182,7 @@ class Query {
      */
     public function addNull(string $column): Query {
         $prefix          = $this->getPrefix();
-        $this->where    .= "{$prefix}ISNULL($column) = 1";
+        $this->where    .= "{$prefix}ISNULL( $column ) = 1";
         $this->columns[] = $column;
         return $this;
     }
@@ -399,8 +399,8 @@ class Query {
     public function groupBy(string ...$columns): Query {
         foreach ($columns as $column) {
             if (!empty($column)) {
-                $prefix         = !empty($this->groupBy) ? ", " : "";
-                $this->groupBy .= $prefix . $column;
+                $prefix         = !empty($this->groupBy) ? "," : "";
+                $this->groupBy .= "$prefix $column ";
                 $this->groups[] = $column;
             }
         }
@@ -415,8 +415,8 @@ class Query {
      */
     public function orderBy(string $column, bool $isASC = true): Query {
         if (!empty($column)) {
-            $prefix         = !empty($this->orderBy) ? ", " : "";
-            $this->orderBy .= " {$prefix}{$column} " . ($isASC ? "ASC" : "DESC");
+            $prefix         = !empty($this->orderBy) ? "," : "";
+            $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
             $this->orders[] = $column;
         }
         return $this;
@@ -547,13 +547,13 @@ class Query {
     public function getOrderLimit(): string {
         $result = "";
         if (!empty($this->groupBy)) {
-            $result .= " GROUP BY " . $this->groupBy;
+            $result .= " GROUP BY {$this->groupBy}";
         }
         if (!empty($this->orderBy)) {
-            $result .= " ORDER BY " . $this->orderBy;
+            $result .= " ORDER BY {$this->orderBy}";
         }
         if (!empty($this->limit)) {
-            $result .= " LIMIT " . $this->limit;
+            $result .= " LIMIT {$this->limit}";
         }
         return $result;
     }
@@ -587,13 +587,7 @@ class Query {
      */
     public function updateColumn(string $oldColumn, string $newColumn): Query {
         foreach ([ "where", "orderBy", "groupBy" ] as $type) {
-            foreach ([ "(", " " ] as $prefix) {
-                $this->{$type} = Strings::replace(
-                    $this->{$type},
-                    "{$prefix}{$oldColumn}",
-                    "{$prefix}{$newColumn}"
-                );
-            }
+            $this->$type = Strings::replace($this->$type, " $oldColumn ", " $newColumn ");
         }
         return $this;
     }
