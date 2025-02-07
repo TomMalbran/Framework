@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\System\AccessCode;
 use Framework\System\ConfigCode;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
@@ -12,6 +11,7 @@ use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
 use Framework\Utils\Arrays;
+use Framework\System\Access;
 use Framework\System\Status;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
@@ -25,7 +25,7 @@ class Auth {
     private static string $refreshToken = "";
     private static bool   $sendRefresh  = false;
 
-    private static string $accessName   = AccessCode::General;
+    private static string $accessName   = Access::General;
     private static int    $credentialID = 0;
     private static int    $adminID      = 0;
     private static int    $userID       = 0;
@@ -140,7 +140,7 @@ class Auth {
     public static function validateAPI(string $token): bool {
         if ($token === self::getApiToken()) {
             self::$apiToken   = $token;
-            self::$accessName = AccessCode::API;
+            self::$accessName = Access::API;
             return true;
         }
         return false;
@@ -151,7 +151,7 @@ class Auth {
      * @return boolean
      */
     public static function validateInternal(): bool {
-        self::$accessName = AccessCode::API;
+        self::$accessName = Access::API;
         return true;
     }
 
@@ -198,7 +198,7 @@ class Auth {
 
         self::$refreshToken = "";
         self::$sendRefresh  = false;
-        self::$accessName   = AccessCode::General;
+        self::$accessName   = Access::General;
         self::$credential   = null;
         self::$credentialID = 0;
         self::$adminID      = 0;
@@ -287,8 +287,8 @@ class Auth {
         return (
             self::canLogin($admin) &&
             !$user->isEmpty() &&
-            AccessCode::getLevel($admin->access) >= AccessCode::getLevel($user->access) &&
-            AccessCode::inGroup(AccessCode::Admin, $admin->access)
+            Access::getLevel($admin->access) >= Access::getLevel($user->access) &&
+            Access::isValidAdmin($admin->access)
         );
     }
 
@@ -509,7 +509,7 @@ class Auth {
      * @return boolean
      */
     public static function isAdmin(): bool {
-        return AccessCode::inGroup(AccessCode::Admin, self::$credential->access);
+        return Access::isValidAdmin(self::$credential->access);
     }
 
 
@@ -529,7 +529,7 @@ class Auth {
      * @return boolean
      */
     public static function requiresLogin(string $accessName): bool {
-        return $accessName !== AccessCode::General && !self::isLoggedIn();
+        return $accessName !== Access::General && !self::isLoggedIn();
     }
 
     /**
@@ -538,15 +538,15 @@ class Auth {
      * @return boolean
      */
     public static function grant(string $accessName): bool {
-        if (AccessCode::inGroup(AccessCode::API, self::$accessName)) {
+        if (Access::isValidAPI(self::$accessName)) {
             return (
-                AccessCode::inGroup(AccessCode::API, $accessName) ||
-                AccessCode::inGroup(AccessCode::General, $accessName)
+                Access::isValidAPI($accessName) ||
+                Access::isValidGeneral($accessName)
             );
         }
 
-        $currentLevel   = AccessCode::getLevel(self::$accessName);
-        $requestedLevel = AccessCode::getLevel($accessName);
+        $currentLevel   = Access::getLevel(self::$accessName);
+        $requestedLevel = Access::getLevel($accessName);
         return $currentLevel >= $requestedLevel;
     }
 }
