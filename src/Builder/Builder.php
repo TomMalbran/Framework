@@ -32,13 +32,13 @@ class Builder {
         File::createDir($writePath);
         File::emptyDir($writePath);
 
+        self::generateOne($writePath, "Path",    FilePath::getCode());
         self::generateOne($writePath, "Access",  AccessCode::getCode());
         self::generateOne($writePath, "Config",  ConfigCode::getCode());
-        self::generateOne($writePath, "Router",  RouterCode::getCode());
         self::generateOne($writePath, "Setting", SettingCode::getCode());
-        self::generateOne($writePath, "Signal",  SignalCode::getCode());
         self::generateOne($writePath, "Status",  StatusCode::getCode());
-        self::generateOne($writePath, "Path",    FilePath::getCode());
+        self::generateOne($writePath, "Signal",  SignalCode::getCode());
+        self::generateOne($writePath, "Router",  RouterCode::getCode());
 
         return true;
     }
