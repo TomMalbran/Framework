@@ -2,7 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Framework;
-use Framework\System\SettingCode;
+use Framework\Core\Settings;
 use Framework\File\File;
 use Framework\Database\Factory;
 use Framework\Database\Database;
@@ -40,7 +40,7 @@ class Migration {
      * @return boolean
      */
     private static function moveTables(Database $db, array $movements): bool {
-        $startMovement = SettingCode::getCore("movement");
+        $startMovement = Settings::getCore("movement");
         $lastMovement  = count($movements);
         $didMove       = false;
 
@@ -56,7 +56,7 @@ class Migration {
         }
 
         if ($didMove) {
-            SettingCode::setCore("movement", $lastMovement);
+            Settings::setCore("movement", $lastMovement);
             print("<br>");
         } else {
             print("No <i>movements</i> required<br>");
@@ -71,7 +71,7 @@ class Migration {
      * @return boolean
      */
     private static function renameColumns(Database $db, array $renames): bool {
-        $startRename = SettingCode::getCore("rename");
+        $startRename = Settings::getCore("rename");
         $lastRename  = count($renames);
         $didRename   = false;
 
@@ -95,7 +95,7 @@ class Migration {
         }
 
         if ($didRename) {
-            SettingCode::setCore("rename", $lastRename);
+            Settings::setCore("rename", $lastRename);
             print("<br>");
         } else {
             print("No <i>column renames</i> required<br><br>");
@@ -378,10 +378,10 @@ class Migration {
      * @return boolean
      */
     private static function extraMigrations(Database $db): bool {
-        $migration = SettingCode::getCore("migration");
+        $migration = Settings::getCore("migration");
         $path      = Framework::getPath(Framework::MigrationsDir);
 
-        SettingCode::setCore("migration", $migration);
+        Settings::setCore("migration", $migration);
         if (!File::exists($path)) {
             print("<br>No <i>migrations</i> required<br>");
             return false;
@@ -411,7 +411,7 @@ class Migration {
             }
         }
 
-        SettingCode::setCore("migration", $last);
+        Settings::setCore("migration", $last);
         return true;
     }
 }

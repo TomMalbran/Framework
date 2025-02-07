@@ -3,9 +3,9 @@ namespace Framework;
 
 use Framework\Response;
 use Framework\System\ConfigCode;
-use Framework\System\SettingCode;
 use Framework\Auth\Auth;
 use Framework\Builder\Builder;
+use Framework\Core\Settings;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
 use Framework\File\FilePath;
@@ -403,7 +403,7 @@ class Framework {
      */
     public static function migrateData(bool $canDelete = false): bool {
         Migration::migrateData($canDelete);
-        SettingCode::migrateData();
+        Settings::migrateData();
         EmailTemplate::migrateData();
         return true;
     }
