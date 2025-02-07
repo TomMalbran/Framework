@@ -18,9 +18,10 @@ class RouterCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $classes    = Framework::findClasses(skipIgnored: true);
-        $routes     = [];
-        $testRoutes = [];
+        $classes     = Framework::findClasses(skipIgnored: true);
+        $routes      = [];
+        $errorRoutes = [];
+        $testRoutes  = [];
 
         foreach ($classes as $className) {
             // Try to Reflect the Class
@@ -47,14 +48,21 @@ class RouterCode {
                     continue;
                 }
 
-                $attribute = $attributes[0];
-                $params    = $method->getNumberOfParameters();
-                $route     = $attribute->newInstance();
+                $attribute  = $attributes[0];
+                $route      = $attribute->newInstance();
+                $params     = $method->getNumberOfParameters();
+                $response   = $method->getReturnType();
+                $methodName = $method->getName();
+
+                if ($response->getName() !== "Framework\\Response") {
+                    $errorRoutes[] = "$className::{$methodName} -> {$response->getName()}";
+                    continue;
+                }
 
                 // Add the Route
                 $routes[] = [
                     "className"  => $className,
-                    "method"     => $method->getName(),
+                    "method"     => $methodName,
                     "hasRequest" => $params > 0,
                     "route"      => $route->route,
                     "access"     => $route->access,
@@ -91,6 +99,15 @@ class RouterCode {
         $oldData = Framework::loadData(Framework::RouteData);
         if (!empty($oldData) && !empty($testRoutes)) {
             Framework::saveData("routesTest", $testRoutes);
+        }
+
+        // Show the Error Routes
+        if (!empty($errorRoutes)) {
+            print("\nROUTES WITH ERROR:\n");
+            foreach ($errorRoutes as $errorRoute) {
+                print("  $errorRoute\n");
+            }
+            print("\n");
         }
 
         return [

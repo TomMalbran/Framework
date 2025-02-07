@@ -2,6 +2,7 @@
 namespace {{codeSpace}};
 
 use Framework\Request;
+use Framework\Response;
 
 /**
  * The Router
@@ -44,9 +45,9 @@ class Router {
      * Calls the given Route with the given params, if it exists
      * @param string  $route
      * @param Request $request
-     * @return mixed
+     * @return Response
      */
-    public static function call(string $route, Request $request): mixed {
+    public static function call(string $route, Request $request): Response {
     {{#hasRoutes}}
         return match ($route) {
         {{#routes}}
@@ -56,11 +57,11 @@ class Router {
             {{/addSpace}}
         {{/routes}}
 
-            default => "",
+            default => Response::empty(),
         };
     {{/hasRoutes}}
     {{^hasRoutes}}
-        return "";
+        return Response::empty();
     {{/hasRoutes}}
     }
 }

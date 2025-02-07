@@ -358,11 +358,6 @@ class Framework {
         $request  = new Request($params, $_FILES);
         $response = Router::call($route, $request);
 
-        // Return an Empty Response
-        if (empty($response) || !($response instanceof Response)) {
-            return Response::empty();
-        }
-
         // Add the Token and return the Response
         $response->addTokens(Auth::getAccessToken(), Auth::getRefreshToken());
         return $response;
