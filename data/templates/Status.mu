@@ -11,6 +11,7 @@ use Framework\Utils\Select;
 enum Status {
 
     case None;
+
 {{#statuses}}
     case {{name}};
 {{/statuses}}

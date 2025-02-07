@@ -24,7 +24,7 @@ class Auth {
     private static string $refreshToken = "";
     private static bool   $sendRefresh  = false;
 
-    private static string $accessName   = Access::General;
+    private static Access $accessName   = Access::General;
     private static int    $credentialID = 0;
     private static int    $adminID      = 0;
     private static int    $userID       = 0;
@@ -303,8 +303,13 @@ class Auth {
     public static function setCredential(CredentialEntity $credential, ?CredentialEntity $admin = null, int $userID = 0): bool {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
-        self::$accessName   = !empty($credential->userAccess) ? $credential->userAccess : $credential->access;
         self::$userID       = $userID;
+
+        if (!empty($credential->userAccess)) {
+            self::$accessName = Access::from($credential->userAccess);
+        } else {
+            self::$accessName = Access::from($credential->access);
+        }
 
         $language = $credential->language;
         $timezone = $credential->timezone;
@@ -345,13 +350,14 @@ class Auth {
 
     /**
      * Sets the Current User
-     * @param integer $userID
-     * @param string  $accessName
+     * @param integer       $userID
+     * @param Access|string $accessName
      * @return boolean
      */
-    public static function setCurrentUser(int $userID, string $accessName): bool {
+    public static function setCurrentUser(int $userID, Access|string $accessName): bool {
         self::$userID     = $userID;
-        self::$accessName = $accessName;
+        self::$accessName = Access::from($accessName);
+
         ActionLog::endSession();
         ActionLog::startSession(true);
         return true;
@@ -377,7 +383,7 @@ class Auth {
 
         // The general data
         $data = [
-            "accessName"       => self::$accessName,
+            "accessName"       => self::$accessName->name,
             "credentialID"     => self::$credentialID,
             "adminID"          => self::$adminID,
             "userID"           => self::$userID,
@@ -451,9 +457,9 @@ class Auth {
 
     /**
      * Returns the Access Name
-     * @return string
+     * @return Access
      */
-    public static function getAccessName(): string {
+    public static function getAccessName(): Access {
         return self::$accessName;
     }
 
@@ -523,19 +529,19 @@ class Auth {
 
     /**
      * Returns true if the current Auth requires login
-     * @param string $accessName
+     * @param Access $accessName
      * @return boolean
      */
-    public static function requiresLogin(string $accessName): bool {
+    public static function requiresLogin(Access $accessName): bool {
         return $accessName !== Access::General && !self::isLoggedIn();
     }
 
     /**
      * Returns true if the user has that Access
-     * @param string $accessName
+     * @param Access $accessName
      * @return boolean
      */
-    public static function grant(string $accessName): bool {
+    public static function grant(Access $accessName): bool {
         if (Access::isValidAPI(self::$accessName)) {
             return (
                 Access::isValidAPI($accessName) ||

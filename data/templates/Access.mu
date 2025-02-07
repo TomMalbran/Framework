@@ -9,34 +9,54 @@ use Framework\Utils\Select;
 /**
  * The Access
  */
-class Access {
+enum Access {
+
+    case None;
 {{#accesses}}
 {{#addSpace}}
 
     // {{group}}
 {{/addSpace}}
-    const {{constant}} = "{{name}}";
+    case {{name}};
 {{/accesses}}
 
 
 
     /**
+     * Creates an Access from a String
+     * @param Access|string $value
+     * @return Access
+     */
+    public static function from(Access|string $value): Access {
+        if ($value instanceof Access) {
+            return $value;
+        }
+        foreach (self::cases() as $case) {
+            if ($case->name === $value) {
+                return $case;
+            }
+        }
+        return self::None;
+    }
+
+    /**
      * Returns the Name of the given Access
-     * @param string $value
-     * @param string $isoCode Optional.
+     * @param Access|string $value
+     * @param string        $isoCode Optional.
      * @return string
      */
-    public static function getName(string $value, string $isoCode = ""): string {
+    public static function getName(Access|string $value, string $isoCode = ""): string {
+        $value = ($value instanceof Access) ? $value->name : $value;
         return NLS::getIndex("SELECT_ACCESS", $value, $isoCode);
     }
 
     /**
      * Returns the Level of the given Access
-     * @param string $value
+     * @param Access|string $value
      * @return integer
      */
-    public static function getLevel(string $value): int {
-        return match ($value) {
+    public static function getLevel(Access|string $value): int {
+        return match (self::from($value)) {
         {{#accesses}}
             self::{{constant}} => {{level}},
         {{/accesses}}
@@ -89,11 +109,11 @@ class Access {
 
     /**
      * Returns true if the given value is one of: {{accesses}}
-     * @param string $value
+     * @param Access|string $value
      * @return boolean
      */
-    public static function isValid{{name}}(string $value): bool {
-        return Arrays::contains([ {{values}} ], $value);
+    public static function isValid{{name}}(Access|string $value): bool {
+        return Arrays::contains([ {{values}} ], self::from($value));
     }
 
     /**
@@ -113,7 +133,7 @@ class Access {
         $result = [];
         foreach ([ {{values}} ] as $value) {
             $name     = self::getName($value, $isoCode);
-            $result[] = new Select($value, $name);
+            $result[] = new Select($value->name, $name);
         }
         return $result;
     }
