@@ -78,10 +78,10 @@ class {{name}}Schema extends Schema {
 {{#hasParents}}
     /**
      * Returns the Parents Query{{#parents}}
-     * @param {{fieldDoc}}{{/parents}}
+     * @param {{fieldDocNull}}{{/parents}}
      * @return Query
      */
-    protected static function createParentQuery({{parentsArgList}}): Query {
+    protected static function createParentQuery({{parentsNullList}}): Query {
         $query = new Query();
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
