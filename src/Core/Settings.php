@@ -85,7 +85,7 @@ class Settings extends SettingsSchema {
             section:      self::Core,
             variable:     $variable,
             value:        $value,
-            variableType: VariableType::Integer,
+            variableType: VariableType::Integer->name,
         );
     }
 
@@ -129,10 +129,11 @@ class Settings extends SettingsSchema {
                 continue;
             }
 
+            $variableType = VariableType::from($elem->variableType);
             self::replaceEntity(
                 section:      $elem->section,
                 variable:     $elem->variable,
-                value:        VariableType::encodeValue($elem->variableType, $data[$variable]),
+                value:        VariableType::encodeValue($variableType, $data[$variable]),
                 variableType: $elem->variableType,
             );
         }
@@ -173,16 +174,17 @@ class Settings extends SettingsSchema {
         // Add/Update Settings
         foreach ($settings as $section => $data) {
             foreach ($data as $variable => $value) {
-                $found        = false;
+                /** @var VariableType */
                 $variableType = VariableType::get($value);
+                $found        = false;
 
                 foreach ($list as $elem) {
                     if ($elem->section === $section && $elem->variable === $variable) {
-                        if ($elem->variableType !== $variableType) {
-                            $modifies[] = [
+                        if ($elem->variableType !== $variableType->name) {
+                            $modifies[] = (object)[
                                 "section"      => $elem->section,
                                 "variable"     => $elem->variable,
-                                "variableType" => $variableType,
+                                "variableType" => $variableType->name,
                             ];
                         }
                         $found = true;
@@ -190,13 +192,13 @@ class Settings extends SettingsSchema {
                     }
 
                     if (Strings::isEqual($elem->section, $section) && Strings::isEqual($elem->variable, $variable)) {
-                        $renames[] = [
+                        $renames[] = (object)[
                             "section"  => $elem->section,
                             "variable" => $elem->variable,
                             "fields"   => [
                                 "section"      => $section,
                                 "variable"     => $variable,
-                                "variableType" => $variableType,
+                                "variableType" => $variableType->name,
                             ],
                         ];
                         $found = true;
@@ -210,7 +212,7 @@ class Settings extends SettingsSchema {
                         "section"      => $section,
                         "variable"     => $variable,
                         "value"        => VariableType::encodeValue($variableType, $value),
-                        "variableType" => $variableType,
+                        "variableType" => $variableType->name,
                         "modifiedTime" => time(),
                     ];
                     $list[] = new SettingsEntity($fields);
@@ -233,7 +235,10 @@ class Settings extends SettingsSchema {
                 }
             }
             if (!$found) {
-                $deletes[] = [ $elem->section, $elem->variable ];
+                $deletes[] = (object)[
+                    "section"  => $elem->section,
+                    "variable" => $elem->variable,
+                ];
             }
         }
 
@@ -249,9 +254,9 @@ class Settings extends SettingsSchema {
         if (!empty($renames)) {
             print("<br>Renamed <i>" . count($renames) . " settings</i><br>");
             foreach ($renames as $rename) {
-                $query = Query::create("section", "=", $rename["section"]);
-                $query->add("variable", "=", $rename["variable"]);
-                self::editEntity($query, ...$rename["fields"]);
+                $query = Query::create("section", "=", $rename->section);
+                $query->add("variable", "=", $rename->variable);
+                self::editEntity($query, ...$rename->fields);
             }
             $didUpdate = true;
         }
@@ -259,9 +264,9 @@ class Settings extends SettingsSchema {
         if (!empty($modifies)) {
             print("<br>Modified <i>" . count($modifies) . " settings</i><br>");
             foreach ($modifies as $modify) {
-                $query = Query::create("section", "=", $modify["section"]);
-                $query->add("variable", "=", $modify["variable"]);
-                self::editEntity($query, variableType: $modify["variableType"]);
+                $query = Query::create("section", "=", $modify->section);
+                $query->add("variable", "=", $modify->variable);
+                self::editEntity($query, variableType: $modify->variableType);
             }
             $didUpdate = true;
         }
@@ -270,10 +275,10 @@ class Settings extends SettingsSchema {
             print("<br>Deleted <i>" . count($deletes) . " settings</i><br>");
             $variables = [];
             foreach ($deletes as $delete) {
-                $query = Query::create("section", "=", $delete[0]);
-                $query->add("variable", "=", $delete[1]);
+                $query = Query::create("section", "=", $delete->section);
+                $query->add("variable", "=", $delete->variable);
                 self::removeEntity($query);
-                $variables[] = $delete[0] . "_" . $delete[1];
+                $variables[] = "{$delete->section}_{$delete->variable}";
             }
             print(Strings::join($variables, ", ") . "<br>");
             $didUpdate = true;

@@ -7,22 +7,38 @@ use Framework\Utils\JSON;
 /**
  * The Variable Types used by the System
  */
-class VariableType {
+enum VariableType {
 
-    const Array   = "Array";
-    const Boolean = "Boolean";
-    const Integer = "Integer";
-    const Float   = "Float";
-    const String  = "String";
+    case None;
+
+    case Array;
+    case Boolean;
+    case Integer;
+    case Float;
+    case String;
 
 
 
     /**
+     * Creates a Variable Type from a String
+     * @param string $value
+     * @return VariableType
+     */
+    public static function from(string $value): VariableType {
+        foreach (self::cases() as $case) {
+            if ($case->name === $value) {
+                return $case;
+            }
+        }
+        return self::None;
+    }
+
+    /**
      * Returns the Setting Type based on the value
      * @param mixed $value
-     * @return string
+     * @return VariableType
      */
-    public static function get(mixed $value): string {
+    public static function get(mixed $value): VariableType {
         if (Arrays::isArray($value)) {
             return self::Array;
         }
@@ -40,10 +56,10 @@ class VariableType {
 
     /**
      * Returns the Setting Type based on the value
-     * @param string $type
+     * @param VariableType $type
      * @return string
      */
-    public static function getType(string $type): string {
+    public static function getType(VariableType $type): string {
         return match ($type) {
             self::Array   => "array",
             self::Boolean => "bool",
@@ -55,10 +71,10 @@ class VariableType {
 
     /**
      * Returns the Setting Doc Type based on the value
-     * @param string $type
+     * @param VariableType $type
      * @return string
      */
-    public static function getDocType(string $type): string {
+    public static function getDocType(VariableType $type): string {
         return match ($type) {
             self::Array   => "string[]",
             self::Boolean => "boolean",
@@ -70,11 +86,11 @@ class VariableType {
 
     /**
      * Encodes the Settings Value for the Database
-     * @param string $type
-     * @param mixed  $value
+     * @param VariableType $type
+     * @param mixed        $value
      * @return string
      */
-    public static function encodeValue(string $type, mixed $value): string {
+    public static function encodeValue(VariableType $type, mixed $value): string {
         return match ($type) {
             self::Boolean => !empty($value) ? "1" : "0",
             self::Array   => JSON::encode($value),

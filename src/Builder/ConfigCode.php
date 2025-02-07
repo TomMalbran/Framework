@@ -66,19 +66,19 @@ class ConfigCode {
                 continue;
             }
 
-            $type         = VariableType::get($value);
+            $variableType = VariableType::get($value);
             $properties[] = [
                 "property"  => $property,
                 "name"      => $name,
                 "title"     => $title,
-                "type"      => VariableType::getType($type),
-                "docType"   => VariableType::getDocType($type),
-                "getter"    => $type === VariableType::Boolean ? "is" : "get",
-                "isString"  => $type === VariableType::String,
-                "isBoolean" => $type === VariableType::Boolean,
-                "isInteger" => $type === VariableType::Integer,
-                "isFloat"   => $type === VariableType::Float,
-                "isArray"   => $type === VariableType::Array,
+                "type"      => VariableType::getType($variableType),
+                "docType"   => VariableType::getDocType($variableType),
+                "getter"    => $variableType === VariableType::Boolean ? "is" : "get",
+                "isString"  => $variableType === VariableType::String,
+                "isBoolean" => $variableType === VariableType::Boolean,
+                "isInteger" => $variableType === VariableType::Integer,
+                "isFloat"   => $variableType === VariableType::Float,
+                "isArray"   => $variableType === VariableType::Array,
             ];
         }
 
