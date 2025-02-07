@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Route;
+namespace {{codeSpace}};
 
 use Framework\Request;
 
@@ -23,6 +23,7 @@ class Router {
      * @return string
      */
     public static function getAccessName(string $route): string {
+    {{#hasRoutes}}
         return match ($route) {
         {{#routes}}
             {{{route}}} => "{{access}}",
@@ -33,6 +34,10 @@ class Router {
 
             default => "",
         };
+    {{/hasRoutes}}
+    {{^hasRoutes}}
+        return "";
+    {{/hasRoutes}}
     }
 
     /**
@@ -42,6 +47,7 @@ class Router {
      * @return mixed
      */
     public static function call(string $route, Request $request): mixed {
+    {{#hasRoutes}}
         return match ($route) {
         {{#routes}}
             {{{route}}} => {{className}}::{{method}}({{#hasRequest}}$request{{/hasRequest}}),
@@ -52,5 +58,9 @@ class Router {
 
             default => "",
         };
+    {{/hasRoutes}}
+    {{^hasRoutes}}
+        return "";
+    {{/hasRoutes}}
     }
 }

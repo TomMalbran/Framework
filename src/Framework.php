@@ -2,7 +2,6 @@
 namespace Framework;
 
 use Framework\Response;
-use Framework\Route\Router;
 use Framework\System\Code;
 use Framework\System\ConfigCode;
 use Framework\System\SettingCode;
@@ -14,6 +13,7 @@ use Framework\Log\ErrorLog;
 use Framework\Database\Database;
 use Framework\Database\Generator;
 use Framework\Database\Migration;
+use Framework\System\Router;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
