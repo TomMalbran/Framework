@@ -353,7 +353,7 @@ class Strings {
      * Pads left the String with the given string to the given length
      * @param string  $string
      * @param integer $length
-     * @param string  $needle
+     * @param string  $needle Optional.
      * @return string
      */
     public static function padLeft(string $string, int $length, string $needle = " "): string {
@@ -364,7 +364,7 @@ class Strings {
      * Pads right the String with the given string to the given length
      * @param string  $string
      * @param integer $length
-     * @param string  $needle
+     * @param string  $needle Optional.
      * @return string
      */
     public static function padRight(string $string, int $length, string $needle = " "): string {
