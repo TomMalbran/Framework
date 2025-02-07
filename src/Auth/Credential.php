@@ -7,6 +7,7 @@ use Framework\NLS\NLS;
 use Framework\File\FilePath;
 use Framework\Database\Query;
 use Framework\Utils\Arrays;
+use Framework\Utils\Select;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 use Framework\Schema\CredentialSchema;
@@ -130,7 +131,7 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials
      * @param Request|null $sort  Optional.
      * @param Query|null   $query Optional.
-     * @return array{}[]
+     * @return CredentialEntity[]
      */
     public static function getAll(?Request $sort = null, ?Query $query = null): array {
         return self::request($query, false, $sort);
@@ -140,7 +141,7 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials for the given Access(s)
      * @param string[]|string $access
      * @param Request|null    $sort   Optional.
-     * @return array{}[]
+     * @return CredentialEntity[]
      */
     public static function getAllForAccess(array|string $access, ?Request $sort = null): array {
         $query = self::createAccessQuery($access);
@@ -154,7 +155,7 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials for the given IDs
      * @param integer[]    $credentialIDs
      * @param Request|null $sort          Optional.
-     * @return array{}[]
+     * @return CredentialEntity[]
      */
     public static function getAllWithIDs(array $credentialIDs, ?Request $sort = null): array {
         if (empty($credentialIDs)) {
@@ -170,7 +171,7 @@ class Credential extends CredentialSchema {
      * @param string          $filter
      * @param mixed|integer   $value  Optional.
      * @param Request|null    $sort   Optional.
-     * @return array{}[]
+     * @return CredentialEntity[]
      */
     public static function getAllWithFilter(array|string $access, string $filter, mixed $value = 1, ?Request $sort = null): array {
         $query = self::createAccessQuery($access, $filter, $value);
@@ -184,7 +185,7 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials for the given Access(s)
      * @param string[]|string $access
      * @param Request|null    $sort   Optional.
-     * @return array{}[]
+     * @return CredentialEntity[]
      */
     public static function getActiveForAccess(array|string $access, ?Request $sort = null): array {
         $query = self::createAccessQuery($access);
@@ -201,7 +202,7 @@ class Credential extends CredentialSchema {
      * @param integer         $amount
      * @param string|null     $filter Optional.
      * @param mixed|integer   $value  Optional.
-     * @return array{}[]
+     * @return CredentialEntity[]
      */
     public static function getLatestForAccess(array|string $access, int $amount, ?string $filter = null, mixed $value = 1): array {
         $query = self::createAccessQuery($access, $filter, $value);
@@ -293,6 +294,9 @@ class Credential extends CredentialSchema {
      */
     private static function requestOne(?Query $query = null, bool $complete = false): CredentialEntity {
         $list = self::request($query, $complete);
+        if (empty($list)) {
+            return new CredentialEntity();
+        }
         return $list[0];
     }
 
@@ -300,7 +304,7 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a select of all the Credentials
-     * @return array{}[]
+     * @return Select[]
      */
     public static function getSelect(): array {
         return self::requestSelect();
@@ -311,7 +315,7 @@ class Credential extends CredentialSchema {
      * @param string[]|string      $access
      * @param string[]|string|null $filter Optional.
      * @param mixed|integer        $value  Optional.
-     * @return array{}[]
+     * @return Select[]
      */
     public static function getSelectForAccess(array|string $access, array|string|null $filter = null, mixed $value = 1): array {
         $query = self::createAccessQuery($access, $filter, $value);
@@ -325,7 +329,7 @@ class Credential extends CredentialSchema {
     /**
      * Returns a select of Credentials with the given IDs
      * @param integer[] $credentialIDs
-     * @return array{}[]
+     * @return Select[]
      */
     public static function getSelectForIDs(array $credentialIDs): array {
         if (empty($credentialIDs)) {
@@ -367,17 +371,17 @@ class Credential extends CredentialSchema {
     /**
      * Returns a select of Credentials under the given conditions
      * @param Query|null $query Optional.
-     * @return array{}[]
+     * @return Select[]
      */
     private static function requestSelect(?Query $query = null): array {
         $list   = self::getEntityList($query);
         $result = [];
 
         foreach ($list as $elem) {
-            $result[] = [
-                "key"   => $elem->credentialID,
-                "value" => self::getName($elem),
-            ];
+            $result[] = new Select(
+                $elem->credentialID,
+                self::getName($elem),
+            );
         }
         return $result;
     }
