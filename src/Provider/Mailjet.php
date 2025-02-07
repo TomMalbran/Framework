@@ -2,7 +2,7 @@
 // spell-checker: ignore  contactslist, managecontact, addforce
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 
 /**
  * The Mailjet Provider
@@ -11,27 +11,6 @@ class Mailjet {
 
     const BaseUrl = "https://api.mailjet.com";
 
-    private static bool   $loaded      = false;
-    private static string $apiKey      = "";
-    private static string $apiSecret   = "";
-    private static int    $contactList = 0;
-
-
-    /**
-     * Creates the Mailjet Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        self::$loaded      = true;
-        self::$apiKey      = ConfigCode::getString("mailjetKey");
-        self::$apiSecret   = ConfigCode::getString("mailjetSecret");
-        self::$contactList = ConfigCode::getInt("mailjetList");
-        return false;
-    }
 
     /**
      * Executes a Request
@@ -41,9 +20,8 @@ class Mailjet {
      * @return array{}
      */
     private static function execute(string $method, string $route, array $params = []): array {
-        self::load();
         $url      = self::BaseUrl . $route;
-        $userPass = self::$apiKey . ":" . self::$apiSecret;
+        $userPass = Config::getMailjetKey() . ":" . Config::getMailjetSecret();
         $headers  = [ "Content-Type" => "application/json" ];
         return Curl::execute($method, $url, $params, $headers, $userPass, jsonBody: true);
     }
@@ -106,14 +84,14 @@ class Mailjet {
      * @return boolean
      */
     public static function createContact(string $firstName, string $lastName, string $email): bool {
-        self::load();
-        if (empty(self::$contactList)) {
+        $contactList = Config::getMailjetList();
+        if (empty($contactList)) {
             $response = self::execute("POST", "/v3/REST/contact", [
                 "Name"  => "$firstName $lastName",
                 "Email" => $email,
             ]);
         } else {
-            $response = self::execute("POST", "/v3/REST/contactslist/" . self::$contactList . "/managecontact", [
+            $response = self::execute("POST", "/v3/REST/contactslist/$contactList/managecontact", [
                 "Action" => "addforce",
                 "Name"   => "$firstName $lastName",
                 "Email"  => $email,
@@ -149,9 +127,9 @@ class Mailjet {
      * @return boolean
      */
     public static function deleteContact(string $email): bool {
-        self::load();
-        if (!empty(self::$clientList)) {
-            self::execute("POST", "/v3/REST/contactslist/" . self::$contactList . "/managecontact", [
+        $contactList = Config::getMailjetList();
+        if (!empty($contactList)) {
+            self::execute("POST", "/v3/REST/contactslist/$contactList/managecontact", [
                 "Action" => "remove",
                 "Email"  => $email,
             ]);

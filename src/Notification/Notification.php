@@ -1,9 +1,9 @@
 <?php
 namespace Framework\Notification;
 
-use Framework\System\ConfigCode;
 use Framework\Provider\Curl;
 use Framework\File\FilePath;
+use Framework\System\Config;
 use Framework\Utils\Strings;
 
 /**
@@ -12,32 +12,6 @@ use Framework\Utils\Strings;
 class Notification {
 
     public const BaseUrl = "https://api.onesignal.com";
-
-    private static bool   $loaded   = false;
-    private static bool   $isActive = false;
-    private static string $icon     = "";
-    private static string $appID    = "";
-    private static string $restKey  = "";
-
-
-    /**
-     * Creates the Notification Provider
-     * @return boolean
-     */
-    public static function load(): bool {
-        if (self::$loaded) {
-            return false;
-        }
-
-        self::$loaded   = true;
-        self::$isActive = ConfigCode::getBoolean("notificationIsActive");
-        self::$icon     = ConfigCode::getString("notificationIcon");
-
-        self::$appID    = ConfigCode::getString("onesignalAppId");
-        self::$restKey  = ConfigCode::getString("onesignalRestKey");
-        return true;
-    }
-
 
 
     /**
@@ -101,23 +75,22 @@ class Notification {
      * @return string|null
      */
     private static function send(string $title, string $body, string $url, string $dataType, int $dataID, array $params): ?string {
-        self::load();
-        if (!self::$isActive) {
+        if (!Config::isNotificationActive()) {
             return null;
         }
 
-        $icon = "";
-        if (!empty(self::$icon)) {
-            $icon = FilePath::getInternalPath(self::$icon);
+        $icon = Config::getNotificationIcon();
+        if (!empty($icon)) {
+            $icon = FilePath::getInternalPath($icon);
         }
 
         $fullUrl = $url;
         if (!Strings::startsWith($url, "http")) {
-            $fullUrl = ConfigCode::getUrl("url", $url);
+            $fullUrl = Config::getUrl($url);
         }
 
         $data = [
-            "app_id"         => self::$appID,
+            "app_id"         => Config::getOnesignalAppId(),
             "headings"       => [ "en" => $title ],
             "contents"       => [ "en" => $body  ],
             "url"            => $fullUrl,
@@ -132,7 +105,7 @@ class Notification {
 
         $headers = [
             "Content-Type"  => "application/json; charset=utf-8",
-            "Authorization" => "Basic " . self::$restKey,
+            "Authorization" => "Basic " . Config::getOnesignalRestKey(),
         ];
         $response = Curl::execute("POST", self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
 

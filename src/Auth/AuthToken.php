@@ -2,7 +2,7 @@
 namespace Framework\Auth;
 
 use Framework\Auth\RefreshToken;
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 use Framework\Utils\Server;
 use Framework\Schema\CredentialRefreshTokenEntity;
 
@@ -36,9 +36,9 @@ class AuthToken {
         JWT::$leeway = 1000;
 
         self::$loaded    = true;
-        self::$secretKey = ConfigCode::getString("authKey");
-        self::$shortTerm = ConfigCode::getFloat("authHours") * 3600;
-        self::$longTerm  = ConfigCode::getFloat("authDays") * 24 * 3600;
+        self::$secretKey = Config::getAuthKey();
+        self::$shortTerm = Config::getAuthHours() * 3600;
+        self::$longTerm  = Config::getAuthDays() * 24 * 3600;
         return true;
     }
 

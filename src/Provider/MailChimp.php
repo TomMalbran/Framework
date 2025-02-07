@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
 use Framework\Email\EmailWhiteList;
+use Framework\System\Config;
 use Framework\Utils\Select;
 
 use DrewM\MailChimp\MailChimp as MailChimpAPI;
@@ -12,27 +12,19 @@ use DrewM\MailChimp\MailChimp as MailChimpAPI;
  */
 class MailChimp {
 
-    private static bool         $loaded = false;
-    private static object       $config;
-    private static MailChimpAPI $api;
+    private static ?MailChimpAPI $api = null;
 
 
     /**
      * Creates the MailChimp Provider
-     * @return boolean
+     * @return MailChimpAPI|null
      */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return false;
-        }
-        self::$loaded = true;
-        self::$config = ConfigCode::getObject("mailchimp");
-
-        if (self::$config->active && !empty(self::$config->key)) {
-            self::$api = new MailChimpAPI(self::$config->key);
+    private static function api(): ?MailChimpAPI {
+        if (empty(self::$api) && Config::isMailchimpActive()) {
+            self::$api = new MailChimpAPI(Config::getMailchimpKey());
             self::$api->verify_ssl = false;
         }
-        return true;
+        return self::$api;
     }
 
     /**
@@ -40,8 +32,8 @@ class MailChimp {
      * @return mixed
      */
     private static function getLastError(): mixed {
-        if (self::$api) {
-            return self::$api->getLastError();
+        if (Config::isMailchimpActive()) {
+            return self::api()->getLastError();
         }
         return null;
     }
@@ -51,8 +43,8 @@ class MailChimp {
      * @return mixed
      */
     private static function getLastResponse(): mixed {
-        if (self::$api) {
-            return self::$api->getLastResponse();
+        if (Config::isMailchimpActive()) {
+            return self::api()->getLastResponse();
         }
         return null;
     }
@@ -65,7 +57,8 @@ class MailChimp {
      * @return string
      */
     private static function getSubscribersRoute(string $route = ""): string {
-        $result = "lists/" . self::$config->list . "/members";
+        $listID = Config::getMailchimpList();
+        $result = "lists/$listID/members";
         if (!empty($route)) {
             $result .= "/$route";
         }
@@ -79,12 +72,12 @@ class MailChimp {
      * @return mixed[]
      */
     public static function getAllSubscribers(int $count = 100, int $offset = 0): array {
-        self::load();
-        if (!self::$api) {
+        if (!Config::isMailchimpActive()) {
             return [];
         }
+
         $route  = self::getSubscribersRoute();
-        $result = self::$api->get($route, [
+        $result = self::api()->get($route, [
             "count"  => $count,
             "offset" => $offset,
         ], 120);
@@ -97,13 +90,13 @@ class MailChimp {
      * @return mixed[]|mixed|null
      */
     public static function getSubscriber(string $email): mixed {
-        self::load();
-        if (!self::$api) {
+        if (!Config::isMailchimpActive()) {
             return null;
         }
-        $hash   = self::$api->subscriberHash($email);
+
+        $hash   = self::api()->subscriberHash($email);
         $route  = self::getSubscribersRoute($hash);
-        $result = self::$api->get($route);
+        $result = self::api()->get($route);
         return !empty($result) ? $result : null;
     }
 
@@ -114,7 +107,7 @@ class MailChimp {
      */
     public static function getSubscriberStatus(string $email): string {
         $subscriber = self::getSubscriber($email);
-        if (empty($subscriber) || !self::$api->success()) {
+        if (empty($subscriber) || !self::api()->success()) {
             return "";
         }
         return $subscriber["status"];
@@ -128,12 +121,11 @@ class MailChimp {
      * @return boolean
      */
     public static function addSubscriber(string $email, string $firstName, string $lastName): bool {
-        self::load();
-        if (!self::$api || !self::$config->subscriberActive) {
+        if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
             return false;
         }
-        $route  = self::getSubscribersRoute();
-        $result = self::$api->post($route, [
+
+        self::api()->post(self::getSubscribersRoute(), [
             "status"        => "subscribed",
             "email_address" => $email,
             "merge_fields"  => [
@@ -141,7 +133,7 @@ class MailChimp {
                 "LNAME" => $lastName,
             ],
         ]);
-        return self::$api->success();
+        return self::api()->success();
     }
 
     /**
@@ -150,12 +142,12 @@ class MailChimp {
      * @return boolean
      */
     public static function addSubscriberBatch(array $subscribers): bool {
-        self::load();
-        if (!self::$api || !self::$config->subscriberActive) {
+        if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
             return false;
         }
+
         $route = self::getSubscribersRoute();
-        $batch = self::$api->new_batch();
+        $batch = self::api()->new_batch();
         foreach ($subscribers as $index => $subscriber) {
             $batch->post("op$index", $route, [
                 "status"        => "subscribed",
@@ -178,13 +170,13 @@ class MailChimp {
      * @return boolean
      */
     public static function editSubscriber(string $email, string $firstName, string $lastName, string $status = "subscribed"): bool {
-        self::load();
-        if (!self::$api || !self::$config->subscriberActive) {
+        if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
             return false;
         }
-        $hash   = self::$api->subscriberHash($email);
-        $route  = self::getSubscribersRoute($hash);
-        $result = self::$api->patch($route, [
+
+        $hash  = self::api()->subscriberHash($email);
+        $route = self::getSubscribersRoute($hash);
+        self::api()->patch($route, [
             "status"        => $status,
             "email_address" => $email,
             "merge_fields"  => [
@@ -192,7 +184,7 @@ class MailChimp {
                 "LNAME" => $lastName,
             ],
         ]);
-        return self::$api->success();
+        return self::api()->success();
     }
 
     /**
@@ -201,14 +193,14 @@ class MailChimp {
      * @return boolean
      */
     public static function deleteSubscriber(string $email): bool {
-        self::load();
-        if (!self::$api || !self::$config->subscriberActive) {
+        if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
             return false;
         }
-        $hash  = self::$api->subscriberHash($email);
+
+        $hash  = self::api()->subscriberHash($email);
         $route = self::getSubscribersRoute($hash);
-        self::$api->delete($route);
-        return self::$api->success();
+        self::api()->delete($route);
+        return self::api()->success();
     }
 
 
@@ -218,11 +210,11 @@ class MailChimp {
      * @return Select[]
      */
     public static function getTemplates(): array {
-        self::load();
-        if (!self::$api) {
+        if (!Config::isMailchimpActive()) {
             return [];
         }
-        $data = self::$api->get("templates");
+
+        $data = self::api()->get("templates");
         return Select::create($data["templates"], "id", "name");
     }
 
@@ -237,10 +229,7 @@ class MailChimp {
      * @return string|null
      */
     public static function sendCampaign(string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): ?string {
-        self::load();
-
-        // We do Nothing
-        if (!self::$api || !self::$config->createActive) {
+        if (!Config::isMailchimpActive() || !Config::isMailchimpCreateActive()) {
             return "disabled";
         }
 
@@ -256,7 +245,7 @@ class MailChimp {
         }
 
         // We cant send
-        if (!self::$config->sendActive) {
+        if (!Config::isMailchimpSendActive()) {
             return $mailChimpID;
         }
 
@@ -281,10 +270,7 @@ class MailChimp {
      * @return boolean
      */
     public static function updateCampaign(string $mailChimpID, string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): bool {
-        self::load();
-
-        // We do Nothing
-        if (!self::$api || !self::$config->createActive) {
+        if (!Config::isMailchimpActive() || !Config::isMailchimpCreateActive()) {
             return false;
         }
 
@@ -299,7 +285,7 @@ class MailChimp {
         }
 
         // We cant send
-        if (!self::$config->sendActive) {
+        if (!Config::isMailchimpSendActive()) {
             return true;
         }
 
@@ -331,17 +317,17 @@ class MailChimp {
             "settings"   => [
                 "subject_line" => $subject,
                 "title"        => $subject,
-                "from_name"    => self::$config->name,
-                "reply_to"     => self::$config->replyTo,
+                "from_name"    => Config::getMailchimpName(),
+                "reply_to"     => Config::getMailchimpReplyTo(),
                 "to_name"      => "*|FNAME|*",
             ],
         ];
         if (!empty($folderID)) {
             $post["settings"]["folder_id"] = $folderID;
         }
-        $result = self::$api->post("campaigns", $post, 300);
+        $result = self::api()->post("campaigns", $post, 300);
 
-        if (self::$api->success()) {
+        if (self::api()->success()) {
             return $result["id"];
         }
         return "";
@@ -371,8 +357,8 @@ class MailChimp {
         if (!empty($folderID)) {
             $post["settings"]["folder_id"] = $folderID;
         }
-        self::$api->patch("campaigns/$mailChimpID", $post, 60);
-        return self::$api->success();
+        self::api()->patch("campaigns/$mailChimpID", $post, 60);
+        return self::api()->success();
     }
 
     /**
@@ -381,14 +367,14 @@ class MailChimp {
      * @return array{}[]|null
      */
     private static function parseRecipients(?array $emails = null): ?array {
-        $recipients = [ "list_id" => self::$config->list ];
+        $recipients = [ "list_id" => Config::getMailchimpList() ];
         if (empty($emails)) {
             return $recipients;
         }
 
         $conditions = [];
         foreach ($emails as $email) {
-            if (self::$config->useWhiteList && !EmailWhiteList::emailExists($email)) {
+            if (Config::isEmailUseWhiteList() && !EmailWhiteList::emailExists($email)) {
                 continue;
             }
             $conditions[] = [
@@ -421,8 +407,8 @@ class MailChimp {
         if (!empty($sections)) {
             $post["template"]["sections"] = $sections;
         }
-        self::$api->put("campaigns/{$mailChimpID}/content", $post, 60);
-        return self::$api->success();
+        self::api()->put("campaigns/{$mailChimpID}/content", $post, 60);
+        return self::api()->success();
     }
 
     /**
@@ -436,15 +422,16 @@ class MailChimp {
             var_dump("no-time");
             return false;
         }
+
         if ($time <= time()) {
-            self::$api->post("campaigns/{$mailChimpID}/actions/send");
+            self::api()->post("campaigns/{$mailChimpID}/actions/send");
         } else {
-            self::$api->post("campaigns/{$mailChimpID}/actions/schedule", [
+            self::api()->post("campaigns/{$mailChimpID}/actions/schedule", [
                 "schedule_time" => gmdate("Y-m-d H:i:s", $time),
                 "timewarp"      => false,
             ]);
         }
-        return self::$api->success();
+        return self::api()->success();
     }
 
     /**
@@ -453,12 +440,12 @@ class MailChimp {
      * @return boolean
      */
     public static function unscheduleCampaign(string $mailChimpID): bool {
-        self::load();
-        if (!self::$api) {
+        if (!Config::isMailchimpActive()) {
             return false;
         }
-        self::$api->post("campaigns/{$mailChimpID}/actions/unschedule");
-        return self::$api->success();
+
+        self::api()->post("campaigns/{$mailChimpID}/actions/unschedule");
+        return self::api()->success();
     }
 
     /**
@@ -467,12 +454,12 @@ class MailChimp {
      * @return boolean
      */
     public static function deleteCampaign(string $mailChimpID): bool {
-        self::load();
-        if (!self::$api) {
+        if (!Config::isMailchimpActive()) {
             return false;
         }
-        self::$api->delete("campaigns/{$mailChimpID}");
-        return self::$api->success();
+
+        self::api()->delete("campaigns/{$mailChimpID}");
+        return self::api()->success();
     }
 
 
@@ -483,11 +470,11 @@ class MailChimp {
      * @return array{}
      */
     public static function getContent(string $mailChimpID): array {
-        self::load();
-        if (!self::$api) {
+        if (!Config::isMailchimpActive()) {
             return [];
         }
-        $result = self::$api->get("campaigns/{$mailChimpID}/content");
+
+        $result = self::api()->get("campaigns/{$mailChimpID}/content");
         return $result;
     }
 
@@ -497,7 +484,6 @@ class MailChimp {
      * @return array{}
      */
     public static function getReport(string $mailChimpID): array {
-        self::load();
         $result = [
             "hasReport"    => false,
             "opensUnique"  => 0,
@@ -505,11 +491,11 @@ class MailChimp {
             "clicksUnique" => 0,
             "clicksRate"   => 0,
         ];
-        if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
             return $result;
         }
 
-        $report = self::$api->get("reports/{$mailChimpID}");
+        $report = self::api()->get("reports/{$mailChimpID}");
         if (empty($report["status"]) || (!empty($report["status"]) && $report["status"] != 404)) {
             $result["hasReport"]    = true;
             $result["emailsSent"]   = $report["emails_sent"];
@@ -527,13 +513,12 @@ class MailChimp {
      * @return string[]
      */
     public static function getSendDetails(string $mailChimpID): array {
-        self::load();
         $result = [];
-        if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
             return $result;
         }
 
-        $report = self::$api->get("reports/{$mailChimpID}/sent-to", [
+        $report = self::api()->get("reports/{$mailChimpID}/sent-to", [
             "count" => 2000,
         ]);
         foreach ($report["sent_to"] as $member) {
@@ -548,13 +533,12 @@ class MailChimp {
      * @return string[]
      */
     public static function getOpenDetails(string $mailChimpID): array {
-        self::load();
         $result = [];
-        if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
             return $result;
         }
 
-        $report = self::$api->get("reports/{$mailChimpID}/open-details", [
+        $report = self::api()->get("reports/{$mailChimpID}/open-details", [
             "count" => 2000,
         ]);
         foreach ($report["members"] as $member) {
@@ -569,16 +553,15 @@ class MailChimp {
      * @return string[]
      */
     public static function getClickDetails(string $mailChimpID): array {
-        self::load();
         $result = [];
-        if (!self::$api || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
             return $result;
         }
 
-        $request = self::$api->get("reports/{$mailChimpID}/click-details");
+        $request = self::api()->get("reports/{$mailChimpID}/click-details");
         if (!empty($request["urls_clicked"][0]["id"])) {
             $clickID = $request["urls_clicked"][0]["id"];
-            $report  = self::$api->get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
+            $report  = self::api()->get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
                 "count" => 2000,
             ]);
             foreach ($report["members"] as $member) {

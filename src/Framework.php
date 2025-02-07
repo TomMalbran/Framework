@@ -2,9 +2,9 @@
 namespace Framework;
 
 use Framework\Response;
-use Framework\System\ConfigCode;
 use Framework\Auth\Auth;
 use Framework\Builder\Builder;
+use Framework\Core\Configs;
 use Framework\Core\Settings;
 use Framework\Email\EmailTemplate;
 use Framework\File\File;
@@ -133,7 +133,7 @@ class Framework {
      */
     public static function getDatabase(): Database {
         if (empty(self::$db)) {
-            $config   = ConfigCode::getObject("db");
+            $config   = Configs::getObject("db");
             self::$db = new Database($config);
         }
         return self::$db;

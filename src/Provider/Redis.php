@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 use Framework\Utils\JSON;
 
 use Redis as RedisClient;
@@ -29,7 +29,7 @@ class Redis {
             return true;
         }
 
-        if (!ConfigCode::getBoolean("redisIsActive")) {
+        if (!Config::isRedisActive()) {
             self::$disabled = true;
             return false;
         }

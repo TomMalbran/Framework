@@ -1,7 +1,8 @@
 <?php
 namespace {{codeSpace}};
 
-use Framework\System\ConfigCode;
+use Framework\Core\Configs;
+use Framework\File\File;
 
 /**
  * The Config
@@ -13,7 +14,7 @@ class Config {
      * @return boolean
      */
     public static function isLocal(): bool {
-        return ConfigCode::getEnvironment() === "local";
+        return Configs::getEnvironment() === "local";
     }
 {{#environments}}
 
@@ -22,11 +23,23 @@ class Config {
      * @return boolean
      */
     public static function is{{name}}(): bool {
-        return ConfigCode::getEnvironment() === "{{environment}}";
+        return Configs::getEnvironment() === "{{environment}}";
     }
 {{/environments}}
 
 
+    /**
+     * Returns the url for the given key and adding the url parts at the end
+     * @param string $urlKey
+     * @param string ...$urlParts
+     * @return string
+     */
+    public static function getUrlWithKey(string $urlKey, string ...$urlParts): string {
+        $url  = Configs::getString($urlKey, Configs::getString("url"));
+        $path = File::parsePath(...$urlParts);
+        $path = File::removeFirstSlash($path);
+        return $url . $path;
+    }
 {{#urls}}
 
     /**
@@ -35,7 +48,7 @@ class Config {
      * @return string
      */
     public static function get{{name}}(string ...$urlParts): string {
-        return ConfigCode::getUrl("{{property}}", ...$urlParts);
+        return self::getUrlWithKey("{{property}}", ...$urlParts);
     }
 {{/urls}}
 
@@ -48,19 +61,19 @@ class Config {
      */
     public static function {{getter}}{{name}}(): {{type}} {
         {{#isString}}
-        return ConfigCode::getString("{{property}}");
+        return Configs::getString("{{property}}");
         {{/isString}}
         {{#isBoolean}}
-        return ConfigCode::getBoolean("{{property}}");
+        return Configs::getBoolean("{{property}}");
         {{/isBoolean}}
         {{#isInteger}}
-        return ConfigCode::getInt("{{property}}");
+        return Configs::getInt("{{property}}");
         {{/isInteger}}
         {{#isFloat}}
-        return ConfigCode::getFloat("{{property}}");
+        return Configs::getFloat("{{property}}");
         {{/isFloat}}
         {{#isArray}}
-        return ConfigCode::getArray("{{property}}");
+        return Configs::getArray("{{property}}");
         {{/isArray}}
     }
 {{/properties}}

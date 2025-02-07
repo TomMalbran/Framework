@@ -5,7 +5,7 @@ use Framework\Request;
 use Framework\Database\Query;
 use Framework\Email\Email;
 use Framework\Email\EmailResult;
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
@@ -46,7 +46,7 @@ class EmailQueue extends EmailQueueSchema {
         $query->add("sendTime", ">", DateTime::getLastXHours(1));
         $query->endOr();
         $query->orderBy("createdTime", false);
-        $query->limitIf(ConfigCode::getInt("emailLimit"));
+        $query->limitIf(Config::getEmailLimit());
         return self::getEntityList($query);
     }
 

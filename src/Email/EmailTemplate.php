@@ -2,10 +2,10 @@
 namespace Framework\Email;
 
 use Framework\Framework;
-use Framework\System\ConfigCode;
 use Framework\NLS\Language;
 use Framework\Provider\Mustache;
 use Framework\Database\Query;
+use Framework\System\Config;
 use Framework\Utils\Strings;
 use Framework\Schema\EmailTemplateSchema;
 use Framework\Schema\EmailTemplateEntity;
@@ -74,7 +74,7 @@ class EmailTemplate extends EmailTemplateSchema {
      * @return integer
      */
     private static function migrateLanguage(array $templates, string $language, string $languageName, int $position): int {
-        $siteName = ConfigCode::getString("name");
+        $siteName = Config::getName();
         $updates  = [];
 
         // Adds the Email Templates

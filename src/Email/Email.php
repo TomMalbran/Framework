@@ -3,7 +3,6 @@ namespace Framework\Email;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\System\ConfigCode;
 use Framework\Email\EmailWhiteList;
 use Framework\Email\EmailProvider;
 use Framework\Email\EmailResult;
@@ -13,6 +12,7 @@ use Framework\Provider\Mandrill;
 use Framework\Provider\Mailjet;
 use Framework\Provider\SendGrid;
 use Framework\File\FilePath;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
@@ -23,29 +23,6 @@ use Framework\Schema\EmailTemplateEntity;
  */
 class Email {
 
-    private static bool    $loaded   = false;
-    private static ?string $template = null;
-    private static string  $url      = "";
-    private static object  $config;
-
-
-    /**
-     * Loads the Email Config
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return false;
-        }
-        self::$loaded   = true;
-        self::$template = Framework::loadFile(Framework::DataDir, "email.html");
-        self::$url      = ConfigCode::getString("url");
-        self::$config   = ConfigCode::getObject("email");
-        return true;
-    }
-
-
-
     /**
      * Sends an Email
      * @param string  $toEmail
@@ -55,13 +32,11 @@ class Email {
      * @return EmailResult
      */
     public static function send(string $toEmail, string $subject, string $message, bool $sendAlways): EmailResult {
-        self::load();
-
         // Return some possible errors
-        if (!self::$config->isActive) {
+        if (!Config::isEmailActive()) {
             return EmailResult::InactiveSend;
         }
-        if (!$sendAlways && !empty(self::$config->useWhiteList) && !EmailWhiteList::emailExists($toEmail)) {
+        if (!$sendAlways && Config::isEmailUseWhiteList() && !EmailWhiteList::emailExists($toEmail)) {
             return EmailResult::WhiteListFilter;
         }
         if (!Utils::isValidEmail($toEmail)) {
@@ -69,28 +44,21 @@ class Email {
         }
 
         // Create the template
-        $logo = "";
-        if (!empty(self::$config->logo)) {
-            $logo = self::$config->logo;
-        }
-        $body = Mustache::render(self::$template, [
-            "url"      => self::$url,
-            "name"     => self::$config->name,
+        $template = Framework::loadFile(Framework::DataDir, "email.html");
+        $body     = Mustache::render($template, [
+            "url"      => Config::getUrl(),
+            "name"     => Config::getName(),
             "files"    => FilePath::getInternalUrl(),
-            "logo"     => $logo,
-            "siteName" => self::$config->name,
+            "logo"     => Config::getEmailLogo(),
+            "siteName" => Config::getName(),
             "message"  => $message,
         ]);
 
         // Configure the variables
-        $provider  = EmailProvider::from(self::$config->provider ?? "");
-        $fromEmail = self::$config->email;
-        $fromName  = self::$config->name;
-        $replyTo   = "";
-
-        if (!empty(self::$config->replyTo)) {
-            $replyTo = self::$config->replyTo;
-        }
+        $provider  = EmailProvider::from(Config::getEmailProvider());
+        $fromName  = Config::getName();
+        $fromEmail = Config::getEmailEmail();
+        $replyTo   = Config::getEmailReplyTo();
 
         // Try to send the email
         $wasSent = match ($provider) {
@@ -138,7 +106,7 @@ class Email {
      * @return boolean
      */
     public static function isCaptchaValid(Request $request, bool $withScore = false): bool {
-        $recaptchaSecret = ConfigCode::getString("recaptchaSecret");
+        $recaptchaSecret = Config::getEmailRecaptchaSecret();
         if (!$request->has("g-recaptcha-response") || empty($recaptchaSecret)) {
             return false;
         }

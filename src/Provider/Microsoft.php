@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 use Framework\Utils\Utils;
 
 use Firebase\JWT\JWT;
@@ -11,33 +11,12 @@ use Firebase\JWT\JWT;
  */
 class Microsoft {
 
-    private static bool   $loaded = false;
-    private static object $config;
-
-
-    /**
-     * Creates the Microsoft Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        self::$loaded = true;
-        self::$config = ConfigCode::getObject("microsoft");
-        return false;
-    }
-
-
-
     /**
      * Returns the Account from the given Token
      * @param string $idToken
      * @return array{}
      */
     public static function getAuthAccount(string $idToken): array {
-        self::load();
         if (empty($idToken)) {
             return [];
         }
@@ -55,7 +34,7 @@ class Microsoft {
         if ($header === null || $payload === null || $signature === null) {
             return [];
         }
-        if ($payload->aud !== self::$config->client) {
+        if ($payload->aud !== Config::getMicrosoftClient()) {
             return [];
         }
         if ($payload->exp < time()) {

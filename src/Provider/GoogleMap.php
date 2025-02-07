@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 
 /**
@@ -11,35 +11,13 @@ class GoogleMap {
 
     const BaseUrl = "https://maps.google.com/maps/api/";
 
-    private static bool   $loaded   = false;
-    private static bool   $isActive = false;
-    private static string $apiKey   = "";
-
-
-    /**
-     * Creates the GoogleMap Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        self::$loaded   = true;
-        self::$isActive = ConfigCode::getBoolean("googleMapIsActive");
-        self::$apiKey   = ConfigCode::getString("googleMapKey");
-        return false;
-    }
-
-
 
     /**
      * Returns true if Google Maps is active
      * @return boolean
      */
     public static function isActive(): bool {
-        self::load();
-        return self::$isActive;
+        return Config::isGoogleMapActive();
     }
 
     /**
@@ -69,12 +47,11 @@ class GoogleMap {
      * @return array{}
      */
     public static function getAddress(string $address, float $latitude, float $longitude): array {
-        self::load();
-        if (!self::$isActive) {
+        if (!self::isActive()) {
             return [];
         }
 
-        $params = [ "key" => self::$apiKey ];
+        $params = [ "key" => Config::getGoogleMapApiKey() ];
         if (!empty($latitude) && !empty($longitude)) {
             $params["latlng"] = "$latitude,$longitude";
         } elseif (!empty($address)) {
@@ -114,13 +91,12 @@ class GoogleMap {
      * @return float|null
      */
     public static function calculateDistance(float $latitude1, float $longitude1, float $latitude2, float $longitude2): ?float {
-        self::load();
-        if (!self::$isActive) {
+        if (!self::isActive()) {
             return null;
         }
 
         $params = [
-            "key"          => self::$apiKey,
+            "key"          => Config::getGoogleMapApiKey(),
             "origins"      => "$latitude1,$longitude1",
             "destinations" => "$latitude2,$longitude2",
             "units"        => "metric",

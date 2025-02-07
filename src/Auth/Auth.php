@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\System\ConfigCode;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Reset;
@@ -10,8 +9,8 @@ use Framework\NLS\NLS;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
-use Framework\Utils\Arrays;
 use Framework\System\Access;
+use Framework\System\Config;
 use Framework\System\Status;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
@@ -41,7 +40,7 @@ class Auth {
      * @return boolean
      */
     public static function isLoginDisabled(): bool {
-        return ConfigCode::getBoolean("authIsDisabled");
+        return !Config::isAuthActive();
     }
 
     /**
@@ -129,7 +128,7 @@ class Auth {
      * @return string
      */
     public static function getApiToken(): string {
-        return ConfigCode::getString("authApiToken");
+        return Config::getAuthApiToken();
     }
 
     /**
@@ -323,8 +322,7 @@ class Auth {
             NLS::setLanguage($language);
         }
 
-        $accesses = ConfigCode::getArray("authTimezone");
-        if (!empty($timezone) && (empty($accesses) || Arrays::contains($accesses, $credential->access))) {
+        if (!empty($timezone)) {
             DateTime::setTimezone($timezone);
         }
         return true;
@@ -395,7 +393,7 @@ class Auth {
         ];
 
         // Add fields from the Config
-        $fields = ConfigCode::getArray("authFields");
+        $fields = Config::getAuthFields();
         foreach ($fields as $field) {
             $data[$field] = self::$credential->get($field);
         }
@@ -501,7 +499,7 @@ class Auth {
      * @return boolean
      */
     public static function hasAPI(): bool {
-        return self::$accessName === AccessCode::API;
+        return self::$accessName === Access::API;
     }
 
     /**

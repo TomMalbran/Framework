@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
 use Framework\Provider\Curl;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
@@ -15,59 +15,20 @@ class MercadoPago {
     const BaseUrl = "https://api.mercadopago.com";
     const AuthUrl = "https://auth.mercadopago.com/authorization";
 
-    private static bool   $loaded          = false;
-    private static string $clientID        = "";
-    private static string $clientSecret    = "";
-    private static string $accessToken     = "";
-    private static string $signature       = "";
-    private static string $redirectUrl     = "";
-    private static string $notificationUrl = "";
-    private static string $backUrl         = "";
 
-
-    /**
-     * Creates the MercadoPago Provider
-     * @param string $accessToken Optional.
-     * @return boolean
-     */
-    private static function load(string $accessToken = ""): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        $config = ConfigCode::getObject("mp");
-
-        self::$loaded       = true;
-        self::$clientID     = $config->clientId;
-        self::$clientSecret = $config->clientSecret;
-        self::$accessToken  = $config->accessToken;
-        self::$signature    = $config->signature;
-        self::$backUrl      = $config->backUrl;
-
-        if (!empty($config->redirectPath)) {
-            self::$redirectUrl = ConfigCode::getUrl("url", $config->redirectPath);
-        }
-        if (!empty($config->notificationPath)) {
-            self::$notificationUrl = ConfigCode::getUrl("url", $config->notificationPath);
-        }
-
-        if (!empty($accessToken)) {
-            self::$accessToken = $accessToken;
-        }
-        return false;
-    }
 
     /**
      * Does a GET Request
      * @param string       $route
      * @param array{}|null $request      Optional.
      * @param boolean      $jsonResponse Optional.
+     * @param string       $accessToken  Optional.
      * @return mixed
      */
-    private static function get(string $route, ?array $request = null, bool $jsonResponse = true): mixed {
-        self::load();
+    private static function get(string $route, ?array $request = null, bool $jsonResponse = true, string $accessToken = ""): mixed {
+        $accessToken = $accessToken ?: Config::getMpAccessToken();
         return Curl::execute("GET", self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . self::$accessToken,
+            "Authorization" => "Bearer $accessToken",
         ], jsonResponse: $jsonResponse);
     }
 
@@ -75,14 +36,15 @@ class MercadoPago {
      * Does a POST Request
      * @param string  $route
      * @param array{} $request
-     * @param array{} $headers Optional.
+     * @param array{} $headers     Optional.
+     * @param string  $accessToken Optional.
      * @return mixed
      */
-    private static function post(string $route, array $request, array $headers = []): mixed {
-        self::load();
+    private static function post(string $route, array $request, array $headers = [], string $accessToken = ""): mixed {
+        $accessToken = $accessToken ?: Config::getMpAccessToken();
         return Curl::execute("POST", self::BaseUrl . $route, $request, Arrays::merge([
             "content-type"  => "application/json",
-            "Authorization" => "Bearer " . self::$accessToken,
+            "Authorization" => "Bearer $accessToken",
         ], $headers), jsonBody: true);
     }
 
@@ -90,13 +52,14 @@ class MercadoPago {
      * Does a PUT Request
      * @param string  $route
      * @param array{} $request
+     * @param string  $accessToken Optional.
      * @return mixed
      */
-    private static function put(string $route, array $request): mixed {
-        self::load();
+    private static function put(string $route, array $request, string $accessToken = ""): mixed {
+        $accessToken = $accessToken ?: Config::getMpAccessToken();
         return Curl::execute("PUT", self::BaseUrl . $route, $request, [
             "content-type"  => "application/json",
-            "Authorization" => "Bearer " . self::$accessToken,
+            "Authorization" => "Bearer $accessToken",
         ], jsonBody: true);
     }
 
@@ -108,7 +71,10 @@ class MercadoPago {
      * @return string
      */
     public static function getRedirectUrl(string $redirectUrl = ""): string {
-        return !empty($redirectUrl) ? $redirectUrl : self::$redirectUrl;
+        if (!empty($redirectUrl)) {
+            return $redirectUrl;
+        }
+        return Config::getUrl(Config::getMpRedirectPath());
     }
 
     /**
@@ -118,10 +84,9 @@ class MercadoPago {
      * @return string
      */
     public static function getAuthUrl(string $state, string $redirectUrl = ""): string {
-        self::load();
         $result = self::AuthUrl;
         $result .= "?response_type=code&platform_id=mp";
-        $result .= "&client_id=" . self::$clientID;
+        $result .= "&client_id=" . Config::getMpClientId();
         $result .= "&state=$state";
         $result .= "&redirect_uri=" . self::getRedirectUrl($redirectUrl);
         return $result;
@@ -134,10 +99,9 @@ class MercadoPago {
      * @return object
      */
     public static function createAccessToken(string $code, string $redirectUrl = ""): object {
-        self::load();
         $result = self::post("/oauth/token", [
-            "client_id"     => self::$clientID,
-            "client_secret" => self::$clientSecret,
+            "client_id"     => Config::getMpClientId(),
+            "client_secret" => Config::getMpClientSecret(),
             "code"          => $code,
             "redirect_uri"  => self::getRedirectUrl($redirectUrl),
             "grant_type"    => "authorization_code",
@@ -160,10 +124,9 @@ class MercadoPago {
      * @return object
      */
     public static function recreateAccessToken(string $refreshToken): object {
-        self::load();
         $result = self::post("/oauth/token", [
-            "client_id"     => self::$clientID,
-            "client_secret" => self::$clientSecret,
+            "client_id"     => Config::getMpClientId(),
+            "client_secret" => Config::getMpClientSecret(),
             "refresh_token" => $refreshToken,
             "grant_type"    => "refresh_token",
         ]);
@@ -197,8 +160,6 @@ class MercadoPago {
         float $marketplaceFee = 0,
         string $accessToken = "",
     ): array {
-        self::load($accessToken);
-
         $itemList = [];
         foreach ($items as $item) {
             $itemList[] = [
@@ -221,18 +182,22 @@ class MercadoPago {
         if (!empty($marketplaceFee)) {
             $fields["marketplace_fee"] = $marketplaceFee;
         }
-        if (!empty(self::$notificationUrl)) {
-            $fields["notification_url"] = self::$notificationUrl;
+
+        $notificationPath = Config::getMpNotificationPath();
+        if (!empty($notificationPath)) {
+            $fields["notification_url"] = Config::getUrl($notificationPath);
         }
-        if (!empty(self::$backUrl)) {
+
+        $backUrl = Config::getMpBackUrl();
+        if (!empty($backUrl)) {
             $fields["back_urls"] = [
-                "success" => self::$backUrl,
-                "pending" => self::$backUrl,
-                "failure" => self::$backUrl,
+                "success" => $backUrl,
+                "pending" => $backUrl,
+                "failure" => $backUrl,
             ];
         }
 
-        return self::post("/checkout/preferences", $fields);
+        return self::post("/checkout/preferences", $fields, accessToken: $accessToken);
     }
 
     /**
@@ -242,12 +207,10 @@ class MercadoPago {
      * @return boolean
      */
     public static function cancelPaymentUrl(string $preferenceID, string $accessToken = ""): bool {
-        self::load($accessToken);
-
         $result = self::put("/checkout/preferences/$preferenceID", [
             "expires"            => true,
             "expiration_date_to" => DateTime::format(time(), "Y-m-d\TH:i:s-03:00"),
-        ]);
+        ], $accessToken);
         return !empty($result["id"]);
     }
 
@@ -258,9 +221,7 @@ class MercadoPago {
      * @return object
      */
     public static function getPaymentData(string $paymentID, string $accessToken = ""): object {
-        self::load($accessToken);
-
-        $result = self::get("/v1/payments/$paymentID");
+        $result = self::get("/v1/payments/$paymentID", accessToken: $accessToken);
         if (empty($result["id"])) {
             return (object)[];
         }
@@ -312,11 +273,9 @@ class MercadoPago {
      * @return boolean
      */
     public static function cancelPayment(string $paymentID, string $accessToken = ""): bool {
-        self::load($accessToken);
-
         $result = self::put("/v1/payments/$paymentID", [
             "status" => "cancelled",
-        ]);
+        ], $accessToken);
         return !empty($result["id"]);
     }
 
@@ -327,13 +286,11 @@ class MercadoPago {
      * @return boolean
      */
     public static function refundPayment(string $paymentID, string $accessToken = ""): bool {
-        self::load($accessToken);
-
         $result = self::post("/v1/payments/$paymentID/refunds", [
             "amount" => null,
         ], [
             "X-Idempotency-Key" => Strings::randomCode(20),
-        ]);
+        ], $accessToken);
         return !empty($result["id"]);
     }
 
@@ -345,10 +302,9 @@ class MercadoPago {
      * @return boolean
      */
     public static function isValidSignature(object $payload): bool {
-        self::load();
+        $signature      = Config::getMpSignature();
         $transactionID  = $payload->transaction_id ?: "";
         $generationDate = $payload->generation_date ?: "";
-        $signature      = self::$signature ?: "";
         $password       = "$transactionID-$signature-$generationDate";
         $hash           = $payload->signature ?: "";
         $isValid        = password_verify($password, $hash);

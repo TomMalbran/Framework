@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 
 /**
  * The SendGrid Provider
@@ -9,25 +9,6 @@ use Framework\System\ConfigCode;
 class SendGrid {
 
     const BaseUrl = "https://api.sendgrid.com/v3/";
-
-    private static bool   $loaded = false;
-    private static string $apiKey = "";
-
-
-    /**
-     * Creates the SendGrid Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        self::$loaded = true;
-        self::$apiKey = ConfigCode::getString("sendGridKey");
-        return false;
-    }
-
 
 
     /**
@@ -48,12 +29,10 @@ class SendGrid {
         string $subject,
         string $body
     ): bool {
-        self::load();
-
         $url     = self::BaseUrl . "mail/send";
         $headers = [
             "Content-Type"  => "application/json",
-            "Authorization" => "Bearer " . self::$apiKey,
+            "Authorization" => "Bearer " . Config::getSendGridKey(),
         ];
         $params = [
             "personalizations" => [[ "to" => [[ "email" => $toEmail ]] ]],

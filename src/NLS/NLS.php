@@ -2,8 +2,8 @@
 namespace Framework\NLS;
 
 use Framework\Framework;
-use Framework\System\ConfigCode;
 use Framework\NLS\Language;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -126,7 +126,7 @@ class NLS {
         foreach ($args as $arg) {
             $result[] = self::get($arg, $language);
         }
-        return ConfigCode::getUrl("url", ...$result);
+        return Config::getUrl(...$result);
     }
 
     /**
@@ -141,7 +141,7 @@ class NLS {
         foreach ($args as $arg) {
             $result[] = self::get($arg, $language);
         }
-        return ConfigCode::getUrl($urlKey, ...$result);
+        return Config::getUrlWithKey($urlKey, ...$result);
     }
 
     /**

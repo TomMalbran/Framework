@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 
 /**
  * The Mandrill Provider
@@ -9,25 +9,6 @@ use Framework\System\ConfigCode;
 class Mandrill {
 
     const BaseUrl = "https://mandrillapp.com/api/1.0/";
-
-    private static bool   $loaded = false;
-    private static string $apiKey = "";
-
-
-    /**
-     * Creates the Mandrill Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-
-        self::$loaded = true;
-        self::$apiKey = ConfigCode::getString("mandrillKey");
-        return false;
-    }
-
 
 
     /**
@@ -48,8 +29,6 @@ class Mandrill {
         string $subject,
         string $body
     ): bool {
-        self::load();
-
         $message = [
             "to"                  => [
                 [
@@ -85,7 +64,7 @@ class Mandrill {
             "Content-Type" => "application/json",
         ];
         $params   = [
-            "key"     => self::$apiKey,
+            "key"     => Config::getMandrillKey(),
             "message" => $message,
             "async"   => false,
             "send_at" => date("Y-m-d H:i:s"),

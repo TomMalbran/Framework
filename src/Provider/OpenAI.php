@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\System\ConfigCode;
+use Framework\System\Config;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -16,22 +16,6 @@ class OpenAI {
 
     const MaxAssistantFiles = 20;
 
-    private static bool   $loaded = false;
-    private static string $apiKey = "";
-
-
-
-    /**
-     * Creates the OpenAI Provider
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return true;
-        }
-        self::$apiKey = ConfigCode::getString("openAiKey");
-        return true;
-    }
 
     /**
      * Does a GET Request
@@ -40,9 +24,8 @@ class OpenAI {
      * @return mixed
      */
     private static function get(string $route, ?array $request = null): mixed {
-        self::load();
         return Curl::execute("GET", self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . self::$apiKey,
+            "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
     }
@@ -54,9 +37,8 @@ class OpenAI {
      * @return mixed
      */
     private static function post(string $route, ?array $request = null): mixed {
-        self::load();
         return Curl::execute("POST", self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . self::$apiKey,
+            "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "application/json",
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonBody: true, jsonResponse: true);
@@ -69,9 +51,8 @@ class OpenAI {
      * @return mixed
      */
     private static function upload(string $route, ?array $request = null): mixed {
-        self::load();
         return Curl::execute("POST", self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . self::$apiKey,
+            "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "multipart/form-data",
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
@@ -84,9 +65,8 @@ class OpenAI {
      * @return mixed
      */
     private static function delete(string $route, ?array $request = null): mixed {
-        self::load();
         return Curl::execute("DELETE", self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . self::$apiKey,
+            "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "application/json",
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
