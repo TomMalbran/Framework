@@ -26,9 +26,13 @@ class AccessCode {
             }
         }
 
+        $accessList = self::getAccesses($groups, $accesses);
+        $maxLength  = self::alignNames($accessList);
+
         return [
-            "accesses" => self::getAccesses($groups, $accesses),
+            "accesses" => $accessList,
             "groups"   => self::getGroups($groups),
+            "default"  => Strings::padRight("default", $maxLength + 6),
         ];
     }
 
@@ -39,9 +43,7 @@ class AccessCode {
      * @return array{}[]
      */
     private static function getAccesses(array $groups, array $accesses): array {
-        $result    = [];
-        $maxLength = 0;
-
+        $result = [];
         foreach ($groups as $groupName => $accessList) {
             $addSpace = true;
             foreach ($accessList as $accessName) {
@@ -51,14 +53,9 @@ class AccessCode {
                     "name"     => $accessName,
                     "level"    => $accesses[$accessName],
                 ];
-                $maxLength = max($maxLength, Strings::length($accessName));
                 $addSpace  = false;
             }
         }
-        foreach ($result as $index => $access) {
-            $result[$index]["constant"] = Strings::padRight($access["name"], $maxLength);
-        }
-
         return $result;
     }
 
@@ -77,5 +74,21 @@ class AccessCode {
             ];
         }
         return $result;
+    }
+
+    /**
+     * Aligns the List Names
+     * @param array{} $list
+     * @return integer
+     */
+    private static function alignNames(array &$list): int {
+        $maxLength = 0;
+        foreach ($list as $elem) {
+            $maxLength = max($maxLength, Strings::length($elem["name"]));
+        }
+        foreach ($list as $index => $elem) {
+            $list[$index]["constant"] = Strings::padRight($elem["name"], $maxLength);
+        }
+        return $maxLength;
     }
 }

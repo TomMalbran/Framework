@@ -2,6 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Framework;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -19,14 +20,19 @@ class StatusCode {
 
         $values = $data["values"];
         $groups = $data["groups"];
+
         if (!empty($appData)) {
-            $values = array_merge($data["values"], $appData["values"]);
-            $groups = array_merge($data["groups"], $appData["groups"]);
+            $values = Arrays::merge($data["values"], $appData["values"]);
+            $groups = Arrays::merge($data["groups"], $appData["groups"]);
         }
 
+        $statusList = self::getStatues($values);
+        $maxLength  = self::alignNames($statusList);
+
         return [
-            "statuses" => self::getStatues($values),
+            "statuses" => $statusList,
             "groups"   => self::getGroups($groups),
+            "default"  => Strings::padRight("default", $maxLength + 6),
         ];
     }
 
@@ -36,20 +42,13 @@ class StatusCode {
      * @return array{}[]
      */
     private static function getStatues(array $values): array {
-        $result    = [];
-        $maxLength = 0;
-
+        $result = [];
         foreach ($values as $name => $color) {
             $result[] = [
                 "name"  => $name,
                 "color" => $color,
             ];
-            $maxLength = max($maxLength, Strings::length($name));
         }
-        foreach ($result as $index => $status) {
-            $result[$index]["constant"] = Strings::padRight($status["name"], $maxLength);
-        }
-
         return $result;
     }
 
@@ -68,5 +67,21 @@ class StatusCode {
             ];
         }
         return $result;
+    }
+
+    /**
+     * Aligns the List Names
+     * @param array{} $list
+     * @return integer
+     */
+    private static function alignNames(array &$list): int {
+        $maxLength = 0;
+        foreach ($list as $elem) {
+            $maxLength = max($maxLength, Strings::length($elem["name"]));
+        }
+        foreach ($list as $index => $elem) {
+            $list[$index]["constant"] = Strings::padRight($elem["name"], $maxLength);
+        }
+        return $maxLength;
     }
 }

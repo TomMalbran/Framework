@@ -40,7 +40,7 @@ class Access {
         {{#accesses}}
             self::{{constant}} => {{level}},
         {{/accesses}}
-            default => 0,
+            {{default}} => 0,
         };
     }
 

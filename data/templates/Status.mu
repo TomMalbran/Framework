@@ -56,7 +56,7 @@ enum Status {
         {{#statuses}}
             self::{{constant}} => "{{color}}",
         {{/statuses}}
-            default => "gray",
+            {{default}} => "gray",
         };
     }
 
