@@ -304,12 +304,12 @@ class Framework {
     public static function getRequest(): object {
         $request = $_REQUEST;
         $result  = [
-            "route"        => !empty($request["route"])        ? $request["route"]         : "",
-            "token"        => !empty($request["token"])        ? $request["token"]         : "",
-            "accessToken"  => !empty($request["accessToken"])  ? $request["accessToken"]   : "",
-            "refreshToken" => !empty($request["refreshToken"]) ? $request["refreshToken"]  : "",
-            "langcode"     => !empty($request["langcode"])     ? $request["langcode"]      : "",
-            "timezone"     => !empty($request["timezone"])     ? (int)$request["timezone"] : 0,
+            "route"        => !empty($request["route"])         ? $request["route"]          : "",
+            "token"        => !empty($request["token"])         ? $request["token"]          : "",
+            "accessToken"  => !empty($request["xAccessToken"])  ? $request["xAccessToken"]   : "",
+            "refreshToken" => !empty($request["xRefreshToken"]) ? $request["xRefreshToken"]  : "",
+            "langcode"     => !empty($request["xLangcode"])     ? $request["xLangcode"]      : "",
+            "timezone"     => !empty($request["xTimezone"])     ? (int)$request["xTimezone"] : 0,
             "params"       => [],
         ];
 
@@ -318,10 +318,11 @@ class Framework {
         } else {
             unset($request["route"]);
             unset($request["token"]);
-            unset($request["accessToken"]);
-            unset($request["refreshToken"]);
-            unset($request["langcode"]);
-            unset($request["timezone"]);
+            unset($request["xAccessToken"]);
+            unset($request["xRefreshToken"]);
+            unset($request["xLangcode"]);
+            unset($request["xTimezone"]);
+
             $result["params"] = $request;
         }
         return (object)$result;

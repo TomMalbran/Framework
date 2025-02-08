@@ -40,9 +40,9 @@ class Response {
             return $this;
         }
 
-        $this->data["accessToken"] = $accessToken;
+        $this->data["xAccessToken"] = $accessToken;
         if (!empty($refreshToken)) {
-            $this->data["refreshToken"] = $refreshToken;
+            $this->data["xRefreshToken"] = $refreshToken;
         }
         return $this;
     }
