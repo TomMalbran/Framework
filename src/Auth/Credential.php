@@ -30,13 +30,7 @@ class Credential extends CredentialSchema {
      * @return Query
      */
     private static function createAccessQuery(array|Access|null $accessName, array|string|null $filter = null, mixed $value = 1): Query {
-        $list        = Arrays::toArray($accessName);
-        $accessNames = [];
-        foreach ($list as $elem) {
-            if (!empty($elem)) {
-                $accessNames[] = $elem->name;
-            }
-        }
+        $accessNames = Access::toStrings($accessName);
         if (empty($accessNames)) {
             return new Query();
         }

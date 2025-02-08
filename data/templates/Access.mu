@@ -64,6 +64,22 @@ enum Access {
         };
     }
 
+    /**
+     * Returns the Accesses as an array of strings
+     * @param Access[]|Access|null $values
+     * @return string[]
+     */
+    public static function toStrings(array|Access|null $values): array {
+        $list   = Arrays::toArray($values);
+        $result = [];
+        foreach ($list as $elem) {
+            if (!empty($elem)) {
+                $result[] = $elem->name;
+            }
+        }
+        return $result;
+    }
+
 
 
 {{#accesses}}
@@ -118,7 +134,7 @@ enum Access {
 
     /**
      * Returns an array with the values of: {{accesses}}
-     * @return string[]
+     * @return Access[]
      */
     public static function get{{name}}s(): array {
         return [ {{values}} ];
