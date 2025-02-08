@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\NLS\NLS;
+use Framework\Core\NLS;
 use Framework\Utils\DateTime;
 use Framework\Utils\Errors;
 use Framework\Utils\JSON;

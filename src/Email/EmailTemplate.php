@@ -2,10 +2,10 @@
 namespace Framework\Email;
 
 use Framework\Framework;
-use Framework\NLS\Language;
 use Framework\Provider\Mustache;
 use Framework\Database\Query;
 use Framework\System\Config;
+use Framework\System\Language;
 use Framework\Utils\Strings;
 use Framework\Schema\EmailTemplateSchema;
 use Framework\Schema\EmailTemplateEntity;
@@ -94,7 +94,7 @@ class EmailTemplate extends EmailTemplateSchema {
 
         // Process the SQL
         if (!empty($updates)) {
-            print("<br>Updated <i>" . count($updates) . " emails</i> for language <i>$languageName</i><br>");
+            print("<br>Updated <i>" . count($updates) . " emails</i> for language <b>$languageName</b><br>");
             self::batchEntities($updates);
         }
 

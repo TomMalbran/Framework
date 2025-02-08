@@ -2,7 +2,7 @@
 namespace Framework\Auth;
 
 use Framework\Request;
-use Framework\NLS\NLS;
+use Framework\Core\NLS;
 use Framework\File\FilePath;
 use Framework\Database\Query;
 use Framework\System\Access;

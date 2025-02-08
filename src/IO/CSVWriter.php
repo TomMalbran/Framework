@@ -1,7 +1,7 @@
 <?php
 namespace Framework\IO;
 
-use Framework\NLS\NLS;
+use Framework\Core\NLS;
 use Framework\IO\ExporterWriter;
 use Framework\Utils\Elements;
 

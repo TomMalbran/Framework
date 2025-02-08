@@ -34,7 +34,6 @@ class Framework {
     const AccessData     = "access";
     const FilesData      = "files";
     const SettingsData   = "settings";
-    const LanguageData   = "languages";
 
     // The Directories
     const SourceDir      = "src";

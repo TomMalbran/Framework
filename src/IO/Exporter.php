@@ -2,7 +2,7 @@
 namespace Framework\IO;
 
 use Framework\Request;
-use Framework\NLS\NLS;
+use Framework\Core\NLS;
 use Framework\IO\ExporterWriter;
 use Framework\IO\XLSXWriter;
 use Framework\IO\CSVWriter;

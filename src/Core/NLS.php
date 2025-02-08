@@ -1,9 +1,9 @@
 <?php
-namespace Framework\NLS;
+namespace Framework\Core;
 
 use Framework\Framework;
-use Framework\NLS\Language;
 use Framework\System\Config;
+use Framework\System\Language;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -18,6 +18,7 @@ class NLS {
     private static string $language = "root";
 
 
+
     /**
      * Sets the Language
      * @param string $language
@@ -27,7 +28,6 @@ class NLS {
         self::$language = $language;
         return true;
     }
-
 
     /**
      * Loads an NLS Language

@@ -1,7 +1,7 @@
 <?php
 namespace {{codeSpace}};
 
-use Framework\NLS\NLS;
+use Framework\Core\NLS;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 
