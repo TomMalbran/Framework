@@ -4,6 +4,7 @@ namespace Framework\Database;
 use Framework\Request;
 use Framework\File\FilePath;
 use Framework\Database\Assign;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;
@@ -223,10 +224,9 @@ class Field {
     /**
      * Returns the Field Value from the given Request
      * @param Request $request
-     * @param string  $masterKey Optional.
      * @return mixed
      */
-    public function fromRequest(Request $request, string $masterKey = ""): mixed {
+    public function fromRequest(Request $request): mixed {
         $result = null;
 
         switch ($this->type) {
@@ -269,10 +269,8 @@ class Field {
             $result = $request->toCSV($this->name);
             break;
         case self::Encrypt:
-            if (!empty($masterKey)) {
-                $value  = $request->get($this->name);
-                $result = Assign::encrypt($value, $masterKey);
-            }
+            $value  = $request->get($this->name);
+            $result = Assign::encrypt($value, Config::getDbKey());
             break;
         default:
             $result = $request->get($this->name);

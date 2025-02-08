@@ -30,7 +30,6 @@ class Framework {
     const RouteData      = "routes";
     const SchemaData     = "schemas";
     const MigrationsData = "migrations";
-    const KeyData        = "keys";
     const StatusData     = "status";
     const AccessData     = "access";
     const FilesData      = "files";

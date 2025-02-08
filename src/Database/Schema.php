@@ -9,6 +9,7 @@ use Framework\Database\Selection;
 use Framework\Database\Modification;
 use Framework\Database\Assign;
 use Framework\Database\Query;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
 use Framework\Utils\Select;
@@ -59,20 +60,12 @@ class Schema {
     }
 
     /**
-     * Returns the Structure Master Key
-     * @return string
-     */
-    protected static function getMasterKey(): string {
-        return self::structure()->masterKey;
-    }
-
-    /**
      * Encrypts the given Value
      * @param string $value
      * @return Assign
      */
     protected static function encrypt(string $value): Assign {
-        return Assign::encrypt($value, self::getMasterKey());
+        return Assign::encrypt($value, Config::getDbKey());
     }
 
 

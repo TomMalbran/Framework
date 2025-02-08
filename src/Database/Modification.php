@@ -75,7 +75,7 @@ class Modification {
             if (!$field->canEdit) {
                 continue;
             }
-            $value = $field->fromRequest($request, $this->structure->masterKey);
+            $value = $field->fromRequest($request);
             if ($skipEmpty && empty($value)) {
                 continue;
             }

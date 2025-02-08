@@ -2,7 +2,6 @@
 namespace Framework\Database;
 
 use Framework\Database\Factory;
-use Framework\Database\KeyChain;
 use Framework\Database\Field;
 use Framework\Database\Join;
 use Framework\Database\Count;
@@ -14,7 +13,6 @@ use Framework\Utils\Strings;
 class Structure {
 
     public string $schema      = "";
-    public string $masterKey   = "";
 
     public string $table       = "";
     public bool   $hasID       = false;
@@ -202,7 +200,6 @@ class Structure {
         // Set the Master Key
         if ($reqMasterKey) {
             $this->hasEncrypt = true;
-            $this->masterKey  = KeyChain::get($schema);
         }
     }
 

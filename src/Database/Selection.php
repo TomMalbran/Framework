@@ -4,6 +4,7 @@ namespace Framework\Database;
 use Framework\Framework;
 use Framework\Database\Structure;
 use Framework\Database\Field;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -49,7 +50,7 @@ class Selection {
      * @return Selection
      */
     public function addFields(bool $decrypted = false): Selection {
-        $masterKey = $this->structure->masterKey;
+        $masterKey = Config::getDbKey();
         $mainKey   = $this->structure->table;
 
         if ($this->structure->hasID) {
