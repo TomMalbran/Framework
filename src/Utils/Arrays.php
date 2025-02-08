@@ -495,6 +495,16 @@ class Arrays {
         return array_reverse($array);
     }
 
+    /**
+     * Applies the given callback to the elements of the given array
+     * @param mixed[]  $array
+     * @param callable $callback
+     * @return mixed[]
+     */
+    public static function map(array $array, callable $callback): array {
+        return array_map($callback, $array);
+    }
+
 
 
     /**
