@@ -20,6 +20,7 @@ class RouterCode {
     public static function getCode(): array {
         $classes     = Framework::findClasses(skipIgnored: true);
         $routes      = [];
+        $usedRoutes  = [];
         $errorRoutes = [];
         $testRoutes  = [];
 
@@ -48,13 +49,24 @@ class RouterCode {
                 }
 
                 $attribute  = $attributes[0];
+                $fileName   = $reflection->getFileName();
                 $route      = $attribute->newInstance();
                 $params     = $method->getNumberOfParameters();
                 $response   = $method->getReturnType();
                 $methodName = $method->getName();
+                $startLine  = $method->getStartLine();
 
+                // Check the Route
+                if (isset($usedRoutes[$route->route])) {
+                    $errorRoutes[] = "Route already used for $methodName: $fileName:$startLine";
+                    continue;
+                }
                 if ($response->getName() !== "Framework\\Response") {
-                    $errorRoutes[] = "$className::{$methodName} -> {$response->getName()}";
+                    $errorRoutes[] = "Wrong Response for $methodName: $fileName:$startLine";
+                    continue;
+                }
+                if (!Strings::endsWith($route->route, "/$methodName")) {
+                    $errorRoutes[] = "Route must end with $methodName: $fileName:$startLine";
                     continue;
                 }
 
@@ -67,6 +79,7 @@ class RouterCode {
                     "access"     => $route->access->name,
                     "addSpace"   => false,
                 ];
+                $usedRoutes[$route->route] = true;
 
                 // Add the Test Route
                 $testMethods[$method->getName()] = $route->access->name;
@@ -104,7 +117,7 @@ class RouterCode {
         if (!empty($errorRoutes)) {
             print("\nROUTES WITH ERROR:\n");
             foreach ($errorRoutes as $errorRoute) {
-                print("  $errorRoute\n");
+                print("- $errorRoute\n\n");
             }
             print("\n");
         }
