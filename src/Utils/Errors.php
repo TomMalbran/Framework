@@ -4,9 +4,12 @@ namespace Framework\Utils;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
+use AllowDynamicProperties;
+
 /**
  * The Errors wrapper
  */
+#[AllowDynamicProperties]
 class Errors {
 
     /** @var array{} */

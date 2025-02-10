@@ -9,10 +9,12 @@ use Countable;
 use IteratorAggregate;
 use Traversable;
 use JsonSerializable;
+use AllowDynamicProperties;
 
 /**
  * A Map wrapper
  */
+#[AllowDynamicProperties]
 class Map implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable {
 
     /** @var ArrayAccess|array{} */

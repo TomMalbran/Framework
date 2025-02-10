@@ -18,10 +18,12 @@ use IteratorAggregate;
 use Traversable;
 use JsonSerializable;
 use CURLFile;
+use AllowDynamicProperties;
 
 /**
  * The Request Wrapper
  */
+#[AllowDynamicProperties]
 class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /** @var ArrayAccess|array{} */

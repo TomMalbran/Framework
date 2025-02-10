@@ -5,10 +5,12 @@ use Framework\Utils\Arrays;
 
 use ArrayAccess;
 use JsonSerializable;
+use AllowDynamicProperties;
 
 /**
  * A Select Wrapper
  */
+#[AllowDynamicProperties]
 class Select implements ArrayAccess, JsonSerializable {
 
     public int        $id;
