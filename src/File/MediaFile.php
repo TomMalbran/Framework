@@ -73,8 +73,9 @@ class MediaFile {
             ],
         ];
 
+        $db = Framework::getDatabase();
         foreach (self::$data["media"] as $field) {
-            $schema = Factory::getSchema($field["schema"]);
+            $structure = Factory::getStructure($field["schema"]);
 
             foreach ($files as $file) {
                 $old = $file["old"];
@@ -82,14 +83,14 @@ class MediaFile {
 
                 if (!empty($field["replace"])) {
                     $query = Query::create($field["field"], "LIKE", "\"$old\"");
-                    $schema->edit($query, [
+                    $db->update($structure->table, [
                         $field["field"] => Assign::replace($old, $new),
-                    ]);
+                    ], $query);
                 } else {
                     $query = Query::create($field["field"], "=", $old);
-                    $schema->edit($query, [
+                    $db->update($structure->table, [
                         $field["field"] => $new,
-                    ]);
+                    ], $query);
                 }
             }
         }
