@@ -1,7 +1,8 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -15,15 +16,15 @@ class StatusCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $data    = Framework::loadJSON(Framework::DataDir, Framework::StatusData, true);
-        $appData = Framework::loadData(Framework::StatusData);
+        $frameData = Discovery::loadFrameData(DataFile::Status);
+        $appData   = Discovery::loadData(DataFile::Status);
 
-        $values = $data["values"];
-        $groups = $data["groups"];
+        $values = $frameData["values"];
+        $groups = $frameData["groups"];
 
         if (!empty($appData)) {
-            $values = Arrays::merge($data["values"], $appData["values"]);
-            $groups = Arrays::merge($data["groups"], $appData["groups"]);
+            $values = Arrays::merge($frameData["values"], $appData["values"]);
+            $groups = Arrays::merge($frameData["groups"], $appData["groups"]);
         }
 
         $statusList = self::getStatues($values);

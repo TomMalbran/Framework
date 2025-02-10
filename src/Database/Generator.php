@@ -1,11 +1,12 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
 use Framework\File\File;
 use Framework\Database\Structure;
 use Framework\Database\Field;
 use Framework\Provider\Mustache;
+use Framework\System\Package;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -25,42 +26,18 @@ class Generator {
 
     /**
      * Generates the Code for the Schemas
-     * @return boolean
-     */
-    public static function generateCode(): bool {
-        print("\nSCHEMA CODES\n");
-
-        self::$namespace = Framework::Namespace;
-        self::$writePath = Framework::getPath(Framework::SchemasDir);
-        self::generate(false);
-
-        self::$namespace = "Framework\\";
-        self::$writePath = Framework::getPath(Framework::SchemasDir, forFramework: true);
-        self::generate(true);
-        return true;
-    }
-
-    /**
-     * Generates the Code for the Schemas Internally
-     * @return boolean
-     */
-    public static function generateInternal(): bool {
-        print("\nSCHEMA CODES\n");
-
-        self::$namespace = "Framework\\";
-        self::$writePath = Framework::getPath(Framework::SchemasDir);
-        return self::generate(true);
-    }
-
-    /**
-     * Does the Generation
+     * @param string  $namespace
+     * @param string  $writePath
      * @param boolean $forFramework
      * @return boolean
      */
-    private static function generate(bool $forFramework): bool {
-        self::$schemaTemplate = Framework::loadFile(Framework::TemplateDir, "Schema.mu");
-        self::$entityTemplate = Framework::loadFile(Framework::TemplateDir, "Entity.mu");
-        self::$columnTemplate = Framework::loadFile(Framework::TemplateDir, "Column.mu");
+    public static function generateCode(string $namespace, string $writePath, bool $forFramework): bool {
+        self::$namespace = $namespace;
+        self::$writePath = $writePath;
+
+        self::$schemaTemplate = Discovery::loadFrameTemplate("Schema.mu");
+        self::$entityTemplate = Discovery::loadFrameTemplate("Entity.mu");
+        self::$columnTemplate = Discovery::loadFrameTemplate("Column.mu");
 
         $schemas = Factory::getData();
         $created = 0;
@@ -109,7 +86,7 @@ class Generator {
         $editParents = $structure->hasPositions ? $parents : [];
 
         $contents    = Mustache::render(self::$schemaTemplate, [
-            "appNamespace"    => Framework::Namespace,
+            "appNamespace"    => Package::Namespace,
             "namespace"       => self::$namespace,
             "name"            => $structure->schema,
             "column"          => "{$structure->schema}Column",
@@ -322,7 +299,7 @@ class Generator {
         $fileName   = "{$structure->schema}Entity.php";
         $attributes = self::getAttributes($structure);
         $contents   = Mustache::render(self::$entityTemplate, [
-            "appNamespace" => Framework::Namespace,
+            "appNamespace" => Package::Namespace,
             "namespace"    => self::$namespace,
             "name"         => $structure->schema,
             "subTypes"     => self::getSubTypes($structure->subRequests),
@@ -536,11 +513,14 @@ class Generator {
                 $addSpace = false;
             }
             foreach ($join->merges as $merge) {
-                $result[] = [
-                    "name"     => Strings::upperCaseFirst($merge->key),
-                    "value"    => $merge->key,
-                    "addSpace" => false,
-                ];
+                $mergeName = Strings::upperCaseFirst($merge->key);
+                if (!Arrays::contains($result, $mergeName, "name")) {
+                    $result[] = [
+                        "name"     => $mergeName,
+                        "value"    => $merge->key,
+                        "addSpace" => false,
+                    ];
+                }
             }
         }
 

@@ -2,6 +2,8 @@
 namespace Framework\Database;
 
 use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\Core\Settings;
 use Framework\File\File;
 use Framework\Database\Factory;
@@ -22,11 +24,11 @@ class Migration {
      */
     public static function migrateData(bool $canDelete = false): bool {
         $db         = Framework::getDatabase();
-        $migrations = Framework::loadData(Framework::MigrationsData, false);
+        $migrations = Discovery::loadData(DataFile::Migrations);
         $schemas    = Factory::getData();
 
-        $moved    = self::moveTables($db, $migrations->movements);
-        $renamed  = self::renameColumns($db, $migrations->renames);
+        $moved    = self::moveTables($db, $migrations["movements"]);
+        $renamed  = self::renameColumns($db, $migrations["renames"]);
 
         $migrated = self::migrateTables($db, $schemas, $canDelete);
         $extras   = self::extraMigrations($db);
@@ -379,7 +381,7 @@ class Migration {
      */
     private static function extraMigrations(Database $db): bool {
         $migration = Settings::getCore("migration");
-        $path      = Framework::getPath(Framework::MigrationsDir);
+        $path      = Discovery::getMigrationsPath();
 
         Settings::setCore("migration", $migration);
         if (!File::exists($path)) {

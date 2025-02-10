@@ -1,7 +1,8 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\Core\Settings;
 use Framework\Core\VariableType;
 use Framework\Utils\Strings;
@@ -16,7 +17,7 @@ class SettingCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $data = Framework::loadData(Framework::SettingsData);
+        $data = Discovery::loadData(DataFile::Settings);
         if (empty($data)) {
             return [];
         }

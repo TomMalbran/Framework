@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Framework;
-use Framework\Core\Listener;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\Listener;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -21,7 +21,7 @@ class SignalCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $classes = Framework::findClasses(skipIgnored: true);
+        $classes = Discovery::findClasses(skipIgnored: true);
         $signals = [];
         $uses    = [];
 

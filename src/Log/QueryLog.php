@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Log;
 
-use Framework\Framework;
 use Framework\Request;
+use Framework\Discovery\Discovery;
 use Framework\Auth\Auth;
 use Framework\Database\Assign;
 use Framework\Database\Query;
@@ -62,7 +62,7 @@ class QueryLog extends LogQuerySchema {
         } else {
             self::createEntity(
                 expression:  $expression,
-                environment: Framework::getEnvironment(),
+                environment: Discovery::getEnvironment(),
                 elapsedTime: $elapsedTime,
                 totalTime:   $elapsedTime,
                 amount:      1,

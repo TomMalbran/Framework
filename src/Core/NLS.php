@@ -1,7 +1,8 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\Utils\Arrays;
@@ -41,7 +42,7 @@ class NLS {
             return self::$data[$langCode];
         }
 
-        $data = Framework::loadJSON(Framework::StringsDir, $langCode);
+        $data = Discovery::loadJSON(Package::StringsDir, $langCode);
         if (!empty($data)) {
             self::$data[$langCode] = $data;
             return self::$data[$langCode];

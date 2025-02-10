@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
 use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Server;
@@ -32,10 +32,10 @@ class Configs {
             return false;
         }
 
-        $framePath  = Framework::getPath(forFramework: true);
+        $framePath  = Discovery::getFramePath();
         $frameData  = self::loadENV($framePath, ".env.example");
 
-        $appPath    = Framework::getPath();
+        $appPath    = Discovery::getAppPath();
         $appData    = self::loadENV($appPath, ".env");
 
         $currentUrl = Server::getUrl();

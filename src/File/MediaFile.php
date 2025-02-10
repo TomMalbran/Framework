@@ -3,6 +3,8 @@ namespace Framework\File;
 
 use Framework\Framework;
 use Framework\Request;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\File\FileType;
@@ -34,7 +36,7 @@ class MediaFile {
         }
 
         self::$loaded = true;
-        self::$data   = Framework::loadData(Framework::FilesData);
+        self::$data   = Discovery::loadData(DataFile::Files);
         return true;
     }
 

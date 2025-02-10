@@ -1,7 +1,8 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\Core\VariableType;
 use Framework\Database\Query;
 use Framework\Utils\Strings;
@@ -161,7 +162,7 @@ class Settings extends SettingsSchema {
      * @return boolean
      */
     public static function migrateData(): bool {
-        $settings  = Framework::loadData(Framework::SettingsData);
+        $settings  = Discovery::loadData(DataFile::Settings);
         $query     = Query::create("section", "<>", self::Core);
         $list      = self::getEntityList($query);
 

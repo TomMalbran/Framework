@@ -1,7 +1,8 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\Database\Structure;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -32,18 +33,18 @@ class Factory {
 
         self::$loaded = true;
 
-        $schemas      = Framework::loadData(Framework::SchemaData);
-        $frameSchemas = Framework::loadJSON(Framework::DataDir, Framework::SchemaData, true);
+        $appSchemas   = Discovery::loadData(DataFile::Schemas);
+        $frameSchemas = Discovery::loadFrameData(DataFile::Schemas);
 
-        foreach ($schemas as $key => $data) {
+        foreach ($appSchemas as $key => $data) {
             if (empty($frameSchemas[$key])) {
                 self::$data[$key] = $data;
             }
         }
 
         foreach ($frameSchemas as $key => $data) {
-            if (!empty($schemas[$key])) {
-                self::$data[$key] = Arrays::extend($data, $schemas[$key]);
+            if (!empty($appSchemas[$key])) {
+                self::$data[$key] = Arrays::extend($data, $appSchemas[$key]);
             } else {
                 self::$data[$key] = $data;
             }

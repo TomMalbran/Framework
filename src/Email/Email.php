@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Framework;
 use Framework\Request;
+use Framework\Discovery\Discovery;
 use Framework\Email\EmailWhiteList;
 use Framework\Email\EmailProvider;
 use Framework\Email\EmailResult;
@@ -44,7 +44,7 @@ class Email {
         }
 
         // Create the template
-        $template = Framework::loadFile(Framework::DataDir, "email.html");
+        $template = Discovery::loadEmailTemplate();
         $body     = Mustache::render($template, [
             "url"      => Config::getUrl(),
             "name"     => Config::getName(),

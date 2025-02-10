@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Core;
+namespace Framework\Discovery;
 
 use Framework\System\Access;
 

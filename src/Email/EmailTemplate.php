@@ -1,9 +1,10 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
 use Framework\Provider\Mustache;
 use Framework\Database\Query;
+use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\Utils\Strings;
@@ -57,7 +58,7 @@ class EmailTemplate extends EmailTemplateSchema {
         $position  = 0;
         $languages = Language::getAll();
         foreach ($languages as $language => $languageName) {
-            $templates = Framework::loadJSON(Framework::EmailsDir, $language);
+            $templates = Discovery::loadJSON(Package::EmailsDir, $language);
             if (!empty($templates)) {
                 $position = self::migrateLanguage($templates, $language, $languageName, $position);
             }

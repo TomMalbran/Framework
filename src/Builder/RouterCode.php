@@ -1,8 +1,9 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Framework;
-use Framework\Core\Route;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
+use Framework\Discovery\Route;
 use Framework\Utils\Strings;
 
 use ReflectionClass;
@@ -18,7 +19,7 @@ class RouterCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $classes     = Framework::findClasses(skipIgnored: true);
+        $classes     = Discovery::findClasses(skipIgnored: true);
         $routes      = [];
         $usedRoutes  = [];
         $errorRoutes = [];
@@ -108,9 +109,9 @@ class RouterCode {
         }
 
         // Save the Test Data
-        $oldData = Framework::loadData(Framework::RouteData);
+        $oldData = Discovery::loadData(DataFile::Route);
         if (!empty($oldData) && !empty($testRoutes)) {
-            Framework::saveData("routesTest", $testRoutes);
+            Discovery::saveData("routesTest", $testRoutes);
         }
 
         // Show the Error Routes

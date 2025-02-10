@@ -1,8 +1,9 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
 use Framework\File\File;
+use Framework\System\Package;
 use Framework\Utils\Strings;
 
 /**
@@ -15,7 +16,7 @@ class LanguageCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $path      = Framework::getPath(Framework::StringsDir);
+        $path      = Discovery::getAppPath(Package::StringsDir);
         $files     = File::getFilesInDir($path);
         $rootCode  = "es";
         $rootFound = false;
@@ -24,7 +25,7 @@ class LanguageCode {
         // Load all the languages
         foreach ($files as $file) {
             $code = Strings::stripEnd($file, ".json");
-            $data = Framework::loadJSON(Framework::StringsDir, $code);
+            $data = Discovery::loadJSON(Package::StringsDir, $code);
             if (empty($data["NAME"])) {
                 continue;
             }

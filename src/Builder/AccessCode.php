@@ -1,7 +1,8 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\Utils\Strings;
 
 /**
@@ -14,7 +15,11 @@ class AccessCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $data     = Framework::loadData(Framework::AccessData);
+        $data = Discovery::loadData(DataFile::Access);
+        if (empty($data)) {
+            $data = Discovery::loadFrameData(DataFile::Access);
+        }
+
         $groups   = [];
         $accesses = [];
 

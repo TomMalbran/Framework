@@ -1,8 +1,10 @@
 <?php
 namespace Framework\File;
 
-use Framework\Framework;
+use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\File\File;
+use Framework\System\Package;
 use Framework\System\Config;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
@@ -33,7 +35,7 @@ class FilePath {
             return false;
         }
         self::$loaded = true;
-        self::$data   = Framework::loadData(Framework::FilesData);
+        self::$data   = Discovery::loadData(DataFile::Files);
         return true;
     }
 
@@ -46,7 +48,7 @@ class FilePath {
      */
     public static function getPath(string ...$pathParts): string {
         $basePath = self::getBasePath();
-        return File::parsePath($basePath, Framework::FilesDir, ...$pathParts);
+        return File::parsePath($basePath, Package::FilesDir, ...$pathParts);
     }
 
     /**
@@ -56,7 +58,7 @@ class FilePath {
      */
     public static function getInternalPath(string ...$pathParts): string {
         $basePath = self::getBasePath(forBackend: true);
-        return File::parsePath($basePath, Framework::FilesDir, ...$pathParts);
+        return File::parsePath($basePath, Package::FilesDir, ...$pathParts);
     }
 
     /**
@@ -67,7 +69,7 @@ class FilePath {
      * @return string
      */
     public static function getBasePath(bool $forFramework = false, bool $forBackend = false, bool $forPrivate = false): string {
-        $result = Framework::getBasePath($forFramework, $forBackend);
+        $result = Discovery::getBasePath($forFramework, $forBackend);
         if ($forPrivate && !Server::isLocalHost()) {
             return dirname($result);
         }
@@ -91,7 +93,7 @@ class FilePath {
      */
     public static function getFTPPath(string ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
-        return File::parsePath($basePath, Framework::FTPDir, ...$pathParts);
+        return File::parsePath($basePath, Package::FTPDir, ...$pathParts);
     }
 
 
@@ -102,7 +104,7 @@ class FilePath {
      * @return string
      */
     public static function getDir(string ...$pathParts): string {
-        return File::parsePath(Framework::FilesDir, ...$pathParts);
+        return File::parsePath(Package::FilesDir, ...$pathParts);
     }
 
     /**
@@ -111,8 +113,7 @@ class FilePath {
      * @return string
      */
     public static function getInternalDir(string ...$pathParts): string {
-        $baseDir = Framework::getBaseDir();
-        return File::parsePath($baseDir, Framework::FilesDir, ...$pathParts);
+        return File::parsePath(Package::AppDir, Package::FilesDir, ...$pathParts);
     }
 
 
@@ -123,7 +124,7 @@ class FilePath {
      * @return string
      */
     public static function getUrl(string ...$pathParts): string {
-        return Config::getFileUrl(Framework::FilesDir, ...$pathParts);
+        return Config::getFileUrl(Package::FilesDir, ...$pathParts);
     }
 
     /**
@@ -132,8 +133,7 @@ class FilePath {
      * @return string
      */
     public static function getInternalUrl(string ...$pathParts): string {
-        $baseDir = Framework::getBaseDir();
-        return Config::getUrl($baseDir, Framework::FilesDir, ...$pathParts);
+        return Config::getUrl(Package::AppDir, Package::FilesDir, ...$pathParts);
     }
 
 
