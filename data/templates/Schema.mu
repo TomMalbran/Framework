@@ -516,7 +516,7 @@ class {{name}}Schema extends Schema {
         }
 
         {{/hasUsers}}
-        return self::editEntityData($query, null, [
+        return self::editEntityData($query, fields: [
             $column->base() => Assign::increase($amount),
         ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
     }

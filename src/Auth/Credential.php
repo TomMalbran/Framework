@@ -454,13 +454,14 @@ class Credential extends CredentialSchema {
 
     /**
      * Creates a new Credential
-     * @param Request|array{} $request
-     * @param Access          $accessName
-     * @param boolean|null    $reqPassChange Optional.
+     * @param Request|null $request       Optional.
+     * @param array{}|null $fields        Optional.
+     * @param Access|null  $accessName    Optional.
+     * @param boolean|null $reqPassChange Optional.
      * @return integer
      */
-    public static function create(Request|array $request, Access $accessName, ?bool $reqPassChange = null): int {
-        $fields = self::getFields($request, $accessName, $reqPassChange);
+    public static function create(?Request $request = null, ?array $fields = null, ?Access $accessName = null, ?bool $reqPassChange = null): int {
+        $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
         $fields["lastLogin"]    = time();
         $fields["currentLogin"] = time();
         return self::createEntity($request, ...$fields);
@@ -468,22 +469,23 @@ class Credential extends CredentialSchema {
 
     /**
      * Edits the given Credential
-     * @param integer         $credentialID
-     * @param Request|array{} $request
-     * @param Access|null     $accessName    Optional.
-     * @param boolean|null    $reqPassChange Optional.
-     * @param boolean         $skipEmpty     Optional.
+     * @param integer      $credentialID
+     * @param Request|null $request       Optional.
+     * @param array{}|null $fields        Optional.
+     * @param Access|null  $accessName    Optional.
+     * @param boolean|null $reqPassChange Optional.
+     * @param boolean      $skipEmpty     Optional.
      * @return boolean
      */
-    public static function edit(int $credentialID, Request|array $request, ?Access $accessName = null, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
-        $fields = self::getFields($request, $accessName, $reqPassChange);
+    public static function edit(int $credentialID, ?Request $request = null, ?array $fields = [], ?Access $accessName = null, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
+        $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
         return self::editEntityData($credentialID, $request, $fields, skipEmpty: $skipEmpty);
     }
 
     /**
      * Updates the given Credential
-     * @param integer   $credentialID
-     * @param array{}[] $fields
+     * @param integer $credentialID
+     * @param array{} $fields
      * @return boolean
      */
     public static function update(int $credentialID, array $fields): bool {
@@ -534,15 +536,18 @@ class Credential extends CredentialSchema {
 
     /**
      * Parses the data and returns the fields
-     * @param Request|array{} $request
-     * @param Access|null     $accessName    Optional.
-     * @param boolean|null    $reqPassChange Optional.
+     * @param Request|null $request       Optional.
+     * @param array{}|null $fields        Optional.
+     * @param Access|null  $accessName    Optional.
+     * @param boolean|null $reqPassChange Optional.
      * @return array{}[]
      */
-    private static function getFields(Request|array $request, ?Access $accessName = null, ?bool $reqPassChange = null): array {
-        $result = [];
-        if (!empty($request["password"])) {
-            $hash = self::createHash($request["password"]);
+    private static function parseFields(?Request $request = null, ?array $fields = null, ?Access $accessName = null, ?bool $reqPassChange = null): array {
+        $password = $request !== null ? $request->getString("password") : (!empty($fields["password"]) ? $fields["password"] : "");
+        $result   = !empty($fields) ? $fields : [];
+
+        if ($password) {
+            $hash = self::createHash($password);
             $result["password"] = $hash["password"];
             $result["salt"]     = $hash["salt"];
         }
@@ -775,7 +780,9 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function setValue(int $credentialID, CredentialColumn $column, mixed $value): bool {
-        return self::editEntity($credentialID, ...[ $column->base() => $value ]);
+        return self::editEntityData($credentialID, fields: [
+            $column->base() => $value,
+        ]);
     }
 
 
