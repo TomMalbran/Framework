@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\File\FilePath;
 use Framework\Database\Assign;
 use Framework\System\Config;
+use Framework\System\Path;
 use Framework\Utils\Arrays;
 use Framework\Utils\CSV;
 use Framework\Utils\JSON;
@@ -332,8 +333,8 @@ class Field {
             if (!empty($this->path)) {
                 $result["{$key}Url"]   = !empty($text) ? FilePath::getUrl($this->path, $text) : "";
             } else {
-                $result["{$key}Url"]   = !empty($text) ? FilePath::getUrl(FilePath::Source, "0", $text) : "";
-                $result["{$key}Thumb"] = !empty($text) ? FilePath::getUrl(FilePath::Thumbs, "0", $text) : "";
+                $result["{$key}Url"]   = !empty($text) ? Path::getSourceUrl("0", $text) : "";
+                $result["{$key}Thumb"] = !empty($text) ? Path::getThumbsUrl("0", $text) : "";
             }
             break;
         default:

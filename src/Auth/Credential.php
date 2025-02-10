@@ -3,10 +3,10 @@ namespace Framework\Auth;
 
 use Framework\Request;
 use Framework\Core\NLS;
-use Framework\File\FilePath;
 use Framework\Database\Query;
 use Framework\System\Access;
 use Framework\System\Status;
+use Framework\System\Path;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -282,7 +282,7 @@ class Credential extends CredentialSchema {
 
             if (!empty($elem->avatar)) {
                 $elem->avatarFile = $elem->avatar;
-                $elem->avatar     = FilePath::getUrl("avatars", $elem->avatar);
+                $elem->avatar     = Path::getAvatarsUrl($elem->avatar);
             }
             if (!$complete) {
                 $elem->password        = "";

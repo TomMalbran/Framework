@@ -14,10 +14,10 @@ use Framework\Utils\Strings;
  */
 class FilePath {
 
-    const Temp    = "temp";
-    const Source  = "source";
-    const Thumbs  = "thumbs";
-    const Avatars = "avatars";
+    private const Temp    = "temp";
+    private const Source  = "source";
+    private const Thumbs  = "thumbs";
+    private const Avatars = "avatars";
 
 
     private static bool  $loaded = false;

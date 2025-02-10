@@ -12,6 +12,7 @@ use Framework\File\Image;
 use Framework\Database\Factory;
 use Framework\Database\Assign;
 use Framework\Database\Query;
+use Framework\System\Path;
 use Framework\Utils\Strings;
 
 /**
@@ -105,7 +106,7 @@ class MediaFile {
      * @return string
      */
     public static function getPath(string ...$pathParts): string {
-        return FilePath::getPath(FilePath::Source, self::$id, ...$pathParts);
+        return Path::getSourcePath(self::$id, ...$pathParts);
     }
 
     /**
@@ -114,7 +115,7 @@ class MediaFile {
      * @return string
      */
     private static function getThumbPath(string ...$pathParts): string {
-        return FilePath::getPath(FilePath::Thumbs, self::$id, ...$pathParts);
+        return Path::getThumbsPath(self::$id, ...$pathParts);
     }
 
     /**
@@ -123,7 +124,7 @@ class MediaFile {
      * @return string
      */
     public static function getUrl(string ...$pathParts): string {
-        return FilePath::getUrl(FilePath::Source, self::$id, ...$pathParts);
+        return Path::getSourceUrl(self::$id, ...$pathParts);
     }
 
     /**
@@ -132,7 +133,7 @@ class MediaFile {
      * @return string
      */
     public static function getThumbUrl(string ...$pathParts): string {
-        return FilePath::getUrl(FilePath::Thumbs, self::$id, ...$pathParts);
+        return Path::getThumbsUrl(self::$id, ...$pathParts);
     }
 
     /**
