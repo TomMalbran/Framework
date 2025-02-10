@@ -73,7 +73,7 @@ class Setting {
         return $result !== null ? (string)$result : "";
         {{/isString}}
         {{#isArray}}
-        return $result !== null ? JSON::decode($result, true) : [];
+        return $result !== null ? JSON::decodeAsArray($result) : [];
         {{/isArray}}
     }
 

@@ -38,15 +38,27 @@ class JSON {
 
     /**
      * Decodes a String if it is not already decoded
+     * @param mixed $value
+     * @return array<string|integer,mixed>
+     */
+    public static function decodeAsArray(mixed $value): array {
+        if (!self::isValid($value)) {
+            return Arrays::isArray($value) ? $value : [];
+        }
+        return (array)json_decode($value, true);
+    }
+
+    /**
+     * Decodes a String if it is not already decoded
      * @param mixed   $value
      * @param boolean $asArray Optional.
-     * @return array{}|object
+     * @return object
      */
-    public static function decode(mixed $value, bool $asArray = false): mixed {
+    public static function decodeAsObject(mixed $value): object {
         if (!self::isValid($value)) {
-            return $value;
+            return Arrays::isObject($value) ? (object)$value : (object)[];
         }
-        return json_decode($value, $asArray);
+        return (object)json_decode($value, false);
     }
 
     /**
@@ -62,53 +74,38 @@ class JSON {
 
 
     /**
-     * Creates the read response
-     * @param boolean $asArray Optional.
-     * @return array{}|object
-     */
-    private static function createResponse(bool $asArray = false): mixed {
-        return $asArray ? [] : (object)[];
-    }
-
-    /**
      * Reads a JSON file
-     * @param string  $path
-     * @param boolean $asArray Optional.
-     * @return array{}|object
+     * @param string ...$pathParts
+     * @return array<string|integer,mixed>
      */
-    public static function readFile(string $path, bool $asArray = false): array|object {
-        if (!File::exists($path)) {
-            return self::createResponse($asArray);
-        }
-        $response = file_get_contents($path);
+    public static function readFile(string ...$pathParts): array {
+        $response = File::read(...$pathParts);
         if (empty($response)) {
-            return self::createResponse($asArray);
+            return [];
         }
-        return self::decode($response, $asArray);
+        return self::decodeAsArray($response);
     }
 
     /**
      * Reads a JSON url
-     * @param string  $url
-     * @param boolean $asArray Optional.
-     * @return array{}|object
+     * @param string $url
+     * @return array<string|integer,mixed>
      */
-    public static function readUrl(string $url, bool $asArray = false): array|object {
-        $response = file_get_contents($url);
+    public static function readUrl(string $url): array {
+        $response = File::readUrl($url);
         if (empty($response)) {
-            return self::createResponse($asArray);
+            return [];
         }
-        return self::decode($response, $asArray);
+        return self::decodeAsArray($response);
     }
 
     /**
      * Posts to a JSON url
-     * @param string  $url
-     * @param array{} $data
-     * @param boolean $asArray Optional.
-     * @return array{}|object
+     * @param string                      $url
+     * @param array<string|integer,mixed> $data
+     * @return array<string|integer,mixed>
      */
-    public static function postUrl(string $url, array $data, bool $asArray = false): array|object {
+    public static function postUrl(string $url, array $data): array {
         $options = [
             "http" => [
                 "header"  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -119,9 +116,9 @@ class JSON {
         $context  = stream_context_create($options);
         $response = file_get_contents($url, false, $context);
         if (empty($response)) {
-            return self::createResponse($asArray);
+            return [];
         }
-        return self::decode($response, $asArray);
+        return self::decodeAsArray($response);
     }
 
     /**

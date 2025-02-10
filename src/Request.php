@@ -177,12 +177,20 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the request data at the given key as JSON
-     * @param string  $key
-     * @param boolean $asArray Optional.
-     * @return mixed
+     * @param string $key
+     * @return array<string|integer,mixed>
      */
-    public function getJSON(string $key, bool $asArray = false): mixed {
-        return JSON::decode($this->get($key, "[]"), $asArray);
+    public function getJSONArray(string $key): array {
+        return JSON::decodeAsArray($this->get($key, "[]"));
+    }
+
+    /**
+     * Returns the request data at the given key as JSON
+     * @param string $key
+     * @return object
+     */
+    public function getJSONObject(string $key): object {
+        return JSON::decodeAsObject($this->get($key, "[]"));
     }
 
     /**
@@ -617,7 +625,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
         if (empty($value)) {
             $value = [];
         } elseif (JSON::isValid($value)) {
-            $value = JSON::decode($value);
+            $value = JSON::decodeAsArray($value);
         } elseif (Strings::isString($value)) {
             $value = Strings::split($value, ",");
         }

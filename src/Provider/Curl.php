@@ -143,7 +143,7 @@ class Curl {
             } elseif (!JSON::isValid($result)) {
                 $response = [ "error" => $result ];
             } else {
-                $response = JSON::decode($result, true);
+                $response = JSON::decodeAsArray($result);
             }
         }
 

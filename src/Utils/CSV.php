@@ -92,13 +92,13 @@ class CSV {
      * @return mixed[]
      */
     public static function readFile(string $path, string $separator = ",", bool $skipHeader = false): array {
-        if (!File::exists($path)) {
+        $content = File::read($path);
+        if (!empty($content)) {
             return [];
         }
 
-        $content = file_get_contents($path);
-        $lines   = Strings::split($content, "\n", true);
-        $result  = [];
+        $lines  = Strings::split($content, "\n", true);
+        $result = [];
         foreach ($lines as $index => $line) {
             if (!empty($line) && ($index > 0 || !$skipHeader)) {
                 $result[] = self::decode($line, $separator);

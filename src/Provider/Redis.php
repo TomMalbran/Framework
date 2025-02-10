@@ -88,7 +88,7 @@ class Redis {
         try {
             $key   = "$module-$id";
             $value = self::$client->get($key);
-            return JSON::decode($value, true);
+            return JSON::decodeAsArray($value);
         } catch (Exception $e) {
             return null;
         }

@@ -309,7 +309,7 @@ class Field {
             $result["{$key}Full"]   = !empty($number) ? date("d-m-Y H:i", $number) : "";
             break;
         case self::JSON:
-            $result[$key]           = JSON::decode($text, true);
+            $result[$key]           = JSON::decodeAsArray($text);
             break;
         case self::CSV:
             $result[$key]           = $text;
