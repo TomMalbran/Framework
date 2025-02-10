@@ -1,5 +1,5 @@
 <?php
-namespace {{codeSpace}};
+namespace {{namespace}};
 
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;

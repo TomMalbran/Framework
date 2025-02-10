@@ -1,5 +1,5 @@
 <?php
-namespace {{codeSpace}};
+namespace {{namespace}};
 
 use Framework\Core\Settings;{{#hasJSON}}
 use Framework\Utils\JSON;{{/hasJSON}}

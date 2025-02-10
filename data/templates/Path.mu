@@ -1,5 +1,5 @@
 <?php
-namespace {{codeSpace}};
+namespace {{namespace}};
 
 use Framework\File\FilePath;
 

@@ -18,7 +18,8 @@ use Framework\Provider\Mustache;
  */
 class Builder {
 
-    private const Namespace = "System";
+    private const Namespace = "Framework\\";
+    private const SystemDir = "System";
 
 
 
@@ -59,8 +60,7 @@ class Builder {
 
         $template = Framework::loadFile(Framework::TemplateDir, "$name.mu");
         $contents = Mustache::render($template, $data + [
-            "nameSpace" => Framework::Namespace,
-            "codeSpace" => "Framework\\" . self::Namespace,
+            "namespace" => self::Namespace . self::SystemDir,
         ]);
 
         File::create($writePath, "$name.php", $contents);

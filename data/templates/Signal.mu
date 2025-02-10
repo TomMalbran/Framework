@@ -1,5 +1,5 @@
 <?php
-namespace {{codeSpace}};
+namespace {{namespace}};
 {{#hasUses}}
 
 {{#uses}}use {{.}};
