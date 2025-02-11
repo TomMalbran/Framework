@@ -13,10 +13,10 @@ class File {
 
     /**
      * Returns the path used to store the files
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function parsePath(string ...$pathParts): string {
+    public static function parsePath(string|int ...$pathParts): string {
         $result = Strings::join($pathParts, "/");
         while (Strings::contains($result, "//")) {
             $result = Strings::replace($result, "//", "/");
@@ -27,10 +27,10 @@ class File {
 
     /**
      * Returns the path used to store the files
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function parseUrl(string ...$pathParts): string {
+    public static function parseUrl(string|int ...$pathParts): string {
         $protocols = [ "http://", "https://" ];
         foreach ($protocols as $protocol) {
             if (Strings::startsWith($pathParts[0], $protocol)) {
@@ -87,20 +87,20 @@ class File {
 
     /**
      * Returns true if given file exists
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return boolean
      */
-    public static function exists(string ...$pathParts): bool {
+    public static function exists(string|int ...$pathParts): bool {
         $fullPath = self::parsePath(...$pathParts);
         return !empty($fullPath) && file_exists($fullPath);
     }
 
     /**
      * Returns the modified time of a file
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return integer
      */
-    public static function getModifiedTime(string ...$pathParts): int {
+    public static function getModifiedTime(string|int ...$pathParts): int {
         $fullPath = self::parsePath(...$pathParts);
         if (empty($fullPath) || !file_exists($fullPath)) {
             return 0;
@@ -112,10 +112,10 @@ class File {
 
     /**
      * Reads the contents of a file
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function read(string ...$pathParts): string {
+    public static function read(string|int ...$pathParts): string {
         $fullPath = self::parsePath(...$pathParts);
         if (empty($fullPath) || !file_exists($fullPath)) {
             return "";
@@ -383,11 +383,11 @@ class File {
 
     /**
      * Ensures that all the directories are created
-     * @param string $basePath
-     * @param string ...$pathParts
+     * @param string         $basePath
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function ensureDir(string $basePath, string ...$pathParts): string {
+    public static function ensureDir(string $basePath, string|int ...$pathParts): string {
         $path        = trim(self::parsePath(...$pathParts));
         $pathParts   = Strings::split($path, "/");
         $totalParts  = count($pathParts);

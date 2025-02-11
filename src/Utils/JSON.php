@@ -75,10 +75,10 @@ class JSON {
 
     /**
      * Reads a JSON file
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return array<string|integer,mixed>
      */
-    public static function readFile(string ...$pathParts): array {
+    public static function readFile(string|int ...$pathParts): array {
         $response = File::read(...$pathParts);
         if (empty($response)) {
             return [];

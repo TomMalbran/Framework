@@ -78,10 +78,10 @@ class Image {
 
     /**
      * Returns the Size of the Image as [ width, height, type ]
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return int[]
      */
-    public static function getSize(string ...$pathParts): array {
+    public static function getSize(string|int ...$pathParts): array {
         $filePath = File::parsePath(...$pathParts);
         if (!File::exists($filePath) || !FileType::isImage($filePath)) {
             return [ 0, 0, 0 ];
@@ -110,10 +110,10 @@ class Image {
 
     /**
      * Returns the Orientation for the given Image
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return integer
      */
-    public static function getOrientation(string ...$pathParts): int {
+    public static function getOrientation(string|int ...$pathParts): int {
         if (!File::exists(...$pathParts)) {
             return 0;
         }
@@ -128,10 +128,10 @@ class Image {
 
     /**
      * Returns true if the Image has Transparency
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return boolean
      */
-    public static function hasTransparency(string ...$pathParts): bool {
+    public static function hasTransparency(string|int ...$pathParts): bool {
         $filePath = File::parsePath(...$pathParts);
         if (!File::exists($filePath) || !FileType::isPNG($filePath)) {
             return false;

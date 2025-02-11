@@ -43,20 +43,20 @@ class FilePath {
 
     /**
      * Returns the Files Path with the given path parts
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getPath(string ...$pathParts): string {
+    public static function getPath(string|int ...$pathParts): string {
         $basePath = self::getBasePath();
         return File::parsePath($basePath, Package::FilesDir, ...$pathParts);
     }
 
     /**
      * Returns the Internal Files Path with the given path parts
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getInternalPath(string ...$pathParts): string {
+    public static function getInternalPath(string|int ...$pathParts): string {
         $basePath = self::getBasePath(forBackend: true);
         return File::parsePath($basePath, Package::FilesDir, ...$pathParts);
     }
@@ -78,20 +78,20 @@ class FilePath {
 
     /**
      * Returns the Private Path
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getPrivatePath(string ...$pathParts): string {
+    public static function getPrivatePath(string|int ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
         return File::parsePath($basePath, ...$pathParts);
     }
 
     /**
      * Returns the FTP Path
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getFTPPath(string ...$pathParts): string {
+    public static function getFTPPath(string|int ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
         return File::parsePath($basePath, Package::FTPDir, ...$pathParts);
     }
@@ -100,19 +100,19 @@ class FilePath {
 
     /**
      * Returns the directory used to store the files
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getDir(string ...$pathParts): string {
+    public static function getDir(string|int ...$pathParts): string {
         return File::parsePath(Package::FilesDir, ...$pathParts);
     }
 
     /**
      * Returns the directory used for the internal files
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getInternalDir(string ...$pathParts): string {
+    public static function getInternalDir(string|int ...$pathParts): string {
         return File::parsePath(Package::AppDir, Package::FilesDir, ...$pathParts);
     }
 
@@ -120,19 +120,19 @@ class FilePath {
 
     /**
      * Returns the url for the given path
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getUrl(string ...$pathParts): string {
+    public static function getUrl(string|int ...$pathParts): string {
         return Config::getFileUrl(Package::FilesDir, ...$pathParts);
     }
 
     /**
      * Returns the url for the given internal path
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getInternalUrl(string ...$pathParts): string {
+    public static function getInternalUrl(string|int ...$pathParts): string {
         return Config::getUrl(Package::AppDir, Package::FilesDir, ...$pathParts);
     }
 
@@ -157,11 +157,11 @@ class FilePath {
 
     /**
      * Creates an url to the files temp directory
-     * @param integer $credentialID
-     * @param string  ...$pathParts
+     * @param integer         $credentialID
+     * @param string|integer  ...$pathParts
      * @return string
      */
-    public static function getTempUrl(int $credentialID, string ...$pathParts): string {
+    public static function getTempUrl(int $credentialID, string|int ...$pathParts): string {
         return Config::getFileUrl(self::Temp, $credentialID, ...$pathParts);
     }
 

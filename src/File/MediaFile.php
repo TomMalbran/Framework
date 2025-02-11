@@ -102,46 +102,46 @@ class MediaFile {
 
     /**
      * Returns the Source Path using the ID
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getPath(string ...$pathParts): string {
+    public static function getPath(string|int ...$pathParts): string {
         return Path::getSourcePath(self::$id, ...$pathParts);
     }
 
     /**
      * Returns the Thumbs Path using the ID
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    private static function getThumbPath(string ...$pathParts): string {
+    private static function getThumbPath(string|int ...$pathParts): string {
         return Path::getThumbsPath(self::$id, ...$pathParts);
     }
 
     /**
      * Returns the Source Url
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getUrl(string ...$pathParts): string {
+    public static function getUrl(string|int ...$pathParts): string {
         return Path::getSourceUrl(self::$id, ...$pathParts);
     }
 
     /**
      * Returns the Thumb Url
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return string
      */
-    public static function getThumbUrl(string ...$pathParts): string {
+    public static function getThumbUrl(string|int ...$pathParts): string {
         return Path::getThumbsUrl(self::$id, ...$pathParts);
     }
 
     /**
      * Returns true if given Source File exists
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return boolean
      */
-    public static function exists(string ...$pathParts): bool {
+    public static function exists(string|int ...$pathParts): bool {
         $path = self::getPath(...$pathParts);
         return File::exists($path);
     }
@@ -185,10 +185,10 @@ class MediaFile {
 
     /**
      * Creates a Directory
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return boolean
      */
-    public static function createDir(string ...$pathParts): bool {
+    public static function createDir(string|int ...$pathParts): bool {
         $source = self::getPath(...$pathParts);
         $thumbs = self::getThumbPath(...$pathParts);
         return File::createDir($source) && File::createDir($thumbs);
@@ -196,11 +196,11 @@ class MediaFile {
 
     /**
      * Uploads a File
-     * @param Request $request
-     * @param string  ...$pathParts
+     * @param Request         $request
+     * @param string|integer  ...$pathParts
      * @return boolean
      */
-    public static function uploadFile(Request $request, string ...$pathParts): bool {
+    public static function uploadFile(Request $request, string|int ...$pathParts): bool {
         $fileName = $request->getFileName("file");
         $tmpFile  = $request->getTmpName("file");
         $source   = self::getPath(...$pathParts);
@@ -220,10 +220,10 @@ class MediaFile {
 
     /**
      * Deletes a Media Element
-     * @param string ...$pathParts
+     * @param string|integer ...$pathParts
      * @return boolean
      */
-    public static function deletePath(string ...$pathParts): bool {
+    public static function deletePath(string|int ...$pathParts): bool {
         $relPath = File::parsePath(...$pathParts);
         $source  = self::getPath(...$pathParts);
         $thumbs  = self::getThumbPath(...$pathParts);
