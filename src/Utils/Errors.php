@@ -4,13 +4,14 @@ namespace Framework\Utils;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
+use JsonSerializable;
 use AllowDynamicProperties;
 
 /**
  * The Errors wrapper
  */
 #[AllowDynamicProperties]
-class Errors {
+class Errors implements JsonSerializable {
 
     /** @var array{} */
     private array $errors = [];
@@ -229,5 +230,13 @@ class Errors {
      */
     public function getTotal(): int {
         return count($this->errors);
+    }
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed {
+        return $this->get();
     }
 }
