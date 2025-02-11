@@ -225,4 +225,14 @@ class NLS {
         }
         return $result;
     }
+
+    /**
+     * Returns the Yes/No string
+     * @param boolean $value
+     * @param string  $language Optional.
+     * @return string
+     */
+    public static function toYesNo(bool $value, string $language = ""): string {
+        return self::getIndex("SELECT_YES_NO", $value ? 1 : 0, $language);
+    }
 }
