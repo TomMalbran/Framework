@@ -716,7 +716,7 @@ class Arrays {
      * @param string  $idKey
      * @param mixed   $idValue
      * @param string  $key     Optional.
-     * @return mixed
+     * @return mixed|null
      */
     public static function findValue(array $array, string $idKey, mixed $idValue, string $key = ""): mixed {
         foreach ($array as $elem) {
@@ -730,7 +730,7 @@ class Arrays {
                 }
             }
         }
-        return $key ? "" : [];
+        return null;
     }
 
     /**
