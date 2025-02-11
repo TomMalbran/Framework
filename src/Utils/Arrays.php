@@ -57,6 +57,15 @@ class Arrays {
 
 
     /**
+     * Returns true if the given array is empty
+     * @param mixed $array
+     * @return boolean
+     */
+    public static function isEmpty(mixed $array): bool {
+        return empty($array);
+    }
+
+    /**
      * Returns the length of the given array
      * @param mixed $array
      * @return integer
