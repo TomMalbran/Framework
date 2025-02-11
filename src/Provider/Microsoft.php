@@ -14,16 +14,16 @@ class Microsoft {
     /**
      * Returns the Account from the given Token
      * @param string $idToken
-     * @return array{}
+     * @return array<string,string>|null
      */
-    public static function getAuthAccount(string $idToken): array {
+    public static function getAuthAccount(string $idToken): ?array {
         if (empty($idToken)) {
-            return [];
+            return null;
         }
 
         $tokens = explode(".", $idToken);
         if (count($tokens) != 3) {
-            return [];
+            return null;
         }
 
         [ $head64, $body64, $crypto64 ] = $tokens;
@@ -32,16 +32,16 @@ class Microsoft {
         $signature = JWT::urlsafeB64Decode($crypto64);
 
         if ($header === null || $payload === null || $signature === null) {
-            return [];
+            return null;
         }
         if ($payload->aud !== Config::getMicrosoftClient()) {
-            return [];
+            return null;
         }
         if ($payload->exp < time()) {
-            return [];
+            return null;
         }
         if (empty($payload->email) || empty($payload->name)) {
-            return [];
+            return null;
         }
 
         // Split the Name

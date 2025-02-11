@@ -15,18 +15,18 @@ class Google {
     /**
      * Returns the Data from the given Token
      * @param string $accessToken
-     * @return array{}
+     * @return array<string,string>|null
      */
-    public static function getAuthAccount(string $accessToken): array {
+    public static function getAuthAccount(string $accessToken): ?array {
         if (empty($accessToken)) {
-            return [];
+            return null;
         }
 
         $response = Curl::execute("GET", self::BaseUrl . "userinfo", null, [
             "Authorization" => "Bearer $accessToken",
         ]);
         if (empty($response["email"])) {
-            return [];
+            return null;
         }
 
         return [

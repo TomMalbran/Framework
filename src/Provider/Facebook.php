@@ -15,11 +15,11 @@ class Facebook {
     /**
      * Returns the Account from the given Token
      * @param string $accessToken
-     * @return array{}
+     * @return array<string,string>|null
      */
-    public static function getAuthAccount(string $accessToken): array {
+    public static function getAuthAccount(string $accessToken): ?array {
         if (empty($accessToken)) {
-            return [];
+            return null;
         }
 
         $response = Curl::execute("GET", self::BaseUrl . "/me", [
@@ -27,7 +27,7 @@ class Facebook {
             "access_token" => $accessToken,
         ]);
         if (empty($response["email"])) {
-            return [];
+            return null;
         }
 
         $firstName = !empty($response["first_name"]) ? $response["first_name"] : "";
