@@ -49,20 +49,21 @@ class RouterCode {
                     continue;
                 }
 
-                $attribute  = $attributes[0];
-                $fileName   = $reflection->getFileName();
-                $route      = $attribute->newInstance();
-                $params     = $method->getNumberOfParameters();
-                $response   = $method->getReturnType();
-                $methodName = $method->getName();
-                $startLine  = $method->getStartLine();
+                $attribute    = $attributes[0];
+                $fileName     = $reflection->getFileName();
+                $route        = $attribute->newInstance();
+                $params       = $method->getNumberOfParameters();
+                $response     = $method->getReturnType();
+                $responseName = $response->getName();
+                $methodName   = $method->getName();
+                $startLine    = $method->getStartLine();
 
                 // Check the Route
                 if (isset($usedRoutes[$route->route])) {
                     $errorRoutes[] = "Route already used for $methodName: $fileName:$startLine";
                     continue;
                 }
-                if ($response->getName() !== "Framework\\Response") {
+                if ($responseName !== "never" && $responseName !== "Framework\\Response") {
                     $errorRoutes[] = "Wrong Response for $methodName: $fileName:$startLine";
                     continue;
                 }
