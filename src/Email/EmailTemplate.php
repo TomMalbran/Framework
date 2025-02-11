@@ -33,8 +33,8 @@ class EmailTemplate extends EmailTemplateSchema {
 
     /**
      * Renders the Email Template message with Mustache
-     * @param string  $message
-     * @param array{} $data    Optional.
+     * @param string              $message
+     * @param array<string,mixed> $data    Optional.
      * @return string
      */
     public static function render(string $message, array $data = []): string {

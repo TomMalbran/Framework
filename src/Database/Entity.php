@@ -16,7 +16,7 @@ class Entity implements ArrayAccess, JsonSerializable {
 
     /**
      * Creates a new Entity instance
-     * @param ArrayAccess|array{}|null $data Optional.
+     * @param ArrayAccess|array<string,mixed>|null $data Optional.
      */
     public function __construct(ArrayAccess|array|null $data = []) {
         if (empty($data)) {

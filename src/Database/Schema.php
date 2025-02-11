@@ -98,7 +98,7 @@ class Schema {
      * @param Query|null $query
      * @param string     $column
      * @param string     $columnKey Optional.
-     * @return string[]
+     * @return array<string|integer>
      */
     protected static function getColumnData(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
@@ -207,8 +207,8 @@ class Schema {
     /**
      * Returns the Data using a basic Expression and Params
      * @param string  $expression
-     * @param array{} $params     Optional.
-     * @return array{}[]
+     * @param mixed[] $params     Optional.
+     * @return array<string,string|integer>[]
      */
     protected static function getDataWithParams(string $expression, array $params = []): array {
         $expression = self::structure()->replaceTable($expression);
@@ -221,7 +221,7 @@ class Schema {
      * @param Query   $query
      * @param string  $expression
      * @param boolean $singleLine Optional.
-     * @return array{}
+     * @return array<string|integer,string|integer>|array<string|integer,string|integer>[]
      */
     protected static function getDataWithQuery(Query $query, string $expression, bool $singleLine = false): array {
         $expression = self::structure()->replaceTable($expression);
@@ -352,9 +352,9 @@ class Schema {
 
     /**
      * Creates a new Entity with data
-     * @param Request|null $request      Optional.
-     * @param array{}      $fields       Optional.
-     * @param integer      $credentialID Optional.
+     * @param Request|null        $request      Optional.
+     * @param array<string,mixed> $fields       Optional.
+     * @param integer             $credentialID Optional.
      * @return integer
      */
     protected static function createEntityData(?Request $request = null, array $fields = [], int $credentialID = 0): int {
@@ -383,7 +383,7 @@ class Schema {
      * Edits the Data of an Entity
      * @param Query|integer|string $query
      * @param Request|null         $request      Optional.
-     * @param array{}              $fields       Optional.
+     * @param array<string,mixed>  $fields       Optional.
      * @param integer              $credentialID Optional.
      * @param boolean              $skipEmpty    Optional.
      * @return boolean

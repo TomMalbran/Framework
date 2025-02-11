@@ -227,7 +227,7 @@ class {{name}}Schema extends Schema {
      * Selects the given column from a single table and returns the entire column
      * @param Query $query
      * @param {{column}} $column
-     * @return string[]
+     * @return array<string|integer>
      */
     protected static function getEntityColumn(Query $query, {{column}} $column): array {
         return self::getColumnData($query, $column->value, $column->key());
@@ -239,7 +239,7 @@ class {{name}}Schema extends Schema {
     /**
      * Returns an array with all the {{idText}}s
      * @param Query|null $query Optional.
-     * @return int[]
+     * @return {{idDocType}}[]
      */
     public static function get{{idText}}s(?Query $query = null): array {
         return self::getColumnData($query, "{{idKey}}");
@@ -452,7 +452,9 @@ class {{name}}Schema extends Schema {
             $createdUser = Auth::getID();
         }
         {{/hasUsers}}
-        return self::replaceEntityData($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+
+        $result = self::replaceEntityData($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return $result > 0;
     }
 {{/canReplace}}
 {{#canEdit}}
@@ -485,7 +487,7 @@ class {{name}}Schema extends Schema {
         }
         {{/canDelete}}
         {{#hasUsers}}
-        if (empty($modifiedUser)) {
+        if ($modifiedUser === 0) {
             $modifiedUser = Auth::getID();
         }
         {{/hasUsers}}
@@ -511,7 +513,7 @@ class {{name}}Schema extends Schema {
      */
     protected static function increaseEntity({{editType}} $query, {{column}} $column, int $amount = 1{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
         {{#hasUsers}}
-        if (empty($modifiedUser)) {
+        if ($modifiedUser === 0) {
             $modifiedUser = Auth::getID();
         }
 
@@ -532,7 +534,7 @@ class {{name}}Schema extends Schema {
      */
     protected static function deleteEntity({{editType}} $query{{parentsEditList}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
         {{#hasUsers}}
-        if (empty($modifiedUser)) {
+        if ($modifiedUser === 0) {
             $modifiedUser = Auth::getID();
         }
 
@@ -575,9 +577,9 @@ class {{name}}Schema extends Schema {
      * @param {{entity}}|null $entity
      * @param Request|array{}|null $fields{{#parents}}
      * @param {{fieldDoc}}{{/parents}}
-     * @return boolean
+     * @return integer
      */
-    protected static function ensurePosOrder(?{{entity}} $entity, Request|array|null $fields{{parentsEditList}}): bool {
+    protected static function ensurePosOrder(?{{entity}} $entity, Request|array|null $fields{{parentsEditList}}): int {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}

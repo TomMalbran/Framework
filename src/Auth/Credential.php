@@ -454,10 +454,10 @@ class Credential extends CredentialSchema {
 
     /**
      * Creates a new Credential
-     * @param Request|null $request       Optional.
-     * @param array{}|null $fields        Optional.
-     * @param Access|null  $accessName    Optional.
-     * @param boolean|null $reqPassChange Optional.
+     * @param Request|null             $request       Optional.
+     * @param array<string,mixed>|null $fields        Optional.
+     * @param Access|null              $accessName    Optional.
+     * @param boolean|null             $reqPassChange Optional.
      * @return integer
      */
     public static function create(?Request $request = null, ?array $fields = null, ?Access $accessName = null, ?bool $reqPassChange = null): int {
@@ -469,12 +469,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Edits the given Credential
-     * @param integer      $credentialID
-     * @param Request|null $request       Optional.
-     * @param array{}|null $fields        Optional.
-     * @param Access|null  $accessName    Optional.
-     * @param boolean|null $reqPassChange Optional.
-     * @param boolean      $skipEmpty     Optional.
+     * @param integer                  $credentialID
+     * @param Request|null             $request       Optional.
+     * @param array<string,mixed>|null $fields        Optional.
+     * @param Access|null              $accessName    Optional.
+     * @param boolean|null             $reqPassChange Optional.
+     * @param boolean                  $skipEmpty     Optional.
      * @return boolean
      */
     public static function edit(int $credentialID, ?Request $request = null, ?array $fields = [], ?Access $accessName = null, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
@@ -484,8 +484,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Updates the given Credential
-     * @param integer $credentialID
-     * @param array{} $fields
+     * @param integer             $credentialID
+     * @param array<string,mixed> $fields
      * @return boolean
      */
     public static function update(int $credentialID, array $fields): bool {
@@ -536,11 +536,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Parses the data and returns the fields
-     * @param Request|null $request       Optional.
-     * @param array{}|null $fields        Optional.
-     * @param Access|null  $accessName    Optional.
-     * @param boolean|null $reqPassChange Optional.
-     * @return array{}[]
+     * @param Request|null             $request       Optional.
+     * @param array<string,mixed>|null $fields        Optional.
+     * @param Access|null              $accessName    Optional.
+     * @param boolean|null             $reqPassChange Optional.
+     * @return array<string,mixed>
      */
     private static function parseFields(?Request $request = null, ?array $fields = null, ?Access $accessName = null, ?bool $reqPassChange = null): array {
         $password = $request !== null ? $request->getString("password") : (!empty($fields["password"]) ? $fields["password"] : "");

@@ -13,19 +13,19 @@ class Curl {
 
     /**
      * Executes a Request
-     * @param string       $method
-     * @param string       $url
-     * @param array{}|null $params       Optional.
-     * @param array{}|null $headers      Optional.
-     * @param string       $userPass     Optional.
-     * @param boolean      $isCustom     Optional.
-     * @param boolean      $jsonBody     Optional.
-     * @param boolean      $urlBody      Optional.
-     * @param boolean      $jsonResponse Optional.
-     * @param boolean      $withHeaders  Optional.
-     * @param boolean      $returnError  Optional.
-     * @param boolean      $disableSSL   Optional.
-     * @param integer      $timeout      Optional.
+     * @param string                    $method
+     * @param string                    $url
+     * @param array<string,mixed>|null  $params       Optional.
+     * @param array<string,string>|null $headers      Optional.
+     * @param string                    $userPass     Optional.
+     * @param boolean                   $isCustom     Optional.
+     * @param boolean                   $jsonBody     Optional.
+     * @param boolean                   $urlBody      Optional.
+     * @param boolean                   $jsonResponse Optional.
+     * @param boolean                   $withHeaders  Optional.
+     * @param boolean                   $returnError  Optional.
+     * @param boolean                   $disableSSL   Optional.
+     * @param integer                   $timeout      Optional.
      * @return mixed
      */
     public static function execute(
@@ -156,8 +156,8 @@ class Curl {
 
     /**
      * Parses the Url adding the Params
-     * @param string       $url
-     * @param array{}|null $params
+     * @param string                   $url
+     * @param array<string,mixed>|null $params
      * @return string
      */
     private static function parseUrl(string $url, ?array $params = null): string {
@@ -171,7 +171,7 @@ class Curl {
 
     /**
      * Parses the Params
-     * @param array{}|null $params
+     * @param array<string,mixed>|null $params
      * @return string
      */
     private static function parseParams(?array $params = null): string {
@@ -193,7 +193,7 @@ class Curl {
 
     /**
      * Parses the Header
-     * @param array{} $headers
+     * @param array<string,string> $headers
      * @return string[]
      */
     private static function parseHeader(array $headers): array {
@@ -208,9 +208,9 @@ class Curl {
 
     /**
      * Executes a Read Request
-     * @param string       $url
-     * @param string       $filePath
-     * @param array{}|null $headers  Optional.
+     * @param string                    $url
+     * @param string                    $filePath
+     * @param array<string,string>|null $headers  Optional.
      * @return boolean
      */
     public static function read(string $url, string $filePath, ?array $headers = null): bool {

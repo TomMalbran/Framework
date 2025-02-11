@@ -18,8 +18,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns the List Query
-     * @param Request $request
-     * @param array{} $mappings Optional.
+     * @param Request              $request
+     * @param array<string,string> $mappings Optional.
      * @return Query
      */
     private static function createQuery(Request $request, array $mappings = []): Query {
@@ -39,8 +39,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns all the Actions Log items
-     * @param Request $request
-     * @param array{} $mappings Optional.
+     * @param Request              $request
+     * @param array<string,string> $mappings Optional.
      * @return array{}[]
      */
     public static function getAll(Request $request, array $mappings = []): array {
@@ -83,8 +83,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns the total amount of Actions Log items
-     * @param Request $request
-     * @param array{} $mappings Optional.
+     * @param Request              $request
+     * @param array<string,string> $mappings Optional.
      * @return integer
      */
     public static function getAmount(Request $request, array $mappings = []): int {

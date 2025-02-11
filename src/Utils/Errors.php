@@ -97,12 +97,12 @@ class Errors implements JsonSerializable {
 
     /**
      * Adds a new error
-     * @param string      $error
-     * @param string      $message
-     * @param string|null $value   Optional.
+     * @param string              $error
+     * @param string              $message
+     * @param string|integer|null $value   Optional.
      * @return Errors
      */
-    public function add(string $error, string $message, ?string $value = null): Errors {
+    public function add(string $error, string $message, string|int|null $value = null): Errors {
         if (empty($message)) {
             return $this;
         }

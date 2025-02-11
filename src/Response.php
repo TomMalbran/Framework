@@ -13,7 +13,7 @@ use ArrayAccess;
  */
 class Response {
 
-    /** @var array{} */
+    /** @var array<string,mixed> */
     private array $data;
 
     private bool $withTokens = true;
@@ -22,8 +22,8 @@ class Response {
 
     /**
      * Creates a new Response instance
-     * @param array{} $data       Optional.
-     * @param boolean $withTokens Optional.
+     * @param array<string,mixed> $data       Optional.
+     * @param boolean             $withTokens Optional.
      */
     public function __construct(array $data = [], bool $withTokens = true) {
         $this->data       = $data;
@@ -50,7 +50,7 @@ class Response {
 
     /**
      * Returns the Data as an Object
-     * @return array{}
+     * @return array<string,mixed>
      */
     public function toObject(): array {
         return $this->data;
@@ -87,7 +87,7 @@ class Response {
 
 
     /**
-     * Returns an empty result
+     * Creates an Empty Response
      * @param boolean $withTokens Optional.
      * @return Response
      */
@@ -96,7 +96,7 @@ class Response {
     }
 
     /**
-     * Returns the given exit code
+     * Creates an Exit Response
      * @param integer $exitCode
      * @return Response
      */
@@ -158,10 +158,10 @@ class Response {
 
 
     /**
-     * @param string                   $success
-     * @param ArrayAccess|array{}|null $data    Optional.
-     * @param string                   $param   Optional.
      * Creates a Success Response
+     * @param string                               $success
+     * @param ArrayAccess|array<string,mixed>|null $data    Optional.
+     * @param string                               $param   Optional.
      * @return Response
      */
     public static function success(string $success, ArrayAccess|array|null $data = null, string $param = ""): Response {
@@ -173,10 +173,10 @@ class Response {
     }
 
     /**
-     * @param string                   $warning
-     * @param ArrayAccess|array{}|null $data    Optional.
-     * @param string                   $param   Optional.
      * Creates a Warning Response
+     * @param string                               $warning
+     * @param ArrayAccess|array<string,mixed>|null $data    Optional.
+     * @param string                               $param   Optional.
      * @return Response
      */
     public static function warning(string $warning, ArrayAccess|array|null $data = null, string $param = ""): Response {
@@ -188,10 +188,10 @@ class Response {
     }
 
     /**
-     * @param Errors|string            $error
-     * @param ArrayAccess|array{}|null $data  Optional.
-     * @param string                   $param Optional.
      * Creates an Error Response
+     * @param Errors|string                        $error
+     * @param ArrayAccess|array<string,mixed>|null $data  Optional.
+     * @param string                               $param Optional.
      * @return Response
      */
     public static function error(Errors|string $error, ArrayAccess|array|null $data = null, string $param = ""): Response {

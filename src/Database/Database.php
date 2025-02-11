@@ -101,7 +101,7 @@ class Database {
      * Process the given expression
      * @param string        $expression
      * @param Query|mixed[] $params     Optional.
-     * @return array{}[]
+     * @return array<string,mixed>[]
      */
     public function query(string $expression, Query|array $params = []): array {
         $startTime = microtime(true);
@@ -116,7 +116,7 @@ class Database {
      * Process the given expression using a Query
      * @param string $expression
      * @param Query  $query
-     * @return array{}[]
+     * @return array<string,mixed>[]
      */
     public function getData(string $expression, Query $query): array {
         $expression .= $query->get(true);

@@ -26,17 +26,17 @@ use AllowDynamicProperties;
 #[AllowDynamicProperties]
 class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
-    /** @var ArrayAccess|array{} */
+    /** @var ArrayAccess|array<string,mixed> */
     private ArrayAccess|array $request;
 
-    /** @var ArrayAccess|array{} */
+    /** @var ArrayAccess|array<string,mixed> */
     private ArrayAccess|array $files;
 
 
     /**
      * Creates a new Request instance
-     * @param ArrayAccess|array{} $request Optional.
-     * @param ArrayAccess|array{} $files   Optional.
+     * @param ArrayAccess|array<string,mixed> $request Optional.
+     * @param ArrayAccess|array<string,mixed> $files   Optional.
      */
     public function __construct(ArrayAccess|array $request = [], ArrayAccess|array $files = []) {
         $this->request = $request;
@@ -883,7 +883,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the Request data
-     * @return ArrayAccess|array{}
+     * @return ArrayAccess|array<string,mixed>
      */
     public function toArray(): ArrayAccess|array {
         return $this->request;
