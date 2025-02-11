@@ -3,6 +3,7 @@ namespace Framework;
 
 use Framework\Utils\Arrays;
 use Framework\Utils\Errors;
+use Framework\Utils\Search;
 use Framework\Utils\JSON;
 
 use ArrayAccess;
@@ -104,8 +105,8 @@ class Response {
     }
 
     /**
-     * Returns the given result
-     * @param array{} $result Optional.
+     * Creates a Result Response
+     * @param array<string,mixed> $result Optional.
      * @return Response
      */
     public static function result(array $result = []): Response {
@@ -113,18 +114,29 @@ class Response {
     }
 
     /**
-     * Returns the given data
-     * @param ArrayAccess|array{}|null $data Optional.
+     * Creates a Data Response
+     * @param array<string,mixed> $data
      * @return Response
      */
-    public static function data(ArrayAccess|array|null $data = null): Response {
+    public static function data(array $data): Response {
         return new Response([
             "data" => $data,
         ]);
     }
 
     /**
-     * Returns an invalid data
+     * Creates a Search Response
+     * @param Search[] $data
+     * @return Response
+     */
+    public static function search(array $data): Response {
+        return new Response([
+            "data" => $data,
+        ]);
+    }
+
+    /**
+     * Creates an Invalid Response
      * @return Response
      */
     public static function invalid(): Response {
@@ -134,7 +146,7 @@ class Response {
     }
 
     /**
-     * Returns a logout
+     * Creates a Logout Response
      * @return Response
      */
     public static function logout(): Response {
@@ -144,11 +156,12 @@ class Response {
     }
 
 
+
     /**
-     * Returns a success response
      * @param string                   $success
      * @param ArrayAccess|array{}|null $data    Optional.
      * @param string                   $param   Optional.
+     * Creates a Success Response
      * @return Response
      */
     public static function success(string $success, ArrayAccess|array|null $data = null, string $param = ""): Response {
@@ -160,10 +173,10 @@ class Response {
     }
 
     /**
-     * Returns a warning response
      * @param string                   $warning
      * @param ArrayAccess|array{}|null $data    Optional.
      * @param string                   $param   Optional.
+     * Creates a Warning Response
      * @return Response
      */
     public static function warning(string $warning, ArrayAccess|array|null $data = null, string $param = ""): Response {
@@ -175,10 +188,10 @@ class Response {
     }
 
     /**
-     * Returns an error response
      * @param Errors|string            $error
      * @param ArrayAccess|array{}|null $data  Optional.
      * @param string                   $param Optional.
+     * Creates an Error Response
      * @return Response
      */
     public static function error(Errors|string $error, ArrayAccess|array|null $data = null, string $param = ""): Response {
