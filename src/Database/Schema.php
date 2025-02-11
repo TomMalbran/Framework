@@ -343,18 +343,6 @@ class Schema {
 
 
     /**
-     * Batches the Entity Data
-     * @param array{}[] $fields
-     * @return boolean
-     */
-    protected static function batchEntities(array $fields): bool {
-        if (empty($fields)) {
-            return false;
-        }
-        return self::db()->batch(self::structure()->table, $fields);
-    }
-
-    /**
      * Truncates all the Entities
      * @return boolean
      */

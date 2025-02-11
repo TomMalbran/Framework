@@ -96,7 +96,9 @@ class EmailTemplate extends EmailTemplateSchema {
         // Process the SQL
         if (!empty($updates)) {
             print("<br>Updated <i>" . count($updates) . " emails</i> for language <b>$languageName</b><br>");
-            self::batchEntities($updates);
+            foreach ($updates as $update) {
+                self::replaceEntityData(null, $update);
+            }
         }
 
         return $position;

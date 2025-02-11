@@ -248,7 +248,9 @@ class Settings extends SettingsSchema {
         if (!empty($adds)) {
             print("<br>Added <i>" . count($adds) . " settings</i><br>");
             print(Strings::join($variables, ", ") . "<br>");
-            self::batchEntities($adds);
+            foreach ($adds as $add) {
+                self::replaceEntity(...$add);
+            }
             $didUpdate = true;
         }
 
