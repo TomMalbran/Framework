@@ -716,13 +716,21 @@ class DateTime {
     /**
      * Returns the Month for the given Time Stamp
      * @param integer $timeStamp Optional.
-     * @param boolean $zeroPad   Optional.
-     * @return integer|string
+     * @return integer
      */
-    public static function getMonth(int $timeStamp = 0, bool $zeroPad = false): int|string {
+    public static function getMonth(int $timeStamp = 0): int {
         $timeStamp = self::getTime($timeStamp);
-        $month     = (int)date("n", $timeStamp);
-        return $zeroPad ? self::parseTime($month) : $month;
+        return (int)date("n", $timeStamp);
+    }
+
+    /**
+     * Returns the Month for the given Time Stamp
+     * @param integer $timeStamp Optional.
+     * @return string
+     */
+    public static function getMonthZero(int $timeStamp = 0): string {
+        $month = self::getMonth($timeStamp);
+        return self::parseTime($month);
     }
 
     /**
@@ -897,13 +905,21 @@ class DateTime {
     /**
      * Returns the Day for the given Time Stamp
      * @param integer $timeStamp Optional.
-     * @param boolean $zeroPad   Optional.
-     * @return integer|string
+     * @return integer
      */
-    public static function getDay(int $timeStamp = 0, bool $zeroPad = false): int|string {
+    public static function getDay(int $timeStamp = 0): int {
         $timeStamp = self::getTime($timeStamp);
-        $day       = (int)date("j", $timeStamp);
-        return $zeroPad ? self::parseTime($day) : $day;
+        return (int)date("j", $timeStamp);
+    }
+
+    /**
+     * Returns the Day for the given Time Stamp with Padding
+     * @param integer $timeStamp Optional.
+     * @return string
+     */
+    public static function getDayZero(int $timeStamp = 0): string {
+        $day = self::getDay($timeStamp);
+        return self::parseTime($day);
     }
 
     /**
@@ -1035,7 +1051,7 @@ class DateTime {
      * @return string
      */
     public static function getDayMonth(int $timeStamp, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
-        $day   = self::getDay($timeStamp, true);
+        $day   = self::getDayZero($timeStamp);
         $month = self::getMonth($timeStamp);
         return "$day " . self::getMonthName($month, $length, $inUpperCase, $language);
     }
