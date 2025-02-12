@@ -198,11 +198,21 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     /**
      * Returns the request data at the given key as CSV
      * @param string $key
-     * @return mixed[]
+     * @return string[]
      */
-    public function getCSV(string $key): array {
+    public function getStrings(string $key): array {
         $result = Strings::split($this->get($key, ""), ",");
-        return Arrays::removeEmpty($result);
+        return Arrays::toStrings($result, true);
+    }
+
+    /**
+     * Returns the request data at the given key as CSV
+     * @param string $key
+     * @return int[]
+     */
+    public function getInts(string $key): array {
+        $result = Strings::split($this->get($key, ""), ",");
+        return Arrays::toInts($result, true);
     }
 
 
