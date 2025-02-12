@@ -28,7 +28,7 @@ class XLSXWriter implements ExporterWriter {
      * @param string $lang     Optional.
      */
     public function __construct(string $title, string $fileName, string $lang = "root") {
-        $this->title = NLS::get($title, $lang);
+        $this->title = NLS::getString($title, $lang);
         $this->lang  = $lang;
 
         $options = new Options();

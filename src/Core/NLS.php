@@ -52,7 +52,7 @@ class NLS {
     }
 
     /**
-     * Returns a string from the data
+     * Returns a value from the data
      * @param string $key
      * @param string $language Optional.
      * @return mixed
@@ -67,6 +67,20 @@ class NLS {
             return $data[$key];
         }
         return $key;
+    }
+
+    /**
+     * Returns a string from the data
+     * @param string $key
+     * @param string $language Optional.
+     * @return string
+     */
+    public static function getString(string $key, string $language = ""): string {
+        $result = self::get($key, $language);
+        if (Strings::isString($result)) {
+            return (string)$result;
+        }
+        return "";
     }
 
     /**

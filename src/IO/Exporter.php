@@ -31,7 +31,7 @@ class Exporter {
      * @param string  $lang     Optional.
      */
     public function __construct(int $total, string $title, string $fileName, string $lang = "root") {
-        $this->fileName = NLS::get($fileName, $lang) . "_" . date("Y-m-d");
+        $this->fileName = NLS::getString($fileName, $lang) . "_" . date("Y-m-d");
         $this->total    = $total;
         $this->header   = new Elements();
 
