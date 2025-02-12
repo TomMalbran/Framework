@@ -496,11 +496,14 @@ class Generator {
         }
 
         foreach ($structure->expressions as $expression) {
-            $result[] = [
-                "name"     => Strings::upperCaseFirst($expression->prefixName),
-                "value"    => $expression->key,
-                "addSpace" => $addSpace,
-            ];
+            $expName = Strings::upperCaseFirst($expression->prefixName);
+            if (!Arrays::contains($result, $expName, "name")) {
+                $result[] = [
+                    "name"     => $expName,
+                    "value"    => $expression->key,
+                    "addSpace" => $addSpace,
+                ];
+            }
             $addSpace = false;
         }
 
