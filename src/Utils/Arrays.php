@@ -244,12 +244,49 @@ class Arrays {
     }
 
     /**
-     * Converts an empty array into an object or returns the array
+     * Converts an array into an object or returns the array
      * @param mixed[]|null $array Optional.
      * @return mixed
      */
     public static function toObject(?array $array = null): mixed {
         return !empty($array) ? $array : (object)[];
+    }
+
+    /**
+     * Converts an array into a list of strings
+     * @param mixed[] $array
+     * @param boolean $removeEmpty Optional.
+     * @return string[]
+     */
+    public static function toStrings(array $array, bool $removeEmpty = false): array {
+        $result = [];
+        foreach ($array as $value) {
+            if ($removeEmpty && empty($value)) {
+                continue;
+            }
+            $result[] = (string)$value;
+        }
+        return $result;
+    }
+
+    /**
+     * Converts an array into a list of integers
+     * @param mixed[] $array
+     * @param boolean $removeEmpty Optional.
+     * @return integer[]
+     */
+    public static function toInts(array $array, bool $removeEmpty = false): array {
+        $result = [];
+        foreach ($array as $value) {
+            if (!Numbers::isValid($value, null)) {
+                continue;
+            }
+            if ($removeEmpty && empty($value)) {
+                continue;
+            }
+            $result[] = (int)$value;
+        }
+        return $result;
     }
 
     /**
