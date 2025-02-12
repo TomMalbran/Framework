@@ -185,6 +185,16 @@ class Numbers {
     }
 
     /**
+     * Returns a division from the given values as an integer
+     * @param integer $numerator
+     * @param integer $divisor
+     * @return integer
+     */
+    public static function divideInt(int $numerator, int $divisor): int {
+        return $divisor == 0 ? 0 : (int)self::round($numerator / $divisor, 0);
+    }
+
+    /**
      * Applies the Discount to the given Number
      * @param integer|float $number
      * @param integer|float $percent
