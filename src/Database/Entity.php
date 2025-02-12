@@ -22,10 +22,17 @@ class Entity implements ArrayAccess, JsonSerializable {
         if (empty($data)) {
             return;
         }
+
         foreach ($this->getProperties() as $property) {
-            if (isset($data[$property])) {
+            if (!isset($data[$property])) {
+                continue;
+            }
+
+            $this->empty = false;
+            if (is_numeric($this->$property) && !is_numeric($data[$property])) {
+                $this->$property = (float)$data[$property];
+            } else {
                 $this->$property = $data[$property];
-                $this->empty     = false;
             }
         }
     }
