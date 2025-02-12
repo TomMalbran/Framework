@@ -14,7 +14,8 @@ use Framework\Database\Assign;{{/canEdit}}{{#hasStatus}}
 use Framework\System\Status;{{/hasStatus}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
-use Framework\Utils\Select;
+use Framework\Utils\Select;{{#hasIntID}}
+use Framework\Utils\Numbers;{{/hasIntID}}
 
 /**
  * The {{name}} Schema
@@ -237,18 +238,33 @@ class {{name}}Schema extends Schema {
 
 {{#hasID}}
     /**
+     * Returns the {{idText}} for the given query
+     * @param Query $query
+     * @return {{idDocType}}
+     */
+    public static function get{{idText}}(Query $query): {{idType}} {
+        $result = self::getValueData($query, "{{idKey}}");
+        {{#hasIntID}}
+        return Numbers::toInt($result);
+        {{/hasIntID}}
+        {{^hasIntID}}
+        return (string)$result;
+        {{/hasIntID}}
+    }
+
+    /**
      * Returns an array with all the {{idText}}s
      * @param Query|null $query Optional.
      * @return {{idDocType}}[]
      */
     public static function get{{idText}}s(?Query $query = null): array {
         $result = self::getColumnData($query, "{{idKey}}");
-        {{#idIsInt}}
+        {{#hasIntID}}
         return Arrays::toInts($result);
-        {{/idIsInt}}
-        {{^idIsInt}}
+        {{/hasIntID}}
+        {{^hasIntID}}
         return Arrays::toStrings($result);
-        {{/idIsInt}}
+        {{/hasIntID}}
     }
 
 {{/hasID}}
