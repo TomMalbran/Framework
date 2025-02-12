@@ -242,7 +242,13 @@ class {{name}}Schema extends Schema {
      * @return {{idDocType}}[]
      */
     public static function get{{idText}}s(?Query $query = null): array {
-        return self::getColumnData($query, "{{idKey}}");
+        $result = self::getColumnData($query, "{{idKey}}");
+        {{#idIsInt}}
+        return Arrays::toInts($result);
+        {{/idIsInt}}
+        {{^idIsInt}}
+        return Arrays::toStrings($result);
+        {{/idIsInt}}
     }
 
 {{/hasID}}

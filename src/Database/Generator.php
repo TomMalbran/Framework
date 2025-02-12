@@ -96,6 +96,7 @@ class Generator {
             "idName"           => $structure->idName,
             "idType"           => $idType,
             "idDocType"        => self::getDocType($idType),
+            "idIsInt"          => $idType === "int",
             "idText"           => Strings::upperCaseFirst($structure->idName),
             "editType"         => $structure->hasID ? "Query|$idType" : "Query",
             "editDocType"      => $structure->hasID ? "Query|" . self::getDocType($idType) : "Query",
