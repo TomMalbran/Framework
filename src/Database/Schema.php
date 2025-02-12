@@ -378,9 +378,9 @@ class Schema {
 
     /**
      * Replaces the Data of an Entity
-     * @param Request|null $request      Optional.
-     * @param array{}      $fields       Optional.
-     * @param integer      $credentialID Optional.
+     * @param Request|null        $request      Optional.
+     * @param array<string,mixed> $fields       Optional.
+     * @param integer             $credentialID Optional.
      * @return integer
      */
     protected static function replaceEntityData(?Request $request = null, array $fields = [], int $credentialID = 0): int {
@@ -436,10 +436,10 @@ class Schema {
 
     /**
      * Creates an Entity and ensures the Order
-     * @param Request|null $request
-     * @param array{}      $fields       Optional.
-     * @param integer      $credentialID Optional.
-     * @param Query|null   $orderQuery   Optional.
+     * @param Request|null        $request
+     * @param array<string,mixed> $fields       Optional.
+     * @param integer             $credentialID Optional.
+     * @param Query|null          $orderQuery   Optional.
      * @return integer
      */
     protected static function createEntityWithOrder(?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
@@ -457,7 +457,7 @@ class Schema {
      * Edits the Data of an Entity and ensures the Order
      * @param Query|integer|string $query
      * @param Request|null         $request
-     * @param array{}              $fields       Optional.
+     * @param array<string,mixed>  $fields       Optional.
      * @param integer              $credentialID Optional.
      * @param Query|null           $orderQuery   Optional.
      * @return boolean

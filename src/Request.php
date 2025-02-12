@@ -924,7 +924,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * @return array
      */
     public function __debugInfo(): array {
-        return $this->request;
+        return (array)$this->request;
     }
 
 
@@ -954,7 +954,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function offsetExists(mixed $key): bool {
-        return array_key_exists($key, $this->request);
+        return array_key_exists($key, (array)$this->request);
     }
 
     /**
@@ -968,7 +968,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /**
      * Implements the Iterator Aggregate Interface
-     * @return Traversable
+     * @return ArrayIterator<string,mixed>
      */
     public function getIterator(): Traversable {
         return new ArrayIterator($this->request);

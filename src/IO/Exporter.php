@@ -126,7 +126,7 @@ class Exporter {
 
     /**
      * Writes a Line
-     * @param array<string,string|integer> $line
+     * @param array<string,string|integer|float> $line
      * @return Exporter
      */
     public function writeLine(array $line): Exporter {
