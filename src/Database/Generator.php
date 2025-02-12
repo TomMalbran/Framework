@@ -199,10 +199,12 @@ class Generator {
      * @return array{}
      */
     private static function getField(Field $field): array {
-        $type    = self::getFieldType($field->type);
-        $docType = self::getDocType($type);
-        $default = self::getDefault($type);
-        $param   = "\${$field->name}";
+        $type      = self::getFieldType($field->type);
+        $docType   = self::getDocType($type);
+        $default   = self::getDefault($type);
+        $canAssign = !$field->isID && !$field->isParent;
+        $assignDoc = $canAssign ? "Assign|" : "";
+        $param     = "\${$field->name}";
 
         return [
             "fieldKey"        => $field->key,
@@ -210,13 +212,13 @@ class Generator {
             "fieldText"       => Strings::upperCaseFirst($field->name),
             "fieldDoc"        => "$docType $param",
             "fieldDocNull"    => "$docType|null $param",
-            "fieldDocEdit"    => "Assign|$docType|null $param",
+            "fieldDocEdit"    => "$assignDoc$docType|null $param",
             "fieldParam"      => $param,
             "fieldArg"        => "$type $param",
             "fieldArgNull"    => "?$type $param",
             "fieldArgDefault" => "$type $param = $default",
             "fieldArgCreate"  => "?$type $param = null",
-            "fieldArgEdit"    => "Assign|$type|null $param = null",
+            "fieldArgEdit"    => ($canAssign ? "Assign|$type|null" : "?$type") . " $param = null",
         ];
     }
 
