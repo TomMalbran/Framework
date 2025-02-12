@@ -220,17 +220,28 @@ class Schema {
      * Returns the Data using a basic Expression and a Query
      * @param Query   $query
      * @param string  $expression
-     * @param boolean $singleLine Optional.
-     * @return array<string|integer,string|integer>|array<string|integer,string|integer>[]
+     * @return array<string,string|integer>[]
      */
-    protected static function getDataWithQuery(Query $query, string $expression, bool $singleLine = false): array {
+    protected static function getDataWithQuery(Query $query, string $expression): array {
+        $expression = self::structure()->replaceTable($expression);
+        $request    = self::db()->getData($expression, $query);
+        return $request;
+    }
+
+    /**
+     * Returns the Data using a basic Expression and a Query
+     * @param Query  $query
+     * @param string $expression
+     * @return array<string,string|integer>
+     */
+    protected static function getRowWithQuery(Query $query, string $expression): array {
         $expression = self::structure()->replaceTable($expression);
         $request    = self::db()->getData($expression, $query);
 
-        if ($singleLine && !empty($request[0])) {
+        if (!empty($request[0])) {
             return $request[0];
         }
-        return $request;
+        return [];
     }
 
     /**
