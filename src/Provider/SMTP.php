@@ -4,8 +4,6 @@ namespace Framework\Provider;
 use Framework\System\Config;
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\OAuth;
-use League\OAuth2\Client\Provider\Google;
 
 /**
  * The SMTP Provider
@@ -46,31 +44,14 @@ class SMTP {
         $email->SMTPAuth    = true;
         $email->SMTPAutoTLS = false;
 
-        if (Config::isSmtpOauth()) {
-            $email->SMTPAuth = true;
-            $email->AuthType = "XOAUTH2";
+        $email->Username    = Config::getSmtpUsername();
+        $email->Password    = Config::getSmtpPassword();
 
-            $provider = new Google([
-                "clientId"     => Config::getGoogleClient(),
-                "clientSecret" => Config::getGoogleSecret(),
-            ]);
-            $email->setOAuth(new OAuth([
-                "provider"     => $provider,
-                "clientId"     => Config::getGoogleClient(),
-                "clientSecret" => Config::getGoogleSecret(),
-                "refreshToken" => Config::getGoogleRefreshToken(),
-                "userName"     => Config::getSmtpUsername(),
-            ]));
-        } else {
-            $email->Username = Config::getSmtpUsername();
-            $email->Password = Config::getSmtpPassword();
-        }
-
-        $email->CharSet  = "UTF-8";
-        $email->From     = $fromEmail;
-        $email->FromName = $fromName;
-        $email->Subject  = $subject;
-        $email->Body     = $body;
+        $email->CharSet     = "UTF-8";
+        $email->From        = $fromEmail;
+        $email->FromName    = $fromName;
+        $email->Subject     = $subject;
+        $email->Body        = $body;
 
         $email->addAddress($toEmail);
         if (!empty($replyTo)) {
@@ -91,40 +72,5 @@ class SMTP {
             echo "Email Error: " . $email->ErrorInfo;
         }
         return $result;
-    }
-
-
-
-    /**
-     * Returns the Google Auth Url
-     * @param string $redirectUri
-     * @return string
-     */
-    public static function getAuthUrl(string $redirectUri): string {
-        $options  = [ "scope" => [ "https://mail.google.com/" ]];
-        $provider = new Google([
-            "clientId"     => Config::getGoogleClient(),
-            "clientSecret" => Config::getGoogleSecret(),
-            "redirectUri"  => Config::getUrl($redirectUri),
-            "accessType"   => "offline",
-        ]);
-        return $provider->getAuthorizationUrl($options);
-    }
-
-    /**
-     * Returns the Google Refresh Token
-     * @param string $redirectUri
-     * @param string $code
-     * @return string
-     */
-    public static function getAuthToken(string $redirectUri, string $code): string {
-        $provider = new Google([
-            "clientId"     => Config::getGoogleClient(),
-            "clientSecret" => Config::getGoogleSecret(),
-            "redirectUri"  => Config::getUrl($redirectUri),
-            "accessType"   => "offline",
-        ]);
-        $token = $provider->getAccessToken("authorization_code", [ "code" => $code ]);
-        return $token->getRefreshToken();
     }
 }
