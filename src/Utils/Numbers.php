@@ -71,14 +71,14 @@ class Numbers {
 
     /**
      * Returns the given number as an integer using the given decimals
-     * @param integer|float $number
-     * @param integer       $decimals
+     * @param mixed   $value
+     * @param integer $decimals Optional.
      * @return integer
      */
-    public static function toInt(int|float $number, int $decimals): int {
-        if (is_numeric($number)) {
+    public static function toInt(mixed $value, int $decimals = 0): int {
+        if (is_numeric($value)) {
             $padding = pow(10, $decimals);
-            return (int)round($number * $padding);
+            return (int)round($value * $padding);
         }
         return 0;
     }
