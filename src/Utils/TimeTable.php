@@ -2,103 +2,138 @@
 namespace Framework\Utils;
 
 use Framework\Core\NLS;
+use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Errors;
 use Framework\Utils\JSON;
+
+/**
+ * The Time Table Data class
+ */
+class TimeTableData {
+    // phpcs:ignore
+    public function __construct(
+        /** @var int[] */
+        public array $days,
+        public string $from,
+        public string $to,
+    ) {
+    }
+}
 
 /**
  * Several Time Table functions
  */
 class TimeTable {
 
+    /** @var TimeTableData[] */
+    private array $timeTables = [];
+
     /**
-     * Validates the Time Tables and returns the values as a JSON
-     * @param array{}[]     $timeTables
-     * @param Errors        $errors
-     * @param boolean       $withHolidays Optional.
-     * @param boolean       $startMonday  Optional.
-     * @param string        $fieldKey     Optional.
-     * @param callable|null $callback     Optional.
+     * Creates a new Time Table instance
+     * @param mixed $data
+     * @return TimeTable
+     */
+    public static function create(mixed $data): TimeTable {
+        $result = new TimeTable();
+        if ($data instanceof TimeTable) {
+            $result->timeTables = $data->timeTables;
+            return $result;
+        }
+
+        if (!Arrays::isArray($data)) {
+            return $result;
+        }
+
+        foreach ($data as $elem) {
+            $days = !empty($elem["days"]) ? Arrays::toInts($elem["days"]) : [];
+            $from = !empty($elem["from"]) ? $elem["from"] : "";
+            $to   = !empty($elem["to"]) ? $elem["to"] : "";
+            sort($days);
+            $result->timeTables[] = new TimeTableData($days, $from, $to);
+        }
+        return $result;
+    }
+
+
+
+    /**
+     * Encodes the Time Tables as a JSON
      * @return string
      */
-    public static function validate(
-        array $timeTables,
+    public function encode(): string {
+        return JSON::encode($this->timeTables);
+    }
+
+    /**
+     * Returns true if the Time Tables are valid and adds the Errors
+     * @param Errors  $errors
+     * @param boolean $withHolidays Optional.
+     * @param boolean $startMonday  Optional.
+     * @param string  $fieldKey     Optional.
+     * @return boolean
+     */
+    public function isValid(
         Errors $errors,
         bool $withHolidays = false,
         bool $startMonday = false,
         string $fieldKey = "timeTables",
-        ?callable $callback = null
-    ): string {
-        $result = [];
+    ): bool {
+        $hasError = false;
 
-        foreach ($timeTables as $index => $timeTable) {
-            $hasError = false;
-            if (empty($timeTable["days"])) {
+        foreach ($this->timeTables as $index => $timeTable) {
+            if (empty($timeTable->days)) {
                 continue;
             }
 
-            foreach ($timeTable["days"] as $day) {
+            foreach ($timeTable->days as $day) {
                 if (!DateTime::isValidDay($day, $withHolidays, $startMonday)) {
                     $errors->add("$fieldKey-$index-days", "GENERAL_ERROR_PERIOD_DAYS_INVALID");
                     $hasError = true;
                     break;
                 }
             }
-            if (empty($timeTable["from"]) || !DateTime::isValidHour($timeTable["from"])) {
+            if (!DateTime::isValidHour($timeTable->from)) {
                 $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TIME");
                 $hasError = true;
             }
-            if (empty($timeTable["to"]) || !DateTime::isValidHour($timeTable["to"])) {
+            if (!DateTime::isValidHour($timeTable->to)) {
                 $errors->add("$fieldKey-$index-to", "GENERAL_ERROR_PERIOD_TO_TIME");
                 $hasError = true;
             }
-            if (!empty($timeTable["from"]) && !empty($timeTable["to"]) && !DateTime::isValidHourPeriod($timeTable["from"], $timeTable["to"], true)) {
+            if (!empty($timeTable->from) && !empty($timeTable->to) && !DateTime::isValidHourPeriod($timeTable->from, $timeTable->to, true)) {
                 $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TO");
                 $hasError = true;
             }
-
-            if (!$hasError) {
-                sort($timeTable["days"]);
-                $result[] = [
-                    "days" => $timeTable["days"],
-                    "from" => $timeTable["from"],
-                    "to"   => $timeTable["to"],
-                ];
-            }
-
-            if ($callback !== null) {
-                $callback($timeTable, $index);
-            }
         }
 
-        return JSON::encode($result);
+        return !$hasError;
     }
 
 
 
     /**
      * Returns true if the Time Tables are in the Current time
-     * @param array{}[] $timeTables
-     * @param integer   $timeStamp   Optional.
-     * @param boolean   $startMonday Optional.
-     * @param integer   $minuteGap   Optional.
+     * @param integer $timeStamp   Optional.
+     * @param boolean $startMonday Optional.
+     * @param integer $minuteGap   Optional.
      * @return boolean
      */
-    public static function isCurrent(array $timeTables, int $timeStamp = 0, bool $startMonday = false, int $minuteGap = 0): bool {
-        if (empty($timeTables)) {
+    public function isCurrent(int $timeStamp = 0, bool $startMonday = false, int $minuteGap = 0): bool {
+        if (empty($this->timeTables)) {
             return false;
         }
 
         $weekDay    = DateTime::getDayOfWeek($timeStamp, $startMonday);
         $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
 
-        foreach ($timeTables as $timeTable) {
-            if (!Arrays::contains($timeTable["days"], $weekDay)) {
+        foreach ($this->timeTables as $timeTable) {
+            if (!Arrays::contains($timeTable->days, $weekDay)) {
                 continue;
             }
 
-            $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
-            $toMinutes   = DateTime::timeToMinutes($timeTable["to"]) - $minuteGap;
+            $fromMinutes = DateTime::timeToMinutes($timeTable->from);
+            $toMinutes   = DateTime::timeToMinutes($timeTable->to) - $minuteGap;
 
             if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
                 return true;
@@ -109,13 +144,12 @@ class TimeTable {
 
     /**
      * Returns the end time of the current day for the given Time Tables
-     * @param array{}[] $timeTables
-     * @param integer   $timeStamp   Optional.
-     * @param boolean   $startMonday Optional.
+     * @param integer $timeStamp   Optional.
+     * @param boolean $startMonday Optional.
      * @return integer
      */
-    public static function getCurrentEndTime(array $timeTables, int $timeStamp = 0, bool $startMonday = false): int {
-        if (empty($timeTables)) {
+    public function getCurrentEndTime(int $timeStamp = 0, bool $startMonday = false): int {
+        if (empty($this->timeTables)) {
             return 0;
         }
 
@@ -123,13 +157,13 @@ class TimeTable {
         $weekDay    = DateTime::getDayOfWeek($timeStamp, $startMonday);
         $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
 
-        foreach ($timeTables as $timeTable) {
-            if (!Arrays::contains($timeTable["days"], $weekDay)) {
+        foreach ($this->timeTables as $timeTable) {
+            if (!Arrays::contains($timeTable->days, $weekDay)) {
                 continue;
             }
 
-            $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
-            $toMinutes   = DateTime::timeToMinutes($timeTable["to"]);
+            $fromMinutes = DateTime::timeToMinutes($timeTable->from);
+            $toMinutes   = DateTime::timeToMinutes($timeTable->to);
             if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
                 $result = DateTime::getDayStart($timeStamp);
                 $result = DateTime::addMinutes($result, $toMinutes);
@@ -142,13 +176,12 @@ class TimeTable {
 
     /**
      * Returns the next start time for the given Time Tables
-     * @param array{}[] $timeTables
-     * @param integer   $timeStamp   Optional.
-     * @param boolean   $startMonday Optional.
+     * @param integer $timeStamp   Optional.
+     * @param boolean $startMonday Optional.
      * @return integer
      */
-    public static function getNextStartTime(array $timeTables, int $timeStamp = 0, bool $startMonday = false): int {
-        if (empty($timeTables)) {
+    public function getNextStartTime(int $timeStamp = 0, bool $startMonday = false): int {
+        if (empty($this->timeTables)) {
             return 0;
         }
 
@@ -159,10 +192,10 @@ class TimeTable {
         $result    = 0;
 
         foreach ($weeks as $week) {
-            foreach ($timeTables as $timeTable) {
-                $fromMinutes = DateTime::timeToMinutes($timeTable["from"]);
+            foreach ($this->timeTables as $timeTable) {
+                $fromMinutes = DateTime::timeToMinutes($timeTable->from);
 
-                foreach ($timeTable["days"] as $day) {
+                foreach ($timeTable->days as $day) {
                     if ($day >= $maxDay) {
                         continue;
                     }
@@ -184,23 +217,21 @@ class TimeTable {
 
     /**
      * Returns the Time Table as list
-     * @param array{}[] $timeTables
-     * @param boolean   $allDays     Optional.
-     * @param boolean   $startMonday Optional.
-     * @param string    $closedText  Optional.
-     * @param string    $timeZone    Optional.
-     * @param string    $isoCode     Optional.
+     * @param boolean $allDays     Optional.
+     * @param boolean $startMonday Optional.
+     * @param string  $closedText  Optional.
+     * @param string  $timeZone    Optional.
+     * @param string  $isoCode     Optional.
      * @return array{}
      */
-    public static function getList(
-        array $timeTables,
+    public function getList(
         bool $allDays = false,
         bool $startMonday = false,
         string $closedText = "TIME_TABLE_NO_HOURS",
         string $timeZone = "",
         string $isoCode = "",
     ): array {
-        if (empty($timeTables) && !$allDays) {
+        if (empty($this->timeTables) && !$allDays) {
             return [];
         }
 
@@ -209,35 +240,33 @@ class TimeTable {
 
         $schedules = [];
         $days      = [];
-        if (!empty($timeTables)) {
-            foreach ($timeTables as $timeTable) {
-                if (empty($timeTable["days"])) {
-                    continue;
-                }
+        foreach ($this->timeTables as $timeTable) {
+            if (empty($timeTable->days)) {
+                continue;
+            }
 
-                foreach ($timeTable["days"] as $day) {
-                    $dayNumber = (int)$day;
-                    $weekTime  = DateTime::getWeekStart(0, $day, $startMonday, true);
-                    $weekDate  = DateTime::toString($weekTime, "dashes");
-                    $fromTime  = DateTime::toTimeHour($weekDate, $timeTable["from"]);
-                    $fromHour  = DateTime::toString($fromTime, "time");
-                    $toTime    = DateTime::toTimeHour($weekDate, $timeTable["to"]);
-                    $toHour    = DateTime::toString($toTime, "time");
-                    $id        = "$fromHour-$toHour";
+            foreach ($timeTable->days as $day) {
+                $dayNumber = (int)$day;
+                $weekTime  = DateTime::getWeekStart(0, $day, $startMonday, true);
+                $weekDate  = DateTime::toString($weekTime, "dashes");
+                $fromTime  = DateTime::toTimeHour($weekDate, $timeTable->from);
+                $fromHour  = DateTime::toString($fromTime, "time");
+                $toTime    = DateTime::toTimeHour($weekDate, $timeTable->to);
+                $toHour    = DateTime::toString($toTime, "time");
+                $id        = "$fromHour-$toHour";
 
-                    if (empty($schedules[$id])) {
-                        $schedules[$id] = [
-                            "fromHour" => $fromHour,
-                            "toHour"   => $toHour,
-                            "numbers"  => [],
-                            "times"    => [],
-                            "days"     => [],
-                        ];
-                    }
-                    $schedules[$id]["numbers"][] = $dayNumber;
-                    $schedules[$id]["times"][]   = $dayNumber < $maxDay ? $fromTime : 0;
-                    $days[$dayNumber] = 1;
+                if (empty($schedules[$id])) {
+                    $schedules[$id] = [
+                        "fromHour" => $fromHour,
+                        "toHour"   => $toHour,
+                        "numbers"  => [],
+                        "times"    => [],
+                        "days"     => [],
+                    ];
                 }
+                $schedules[$id]["numbers"][] = $dayNumber;
+                $schedules[$id]["times"][]   = $dayNumber < $maxDay ? $fromTime : 0;
+                $days[$dayNumber] = 1;
             }
         }
         $schedules = array_values($schedules);
@@ -365,14 +394,13 @@ class TimeTable {
 
     /**
      * Returns the Time Table as a string
-     * @param array{}[] $timeTables
-     * @param boolean   $startMonday Optional.
-     * @param string    $timeZone    Optional.
-     * @param string    $isoCode     Optional.
+     * @param boolean $startMonday Optional.
+     * @param string  $timeZone    Optional.
+     * @param string  $isoCode     Optional.
      * @return string
      */
-    public static function getText(array $timeTables, bool $startMonday = false, string $timeZone = "", string $isoCode = ""): string {
-        $list = self::getList($timeTables, false, $startMonday, $timeZone, $isoCode);
+    public function getText(bool $startMonday = false, string $timeZone = "", string $isoCode = ""): string {
+        $list = $this->getList(false, $startMonday, $timeZone, $isoCode);
         if (empty($list)) {
             return "";
         }
