@@ -218,9 +218,9 @@ class {{name}}Schema extends Schema {
      * Selects the given column from a single table and returns a single value
      * @param Query $query
      * @param {{column}} $column
-     * @return mixed
+     * @return string|integer|float|boolean
      */
-    protected static function getEntityValue(Query $query, {{column}} $column): mixed {
+    protected static function getEntityValue(Query $query, {{column}} $column): string|int|float|bool {
         return self::getValueData($query, $column->base());
     }
 
@@ -365,15 +365,8 @@ class {{name}}Schema extends Schema {
         $idKey       = !empty($idColumn)       ? $idColumn->key()       : null;
         $distinctKey = !empty($distinctColumn) ? $distinctColumn->value : null;
 
-        $nameKey     = !empty($nameColumn)  ? Arrays::toArray($nameColumn)  : [];
-        $extraKey    = !empty($extraColumn) ? Arrays::toArray($extraColumn) : [];
-
-        foreach ($nameKey as $index => $column) {
-            $nameKey[$index] = $column->key();
-        }
-        foreach ($extraKey as $index => $column) {
-            $extraKey[$index] = $column->key();
-        }
+        $nameKey     = {{column}}::toKeys($nameColumn);
+        $extraKey    = {{column}}::toKeys($extraColumn);
 
         return self::getSelectData($query, $orderKey, $orderAsc, $idKey, $nameKey, $extraKey, $distinctKey, $useEmpty);
     }
@@ -392,12 +385,8 @@ class {{name}}Schema extends Schema {
         array|{{column}}|null $nameColumn = null,
         int $limit = 0,
     ): array {
-        $idKey   = !empty($idColumn)   ? $idColumn->key()             : null;
-        $nameKey = !empty($nameColumn) ? Arrays::toArray($nameColumn) : [];
-        foreach ($nameKey as $index => $column) {
-            $nameKey[$index] = $column->key();
-        }
-
+        $idKey   = !empty($idColumn) ? $idColumn->key() : null;
+        $nameKey = {{column}}::toKeys($nameColumn);
         return self::getSearchData($query, $idKey, $nameKey, $limit);
     }
 

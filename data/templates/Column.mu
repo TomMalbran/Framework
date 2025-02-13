@@ -32,4 +32,19 @@ enum {{name}}Column : string {
     public function base(): string {
         return Strings::substringAfter($this->value, ".");
     }
+
+    /**
+     * Get the name of the column without the table
+     * @param self[]|self|null $values
+     * @return string[]
+     */
+    public static function toKeys(array|self|null $values): array {
+        if (is_null($values)) {
+            return [];
+        }
+        if ($values instanceof static) {
+            return [ $values->key() ];
+        }
+        return array_map(fn($value) => $value->key(), $values);
+    }
 }

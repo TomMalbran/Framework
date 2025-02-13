@@ -147,9 +147,9 @@ class Database {
      * @param string $table
      * @param string $column
      * @param Query  $query
-     * @return mixed
+     * @return string|integer|float|boolean
      */
-    public function getValue(string $table, string $column, Query $query): mixed {
+    public function getValue(string $table, string $column, Query $query): string|int|float|bool {
         $request = $this->getAll($table, $column, $query->limit(1));
 
         if (isset($request[0][$column])) {

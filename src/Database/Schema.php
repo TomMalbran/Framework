@@ -87,9 +87,9 @@ class Schema {
      * Selects the given column from a single table and returns a single value
      * @param Query  $query
      * @param string $column
-     * @return mixed
+     * @return string|integer|float|boolean
      */
-    protected static function getValueData(Query $query, string $column): mixed {
+    protected static function getValueData(Query $query, string $column): string|int|float|bool {
         return self::db()->getValue(self::structure()->table, $column, $query);
     }
 
