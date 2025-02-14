@@ -22,7 +22,6 @@ class Field {
     const Boolean  = "boolean";
     const Number   = "number";
     const Float    = "float";
-    const Price    = "price";
     const Date     = "date";
     const String   = "string";
     const JSON     = "json";
@@ -245,9 +244,6 @@ class Field {
         case self::Float:
             $result = $request->toInt($this->name, $this->decimals);
             break;
-        case self::Price:
-            $result = $request->toCents($this->name);
-            break;
         case self::Date:
             if (!empty($this->date) && !empty($this->hour)) {
                 $result = $request->toTimeHour($this->date, $this->hour, true);
@@ -300,9 +296,6 @@ class Field {
             break;
         case self::Float:
             $result[$key]           = Numbers::toFloat($number, $this->decimals);
-            break;
-        case self::Price:
-            $result[$key]           = Numbers::fromCents($number);
             break;
         case self::Date:
             $result[$key]           = $number;
