@@ -30,38 +30,45 @@ class Builder {
 
     /**
      * Generates all the Code
-     * @return boolean
+     * @param boolean $willContinue Optional.
+     * @return integer
      */
-    public static function generateCode(): bool {
+    public static function generateCode(bool $willContinue = false): int {
         $package   = self::getPackageData();
         $writePath = File::parsePath($package["framePath"], "src", self::SystemDir);
+        $files     = 0;
 
         File::createDir($writePath);
         File::emptyDir($writePath);
 
 
         print("\nFRAMEWORK MAIN CODES\n");
-        self::generateOne($writePath, "Package",  $package);
-        self::generateOne($writePath, "Path",     FilePath::getCode());
-        self::generateOne($writePath, "Language", LanguageCode::getCode());
-        self::generateOne($writePath, "Access",   AccessCode::getCode());
-        self::generateOne($writePath, "Status",   StatusCode::getCode());
+        $files += self::generateOne($writePath, "Package",  $package);
+        $files += self::generateOne($writePath, "Path",     FilePath::getCode());
+        $files += self::generateOne($writePath, "Language", LanguageCode::getCode());
+        $files += self::generateOne($writePath, "Access",   AccessCode::getCode());
+        $files += self::generateOne($writePath, "Status",   StatusCode::getCode());
 
 
         print("\nSCHEMA CODES\n");
         $schemaWritePath = File::parsePath($package["basePath"], $package["sourceDir"], self::SchemaDir);
-        Generator::generateCode($package["appNamespace"], $schemaWritePath, false);
+        $files += Generator::generateCode($package["appNamespace"], $schemaWritePath, false);
 
         $schemaWritePath = File::parsePath($package["framePath"], "src", self::SchemaDir);
-        Generator::generateCode(self::Namespace, $schemaWritePath, true);
+        $files += Generator::generateCode(self::Namespace, $schemaWritePath, true);
 
 
         print("\nFRAMEWORK SEC CODES\n");
-        self::generateOne($writePath, "Setting", SettingCode::getCode());
-        self::generateOne($writePath, "Config",  ConfigCode::getCode());
-        self::generateOne($writePath, "Signal",  SignalCode::getCode());
-        self::generateOne($writePath, "Router",  RouterCode::getCode());
-        return true;
+        $files += self::generateOne($writePath, "Setting", SettingCode::getCode());
+        $files += self::generateOne($writePath, "Config",  ConfigCode::getCode());
+        $files += self::generateOne($writePath, "Signal",  SignalCode::getCode());
+        $files += self::generateOne($writePath, "Router",  RouterCode::getCode());
+
+
+        if (!$willContinue) {
+            print("\nGenerated $files files\n");
+        }
+        return $files;
     }
 
     /**
@@ -116,11 +123,11 @@ class Builder {
      * @param string  $writePath
      * @param string  $name
      * @param array{} $data
-     * @return boolean
+     * @return integer
      */
-    private static function generateOne(string $writePath, string $name, array $data): bool {
+    private static function generateOne(string $writePath, string $name, array $data): int {
         if (empty($data)) {
-            return false;
+            return 0;
         }
 
         $template = Discovery::loadFrameTemplate($name);
@@ -130,6 +137,6 @@ class Builder {
 
         File::create($writePath, "$name.php", $contents);
         print("- Generated the $name code\n");
-        return true;
+        return 1;
     }
 }

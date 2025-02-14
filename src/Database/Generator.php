@@ -29,9 +29,9 @@ class Generator {
      * @param string  $namespace
      * @param string  $writePath
      * @param boolean $forFramework
-     * @return boolean
+     * @return integer
      */
-    public static function generateCode(string $namespace, string $writePath, bool $forFramework): bool {
+    public static function generateCode(string $namespace, string $writePath, bool $forFramework): int {
         self::$namespace = $namespace;
         self::$writePath = $writePath;
 
@@ -66,7 +66,7 @@ class Generator {
 
         $name = $forFramework ? "Framework" : "App";
         print("- Generated the $name codes -> $created schemas\n");
-        return $created > 0;
+        return $created * 3;
     }
 
 
