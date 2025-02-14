@@ -534,7 +534,7 @@ class Schema {
         $isEdit          = !empty($oldPosition);
         $nextPosition    = self::getNextPosition($query);
         $oldPosition     = $isEdit ? $oldPosition : $nextPosition;
-        $newPosition     = !empty($newPosition) ? $newPosition : $nextPosition;
+        $newPosition     = $newPosition > 0 ? $newPosition : $nextPosition - ($isEdit ? 1 : 0);
         $updatedPosition = $newPosition;
 
         if (!$isEdit && (empty($newPosition) || $newPosition >= $nextPosition)) {
