@@ -244,6 +244,15 @@ class Arrays {
     }
 
     /**
+     * Converts a mixed value to a map
+     * @param mixed $array
+     * @return array<string,mixed>
+     */
+    public static function toMap(mixed $array): array {
+        return self::isArray($array) ? $array : [];
+    }
+
+    /**
      * Converts an array into an object or returns the array
      * @param mixed[]|null $array Optional.
      * @return mixed
@@ -254,11 +263,14 @@ class Arrays {
 
     /**
      * Converts an array into a list of strings
-     * @param mixed[] $array
+     * @param mixed   $array
      * @param boolean $removeEmpty Optional.
      * @return string[]
      */
-    public static function toStrings(array $array, bool $removeEmpty = false): array {
+    public static function toStrings(mixed $array, bool $removeEmpty = false): array {
+        if (!self::isArray($array)) {
+            return [];
+        }
         $result = [];
         foreach ($array as $value) {
             if ($removeEmpty && empty($value)) {
@@ -271,11 +283,14 @@ class Arrays {
 
     /**
      * Converts an array into a list of integers
-     * @param mixed[] $array
+     * @param mixed   $array
      * @param boolean $removeEmpty Optional.
      * @return integer[]
      */
-    public static function toInts(array $array, bool $removeEmpty = false): array {
+    public static function toInts(mixed $array, bool $removeEmpty = false): array {
+        if (!self::isArray($array)) {
+            return [];
+        }
         $result = [];
         foreach ($array as $value) {
             if (!Numbers::isValid($value, null)) {
@@ -320,12 +335,13 @@ class Arrays {
 
     /**
      * Removes the given value from the array
-     * @param mixed[] $array
-     * @param mixed   $key
-     * @param string  $idKey Optional.
-     * @return mixed[]
+     * @template T
+     * @param T[]            $array
+     * @param string|integer $key
+     * @param string|integer $idKey Optional.
+     * @return T[]
      */
-    public static function removeValue(array $array, mixed $key, string $idKey = ""): array {
+    public static function removeValue(array $array, string|int $key, string|int $idKey = ""): array {
         $result = [];
         foreach ($array as $elem) {
             $shouldAdd = false;
@@ -377,8 +393,10 @@ class Arrays {
 
     /**
      * Merges the given Arrays
-     * @param mixed[] ...$arrays
-     * @return mixed[]
+     * @template TKey of array-key
+     * @template TValue
+     * @param array<TKey,TValue> ...$arrays
+     * @return array<TKey,TValue>
      */
     public static function merge(array ...$arrays): array {
         return array_merge(...$arrays);
@@ -386,9 +404,12 @@ class Arrays {
 
     /**
      * Adds the given element to the start of the Array
-     * @param mixed[] $array
-     * @param mixed   ...$elem
-     * @return mixed[]
+     * @template TValue
+     * @phpstan-param TValue ...$elem
+     *
+     * @param TValue[] $array
+     * @param mixed    ...$elem
+     * @return TValue[]
      */
     public static function addFirst(array $array, mixed ...$elem): array {
         array_unshift($array, ...$elem);
@@ -397,10 +418,13 @@ class Arrays {
 
     /**
      * Adds the given element at the given position
-     * @param mixed[] $array
+     * @template T
+     * @phpstan-param T ...$elem
+     *
+     * @param T[]     $array
      * @param integer $position
      * @param mixed   ...$elem
-     * @return mixed[]
+     * @return T[]
      */
     public static function addAt(array $array, int $position, mixed ...$elem): array {
         array_splice($array, $position, 0, $elem);
@@ -466,11 +490,12 @@ class Arrays {
 
     /**
      * Sorts an array using the given callback
-     * @param mixed[]       $array
+     * @template T
+     * @param T[]           $array
      * @param callable|null $callback Optional.
-     * @return mixed[]
+     * @return T[]
      */
-    public static function sort(array &$array, ?callable $callback = null): array {
+    public static function sort(array $array, ?callable $callback = null): array {
         if (empty($callback)) {
             sort($array);
         } elseif (self::isList($array)) {
@@ -534,8 +559,9 @@ class Arrays {
 
     /**
      * Returns the given array reversed
-     * @param mixed[] $array
-     * @return mixed[]
+     * @template T
+     * @param T[] $array
+     * @return T[]
      */
     public static function reverse(array $array): array {
         return array_reverse($array);
@@ -554,36 +580,67 @@ class Arrays {
 
 
     /**
-     * Creates a Map using the given Array
-     * @param mixed[]              $array
-     * @param string               $key
-     * @param string[]|string|null $value    Optional.
-     * @param boolean              $useEmpty Optional.
-     * @return mixed[]
+     * Creates a Dict using the given Array
+     * @param mixed[] $array
+     * @param string  $key
+     * @param string  $value
+     * @return array<string|integer,string|integer>
      */
-    public static function createMap(array $array, string $key, array|string|null $value = null, bool $useEmpty = false): array {
+    public static function createDict(array $array, string $key, string $value): array {
         $result = [];
         foreach ($array as $row) {
-            $result[$row[$key]] = !empty($value) ? self::getValue($row, $value, " - ", "", $useEmpty) : $row;
+            $result[$row[$key]] = $row[$value];
+        }
+        return $result;
+    }
+
+    /**
+     * Creates a Map using the given Array
+     * @template T
+     * @param T[]    $array
+     * @param string $key
+     * @return array<string|integer,T>
+     */
+    public static function createMap(array $array, string $key): array {
+        $result = [];
+        foreach ($array as $row) {
+            $result[$row[$key]] = $row;
         }
         return $result;
     }
 
     /**
      * Creates a Map of Arrays using the given Array
-     * @param mixed[]              $array
-     * @param string               $key
-     * @param string[]|string|null $value    Optional.
-     * @param boolean              $useEmpty Optional.
-     * @return mixed[]
+     * @param mixed[] $array
+     * @param string  $key
+     * @param string  $value
+     * @return array<string|integer,array<string|integer>>
      */
-    public static function createMapArray(array $array, string $key, array|string|null $value = null, bool $useEmpty = false): array {
+    public static function createMapArray(array $array, string $key, string $value): array {
         $result = [];
         foreach ($array as $row) {
             if (empty($result[$row[$key]])) {
                 $result[$row[$key]] = [];
             }
-            $result[$row[$key]][] = !empty($value) ? self::getValue($row, $value, " - ", "", $useEmpty) : $row;
+            $result[$row[$key]][] = isset($row[$value]) ? $row[$value] : "";
+        }
+        return $result;
+    }
+
+    /**
+     * Creates a Map of Lists using the given Array
+     * @template T
+     * @param T[]    $array
+     * @param string $key
+     * @return array<integer,T[]>
+     */
+    public static function createMapList(array $array, string $key): array {
+        $result = [];
+        foreach ($array as $row) {
+            if (empty($result[$row[$key]])) {
+                $result[$row[$key]] = [];
+            }
+            $result[$row[$key]][] = $row;
         }
         return $result;
     }

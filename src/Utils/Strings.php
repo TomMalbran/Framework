@@ -19,6 +19,15 @@ class Strings {
     }
 
     /**
+     * Returns the given value as a string
+     * @param mixed $value
+     * @return string
+     */
+    public static function toString(mixed $value): string {
+        return strval($value);
+    }
+
+    /**
      * Returns the length og the given String
      * @param string $string
      * @return integer
@@ -493,44 +502,42 @@ class Strings {
 
     /**
      * Joins the given Strings using the given glue
-     * @param string[]|string $value
-     * @param string          $glue      Optional.
-     * @param boolean         $skipEmpty Optional.
+     * @param mixed   $value
+     * @param string  $glue      Optional.
+     * @param boolean $skipEmpty Optional.
      * @return string
      */
-    public static function join(array|string $value, string $glue = "", bool $skipEmpty = false): string {
-        if (!Arrays::isArray($value)) {
+    public static function join(mixed $value, string $glue = "", bool $skipEmpty = false): string {
+        if (self::isString($value)) {
             return $value;
         }
-        if ($skipEmpty) {
-            $value = Arrays::removeEmpty($value);
-        }
-        return implode($glue, $value);
+        $list = Arrays::toStrings($value, $skipEmpty);
+        return implode($glue, $list);
     }
 
     /**
      * Joins the given String keys using the given glue
-     * @param string[]|string $value
-     * @param string          $glue  Optional.
+     * @param mixed  $value
+     * @param string $glue  Optional.
      * @return string
      */
-    public static function joinKeys(array|string $value, string $glue = ""): string {
+    public static function joinKeys(mixed $value, string $glue = ""): string {
         if (!Arrays::isArray($value)) {
-            return $value;
+            return self::isString($value) ? $value : "";
         }
         return implode($glue, array_keys($value));
     }
 
     /**
      * Joins the given String values using the given glue
-     * @param string[]|string $value
-     * @param string          $key
-     * @param string          $glue  Optional.
+     * @param mixed  $value
+     * @param string $key
+     * @param string $glue  Optional.
      * @return string
      */
-    public static function joinValues(array|string $value, string $key, string $glue = ""): string {
+    public static function joinValues(mixed $value, string $key, string $glue = ""): string {
         if (!Arrays::isArray($value)) {
-            return $value;
+            return self::isString($value) ? $value : "";
         }
         $value = Arrays::createArray($value, $key);
         return implode($glue, $value);

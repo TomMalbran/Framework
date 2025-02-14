@@ -410,7 +410,7 @@ class Credential extends CredentialSchema {
         }
 
         $list = self::getEntityList($query);
-        return Arrays::createMap($list, "email", "language");
+        return Arrays::createDict($list, "email", "language");
     }
 
 

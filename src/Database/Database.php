@@ -649,7 +649,7 @@ class Database {
     /**
      * Returns the Table Keys
      * @param string $tableName
-     * @return string[]
+     * @return array<string,mixed>[]
      */
     public function getTableKeys(string $tableName): array {
         return $this->query("SHOW INDEXES IN `$tableName`");
@@ -658,7 +658,7 @@ class Database {
     /**
      * Returns the Table Fields
      * @param string $tableName
-     * @return string[]
+     * @return array<string,mixed>[]
      */
     public function getTableFields(string $tableName): array {
         return $this->query("SHOW FIELDS FROM `$tableName`");

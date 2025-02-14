@@ -178,7 +178,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key as JSON
+     * Returns the request data at the given key from a JSON Array
      * @param string $key
      * @return array<string|integer,mixed>
      */
@@ -187,11 +187,20 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key as JSON
+     * Returns the request data at the given key from a JSON Multi Array
      * @param string $key
-     * @return object
+     * @return array<string|integer,array<string,mixed>>
      */
-    public function getJSONObject(string $key): object {
+    public function getJSONMulti(string $key): array {
+        return JSON::decodeAsArray($this->get($key, "[]"));
+    }
+
+    /**
+     * Returns the request data at the given key from a JSON Object
+     * @param string $key
+     * @return object[]|object
+     */
+    public function getJSONObject(string $key): array|object {
         return JSON::decodeAsObject($this->get($key, "[]"));
     }
 
@@ -201,7 +210,13 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * @return string[]
      */
     public function getStrings(string $key): array {
-        $result = Strings::split($this->get($key, ""), ",");
+        $value  = $this->get($key, "");
+        $result = [];
+        if (JSON::isValid($value)) {
+            $result = JSON::decodeAsArray($value);
+        } else {
+            $result = Strings::split($value, ",");
+        }
         return Arrays::toStrings($result, true);
     }
 
@@ -211,7 +226,13 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      * @return int[]
      */
     public function getInts(string $key): array {
-        $result = Strings::split($this->get($key, ""), ",");
+        $value  = $this->get($key, "");
+        $result = [];
+        if (JSON::isValid($value)) {
+            $result = JSON::decodeAsArray($value);
+        } else {
+            $result = Strings::split($value, ",");
+        }
         return Arrays::toInts($result, true);
     }
 

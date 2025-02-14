@@ -52,9 +52,9 @@ class JSON {
      * Decodes a String if it is not already decoded
      * @param mixed   $value
      * @param boolean $asArray Optional.
-     * @return object
+     * @return object[]|object
      */
-    public static function decodeAsObject(mixed $value): object {
+    public static function decodeAsObject(mixed $value): array|object {
         if (!self::isValid($value)) {
             return Arrays::isObject($value) ? (object)$value : (object)[];
         }
