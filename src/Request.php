@@ -217,7 +217,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
         } else {
             $result = Strings::split($value, ",");
         }
-        return Arrays::toStrings($result, true);
+        return Arrays::toStrings($result, withoutEmpty: true);
     }
 
     /**
@@ -233,7 +233,7 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
         } else {
             $result = Strings::split($value, ",");
         }
-        return Arrays::toInts($result, true);
+        return Arrays::toInts($result, withoutEmpty: true);
     }
 
 

@@ -503,15 +503,15 @@ class Strings {
     /**
      * Joins the given Strings using the given glue
      * @param mixed   $value
-     * @param string  $glue      Optional.
-     * @param boolean $skipEmpty Optional.
+     * @param string  $glue         Optional.
+     * @param boolean $withoutEmpty Optional.
      * @return string
      */
-    public static function join(mixed $value, string $glue = "", bool $skipEmpty = false): string {
+    public static function join(mixed $value, string $glue = "", bool $withoutEmpty = false): string {
         if (self::isString($value)) {
             return $value;
         }
-        $list = Arrays::toStrings($value, $skipEmpty);
+        $list = Arrays::toStrings($value, withoutEmpty: $withoutEmpty);
         return implode($glue, $list);
     }
 

@@ -2,6 +2,7 @@
 namespace Framework\Utils;
 
 use Framework\Utils\Numbers;
+
 use ArrayAccess;
 
 /**
@@ -52,6 +53,75 @@ class Arrays {
      */
     public static function isMap(mixed $array): bool {
         return self::isArray($array) && self::isArray(array_values($array)[0]);
+    }
+
+
+
+    /**
+     * Converts a single value or an array into an array
+     * @param mixed $array
+     * @return mixed[]
+     */
+    public static function toArray(mixed $array): array {
+        return self::isArray($array) ? $array : [ $array ];
+    }
+
+    /**
+     * Converts an array into an object or returns the array
+     * @param mixed[]|null $array Optional.
+     * @return mixed
+     */
+    public static function toObject(?array $array = null): mixed {
+        return !empty($array) ? $array : (object)[];
+    }
+
+    /**
+     * Converts an array into a list of strings
+     * @param mixed   $array
+     * @param string  $key          Optional.
+     * @param boolean $withoutEmpty Optional.
+     * @return string[]
+     */
+    public static function toStrings(mixed $array, string $key = "", bool $withoutEmpty = false): array {
+        if (!self::isArray($array)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $row) {
+            $value = self::getValue($row, $key);
+            if ($withoutEmpty && empty($value)) {
+                continue;
+            }
+            $result[] = (string)$value;
+        }
+        return $result;
+    }
+
+    /**
+     * Converts an array into a list of integers
+     * @param mixed   $array
+     * @param string  $key          Optional.
+     * @param boolean $withoutEmpty Optional.
+     * @return integer[]
+     */
+    public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
+        if (!self::isArray($array)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $row) {
+            $value = self::getValue($row, $key);
+            if (!Numbers::isValid($value, null)) {
+                continue;
+            }
+            if ($withoutEmpty && empty($value)) {
+                continue;
+            }
+            $result[] = (int)$value;
+        }
+        return $result;
     }
 
 
@@ -233,76 +303,6 @@ class Arrays {
     }
 
 
-
-    /**
-     * Converts a single value or an array into an array
-     * @param mixed $array
-     * @return mixed[]
-     */
-    public static function toArray(mixed $array): array {
-        return self::isArray($array) ? $array : [ $array ];
-    }
-
-    /**
-     * Converts a mixed value to a map
-     * @param mixed $array
-     * @return array<string,mixed>
-     */
-    public static function toMap(mixed $array): array {
-        return self::isArray($array) ? $array : [];
-    }
-
-    /**
-     * Converts an array into an object or returns the array
-     * @param mixed[]|null $array Optional.
-     * @return mixed
-     */
-    public static function toObject(?array $array = null): mixed {
-        return !empty($array) ? $array : (object)[];
-    }
-
-    /**
-     * Converts an array into a list of strings
-     * @param mixed   $array
-     * @param boolean $removeEmpty Optional.
-     * @return string[]
-     */
-    public static function toStrings(mixed $array, bool $removeEmpty = false): array {
-        if (!self::isArray($array)) {
-            return [];
-        }
-        $result = [];
-        foreach ($array as $value) {
-            if ($removeEmpty && empty($value)) {
-                continue;
-            }
-            $result[] = (string)$value;
-        }
-        return $result;
-    }
-
-    /**
-     * Converts an array into a list of integers
-     * @param mixed   $array
-     * @param boolean $removeEmpty Optional.
-     * @return integer[]
-     */
-    public static function toInts(mixed $array, bool $removeEmpty = false): array {
-        if (!self::isArray($array)) {
-            return [];
-        }
-        $result = [];
-        foreach ($array as $value) {
-            if (!Numbers::isValid($value, null)) {
-                continue;
-            }
-            if ($removeEmpty && empty($value)) {
-                continue;
-            }
-            $result[] = (int)$value;
-        }
-        return $result;
-    }
 
     /**
      * Returns a random value from the array
@@ -523,6 +523,28 @@ class Arrays {
     }
 
     /**
+     * Returns the given array reversed
+     * @template T
+     * @param T[] $array
+     * @return T[]
+     */
+    public static function reverse(array $array): array {
+        return array_reverse($array);
+    }
+
+    /**
+     * Applies the given callback to the elements of the given array
+     * @param mixed[]  $array
+     * @param callable $callback
+     * @return mixed[]
+     */
+    public static function map(array $array, callable $callback): array {
+        return array_map($callback, $array);
+    }
+
+
+
+    /**
      * Returns the sum of the elements of the given array
      * @param mixed[]     $array
      * @param string|null $key   Optional.
@@ -555,26 +577,6 @@ class Arrays {
 
         $sum = self::sum($array, $key);
         return Numbers::divide($sum, $total, $decimals);
-    }
-
-    /**
-     * Returns the given array reversed
-     * @template T
-     * @param T[] $array
-     * @return T[]
-     */
-    public static function reverse(array $array): array {
-        return array_reverse($array);
-    }
-
-    /**
-     * Applies the given callback to the elements of the given array
-     * @param mixed[]  $array
-     * @param callable $callback
-     * @return mixed[]
-     */
-    public static function map(array $array, callable $callback): array {
-        return array_map($callback, $array);
     }
 
 
@@ -666,16 +668,16 @@ class Arrays {
     /**
      * Creates an Array using the given Array
      * @param mixed[]              $array
-     * @param string[]|string|null $value     Optional.
+     * @param string[]|string|null $key       Optional.
      * @param boolean              $skipEmpty Optional.
      * @param boolean              $distinct  Optional.
      * @return mixed[]
      */
-    public static function createArray(array $array, array|string|null $value = null, bool $skipEmpty = false, bool $distinct = false): array {
+    public static function createArray(array $array, array|string|null $key = null, bool $skipEmpty = false, bool $distinct = false): array {
         $result = [];
         foreach ($array as $row) {
-            $elem = !empty($value) ? self::getValue($row, $value) : $row;
-            if (($distinct && in_array($elem, $result)) || ($skipEmpty && empty($value))) {
+            $elem = self::getValue($row, $key);
+            if (($distinct && in_array($elem, $result)) || ($skipEmpty && empty($key))) {
                 continue;
             }
             $result[] = $elem;
@@ -702,22 +704,6 @@ class Arrays {
         return $result;
     }
 
-    /**
-     * Returns only the requested Fields of the Map
-     * @param array{} $array
-     * @param string  ...$fields
-     * @return array{}
-     */
-    public static function reduceMap(array $array, string ...$fields): array {
-        $result = [];
-        foreach ($fields as $field) {
-            if (isset($array[$field])) {
-                $result[$field] = $array[$field];
-            }
-        }
-        return $result;
-    }
-
 
 
     /**
@@ -732,7 +718,7 @@ class Arrays {
         }
         $firstKey = array_key_first($array);
         $value    = $array[$firstKey];
-        return !empty($key) ? self::getValue($value, $key) : $value;
+        return self::getValue($value, $key);
     }
 
     /**
@@ -760,7 +746,7 @@ class Arrays {
         }
         $lastKey = array_key_last($array);
         $value   = $array[$lastKey];
-        return !empty($key) ? self::getValue($value, $key) : $value;
+        return self::getValue($value, $key);
     }
 
     /**
@@ -778,7 +764,6 @@ class Arrays {
         }
         return -1;
     }
-
 
     /**
      * Returns true if there is an item with the given id key with the given is value
@@ -880,15 +865,19 @@ class Arrays {
 
     /**
      * Returns one or multiple values as a string
-     * @param mixed           $array
-     * @param string[]|string $key
-     * @param string          $glue     Optional.
-     * @param string          $prefix   Optional.
-     * @param boolean         $useEmpty Optional.
-     * @param mixed|string    $default  Optional.
+     * @param mixed                $array
+     * @param string[]|string|null $key      Optional.
+     * @param string               $glue     Optional.
+     * @param string               $prefix   Optional.
+     * @param boolean              $useEmpty Optional.
+     * @param mixed|string         $default  Optional.
      * @return mixed
      */
-    public static function getValue(mixed $array, array|string $key, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
+    public static function getValue(mixed $array, array|string|null $key = null, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
+        if (empty($key)) {
+            return $array;
+        }
+
         $result = $default;
         if (self::isArray($key)) {
             $values = [];
@@ -935,20 +924,6 @@ class Arrays {
             return $array[$key];
         }
         return $default;
-    }
-
-    /**
-     * Returns one value as an array
-     * @param mixed  $array
-     * @param string $key
-     * @return array{}|mixed[]
-     */
-    public static function getValueArray(mixed $array, string $key): array {
-        $value = self::getValue($array, $key);
-        if (empty($value) || !self::isArray($value)) {
-            return [];
-        }
-        return $value;
     }
 
     /**
