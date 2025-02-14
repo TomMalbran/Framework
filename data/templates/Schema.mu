@@ -84,7 +84,7 @@ class {{name}}Schema extends Schema {
     protected static function createParentQuery({{parentsNullList}}): Query {
         $query = new Query();
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         return $query;
     }
@@ -114,7 +114,7 @@ class {{name}}Schema extends Schema {
     public static function exists({{idType}} ${{idName}}{{{parentsDefList}}}{{#hasDeleted}}, bool $withDeleted = true{{/hasDeleted}}): bool {
         $query = Query::create("{{idKey}}", "=", ${{idName}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         return self::entityExists($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}});
     }
@@ -129,9 +129,9 @@ class {{name}}Schema extends Schema {
      * @return boolean
      */
     public static function {{fieldName}}Exists({{fieldArg}}{{{parentsDefList}}}, int $skipID = 0): bool {
-        $query = Query::create("{{fieldKey}}", "=", {{fieldParam}});
+        $query = Query::create("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         $query->addIf("{{idKey}}", "<>", $skipID);
         return self::entityExists($query);
@@ -162,7 +162,7 @@ class {{name}}Schema extends Schema {
     public static function getByID({{idType}} ${{idName}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
         $query = Query::create("{{idKey}}", "=", ${{idName}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         return self::getEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
     }
@@ -178,7 +178,7 @@ class {{name}}Schema extends Schema {
     public static function getByName(string ${{nameKey}}{{{parentsDefList}}}): {{entity}} {
         $query = Query::create("{{nameKey}}", "=", ${{nameKey}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         return self::getEntity($query);
     }
@@ -194,9 +194,9 @@ class {{name}}Schema extends Schema {
      * @return {{entity}}
      */
     public static function getBy{{fieldText}}({{fieldArg}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
-        $query = Query::create("{{fieldKey}}", "=", {{fieldParam}});
+        $query = Query::create("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         return self::getEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
     }
@@ -279,7 +279,7 @@ class {{name}}Schema extends Schema {
         {{#hasFilters}}
         $query = static::createListQuery($request);
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         {{/hasFilters}}
         {{^hasFilters}}
@@ -312,7 +312,7 @@ class {{name}}Schema extends Schema {
         {{#hasFilters}}
         $query = static::createListQuery($request);
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParam}});
+        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
         {{/hasFilters}}
         {{^hasFilters}}

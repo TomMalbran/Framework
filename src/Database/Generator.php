@@ -214,6 +214,7 @@ class Generator {
             "fieldDocNull"    => "$docType|null $param",
             "fieldDocEdit"    => "$assignDoc$docType|null $param",
             "fieldParam"      => $param,
+            "fieldParamQuery" => $type === "bool" ? "$param ? 1 : 0" : $param,
             "fieldArg"        => "$type $param",
             "fieldArgNull"    => "?$type $param",
             "fieldArgDefault" => "$type $param = $default",
