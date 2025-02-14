@@ -284,9 +284,10 @@ class Migration {
                     if ($newData !== $oldData || $newPrev !== $oldPrev) {
                         $update     = true;
                         $modifies[] = [
-                            "key"   => $field->key,
-                            "type"  => $newData,
-                            "after" => $newPrev,
+                            "key"    => $field->key,
+                            "type"   => $newData,
+                            "after"  => $newPrev,
+                            "toInts" => Strings::contains($newData, "int") && Strings::contains($oldData, "varchar"),
                         ];
                     }
                     break;
@@ -354,6 +355,9 @@ class Migration {
             print("$sql<br>");
         }
         foreach ($modifies as $modify) {
+            if ($modify["toInts"]) {
+                $db->query("UPDATE `$structure->table` SET `{$modify["key"]}` = '0' WHERE `{$modify["key"]}` = ''");
+            }
             $sql = $db->updateColumn($structure->table, $modify["key"], $modify["type"], $modify["after"]);
             print("$sql<br>");
         }
