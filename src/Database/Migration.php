@@ -27,18 +27,19 @@ class Migration {
         $migrations = Discovery::loadData(DataFile::Migrations);
         $schemas    = Factory::getData();
 
-        $moved    = self::moveTables($db, $migrations["movements"]);
-        $renamed  = self::renameColumns($db, $migrations["renames"]);
+        $moved      = self::moveTables($db, $migrations["movements"]);
+        $renamed    = self::renameColumns($db, $migrations["renames"]);
 
-        $migrated = self::migrateTables($db, $schemas, $canDelete);
-        $extras   = self::extraMigrations($db);
+        $migrated   = self::migrateTables($db, $schemas, $canDelete);
+        $extras     = self::extraMigrations($db);
+
         return $moved || $renamed || $migrated || $extras;
     }
 
     /**
      * Moves the Tables
-     * @param Database $db
-     * @param object[] $movements
+     * @param Database  $db
+     * @param array{}[] $movements
      * @return boolean
      */
     private static function moveTables(Database $db, array $movements): bool {
@@ -47,8 +48,8 @@ class Migration {
         $didMove       = false;
 
         for ($i = $startMovement; $i < $lastMovement; $i++) {
-            $fromName = Factory::getTableName($movements[$i]->from);
-            $toName   = Factory::getTableName($movements[$i]->to);
+            $fromName = Factory::getTableName($movements[$i]["from"]);
+            $toName   = Factory::getTableName($movements[$i]["to"]);
 
             if ($db->tableExists($fromName)) {
                 $db->renameTable($fromName, $toName);
@@ -68,8 +69,8 @@ class Migration {
 
     /**
      * Renames the Table Columns
-     * @param Database $db
-     * @param object[] $renames
+     * @param Database  $db
+     * @param array{}[] $renames
      * @return boolean
      */
     private static function renameColumns(Database $db, array $renames): bool {
@@ -78,9 +79,9 @@ class Migration {
         $didRename   = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
-            $table    = Factory::getTableName($renames[$i]->schema);
-            $fromName = $renames[$i]->from;
-            $toName   = $renames[$i]->to;
+            $table    = Factory::getTableName($renames[$i]["schema"]);
+            $fromName = $renames[$i]["from"];
+            $toName   = $renames[$i]["to"];
 
             if (!$db->tableExists($table)) {
                 continue;
