@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Database;
 
+use Framework\Request;
+
 use ArrayAccess;
 use JsonSerializable;
 use ReflectionClass;
@@ -11,7 +13,10 @@ use ReflectionProperty;
  */
 class Entity implements ArrayAccess, JsonSerializable {
 
+    protected const ID = "";
+
     private bool $empty = true;
+
 
 
     /**
@@ -38,18 +43,67 @@ class Entity implements ArrayAccess, JsonSerializable {
     }
 
     /**
-     * Returns a list of Properties
-     * @return string[]
+     * Creates a new Entity instance from a Request
+     * @param Request $request
+     * @return static
      */
-    public function getProperties(): array {
+    public static function fromRequest(Request $request): static {
+        $entity = new static();
+        foreach ($entity->getPropertiesTypes() as $property => $type) {
+            if ($request->exists($property)) {
+                $entity->empty = false;
+            } else {
+                continue;
+            }
+
+            if ($property === static::ID && property_exists($entity, "id")) {
+                if (is_numeric($request->$property)) {
+                    $entity->{"id"} = $request->getInt($property);
+                } else {
+                    $entity->{"id"} = $request->getString($property);
+                }
+            }
+
+            switch ($type) {
+            case "bool":
+                $entity->$property = $request->has($property);
+                break;
+            case "int":
+                $entity->$property = $request->getInt($property);
+                break;
+            case "float":
+                $entity->$property = $request->getFloat($property);
+                break;
+            default:
+                $entity->$property = $request->getString($property);
+            }
+        }
+        return $entity;
+    }
+
+    /**
+     * Returns a list of Properties and Types
+     * @return array<string,string>
+     */
+    private function getPropertiesTypes(): array {
         $reflection = new ReflectionClass($this);
         $props      = $reflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
         $result     = [];
 
         foreach ($props as $prop) {
-            $result[] = $prop->getName();
+            $type     = $prop->getType();
+            $typeName = $type ? $type->getName() : "mixed";
+            $result[$prop->getName()] = $typeName;
         }
         return $result;
+    }
+
+    /**
+     * Returns a list of Properties
+     * @return string[]
+     */
+    public function getProperties(): array {
+        return array_keys($this->getPropertiesTypes());
     }
 
 
@@ -60,6 +114,14 @@ class Entity implements ArrayAccess, JsonSerializable {
      */
     public function isEmpty(): bool {
         return $this->empty;
+    }
+
+    /**
+     * Returns true if the Entity is being Edited
+     * @return boolean
+     */
+    public function isEdit(): bool {
+        return !empty($this->get(static::ID));
     }
 
     /**

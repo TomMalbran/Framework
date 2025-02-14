@@ -10,6 +10,8 @@ use Framework\Database\Entity;
  */
 class {{name}}Entity extends Entity {
 
+    protected const ID = "{{id}}";
+
 {{#attributes}}{{#subType}}
 
     /** @var {{{subType}}} */

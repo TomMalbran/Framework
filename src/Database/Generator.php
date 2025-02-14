@@ -306,6 +306,7 @@ class Generator {
             "appNamespace" => Package::Namespace,
             "namespace"    => self::$namespace,
             "name"         => $structure->schema,
+            "id"           => $structure->idName,
             "subTypes"     => self::getSubTypes($structure->subRequests),
             "attributes"   => self::parseAttributes($attributes),
         ]);
