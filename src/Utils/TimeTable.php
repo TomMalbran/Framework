@@ -27,32 +27,43 @@ class TimeTableData {
 class TimeTable {
 
     /** @var TimeTableData[] */
-    private array $timeTables = [];
+    private array $timeTables  = [];
+    private bool  $startMonday = false;
+
 
     /**
      * Creates a new Time Table instance
-     * @param mixed $data
+     * @param TimeTableData[] $timeTables  Optional.
+     * @param boolean         $startMonday Optional.
+     */
+    private function __construct(array $timeTables = [], bool $startMonday = false) {
+        $this->timeTables  = $timeTables;
+        $this->startMonday = $startMonday;
+    }
+
+    /**
+     * Creates a new Time Table instance
+     * @param mixed   $data
+     * @param boolean $startMonday Optional.
      * @return TimeTable
      */
-    public static function create(mixed $data): TimeTable {
-        $result = new TimeTable();
+    public static function create(mixed $data, bool $startMonday = false): TimeTable {
         if ($data instanceof TimeTable) {
-            $result->timeTables = $data->timeTables;
-            return $result;
+            return new TimeTable($data->timeTables, $data->startMonday);
         }
 
         if (!Arrays::isArray($data)) {
-            return $result;
+            return new TimeTable();
         }
 
+        $timeTables = [];
         foreach ($data as $elem) {
-            $days = !empty($elem["days"]) ? Arrays::toInts($elem["days"]) : [];
+            $days = !empty($elem["days"]) ? Arrays::sort(Arrays::toInts($elem["days"])) : [];
             $from = !empty($elem["from"]) ? $elem["from"] : "";
             $to   = !empty($elem["to"]) ? $elem["to"] : "";
-            sort($days);
-            $result->timeTables[] = new TimeTableData($days, $from, $to);
+            $timeTables[] = new TimeTableData($days, $from, $to);
         }
-        return $result;
+        return new TimeTable($timeTables, $startMonday);
     }
 
 
@@ -62,21 +73,25 @@ class TimeTable {
      * @return string
      */
     public function encode(): string {
-        return JSON::encode($this->timeTables);
+        $list = [];
+        foreach ($this->timeTables as $timeTable) {
+            if (!empty($timeTable->days)) {
+                $list[] = $timeTable;
+            }
+        }
+        return JSON::encode($list);
     }
 
     /**
      * Returns true if the Time Tables are valid and adds the Errors
      * @param Errors  $errors
      * @param boolean $withHolidays Optional.
-     * @param boolean $startMonday  Optional.
      * @param string  $fieldKey     Optional.
      * @return boolean
      */
     public function isValid(
         Errors $errors,
         bool $withHolidays = false,
-        bool $startMonday = false,
         string $fieldKey = "timeTables",
     ): bool {
         $hasError = false;
@@ -87,7 +102,7 @@ class TimeTable {
             }
 
             foreach ($timeTable->days as $day) {
-                if (!DateTime::isValidDay($day, $withHolidays, $startMonday)) {
+                if (!DateTime::isValidDay($day, $withHolidays, $this->startMonday)) {
                     $errors->add("$fieldKey-$index-days", "GENERAL_ERROR_PERIOD_DAYS_INVALID");
                     $hasError = true;
                     break;
@@ -114,17 +129,16 @@ class TimeTable {
 
     /**
      * Returns true if the Time Tables are in the Current time
-     * @param integer $timeStamp   Optional.
-     * @param boolean $startMonday Optional.
-     * @param integer $minuteGap   Optional.
+     * @param integer $timeStamp Optional.
+     * @param integer $minuteGap Optional.
      * @return boolean
      */
-    public function isCurrent(int $timeStamp = 0, bool $startMonday = false, int $minuteGap = 0): bool {
+    public function isCurrent(int $timeStamp = 0, int $minuteGap = 0): bool {
         if (empty($this->timeTables)) {
             return false;
         }
 
-        $weekDay    = DateTime::getDayOfWeek($timeStamp, $startMonday);
+        $weekDay    = DateTime::getDayOfWeek($timeStamp, $this->startMonday);
         $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
 
         foreach ($this->timeTables as $timeTable) {
@@ -144,17 +158,16 @@ class TimeTable {
 
     /**
      * Returns the end time of the current day for the given Time Tables
-     * @param integer $timeStamp   Optional.
-     * @param boolean $startMonday Optional.
+     * @param integer $timeStamp Optional.
      * @return integer
      */
-    public function getCurrentEndTime(int $timeStamp = 0, bool $startMonday = false): int {
+    public function getCurrentEndTime(int $timeStamp = 0): int {
         if (empty($this->timeTables)) {
             return 0;
         }
 
         $result     = 0;
-        $weekDay    = DateTime::getDayOfWeek($timeStamp, $startMonday);
+        $weekDay    = DateTime::getDayOfWeek($timeStamp, $this->startMonday);
         $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
 
         foreach ($this->timeTables as $timeTable) {
@@ -176,18 +189,17 @@ class TimeTable {
 
     /**
      * Returns the next start time for the given Time Tables
-     * @param integer $timeStamp   Optional.
-     * @param boolean $startMonday Optional.
+     * @param integer $timeStamp Optional.
      * @return integer
      */
-    public function getNextStartTime(int $timeStamp = 0, bool $startMonday = false): int {
+    public function getNextStartTime(int $timeStamp = 0): int {
         if (empty($this->timeTables)) {
             return 0;
         }
 
-        $maxDay    = $startMonday ? 8 : 7;
+        $maxDay    = $this->startMonday ? 8 : 7;
         $timeStamp = DateTime::getTime($timeStamp);
-        $weekStart = DateTime::getWeekStart($timeStamp, 0, $startMonday, false);
+        $weekStart = DateTime::getWeekStart($timeStamp, 0, $this->startMonday, false);
         $weeks     = [ 0, 7 ];
         $result    = 0;
 
@@ -217,16 +229,14 @@ class TimeTable {
 
     /**
      * Returns the Time Table as list
-     * @param boolean $allDays     Optional.
-     * @param boolean $startMonday Optional.
-     * @param string  $closedText  Optional.
-     * @param string  $timeZone    Optional.
-     * @param string  $isoCode     Optional.
+     * @param boolean $allDays    Optional.
+     * @param string  $closedText Optional.
+     * @param string  $timeZone   Optional.
+     * @param string  $isoCode    Optional.
      * @return array{}
      */
     public function getList(
         bool $allDays = false,
-        bool $startMonday = false,
         string $closedText = "TIME_TABLE_NO_HOURS",
         string $timeZone = "",
         string $isoCode = "",
@@ -235,8 +245,8 @@ class TimeTable {
             return [];
         }
 
-        $minDay = $startMonday ? 1 : 0;
-        $maxDay = $startMonday ? 8 : 7;
+        $minDay = $this->startMonday ? 1 : 0;
+        $maxDay = $this->startMonday ? 8 : 7;
 
         $schedules = [];
         $days      = [];
@@ -247,7 +257,7 @@ class TimeTable {
 
             foreach ($timeTable->days as $day) {
                 $dayNumber = (int)$day;
-                $weekTime  = DateTime::getWeekStart(0, $day, $startMonday, true);
+                $weekTime  = DateTime::getWeekStart(0, $day, $this->startMonday, true);
                 $weekDate  = DateTime::toString($weekTime, "dashes");
                 $fromTime  = DateTime::toTimeHour($weekDate, $timeTable->from);
                 $fromHour  = DateTime::toString($fromTime, "time");
@@ -297,15 +307,15 @@ class TimeTable {
                     if (!empty($dayTime)) {
                         $schedules[$id]["days"][$index] = DateTime::getDayText(
                             $dayTime,
-                            startMonday: $startMonday,
-                            language: $isoCode,
+                            startMonday: $this->startMonday,
+                            language:    $isoCode,
                         );
                     } else {
                         $dayNumber = (int)$elem["numbers"][$index];
                         $schedules[$id]["days"][$index] = DateTime::getDayName(
                             $dayNumber,
-                            startMonday: $startMonday,
-                            language: $isoCode,
+                            startMonday: $this->startMonday,
+                            language:    $isoCode,
                         );
                     }
                 }
@@ -313,8 +323,8 @@ class TimeTable {
                 foreach ($elem["numbers"] as $index => $dayNumber) {
                     $schedules[$id]["days"][$index] = DateTime::getDayName(
                         $dayNumber,
-                        startMonday: $startMonday,
-                        language: $isoCode,
+                        startMonday: $this->startMonday,
+                        language:    $isoCode,
                     );
                 }
             }
@@ -394,13 +404,12 @@ class TimeTable {
 
     /**
      * Returns the Time Table as a string
-     * @param boolean $startMonday Optional.
-     * @param string  $timeZone    Optional.
-     * @param string  $isoCode     Optional.
+     * @param string $timeZone Optional.
+     * @param string $isoCode  Optional.
      * @return string
      */
-    public function getText(bool $startMonday = false, string $timeZone = "", string $isoCode = ""): string {
-        $list = $this->getList(false, $startMonday, $timeZone, $isoCode);
+    public function getText(string $timeZone = "", string $isoCode = ""): string {
+        $list = $this->getList(false, $timeZone, $isoCode);
         if (empty($list)) {
             return "";
         }
