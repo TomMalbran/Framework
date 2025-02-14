@@ -27,9 +27,9 @@ class EmailWhiteList extends EmailWhiteListSchema {
     /**
      * Adds the given Email to the White List
      * @param Request $request
-     * @return boolean
+     * @return integer
      */
-    public static function add(Request $request): bool {
+    public static function add(Request $request): int {
         return self::createEntity($request);
     }
 
