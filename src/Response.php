@@ -6,7 +6,7 @@ use Framework\Utils\Errors;
 use Framework\Utils\Search;
 use Framework\Utils\JSON;
 
-use ArrayAccess;
+use JsonSerializable;
 
 /**
  * The Response wrapper
@@ -115,10 +115,10 @@ class Response {
 
     /**
      * Creates a Data Response
-     * @param array<string,mixed> $data
+     * @param JsonSerializable|array<string,mixed> $data
      * @return Response
      */
-    public static function data(array $data): Response {
+    public static function data(JsonSerializable|array $data): Response {
         return new Response([
             "data" => $data,
         ]);
@@ -159,12 +159,12 @@ class Response {
 
     /**
      * Creates a Success Response
-     * @param string                               $success
-     * @param ArrayAccess|array<string,mixed>|null $data    Optional.
-     * @param string                               $param   Optional.
+     * @param string                                    $success
+     * @param JsonSerializable|array<string,mixed>|null $data    Optional.
+     * @param string                                    $param   Optional.
      * @return Response
      */
-    public static function success(string $success, ArrayAccess|array|null $data = null, string $param = ""): Response {
+    public static function success(string $success, JsonSerializable|array|null $data = null, string $param = ""): Response {
         return new Response([
             "success" => $success,
             "param"   => $param,
@@ -174,12 +174,12 @@ class Response {
 
     /**
      * Creates a Warning Response
-     * @param string                               $warning
-     * @param ArrayAccess|array<string,mixed>|null $data    Optional.
-     * @param string                               $param   Optional.
+     * @param string                                    $warning
+     * @param JsonSerializable|array<string,mixed>|null $data    Optional.
+     * @param string                                    $param   Optional.
      * @return Response
      */
-    public static function warning(string $warning, ArrayAccess|array|null $data = null, string $param = ""): Response {
+    public static function warning(string $warning, JsonSerializable|array|null $data = null, string $param = ""): Response {
         return new Response([
             "warning" => $warning,
             "param"   => $param,
@@ -189,12 +189,12 @@ class Response {
 
     /**
      * Creates an Error Response
-     * @param Errors|string                        $error
-     * @param ArrayAccess|array<string,mixed>|null $data  Optional.
-     * @param string                               $param Optional.
+     * @param Errors|string                             $error
+     * @param JsonSerializable|array<string,mixed>|null $data  Optional.
+     * @param string                                    $param Optional.
      * @return Response
      */
-    public static function error(Errors|string $error, ArrayAccess|array|null $data = null, string $param = ""): Response {
+    public static function error(Errors|string $error, JsonSerializable|array|null $data = null, string $param = ""): Response {
         if (Arrays::isArray($error)) {
             return new Response([
                 "errors" => $error,
