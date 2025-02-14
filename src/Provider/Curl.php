@@ -183,7 +183,7 @@ class Curl {
         foreach ($params as $key => $value) {
             if (Arrays::isArray($value)) {
                 $content[] = "$key=" . urlencode(JSON::encode($value));
-            } else {
+            } elseif ($value !== null) {
                 $content[] = "$key=" . urlencode($value);
             }
         }
