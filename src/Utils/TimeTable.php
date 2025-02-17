@@ -86,21 +86,27 @@ class TimeTable {
      * Returns true if the Time Tables are valid and adds the Errors
      * @param Errors  $errors
      * @param boolean $withHolidays Optional.
+     * @param boolean $isRequired   Optional.
      * @param string  $fieldKey     Optional.
      * @return boolean
      */
     public function isValid(
         Errors $errors,
         bool $withHolidays = false,
+        bool $isRequired = false,
         string $fieldKey = "timeTables",
     ): bool {
         $hasError = false;
 
         foreach ($this->timeTables as $index => $timeTable) {
-            if (empty($timeTable->days)) {
+            if (!$isRequired && Arrays::isEmpty($timeTable->days)) {
                 continue;
             }
 
+            if ($isRequired && Arrays::isEmpty($timeTable->days)) {
+                $errors->add("$fieldKey-$index-days", "GENERAL_ERROR_PERIOD_DAYS_EMPTY");
+                $hasError = true;
+            }
             foreach ($timeTable->days as $day) {
                 if (!DateTime::isValidDay($day, $withHolidays, $this->startMonday)) {
                     $errors->add("$fieldKey-$index-days", "GENERAL_ERROR_PERIOD_DAYS_INVALID");
