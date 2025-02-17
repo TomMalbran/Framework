@@ -87,7 +87,7 @@ class Select implements JsonSerializable {
     public function set(string $key, mixed $value): Select {
         if (property_exists($this, $key)) {
             $this->$key = $value;
-        } elseif (array_key_exists($key, $this->extras)) {
+        } else {
             $this->extras[$key] = $value;
         }
         return $this;
@@ -142,7 +142,7 @@ class Select implements JsonSerializable {
             if (!empty($extraKey)) {
                 $extraKeys = Arrays::toArray($extraKey);
                 foreach ($extraKeys as $extraKey) {
-                    $item->set($extraKey, Arrays::getValue($row, $extraKey));
+                    $item->set($extraKey, Arrays::getValue($row, $extraKey, useEmpty: true));
                 }
             }
 
