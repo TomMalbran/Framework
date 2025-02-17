@@ -591,7 +591,8 @@ class Arrays {
     public static function createDict(array $array, string $key, string $value): array {
         $result = [];
         foreach ($array as $row) {
-            $result[$row[$key]] = $row[$value];
+            $keyValue = self::getOneValue($row, $key);
+            $result[$keyValue] = self::getOneValue($row, $value);
         }
         return $result;
     }
@@ -606,7 +607,8 @@ class Arrays {
     public static function createMap(array $array, string $key): array {
         $result = [];
         foreach ($array as $row) {
-            $result[$row[$key]] = $row;
+            $keyValue = self::getOneValue($row, $key);
+            $result[$keyValue] = $row;
         }
         return $result;
     }
@@ -915,6 +917,7 @@ class Arrays {
             if (!$useEmpty && !empty($array->$key)) {
                 return $array->$key;
             }
+            return $default;
         }
 
         if ($useEmpty && isset($array[$key])) {
