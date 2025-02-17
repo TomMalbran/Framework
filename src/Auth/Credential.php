@@ -357,10 +357,18 @@ class Credential extends CredentialSchema {
      * @param integer                $amount       Optional.
      * @param Access[]|Access|null   $accessName   Optional.
      * @param integer[]|integer|null $credentialID Optional.
+     * @param boolean                $withEmail    Optional.
      * @param boolean                $splitText    Optional.
      * @return Search[]
      */
-    public static function search(string $text, int $amount = 10, array|Access|null $accessName = null, array|int|null $credentialID = null, bool $splitText = true): array {
+    public static function search(
+        string $text,
+        int $amount = 10,
+        array|Access|null $accessName = null,
+        array|int|null $credentialID = null,
+        bool $withEmail = true,
+        bool $splitText = true,
+    ): array {
         $query = self::createAccessQuery($accessName);
         $query->search([ "firstName", "lastName", "email" ], $text, "LIKE", true, $splitText);
         $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
@@ -369,7 +377,10 @@ class Credential extends CredentialSchema {
         $list   = self::getEntityList($query);
         $result = [];
         foreach ($list as $elem) {
-            $result[] = new Search($elem->credentialID, self::getName($elem));
+            $result[] = new Search(
+                $elem->credentialID,
+                self::getName($elem, $withEmail),
+            );
         }
         return $result;
     }
@@ -798,17 +809,22 @@ class Credential extends CredentialSchema {
     /**
      * Returns a parsed Name for the given Credential
      * @param ArrayAccess|array{} $data
-     * @param string              $prefix Optional.
+     * @param boolean             $withEmail Optional.
+     * @param string              $prefix    Optional.
      * @return string
      */
-    public static function getName(ArrayAccess|array $data, string $prefix = ""): string {
+    public static function getName(ArrayAccess|array $data, bool $withEmail = false, string $prefix = ""): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
+        $email     = Arrays::getValue($data, "email",        "", $prefix);
         $result    = "";
 
-        if (!empty($firstName) && !empty($lastName)) {
-            $result = "$firstName $lastName";
+        if (!empty($firstName) || !empty($lastName)) {
+            $result = Strings::merge($firstName, $lastName);
+            if ($withEmail && !empty($email)) {
+                $result .= " ($email)";
+            }
         }
         if (empty($result) && !empty($id)) {
             $result = "#$id";
