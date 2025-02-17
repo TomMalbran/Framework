@@ -8,6 +8,7 @@ use Framework\System\Access;
 use Framework\System\Status;
 use Framework\System\Path;
 use Framework\Utils\Arrays;
+use Framework\Utils\Search;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
@@ -357,7 +358,7 @@ class Credential extends CredentialSchema {
      * @param Access[]|Access|null   $accessName   Optional.
      * @param integer[]|integer|null $credentialID Optional.
      * @param boolean                $splitText    Optional.
-     * @return array{}[]
+     * @return Search[]
      */
     public static function search(string $text, int $amount = 10, array|Access|null $accessName = null, array|int|null $credentialID = null, bool $splitText = true): array {
         $query = self::createAccessQuery($accessName);
@@ -367,13 +368,8 @@ class Credential extends CredentialSchema {
 
         $list   = self::getEntityList($query);
         $result = [];
-
         foreach ($list as $elem) {
-            $result[] = [
-                "id"    => $elem->credentialID,
-                "title" => self::getName($elem),
-                "email" => $elem->email,
-            ];
+            $result[] = new Search($elem->credentialID, self::getName($elem));
         }
         return $result;
     }
