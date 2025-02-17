@@ -126,10 +126,10 @@ class Response {
 
     /**
      * Creates a Search Response
-     * @param Search[] $data
+     * @param Search[] $data Optional.
      * @return Response
      */
-    public static function search(array $data): Response {
+    public static function search(array $data = []): Response {
         return new Response([
             "data" => $data,
         ]);

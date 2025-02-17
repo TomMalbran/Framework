@@ -189,7 +189,7 @@ class Schema {
      * @param integer              $limit      Optional.
      * @return Search[]
      */
-    public static function getSearchData(
+    protected static function getSearchData(
         Query $query,
         ?string $idColumn = null,
         array|string|null $nameColumn = null,
