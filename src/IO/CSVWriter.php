@@ -3,18 +3,18 @@ namespace Framework\IO;
 
 use Framework\Core\NLS;
 use Framework\IO\ExporterWriter;
-use Framework\Utils\Elements;
 
 /**
  * The CSV Writer
  */
 class CSVWriter implements ExporterWriter {
 
-    private string   $fileName;
-    private string   $lang;
-    private Elements $header;
-    private mixed    $file;
-    private int      $line = 0;
+    /** @var array<string,string> */
+    private array  $headers;
+    private string $fileName;
+    private string $lang;
+    private mixed  $file;
+    private int    $line = 0;
 
 
     /**
@@ -51,12 +51,12 @@ class CSVWriter implements ExporterWriter {
 
     /**
      * Writes the Header
-     * @param Elements $header
+     * @param array<string,string> $headers
      * @return CSVWriter
      */
-    public function writeHeader(Elements $header): CSVWriter {
-        $this->header = $header;
-        $values = NLS::getAll($header->getValues(), $this->lang);
+    public function writeHeader(array $headers): CSVWriter {
+        $this->headers = $headers;
+        $values = NLS::getAll(array_values($headers), $this->lang);
         fputcsv($this->file, $values);
         return $this;
     }
@@ -67,8 +67,12 @@ class CSVWriter implements ExporterWriter {
      * @return CSVWriter
      */
     public function writeLine(array $line): CSVWriter {
+        $values = [];
+        foreach (array_keys($this->headers) as $key) {
+            $values[] = isset($line[$key]) ? $line[$key] : "";
+        }
+
         $this->line += 1;
-        $values = $this->header->parseValues($line);
         fputcsv($this->file, $values);
         if ($this->line % 100 == 0) {
             flush();
@@ -78,10 +82,9 @@ class CSVWriter implements ExporterWriter {
 
     /**
      * Downloads the File
-     * @param string $fileName
      * @return CSVWriter
      */
-    public function downloadFile(string $fileName): CSVWriter {
+    public function downloadFile(): CSVWriter {
         fclose($this->file);
         flush();
         return $this;

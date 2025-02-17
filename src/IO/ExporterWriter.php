@@ -1,8 +1,6 @@
 <?php
 namespace Framework\IO;
 
-use Framework\Utils\Elements;
-
 /**
  * The Exporter Writer
  */
@@ -10,10 +8,10 @@ interface ExporterWriter {
 
     /**
      * Writes the Header
-     * @param Elements $header
+     * @param array<string,string> $headers
      * @return ExporterWriter
      */
-    public function writeHeader(Elements $header): ExporterWriter;
+    public function writeHeader(array $headers): ExporterWriter;
 
     /**
      * Writes a Line
@@ -24,8 +22,7 @@ interface ExporterWriter {
 
     /**
      * Downloads the file
-     * @param string $fileName
      * @return ExporterWriter
      */
-    public function downloadFile(string $fileName): ExporterWriter;
+    public function downloadFile(): ExporterWriter;
 }

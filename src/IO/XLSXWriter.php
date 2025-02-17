@@ -3,7 +3,6 @@ namespace Framework\IO;
 
 use Framework\Core\NLS;
 use Framework\IO\ExporterWriter;
-use Framework\Utils\Elements;
 
 use OpenSpout\Writer\XLSX\Writer;
 use OpenSpout\Writer\XLSX\Options;
@@ -15,10 +14,11 @@ use OpenSpout\Common\Entity\Style\Style;
  */
 class XLSXWriter implements ExporterWriter {
 
-    private string   $title;
-    private string   $lang;
-    private Elements $header;
-    private Writer   $writer;
+    /** @var array<string,string> */
+    private array  $headers;
+    private string $title;
+    private string $lang;
+    private Writer $writer;
 
 
     /**
@@ -53,13 +53,13 @@ class XLSXWriter implements ExporterWriter {
 
     /**
      * Writes the Header
-     * @param Elements $header
+     * @param array<string,string> $headers
      * @return XLSXWriter
      */
-    public function writeHeader(Elements $header): XLSXWriter {
-        $this->header = $header;
+    public function writeHeader(array $headers): XLSXWriter {
+        $this->headers = $headers;
 
-        $values = NLS::getAll($header->getValues(), $this->lang);
+        $values = NLS::getAll(array_values($headers), $this->lang);
         $row    = Row::fromValues($values);
         $this->writer->addRow($row);
         return $this;
@@ -71,18 +71,21 @@ class XLSXWriter implements ExporterWriter {
      * @return XLSXWriter
      */
     public function writeLine(array $line): XLSXWriter {
-        $values = $this->header->parseValues($line);
-        $row    = Row::fromValues($values);
+        $values = [];
+        foreach (array_keys($this->headers) as $key) {
+            $values[] = isset($line[$key]) ? $line[$key] : "";
+        }
+
+        $row = Row::fromValues($values);
         $this->writer->addRow($row);
         return $this;
     }
 
     /**
      * Downloads the File
-     * @param string $fileName
      * @return XLSXWriter
      */
-    public function downloadFile(string $fileName): XLSXWriter {
+    public function downloadFile(): XLSXWriter {
         $this->writer->close();
         return $this;
     }

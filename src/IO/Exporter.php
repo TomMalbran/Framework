@@ -6,7 +6,6 @@ use Framework\Core\NLS;
 use Framework\IO\ExporterWriter;
 use Framework\IO\XLSXWriter;
 use Framework\IO\CSVWriter;
-use Framework\Utils\Elements;
 
 /**
  * The Exporter Wrapper
@@ -15,7 +14,10 @@ class Exporter {
 
     private string         $fileName;
     private int            $total;
-    private Elements       $header;
+
+    /** @var array<string,string> */
+    private array          $headers;
+
     private ExporterWriter $writer;
 
     private int $requests = 0;
@@ -33,7 +35,7 @@ class Exporter {
     public function __construct(int $total, string $title, string $fileName, string $lang = "root") {
         $this->fileName = NLS::getString($fileName, $lang) . "_" . date("Y-m-d");
         $this->total    = $total;
-        $this->header   = new Elements();
+        $this->headers  = [];
 
         if (XLSXWriter::isAvailable()) {
             $this->writer = new XLSXWriter($title, $this->fileName, $lang);
@@ -45,24 +47,13 @@ class Exporter {
 
 
     /**
-     * Sets the Header
-     * @param Elements $header
-     * @return Exporter
-     */
-    public function setHeader(Elements $header): Exporter {
-        $this->header = $header;
-        $this->writeHeader();
-        return $this;
-    }
-
-    /**
      * Adds multiple Headers
      * @param array<string,string> $headers
      * @return Exporter
      */
     public function addHeaders(array $headers): Exporter {
         foreach ($headers as $key => $value) {
-            $this->header->add($key, $value);
+            $this->headers[$key] = $value;
         }
         return $this;
     }
@@ -75,7 +66,9 @@ class Exporter {
      * @return Exporter
      */
     public function addHeader(string $key, string $value, bool $condition = true): Exporter {
-        $this->header->add($key, $value, $condition);
+        if ($condition) {
+            $this->headers[$key] = $value;
+        }
         return $this;
     }
 
@@ -86,7 +79,7 @@ class Exporter {
      */
     public function removeHeaders(array $headers): Exporter {
         foreach ($headers as $key) {
-            $this->header->remove($key);
+            unset($this->headers[$key]);
         }
         return $this;
     }
@@ -96,7 +89,7 @@ class Exporter {
      * @return Exporter
      */
     public function writeHeader(): Exporter {
-        $this->writer->writeHeader($this->header);
+        $this->writer->writeHeader($this->headers);
         return $this;
     }
 
@@ -140,7 +133,7 @@ class Exporter {
      * @return never
      */
     public function download(): never {
-        $this->writer->downloadFile($this->fileName);
+        $this->writer->downloadFile();
         exit();
     }
 }
