@@ -33,6 +33,36 @@ class Search implements JsonSerializable {
     }
 
     /**
+     * Returns the value as a string
+     * @param string $key
+     * @return string
+     */
+    public function getString(string $key): string {
+        if (property_exists($this, $key)) {
+            return (string)$this->$key;
+        }
+        if (isset($this->data[$key])) {
+            return Strings::toString($this->data[$key]);
+        }
+        return "";
+    }
+
+    /**
+     * Returns the value as an integer
+     * @param string $key
+     * @return integer
+     */
+    public function getInt(string $key): int {
+        if (property_exists($this, $key)) {
+            return (int)$this->$key;
+        }
+        if (isset($this->data[$key])) {
+            return Numbers::toInt($this->data[$key]);
+        }
+        return 0;
+    }
+
+    /**
      * Implements the JSON Serializable Interface
      * @return mixed
      */
