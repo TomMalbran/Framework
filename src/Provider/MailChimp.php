@@ -419,7 +419,6 @@ class MailChimp {
      */
     private static function mailCampaign(string $mailChimpID, int $time): bool {
         if (empty($time)) {
-            var_dump("no-time");
             return false;
         }
 
