@@ -201,7 +201,9 @@ class NotificationQueue extends NotificationQueueSchema {
             $playerIDs          = Device::getAllForCredential($elem->credentialID);
             $externalID         = "";
 
-            if (empty($playerIDs)) {
+            if (!Config::isNotificationActive()) {
+                $notificationResult = NotificationResult::InactiveSend;
+            } elseif (empty($playerIDs)) {
                 $notificationResult = NotificationResult::NoDevices;
             } else {
                 $externalID = Notification::sendToSome(
@@ -210,7 +212,7 @@ class NotificationQueue extends NotificationQueueSchema {
                     $elem->url,
                     $elem->dataType,
                     $elem->dataID,
-                    $playerIDs
+                    $playerIDs,
                 );
                 if (empty($externalID)) {
                     $notificationResult = NotificationResult::ProviderError;
