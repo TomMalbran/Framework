@@ -128,12 +128,23 @@ class Numbers {
 
     /**
      * Clamps the given number between the min and max
-     * @param integer|float $number
-     * @param integer|float $min
-     * @param integer|float $max
-     * @return integer|float
+     * @param integer $number
+     * @param integer $min
+     * @param integer $max
+     * @return integer
      */
-    public static function clamp(int|float $number, int|float $min, int|float $max): int|float {
+    public static function clampInt(int $number, int $min, int $max): int {
+        return max($min, min($max, $number));
+    }
+
+    /**
+     * Clamps the given number between the min and max
+     * @param float $number
+     * @param float $min
+     * @param float $max
+     * @return float
+     */
+    public static function clampFloat(float $number, float $min, float $max): float {
         return max($min, min($max, $number));
     }
 
@@ -218,7 +229,7 @@ class Numbers {
         if (empty($percent)) {
             return $number;
         }
-        $percent   = self::clamp($percent, 0, 100);
+        $percent   = max(0, min(100, $percent));
         $increment = $percent / (100 - $percent);
         return $number + $number * $increment;
     }
