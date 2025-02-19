@@ -11,11 +11,13 @@ use JsonSerializable;
 class Select implements JsonSerializable {
 
     public int        $id;
+    public string     $field;
+
     public string|int $key;
     public string     $value;
 
     /** @var array<string,mixed> */
-    private array     $extras = [];
+    private array $extras = [];
 
 
     /**
@@ -26,6 +28,7 @@ class Select implements JsonSerializable {
      */
     public function __construct(string|int $key, string $value, array $extras = []) {
         $this->id     = (int)$key;
+        $this->field  = (string)$key;
         $this->key    = $key;
         $this->value  = $value;
         $this->extras = $extras;
