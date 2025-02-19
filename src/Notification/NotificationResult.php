@@ -8,9 +8,8 @@ enum NotificationResult {
 
     case Sent;
     case NotProcessed;
-    case NoDevices;
     case InactiveSend;
+    case NoDevices;
     case ProviderError;
-    case UnknownError;
 
 }

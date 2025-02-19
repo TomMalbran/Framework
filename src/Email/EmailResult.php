@@ -8,11 +8,10 @@ enum EmailResult {
 
     case Sent;
     case NotProcessed;
-    case NoEmails;
     case InactiveSend;
+    case NoEmails;
     case WhiteListFilter;
     case InvalidEmail;
     case ProviderError;
-    case UnknownError;
 
 }
