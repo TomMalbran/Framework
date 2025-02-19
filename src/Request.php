@@ -164,20 +164,6 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key from an array or the default
-     * @param string       $key
-     * @param integer      $index
-     * @param mixed|string $default Optional.
-     * @return mixed
-     */
-    public function getFromArray(string $key, int $index, mixed $default = ""): mixed {
-        if (isset($this->request[$key]) && isset($this->request[$key][$index])) {
-            return $this->request[$key][$index];
-        }
-        return $default;
-    }
-
-    /**
      * Returns the request data at the given key from a JSON Array
      * @param string $key
      * @return array<string|integer,mixed>
@@ -198,9 +184,9 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     /**
      * Returns the request data at the given key from a JSON Object
      * @param string $key
-     * @return object[]|object
+     * @return object[]
      */
-    public function getJSONObject(string $key): array|object {
+    public function getJSONObject(string $key): array {
         return JSON::decodeAsObject($this->get($key, "[]"));
     }
 
@@ -639,13 +625,12 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given price in Cents
-     * @param string       $key
-     * @param integer|null $index Optional.
+     * @param string $key
      * @return integer
      */
-    public function toCents(string $key, ?int $index = null): int {
-        $value = $index !== null ? $this->getFromArray($key, $index, 0) : $this->get($key);
-        return Numbers::toCents((float)$value);
+    public function toCents(string $key): int {
+        $value = (float)$this->get($key);
+        return Numbers::toCents($value);
     }
 
     /**
@@ -805,17 +790,6 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
 
     /**
-     * Returns the Array keys from the given array
-     * @param string $key
-     * @return string[]
-     */
-    public function getKeys(string $key): array {
-        return array_keys($this->get($key, []));
-    }
-
-
-
-    /**
      * Returns the request file at the given key
      * @param string $key
      * @return mixed
@@ -918,26 +892,6 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      */
     public function toArray(): ArrayAccess|array {
         return $this->request;
-    }
-
-    /**
-     * Prints the Request
-     * @return Request
-     */
-    public function print(): Request {
-        print("<pre>");
-        print_r($this->request);
-        print("</pre>");
-        return $this;
-    }
-
-    /**
-     * Dumps the Request
-     * @return Request
-     */
-    public function dump(): Request {
-        var_dump($this->request);
-        return $this;
     }
 
     /**
