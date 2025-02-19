@@ -400,19 +400,19 @@ class OpenAI {
      * Returns the total tokens of a Run
      * @param string $threadID
      * @param string $runID
-     * @return object
+     * @return OpenAIData
      */
-    public static function getRunData(string $threadID, string $runID): object {
+    public static function getRunData(string $threadID, string $runID): OpenAIData {
+        $result  = new OpenAIData();
         $request = self::get("/threads/$threadID/runs/$runID");
         if (empty($request["usage"])) {
-            return (object)[];
+            return $result;
         }
 
-        return (object)[
-            "runTime"      => $request["completed_at"] - $request["started_at"],
-            "inputTokens"  => $request["usage"]["prompt_tokens"],
-            "outputTokens" => $request["usage"]["completion_tokens"],
-        ];
+        $result->runTime      = $request["completed_at"] - $request["started_at"];
+        $result->inputTokens  = $request["usage"]["prompt_tokens"];
+        $result->outputTokens = $request["usage"]["completion_tokens"];
+        return $result;
     }
 
     /**
@@ -433,9 +433,10 @@ class OpenAI {
      * @param string $fileContent
      * @param string $fileName
      * @param string $language
-     * @return object
+     * @return OpenAIData
      */
-    public static function transcribeAudio(string $fileContent, string $fileName, string $language): object {
+    public static function transcribeAudio(string $fileContent, string $fileName, string $language): OpenAIData {
+        $result    = new OpenAIData();
         $timeStart = microtime(true);
         $request   = self::upload("/audio/transcriptions", [
             "file"            => new CURLStringFile($fileContent, $fileName),
@@ -445,19 +446,34 @@ class OpenAI {
         ]);
         $timeEnd   = microtime(true);
         if (empty($request["text"])) {
-            return (object)[];
+            return $result;
         }
 
-        $tokens = 0;
+        $outputTokens = 0;
         foreach ($request["segments"] as $segment) {
-            $tokens += count($segment["tokens"]);
+            $outputTokens += count($segment["tokens"]);
         }
-        return  (object)[
-            "text"     => $request["text"],
-            "language" => $request["language"],
-            "duration" => ceil($request["duration"]),
-            "tokens"   => $tokens,
-            "runTime"  => round(($timeEnd - $timeStart) / 60),
-        ];
+
+        $result->text         = $request["text"];
+        $result->language     = $request["language"];
+        $result->duration     = (int)ceil($request["duration"]);
+        $result->runTime      = (int)round(($timeEnd - $timeStart) / 60);
+        $result->outputTokens = $outputTokens;
+        return $result;
     }
+}
+
+/**
+ * The OpenAI Data
+ */
+class OpenAIData {
+
+    public string $text         = "";
+    public string $language     = "";
+    public int    $duration     = 0;
+
+    public int    $runTime      = 0;
+    public int    $inputTokens  = 0;
+    public int    $outputTokens = 0;
+
 }
