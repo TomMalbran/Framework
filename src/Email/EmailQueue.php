@@ -157,11 +157,11 @@ class EmailQueue extends EmailQueueSchema {
     }
 
     /**
-     * Deletes the items older than 90 days
-     * @param integer $days Optional.
+     * Deletes the items older than some days
      * @return boolean
      */
-    public static function deleteOld(int $days = 90): bool {
+    public static function deleteOld(): bool {
+        $days  = Config::getEmailDeleteDays();
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::removeEntity($query);

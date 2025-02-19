@@ -6,6 +6,7 @@ use Framework\Discovery\Discovery;
 use Framework\Auth\Auth;
 use Framework\Database\Assign;
 use Framework\Database\Query;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
@@ -98,11 +99,11 @@ class QueryLog extends LogQuerySchema {
     }
 
     /**
-     * Deletes the items older than 60 days
-     * @param integer $days Optional.
+     * Deletes the items older than some days
      * @return boolean
      */
-    public static function deleteOld(int $days = 60): bool {
+    public static function deleteOld(): bool {
+        $days  = Config::getQueryLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::removeEntity($query);

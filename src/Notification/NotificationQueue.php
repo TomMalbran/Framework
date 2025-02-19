@@ -6,6 +6,7 @@ use Framework\Database\Query;
 use Framework\Auth\Device;
 use Framework\Notification\Notification;
 use Framework\Notification\NotificationResult;
+use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Schema\NotificationQueueSchema;
 use Framework\Schema\NotificationQueueEntity;
@@ -153,21 +154,14 @@ class NotificationQueue extends NotificationQueueSchema {
     }
 
     /**
-     * Deletes the items older than 30 days
-     * @param integer $days Optional.
+     * Deletes the items older than some days
      * @return boolean
      */
-    public static function deleteOld(int $days = 30): bool {
+    public static function deleteOld(): bool {
+        $days  = Config::getNotificationDeleteDays();
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("notification_queue.createdTime", "<", $time);
-        $ids   = self::getNotificationIDs($query);
-        if (empty($ids)) {
-            return false;
-        }
-
-        $query = Query::create("NOTIFICATION_ID", "IN", $ids);
-        self::removeEntity($query);
-        return true;
+        return self::removeEntity($query);
     }
 
 

@@ -3,6 +3,7 @@ namespace Framework\Log;
 
 use Framework\Auth\Auth;
 use Framework\Database\Query;
+use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
 use Framework\Schema\LogSessionSchema;
@@ -54,7 +55,8 @@ class SessionLog extends LogSessionSchema {
      * @param integer $days Optional.
      * @return boolean
      */
-    public static function deleteOld(int $days = 90): bool {
+    public static function deleteOld(): bool {
+        $days  = Config::getActionLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::removeEntity($query);

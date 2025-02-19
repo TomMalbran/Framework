@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Database\Assign;
 use Framework\Database\Query;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
@@ -80,11 +81,11 @@ class ErrorLog extends LogErrorSchema {
     }
 
     /**
-     * Deletes the items older than 90 days
-     * @param integer $days Optional.
+     * Deletes the items older than some days
      * @return boolean
      */
-    public static function deleteOld(int $days = 90): bool {
+    public static function deleteOld(): bool {
+        $days  = Config::getErrorLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::removeEntity($query);

@@ -3,6 +3,7 @@ namespace Framework\Log;
 
 use Framework\Request;
 use Framework\Database\Query;
+use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
 use Framework\Schema\LogDeviceSchema;
@@ -62,10 +63,10 @@ class DeviceLog extends LogDeviceSchema {
 
     /**
      * Deletes the items older than 90 days
-     * @param integer $days Optional.
      * @return boolean
      */
-    public static function deleteOld(int $days = 90): bool {
+    public static function deleteOld(): bool {
+        $days  = Config::getDeviceLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         return self::removeEntity($query);

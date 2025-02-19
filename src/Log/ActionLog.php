@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\Auth\Auth;
 use Framework\Database\Query;
 use Framework\Log\SessionLog;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
@@ -175,14 +176,14 @@ class ActionLog extends LogActionSchema {
 
 
     /**
-     * Deletes the items older than 90 days
-     * @param integer $days Optional.
+     * Deletes the items older than some days
      * @return boolean
      */
-    public static function deleteOld(int $days = 90): bool {
+    public static function deleteOld(): bool {
+        $days  = Config::getActionLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
         $query = Query::create("createdTime", "<", $time);
         self::removeEntity($query);
-        return SessionLog::deleteOld($days);
+        return SessionLog::deleteOld();
     }
 }
