@@ -4,6 +4,7 @@ namespace Framework\Database;
 use Framework\Database\Assign;
 use Framework\Database\Query;
 use Framework\Log\QueryLog;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
@@ -566,8 +567,9 @@ class Database {
      * @return boolean
      */
     protected function processTime(float $startTime, string $expression, array $params): bool {
-        $time = microtime(true) - $startTime;
-        if ($time < 3 || $this->skipLog) {
+        $logTime = Config::getDbLogTime();
+        $time    = microtime(true) - $startTime;
+        if ($logTime === 0 || $time < $logTime || $this->skipLog) {
             return false;
         }
 
