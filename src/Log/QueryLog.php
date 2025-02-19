@@ -56,6 +56,7 @@ class QueryLog extends LogQuerySchema {
                 amount:      Assign::increase(1),
                 elapsedTime: Assign::greatest($elapsedTime),
                 totalTime:   Assign::increase($elapsedTime),
+                isResolved:  false,
                 updatedTime: time(),
                 updatedUser: Auth::getID(),
             );
