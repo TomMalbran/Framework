@@ -6,6 +6,10 @@ use Framework\System\Package;
 use Framework\Utils\Strings;
 use Framework\Utils\JSON;
 
+use ReflectionClass;
+use ReflectionProperty;
+use ReflectionUnionType;
+
 /**
  * The Discovery
  */
@@ -89,43 +93,6 @@ class Discovery {
             return $environment;
         }
         return "localhost";
-    }
-
-    /**
-     * Finds the Classes in the given Directory
-     * @param string  $dir         Optional.
-     * @param boolean $skipIgnored Optional.
-     * @return array<string,string>
-     */
-    public static function findClasses(string $dir = "", bool $skipIgnored = false): array {
-        $sourcePath = self::getAppPath(Package::SourceDir);
-        $basePath   = self::getAppPath(Package::SourceDir, $dir);
-        $files      = File::getFilesInDir($basePath, true);
-        $result     = [];
-
-        foreach ($files as $file) {
-            if (!Strings::endsWith($file, ".php")) {
-                continue;
-            }
-
-            // Skip some ignored directories
-            if ($skipIgnored && Strings::contains($file, "/Schema/", "/System/")) {
-                continue;
-            }
-
-            $className = Strings::replace($file, [ $sourcePath, ".php" ], "");
-            $className = Strings::substringAfter($className, "/", true);
-            $className = Strings::replace($className, "/", "\\");
-            $className = "\\" . Package::Namespace . $className;
-
-            if (empty($dir)) {
-                $result[] = $className;
-            } else {
-                $classKey = Strings::substringAfter($className, "\\");
-                $result[$classKey] = $className;
-            }
-        }
-        return $result;
     }
 
     /**
@@ -233,5 +200,69 @@ class Discovery {
         $file = Strings::addSuffix($fileName, ".mu");
         $path = self::getFramePath(self::TemplateDir, $file);
         return File::read($path);
+    }
+
+
+
+    /**
+     * Finds the Classes in the given Directory
+     * @param string  $dir         Optional.
+     * @param boolean $skipIgnored Optional.
+     * @return array<string,string>
+     */
+    public static function findClasses(string $dir = "", bool $skipIgnored = false): array {
+        $sourcePath = self::getAppPath(Package::SourceDir);
+        $basePath   = self::getAppPath(Package::SourceDir, $dir);
+        $files      = File::getFilesInDir($basePath, true);
+        $result     = [];
+
+        foreach ($files as $file) {
+            if (!Strings::endsWith($file, ".php")) {
+                continue;
+            }
+
+            // Skip some ignored directories
+            if ($skipIgnored && Strings::contains($file, "/Schema/", "/System/")) {
+                continue;
+            }
+
+            $className = Strings::replace($file, [ $sourcePath, ".php" ], "");
+            $className = Strings::substringAfter($className, "/", true);
+            $className = Strings::replace($className, "/", "\\");
+            $className = "\\" . Package::Namespace . $className;
+
+            if (empty($dir)) {
+                $result[] = $className;
+            } else {
+                $classKey = Strings::substringAfter($className, "\\");
+                $result[$classKey] = $className;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Properties of the given Class
+     * @param object       $class
+     * @param integer|null $filter Optional.
+     * @return array<string,string>
+     */
+    public static function getProperties(object $class, ?int $filter = null): array {
+        $reflection = new ReflectionClass($class);
+        $props      = $reflection->getProperties($filter ?? ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+        $result     = [];
+
+        if ($props === null) {
+            return $result;
+        }
+        foreach ($props as $prop) {
+            $type     = $prop->getType();
+            $typeName = "mixed";
+            if ($type !== null && !($type instanceof ReflectionUnionType)) {
+                $typeName = $type->getName();
+            }
+            $result[$prop->getName()] = $typeName;
+        }
+        return $result;
     }
 }

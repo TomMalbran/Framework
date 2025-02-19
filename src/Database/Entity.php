@@ -2,11 +2,10 @@
 namespace Framework\Database;
 
 use Framework\Request;
+use Framework\Discovery\Discovery;
 
 use ArrayAccess;
 use JsonSerializable;
-use ReflectionClass;
-use ReflectionProperty;
 
 /**
  * The Schema Entity
@@ -86,16 +85,7 @@ class Entity implements ArrayAccess, JsonSerializable {
      * @return array<string,string>
      */
     private function getPropertiesTypes(): array {
-        $reflection = new ReflectionClass($this);
-        $props      = $reflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
-        $result     = [];
-
-        foreach ($props as $prop) {
-            $type     = $prop->getType();
-            $typeName = $type ? $type->getName() : "mixed";
-            $result[$prop->getName()] = $typeName;
-        }
-        return $result;
+        return Discovery::getProperties($this);
     }
 
     /**
