@@ -12,6 +12,8 @@ use Framework\Log\ErrorLog;
 use Framework\Database\Database;
 use Framework\Database\Migration;
 use Framework\System\Router;
+use Framework\Utils\Dictionary;
+use Framework\Utils\JSON;
 
 use Exception;
 
@@ -63,6 +65,22 @@ class Framework {
             print($e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Executes an Internal Request
+     * @return Dictionary
+     */
+    public static function executeInternal(): Dictionary {
+        ErrorLog::init();
+        Auth::validateInternal();
+
+        $data    = new Dictionary($_REQUEST);
+        $payload = file_get_contents("php://input");
+        if (!empty($payload) && JSON::isValid($payload)) {
+            $data = JSON::decodeAsDictionary($payload);
+        }
+        return $data;
     }
 
     /**
