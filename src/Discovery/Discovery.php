@@ -9,6 +9,7 @@ use Framework\Utils\JSON;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionUnionType;
+use Throwable;
 
 /**
  * The Discovery
@@ -236,6 +237,26 @@ class Discovery {
             } else {
                 $classKey = Strings::substringAfter($className, "\\");
                 $result[$classKey] = $className;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Reflection Classes in the given Directory
+     * @param string  $dir         Optional.
+     * @param boolean $skipIgnored Optional.
+     * @return array<string,ReflectionClass>
+     */
+    public static function getReflectionClasses(string $dir = "", bool $skipIgnored = false): array {
+        $classes = self::findClasses($dir, $skipIgnored);
+        $result  = [];
+
+        foreach ($classes as $className) {
+            try {
+                $result[$className] = new ReflectionClass($className);
+            } catch (Throwable $e) {
+                continue;
             }
         }
         return $result;

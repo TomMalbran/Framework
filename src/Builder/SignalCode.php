@@ -21,17 +21,11 @@ class SignalCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $classes = Discovery::findClasses(skipIgnored: true);
-        $signals = [];
-        $uses    = [];
+        $reflections = Discovery::getReflectionClasses(skipIgnored: true);
+        $signals     = [];
+        $uses        = [];
 
-        foreach ($classes as $className) {
-            try {
-                $reflection = new ReflectionClass($className);
-            } catch (Throwable $e) {
-                continue;
-            }
-
+        foreach ($reflections as $className => $reflection) {
             $methods = $reflection->getMethods();
             foreach ($methods as $method) {
                 $attributes = $method->getAttributes(Listener::class);

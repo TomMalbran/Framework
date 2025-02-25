@@ -19,19 +19,13 @@ class RouterCode {
      * @return array{}
      */
     public static function getCode(): array {
-        $classes     = Discovery::findClasses(skipIgnored: true);
+        $reflections = Discovery::getReflectionClasses(skipIgnored: true);
         $routes      = [];
         $usedRoutes  = [];
         $errorRoutes = [];
         $testRoutes  = [];
 
-        foreach ($classes as $className) {
-            try {
-                $reflection = new ReflectionClass($className);
-            } catch (Throwable $e) {
-                continue;
-            }
-
+        foreach ($reflections as $className => $reflection) {
             $baseRoute   = "";
             $testMethods = [];
 
