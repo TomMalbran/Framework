@@ -469,9 +469,9 @@ class Schema {
 
         $fields = $modification->getFields();
         if (isset($fields["position"])) {
-            $elem        = self::getEntityData($query);
-            $newPosition = self::ensureEntityOrder($elem, $fields, $orderQuery);
-            $modification->setField("position", $newPosition);
+            $elem         = self::getEntityData($query);
+            $savePosition = self::ensureEntityOrder($elem, $fields, $orderQuery);
+            $modification->setField("position", $savePosition);
         }
 
         $query = self::generateQueryID($query, false);
@@ -517,25 +517,14 @@ class Schema {
      * @return integer
      */
     protected static function ensureEntityOrder(ArrayAccess|array|null $oldFields, ArrayAccess|array|null $newFields, ?Query $query = null): int {
-        $oldPosition = !empty($oldFields["position"]) ? (int)$oldFields["position"] : 0;
-        $newPosition = !empty($newFields["position"]) ? (int)$newFields["position"] : 0;
-        $updPosition = self::ensureOrder($oldPosition, $newPosition, $query);
-        return $updPosition;
-    }
+        $isEdit       = !empty($oldFields) && !empty($newFields);
+        $oldPosition  = !empty($oldFields["position"]) ? (int)$oldFields["position"] : 0;
+        $newPosition  = !empty($newFields["position"]) ? (int)$newFields["position"] : 0;
+        $nextPosition = self::getNextPosition($query);
 
-    /**
-     * Ensures that the Order of the Entities is correct on Create/Edit
-     * @param integer    $oldPosition
-     * @param integer    $newPosition
-     * @param Query|null $query       Optional.
-     * @return integer
-     */
-    protected static function ensureOrder(int $oldPosition, int $newPosition, ?Query $query = null): int {
-        $isEdit          = !empty($oldPosition);
-        $nextPosition    = self::getNextPosition($query);
-        $oldPosition     = $isEdit ? $oldPosition : $nextPosition;
-        $newPosition     = $newPosition > 0 ? $newPosition : $nextPosition - ($isEdit ? 1 : 0);
-        $updatedPosition = $newPosition;
+        $oldPosition  = $isEdit ? $oldPosition : $nextPosition;
+        $newPosition  = $newPosition > 0 ? $newPosition : $nextPosition - ($isEdit ? 1 : 0);
+        $savePosition = $newPosition;
 
         if (!$isEdit && (empty($newPosition) || $newPosition >= $nextPosition)) {
             return $nextPosition;
@@ -545,7 +534,7 @@ class Schema {
         }
 
         if ($isEdit && $newPosition > $nextPosition) {
-            $updatedPosition = $nextPosition - 1;
+            $savePosition = $nextPosition - 1;
         }
 
         $newQuery = self::generateQuery($query);
@@ -562,7 +551,7 @@ class Schema {
         self::db()->update(self::structure()->table, [
             "position" => $assign,
         ], $newQuery);
-        return $updatedPosition;
+        return $savePosition;
     }
 
     /**
