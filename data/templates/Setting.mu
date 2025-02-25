@@ -56,7 +56,7 @@ class Setting {
 {{/isFirst}}
     /**
      * Returns the value of "{{title}}"
-     * @return {{docType}}
+     * @return {{{docType}}}
      */
     public static function {{getter}}{{prefix}}{{name}}(): {{type}} {
         $result = Settings::get("{{section}}", "{{variable}}");
@@ -79,7 +79,7 @@ class Setting {
 
     /**
      * Sets the value of "{{title}}"
-     * @param {{docType}} $value
+     * @param {{{docType}}} $value
      * @return boolean
      */
     public static function set{{prefix}}{{name}}({{type}} $value): bool {
