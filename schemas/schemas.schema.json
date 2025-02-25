@@ -50,23 +50,23 @@
                     "additionalProperties" : false,
                     "required"             : [ "type" ],
                     "properties"           : {
-                        "type"      : { "$ref" : "#/$defs/type"  },
-                        "length"    : { "type" : "number"        },
-                        "isSigned"  : { "type" : "boolean"       },
-                        "decimals"  : { "type" : "number"        },
-                        "dateType"  : { "$ref" : "#/$defs/field" },
-                        "date"      : { "$ref" : "#/$defs/field" },
-                        "hour"      : { "$ref" : "#/$defs/field" },
-                        "path"      : { "$ref" : "#/$defs/field" },
-                        "default"   : {                          },
-                        "isPrimary" : { "type" : "boolean"       },
-                        "isKey"     : { "type" : "boolean"       },
-                        "isName"    : { "type" : "boolean"       },
-                        "isUnique"  : { "type" : "boolean"       },
-                        "isParent"  : { "type" : "boolean"       },
-                        "noExists"  : { "type" : "boolean"       },
-                        "noEmpty"   : { "type" : "boolean"       },
-                        "cantEdit"  : { "type" : "boolean"       }
+                        "type"      : { "$ref" : "#/$defs/type"     },
+                        "length"    : { "type" : "number"           },
+                        "isSigned"  : { "type" : "boolean"          },
+                        "decimals"  : { "type" : "number"           },
+                        "date"      : { "$ref" : "#/$defs/field"    },
+                        "dateType"  : { "$ref" : "#/$defs/dateType" },
+                        "hour"      : { "$ref" : "#/$defs/field"    },
+                        "path"      : { "$ref" : "#/$defs/field"    },
+                        "default"   : {                             },
+                        "isPrimary" : { "type" : "boolean"          },
+                        "isKey"     : { "type" : "boolean"          },
+                        "isName"    : { "type" : "boolean"          },
+                        "isUnique"  : { "type" : "boolean"          },
+                        "isParent"  : { "type" : "boolean"          },
+                        "noExists"  : { "type" : "boolean"          },
+                        "noEmpty"   : { "type" : "boolean"          },
+                        "cantEdit"  : { "type" : "boolean"          }
                     }
                 }
             }
@@ -243,6 +243,13 @@
                 "longtext",
                 "encrypt",
                 "file"
+            ]
+        },
+        "dateType" : {
+            "enum" : [
+                "start",
+                "middle",
+                "end"
             ]
         }
     }
