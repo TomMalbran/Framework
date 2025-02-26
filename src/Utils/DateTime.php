@@ -1072,6 +1072,18 @@ class DateTime {
     }
 
     /**
+     * Returns the difference between 2 Time Stamps in Hours
+     * @param integer $timeStamp1
+     * @param integer $timeStamp2
+     * @return integer
+     */
+    public static function getHoursDiff(int $timeStamp1, int $timeStamp2): int {
+        return floor(abs($timeStamp1 - $timeStamp2) / 3600);
+    }
+
+
+
+    /**
      * Adds the given Minutes to the given Time Stamp
      * @param integer $timeStamp   Optional.
      * @param integer $minuteDiff  Optional.
