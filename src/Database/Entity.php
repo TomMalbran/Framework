@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Request;
 use Framework\Discovery\Discovery;
+use Framework\Utils\Strings;
 
 use ArrayAccess;
 use JsonSerializable;
@@ -134,6 +135,17 @@ class Entity implements ArrayAccess, JsonSerializable {
             return $this->$key;
         }
         return $default;
+    }
+
+    /**
+     * Gets the Data as a String
+     * @param string $key
+     * @param string $default Optional.
+     * @return string
+     */
+    public function getString(string $key, string $default = ""): string {
+        $result = $this->get($key, $default);
+        return Strings::toString($result);
     }
 
 
