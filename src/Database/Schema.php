@@ -103,13 +103,15 @@ class Schema {
     protected static function getColumnData(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
         $selection = new Selection(self::structure());
+        $selection->addFields();
         $selection->addSelects($column, true);
         $selection->addJoins();
 
-        $columnKey = !empty($columnKey) ? $columnKey : Strings::substringAfter($column, ".");
-        $request   = $selection->request($query);
-        $result    = [];
+        $selection->request($query);
+        $request = $selection->resolve();
+        $result  = [];
 
+        $columnKey = !empty($columnKey) ? $columnKey : Strings::substringAfter($column, ".");
         foreach ($request as $row) {
             if (!empty($row[$columnKey]) && !Arrays::contains($result, $row[$columnKey])) {
                 $result[] = $row[$columnKey];
