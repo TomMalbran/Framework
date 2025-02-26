@@ -3,6 +3,7 @@ namespace Framework\Utils;
 
 use Framework\File\File;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -46,6 +47,26 @@ class JSON {
             return Arrays::isArray($value) ? $value : [];
         }
         return (array)json_decode($value, true);
+    }
+
+    /**
+     * Decodes a String if it is not already decoded
+     * @param mixed $value
+     * @return Dictionary
+     */
+    public static function decodeAsDictionary(mixed $value): Dictionary {
+        $result = self::decodeAsArray($value);
+        return new Dictionary($result);
+    }
+
+    /**
+     * Decodes a String as a list of Strings
+     * @param mixed $value
+     * @return string[]
+     */
+    public static function decodeAsStrings(mixed $value): array {
+        $result = self::decodeAsArray($value);
+        return Arrays::toStrings($result);
     }
 
     /**
