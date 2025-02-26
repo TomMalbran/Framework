@@ -85,13 +85,22 @@ class Numbers {
 
     /**
      * Returns the given number as a float using the given decimals
-     * @param integer $number
-     * @param integer $decimals
+     * @param mixed   $number
+     * @param integer $decimals Optional.
      * @return float
      */
-    public static function toFloat(int $number, int $decimals): float {
-        $padding = pow(10, $decimals);
-        return $number / $padding;
+    public static function toFloat(mixed $number, int $decimals = 0): float {
+        if (is_int($number)) {
+            $padding = pow(10, $decimals);
+            return $number / $padding;
+        }
+        if (is_float($number)) {
+            return $number;
+        }
+        if (is_numeric($number)) {
+            return floatval($number);
+        }
+        return 0;
     }
 
     /**
