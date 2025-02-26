@@ -47,6 +47,15 @@ class Arrays {
     }
 
     /**
+     * Returns true if the given value is a dictionary
+     * @param mixed $array
+     * @return boolean
+     */
+    public static function isDict(mixed $array): bool {
+        return self::isArray($array) && !array_is_list($array);
+    }
+
+    /**
      * Returns true if the given value is a map
      * @param mixed $array
      * @return boolean
@@ -83,6 +92,9 @@ class Arrays {
      * @return string[]
      */
     public static function toStrings(mixed $array, string $key = "", bool $withoutEmpty = false): array {
+        if (is_string($array)) {
+            return [ $array ];
+        }
         if (!self::isArray($array)) {
             return [];
         }
@@ -361,8 +373,9 @@ class Arrays {
 
     /**
      * Removes the empty entries from the given array
-     * @param mixed[] $array
-     * @return mixed[]
+     * @template T
+     * @param T[] $array
+     * @return T[]
      */
     public static function removeEmpty(array $array): array {
         $result = [];
@@ -376,8 +389,9 @@ class Arrays {
 
     /**
      * Removes the duplicate entries from the given array
-     * @param mixed[] $array
-     * @return mixed[]
+     * @template T
+     * @param T[] $array
+     * @return T[]
      */
     public static function removeDuplicates(array $array): array {
         $result = [];
@@ -802,21 +816,21 @@ class Arrays {
 
     /**
      * Returns the Value at the given id with the given key
-     * @param mixed[] $array
-     * @param string  $idKey
-     * @param mixed   $idValue
-     * @param string  $key     Optional.
-     * @return mixed|null
+     * @template T
+     * @param T[]    $array
+     * @param string $idKey
+     * @param mixed  $idValue
+     * @return T|null
      */
-    public static function findValue(array $array, string $idKey, mixed $idValue, string $key = ""): mixed {
+    public static function findValue(array $array, string $idKey, mixed $idValue) {
         foreach ($array as $elem) {
             if (self::isObject($elem)) {
                 if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
-                    return $key ? $elem->$key : $elem;
+                    return $elem;
                 }
             } elseif (self::isArrayLike($elem)) {
                 if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
-                    return $key ? $elem[$key] : $elem;
+                    return $elem;
                 }
             }
         }
