@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 
 use Redis as RedisClient;
@@ -78,19 +79,19 @@ class Redis {
      * Gets a Key
      * @param string  $module
      * @param integer $id
-     * @return mixed
+     * @return Dictionary
      */
-    public static function get(string $module, int $id): mixed {
+    public static function get(string $module, int $id): Dictionary {
         if (!self::load()) {
-            return null;
+            return new Dictionary();
         }
 
         try {
             $key   = "$module-$id";
             $value = self::$client->get($key);
-            return JSON::decodeAsArray($value);
+            return JSON::decodeAsDictionary($value);
         } catch (Exception $e) {
-            return null;
+            return new Dictionary();
         }
     }
 }
