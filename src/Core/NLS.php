@@ -99,6 +99,34 @@ class NLS {
     }
 
     /**
+     * Returns a List from the data
+     * @param string $key
+     * @param string $language Optional.
+     * @return string[]
+     */
+    public static function getList(string $key, string $language = ""): array {
+        $result = self::get($key, $language);
+        if (Arrays::isList($result)) {
+            return $result;
+        }
+        return [];
+    }
+
+    /**
+     * Returns a Map from the data
+     * @param string $key
+     * @param string $language Optional.
+     * @return array<string,string>
+     */
+    public static function getMap(string $key, string $language = ""): array {
+        $result = self::get($key, $language);
+        if (Arrays::isDict($result)) {
+            return $result;
+        }
+        return [];
+    }
+
+    /**
      * Returns a string from the data
      * @param string $key
      * @param string $language Optional.
