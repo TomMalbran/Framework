@@ -5,11 +5,12 @@ use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Utils\Arrays;
+use Framework\Utils\CSV;
 use Framework\Utils\DateTime;
+use Framework\Utils\Dictionary;
+use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
-use Framework\Utils\CSV;
-use Framework\Utils\JSON;
 use Framework\Utils\Utils;
 
 use ArrayAccess;
@@ -161,6 +162,15 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      */
     public function getArray(string $key): array {
         return Arrays::removeEmpty($this->get($key, []));
+    }
+
+    /**
+     * Returns the request data at the given key as a Dictionary
+     * @param string $key
+     * @return Dictionary
+     */
+    public function getDictionary(string $key): Dictionary {
+        return JSON::decodeAsDictionary($this->get($key, "[]"));
     }
 
     /**
