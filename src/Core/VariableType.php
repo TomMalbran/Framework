@@ -76,7 +76,7 @@ enum VariableType {
      */
     public static function getDocType(VariableType $type): string {
         return match ($type) {
-            self::Array   => "array<string,string>",
+            self::Array   => "array<string,mixed>",
             self::Boolean => "boolean",
             self::Integer => "integer",
             self::Float   => "float",
