@@ -61,12 +61,13 @@ class JSON {
 
     /**
      * Decodes a String as a list of Strings
-     * @param mixed $value
+     * @param mixed   $value
+     * @param boolean $withoutEmpty Optional.
      * @return string[]
      */
-    public static function decodeAsStrings(mixed $value): array {
+    public static function decodeAsStrings(mixed $value, bool $withoutEmpty = false): array {
         $result = self::decodeAsArray($value);
-        return Arrays::toStrings($result);
+        return Arrays::toStrings($result, withoutEmpty: $withoutEmpty);
     }
 
     /**
