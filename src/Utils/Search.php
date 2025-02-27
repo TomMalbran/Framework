@@ -12,16 +12,18 @@ class Search implements JsonSerializable {
 
     public int    $id;
     public string $title;
-    public mixed  $data;
+
+    /** @var array<string,mixed> */
+    public array  $data;
 
 
     /**
      * Creates a new Search instance
-     * @param integer|string $id
-     * @param string         $title
-     * @param mixed|null     $data  Optional.
+     * @param integer|string           $id
+     * @param string                   $title
+     * @param array<string,mixed>|null $data  Optional.
      */
-    public function __construct(int|string $id, string $title, mixed $data = null) {
+    public function __construct(int|string $id, string $title, ?array $data = null) {
         $this->id    = (int)$id;
         $this->title = $title;
 
@@ -78,9 +80,9 @@ class Search implements JsonSerializable {
 
     /**
      * Creates a select using the given array
-     * @param mixed[]         $array
-     * @param string          $idKey
-     * @param string[]|string $nameKey
+     * @param array<string,mixed>[] $array
+     * @param string                $idKey
+     * @param string[]|string       $nameKey
      * @return Search[]
      */
     public static function create(array $array, string $idKey, array|string $nameKey): array {
