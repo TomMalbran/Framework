@@ -12,9 +12,9 @@ use CURLStringFile;
  */
 class OpenAI {
 
-    const BaseUrl = "https://api.openai.com/v1";
+    private const BaseUrl = "https://api.openai.com/v1";
 
-    const MaxAssistantFiles = 20;
+    public  const MaxAssistantFiles = 20;
 
 
     /**
@@ -102,6 +102,30 @@ class OpenAI {
         }
         $request = self::get("/models/$model");
         return !empty($request["id"]);
+    }
+
+
+
+    /**
+     * Creates a Completion and returns the Response
+     * @param string $model
+     * @param string $message
+     * @return string
+     */
+    public static function createCompletion(string $model, string $message): string {
+        $request = self::post("/chat/completions", [
+            "model"    => $model,
+            "messages" => [
+                [
+                    "role"    => "user",
+                    "content" => $message,
+                ],
+            ],
+        ]);
+        if (empty($request["choices"][0])) {
+            return "";
+        }
+        return $request["choices"][0]["message"]["content"];
     }
 
 
