@@ -24,7 +24,19 @@ class Strings {
      * @return string
      */
     public static function toString(mixed $value): string {
+        if (self::isString($value)) {
+            return $value;
+        }
         return strval($value);
+    }
+
+    /**
+     * Returns the given value as a string
+     * @param mixed $value
+     * @return string
+     */
+    public static function trim(mixed $value): string {
+        return trim(self::toString($value));
     }
 
     /**
