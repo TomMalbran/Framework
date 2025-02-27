@@ -321,8 +321,9 @@ class Arrays {
 
     /**
      * Returns a random value from the array
-     * @param mixed[] $array
-     * @return mixed
+     * @template TValue
+     * @param TValue[] $array
+     * @return TValue
      */
     public static function random(array $array): mixed {
         return $array[array_rand($array)];
@@ -330,8 +331,9 @@ class Arrays {
 
     /**
      * Removes the First value from the array
-     * @param mixed[] $array
-     * @return mixed[]
+     * @template TValue
+     * @param TValue[] $array
+     * @return TValue[]
      */
     public static function removeFirst(array $array): array {
         array_shift($array);
@@ -340,8 +342,9 @@ class Arrays {
 
     /**
      * Removes the Last value from the array
-     * @param mixed[] $array
-     * @return mixed[]
+     * @template TValue
+     * @param TValue[] $array
+     * @return TValue[]
      */
     public static function removeLast(array $array): array {
         array_pop($array);
@@ -350,11 +353,11 @@ class Arrays {
 
     /**
      * Removes the given value from the array
-     * @template T
-     * @param T[]            $array
+     * @template TValue
+     * @param TValue[]       $array
      * @param string|integer $key
      * @param string|integer $idKey Optional.
-     * @return T[]
+     * @return TValue[]
      */
     public static function removeValue(array $array, string|int $key, string|int $idKey = ""): array {
         $result = [];
@@ -376,9 +379,9 @@ class Arrays {
 
     /**
      * Removes the empty entries from the given array
-     * @template T
-     * @param T[] $array
-     * @return T[]
+     * @template TValue
+     * @param TValue[] $array
+     * @return TValue[]
      */
     public static function removeEmpty(array $array): array {
         $result = [];
@@ -392,9 +395,9 @@ class Arrays {
 
     /**
      * Removes the duplicate entries from the given array
-     * @template T
-     * @param T[] $array
-     * @return T[]
+     * @template TValue
+     * @param TValue[] $array
+     * @return TValue[]
      */
     public static function removeDuplicates(array $array): array {
         $result = [];
@@ -435,13 +438,13 @@ class Arrays {
 
     /**
      * Adds the given element at the given position
-     * @template T
-     * @phpstan-param T ...$elem
+     * @template TValue
+     * @phpstan-param TValue ...$elem
      *
-     * @param T[]     $array
-     * @param integer $position
-     * @param mixed   ...$elem
-     * @return T[]
+     * @param TValue[] $array
+     * @param integer  $position
+     * @param mixed    ...$elem
+     * @return TValue[]
      */
     public static function addAt(array $array, int $position, mixed ...$elem): array {
         array_splice($array, $position, 0, $elem);
@@ -450,10 +453,11 @@ class Arrays {
 
     /**
      * Slices an Array from the index the amount of items
-     * @param mixed[]      $array
+     * @template TValue
+     * @param TValue[]     $array
      * @param integer      $from
      * @param integer|null $amount Optional.
-     * @return mixed[]
+     * @return TValue[]
      */
     public static function slice(array $array, int $from, ?int $amount = null): array {
         return array_slice($array, $from, $amount);
@@ -461,10 +465,11 @@ class Arrays {
 
     /**
      * Paginates an Array from the page to the amount of items
-     * @param mixed[] $array
-     * @param integer $page
-     * @param integer $amount
-     * @return mixed[]
+     * @template TValue
+     * @param TValue[] $array
+     * @param integer  $page
+     * @param integer  $amount
+     * @return TValue[]
      */
     public static function paginate(array $array, int $page, int $amount): array {
         $from = $page * $amount;
@@ -507,10 +512,10 @@ class Arrays {
 
     /**
      * Sorts an array using the given callback
-     * @template T
-     * @param T[]           $array
+     * @template TValue
+     * @param TValue[]      $array
      * @param callable|null $callback Optional.
-     * @return T[]
+     * @return TValue[]
      */
     public static function sort(array $array, ?callable $callback = null): array {
         if (empty($callback)) {
@@ -525,10 +530,11 @@ class Arrays {
 
     /**
      * Sorts the arrays at the given key of the given array using the given callback
-     * @param mixed[]  $array
+     * @template TValue
+     * @param TValue[] $array
      * @param string   $field
      * @param callable $callback
-     * @return mixed[]
+     * @return TValue[]
      */
     public static function sortArray(array &$array, string $field, callable $callback): array {
         foreach ($array as $value) {
@@ -541,9 +547,9 @@ class Arrays {
 
     /**
      * Returns the given array reversed
-     * @template T
-     * @param T[] $array
-     * @return T[]
+     * @template TValue
+     * @param TValue[] $array
+     * @return TValue[]
      */
     public static function reverse(array $array): array {
         return array_reverse($array);
@@ -616,10 +622,10 @@ class Arrays {
 
     /**
      * Creates a Map using the given Array
-     * @template T
-     * @param T[]    $array
-     * @param string $key
-     * @return array<string|integer,T>
+     * @template TValue
+     * @param TValue[] $array
+     * @param string   $key
+     * @return array<string|integer,TValue>
      */
     public static function createMap(array $array, string $key): array {
         $result = [];
@@ -650,10 +656,10 @@ class Arrays {
 
     /**
      * Creates a Map of Lists using the given Array
-     * @template T
-     * @param T[]    $array
-     * @param string $key
-     * @return array<integer,T[]>
+     * @template TValue
+     * @param TValue[] $array
+     * @param string   $key
+     * @return array<integer,TValue[]>
      */
     public static function createMapList(array $array, string $key): array {
         $result = [];
@@ -819,11 +825,11 @@ class Arrays {
 
     /**
      * Returns the Value at the given id with the given key
-     * @template T
-     * @param T[]    $array
-     * @param string $idKey
-     * @param mixed  $idValue
-     * @return T|null
+     * @template TValue
+     * @param TValue[] $array
+     * @param string   $idKey
+     * @param mixed    $idValue
+     * @return TValue|null
      */
     public static function findValue(array $array, string $idKey, mixed $idValue) {
         foreach ($array as $elem) {
