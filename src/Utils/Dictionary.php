@@ -4,13 +4,14 @@ namespace Framework\Utils;
 use Framework\Utils\JSON;
 
 use IteratorAggregate;
+use Countable;
 use Traversable;
 use JsonSerializable;
 
 /**
  * A Dictionary wrapper
  */
-class Dictionary implements IteratorAggregate, JsonSerializable {
+class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /** @var array{} */
     private array $data;
@@ -45,6 +46,18 @@ class Dictionary implements IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns true if the data is a list
+     * @param string $key Optional.
+     * @return boolean
+     */
+    public function isList(string $key = ""): bool {
+        if ($key !== "") {
+            return !empty($this->data[$key]) && Arrays::isList($this->data[$key]);
+        }
+        return Arrays::isList($this->data);
+    }
+
+    /**
      * Returns true if the key exits in the data
      * @param string $key
      * @return boolean
@@ -74,12 +87,23 @@ class Dictionary implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Sets the value of the given key
+     * Sets a string value of the given key
      * @param string $key
      * @param string $value
      * @return Dictionary
      */
     public function setString(string $key, string $value): Dictionary {
+        $this->data[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * Sets an int value of the given key
+     * @param string  $key
+     * @param integer $value
+     * @return Dictionary
+     */
+    public function setInt(string $key, int $value): Dictionary {
         $this->data[$key] = $value;
         return $this;
     }
@@ -274,6 +298,16 @@ class Dictionary implements IteratorAggregate, JsonSerializable {
      */
     public function toJSON(): string {
         return JSON::encode($this->data);
+    }
+
+
+
+    /**
+     * Implements the Countable Interface
+     * @return integer
+     */
+    public function count(): int {
+        return count($this->data);
     }
 
     /**
