@@ -105,12 +105,20 @@ class Join {
             $values = $field->toValues($data);
             $result = array_merge($result, $values);
         }
+
         foreach ($this->merges as $merge) {
             $result[$merge->key] = Arrays::getValue($data, $merge->fields, $merge->glue);
         }
+
         foreach ($this->defaults as $key => $fields) {
             if (empty($result[$key])) {
-                $result[$key] = Arrays::getAnyValue($data, $fields, "");
+                $result[$key] = "";
+                foreach ($fields as $key) {
+                    if (!empty($data[$key])) {
+                        $result[$key] = $data[$key];
+                        break;
+                    }
+                }
             }
         }
         return $result;
