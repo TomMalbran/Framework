@@ -34,12 +34,11 @@ class CSV {
      * @param string[]|string $value
      * @param string          $separator Optional.
      * @param string[]        $fields    Optional.
-     * @param boolean         $asArray   Optional.
-     * @return mixed[]
+     * @return string[]|string[][]
      */
-    public static function decode(array|string $value, string $separator = ",", array $fields = [], bool $asArray = false): array {
+    public static function decode(array|string $value, string $separator = ",", array $fields = []): array {
         if (Arrays::isArray($value)) {
-            return self::parseLine($value, $fields, $asArray);
+            return self::parseLine($value, $fields);
         }
         if (!Strings::isString($value)) {
             return [];
@@ -47,16 +46,27 @@ class CSV {
 
         if (!Strings::contains($value, "\n")) {
             $csv = str_getcsv($value, $separator);
-            return self::parseLine($csv, $fields, $asArray);
+            return self::parseLine($csv, $fields);
         }
 
+        return self::decodeFile($value, $separator, $fields);
+    }
+
+    /**
+     * Decodes a CSV File
+     * @param string   $value
+     * @param string   $separator Optional.
+     * @param string[] $fields    Optional.
+     * @return string[][]
+     */
+    public static function decodeFile(string $value, string $separator = ",", array $fields = []): array {
         $lines  = Strings::split($value, "\n");
         $result = [];
         foreach ($lines as $line) {
             if (!empty($line)) {
                 $csv = str_getcsv($line, $separator);
                 if ($csv[0] !== null) {
-                    $result[] = self::parseLine($csv, $fields, $asArray);;
+                    $result[] = self::parseLine($csv, $fields);
                 }
             }
         }
@@ -67,10 +77,9 @@ class CSV {
      * Parses a CSV Line
      * @param string[] $value
      * @param string[] $fields
-     * @param boolean  $asArray Optional.
      * @return mixed
      */
-    private static function parseLine(array $value, array $fields, bool $asArray = false): mixed {
+    private static function parseLine(array $value, array $fields): mixed {
         if (empty($fields)) {
             return $value;
         }
@@ -79,7 +88,7 @@ class CSV {
         foreach ($fields as $index => $field) {
             $result[$field] = isset($value[$index]) ? $value[$index] : "";
         }
-        return $asArray ? $result : (object)$result;
+        return $result;
     }
 
 
