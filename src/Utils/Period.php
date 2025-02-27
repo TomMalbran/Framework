@@ -3,6 +3,7 @@ namespace Framework\Utils;
 
 use Framework\Request;
 use Framework\Utils\DateTime;
+use Framework\Utils\Dictionary;
 
 /**
  * The Period Types used by the System
@@ -85,10 +86,26 @@ class Period {
      * @param string $period
      * @return Period
      */
-    public static function createFromPeriod(string $period): Period {
+    public static function fromPeriod(string $period): Period {
         $data = new Request([ "period" => $period ]);
         return new Period($data);
     }
+
+    /**
+     * Creates a new Period instance from the given Period
+     * @param Dictionary $data
+     * @return Period
+     */
+    public static function fromDictionary(Dictionary $data): Period {
+        $data = new Request([
+            "period"   => $data->getString("period"),
+            "fromDate" => $data->getString("fromDate"),
+            "toDate"   => $data->getString("toDate"),
+        ]);
+        return new Period($data);
+    }
+
+
 
     /**
      * Returns true if the Period is empty
