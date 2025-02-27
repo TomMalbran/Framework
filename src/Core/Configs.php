@@ -6,6 +6,7 @@ use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
+use Framework\Utils\Utils;
 
 /**
  * The Configs
@@ -16,10 +17,10 @@ class Configs {
     private static string $environment = "local";
 
     /** @var array{}[] */
-    private static array $data   = [];
+    private static array $data         = [];
 
     /** @var string[] */
-    private static array $environments = [ "dev", "stage", "production" ];
+    private static array $environments = [];
 
 
 
@@ -32,27 +33,36 @@ class Configs {
             return false;
         }
 
-        $framePath  = Discovery::getFramePath();
-        $frameData  = self::loadENV($framePath, ".env.example");
+        $framePath   = Discovery::getFramePath();
+        $frameData   = self::loadENV($framePath, ".env.example");
 
-        $appPath    = Discovery::getAppPath();
-        $appData    = self::loadENV($appPath, ".env");
+        $appPath     = Discovery::getAppPath();
+        $appData     = self::loadENV($appPath, ".env");
 
-        $currentUrl = Server::getUrl();
-        $currentUrl = File::addLastSlash($currentUrl);
-        $replace    = [];
+        $currentUrl  = Server::getUrl();
+        $currentHost = Utils::getHost($currentUrl);
+        $replace     = [];
 
-        foreach (self::$environments as $environment) {
-            if (File::exists($appPath, ".env.$environment")) {
-                $values = self::loadENV($appPath, ".env.$environment");
-                foreach ($values as $key => $value) {
-                    if (Strings::endsWith($key, "URL") && $value == $currentUrl) {
-                        self::$environment = $environment;
-                        $replace = $values;
-                        break 2;
-                    }
+        // Read all the .env files in the App Path
+        $files = File::getFilesInDir($appPath);
+        foreach ($files as $file) {
+            if (!Strings::startsWith($file, ".env.")) {
+                continue;
+            }
+            $environment = Strings::replace($file, ".env.", "");
+            if (Arrays::contains(self::$environments, $environment)) {
+                continue;
+            }
+
+            $values = self::loadENV($appPath, $file);
+            foreach ($values as $key => $value) {
+                if (Strings::endsWith($key, "URL") && Utils::getHost($value) === $currentHost) {
+                    self::$environment = $environment;
+                    $replace = $values;
+                    break;
                 }
             }
+            self::$environments[] = $environment;
         }
 
         self::$loaded = true;
@@ -120,6 +130,7 @@ class Configs {
      * @return string[]
      */
     public static function getEnvironments(): array {
+        self::load();
         return self::$environments;
     }
 

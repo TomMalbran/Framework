@@ -281,12 +281,24 @@ class Utils {
         if (!Strings::startsWith($domain, "http://")) {
             $domain = "http://$domain";
         }
-        $host = parse_url($domain, PHP_URL_HOST);
+        $host = self::getHost($domain);
 
         if ($host) {
             return Strings::replace($host, "www.", "");
         }
         return "";
+    }
+
+    /**
+     * Returns the host of the given Url
+     * @param string $url
+     * @return string
+     */
+    public static function getHost(string $url): string {
+        if (empty($url)) {
+            return "";
+        }
+        return parse_url($url, PHP_URL_HOST);
     }
 
     /**
