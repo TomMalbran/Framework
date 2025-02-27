@@ -193,7 +193,7 @@ class Errors implements JsonSerializable {
             return !empty($this->errors);
         }
 
-        $errors = Arrays::toArray($error);
+        $errors = Arrays::toStrings($error);
         foreach ($errors as $errorKey) {
             if (Strings::contains($errorKey, "-")) {
                 foreach (array_keys($this->errors) as $key) {

@@ -38,7 +38,7 @@ class Credential extends CredentialSchema {
 
         $query = Query::create("access", "IN", $accessNames);
         if (!empty($filter)) {
-            $filters = Arrays::toArray($filter);
+            $filters = Arrays::toStrings($filter);
             foreach ($filters as $key) {
                 $query->add($key, "=", $value);
             }
@@ -371,7 +371,7 @@ class Credential extends CredentialSchema {
     ): array {
         $query = self::createAccessQuery($accessName);
         $query->search([ "firstName", "lastName", "email" ], $text, "LIKE", true, $splitText);
-        $query->addIf("CREDENTIAL_ID", "IN", Arrays::toArray($credentialID), $credentialID !== null);
+        $query->addIf("CREDENTIAL_ID", "IN", Arrays::toInts($credentialID), $credentialID !== null);
         $query->limit($amount);
 
         $list   = self::getEntityList($query);

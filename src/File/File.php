@@ -455,7 +455,7 @@ class File {
      */
     public static function createZip(string $name, array|string $files): ?ZipArchive {
         $zip   = new ZipArchive();
-        $files = Arrays::toArray($files);
+        $files = Arrays::toStrings($files);
 
         if ($zip->open($name, ZIPARCHIVE::CREATE)) {
             foreach ($files as $file) {

@@ -86,7 +86,7 @@ class Selection {
      * @return Selection
      */
     public function addSelects(array|string $selects, bool $addMainKey = false): Selection {
-        $selects = Arrays::toArray($selects);
+        $selects = Arrays::toStrings($selects);
         foreach ($selects as $select) {
             if ($addMainKey) {
                 $this->selects[] = $this->structure->getKey($select);
@@ -275,7 +275,7 @@ class Selection {
 
             // Parse the Extras
             if (!empty($extras)) {
-                $extras = Arrays::toArray($extras);
+                $extras = Arrays::toStrings($extras);
                 foreach ($extras as $extra) {
                     $fields[$extra] = $row[$extra];
                 }

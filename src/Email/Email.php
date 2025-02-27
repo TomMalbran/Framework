@@ -86,7 +86,7 @@ class Email {
         ?string $subject = null,
         bool $sendAlways = false,
     ): EmailResult {
-        $sendTo  = Arrays::toArray($sendTo);
+        $sendTo  = Arrays::toStrings($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
         $result  = EmailResult::NoEmails;

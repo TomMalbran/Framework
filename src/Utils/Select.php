@@ -143,7 +143,7 @@ class Select implements JsonSerializable {
 
             $item = new Select($key, $value);
             if (!empty($extraKey)) {
-                $extraKeys = Arrays::toArray($extraKey);
+                $extraKeys = Arrays::toStrings($extraKey);
                 foreach ($extraKeys as $extraKey) {
                     $item->set($extraKey, Arrays::getValue($row, $extraKey, useEmpty: true));
                 }

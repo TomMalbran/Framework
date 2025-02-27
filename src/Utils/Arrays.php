@@ -118,6 +118,9 @@ class Arrays {
      * @return integer[]
      */
     public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
+        if (is_int($array)) {
+            return [ $array ];
+        }
         if (!self::isArray($array)) {
             return [];
         }

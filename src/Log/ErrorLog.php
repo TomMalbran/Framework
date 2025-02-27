@@ -64,7 +64,7 @@ class ErrorLog extends LogErrorSchema {
      * @return boolean
      */
     public static function markResolved(array|int $logID): bool {
-        $logIDs = Arrays::toArray($logID);
+        $logIDs = Arrays::toInts($logID);
         $query  = Query::create("LOG_ID", "IN", $logIDs);
         return self::editEntity($query, isResolved: true);
     }
@@ -75,7 +75,7 @@ class ErrorLog extends LogErrorSchema {
      * @return boolean
      */
     public static function delete(array|int $logID): bool {
-        $logIDs = Arrays::toArray($logID);
+        $logIDs = Arrays::toInts($logID);
         $query  = Query::create("LOG_ID", "IN", $logIDs);
         return self::removeEntity($query);
     }

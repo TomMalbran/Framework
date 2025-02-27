@@ -63,7 +63,7 @@ class EmailQueue extends EmailQueueSchema {
      * @return boolean
      */
     public static function add(EmailTemplateEntity $template, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false, int $dataID = 0): bool {
-        $sendTo  = Arrays::toArray($sendTo);
+        $sendTo  = Arrays::toStrings($sendTo);
         $subject = $subject ?: $template->subject;
         $message = $message ?: $template->message;
 
@@ -132,7 +132,7 @@ class EmailQueue extends EmailQueueSchema {
      * @return boolean
      */
     public static function markAsNotSent(array|int $emailID): bool {
-        $emailIDs = Arrays::toArray($emailID);
+        $emailIDs = Arrays::toInts($emailID);
         $query    = Query::create("EMAIL_ID", "IN", $emailIDs);
         return self::editEntity(
             $query,
