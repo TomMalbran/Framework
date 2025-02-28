@@ -16,8 +16,6 @@ use Framework\Schema\CredentialSchema;
 use Framework\Schema\CredentialEntity;
 use Framework\Schema\CredentialColumn;
 
-use ArrayAccess;
-
 /**
  * The Auth Credential
  */
@@ -808,12 +806,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a parsed Name for the given Credential
-     * @param ArrayAccess|array{} $data
-     * @param boolean             $withEmail Optional.
-     * @param string              $prefix    Optional.
+     * @param mixed   $data
+     * @param boolean $withEmail Optional.
+     * @param string  $prefix    Optional.
      * @return string
      */
-    public static function getName(ArrayAccess|array $data, bool $withEmail = false, string $prefix = ""): string {
+    public static function getName(mixed $data, bool $withEmail = false, string $prefix = ""): string {
         $id        = Arrays::getValue($data, "credentialID", "", $prefix);
         $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
         $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
@@ -834,12 +832,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a parsed Phone for the given Credential
-     * @param ArrayAccess|array{} $data
-     * @param string              $prefix   Optional.
-     * @param boolean             $withPlus Optional.
+     * @param mixed   $data
+     * @param string  $prefix   Optional.
+     * @param boolean $withPlus Optional.
      * @return string
      */
-    public static function getPhone(ArrayAccess|array $data, string $prefix = "", bool $withPlus = false): string {
+    public static function getPhone(mixed $data, string $prefix = "", bool $withPlus = false): string {
         $phone     = Arrays::getValue($data, "phone",     "", $prefix);
         $cellphone = Arrays::getValue($data, "cellphone", "", $prefix);
         $iddRoot   = Arrays::getValue($data, "iddRoot",   "", $prefix);
@@ -855,11 +853,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a WhatsApp url
-     * @param ArrayAccess|array{} $data
-     * @param string              $prefix Optional.
+     * @param mixed  $data
+     * @param string $prefix Optional.
      * @return string
      */
-    public static function getWhatsAppUrl(ArrayAccess|array $data, string $prefix = ""): string {
+    public static function getWhatsAppUrl(mixed $data, string $prefix = ""): string {
         $whatsapp = self::getPhone($data, $prefix, false);
         return Utils::getWhatsAppUrl($whatsapp);
     }

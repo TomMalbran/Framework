@@ -513,15 +513,15 @@ class Schema {
 
     /**
      * Ensures that the Order of the Entities is correct
-     * @param ArrayAccess|array{}|null $oldFields
-     * @param ArrayAccess|array{}|null $newFields
-     * @param Query|null               $query     Optional.
+     * @param mixed      $oldFields
+     * @param mixed      $newFields
+     * @param Query|null $query     Optional.
      * @return integer
      */
-    protected static function ensureEntityOrder(ArrayAccess|array|null $oldFields, ArrayAccess|array|null $newFields, ?Query $query = null): int {
+    protected static function ensureEntityOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
         $isEdit       = !empty($oldFields) && !empty($newFields);
-        $oldPosition  = !empty($oldFields["position"]) ? (int)$oldFields["position"] : 0;
-        $newPosition  = !empty($newFields["position"]) ? (int)$newFields["position"] : 0;
+        $oldPosition  = Arrays::getOneValue($oldFields, "position", 0);
+        $newPosition  = Arrays::getOneValue($newFields, "position", 0);
         $nextPosition = self::getNextPosition($query);
 
         $oldPosition  = $isEdit ? $oldPosition : $nextPosition;

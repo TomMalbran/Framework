@@ -3,15 +3,16 @@ namespace Framework\Database;
 
 use Framework\Request;
 use Framework\Discovery\Discovery;
+use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
-use ArrayAccess;
 use JsonSerializable;
 
 /**
  * The Schema Entity
  */
-class Entity implements ArrayAccess, JsonSerializable {
+class Entity implements JsonSerializable {
 
     protected const ID = "";
 
@@ -21,23 +22,24 @@ class Entity implements ArrayAccess, JsonSerializable {
 
     /**
      * Creates a new Entity instance
-     * @param ArrayAccess|array<string,mixed>|null $data Optional.
+     * @param mixed $data Optional.
      */
-    public function __construct(ArrayAccess|array|null $data = []) {
+    public function __construct(mixed $data = null) {
         if (empty($data)) {
             return;
         }
 
         foreach ($this->getProperties() as $property) {
-            if (!isset($data[$property])) {
+            $value = Arrays::getOneValue($data, $property);
+            if ($value === null) {
                 continue;
             }
 
             $this->empty = false;
-            if (is_numeric($this->$property) && !is_numeric($data[$property])) {
-                $this->$property = (float)$data[$property];
+            if (is_numeric($this->$property) && !is_numeric($value)) {
+                $this->$property = (float)$value;
             } else {
-                $this->$property = $data[$property];
+                $this->$property = $value;
             }
         }
     }
@@ -125,13 +127,22 @@ class Entity implements ArrayAccess, JsonSerializable {
     }
 
     /**
-     * Gets the Data
+     * Returns true if the value at the given key is not empty
+     * @param string $key
+     * @return boolean
+     */
+    public function hasValue(string $key): bool {
+        return !empty($this->$key);
+    }
+
+    /**
+     * Gets the Data at the given key
      * @param string     $key
      * @param mixed|null $default Optional.
      * @return mixed
      */
     public function get(string $key, mixed $default = null): mixed {
-        if (property_exists($this, $key)) {
+        if ($this->has($key)) {
             return $this->$key;
         }
         return $default;
@@ -146,6 +157,17 @@ class Entity implements ArrayAccess, JsonSerializable {
     public function getString(string $key, string $default = ""): string {
         $result = $this->get($key, $default);
         return Strings::toString($result);
+    }
+
+    /**
+     * Gets the Data as an Integer
+     * @param string  $key
+     * @param integer $default Optional.
+     * @return integer
+     */
+    public function getInt(string $key, int $default = 0): int {
+        $result = $this->get($key, $default);
+        return Numbers::toInt($result);
     }
 
 
@@ -177,69 +199,12 @@ class Entity implements ArrayAccess, JsonSerializable {
     }
 
     /**
-     * Prints the Entity
-     * @return Entity
-     */
-    public function print(): Entity {
-        print("<pre>");
-        print_r($this->toArray());
-        print("</pre>");
-        return $this;
-    }
-
-    /**
      * Dumps the Entity
      * @return Entity
      */
     public function dump(): Entity {
         var_dump($this->toArray());
         return $this;
-    }
-
-
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return mixed
-     */
-    public function offsetGet(mixed $key): mixed {
-        if (property_exists($this, $key)) {
-            return $this->$key;
-        }
-        return null;
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @param mixed $value
-     * @return void
-     */
-    public function offsetSet(mixed $key, mixed $value): void {
-        if (property_exists($this, $key)) {
-            $this->$key = $value;
-        }
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return boolean
-     */
-    public function offsetExists(mixed $key): bool {
-        return property_exists($this, $key);
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return void
-     */
-    public function offsetUnset(mixed $key): void {
-        if (property_exists($this, $key)) {
-            unset($this->$key);
-        }
     }
 
     /**
