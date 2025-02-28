@@ -25,7 +25,7 @@ use AllowDynamicProperties;
  * The Request Wrapper
  */
 #[AllowDynamicProperties]
-class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
+class Request implements IteratorAggregate, JsonSerializable {
 
     /** @var ArrayAccess|array<string,mixed> */
     private ArrayAccess|array $request;
@@ -42,45 +42,6 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
     public function __construct(ArrayAccess|array $request = [], ArrayAccess|array $files = []) {
         $this->request = $request;
         $this->files   = $files;
-    }
-
-
-
-    /**
-     * Returns the request data at the given key
-     * @param string $key
-     * @return mixed
-     */
-    public function __get(string $key): mixed {
-        return $this->get($key);
-    }
-
-    /**
-     * Sets the given key on the request data with the given value
-     * @param string $key
-     * @param mixed  $value
-     * @return void
-     */
-    public function __set(string $key, mixed $value): void {
-        $this->set($key, $value);
-    }
-
-    /**
-     * Returns true if the given key is set in the request data
-     * @param string $key
-     * @return boolean
-     */
-    public function __isset(string $key): bool {
-        return $this->exists($key);
-    }
-
-    /**
-     * Removes the request data at the given key
-     * @param string $key
-     * @return void
-     */
-    public function __unset(string $key): void {
-        $this->remove($key);
     }
 
 
@@ -910,45 +871,6 @@ class Request implements ArrayAccess, IteratorAggregate, JsonSerializable {
      */
     public function __debugInfo(): array {
         return (array)$this->request;
-    }
-
-
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return mixed
-     */
-    public function offsetGet(mixed $key): mixed {
-        return $this->get($key);
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @param mixed $value
-     * @return void
-     */
-    public function offsetSet(mixed $key, mixed $value): void {
-        $this->set($key, $value);
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return boolean
-     */
-    public function offsetExists(mixed $key): bool {
-        return array_key_exists($key, (array)$this->request);
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return void
-     */
-    public function offsetUnset(mixed $key): void {
-        unset($this->request[$key]);
     }
 
     /**

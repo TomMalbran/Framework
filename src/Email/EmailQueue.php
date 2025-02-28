@@ -31,7 +31,7 @@ class EmailQueue extends EmailQueueSchema {
         $query = Query::createSearch([ "sendTo", "subject", "message" ], $search);
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
-        $query->addIf("dataID",      "=", $request->dataID);
+        $query->addIf("dataID",      "=", $request->get("dataID"));
         return $query;
     }
 

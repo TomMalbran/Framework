@@ -44,6 +44,7 @@ class NotificationQueue extends NotificationQueueSchema {
             "title", "body",
             "CONCAT(credential.firstName, ' ', credential.lastName)",
         ], $search);
+
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
         return $query;
@@ -82,16 +83,16 @@ class NotificationQueue extends NotificationQueueSchema {
      * Returns all the Notifications for the given Credential
      * @param integer $credentialID
      * @param integer $currentUser
-     * @param Request $request
+     * @param Request $sort
      * @return NotificationQueueEntity[]
      */
-    public static function getAllForCredential(int $credentialID, int $currentUser, Request $request): array {
+    public static function getAllForCredential(int $credentialID, int $currentUser, Request $sort): array {
         $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
         $query->add("currentUser", "=", $currentUser);
         $query->add("isDiscarded", "=", 0);
         $query->add("createdTime", ">", DateTime::getLastXDays(30));
         $query->orderBy("createdTime", false);
-        return self::getEntityList($query, $request);
+        return self::getEntityList($query, $sort);
     }
 
     /**

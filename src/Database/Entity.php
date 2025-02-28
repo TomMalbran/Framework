@@ -59,7 +59,7 @@ class Entity implements JsonSerializable {
             }
 
             if ($property === static::ID && property_exists($entity, "id")) {
-                if (is_numeric($request->$property)) {
+                if (is_numeric($request->get($property))) {
                     $entity->{"id"} = $request->getInt($property);
                 } else {
                     $entity->{"id"} = $request->getString($property);

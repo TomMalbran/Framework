@@ -28,7 +28,7 @@ class ActionLog extends LogActionSchema {
         $toTime   = $request->toDayEnd("toDate");
 
         $query = new Query();
-        $query->addIf("CREDENTIAL_ID", "=", $request->credentialID);
+        $query->addIf("CREDENTIAL_ID", "=", $request->getInt("credentialID"));
         foreach ($mappings as $key => $value) {
             $query->addIf($value, "=", $request->get($key));
         }

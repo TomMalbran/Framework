@@ -26,7 +26,7 @@ class QueryLog extends LogQuerySchema {
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "expression" ], $request->search);
+        $query = Query::createSearch([ "expression" ], $request->getString("search"));
         $query->addIf("createdTime", ">", $fromTime);
         $query->addIf("createdTime", "<", $toTime);
         return $query;

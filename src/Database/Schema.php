@@ -15,8 +15,6 @@ use Framework\Utils\Search;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
-use ArrayAccess;
-
 /**
  * The Schema
  */
@@ -610,7 +608,7 @@ class Schema {
 
         if (!empty($sort)) {
             if ($sort->has("orderBy")) {
-                $query->orderBy($sort->orderBy, !empty($sort->orderAsc));
+                $query->orderBy($sort->getString("orderBy"), $sort->has("orderAsc"));
             }
             if ($sort->exists("page")) {
                 $query->paginate($sort->getInt("page"), $sort->getInt("amount"));

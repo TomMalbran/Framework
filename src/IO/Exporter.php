@@ -102,8 +102,9 @@ class Exporter {
      * @return Exporter
      */
     public function startChunk(Request $request, int $perPage = 2000): Exporter {
-        $request->amount = $perPage;
-        $request->page   = $this->page;
+        $request->set("amount", $perPage);
+        $request->set("page", $this->page);
+
         $this->page     += 1;
         $this->requests += $perPage;
         return $this;

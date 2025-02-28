@@ -57,26 +57,26 @@ class Period {
 
     /**
      * Creates a new Period instance
-     * @param Request $data
+     * @param Request $request
      */
-    public function __construct(Request $data) {
+    public function __construct(Request $request) {
         $this->period = self::Custom;
 
-        if ($data->has("fromDate")) {
-            $this->fromTime = DateTime::toDayStart($data->fromDate);
-        } elseif ($data->has("fromTime")) {
-            $this->fromTime = $data->fromTime;
-        } elseif ($data->has("period")) {
-            $this->period   = $data->period;
+        if ($request->has("fromDate")) {
+            $this->fromTime = DateTime::toDayStart($request->getString("fromDate"));
+        } elseif ($request->has("fromTime")) {
+            $this->fromTime = $request->getInt("fromTime");
+        } elseif ($request->has("period")) {
+            $this->period   = $request->getString("period");
             $this->fromTime = $this->getFromTime();
         }
 
-        if ($data->has("toDate")) {
-            $this->toTime = DateTime::toDayEnd($data->toDate);
-        } elseif ($data->has("toTime")) {
-            $this->toTime = $data->toTime;
-        } elseif ($data->has("period")) {
-            $this->period = $data->period;
+        if ($request->has("toDate")) {
+            $this->toTime = DateTime::toDayEnd($request->getString("toDate"));
+        } elseif ($request->has("toTime")) {
+            $this->toTime = $request->getInt("toTime");
+        } elseif ($request->has("period")) {
+            $this->period = $request->getString("period");
             $this->toTime = $this->getToTime();
         }
     }
