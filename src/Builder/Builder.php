@@ -13,6 +13,7 @@ use Framework\Database\Generator;
 use Framework\Discovery\DataFile;
 use Framework\File\File;
 use Framework\File\FilePath;
+use Framework\File\FileType;
 use Framework\Provider\Mustache;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
@@ -96,13 +97,21 @@ class Builder {
         $schemasFile = DataFile::Schemas->fileName();
         $dataDir     = "";
         $templateDir = "";
+        $intFilesDir = "";
 
         foreach ($files as $file) {
+            if (Strings::contains($file, "vendor") || File::hasExtension($file, "php")) {
+                continue;
+            }
+
             if (empty($dataDir) && Strings::endsWith($file, $schemasFile)) {
                 $dataDir = Strings::substringBetween($file, "$basePath/", "/$schemasFile");
             } elseif (empty($templateDir) && Strings::endsWith($file, ".mu")) {
                 $templateDir = Strings::substringAfter($file, "$basePath/");
                 $templateDir = Strings::substringBefore($templateDir, "/", false);
+            } elseif (empty($intFilesDir) && FileType::isImage($file)) {
+                $intFilesDir = Strings::substringAfter($file, "$basePath/");
+                $intFilesDir = Strings::substringBefore($intFilesDir, "/", false);
             }
         }
 
@@ -115,6 +124,7 @@ class Builder {
             "sourceDir"    => $sourceDir,
             "dataDir"      => $dataDir,
             "templateDir"  => $templateDir,
+            "intFilesDir"  => $intFilesDir,
         ];
     }
 

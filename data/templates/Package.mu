@@ -15,6 +15,7 @@ class Package {
 
     public const DataDir     = "{{dataDir}}";
     public const TemplateDir = "{{templateDir}}";
+    public const IntFilesDir = "{{intFilesDir}}";
 
     public const StringsDir  = "nls/strings";
     public const EmailsDir   = "nls/emails";

@@ -58,7 +58,7 @@ class FilePath {
      */
     public static function getInternalPath(string|int ...$pathParts): string {
         $basePath = self::getBasePath(forBackend: true);
-        return File::parsePath($basePath, Package::FilesDir, ...$pathParts);
+        return File::parsePath($basePath, Package::IntFilesDir, ...$pathParts);
     }
 
     /**
@@ -133,7 +133,7 @@ class FilePath {
      * @return string
      */
     public static function getInternalUrl(string|int ...$pathParts): string {
-        return Config::getUrl(Package::AppDir, Package::FilesDir, ...$pathParts);
+        return Config::getUrl(Package::AppDir, Package::IntFilesDir, ...$pathParts);
     }
 
 
