@@ -75,6 +75,24 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         return !empty($this->data[$key]);
     }
 
+
+
+    /**
+     * Adds an array to the data
+     * @param mixed $value
+     * @return Dictionary
+     */
+    public function push(mixed $value): Dictionary {
+        if (Arrays::isList($this->data)) {
+            if ($value instanceof self) {
+                $this->data[] = $value->toArray();
+            } else {
+                $this->data[] = $value;
+            }
+        }
+        return $this;
+    }
+
     /**
      * Sets the value of the given key
      * @param string $key
