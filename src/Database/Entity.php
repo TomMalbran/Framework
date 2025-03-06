@@ -170,6 +170,20 @@ class Entity implements JsonSerializable {
         return Numbers::toInt($result);
     }
 
+    /**
+     * Sets the Data at the given key
+     * @param string $key
+     * @param mixed  $value
+     * @return bool
+     */
+    public function set(string $key, mixed $value): bool {
+        if ($this->has($key)) {
+            $this->$key = $value;
+            return true;
+        }
+        return false;
+    }
+
 
 
     /**
