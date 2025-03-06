@@ -747,12 +747,15 @@ class DateTime {
      * Returns true if the given time is the current month
      * @param integer    $timeStamp Optional.
      * @param float|null $timeZone  Optional.
-     * @return integer
+     * @return boolean
      */
-    public static function isCurrentMonth(int $timeStamp = 0, ?float $timeZone = null): int {
+    public static function isCurrentMonth(int $timeStamp = 0, ?float $timeZone = null): bool {
         $timeStamp = self::getTime($timeStamp);
         $timeStamp = self::toTimeZone($timeStamp, $timeZone);
-        return (self::getYear() == self::getYear($timeStamp) && self::getMonth() == self::getMonth($timeStamp));
+        return (
+            self::getYear() === self::getYear($timeStamp) &&
+            self::getMonth() === self::getMonth($timeStamp)
+        );
     }
 
     /**

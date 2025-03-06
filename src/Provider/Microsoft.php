@@ -14,7 +14,7 @@ class Microsoft {
     /**
      * Returns the Account from the given Token
      * @param string $idToken
-     * @return array<string,string>|null
+     * @return array{email:string,firstName:string,lastName:string}|null
      */
     public static function getAuthAccount(string $idToken): ?array {
         if (empty($idToken)) {

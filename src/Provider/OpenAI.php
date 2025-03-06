@@ -320,7 +320,7 @@ class OpenAI {
     /**
      * Returns the last Message in a Thread
      * @param string $threadID
-     * @return string[]
+     * @return array{string,string} [Message, FileIDs]
      */
     public static function getLastMessage(string $threadID): array {
         $request = self::get("/threads/$threadID/messages", [
@@ -370,7 +370,7 @@ class OpenAI {
      * @param string  $assistantID
      * @param string  $message
      * @param boolean $requiresFiles Optional.
-     * @return string[]
+     * @return array{string,string} [RunID, ThreadID]
      */
     public static function createRun(string $assistantID, string $message, bool $requiresFiles = false): array {
         $request = self::post("/threads/runs", [
@@ -386,10 +386,10 @@ class OpenAI {
             ],
         ]);
 
-        if (empty($request["id"])) {
-            return [ "", "" ];
-        }
-        return [ $request["id"], $request["thread_id"] ];
+        return [
+            $request["id"]        ?? "",
+            $request["thread_id"] ?? "",
+        ];
     }
 
     /**

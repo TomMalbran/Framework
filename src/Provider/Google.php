@@ -15,7 +15,7 @@ class Google {
     /**
      * Returns the Data from the given Token
      * @param string $accessToken
-     * @return array<string,string>|null
+     * @return array{email:string,firstName:string,lastName:string}|null
      */
     public static function getAuthAccount(string $accessToken): ?array {
         if (empty($accessToken)) {

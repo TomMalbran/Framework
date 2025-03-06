@@ -151,7 +151,7 @@ class Utils {
     /**
      * Parses a Full Name into a First and Last Name
      * @param string $fullName
-     * @return string[]
+     * @return array{string,string}
      */
     public static function parseName(string $fullName): array {
         $nameParts = Strings::split(trim($fullName), " ");

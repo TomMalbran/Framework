@@ -801,9 +801,9 @@ class Strings {
      * @param string  $string
      * @param integer $length Optional.
      * @param boolean $asUtf8 Optional.
-     * @return string
+     * @return boolean
      */
-    public static function isShort(string $string, int $length = 30, bool $asUtf8 = true): string {
+    public static function isShort(string $string, int $length = 30, bool $asUtf8 = true): bool {
         return self::makeShort($string, $length, $asUtf8) !== $string;
     }
 

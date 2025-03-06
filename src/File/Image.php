@@ -79,7 +79,7 @@ class Image {
     /**
      * Returns the Size of the Image as [ width, height, type ]
      * @param string|integer ...$pathParts
-     * @return int[]
+     * @return array{integer,integer,integer}
      */
     public static function getSize(string|int ...$pathParts): array {
         $filePath = File::parsePath(...$pathParts);
@@ -97,7 +97,7 @@ class Image {
     /**
      * Returns the Size of the Image as [ width, height, type ]
      * @param string $fileUrl
-     * @return int[]
+     * @return array{integer,integer,integer}
      */
     public static function getSizeFromUrl(string $fileUrl): array {
         $fileUrl = Strings::encodeUrl($fileUrl);
