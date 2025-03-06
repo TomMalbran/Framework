@@ -664,9 +664,10 @@ class Arrays {
 
     /**
      * Returns the first Value of the given array
-     * @param mixed[] $array
-     * @param string  $key   Optional.
-     * @return mixed
+     * @template TValue
+     * @param TValue[] $array
+     * @param string   $key   Optional.
+     * @return TValue
      */
     public static function getFirst(array $array, string $key = ""): mixed {
         if (empty($array)) {
