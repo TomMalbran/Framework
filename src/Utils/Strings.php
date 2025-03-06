@@ -954,4 +954,14 @@ class Strings {
             "UTF-8"
         );
     }
+
+    /**
+     * Returns the Base64 Decoded String
+     * @param string $string
+     * @return string
+     */
+    public static function base64Decode(string $string): string {
+        $result = base64_decode($string, true);
+        return $result !== false ? $result : "";
+    }
 }
