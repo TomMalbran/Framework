@@ -23,29 +23,42 @@ class Migration {
      * @return boolean
      */
     public static function migrateData(bool $canDelete = false): bool {
-        $db         = Framework::getDatabase();
-        $migrations = Discovery::loadData(DataFile::Migrations);
-        $schemas    = Factory::getData();
+        $db             = Framework::getDatabase();
+        $migrations     = Discovery::loadData(DataFile::Migrations);
+        $schemas        = Factory::getData();
+        $startMovement  = Settings::getCore("movement");
+        $startRename    = Settings::getCore("rename");
+        $startMigration = Settings::getCore("migration");
 
-        $moved      = self::moveTables($db, $migrations["movements"]);
-        $renamed    = self::renameColumns($db, $migrations["renames"]);
+        $lastMovement   = self::moveTables($db, $startMovement, $migrations["movements"]);
+        $lastRename     = self::renameColumns($db, $startRename, $migrations["renames"]);
 
-        $migrated   = self::migrateTables($db, $schemas, $canDelete);
-        $extras     = self::extraMigrations($db);
+        $migrated       = self::migrateTables($db, $schemas, $canDelete);
+        $lastMigration  = self::extraMigrations($db, $startMigration);
 
-        return $moved || $renamed || $migrated || $extras;
+        if ($lastMovement > 0) {
+            Settings::setCore("movement", $lastMovement);
+        }
+        if ($lastRename > 0) {
+            Settings::setCore("rename", $lastRename);
+        }
+        if ($lastMigration > 0) {
+            Settings::setCore("migration", $lastMigration);
+        }
+
+        return $lastMovement > 0 || $lastRename > 0 || $migrated || $lastMigration > 0;
     }
 
     /**
      * Moves the Tables
      * @param Database  $db
+     * @param integer   $startMovement
      * @param array{}[] $movements
-     * @return boolean
+     * @return integer
      */
-    private static function moveTables(Database $db, array $movements): bool {
-        $startMovement = Settings::getCore("movement");
-        $lastMovement  = count($movements);
-        $didMove       = false;
+    private static function moveTables(Database $db, int $startMovement, array $movements): int {
+        $lastMovement = count($movements);
+        $didMove      = false;
 
         for ($i = $startMovement; $i < $lastMovement; $i++) {
             $fromName = Factory::getTableName($movements[$i]["from"]);
@@ -59,24 +72,23 @@ class Migration {
         }
 
         if ($didMove) {
-            Settings::setCore("movement", $lastMovement);
             print("<br>");
         } else {
             print("No <i>movements</i> required<br>");
         }
-        return $didMove;
+        return $didMove ? $lastMovement : 0;
     }
 
     /**
      * Renames the Table Columns
      * @param Database  $db
+     * @param integer   $startRename
      * @param array{}[] $renames
-     * @return boolean
+     * @return integer
      */
-    private static function renameColumns(Database $db, array $renames): bool {
-        $startRename = Settings::getCore("rename");
-        $lastRename  = count($renames);
-        $didRename   = false;
+    private static function renameColumns(Database $db, int $startRename, array $renames): int {
+        $lastRename = count($renames);
+        $didRename  = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
             $table    = Factory::getTableName($renames[$i]["schema"]);
@@ -98,12 +110,11 @@ class Migration {
         }
 
         if ($didRename) {
-            Settings::setCore("rename", $lastRename);
             print("<br>");
         } else {
             print("No <i>column renames</i> required<br><br>");
         }
-        return $didRename;
+        return $didRename ? $lastRename : 0;
     }
 
     /**
@@ -382,16 +393,15 @@ class Migration {
     /**
      * Runs extra Migrations
      * @param Database $db
-     * @return boolean
+     * @param integer  $startMigration
+     * @return integer
      */
-    private static function extraMigrations(Database $db): bool {
-        $migration = Settings::getCore("migration");
-        $path      = Discovery::getMigrationsPath();
+    private static function extraMigrations(Database $db, int $startMigration): int {
+        $path = Discovery::getMigrationsPath();
 
-        Settings::setCore("migration", $migration);
         if (!File::exists($path)) {
             print("<br>No <i>migrations</i> required<br>");
-            return false;
+            return 0;
         }
 
         $files = File::getFilesInDir($path);
@@ -403,22 +413,21 @@ class Migration {
         }
         sort($names);
 
-        $first = !empty($migration) ? $migration + 1 : 1;
-        $last  = end($names);
-        if (empty($names) || $first > $last) {
+        $firstMigration = $startMigration + 1;
+        $lastMigration  = end($names);
+        if (empty($names) || $firstMigration > $lastMigration) {
             print("<br>No <i>migrations</i> required<br>");
-            return false;
+            return 0;
         }
 
-        print("<br>Running <b>migrations $first to $last</b><br>");
+        print("<br>Running <b>migrations $firstMigration to $lastMigration</b><br>");
         foreach ($names as $name) {
-            if ($name >= $first) {
+            if ($name >= $firstMigration) {
                 include_once("$path/$name.php");
                 call_user_func("migration$name", $db);
             }
         }
 
-        Settings::setCore("migration", $last);
-        return true;
+        return $lastMigration;
     }
 }
