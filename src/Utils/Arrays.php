@@ -143,10 +143,14 @@ class Arrays {
 
     /**
      * Returns true if the given array is empty
-     * @param mixed $array
+     * @param mixed               $array
+     * @param string|integer|null $key   Optional.
      * @return boolean
      */
-    public static function isEmpty(mixed $array): bool {
+    public static function isEmpty(mixed $array, string|int|null $key = null): bool {
+        if ($key !== null && self::isArray($array)) {
+            return empty($array[$key]);
+        }
         return empty($array);
     }
 
