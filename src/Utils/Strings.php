@@ -489,10 +489,11 @@ class Strings {
             return $string;
         }
 
-        $content = !empty($string) ? explode($needle, $string) : [];
+        $content = explode($needle, $string);
         if (!$trim) {
             return $content;
         }
+
         $parts  = self::split($content, ",");
         $result = [];
         foreach ($parts as $part) {
