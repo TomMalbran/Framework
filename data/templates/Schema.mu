@@ -258,7 +258,7 @@ class {{name}}Schema extends Schema {
      * @return {{idDocType}}[]
      */
     public static function get{{idText}}s(?Query $query = null): array {
-        $result = self::getColumnData($query, "{{idKey}}");
+        $result = self::getColumnData($query, "{{idKey}}", "{{idName}}");
         {{#hasIntID}}
         return Arrays::toInts($result);
         {{/hasIntID}}
@@ -361,9 +361,9 @@ class {{name}}Schema extends Schema {
         ?{{column}} $distinctColumn = null,
         bool $useEmpty = false,
     ): array {
-        $orderKey    = !empty($orderColumn)    ? $orderColumn->key()    : null;
-        $idKey       = !empty($idColumn)       ? $idColumn->key()       : null;
-        $distinctKey = !empty($distinctColumn) ? $distinctColumn->value : null;
+        $orderKey    = $orderColumn    !== null ? $orderColumn->key()    : null;
+        $idKey       = $idColumn       !== null ? $idColumn->key()       : null;
+        $distinctKey = $distinctColumn !== null ? $distinctColumn->value : null;
 
         $nameKey     = {{column}}::toKeys($nameColumn);
         $extraKey    = {{column}}::toKeys($extraColumn);
@@ -385,7 +385,7 @@ class {{name}}Schema extends Schema {
         array|{{column}}|null $nameColumn = null,
         int $limit = 0,
     ): array {
-        $idKey   = !empty($idColumn) ? $idColumn->key() : null;
+        $idKey   = $idColumn !== null ? $idColumn->key() : null;
         $nameKey = {{column}}::toKeys($nameColumn);
         return self::getSearchData($query, $idKey, $nameKey, $limit);
     }
