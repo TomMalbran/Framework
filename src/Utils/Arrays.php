@@ -641,60 +641,6 @@ class Arrays {
     }
 
     /**
-     * Creates a Map of Arrays using the given Array
-     * @param mixed[] $array
-     * @param string  $key
-     * @param string  $value
-     * @return array<string|integer,array<string|integer>>
-     */
-    public static function createMapArray(array $array, string $key, string $value): array {
-        $result = [];
-        foreach ($array as $row) {
-            if (empty($result[$row[$key]])) {
-                $result[$row[$key]] = [];
-            }
-            $result[$row[$key]][] = isset($row[$value]) ? $row[$value] : "";
-        }
-        return $result;
-    }
-
-    /**
-     * Creates a Map of Lists using the given Array
-     * @template TValue
-     * @param TValue[] $array
-     * @param string   $key
-     * @return array<integer,TValue[]>
-     */
-    public static function createMapList(array $array, string $key): array {
-        $result = [];
-        foreach ($array as $row) {
-            if (empty($result[$row[$key]])) {
-                $result[$row[$key]] = [];
-            }
-            $result[$row[$key]][] = $row;
-        }
-        return $result;
-    }
-
-    /**
-     * Creates a Map of Dictionaries using the given Array
-     * @param mixed[] $array
-     * @param string  $key
-     * @param string  ...$values
-     * @return mixed[]
-     */
-    public static function createMapDict(array $array, string $key, string ...$values): array {
-        $result = [];
-        foreach ($array as $row) {
-            $result[$row[$key]] = [];
-            foreach ($values as $value) {
-                $result[$row[$key]][$value] = isset($row[$value]) ? $row[$value] : "";
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Creates an Array using the given Array
      * @param mixed[]              $array
      * @param string[]|string|null $key       Optional.
@@ -710,25 +656,6 @@ class Arrays {
                 continue;
             }
             $result[] = $elem;
-        }
-        return $result;
-    }
-
-    /**
-     * Creates an Sub-Array using the given Array
-     * @param mixed[] $array
-     * @param string  $idKey
-     * @param mixed   $idValue
-     * @param string  $key
-     * @param boolean $caseInsensitive Optional.
-     * @return mixed[]
-     */
-    public static function createSubArray(array $array, string $idKey, mixed $idValue, string $key, bool $caseInsensitive = true): array {
-        $result = [];
-        foreach ($array as $row) {
-            if (Strings::isEqual($row[$idKey], $idValue, $caseInsensitive)) {
-                $result[] = $row[$key];
-            }
         }
         return $result;
     }
