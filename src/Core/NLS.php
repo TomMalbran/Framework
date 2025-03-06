@@ -109,6 +109,9 @@ class NLS {
         if (Arrays::isList($result)) {
             return $result;
         }
+        if (Arrays::isDict($result)) {
+            return array_values($result);
+        }
         return [];
     }
 
