@@ -13,7 +13,7 @@ use JsonSerializable;
  */
 class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
-    /** @var array{} */
+    /** @var array<string|integer,mixed> */
     private array $data;
 
 
@@ -168,6 +168,19 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Gets the value of the given key as a Price
+     * @param string $key
+     * @param float  $default Optional.
+     * @return float
+     */
+    public function getPrice(string $key, float $default = 0.0): float {
+        if ($this->has($key) && !Arrays::isArray($this->data[$key])) {
+            return Numbers::fromCents((int)$this->data[$key]);
+        }
+        return $default;
+    }
+
+    /**
      * Gets the value of the given key as a String
      * @param string $key
      * @param string $default Optional.
@@ -304,10 +317,22 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the data as an Array
-     * @return array{}
+     * @return array<string|integer,mixed>
      */
     public function toArray(): array {
         return $this->data;
+    }
+
+    /**
+     * Returns the data as a Map
+     * @return array<string,string>
+     */
+    public function toMap(): array {
+        $result = [];
+        foreach ($this->data as $key => $value) {
+            $result[(string)$key] = Strings::toString($value);
+        }
+        return $result;
     }
 
     /**
