@@ -51,11 +51,17 @@ class Modification {
      * @param Request|null $request
      * @param array{}      $fields    Optional.
      * @param boolean      $skipEmpty Optional.
+     * @param boolean      $skipUnset Optional.
      * @return Modification
      */
-    public function addFields(?Request $request, array $fields = [], bool $skipEmpty = false): Modification {
+    public function addFields(
+        ?Request $request,
+        array $fields = [],
+        bool $skipEmpty = false,
+        bool $skipUnset = false,
+    ): Modification {
         if ($request !== null) {
-            $this->fields = $this->parseFields($request, $skipEmpty);
+            $this->fields = $this->parseFields($request, $skipEmpty, $skipUnset);
         }
         if (!empty($fields)) {
             $this->fields = array_merge($this->fields, $fields);
@@ -67,14 +73,19 @@ class Modification {
      * Parses the data and returns the fields
      * @param Request $request
      * @param boolean $skipEmpty Optional.
+     * @param boolean $skipUnset Optional.
      * @return array{}
      */
-    private function parseFields(Request $request, bool $skipEmpty = false): array {
+    private function parseFields(Request $request, bool $skipEmpty = false, bool $skipUnset = false): array {
         $result = [];
         foreach ($this->structure->fields as $field) {
             if (!$field->canEdit) {
                 continue;
             }
+            if ($skipUnset && !$request->exists($field->name)) {
+                continue;
+            }
+
             $value = $field->fromRequest($request);
             if ($skipEmpty && empty($value)) {
                 continue;

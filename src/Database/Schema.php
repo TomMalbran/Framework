@@ -397,11 +397,19 @@ class Schema {
      * @param array<string,mixed>  $fields       Optional.
      * @param integer              $credentialID Optional.
      * @param boolean              $skipEmpty    Optional.
+     * @param boolean              $skipUnset    Optional.
      * @return boolean
      */
-    protected static function editEntityData(Query|int|string $query, ?Request $request = null, array $fields = [], int $credentialID = 0, bool $skipEmpty = false): bool {
+    protected static function editEntityData(
+        Query|int|string $query,
+        ?Request $request = null,
+        array $fields = [],
+        int $credentialID = 0,
+        bool $skipEmpty = false,
+        bool $skipUnset = false,
+    ): bool {
         $modification = new Modification(self::structure());
-        $modification->addFields($request, $fields, $skipEmpty);
+        $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
         $modification->addModification($credentialID);
 
         $query = self::generateQueryID($query, false);
@@ -460,11 +468,21 @@ class Schema {
      * @param array<string,mixed>  $fields       Optional.
      * @param integer              $credentialID Optional.
      * @param Query|null           $orderQuery   Optional.
+     * @param boolean              $skipEmpty    Optional.
+     * @param boolean              $skipUnset    Optional.
      * @return boolean
      */
-    protected static function editEntityWithOrder(Query|int|string $query, ?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): bool {
+    protected static function editEntityWithOrder(
+        Query|int|string $query,
+        ?Request $request,
+        array $fields = [],
+        int $credentialID = 0,
+        ?Query $orderQuery = null,
+        bool $skipEmpty = false,
+        bool $skipUnset = false,
+    ): bool {
         $modification = new Modification(self::structure());
-        $modification->addFields($request, $fields);
+        $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
         $modification->addModification($credentialID);
 
         $fields = $modification->getFields();
