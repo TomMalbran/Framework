@@ -321,7 +321,7 @@ class Request implements IteratorAggregate, JsonSerializable {
 
 
     /**
-     * Returns true if the given email is valid
+     * Returns true if the value at the given key is a valid String
      * @param string $key
      * @return boolean
      */
@@ -330,7 +330,17 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given value is a number and greater and/or equal to cero
+     * Returns true if the value at the given key is a valid Number
+     * @param string $key
+     * @return boolean
+     */
+    public function isValidNumber(string $key): bool {
+        $string = $this->getString($key, "");
+        return is_numeric($string);
+    }
+
+    /**
+     * Returns true if the value at given key is a Number between the min and max
      * @param string       $key
      * @param integer|null $min      Optional.
      * @param integer|null $max      Optional.
@@ -342,7 +352,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given price is valid
+     * Returns true if the value at the given key is a valid Price
      * @param string       $key
      * @param integer|null $min Optional.
      * @param integer|null $max Optional.
@@ -353,7 +363,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given value is alpha-numeric
+     * Returns true if the value at the given key is a Alpha-Numeric
      * @param string       $key
      * @param boolean      $withDashes Optional.
      * @param integer|null $length     Optional.
@@ -364,7 +374,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given slug is valid
+     * Returns true if the value at the given key is a valid Slug
      * @param string $key
      * @return boolean
      */
@@ -373,7 +383,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given email is valid
+     * Returns true if the value at the given key is a valid Email
      * @param string $key
      * @return boolean
      */
@@ -382,7 +392,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given password is valid
+     * Returns true if the value at the given key is a valid Password
      * @param string  $key
      * @param string  $checkSets Optional.
      * @param integer $minLength Optional.
@@ -393,7 +403,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given domain is valid
+     * Returns true if the value at the given key is a valid Domain
      * @param string $key
      * @return boolean
      */
@@ -402,7 +412,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given username is valid
+     * Returns true if the value at the given key is a valid Username
      * @param string $key
      * @return boolean
      */
@@ -411,16 +421,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given name is valid
-     * @param string $key
-     * @return boolean
-     */
-    public function isValidName(string $key): bool {
-        return Utils::isValidName($this->get($key));
-    }
-
-    /**
-     * Returns true if the given color is valid
+     * Returns true if the value at the given key is a valid Color
      * @param string $key
      * @return boolean
      */
@@ -429,7 +430,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given CUIT is valid
+     * Returns true if the value at the given key is a valid CUIT
      * @param string $key
      * @return boolean
      */
@@ -438,7 +439,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given DNI is valid
+     * Returns true if the value at the given key is a valid DNI
      * @param string $key
      * @return boolean
      */
@@ -447,7 +448,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given Phone is valid
+     * Returns true if the value at the given key is a valid Phone
      * @param string $key
      * @return boolean
      */
@@ -456,7 +457,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given Url is valid
+     * Returns true if the value at the given key is a valid Url
      * @param string $key
      * @return boolean
      */
@@ -465,7 +466,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given Position is valid
+     * Returns true if the value at the given key is a valid Position
      * @param string $key
      * @return boolean
      */
@@ -476,7 +477,7 @@ class Request implements IteratorAggregate, JsonSerializable {
 
 
     /**
-     * Returns true if the given date is Valid
+     * Returns true if the value at the given key is a valid Date
      * @param string $key
      * @return boolean
      */
@@ -485,7 +486,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given hour is Valid
+     * Returns true if the value at the given key is a valid Hour
      * @param string|null    $key
      * @param integer[]|null $minutes Optional.
      * @param integer        $minHour Optional.
@@ -497,7 +498,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given dates are a valid period
+     * Returns true if the dates at the given keys are a valid Period
      * @param string $fromKey
      * @param string $toKey
      * @return boolean
@@ -510,7 +511,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given hours are a valid period
+     * Returns true if the hours at the given keys are a valid Period
      * @param string $fromKey
      * @param string $toKey
      * @return boolean
@@ -523,7 +524,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given hours are a valid period
+     * Returns true if the dates and hours at the given keys are a valid Period
      * @param string $fromDateKey
      * @param string $fromHourKey
      * @param string $toDateKey
@@ -548,7 +549,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given week day is valid
+     * Returns true if the week day at the given keys are a valid Period
      * @param string  $key
      * @param boolean $startMonday Optional.
      * @return boolean
@@ -558,7 +559,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the given date is in the future
+     * Returns true if the date at the given key is in the Future
      * @param string $key
      * @param string $type Optional.
      * @return boolean

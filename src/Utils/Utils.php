@@ -69,16 +69,7 @@ class Utils {
      * @return boolean
      */
     public static function isValidUsername(string $username): bool {
-        return Strings::match($username, '/^[a-z]+[a-z0-9]{2,11}$/i');
-    }
-
-    /**
-     * Returns true if the given Name is valid
-     * @param string $name
-     * @return boolean
-     */
-    public static function isValidName(string $name): bool {
-        return Strings::match($name, '/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i');
+        return Strings::match($username, '/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i');
     }
 
     /**
