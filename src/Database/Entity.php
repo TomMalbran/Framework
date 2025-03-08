@@ -4,6 +4,7 @@ namespace Framework\Database;
 use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
@@ -29,58 +30,117 @@ class Entity implements JsonSerializable {
             return;
         }
 
-        foreach ($this->getProperties() as $property) {
-            $value = Arrays::getOneValue($data, $property);
-            if ($value === null) {
-                continue;
-            }
-
-            $this->empty = false;
-            if (is_numeric($this->$property) && !is_numeric($value)) {
-                $this->$property = (float)$value;
+        foreach ($this->getPropertiesTypes() as $property => $type) {
+            if ($data instanceof Request) {
+                $added = $this->addFromRequest($data, $property, $type);
+            } elseif ($data instanceof Dictionary) {
+                $added = $this->addFromDictionary($data, $property, $type);
             } else {
-                $this->$property = $value;
+                $added = $this->addFromObject($data, $property, $type);
+            }
+            if ($added) {
+                $this->empty = false;
             }
         }
     }
 
     /**
-     * Creates a new Entity instance from a Request
-     * @param Request $request
-     * @return static
+     * Adds a value from an Object or Array
+     * @param mixed  $data
+     * @param string $property
+     * @param string $type
+     * @return boolean
      */
-    public static function fromRequest(Request $request): static {
-        $entity = new static();
-        foreach ($entity->getPropertiesTypes() as $property => $type) {
-            if ($request->exists($property)) {
-                $entity->empty = false;
+    private function addFromObject(mixed $data, string $property, string $type): bool {
+        $value = Arrays::getOneValue($data, $property);
+        if ($value === null) {
+            return false;
+        }
+
+        switch ($type) {
+        case "int":
+            $this->$property = Numbers::toInt($value);
+            break;
+        case "float":
+            $this->$property = Numbers::toFloat($value);
+            break;
+        default:
+            $this->$property = $value;
+        }
+        return true;
+    }
+
+    /**
+     * Adds a value from a Request
+     * @param Request $request
+     * @param string  $property
+     * @param string  $type
+     * @return boolean
+     */
+    private function addFromRequest(Request $request, string $property, string $type): bool {
+        if (!$request->exists($property)) {
+            return false;
+        }
+
+        $this->empty = false;
+        if ($property === static::ID && property_exists($this, "id")) {
+            if (is_numeric($request->get($property))) {
+                $this->{"id"} = $request->getInt($property);
             } else {
-                continue;
-            }
-
-            if ($property === static::ID && property_exists($entity, "id")) {
-                if (is_numeric($request->get($property))) {
-                    $entity->{"id"} = $request->getInt($property);
-                } else {
-                    $entity->{"id"} = $request->getString($property);
-                }
-            }
-
-            switch ($type) {
-            case "bool":
-                $entity->$property = $request->has($property);
-                break;
-            case "int":
-                $entity->$property = $request->getInt($property);
-                break;
-            case "float":
-                $entity->$property = $request->getFloat($property);
-                break;
-            default:
-                $entity->$property = $request->getString($property);
+                $this->{"id"} = $request->getString($property);
             }
         }
-        return $entity;
+
+        switch ($type) {
+        case "bool":
+            $this->$property = $request->has($property);
+            break;
+        case "int":
+            $this->$property = $request->getInt($property);
+            break;
+        case "float":
+            $this->$property = $request->getFloat($property);
+            break;
+        default:
+            $this->$property = $request->getString($property);
+        }
+        return true;
+    }
+
+    /**
+     * Adds a value from a Dictionary
+     * @param Dictionary $data
+     * @param string  $property
+     * @param string  $type
+     * @return boolean
+     */
+    private function addFromDictionary(Dictionary $data, string $property, string $type): bool {
+        if (!$data->has($property)) {
+            return false;
+        }
+
+        if ($property === static::ID && property_exists($this, "id")) {
+            if (is_numeric($data->getString($property))) {
+                $this->{"id"} = $data->getInt($property);
+            } else {
+                $this->{"id"} = $data->getString($property);
+            }
+        }
+
+        switch ($type) {
+        case "bool":
+            $this->$property = $data->getBool($property);
+            break;
+        case "int":
+            $this->$property = $data->getInt($property);
+            break;
+        case "float":
+            $this->$property = $data->getFloat($property);
+            break;
+        default:
+            $this->$property = $data->getString($property);
+        }
+        return true;
     }
 
     /**
