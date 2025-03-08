@@ -71,19 +71,6 @@ class JSON {
     }
 
     /**
-     * Decodes a String if it is not already decoded
-     * @param mixed   $value
-     * @param boolean $asArray Optional.
-     * @return object[]|object
-     */
-    public static function decodeAsObject(mixed $value): array|object {
-        if (!self::isValid($value)) {
-            return Arrays::isObject($value) ? (object)$value : (object)[];
-        }
-        return (object)json_decode($value, false);
-    }
-
-    /**
      * Converts a Coma Separated Value into an encoded JSON
      * @param string $value
      * @return string

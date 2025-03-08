@@ -153,15 +153,6 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key from a JSON Object
-     * @param string $key
-     * @return object[]
-     */
-    public function getJSONObject(string $key): array {
-        return JSON::decodeAsObject($this->get($key, "[]"));
-    }
-
-    /**
      * Returns the request data at the given key as CSV
      * @param string $key
      * @return string[]
