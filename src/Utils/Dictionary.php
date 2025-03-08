@@ -313,6 +313,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         return [];
     }
 
+    /**
+     * Gets the value of the given key as an Array
+     * @param string $key
+     * @return array<string|integer,mixed>
+     */
+    public function getArray(string $key): array {
+        if ($this->has($key) && is_array($this->data[$key])) {
+            return $this->data[$key];
+        }
+        return [];
+    }
+
 
 
     /**
