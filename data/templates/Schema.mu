@@ -1,10 +1,10 @@
 <?php
-namespace {{namespace}}Schema;
+namespace {{namespace}};
 
-{{#subTypes}}use {{appNamespace}}Schema\{{type}}Entity;
+{{#subTypes}}use {{appNamespace}}Schema\{{folder}}\{{type}}Entity;
 {{/subTypes}}
-use {{namespace}}Schema\{{entity}};
-use {{namespace}}Schema\{{column}};
+use {{namespace}}\{{entity}};
+use {{namespace}}\{{column}};
 
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}

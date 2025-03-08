@@ -15,35 +15,21 @@ use Framework\Utils\Strings;
  */
 class Generator {
 
-    private static string $namespace;
-    private static string $writePath;
-
-    private static string $schemaTemplate;
-    private static string $entityTemplate;
-    private static string $columnTemplate;
-
-
-
     /**
      * Generates the Code for the Schemas
-     * @param string  $namespace
+     * @param string  $baseNamespace
      * @param string  $writePath
      * @param boolean $forFramework
      * @return integer
      */
-    public static function generateCode(string $namespace, string $writePath, bool $forFramework): int {
-        self::$namespace = $namespace;
-        self::$writePath = $writePath;
-
-        self::$schemaTemplate = Discovery::loadFrameTemplate("Schema.mu");
-        self::$entityTemplate = Discovery::loadFrameTemplate("Entity.mu");
-        self::$columnTemplate = Discovery::loadFrameTemplate("Column.mu");
-
+    public static function generateCode(string $baseNamespace, string $writePath, bool $forFramework): int {
         $schemas = Factory::getData();
         $created = 0;
 
-        File::createDir(self::$writePath);
-        File::emptyDir(self::$writePath);
+        File::createDir($writePath);
+        File::emptyDir($writePath);
+
+        $folders = self::generateFolders($schemas, $writePath, $forFramework);
 
         foreach ($schemas as $schemaKey => $schemaData) {
             $fromFramework = $schemaData["fromFramework"] ?? false;
@@ -52,15 +38,27 @@ class Generator {
             }
 
             $structure = new Structure($schemaKey, $schemaData);
-            if (!self::createSchema($structure)) {
-                continue;
+            $namespace = "{$baseNamespace}Schema";
+            $path      = $writePath;
+
+            if (!$forFramework) {
+                $folder     = $folders[$schemaKey];
+                $path      .= "/$folder";
+                $namespace .= "\\$folder";
             }
-            if (!self::createEntity($structure)) {
-                continue;
-            }
-            if (!self::createColumn($structure)) {
-                continue;
-            }
+
+            $schemaName = "{$structure->schema}Schema.php";
+            $schemaCode = self::getSchemaCode($structure, $namespace, $folders);
+            File::create($path, $schemaName, $schemaCode);
+
+            $entityName = "{$structure->schema}Entity.php";
+            $entityCode = self::getEntityCode($structure, $namespace, $folders);
+            File::create($path, $entityName, $entityCode);
+
+            $columnName = "{$structure->schema}Column.php";
+            $columnCode = self::getColumnCode($structure, $namespace);
+            File::create($path, $columnName, $columnCode);
+
             $created += 1;
         }
 
@@ -69,25 +67,67 @@ class Generator {
         return $created * 3;
     }
 
+    /**
+     * Generates the Folders for the Schemas
+     * @param array{} $schemas
+     * @param string  $writePath
+     * @param boolean $forFramework
+     * @return array{}
+     */
+    private static function generateFolders(array $schemas, string $writePath, bool $forFramework): array {
+        $groups  = [];
+        $folders = [];
+
+        foreach ($schemas as $schemaKey => $schemaData) {
+            $fromFramework = $schemaData["fromFramework"] ?? false;
+            if ($fromFramework) {
+                continue;
+            }
+
+            $found = false;
+            foreach ($groups as $group) {
+                if (Strings::startsWith($schemaKey, $group)) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            if ($found) {
+                $folders[$schemaKey] = $group;
+                continue;
+            }
+
+            $groups[]            = $schemaKey;
+            $folders[$schemaKey] = $schemaKey;
+
+            if (!$forFramework) {
+                File::createDir("$writePath/$schemaKey");
+            }
+        }
+        return $folders;
+    }
+
 
 
     /**
-     * Creates the Schema file
-     * @param Structure $structure
-     * @return boolean
+     * Returns the Schema code
+     * @param Structure            $structure
+     * @param string               $namespace
+     * @param array<string,string> $folders
+     * @return string
      */
-    private static function createSchema(Structure $structure): bool {
-        $fileName    = "{$structure->schema}Schema.php";
+    private static function getSchemaCode(Structure $structure, string $namespace, array $folders): string {
         $idType      = self::getFieldType($structure->idType);
         $fields      = self::getAllFields($structure);
         $uniques     = self::getFieldList($structure, "isUnique");
         $parents     = self::getFieldList($structure, "isParent");
-        $subTypes    = self::getSubTypes($structure->subRequests);
+        $subTypes    = self::getSubTypes($structure->subRequests, $folders);
         $editParents = $structure->hasPositions ? $parents : [];
 
-        $contents    = Mustache::render(self::$schemaTemplate, [
+        $template    = Discovery::loadFrameTemplate("Schema.mu");
+        $contents    = Mustache::render($template, [
             "appNamespace"     => Package::Namespace,
-            "namespace"        => self::$namespace,
+            "namespace"        => $namespace,
             "name"             => $structure->schema,
             "column"           => "{$structure->schema}Column",
             "entity"           => "{$structure->schema}Entity",
@@ -134,22 +174,23 @@ class Generator {
         ]);
 
         $contents = self::alignParams($contents);
-        $contents = Strings::replace($contents, "(, ", "(");
-        return File::create(self::$writePath, $fileName, $contents);
+        return Strings::replace($contents, "(, ", "(");
     }
 
     /**
      * Returns the Sub Types from the Sub Requests
-     * @param SubRequest[] $subRequests
+     * @param SubRequest[]         $subRequests
+     * @param array<string,string> $folders
      * @return array{}[]
      */
-    private static function getSubTypes(array $subRequests): array {
+    private static function getSubTypes(array $subRequests, array $folders): array {
         $result = [];
         foreach ($subRequests as $subRequest) {
             if (!Strings::contains($subRequest->type, "<", "[")) {
                 $result[] = [
-                    "name" => $subRequest->name,
-                    "type" => $subRequest->type,
+                    "name"   => $subRequest->name,
+                    "type"   => $subRequest->type,
+                    "folder" => $folders[$subRequest->type] ?? "",
                 ];
             }
         }
@@ -295,22 +336,25 @@ class Generator {
 
 
     /**
-     * Creates the Entity file
-     * @param Structure $structure
-     * @return boolean
+     * Returns the Entity code
+     * @param Structure            $structure
+     * @param string               $namespace
+     * @param array<string,string> $folders
+     * @return string
      */
-    private static function createEntity(Structure $structure): bool {
-        $fileName   = "{$structure->schema}Entity.php";
+    private static function getEntityCode(Structure $structure, string $namespace, array $folders): string {
         $attributes = self::getAttributes($structure);
-        $contents   = Mustache::render(self::$entityTemplate, [
+
+        $template   = Discovery::loadFrameTemplate("Entity.mu");
+        $contents   = Mustache::render($template, [
             "appNamespace" => Package::Namespace,
-            "namespace"    => self::$namespace,
+            "namespace"    => $namespace,
             "name"         => $structure->schema,
             "id"           => $structure->idName,
-            "subTypes"     => self::getSubTypes($structure->subRequests),
+            "subTypes"     => self::getSubTypes($structure->subRequests, $folders),
             "attributes"   => self::parseAttributes($attributes),
         ]);
-        return File::create(self::$writePath, $fileName, $contents);
+        return $contents;
     }
 
     /**
@@ -459,18 +503,19 @@ class Generator {
 
 
     /**
-     * Creates the Column file
+     * Returns the Column code
      * @param Structure $structure
-     * @return boolean
+     * @param string    $namespace
+     * @return string
      */
-    private static function createColumn(Structure $structure): bool {
-        $fileName = "{$structure->schema}Column.php";
-        $contents = Mustache::render(self::$columnTemplate, [
-            "namespace" => self::$namespace,
+    private static function getColumnCode(Structure $structure, string $namespace): string {
+        $template = Discovery::loadFrameTemplate("Column.mu");
+        $contents = Mustache::render($template, [
+            "namespace" => $namespace,
             "name"      => $structure->schema,
             "columns"   => self::getColumns($structure),
         ]);
-        return File::create(self::$writePath, $fileName, $contents);
+        return $contents;
     }
 
     /**

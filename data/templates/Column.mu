@@ -1,5 +1,5 @@
 <?php
-namespace {{namespace}}Schema;
+namespace {{namespace}};
 
 use Framework\Utils\Strings;
 
