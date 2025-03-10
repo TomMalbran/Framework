@@ -1,11 +1,11 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\Database\Query;
 use Framework\Utils\Strings;
 use Framework\Utils\Server;
 use Framework\Schema\CredentialRefreshTokenSchema;
 use Framework\Schema\CredentialRefreshTokenEntity;
+use Framework\Schema\CredentialRefreshTokenQuery;
 
 /**
  * The Refresh Tokens
@@ -18,7 +18,8 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return CredentialRefreshTokenEntity
      */
     public static function get(string $refreshToken): CredentialRefreshTokenEntity {
-        $query = Query::create("refreshToken", "=", $refreshToken);
+        $query = new CredentialRefreshTokenQuery();
+        $query->refreshToken->equal($refreshToken);
         return self::getEntity($query);
     }
 
@@ -28,8 +29,9 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return CredentialRefreshTokenEntity[]
      */
     public static function getAllForCredential(int $credentialID): array {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $query->orderBy("createdTime", true);
+        $query = new CredentialRefreshTokenQuery();
+        $query->credentialID->equal($credentialID);
+        $query->createdTime->orderByAsc();
         return self::getEntityList($query);
     }
 
@@ -59,9 +61,10 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return string
      */
     public static function recreate(string $refreshToken, int $expiration): string {
-        $query           = Query::create("refreshToken", "=", $refreshToken);
-        $newRefreshToken = Strings::randomCode(20);
+        $query = new CredentialRefreshTokenQuery();
+        $query->refreshToken->equal($refreshToken);
 
+        $newRefreshToken = Strings::randomCode(20);
         self::editEntity(
             $query,
             refreshToken:   $newRefreshToken,
@@ -76,7 +79,8 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return boolean
      */
     public static function remove(string $refreshToken): bool {
-        $query = Query::create("refreshToken", "=", $refreshToken);
+        $query = new CredentialRefreshTokenQuery();
+        $query->refreshToken->equal($refreshToken);
         return self::removeEntity($query);
     }
 
@@ -86,7 +90,8 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return boolean
      */
     public static function removeAll(int $credentialID): bool {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        $query = new CredentialRefreshTokenQuery();
+        $query->credentialID->equal($credentialID);
         return self::removeEntity($query);
     }
 
@@ -96,7 +101,8 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      * @return boolean
      */
     public static function removeOld(int $expiration): bool {
-        $query = Query::create("expirationTime", "<", time() - $expiration);
+        $query = new CredentialRefreshTokenQuery();
+        $query->expirationTime->lessThan(time() - $expiration);
         return self::removeEntity($query);
     }
 }

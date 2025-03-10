@@ -3,7 +3,6 @@ namespace Framework\Auth;
 
 use Framework\Request;
 use Framework\Core\NLS;
-use Framework\Database\Query;
 use Framework\System\Access;
 use Framework\System\Status;
 use Framework\System\Path;
@@ -15,6 +14,7 @@ use Framework\Utils\Utils;
 use Framework\Schema\CredentialSchema;
 use Framework\Schema\CredentialEntity;
 use Framework\Schema\CredentialColumn;
+use Framework\Schema\CredentialQuery;
 
 /**
  * The Auth Credential
@@ -26,19 +26,25 @@ class Credential extends CredentialSchema {
      * @param Access[]|Access|null $accessName
      * @param string[]|string|null $filter     Optional.
      * @param mixed|integer        $value      Optional.
-     * @return Query
+     * @return CredentialQuery
      */
-    private static function createAccessQuery(array|Access|null $accessName, array|string|null $filter = null, mixed $value = 1): Query {
+    private static function createAccessQuery(
+        array|Access|null $accessName,
+        array|string|null $filter = null,
+        mixed $value = 1,
+    ): CredentialQuery {
         $accessNames = Access::toStrings($accessName);
         if (empty($accessNames)) {
-            return new Query();
+            return new CredentialQuery();
         }
 
-        $query = Query::create("access", "IN", $accessNames);
+        $query = new CredentialQuery();
+        $query->access->in($accessNames);
+
         if (!empty($filter)) {
             $filters = Arrays::toStrings($filter);
             foreach ($filters as $key) {
-                $query->add($key, "=", $value);
+                $query->query->add($key, "=", $value);
             }
         }
         return $query;
@@ -53,7 +59,8 @@ class Credential extends CredentialSchema {
      * @return CredentialEntity
      */
     public static function getByID(int $credentialID, bool $complete = false): CredentialEntity {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        $query = new CredentialQuery();
+        $query->credentialID->equal($credentialID);
         return self::getCredential($query, $complete);
     }
 
@@ -64,7 +71,8 @@ class Credential extends CredentialSchema {
      * @return CredentialEntity
      */
     public static function getByEmail(string $email, bool $complete = true): CredentialEntity {
-        $query = Query::create("email", "=", $email);
+        $query = new CredentialQuery();
+        $query->email->equal($email);
         return self::getCredential($query, $complete);
     }
 
@@ -75,8 +83,9 @@ class Credential extends CredentialSchema {
      * @return CredentialEntity
      */
     public static function getByAccessToken(string $accessToken, bool $complete = true): CredentialEntity {
-        $query = Query::create("accessToken", "=", $accessToken);
-        $query->add("tokenExpiration", ">", time());
+        $query = new CredentialQuery();
+        $query->accessToken->equal($accessToken);
+        $query->tokenExpiration->greaterThan(time());
         return self::getCredential($query, $complete);
     }
 
@@ -96,7 +105,8 @@ class Credential extends CredentialSchema {
             return false;
         }
 
-        $query->add("CREDENTIAL_ID", "=", $credentialID);
+        $query = new CredentialQuery();
+        $query->credentialID->equal($credentialID);
         return self::entityExists($query);
     }
 
@@ -109,8 +119,8 @@ class Credential extends CredentialSchema {
      */
     public static function emailExists(string $email, int $skipID = 0, array|Access|null $accessName = null): bool {
         $query = self::createAccessQuery($accessName);
-        $query->add("email", "=", $email);
-        $query->addIf("CREDENTIAL_ID", "<>", $skipID);
+        $query->email->equal($email);
+        $query->credentialID->notEqual($skipID);
         return self::entityExists($query);
     }
 
@@ -122,8 +132,9 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function fieldExists(string $field, mixed $value, int $skipID = 0): bool {
-        $query = Query::create($field, "=", $value);
-        $query->addIf("CREDENTIAL_ID", "<>", $skipID);
+        $query = new CredentialQuery();
+        $query->query->add($field, "=", $value);
+        $query->credentialID->notEqualIf($skipID);
         return self::entityExists($query);
     }
 
@@ -131,11 +142,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials
-     * @param Request|null $sort  Optional.
-     * @param Query|null   $query Optional.
+     * @param Request|null         $sort  Optional.
+     * @param CredentialQuery|null $query Optional.
      * @return CredentialEntity[]
      */
-    public static function getAll(?Request $sort = null, ?Query $query = null): array {
+    public static function getAll(?Request $sort = null, ?CredentialQuery $query = null): array {
         return self::getCredentials($query, $sort, false);
     }
 
@@ -164,7 +175,9 @@ class Credential extends CredentialSchema {
         if (empty($credentialIDs)) {
             return [];
         }
-        $query = Query::create("CREDENTIAL_ID", "IN", $credentialIDs);
+
+        $query = new CredentialQuery();
+        $query->credentialID->in($credentialIDs);
         return self::getCredentials($query, $sort, false);
     }
 
@@ -197,7 +210,7 @@ class Credential extends CredentialSchema {
             return [];
         }
 
-        $query->add("status", "=", Status::Active->name);
+        $query->status->equal(Status::Active);
         return self::getCredentials($query, $sort, false);
     }
 
@@ -215,7 +228,7 @@ class Credential extends CredentialSchema {
             return [];
         }
 
-        $query->orderBy("createdTime", false);
+        $query->createdTime->orderByDesc();
         $query->limit($amount);
         return self::getCredentials($query, null, false);
     }
@@ -228,7 +241,7 @@ class Credential extends CredentialSchema {
      */
     public static function getAllCreateTimes(int $fromTime, ?Access $accessName = null): array {
         $query = self::createAccessQuery($accessName);
-        $query->add("createdTime", ">=", $fromTime);
+        $query->createdTime->greaterOrEqual($fromTime);
 
         $list   = self::getEntityList($query);
         $result = [];
@@ -241,11 +254,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the total amount of Credentials
-     * @param Query|null $query Optional.
+     * @param CredentialQuery|null $query Optional.
      * @return integer
      */
-    public static function getTotal(?Query $query = null): int {
-        return self::getEntityTotal($query);
+    public static function getTotal(?CredentialQuery $query = null): int {
+        return self::getTotalEntities($query);
     }
 
     /**
@@ -261,17 +274,17 @@ class Credential extends CredentialSchema {
             return 0;
         }
 
-        return self::getEntityTotal($query);
+        return self::getTotalEntities($query);
     }
 
     /**
      * Returns all the Credentials for the given Query
-     * @param Query|null   $query    Optional.
-     * @param Request|null $sort     Optional.
-     * @param boolean      $complete Optional.
+     * @param CredentialQuery|null $query    Optional.
+     * @param Request|null         $sort     Optional.
+     * @param boolean              $complete Optional.
      * @return CredentialEntity[]
      */
-    private static function getCredentials(?Query $query = null, ?Request $sort = null, bool $complete = false): array {
+    private static function getCredentials(?CredentialQuery $query = null, ?Request $sort = null, bool $complete = false): array {
         $list   = self::getEntityList($query, $sort);
         $result = [];
 
@@ -296,11 +309,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Requests a single row from the database
-     * @param Query|null $query    Optional.
-     * @param boolean    $complete Optional.
+     * @param CredentialQuery|null $query    Optional.
+     * @param boolean              $complete Optional.
      * @return CredentialEntity
      */
-    private static function getCredential(?Query $query = null, bool $complete = false): CredentialEntity {
+    private static function getCredential(?CredentialQuery $query = null, bool $complete = false): CredentialEntity {
         $list = self::getCredentials($query, null, $complete);
         if (empty($list)) {
             return new CredentialEntity();
@@ -331,7 +344,7 @@ class Credential extends CredentialSchema {
             return [];
         }
 
-        $query->orderBy("access", false);
+        $query->access->orderByDesc();
         return self::requestSelect($query);
     }
 
@@ -344,8 +357,10 @@ class Credential extends CredentialSchema {
         if (empty($credentialIDs)) {
             return [];
         }
-        $query = Query::create("CREDENTIAL_ID", "IN", $credentialIDs);
-        $query->orderBy("firstName", true);
+
+        $query = new CredentialQuery();
+        $query->credentialID->in($credentialIDs);
+        $query->firstName->orderByAsc();
         return self::requestSelect($query);
     }
 
@@ -368,8 +383,15 @@ class Credential extends CredentialSchema {
         bool $splitText = true,
     ): array {
         $query = self::createAccessQuery($accessName);
-        $query->search([ "firstName", "lastName", "email" ], $text, "LIKE", true, $splitText);
-        $query->addIf("CREDENTIAL_ID", "IN", Arrays::toInts($credentialID), $credentialID !== null);
+        $query->search([
+            CredentialColumn::FirstName,
+            CredentialColumn::LastName,
+            CredentialColumn::Email,
+        ], $text, splitText: $splitText);
+
+        if ($credentialID !== null) {
+            $query->credentialID->in(Arrays::toInts($credentialID));
+        }
         $query->limit($amount);
 
         $list   = self::getEntityList($query);
@@ -385,10 +407,10 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a select of Credentials under the given conditions
-     * @param Query|null $query Optional.
+     * @param CredentialQuery|null $query Optional.
      * @return Select[]
      */
-    private static function requestSelect(?Query $query = null): array {
+    private static function requestSelect(?CredentialQuery $query = null): array {
         $list   = self::getEntityList($query);
         $result = [];
 
@@ -447,10 +469,11 @@ class Credential extends CredentialSchema {
         if (empty($credentialID) && empty($email)) {
             return false;
         }
-        $query = new Query();
+
+        $query = new CredentialQuery();
         $query->startOr();
-        $query->addIf("CREDENTIAL_ID", "=", $credentialID);
-        $query->addIf("email",         "=", $email);
+        $query->credentialID->equalIf($credentialID);
+        $query->email->equalIf($email);
         $query->endOr();
         return self::getEntityValue($query, CredentialColumn::ReqPassChange) == 1;
     }
@@ -484,7 +507,7 @@ class Credential extends CredentialSchema {
      */
     public static function edit(int $credentialID, ?Request $request = null, ?array $fields = [], ?Access $accessName = null, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
         $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
-        return self::editEntityData($credentialID, $request, $fields, skipEmpty: $skipEmpty);
+        return self::editSchemaEntity($credentialID, $request, $fields, skipEmpty: $skipEmpty);
     }
 
     /**
@@ -773,7 +796,8 @@ class Credential extends CredentialSchema {
      * @return mixed
      */
     public static function getValue(int $credentialID, CredentialColumn $column): mixed {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        $query = new CredentialQuery();
+        $query->credentialID->equal($credentialID);
         return self::getEntityValue($query, $column);
     }
 
@@ -785,7 +809,7 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function setValue(int $credentialID, CredentialColumn $column, mixed $value): bool {
-        return self::editEntityData($credentialID, fields: [
+        return self::editSchemaEntity($credentialID, fields: [
             $column->base() => $value,
         ]);
     }

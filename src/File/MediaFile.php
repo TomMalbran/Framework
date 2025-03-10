@@ -6,7 +6,6 @@ use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\File\File;
-use Framework\File\FilePath;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Database\Factory;

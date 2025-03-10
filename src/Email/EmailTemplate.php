@@ -3,13 +3,13 @@ namespace Framework\Email;
 
 use Framework\Discovery\Discovery;
 use Framework\Provider\Mustache;
-use Framework\Database\Query;
 use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\Utils\Strings;
 use Framework\Schema\EmailTemplateSchema;
 use Framework\Schema\EmailTemplateEntity;
+use Framework\Schema\EmailTemplateQuery;
 
 /**
  * The Email Templates
@@ -24,8 +24,10 @@ class EmailTemplate extends EmailTemplateSchema {
      */
     public static function get(string $templateCode, string $language = "root"): EmailTemplateEntity {
         $langCode = Language::getCode($language);
-        $query    = Query::create("templateCode", "=", $templateCode);
-        $query->add("language", "=", $langCode);
+
+        $query = new EmailTemplateQuery();
+        $query->templateCode->equal($templateCode);
+        $query->language->equal($langCode);
         return self::getEntity($query);
     }
 
@@ -97,7 +99,7 @@ class EmailTemplate extends EmailTemplateSchema {
         if (!empty($updates)) {
             print("<br>Updated <i>" . count($updates) . " emails</i> for language <b>$languageName</b><br>");
             foreach ($updates as $update) {
-                self::replaceEntityData(null, $update);
+                self::replaceSchemaEntity(null, $update);
             }
         }
 

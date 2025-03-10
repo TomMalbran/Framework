@@ -5,12 +5,13 @@ use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Auth\Auth;
 use Framework\Database\Assign;
-use Framework\Database\Query;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 use Framework\Schema\LogQuerySchema;
+use Framework\Schema\LogQueryColumn;
+use Framework\Schema\LogQueryQuery;
 
 /**
  * The Query Log
@@ -20,15 +21,20 @@ class QueryLog extends LogQuerySchema {
     /**
      * Creates the List Query
      * @param Request $request
-     * @return Query
+     * @return LogQueryQuery
      */
-    protected static function createListQuery(Request $request): Query {
+    protected static function createListQuery(Request $request): LogQueryQuery {
+        $search   = $request->getString("search");
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "expression" ], $request->getString("search"));
-        $query->addIf("createdTime", ">", $fromTime);
-        $query->addIf("createdTime", "<", $toTime);
+        $query = new LogQueryQuery();
+        $query->search([
+            LogQueryColumn::Expression,
+        ], $search);
+
+        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
+        $query->createdTime->lessThan($toTime, $toTime > 0);
         return $query;
     }
 
@@ -49,9 +55,11 @@ class QueryLog extends LogQuerySchema {
             $expression = Strings::replacePattern($expression, "/[?]/", $value, 1);
         }
 
-        $query = Query::create("expression", "=", $expression);
-        if (self::getEntityTotal($query) > 0) {
-            $query->orderBy("updatedTime", false)->limit(1);
+        $query = new LogQueryQuery();
+        $query->expression->equal($expression);
+
+        if (self::getTotalEntities($query) > 0) {
+            $query->updatedTime->orderByDesc()->limit(1);
             self::editEntity(
                 $query,
                 amount:      Assign::increase(1),
@@ -82,8 +90,8 @@ class QueryLog extends LogQuerySchema {
      * @return boolean
      */
     public static function markResolved(array|int $logID): bool {
-        $logIDs = Arrays::toInts($logID);
-        $query  = Query::create("LOG_ID", "IN", $logIDs);
+        $query = new LogQueryQuery();
+        $query->logID->in(Arrays::toInts($logID));
         return self::editEntity($query, isResolved: true);
     }
 
@@ -93,8 +101,8 @@ class QueryLog extends LogQuerySchema {
      * @return boolean
      */
     public static function delete(array|int $logID): bool {
-        $logIDs = Arrays::toInts($logID);
-        $query  = Query::create("LOG_ID", "IN", $logIDs);
+        $query = new LogQueryQuery();
+        $query->logID->in(Arrays::toInts($logID));
         return self::removeEntity($query);
     }
 
@@ -105,7 +113,9 @@ class QueryLog extends LogQuerySchema {
     public static function deleteOld(): bool {
         $days  = Config::getQueryLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("createdTime", "<", $time);
+
+        $query = new LogQueryQuery();
+        $query->createdTime->lessThan($time);
         return self::removeEntity($query);
     }
 }

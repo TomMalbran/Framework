@@ -2,7 +2,6 @@
 namespace Framework\Email;
 
 use Framework\Request;
-use Framework\Database\Query;
 use Framework\Email\Email;
 use Framework\Email\EmailResult;
 use Framework\System\Config;
@@ -11,6 +10,8 @@ use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
 use Framework\Schema\EmailQueueSchema;
 use Framework\Schema\EmailQueueEntity;
+use Framework\Schema\EmailQueueColumn;
+use Framework\Schema\EmailQueueQuery;
 use Framework\Schema\EmailTemplateEntity;
 
 /**
@@ -21,17 +22,24 @@ class EmailQueue extends EmailQueueSchema {
     /**
      * Creates the List Query
      * @param Request $request
-     * @return Query
+     * @return EmailQueueQuery
      */
-    protected static function createListQuery(Request $request): Query {
+    protected static function createListQuery(Request $request): EmailQueueQuery {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
+        $dataID   = $request->getInt("dataID");
 
-        $query = Query::createSearch([ "sendTo", "subject", "message" ], $search);
-        $query->addIf("createdTime", ">", $fromTime);
-        $query->addIf("createdTime", "<", $toTime);
-        $query->addIf("dataID",      "=", $request->get("dataID"));
+        $query = new EmailQueueQuery();
+        $query->search([
+            EmailQueueColumn::SendTo,
+            EmailQueueColumn::Subject,
+            EmailQueueColumn::Message,
+        ], $search);
+
+        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
+        $query->createdTime->lessThan($toTime, $toTime > 0);
+        $query->dataID->equalIf($dataID);
         return $query;
     }
 
@@ -40,13 +48,14 @@ class EmailQueue extends EmailQueueSchema {
      * @return EmailQueueEntity[]
      */
     public static function getAllUnsent(): array {
-        $query = Query::create("sentTime", "=", 0);
+        $query = new EmailQueueQuery();
+        $query->sentTime->equal(0);
         $query->startOr();
-        $query->add("createdTime", ">", DateTime::getLastXHours(1));
-        $query->add("sendTime", ">", DateTime::getLastXHours(1));
+        $query->createdTime->greaterThan(DateTime::getLastXHours(1));
+        $query->sendTime->greaterThan(DateTime::getLastXHours(1));
         $query->endOr();
-        $query->orderBy("createdTime", false);
-        $query->limitIf(Config::getEmailLimit());
+        $query->createdTime->orderByDesc();
+        $query->limit(Config::getEmailLimit());
         return self::getEntityList($query);
     }
 
@@ -132,8 +141,9 @@ class EmailQueue extends EmailQueueSchema {
      * @return boolean
      */
     public static function markAsNotSent(array|int $emailID): bool {
-        $emailIDs = Arrays::toInts($emailID);
-        $query    = Query::create("EMAIL_ID", "IN", $emailIDs);
+        $query = new EmailQueueQuery();
+        $query->emailID->in(Arrays::toInts($emailID));
+
         return self::editEntity(
             $query,
             emailResult: EmailResult::NotProcessed->name,
@@ -163,7 +173,9 @@ class EmailQueue extends EmailQueueSchema {
     public static function deleteOld(): bool {
         $days  = Config::getEmailDeleteDays();
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("createdTime", "<", $time);
+
+        $query = new EmailQueueQuery();
+        $query->createdTime->lessThan($time);
         return self::removeEntity($query);
     }
 }

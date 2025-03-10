@@ -4,12 +4,13 @@ namespace Framework\Log;
 use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Database\Assign;
-use Framework\Database\Query;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 use Framework\Schema\LogErrorSchema;
+use Framework\Schema\LogErrorColumn;
+use Framework\Schema\LogErrorQuery;
 
 /**
  * The Errors Log
@@ -45,16 +46,21 @@ class ErrorLog extends LogErrorSchema {
     /**
      * Creates the List Query
      * @param Request $request
-     * @return Query
+     * @return LogErrorQuery
      */
-    protected static function createListQuery(Request $request): Query {
+    protected static function createListQuery(Request $request): LogErrorQuery {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "description", "file" ], $search);
-        $query->addIf("createdTime", ">", $fromTime);
-        $query->addIf("createdTime", "<", $toTime);
+        $query = new LogErrorQuery();
+        $query->search([
+            LogErrorColumn::Description,
+            LogErrorColumn::File,
+        ], $search);
+
+        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
+        $query->createdTime->lessThan($toTime, $toTime > 0);
         return $query;
     }
 
@@ -64,8 +70,8 @@ class ErrorLog extends LogErrorSchema {
      * @return boolean
      */
     public static function markResolved(array|int $logID): bool {
-        $logIDs = Arrays::toInts($logID);
-        $query  = Query::create("LOG_ID", "IN", $logIDs);
+        $query = new LogErrorQuery();
+        $query->logID->in(Arrays::toInts($logID));
         return self::editEntity($query, isResolved: true);
     }
 
@@ -75,8 +81,8 @@ class ErrorLog extends LogErrorSchema {
      * @return boolean
      */
     public static function delete(array|int $logID): bool {
-        $logIDs = Arrays::toInts($logID);
-        $query  = Query::create("LOG_ID", "IN", $logIDs);
+        $query = new LogErrorQuery();
+        $query->logID->in(Arrays::toInts($logID));
         return self::removeEntity($query);
     }
 
@@ -87,7 +93,9 @@ class ErrorLog extends LogErrorSchema {
     public static function deleteOld(): bool {
         $days  = Config::getErrorLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("createdTime", "<", $time);
+
+        $query = new LogErrorQuery();
+        $query->createdTime->lessThan($time);
         return self::removeEntity($query);
     }
 
@@ -129,14 +137,15 @@ class ErrorLog extends LogErrorSchema {
         $description = self::getDescription($description);
         [ $description, $backtrace ] = self::getBacktrace($description);
 
-        $query = Query::create("errorCode", "=", $errorCode);
-        $query->addIf("file", "=", $filePath);
-        $query->addIf("line", "=", $line);
-        $query->add("description", "=", $description);
-        $query->add("backtrace",   "=", $backtrace);
+        $query = new LogErrorQuery();
+        $query->errorCode->equal($errorCode);
+        $query->file->equalIf($filePath);
+        $query->line->equalIf($line);
+        $query->description->equal($description);
+        $query->backtrace->equal($backtrace);
 
-        if (self::getEntityTotal($query) > 0) {
-            $query->orderBy("updatedTime", false)->limit(1);
+        if (self::getTotalEntities($query) > 0) {
+            $query->updatedTime->orderByDesc()->limit(1);
             self::editEntity(
                 $query,
                 amount:      Assign::increase(1),
@@ -158,10 +167,12 @@ class ErrorLog extends LogErrorSchema {
                 updatedTime: time(),
             );
 
-            $total = self::getEntityTotal();
+            $total = self::getTotalEntities();
             if ($total > self::$maxLog) {
-                $query = Query::createOrderBy("updatedTime", false);
+                $query = new LogErrorQuery();
+                $query->updatedTime->orderByAsc();
                 $query->limit($total - self::$maxLog);
+
                 self::removeEntity($query);
             }
         }

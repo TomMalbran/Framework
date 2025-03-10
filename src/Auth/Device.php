@@ -2,10 +2,10 @@
 namespace Framework\Auth;
 
 use Framework\Log\DeviceLog;
-use Framework\Database\Query;
 use Framework\Utils\Server;
 use Framework\Schema\CredentialDeviceSchema;
 use Framework\Schema\CredentialDeviceColumn;
+use Framework\Schema\CredentialDeviceQuery;
 
 /**
  * The Credential Devices
@@ -32,7 +32,8 @@ class Device extends CredentialDeviceSchema {
             return [];
         }
 
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
+        $query = new CredentialDeviceQuery();
+        $query->credentialID->in($credentialID);
         return self::getEntityColumn($query, CredentialDeviceColumn::PlayerID);
     }
 
@@ -61,8 +62,10 @@ class Device extends CredentialDeviceSchema {
      * @return boolean
      */
     public static function remove(int $credentialID, string $playerID): bool {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $query->add("playerID", "=", $playerID);
+        $query = new CredentialDeviceQuery();
+        $query->credentialID->equal($credentialID);
+        $query->playerID->equal($playerID);
+
         $result = self::removeEntity($query);
         DeviceLog::removed($credentialID, $playerID);
         return $result;

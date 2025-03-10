@@ -2,7 +2,6 @@
 namespace Framework\Notification;
 
 use Framework\Request;
-use Framework\Database\Query;
 use Framework\Auth\Device;
 use Framework\Notification\Notification;
 use Framework\Notification\NotificationResult;
@@ -10,6 +9,8 @@ use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Schema\NotificationQueueSchema;
 use Framework\Schema\NotificationQueueEntity;
+use Framework\Schema\NotificationQueueColumn;
+use Framework\Schema\NotificationQueueQuery;
 
 /**
  * The Notification Queue
@@ -23,8 +24,9 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return boolean
      */
     public static function existsForCredential(int $notificationID, int $credentialID): bool {
-        $query = Query::create("NOTIFICATION_ID", "=", $notificationID);
-        $query->add("CREDENTIAL_ID", "=", $credentialID);
+        $query = new NotificationQueueQuery();
+        $query->notificationID->equal($notificationID);
+        $query->credentialID->equal($credentialID);
         return self::entityExists($query);
     }
 
@@ -33,20 +35,22 @@ class NotificationQueue extends NotificationQueueSchema {
     /**
      * Creates the List Query
      * @param Request $request
-     * @return Query
+     * @return NotificationQueueQuery
      */
-    protected static function createListQuery(Request $request): Query {
+    protected static function createListQuery(Request $request): NotificationQueueQuery {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([
-            "title", "body",
-            "CONCAT(credential.firstName, ' ', credential.lastName)",
+        $query = new NotificationQueueQuery();
+        $query->search([
+            NotificationQueueColumn::Title,
+            NotificationQueueColumn::Body,
+            NotificationQueueColumn::CredentialName,
         ], $search);
 
-        $query->addIf("createdTime", ">", $fromTime);
-        $query->addIf("createdTime", "<", $toTime);
+        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
+        $query->createdTime->lessThan($toTime, $toTime > 0);
         return $query;
     }
 
@@ -57,9 +61,10 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return NotificationQueueEntity[]
      */
     public static function getAllUnsent(): array {
-        $query = Query::create("notificationResult", "=", NotificationResult::NotProcessed->name);
-        $query->add("createdTime", ">", DateTime::getLastXHours(1));
-        $query->orderBy("createdTime", false);
+        $query = new NotificationQueueQuery();
+        $query->notificationResult->equal(NotificationResult::NotProcessed->name);
+        $query->createdTime->greaterThan(DateTime::getLastXHours(1));
+        $query->createdTime->orderByDesc();
         return self::getEntityList($query);
     }
 
@@ -71,11 +76,12 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return NotificationQueueEntity[]
      */
     public static function getUnsentForCredential(int $credentialID, int $currentUser, int $time): array {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $query->add("currentUser", "=", $currentUser);
-        $query->add("sentTime",    "=", 0);
-        $query->add("createdTime", ">", $time - 3600);
-        $query->orderBy("createdTime", false);
+        $query = new NotificationQueueQuery();
+        $query->credentialID->equal($credentialID);
+        $query->currentUser->equal($currentUser);
+        $query->sentTime->equal(0);
+        $query->createdTime->greaterThan($time - 3600);
+        $query->createdTime->orderByDesc();
         return self::getEntityList($query);
     }
 
@@ -87,11 +93,12 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return NotificationQueueEntity[]
      */
     public static function getAllForCredential(int $credentialID, int $currentUser, Request $sort): array {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $query->add("currentUser", "=", $currentUser);
-        $query->add("isDiscarded", "=", 0);
-        $query->add("createdTime", ">", DateTime::getLastXDays(30));
-        $query->orderBy("createdTime", false);
+        $query = new NotificationQueueQuery();
+        $query->credentialID->equal($credentialID);
+        $query->currentUser->equal($currentUser);
+        $query->isDiscarded->isFalse();
+        $query->createdTime->greaterThan(DateTime::getLastXDays(30));
+        $query->createdTime->orderByDesc();
         return self::getEntityList($query, $sort);
     }
 
@@ -102,12 +109,13 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return integer
      */
     public static function getUnreadAmount(int $credentialID, int $currentUser): int {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $query->add("currentUser", "=", $currentUser);
-        $query->add("isRead",      "=", 0);
-        $query->add("isDiscarded", "=", 0);
-        $query->add("createdTime", ">", DateTime::getLastXDays(30));
-        return self::getEntityTotal($query);
+        $query = new NotificationQueueQuery();
+        $query->credentialID->equal($credentialID);
+        $query->currentUser->equal($currentUser);
+        $query->isRead->isFalse();
+        $query->isDiscarded->isFalse();
+        $query->createdTime->greaterThan(DateTime::getLastXDays(30));
+        return self::getTotalEntities($query);
     }
 
 
@@ -150,7 +158,8 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return boolean
      */
     public static function delete(int $notificationID): bool {
-        $query = Query::create("NOTIFICATION_ID", "=", $notificationID);
+        $query = new NotificationQueueQuery();
+        $query->notificationID->equal($notificationID);
         return self::removeEntity($query);
     }
 
@@ -161,7 +170,9 @@ class NotificationQueue extends NotificationQueueSchema {
     public static function deleteOld(): bool {
         $days  = Config::getNotificationDeleteDays();
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("notification_queue.createdTime", "<", $time);
+
+        $query = new NotificationQueueQuery();
+        $query->createdTime->lessThan($time);
         return self::removeEntity($query);
     }
 
@@ -173,7 +184,8 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return boolean
      */
     public static function markAsRead(int $notificationID): bool {
-        $query = Query::create("NOTIFICATION_ID", "=", $notificationID);
+        $query = new NotificationQueueQuery();
+        $query->notificationID->equal($notificationID);
         return self::editEntity($query, isRead: true);
     }
 
@@ -183,7 +195,8 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return boolean
      */
     public static function discard(int $notificationID): bool {
-        $query = Query::create("NOTIFICATION_ID", "=", $notificationID);
+        $query = new NotificationQueueQuery();
+        $query->notificationID->equal($notificationID);
         return self::editEntity($query, isDiscarded: true);
     }
 

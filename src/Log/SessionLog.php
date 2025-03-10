@@ -2,11 +2,11 @@
 namespace Framework\Log;
 
 use Framework\Auth\Auth;
-use Framework\Database\Query;
 use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
 use Framework\Schema\LogSessionSchema;
+use Framework\Schema\LogSessionQuery;
 
 /**
  * The Sessions Log
@@ -19,8 +19,9 @@ class SessionLog extends LogSessionSchema {
      * @return integer
      */
     public static function getID(int $credentialID): int {
-        $query = Query::create("CREDENTIAL_ID", "=", $credentialID);
-        $query->add("isOpen", "=", 1);
+        $query = new LogSessionQuery();
+        $query->credentialID->equal($credentialID);
+        $query->isOpen->isTrue();
         return self::getSessionID($query);
     }
 
@@ -58,7 +59,9 @@ class SessionLog extends LogSessionSchema {
     public static function deleteOld(): bool {
         $days  = Config::getActionLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("createdTime", "<", $time);
+
+        $query = new LogSessionQuery();
+        $query->createdTime->lessThan($time);
         return self::removeEntity($query);
     }
 }

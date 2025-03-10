@@ -1,12 +1,12 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\Database\Query;
 use Framework\Utils\DateTime;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 use Framework\Schema\CredentialResetSchema;
 use Framework\Schema\CredentialResetColumn;
-use Framework\Utils\Numbers;
+use Framework\Schema\CredentialResetQuery;
 
 /**
  * The Auth Reset
@@ -19,7 +19,9 @@ class Reset extends CredentialResetSchema {
      * @return integer
      */
     public static function getCredentialID(string $resetCode): int {
-        $query  = Query::create("resetCode", "=", $resetCode);
+        $query = new CredentialResetQuery();
+        $query->resetCode->equal($resetCode);
+
         $result = self::getEntityValue($query, CredentialResetColumn::CredentialID);
         return Numbers::toInt($result);
     }
@@ -30,7 +32,8 @@ class Reset extends CredentialResetSchema {
      * @return string
      */
     public static function getEmail(string $resetCode): string {
-        $query = Query::create("resetCode", "=", $resetCode);
+        $query = new CredentialResetQuery();
+        $query->resetCode->equal($resetCode);
         return self::getEntityValue($query, CredentialResetColumn::Email);
     }
 
@@ -41,8 +44,9 @@ class Reset extends CredentialResetSchema {
      * @return boolean
      */
     public static function codeExists(string $resetCode, string $email = ""): bool {
-        $query = Query::create("resetCode", "=", $resetCode);
-        $query->addIf("email", "=", $email);
+        $query = new CredentialResetQuery();
+        $query->resetCode->equal($resetCode);
+        $query->email->equalIf($email);
         return self::entityExists($query);
     }
 
@@ -73,8 +77,9 @@ class Reset extends CredentialResetSchema {
      * @return boolean
      */
     public static function delete(int $credentialID = 0, string $email = ""): bool {
-        $query = Query::createIf("CREDENTIAL_ID", "=", $credentialID);
-        $query->addIf("email", "=", $email);
+        $query = new CredentialResetQuery();
+        $query->credentialID->equal($credentialID);
+        $query->email->equalIf($email);
         return self::removeEntity($query);
     }
 
@@ -83,7 +88,8 @@ class Reset extends CredentialResetSchema {
      * @return boolean
      */
     public static function deleteOld(): bool {
-        $query = Query::create("time", "<", DateTime::getLastXHours(3));
+        $query = new CredentialResetQuery();
+        $query->time->lessThan(DateTime::getLastXHours(3));
         return self::removeEntity($query);
     }
 }

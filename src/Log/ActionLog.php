@@ -3,7 +3,6 @@ namespace Framework\Log;
 
 use Framework\Request;
 use Framework\Auth\Auth;
-use Framework\Database\Query;
 use Framework\Log\SessionLog;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
@@ -11,6 +10,7 @@ use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Schema\LogActionSchema;
+use Framework\Schema\LogActionQuery;
 
 /**
  * The Actions Log
@@ -21,20 +21,21 @@ class ActionLog extends LogActionSchema {
      * Returns the List Query
      * @param Request              $request
      * @param array<string,string> $mappings Optional.
-     * @return Query
+     * @return LogActionQuery
      */
-    private static function createQuery(Request $request, array $mappings = []): Query {
-        $fromTime = $request->toDayStart("fromDate");
-        $toTime   = $request->toDayEnd("toDate");
+    private static function createQuery(Request $request, array $mappings = []): LogActionQuery {
+        $credentialID = $request->getInt("credentialID");
+        $fromTime     = $request->toDayStart("fromDate");
+        $toTime       = $request->toDayEnd("toDate");
 
-        $query = new Query();
-        $query->addIf("CREDENTIAL_ID", "=", $request->getInt("credentialID"));
+        $query = new LogActionQuery();
         foreach ($mappings as $key => $value) {
-            $query->addIf($value, "=", $request->get($key));
+            $query->query->addIf($value, "=", $request->get($key));
         }
 
-        $query->addIf("createdTime", ">", $fromTime);
-        $query->addIf("createdTime", "<", $toTime);
+        $query->credentialID->equalIf($credentialID);
+        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
+        $query->createdTime->lessThan($toTime, $toTime > 0);
         return $query;
     }
 
@@ -46,9 +47,9 @@ class ActionLog extends LogActionSchema {
      */
     public static function getAll(Request $request, array $mappings = []): array {
         $query = self::createQuery($request, $mappings);
-        $query->orderBy("log_session.createdTime", false);
-        $query->orderBy("log_session.SESSION_ID", false);
-        $query->orderBy("log_action.createdTime", false);
+        $query->sessionCreatedTime->orderByDesc();
+        $query->sessionID->orderByDesc();
+        $query->createdTime->orderByDesc();
 
         $list      = self::getEntityList($query, $request);
         $result    = [];
@@ -90,7 +91,7 @@ class ActionLog extends LogActionSchema {
      */
     public static function getAmount(Request $request, array $mappings = []): int {
         $query = self::createQuery($request, $mappings);
-        return self::getEntityTotal($query);
+        return self::getTotalEntities($query);
     }
 
 
@@ -182,7 +183,9 @@ class ActionLog extends LogActionSchema {
     public static function deleteOld(): bool {
         $days  = Config::getActionLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("createdTime", "<", $time);
+
+        $query = new LogActionQuery();
+        $query->createdTime->lessThan($time);
         self::removeEntity($query);
         return SessionLog::deleteOld();
     }

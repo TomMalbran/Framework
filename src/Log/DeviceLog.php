@@ -2,11 +2,12 @@
 namespace Framework\Log;
 
 use Framework\Request;
-use Framework\Database\Query;
 use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
 use Framework\Schema\LogDeviceSchema;
+use Framework\Schema\LogDeviceColumn;
+use Framework\Schema\LogDeviceQuery;
 
 /**
  * The Devices Log
@@ -16,16 +17,21 @@ class DeviceLog extends LogDeviceSchema {
     /**
      * Creates the List Query
      * @param Request $request
-     * @return Query
+     * @return LogDeviceQuery
      */
-    protected static function createListQuery(Request $request): Query {
+    protected static function createListQuery(Request $request): LogDeviceQuery {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStart("fromDate");
         $toTime   = $request->toDayEnd("toDate");
 
-        $query = Query::createSearch([ "playerID", "userAgent" ], $search);
-        $query->addIf("createdTime", ">", $fromTime);
-        $query->addIf("createdTime", "<", $toTime);
+        $query = new LogDeviceQuery();
+        $query->search([
+            LogDeviceColumn::PlayerID,
+            LogDeviceColumn::UserAgent,
+        ], $search);
+
+        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
+        $query->createdTime->lessThan($toTime, $toTime > 0);
         return $query;
     }
 
@@ -68,7 +74,9 @@ class DeviceLog extends LogDeviceSchema {
     public static function deleteOld(): bool {
         $days  = Config::getDeviceLogDeleteDays();
         $time  = DateTime::getLastXDays($days);
-        $query = Query::create("createdTime", "<", $time);
+
+        $query = new LogDeviceQuery();
+        $query->createdTime->lessThan($time);
         return self::removeEntity($query);
     }
 }

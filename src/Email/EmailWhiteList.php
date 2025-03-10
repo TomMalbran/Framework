@@ -2,8 +2,8 @@
 namespace Framework\Email;
 
 use Framework\Request;
-use Framework\Database\Query;
 use Framework\Schema\EmailWhiteListSchema;
+use Framework\Schema\EmailWhiteListQuery;
 
 /**
  * The Email White List
@@ -17,8 +17,9 @@ class EmailWhiteList extends EmailWhiteListSchema {
      * @return boolean
      */
     public static function emailExists(string $email, int $skipID = 0): bool {
-        $query = Query::create("email", "=", $email);
-        $query->addIf("EMAIL_ID", "<>", $skipID);
+        $query = new EmailWhiteListQuery();
+        $query->email->equal($email);
+        $query->emailID->notEqualIf($skipID);
         return self::entityExists($query);
     }
 

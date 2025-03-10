@@ -4,19 +4,19 @@ namespace Framework\Core;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\Core\VariableType;
-use Framework\Database\Query;
 use Framework\Utils\Strings;
 use Framework\Schema\SettingsSchema;
 use Framework\Schema\SettingsEntity;
 use Framework\Schema\SettingsColumn;
+use Framework\Schema\SettingsQuery;
 
 /**
  * The Settings
  */
 class Settings extends SettingsSchema {
 
-    const Core    = "Core";
-    const General = "General";
+    public const Core    = "Core";
+    public const General = "General";
 
 
 
@@ -27,8 +27,9 @@ class Settings extends SettingsSchema {
      * @return string
      */
     public static function get(string $section, string $variable): string {
-        $query = Query::create("section", "=", $section);
-        $query->add("variable", "=", $variable);
+        $query = new SettingsQuery();
+        $query->section->equal($section);
+        $query->variable->equal($variable);
         return self::getEntityValue($query, SettingsColumn::Value);
     }
 
@@ -40,8 +41,9 @@ class Settings extends SettingsSchema {
      * @return boolean
      */
     public static function set(string $section, string $variable, string $value): bool {
-        $query = Query::create("section", "=", $section);
-        $query->add("variable", "=", $variable);
+        $query = new SettingsQuery();
+        $query->section->equal($section);
+        $query->variable->equal($variable);
 
         $elem = self::getEntity($query);
         if ($elem->isEmpty()) {
@@ -99,7 +101,9 @@ class Settings extends SettingsSchema {
      * @return array{}|object
      */
     public static function getAll(?string $section = null, bool $asObject = false): array|object {
-        $query  = Query::createIf("section", "=", $section);
+        $query = new SettingsQuery();
+        $query->section->equalIf($section);
+
         $list   = self::getEntityList($query);
         $result = [];
 
@@ -162,9 +166,11 @@ class Settings extends SettingsSchema {
      * @return boolean
      */
     public static function migrateData(): bool {
-        $settings  = Discovery::loadData(DataFile::Settings);
-        $query     = Query::create("section", "<>", self::Core);
+        $query = new SettingsQuery();
+        $query->section->notEqual(self::Core);
+
         $list      = self::getEntityList($query);
+        $settings  = Discovery::loadData(DataFile::Settings);
 
         $variables = [];
         $adds      = [];
@@ -257,8 +263,9 @@ class Settings extends SettingsSchema {
         if (!empty($renames)) {
             print("<br>Renamed <i>" . count($renames) . " settings</i><br>");
             foreach ($renames as $rename) {
-                $query = Query::create("section", "=", $rename->section);
-                $query->add("variable", "=", $rename->variable);
+                $query = new SettingsQuery();
+                $query->section->equal($rename->section);
+                $query->variable->equal($rename->variable);
                 self::editEntity($query, ...$rename->fields);
             }
             $didUpdate = true;
@@ -267,8 +274,9 @@ class Settings extends SettingsSchema {
         if (!empty($modifies)) {
             print("<br>Modified <i>" . count($modifies) . " settings</i><br>");
             foreach ($modifies as $modify) {
-                $query = Query::create("section", "=", $modify->section);
-                $query->add("variable", "=", $modify->variable);
+                $query = new SettingsQuery();
+                $query->section->equal($modify->section);
+                $query->variable->equal($modify->variable);
                 self::editEntity($query, variableType: $modify->variableType);
             }
             $didUpdate = true;
@@ -278,8 +286,10 @@ class Settings extends SettingsSchema {
             print("<br>Deleted <i>" . count($deletes) . " settings</i><br>");
             $variables = [];
             foreach ($deletes as $delete) {
-                $query = Query::create("section", "=", $delete->section);
-                $query->add("variable", "=", $delete->variable);
+                $query = new SettingsQuery();
+                $query->section->equal($delete->section);
+                $query->variable->equal($delete->variable);
+
                 self::removeEntity($query);
                 $variables[] = "{$delete->section}_{$delete->variable}";
             }

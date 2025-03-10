@@ -1,9 +1,9 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\Database\Query;
 use Framework\Utils\Server;
 use Framework\Schema\CredentialSpamSchema;
+use Framework\Schema\CredentialSpamQuery;
 
 /**
  * The Auth Spam
@@ -18,11 +18,17 @@ class Spam extends CredentialSpamSchema {
         $ip = Server::getIP();
 
         // Delete old entries
-        self::removeEntity(Query::create("time", "<", time() - 1)->add("ip", "=", $ip));
-        self::removeEntity(Query::create("time", "<", time() - 3));
+        $query = new CredentialSpamQuery();
+        $query->time->lessThan(time() - 1);
+        $query->ip->equal($ip);
+        self::removeEntity($query);
+
+        $query = new CredentialSpamQuery();
+        $query->time->lessThan(time() - 3);
+        self::removeEntity($query);
 
         // Check if there is still an entry for the given ip
-        if (self::entityExists(Query::create("ip", "=", $ip))) {
+        if (self::hasIp($ip)) {
             return true;
         }
 
@@ -35,12 +41,25 @@ class Spam extends CredentialSpamSchema {
     }
 
     /**
+     * Returns true if the given IP has an entry
+     * @param string $ip
+     * @return boolean
+     */
+    private static function hasIp(string $ip): bool {
+        $query = new CredentialSpamQuery();
+        $query->ip->equal($ip);
+        return self::entityExists($query);
+    }
+
+
+
+    /**
      * Reset the spam protections
      * @return boolean
      */
     public static function reset(): bool {
-        $ip    = Server::getIP();
-        $query = Query::create("ip", "=", $ip);
+        $query = new CredentialSpamQuery();
+        $query->ip->equal(Server::getIP());
         return self::removeEntity($query);
     }
 }
