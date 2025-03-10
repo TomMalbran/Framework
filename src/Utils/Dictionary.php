@@ -236,7 +236,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return Dictionary
      */
     public function getDict(string $key): Dictionary {
-        if ($this->has($key) && (Arrays::isArray($this->data[$key]) || Arrays::isObject($this->data[$key]))) {
+        if ($this->has($key)) {
             return new Dictionary($this->data[$key]);
         }
         return new Dictionary();
