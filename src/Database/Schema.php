@@ -20,7 +20,8 @@ use Framework\Utils\Strings;
  */
 class Schema {
 
-    const Schema = "";
+    protected const Schema = "";
+
 
     /**
      * Returns the Database
@@ -75,9 +76,9 @@ class Schema {
      * @param boolean              $decrypted   Optional.
      * @return array{}
      */
-    protected static function getEntityData(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): array {
+    protected static function getSchemaEntity(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): array {
         $query   = self::generateQueryID($query, $withDeleted)->limit(1);
-        $request = self::requestData($query, decrypted: $decrypted);
+        $request = self::requestSchemaData($query, decrypted: $decrypted);
         return !empty($request[0]) ? $request[0] : [];
     }
 
@@ -87,7 +88,7 @@ class Schema {
      * @param string $column
      * @return string|integer|float|boolean
      */
-    protected static function getValueData(Query $query, string $column): string|int|float|bool {
+    protected static function getSchemaValue(Query $query, string $column): string|int|float|bool {
         return self::db()->getValue(self::structure()->table, $column, $query);
     }
 
@@ -98,7 +99,7 @@ class Schema {
      * @param string     $columnKey Optional.
      * @return array<string|integer>
      */
-    protected static function getColumnData(?Query $query, string $column, string $columnKey = ""): array {
+    protected static function getSchemaColumn(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
         $selection = new Selection(self::structure());
         $selection->addFields();
@@ -124,7 +125,7 @@ class Schema {
      * @param boolean    $withDeleted Optional.
      * @return integer
      */
-    protected static function getEntityTotal(?Query $query = null, bool $withDeleted = true): int {
+    protected static function getSchemaTotal(?Query $query = null, bool $withDeleted = true): int {
         $query     = self::generateQuery($query, $withDeleted);
         $selection = new Selection(self::structure());
         $selection->addSelects("COUNT(*) AS cnt");
@@ -140,8 +141,6 @@ class Schema {
     /**
      * Returns a Select array
      * @param Query|null           $query       Optional.
-     * @param string|null          $orderColumn Optional.
-     * @param boolean              $orderAsc    Optional.
      * @param string|null          $idColumn    Optional.
      * @param string[]|string|null $nameColumn  Optional.
      * @param string[]|string|null $extraColumn Optional.
@@ -149,22 +148,15 @@ class Schema {
      * @param string|null          $distinctID  Optional.
      * @return Select[]
      */
-    protected static function getSelectData(
+    protected static function getSchemaSelect(
         ?Query $query = null,
-        ?string $orderColumn = null,
-        bool $orderAsc = true,
         ?string $idColumn = null,
         array|string|null $nameColumn = null,
         array|string|null $extraColumn = null,
         ?string $distinctColumn = null,
         bool $useEmpty = false,
     ): array {
-        $query = self::generateQuery($query);
-        if (!$query->hasOrder()) {
-            $field = self::structure()->getOrder($orderColumn);
-            $query->orderBy($field, $orderAsc);
-        }
-
+        $query     = self::generateQuery($query);
         $selection = new Selection(self::structure());
         if ($distinctColumn !== null) {
             $selection->addSelects("DISTINCT($distinctColumn)");
@@ -189,14 +181,14 @@ class Schema {
      * @param integer              $limit      Optional.
      * @return Search[]
      */
-    protected static function getSearchData(
+    protected static function getSchemaSearch(
         Query $query,
         ?string $idColumn = null,
         array|string|null $nameColumn = null,
         int $limit = 0,
     ): array {
-        $query   = self::generateQuery($query)->limitIf($limit);
-        $request = self::requestData($query);
+        $query   = self::generateQuery($query)->limit($limit);
+        $request = self::requestSchemaData($query);
         $idKey   = !empty($idColumn)   ? $idColumn   : self::structure()->idName;
         $nameKey = !empty($nameColumn) ? $nameColumn : self::structure()->nameKey;
         return Search::create($request, $idKey, $nameKey);
@@ -218,11 +210,11 @@ class Schema {
 
     /**
      * Returns the Data using a basic Expression and a Query
-     * @param Query   $query
-     * @param string  $expression
+     * @param Query  $query
+     * @param string $expression
      * @return array<string,string|integer>[]
      */
-    protected static function getDataWithQuery(Query $query, string $expression): array {
+    protected static function getSchemaData(Query $query, string $expression): array {
         $expression = self::structure()->replaceTable($expression);
         $request    = self::db()->getData($expression, $query);
         return $request;
@@ -234,7 +226,7 @@ class Schema {
      * @param string $expression
      * @return array<string,string|integer>
      */
-    protected static function getRowWithQuery(Query $query, string $expression): array {
+    protected static function getSchemaRow(Query $query, string $expression): array {
         $expression = self::structure()->replaceTable($expression);
         $request    = self::db()->getData($expression, $query);
 
@@ -253,21 +245,27 @@ class Schema {
      * @param boolean      $decrypted Optional.
      * @return array{}[]
      */
-    protected static function getEntitiesData(?Query $query = null, ?Request $sort = null, array $selects = [], array $joins = [], bool $decrypted = false): array {
+    protected static function getSchemaEntities(
+        ?Query $query = null,
+        ?Request $sort = null,
+        array $selects = [],
+        array $joins = [],
+        bool $decrypted = false,
+    ): array {
         $query   = self::generateQuerySort($query, $sort);
-        $request = self::requestData($query, $selects, $joins, $decrypted);
+        $request = self::requestSchemaData($query, $selects, $joins, $decrypted);
         return $request;
     }
 
     /**
      * Requests data to the database
-     * @param Query|null $query     Optional.
-     * @param array{}    $selects   Optional.
-     * @param string[]   $joins     Optional.
-     * @param boolean    $decrypted Optional.
+     * @param Query|null           $query     Optional.
+     * @param array<string,string> $selects   Optional.
+     * @param string[]             $joins     Optional.
+     * @param boolean              $decrypted Optional.
      * @return array{}[]
      */
-    private static function requestData(?Query $query = null, array $selects = [], array $joins = [], bool $decrypted = false): array {
+    private static function requestSchemaData(?Query $query = null, array $selects = [], array $joins = [], bool $decrypted = false): array {
         $selection = new Selection(self::structure());
         $selection->addFields($decrypted);
         $selection->addExpressions();
@@ -284,32 +282,6 @@ class Schema {
     }
 
 
-
-    /**
-     * Gets the Next Position
-     * @param Query|null $query       Optional.
-     * @param boolean    $withDeleted Optional.
-     * @return integer
-     */
-    protected static function getNextPosition(?Query $query = null, bool $withDeleted = true): int {
-        if (!self::structure()->hasPositions) {
-            return 0;
-        }
-
-        $selection = new Selection(self::structure());
-        $selection->addSelects("position", true);
-        $selection->addJoins(withSelects: false);
-
-        $query = self::generateQuery($query, $withDeleted);
-        $query->orderBy("position", false);
-        $query->limit(1);
-
-        $request = $selection->request($query);
-        if (!empty($request[0])) {
-            return (int)$request[0]["position"] + 1;
-        }
-        return 1;
-    }
 
     /**
      * Returns the expression of the Query
@@ -368,7 +340,7 @@ class Schema {
      * @param integer             $credentialID Optional.
      * @return integer
      */
-    protected static function createEntityData(?Request $request = null, array $fields = [], int $credentialID = 0): int {
+    protected static function createSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
         $modification = new Modification(self::structure());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
@@ -383,7 +355,7 @@ class Schema {
      * @param integer             $credentialID Optional.
      * @return integer
      */
-    protected static function replaceEntityData(?Request $request = null, array $fields = [], int $credentialID = 0): int {
+    protected static function replaceSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
         $modification = new Modification(self::structure());
         $modification->addFields($request, $fields);
         $modification->addModification($credentialID);
@@ -400,7 +372,7 @@ class Schema {
      * @param boolean              $skipUnset    Optional.
      * @return boolean
      */
-    protected static function editEntityData(
+    protected static function editSchemaEntity(
         Query|int|string $query,
         ?Request $request = null,
         array $fields = [],
@@ -422,10 +394,10 @@ class Schema {
      * @param integer              $credentialID Optional.
      * @return boolean
      */
-    protected static function deleteEntityData(Query|int|string $query, int $credentialID = 0): bool {
+    protected static function deleteSchemaEntity(Query|int|string $query, int $credentialID = 0): bool {
         $query = self::generateQueryID($query, false);
         if (self::structure()->canDelete) {
-            return self::editEntityData($query, null, [ "isDeleted" => 1 ], $credentialID);
+            return self::editSchemaEntity($query, null, [ "isDeleted" => 1 ], $credentialID);
         }
         return false;
     }
@@ -435,7 +407,7 @@ class Schema {
      * @param Query|integer|string $query
      * @return boolean
      */
-    protected static function removeEntityData(Query|int|string $query): bool {
+    protected static function removeSchemaEntity(Query|int|string $query): bool {
         $query = self::generateQueryID($query, false);
         return self::db()->delete(self::structure()->table, $query);
     }
@@ -450,13 +422,13 @@ class Schema {
      * @param Query|null          $orderQuery   Optional.
      * @return integer
      */
-    protected static function createEntityWithOrder(?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
+    protected static function createSchemaEntityWithOrder(?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
         $modification = new Modification(self::structure());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
         $modification->addModification();
 
-        $newPosition = self::ensureEntityOrder(null, $modification->getFields(), $orderQuery);
+        $newPosition = self::ensureSchemaEntityOrder(null, $modification->getFields(), $orderQuery);
         $modification->setField("position", $newPosition);
         return $modification->insert();
     }
@@ -472,7 +444,7 @@ class Schema {
      * @param boolean              $skipUnset    Optional.
      * @return boolean
      */
-    protected static function editEntityWithOrder(
+    protected static function editSchemaEntityWithOrder(
         Query|int|string $query,
         ?Request $request,
         array $fields = [],
@@ -487,8 +459,8 @@ class Schema {
 
         $fields = $modification->getFields();
         if (isset($fields["position"])) {
-            $elem         = self::getEntityData($query);
-            $savePosition = self::ensureEntityOrder($elem, $fields, $orderQuery);
+            $elem         = self::getSchemaEntity($query);
+            $savePosition = self::ensureSchemaEntityOrder($elem, $fields, $orderQuery);
             $modification->setField("position", $savePosition);
         }
 
@@ -503,10 +475,10 @@ class Schema {
      * @param Query|null           $orderQuery   Optional.
      * @return boolean
      */
-    protected static function deleteEntityWithOrder(Query|int|string $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
-        $elem = self::getEntityData($query);
-        if (self::deleteEntityData($query, $credentialID)) {
-            self::ensureEntityOrder($elem, null, $orderQuery);
+    protected static function deleteSchemaEntityWithOrder(Query|int|string $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
+        $elem = self::getSchemaEntity($query);
+        if (self::deleteSchemaEntity($query, $credentialID)) {
+            self::ensureSchemaEntityOrder($elem, null, $orderQuery);
             return true;
         }
         return false;
@@ -518,10 +490,10 @@ class Schema {
      * @param Query|null           $orderQuery Optional.
      * @return boolean
      */
-    protected static function removeEntityWithOrder(Query|int|string $query, ?Query $orderQuery = null): bool {
-        $elem = self::getEntityData($query);
-        if (self::removeEntityData($query)) {
-            self::ensureEntityOrder($elem, null, $orderQuery);
+    protected static function removeSchemaEntityWithOrder(Query|int|string $query, ?Query $orderQuery = null): bool {
+        $elem = self::getSchemaEntity($query);
+        if (self::removeSchemaEntity($query)) {
+            self::ensureSchemaEntityOrder($elem, null, $orderQuery);
             return true;
         }
         return false;
@@ -534,7 +506,7 @@ class Schema {
      * @param Query|null $query     Optional.
      * @return integer
      */
-    protected static function ensureEntityOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
+    protected static function ensureSchemaEntityOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
         $isEdit       = !empty($oldFields) && !empty($newFields);
         $oldPosition  = Arrays::getOneValue($oldFields, "position", 0);
         $newPosition  = Arrays::getOneValue($newFields, "position", 0);
@@ -573,28 +545,60 @@ class Schema {
     }
 
     /**
-     * Ensures that only one Entity has the Unique field set
-     * @param string     $field
+     * Gets the Next Position
+     * @param Query|null $query       Optional.
+     * @param boolean    $withDeleted Optional.
+     * @return integer
+     */
+    private static function getNextPosition(?Query $query = null, bool $withDeleted = true): int {
+        if (!self::structure()->hasPositions) {
+            return 0;
+        }
+
+        $selection = new Selection(self::structure());
+        $selection->addSelects("position", true);
+        $selection->addJoins(withSelects: false);
+
+        $query = self::generateQuery($query, $withDeleted);
+        $query->orderBy("position", false);
+        $query->limit(1);
+
+        $request = $selection->request($query);
+        if (!empty($request[0])) {
+            return (int)$request[0]["position"] + 1;
+        }
+        return 1;
+    }
+
+    /**
+     * Ensures that only one Entity has the Unique column set
+     * @param string     $column
      * @param integer    $id
      * @param integer    $oldValue
      * @param integer    $newValue
      * @param Query|null $query    Optional.
      * @return boolean
      */
-    protected static function ensureUniqueData(string $field, int $id, int $oldValue, int $newValue, ?Query $query = null): bool {
+    protected static function ensureSchemaUniqueData(
+        string $column,
+        int $id,
+        int $oldValue,
+        int $newValue,
+        ?Query $query = null,
+    ): bool {
         $updated = false;
         if (!empty($newValue) && empty($oldValue)) {
             $newQuery = new Query($query);
             $newQuery->add(self::structure()->idKey, "<>", $id);
-            $newQuery->add($field, "=", 1);
-            self::editEntityData($newQuery, null, [ $field => 0 ]);
+            $newQuery->add($column, "=", 1);
+            self::editSchemaEntity($newQuery, null, [ $column => 0 ]);
             $updated = true;
         }
         if (empty($newValue) && !empty($oldValue)) {
             $newQuery = self::generateQuery($query, true);
             $newQuery->orderBy(self::structure()->getOrder(), true);
             $newQuery->limit(1);
-            self::editEntityData($newQuery, null, [ $field => 1 ]);
+            self::editSchemaEntity($newQuery, null, [ $column => 1 ]);
             $updated = true;
         }
         return $updated;

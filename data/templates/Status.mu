@@ -37,6 +37,19 @@ enum Status {
     }
 
     /**
+     * Creates a list of Statuses from the given Strings
+     * @param string[] $values
+     * @return Status[]
+     */
+    public static function fromList(array $values): array {
+        $result = [];
+        foreach ($values as $value) {
+            $result[] = self::from($value);
+        }
+        return $result;
+    }
+
+    /**
      * Returns the Name of the given Status
      * @param Status|string $value
      * @param string        $isoCode Optional.

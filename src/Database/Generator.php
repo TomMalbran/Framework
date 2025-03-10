@@ -59,12 +59,16 @@ class Generator {
             $columnCode = self::getColumnCode($structure, $namespace);
             File::create($path, $columnName, $columnCode);
 
+            $queryName = "{$structure->schema}Query.php";
+            $queryCode = self::getQueryCode($structure, $namespace);
+            File::create($path, $queryName, $queryCode);
+
             $created += 1;
         }
 
         $name = $forFramework ? "Framework" : "App";
         print("- Generated the $name codes -> $created schemas\n");
-        return $created * 3;
+        return $created * 4;
     }
 
     /**
@@ -123,6 +127,7 @@ class Generator {
         $parents     = self::getFieldList($structure, "isParent");
         $subTypes    = self::getSubTypes($structure->subRequests, $folders);
         $editParents = $structure->hasPositions ? $parents : [];
+        $queryName   = "{$structure->schema}Query";
 
         $template    = Discovery::loadFrameTemplate("Schema.mu");
         $contents    = Mustache::render($template, [
@@ -131,6 +136,7 @@ class Generator {
             "name"             => $structure->schema,
             "column"           => "{$structure->schema}Column",
             "entity"           => "{$structure->schema}Entity",
+            "query"            => $queryName,
             "hasID"            => $structure->hasID,
             "idKey"            => $structure->idKey,
             "idName"           => $structure->idName,
@@ -138,8 +144,10 @@ class Generator {
             "idDocType"        => self::getDocType($idType),
             "hasIntID"         => $structure->hasID && $idType === "int",
             "idText"           => Strings::upperCaseFirst($structure->idName),
-            "editType"         => $structure->hasID ? "Query|$idType" : "Query",
-            "editDocType"      => $structure->hasID ? "Query|" . self::getDocType($idType) : "Query",
+            "editType"         => $structure->hasID ? "$queryName|$idType" : $queryName,
+            "editDocType"      => $structure->hasID ? "$queryName|" . self::getDocType($idType) : $queryName,
+            "convertType"      => $structure->hasID ? "Query|$idType" : "Query",
+            "convertDocType"   => $structure->hasID ? "Query|" . self::getDocType($idType) : "Query",
             "hasName"          => $structure->nameKey !== "" && !Arrays::contains($uniques, $structure->nameKey, "fieldName"),
             "nameKey"          => $structure->nameKey,
             "hasSelect"        => $structure->nameKey !== "",
@@ -154,6 +162,7 @@ class Generator {
             "canReplace"       => $structure->canEdit && !$structure->hasAutoInc,
             "canDelete"        => $structure->canDelete,
             "canRemove"        => $structure->canRemove,
+            "canConvert"       => $structure->canEdit || $structure->canDelete || $structure->canRemove,
             "processEntity"    => !empty($subTypes) || !empty($structure->processed) || $structure->hasStatus,
             "subTypes"         => $subTypes,
             "hasProcessed"     => !empty($structure->processed),
@@ -343,16 +352,14 @@ class Generator {
      * @return string
      */
     private static function getEntityCode(Structure $structure, string $namespace, array $folders): string {
-        $attributes = self::getAttributes($structure);
-
-        $template   = Discovery::loadFrameTemplate("Entity.mu");
-        $contents   = Mustache::render($template, [
+        $template = Discovery::loadFrameTemplate("Entity.mu");
+        $contents = Mustache::render($template, [
             "appNamespace" => Package::Namespace,
             "namespace"    => $namespace,
             "name"         => $structure->schema,
             "id"           => $structure->idName,
             "subTypes"     => self::getSubTypes($structure->subRequests, $folders),
-            "attributes"   => self::parseAttributes($attributes),
+            "attributes"   => self::getAttributes($structure),
         ]);
         return $contents;
     }
@@ -402,7 +409,8 @@ class Generator {
             }
             $result[] = self::getTypeData($subRequest->name, "array", $type);
         }
-        return $result;
+
+        return self::parseAttributes($result);
     }
 
     /**
@@ -577,13 +585,104 @@ class Generator {
             }
         }
 
-
         $nameLength = 0;
         foreach ($result as $index => $column) {
             $nameLength = max($nameLength, Strings::length($column["name"]));
         }
         foreach ($result as $index => $column) {
             $result[$index]["name"] = Strings::padRight($column["name"], $nameLength);
+        }
+        return $result;
+    }
+
+
+
+    /**
+     * Returns the Query code
+     * @param Structure $structure
+     * @param string    $namespace
+     * @return string
+     */
+    private static function getQueryCode(Structure $structure, string $namespace): string {
+        $template = Discovery::loadFrameTemplate("Query.mu");
+        $contents = Mustache::render($template, [
+            "namespace"  => $namespace,
+            "name"       => $structure->schema,
+            "column"     => "{$structure->schema}Column",
+            "query"      => "{$structure->schema}Query",
+            "properties" => self::getProperties($structure),
+        ]);
+        $contents = self::alignParams($contents);
+        return $contents;
+    }
+
+    /**
+     * Returns the Field properties for the Query
+     * @param Structure $structure
+     * @return array{}
+     */
+    private static function getProperties(Structure $structure): array {
+        $maxLength = 0;
+        $list      = [];
+        $result    = [];
+
+        foreach ($structure->fields as $field) {
+            $list[] = [
+                "type"   => $field->type,
+                "column" => $field->name,
+                "name"   => $field->name,
+                "value"  => "{$structure->table}.{$field->key}",
+            ];
+            $maxLength = max($maxLength, Strings::length($field->name));
+        }
+
+        foreach ($structure->expressions as $expression) {
+            $list[] = [
+                "type"   => $expression->type,
+                "column" => $expression->name,
+                "name"   => $expression->prefixName,
+                "value"  => $expression->key,
+            ];
+            $maxLength = max($maxLength, Strings::length($expression->prefixName));
+        }
+
+        foreach ($structure->joins as $join) {
+            foreach ($join->fields as $field) {
+                $table  = $join->asTable ?: $join->table;
+                $list[] = [
+                    "type"   => $field->type,
+                    "column" => $field->name,
+                    "name"   => $field->prefixName,
+                    "value"  => "{$table}.{$field->key}",
+                ];
+                $maxLength = max($maxLength, Strings::length($field->prefixName));
+            }
+        }
+
+        foreach ($list as $property) {
+            $property["title"] = Strings::padRight($property["name"], $maxLength);
+
+            $type = $property["type"];
+            if ($property["column"] === "status") {
+                $property["type"] = "StatusQuery";
+            } else {
+                $property["type"] = match($type) {
+                    Field::Boolean => "BooleanQuery",
+                    Field::ID,
+                    Field::Number,
+                    Field::Date => "NumberQuery",
+                    Field::String,
+                    Field::Text,
+                    Field::LongText,
+                    Field::JSON,
+                    Field::CSV,
+                    Field::HTML => "StringQuery",
+                    default => "",
+                };
+            }
+            if ($property["type"] !== "") {
+                $result[] = $property;
+            }
         }
         return $result;
     }

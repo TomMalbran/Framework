@@ -54,6 +54,22 @@ class Query {
         }
     }
 
+    /**
+     * Creates a new Query with the given values
+     * @param string                      $column        Optional.
+     * @param string                      $expression    Optional.
+     * @param mixed[]|integer|string|null $value         Optional.
+     * @param boolean                     $caseSensitive Optional.
+     * @return Query
+     */
+    public static function create(string $column = "", string $expression = "", array|int|string|null $value = null, bool $caseSensitive = false): Query {
+        $query = new Query();
+        if (!empty($column)) {
+            $query->add($column, $expression, $value, $caseSensitive);
+        }
+        return $query;
+    }
+
 
 
     /**
@@ -74,9 +90,20 @@ class Query {
      * @param string                 $expression
      * @param mixed[]|integer|string $value
      * @param boolean                $caseSensitive Optional.
+     * @param boolean|null           $condition     Optional.
      * @return Query
      */
-    public function add(string $column, string $expression, array|int|string $value, bool $caseSensitive = false): Query {
+    public function add(
+        string $column,
+        string $expression,
+        array|int|string $value,
+        bool $caseSensitive = false,
+        ?bool $condition = null,
+    ): Query {
+        if ($condition !== null && !$condition) {
+            return $this;
+        }
+
         $prefix = $this->getPrefix();
         $suffix = $caseSensitive ? "BINARY" : "";
         $binds  = "?";
@@ -188,31 +215,19 @@ class Query {
     }
 
     /**
-     * Adds an expression as an and where the column is between the given values
-     * @param string  $column
-     * @param integer $from
-     * @param integer $to
-     * @return Query
-     */
-    public function addBetween(string $column, int $from, int $to): Query {
-        if (!empty($from)) {
-            $this->add($column, ">=", $from);
-        }
-        if (!empty($to)) {
-            $this->add($column, "<=", $to);
-        }
-        return $this;
-    }
-
-    /**
-     * Adds an expression as NULL
+     * Uses the Period to add a Between expression
      * @param string  $column
      * @param Request $request
      * @return Query
      */
     public function addPeriod(string $column, Request $request): Query {
         $period = new Period($request);
-        $this->addBetween($column, $period->fromTime, $period->toTime);
+        if ($period->fromTime > 0) {
+            $this->add($column, ">=", $period->fromTime);
+        }
+        if ($period->toTime > 0) {
+            $this->add($column, "<=", $period->toTime);
+        }
         return $this;
     }
 
@@ -439,23 +454,13 @@ class Query {
      * @return Query
      */
     public function limit(int $from, ?int $to = null): Query {
+        if (empty($from) && empty($to)) {
+            return $this;
+        }
         if ($to != null) {
             $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
         } else {
             $this->limit = $from;
-        }
-        return $this;
-    }
-
-    /**
-     * Adds a Limit
-     * @param integer|null $from Optional.
-     * @param integer|null $to   Optional.
-     * @return Query
-     */
-    public function limitIf(?int $from = null, ?int $to = null): Query {
-        if (!empty($from)) {
-            $this->limit($from, $to);
         }
         return $this;
     }
@@ -590,151 +595,6 @@ class Query {
             $this->$type = Strings::replace($this->$type, " $oldColumn ", " $newColumn ");
         }
         return $this;
-    }
-
-
-
-    /**
-     * Creates a new Query with the given values
-     * @param string                      $column        Optional.
-     * @param string                      $expression    Optional.
-     * @param mixed[]|integer|string|null $value         Optional.
-     * @param boolean                     $caseSensitive Optional.
-     * @return Query
-     */
-    public static function create(string $column = "", string $expression = "", array|int|string|null $value = null, bool $caseSensitive = false): Query {
-        $query = new Query();
-        if (!empty($column)) {
-            $query->add($column, $expression, $value, $caseSensitive);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query with the given values
-     * @param string                      $column     Optional.
-     * @param string                      $expression Optional.
-     * @param mixed[]|integer|string|null $value      Optional.
-     * @param boolean|null                $condition  Optional.
-     * @return Query
-     */
-    public static function createIf(string $column = "", string $expression = "", array|int|string|null $value = null, ?bool $condition = null): Query {
-        $query = new Query();
-        if (!empty($column)) {
-            $query->addIf($column, $expression, $value, $condition);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query with the given values
-     * @param string[]|string|null $column          Optional.
-     * @param mixed|null           $value           Optional.
-     * @param string               $expression      Optional.
-     * @param boolean              $caseInsensitive Optional.
-     * @param boolean              $splitValue      Optional.
-     * @param string               $splitText       Optional.
-     * @param boolean              $matchAny        Optional.
-     * @return Query
-     */
-    public static function createSearch(
-        array|string|null $column = null,
-        mixed $value = null,
-        string $expression = "LIKE",
-        bool $caseInsensitive = true,
-        bool $splitValue = false,
-        string $splitText = " ",
-        bool $matchAny = false,
-    ): Query {
-        $query = new Query();
-        if (!empty($column) && !empty($value)) {
-            $query->search($column, $value, $expression, $caseInsensitive, $splitValue, $splitText, $matchAny);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query between the given values
-     * @param string  $column Optional.
-     * @param integer $from   Optional.
-     * @param integer $to     Optional.
-     * @return Query
-     */
-    public static function createBetween(string $column = "", int $from = 0, int $to = 0): Query {
-        $query = new Query();
-        if (!empty($column)) {
-            $query->addBetween($column, $from, $to);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query with a Period
-     * @param string       $column  Optional.
-     * @param Request|null $request Optional.
-     * @return Query
-     */
-    public static function createPeriod(string $column = "", ?Request $request = null): Query {
-        $query = new Query();
-        if (!empty($column) && !empty($request)) {
-            $query->addPeriod($column, $request);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query with an Expression
-     * @param string $expression Optional.
-     * @param mixed  ...$values  Optional.
-     * @return Query
-     */
-    public static function createExp(string $expression = "", mixed ...$values): Query {
-        $query = new Query();
-        if (!empty($expression)) {
-            $query->addExp($expression, ...$values);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query with a Param
-     * @param mixed|null $param Optional.
-     * @return Query
-     */
-    public static function createParam(mixed $param = null): Query {
-        $query = new Query();
-        if ($param !== null) {
-            $query->addParam($param);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query with an Order
-     * @param string  $column Optional.
-     * @param boolean $isASC  Optional.
-     * @return Query
-     */
-    public static function createOrderBy(string $column = "", bool $isASC = false): Query {
-        $query = new Query();
-        if (!empty($column)) {
-            $query->orderBy($column, $isASC);
-        }
-        return $query;
-    }
-
-    /**
-     * Creates a new Query with a Pagination
-     * @param integer $page   Optional.
-     * @param integer $amount Optional.
-     * @return Query
-     */
-    public static function createPaginate(int $page = 0, int $amount = 0): Query {
-        $query = new Query();
-        if (!empty($page) && !empty($amount)) {
-            $query->paginate($page, $amount);
-        }
-        return $query;
     }
 
 
