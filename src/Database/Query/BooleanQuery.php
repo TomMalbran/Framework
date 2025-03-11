@@ -11,21 +11,12 @@ class BooleanQuery extends BaseQuery {
 
     /**
      * Generates an Equal Query
-     * @param bool $value
-     * @return Query
-     */
-    public function equal(bool $value): Query {
-        return $this->query->add($this->column, "=", (int)$value);
-    }
-
-    /**
-     * Generates an Equal Query
      * @param bool         $value
      * @param boolean|null $condition Optional.
      * @return Query
      */
-    public function equalIf(bool $value, ?bool $condition = null): Query {
-        return $this->query->add($this->column, "=", (int)$value, $condition);
+    public function equal(bool $value, ?bool $condition = null): Query {
+        return $this->query->add($this->column, "=", (int)$value, condition: $condition);
     }
 
 

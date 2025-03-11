@@ -112,27 +112,27 @@ class Query {
         case "=":
             if (Arrays::isArray($value)) {
                 $expression = "IN";
-                $binds      = self::createBinds($value);
+                $binds      = $this->createBinds($value);
             }
             break;
         case "<>":
             if (Arrays::isArray($value)) {
                 $expression = "NOT IN";
-                $binds      = self::createBinds($value);
+                $binds      = $this->createBinds($value);
             }
             break;
         case "IN":
             if (!Arrays::isArray($value)) {
                 $expression = "=";
             } else {
-                $binds = self::createBinds($value);
+                $binds = $this->createBinds($value);
             }
             break;
         case "NOT IN":
             if (!Arrays::isArray($value)) {
                 $expression = "<>";
             } else {
-                $binds = self::createBinds($value);
+                $binds = $this->createBinds($value);
             }
             break;
         case "LIKE":
@@ -190,31 +190,6 @@ class Query {
     }
 
     /**
-     * Adds an expression with a value if the value is not empty
-     * @param string $expression
-     * @param mixed  ...$values
-     * @return Query
-     */
-    public function addExpIf(string $expression, mixed ...$values): Query {
-        if (!empty($values[0])) {
-            $this->addExp($expression, ...$values);
-        }
-        return $this;
-    }
-
-    /**
-     * Adds an expression as NULL
-     * @param string $column
-     * @return Query
-     */
-    public function addNull(string $column): Query {
-        $prefix          = $this->getPrefix();
-        $this->where    .= "{$prefix}ISNULL( $column ) = 1";
-        $this->columns[] = $column;
-        return $this;
-    }
-
-    /**
      * Uses the Period to add a Between expression
      * @param string  $column
      * @param Request $request
@@ -227,6 +202,66 @@ class Query {
         }
         if ($period->toTime > 0) {
             $this->add($column, "<=", $period->toTime);
+        }
+        return $this;
+    }
+
+    /**
+     * Adds a Search expression
+     * @param string[]|string $column
+     * @param mixed           $value
+     * @param string          $expression      Optional.
+     * @param boolean         $caseInsensitive Optional.
+     * @param boolean         $splitValue      Optional.
+     * @param string          $splitText       Optional.
+     * @param boolean         $matchAny        Optional.
+     * @return Query
+     */
+    public function search(
+        array|string $column,
+        mixed        $value,
+        string       $expression = "LIKE",
+        bool         $caseInsensitive = true,
+        bool         $splitValue = false,
+        string       $splitText = " ",
+        bool         $matchAny = false,
+    ): Query {
+        if (empty($value)) {
+            return $this;
+        }
+
+        $valueParts = $splitValue ? Strings::split($value, $splitText) : Arrays::toArray($value);
+        $valueParts = Arrays::removeEmpty($valueParts);
+        $columns    = Arrays::toArray($column);
+        $multiParts = Arrays::length($valueParts) > 1;
+        $multiCols  = Arrays::length($columns) > 1;
+        $isFirst    = true;
+
+        if ($multiParts) {
+            $this->startParen();
+        }
+        foreach ($valueParts as $valuePart) {
+            $valueSearch = $caseInsensitive ? Strings::toLowerCase($valuePart) : $valuePart;
+            if ($multiParts && !$isFirst) {
+                if ($matchAny) {
+                    $this->or();
+                } else {
+                    $this->and();
+                }
+            }
+            if ($multiCols) {
+                $this->startOr();
+            }
+            foreach ($columns as $columnSearch) {
+                $this->add($columnSearch, $expression, $valueSearch);
+            }
+            if ($multiCols) {
+                $this->endOr();
+            }
+            $isFirst = false;
+        }
+        if ($multiParts) {
+            $this->endParen();
         }
         return $this;
     }
@@ -330,7 +365,7 @@ class Query {
      * Ends an And o Or expression
      * @return Query
      */
-    public function endAndOr(): Query {
+    private function endAndOr(): Query {
         if (Strings::endsWith($this->where, "AND (")) {
             $this->where = Strings::stripEnd($this->where, "AND (");
         } elseif (Strings::endsWith($this->where, "OR (")) {
@@ -346,79 +381,17 @@ class Query {
         return $this;
     }
 
-    /**
-     * Adds a Search expression
-     * @param string[]|string $column
-     * @param mixed           $value
-     * @param string          $expression      Optional.
-     * @param boolean         $caseInsensitive Optional.
-     * @param boolean         $splitValue      Optional.
-     * @param string          $splitText       Optional.
-     * @param boolean         $matchAny        Optional.
-     * @return Query
-     */
-    public function search(
-        array|string $column,
-        mixed        $value,
-        string       $expression = "LIKE",
-        bool         $caseInsensitive = true,
-        bool         $splitValue = false,
-        string       $splitText = " ",
-        bool         $matchAny = false,
-    ): Query {
-        if (empty($value)) {
-            return $this;
-        }
 
-        $valueParts = $splitValue ? Strings::split($value, $splitText) : Arrays::toArray($value);
-        $valueParts = Arrays::removeEmpty($valueParts);
-        $columns    = Arrays::toArray($column);
-        $multiParts = Arrays::length($valueParts) > 1;
-        $multiCols  = Arrays::length($columns) > 1;
-        $isFirst    = true;
-
-        if ($multiParts) {
-            $this->startParen();
-        }
-        foreach ($valueParts as $valuePart) {
-            $valueSearch = $caseInsensitive ? Strings::toLowerCase($valuePart) : $valuePart;
-            if ($multiParts && !$isFirst) {
-                if ($matchAny) {
-                    $this->or();
-                } else {
-                    $this->and();
-                }
-            }
-            if ($multiCols) {
-                $this->startOr();
-            }
-            foreach ($columns as $columnSearch) {
-                $this->add($columnSearch, $expression, $valueSearch);
-            }
-            if ($multiCols) {
-                $this->endOr();
-            }
-            $isFirst = false;
-        }
-        if ($multiParts) {
-            $this->endParen();
-        }
-        return $this;
-    }
 
     /**
      * Adds a Group By
-     * @param string ...$columns
+     * @param string $column
      * @return Query
      */
-    public function groupBy(string ...$columns): Query {
-        foreach ($columns as $column) {
-            if (!empty($column)) {
-                $prefix         = !empty($this->groupBy) ? "," : "";
-                $this->groupBy .= "$prefix $column ";
-                $this->groups[] = $column;
-            }
-        }
+    public function groupBy(string $column): Query {
+        $prefix         = !empty($this->groupBy) ? "," : "";
+        $this->groupBy .= "$prefix $column ";
+        $this->groups[] = $column;
         return $this;
     }
 
@@ -429,21 +402,9 @@ class Query {
      * @return Query
      */
     public function orderBy(string $column, bool $isASC = true): Query {
-        if (!empty($column)) {
-            $prefix         = !empty($this->orderBy) ? "," : "";
-            $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
-            $this->orders[] = $column;
-        }
-        return $this;
-    }
-
-    /**
-     * Orders Randomly
-     * @return Query
-     */
-    public function random(): Query {
-        $this->orderBy = "RAND()";
-        $this->orders  = [];
+        $prefix         = !empty($this->orderBy) ? "," : "";
+        $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
+        $this->orders[] = $column;
         return $this;
     }
 
@@ -454,13 +415,12 @@ class Query {
      * @return Query
      */
     public function limit(int $from, ?int $to = null): Query {
-        if (empty($from) && empty($to)) {
-            return $this;
-        }
-        if ($to != null) {
-            $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
-        } else {
-            $this->limit = $from;
+        if (!empty($from) || !empty($to)) {
+            if ($to != null) {
+                $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
+            } else {
+                $this->limit = $from;
+            }
         }
         return $this;
     }
@@ -528,29 +488,10 @@ class Query {
      * @return string
      */
     public function get(bool $addWhere = true): string {
-        $result  = $this->getWhere($addWhere);
-        $result .= $this->getOrderLimit();
-        return Strings::replacePattern($result, "!\s+!", " ");
-    }
-
-    /**
-     * Returns the where part of the Query to use with the Database
-     * @param boolean $addWhere Optional.
-     * @return string
-     */
-    public function getWhere(bool $addWhere = false): string {
-        if (!empty($this->where)) {
-            return ($addWhere ? "WHERE " : "AND ") . $this->where;
-        }
-        return "";
-    }
-
-    /**
-     * Returns the group order and limit part of the Query to use with the Database
-     * @return string
-     */
-    public function getOrderLimit(): string {
         $result = "";
+        if (!empty($this->where)) {
+            $result .= ($addWhere ? "WHERE " : "AND ") . $this->where;
+        }
         if (!empty($this->groupBy)) {
             $result .= " GROUP BY {$this->groupBy}";
         }
@@ -560,7 +501,7 @@ class Query {
         if (!empty($this->limit)) {
             $result .= " LIMIT {$this->limit}";
         }
-        return $result;
+        return Strings::replacePattern($result, "!\s+!", " ");
     }
 
     /**
@@ -591,20 +532,18 @@ class Query {
      * @return Query
      */
     public function updateColumn(string $oldColumn, string $newColumn): Query {
-        foreach ([ "where", "orderBy", "groupBy" ] as $type) {
-            $this->$type = Strings::replace($this->$type, " $oldColumn ", " $newColumn ");
-        }
+        $this->where   = Strings::replace($this->where,   " $oldColumn ", " $newColumn ");
+        $this->orderBy = Strings::replace($this->orderBy, " $oldColumn ", " $newColumn ");
+        $this->groupBy = Strings::replace($this->groupBy, " $oldColumn ", " $newColumn ");
         return $this;
     }
-
-
 
     /**
      * Creates a list of question marks for the given array
      * @param mixed[] $array
      * @return string
      */
-    public static function createBinds(array $array): string {
+    public function createBinds(array $array): string {
         $bind = [];
         for ($i = 0; $i < count($array); $i++) {
             $bind[] = "?";

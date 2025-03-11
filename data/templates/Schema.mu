@@ -334,10 +334,10 @@ class {{name}}Schema extends Schema {
 
     /**
      * Returns a Total number of {{name}} Entities
-     * @param {{query}}|null $query
+     * @param {{query}}|null $query Optional.
      * @return integer
      */
-    public static function getTotalEntities(?{{query}} $query): int {
+    public static function getTotalEntities(?{{query}} $query = null): int {
         $query = $query !== null ? $query->query : null;
         return self::getSchemaTotal($query);
     }

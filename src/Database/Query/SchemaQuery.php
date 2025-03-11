@@ -32,7 +32,7 @@ class SchemaQuery {
      * @return string
      */
     public function createBinds(array $array): string {
-        return Query::createBinds($array);
+        return $this->query->createBinds($array);
     }
 
 
@@ -122,6 +122,8 @@ class SchemaQuery {
         return $this->query->endOr();
     }
 
+
+
     /**
      * Adds an Limit
      * @param integer      $from
@@ -133,5 +135,15 @@ class SchemaQuery {
             return $this->query->limit($from, $to);
         }
         return $this->query;
+    }
+
+    /**
+     * Adds a limit using pagination
+     * @param integer $page   Optional.
+     * @param integer $amount Optional.
+     * @return Query
+     */
+    public function paginate(int $page = 0, int $amount = 100): Query {
+        return $this->query->paginate($page, $amount);
     }
 }

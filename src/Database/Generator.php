@@ -661,6 +661,7 @@ class Generator {
 
         foreach ($list as $property) {
             $property["title"] = Strings::padRight($property["name"], $maxLength);
+            $property["name"]  = Strings::padRight("{$property["name"]};", $maxLength);
 
             $type = $property["type"];
             if ($property["column"] === "status") {

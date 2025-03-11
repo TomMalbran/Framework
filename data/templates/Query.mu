@@ -15,7 +15,7 @@ use Framework\Database\Query\StringQuery;
 class {{query}} extends SchemaQuery {
 
 {{#properties}}
-    public {{type}} ${{name}};
+    public {{type}} ${{name}} // {{value}}
 {{/properties}}
 
 
