@@ -551,6 +551,26 @@ class {{name}}Schema extends Schema {
     }
 
     /**
+     * Edits a value in a {{name}} Entity
+     * @param {{editDocType}} $query
+     * @param {{column}} $column
+     * @param string|integer $value{{#hasUsers}}
+     * @param integer $modifiedUser Optional.{{/hasUsers}}
+     * @return boolean
+     */
+    protected static function editEntityValue({{editType}} $query, {{column}} $column, string|int $value{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
+        {{#hasUsers}}
+        if ($modifiedUser === 0) {
+            $modifiedUser = Auth::getID();
+        }
+
+        {{/hasUsers}}
+        return self::editSchemaEntity(self::toQuery($query), fields: [
+            $column->base() => $value,
+        ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+    }
+
+    /**
      * Increments a value in a {{name}} Entity
      * @param {{editDocType}} $query
      * @param {{column}} $column
