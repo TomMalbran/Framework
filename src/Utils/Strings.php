@@ -27,6 +27,9 @@ class Strings {
         if (self::isString($value)) {
             return $value;
         }
+        if (!is_array($value) && !is_object($value)) {
+            return strval($value);
+        }
         return strval($value);
     }
 
@@ -267,7 +270,7 @@ class Strings {
      * @return string
      */
     public static function replace(string $string, array|string $search, array|string|null $replace = null): string {
-        if ($replace === null && Arrays::isArray($search)) {
+        if ($replace === null && is_array($search)) {
             return str_replace(array_keys($search), array_values($search), $string);
         }
         return str_replace($search, $replace, $string);
@@ -485,8 +488,11 @@ class Strings {
      * @return string[]
      */
     public static function split(array|string $string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
-        if (Arrays::isArray($string)) {
+        if (is_array($string)) {
             return $string;
+        }
+        if ($string === "") {
+            return [];
         }
 
         $content = explode($needle, $string);
@@ -535,7 +541,7 @@ class Strings {
      * @return string
      */
     public static function joinKeys(mixed $value, string $glue = ""): string {
-        if (!Arrays::isArray($value)) {
+        if (!is_array($value)) {
             return self::isString($value) ? $value : "";
         }
         return implode($glue, array_keys($value));
@@ -549,11 +555,11 @@ class Strings {
      * @return string
      */
     public static function joinValues(mixed $value, string $key, string $glue = ""): string {
-        if (!Arrays::isArray($value)) {
+        if (!is_array($value)) {
             return self::isString($value) ? $value : "";
         }
-        $value = Arrays::createArray($value, $key);
-        return implode($glue, $value);
+        $values = Arrays::toStrings($value, $key);
+        return implode($glue, $values);
     }
 
     /**
