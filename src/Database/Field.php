@@ -6,8 +6,6 @@ use Framework\File\FilePath;
 use Framework\Database\Assign;
 use Framework\System\Config;
 use Framework\System\Path;
-use Framework\Utils\Arrays;
-use Framework\Utils\CSV;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -25,7 +23,6 @@ class Field {
     const Date     = "date";
     const String   = "string";
     const JSON     = "json";
-    const CSV      = "csv";
     const HTML     = "html";
     const Text     = "text";
     const LongText = "longtext";
@@ -184,7 +181,6 @@ class Field {
             $default    = "";
             break;
         case self::JSON:
-        case self::CSV:
         case self::HTML:
             $type       = "mediumtext";
             $attributes = "NULL";
@@ -262,9 +258,6 @@ class Field {
         case self::JSON:
             $result = $request->toJSON($this->name);
             break;
-        case self::CSV:
-            $result = $request->toCSV($this->name);
-            break;
         case self::Encrypt:
             $value  = $request->get($this->name);
             $result = Assign::encrypt($value, Config::getDbKey());
@@ -304,11 +297,6 @@ class Field {
             break;
         case self::JSON:
             $result[$key]           = JSON::decodeAsArray($text);
-            break;
-        case self::CSV:
-            $result[$key]           = $text;
-            $result["{$key}Parts"]  = !empty($text) ? CSV::decode($text) : [];
-            $result["{$key}Count"]  = Arrays::length($result["{$key}Parts"]);
             break;
         case self::HTML:
             $result[$key]           = $text;

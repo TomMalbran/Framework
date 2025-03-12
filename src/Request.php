@@ -5,7 +5,6 @@ use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Utils\Arrays;
-use Framework\Utils\CSV;
 use Framework\Utils\DateTime;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
@@ -611,15 +610,6 @@ class Request implements IteratorAggregate, JsonSerializable {
             $value = Strings::split($value, ",");
         }
         return JSON::encode($value);
-    }
-
-    /**
-     * Returns the given array encoded as JSON
-     * @param string $key
-     * @return string
-     */
-    public function toCSV(string $key): string {
-        return CSV::encode($this->get($key));
     }
 
     /**

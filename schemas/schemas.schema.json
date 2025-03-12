@@ -237,7 +237,6 @@
                 "date",
                 "string",
                 "json",
-                "csv",
                 "html",
                 "text",
                 "longtext",
