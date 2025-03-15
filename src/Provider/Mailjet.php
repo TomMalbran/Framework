@@ -9,7 +9,7 @@ use Framework\System\Config;
  */
 class Mailjet {
 
-    const BaseUrl = "https://api.mailjet.com";
+    private const BaseUrl = "https://api.mailjet.com";
 
 
     /**
@@ -57,7 +57,7 @@ class Mailjet {
             "Subject"  => $subject,
             "HTMLPart" => $body,
         ];
-        if (!empty($replyTo)) {
+        if ($replyTo !== "") {
             $message["ReplyTo"] = [
                 "Email" => $replyTo,
                 "Name"  => $fromName,

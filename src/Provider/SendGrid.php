@@ -8,7 +8,7 @@ use Framework\System\Config;
  */
 class SendGrid {
 
-    const BaseUrl = "https://api.sendgrid.com/v3/";
+    private const BaseUrl = "https://api.sendgrid.com/v3/";
 
 
     /**
@@ -48,7 +48,7 @@ class SendGrid {
                 ],
             ],
         ];
-        if (!empty($replyTo)) {
+        if ($replyTo !== "") {
             $params["reply_to"] = [
                 "email" => $replyTo,
                 "name"  => $fromName,

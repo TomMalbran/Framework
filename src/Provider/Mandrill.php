@@ -8,7 +8,7 @@ use Framework\System\Config;
  */
 class Mandrill {
 
-    const BaseUrl = "https://mandrillapp.com/api/1.0/";
+    private const BaseUrl = "https://mandrillapp.com/api/1.0/";
 
 
     /**
@@ -53,7 +53,7 @@ class Mandrill {
             "signing_domain"      => null,
             "return_path_domain"  => null,
         ];
-        if (!empty($replyTo)) {
+        if ($replyTo !== "") {
             $message["headers"] = [
                 "reply-to" => $replyTo,
             ];
