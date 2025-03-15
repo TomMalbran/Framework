@@ -58,7 +58,7 @@ class QueryLog extends LogQuerySchema {
         $query = new LogQueryQuery();
         $query->expression->equal($expression);
 
-        if (self::getTotalEntities($query) > 0) {
+        if (self::getEntityTotal($query) > 0) {
             $query->updatedTime->orderByDesc()->limit(1);
             self::editEntity(
                 $query,

@@ -91,7 +91,7 @@ class ActionLog extends LogActionSchema {
      */
     public static function getAmount(Request $request, array $mappings = []): int {
         $query = self::createQuery($request, $mappings);
-        return self::getTotalEntities($query);
+        return self::getEntityTotal($query);
     }
 
 

@@ -115,7 +115,7 @@ class NotificationQueue extends NotificationQueueSchema {
         $query->isRead->isFalse();
         $query->isDiscarded->isFalse();
         $query->createdTime->greaterThan(DateTime::getLastXDays(30));
-        return self::getTotalEntities($query);
+        return self::getEntityTotal($query);
     }
 
 
