@@ -337,7 +337,7 @@ class {{name}}Schema extends Schema {
      * @param {{query}}|null $query Optional.
      * @return integer
      */
-    public static function getTotalEntities(?{{query}} $query = null): int {
+    public static function getEntityTotal(?{{query}} $query = null): int {
         $query = $query !== null ? $query->query : null;
         return self::getSchemaTotal($query);
     }
