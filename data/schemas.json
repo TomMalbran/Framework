@@ -110,17 +110,17 @@
 
     "EmailTemplate" : {
         "fields" : {
-            "TEMPLATE_ID"  : { "type" : "id"                        },
-            "templateCode" : { "type" : "string", "cantEdit" : true },
-            "language"     : { "type" : "string", "cantEdit" : true },
-            "languageName" : { "type" : "string", "cantEdit" : true },
-            "description"  : { "type" : "string", "cantEdit" : true },
-            "subject"      : { "type" : "string"                    },
-            "message"      : { "type" : "text"                      },
-            "position"     : { "type" : "number", "cantEdit" : true }
+            "TEMPLATE_ID"  : { "type" : "id"     },
+            "templateCode" : { "type" : "string" },
+            "language"     : { "type" : "string" },
+            "languageName" : { "type" : "string" },
+            "description"  : { "type" : "string" },
+            "subject"      : { "type" : "string" },
+            "message"      : { "type" : "text"   },
+            "position"     : { "type" : "number" }
         },
         "hasTimestamps" : false,
-        "canCreate"     : false,
+        "canCreate"     : true,
         "canEdit"       : false,
         "canDelete"     : false,
         "canRemove"     : false

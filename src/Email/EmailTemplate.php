@@ -78,31 +78,27 @@ class EmailTemplate extends EmailTemplateSchema {
      */
     private static function migrateLanguage(array $templates, string $language, string $languageName, int $position): int {
         $siteName = Config::getName();
-        $updates  = [];
+        $total    = 0;
 
-        // Adds the Email Templates
         foreach ($templates as $templateCode => $template) {
-            $position += 1;
             $message   = Strings::join($template["message"], "\n\n");
-            $updates[] = [
-                "templateCode" => $templateCode,
-                "language"     => $language,
-                "languageName" => $languageName,
-                "description"  => $template["description"],
-                "subject"      => Strings::replace($template["subject"], "[site]", $siteName),
-                "message"      => Strings::replace($message, "[site]", $siteName),
-                "position"     => $position,
-            ];
+            $position += 1;
+            $total    += 1;
+
+            self::createEntity(
+                templateCode: $templateCode,
+                language:     $language,
+                languageName: $languageName,
+                description:  $template["description"],
+                subject:      Strings::replace($template["subject"], "[site]", $siteName),
+                message:      Strings::replace($message, "[site]", $siteName),
+                position:     $position,
+            );
         }
 
-        // Process the SQL
-        if (!empty($updates)) {
-            print("<br>Updated <i>" . count($updates) . " emails</i> for language <b>$languageName</b><br>");
-            foreach ($updates as $update) {
-                self::replaceSchemaEntity(null, $update);
-            }
+        if ($total > 0) {
+            print("<br>Updated <i>$total emails</i> for language <b>$languageName</b><br>");
         }
-
         return $position;
     }
 }
