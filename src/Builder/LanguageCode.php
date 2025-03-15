@@ -52,7 +52,18 @@ class LanguageCode {
             $rootCode = $languages[0]["code"];
         }
 
+        // Sort the Root Language to the top
+        usort($languages, function($a, $b) use ($rootCode) {
+            if ($a["code"] === $rootCode) {
+                return -1;
+            }
+            if ($b["code"] === $rootCode) {
+                return 1;
+            }
+            return strcmp($a["name"], $b["name"]);
+        });
 
+        // Return the Languages
         return [
             "languages" => $languages,
             "rootCode"  => $rootCode,
