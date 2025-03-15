@@ -258,7 +258,7 @@ class Credential extends CredentialSchema {
      * @return integer
      */
     public static function getTotal(?CredentialQuery $query = null): int {
-        return self::getTotalEntities($query);
+        return self::getEntityTotal($query);
     }
 
     /**
@@ -274,7 +274,7 @@ class Credential extends CredentialSchema {
             return 0;
         }
 
-        return self::getTotalEntities($query);
+        return self::getEntityTotal($query);
     }
 
     /**
@@ -809,9 +809,7 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function setValue(int $credentialID, CredentialColumn $column, mixed $value): bool {
-        return self::editSchemaEntity($credentialID, fields: [
-            $column->base() => $value,
-        ]);
+        return self::editEntityValue($credentialID, $column, $value);
     }
 
 
