@@ -30,7 +30,7 @@ class Strings {
         if (!is_array($value) && !is_object($value)) {
             return strval($value);
         }
-        return strval($value);
+        return "";
     }
 
     /**
