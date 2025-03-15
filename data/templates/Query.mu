@@ -6,7 +6,6 @@ use {{namespace}}\{{column}};
 use Framework\Database\Query;
 use Framework\Database\Query\SchemaQuery;
 use Framework\Database\Query\BooleanQuery;
-use Framework\Database\Query\FloatQuery;
 use Framework\Database\Query\NumberQuery;
 use Framework\Database\Query\StatusQuery;
 use Framework\Database\Query\StringQuery;
