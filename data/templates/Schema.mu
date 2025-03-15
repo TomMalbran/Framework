@@ -673,7 +673,7 @@ class {{name}}Schema extends Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::ensureSchemaEntityOrder($entity, $fields{{#hasEditParents}}, $orderQuery->query{{/hasEditParents}});
+        return self::ensureSchemaOrder($entity, $fields{{#hasEditParents}}, $orderQuery->query{{/hasEditParents}});
     }
 {{/hasPositions}}
 

@@ -428,7 +428,7 @@ class Schema {
         $modification->addCreation($credentialID);
         $modification->addModification();
 
-        $newPosition = self::ensureSchemaEntityOrder(null, $modification->getFields(), $orderQuery);
+        $newPosition = self::ensureSchemaOrder(null, $modification->getFields(), $orderQuery);
         $modification->setField("position", $newPosition);
         return $modification->insert();
     }
@@ -460,7 +460,7 @@ class Schema {
         $fields = $modification->getFields();
         if (isset($fields["position"])) {
             $elem         = self::getSchemaEntity($query);
-            $savePosition = self::ensureSchemaEntityOrder($elem, $fields, $orderQuery);
+            $savePosition = self::ensureSchemaOrder($elem, $fields, $orderQuery);
             $modification->setField("position", $savePosition);
         }
 
@@ -478,7 +478,7 @@ class Schema {
     protected static function deleteSchemaEntityWithOrder(Query|int|string $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $elem = self::getSchemaEntity($query);
         if (self::deleteSchemaEntity($query, $credentialID)) {
-            self::ensureSchemaEntityOrder($elem, null, $orderQuery);
+            self::ensureSchemaOrder($elem, null, $orderQuery);
             return true;
         }
         return false;
@@ -493,33 +493,36 @@ class Schema {
     protected static function removeSchemaEntityWithOrder(Query|int|string $query, ?Query $orderQuery = null): bool {
         $elem = self::getSchemaEntity($query);
         if (self::removeSchemaEntity($query)) {
-            self::ensureSchemaEntityOrder($elem, null, $orderQuery);
+            self::ensureSchemaOrder($elem, null, $orderQuery);
             return true;
         }
         return false;
     }
 
     /**
-     * Ensures that the Order of the Entities is correct
+     * Ensures that the Order of the Schema is correct
      * @param mixed      $oldFields
      * @param mixed      $newFields
      * @param Query|null $query     Optional.
      * @return integer
      */
-    protected static function ensureSchemaEntityOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
+    protected static function ensureSchemaOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
+        $isCreate     = empty($oldFields)  && !empty($newFields);
         $isEdit       = !empty($oldFields) && !empty($newFields);
-        $oldPosition  = Arrays::getOneValue($oldFields, "position", 0);
-        $newPosition  = Arrays::getOneValue($newFields, "position", 0);
+        $isDelete     = !empty($oldFields) && empty($newFields);
+
+        $oldPosition  = Arrays::getOneValue($oldFields, "position", default: 0);
+        $newPosition  = Arrays::getOneValue($newFields, "position", default: 0);
         $nextPosition = self::getNextPosition($query);
 
-        $oldPosition  = $isEdit ? $oldPosition : $nextPosition;
+        $oldPosition  = $isCreate ? $nextPosition : $oldPosition;
         $newPosition  = $newPosition > 0 ? $newPosition : $nextPosition - ($isEdit ? 1 : 0);
         $savePosition = $newPosition;
 
-        if (!$isEdit && (empty($newPosition) || $newPosition >= $nextPosition)) {
+        if ($isCreate && ($newPosition === 0 || $newPosition >= $nextPosition)) {
             return $nextPosition;
         }
-        if ($oldPosition == $newPosition) {
+        if (!$isDelete && $oldPosition === $newPosition) {
             return $newPosition;
         }
 
