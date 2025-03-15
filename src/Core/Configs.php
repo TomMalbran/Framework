@@ -16,7 +16,7 @@ class Configs {
     private static bool   $loaded      = false;
     private static string $environment = "local";
 
-    /** @var array{}[] */
+    /** @var array<string,mixed> */
     private static array $data         = [];
 
     /** @var string[] */
@@ -74,7 +74,7 @@ class Configs {
      * Parses the Contents of the env files
      * @param string $path
      * @param string $fileName
-     * @return array{}
+     * @return array<string,mixed>
      */
     private static function loadENV(string $path, string $fileName): array {
         $contents = File::read($path, $fileName);
@@ -109,6 +109,7 @@ class Configs {
             } else {
                 $value = (int)$value;
             }
+
             $result[$key] = $value;
         }
         return $result;
@@ -118,7 +119,7 @@ class Configs {
 
     /**
      * Returns the Config Data
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getData(): array {
         self::load();

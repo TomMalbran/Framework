@@ -292,8 +292,8 @@ class Field {
             break;
         case self::Date:
             $result[$key]           = $number;
-            $result["{$key}Date"]   = !empty($number) ? date("d-m-Y",     $number) : "";
-            $result["{$key}Full"]   = !empty($number) ? date("d-m-Y H:i", $number) : "";
+            $result["{$key}Date"]   = $number !== 0 ? date("d-m-Y",     $number) : "";
+            $result["{$key}Full"]   = $number !== 0 ? date("d-m-Y H:i", $number) : "";
             break;
         case self::JSON:
             $result[$key]           = JSON::decodeAsArray($text);
@@ -312,10 +312,10 @@ class Field {
         case self::File:
             $result[$key]           = $text;
             if (!empty($this->path)) {
-                $result["{$key}Url"]   = !empty($text) ? FilePath::getUrl($this->path, $text) : "";
+                $result["{$key}Url"]   = $text !== "" ? FilePath::getUrl($this->path, $text) : "";
             } else {
-                $result["{$key}Url"]   = !empty($text) ? Path::getSourceUrl("0", $text) : "";
-                $result["{$key}Thumb"] = !empty($text) ? Path::getThumbsUrl("0", $text) : "";
+                $result["{$key}Url"]   = $text !== "" ? Path::getSourceUrl("0", $text) : "";
+                $result["{$key}Thumb"] = $text !== "" ? Path::getThumbsUrl("0", $text) : "";
             }
             break;
         default:

@@ -337,8 +337,9 @@ class Database {
      * @return mysqli_stmt|null
      */
     private function processQuery(string $expression, array $bindParams = []): ?mysqli_stmt {
+        $query = Strings::replace(trim($expression), "\n", "");
+
         try {
-            $query     = Strings::replace(trim($expression), "\n", "");
             $statement = $this->mysqli->prepare($expression);
             if (!$statement) {
                 return null;

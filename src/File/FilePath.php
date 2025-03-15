@@ -169,7 +169,7 @@ class FilePath {
 
     /**
      * Returns the Code variables
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getCode(): array {
         self::load();

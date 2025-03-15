@@ -13,7 +13,7 @@ class LanguageCode {
 
     /**
      * Returns the Code variables
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getCode(): array {
         $path      = Discovery::getAppPath(Package::StringsDir);

@@ -237,6 +237,11 @@ class Image {
             return false;
         }
 
+        $oldWidth  = 0;
+        $oldHeight = 0;
+        $xCorner   = 0;
+        $yCorner   = 0;
+
         switch ($action) {
         // Resize to a Size respecting aspect ratio
         case self::Resize:

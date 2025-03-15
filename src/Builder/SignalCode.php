@@ -6,10 +6,8 @@ use Framework\Discovery\Listener;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
-use ReflectionClass;
 use ReflectionMethod;
 use ReflectionUnionType;
-use Throwable;
 
 /**
  * The Signal Code
@@ -18,7 +16,7 @@ class SignalCode {
 
     /**
      * Returns the Code variables
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getCode(): array {
         $reflections = Discovery::getReflectionClasses(skipIgnored: true);
@@ -75,8 +73,8 @@ class SignalCode {
 
     /**
      * Generates the Params of the Method
-     * @param ReflectionMethod $method
-     * @param array{}          $uses
+     * @param ReflectionMethod      $method
+     * @param array<string,integer> $uses
      * @return array{}[]
      */
     private static function getParams(ReflectionMethod $method, array &$uses): array {

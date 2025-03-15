@@ -74,7 +74,7 @@ class Builder {
 
     /**
      * Returns the Package Data
-     * @return array{}
+     * @return array<string,mixed>
      */
     private static function getPackageData(): array {
         $framePath = dirname(__FILE__, 3);
@@ -130,9 +130,9 @@ class Builder {
 
     /**
      * Generates a single System Code
-     * @param string  $writePath
-     * @param string  $name
-     * @param array{} $data
+     * @param string              $writePath
+     * @param string              $name
+     * @param array<string,mixed> $data
      * @return integer
      */
     private static function generateOne(string $writePath, string $name, array $data): int {

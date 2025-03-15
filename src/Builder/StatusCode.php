@@ -13,7 +13,7 @@ class StatusCode {
 
     /**
      * Returns the Code variables
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getCode(): array {
         $frameData = Discovery::loadFrameData(DataFile::Status);

@@ -231,11 +231,14 @@ class Migration {
         // Add new Columns
         $prev = "";
         foreach ($structure->fields as $field) {
-            $found  = false;
-            $rename = false;
+            $found       = false;
+            $isRename    = false;
+            $renameTable = "";
+
             foreach (array_keys($tableFields) as $tableKey) {
                 if (Strings::isEqual($field->key, $tableKey) && $field->key !== $tableKey) {
-                    $rename = true;
+                    $isRename    = true;
+                    $renameTable = $tableKey;
                     break;
                 }
                 if ($field->key === $tableKey) {
@@ -245,11 +248,11 @@ class Migration {
             }
 
             $type = $field->getType();
-            if ($rename) {
+            if ($isRename) {
                 $update    = true;
                 $found     = true;
                 $renames[] = [
-                    "key"  => $tableKey,
+                    "key"  => $renameTable,
                     "new"  => $field->key,
                     "type" => $type,
                 ];

@@ -239,7 +239,7 @@ class TimeTable {
      * @param string  $closedText Optional.
      * @param string  $timeZone   Optional.
      * @param string  $isoCode    Optional.
-     * @return array{}
+     * @return array<string,mixed>[]
      */
     public function getList(
         bool $allDays = false,

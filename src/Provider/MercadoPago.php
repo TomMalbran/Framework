@@ -146,11 +146,11 @@ class MercadoPago {
 
     /**
      * Creates a Payment Url
-     * @param string   $reference
-     * @param object[] $items
-     * @param array{}  $payer          Optional.
-     * @param float    $marketplaceFee Optional.
-     * @param string   $accessToken    Optional.
+     * @param string              $reference
+     * @param object[]            $items
+     * @param array<string,mixed> $payer          Optional.
+     * @param float               $marketplaceFee Optional.
+     * @param string              $accessToken    Optional.
      * @return array{}
      */
     public static function createPaymentUrl(

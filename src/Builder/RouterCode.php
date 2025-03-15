@@ -6,9 +6,6 @@ use Framework\Discovery\DataFile;
 use Framework\Discovery\Route;
 use Framework\Utils\Strings;
 
-use ReflectionClass;
-use Throwable;
-
 /**
  * The Router Code
  */
@@ -16,7 +13,7 @@ class RouterCode {
 
     /**
      * Returns the Code variables
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getCode(): array {
         $reflections = Discovery::getReflectionClasses(skipIgnored: true);

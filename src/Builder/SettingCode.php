@@ -14,7 +14,7 @@ class SettingCode {
 
     /**
      * Returns the Code variables
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getCode(): array {
         $data = Discovery::loadData(DataFile::Settings);

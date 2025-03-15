@@ -88,16 +88,15 @@ class Generator {
                 continue;
             }
 
-            $found = false;
+            $newGroup = "";
             foreach ($groups as $group) {
                 if (Strings::startsWith($schemaKey, $group)) {
-                    $found = true;
+                    $newGroup = $group;
                     break;
                 }
             }
-
-            if ($found) {
-                $folders[$schemaKey] = $group;
+            if ($newGroup !== "") {
+                $folders[$schemaKey] = $newGroup;
                 continue;
             }
 

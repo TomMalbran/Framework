@@ -13,7 +13,7 @@ class Modification {
 
     private Structure $structure;
 
-    /** @var array{} */
+    /** @var array<string,mixed> */
     private array $fields;
 
 
@@ -29,7 +29,7 @@ class Modification {
 
     /**
      * Returns the Fields
-     * @return array{}
+     * @return array<string,mixed>
      */
     public function getFields(): array {
         return $this->fields;
@@ -48,10 +48,10 @@ class Modification {
 
     /**
      * Adds all the Fields
-     * @param Request|null $request
-     * @param array{}      $fields    Optional.
-     * @param boolean      $skipEmpty Optional.
-     * @param boolean      $skipUnset Optional.
+     * @param Request|null        $request
+     * @param array<string,mixed> $fields    Optional.
+     * @param boolean             $skipEmpty Optional.
+     * @param boolean             $skipUnset Optional.
      * @return Modification
      */
     public function addFields(

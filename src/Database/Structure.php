@@ -132,7 +132,7 @@ class Structure {
             if (!empty($value["isPrimary"])) {
                 $primaryCount += 1;
             }
-            if (empty($idKey) && !empty($value["isPrimary"])) {
+            if ($idKey === "" && !empty($value["isPrimary"])) {
                 $idKey = $key;
             }
             if ($value["type"] == Field::Encrypt) {

@@ -117,7 +117,7 @@ class Discovery {
      * Loads a JSON File
      * @param string $dir
      * @param string $fileName
-     * @return array{}
+     * @return array<string|integer,mixed>
      */
     public static function loadJSON(string $dir, string $fileName): array {
         $file = Strings::addSuffix($fileName, ".json");
@@ -128,7 +128,7 @@ class Discovery {
     /**
      * Loads a Data File
      * @param DataFile $file
-     * @return array{}
+     * @return array<string|integer,mixed>
      */
     public static function loadData(DataFile $file): array {
         return self::loadJSON(Package::DataDir, $file->name());

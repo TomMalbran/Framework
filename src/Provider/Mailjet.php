@@ -17,7 +17,7 @@ class Mailjet {
      * @param string  $method
      * @param string  $route
      * @param array{} $params Optional.
-     * @return array{}
+     * @return array<string,mixed>
      */
     private static function execute(string $method, string $route, array $params = []): array {
         $url      = self::BaseUrl . $route;
