@@ -441,11 +441,6 @@ class Generator {
         case Field::JSON:
             $result[] = self::getTypeData($key, "mixed");
             break;
-        case Field::CSV:
-            $result[] = self::getTypeData($key, "string");
-            $result[] = self::getTypeData("{$key}Parts", "array");
-            $result[] = self::getTypeData("{$key}Count", "int");
-            break;
         case Field::HTML:
             $result[] = self::getTypeData($key, "string");
             $result[] = self::getTypeData("{$key}Html", "string");
