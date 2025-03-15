@@ -568,7 +568,7 @@ class Generator {
                 $table    = $join->asTable ?: $join->table;
                 $result[] = [
                     "name"     => Strings::upperCaseFirst($field->prefixName),
-                    "value"    => "{$table}.{$field->name}",
+                    "value"    => "{$table}.{$field->key}",
                     "addSpace" => $addSpace,
                 ];
                 $addSpace = false;
