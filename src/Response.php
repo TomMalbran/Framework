@@ -52,7 +52,7 @@ class Response {
      * Returns the Data as an Object
      * @return array<string,mixed>
      */
-    public function toObject(): array {
+    public function toArray(): array {
         return $this->data;
     }
 
