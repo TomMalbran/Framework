@@ -3,6 +3,7 @@ namespace {{namespace}};
 
 use {{namespace}}\{{column}};
 
+use Framework\Database\Query;
 use Framework\Database\Query\SchemaQuery;
 use Framework\Database\Query\StatusQuery;
 use Framework\Database\Query\BooleanQuery;
@@ -22,9 +23,10 @@ class {{query}} extends SchemaQuery {
 
     /**
      * Creates a new {{query}} instance
+     * @param Query|null $query Optional.
      */
-    public function __construct() {
-        parent::__construct();
+    public function __construct(?Query $query = null) {
+        parent::__construct($query);
 
         {{#properties}}
         $this->{{title}} = new {{type}}($this->query, "{{value}}");

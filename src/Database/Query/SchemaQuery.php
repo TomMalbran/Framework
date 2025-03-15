@@ -13,9 +13,10 @@ class SchemaQuery {
 
     /**
      * Creates a new SchemaQuery instance
+     * @param Query|null $query Optional.
      */
-    public function __construct() {
-        $this->query = new Query();
+    public function __construct(?Query $query = null) {
+        $this->query = new Query($query);
     }
 
     /**
