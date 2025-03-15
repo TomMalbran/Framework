@@ -269,7 +269,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         }
 
         $list = $this->getList($key);
-        return $list[0] ?: new Dictionary();
+        return $list[0] ?? new Dictionary();
     }
 
     /**
