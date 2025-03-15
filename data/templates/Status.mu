@@ -80,7 +80,7 @@ enum Status {
      * @param string        $isoCode Optional.
      * @return Select
      */
-    private static function getSelect(Status|string $value, string $isoCode): Select {
+    private static function getSelect(Status|string $value, string $isoCode = ""): Select {
         $status = self::from($value);
         $key    = $status->name;
         $name   = self::getName($value, $isoCode);
