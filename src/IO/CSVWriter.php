@@ -63,13 +63,13 @@ class CSVWriter implements ExporterWriter {
 
     /**
      * Writes a Line
-     * @param array{} $line
+     * @param array<string,string> $line
      * @return CSVWriter
      */
     public function writeLine(array $line): CSVWriter {
         $values = [];
         foreach (array_keys($this->headers) as $key) {
-            $values[] = isset($line[$key]) ? $line[$key] : "";
+            $values[] = $line[$key] ?? "";
         }
 
         $this->line += 1;

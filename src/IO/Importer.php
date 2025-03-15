@@ -14,7 +14,6 @@ use Iterator;
  */
 class Importer implements Iterator {
 
-    private string         $path;
     private ImporterReader $reader;
 
     /** @var array<string,integer> */
@@ -27,8 +26,6 @@ class Importer implements Iterator {
      * @param string $path
      */
     public function __construct(string $path) {
-        $this->path = $path;
-
         if (XLSXReader::isAvailable()) {
             $this->reader = new XLSXReader($path);
         } else {
@@ -63,7 +60,7 @@ class Importer implements Iterator {
 
     /**
      * Sets the Columns
-     * @param array{} ...$columnsList
+     * @param array<string,string> ...$columnsList
      * @return Importer
      */
     public function setColumns(array ...$columnsList): Importer {

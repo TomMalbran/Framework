@@ -268,9 +268,9 @@ class Arrays {
 
     /**
      * Returns true if the arrays are Equal with the given keys
-     * @param array{}  $array
-     * @param array{}  $other
-     * @param string[] $keys
+     * @param array<string,mixed> $array
+     * @param array<string,mixed> $other
+     * @param string[]            $keys
      * @return boolean
      */
     public static function isEqualWithKeys(array $array, array $other, array $keys): bool {

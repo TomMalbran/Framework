@@ -133,6 +133,7 @@ class File {
         if (empty($fileUrl)) {
             return "";
         }
+
         $fileUrl = Strings::encodeUrl($fileUrl);
         $result  = file_get_contents($fileUrl);
         return $result !== false ? $result : "";
@@ -202,7 +203,7 @@ class File {
      */
     public static function writeFromUrl(string $path, string $fileUrl): bool {
         $content = self::readUrl($fileUrl);
-        if ($content === false) {
+        if ($content === "") {
             return false;
         }
         return self::write($path, $content);
@@ -394,7 +395,7 @@ class File {
         $partialPath = [];
 
         if (!is_dir($path)) {
-            $totalParts - 1;
+            $totalParts -= 1;
         }
         for ($i = 0; $i < $totalParts; $i++) {
             $partialPath[] = $pathParts[$i];

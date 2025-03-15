@@ -8,7 +8,7 @@ use Framework\Utils\Strings;
  */
 class ImporterRow {
 
-    /** @var array{} */
+    /** @var string[] */
     private array $fields;
 
     /** @var array<string,integer> */
@@ -18,7 +18,7 @@ class ImporterRow {
 
     /**
      * Creates a new ImporterRow instance
-     * @param array{}               $fields
+     * @param string[]              $fields
      * @param array<string,integer> $columns
      */
     public function __construct(array $fields, array $columns) {

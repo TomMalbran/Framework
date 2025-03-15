@@ -39,8 +39,8 @@ class StatusCode {
 
     /**
      * Generates the Statues data
-     * @param array{} $values
-     * @return array{}[]
+     * @param array<string,mixed> $values
+     * @return array{name:string,color:string}[]
      */
     private static function getStatues(array $values): array {
         $result = [];
@@ -55,8 +55,8 @@ class StatusCode {
 
     /**
      * Generates the Groups data
-     * @param array{} $groups
-     * @return array{}[]
+     * @param array<string,mixed> $groups
+     * @return array{name:string,statuses:string,values:string}[]
      */
     private static function getGroups(array $groups): array {
         $result = [];
@@ -72,7 +72,7 @@ class StatusCode {
 
     /**
      * Aligns the List Names
-     * @param array{} $list
+     * @param array{name:string,color:string,constant:string}[] $list
      * @return integer
      */
     private static function alignNames(array &$list): int {

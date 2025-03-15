@@ -122,7 +122,7 @@ class Settings extends SettingsSchema {
 
     /**
      * Saves all the Settings
-     * @param array{} $data
+     * @param array<string,string> $data
      * @return boolean
      */
     public static function saveAll(array $data): bool {
@@ -147,8 +147,8 @@ class Settings extends SettingsSchema {
 
     /**
      * Saves the Settings from the given Section
-     * @param string  $section
-     * @param array{} $data
+     * @param string               $section
+     * @param array<string,string> $data
      * @return boolean
      */
     public static function saveSection(string $section, array $data): bool {

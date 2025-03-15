@@ -326,7 +326,7 @@ class DateTime {
         $fromTime = self::toDayStart($fromDate, $useTimeZone);
         $toTime   = self::toDayEnd($toDate, $useTimeZone);
 
-        return $fromTime !== null && $toTime !== null && $fromTime < $toTime;
+        return $fromTime !== 0 && $toTime !== 0 && $fromTime < $toTime;
     }
 
     /**

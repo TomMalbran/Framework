@@ -206,6 +206,7 @@ class Image {
             3 => imagerotate($dstImage, 180, 0),
             6 => imagerotate($dstImage, -90, 0),
             8 => imagerotate($dstImage, 90, 0),
+            default => $dstImage,
         };
 
         // Create the Image
@@ -479,8 +480,7 @@ class Image {
             }
 
             // Log the error
-            trigger_error("Imagick Error: " . $error, E_USER_ERROR);
-            return false;
+            trigger_error("Imagick Error: $error", E_USER_ERROR);
         }
     }
 }

@@ -36,16 +36,16 @@ class Count {
         $this->field     = new Field($key, $data);
         $this->key       = $key;
 
-        $this->isSum     = !empty($data["isSum"]) && $data["isSum"];
-        $this->value     = !empty($data["value"])    ? $data["value"]     : "";
-        $this->mult      = !empty($data["mult"])     ? (int)$data["mult"] : 1;
+        $this->isSum     = $data["isSum"] ?? false;
+        $this->value     = $data["value"] ?? "";
+        $this->mult      = (int)($data["mult"] ?? 1);
 
         $this->table     = Factory::getTableName($data["schema"]);
         $this->onTable   = !empty($data["onSchema"]) ? Factory::getTableName($data["onSchema"]) : "";
-        $this->rightKey  = !empty($data["rightKey"]) ? $data["rightKey"]  : $data["key"];
-        $this->leftKey   = !empty($data["leftKey"])  ? $data["leftKey"]   : $data["key"];
-        $this->where     = !empty($data["where"])    ? $data["where"]     : [];
-        $this->noDeleted = !empty($data["noDeleted"]) && $data["noDeleted"];
+        $this->rightKey  = $data["rightKey"]  ?? $data["key"];
+        $this->leftKey   = $data["leftKey"]   ?? $data["key"];
+        $this->where     = $data["where"]     ?? [];
+        $this->noDeleted = $data["noDeleted"] ?? false;
     }
 
 

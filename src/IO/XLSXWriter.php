@@ -67,13 +67,13 @@ class XLSXWriter implements ExporterWriter {
 
     /**
      * Writes a Line
-     * @param array{} $line
+     * @param array<string,string> $line
      * @return XLSXWriter
      */
     public function writeLine(array $line): XLSXWriter {
         $values = [];
         foreach (array_keys($this->headers) as $key) {
-            $values[] = isset($line[$key]) ? $line[$key] : "";
+            $values[] = $line[$key] ?? "";
         }
 
         $row = Row::fromValues($values);

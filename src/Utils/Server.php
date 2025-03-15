@@ -45,7 +45,7 @@ class Server {
         $protocol = substr($sp, 0, strpos($sp, "/")) . ($ssl ? "s" : "");
         $port     = $_SERVER["SERVER_PORT"];
         $port     = (!$ssl && $port == "80") || ($ssl && $port == "443") ? "" : ":$port";
-        $host     = $useForwarded && isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? $_SERVER["HTTP_X_FORWARDED_HOST"] : ($_SERVER["HTTP_HOST"] ?: null);
+        $host     = $useForwarded && isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? $_SERVER["HTTP_X_FORWARDED_HOST"] : ($_SERVER["HTTP_HOST"] ?? null);
         $host     = $host ?: $_SERVER["SERVER_NAME"] . $port;
         return "$protocol://$host";
     }

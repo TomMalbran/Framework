@@ -31,7 +31,7 @@ class Microsoft {
         $payload   = JWT::jsonDecode(JWT::urlsafeB64Decode($body64));
         $signature = JWT::urlsafeB64Decode($crypto64);
 
-        if ($header === null || $payload === null || $signature === null) {
+        if ($header === "" || $payload === "" || $signature === "") {
             return null;
         }
         if ($payload->aud !== Config::getMicrosoftClient()) {

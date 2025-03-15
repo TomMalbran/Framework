@@ -210,7 +210,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns the errors as an Object
-     * @return array{}
+     * @return array<string,string|integer|array>
      */
     public function get(): array {
         return $this->errors + $this->counts;

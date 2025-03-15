@@ -27,28 +27,6 @@ class MailChimp {
         return self::$api;
     }
 
-    /**
-     * Returns the Last Error
-     * @return mixed
-     */
-    private static function getLastError(): mixed {
-        if (Config::isMailchimpActive()) {
-            return self::api()->getLastError();
-        }
-        return null;
-    }
-
-    /**
-     * Returns the Last Response
-     * @return mixed
-     */
-    private static function getLastResponse(): mixed {
-        if (Config::isMailchimpActive()) {
-            return self::api()->getLastResponse();
-        }
-        return null;
-    }
-
 
 
     /**
@@ -495,7 +473,9 @@ class MailChimp {
         }
 
         $report = self::api()->get("reports/{$mailChimpID}");
-        if (empty($report["status"]) || (!empty($report["status"]) && $report["status"] != 404)) {
+
+        // @phpstan-ignore isset.offset
+        if (!isset($report["status"]) || (isset($report["status"]) && $report["status"] != 404)) {
             $result["hasReport"]    = true;
             $result["emailsSent"]   = $report["emails_sent"];
             $result["opensUnique"]  = $report["opens"]["unique_opens"];

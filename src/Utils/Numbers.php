@@ -53,11 +53,8 @@ class Numbers {
      * @return integer|float
      */
     public static function round(int|float $number, int $decimals): int|float {
-        if (is_numeric($number)) {
-            $padding = pow(10, $decimals);
-            return round($number * $padding) / $padding;
-        }
-        return 0;
+        $padding = pow(10, $decimals);
+        return round($number * $padding) / $padding;
     }
 
     /**

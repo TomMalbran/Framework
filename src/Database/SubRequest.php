@@ -108,7 +108,7 @@ class SubRequest {
     /**
      * Returns the Data from the Query
      * @param Query|null $query
-     * @return array{}[]
+     * @return array<string,mixed>[]
      */
     private function getData(?Query $query): array {
         if ($query === null) {

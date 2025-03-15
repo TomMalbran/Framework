@@ -32,7 +32,7 @@ class SettingCode {
 
     /**
      * Returns the Settings Sections for the generator
-     * @param array{} $data
+     * @param array<string,mixed> $data
      * @return mixed[]
      */
     private static function getSections(array $data): array {
@@ -51,7 +51,7 @@ class SettingCode {
 
     /**
      * Returns the Settings Variables for the generator
-     * @param array{} $data
+     * @param array<string,mixed> $data
      * @return mixed[]
      */
     private static function getVariables(array $data): array {

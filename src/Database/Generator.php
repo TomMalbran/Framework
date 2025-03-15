@@ -473,8 +473,8 @@ class Generator {
 
     /**
      * Parses the Attributes
-     * @param array{} $attributes
-     * @return string[]
+     * @param array<string,object> $attributes
+     * @return array{type:string,name:string,default:string,subType:string}[]
      */
     private static function parseAttributes(array $attributes): array {
         $nameLength = 0;

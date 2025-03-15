@@ -83,7 +83,7 @@ class AccessCode {
 
     /**
      * Aligns the List Names
-     * @param array{} $list
+     * @param array{addSpace:boolean,group:string,name:string,constant:string,level:integer}[] $list
      * @return integer
      */
     private static function alignNames(array &$list): int {

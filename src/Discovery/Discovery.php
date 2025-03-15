@@ -275,9 +275,6 @@ class Discovery {
         /** @var ReflectionProperty[] */
         $props = $reflection->getProperties($filter ?? ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
 
-        if ($props === null) {
-            return $result;
-        }
         foreach ($props as $prop) {
             $type     = $prop->getType();
             $typeName = "mixed";

@@ -172,7 +172,7 @@ class Selection {
     /**
      * Does a Request to the Query
      * @param Query $query
-     * @return array{}[]
+     * @return array<string,mixed>[]
      */
     public function request(Query $query): array {
         $expression    = $this->getExpression($query);

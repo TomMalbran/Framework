@@ -72,7 +72,6 @@ class Database {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database);
         if ($this->mysqli->connect_error) {
             trigger_error("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}", E_USER_ERROR);
-            return false;
         }
         if (!empty($this->charset)) {
             $this->mysqli->set_charset($this->charset);
@@ -346,14 +345,27 @@ class Database {
             }
 
             if (Arrays::isArray($bindParams) && !empty($bindParams)) {
-                $params = [ "" ];
+                $types  = "";
+                $params = [];
                 foreach ($bindParams as $value) {
-                    $params[0] .= $this->determineType($value);
+                    // NOTE: For bind_params the first parameter is a string with the types of the following parameters:
+	                //       i | corresponding variable has type `int`
+                    //       d | corresponding variable has type `float`
+                    //       s | corresponding variable has type `string`
+                    //       b | corresponding variable is a blob and will be sent in packets
+                    $types .= match (gettype($value)) {
+                        "NULL", "string"     => "s",
+                        "boolean", "integer" => "i",
+                        "double"             => "d",
+                        "resource"           => "b",
+                        default              => "",
+                    };
+
                     array_push($params, $value);
                 }
 
                 $values = $this->refValues($params);
-                if (!$statement->bind_param(...$values)) {
+                if (!$statement->bind_param($types, ...$values)) {
                     return null;
                 }
             }
@@ -373,7 +385,6 @@ class Database {
                 die($error);
             }
             trigger_error($error, E_USER_ERROR);
-            return null;
         }
     }
 
@@ -421,21 +432,6 @@ class Database {
     }
 
     /**
-     * This method is used to prepare the statements by turning the item type into a type used by mysqli
-     * @param mixed $item Input to determine the type.
-     * @return string The parameter type.
-     */
-    private function determineType(mixed $item): string {
-        return match (gettype($item)) {
-            "NULL", "string"     => "s",
-            "boolean", "integer" => "i",
-            "blob"               => "b",
-            "double"             => "d",
-            default              => "",
-        };
-    }
-
-    /**
      * Creates a reference of each value
      * @param string[] $array
      * @return string[]
@@ -479,6 +475,7 @@ class Database {
             $x = [];
             foreach ($row as $key => $val) {
                 $string  = (string)$val;
+                // @phpstan-ignore function.impossibleType
                 $x[$key] = ctype_digit($string) && strrpos($string, "0", -strlen($string)) === false ? (int)$val : $val;
             }
             array_push($results, $x);
