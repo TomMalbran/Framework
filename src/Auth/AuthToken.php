@@ -3,6 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Auth\RefreshToken;
 use Framework\System\Config;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Server;
 use Framework\Schema\CredentialRefreshTokenEntity;
 
@@ -50,8 +51,8 @@ class AuthToken {
      * @return string
      */
     public static function getAPIToken(string $accessToken): string {
-        $accessData = self::getAccessToken($accessToken);
-        return !empty($accessData->apiToken) ? $accessData->apiToken : "";
+        $accessData = self::getAccessData($accessToken);
+        return $accessData->getString("apiToken");
     }
 
 
@@ -73,12 +74,12 @@ class AuthToken {
      * Returns the Credentials for the given Refresh Token or JWT
      * @param string $accessToken
      * @param string $refreshToken
-     * @return integer[]
+     * @return array{integer,integer}
      */
     public static function getCredentials(string $accessToken, string $refreshToken): array {
-        $accessData = self::getAccessToken($accessToken);
+        $accessData = self::getAccessData($accessToken);
         if (!empty($accessData->credentialID)) {
-            return [ $accessData->credentialID, $accessData->adminID ];
+            return [ $accessData->getInt("credentialID"), $accessData->getInt("adminID") ];
         }
 
         $refresh = self::getOne($refreshToken);
@@ -97,23 +98,23 @@ class AuthToken {
      * @return boolean
      */
     public static function isValidAccessToken(string $accessToken): bool {
-        $accessData = self::getAccessToken($accessToken);
-        return !empty($accessData);
+        $accessData = self::getAccessData($accessToken);
+        return $accessData->isEmpty();
     }
 
     /**
      * Returns the data of the Access Token
      * @param string $accessToken
-     * @return object
+     * @return Dictionary
      */
-    public static function getAccessToken(string $accessToken): object {
+    private static function getAccessData(string $accessToken): Dictionary {
         self::load();
         try {
             $jwt = JWT::decode($accessToken, new Key(self::$secretKey, self::$algorithm));
         } catch (Exception $e) {
-            return (object)[];
+            return new Dictionary();
         }
-        return (object)$jwt->data;
+        return new Dictionary($jwt->data);
     }
 
     /**
