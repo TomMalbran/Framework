@@ -186,7 +186,7 @@ class Discovery {
     /**
      * Loads a Data File
      * @param DataFile $file
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function loadFrameData(DataFile $file): array {
         return self::loadFrameJSON(self::DataDir, $file->name());

@@ -41,9 +41,9 @@ class DeviceLog extends LogDeviceSchema {
      * Logs the given Action
      * @param integer $credentialID
      * @param string  $playerID
-     * @return boolean
+     * @return integer
      */
-    public static function added(int $credentialID, string $playerID): bool {
+    public static function added(int $credentialID, string $playerID): int {
         return self::createEntity(
             credentialID: $credentialID,
             userAgent:    Server::getUserAgent(),
@@ -56,9 +56,9 @@ class DeviceLog extends LogDeviceSchema {
      * Removes a Device
      * @param integer $credentialID
      * @param string  $playerID
-     * @return boolean
+     * @return integer
      */
-    public static function removed(int $credentialID, string $playerID): bool {
+    public static function removed(int $credentialID, string $playerID): int {
         return self::createEntity(
             credentialID: $credentialID,
             userAgent:    Server::getUserAgent(),

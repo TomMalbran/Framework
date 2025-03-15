@@ -14,7 +14,7 @@ class Factory {
 
     private static bool  $loaded     = false;
 
-    /** @var array{}[] */
+    /** @var array<string,mixed> */
     private static array $data       = [];
 
     /** @var Structure[] */
@@ -57,7 +57,7 @@ class Factory {
 
     /**
      * Gets the Schema data
-     * @return array{}
+     * @return array<string,mixed>
      */
     public static function getData(): array {
         self::load();

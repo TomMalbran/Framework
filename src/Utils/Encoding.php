@@ -6,7 +6,7 @@ namespace Framework\Utils;
  */
 class Encoding {
 
-    /** @var array{} */
+    /** @var array<integer,string> */
     private static array $win1252ToUtf8 = [
         128 => "\xe2\x82\xac",
 
@@ -41,7 +41,7 @@ class Encoding {
         159 => "\xc5\xb8",
     ];
 
-    /** @var array{} */
+    /** @var array<string,string> */
     private static array $brokenUtf8ToUtf8 = [
         "\xc2\x80" => "\xe2\x82\xac",
 
@@ -76,7 +76,7 @@ class Encoding {
         "\xc2\x9f" => "\xc5\xb8",
     ];
 
-    /** @var array{} */
+    /** @var array<string,string> */
     private static array $utf8ToWin1252 = [
        "\xe2\x82\xac" => "\x80",
 

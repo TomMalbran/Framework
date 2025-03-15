@@ -419,7 +419,7 @@ class Query {
             if ($to != null) {
                 $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
             } else {
-                $this->limit = $from;
+                $this->limit = (string)$from;
             }
         }
         return $this;

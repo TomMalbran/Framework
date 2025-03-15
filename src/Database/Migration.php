@@ -51,9 +51,9 @@ class Migration {
 
     /**
      * Moves the Tables
-     * @param Database  $db
-     * @param integer   $startMovement
-     * @param array{}[] $movements
+     * @param Database                       $db
+     * @param integer                        $startMovement
+     * @param array{from:string,to:string}[] $movements
      * @return integer
      */
     private static function moveTables(Database $db, int $startMovement, array $movements): int {
@@ -81,9 +81,9 @@ class Migration {
 
     /**
      * Renames the Table Columns
-     * @param Database  $db
-     * @param integer   $startRename
-     * @param array{}[] $renames
+     * @param Database                                     $db
+     * @param integer                                      $startRename
+     * @param array{schema:string,from:string,to:string}[] $renames
      * @return integer
      */
     private static function renameColumns(Database $db, int $startRename, array $renames): int {

@@ -11,15 +11,15 @@ class ImporterRow {
     /** @var array{} */
     private array $fields;
 
-    /** @var array{} */
+    /** @var array<string,integer> */
     private array $columns;
 
 
 
     /**
      * Creates a new ImporterRow instance
-     * @param array{} $fields
-     * @param array{} $columns
+     * @param array{}               $fields
+     * @param array<string,integer> $columns
      */
     public function __construct(array $fields, array $columns) {
         $this->fields  = $fields;

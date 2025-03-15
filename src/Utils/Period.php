@@ -32,7 +32,7 @@ class Period {
     public int    $fromTime = 0;
     public int    $toTime   = 0;
 
-    /** @var array{} All the Period Names */
+    /** @var array<string,string> All the Period Names */
     public static array $names = [
         self::Today       => "Hoy",
         self::Yesterday   => "Ayer",
@@ -219,10 +219,10 @@ class Period {
 
     /**
      * Returns the name at the given Period
-     * @param integer $value
+     * @param string $value
      * @return string
      */
-    public static function getName(int $value): string {
+    public static function getName(string $value): string {
         return !empty(self::$names[$value]) ? self::$names[$value] : "";
     }
 

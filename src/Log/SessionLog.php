@@ -45,9 +45,9 @@ class SessionLog extends LogSessionSchema {
     /**
      * Ends a Session Log
      * @param integer $sessionID
-     * @return integer
+     * @return boolean
      */
-    public static function end(int $sessionID): int {
+    public static function end(int $sessionID): bool {
         return self::editEntity($sessionID, isOpen: false);
     }
 

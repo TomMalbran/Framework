@@ -70,10 +70,10 @@ class EmailTemplate extends EmailTemplateSchema {
 
     /**
      * Migrates the Email Templates for the given Language
-     * @param array{}[] $templates
-     * @param string    $language
-     * @param string    $languageName
-     * @param integer   $position
+     * @param array<string,mixed>[] $templates
+     * @param string                $language
+     * @param string                $languageName
+     * @param integer               $position
      * @return integer
      */
     private static function migrateLanguage(array $templates, string $language, string $languageName, int $position): int {

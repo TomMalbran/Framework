@@ -29,7 +29,7 @@ class Selection {
     /** @var string[] */
     private array $joins   = [];
 
-    /** @var array{}[] */
+    /** @var array<string,mixed>[] */
     private array $request = [];
 
 
@@ -233,7 +233,7 @@ class Selection {
     /**
      * Generates the Result from the Request
      * @param string[]|string|null $extras Optional.
-     * @return array{}[]
+     * @return array<string,mixed>[]
      */
     public function resolve(array|string|null $extras = null): array {
         $result = [];

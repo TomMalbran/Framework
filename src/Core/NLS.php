@@ -33,7 +33,7 @@ class NLS {
     /**
      * Loads an NLS Language
      * @param string $language
-     * @return array{}
+     * @return array<string,mixed>
      */
     private static function load(string $language): array {
         $langCode = Language::getCode($language);

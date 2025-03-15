@@ -237,7 +237,7 @@ class Credential extends CredentialSchema {
      * Returns the create times for all the Credentials with the given Access
      * @param integer     $fromTime
      * @param Access|null $accessName Optional.
-     * @return array{}[]
+     * @return array<integer,integer>
      */
     public static function getAllCreateTimes(int $fromTime, ?Access $accessName = null): array {
         $query = self::createAccessQuery($accessName);
@@ -456,7 +456,7 @@ class Credential extends CredentialSchema {
             return false;
         }
         $hash = self::createHash($password, $credential->salt);
-        return $hash["password"] == $credential->password;
+        return $hash["password"] === $credential->password;
     }
 
     /**
@@ -665,7 +665,7 @@ class Credential extends CredentialSchema {
      * Sets the Credential Password
      * @param integer $credentialID
      * @param string  $password
-     * @return array{}[]
+     * @return array{password:string,salt:string}
      */
     public static function setPassword(int $credentialID, string $password): array {
         $hash = self::createHash($password);
@@ -818,7 +818,7 @@ class Credential extends CredentialSchema {
      * Creates a Hash and Salt (if required) for the the given Password
      * @param string $pass
      * @param string $salt Optional.
-     * @return array{}
+     * @return array{password:string,salt:string}
      */
     public static function createHash(string $pass, string $salt = ""): array {
         $salt = !empty($salt) ? $salt : Strings::random(50);

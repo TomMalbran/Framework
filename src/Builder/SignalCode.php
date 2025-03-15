@@ -76,7 +76,7 @@ class SignalCode {
      * Generates the Params of the Method
      * @param ReflectionMethod      $method
      * @param array<string,integer> $uses
-     * @return array{}[]
+     * @return array{isFirst:boolean,name:string,type:string,docType:string}[]
      */
     private static function getParams(ReflectionMethod $method, array &$uses): array {
         $parameters = $method->getParameters();

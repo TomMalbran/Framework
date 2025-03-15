@@ -54,21 +54,21 @@ class Structure {
 
     /**
      * Creates a new Structure instance
-     * @param string  $schema
-     * @param array{} $data
+     * @param string              $schema
+     * @param array<string,mixed> $data
      */
     public function __construct(string $schema, array $data) {
         $this->schema        = $schema;
         $this->table         = Factory::getTableName($schema);
-        $this->hasStatus     = !empty($data["hasStatus"]);
-        $this->hasPositions  = !empty($data["hasPositions"]);
-        $this->hasTimestamps = !empty($data["hasTimestamps"]);
-        $this->hasUsers      = !empty($data["hasUsers"]);
-        $this->hasFilters    = !empty($data["hasFilters"]);
-        $this->canCreate     = $data["canCreate"];
-        $this->canEdit       = $data["canEdit"];
-        $this->canDelete     = $data["canDelete"];
-        $this->canRemove     = !empty($data["canRemove"]);
+        $this->hasStatus     = $data["hasStatus"]     ?? false;
+        $this->hasPositions  = $data["hasPositions"]  ?? false;
+        $this->hasTimestamps = $data["hasTimestamps"] ?? false;
+        $this->hasUsers      = $data["hasUsers"]      ?? false;
+        $this->hasFilters    = $data["hasFilters"]    ?? false;
+        $this->canCreate     = $data["canCreate"]     ?? false;
+        $this->canEdit       = $data["canEdit"]       ?? false;
+        $this->canDelete     = $data["canDelete"]     ?? false;
+        $this->canRemove     = $data["canRemove"]     ?? false;
 
         // Add additional Fields
         if ($this->hasStatus) {

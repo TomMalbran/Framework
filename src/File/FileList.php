@@ -82,7 +82,7 @@ class FileList {
 
     /**
      * Sorts and returns the List
-     * @return array{}[]
+     * @return array<string,string|boolean>[]
      */
     public function getSorted(): array {
         return Arrays::sort($this->list, function ($a, $b) {

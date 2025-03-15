@@ -443,9 +443,9 @@ class OpenAI {
      * Cancels a Thread Run
      * @param string $threadID
      * @param string $runID
-     * @return string
+     * @return boolean
      */
-    public static function cancelRun(string $threadID, string $runID): string {
+    public static function cancelRun(string $threadID, string $runID): bool {
         $request = self::post("/threads/$threadID/runs/$runID/cancel");
         return !empty($request["id"]);
     }

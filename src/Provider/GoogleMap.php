@@ -44,7 +44,7 @@ class GoogleMap {
      * @param string $address
      * @param float  $latitude
      * @param float  $longitude
-     * @return array{}
+     * @return array<string,string>
      */
     public static function getAddress(string $address, float $latitude, float $longitude): array {
         if (!self::isActive()) {

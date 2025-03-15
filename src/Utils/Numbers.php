@@ -390,7 +390,7 @@ class Numbers {
         if (!empty($value)) {
             return str_pad((string)$value, $amount, "0", STR_PAD_LEFT);
         }
-        return $value;
+        return (string)$value;
     }
 
 

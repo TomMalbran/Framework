@@ -45,7 +45,7 @@ class AccessCode {
      * Returns the Access Accesses for the generator
      * @param array<string,array<string>> $groups
      * @param array<string,integer>       $accesses
-     * @return array{}[]
+     * @return array{addSpace:boolean,group:string,name:string,level:integer}[]
      */
     private static function getAccesses(array $groups, array $accesses): array {
         $result = [];
@@ -67,7 +67,7 @@ class AccessCode {
     /**
      * Returns the Access Groups for the generator
      * @param array<string,array<string>> $groups
-     * @return array{}[]
+     * @return array<string,string>[]
      */
     private static function getGroups(array $groups): array {
         $result = [];

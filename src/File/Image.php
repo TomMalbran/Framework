@@ -26,7 +26,7 @@ class Image {
     /** @var int[] The transparent image type */
     private static array $transTypes = [ 1, 3 ];
 
-    /** @var array{}[] */
+    /** @var array{string,string,string,string}[] */
     private static array $imageData  = [
         1  => [ "imagecreatefromgif",  "imagegif",  "image/gif",  "gif" ],
         2  => [ "imagecreatefromjpeg", "imagejpeg", "image/jpeg", "jpg" ],

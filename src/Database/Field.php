@@ -63,9 +63,9 @@ class Field {
 
     /**
      * Creates a new Field instance
-     * @param string  $key
-     * @param array{} $data
-     * @param string  $prefix Optional.
+     * @param string              $key
+     * @param array<string,mixed> $data
+     * @param string              $prefix Optional.
      */
     public function __construct(string $key, array $data, string $prefix = "") {
         $this->key        = $key;
@@ -270,8 +270,8 @@ class Field {
 
     /**
      * Returns the Field Values from the given Data
-     * @param array{} $data
-     * @return array{}
+     * @param array<string,mixed> $data
+     * @return array<string,string|integer|float|boolean|array>
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;

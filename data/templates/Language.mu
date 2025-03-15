@@ -20,7 +20,7 @@ class Language {
 
     /**
      * Returns all the Languages
-     * @return array{}
+     * @return array<string,string>
      */
     public static function getAll(): array {
         return [

@@ -13,10 +13,10 @@ use AllowDynamicProperties;
 #[AllowDynamicProperties]
 class Errors implements JsonSerializable {
 
-    /** @var array{} */
+    /** @var array<string,string|integer|array> */
     private array $errors = [];
 
-    /** @var array{} */
+    /** @var array<string,integer> */
     private array $counts = [];
 
 
@@ -139,7 +139,7 @@ class Errors implements JsonSerializable {
     public function addFor(string $section, string $error, string $message, ?string $value = null): Errors {
         if (empty($this->errors[$section])) {
             $this->errors[$section] = 1;
-        } else {
+        } elseif (is_int($this->errors[$section])) {
             $this->errors[$section] += 1;
         }
         return $this->add($error, $message, $value);

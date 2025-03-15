@@ -73,10 +73,10 @@ class Generator {
 
     /**
      * Generates the Folders for the Schemas
-     * @param array{} $schemas
-     * @param string  $writePath
-     * @param boolean $forFramework
-     * @return array{}
+     * @param array<string,mixed> $schemas
+     * @param string              $writePath
+     * @param boolean             $forFramework
+     * @return array<string,string>
      */
     private static function generateFolders(array $schemas, string $writePath, bool $forFramework): array {
         $groups  = [];
@@ -189,7 +189,7 @@ class Generator {
      * Returns the Sub Types from the Sub Requests
      * @param SubRequest[]         $subRequests
      * @param array<string,string> $folders
-     * @return array{}[]
+     * @return array{name:string,type:string,folder:string}[]
      */
     private static function getSubTypes(array $subRequests, array $folders): array {
         $result = [];
@@ -245,7 +245,7 @@ class Generator {
     /**
      * Returns the Fields data for the Schema
      * @param Field $field
-     * @return array{}
+     * @return array<string,string>
      */
     private static function getField(Field $field): array {
         $type      = self::getFieldType($field->type);

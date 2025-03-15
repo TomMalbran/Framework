@@ -129,7 +129,7 @@ class Database {
      * @param string          $table
      * @param string[]|string $columns Optional.
      * @param Query|null      $query   Optional.
-     * @return array{}[]
+     * @return array<string,mixed>[]
      */
     public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
         $selection  = Strings::join($columns, ", ");
@@ -765,7 +765,7 @@ class Database {
 
     /**
      * Parses the Column Type
-     * @param array{} $data
+     * @param array<string,mixed> $data
      * @return string
      */
     public function parseColumnType(array $data): string {

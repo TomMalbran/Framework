@@ -44,8 +44,8 @@ class Join {
 
     /**
      * Creates a new Join instance
-     * @param string  $key
-     * @param array{} $data
+     * @param string              $key
+     * @param array<string,mixed> $data
      */
     public function __construct(string $key, array $data) {
         $this->key        = $key;
@@ -96,8 +96,8 @@ class Join {
 
     /**
      * Returns the Values for the given Field
-     * @param array{} $data
-     * @return array{}
+     * @param array<string,mixed> $data
+     * @return array<string,mixed>
      */
     public function toValues(array $data): array {
         $result = [];

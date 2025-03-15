@@ -17,7 +17,7 @@ class Importer implements Iterator {
     private string         $path;
     private ImporterReader $reader;
 
-    /** @var array{} */
+    /** @var array<string,integer> */
     private array          $columns = [];
 
 

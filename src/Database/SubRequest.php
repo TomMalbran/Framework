@@ -32,10 +32,10 @@ class SubRequest {
 
     /**
      * Creates a new SubRequest instance
-     * @param Structure $structure
-     * @param array{}   $data
-     * @param string    $idKey
-     * @param string    $idName
+     * @param Structure           $structure
+     * @param array<string,mixed> $data
+     * @param string              $idKey
+     * @param string              $idName
      */
     public function __construct(Structure $structure, array $data, string $idKey, string $idName) {
         $this->structure = $structure;
@@ -156,7 +156,7 @@ class SubRequest {
 
     /**
      * Returns the Values depending on the Data
-     * @param array{} $row
+     * @param array<string,mixed> $row
      * @return mixed
      */
     private function getValues(array $row): mixed {

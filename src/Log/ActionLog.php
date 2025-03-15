@@ -43,7 +43,7 @@ class ActionLog extends LogActionSchema {
      * Returns all the Actions Log items
      * @param Request              $request
      * @param array<string,string> $mappings Optional.
-     * @return array{}[]
+     * @return array<string,mixed>[]
      */
     public static function getAll(Request $request, array $mappings = []): array {
         $query = self::createQuery($request, $mappings);

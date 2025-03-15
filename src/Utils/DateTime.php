@@ -9,7 +9,7 @@ use Framework\Utils\Strings;
  */
 class DateTime {
 
-    /** @var array{} The Date Formats */
+    /** @var array<string,string> The Date Formats */
     public static array $formats = [
         "time"           => "H:i",
         "dashes"         => "d-m-Y",
@@ -78,7 +78,7 @@ class DateTime {
      */
     public static function toUserTime(int $value, bool $useTimeZone = true): int {
         if (!empty($value) && $useTimeZone) {
-            return $value - (self::$timeDiff * 3600);
+            return $value - (int)(self::$timeDiff * 3600);
         }
         return $value;
     }
@@ -91,7 +91,7 @@ class DateTime {
      */
     public static function toServerTime(int $value, bool $useTimeZone = true): int {
         if (!empty($value) && $useTimeZone) {
-            return $value + (self::$timeDiff * 3600);
+            return $value + (int)(self::$timeDiff * 3600);
         }
         return $value;
     }
@@ -155,7 +155,7 @@ class DateTime {
         }
         if ($timeZone !== null) {
             $timeDiff = self::$serverZone - $timeZone;
-            return $timeStamp - ($timeDiff * 3600);
+            return $timeStamp - (int)($timeDiff * 3600);
         }
         return $timeStamp;
     }
@@ -241,7 +241,7 @@ class DateTime {
     public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
         $result = self::toTime($string, $useTimeZone);
         if (!empty($result)) {
-            return $result + 12 * 3600 - self::$serverZone * 3600;
+            return $result + 12 * 3600 - (int)(self::$serverZone * 3600);
         }
         return 0;
     }
@@ -900,7 +900,7 @@ class DateTime {
      * @return integer
      */
     public static function getWeeksDiff(int $timeStamp1, int $timeStamp2): int {
-        return floor(abs($timeStamp1 - $timeStamp2) / (7 * 24 * 3600));
+        return (int)floor(abs($timeStamp1 - $timeStamp2) / (7 * 24 * 3600));
     }
 
 
@@ -993,7 +993,7 @@ class DateTime {
      * @return integer
      */
     public static function getDaysDiff(int $timeStamp1, int $timeStamp2): int {
-        return floor(abs($timeStamp1 - $timeStamp2) / (24 * 3600));
+        return (int)floor(abs($timeStamp1 - $timeStamp2) / (24 * 3600));
     }
 
     /**
@@ -1081,7 +1081,7 @@ class DateTime {
      * @return integer
      */
     public static function getHoursDiff(int $timeStamp1, int $timeStamp2): int {
-        return floor(abs($timeStamp1 - $timeStamp2) / 3600);
+        return (int)floor(abs($timeStamp1 - $timeStamp2) / 3600);
     }
 
 
@@ -1178,7 +1178,7 @@ class DateTime {
      * @return integer
      */
     public static function getMinsDiff(int $timeStamp1, int $timeStamp2): int {
-        return floor(abs($timeStamp1 - $timeStamp2) / 60);
+        return (int)floor(abs($timeStamp1 - $timeStamp2) / 60);
     }
 
 

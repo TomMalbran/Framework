@@ -138,7 +138,7 @@ class MailChimp {
 
     /**
      * Adds a Subscriber Batch
-     * @param array{}[] $subscribers
+     * @param array<string,string>[] $subscribers
      * @return boolean
      */
     public static function addSubscriberBatch(array $subscribers): bool {
@@ -364,7 +364,7 @@ class MailChimp {
     /**
      * Parses the recipients of a Campaign
      * @param string[]|null $emails Optional.
-     * @return array{}[]|null
+     * @return array<string,mixed>|null
      */
     private static function parseRecipients(?array $emails = null): ?array {
         $recipients = [ "list_id" => Config::getMailchimpList() ];
@@ -480,7 +480,7 @@ class MailChimp {
     /**
      * Returns the Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array{}
+     * @return array<string,boolean|integer|float>
      */
     public static function getReport(string $mailChimpID): array {
         $result = [

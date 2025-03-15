@@ -182,7 +182,7 @@ class ErrorLog extends LogErrorSchema {
     /**
      * Maps an Error Code into an Error word, and log location.
      * @param integer $errorCode
-     * @return array{}
+     * @return array{string,integer}
      */
     private static function parseErrorCode(int $errorCode): array {
         $errorText  = "";

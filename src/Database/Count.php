@@ -29,8 +29,8 @@ class Count {
 
     /**
      * Creates a new Count instance
-     * @param string  $key
-     * @param array{} $data
+     * @param string              $key
+     * @param array<string,mixed> $data
      */
     public function __construct(string $key, array $data) {
         $this->field     = new Field($key, $data);
@@ -110,7 +110,7 @@ class Count {
 
     /**
      * Returns the Count Value
-     * @param array{} $data
+     * @param array<string,mixed> $data
      * @return mixed
      */
     public function getValue(array $data): mixed {
