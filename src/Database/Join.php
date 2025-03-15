@@ -32,7 +32,7 @@ class Join {
     /** @var object[] */
     public array   $merges     = [];
 
-    /** @var array{}[] */
+    /** @var array<string,string[]> */
     public array   $defaults   = [];
 
     /** @var string[] */
@@ -71,7 +71,7 @@ class Join {
             $field = new Field($key, $value, $this->prefix);
             $this->fields[] = $field;
 
-            if (!empty($field->mergeTo)) {
+            if ($field->mergeTo !== "") {
                 if (empty($this->merges[$field->mergeTo])) {
                     $this->merges[$field->mergeTo] = (object)[
                         "key"    => $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo,
@@ -82,7 +82,7 @@ class Join {
                 $this->merges[$field->mergeTo]->fields[] = $field->prefixName;
             }
 
-            if (!empty($field->defaultTo)) {
+            if ($field->defaultTo !== "") {
                 $defaultKey = $this->hasPrefix ? $this->prefix . ucfirst($field->defaultTo) : $field->defaultTo;
                 if (empty($this->defaults[$defaultKey])) {
                     $this->defaults[$defaultKey] = [];
@@ -113,9 +113,9 @@ class Join {
         foreach ($this->defaults as $key => $fields) {
             if (empty($result[$key])) {
                 $result[$key] = "";
-                foreach ($fields as $key) {
-                    if (!empty($data[$key])) {
-                        $result[$key] = $data[$key];
+                foreach ($fields as $fieldKey) {
+                    if (!empty($data[$fieldKey])) {
+                        $result[$key] = $data[$fieldKey];
                         break;
                     }
                 }
