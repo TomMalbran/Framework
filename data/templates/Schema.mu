@@ -85,7 +85,7 @@ class {{name}}Schema extends Schema {
     protected static function createParentQuery({{parentsNullList}}): {{query}} {
         $query = new {{query}}();
         {{#parents}}
-        $query->query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query->query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}}, {{fieldParam}} !== null);
         {{/parents}}
         return $query;
     }
