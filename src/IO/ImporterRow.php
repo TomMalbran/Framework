@@ -3,12 +3,10 @@ namespace Framework\IO;
 
 use Framework\Utils\Strings;
 
-use ArrayAccess;
-
 /**
  * The Importer Row
  */
-class ImporterRow implements ArrayAccess {
+class ImporterRow {
 
     /** @var array{} */
     private array $fields;
@@ -90,44 +88,5 @@ class ImporterRow implements ArrayAccess {
      */
     public function getList(string $key): array {
         return $this->getValue($key, true);
-    }
-
-
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return mixed
-     */
-    public function offsetGet(mixed $key): mixed {
-        return $this->fields[$key];
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @param mixed $value
-     * @return void
-     */
-    public function offsetSet(mixed $key, mixed $value): void {
-        $this->fields[$key] = $value;
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return boolean
-     */
-    public function offsetExists(mixed $key): bool {
-        return array_key_exists($key, $this->fields);
-    }
-
-    /**
-     * Implements the Array Access Interface
-     * @param mixed $key
-     * @return void
-     */
-    public function offsetUnset(mixed $key): void {
-        unset($this->fields[$key]);
     }
 }
