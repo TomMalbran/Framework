@@ -622,9 +622,10 @@ class Generator {
      * @return array{}
      */
     private static function getProperties(Structure $structure): array {
-        $maxLength = 0;
-        $list      = [];
-        $result    = [];
+        $nameLength = 0;
+        $typeLength = 0;
+        $list       = [];
+        $result     = [];
 
         foreach ($structure->fields as $field) {
             $list[] = [
@@ -633,7 +634,6 @@ class Generator {
                 "name"   => $field->name,
                 "value"  => "{$structure->table}.{$field->key}",
             ];
-            $maxLength = max($maxLength, Strings::length($field->name));
         }
 
         foreach ($structure->expressions as $expression) {
@@ -643,7 +643,6 @@ class Generator {
                 "name"   => $expression->prefixName,
                 "value"  => $expression->key,
             ];
-            $maxLength = max($maxLength, Strings::length($expression->prefixName));
         }
 
         foreach ($structure->joins as $join) {
@@ -655,14 +654,10 @@ class Generator {
                     "name"   => $field->prefixName,
                     "value"  => "{$table}.{$field->key}",
                 ];
-                $maxLength = max($maxLength, Strings::length($field->prefixName));
             }
         }
 
         foreach ($list as $property) {
-            $property["title"] = Strings::padRight($property["name"], $maxLength);
-            $property["name"]  = Strings::padRight("{$property["name"]};", $maxLength);
-
             $type = $property["type"];
             if ($property["column"] === "status") {
                 $property["type"] = "StatusQuery";
@@ -671,19 +666,28 @@ class Generator {
                     Field::Boolean => "BooleanQuery",
                     Field::ID,
                     Field::Number,
-                    Field::Date => "NumberQuery",
+                    Field::Date    => "NumberQuery",
+                    Field::Float   => "FloatQuery",
                     Field::String,
                     Field::Text,
                     Field::LongText,
                     Field::JSON,
-                    Field::CSV,
-                    Field::HTML => "StringQuery",
-                    default => "",
+                    Field::HTML    => "StringQuery",
+                    default        => "",
                 };
             }
             if ($property["type"] !== "") {
+                $nameLength = max($nameLength, Strings::length($property["name"]));
+                $typeLength = max($typeLength, Strings::length($property["type"]));
+
                 $result[] = $property;
             }
+        }
+
+        foreach ($result as $index => $property) {
+            $result[$index]["propName"]  = Strings::padRight("{$property["name"]};", $nameLength + 1);
+            $result[$index]["propType"]  = Strings::padRight($property["type"], $typeLength);
+            $result[$index]["constName"] = Strings::padRight($property["name"], $nameLength);
         }
         return $result;
     }

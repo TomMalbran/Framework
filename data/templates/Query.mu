@@ -5,9 +5,10 @@ use {{namespace}}\{{column}};
 
 use Framework\Database\Query;
 use Framework\Database\Query\SchemaQuery;
-use Framework\Database\Query\StatusQuery;
 use Framework\Database\Query\BooleanQuery;
+use Framework\Database\Query\FloatQuery;
 use Framework\Database\Query\NumberQuery;
+use Framework\Database\Query\StatusQuery;
 use Framework\Database\Query\StringQuery;
 
 /**
@@ -16,7 +17,7 @@ use Framework\Database\Query\StringQuery;
 class {{query}} extends SchemaQuery {
 
 {{#properties}}
-    public {{type}} ${{name}} // {{value}}
+    public {{propType}} ${{propName}} // {{value}}
 {{/properties}}
 
 
@@ -29,7 +30,7 @@ class {{query}} extends SchemaQuery {
         parent::__construct($query);
 
         {{#properties}}
-        $this->{{title}} = new {{type}}($this->query, "{{value}}");
+        $this->{{constName}} = new {{type}}($this->query, "{{value}}");
         {{/properties}}
     }
 
