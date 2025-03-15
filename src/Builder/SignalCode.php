@@ -7,6 +7,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionUnionType;
 
 /**
@@ -96,10 +97,14 @@ class SignalCode {
             $typeNames = [];
             $docTypes  = [];
             foreach ($types as $type) {
-                $name = $type ? $type->getName() : "mixed";
-                if (!$type->isBuiltin()) {
-                    $uses[$name] = 1;
-                    $name = Strings::substringAfter($name, "\\");
+                $name = "mixed";
+
+                if ($type instanceof ReflectionNamedType) {
+                    $name = $type->getName();
+                    if (!$type->isBuiltin()) {
+                        $uses[$name] = 1;
+                        $name = Strings::substringAfter($name, "\\");
+                    }
                 }
 
                 $docType = match ($name) {

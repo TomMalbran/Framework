@@ -140,12 +140,12 @@ class Schema {
 
     /**
      * Returns a Select array
-     * @param Query|null           $query       Optional.
-     * @param string|null          $idColumn    Optional.
-     * @param string[]|string|null $nameColumn  Optional.
-     * @param string[]|string|null $extraColumn Optional.
-     * @param boolean              $useEmpty    Optional.
-     * @param string|null          $distinctID  Optional.
+     * @param Query|null           $query          Optional.
+     * @param string|null          $idColumn       Optional.
+     * @param string[]|string|null $nameColumn     Optional.
+     * @param string[]|string|null $extraColumn    Optional.
+     * @param string|null          $distinctColumn Optional.
+     * @param boolean              $useEmpty       Optional.
      * @return Select[]
      */
     protected static function getSchemaSelect(

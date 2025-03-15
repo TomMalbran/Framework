@@ -6,6 +6,8 @@ use Framework\Discovery\DataFile;
 use Framework\Discovery\Route;
 use Framework\Utils\Strings;
 
+use ReflectionNamedType;
+
 /**
  * The Router Code
  */
@@ -45,9 +47,15 @@ class RouterCode {
                 $route        = $attribute->newInstance();
                 $params       = $method->getNumberOfParameters();
                 $response     = $method->getReturnType();
-                $responseName = $response->getName();
                 $methodName   = $method->getName();
                 $startLine    = $method->getStartLine();
+
+                // Check the Response
+                if ($response === null || !$response instanceof ReflectionNamedType) {
+                    $errorRoutes[] = "Required Response for $methodName: $fileName:$startLine";
+                    continue;
+                }
+                $responseName = $response->getName();
 
                 // Check the Route
                 if (isset($usedRoutes[$route->route])) {

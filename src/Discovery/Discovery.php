@@ -8,7 +8,7 @@ use Framework\Utils\JSON;
 
 use ReflectionClass;
 use ReflectionProperty;
-use ReflectionUnionType;
+use ReflectionNamedType;
 use Throwable;
 
 /**
@@ -269,9 +269,11 @@ class Discovery {
      * @return array<string,string>
      */
     public static function getProperties(object $class, ?int $filter = null): array {
-        $reflection = new ReflectionClass($class);
-        $props      = $reflection->getProperties($filter ?? ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
         $result     = [];
+        $reflection = new ReflectionClass($class);
+
+        /** @var ReflectionProperty[] */
+        $props = $reflection->getProperties($filter ?? ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
 
         if ($props === null) {
             return $result;
@@ -279,7 +281,7 @@ class Discovery {
         foreach ($props as $prop) {
             $type     = $prop->getType();
             $typeName = "mixed";
-            if ($type !== null && !($type instanceof ReflectionUnionType)) {
+            if ($type !== null && $type instanceof ReflectionNamedType) {
                 $typeName = $type->getName();
             }
             $result[$prop->getName()] = $typeName;

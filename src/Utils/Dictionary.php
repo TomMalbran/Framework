@@ -131,7 +131,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as a Boolean
      * @param string $key
-     * @return integer
+     * @return boolean
      */
     public function getBool(string $key): bool {
         if ($this->has($key) && !Arrays::isArray($this->data[$key])) {
@@ -223,7 +223,6 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the keys of the Data
-     * @param string $key
      * @return string[]
      */
     public function getKeys(): array {

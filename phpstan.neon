@@ -1,4 +1,6 @@
 parameters:
-    level: 1
+    level: 2
     paths:
         - src
+    universalObjectCratesClasses:
+        - Framework\Utils\Errors

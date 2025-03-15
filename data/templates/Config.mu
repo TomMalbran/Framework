@@ -57,7 +57,7 @@ class Config {
 
     /**
      * Returns the value of the "{{title}}"
-     * @return {{docType}}
+     * @return {{{docType}}}
      */
     public static function {{getter}}{{name}}(): {{type}} {
         {{#isString}}

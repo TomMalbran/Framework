@@ -693,10 +693,10 @@ class Database {
 
     /**
      * Creates a Table
-     * @param string    $tableName
-     * @param array{}[] $fields
-     * @param string[]  $primary
-     * @param string[]  $keys
+     * @param string               $tableName
+     * @param array<string,string> $fields
+     * @param string[]             $primary
+     * @param string[]             $keys
      * @return string
      */
     public function createTable(string $tableName, array $fields, array $primary, array $keys): string {
@@ -704,8 +704,9 @@ class Database {
         $sql     = "CREATE TABLE `$tableName` (\n";
 
         foreach ($fields as $key => $type) {
-            $sql .= "  `$key` " . $type . ",\n";
+            $sql .= "  `$key` $type,\n";
         }
+
         $sql .= "  PRIMARY KEY (`" . Strings::join($primary, "`, `") . "`)";
         foreach ($keys as $key) {
             $sql .= ",\n  KEY `$key` (`$key`)";

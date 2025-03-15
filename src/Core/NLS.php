@@ -14,7 +14,7 @@ use Framework\Utils\Strings;
  */
 class NLS {
 
-    /** @var array{}{} */
+    /** @var array<string,array<string,mixed>> */
     private static array  $data     = [];
     private static string $language = "root";
 

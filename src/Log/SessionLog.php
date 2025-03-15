@@ -53,7 +53,6 @@ class SessionLog extends LogSessionSchema {
 
     /**
      * Deletes the items older than 90 days
-     * @param integer $days Optional.
      * @return boolean
      */
     public static function deleteOld(): bool {
