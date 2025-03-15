@@ -90,6 +90,16 @@ class StringQuery extends BaseQuery {
     }
 
     /**
+     * Generates a Like If Query
+     * @param string  $value
+     * @param boolean $caseSensitive Optional.
+     * @return Query
+     */
+    public function likeIf(string $value, bool $caseSensitive = false): Query {
+        return $this->query->addIf($this->column, "LIKE", $value, $caseSensitive);
+    }
+
+    /**
      * Generates a Not Like Query
      * @param string  $value
      * @param boolean $caseSensitive Optional.
