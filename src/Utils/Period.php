@@ -10,23 +10,24 @@ use Framework\Utils\Dictionary;
  */
 class Period {
 
-    const Today       = "today";
-    const Yesterday   = "yesterday";
-    const Last7Days   = "last7Days";
-    const Last15Days  = "last15Days";
-    const Last30Days  = "last30Days";
-    const Last60Days  = "last60Days";
-    const Last90Days  = "last90Days";
-    const Last120Days = "last120Days";
-    const LastYear    = "lastYear";
-    const ThisWeek    = "thisWeek";
-    const ThisMonth   = "thisMonth";
-    const ThisYear    = "thisYear";
-    const PastWeek    = "pastWeek";
-    const PastMonth   = "pastMonth";
-    const PastYear    = "pastYear";
-    const AllPeriod   = "allPeriod";
-    const Custom      = "custom";
+    private const Today       = "today";
+    private const Yesterday   = "yesterday";
+    private const Last7Days   = "last7Days";
+    private const Last15Days  = "last15Days";
+    private const Last30Days  = "last30Days";
+    private const Last60Days  = "last60Days";
+    private const Last90Days  = "last90Days";
+    private const Last120Days = "last120Days";
+    private const LastYear    = "lastYear";
+    private const ThisWeek    = "thisWeek";
+    private const ThisMonth   = "thisMonth";
+    private const ThisYear    = "thisYear";
+    private const PastWeek    = "pastWeek";
+    private const PastMonth   = "pastMonth";
+    private const PastYear    = "pastYear";
+    private const AllPeriod   = "allPeriod";
+    private const Custom      = "custom";
+
 
     public string $period   = "";
     public int    $fromTime = 0;
@@ -121,27 +122,27 @@ class Period {
      * @return integer
      */
     public function getFromTime(bool $useTimeZone = true): int {
-        $day    = (int)date("j");
-        $date   = (int)date("N");
-        $month  = (int)date("n");
-        $year   = (int)date("Y");
+        $day    = DateTime::getDay();
+        $date   = DateTime::getDayOfWeek(startMonday: true);
+        $month  = DateTime::getMonth();
+        $year   = DateTime::getYear();
 
         $result = match ($this->period) {
-            self::Today       => mktime(0, 0, 0, $month, $day, $year),
-            self::Yesterday   => mktime(0, 0, 0, $month, $day - 1, $year),
-            self::Last7Days   => mktime(0, 0, 0, $month, $day - 7, $year),
-            self::Last15Days  => mktime(0, 0, 0, $month, $day - 15, $year),
-            self::Last30Days  => mktime(0, 0, 0, $month, $day - 30, $year),
-            self::Last60Days  => mktime(0, 0, 0, $month, $day - 60, $year),
-            self::Last90Days  => mktime(0, 0, 0, $month, $day - 90, $year),
-            self::Last120Days => mktime(0, 0, 0, $month, $day - 120, $year),
-            self::LastYear    => mktime(0, 0, 0, $month, $day, $year - 1),
-            self::ThisWeek    => mktime(0, 0, 0, $month, $day - $date, $year),
-            self::ThisMonth   => mktime(0, 0, 0, $month, 1, $year),
-            self::ThisYear    => mktime(0, 0, 0, 1, 1, $year),
-            self::PastWeek    => mktime(0, 0, 0, $month, $day - $date - 7, $year),
-            self::PastMonth   => mktime(0, 0, 0, $month - 1, 1, $year),
-            self::PastYear    => mktime(0, 0, 0, 1, 1, $year - 1),
+            self::Today       => DateTime::createTime($day,             $month,     $year),
+            self::Yesterday   => DateTime::createTime($day - 1,         $month,     $year),
+            self::Last7Days   => DateTime::createTime($day - 7,         $month,     $year),
+            self::Last15Days  => DateTime::createTime($day - 15,        $month,     $year),
+            self::Last30Days  => DateTime::createTime($day - 30,        $month,     $year),
+            self::Last60Days  => DateTime::createTime($day - 60,        $month,     $year),
+            self::Last90Days  => DateTime::createTime($day - 90,        $month,     $year),
+            self::Last120Days => DateTime::createTime($day - 120,       $month,     $year),
+            self::LastYear    => DateTime::createTime($day,             $month,     $year - 1),
+            self::ThisWeek    => DateTime::createTime($day - $date,     $month,     $year),
+            self::ThisMonth   => DateTime::createTime(1,                $month,     $year),
+            self::ThisYear    => DateTime::createTime(1,                1,          $year),
+            self::PastWeek    => DateTime::createTime($day - $date - 7, $month,     $year),
+            self::PastMonth   => DateTime::createTime(1,                $month - 1, $year),
+            self::PastYear    => DateTime::createTime(1,                1,          $year - 1),
             self::AllPeriod   => 0,
             default           => 0,
         };
@@ -155,11 +156,11 @@ class Period {
      * @return integer
      */
     public function getToTime(bool $useTimeZone = true): int {
-        $month  = (int)date("n");
-        $day    = (int)date("j");
-        $date   = (int)date("N");
-        $year   = (int)date("Y");
-        $days   = (int)date("t", mktime(0, 0, 0, $month - 1, 1, $year));
+        $month  = DateTime::getMonth();
+        $day    = DateTime::getDay();
+        $date   = DateTime::getDayOfWeek(startMonday: true);
+        $year   = DateTime::getYear();
+        $days   = DateTime::getMonthDays(DateTime::createTime(1, $month - 1, $year));
         $result = 0;
 
         switch ($this->period) {
@@ -174,23 +175,23 @@ class Period {
         case self::ThisWeek:
         case self::ThisMonth:
         case self::ThisYear:
-            $result = mktime(23, 59, 59, $month, $day, $year);
+            $result = DateTime::createTime($day, $month, $year, 23, 59, 59);
             break;
         case self::Yesterday:
-            $result = mktime(23, 59, 59, $month, $day - 1, $year);
+            $result = DateTime::createTime($day - 1, $month, $year, 23, 59, 59);
             break;
         case self::PastWeek:
-            $result = mktime(23, 59, 59, $month, $day - $date - 1, $year);
+            $result = DateTime::createTime($day - $date - 1, $month, $year, 23, 59, 59);
             break;
         case self::PastMonth:
-            $result = mktime(23, 59, 59, $month - 1, $days, $year);
+            $result = DateTime::createTime($days, $month - 1, $year, 23, 59, 59);
             break;
         case self::PastYear:
-            $days   = (int)date("t", mktime(0, 0, 0, 12, 1, $year - 1));
-            $result = mktime(23, 59, 59, 12, $days, $year - 1);
+            $days   = DateTime::getMonthDays(DateTime::createTime(1, 12, $year - 1));
+            $result = DateTime::createTime($days, 12, $year - 1, 23, 59, 59);
             break;
         case self::AllPeriod:
-            $result = mktime(23, 59, 59, $month, $day, $year);
+            $result = DateTime::createTime($day, $month, $year, 23, 59, 59);
             break;
         default:
         }
@@ -242,8 +243,8 @@ class Period {
      * @return integer
      */
     public static function getDays(string $period): int {
-        $month = (int)date("n");
-        $year  = (int)date("Y");
+        $month = DateTime::getMonth();
+        $year  = DateTime::getYear();
 
         return match ($period) {
             self::Today       => 1,
@@ -256,11 +257,11 @@ class Period {
             self::Last120Days => 120,
             self::LastYear    => 365,
             self::ThisWeek    => 7,
-            self::ThisMonth   => (int)date("t"),
-            self::ThisYear    => 365 + (int)date("L"),
+            self::ThisMonth   => DateTime::getMonthDays(),
+            self::ThisYear    => DateTime::getYearDays(),
             self::PastWeek    => 7,
-            self::PastMonth   => (int)date("t", mktime(0, 0, 0, $month - 1, 1, $year)),
-            self::PastYear    => 365 + (int)date("L", mktime(0, 0, 0, 1, 1, $year - 1)),
+            self::PastMonth   => DateTime::getMonthDays(DateTime::createTime(1, $month - 1, $year, 0, 0, 0)),
+            self::PastYear    => DateTime::getYearDays(DateTime::createTime(1, 1, $year - 1)),
             self::AllPeriod   => 0,
             default           => 0,
         };

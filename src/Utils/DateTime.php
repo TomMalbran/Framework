@@ -180,7 +180,8 @@ class DateTime {
      * @return integer
      */
     public static function createTime(int $day, int $month, int $year, int $hour = 0, int $minute = 0, int $second = 0): int {
-        return mktime($hour, $minute, $second, $month, $day, $year);
+        $result = mktime($hour, $minute, $second, $month, $day, $year);
+        return $result !== false ? $result : 0;
     }
 
     /**
@@ -704,16 +705,6 @@ class DateTime {
 
 
     /**
-     * Returns the Year for the given Time Stamp
-     * @param integer $timeStamp Optional.
-     * @return integer
-     */
-    public static function getYear(int $timeStamp = 0): int {
-        $timeStamp = self::getTime($timeStamp);
-        return (int)date("Y", $timeStamp);
-    }
-
-    /**
      * Returns the Month for the given Time Stamp
      * @param integer $timeStamp Optional.
      * @return integer
@@ -830,7 +821,7 @@ class DateTime {
      * @return integer
      */
     public static function getMonthsDiff(int $timeStamp1, int $timeStamp2): int {
-        return 12 * ((int)self::getYear($timeStamp1) - (int)self::getYear($timeStamp2)) + self::getMonth($timeStamp1) - self::getMonth($timeStamp2);
+        return 12 * (self::getYear($timeStamp1) - self::getYear($timeStamp2)) + self::getMonth($timeStamp1) - self::getMonth($timeStamp2);
     }
 
     /**
@@ -872,6 +863,29 @@ class DateTime {
      */
     public static function getShortMonth(int $month, string $language = ""): string {
         return self::getMonthName($month, 3, true, $language);
+    }
+
+
+
+    /**
+     * Returns the Year for the given Time Stamp
+     * @param integer $timeStamp Optional.
+     * @return integer
+     */
+    public static function getYear(int $timeStamp = 0): int {
+        $timeStamp = self::getTime($timeStamp);
+        return (int)date("Y", $timeStamp);
+    }
+
+    /**
+     * Returns the amount of days in the Year for the given Time Stamp
+     * @param integer $timeStamp Optional.
+     * @return integer
+     */
+    public static function getYearDays(int $timeStamp = 0): int {
+        $timeStamp = self::getTime($timeStamp);
+        // NOTE: L returns 1 for leap years and 0 for non-leap years
+        return 365 + (int)date("L", $timeStamp);
     }
 
 
@@ -1321,7 +1335,7 @@ class DateTime {
         }
 
         // Return the Time Stamp
-        return mktime(0, 0, 0, $month, $day, $year);
+        return self::createTime($day, $month, $year);
     }
 
     /**
@@ -1372,6 +1386,6 @@ class DateTime {
             return 0;
         }
 
-        return mktime(0, 0, 0, $month, $day, $year);
+        return self::createTime($day, $month, $year);
     }
 }
