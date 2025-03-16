@@ -154,7 +154,23 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key as CSV
+     * Returns the request data at the given key as an array of integers
+     * @param string $key
+     * @return int[]
+     */
+    public function getInts(string $key): array {
+        $value  = $this->get($key, "");
+        $result = [];
+        if (JSON::isValid($value)) {
+            $result = JSON::decodeAsArray($value);
+        } else {
+            $result = Strings::split($value, ",");
+        }
+        return Arrays::toInts($result, withoutEmpty: true);
+    }
+
+    /**
+     * Returns the request data at the given key as an array of Strings
      * @param string $key
      * @return string[]
      */
@@ -170,19 +186,13 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key as CSV
+     * Returns the request data at the given key as an array of Strings
      * @param string $key
-     * @return int[]
+     * @return array<string,string>
      */
-    public function getInts(string $key): array {
-        $value  = $this->get($key, "");
-        $result = [];
-        if (JSON::isValid($value)) {
-            $result = JSON::decodeAsArray($value);
-        } else {
-            $result = Strings::split($value, ",");
-        }
-        return Arrays::toInts($result, withoutEmpty: true);
+    public function getStringsMap(string $key): array {
+        $value = $this->getJSONArray($key);
+        return Arrays::toStringsMap($value);
     }
 
 

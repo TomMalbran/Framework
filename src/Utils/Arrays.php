@@ -85,6 +85,35 @@ class Arrays {
     }
 
     /**
+     * Converts an array into a list of integers
+     * @param mixed   $array
+     * @param string  $key          Optional.
+     * @param boolean $withoutEmpty Optional.
+     * @return integer[]
+     */
+    public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
+        if (is_int($array)) {
+            return [ $array ];
+        }
+        if (!self::isArray($array)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $row) {
+            $value = self::getValue($row, $key);
+            if (!Numbers::isValid($value, null)) {
+                continue;
+            }
+            if ($withoutEmpty && empty($value)) {
+                continue;
+            }
+            $result[] = (int)$value;
+        }
+        return $result;
+    }
+
+    /**
      * Converts an array into a list of strings
      * @param mixed   $array
      * @param string  $key          Optional.
@@ -111,30 +140,18 @@ class Arrays {
     }
 
     /**
-     * Converts an array into a list of integers
-     * @param mixed   $array
-     * @param string  $key          Optional.
-     * @param boolean $withoutEmpty Optional.
-     * @return integer[]
+     * Converts an array into a Map of string keys and values
+     * @param mixed $array
+     * @return array<string,string>
      */
-    public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
-        if (is_int($array)) {
-            return [ $array ];
-        }
-        if (!self::isArray($array)) {
+    public static function toStringsMap(mixed $array): array {
+        if (!is_array($array)) {
             return [];
         }
 
         $result = [];
-        foreach ($array as $row) {
-            $value = self::getValue($row, $key);
-            if (!Numbers::isValid($value, null)) {
-                continue;
-            }
-            if ($withoutEmpty && empty($value)) {
-                continue;
-            }
-            $result[] = (int)$value;
+        foreach ($array as $key => $value) {
+            $result[$key] = (string)$value;
         }
         return $result;
     }
