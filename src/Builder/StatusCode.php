@@ -23,8 +23,8 @@ class StatusCode {
         $groups = $frameData["groups"];
 
         if (!empty($appData)) {
-            $values = Arrays::merge($frameData["values"], $appData["values"]);
-            $groups = Arrays::merge($frameData["groups"], $appData["groups"]);
+            $values = array_merge($frameData["values"], $appData["values"]);
+            $groups = array_merge($frameData["groups"], $appData["groups"]);
         }
 
         $statusList = self::getStatues($values);

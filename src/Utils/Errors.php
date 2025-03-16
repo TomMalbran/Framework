@@ -13,7 +13,7 @@ use AllowDynamicProperties;
 #[AllowDynamicProperties]
 class Errors implements JsonSerializable {
 
-    /** @var array<string,string|integer|array> */
+    /** @var array<string,string|integer|array<string|integer>> */
     private array $errors = [];
 
     /** @var array<string,integer> */
@@ -210,7 +210,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns the errors as an Object
-     * @return array<string,string|integer|array>
+     * @return array<string,string|integer|array<string|integer>>
      */
     public function get(): array {
         return $this->errors + $this->counts;

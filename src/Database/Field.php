@@ -271,7 +271,7 @@ class Field {
     /**
      * Returns the Field Values from the given Data
      * @param array<string,mixed> $data
-     * @return array<string,string|integer|float|boolean|array>
+     * @return array<string,string|integer|float|boolean|array<string|integer,mixed>>
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;

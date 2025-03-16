@@ -10,6 +10,7 @@ use JsonSerializable;
 
 /**
  * A Dictionary wrapper
+ * @implements IteratorAggregate<string,Dictionary>
  */
 class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 

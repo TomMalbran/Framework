@@ -18,25 +18,24 @@ use IteratorAggregate;
 use Traversable;
 use JsonSerializable;
 use CURLFile;
-use AllowDynamicProperties;
 
 /**
  * The Request Wrapper
+ * @implements IteratorAggregate<string,mixed>
  */
-#[AllowDynamicProperties]
 class Request implements IteratorAggregate, JsonSerializable {
 
-    /** @var ArrayAccess|array<string,mixed> */
+    /** @var ArrayAccess<string,mixed>|array<string,mixed> */
     private ArrayAccess|array $request;
 
-    /** @var ArrayAccess|array<string,mixed> */
+    /** @var ArrayAccess<string,mixed>|array<string,mixed> */
     private ArrayAccess|array $files;
 
 
     /**
      * Creates a new Request instance
-     * @param ArrayAccess|array<string,mixed> $request Optional.
-     * @param ArrayAccess|array<string,mixed> $files   Optional.
+     * @param ArrayAccess<string,mixed>|array<string,mixed> $request Optional.
+     * @param ArrayAccess<string,mixed>|array<string,mixed> $files   Optional.
      */
     public function __construct(ArrayAccess|array $request = [], ArrayAccess|array $files = []) {
         $this->request = $request;
@@ -121,7 +120,11 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return mixed[]
      */
     public function getArray(string $key): array {
-        return Arrays::removeEmpty($this->get($key, []));
+        $value = $this->get($key, []);
+        if (!is_array($value)) {
+            return [];
+        }
+        return Arrays::removeEmpty($value);
     }
 
     /**
@@ -841,7 +844,7 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the Request data
-     * @return ArrayAccess|array<string,mixed>
+     * @return ArrayAccess<string,mixed>|array<string,mixed>
      */
     public function toArray(): ArrayAccess|array {
         return $this->request;
@@ -849,7 +852,7 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Return the Data for var_dump
-     * @return array
+     * @return array<string,mixed>
      */
     public function __debugInfo(): array {
         return (array)$this->request;

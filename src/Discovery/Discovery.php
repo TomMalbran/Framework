@@ -246,7 +246,7 @@ class Discovery {
      * Returns the Reflection Classes in the given Directory
      * @param string  $dir         Optional.
      * @param boolean $skipIgnored Optional.
-     * @return array<string,ReflectionClass>
+     * @return array<string,ReflectionClass<object>>
      */
     public static function getReflectionClasses(string $dir = "", bool $skipIgnored = false): array {
         $classes = self::findClasses($dir, $skipIgnored);

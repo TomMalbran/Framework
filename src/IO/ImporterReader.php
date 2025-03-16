@@ -8,6 +8,7 @@ use Iterator;
 
 /**
  * The Importer Reader
+ * @extends Iterator<integer,string[]>
  */
 interface ImporterReader extends Iterator {
 

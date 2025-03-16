@@ -157,7 +157,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns the current Row
-     * @return mixed[]
+     * @return string[]
      */
     public function current(): array {
         return $this->parseRow($this->iterator->current());

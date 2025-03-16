@@ -11,6 +11,7 @@ use Iterator;
 
 /**
  * The Importer Wrapper
+ * @implements Iterator<integer,ImporterRow>
  */
 class Importer implements Iterator {
 
