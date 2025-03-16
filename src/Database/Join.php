@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Database\Factory;
 use Framework\Database\Field;
+use Framework\Database\Merge;
 use Framework\Utils\Arrays;
 
 /**
@@ -29,7 +30,7 @@ class Join {
     /** @var Field[] */
     public array   $fields     = [];
 
-    /** @var object[] */
+    /** @var Merge[] */
     public array   $merges     = [];
 
     /** @var array<string,string[]> */
@@ -73,11 +74,8 @@ class Join {
 
             if ($field->mergeTo !== "") {
                 if (empty($this->merges[$field->mergeTo])) {
-                    $this->merges[$field->mergeTo] = (object)[
-                        "key"    => $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo,
-                        "glue"   => !empty($data["mergeGlue"]) ? $data["mergeGlue"] : " ",
-                        "fields" => [],
-                    ];
+                    $key = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
+                    $this->merges[$field->mergeTo] = new Merge($key, $data);
                 }
                 $this->merges[$field->mergeTo]->fields[] = $field->prefixName;
             }
