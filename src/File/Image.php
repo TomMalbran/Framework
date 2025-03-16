@@ -3,6 +3,7 @@ namespace Framework\File;
 
 use Framework\File\File;
 use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 use Imagick;
@@ -252,9 +253,9 @@ class Image {
             $yCorner   = 0;
 
             if ($imgWidth > $imgHeight) {
-                $height = round($imgHeight * $width / $imgWidth);
+                $height = Numbers::roundInt($imgHeight * $width / $imgWidth);
             } else {
-                $width  = round($imgWidth * $height / $imgHeight);
+                $width  = Numbers::roundInt($imgWidth * $height / $imgHeight);
             }
             break;
 
@@ -268,9 +269,9 @@ class Image {
                 $oldHeight = $imgHeight;
 
                 if ($imgWidth > $imgHeight) {
-                    $height = round($imgHeight * $width / $imgWidth);
+                    $height = Numbers::roundInt($imgHeight * $width / $imgWidth);
                 } else {
-                    $width  = round($imgWidth * $height / $imgHeight);
+                    $width  = Numbers::roundInt($imgWidth * $height / $imgHeight);
                 }
             } else {
                 $width     = $imgWidth;
@@ -286,15 +287,15 @@ class Image {
             $yScale = $imgHeight / $height;
 
             if ($yScale < $xScale) {
-                $oldWidth  = round($width  * $yScale);
-                $oldHeight = round($height * $yScale);
-                $xCorner   = round(($imgWidth - $oldWidth) / 2);
+                $oldWidth  = Numbers::roundInt($width  * $yScale);
+                $oldHeight = Numbers::roundInt($height * $yScale);
+                $xCorner   = Numbers::roundInt(($imgWidth - $oldWidth) / 2);
                 $yCorner   = 0;
             } else {
-                $oldWidth  = round($width  * $xScale);
-                $oldHeight = round($height * $xScale);
+                $oldWidth  = Numbers::roundInt($width  * $xScale);
+                $oldHeight = Numbers::roundInt($height * $xScale);
                 $xCorner   = 0;
-                $yCorner   = round(($imgHeight - $oldHeight) / 2);
+                $yCorner   = Numbers::roundInt(($imgHeight - $oldHeight) / 2);
             }
             break;
         }

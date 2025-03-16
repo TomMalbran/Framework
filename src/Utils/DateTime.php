@@ -1128,7 +1128,7 @@ class DateTime {
         }
         if (!empty($timeZone)) {
             $timeDiff = self::$serverZone - $timeZone;
-            $result  += $timeDiff * 60;
+            $result  += Numbers::roundInt($timeDiff * 60);
         }
         return $result;
     }

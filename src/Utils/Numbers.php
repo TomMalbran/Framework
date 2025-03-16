@@ -58,6 +58,15 @@ class Numbers {
     }
 
     /**
+     * Rounds the given number to the nearest integer
+     * @param integer|float $number
+     * @return integer
+     */
+    public static function roundInt(int|float $number): int {
+        return (int)round($number);
+    }
+
+    /**
      * Returns a number with the given length
      * @param integer $length Optional.
      * @return integer
@@ -75,7 +84,7 @@ class Numbers {
     public static function toInt(mixed $value, int $decimals = 0): int {
         if (is_numeric($value)) {
             $padding = pow(10, $decimals);
-            return (int)round($value * $padding);
+            return self::roundInt($value * $padding);
         }
         return 0;
     }
@@ -208,7 +217,7 @@ class Numbers {
      * @return integer
      */
     public static function divideInt(int $numerator, int $divisor): int {
-        return $divisor == 0 ? 0 : (int)self::round($numerator / $divisor, 0);
+        return $divisor == 0 ? 0 : self::roundInt($numerator / $divisor);
     }
 
     /**

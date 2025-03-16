@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Utils\Numbers;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -481,7 +482,7 @@ class OpenAI {
         $result->text         = $request["text"];
         $result->language     = $request["language"];
         $result->duration     = (int)ceil($request["duration"]);
-        $result->runTime      = (int)round(($timeEnd - $timeStart) / 60);
+        $result->runTime      = Numbers::roundInt(($timeEnd - $timeStart) / 60);
         $result->outputTokens = $outputTokens;
         return $result;
     }
