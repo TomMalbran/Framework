@@ -12,7 +12,6 @@ use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 
-use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
 use Traversable;
@@ -25,19 +24,19 @@ use CURLFile;
  */
 class Request implements IteratorAggregate, JsonSerializable {
 
-    /** @var ArrayAccess<string,mixed>|array<string,mixed> */
-    private ArrayAccess|array $request;
+    /** @var array<string,mixed> */
+    private array $request;
 
-    /** @var ArrayAccess<string,mixed>|array<string,mixed> */
-    private ArrayAccess|array $files;
+    /** @var array<string,mixed> */
+    private array $files;
 
 
     /**
      * Creates a new Request instance
-     * @param ArrayAccess<string,mixed>|array<string,mixed> $request Optional.
-     * @param ArrayAccess<string,mixed>|array<string,mixed> $files   Optional.
+     * @param array<string,mixed> $request Optional.
+     * @param array<string,mixed> $files   Optional.
      */
-    public function __construct(ArrayAccess|array $request = [], ArrayAccess|array $files = []) {
+    public function __construct(array $request = [], array $files = []) {
         $this->request = $request;
         $this->files   = $files;
     }
@@ -844,9 +843,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the Request data
-     * @return ArrayAccess<string,mixed>|array<string,mixed>
+     * @return array<string,mixed>
      */
-    public function toArray(): ArrayAccess|array {
+    public function toArray(): array {
         return $this->request;
     }
 
