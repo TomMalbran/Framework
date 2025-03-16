@@ -285,11 +285,11 @@ class Schema {
 
     /**
      * Returns the expression of the Query
-     * @param Query|null   $query     Optional.
-     * @param Request|null $sort      Optional.
-     * @param array{}      $selects   Optional.
-     * @param string[]     $joins     Optional.
-     * @param boolean      $decrypted Optional.
+     * @param Query|null           $query     Optional.
+     * @param Request|null         $sort      Optional.
+     * @param array<string,string> $selects   Optional.
+     * @param string[]             $joins     Optional.
+     * @param boolean              $decrypted Optional.
      * @return string
      */
     protected static function getExpression(

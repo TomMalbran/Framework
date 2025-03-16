@@ -66,12 +66,12 @@ class Notification {
 
     /**
      * Sends the Notification
-     * @param string  $title
-     * @param string  $body
-     * @param string  $url
-     * @param string  $dataType
-     * @param integer $dataID
-     * @param array{} $params
+     * @param string              $title
+     * @param string              $body
+     * @param string              $url
+     * @param string              $dataType
+     * @param integer             $dataID
+     * @param array<string,mixed> $params
      * @return string|null
      */
     private static function send(string $title, string $body, string $url, string $dataType, int $dataID, array $params): ?string {

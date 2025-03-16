@@ -19,8 +19,8 @@ class OpenAI {
 
     /**
      * Does a GET Request
-     * @param string       $route
-     * @param array{}|null $request Optional.
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
      * @return mixed
      */
     private static function get(string $route, ?array $request = null): mixed {
@@ -32,8 +32,8 @@ class OpenAI {
 
     /**
      * Does a POST Request
-     * @param string       $route
-     * @param array{}|null $request Optional.
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
      * @return mixed
      */
     private static function post(string $route, ?array $request = null): mixed {
@@ -46,8 +46,8 @@ class OpenAI {
 
     /**
      * Does an UPLOAD Request
-     * @param string       $route
-     * @param array{}|null $request Optional.
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
      * @return mixed
      */
     private static function upload(string $route, ?array $request = null): mixed {

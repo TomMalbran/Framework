@@ -268,12 +268,14 @@ class Numbers {
     public static function isValidFloat(int|float $number, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
         $mult = 1;
         if ($decimals != null) {
-            $decimalCount = strlen($number) - strrpos($number, ".") - 1;
-            if (strrpos($number, ".") > 0 && $decimalCount > $decimals) {
+            $numberStr    = (string)$number;
+            $decimalCount = strlen($numberStr) - strrpos($numberStr, ".") - 1;
+            if (strrpos($numberStr, ".") > 0 && $decimalCount > $decimals) {
                 return false;
             }
             $mult = pow(10, $decimals);
         }
+
         $multMin = $min !== null ? $min * $mult : $min;
         $multMax = $max !== null ? $max * $mult : $max;
         return self::isValid($number * $mult, $multMin, $multMax);

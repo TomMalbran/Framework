@@ -727,7 +727,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getDayStart(string $key, bool $useTimezone = true): int {
-        return DateTime::getDayStart($this->getInt($key), $useTimezone);
+        return DateTime::getDayStart($this->getInt($key), 0, $useTimezone);
     }
 
     /**
@@ -737,7 +737,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getDayEnd(string $key, bool $useTimezone = true): int {
-        return DateTime::getDayEnd($this->getInt($key), $useTimezone);
+        return DateTime::getDayEnd($this->getInt($key), 0, $useTimezone);
     }
 
 

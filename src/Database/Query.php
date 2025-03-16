@@ -88,7 +88,7 @@ class Query {
      * Adds an expression as an and
      * @param string                 $column
      * @param string                 $expression
-     * @param mixed[]|integer|string $value
+     * @param mixed[]|string|integer $value
      * @param boolean                $caseSensitive Optional.
      * @param boolean|null           $condition     Optional.
      * @return Query

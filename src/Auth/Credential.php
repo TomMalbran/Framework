@@ -371,7 +371,7 @@ class Credential extends CredentialSchema {
      * @param Access[]|Access|null   $accessName   Optional.
      * @param integer[]|integer|null $credentialID Optional.
      * @param boolean                $withEmail    Optional.
-     * @param boolean                $splitText    Optional.
+     * @param boolean                $splitValue   Optional.
      * @return Search[]
      */
     public static function search(
@@ -380,14 +380,14 @@ class Credential extends CredentialSchema {
         array|Access|null $accessName = null,
         array|int|null $credentialID = null,
         bool $withEmail = true,
-        bool $splitText = true,
+        bool $splitValue = true,
     ): array {
         $query = self::createAccessQuery($accessName);
         $query->search([
             CredentialColumn::FirstName,
             CredentialColumn::LastName,
             CredentialColumn::Email,
-        ], $text, splitText: $splitText);
+        ], $text, splitValue: $splitValue);
 
         if ($credentialID !== null) {
             $query->credentialID->in(Arrays::toInts($credentialID));
@@ -546,19 +546,19 @@ class Credential extends CredentialSchema {
             avatar:           "",
             password:         "",
             salt:             "",
-            reqPassChange:    0,
+            reqPassChange:    false,
             passExpiration:   0,
             accessToken:      "",
             tokenExpiration:  0,
             observations:     "",
-            sendEmails:       0,
-            sendEmailNotis:   0,
+            sendEmails:       false,
+            sendEmailNotis:   false,
             timezone:         0,
             currentLogin:     0,
             lastLogin:        0,
-            askNotifications: 0,
+            askNotifications: false,
             status:           Status::Inactive,
-            isDeleted:        1,
+            isDeleted:        true,
         );
     }
 
@@ -674,7 +674,7 @@ class Credential extends CredentialSchema {
             password:       $hash["password"],
             salt:           $hash["salt"],
             passExpiration: 0,
-            reqPassChange:  0,
+            reqPassChange:  false,
         );
         return $hash;
     }

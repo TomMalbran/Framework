@@ -269,9 +269,9 @@ class Database {
 
     /**
      * Updates the content of the database based on the query and given fields
-     * @param string    $table
-     * @param array{}[] $fields
-     * @param Query     $query
+     * @param string              $table
+     * @param array<string,mixed> $fields
+     * @param Query               $query
      * @return boolean
      */
     public function update(string $table, array $fields, Query $query): bool {

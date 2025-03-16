@@ -40,14 +40,15 @@ class StatusCode {
     /**
      * Generates the Statues data
      * @param array<string,mixed> $values
-     * @return array{name:string,color:string}[]
+     * @return array{name:string,color:string,constant:string}[]
      */
     private static function getStatues(array $values): array {
         $result = [];
         foreach ($values as $name => $color) {
             $result[] = [
-                "name"  => $name,
-                "color" => $color,
+                "name"     => $name,
+                "color"    => $color,
+                "constant" => "",
             ];
         }
         return $result;

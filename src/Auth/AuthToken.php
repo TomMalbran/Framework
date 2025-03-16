@@ -119,7 +119,7 @@ class AuthToken {
 
     /**
      * Creates an Access Token
-     * @param array{} $data
+     * @param array<string,mixed> $data
      * @return string
      */
     public static function createAccessToken(array $data): string {

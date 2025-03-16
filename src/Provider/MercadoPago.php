@@ -34,10 +34,10 @@ class MercadoPago {
 
     /**
      * Does a POST Request
-     * @param string  $route
-     * @param array{} $request
-     * @param array{} $headers     Optional.
-     * @param string  $accessToken Optional.
+     * @param string               $route
+     * @param array<string,mixed>  $request
+     * @param array<string,string> $headers     Optional.
+     * @param string               $accessToken Optional.
      * @return mixed
      */
     private static function post(string $route, array $request, array $headers = [], string $accessToken = ""): mixed {
@@ -50,9 +50,9 @@ class MercadoPago {
 
     /**
      * Does a PUT Request
-     * @param string  $route
-     * @param array{} $request
-     * @param string  $accessToken Optional.
+     * @param string              $route
+     * @param array<string,mixed> $request
+     * @param string              $accessToken Optional.
      * @return mixed
      */
     private static function put(string $route, array $request, string $accessToken = ""): mixed {

@@ -594,7 +594,7 @@ class DateTime {
         if ($seconds < 120) {
             return "{$seconds}s";
         }
-        $minutes = floor($seconds / 60);
+        $minutes = (int)floor($seconds / 60);
         return self::toMinString($minutes);
     }
 
@@ -618,12 +618,12 @@ class DateTime {
 
     /**
      * Returns the Time Stamp minus x days
-     * @param float   $days
+     * @param integer $days
      * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXDays(float $days, int $timeStamp = 0, bool $useTimeZone = false): int {
+    public static function getLastXDays(int $days, int $timeStamp = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp - $days * 24 * 3600;
         return self::toServerTime($result, $useTimeZone);
@@ -631,12 +631,12 @@ class DateTime {
 
     /**
      * Returns the Time Stamp minus x hours
-     * @param float   $hours
+     * @param integer $hours
      * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXHours(float $hours, int $timeStamp = 0, bool $useTimeZone = false): int {
+    public static function getLastXHours(int $hours, int $timeStamp = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp - $hours * 3600;
         return self::toServerTime($result, $useTimeZone);
@@ -644,12 +644,12 @@ class DateTime {
 
     /**
      * Returns the Time Stamp minus x minutes
-     * @param float   $minutes
+     * @param integer $minutes
      * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getLastXMinutes(float $minutes, int $timeStamp = 0, bool $useTimeZone = false): int {
+    public static function getLastXMinutes(int $minutes, int $timeStamp = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp - $minutes * 60;
         return self::toServerTime($result, $useTimeZone);
@@ -670,34 +670,34 @@ class DateTime {
 
     /**
      * Returns the Time Stamp plus x days
-     * @param float   $days
+     * @param integer $days
      * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getNextXDays(float $days, int $timeStamp = 0, bool $useTimeZone = false): int {
+    public static function getNextXDays(int $days, int $timeStamp = 0, bool $useTimeZone = false): int {
         return self::getLastXDays(-$days, $timeStamp, $useTimeZone);
     }
 
     /**
      * Returns the Time Stamp plus x hours
-     * @param float   $hours
+     * @param integer $hours
      * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getNextXHours(float $hours, int $timeStamp = 0, bool $useTimeZone = false): int {
+    public static function getNextXHours(int $hours, int $timeStamp = 0, bool $useTimeZone = false): int {
         return self::getLastXHours(-$hours, $timeStamp, $useTimeZone);
     }
 
     /**
      * Returns the Time Stamp plus x minutes
-     * @param float   $minutes
+     * @param integer $minutes
      * @param integer $timeStamp   Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function getNextXMinutes(float $minutes, int $timeStamp = 0, bool $useTimeZone = false): int {
+    public static function getNextXMinutes(int $minutes, int $timeStamp = 0, bool $useTimeZone = false): int {
         return self::getLastXMinutes(-$minutes, $timeStamp, $useTimeZone);
     }
 
@@ -816,9 +816,9 @@ class DateTime {
             !empty($day) ? $day : self::getDay($timeStamp),
             self::getMonth($timeStamp) + $monthDiff,
             self::getYear($timeStamp),
-            date("h", $timeStamp),
-            date("i", $timeStamp),
-            date("s", $timeStamp),
+            (int)date("h", $timeStamp),
+            (int)date("i", $timeStamp),
+            (int)date("s", $timeStamp),
         );
         return self::toServerTime($result, $useTimeZone);
     }

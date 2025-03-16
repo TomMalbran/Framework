@@ -147,11 +147,11 @@ class Discovery {
 
     /**
      * Saves a Data File
-     * @param string          $fileName
-     * @param string[]|string $contents
+     * @param string $fileName
+     * @param mixed  $contents
      * @return boolean
      */
-    public static function saveData(string $fileName, array|string $contents): bool {
+    public static function saveData(string $fileName, mixed $contents): bool {
         $file = Strings::addSuffix($fileName, ".json");
         $path = self::getAppPath(Package::DataDir, $file);
         return JSON::writeFile($path, $contents);

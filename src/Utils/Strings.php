@@ -195,7 +195,8 @@ class Strings {
      * @return string
      */
     public static function random(int $length = 50): string {
-        return substr(md5(rand()), 0, $length);
+        $value = (string)rand();
+        return substr(md5($value), 0, $length);
     }
 
     /**

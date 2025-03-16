@@ -14,9 +14,9 @@ class Mailjet {
 
     /**
      * Executes a Request
-     * @param string  $method
-     * @param string  $route
-     * @param array{} $params Optional.
+     * @param string              $method
+     * @param string              $route
+     * @param array<string,mixed> $params Optional.
      * @return array<string,mixed>
      */
     private static function execute(string $method, string $route, array $params = []): array {

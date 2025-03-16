@@ -470,7 +470,6 @@ class Image {
             $image = new Imagick($src);
             $image->thumbnailImage($width, $height, $bestFit, $fill);
             $image->writeImage($dst);
-            return true;
         } catch (Exception $e) {
             $error = $e->getMessage();
 
@@ -482,5 +481,6 @@ class Image {
             // Log the error
             trigger_error("Imagick Error: $error", E_USER_ERROR);
         }
+        return true;
     }
 }

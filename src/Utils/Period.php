@@ -121,10 +121,10 @@ class Period {
      * @return integer
      */
     public function getFromTime(bool $useTimeZone = true): int {
-        $day    = date("j");
-        $date   = date("N");
-        $month  = date("n");
-        $year   = date("Y");
+        $day    = (int)date("j");
+        $date   = (int)date("N");
+        $month  = (int)date("n");
+        $year   = (int)date("Y");
 
         $result = match ($this->period) {
             self::Today       => mktime(0, 0, 0, $month, $day, $year),
@@ -155,11 +155,11 @@ class Period {
      * @return integer
      */
     public function getToTime(bool $useTimeZone = true): int {
-        $month  = date("n");
-        $day    = date("j");
-        $date   = date("N");
-        $year   = date("Y");
-        $days   = date("t", mktime(0, 0, 0, $month - 1, 1, $year));
+        $month  = (int)date("n");
+        $day    = (int)date("j");
+        $date   = (int)date("N");
+        $year   = (int)date("Y");
+        $days   = (int)date("t", mktime(0, 0, 0, $month - 1, 1, $year));
         $result = 0;
 
         switch ($this->period) {
@@ -186,7 +186,7 @@ class Period {
             $result = mktime(23, 59, 59, $month - 1, $days, $year);
             break;
         case self::PastYear:
-            $days   = date("t", mktime(0, 0, 0, 12, 1, $year - 1));
+            $days   = (int)date("t", mktime(0, 0, 0, 12, 1, $year - 1));
             $result = mktime(23, 59, 59, 12, $days, $year - 1);
             break;
         case self::AllPeriod:
@@ -242,8 +242,8 @@ class Period {
      * @return integer
      */
     public static function getDays(string $period): int {
-        $month = date("n");
-        $year  = date("Y");
+        $month = (int)date("n");
+        $year  = (int)date("Y");
 
         return match ($period) {
             self::Today       => 1,

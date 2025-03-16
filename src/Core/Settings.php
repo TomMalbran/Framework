@@ -87,7 +87,7 @@ class Settings extends SettingsSchema {
         return self::replaceEntity(
             section:      self::Core,
             variable:     $variable,
-            value:        $value,
+            value:        (string)$value,
             variableType: VariableType::Integer->name,
         );
     }
