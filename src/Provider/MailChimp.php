@@ -1,33 +1,121 @@
 <?php
+// spell-checker: ignore  apikey
 namespace Framework\Provider;
 
 use Framework\Email\EmailWhiteList;
 use Framework\System\Config;
 use Framework\Utils\Select;
-
-use DrewM\MailChimp\MailChimp as MailChimpAPI;
+use Framework\Utils\Strings;
 
 /**
  * The MailChimp Provider
  */
 class MailChimp {
 
-    private static ?MailChimpAPI $api = null;
+    private const BaseUrl = "https://<dc>.api.mailchimp.com/3.0";
 
 
     /**
-     * Creates the MailChimp Provider
-     * @return MailChimpAPI|null
+     * Returns the Base Url
+     * @return string
      */
-    private static function api(): ?MailChimpAPI {
-        if (empty(self::$api) && Config::isMailchimpActive()) {
-            self::$api = new MailChimpAPI(Config::getMailchimpKey());
-            self::$api->verify_ssl = false;
+    private static function getUrl(string $route): string {
+        $key     = Config::getMailchimpKey();
+        $dc      = Strings::substringAfter($key, "-");
+        $baseUrl = Strings::replace(self::BaseUrl, "<dc>", $dc);
+        return "$baseUrl/$route";
+    }
+
+    /**
+     * Returns the Headers
+     * @return array<string,string>
+     */
+    private static function getHeaders(): array {
+        $key = Config::getMailchimpKey();
+        return [
+            "Accept"        => "application/vnd.api+json",
+            "Content-Type"  => "application/vnd.api+json",
+            "Authorization" => "apikey $key",
+        ];
+    }
+
+    /**
+     * Returns true if the result is successful
+     * @param array<string|integer,mixed> $result
+     * @return boolean
+     */
+    private static function isSuccess(array $result): bool {
+        if (isset($result["status"])) {
+            $status = (int)$result["status"];
+            return $status >= 200 && $status <= 299;
         }
-        return self::$api;
+        return false;
+    }
+
+    /**
+     * Does a GET Request
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
+     * @return array<string|integer,mixed>
+     */
+    private static function get(string $route, ?array $request = null): array {
+        $result = Curl::execute("GET", self::getUrl($route), $request, self::getHeaders());
+        return is_array($result) ? $result : [];
+    }
+
+    /**
+     * Does a POST Request
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
+     * @return array<string|integer,mixed>
+     */
+    private static function post(string $route, ?array $request = null): array {
+        $result = Curl::execute("POST", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        return is_array($result) ? $result : [];
+    }
+
+    /**
+     * Does a PATCH Request
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
+     * @return array<string|integer,mixed>
+     */
+    private static function patch(string $route, ?array $request = null): array {
+        $result = Curl::execute("PATCH", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        return is_array($result) ? $result : [];
+    }
+
+    /**
+     * Does a PUT Request
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
+     * @return array<string|integer,mixed>
+     */
+    private static function put(string $route, ?array $request = null): array {
+        $result = Curl::execute("PUT", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        return is_array($result) ? $result : [];
+    }
+
+    /**
+     * Does a DELETE Request
+     * @param string $route
+     * @return array<string|integer,mixed>
+     */
+    private static function delete(string $route): array {
+        $result = Curl::execute("DELETE", self::getUrl($route), null, self::getHeaders());
+        return is_array($result) ? $result : [];
     }
 
 
+
+    /**
+     * Convert an email address into a subscriber hash
+     * @param string $email
+     * @return string
+     */
+    public static function getSubscriberHash(string $email): string {
+        return md5(strtolower($email));
+    }
 
     /**
      * Returns the Members Route
@@ -54,12 +142,12 @@ class MailChimp {
             return [];
         }
 
-        $route  = self::getSubscribersRoute();
-        $result = self::api()->get($route, [
+        $route    = self::getSubscribersRoute();
+        $response = self::get($route, [
             "count"  => $count,
             "offset" => $offset,
-        ], 120);
-        return $result === false ? [] : $result;
+        ]);
+        return $response;
     }
 
     /**
@@ -72,10 +160,10 @@ class MailChimp {
             return null;
         }
 
-        $hash   = self::api()->subscriberHash($email);
-        $route  = self::getSubscribersRoute($hash);
-        $result = self::api()->get($route);
-        return !empty($result) ? $result : null;
+        $hash     = self::getSubscriberHash($email);
+        $route    = self::getSubscribersRoute($hash);
+        $response = self::get($route);
+        return !empty($response) ? $response : null;
     }
 
     /**
@@ -85,7 +173,7 @@ class MailChimp {
      */
     public static function getSubscriberStatus(string $email): string {
         $subscriber = self::getSubscriber($email);
-        if (empty($subscriber) || !self::api()->success()) {
+        if (empty($subscriber)) {
             return "";
         }
         return $subscriber["status"];
@@ -103,7 +191,7 @@ class MailChimp {
             return false;
         }
 
-        self::api()->post(self::getSubscribersRoute(), [
+        $response = self::post(self::getSubscribersRoute(), [
             "status"        => "subscribed",
             "email_address" => $email,
             "merge_fields"  => [
@@ -111,7 +199,7 @@ class MailChimp {
                 "LNAME" => $lastName,
             ],
         ]);
-        return self::api()->success();
+        return self::isSuccess($response);
     }
 
     /**
@@ -125,9 +213,8 @@ class MailChimp {
         }
 
         $route = self::getSubscribersRoute();
-        $batch = self::api()->new_batch();
-        foreach ($subscribers as $index => $subscriber) {
-            $batch->post("op$index", $route, [
+        foreach ($subscribers as $subscriber) {
+            self::post($route, [
                 "status"        => "subscribed",
 				"email_address" => $subscriber["email"],
                 "merge_fields"  => [
@@ -152,9 +239,9 @@ class MailChimp {
             return false;
         }
 
-        $hash  = self::api()->subscriberHash($email);
-        $route = self::getSubscribersRoute($hash);
-        self::api()->patch($route, [
+        $hash     = self::getSubscriberHash($email);
+        $route    = self::getSubscribersRoute($hash);
+        $response = self::patch($route, [
             "status"        => $status,
             "email_address" => $email,
             "merge_fields"  => [
@@ -162,7 +249,7 @@ class MailChimp {
                 "LNAME" => $lastName,
             ],
         ]);
-        return self::api()->success();
+        return self::isSuccess($response);
     }
 
     /**
@@ -175,10 +262,10 @@ class MailChimp {
             return false;
         }
 
-        $hash  = self::api()->subscriberHash($email);
-        $route = self::getSubscribersRoute($hash);
-        self::api()->delete($route);
-        return self::api()->success();
+        $hash     = self::getSubscriberHash($email);
+        $route    = self::getSubscribersRoute($hash);
+        $response = self::delete($route);
+        return self::isSuccess($response);
     }
 
 
@@ -192,12 +279,11 @@ class MailChimp {
             return [];
         }
 
-        $data = self::api()->get("templates");
-        if ($data === false) {
-            return [];
+        $response = self::get("templates");
+        if (!empty($response["templates"])) {
+            return Select::create($response["templates"], "id", "name");
         }
-
-        return Select::create($data["templates"], "id", "name");
+        return [];
     }
 
     /**
@@ -307,10 +393,10 @@ class MailChimp {
         if (!empty($folderID)) {
             $post["settings"]["folder_id"] = $folderID;
         }
-        $result = self::api()->post("campaigns", $post, 300);
+        $response = self::post("campaigns", $post);
 
-        if ($result !== false && self::api()->success()) {
-            return $result["id"];
+        if (self::isSuccess($response)) {
+            return $response["id"];
         }
         return "";
     }
@@ -339,8 +425,9 @@ class MailChimp {
         if (!empty($folderID)) {
             $post["settings"]["folder_id"] = $folderID;
         }
-        self::api()->patch("campaigns/$mailChimpID", $post, 60);
-        return self::api()->success();
+
+        $response = self::patch("campaigns/$mailChimpID", $post);
+        return self::isSuccess($response);
     }
 
     /**
@@ -389,8 +476,9 @@ class MailChimp {
         if (!empty($sections)) {
             $post["template"]["sections"] = $sections;
         }
-        self::api()->put("campaigns/{$mailChimpID}/content", $post, 60);
-        return self::api()->success();
+
+        $response = self::put("campaigns/{$mailChimpID}/content", $post);
+        return self::isSuccess($response);
     }
 
     /**
@@ -405,14 +493,14 @@ class MailChimp {
         }
 
         if ($time <= time()) {
-            self::api()->post("campaigns/{$mailChimpID}/actions/send");
+            $response = self::post("campaigns/{$mailChimpID}/actions/send");
         } else {
-            self::api()->post("campaigns/{$mailChimpID}/actions/schedule", [
+            $response = self::post("campaigns/{$mailChimpID}/actions/schedule", [
                 "schedule_time" => gmdate("Y-m-d H:i:s", $time),
                 "timewarp"      => false,
             ]);
         }
-        return self::api()->success();
+        return self::isSuccess($response);
     }
 
     /**
@@ -425,8 +513,8 @@ class MailChimp {
             return false;
         }
 
-        self::api()->post("campaigns/{$mailChimpID}/actions/unschedule");
-        return self::api()->success();
+        $response = self::post("campaigns/{$mailChimpID}/actions/unschedule");
+        return self::isSuccess($response);
     }
 
     /**
@@ -439,8 +527,8 @@ class MailChimp {
             return false;
         }
 
-        self::api()->delete("campaigns/{$mailChimpID}");
-        return self::api()->success();
+        $response = self::delete("campaigns/{$mailChimpID}");
+        return self::isSuccess($response);
     }
 
 
@@ -455,8 +543,8 @@ class MailChimp {
             return [];
         }
 
-        $result = self::api()->get("campaigns/{$mailChimpID}/content");
-        return $result === false ? [] : $result;
+        $response = self::get("campaigns/{$mailChimpID}/content");
+        return $response;
     }
 
     /**
@@ -476,20 +564,17 @@ class MailChimp {
             return $result;
         }
 
-        $report = self::api()->get("reports/{$mailChimpID}");
-        if (empty($report)) {
+        $response = self::get("reports/{$mailChimpID}");
+        if (!self::isSuccess($response)) {
             return $result;
         }
 
-        // @phpstan-ignore isset.offset
-        if (!isset($report["status"]) || (isset($report["status"]) && $report["status"] != 404)) {
-            $result["hasReport"]    = true;
-            $result["emailsSent"]   = $report["emails_sent"];
-            $result["opensUnique"]  = $report["opens"]["unique_opens"];
-            $result["opensRate"]    = round($report["opens"]["open_rate"] * 1000) / 10;
-            $result["clicksUnique"] = $report["clicks"]["unique_clicks"];
-            $result["clicksRate"]   = round($report["clicks"]["click_rate"] * 1000) / 10;
-        }
+        $result["hasReport"]    = true;
+        $result["emailsSent"]   = $response["emails_sent"];
+        $result["opensUnique"]  = $response["opens"]["unique_opens"];
+        $result["opensRate"]    = round($response["opens"]["open_rate"] * 1000) / 10;
+        $result["clicksUnique"] = $response["clicks"]["unique_clicks"];
+        $result["clicksRate"]   = round($response["clicks"]["click_rate"] * 1000) / 10;
         return $result;
     }
 
@@ -504,14 +589,11 @@ class MailChimp {
             return $result;
         }
 
-        $report = self::api()->get("reports/{$mailChimpID}/sent-to", [
+        $response = self::get("reports/{$mailChimpID}/sent-to", [
             "count" => 2000,
         ]);
-        if ($report === false) {
-            return $result;
-        }
 
-        foreach ($report["sent_to"] as $member) {
+        foreach ($response["sent_to"] as $member) {
             $result[] = $member["email_address"];
         }
         return $result;
@@ -528,14 +610,11 @@ class MailChimp {
             return $result;
         }
 
-        $report = self::api()->get("reports/{$mailChimpID}/open-details", [
+        $response = self::get("reports/{$mailChimpID}/open-details", [
             "count" => 2000,
         ]);
-        if ($report === false) {
-            return $result;
-        }
 
-        foreach ($report["members"] as $member) {
+        foreach ($response["members"] as $member) {
             $result[] = $member["email_address"];
         }
         return $result;
@@ -552,15 +631,12 @@ class MailChimp {
             return $result;
         }
 
-        $request = self::api()->get("reports/{$mailChimpID}/click-details");
-        if (!empty($request["urls_clicked"][0]["id"])) {
-            $clickID = $request["urls_clicked"][0]["id"];
-            $report  = self::api()->get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
+        $response = self::get("reports/{$mailChimpID}/click-details");
+        if (!empty($response["urls_clicked"][0]["id"])) {
+            $clickID = $response["urls_clicked"][0]["id"];
+            $report  = self::get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
                 "count" => 2000,
             ]);
-            if ($report === false) {
-                return $result;
-            }
 
             foreach ($report["members"] as $member) {
                 $result[] = $member["email_address"];
