@@ -186,13 +186,23 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key as an array of Strings
+     * Returns the request data at the given key as a map of Strings
      * @param string $key
      * @return array<string,string>
      */
     public function getStringsMap(string $key): array {
         $value = $this->getJSONArray($key);
         return Arrays::toStringsMap($value);
+    }
+
+    /**
+     * Returns the request data at the given key as a map of String-Integer
+     * @param string $key
+     * @return array<string,integer>
+     */
+    public function getStringIntMap(string $key): array {
+        $value = $this->getJSONArray($key);
+        return Arrays::toStringIntMap($value);
     }
 
 

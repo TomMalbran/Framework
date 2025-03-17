@@ -156,6 +156,23 @@ class Arrays {
         return $result;
     }
 
+    /**
+     * Converts an array into a Map of string keys and int values
+     * @param mixed $array
+     * @return array<string,integer>
+     */
+    public static function toStringIntMap(mixed $array): array {
+        if (!is_array($array)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $key => $value) {
+            $result[$key] = (int)$value;
+        }
+        return $result;
+    }
+
 
 
     /**
