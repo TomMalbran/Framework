@@ -10,23 +10,23 @@ use Framework\Utils\Dictionary;
  */
 class Period {
 
-    private const Today       = "today";
-    private const Yesterday   = "yesterday";
-    private const Last7Days   = "last7Days";
-    private const Last15Days  = "last15Days";
-    private const Last30Days  = "last30Days";
-    private const Last60Days  = "last60Days";
-    private const Last90Days  = "last90Days";
-    private const Last120Days = "last120Days";
-    private const LastYear    = "lastYear";
-    private const ThisWeek    = "thisWeek";
-    private const ThisMonth   = "thisMonth";
-    private const ThisYear    = "thisYear";
-    private const PastWeek    = "pastWeek";
-    private const PastMonth   = "pastMonth";
-    private const PastYear    = "pastYear";
-    private const AllPeriod   = "allPeriod";
-    private const Custom      = "custom";
+    public const Today       = "today";
+    public const Yesterday   = "yesterday";
+    public const Last7Days   = "last7Days";
+    public const Last15Days  = "last15Days";
+    public const Last30Days  = "last30Days";
+    public const Last60Days  = "last60Days";
+    public const Last90Days  = "last90Days";
+    public const Last120Days = "last120Days";
+    public const LastYear    = "lastYear";
+    public const ThisWeek    = "thisWeek";
+    public const ThisMonth   = "thisMonth";
+    public const ThisYear    = "thisYear";
+    public const PastWeek    = "pastWeek";
+    public const PastMonth   = "pastMonth";
+    public const PastYear    = "pastYear";
+    public const AllPeriod   = "allPeriod";
+    public const Custom      = "custom";
 
 
     public string $period   = "";
