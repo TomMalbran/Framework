@@ -8,7 +8,7 @@ use Framework\Config\Config;
  */
 class Google {
 
-    const BaseUrl = "https://www.googleapis.com/oauth2/v1/";
+    private const BaseUrl = "https://www.googleapis.com/oauth2/v1/";
 
 
 

@@ -259,13 +259,13 @@ class Schema {
 
     /**
      * Requests data to the database
-     * @param Query|null           $query     Optional.
+     * @param Query                $query
      * @param array<string,string> $selects   Optional.
      * @param string[]             $joins     Optional.
      * @param boolean              $decrypted Optional.
      * @return array{}[]
      */
-    private static function requestSchemaData(?Query $query = null, array $selects = [], array $joins = [], bool $decrypted = false): array {
+    private static function requestSchemaData(Query $query, array $selects = [], array $joins = [], bool $decrypted = false): array {
         $selection = new Selection(self::structure());
         $selection->addFields($decrypted);
         $selection->addExpressions();

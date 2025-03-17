@@ -9,7 +9,7 @@ use Framework\Utils\Arrays;
  */
 class GoogleMap {
 
-    const BaseUrl = "https://maps.google.com/maps/api/";
+    private const BaseUrl = "https://maps.google.com/maps/api/";
 
 
     /**

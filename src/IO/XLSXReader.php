@@ -74,7 +74,7 @@ class XLSXReader implements ImporterReader {
             first:   "",
             last:    "",
         );
-        if (!$this->isValid()) {
+        if ($this->sheet === null) {
             return $data;
         }
 
@@ -108,7 +108,7 @@ class XLSXReader implements ImporterReader {
      */
     public function getHeader(): array {
         $columns = [];
-        if (!$this->isValid()) {
+        if ($this->sheet === null) {
             return $columns;
         }
 
@@ -123,8 +123,6 @@ class XLSXReader implements ImporterReader {
         }
         return $columns;
     }
-
-
 
     /**
      * Returns the Content of the Row
@@ -151,6 +149,10 @@ class XLSXReader implements ImporterReader {
      * @return void
      */
     public function rewind(): void {
+        if ($this->sheet === null) {
+            return;
+        }
+
         $this->iterator = $this->sheet->getRowIterator();
         $this->iterator->rewind();
         $this->iterator->next();

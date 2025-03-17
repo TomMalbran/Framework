@@ -44,6 +44,7 @@ class CSV {
 
         if (!Strings::contains($value, "\n")) {
             $csv = str_getcsv($value, $separator);
+            $csv = Arrays::toStrings($csv);
             return self::parseLine($csv, $fields);
         }
 
@@ -63,9 +64,8 @@ class CSV {
         foreach ($lines as $line) {
             if (!empty($line)) {
                 $csv = str_getcsv($line, $separator);
-                if ($csv[0] !== null) {
-                    $result[] = self::parseLine($csv, $fields);
-                }
+                $csv = Arrays::toStrings($csv);
+                $result[] = self::parseLine($csv, $fields);
             }
         }
         return $result;

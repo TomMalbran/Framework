@@ -1,6 +1,10 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Utils\Strings;
+
+use Throwable;
+
 /**
  * Several Numbers Utils
  */
@@ -434,21 +438,21 @@ class Numbers {
      */
     public static function calcExpression(string $expression): int|float {
         // Sanitize the input
-        $expression = preg_replace("/[^0-9.,+\-*\/()%]/", "", $expression);
+        $expression = Strings::replacePattern($expression, "/[^0-9.,+\-*\/()%]/", "");
 
         // Convert percentages to decimal
-        $expression = preg_replace("/([+-])([0-9]{1})(%)/", "*(1\$1.0\$2)", $expression);
-        $expression = preg_replace("/([+-])([0-9]+)(%)/", "*(1\$1.\$2)", $expression);
-        $expression = preg_replace("/([0-9]{1})(%)/", ".0\$1", $expression);
-        $expression = preg_replace("/([0-9]+)(%)/", ".\$1", $expression);
+        $expression = Strings::replacePattern($expression, "/([+-])([0-9]{1})(%)/", "*(1\$1.0\$2)");
+        $expression = Strings::replacePattern($expression, "/([+-])([0-9]+)(%)/", "*(1\$1.\$2)");
+        $expression = Strings::replacePattern($expression, "/([0-9]{1})(%)/", ".0\$1");
+        $expression = Strings::replacePattern($expression, "/([0-9]+)(%)/", ".\$1");
 
         // Fix some errors
-        $expression = preg_replace("/,/", ".", $expression);
-        $expression = preg_replace("/\.+/", ".", $expression);
-        $expression = preg_replace("/\(\)/", "", $expression);
-        $expression = preg_replace("/\+\-/", "-", $expression);
-        $expression = preg_replace("/--/", "+", $expression);
-        $expression = preg_replace("/([+\-*\/])[+\-*\/]+/", "$1", $expression);
+        $expression = Strings::replacePattern($expression, "/,/", ".");
+        $expression = Strings::replacePattern($expression, "/\.+/", ".");
+        $expression = Strings::replacePattern($expression, "/\(\)/", "");
+        $expression = Strings::replacePattern($expression, "/\+\-/", "-");
+        $expression = Strings::replacePattern($expression, "/--/", "+");
+        $expression = Strings::replacePattern($expression, "/([+\-*\/])[+\-*\/]+/", "$1");
 
         // Calculate
         if (empty($expression)) {
@@ -456,7 +460,7 @@ class Numbers {
         }
         try {
             return @eval("return $expression;");
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return 0;
         }
     }

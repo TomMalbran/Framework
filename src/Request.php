@@ -499,13 +499,13 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the value at the given key is a valid Hour
-     * @param string|null    $key
+     * @param string         $key
      * @param integer[]|null $minutes Optional.
      * @param integer        $minHour Optional.
      * @param integer        $maxHour Optional.
      * @return boolean
      */
-    public function isValidHour(?string $key, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
+    public function isValidHour(string $key, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
         return DateTime::isValidHour($this->get($key), $minutes, $minHour, $maxHour);
     }
 

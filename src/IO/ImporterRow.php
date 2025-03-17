@@ -45,7 +45,7 @@ class ImporterRow {
      * @return string[]|string
      */
     private function getValue(string $key, bool $splitResult = false): array|string {
-        $index  = !empty($this->columns[$key]) ? $this->columns[$key] - 1 : -1;
+        $index  = isset($this->columns[$key]) ? $this->columns[$key] - 1 : -1;
         $result = "";
 
         if ($index < 0 || !isset($this->fields[$index])) {

@@ -275,7 +275,10 @@ class Strings {
         if ($replace === null && is_array($search)) {
             return str_replace(array_keys($search), array_values($search), $string);
         }
-        return str_replace($search, $replace, $string);
+        if ($replace !== null) {
+            return str_replace($search, $replace, $string);
+        }
+        return "";
     }
 
     /**
@@ -759,7 +762,8 @@ class Strings {
      * @return string
      */
     public static function pascalCaseToSnakeCase(string $string): string {
-        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
+        $result = self::replacePattern($string, '/(?<!^)[A-Z]/', '_$0');
+        return strtolower($result);
     }
 
 

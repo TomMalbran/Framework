@@ -8,7 +8,7 @@ use Framework\Utils\Utils;
  */
 class Facebook {
 
-    const BaseUrl = "https://graph.facebook.com/v16.0/";
+    private const BaseUrl = "https://graph.facebook.com/v16.0/";
 
 
 

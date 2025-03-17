@@ -105,7 +105,9 @@ class Settings extends SettingsSchema {
      */
     public static function getAll(?string $section = null, bool $asObject = false): array|object {
         $query = new SettingsQuery();
-        $query->section->equalIf($section);
+        if ($section !== null && $section !== "") {
+            $query->section->equal($section);
+        }
 
         $list   = self::getEntityList($query);
         $result = [];

@@ -64,7 +64,7 @@ class Query {
      */
     public static function create(string $column = "", string $expression = "", array|int|string|null $value = null, bool $caseSensitive = false): Query {
         $query = new Query();
-        if (!empty($column)) {
+        if (!empty($column) && $value !== null) {
             $query->add($column, $expression, $value, $caseSensitive);
         }
         return $query;
@@ -179,7 +179,7 @@ class Query {
      * @return Query
      */
     public function addIf(string $column, string $expression, array|int|string|null $value, ?bool $condition = null): Query {
-        if ($condition !== null && $condition) {
+        if ($condition === true && $value !== null) {
             $this->add($column, $expression, $value);
         } elseif ($condition === null && !empty($value)) {
             $this->add($column, $expression, $value);

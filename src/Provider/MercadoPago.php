@@ -12,8 +12,8 @@ use Framework\Utils\Strings;
  */
 class MercadoPago {
 
-    const BaseUrl = "https://api.mercadopago.com";
-    const AuthUrl = "https://auth.mercadopago.com/authorization";
+    private const BaseUrl = "https://api.mercadopago.com";
+    private const AuthUrl = "https://auth.mercadopago.com/authorization";
 
 
 

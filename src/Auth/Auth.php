@@ -226,6 +226,10 @@ class Auth {
      * @return boolean
      */
     public static function loginAs(int $credentialID): bool {
+        if (self::$credential === null) {
+            return false;
+        }
+
         $admin = self::$credential;
         $user  = Credential::getByID($credentialID, true);
 
@@ -241,7 +245,7 @@ class Auth {
      * @return integer
      */
     public static function logoutAs(): int {
-        if (!self::isLoggedAsUser()) {
+        if (self::$admin === null || self::$credential === null) {
             return 0;
         }
 
@@ -338,7 +342,7 @@ class Auth {
      * @return boolean
      */
     public static function updateCredential(): bool {
-        if (!empty(self::$credentialID)) {
+        if (self::$credentialID !== 0) {
             $credential = Credential::getByID(self::$credentialID, true);
             if (!$credential->isEmpty()) {
                 self::$credential = $credential;
@@ -377,7 +381,7 @@ class Auth {
         }
 
         // Check if there is a Credential
-        if (!self::hasCredential()) {
+        if (self::$credential === null) {
             return "";
         }
 
@@ -468,10 +472,10 @@ class Auth {
      * @return string
      */
     public static function getTempPath(): string {
-        if (empty(self::$credentialID)) {
-            return "";
+        if (self::$credentialID !== 0) {
+            return FilePath::getTempPath(self::$credentialID);
         }
-        return FilePath::getTempPath(self::$credentialID);
+        return "";
     }
 
 
@@ -489,7 +493,7 @@ class Auth {
      * @return boolean
      */
     public static function isLoggedAsUser(): bool {
-        return !empty(self::$adminID);
+        return self::$adminID !== 0;
     }
 
     /**
@@ -497,7 +501,7 @@ class Auth {
      * @return boolean
      */
     public static function hasCredential(): bool {
-        return !empty(self::$credentialID);
+        return self::$credentialID !== 0;
     }
 
     /**
@@ -513,7 +517,7 @@ class Auth {
      * @return boolean
      */
     public static function isAdmin(): bool {
-        return Access::isValidAdmin(self::$credential->access);
+        return self::$credential !== null && Access::isValidAdmin(self::$credential->access);
     }
 
 
