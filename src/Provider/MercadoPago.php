@@ -146,11 +146,11 @@ class MercadoPago {
 
     /**
      * Creates a Payment Url
-     * @param string              $reference
-     * @param object[]            $items
-     * @param array<string,mixed> $payer          Optional.
-     * @param float               $marketplaceFee Optional.
-     * @param string              $accessToken    Optional.
+     * @param string                $reference
+     * @param array<string,mixed>[] $items
+     * @param array<string,mixed>   $payer          Optional.
+     * @param float                 $marketplaceFee Optional.
+     * @param string                $accessToken    Optional.
      * @return array{}
      */
     public static function createPaymentUrl(
@@ -163,11 +163,11 @@ class MercadoPago {
         $itemList = [];
         foreach ($items as $item) {
             $itemList[] = [
-                "id"          => $item->id,
-                "title"       => $item->name,
-                "quantity"    => $item->quantity,
+                "id"          => $item["id"],
+                "title"       => $item["name"],
+                "quantity"    => $item["quantity"],
+                "unit_price"  => $item["price"],
                 "currency_id" => "ARS",
-                "unit_price"  => $item->price,
             ];
         }
         $fields = [
@@ -303,10 +303,10 @@ class MercadoPago {
      */
     public static function isValidSignature(object $payload): bool {
         $signature      = Config::getMpSignature();
-        $transactionID  = $payload->transaction_id ?: "";
-        $generationDate = $payload->generation_date ?: "";
+        $transactionID  = $payload->transaction_id ?? "";
+        $generationDate = $payload->generation_date ?? "";
         $password       = "$transactionID-$signature-$generationDate";
-        $hash           = $payload->signature ?: "";
+        $hash           = $payload->signature ?? "";
         $isValid        = password_verify($password, $hash);
         return $isValid;
     }

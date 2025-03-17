@@ -25,7 +25,8 @@ class Utils {
      * @return boolean
      */
     public static function isValidEmail(string $email): bool {
-        return filter_var($email, FILTER_VALIDATE_EMAIL);
+        $result = filter_var($email, FILTER_VALIDATE_EMAIL);
+        return !empty($result);
     }
 
     /**
@@ -289,7 +290,8 @@ class Utils {
         if (empty($url)) {
             return "";
         }
-        return parse_url($url, PHP_URL_HOST);
+        $result = parse_url($url, PHP_URL_HOST);
+        return Strings::toString($result);
     }
 
     /**

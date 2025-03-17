@@ -33,7 +33,7 @@ class File {
     public static function parseUrl(string|int ...$pathParts): string {
         $protocols = [ "http://", "https://" ];
         foreach ($protocols as $protocol) {
-            if (Strings::startsWith($pathParts[0], $protocol)) {
+            if (isset($pathParts[0]) && is_string($pathParts[0]) && Strings::startsWith($pathParts[0], $protocol)) {
                 $pathParts[0] = Strings::substringAfter($pathParts[0], $protocol);
                 return $protocol . self::parsePath(...$pathParts);
             }
@@ -105,7 +105,8 @@ class File {
         if (empty($fullPath) || !file_exists($fullPath)) {
             return 0;
         }
-        return filemtime($fullPath);
+        $time = filemtime($fullPath);
+        return $time !== false ? $time : 0;
     }
 
 
@@ -299,17 +300,26 @@ class File {
 
 
     /**
+     * Returns the files inside the given path
+     * @param string $path
+     * @return string[]
+     */
+    private static function scanPath(string $path): array {
+        if (!file_exists($path) || !is_dir($path)) {
+            return [];
+        }
+        $files = scandir($path);
+        return $files !== false ? $files : [];
+    }
+
+    /**
      * Returns all the Files and Directories inside the given path
      * @param string $path
      * @return string[]
      */
     public static function getAllInDir(string $path): array {
+        $files  = self::scanPath($path);
         $result = [];
-        if (!file_exists($path) || !is_dir($path)) {
-            return $result;
-        }
-
-        $files = scandir($path);
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
                 $result[] = self::parsePath($path, $file);
@@ -341,7 +351,7 @@ class File {
             return $result;
         }
         if (is_dir($path)) {
-            $files = scandir($path);
+            $files = self::scanPath($path);
             foreach ($files as $file) {
                 if ($file == "." || $file == "..") {
                     continue;
@@ -412,7 +422,7 @@ class File {
      */
     public static function deleteDir(string $path): bool {
         if (is_dir($path)) {
-            $files = scandir($path);
+            $files = self::scanPath($path);
             foreach ($files as $file) {
                 if ($file != "." && $file != "..") {
                     self::deleteDir("$path/$file");
@@ -431,13 +441,10 @@ class File {
      * @return boolean
      */
     public static function emptyDir(string $path): bool {
-        if (!file_exists($path)) {
-            return false;
-        }
+        $files  = self::scanPath($path);
         $result = true;
-        $files  = scandir($path);
         foreach ($files as $file) {
-            if ($file != "." && $file != "..") {
+            if ($file !== "." && $file !== "..") {
                 if (!self::deleteDir("$path/$file")) {
                     $result = false;
                 }
@@ -483,7 +490,7 @@ class File {
         if (is_dir($src)) {
             $result = true;
             $zip->addEmptyDir($dst);
-            $files = scandir($src);
+            $files = self::scanPath($src);
             foreach ($files as $file) {
                 if ($file != "." && $file != "..") {
                     if (!self::addDirToZip($zip, "$src/$file", "$dst/$file")) {

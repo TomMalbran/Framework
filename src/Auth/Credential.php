@@ -436,8 +436,12 @@ class Credential extends CredentialSchema {
             return [];
         }
 
-        $list = self::getEntityList($query);
-        return Arrays::createDict($list, "email", "language");
+        $list   = self::getEntityList($query);
+        $result = [];
+        foreach ($list as $elem) {
+            $result[$elem->email] = $elem->language;
+        }
+        return $result;
     }
 
 

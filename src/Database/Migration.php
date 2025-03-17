@@ -216,6 +216,7 @@ class Migration {
         $tableKeys   = $db->getTableKeys($structure->table);
         $tableFields = $db->getTableFields($structure->table);
         $tableFields = Arrays::createMap($tableFields, "Field");
+        $tableNames  = Arrays::toStrings(array_keys($tableFields));
         $update      = false;
         $adds        = [];
         $drops       = [];
@@ -235,7 +236,7 @@ class Migration {
             $isRename    = false;
             $renameTable = "";
 
-            foreach (array_keys($tableFields) as $tableKey) {
+            foreach ($tableNames as $tableKey) {
                 if (Strings::isEqual($field->key, $tableKey) && $field->key !== $tableKey) {
                     $isRename    = true;
                     $renameTable = $tableKey;
@@ -321,7 +322,7 @@ class Migration {
             }
             if (!$found) {
                 $update  = true;
-                $drops[] = $tableKey;
+                $drops[] = (string)$tableKey;
             }
         }
 
@@ -407,8 +408,10 @@ class Migration {
             return 0;
         }
 
-        $files = File::getFilesInDir($path);
+        /** @var integer[] */
         $names = [];
+        $files = File::getFilesInDir($path);
+
         foreach ($files as $file) {
             if (File::hasExtension($file, "php")) {
                 $names[] = (int)File::getName($file);
@@ -417,8 +420,8 @@ class Migration {
         sort($names);
 
         $firstMigration = $startMigration + 1;
-        $lastMigration  = end($names);
-        if (empty($names) || $firstMigration > $lastMigration) {
+        $lastMigration  = (int)end($names);
+        if (count($names) === 0 || $firstMigration > $lastMigration) {
             print("<br>No <i>migrations</i> required<br>");
             return 0;
         }
@@ -426,8 +429,11 @@ class Migration {
         print("<br>Running <b>migrations $firstMigration to $lastMigration</b><br>");
         foreach ($names as $name) {
             if ($name >= $firstMigration) {
-                include_once("$path/$name.php");
-                call_user_func("migration$name", $db);
+                include_once "$path/$name.php";
+                $functionName = "migration$name";
+                if (function_exists($functionName)) {
+                    $functionName($db);
+                }
             }
         }
 

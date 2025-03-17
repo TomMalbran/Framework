@@ -42,6 +42,7 @@ class NLS {
             return self::$data[$langCode];
         }
 
+        /** @var array<string,mixed> */
         $data = Discovery::loadJSON(Package::StringsDir, $langCode);
         if (!empty($data)) {
             self::$data[$langCode] = $data;

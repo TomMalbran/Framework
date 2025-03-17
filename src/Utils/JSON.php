@@ -34,7 +34,8 @@ class JSON {
         if (self::isValid($value)) {
             return $value;
         }
-        return json_encode($value, $asPretty ? JSON_PRETTY_PRINT : 0);
+        $result = json_encode($value, $asPretty ? JSON_PRETTY_PRINT : 0);
+        return $result === false ? $value : $result;
     }
 
     /**

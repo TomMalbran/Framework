@@ -701,7 +701,7 @@ class Arrays {
      * @template TValue
      * @param TValue[] $array
      * @param string   $key   Optional.
-     * @return TValue
+     * @return TValue|null
      */
     public static function getFirst(array $array, string $key = ""): mixed {
         if (empty($array)) {
@@ -840,7 +840,7 @@ class Arrays {
         }
 
         $result = $default;
-        if (self::isArray($key)) {
+        if (is_array($key)) {
             $values = [];
             foreach ($key as $id) {
                 $fullKey = self::getKey($id, $prefix);

@@ -227,7 +227,8 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return string[]
      */
     public function getKeys(): array {
-        return array_keys($this->data);
+        $result = array_keys($this->data);
+        return Arrays::toStrings($result);
     }
 
     /**

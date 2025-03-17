@@ -10,7 +10,7 @@ use Framework\Utils\Arrays;
  */
 class FileList {
 
-    /** @var array{}[] */
+    /** @var array<string,mixed>[] */
     private array $list = [];
 
 

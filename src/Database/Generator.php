@@ -366,7 +366,7 @@ class Generator {
     /**
      * Returns the Field attributes for the Entity
      * @param Structure $structure
-     * @return array{}
+     * @return array{name:string,type:string,subType:string,default:string}[]
      */
     private static function getAttributes(Structure $structure): array {
         $result = [];
@@ -414,8 +414,8 @@ class Generator {
 
     /**
      * Adds the Field types for the Entity
-     * @param object[] $result
-     * @param Field    $field
+     * @param array{name:string,type:string,subType:string,default:string}[] $result
+     * @param Field                                                          $field
      * @return boolean
      */
     private static function addAttribute(array &$result, Field $field): bool {
@@ -460,10 +460,10 @@ class Generator {
      * @param string $name
      * @param string $type
      * @param string $subType
-     * @return object
+     * @return array{name:string,type:string,subType:string,default:string}
      */
-    private static function getTypeData(string $name, string $type, string $subType = ""): object {
-        return (object)[
+    private static function getTypeData(string $name, string $type, string $subType = ""): array {
+        return [
             "name"    => $name,
             "type"    => $type,
             "subType" => $subType,
@@ -473,8 +473,8 @@ class Generator {
 
     /**
      * Parses the Attributes
-     * @param array<string,object> $attributes
-     * @return array{type:string,name:string,default:string,subType:string}[]
+     * @param array{name:string,type:string,subType:string,default:string}[] $attributes
+     * @return array{name:string,type:string,subType:string,default:string}[]
      */
     private static function parseAttributes(array $attributes): array {
         $nameLength = 0;
@@ -483,21 +483,21 @@ class Generator {
         $parsed     = [];
 
         foreach ($attributes as $attribute) {
-            $nameLength = max($nameLength, Strings::length($attribute->name));
-            $typeLength = max($typeLength, Strings::length($attribute->type));
+            $nameLength = max($nameLength, Strings::length($attribute["name"]));
+            $typeLength = max($typeLength, Strings::length($attribute["type"]));
         }
 
         foreach ($attributes as $attribute) {
-            if (!empty($parsed[$attribute->name])) {
+            if (!empty($parsed[$attribute["name"]])) {
                 continue;
             }
             $result[] = [
-                "type"    => Strings::padRight($attribute->type, $typeLength),
-                "name"    => Strings::padRight($attribute->name, $nameLength),
-                "default" => $attribute->default,
-                "subType" => $attribute->subType,
+                "name"    => Strings::padRight($attribute["name"], $nameLength),
+                "type"    => Strings::padRight($attribute["type"], $typeLength),
+                "subType" => $attribute["subType"],
+                "default" => $attribute["default"],
             ];
-            $parsed[$attribute->name] = true;
+            $parsed[$attribute["name"]] = true;
         }
         return $result;
     }

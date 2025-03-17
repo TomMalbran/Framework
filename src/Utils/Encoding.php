@@ -143,7 +143,7 @@ class Encoding {
             $c1 = $text[$i];
 
             // Should be converted to UTF8, if it's not UTF8 already
-            if ($c1>="\xc0") {
+            if ($c1 >= "\xc0") {
                 $c2 = $i + 1 >= $max? "\x00" : $text[$i + 1];
                 $c3 = $i + 2 >= $max? "\x00" : $text[$i + 2];
                 $c4 = $i + 3 >= $max? "\x00" : $text[$i + 3];
@@ -154,10 +154,10 @@ class Encoding {
                     if ($c2 >= "\x80" && $c2 <= "\xbf") {
                         $buf .= $c1 . $c2;
                         $i++;
-                    // not valid UTF8.  Convert it.
+                    // not valid UTF8. Convert it.
                     } else {
-                        $cc1 = (chr(ord($c1) / 64) | "\xc0");
-                        $cc2 = ($c1 & "\x3f") | "\x80";
+                        $cc1  = chr((int)(ord($c1) / 64)) | "\xc0";
+                        $cc2  = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1 . $cc2;
                     }
                 // looks like 3 bytes UTF8
@@ -168,8 +168,8 @@ class Encoding {
                         $i = $i + 2;
                     // not valid UTF8.  Convert it.
                     } else {
-                        $cc1 = (chr(ord($c1) / 64) | "\xc0");
-                        $cc2 = ($c1 & "\x3f") | "\x80";
+                        $cc1  = chr((int)(ord($c1) / 64)) | "\xc0";
+                        $cc2  = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1 . $cc2;
                     }
                 // looks like 4 bytes UTF8
@@ -180,14 +180,14 @@ class Encoding {
                         $i = $i + 2;
                     // not valid UTF8.  Convert it.
                     } else {
-                        $cc1 = (chr(ord($c1) / 64) | "\xc0");
-                        $cc2 = ($c1 & "\x3f") | "\x80";
+                        $cc1  = chr((int)(ord($c1) / 64)) | "\xc0";
+                        $cc2  = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1 . $cc2;
                     }
                 // doesn't look like UTF8, but should be converted
                 } else {
-                    $cc1 = (chr(ord($c1) / 64) | "\xc0");
-                    $cc2 = (($c1 & "\x3f") | "\x80");
+                    $cc1  = chr((int)(ord($c1) / 64)) | "\xc0";
+                    $cc2  = ($c1 & "\x3f") | "\x80";
                     $buf .= $cc1 . $cc2;
                 }
             // needs conversion
@@ -196,8 +196,8 @@ class Encoding {
                 if (isset(self::$win1252ToUtf8[ord($c1)])) {
                     $buf .= self::$win1252ToUtf8[ord($c1)];
                 } else {
-                    $cc1 = (chr(ord($c1) / 64) | "\xc0");
-                    $cc2 = (($c1 & "\x3f") | "\x80");
+                    $cc1  = chr((int)(ord($c1) / 64)) | "\xc0";
+                    $cc2  = ($c1 & "\x3f") | "\x80";
                     $buf .= $cc1 . $cc2;
                 }
             // it doesn't need conversion

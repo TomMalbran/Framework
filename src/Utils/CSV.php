@@ -17,16 +17,14 @@ class CSV {
      * @return string
      */
     public static function encode(array|string $value, string $separator = ","): string {
-        if (Arrays::isArray($value)) {
+        if (is_array($value)) {
             $parts = Arrays::removeEmpty($value);
             return Strings::join($parts, $separator);
         }
-        if (Strings::isString($value)) {
-            $parts = Strings::split($value, $separator);
-            $parts = Arrays::removeEmpty($parts);
-            return Strings::join($parts, $separator);
-        }
-        return "";
+
+        $parts = Strings::split($value, $separator);
+        $parts = Arrays::removeEmpty($parts);
+        return Strings::join($parts, $separator);
     }
 
     /**
@@ -37,7 +35,7 @@ class CSV {
      * @return string[]|string[][]
      */
     public static function decode(array|string $value, string $separator = ",", array $fields = []): array {
-        if (Arrays::isArray($value)) {
+        if (is_array($value)) {
             return self::parseLine($value, $fields);
         }
         if (!Strings::isString($value)) {

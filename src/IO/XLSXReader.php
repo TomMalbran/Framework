@@ -3,6 +3,7 @@ namespace Framework\IO;
 
 use Framework\IO\ImporterReader;
 use Framework\IO\ImporterData;
+use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -140,7 +141,7 @@ class XLSXReader implements ImporterReader {
                 $result[] = $cell->getValue();
             }
         }
-        return $result;
+        return Arrays::toStrings($result);
     }
 
 

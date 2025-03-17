@@ -60,7 +60,7 @@ class XLSXWriter implements ExporterWriter {
         $this->headers = $headers;
 
         $values = NLS::getAll(array_values($headers), $this->lang);
-        $row    = Row::fromValues($values);
+        $row    = Row::fromValues(array_values($values));
         $this->writer->addRow($row);
         return $this;
     }

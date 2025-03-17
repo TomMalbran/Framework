@@ -59,7 +59,7 @@ class MailChimp {
             "count"  => $count,
             "offset" => $offset,
         ], 120);
-        return $result;
+        return $result === false ? [] : $result;
     }
 
     /**
@@ -193,6 +193,10 @@ class MailChimp {
         }
 
         $data = self::api()->get("templates");
+        if ($data === false) {
+            return [];
+        }
+
         return Select::create($data["templates"], "id", "name");
     }
 
@@ -305,7 +309,7 @@ class MailChimp {
         }
         $result = self::api()->post("campaigns", $post, 300);
 
-        if (self::api()->success()) {
+        if ($result !== false && self::api()->success()) {
             return $result["id"];
         }
         return "";
@@ -452,7 +456,7 @@ class MailChimp {
         }
 
         $result = self::api()->get("campaigns/{$mailChimpID}/content");
-        return $result;
+        return $result === false ? [] : $result;
     }
 
     /**
@@ -473,6 +477,9 @@ class MailChimp {
         }
 
         $report = self::api()->get("reports/{$mailChimpID}");
+        if (empty($report)) {
+            return $result;
+        }
 
         // @phpstan-ignore isset.offset
         if (!isset($report["status"]) || (isset($report["status"]) && $report["status"] != 404)) {
@@ -500,6 +507,10 @@ class MailChimp {
         $report = self::api()->get("reports/{$mailChimpID}/sent-to", [
             "count" => 2000,
         ]);
+        if ($report === false) {
+            return $result;
+        }
+
         foreach ($report["sent_to"] as $member) {
             $result[] = $member["email_address"];
         }
@@ -520,6 +531,10 @@ class MailChimp {
         $report = self::api()->get("reports/{$mailChimpID}/open-details", [
             "count" => 2000,
         ]);
+        if ($report === false) {
+            return $result;
+        }
+
         foreach ($report["members"] as $member) {
             $result[] = $member["email_address"];
         }
@@ -543,6 +558,10 @@ class MailChimp {
             $report  = self::api()->get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
                 "count" => 2000,
             ]);
+            if ($report === false) {
+                return $result;
+            }
+
             foreach ($report["members"] as $member) {
                 $result[] = $member["email_address"];
             }

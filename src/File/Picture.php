@@ -38,7 +38,12 @@ class Picture {
      * @return integer
      */
     public function createColor(int $red, int $green, int $blue): int {
-        return imagecolorallocate($this->image, $red, $green, $blue);
+        if ($red < 0 || $red > 255 || $green < 0 || $green > 255 || $blue < 0 || $blue > 255) {
+            return 0;
+        }
+
+        $result = imagecolorallocate($this->image, $red, $green, $blue);
+        return $result !== false ? $result : 0;
     }
 
     /**

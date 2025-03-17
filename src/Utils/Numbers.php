@@ -285,9 +285,10 @@ class Numbers {
             $mult = pow(10, $decimals);
         }
 
-        $multMin = $min !== null ? $min * $mult : $min;
-        $multMax = $max !== null ? $max * $mult : $max;
-        return self::isValid($number * $mult, $multMin, $multMax);
+        $integer = (int)($number * $mult);
+        $multMin = $min !== null ? (int)($min * $mult) : $min;
+        $multMax = $max !== null ? (int)($max * $mult) : $max;
+        return self::isValid($integer, $multMin, $multMax);
     }
 
     /**

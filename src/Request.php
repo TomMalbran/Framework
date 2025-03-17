@@ -254,7 +254,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         if ($key === null) {
             return !empty($this->request);
         }
-        if (Arrays::isArray($key)) {
+        if (is_array($key)) {
             foreach ($key as $keyID) {
                 if (empty($this->request[$keyID])) {
                     return false;
@@ -274,7 +274,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function exists(array|string $key): bool {
-        if (Arrays::isArray($key)) {
+        if (is_array($key)) {
             foreach ($key as $keyID) {
                 if (!isset($this->request[$keyID])) {
                     return false;

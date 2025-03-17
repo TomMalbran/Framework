@@ -240,7 +240,7 @@ class Database {
         if (empty($statement)) {
             return 0;
         }
-        $result = $statement->affected_rows > 0 ? $statement->insert_id : -1;
+        $result = $statement->affected_rows > 0 ? (int)$statement->insert_id : -1;
         $statement->close();
         return $result;
     }
@@ -459,7 +459,7 @@ class Database {
 
         // If $meta is false yet sqlstate is true, there's no sql error but the query is
         // most likely an update/insert/delete which doesn't produce any results
-        if (!$meta && $statement->sqlstate) {
+        if ($meta === false || $statement->sqlstate) {
             return [];
         }
 

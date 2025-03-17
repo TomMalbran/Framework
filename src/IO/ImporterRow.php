@@ -1,6 +1,8 @@
 <?php
 namespace Framework\IO;
 
+use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 /**
@@ -60,7 +62,8 @@ class ImporterRow {
      * @return string
      */
     public function getString(string $key): string {
-        return (string)$this->getValue($key);
+        $value = $this->getValue($key);
+        return Strings::toString($value);
     }
 
     /**
@@ -69,7 +72,8 @@ class ImporterRow {
      * @return integer
      */
     public function getInt(string $key): int {
-        return (int)$this->getValue($key);
+        $value = $this->getValue($key);
+        return Numbers::toInt($value);
     }
 
     /**
@@ -78,7 +82,8 @@ class ImporterRow {
      * @return float
      */
     public function getFloat(string $key): float {
-        return (float)$this->getValue($key);
+        $value = $this->getValue($key);
+        return Numbers::toFloat($value);
     }
 
     /**
@@ -87,6 +92,7 @@ class ImporterRow {
      * @return string[]
      */
     public function getList(string $key): array {
-        return $this->getValue($key, true);
+        $value = $this->getValue($key);
+        return Arrays::toStrings($value);
     }
 }

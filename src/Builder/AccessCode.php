@@ -15,6 +15,7 @@ class AccessCode {
      * @return array<string,mixed>
      */
     public static function getCode(): array {
+        /** @var array<string,array<string,integer>> */
         $data = Discovery::loadData(DataFile::Access);
         if (empty($data)) {
             $data = Discovery::loadFrameData(DataFile::Access);

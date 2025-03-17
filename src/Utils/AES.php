@@ -33,7 +33,7 @@ class AES {
         while ($index < strlen($text)) {
             $char = ord($text[$index++]);
             if ($char === 37) {
-                $result[] = hexdec(substr($text, $index, 2));
+                $result[] = (int)hexdec(substr($text, $index, 2));
                 $index += 2;
             } else {
                 $result[] = $char;

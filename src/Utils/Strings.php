@@ -119,7 +119,8 @@ class Strings {
      * @return boolean
      */
     public static function match(string $string, string $pattern): bool {
-        return preg_match($pattern, $string);
+        $result = preg_match($pattern, $string);
+        return $result !== false && $result > 0;
     }
 
     /**
@@ -458,8 +459,8 @@ class Strings {
      * @return string
      */
     public static function substringBefore(string $string, string $needle, bool $useFirst = true): string {
-        if (self::contains($string, $needle)) {
-            $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
+        $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
+        if ($position > 0) {
             return substr($string, 0, $position);
         }
         return $string;
@@ -492,7 +493,7 @@ class Strings {
         if (is_array($string)) {
             return $string;
         }
-        if ($string === "") {
+        if ($string === "" || $needle === "") {
             return [];
         }
 
@@ -517,7 +518,8 @@ class Strings {
      * @return string[]
      */
     public static function splitToWords(string $string): array {
-        return preg_split('/(\.\.\.\s?|[-.?!,;:(){}\[\]\'"]\s?)|\s/', $string, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $result = preg_split('/(\.\.\.\s?|[-.?!,;:(){}\[\]\'"]\s?)|\s/', $string, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        return $result !== false ? $result : [];
     }
 
     /**
@@ -725,7 +727,11 @@ class Strings {
      * @return string
      */
     public static function camelCaseToUpperCase(string $string): string {
-        $parts  = preg_split('/(?=[A-Z])/', $string);
+        $parts = preg_split('/(?=[A-Z])/', $string);
+        if ($parts === false) {
+            return strtoupper($string);
+        }
+
         $result = implode("_", $parts);
         $result = strtoupper($result);
         return $result;
@@ -737,7 +743,11 @@ class Strings {
      * @return string
      */
     public static function camelCaseToPascalCase(string $string): string {
-        $parts  = preg_split('/(?=[A-Z])/', $string);
+        $parts = preg_split('/(?=[A-Z])/', $string);
+        if ($parts === false) {
+            return ucfirst($string);
+        }
+
         $result = implode(" ", $parts);
         $result = ucfirst($result);
         return $result;
@@ -770,7 +780,12 @@ class Strings {
      */
     public static function removeHtml(string $string): string {
         $result = strip_tags($string, "<style>");
-        $styles = substr($result, strpos($result, "<style"), strpos($result, "</style>") + strlen("</style>"));
+        $start  = strpos($result, "<style");
+        if ($start === false) {
+            return $result;
+        }
+
+        $styles = substr($result, $start, strpos($result, "</style>") + strlen("</style>"));
         $result = str_replace($styles, "", $result);
         return $result;
     }

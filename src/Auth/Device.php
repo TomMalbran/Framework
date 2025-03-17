@@ -2,6 +2,7 @@
 namespace Framework\Auth;
 
 use Framework\Log\DeviceLog;
+use Framework\Utils\Arrays;
 use Framework\Utils\Server;
 use Framework\Schema\CredentialDeviceSchema;
 use Framework\Schema\CredentialDeviceColumn;
@@ -31,10 +32,13 @@ class Device extends CredentialDeviceSchema {
         if (empty($credentialID)) {
             return [];
         }
+        $credentialIDs = Arrays::toArray($credentialID);
 
         $query = new CredentialDeviceQuery();
-        $query->credentialID->in($credentialID);
-        return self::getEntityColumn($query, CredentialDeviceColumn::PlayerID);
+        $query->credentialID->in($credentialIDs);
+
+        $result = self::getEntityColumn($query, CredentialDeviceColumn::PlayerID);
+        return Arrays::toStrings($result);
     }
 
 

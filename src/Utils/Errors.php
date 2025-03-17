@@ -52,7 +52,7 @@ class Errors implements JsonSerializable {
      */
     public function __get(string $error): string {
         if ($this->has($error)) {
-            return $this->errors[$error];
+            return Strings::toString($this->errors[$error]);
         }
         return "";
     }

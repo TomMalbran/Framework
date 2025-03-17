@@ -61,7 +61,7 @@ class Importer implements Iterator {
 
     /**
      * Sets the Columns
-     * @param array<string,string> ...$columnsList
+     * @param array<string,integer> ...$columnsList
      * @return Importer
      */
     public function setColumns(array ...$columnsList): Importer {
@@ -80,7 +80,7 @@ class Importer implements Iterator {
      */
     public function setColumnNames(string ...$columnsKeys): Importer {
         foreach ($columnsKeys as $index => $key) {
-            $this->columns[$key] = $index + 1;
+            $this->columns[$key] = (int)$index + 1;
         }
         return $this;
     }

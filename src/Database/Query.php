@@ -110,51 +110,62 @@ class Query {
 
         switch ($expression) {
         case "=":
-            if (Arrays::isArray($value)) {
+            if (is_array($value)) {
                 $expression = "IN";
                 $binds      = $this->createBinds($value);
             }
             break;
+
         case "<>":
-            if (Arrays::isArray($value)) {
+            if (is_array($value)) {
                 $expression = "NOT IN";
                 $binds      = $this->createBinds($value);
             }
             break;
+
         case "IN":
-            if (!Arrays::isArray($value)) {
+            if (is_array($value)) {
+                $binds = $this->createBinds($value);
+            } else {
                 $expression = "=";
-            } else {
-                $binds = $this->createBinds($value);
             }
             break;
+
         case "NOT IN":
-            if (!Arrays::isArray($value)) {
-                $expression = "<>";
-            } else {
+            if (is_array($value)) {
                 $binds = $this->createBinds($value);
+            } else {
+                $expression = "<>";
             }
             break;
+
         case "LIKE":
         case "NOT LIKE":
-            $value = "%" . trim(strtolower($value)) . "%";
+            if (!is_array($value)) {
+                $value = "%" . trim(strtolower((string)$value)) . "%";
+            }
             break;
+
         case "STARTS":
         case "NOT STARTS":
-            $expression = Strings::replace($expression, "STARTS", "LIKE");
-            $value      = trim(strtolower($value)) . "%";
+            if (!is_array($value)) {
+                $expression = Strings::replace($expression, "STARTS", "LIKE");
+                $value      = trim(strtolower((string)$value)) . "%";
+            }
             break;
+
         case "ENDS":
         case "NOT ENDS":
-            $expression = Strings::replace($expression, "ENDS", "LIKE");
-            $value      = "%" . trim(strtolower($value));
+            if (!is_array($value)) {
+                $expression = Strings::replace($expression, "ENDS", "LIKE");
+                $value      = "%" . trim(strtolower((string)$value));
+            }
             break;
         default:
         }
-        $values = Arrays::toArray($value);
 
         $this->where    .= "$prefix $column $expression $suffix $binds ";
-        $this->params    = array_merge($this->params, $values);
+        $this->params    = array_merge($this->params, Arrays::toArray($value));
         $this->columns[] = $column;
         return $this;
     }

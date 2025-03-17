@@ -78,7 +78,7 @@ class Curl {
                 $options[CURLOPT_POSTFIELDS] = $body;
             }
             if (!empty($headers) && is_scalar($body)) {
-                $headers["Content-Length"] = strlen($body);
+                $headers["Content-Length"] = (string)strlen($body);
             }
 
         // Custom Requests
@@ -214,7 +214,11 @@ class Curl {
      * @return boolean
      */
     public static function read(string $url, string $filePath, ?array $headers = null): bool {
-        $file    = fopen($filePath, "wb");
+        $file = fopen($filePath, "wb");
+        if ($file === false) {
+            return false;
+        }
+
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_FILE            => $file,
@@ -242,9 +246,9 @@ class Curl {
 
     /**
      * Executes a Write Request
-     * @param string       $url
-     * @param string       $fileContent
-     * @param array{}|null $headers     Optional.
+     * @param string                    $url
+     * @param string                    $fileContent
+     * @param array<string,string>|null $headers     Optional.
      * @return mixed
      */
     public static function write(string $url, string $fileContent, ?array $headers = null): mixed {
@@ -268,9 +272,14 @@ class Curl {
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         curl_exec($curl);
-        $output   = curl_exec($curl);
-        $response = json_decode($output, true);
+        $output = curl_exec($curl);
         curl_close($curl);
+
+        // Return the Response
+        if (!is_string($output)) {
+            return [];
+        }
+        $response = json_decode($output, true);
         return $response;
     }
 }

@@ -30,10 +30,12 @@ class Factory {
         if (self::$loaded) {
             return false;
         }
-
         self::$loaded = true;
 
+        /** @var array<string,mixed> */
         $appSchemas   = Discovery::loadData(DataFile::Schemas);
+
+        /** @var array<string,mixed> */
         $frameSchemas = Discovery::loadFrameData(DataFile::Schemas);
 
         foreach ($appSchemas as $key => $data) {

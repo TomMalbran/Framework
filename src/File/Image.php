@@ -63,7 +63,8 @@ class Image {
      * @return integer
      */
     public static function getType(string $fileName): int {
-        return exif_imagetype($fileName);
+        $result = exif_imagetype($fileName);
+        return $result === false ? 0 : $result;
     }
 
     /**
@@ -73,7 +74,7 @@ class Image {
      */
     public static function getMimeType(string $fileUrl): string {
         $fileUrl   = Strings::encodeUrl($fileUrl);
-        $imageType = exif_imagetype($fileUrl);
+        $imageType = self::getType($fileUrl);
         return image_type_to_mime_type($imageType);
     }
 
@@ -139,8 +140,12 @@ class Image {
         }
 
         $imgData = imagecreatefrompng($filePath);
-        $width   = imagesx($imgData);
-        $height  = imagesy($imgData);
+        if ($imgData === false) {
+            return false;
+        }
+
+        $width  = imagesx($imgData);
+        $height = imagesy($imgData);
 
         if ($width > 50 || $height > 50) {
             $thumb = imagecreatetruecolor(10, 10);
@@ -172,6 +177,9 @@ class Image {
      */
     public static function getTextWidth(string $text, string $fontFile, int $fontSize): int {
         $dimensions = imagettfbbox($fontSize, 0, $fontFile, $text);
+        if ($dimensions === false) {
+            return 0;
+        }
         return abs($dimensions[4] - $dimensions[0]);
     }
 
@@ -303,6 +311,9 @@ class Image {
         // Creation Process
         $srcResize = self::createSrcImage($imgType, $src);
         $dstResize = self::createDstImage($imgType, $width, $height);
+        if ($dstResize === null) {
+            return false;
+        }
         imagecopyresampled($dstResize, $srcResize, 0, 0, $xCorner, $yCorner, $width, $height, $oldWidth, $oldHeight);
 
         // Create Image
@@ -336,7 +347,7 @@ class Image {
         int    $cropHeight
     ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
-        if (!self::hasType($imgType)) {
+        if (!self::hasType($imgType) || $resWidth <= 0 || $resHeight <= 0 || $cropWidth <= 0 || $cropHeight <= 0) {
             return false;
         }
 
@@ -348,6 +359,9 @@ class Image {
         // Crop Image
         $dstCrop = imagecreatetruecolor($cropWidth, $cropHeight);
         $bgColor = imagecolorallocate($dstCrop, 255, 255, 255);
+        if ($bgColor === false) {
+            return false;
+        }
         imagefill($dstCrop, 0, 0, $bgColor);
         imagecopy($dstCrop, $dstResize, -$cropX, -$cropY, 0, 0, $resWidth, $resHeight);
 
@@ -387,7 +401,11 @@ class Image {
      * @return mixed
      */
     public static function createSrcImage(int $imgType, mixed $image): mixed {
-        return self::$imageData[$imgType][0]($image);
+        $functionName = self::$imageData[$imgType][0];
+        if (function_exists($functionName)) {
+            return $functionName($image);
+        }
+        return null;
     }
 
     /**
@@ -398,12 +416,22 @@ class Image {
      * @return mixed
      */
     public static function createDstImage(int $imgType, int $width, int $height): mixed {
+        if ($width <= 0 || $height <= 0) {
+            return null;
+        }
+
         $result = imagecreatetruecolor($width, $height);
+        if ($result === false) {
+            return null;
+        }
+
         if (Arrays::contains(self::$transTypes, $imgType)) {
             imagealphablending($result, false);
             imagesavealpha($result,true);
             $transparent = imagecolorallocatealpha($result, 255, 255, 255, 127);
-            imagefilledrectangle($result, 0, 0, $width, $height, $transparent);
+            if ($transparent !== false) {
+                imagefilledrectangle($result, 0, 0, $width, $height, $transparent);
+            }
         }
         return $result;
     }
@@ -417,10 +445,15 @@ class Image {
      * @return boolean
      */
     public static function createImage(int $imgType, mixed $image, ?string $fileName = null, int $quality = 90): bool {
+        $functionName = self::$imageData[$imgType][1];
+        if (!function_exists($functionName)) {
+            return false;
+        }
+
         if ($imgType == 2) {
-            self::$imageData[$imgType][1]($image, $fileName, $quality);
+            $functionName($image, $fileName, $quality);
         } else {
-            self::$imageData[$imgType][1]($image, $fileName);
+            $functionName($image, $fileName);
         }
         return imagedestroy($image);
     }

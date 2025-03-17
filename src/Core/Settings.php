@@ -4,6 +4,7 @@ namespace Framework\Core;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\Core\VariableType;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 use Framework\Schema\SettingsSchema;
 use Framework\Schema\SettingsEntity;
@@ -30,7 +31,9 @@ class Settings extends SettingsSchema {
         $query = new SettingsQuery();
         $query->section->equal($section);
         $query->variable->equal($variable);
-        return self::getEntityValue($query, SettingsColumn::Value);
+
+        $result = self::getEntityValue($query, SettingsColumn::Value);
+        return Strings::toString($result);
     }
 
     /**
@@ -70,7 +73,7 @@ class Settings extends SettingsSchema {
         }
 
         $result = self::get(self::Core, $variable);
-        return !empty($result) ? $result : 0;
+        return Numbers::toInt($result);
     }
 
     /**
@@ -166,11 +169,12 @@ class Settings extends SettingsSchema {
      * @return boolean
      */
     public static function migrateData(): bool {
+        /** @var array<string,mixed> */
+        $settings  = Discovery::loadData(DataFile::Settings);
+
         $query = new SettingsQuery();
         $query->section->notEqual(self::Core);
-
-        $list      = self::getEntityList($query);
-        $settings  = Discovery::loadData(DataFile::Settings);
+        $list = self::getEntityList($query);
 
         $variables = [];
         $adds      = [];

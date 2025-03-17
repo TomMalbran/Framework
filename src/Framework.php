@@ -33,31 +33,53 @@ class Framework {
      */
     public static function execute(): bool {
         ErrorLog::init();
-        $request = self::getRequest();
+
+        // Parse the Request
+        $request      = $_REQUEST;
+        $route        = !empty($request["route"])         ? $request["route"]          : "";
+        $token        = !empty($request["token"])         ? $request["token"]          : "";
+        $accessToken  = !empty($request["xAccessToken"])  ? $request["xAccessToken"]   : "";
+        $refreshToken = !empty($request["xRefreshToken"]) ? $request["xRefreshToken"]  : "";
+        $langcode     = !empty($request["xLangcode"])     ? $request["xLangcode"]      : "";
+        $timezone     = !empty($request["xTimezone"])     ? (int)$request["xTimezone"] : 0;
+        $params       = [];
+
+        if (!empty($request["params"])) {
+            $params = json_decode($request["params"], true);
+        } else {
+            unset($request["route"]);
+            unset($request["token"]);
+            unset($request["xAccessToken"]);
+            unset($request["xRefreshToken"]);
+            unset($request["xLangcode"]);
+            unset($request["xTimezone"]);
+
+            $params = $request;
+        }
 
         // The Route is required
-        if (empty($request->route)) {
+        if (empty($route)) {
             return false;
         }
 
         // Validate the API
-        if (!empty($request->token)) {
-            Auth::validateAPI($request->token);
+        if (!empty($token)) {
+            Auth::validateAPI($token);
 
         // Validate the Credential
-        } elseif (!empty($request->accessToken) || !empty($request->refreshToken)) {
+        } elseif (!empty($accessToken) || !empty($refreshToken)) {
             Auth::validateCredential(
-                $request->accessToken,
-                $request->refreshToken,
-                $request->langcode,
-                $request->timezone,
+                $accessToken,
+                $refreshToken,
+                $langcode,
+                $timezone,
             );
         }
 
         // Perform the Request
         try {
             header("Content-Type:application/json;charset=utf-8");
-            $response = self::request($request->route, $request->params);
+            $response = self::request($route, $params);
             $response->print();
             return true;
         } catch (Exception $e) {
@@ -93,37 +115,6 @@ class Framework {
             self::$db = new Database($config);
         }
         return self::$db;
-    }
-
-    /**
-     * Parses and returns the initial Request
-     * @return object
-     */
-    public static function getRequest(): object {
-        $request = $_REQUEST;
-        $result  = [
-            "route"        => !empty($request["route"])         ? $request["route"]          : "",
-            "token"        => !empty($request["token"])         ? $request["token"]          : "",
-            "accessToken"  => !empty($request["xAccessToken"])  ? $request["xAccessToken"]   : "",
-            "refreshToken" => !empty($request["xRefreshToken"]) ? $request["xRefreshToken"]  : "",
-            "langcode"     => !empty($request["xLangcode"])     ? $request["xLangcode"]      : "",
-            "timezone"     => !empty($request["xTimezone"])     ? (int)$request["xTimezone"] : 0,
-            "params"       => [],
-        ];
-
-        if (!empty($request["params"])) {
-            $result["params"] = json_decode($request["params"], true);
-        } else {
-            unset($request["route"]);
-            unset($request["token"]);
-            unset($request["xAccessToken"]);
-            unset($request["xRefreshToken"]);
-            unset($request["xLangcode"]);
-            unset($request["xTimezone"]);
-
-            $result["params"] = $request;
-        }
-        return (object)$result;
     }
 
     /**

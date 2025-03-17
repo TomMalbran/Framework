@@ -232,12 +232,8 @@ class Discovery {
             $className = Strings::replace($className, "/", "\\");
             $className = "\\" . Package::Namespace . $className;
 
-            if (empty($dir)) {
-                $result[] = $className;
-            } else {
-                $classKey = Strings::substringAfter($className, "\\");
-                $result[$classKey] = $className;
-            }
+            $classKey = Strings::substringAfter($className, "\\");
+            $result[$classKey] = $className;
         }
         return $result;
     }
@@ -254,7 +250,9 @@ class Discovery {
 
         foreach ($classes as $className) {
             try {
-                $result[$className] = new ReflectionClass($className);
+                if (class_exists($className)) {
+                    $result[$className] = new ReflectionClass($className);
+                }
             } catch (Throwable $e) {
                 continue;
             }
