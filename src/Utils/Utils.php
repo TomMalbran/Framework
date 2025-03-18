@@ -338,8 +338,9 @@ class Utils {
      * @return string
      */
     public static function encodeUrl(string $url): string {
-        return Strings::replaceCallback($url, "/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function ($match) {
-            return rawurlencode($match[0]);
+        return Strings::replaceCallback($url, "/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function (array $match) {
+            $value = Strings::toString($match[0]);
+            return rawurlencode($value);
         });
     }
 
