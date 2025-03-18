@@ -24,10 +24,10 @@ class Strings {
      * @return string
      */
     public static function toString(mixed $value): string {
-        if (self::isString($value)) {
+        if (is_string($value)) {
             return $value;
         }
-        if (!is_array($value) && !is_object($value)) {
+        if (is_int($value) || is_float($value)) {
             return strval($value);
         }
         return "";
@@ -319,7 +319,7 @@ class Strings {
      */
     public static function replacePattern(string $string, array|string $pattern, array|string $replacement, int $limit = -1): string {
         $result = preg_replace($pattern, $replacement, $string, $limit);
-        return !empty($result) ? $result : "";
+        return $result !== null ? $result : "";
     }
 
     /**
@@ -332,7 +332,7 @@ class Strings {
      */
     public static function replaceCallback(string $string, array|string $pattern, callable $callback, int $limit = -1): string {
         $result = preg_replace_callback($pattern, $callback, $string, $limit);
-        return !empty($result) ? $result : "";
+        return $result !== null ? $result : "";
     }
 
 
@@ -508,7 +508,7 @@ class Strings {
         $parts  = self::split($content, ",");
         $result = [];
         foreach ($parts as $part) {
-            if (!$skipEmpty || !empty($part)) {
+            if (!$skipEmpty || $part !== "") {
                 $result[] = trim($part);
             }
         }
@@ -533,7 +533,7 @@ class Strings {
      * @return string
      */
     public static function join(mixed $value, string $glue = "", bool $withoutEmpty = false): string {
-        if (self::isString($value)) {
+        if (is_string($value)) {
             return $value;
         }
         $list = Arrays::toStrings($value, withoutEmpty: $withoutEmpty);
@@ -548,7 +548,7 @@ class Strings {
      */
     public static function joinKeys(mixed $value, string $glue = ""): string {
         if (!is_array($value)) {
-            return self::isString($value) ? $value : "";
+            return is_string($value) ? $value : "";
         }
         return implode($glue, array_keys($value));
     }
@@ -562,7 +562,7 @@ class Strings {
      */
     public static function joinValues(mixed $value, string $key, string $glue = ""): string {
         if (!is_array($value)) {
-            return self::isString($value) ? $value : "";
+            return is_string($value) ? $value : "";
         }
         $values = Arrays::toStrings($value, $key);
         return implode($glue, $values);
@@ -577,11 +577,11 @@ class Strings {
      */
     public static function merge(string $first, string $second, string $glue = " "): string {
         $result = "";
-        if (!empty($first) && !empty($second)) {
+        if ($first !== "" && $second !== "") {
             $result = "{$first}{$glue}{$second}";
-        } elseif (!empty($first)) {
+        } elseif ($first !== "") {
             $result = $first;
-        } elseif (!empty($second)) {
+        } elseif ($second !== "") {
             $result = $second;
         }
         return $result;
@@ -598,7 +598,7 @@ class Strings {
      * @return boolean
      */
     public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true, bool $trimValues = true): bool {
-        if (!self::isString($string) || !self::isString($other)) {
+        if (!is_string($string) || !is_string($other)) {
             return $string == $other;
         }
 
@@ -891,11 +891,11 @@ class Strings {
      */
     public static function replaceUrls(string $string, string $url): string {
         $regex = '/<(img|audio|video)([^>]*?)src=["\']((?!https?:\/\/|\/\/|data:)[^"\']+)["\']([^>]*?)>/i';
-        return self::replaceCallback($string, $regex, function ($matches) use ($url) {
-            $tag          = $matches[1];
-            $beforeSrc    = $matches[2];
-            $relativePath = $matches[3];
-            $afterSrc     = $matches[4];
+        return self::replaceCallback($string, $regex, function (array $matches) use ($url) {
+            $tag          = self::toString($matches[1]);
+            $beforeSrc    = self::toString($matches[2]);
+            $relativePath = self::toString($matches[3]);
+            $afterSrc     = self::toString($matches[4]);
             $absolutePath = "$url/{$relativePath}";
             return "<$tag{$beforeSrc}src=\"$absolutePath\"{$afterSrc}>";
         });
@@ -962,8 +962,7 @@ class Strings {
             . '\x{1F910}-\x{1F96B}'
             . '\x{1F980}-\x{1F9E0}]/u';
 
-        preg_match($emojis, $string, $matches);
-        return !empty($matches);
+        return self::match($string, $emojis);
     }
 
     /**
