@@ -43,7 +43,7 @@ class Arrays {
      * @return boolean
      */
     public static function isList(mixed $array): bool {
-        return self::isArray($array) && array_is_list($array);
+        return is_array($array) && array_is_list($array);
     }
 
     /**
@@ -52,7 +52,7 @@ class Arrays {
      * @return boolean
      */
     public static function isDict(mixed $array): bool {
-        return self::isArray($array) && !array_is_list($array);
+        return is_array($array) && !array_is_list($array);
     }
 
     /**
@@ -61,7 +61,7 @@ class Arrays {
      * @return boolean
      */
     public static function isMap(mixed $array): bool {
-        return self::isArray($array) && self::isArray(array_values($array)[0]);
+        return is_array($array) && is_array(array_values($array)[0]);
     }
 
 
@@ -72,7 +72,7 @@ class Arrays {
      * @return mixed[]
      */
     public static function toArray(mixed $array): array {
-        return self::isArray($array) ? $array : [ $array ];
+        return is_array($array) ? $array : [ $array ];
     }
 
     /**
@@ -95,7 +95,7 @@ class Arrays {
         if (is_int($array)) {
             return [ $array ];
         }
-        if (!self::isArray($array)) {
+        if (!is_array($array)) {
             return [];
         }
 
@@ -108,7 +108,7 @@ class Arrays {
             if ($withoutEmpty && empty($value)) {
                 continue;
             }
-            $result[] = (int)$value;
+            $result[] = Numbers::toInt($value);
         }
         return $result;
     }
@@ -124,7 +124,7 @@ class Arrays {
         if (is_string($array)) {
             return [ $array ];
         }
-        if (!self::isArray($array)) {
+        if (!is_array($array)) {
             return [];
         }
 
@@ -134,7 +134,7 @@ class Arrays {
             if ($withoutEmpty && empty($value)) {
                 continue;
             }
-            $result[] = (string)$value;
+            $result[] = Strings::toString($value);
         }
         return $result;
     }
@@ -151,7 +151,8 @@ class Arrays {
 
         $result = [];
         foreach ($array as $key => $value) {
-            $result[$key] = (string)$value;
+            $keyName = Strings::toString($key);
+            $result[$keyName] = Strings::toString($value);
         }
         return $result;
     }
@@ -168,7 +169,8 @@ class Arrays {
 
         $result = [];
         foreach ($array as $key => $value) {
-            $result[$key] = (int)$value;
+            $keyName = Strings::toString($key);
+            $result[$keyName] = Numbers::toInt($value);
         }
         return $result;
     }
@@ -182,7 +184,7 @@ class Arrays {
      * @return boolean
      */
     public static function isEmpty(mixed $array, string|int|null $key = null): bool {
-        if ($key !== null && self::isArray($array)) {
+        if ($key !== null && is_array($array)) {
             return empty($array[$key]);
         }
         return empty($array);
@@ -194,7 +196,7 @@ class Arrays {
      * @return integer
      */
     public static function length(mixed $array): int {
-        return self::isArray($array) ? count($array) : 0;
+        return is_array($array) ? count($array) : 0;
     }
 
     /**
@@ -203,14 +205,15 @@ class Arrays {
      * @return integer
      */
     public static function max(mixed $array): int {
+        if (empty($array) || !is_array($array)) {
+            return 0;
+        }
+
         $length = self::length($array);
         if ($length > 1) {
-            return max(...$array);
+            return Numbers::toInt(max(...$array));
         }
-        if ($length === 1) {
-            return (int)$array[0];
-        }
-        return !empty($array) ? (int)$array : 0;
+        return Numbers::toInt($array[0]);
     }
 
     /**
@@ -225,7 +228,7 @@ class Arrays {
     public static function contains(mixed $array, mixed $needle, mixed $key = null, bool $caseInsensitive = true, bool $atLeastOne = false): bool {
         $array = self::toArray($array);
 
-        if (self::isArray($needle)) {
+        if (is_array($needle)) {
             $count = 0;
             foreach ($array as $row) {
                 foreach ($needle as $value) {
@@ -264,7 +267,10 @@ class Arrays {
         if (self::isObject($row)) {
             return isset($row->$key) && Strings::isEqual($row->$key, $value, $caseInsensitive);
         }
-        return isset($row[$key]) && Strings::isEqual($row[$key], $value, $caseInsensitive);
+        if (is_array($row)) {
+            return isset($row[$key]) && Strings::isEqual($row[$key], $value, $caseInsensitive);
+        }
+        return false;
     }
 
     /**
@@ -289,7 +295,7 @@ class Arrays {
             return false;
         }
         foreach ($array as $index => $value) {
-            if (!empty($key)) {
+            if (is_array($value) && !empty($key)) {
                 if (!isset($value[$key]) || !self::contains($other, $value[$key], $key)) {
                     return false;
                 }
@@ -344,7 +350,7 @@ class Arrays {
     public static function getDiff(array $array, array $other, string $checkKey, ?string $getKey = null): array {
         $result = [];
         foreach ($array as $row) {
-            if (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey)) {
+            if (is_array($row) && (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey))) {
                 if ($getKey != null) {
                     $result[] = $row[$getKey];
                 } else {
@@ -403,7 +409,7 @@ class Arrays {
             $shouldAdd = false;
             if (self::isObject($elem)) {
                 $shouldAdd = !empty($elem->$idKey) && $elem->$idKey != $key;
-            } elseif (self::isArrayLike($elem)) {
+            } elseif (is_array($elem) || $elem instanceof ArrayAccess) {
                 $shouldAdd = !empty($elem[$idKey]) && $elem[$idKey] != $key;
             } else {
                 $shouldAdd = $elem != $key;
@@ -539,7 +545,7 @@ class Arrays {
     public static function extend(array &$array1, array &$array2): array {
         $result = $array1;
         foreach ($array2 as $key => &$value) {
-            if (self::isArray($value) && isset($result[$key]) && self::isArray($result[$key])) {
+            if (is_array($value) && isset($result[$key]) && is_array($result[$key])) {
                 $result[$key] = self::extend($result[$key], $value);
             } else {
                 $result[$key] = $value;
@@ -576,7 +582,7 @@ class Arrays {
      */
     public static function sortArray(array &$array, string $field, callable $callback): array {
         foreach ($array as $value) {
-            if (!empty($value[$field]) && self::isArray($value[$field])) {
+            if (is_array($value) && !empty($value[$field]) && is_array($value[$field])) {
                 usort($value[$field], $callback);
             }
         }
@@ -609,15 +615,17 @@ class Arrays {
      * Returns the sum of the elements of the given array
      * @param mixed[]     $array
      * @param string|null $key   Optional.
-     * @return mixed|integer|float
+     * @return integer|float
      */
-    public static function sum(array $array, ?string $key = null): mixed {
+    public static function sum(array $array, ?string $key = null): int|float {
         $result = 0;
         foreach ($array as $value) {
-            if (!empty($key)) {
-                $result += $value[$key];
+            if (is_array($value)) {
+                if (isset($value[$key])) {
+                    $result += Numbers::toIntOrFloat($value[$key]);
+                }
             } else {
-                $result += $value;
+                $result += Numbers::toIntOrFloat($value);
             }
         }
         return $result;
@@ -764,7 +772,7 @@ class Arrays {
                 if ($elem->$idKey == $idValue) {
                     return $index;
                 }
-            } elseif (self::isArrayLike($elem)) {
+            } elseif (is_array($elem) || $elem instanceof ArrayAccess) {
                 if ($elem[$idKey] == $idValue) {
                     return $index;
                 }
@@ -787,7 +795,7 @@ class Arrays {
                 if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
                     return $elem;
                 }
-            } elseif (self::isArrayLike($elem)) {
+            } elseif (is_array($elem) || $elem instanceof ArrayAccess) {
                 if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
                     return $elem;
                 }
@@ -863,11 +871,13 @@ class Arrays {
             return $default;
         }
 
-        if ($useEmpty && isset($array[$key])) {
-            return $array[$key];
-        }
-        if (!$useEmpty && !empty($array[$key])) {
-            return $array[$key];
+        if (is_array($array)) {
+            if ($useEmpty && isset($array[$key])) {
+                return $array[$key];
+            }
+            if (!$useEmpty && !empty($array[$key])) {
+                return $array[$key];
+            }
         }
         return $default;
     }
