@@ -17,7 +17,7 @@ class JSON {
      * @return boolean
      */
     public static function isValid(mixed $value): bool {
-        if (Strings::isString($value)) {
+        if (is_string($value)) {
             json_decode($value);
             return json_last_error() == JSON_ERROR_NONE;
         }
@@ -31,11 +31,16 @@ class JSON {
      * @return string
      */
     public static function encode(mixed $value, bool $asPretty = false): string {
-        if (self::isValid($value)) {
+        if (is_string($value) && self::isValid($value)) {
             return $value;
         }
+
         $result = json_encode($value, $asPretty ? JSON_PRETTY_PRINT : 0);
-        return $result === false ? $value : $result;
+        if ($result !== false) {
+            return $result;
+        }
+
+        return is_string($value) ? $value : "";
     }
 
     /**
@@ -44,8 +49,8 @@ class JSON {
      * @return array<string|integer,mixed>
      */
     public static function decodeAsArray(mixed $value): array {
-        if (!self::isValid($value)) {
-            return Arrays::isArray($value) ? $value : [];
+        if (!is_string($value) || !self::isValid($value)) {
+            return is_array($value) ? $value : [];
         }
         return (array)json_decode($value, true);
     }
