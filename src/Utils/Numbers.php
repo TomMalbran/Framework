@@ -114,6 +114,24 @@ class Numbers {
     }
 
     /**
+     * Returns the given number as an integer or a float
+     * @param mixed $number
+     * @return integer|float
+     */
+    public static function toIntOrFloat(mixed $number): int|float {
+        if (is_int($number)) {
+            return $number;
+        }
+        if (is_float($number)) {
+            return $number;
+        }
+        if (is_numeric($number)) {
+            return floatval($number);
+        }
+        return 0;
+    }
+
+    /**
      * Returns a number using the right format
      * @param integer|float $number
      * @param integer       $decimals
@@ -459,7 +477,8 @@ class Numbers {
             return 0;
         }
         try {
-            return @eval("return $expression;");
+            $result = @eval("return $expression;");
+            return self::toIntOrFloat($result);
         } catch (Throwable $e) {
             return 0;
         }
