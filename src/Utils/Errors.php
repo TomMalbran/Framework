@@ -22,11 +22,10 @@ class Errors implements JsonSerializable {
 
     /**
      * Creates a new Errors instance
-     * @param array{}|null $errors
+     * @param array<string,string>|null $errors
      */
     public function __construct(?array $errors = null) {
         if ($errors !== null) {
-            $errors = Arrays::toArray($errors);
             foreach ($errors as $error => $message) {
                 $this->add($error, $message);
             }
