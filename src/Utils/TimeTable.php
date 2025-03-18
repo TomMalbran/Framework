@@ -52,15 +52,20 @@ class TimeTable {
             return new TimeTable($data->timeTables, $data->startMonday);
         }
 
-        if (!Arrays::isArray($data)) {
+        if (!is_array($data)) {
             return new TimeTable();
         }
 
         $timeTables = [];
         foreach ($data as $elem) {
-            $days = !empty($elem["days"]) ? Arrays::sort(Arrays::toInts($elem["days"])) : [];
-            $from = !empty($elem["from"]) ? $elem["from"] : "";
-            $to   = !empty($elem["to"]) ? $elem["to"] : "";
+            if (!is_array($elem)) {
+                continue;
+            }
+
+            $days = isset($elem["days"]) ? Arrays::sort(Arrays::toInts($elem["days"])) : [];
+            $from = Strings::toString($elem["from"] ?? "");
+            $to   = Strings::toString($elem["to"]   ?? "");
+
             $timeTables[] = new TimeTableData($days, $from, $to);
         }
         return new TimeTable($timeTables, $startMonday);
