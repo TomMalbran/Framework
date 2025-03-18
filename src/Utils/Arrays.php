@@ -643,22 +643,6 @@ class Arrays {
 
 
     /**
-     * Creates a Dict using the given Array
-     * @param mixed[] $array
-     * @param string  $key
-     * @param string  $value
-     * @return array<string|integer,string|integer>
-     */
-    public static function createDict(array $array, string $key, string $value): array {
-        $result = [];
-        foreach ($array as $row) {
-            $keyValue = self::getOneValue($row, $key);
-            $result[$keyValue] = self::getOneValue($row, $value);
-        }
-        return $result;
-    }
-
-    /**
      * Creates a Map using the given Array
      * @template TValue
      * @param TValue[] $array
