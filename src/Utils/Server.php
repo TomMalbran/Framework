@@ -25,7 +25,8 @@ class Server {
      * @return boolean
      */
     public static function hostStartsWith(string $prefix): bool {
-        return Strings::startsWith($_SERVER["HTTP_HOST"], $prefix);
+        $host = Strings::toString($_SERVER["HTTP_HOST"]);
+        return Strings::startsWith($host, $prefix);
     }
 
 
@@ -40,14 +41,20 @@ class Server {
             return "";
         }
 
-        $ssl      = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on";
-        $sp       = Strings::toLowerCase($_SERVER["SERVER_PROTOCOL"]);
-        $http     = Strings::substringBefore($sp, "/");
-        $protocol = $http . ($ssl ? "s" : "");
-        $port     = $_SERVER["SERVER_PORT"];
-        $port     = (!$ssl && $port == "80") || ($ssl && $port == "443") ? "" : ":$port";
-        $host     = $useForwarded && isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? $_SERVER["HTTP_X_FORWARDED_HOST"] : ($_SERVER["HTTP_HOST"] ?? null);
-        $host     = $host ?: $_SERVER["SERVER_NAME"] . $port;
+        $ssl         = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on";
+        $serverProto = Strings::toString($_SERVER["SERVER_PROTOCOL"]);
+        $serverProto = Strings::toLowerCase($serverProto);
+        $http        = Strings::substringBefore($serverProto, "/");
+        $protocol    = $http . ($ssl ? "s" : "");
+
+        $port        = Strings::toString($_SERVER["SERVER_PORT"]);
+        $port        = (!$ssl && $port == "80") || ($ssl && $port == "443") ? "" : ":$port";
+
+        $serverName  = Strings::toString($_SERVER["SERVER_NAME"]);
+        $forwardHost = isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? Strings::toString($_SERVER["HTTP_X_FORWARDED_HOST"]) : "";
+        $httpHost    = Strings::toString($_SERVER["HTTP_HOST"]);
+        $host        = $useForwarded && $forwardHost !== "" ? $forwardHost : $httpHost;
+        $host        = $host !== "" ? $host : $serverName . $port;
 
         return "$protocol://$host";
     }
@@ -58,7 +65,7 @@ class Server {
      * @return string
      */
     public static function getFullUrl(bool $useForwarded = false): string {
-        return self::getUrl($useForwarded) . $_SERVER["REQUEST_URI"];
+        return self::getUrl($useForwarded) . Strings::toString($_SERVER["REQUEST_URI"]);
     }
 
     /**
@@ -83,7 +90,7 @@ class Server {
                 $ip = getenv("REMOTE_ADDR");
             }
         }
-        return $ip;
+        return Strings::toString($ip);
     }
 
     /**
@@ -91,7 +98,7 @@ class Server {
      * @return string
      */
     public static function getUserAgent(): string {
-        return $_SERVER["HTTP_USER_AGENT"];
+        return Strings::toString($_SERVER["HTTP_USER_AGENT"]);
     }
 
     /**
