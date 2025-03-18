@@ -317,19 +317,19 @@ class Numbers {
 
     /**
      * Returns the given price in Cents
-     * @param integer|float $price
+     * @param mixed $price
      * @return integer
      */
-    public static function toCents(int|float $price): int {
+    public static function toCents(mixed $price): int {
         return self::toInt($price, 2);
     }
 
     /**
      * Returns the given price in Dollars
-     * @param integer|float $price
+     * @param mixed $price
      * @return float
      */
-    public static function fromCents(int|float $price): float {
+    public static function fromCents(mixed $price): float {
         return self::toFloat($price, 2);
     }
 
