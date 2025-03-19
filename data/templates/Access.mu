@@ -70,10 +70,11 @@ enum Access {
      * @return string[]
      */
     public static function toStrings(array|Access|null $values): array {
-        $list   = Arrays::toArray($values);
         $result = [];
-        foreach ($list as $elem) {
-            if (!empty($elem)) {
+        if ($values instanceof Access) {
+            $result[] = $values->name;
+        } elseif (is_array($values)) {
+            foreach ($values as $elem) {
                 $result[] = $elem->name;
             }
         }
