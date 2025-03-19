@@ -35,39 +35,33 @@ class Framework {
         ErrorLog::init();
 
         // Parse the Request
-        $request      = $_REQUEST;
-        $route        = !empty($request["route"])         ? $request["route"]          : "";
-        $token        = !empty($request["token"])         ? $request["token"]          : "";
-        $accessToken  = !empty($request["xAccessToken"])  ? $request["xAccessToken"]   : "";
-        $refreshToken = !empty($request["xRefreshToken"]) ? $request["xRefreshToken"]  : "";
-        $langcode     = !empty($request["xLangcode"])     ? $request["xLangcode"]      : "";
-        $timezone     = !empty($request["xTimezone"])     ? (int)$request["xTimezone"] : 0;
-        $params       = [];
+        $request      = new Request(withRequest: true, withFiles: true);
+        $route        = $request->getString("route");
+        $token        = $request->getString("token");
+        $accessToken  = $request->getString("xAccessToken");
+        $refreshToken = $request->getString("xRefreshToken");
+        $langcode     = $request->getString("xLangcode");
+        $timezone     = $request->getInt("xTimezone");
 
-        if (!empty($request["params"])) {
-            $params = json_decode($request["params"], true);
-        } else {
-            unset($request["route"]);
-            unset($request["token"]);
-            unset($request["xAccessToken"]);
-            unset($request["xRefreshToken"]);
-            unset($request["xLangcode"]);
-            unset($request["xTimezone"]);
-
-            $params = $request;
-        }
+        // Remove sensitive data
+        $request->remove("route");
+        $request->remove("token");
+        $request->remove("xAccessToken");
+        $request->remove("xRefreshToken");
+        $request->remove("xLangcode");
+        $request->remove("xTimezone");
 
         // The Route is required
-        if (empty($route)) {
+        if ($route === "") {
             return false;
         }
 
         // Validate the API
-        if (!empty($token)) {
+        if ($token !== "") {
             Auth::validateAPI($token);
 
         // Validate the Credential
-        } elseif (!empty($accessToken) || !empty($refreshToken)) {
+        } elseif ($accessToken !== "" || $refreshToken !== "") {
             Auth::validateCredential(
                 $accessToken,
                 $refreshToken,
@@ -79,7 +73,7 @@ class Framework {
         // Perform the Request
         try {
             header("Content-Type:application/json;charset=utf-8");
-            $response = self::request($route, $params);
+            $response = self::request($route, $request);
             $response->print();
             return true;
         } catch (Exception $e) {
@@ -106,24 +100,12 @@ class Framework {
     }
 
     /**
-     * Returns the Framework Database
-     * @return Database
-     */
-    public static function getDatabase(): Database {
-        if (empty(self::$db)) {
-            $config   = Configs::getObject("db");
-            self::$db = new Database($config);
-        }
-        return self::$db;
-    }
-
-    /**
      * Requests an API function
      * @param string  $route
-     * @param array{} $params Optional.
+     * @param Request $request
      * @return Response
      */
-    public static function request(string $route, array $params = []): Response {
+    private static function request(string $route, Request $request): Response {
         // The Route doesn't exists
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");
@@ -143,12 +125,25 @@ class Framework {
         }
 
         // Perform the Request
-        $request  = new Request($params, $_FILES);
         $response = Router::call($route, $request);
 
         // Add the Token and return the Response
         $response->addTokens(Auth::getAccessToken(), Auth::getRefreshToken());
         return $response;
+    }
+
+
+
+    /**
+     * Returns the Framework Database
+     * @return Database
+     */
+    public static function getDatabase(): Database {
+        if (empty(self::$db)) {
+            $config   = Configs::getObject("db");
+            self::$db = new Database($config);
+        }
+        return self::$db;
     }
 
     /**
