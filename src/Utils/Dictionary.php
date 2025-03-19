@@ -127,6 +127,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         return $this;
     }
 
+    /**
+     * Removes the value at the given key
+     * @param string $key
+     * @return Dictionary
+     */
+    public function remove(string $key): Dictionary {
+        if ($this->has($key)) {
+            unset($this->data[$key]);
+        }
+        return $this;
+    }
+
 
 
     /**
