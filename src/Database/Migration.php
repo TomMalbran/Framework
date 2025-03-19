@@ -66,15 +66,15 @@ class Migration {
 
             if ($db->tableExists($fromName)) {
                 $db->renameTable($fromName, $toName);
-                print("Renamed table <i>$fromName</i> to <b>$toName</b><br>");
+                print("- Renamed table $fromName -> $toName\n");
                 $didMove = true;
             }
         }
 
         if ($didMove) {
-            print("<br>");
+            print("\n");
         } else {
-            print("No <i>movements</i> required<br>");
+            print("- No movements required\n");
         }
         return $didMove ? $lastMovement : 0;
     }
@@ -105,14 +105,14 @@ class Migration {
             }
 
             $db->renameColumn($table, $fromName, $toName, $type);
-            print("Renamed column <i>$fromName</i> to <b>$toName</b> in table <u>$table</u><br>");
+            print("- Renamed column $fromName -> $toName in $table\n");
             $didRename = true;
         }
 
         if ($didRename) {
-            print("<br>");
+            print("\n");
         } else {
-            print("No <i>column renames</i> required<br><br>");
+            print("- No column renames required\n\n");
         }
         return $didRename ? $lastRename : 0;
     }
@@ -172,8 +172,8 @@ class Migration {
         }
 
         $sql = $db->createTable($structure->table, $fields, $primary, $keys);
-        print("<br>Created table <b>$structure->table</b> ... <br>");
-        print(Strings::toHtml($sql) . "<br><br>");
+        print("\n- Created table {$structure->table} ... \n");
+        print(Strings::toHtml($sql) . "\n\n");
         return true;
     }
 
@@ -187,14 +187,14 @@ class Migration {
      */
     private static function deleteTables(Database $db, array $tableNames, array $schemaNames, bool $canDelete): bool {
         $deleted  = 0;
-        $preBreak = "<br>";
+        $preBreak = "\n";
         foreach ($tableNames as $tableName) {
             if (!Arrays::contains($schemaNames, $tableName)) {
                 if ($canDelete) {
                     $db->deleteTable($tableName);
-                    print("{$preBreak}Deleted table <i>$tableName</i><br>");
+                    print("{$preBreak}- Deleted table $tableName\n");
                 } else {
-                    print("{$preBreak}Delete table <i>$tableName</i> (manually)<br>");
+                    print("{$preBreak}- Delete table $tableName (manually)\n");
                 }
                 $deleted += 1;
                 $preBreak = "";
@@ -351,44 +351,44 @@ class Migration {
 
         // Nothing to change
         if (!$update) {
-            print("No changes for <i>$structure->table</i><br>");
+            print("- No changes for {$structure->table}\n");
             return false;
         }
 
         // Update the Table
-        print("<br>Updated table <b>$structure->table</b> ... <br>");
+        print("\n- Updated table {$structure->table} ... \n");
         if ($dropPrimary && $canDrop) {
             $sql = $db->dropPrimary($structure->table);
-            print("$sql<br>");
+            print("    $sql\n");
         }
         foreach ($renames as $rename) {
             $sql = $db->renameColumn($structure->table, $rename["key"], $rename["new"], $rename["type"]);
-            print("$sql<br>");
+            print("    $sql\n");
         }
         foreach ($adds as $add) {
             $sql = $db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
-            print("$sql<br>");
+            print("    $sql\n");
         }
         foreach ($modifies as $modify) {
             if ($modify["toInts"]) {
                 $db->query("UPDATE `$structure->table` SET `{$modify["key"]}` = '0' WHERE `{$modify["key"]}` = ''");
             }
             $sql = $db->updateColumn($structure->table, $modify["key"], $modify["type"], $modify["after"]);
-            print("$sql<br>");
+            print("    $sql\n");
         }
         foreach ($drops as $drop) {
             $sql = $db->deleteColumn($structure->table, $drop, $canDelete);
-            print($sql . (!$canDelete ? " (manually)" : "") . "<br>");
+            print("    $sql" . (!$canDelete ? " (manually)" : "") . "\n");
         }
         foreach ($keys as $key) {
             $sql = $db->createIndex($structure->table, $key);
-            print("$sql<br>");
+            print("    $sql\n");
         }
         if ($addPrimary) {
             $sql = $db->updatePrimary($structure->table, $primary);
-            print("$sql<br>");
+            print("    $sql\n");
         }
-        print("<br>");
+        print("\n");
         return true;
     }
 
@@ -404,7 +404,7 @@ class Migration {
         $path = Discovery::getMigrationsPath();
 
         if (!File::exists($path)) {
-            print("<br>No <i>migrations</i> required<br>");
+            print("\n- No extra migrations required\n");
             return 0;
         }
 
@@ -422,11 +422,11 @@ class Migration {
         $firstMigration = $startMigration + 1;
         $lastMigration  = (int)end($names);
         if (count($names) === 0 || $firstMigration > $lastMigration) {
-            print("<br>No <i>migrations</i> required<br>");
+            print("\n- No extra migrations required\n");
             return 0;
         }
 
-        print("<br>Running <b>migrations $firstMigration to $lastMigration</b><br>");
+        print("\n- Running migrations $firstMigration -> $lastMigration\n");
         foreach ($names as $name) {
             if ($name >= $firstMigration) {
                 include_once "$path/$name.php";

@@ -97,7 +97,7 @@ class EmailTemplate extends EmailTemplateSchema {
         }
 
         if ($total > 0) {
-            print("<br>Updated <i>$total emails</i> for language <b>$languageName</b><br>");
+            print("- Updated $total emails for language $languageName\n");
         }
         return $position;
     }

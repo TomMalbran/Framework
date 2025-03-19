@@ -172,7 +172,7 @@ class Settings extends SettingsSchema {
      */
     public static function migrateData(): bool {
         /** @var array<string,mixed> */
-        $settings  = Discovery::loadData(DataFile::Settings);
+        $settings = Discovery::loadData(DataFile::Settings);
 
         $query = new SettingsQuery();
         $query->section->notEqual(self::Core);
@@ -258,8 +258,8 @@ class Settings extends SettingsSchema {
         // Process the SQL
         $didUpdate = false;
         if (!empty($adds)) {
-            print("<br>Added <i>" . count($adds) . " settings</i><br>");
-            print(Strings::join($variables, ", ") . "<br>");
+            print("- Added " . count($adds) . " settings\n");
+            print("    " . Strings::join($variables, ", ") . "\n");
             foreach ($adds as $add) {
                 self::replaceEntity(
                     section:      $add["section"],
@@ -272,7 +272,7 @@ class Settings extends SettingsSchema {
         }
 
         if (!empty($renames)) {
-            print("<br>Renamed <i>" . count($renames) . " settings</i><br>");
+            print("- Renamed " . count($renames) . " settings\n");
             foreach ($renames as $rename) {
                 $query = new SettingsQuery();
                 $query->section->equal($rename->section);
@@ -283,7 +283,7 @@ class Settings extends SettingsSchema {
         }
 
         if (!empty($modifies)) {
-            print("<br>Modified <i>" . count($modifies) . " settings</i><br>");
+            print("- Modified " . count($modifies) . " settings\n");
             foreach ($modifies as $modify) {
                 $query = new SettingsQuery();
                 $query->section->equal($modify->section);
@@ -294,7 +294,7 @@ class Settings extends SettingsSchema {
         }
 
         if (!empty($deletes)) {
-            print("<br>Deleted <i>" . count($deletes) . " settings</i><br>");
+            print("- Deleted " . count($deletes) . " settings\n");
             $variables = [];
             foreach ($deletes as $delete) {
                 $query = new SettingsQuery();
@@ -304,12 +304,12 @@ class Settings extends SettingsSchema {
                 self::removeEntity($query);
                 $variables[] = "{$delete->section}_{$delete->variable}";
             }
-            print(Strings::join($variables, ", ") . "<br>");
+            print("    " . Strings::join($variables, ", ") . "\n");
             $didUpdate = true;
         }
 
         if (!$didUpdate) {
-            print("<br>No <i>settings</i> updated<br>");
+            print("- No settings updated\n");
             return false;
         }
         return true;

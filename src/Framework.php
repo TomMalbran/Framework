@@ -181,8 +181,13 @@ class Framework {
      * @return boolean
      */
     public static function migrateData(bool $canDelete = false): bool {
+        print("\nDATABASE MIGRATIONS\n");
         Migration::migrateData($canDelete);
+
+        print("\nSETTINGS MIGRATIONS\n");
         Settings::migrateData();
+
+        print("\nEMAIL MIGRATIONS\n");
         EmailTemplate::migrateData();
         return true;
     }
