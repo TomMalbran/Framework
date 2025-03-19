@@ -151,8 +151,7 @@ class Arrays {
 
         $result = [];
         foreach ($array as $key => $value) {
-            $keyName = Strings::toString($key);
-            $result[$keyName] = Strings::toString($value);
+            $result[Strings::toString($key)] = Strings::toString($value);
         }
         return $result;
     }
@@ -169,8 +168,24 @@ class Arrays {
 
         $result = [];
         foreach ($array as $key => $value) {
-            $keyName = Strings::toString($key);
-            $result[$keyName] = Numbers::toInt($value);
+            $result[Strings::toString($key)] = Numbers::toInt($value);
+        }
+        return $result;
+    }
+
+    /**
+     * Converts an array into a Map of string keys and mixed values
+     * @param mixed $array
+     * @return array<string,mixed>
+     */
+    public static function toStringMixedMap(mixed $array): array {
+        if (!is_array($array)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $key => $value) {
+            $result[Strings::toString($key)] = $value;
         }
         return $result;
     }
