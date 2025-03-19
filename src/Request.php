@@ -33,12 +33,20 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Creates a new Request instance
-     * @param array<string,mixed> $request Optional.
-     * @param array<string,mixed> $files   Optional.
+     * @param array<string,mixed> $request     Optional.
+     * @param boolean             $withRequest Optional.
+     * @param boolean             $withFiles   Optional.
      */
-    public function __construct(array $request = [], array $files = []) {
-        $this->request = $request;
-        $this->files   = $files;
+    public function __construct(array $request = [], bool $withRequest = false, bool $withFiles = false) {
+        if ($withRequest) {
+            $this->request = Arrays::toStringMixedMap($_REQUEST);
+        } else {
+            $this->request = $request;
+        }
+
+        if ($withFiles) {
+            $this->files = Arrays::toStringMixedMap($_FILES);
+        }
     }
 
 
@@ -70,17 +78,10 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getInt(string $key, int $default = 0): int {
-        return isset($this->request[$key]) ? (int)$this->request[$key] : $default;
-    }
-
-    /**
-     * Returns the request data at the given key or the default
-     * @param string  $key
-     * @param integer $default
-     * @return integer
-     */
-    public function getIntOr(string $key, int $default): int {
-        return !empty($this->request[$key]) ? (int)$this->request[$key] : $default;
+        if (isset($this->request[$key])) {
+            return Numbers::toInt($this->request[$key]);
+        }
+        return $default;
     }
 
     /**
@@ -90,7 +91,10 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return float
      */
     public function getFloat(string $key, float $default = 0): float {
-        return isset($this->request[$key]) ? (float)$this->request[$key] : $default;
+        if (isset($this->request[$key])) {
+            return Numbers::toFloat($this->request[$key]);
+        }
+        return $default;
     }
 
     /**
@@ -100,17 +104,10 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getString(string $key, string $default = ""): string {
-        return isset($this->request[$key]) ? trim((string)$this->request[$key]) : $default;
-    }
-
-    /**
-     * Returns the request data at the given key as a trimmed string or the default
-     * @param string $key
-     * @param string $default
-     * @return string
-     */
-    public function getStringOr(string $key, string $default): string {
-        return !empty($this->request[$key]) ? trim((string)$this->request[$key]) : $default;
+        if (isset($this->request[$key])) {
+            return trim(Strings::toString($this->request[$key]));
+        }
+        return $default;
     }
 
     /**
@@ -163,7 +160,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         $result = [];
         if (JSON::isValid($value)) {
             $result = JSON::decodeAsArray($value);
-        } else {
+        } elseif (is_string($value)) {
             $result = Strings::split($value, ",");
         }
         return Arrays::toInts($result, withoutEmpty: true);
@@ -179,7 +176,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         $result = [];
         if (JSON::isValid($value)) {
             $result = JSON::decodeAsArray($value);
-        } else {
+        } elseif (is_string($value)) {
             $result = Strings::split($value, ",");
         }
         return Arrays::toStrings($result, withoutEmpty: true);
@@ -219,18 +216,6 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Sets the data of the give object
-     * @param mixed[] $object
-     * @return Request
-     */
-    public function setObject(array $object): Request {
-        foreach ($object as $key => $value) {
-            $this->request[$key] = $value;
-        }
-        return $this;
-    }
-
-    /**
      * Removes the request data at the given key
      * @param string $key
      * @return Request
@@ -263,7 +248,11 @@ class Request implements IteratorAggregate, JsonSerializable {
             return true;
         }
         if ($index !== null) {
-            return !empty($this->request[$key]) && !empty($this->request[$key][$index]);
+            return (
+                !empty($this->request[$key]) &&
+                is_array($this->request[$key]) &&
+                !empty($this->request[$key][$index])
+            );
         }
         return !empty($this->request[$key]);
     }
@@ -338,7 +327,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidString(string $key): bool {
-        return !empty(trim($this->get($key, "")));
+        $value = $this->getString($key);
+        return $value !== "";
     }
 
     /**
@@ -347,8 +337,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidNumber(string $key): bool {
-        $string = $this->getString($key, "");
-        return is_numeric($string);
+        $value = $this->getString($key);
+        return is_numeric($value);
     }
 
     /**
@@ -360,7 +350,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isNumeric(string $key, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
-        return Numbers::isValidFloat($this->getFloat($key), $min, $max, $decimals);
+        $value = $this->getFloat($key);
+        return Numbers::isValidFloat($value, $min, $max, $decimals);
     }
 
     /**
@@ -371,7 +362,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidPrice(string $key, ?int $min = 1, ?int $max = null): bool {
-        return Numbers::isValidPrice($this->getFloat($key), $min, $max);
+        $value = $this->getFloat($key);
+        return Numbers::isValidPrice($value, $min, $max);
     }
 
     /**
@@ -382,7 +374,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isAlphaNum(string $key, bool $withDashes = false, ?int $length = null): bool {
-        return Strings::isAlphaNum($this->get($key, ""), $withDashes, $length);
+        $value = $this->getString($key);
+        return Strings::isAlphaNum($value, $withDashes, $length);
     }
 
     /**
@@ -391,7 +384,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidSlug(string $key): bool {
-        return Strings::isValidSlug($this->get($key, ""));
+        $value = $this->getString($key);
+        return Strings::isValidSlug($value);
     }
 
     /**
@@ -400,7 +394,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidEmail(string $key): bool {
-        return Utils::isValidEmail($this->get($key));
+        $value = $this->getString($key);
+        return Utils::isValidEmail($value);
     }
 
     /**
@@ -411,7 +406,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidPassword(string $key, string $checkSets = "ad", int $minLength = 6): bool {
-        return Utils::isValidPassword($this->get($key), $checkSets, $minLength);
+        $value = $this->getString($key);
+        return Utils::isValidPassword($value, $checkSets, $minLength);
     }
 
     /**
@@ -429,7 +425,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidUsername(string $key): bool {
-        return Utils::isValidUsername($this->get($key));
+        $value = $this->getString($key);
+        return Utils::isValidUsername($value);
     }
 
     /**
@@ -438,7 +435,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidColor(string $key): bool {
-        return Utils::isValidColor($this->get($key));
+        $value = $this->getString($key);
+        return Utils::isValidColor($value);
     }
 
     /**
@@ -447,7 +445,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidCUIT(string $key): bool {
-        return Utils::isValidCUIT($this->get($key));
+        $value = $this->getString($key);
+        return Utils::isValidCUIT($value);
     }
 
     /**
@@ -456,7 +455,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidDNI(string $key): bool {
-        return Utils::isValidDNI($this->get($key));
+        $value = $this->getString($key);
+        return Utils::isValidDNI($value);
     }
 
     /**
@@ -465,7 +465,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidPhone(string $key): bool {
-        return Utils::isValidPhone($this->get($key));
+        $value = $this->getString($key);
+        return Utils::isValidPhone($value);
     }
 
     /**
@@ -474,7 +475,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidUrl(string $key): bool {
-        return Utils::isValidUrl($this->get($key));
+        $value = $this->getString($key);
+        return Utils::isValidUrl($value);
     }
 
     /**
@@ -494,7 +496,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidDate(string $key): bool {
-        return DateTime::isValidDate($this->get($key));
+        $value = $this->getString($key);
+        return DateTime::isValidDate($value);
     }
 
     /**
@@ -506,7 +509,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidHour(string $key, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
-        return DateTime::isValidHour($this->get($key), $minutes, $minHour, $maxHour);
+        $value = $this->getString($key);
+        return DateTime::isValidHour($value, $minutes, $minHour, $maxHour);
     }
 
     /**
@@ -517,7 +521,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidPeriod(string $fromKey, string $toKey): bool {
         if (!$this->isEmpty([ $fromKey, $toKey ])) {
-            return DateTime::isValidPeriod($this->get($fromKey), $this->get($toKey));
+            return DateTime::isValidPeriod($this->getString($fromKey), $this->getString($toKey));
         }
         return true;
     }
@@ -530,7 +534,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidHourPeriod(string $fromKey, string $toKey): bool {
         if (!$this->isEmpty([ $fromKey, $toKey ])) {
-            return DateTime::isValidHourPeriod($this->get($fromKey), $this->get($toKey));
+            return DateTime::isValidHourPeriod($this->getString($fromKey), $this->getString($toKey));
         }
         return true;
     }
@@ -551,10 +555,10 @@ class Request implements IteratorAggregate, JsonSerializable {
     ): bool {
         if (!$this->isEmpty([ $fromDateKey, $fromHourKey, $toDateKey, $toHourKey ])) {
             return DateTime::isValidFullPeriod(
-                $this->get($fromDateKey),
-                $this->get($fromHourKey),
-                $this->get($toDateKey),
-                $this->get($toHourKey)
+                $this->getString($fromDateKey),
+                $this->getString($fromHourKey),
+                $this->getString($toDateKey),
+                $this->getString($toHourKey)
             );
         }
         return true;
@@ -567,7 +571,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isValidWeekDay(string $key, bool $startMonday = false): bool {
-        return DateTime::isValidWeekDay($this->getInt($key), $startMonday);
+        $value = $this->getInt($key);
+        return DateTime::isValidWeekDay($value, $startMonday);
     }
 
     /**
@@ -577,7 +582,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isFutureDate(string $key, string $type = "middle"): bool {
-        return DateTime::isFutureDate($this->get($key), $type);
+        $value = $this->getString($key);
+        return DateTime::isFutureDate($value, $type);
     }
 
 
@@ -603,7 +609,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function toInt(string $key, int $decimals): int {
-        $value = (float)$this->get($key);
+        $value = $this->getFloat($key);
         return Numbers::toInt($value, $decimals);
     }
 
@@ -613,7 +619,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function toCents(string $key): int {
-        $value = (float)$this->get($key);
+        $value = $this->getFloat($key);
         return Numbers::toCents($value);
     }
 
@@ -628,7 +634,7 @@ class Request implements IteratorAggregate, JsonSerializable {
             $value = [];
         } elseif (JSON::isValid($value)) {
             $value = JSON::decodeAsArray($value);
-        } elseif (Strings::isString($value)) {
+        } elseif (is_string($value)) {
             $value = Strings::split($value, ",");
         }
         return JSON::encode($value);
@@ -640,7 +646,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function cuitToNumber(string $key): string {
-        return Utils::cuitToNumber($this->get($key));
+        $value = $this->getString($key);
+        return Utils::cuitToNumber($value);
     }
 
     /**
@@ -649,7 +656,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function dniToNumber(string $key): string {
-        return Utils::dniToNumber($this->get($key));
+        $value = $this->getString($key);
+        return Utils::dniToNumber($value);
     }
 
     /**
@@ -658,7 +666,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function phoneToNumber(string $key): string {
-        return Utils::phoneToNumber($this->get($key));
+        $value = $this->getString($key);
+        return Utils::phoneToNumber($value);
     }
 
     /**
@@ -667,7 +676,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function toDomain(string $key): string {
-        return Utils::parseDomain($this->get($key));
+        $value = $this->getString($key);
+        return Utils::parseDomain($value);
     }
 
 
@@ -698,7 +708,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         if ($skipEmpty && (!$this->has($dateKey) || !$this->has($hourKey))) {
             return 0;
         }
-        return DateTime::toTimeHour($this->get($dateKey), $this->get($hourKey), $useTimezone);
+        return DateTime::toTimeHour($this->getString($dateKey), $this->getString($hourKey), $useTimezone);
     }
 
     /**
@@ -709,7 +719,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function toDay(string $key, string $type = "start", bool $useTimezone = true): int {
-        return DateTime::toDay($this->get($key), $type, $useTimezone);
+        $value = $this->getString($key);
+        return DateTime::toDay($value, $type, $useTimezone);
     }
 
     /**
@@ -719,7 +730,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function toDayStart(string $key, bool $useTimezone = true): int {
-        return DateTime::toDayStart($this->get($key), $useTimezone);
+        $value = $this->getString($key);
+        return DateTime::toDayStart($value, $useTimezone);
     }
 
     /**
@@ -729,7 +741,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function toDayMiddle(string $key, bool $useTimezone = true): int {
-        return DateTime::toDayMiddle($this->get($key), $useTimezone);
+        $value = $this->getString($key);
+        return DateTime::toDayMiddle($value, $useTimezone);
     }
 
     /**
@@ -739,7 +752,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function toDayEnd(string $key, bool $useTimezone = true): int {
-        return DateTime::toDayEnd($this->get($key), $useTimezone);
+        $value = $this->getString($key);
+        return DateTime::toDayEnd($value, $useTimezone);
     }
 
     /**
@@ -749,7 +763,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getDayStart(string $key, bool $useTimezone = true): int {
-        return DateTime::getDayStart($this->getInt($key), 0, $useTimezone);
+        $value = $this->getInt($key);
+        return DateTime::getDayStart($value, 0, $useTimezone);
     }
 
     /**
@@ -759,7 +774,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getDayEnd(string $key, bool $useTimezone = true): int {
-        return DateTime::getDayEnd($this->getInt($key), 0, $useTimezone);
+        $value = $this->getInt($key);
+        return DateTime::getDayEnd($value, 0, $useTimezone);
     }
 
 
@@ -779,8 +795,20 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getFileName(string $key): string {
-        if ($this->hasFile($key)) {
-            return $this->files[$key]["name"];
+        if ($this->hasFile($key) && is_array($this->files[$key])) {
+            return Strings::toString($this->files[$key]["name"]);
+        }
+        return "";
+    }
+
+    /**
+     * Returns the request file type at the given key
+     * @param string $key
+     * @return string
+     */
+    public function getFileType(string $key): string {
+        if ($this->hasFile($key) && is_array($this->files[$key])) {
+            return Strings::toString($this->files[$key]["type"]);
         }
         return "";
     }
@@ -791,8 +819,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getTmpName(string $key): string {
-        if ($this->hasFile($key)) {
-            return $this->files[$key]["tmp_name"];
+        if ($this->hasFile($key) && is_array($this->files[$key])) {
+            return Strings::toString($this->files[$key]["tmp_name"]);
         }
         return "";
     }
@@ -805,9 +833,9 @@ class Request implements IteratorAggregate, JsonSerializable {
     public function getCurlFile(string $key): ?CURLFile {
         if ($this->hasFile($key)) {
             return curl_file_create(
-                $this->files[$key]["tmp_name"],
-                $this->files[$key]["type"],
-                $this->files[$key]["name"],
+                $this->getTmpName($key),
+                $this->getFileType($key),
+                $this->getFileName($key),
             );
         }
         return null;
@@ -819,7 +847,11 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function hasFile(string $key): bool {
-        return !empty($this->files[$key]) && !empty($this->files[$key]["name"]);
+        return (
+            !empty($this->files[$key]) &&
+            is_array($this->files[$key]) &&
+            !empty($this->files[$key]["name"])
+        );
     }
 
     /**
@@ -828,7 +860,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function hasSizeError(string $key): bool {
-        if ($this->hasFile($key)) {
+        if ($this->hasFile($key) && is_array($this->files[$key])) {
             return !empty($this->files[$key]["error"]) && $this->files[$key]["error"] == UPLOAD_ERR_INI_SIZE;
         }
         return true;
@@ -841,10 +873,11 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function hasExtension(string $key, array|string $extensions): bool {
+        $fileName = $this->getString($key);
         if ($this->hasFile($key)) {
-            return File::hasExtension($_FILES[$key]["name"], $extensions);
+            $fileName = $this->getFileName($key);
         }
-        return File::hasExtension($this->get($key), $extensions);
+        return File::hasExtension($fileName, $extensions);
     }
 
     /**
@@ -854,9 +887,9 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidImage(string $key): bool {
         if ($this->hasFile($key)) {
-            return Image::isValidType($_FILES[$key]["tmp_name"]);
+            return Image::isValidType($this->getTmpName($key));
         }
-        return FileType::isImage($this->get($key));
+        return FileType::isImage($this->getString($key));
     }
 
 
