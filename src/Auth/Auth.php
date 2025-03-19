@@ -107,18 +107,18 @@ class Auth {
      * @return boolean
      */
     private static function setLanguageTimezone(CredentialEntity $credential, CredentialEntity $admin, ?string $langcode = null, ?int $timezone = null): bool {
-        $model = $credential;
+        $entity = $credential;
         if (!$admin->isEmpty()) {
-            $model = $admin;
+            $entity = $admin;
         }
 
-        if (!empty($langcode) && !$model->has("language")) {
-            Credential::setLanguage($model->id, $langcode);
-            $model->language = $langcode;
+        if (!empty($langcode) && !$entity->hasValue("language")) {
+            Credential::setLanguage($entity->id, $langcode);
+            $entity->language = $langcode;
         }
         if (!empty($timezone)) {
-            Credential::setTimezone($model->id, $timezone);
-            $model->timezone = $timezone;
+            Credential::setTimezone($entity->id, $timezone);
+            $entity->timezone = $timezone;
         }
         return true;
     }
