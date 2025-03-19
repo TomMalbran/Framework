@@ -58,7 +58,7 @@
                         "dateType"  : { "$ref" : "#/$defs/dateType" },
                         "hour"      : { "$ref" : "#/$defs/field"    },
                         "path"      : { "$ref" : "#/$defs/field"    },
-                        "default"   : {                             },
+                        "default"   : { "type" : "string"           },
                         "isPrimary" : { "type" : "boolean"          },
                         "isKey"     : { "type" : "boolean"          },
                         "isName"    : { "type" : "boolean"          },

@@ -38,7 +38,7 @@ class Field {
     public string $date       = "";
     public string $hour       = "";
     public string $path       = "";
-    public mixed  $default    = null;
+    public string $default    = "";
 
     public bool   $isID       = false;
     public bool   $isPrimary  = false;
@@ -208,7 +208,7 @@ class Field {
         }
 
         if ($result !== "unknown") {
-            if ($this->default !== null) {
+            if ($this->default !== "") {
                 $result .= " DEFAULT '{$this->default}'";
             } elseif ($default !== null) {
                 $result .= " DEFAULT '{$default}'";
