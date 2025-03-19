@@ -386,6 +386,7 @@ class Database {
             }
             trigger_error($error, E_USER_ERROR);
         }
+
     }
 
     /**
@@ -459,7 +460,7 @@ class Database {
 
         // If $meta is false yet sqlstate is true, there's no sql error but the query is
         // most likely an update/insert/delete which doesn't produce any results
-        if ($meta === false || $statement->sqlstate) {
+        if ($meta === false) {
             return [];
         }
 
@@ -487,7 +488,7 @@ class Database {
 
     /**
      * Builds the query for inserting or updating
-     * @param array{}[] $fields
+     * @param array<string,mixed> $fields
      * @return string
      */
     private function buildInsertHeader(array $fields): string {
