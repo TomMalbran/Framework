@@ -109,9 +109,9 @@ class Notification {
         ];
         $response = Curl::execute("POST", self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
 
-        if (empty($response["id"])) {
+        if (!is_array($response) || empty($response["id"])) {
             return null;
         }
-        return $response["id"];
+        return Strings::toString($response["id"]);
     }
 }
