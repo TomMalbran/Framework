@@ -44,29 +44,36 @@ class Configs {
         $currentHost = Utils::getHost($currentUrl);
         $replace     = [];
 
-        // Read all the .env files in the App Path
-        $files = File::getFilesInDir($appPath);
-        foreach ($files as $file) {
-            if (!Strings::startsWith($file, ".env.")) {
-                continue;
-            }
-            $environment = Strings::replace($file, ".env.", "");
-            if (Arrays::contains(self::$environments, $environment)) {
-                continue;
-            }
+        // Read using the getenv function
+        $fileName = getenv("ENV_FILENAME");
+        if ($fileName !== false) {
+            $replace = self::loadENV($appPath, $fileName);
 
-            $values = self::loadENV($appPath, $file);
-            foreach ($values as $key => $value) {
-                if (Strings::endsWith($key, "URL")) {
-                    $host = Strings::toString($value);
-                    if (Utils::getHost($host) === $currentHost) {
-                        self::$environment = $environment;
-                        $replace = $values;
-                        break;
+        // Read all the .env files in the App Path
+        } else {
+            $files = File::getFilesInDir($appPath);
+            foreach ($files as $file) {
+                if (!Strings::startsWith($file, ".env.")) {
+                    continue;
+                }
+                $environment = Strings::replace($file, ".env.", "");
+                if (Arrays::contains(self::$environments, $environment)) {
+                    continue;
+                }
+
+                $values = self::loadENV($appPath, $file);
+                foreach ($values as $key => $value) {
+                    if (Strings::endsWith($key, "URL")) {
+                        $host = Strings::toString($value);
+                        if (Utils::getHost($host) === $currentHost) {
+                            self::$environment = $environment;
+                            $replace = $values;
+                            break;
+                        }
                     }
                 }
+                self::$environments[] = $environment;
             }
-            self::$environments[] = $environment;
         }
 
         self::$loaded = true;
