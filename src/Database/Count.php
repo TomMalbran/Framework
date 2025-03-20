@@ -23,7 +23,7 @@ class Count {
     private string $rightKey  = "";
     private bool   $noDeleted = false;
 
-    /** @var mixed[] */
+    /** @var string[] */
     private array  $where     = [];
 
 

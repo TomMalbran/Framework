@@ -18,7 +18,7 @@ class SubRequest {
     private string $idKey    = "";
     private string $idName   = "";
 
-    /** @var mixed[] */
+    /** @var string[] */
     private array  $where    = [];
 
     private bool   $hasOrder = false;

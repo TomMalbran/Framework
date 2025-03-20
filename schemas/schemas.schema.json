@@ -112,16 +112,16 @@
                     "additionalProperties" : false,
                     "required"             : [ "name" ],
                     "properties"           : {
-                        "type"    : { "type" : "string"        },
-                        "name"    : { "$ref" : "#/$defs/field" },
-                        "idKey"   : { "$ref" : "#/$defs/field" },
-                        "idName"  : { "$ref" : "#/$defs/field" },
-                        "where"   : { "type" : "array"         },
-                        "orderBy" : { "$ref" : "#/$defs/field" },
-                        "isAsc"   : { "type" : "boolean"       },
-                        "asArray" : { "type" : "boolean"       },
-                        "field"   : { "$ref" : "#/$defs/field" },
                         "value"   : {                          }
+                        "type"    : { "type" : "string"          },
+                        "name"    : { "$ref" : "#/$defs/field"   },
+                        "idKey"   : { "$ref" : "#/$defs/field"   },
+                        "idName"  : { "$ref" : "#/$defs/field"   },
+                        "where"   : { "$ref" : "#/$defs/strings" },
+                        "orderBy" : { "$ref" : "#/$defs/field"   },
+                        "isAsc"   : { "type" : "boolean"         },
+                        "asArray" : { "type" : "boolean"         },
+                        "field"   : { "$ref" : "#/$defs/field"   },
                     }
                 }
             }
@@ -136,17 +136,17 @@
                     "additionalProperties" : false,
                     "required"             : [ "schema", "type" ],
                     "properties"           : {
-                        "schema"    : { "$ref" : "#/$defs/schema" },
-                        "type"      : { "$ref" : "#/$defs/type"   },
-                        "isSum"     : { "type" : "boolean"        },
-                        "key"       : { "type" : "string"         },
-                        "value"     : { "type" : "string"         },
-                        "mult"      : { "type" : "number"         },
-                        "onSchema"  : { "$ref" : "#/$defs/schema" },
-                        "rightKey"  : { "$ref" : "#/$defs/field"  },
-                        "leftKey"   : { "$ref" : "#/$defs/field"  },
-                        "where"     : { "type" : "array"          },
-                        "noDeleted" : { "type" : "boolean"        }
+                        "schema"    : { "$ref" : "#/$defs/schema"  },
+                        "type"      : { "$ref" : "#/$defs/type"    },
+                        "isSum"     : { "type" : "boolean"         },
+                        "key"       : { "type" : "string"          },
+                        "value"     : { "type" : "string"          },
+                        "mult"      : { "type" : "number"          },
+                        "onSchema"  : { "$ref" : "#/$defs/schema"  },
+                        "rightKey"  : { "$ref" : "#/$defs/field"   },
+                        "leftKey"   : { "$ref" : "#/$defs/field"   },
+                        "where"     : { "$ref" : "#/$defs/strings" },
+                        "noDeleted" : { "type" : "boolean"         }
                     }
                 }
             }
