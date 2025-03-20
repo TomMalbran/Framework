@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Database\Factory;
 use Framework\Database\Field;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
@@ -11,9 +12,9 @@ use Framework\Utils\Strings;
  */
 class Count {
 
-    public Field  $field;
+    public  Field  $field;
     private bool   $isSum     = false;
-    public string  $key       = "";
+    public  string $key       = "";
     private string $value     = "";
     private int    $mult      = 1;
 
@@ -29,23 +30,25 @@ class Count {
 
     /**
      * Creates a new Count instance
-     * @param string              $key
-     * @param array<string,mixed> $data
+     * @param string     $key
+     * @param Dictionary $data
      */
-    public function __construct(string $key, array $data) {
+    public function __construct(string $key, Dictionary $data) {
+        $whereKey = $data->getString("key", $key);
+
         $this->field     = new Field($key, $data);
         $this->key       = $key;
 
-        $this->isSum     = $data["isSum"] ?? false;
-        $this->value     = $data["value"] ?? "";
-        $this->mult      = (int)($data["mult"] ?? 1);
+        $this->isSum     = $data->hasValue("isSum");
+        $this->value     = $data->getString("value");
+        $this->mult      = $data->getInt("mult");
 
-        $this->table     = Factory::getTableName($data["schema"]);
-        $this->onTable   = !empty($data["onSchema"]) ? Factory::getTableName($data["onSchema"]) : "";
-        $this->rightKey  = $data["rightKey"]  ?? $data["key"];
-        $this->leftKey   = $data["leftKey"]   ?? $data["key"];
-        $this->where     = $data["where"]     ?? [];
-        $this->noDeleted = $data["noDeleted"] ?? false;
+        $this->table     = Factory::getTableName($data->getString("schema"));
+        $this->onTable   = Factory::getTableName($data->getString("onSchema"));
+        $this->rightKey  = $data->getString("rightKey", $whereKey);
+        $this->leftKey   = $data->getString("leftKey", $whereKey);
+        $this->where     = $data->getStrings("where");
+        $this->noDeleted = $data->hasValue("noDeleted");
     }
 
 

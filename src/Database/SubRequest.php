@@ -4,6 +4,7 @@ namespace Framework\Database;
 use Framework\Database\Structure;
 use Framework\Database\Query;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 
 /**
  * The Schema SubRequests
@@ -35,35 +36,36 @@ class SubRequest {
 
     /**
      * Creates a new SubRequest instance
-     * @param Structure           $structure
-     * @param array<string,mixed> $data
-     * @param string              $idKey
-     * @param string              $idName
+     * @param Structure  $structure
+     * @param Dictionary $data
+     * @param string     $idKey
+     * @param string     $idName
      */
-    public function __construct(Structure $structure, array $data, string $idKey, string $idName) {
+    public function __construct(Structure $structure, Dictionary $data, string $idKey, string $idName) {
         $this->structure = $structure;
 
-        $this->name      = $data["name"];
-        $this->type      = !empty($data["type"])    ? $data["type"]    : $structure->schema;
-        $this->idKey     = !empty($data["idKey"])   ? $data["idKey"]   : $idKey;
-        $this->idName    = !empty($data["idName"])  ? $data["idName"]  : $idName;
-        $this->where     = !empty($data["where"])   ? $data["where"]   : [];
+        $this->name      = $data->getString("name");
+        $this->type      = $data->getString("type", $structure->schema);
+        $this->idKey     = $data->getString("idKey", $idKey);
+        $this->idName    = $data->getString("idName", $idName);
+        $this->where     = $data->getStrings("where");
 
-        $this->hasOrder  = !empty($data["orderBy"]);
-        $this->orderBy   = !empty($data["orderBy"]) ? $data["orderBy"] : "";
-        $this->isAsc     = !empty($data["isAsc"])   ? $data["isAsc"]   : false;
+        $this->hasOrder  = $data->hasValue("orderBy");
+        $this->orderBy   = $data->getString("orderBy");
+        $this->isAsc     = $data->hasValue("isAsc");
 
-        $this->asArray   = !empty($data["asArray"]);
-        $this->field     = !empty($data["field"])   ? $data["field"]   : "";
-        $this->value     = !empty($data["value"])   ? $data["value"]   : null;
+        $this->asArray   = $data->hasValue("asArray");
+        $this->field     = $data->getString("field");
+        $this->value     = $data->getString("value");
+        $this->values    = $data->getStrings("value");
     }
 
 
 
     /**
      * Does the Request with a Sub Request
-     * @param mixed[] $result
-     * @return array{}[]
+     * @param array<string,mixed>[] $result
+     * @return array<string,mixed>[]
      */
     public function request(array $result): array {
         $query     = $this->createQuery($result);
@@ -94,7 +96,9 @@ class SubRequest {
             if (empty($subResult[$name][$field])) {
                 $subResult[$name][$field] = [];
             }
-            $subResult[$name][$field][] = $this->getValues($row);
+            if (is_array($subResult[$name][$field])) {
+                $subResult[$name][$field][] = $this->getValues($row);
+            }
         }
 
         foreach ($result as $index => $row) {

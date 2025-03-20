@@ -5,6 +5,7 @@ use Framework\Database\Factory;
 use Framework\Database\Field;
 use Framework\Database\Merge;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 
 /**
  * The Schema Join
@@ -45,37 +46,38 @@ class Join {
 
     /**
      * Creates a new Join instance
-     * @param string              $key
-     * @param array<string,mixed> $data
+     * @param string     $key
+     * @param Dictionary $data
      */
-    public function __construct(string $key, array $data) {
+    public function __construct(string $key, Dictionary $data) {
         $this->key        = $key;
-        $this->table      = Factory::getTableName($data["schema"]);
-        $this->asTable    = !empty($data["asSchema"])   ? Factory::getTableName($data["asSchema"]) : "";
-        $this->onTable    = !empty($data["onSchema"])   ? Factory::getTableName($data["onSchema"]) : "";
-        $this->leftKey    = !empty($data["leftKey"])    ? $data["leftKey"]    : $key;
-        $this->rightKey   = !empty($data["rightKey"])   ? $data["rightKey"]   : $key;
-        $this->andTable   = !empty($data["andSchema"])  ? Factory::getTableName($data["andSchema"]) : "";
-        $this->and        = !empty($data["and"])        ? $data["and"]        : "";
-        $this->andKey     = !empty($data["andKey"])     ? $data["andKey"]     : "";
-        $this->andKeys    = !empty($data["andKeys"])    ? $data["andKeys"]    : [];
-        $this->orKeys     = !empty($data["orKeys"])     ? $data["orKeys"]     : [];
-        $this->andValue   = !empty($data["andValue"])   ? $data["andValue"]   : "";
-        $this->andDeleted = !empty($data["andDeleted"]) ? $data["andDeleted"] : false;
+        $this->table      = Factory::getTableName($data->getString("schema"));
+        $this->asTable    = Factory::getTableName($data->getString("asSchema"));
+        $this->onTable    = Factory::getTableName($data->getString("onSchema"));
+        $this->leftKey    = $data->getString("leftKey", $key);
+        $this->rightKey   = $data->getString("rightKey", $key);
+        $this->andTable   = Factory::getTableName($data->getString("andSchema"));
+        $this->and        = $data->getString("and");
+        $this->andKey     = $data->getString("andKey");
+        $this->andKeys    = $data->getStrings("andKeys");
+        $this->orKeys     = $data->getStrings("orKeys");
+        $this->andValue   = $data->getString("andValue");
+        $this->andDeleted = $data->hasValue("andDeleted");
 
-        $this->hasPrefix  = !empty($data["prefix"]);
-        $this->prefix     = !empty($data["prefix"])     ? $data["prefix"]   : "";
+        $this->hasPrefix  = $data->hasValue("prefix");
+        $this->prefix     = $data->getString("prefix");
 
 
         // Creates the Fields
-        foreach ($data["fields"] as $key => $value) {
+        foreach ($data->getDict("fields") as $key => $value) {
             $field = new Field($key, $value, $this->prefix);
             $this->fields[] = $field;
 
             if ($field->mergeTo !== "") {
                 if (empty($this->merges[$field->mergeTo])) {
-                    $key = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
-                    $this->merges[$field->mergeTo] = new Merge($key, $data);
+                    $key  = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
+                    $glue = $data->getString("mergeGlue");
+                    $this->merges[$field->mergeTo] = new Merge($key, $glue);
                 }
                 $this->merges[$field->mergeTo]->fields[] = $field->prefixName;
             }

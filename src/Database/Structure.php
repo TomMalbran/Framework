@@ -5,6 +5,7 @@ use Framework\Database\Factory;
 use Framework\Database\Field;
 use Framework\Database\Join;
 use Framework\Database\Count;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -54,88 +55,89 @@ class Structure {
 
     /**
      * Creates a new Structure instance
-     * @param string              $schema
-     * @param array<string,mixed> $data
+     * @param string     $schema
+     * @param Dictionary $data
      */
-    public function __construct(string $schema, array $data) {
+    public function __construct(string $schema, Dictionary $data) {
         $this->schema        = $schema;
         $this->table         = Factory::getTableName($schema);
-        $this->hasStatus     = $data["hasStatus"]     ?? false;
-        $this->hasPositions  = $data["hasPositions"]  ?? false;
-        $this->hasTimestamps = $data["hasTimestamps"] ?? false;
-        $this->hasUsers      = $data["hasUsers"]      ?? false;
-        $this->hasFilters    = $data["hasFilters"]    ?? false;
-        $this->canCreate     = $data["canCreate"]     ?? false;
-        $this->canEdit       = $data["canEdit"]       ?? false;
-        $this->canDelete     = $data["canDelete"]     ?? false;
-        $this->canRemove     = $data["canRemove"]     ?? false;
+        $this->hasStatus     = $data->hasValue("hasStatus");
+        $this->hasPositions  = $data->hasValue("hasPositions");
+        $this->hasTimestamps = $data->hasValue("hasTimestamps");
+        $this->hasUsers      = $data->hasValue("hasUsers");
+        $this->hasFilters    = $data->hasValue("hasFilters");
+        $this->canCreate     = $data->hasValue("canCreate");
+        $this->canEdit       = $data->hasValue("canEdit");
+        $this->canDelete     = $data->hasValue("canDelete");
+        $this->canRemove     = $data->hasValue("canRemove");
 
         // Add additional Fields
+        $fields = $data->getDict("fields");
         if ($this->hasStatus) {
-            $data["fields"]["status"] = [
+            $fields->set("status", [
                 "type"    => Field::String,
                 "noEmpty" => true,
                 "default" => "",
-            ];
+            ]);
         }
         if ($this->hasPositions) {
-            $data["fields"]["position"] = [
+            $fields->set("position", [
                 "type"    => Field::Number,
                 "default" => 0,
-            ];
+            ]);
         }
         if ($this->canCreate && $this->hasTimestamps) {
-            $data["fields"]["createdTime"] = [
+            $fields->set("createdTime", [
                 "type"     => Field::Date,
                 "cantEdit" => true,
                 "default"  => 0,
-            ];
+            ]);
         }
         if ($this->canCreate && $this->hasUsers) {
-            $data["fields"]["createdUser"] = [
+            $fields->set("createdUser", [
                 "type"     => Field::Number,
                 "cantEdit" => true,
                 "default"  => 0,
-            ];
+            ]);
         }
         if ($this->canEdit && $this->hasTimestamps) {
-            $data["fields"]["modifiedTime"] = [
+            $fields->set("modifiedTime", [
                 "type"     => Field::Date,
                 "cantEdit" => true,
                 "default"  => 0,
-            ];
+            ]);
         }
         if ($this->canEdit && $this->hasUsers) {
-            $data["fields"]["modifiedUser"] = [
+            $fields->set("modifiedUser", [
                 "type"     => Field::Number,
                 "cantEdit" => true,
                 "default"  => 0,
-            ];
+            ]);
         }
         if ($this->canDelete) {
-            $data["fields"]["isDeleted"] = [
+            $fields->set("isDeleted", [
                 "type"     => Field::Boolean,
                 "cantEdit" => true,
                 "default"  => 0,
-            ];
+            ]);
         }
 
         // Parse the Fields
         $idKey        = "";
         $primaryCount = 0;
         $reqMasterKey = false;
-        foreach ($data["fields"] as $key => $value) {
-            if ($value["type"] == Field::ID) {
-                $data["fields"][$key]["isPrimary"] = true;
-                $idKey = $key;
-            }
-            if (!empty($value["isPrimary"])) {
+
+        foreach ($fields as $key => $value) {
+            if ($value->getString("type") === Field::ID) {
+                $idKey         = $key;
+                $primaryCount += 1;
+            } elseif ($value->hasValue("isPrimary")) {
                 $primaryCount += 1;
             }
-            if ($idKey === "" && !empty($value["isPrimary"])) {
+            if ($idKey === "" && $value->hasValue("isPrimary")) {
                 $idKey = $key;
             }
-            if ($value["type"] == Field::Encrypt) {
+            if ($value->getString("type") === Field::Encrypt) {
                 $reqMasterKey = true;
             }
         }
@@ -144,9 +146,9 @@ class Structure {
         }
 
         // Create the Fields
-        foreach ($data["fields"] as $key => $value) {
+        foreach ($fields as $key => $value) {
             $field = new Field($key, $value);
-            if ($field->type == Field::ID) {
+            if ($field->type === Field::ID) {
                 $this->hasAutoInc = true;
             }
             if ($key == $idKey) {
@@ -156,45 +158,36 @@ class Structure {
                 $this->idType = $field->type;
             }
             if ($field->isName) {
-                $this->nameKey = $field->type == Field::Text ? "{$field->key}Short" : $field->key;
+                $this->nameKey = $field->type === Field::Text ? "{$field->key}Short" : $field->key;
             }
             $this->fields[] = $field;
         }
 
         // Create the Expressions
-        if (!empty($data["expressions"])) {
-            foreach ($data["expressions"] as $key => $value) {
-                $this->expressions[$value["expression"]] = new Field($key, $value);
-            }
+        foreach ($data->getDict("expressions") as $key => $value) {
+            $expression = $value->getString("expression");
+            $this->expressions[$expression] = new Field($key, $value);
         }
 
         // Create the Processed
-        if (!empty($data["processed"])) {
-            foreach ($data["processed"] as $key => $value) {
-                $this->processed[] = new Field($key, $value);
-            }
+        foreach ($data->getDict("processed") as $key => $value) {
+            $this->processed[] = new Field($key, $value);
         }
 
         // Create the Joins
-        if (!empty($data["joins"])) {
-            foreach ($data["joins"] as $key => $value) {
-                $this->joins[] = new Join($key, $value);
-            }
+        foreach ($data->getDict("joins") as $key => $value) {
+            $this->joins[] = new Join($key, $value);
         }
 
         // Create the Counts
-        if (!empty($data["counts"])) {
-            foreach ($data["counts"] as $key => $value) {
-                $this->counts[] = new Count($key, $value);
-            }
+        foreach ($data->getDict("counts") as $key => $value) {
+            $this->counts[] = new Count($key, $value);
         }
 
         // Create the SubRequests
-        if (!empty($data["subrequests"])) {
-            foreach ($data["subrequests"] as $key => $value) {
-                $subStructure = Factory::getStructure($key);
-                $this->subRequests[] = new SubRequest($subStructure, $value, $this->idKey, $this->idName);
-            }
+        foreach ($data->getDict("subrequests") as $key => $value) {
+            $subStructure = Factory::getStructure($key);
+            $this->subRequests[] = new SubRequest($subStructure, $value, $this->idKey, $this->idName);
         }
 
         // Set the Master Key

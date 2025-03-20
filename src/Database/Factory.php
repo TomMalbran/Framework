@@ -5,6 +5,7 @@ use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\Database\Structure;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -12,10 +13,7 @@ use Framework\Utils\Strings;
  */
 class Factory {
 
-    private static bool  $loaded     = false;
-
-    /** @var array<string,mixed> */
-    private static array $data       = [];
+    private static ?Dictionary $data = null;
 
     /** @var Structure[] */
     private static array $structures = [];
@@ -23,14 +21,14 @@ class Factory {
 
 
     /**
-     * Loads the Schemas Data
-     * @return boolean
+     * Gets the Schema data
+     * @return Dictionary
      */
-    public static function load(): bool {
-        if (self::$loaded) {
-            return false;
+    public static function getData(): Dictionary {
+        if (self::$data !== null) {
+            return self::$data;
         }
-        self::$loaded = true;
+        self::$data = new Dictionary();
 
         /** @var array<string,mixed> */
         $appSchemas   = Discovery::loadData(DataFile::Schemas);
@@ -40,31 +38,30 @@ class Factory {
 
         foreach ($appSchemas as $key => $data) {
             if (empty($frameSchemas[$key])) {
-                self::$data[$key] = $data;
+                self::$data->set($key, $data);
             }
         }
 
         foreach ($frameSchemas as $key => $data) {
-            if (!empty($appSchemas[$key])) {
-                self::$data[$key] = Arrays::extend($data, $appSchemas[$key]);
-            } else {
-                self::$data[$key] = $data;
+            if (!is_array($data)) {
+                continue;
             }
-            self::$data[$key]["fromFramework"] = true;
+
+            $schemaData = [];
+            if (isset($appSchemas[$key]) && is_array($appSchemas[$key])) {
+                $schemaData = Arrays::extend($data, $appSchemas[$key]);
+            } else {
+                $schemaData = $data;
+            }
+            $schemaData["fromFramework"] = true;
+
+            self::$data->set($key, $schemaData);
         }
-        return true;
-    }
 
-
-
-    /**
-     * Gets the Schema data
-     * @return array<string,mixed>
-     */
-    public static function getData(): array {
-        self::load();
         return self::$data;
     }
+
+
 
     /**
      * Creates and Returns the Structure for the given Key
@@ -72,9 +69,9 @@ class Factory {
      * @return Structure
      */
     public static function getStructure(string $schema): Structure {
-        self::load();
-        if (empty(self::$structures[$schema])) {
-            self::$structures[$schema] = new Structure($schema, self::$data[$schema]);
+        if (!isset(self::$structures[$schema])) {
+            $data = self::getData()->getDict($schema);
+            self::$structures[$schema] = new Structure($schema, $data);
         }
         return self::$structures[$schema];
     }

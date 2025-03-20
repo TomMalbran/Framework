@@ -8,6 +8,7 @@ use Framework\Database\Field;
 use Framework\Provider\Mustache;
 use Framework\System\Package;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -32,7 +33,7 @@ class Generator {
         $folders = self::generateFolders($schemas, $writePath, $forFramework);
 
         foreach ($schemas as $schemaKey => $schemaData) {
-            $fromFramework = $schemaData["fromFramework"] ?? false;
+            $fromFramework = $schemaData->hasValue("fromFramework");
             if (($forFramework && !$fromFramework) || (!$forFramework && $fromFramework)) {
                 continue;
             }
@@ -73,17 +74,17 @@ class Generator {
 
     /**
      * Generates the Folders for the Schemas
-     * @param array<string,mixed> $schemas
-     * @param string              $writePath
-     * @param boolean             $forFramework
+     * @param Dictionary $schemas
+     * @param string     $writePath
+     * @param boolean    $forFramework
      * @return array<string,string>
      */
-    private static function generateFolders(array $schemas, string $writePath, bool $forFramework): array {
+    private static function generateFolders(Dictionary $schemas, string $writePath, bool $forFramework): array {
         $groups  = [];
         $folders = [];
 
         foreach ($schemas as $schemaKey => $schemaData) {
-            $fromFramework = $schemaData["fromFramework"] ?? false;
+            $fromFramework = $schemaData->hasValue("fromFramework");
             if ($fromFramework) {
                 continue;
             }

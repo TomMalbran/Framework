@@ -6,21 +6,21 @@ namespace Framework\Database;
  */
 class Merge {
 
-    public string  $key    = "";
-    public string  $glue   = "";
+    public string $key    = "";
+    public string $glue   = "";
 
     /** @var string[] */
-    public array   $fields = [];
+    public array  $fields = [];
 
 
     /**
      * Creates a new Merge instance
-     * @param string              $key
-     * @param array<string,mixed> $data
+     * @param string $key
+     * @param string $glue
      */
-    public function __construct(string $key, array $data) {
+    public function __construct(string $key, string $glue) {
         $this->key    = $key;
-        $this->glue   = !empty($data["mergeGlue"]) ? $data["mergeGlue"] : "";
+        $this->glue   = $glue;
         $this->fields = [];
     }
 }

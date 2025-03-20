@@ -6,6 +6,7 @@ use Framework\File\FilePath;
 use Framework\Database\Assign;
 use Framework\System\Config;
 use Framework\System\Path;
+use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -63,36 +64,36 @@ class Field {
 
     /**
      * Creates a new Field instance
-     * @param string              $key
-     * @param array<string,mixed> $data
-     * @param string              $prefix Optional.
+     * @param string     $key
+     * @param Dictionary $data
+     * @param string     $prefix Optional.
      */
-    public function __construct(string $key, array $data, string $prefix = "") {
+    public function __construct(string $key, Dictionary $data, string $prefix = "") {
         $this->key        = $key;
 
-        $this->type       = !empty($data["type"])     ? $data["type"]          : self::String;
-        $this->length     = !empty($data["length"])   ? (int)$data["length"]   : $this->length;
-        $this->decimals   = !empty($data["decimals"]) ? (int)$data["decimals"] : $this->decimals;
-        $this->dateType   = !empty($data["dateType"]) ? $data["dateType"]      : $this->dateType;
-        $this->date       = !empty($data["date"])     ? $data["date"]          : $this->date;
-        $this->hour       = !empty($data["hour"])     ? $data["hour"]          : $this->hour;
-        $this->path       = !empty($data["path"])     ? $data["path"]          : $this->path;
-        $this->default    = isset($data["default"])   ? $data["default"]       : $this->default;
+        $this->type       = $data->getString("type", self::String);
+        $this->length     = $data->getInt("length", $this->length);
+        $this->decimals   = $data->getInt("decimals", $this->decimals);
+        $this->dateType   = $data->getString("dateType", $this->dateType);
+        $this->date       = $data->getString("date", $this->date);
+        $this->hour       = $data->getString("hour", $this->hour);
+        $this->path       = $data->getString("path", $this->path);
+        $this->default    = $data->getString("default", $this->default);
 
         $this->isID       = $this->type === self::ID;
-        $this->isPrimary  = !empty($data["isPrimary"]);
-        $this->isKey      = !empty($data["isKey"]);
-        $this->isName     = !empty($data["isName"]);
-        $this->isUnique   = !empty($data["isUnique"]);
-        $this->isParent   = !empty($data["isParent"]);
-        $this->noExists   = !empty($data["noExists"]);
-        $this->noEmpty    = !empty($data["noEmpty"]);
-        $this->isSigned   = !empty($data["isSigned"]);
-        $this->noPrefix   = !empty($data["noPrefix"]);
-        $this->canEdit    = empty($data["cantEdit"]);
+        $this->isPrimary  = $this->isID || $data->hasValue("isPrimary");
+        $this->isKey      = $data->hasValue("isKey");
+        $this->isName     = $data->hasValue("isName");
+        $this->isUnique   = $data->hasValue("isUnique");
+        $this->isParent   = $data->hasValue("isParent");
+        $this->noExists   = $data->hasValue("noExists");
+        $this->noEmpty    = $data->hasValue("noEmpty");
+        $this->isSigned   = $data->hasValue("isSigned");
+        $this->noPrefix   = $data->hasValue("noPrefix");
+        $this->canEdit    = !$data->hasValue("cantEdit");
 
-        $this->mergeTo    = !empty($data["mergeTo"])   ? $data["mergeTo"]   : "";
-        $this->defaultTo  = !empty($data["defaultTo"]) ? $data["defaultTo"] : "";
+        $this->mergeTo    = $data->getString("mergeTo");
+        $this->defaultTo  = $data->getString("defaultTo");
 
         $this->hasName    = Strings::isUpperCase($key);
         $this->name       = $this->getFieldName();
@@ -259,7 +260,7 @@ class Field {
             $result = $request->toJSON($this->name);
             break;
         case self::Encrypt:
-            $value  = $request->get($this->name);
+            $value  = $request->getString($this->name);
             $result = Assign::encrypt($value, Config::getDbKey());
             break;
         default:
@@ -275,8 +276,8 @@ class Field {
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;
-        $text   = isset($data[$key]) ? (string)$data[$key] : "";
-        $number = isset($data[$key]) ? (int)$data[$key]    : 0;
+        $text   = isset($data[$key]) ? Strings::toString($data[$key]) : "";
+        $number = isset($data[$key]) ? Numbers::toInt($data[$key])    : 0;
         $result = [];
 
         switch ($this->type) {
@@ -307,7 +308,7 @@ class Field {
             $result[$key]           = $text;
             break;
         case self::Encrypt:
-            $result[$key]           = !empty($data["{$key}Decrypt"]) ? $data["{$key}Decrypt"] : "";
+            $result[$key]           = !empty($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
             break;
         case self::File:
             $result[$key]           = $text;
@@ -321,6 +322,7 @@ class Field {
         default:
             $result[$key]           = $text;
         }
+
         return $result;
     }
 }
