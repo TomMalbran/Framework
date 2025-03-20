@@ -111,7 +111,7 @@ class Email {
             return false;
         }
         $secretKey = urlencode($recaptchaSecret);
-        $captcha   = urlencode($request->get("g-recaptcha-response"));
+        $captcha   = urlencode($request->getString("g-recaptcha-response"));
         $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";
         $response  = JSON::readUrl($url);
 

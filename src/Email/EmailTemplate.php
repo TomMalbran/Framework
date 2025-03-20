@@ -6,6 +6,7 @@ use Framework\Provider\Mustache;
 use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Schema\EmailTemplateSchema;
 use Framework\Schema\EmailTemplateEntity;
@@ -60,8 +61,10 @@ class EmailTemplate extends EmailTemplateSchema {
         $position  = 0;
         $languages = Language::getAll();
         foreach ($languages as $language => $languageName) {
+            /** @var array<string,string>[] */
             $templates = Discovery::loadJSON(Package::EmailsDir, $language);
-            if (!empty($templates)) {
+
+            if (!Arrays::isEmpty($templates)) {
                 $position = self::migrateLanguage($templates, $language, $languageName, $position);
             }
         }
@@ -70,10 +73,10 @@ class EmailTemplate extends EmailTemplateSchema {
 
     /**
      * Migrates the Email Templates for the given Language
-     * @param array<string,mixed>[] $templates
-     * @param string                $language
-     * @param string                $languageName
-     * @param integer               $position
+     * @param array<string,string>[] $templates
+     * @param string                 $language
+     * @param string                 $languageName
+     * @param integer                $position
      * @return integer
      */
     private static function migrateLanguage(array $templates, string $language, string $languageName, int $position): int {

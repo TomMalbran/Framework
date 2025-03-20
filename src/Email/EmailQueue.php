@@ -122,7 +122,9 @@ class EmailQueue extends EmailQueueSchema {
      */
     public static function send(EmailQueueEntity $email, bool $sendAlways): bool {
         $emailResult = EmailResult::NoEmails;
-        foreach ($email->sendTo as $sendTo) {
+        $sendTos     = Arrays::toStrings($email->sendTo);
+
+        foreach ($sendTos as $sendTo) {
             if (!empty($sendTo)) {
                 $emailResult = Email::send(
                     $sendTo,
