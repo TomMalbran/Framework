@@ -61,14 +61,12 @@ class Importer implements Iterator {
 
     /**
      * Sets the Columns
-     * @param array<string,integer> ...$columnsList
+     * @param array<string,integer> $columns
      * @return Importer
      */
-    public function setColumns(array ...$columnsList): Importer {
-        foreach ($columnsList as $columns) {
-            foreach ($columns as $key => $index) {
-                $this->columns[$key] = $index;
-            }
+    public function setColumns(array $columns): Importer {
+        foreach ($columns as $key => $index) {
+            $this->columns[$key] = $index;
         }
         return $this;
     }
