@@ -58,7 +58,7 @@ class SignalCode {
         }
 
         $signals = array_values($signals);
-        $signals = Arrays::sort($signals, function ($a, $b) {
+        $signals = Arrays::sort($signals, function (array $a, array $b) {
             return $a["event"] <=> $b["event"];
         });
 

@@ -26,13 +26,13 @@ class LanguageCode {
         foreach ($files as $file) {
             $code = Strings::stripEnd($file, ".json");
             $data = Discovery::loadJSON(Package::StringsDir, $code);
-            if (empty($data["NAME"])) {
+            if (!isset($data["NAME"])) {
                 continue;
             }
 
             $languages[] = [
                 "code" => $code,
-                "name" => $data["NAME"],
+                "name" => Strings::toString($data["NAME"]),
             ];
             if ($code === $rootCode) {
                 $rootFound = true;
@@ -52,16 +52,18 @@ class LanguageCode {
             $rootCode = $languages[0]["code"];
         }
 
+
         // Sort the Root Language to the top
-        usort($languages, function($a, $b) use ($rootCode) {
+        usort($languages, function(array $a, array $b) use ($rootCode) {
             if ($a["code"] === $rootCode) {
                 return -1;
             }
             if ($b["code"] === $rootCode) {
                 return 1;
             }
-            return strcmp($a["name"], $b["name"]);
+            return Strings::compare($a["name"], $b["name"]);
         });
+
 
         // Return the Languages
         return [

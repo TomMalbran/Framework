@@ -16,13 +16,16 @@ class StatusCode {
      * @return array<string,mixed>
      */
     public static function getCode(): array {
+        /** @var array{values:array<string,string>,groups:array<string,string[]>} */
         $frameData = Discovery::loadFrameData(DataFile::Status);
+
+        /** @var array{values:array<string,string>,groups:array<string,string[]>} */
         $appData   = Discovery::loadData(DataFile::Status);
 
         $values = $frameData["values"];
         $groups = $frameData["groups"];
 
-        if (!empty($appData)) {
+        if (!Arrays::isEmpty($appData)) {
             $values = array_merge($frameData["values"], $appData["values"]);
             $groups = array_merge($frameData["groups"], $appData["groups"]);
         }
@@ -39,7 +42,7 @@ class StatusCode {
 
     /**
      * Generates the Statues data
-     * @param array<string,mixed> $values
+     * @param array<string,string> $values
      * @return array{name:string,color:string,constant:string}[]
      */
     private static function getStatues(array $values): array {
@@ -56,7 +59,7 @@ class StatusCode {
 
     /**
      * Generates the Groups data
-     * @param array<string,mixed> $groups
+     * @param array<string,string[]> $groups
      * @return array{name:string,statuses:string,values:string}[]
      */
     private static function getGroups(array $groups): array {

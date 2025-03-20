@@ -74,7 +74,7 @@ class Builder {
 
     /**
      * Returns the Package Data
-     * @return array<string,mixed>
+     * @return array<string,string>
      */
     private static function getPackageData(): array {
         $framePath = dirname(__FILE__, 3);
@@ -88,9 +88,15 @@ class Builder {
 
         // Read the Composer File
         $composer     = JSON::readFile($basePath, "composer.json");
-        $psr          = $composer["autoload"]["psr-4"];
-        $appNamespace = key($psr);
-        $sourceDir    = $psr[$appNamespace];
+        $psr          = [];
+        $appNamespace = "";
+        $sourceDir    = "";
+
+        if (isset($composer["autoload"]) && is_array($composer["autoload"]) && is_array($composer["autoload"]["psr-4"])) {
+            $psr          = $composer["autoload"]["psr-4"];
+            $appNamespace = Strings::toString(key($psr));
+            $sourceDir    = Strings::toString($psr[$appNamespace]);
+        }
 
         // Find the Data and Template directories
         $files       = File::getFilesInDir($basePath, true);

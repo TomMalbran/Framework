@@ -5,6 +5,7 @@ use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\Core\Settings;
 use Framework\Core\VariableType;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -17,9 +18,9 @@ class SettingCode {
      * @return array<string,mixed>
      */
     public static function getCode(): array {
-        /** @var array<string,mixed> */
+        /** @var array<string,array<string,mixed>> */
         $data = Discovery::loadData(DataFile::Settings);
-        if (empty($data)) {
+        if (Arrays::isEmpty($data)) {
             return [];
         }
 
@@ -52,7 +53,7 @@ class SettingCode {
 
     /**
      * Returns the Settings Variables for the generator
-     * @param array<string,mixed> $data
+     * @param array<string,array<string,mixed>> $data
      * @return mixed[]
      */
     private static function getVariables(array $data): array {

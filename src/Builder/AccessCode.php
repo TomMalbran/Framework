@@ -3,6 +3,7 @@ namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -17,7 +18,9 @@ class AccessCode {
     public static function getCode(): array {
         /** @var array<string,array<string,integer>> */
         $data = Discovery::loadData(DataFile::Access);
-        if (empty($data)) {
+
+        if (Arrays::isEmpty($data)) {
+            /** @var array<string,array<string,integer>> */
             $data = Discovery::loadFrameData(DataFile::Access);
         }
 
