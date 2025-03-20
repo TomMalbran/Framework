@@ -4,6 +4,7 @@ namespace Framework\Core;
 use Framework\Discovery\Discovery;
 use Framework\File\File;
 use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
@@ -56,10 +57,13 @@ class Configs {
 
             $values = self::loadENV($appPath, $file);
             foreach ($values as $key => $value) {
-                if (Strings::endsWith($key, "URL") && Utils::getHost($value) === $currentHost) {
-                    self::$environment = $environment;
-                    $replace = $values;
-                    break;
+                if (Strings::endsWith($key, "URL")) {
+                    $host = Strings::toString($value);
+                    if (Utils::getHost($host) === $currentHost) {
+                        self::$environment = $environment;
+                        $replace = $values;
+                        break;
+                    }
                 }
             }
             self::$environments[] = $environment;
@@ -146,11 +150,10 @@ class Configs {
 
     /**
      * Returns a Config Property or null
-     * @param string     $property
-     * @param mixed|null $default  Optional.
+     * @param string $property
      * @return mixed
      */
-    private static function get(string $property, mixed $default = null): mixed {
+    private static function get(string $property): mixed {
         self::load();
 
         // Check if there is a property with the given value
@@ -177,7 +180,7 @@ class Configs {
         }
 
         // We got nothing
-        return $default;
+        return null;
     }
 
     /**
@@ -188,7 +191,7 @@ class Configs {
      */
     public static function getString(string $property, string $default = ""): string {
         $value = self::get($property);
-        return !empty($value) ? (string)$value : $default;
+        return $value !== null ? Strings::toString($value) : $default;
     }
 
     /**
@@ -209,8 +212,8 @@ class Configs {
      */
     public static function getInt(string $property, int $default = 0): int {
         $value = self::get($property);
-        if (!empty($value) && is_numeric($value)) {
-            return (int)$value;
+        if ($value !== null) {
+            return Numbers::toInt($value);
         }
         return $default;
     }
@@ -223,8 +226,8 @@ class Configs {
      */
     public static function getFloat(string $property, float $default = 0): float {
         $value = self::get($property);
-        if (!empty($value) && is_numeric($value)) {
-            return (float)$value;
+        if ($value !== null) {
+            return Numbers::toFloat($value);
         }
         return $default;
     }
@@ -236,7 +239,7 @@ class Configs {
      */
     public static function getObject(string $property): object {
         $value = self::get($property);
-        return !empty($value) ? (object)$value : (object)[];
+        return $value !== null ? (object)$value : (object)[];
     }
 
     /**
@@ -246,7 +249,8 @@ class Configs {
      */
     public static function getArray(string $property): array {
         $value = self::get($property);
-        if (!empty($value)) {
+        if ($value !== null) {
+            $value = Strings::toString($value);
             return Strings::split($value, ",");
         }
         return [];
