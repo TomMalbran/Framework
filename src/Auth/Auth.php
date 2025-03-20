@@ -12,6 +12,7 @@ use Framework\Log\ActionLog;
 use Framework\System\Access;
 use Framework\System\Config;
 use Framework\System\Status;
+use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
 use Framework\Schema\CredentialEntity;
@@ -404,6 +405,7 @@ class Auth {
 
         // Add fields from the Config
         $fields = Config::getAuthFields();
+        $fields = Arrays::toStrings($fields);
         foreach ($fields as $field) {
             $data[$field] = self::$credential->get($field);
         }
