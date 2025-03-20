@@ -17,15 +17,30 @@ class Entity implements JsonSerializable {
 
     protected const ID = "";
 
-    private bool $empty = true;
+    private bool $isEmpty = true;
+    private bool $isEdit  = true;
 
 
+
+    /**
+     * Creates a new Entity instance from a Request
+     * @param Request $request
+     * @return static[]
+     */
+    final public static function createList(Request $request, string $key): array {
+        $data   = $request->getDictionary($key);
+        $result = [];
+        foreach ($data as $item) {
+            $result[] = new static($item);
+        }
+        return $result;
+    }
 
     /**
      * Creates a new Entity instance
      * @param mixed $data Optional.
      */
-    public function __construct(mixed $data = null) {
+    final public function __construct(mixed $data = null) {
         if (empty($data)) {
             return;
         }
@@ -39,7 +54,7 @@ class Entity implements JsonSerializable {
                 $added = $this->addFromObject($data, $property, $type);
             }
             if ($added) {
-                $this->empty = false;
+                $this->isEmpty = false;
             }
         }
     }
@@ -82,12 +97,14 @@ class Entity implements JsonSerializable {
             return false;
         }
 
-        $this->empty = false;
-        if ($property === static::ID && property_exists($this, "id")) {
-            if (is_numeric($request->get($property))) {
-                $this->{"id"} = $request->getInt($property);
-            } else {
-                $this->{"id"} = $request->getString($property);
+        if ($property === static::ID) {
+            $this->isEdit = true;
+            if (property_exists($this, "id")) {
+                if (is_numeric($request->get($property))) {
+                    $this->{"id"} = $request->getInt($property);
+                } else {
+                    $this->{"id"} = $request->getString($property);
+                }
             }
         }
 
@@ -101,8 +118,11 @@ class Entity implements JsonSerializable {
         case "float":
             $this->$property = $request->getFloat($property);
             break;
-        default:
+        case "string":
             $this->$property = $request->getString($property);
+            break;
+        default:
+            $this->$property = $request->get($property);
         }
         return true;
     }
@@ -119,11 +139,14 @@ class Entity implements JsonSerializable {
             return false;
         }
 
-        if ($property === static::ID && property_exists($this, "id")) {
-            if (is_numeric($data->getString($property))) {
-                $this->{"id"} = $data->getInt($property);
-            } else {
-                $this->{"id"} = $data->getString($property);
+        if ($property === static::ID) {
+            $this->isEdit = true;
+            if (property_exists($this, "id")) {
+                if (is_numeric($data->getString($property))) {
+                    $this->{"id"} = $data->getInt($property);
+                } else {
+                    $this->{"id"} = $data->getString($property);
+                }
             }
         }
 
@@ -137,8 +160,11 @@ class Entity implements JsonSerializable {
         case "float":
             $this->$property = $data->getFloat($property);
             break;
-        default:
+        case "string":
             $this->$property = $data->getString($property);
+            break;
+        default:
+            $this->$property = $data->getArray($property);
         }
         return true;
     }
@@ -165,16 +191,16 @@ class Entity implements JsonSerializable {
      * Returns true if the Entity is Empty
      * @return boolean
      */
-    public function isEmpty(): bool {
-        return $this->empty;
+    final public function isEmpty(): bool {
+        return $this->isEmpty;
     }
 
     /**
      * Returns true if the Entity is being Edited
      * @return boolean
      */
-    public function isEdit(): bool {
-        return !empty($this->get(static::ID));
+    final public function isEdit(): bool {
+        return $this->isEdit;
     }
 
     /**
@@ -182,7 +208,7 @@ class Entity implements JsonSerializable {
      * @param string $key
      * @return boolean
      */
-    public function has(string $key): bool {
+    final public function has(string $key): bool {
         return property_exists($this, $key);
     }
 
@@ -191,7 +217,7 @@ class Entity implements JsonSerializable {
      * @param string $key
      * @return boolean
      */
-    public function hasValue(string $key): bool {
+    final public function hasValue(string $key): bool {
         return !empty($this->$key);
     }
 
@@ -201,7 +227,7 @@ class Entity implements JsonSerializable {
      * @param mixed|null $default Optional.
      * @return mixed
      */
-    public function get(string $key, mixed $default = null): mixed {
+    final public function get(string $key, mixed $default = null): mixed {
         if ($this->has($key)) {
             return $this->$key;
         }
@@ -214,7 +240,7 @@ class Entity implements JsonSerializable {
      * @param string $default Optional.
      * @return string
      */
-    public function getString(string $key, string $default = ""): string {
+    final public function getString(string $key, string $default = ""): string {
         $result = $this->get($key, $default);
         return Strings::toString($result);
     }
@@ -225,7 +251,7 @@ class Entity implements JsonSerializable {
      * @param integer $default Optional.
      * @return integer
      */
-    public function getInt(string $key, int $default = 0): int {
+    final public function getInt(string $key, int $default = 0): int {
         $result = $this->get($key, $default);
         return Numbers::toInt($result);
     }
@@ -236,7 +262,7 @@ class Entity implements JsonSerializable {
      * @param mixed  $value
      * @return bool
      */
-    public function set(string $key, mixed $value): bool {
+    final public function set(string $key, mixed $value): bool {
         if ($this->has($key)) {
             $this->$key = $value;
             return true;
@@ -251,7 +277,7 @@ class Entity implements JsonSerializable {
      * @param array{} $extraData
      * @return array{}
      */
-    public function toArray(array $extraData = []): array {
+    final public function toArray(array $extraData = []): array {
         $result = [];
         foreach ($this->getProperties() as $property) {
             $result[$property] = $this->$property;
@@ -264,21 +290,12 @@ class Entity implements JsonSerializable {
      * @param string ...$fields
      * @return array{}
      */
-    public function toFields(string ...$fields): array {
+    final public function toFields(string ...$fields): array {
         $result = [];
         foreach ($fields as $field) {
             $result[$field] = $this->$field;
         }
         return $result;
-    }
-
-    /**
-     * Dumps the Entity
-     * @return Entity
-     */
-    public function dump(): Entity {
-        var_dump($this->toArray());
-        return $this;
     }
 
     /**
