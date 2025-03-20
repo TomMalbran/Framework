@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -22,55 +23,59 @@ class OpenAI {
      * Does a GET Request
      * @param string                   $route
      * @param array<string,mixed>|null $request Optional.
-     * @return mixed
+     * @return Dictionary
      */
-    private static function get(string $route, ?array $request = null): mixed {
-        return Curl::execute("GET", self::BaseUrl . $route, $request, [
+    private static function get(string $route, ?array $request = null): Dictionary {
+        $response = Curl::execute("GET", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
+        return new Dictionary($response);
     }
 
     /**
      * Does a POST Request
      * @param string                   $route
      * @param array<string,mixed>|null $request Optional.
-     * @return mixed
+     * @return Dictionary
      */
-    private static function post(string $route, ?array $request = null): mixed {
-        return Curl::execute("POST", self::BaseUrl . $route, $request, [
+    private static function post(string $route, ?array $request = null): Dictionary {
+        $response = Curl::execute("POST", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "application/json",
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonBody: true, jsonResponse: true);
+        return new Dictionary($response);
     }
 
     /**
      * Does an UPLOAD Request
      * @param string                   $route
      * @param array<string,mixed>|null $request Optional.
-     * @return mixed
+     * @return Dictionary
      */
-    private static function upload(string $route, ?array $request = null): mixed {
-        return Curl::execute("POST", self::BaseUrl . $route, $request, [
+    private static function upload(string $route, ?array $request = null): Dictionary {
+        $response = Curl::execute("POST", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "multipart/form-data",
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
+        return new Dictionary($response);
     }
 
     /**
      * Does a DELETE Request
      * @param string       $route
      * @param array{}|null $request Optional.
-     * @return mixed
+     * @return Dictionary
      */
-    private static function delete(string $route, ?array $request = null): mixed {
-        return Curl::execute("DELETE", self::BaseUrl . $route, $request, [
+    private static function delete(string $route, ?array $request = null): Dictionary {
+        $response = Curl::execute("DELETE", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "application/json",
             "OpenAI-Beta"   => "assistants=v2",
         ], jsonResponse: true);
+        return new Dictionary($response);
     }
 
 
@@ -80,14 +85,12 @@ class OpenAI {
      * @return Select[]
      */
     public static function getModelSelect(): array {
-        $request = self::get("/models");
-        $result  = [];
+        $response = self::get("/models");
+        $result   = [];
 
-        if (!empty($request["data"])) {
-            foreach ($request["data"] as $model) {
-                $name     = $model["id"];
-                $result[] = new Select($name, $name);
-            }
+        foreach ($response->getDict("data") as $model) {
+            $name     = $model->getString("id");
+            $result[] = new Select($name, $name);
         }
         return $result;
     }
@@ -101,8 +104,8 @@ class OpenAI {
         if (empty($model)) {
             return false;
         }
-        $request = self::get("/models/$model");
-        return !empty($request["id"]);
+        $response = self::get("/models/$model");
+        return $response->hasValue("id");
     }
 
 
@@ -114,7 +117,7 @@ class OpenAI {
      * @return string
      */
     public static function createCompletion(string $model, string $message): string {
-        $request = self::post("/chat/completions", [
+        $response = self::post("/chat/completions", [
             "model"    => $model,
             "messages" => [
                 [
@@ -123,10 +126,12 @@ class OpenAI {
                 ],
             ],
         ]);
-        if (empty($request["choices"][0])) {
+
+        $choice = $response->getFirst("choices");
+        if ($choice->isEmpty()) {
             return "";
         }
-        return $request["choices"][0]["message"]["content"];
+        return $choice->getDict("message")->getString("content");
     }
 
 
@@ -138,11 +143,11 @@ class OpenAI {
      * @return string
      */
     public static function uploadFile(string $fileName, string $fileContent): string {
-        $request = self::upload("/files", [
+        $response = self::upload("/files", [
             "purpose" => "assistants",
             "file"    => new CURLStringFile($fileContent, $fileName, "text/plain"),
         ]);
-        return !empty($request["id"]) ? $request["id"] : "";
+        return $response->getString("id");
     }
 
     /**
@@ -151,19 +156,19 @@ class OpenAI {
      * @return boolean
      */
     public static function deleteFile(string $fileID): bool {
-        $request = self::delete("/files/$fileID");
-        return !empty($request["id"]);
+        $response = self::delete("/files/$fileID");
+        return $response->hasValue("id");
     }
 
 
 
     /**
      * Lists all the Vector Store
-     * @return array{}[]
+     * @return array<integer|string,mixed>
      */
     public static function getAllVectorStores(): array {
-        $request = self::get("/vector_stores");
-        return !empty($request["data"]) ? $request["data"] : [];
+        $response = self::get("/vector_stores");
+        return $response->getArray("data");
     }
 
     /**
@@ -172,10 +177,10 @@ class OpenAI {
      * @return string
      */
     public static function createVectorStore(string $name): string {
-        $request = self::post("/vector_stores", [
+        $response = self::post("/vector_stores", [
             "name" => $name,
         ]);
-        return !empty($request["id"]) ? $request["id"] : "";
+        return $response->getString("id");
     }
 
     /**
@@ -185,10 +190,10 @@ class OpenAI {
      * @return string
      */
     public static function editVectorStore(string $vectorStoreID, string $name): string {
-        $request = self::post("/vector_stores/$vectorStoreID", [
+        $response = self::post("/vector_stores/$vectorStoreID", [
             "name" => $name,
         ]);
-        return !empty($request["id"]) ? $request["id"] : "";
+        return $response->getString("id");
     }
 
     /**
@@ -197,8 +202,8 @@ class OpenAI {
      * @return string
      */
     public static function deleteVectorStore(string $vectorStoreID): string {
-        $request = self::delete("/vector_stores/$vectorStoreID");
-        return !empty($request["id"]) ? $request["id"] : "";
+        $response = self::delete("/vector_stores/$vectorStoreID");
+        return $response->getString("id");
     }
 
     /**
@@ -208,10 +213,10 @@ class OpenAI {
      * @return string
      */
     public static function createVectorFile(string $vectorStoreID, string $fileID): string {
-        $request = self::post("/vector_stores/$vectorStoreID/files", [
+        $response = self::post("/vector_stores/$vectorStoreID/files", [
             "file_id" => $fileID,
         ]);
-        return !empty($request["id"]) ? $request["id"] : "";
+        return $response->getString("id");
     }
 
     /**
@@ -221,8 +226,8 @@ class OpenAI {
      * @return string
      */
     public static function deleteVectorFile(string $vectorStoreID, string $fileID): string {
-        $request = self::delete("/vector_stores/$vectorStoreID/files/$fileID");
-        return !empty($request["id"]) ? $request["id"] : "";
+        $response = self::delete("/vector_stores/$vectorStoreID/files/$fileID");
+        return $response->getString("id");
     }
 
 
@@ -243,7 +248,7 @@ class OpenAI {
         string $instructions,
         string $vectorStoreID,
     ): string {
-        $request = self::post("/assistants", [
+        $response = self::post("/assistants", [
             "name"           => $name,
             "model"          => $model,
             "description"    => $description,
@@ -251,7 +256,7 @@ class OpenAI {
             "tools"          => [[ "type" => "file_search" ]],
             "tool_resources" => [ "file_search" => [ "vector_store_ids" => [ $vectorStoreID ]]],
         ]);
-        return !empty($request["id"]) ? $request["id"] : "";
+        return $response->getString("id");
     }
 
     /**
@@ -272,7 +277,7 @@ class OpenAI {
         string $instructions,
         string $vectorStoreID,
     ): string {
-        $request = self::post("/assistants/$assistantID", [
+        $response = self::post("/assistants/$assistantID", [
             "name"           => $name,
             "model"          => $model,
             "description"    => $description,
@@ -280,7 +285,7 @@ class OpenAI {
             "tools"          => [[ "type" => "file_search" ]],
             "tool_resources" => [ "file_search" => [ "vector_store_ids" => [ $vectorStoreID ]]],
         ]);
-        return !empty($request["id"]) ? $request["id"] : "";
+        return $response->getString("id");
     }
 
     /**
@@ -289,8 +294,8 @@ class OpenAI {
      * @return boolean
      */
     public static function deleteAssistant(string $assistantID): bool {
-        $request = self::delete("/assistants/$assistantID");
-        return !empty($request["id"]);
+        $response = self::delete("/assistants/$assistantID");
+        return $response->hasValue("id");
     }
 
 
@@ -300,8 +305,8 @@ class OpenAI {
      * @return string
      */
     public static function createThread(): string {
-        $request = self::post("/threads");
-        return !empty($request["id"]) ? $request["id"] : "";
+        $response = self::post("/threads");
+        return $response->getString("id");
     }
 
     /**
@@ -311,11 +316,11 @@ class OpenAI {
      * @return boolean
      */
     public static function addThreadMessage(string $threadID, string $message): bool {
-        $request = self::post("/threads/$threadID/messages", [
+        $response = self::post("/threads/$threadID/messages", [
             "role"    => "user",
             "content" => $message,
         ]);
-        return !empty($request["id"]);
+        return $response->hasValue("id");
     }
 
     /**
@@ -324,25 +329,27 @@ class OpenAI {
      * @return array{string,string} [Message, FileIDs]
      */
     public static function getLastMessage(string $threadID): array {
-        $request = self::get("/threads/$threadID/messages", [
+        $response = self::get("/threads/$threadID/messages", [
             "limit" => 1,
             "order" => "desc",
         ]);
-        if (empty($request["data"][0])) {
+        $data = $response->getFirst("data");
+        if ($data->isEmpty()) {
             return [ "", "" ];
         }
 
         $messages = [];
         $fileIDs  = [];
-        foreach ($request["data"][0]["content"] as $content) {
-            if ($content["type"] === "text") {
-                $message = $content["text"]["value"];
-                if (!empty($content["text"]["annotations"])) {
-                    foreach ($content["text"]["annotations"] as $annotation) {
-                        $message = Strings::replace($message, $annotation["text"], "");
-                        if (!empty($annotation["file_citation"]["file_id"])) {
-                            $fileIDs[] = $annotation["file_citation"]["file_id"];
-                        }
+        foreach ($data->getDict("content") as $content) {
+            if ($content->getString("type") === "text") {
+                $text    = $content->getDict("text");
+                $message = $text->getString("value");
+
+                foreach ($text->getDict("annotations") as $annotation) {
+                    $message = Strings::replace($message, $annotation->getString("text"), "");
+                    $fileID  = $annotation->getDict("file_citation")->getString("file_id");
+                    if ($fileID !== "") {
+                        $fileIDs[] = $fileID;
                     }
                 }
                 $messages[] = $message;
@@ -360,8 +367,8 @@ class OpenAI {
      * @return boolean
      */
     public static function deleteThread(string $threadID): bool {
-        $request = self::delete("/threads/$threadID");
-        return !empty($request["id"]);
+        $response = self::delete("/threads/$threadID");
+        return $response->hasValue("id");
     }
 
 
@@ -374,7 +381,7 @@ class OpenAI {
      * @return array{string,string} [RunID, ThreadID]
      */
     public static function createRun(string $assistantID, string $message, bool $requiresFiles = false): array {
-        $request = self::post("/threads/runs", [
+        $response = self::post("/threads/runs", [
             "assistant_id" => $assistantID,
             "tool_choice"  => $requiresFiles ? "required" : "auto",
             "thread"       => [
@@ -388,8 +395,8 @@ class OpenAI {
         ]);
 
         return [
-            $request["id"]        ?? "",
-            $request["thread_id"] ?? "",
+            $response->getString("id"),
+            $response->getString("thread_id"),
         ];
     }
 
@@ -402,12 +409,12 @@ class OpenAI {
      * @return string
      */
     public static function startRun(string $threadID, string $assistantID, string $instructions, bool $requiresFiles = false): string {
-        $request = self::post("/threads/$threadID/runs", [
+        $response = self::post("/threads/$threadID/runs", [
             "assistant_id" => $assistantID,
             "instructions" => $instructions,
             "tool_choice"  => $requiresFiles ? "required" : "auto",
         ]);
-        return !empty($request["id"]) ? $request["id"] : "";
+        return $response->getString("id");
     }
 
     /**
@@ -417,8 +424,8 @@ class OpenAI {
      * @return boolean
      */
     public static function isRunComplete(string $threadID, string $runID): bool {
-        $request = self::get("/threads/$threadID/runs/$runID");
-        return empty($request["id"]) || $request["status"] === "completed";
+        $response = self::get("/threads/$threadID/runs/$runID");
+        return !$response->hasValue("id") || $response->getString("status") === "completed";
     }
 
     /**
@@ -428,15 +435,15 @@ class OpenAI {
      * @return OpenAIData
      */
     public static function getRunData(string $threadID, string $runID): OpenAIData {
-        $result  = new OpenAIData();
-        $request = self::get("/threads/$threadID/runs/$runID");
-        if (empty($request["usage"])) {
+        $result   = new OpenAIData();
+        $response = self::get("/threads/$threadID/runs/$runID");
+        if (!$response->hasValue("usage")) {
             return $result;
         }
 
-        $result->runTime      = $request["completed_at"] - $request["started_at"];
-        $result->inputTokens  = $request["usage"]["prompt_tokens"];
-        $result->outputTokens = $request["usage"]["completion_tokens"];
+        $result->runTime      = $response->getInt("completed_at") - $response->getInt("started_at");
+        $result->inputTokens  = $response->getDict("usage")->getInt("prompt_tokens");
+        $result->outputTokens = $response->getDict("usage")->getInt("completion_tokens");
         return $result;
     }
 
@@ -447,8 +454,8 @@ class OpenAI {
      * @return boolean
      */
     public static function cancelRun(string $threadID, string $runID): bool {
-        $request = self::post("/threads/$threadID/runs/$runID/cancel");
-        return !empty($request["id"]);
+        $response = self::post("/threads/$threadID/runs/$runID/cancel");
+        return $response->hasValue("id");
     }
 
 
@@ -463,25 +470,25 @@ class OpenAI {
     public static function transcribeAudio(string $fileContent, string $fileName, string $language): OpenAIData {
         $result    = new OpenAIData();
         $timeStart = microtime(true);
-        $request   = self::upload("/audio/transcriptions", [
+        $response  = self::upload("/audio/transcriptions", [
             "file"            => new CURLStringFile($fileContent, $fileName),
             "model"           => "whisper-1",
             "language"        => $language,
             "response_format" => "verbose_json",
         ]);
         $timeEnd   = microtime(true);
-        if (empty($request["text"])) {
+        if (!$response->hasValue("text")) {
             return $result;
         }
 
         $outputTokens = 0;
-        foreach ($request["segments"] as $segment) {
-            $outputTokens += count($segment["tokens"]);
+        foreach ($response->getDict("segments") as $segment) {
+            $outputTokens += count($segment->getArray("tokens"));
         }
 
-        $result->text         = $request["text"];
-        $result->language     = $request["language"];
-        $result->duration     = (int)ceil($request["duration"]);
+        $result->text         = $response->getString("text");
+        $result->language     = $response->getString("language");
+        $result->duration     = (int)ceil($response->getFloat("duration"));
         $result->runTime      = Numbers::roundInt(($timeEnd - $timeStart) / 60);
         $result->outputTokens = $outputTokens;
         return $result;
