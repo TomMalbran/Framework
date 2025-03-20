@@ -225,9 +225,9 @@ class Database {
 
     /**
      * Replaces or Inserts the given content into the given table
-     * @param string    $table
-     * @param array{}[] $fields
-     * @param string    $method Optional.
+     * @param string              $table
+     * @param array<string,mixed> $fields
+     * @param string              $method Optional.
      * @return integer The Inserted ID or -1
      */
     public function insert(string $table, array $fields, string $method = "INSERT"): int {
@@ -340,7 +340,7 @@ class Database {
 
         try {
             $statement = $this->mysqli->prepare($expression);
-            if (!$statement) {
+            if ($statement === false) {
                 return null;
             }
 
@@ -387,6 +387,8 @@ class Database {
             trigger_error($error, E_USER_ERROR);
         }
 
+        // @phpstan-ignore deadCode.unreachable
+        return null;
     }
 
     /**
@@ -418,12 +420,12 @@ class Database {
         $values     = [];
 
         foreach ($params as $key => $value) {
-            if (Strings::isString($key)) {
+            if (is_string($key)) {
                 $keys[] = '/:' . $key . '/';
             } else {
                 $keys[] = '/[?]/';
             }
-            if (Strings::isString($value)) {
+            if (is_string($value)) {
                 $values[] = "'$value'";
             } else {
                 $values[] = $value;
