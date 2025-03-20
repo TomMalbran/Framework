@@ -124,10 +124,10 @@ class DateTime {
      */
     public static function toTime(mixed $time, bool $useTimeZone = true): int {
         $timeStamp = 0;
-        if (Strings::isString($time)) {
+        if (is_string($time)) {
             $timeStamp = strtotime($time);
         } else {
-            $timeStamp = (int)$time;
+            $timeStamp = Numbers::toInt($time);
         }
 
         if (empty($timeStamp) || $timeStamp > 4294967295) {
@@ -144,10 +144,10 @@ class DateTime {
      */
     public static function toTimeZone(mixed $time, ?float $timeZone = null): int {
         $timeStamp = 0;
-        if (Strings::isString($time)) {
+        if (is_string($time)) {
             $timeStamp = strtotime($time);
         } else {
-            $timeStamp = (int)$time;
+            $timeStamp = Numbers::toInt($time);
         }
 
         if (empty($timeStamp)) {
@@ -1350,11 +1350,12 @@ class DateTime {
         $day   = 0;
 
         $numbers = Strings::getAllMatches($text, "!\d+!");
+        $numbers = Arrays::toInts($numbers);
         if (empty($numbers)) {
             return 0;
         }
 
-        $monthNames = NLS::get("DATE_TIME_MONTHS", $language);
+        $monthNames = NLS::getList("DATE_TIME_MONTHS", $language);
         foreach ($monthNames as $index => $monthName) {
             if (Strings::containsCaseInsensitive($text, $monthName, Strings::substring($monthName, 0, 3))) {
                 $month = $index + 1;
