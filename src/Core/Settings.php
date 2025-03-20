@@ -171,7 +171,7 @@ class Settings extends SettingsSchema {
      * @return boolean
      */
     public static function migrateData(): bool {
-        /** @var array<string,mixed> */
+        /** @var array<string,array<string,mixed>> */
         $settings = Discovery::loadData(DataFile::Settings);
 
         $query = new SettingsQuery();
@@ -187,7 +187,6 @@ class Settings extends SettingsSchema {
         // Add/Update Settings
         foreach ($settings as $section => $data) {
             foreach ($data as $variable => $value) {
-                /** @var VariableType */
                 $variableType = VariableType::get($value);
                 $found        = false;
 
