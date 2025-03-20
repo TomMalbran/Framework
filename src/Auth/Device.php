@@ -32,10 +32,13 @@ class Device extends CredentialDeviceSchema {
         if (empty($credentialID)) {
             return [];
         }
-        $credentialIDs = Arrays::toArray($credentialID);
 
         $query = new CredentialDeviceQuery();
-        $query->credentialID->in($credentialIDs);
+        if (is_array($credentialID)) {
+            $query->credentialID->in($credentialID);
+        } else {
+            $query->credentialID->equal($credentialID);
+        }
 
         $result = self::getEntityColumn($query, CredentialDeviceColumn::PlayerID);
         return Arrays::toStrings($result);
