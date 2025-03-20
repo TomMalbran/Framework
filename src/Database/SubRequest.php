@@ -27,7 +27,10 @@ class SubRequest {
 
     private bool   $asArray  = false;
     private string $field    = "";
-    private mixed  $value    = null;
+    private string $value    = "";
+
+    /** @var string[] */
+    private array  $values   = [];
 
 
     /**
@@ -160,16 +163,16 @@ class SubRequest {
      * @return mixed
      */
     private function getValues(array $row): mixed {
-        if (empty($this->value)) {
-            return $row;
+        if ($this->value !== "") {
+            return $row[$this->value];
         }
-        if (Arrays::isArray($this->value)) {
+        if (count($this->values) > 0) {
             $result = [];
-            foreach ($this->value as $value) {
+            foreach ($this->values as $value) {
                 $result[$value] = $row[$value];
             }
             return $result;
         }
-        return $row[$this->value];
+        return $row;
     }
 }

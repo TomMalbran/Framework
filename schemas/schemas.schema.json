@@ -112,7 +112,6 @@
                     "additionalProperties" : false,
                     "required"             : [ "name" ],
                     "properties"           : {
-                        "value"   : {                          }
                         "type"    : { "type" : "string"          },
                         "name"    : { "$ref" : "#/$defs/field"   },
                         "idKey"   : { "$ref" : "#/$defs/field"   },
@@ -122,6 +121,8 @@
                         "isAsc"   : { "type" : "boolean"         },
                         "asArray" : { "type" : "boolean"         },
                         "field"   : { "$ref" : "#/$defs/field"   },
+                        "value"   : { "type" : "string"          },
+                        "values"  : { "$ref" : "#/$defs/strings" }
                     }
                 }
             }
