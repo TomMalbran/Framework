@@ -78,10 +78,7 @@ class NLS {
      */
     public static function getString(string $key, string $language = ""): string {
         $result = self::get($key, $language);
-        if (Strings::isString($result)) {
-            return (string)$result;
-        }
-        return "";
+        return Strings::toString($result);
     }
 
     /**
@@ -93,8 +90,8 @@ class NLS {
      */
     public static function getIndex(string $key, int|string $index, string $language = ""): string {
         $result = self::get($key, $language);
-        if (!empty($result[$index])) {
-            return $result[$index];
+        if (is_array($result) && !empty($result[$index])) {
+            return Strings::toString($result[$index]);
         }
         return "";
     }
@@ -107,13 +104,13 @@ class NLS {
      */
     public static function getList(string $key, string $language = ""): array {
         $result = self::get($key, $language);
-        if (Arrays::isList($result)) {
-            return $result;
+        if (!is_array($result)) {
+            return [];
         }
-        if (Arrays::isDict($result)) {
-            return array_values($result);
+        if (array_is_list($result)) {
+            return Arrays::toStrings($result);
         }
-        return [];
+        return Arrays::toStrings(array_values($result));
     }
 
     /**
@@ -125,7 +122,7 @@ class NLS {
     public static function getMap(string $key, string $language = ""): array {
         $result = self::get($key, $language);
         if (Arrays::isDict($result)) {
-            return $result;
+            return Arrays::toStringsMap($result);
         }
         return [];
     }
@@ -138,7 +135,8 @@ class NLS {
      */
     public static function getSelect(string $key, string $language = ""): array {
         $result = self::get($key, $language);
-        if (Arrays::isArray($result)) {
+        if (is_array($result)) {
+            $result = Arrays::toStringsMap($result);
             return Select::createFromMap($result);
         }
         return [];
@@ -154,7 +152,7 @@ class NLS {
         $result = [];
         foreach ($keys as $key) {
             if (!empty($key)) {
-                $result[] = self::get($key, $language);
+                $result[] = self::getString($key, $language);
             }
         }
         return $result;
@@ -171,7 +169,11 @@ class NLS {
     public static function url(array $args, string $language = ""): string {
         $result = [];
         foreach ($args as $arg) {
-            $result[] = self::get($arg, $language);
+            if (is_string($arg)) {
+                $result[] = self::getString($arg, $language);
+            } elseif (is_int($arg)) {
+                $result[] = $arg;
+            }
         }
         return Config::getUrl(...$result);
     }
@@ -186,7 +188,11 @@ class NLS {
     public static function urlPath(string $urlKey, array $args, string $language = ""): string {
         $result = [];
         foreach ($args as $arg) {
-            $result[] = self::get($arg, $language);
+            if (is_string($arg)) {
+                $result[] = self::getString($arg, $language);
+            } elseif (is_int($arg)) {
+                $result[] = $arg;
+            }
         }
         return Config::getUrlWithKey($urlKey, ...$result);
     }
@@ -199,9 +205,9 @@ class NLS {
      * @return string
      */
     public static function format(string $key, array $args, string $language = ""): string {
-        $subject = self::get($key, $language);
-        return Strings::replaceCallback($subject, "/\{(\d+)\}/", function ($match) use ($args) {
-            return $args[$match[1]] ?: "";
+        $subject = self::getString($key, $language);
+        return Strings::replaceCallback($subject, "/\{(\d+)\}/", function (array $match) use ($args) {
+            return $args[$match[1]] ?? "";
         });
     }
 
@@ -264,7 +270,7 @@ class NLS {
             return $strings[0];
         }
 
-        $glue   = self::get($useOr ? "GENERAL_OR" : "GENERAL_AND", $language);
+        $glue   = self::getString($useOr ? "GENERAL_OR" : "GENERAL_AND", $language);
         $result = $strings[0];
         for ($i = 1; $i < $count; $i++) {
             $result .= ($i < $count - 1 ? ", " : " $glue ") . $strings[$i];
