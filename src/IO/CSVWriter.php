@@ -13,8 +13,11 @@ class CSVWriter implements ExporterWriter {
     private array  $headers;
     private string $fileName;
     private string $lang;
+
+    /** @var resource */
     private mixed  $file;
     private int    $line = 0;
+
 
 
     /**
@@ -25,7 +28,11 @@ class CSVWriter implements ExporterWriter {
     public function __construct(string $fileName, string $lang = "root") {
         $this->fileName = $fileName;
         $this->lang     = $lang;
-        $this->file     = fopen("php://output", "w");
+
+        $handle = fopen("php://output", "w");
+        if ($handle !== false) {
+            $this->file = $handle;
+        }
 
         $this->start();
     }
