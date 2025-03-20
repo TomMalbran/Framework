@@ -51,7 +51,7 @@ class QueryLog extends LogQuerySchema {
         $elapsedTime = (int)floor($time);
         $expression  = Strings::replacePattern($expression, "/ +/", " ");
         foreach ($params as $param) {
-            $value      = Strings::isString($param) ? "'$param'" : $param;
+            $value      = is_string($param) ? "'$param'" : Strings::toString($param);
             $expression = Strings::replacePattern($expression, "/[?]/", $value, 1);
         }
 

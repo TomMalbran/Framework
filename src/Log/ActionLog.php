@@ -30,7 +30,7 @@ class ActionLog extends LogActionSchema {
 
         $query = new LogActionQuery();
         foreach ($mappings as $key => $value) {
-            $query->query->addIf($value, "=", $request->get($key));
+            $query->query->addIf($value, "=", $request->getString($key));
         }
 
         $query->credentialID->equalIf($credentialID);
@@ -160,7 +160,7 @@ class ActionLog extends LogActionSchema {
 
         $dataID = Arrays::toArray($dataID);
         foreach ($dataID as $index => $value) {
-            $dataID[$index] = Numbers::isValid($value) ? (int)$value : $value;
+            $dataID[$index] = Numbers::isValid($value) ? Numbers::toInt($value) : $value;
         }
 
         self::createEntity(
