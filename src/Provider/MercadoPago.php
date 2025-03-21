@@ -5,6 +5,7 @@ use Framework\Provider\Curl;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -23,13 +24,14 @@ class MercadoPago {
      * @param array{}|null $request      Optional.
      * @param boolean      $jsonResponse Optional.
      * @param string       $accessToken  Optional.
-     * @return mixed
+     * @return Dictionary
      */
-    private static function get(string $route, ?array $request = null, bool $jsonResponse = true, string $accessToken = ""): mixed {
+    private static function get(string $route, ?array $request = null, bool $jsonResponse = true, string $accessToken = ""): Dictionary {
         $accessToken = $accessToken ?: Config::getMpAccessToken();
-        return Curl::execute("GET", self::BaseUrl . $route, $request, [
+        $response    = Curl::execute("GET", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer $accessToken",
         ], jsonResponse: $jsonResponse);
+        return new Dictionary($response);
     }
 
     /**
@@ -38,14 +40,15 @@ class MercadoPago {
      * @param array<string,mixed>  $request
      * @param array<string,string> $headers     Optional.
      * @param string               $accessToken Optional.
-     * @return mixed
+     * @return Dictionary
      */
-    private static function post(string $route, array $request, array $headers = [], string $accessToken = ""): mixed {
+    private static function post(string $route, array $request, array $headers = [], string $accessToken = ""): Dictionary {
         $accessToken = $accessToken ?: Config::getMpAccessToken();
-        return Curl::execute("POST", self::BaseUrl . $route, $request, Arrays::merge([
+        $response    =  Curl::execute("POST", self::BaseUrl . $route, $request, Arrays::merge([
             "content-type"  => "application/json",
             "Authorization" => "Bearer $accessToken",
         ], $headers), jsonBody: true);
+        return new Dictionary($response);
     }
 
     /**
@@ -53,14 +56,15 @@ class MercadoPago {
      * @param string              $route
      * @param array<string,mixed> $request
      * @param string              $accessToken Optional.
-     * @return mixed
+     * @return Dictionary
      */
-    private static function put(string $route, array $request, string $accessToken = ""): mixed {
+    private static function put(string $route, array $request, string $accessToken = ""): Dictionary {
         $accessToken = $accessToken ?: Config::getMpAccessToken();
-        return Curl::execute("PUT", self::BaseUrl . $route, $request, [
+        $response    = Curl::execute("PUT", self::BaseUrl . $route, $request, [
             "content-type"  => "application/json",
             "Authorization" => "Bearer $accessToken",
         ], jsonBody: true);
+        return new Dictionary($response);
     }
 
 
@@ -99,7 +103,7 @@ class MercadoPago {
      * @return object
      */
     public static function createAccessToken(string $code, string $redirectUrl = ""): object {
-        $result = self::post("/oauth/token", [
+        $response = self::post("/oauth/token", [
             "client_id"     => Config::getMpClientId(),
             "client_secret" => Config::getMpClientSecret(),
             "code"          => $code,
@@ -107,14 +111,14 @@ class MercadoPago {
             "grant_type"    => "authorization_code",
         ]);
 
-        if (empty($result["user_id"])) {
+        if (!$response->hasValue("user_id")) {
             return (object)[];
         }
         return (object)[
-            "userID"         => $result["user_id"],
-            "accessToken"    => $result["access_token"],
-            "refreshToken"   => $result["refresh_token"],
-            "expirationTime" => time() + $result["expires_in"],
+            "userID"         => $response->getString("user_id"),
+            "accessToken"    => $response->getString("access_token"),
+            "refreshToken"   => $response->getString("refresh_token"),
+            "expirationTime" => time() + $response->getInt("expires_in"),
         ];
     }
 
@@ -124,21 +128,21 @@ class MercadoPago {
      * @return object
      */
     public static function recreateAccessToken(string $refreshToken): object {
-        $result = self::post("/oauth/token", [
+        $response = self::post("/oauth/token", [
             "client_id"     => Config::getMpClientId(),
             "client_secret" => Config::getMpClientSecret(),
             "refresh_token" => $refreshToken,
             "grant_type"    => "refresh_token",
         ]);
 
-        if (empty($result["user_id"])) {
+        if (!$response->hasValue("user_id")) {
             return (object)[];
         }
         return (object)[
-            "userID"         => $result["user_id"],
-            "accessToken"    => $result["access_token"],
-            "refreshToken"   => $result["refresh_token"],
-            "expirationTime" => time() + $result["expires_in"],
+            "userID"         => $response->getString("user_id"),
+            "accessToken"    => $response->getString("access_token"),
+            "refreshToken"   => $response->getString("refresh_token"),
+            "expirationTime" => time() + $response->getInt("expires_in"),
         ];
     }
 
@@ -151,7 +155,7 @@ class MercadoPago {
      * @param array<string,mixed>   $payer          Optional.
      * @param float                 $marketplaceFee Optional.
      * @param string                $accessToken    Optional.
-     * @return array{}
+     * @return array{id:string,url:string}
      */
     public static function createPaymentUrl(
         string $reference,
@@ -197,7 +201,11 @@ class MercadoPago {
             ];
         }
 
-        return self::post("/checkout/preferences", $fields, accessToken: $accessToken);
+        $response = self::post("/checkout/preferences", $fields, accessToken: $accessToken);
+        return [
+            "id"  => $response->getString("id"),
+            "url" => $response->getString("init_point"),
+        ];
     }
 
     /**
@@ -207,11 +215,11 @@ class MercadoPago {
      * @return boolean
      */
     public static function cancelPaymentUrl(string $preferenceID, string $accessToken = ""): bool {
-        $result = self::put("/checkout/preferences/$preferenceID", [
+        $response = self::put("/checkout/preferences/$preferenceID", [
             "expires"            => true,
             "expiration_date_to" => DateTime::format(time(), "Y-m-d\TH:i:s-03:00"),
         ], $accessToken);
-        return !empty($result["id"]);
+        return $response->hasValue("id");
     }
 
     /**
@@ -221,46 +229,40 @@ class MercadoPago {
      * @return object
      */
     public static function getPaymentData(string $paymentID, string $accessToken = ""): object {
-        $result = self::get("/v1/payments/$paymentID", accessToken: $accessToken);
-        if (empty($result["id"])) {
+        $response = self::get("/v1/payments/$paymentID", accessToken: $accessToken);
+        if (!$response->hasValue("id")) {
             return (object)[];
         }
 
         $mercadoPagoFee = 0;
         $applicationFee = 0;
-        foreach ($result["fee_details"] as $fee) {
-            match ($fee["type"]) {
-                "mercadopago_fee" => $mercadoPagoFee = $fee["amount"],
-                "application_fee" => $applicationFee = $fee["amount"],
+        foreach ($response->getList("fee_details") as $fee) {
+            match ($fee->getString("type")) {
+                "mercadopago_fee" => $mercadoPagoFee = $fee->getFloat("amount"),
+                "application_fee" => $applicationFee = $fee->getFloat("amount"),
                 default           => 0,
             };
         }
 
-        $refundedID   = 0;
-        $refundedTime = 0;
-        if (!empty($result["refunds"][0])) {
-            $refundedID   = $result["refunds"][0]["id"];
-            $refundedTime = DateTime::toTime($result["refunds"][0]["date_created"]);
-        }
-
+        $refund = $response->getFirst("refunds");
         return (object)[
-            "id"                => $result["id"],
-            "orderID"           => $result["order"]["id"],
-            "refundedID"        => $refundedID,
-            "reference"         => $result["external_reference"],
-            "status"            => $result["status"],
-            "createdTime"       => DateTime::toTime($result["date_created"]),
-            "approvedTime"      => DateTime::toTime($result["date_approved"]),
-            "refundedTime"      => $refundedTime,
-            "modifiedTime"      => DateTime::toTime($result["date_last_updated"]),
-            "paymentMethod"     => $result["payment_method_id"],
-            "paymentType"       => $result["payment_type_id"],
-            "cardInitialNumber" => !empty($result["issuer_id"]) ? $result["issuer_id"] : "",
-            "cardAuthorization" => !empty($result["authorization_code"]) ? $result["authorization_code"] : "",
-            "currency"          => $result["currency_id"],
-            "installments"      => $result["installments"],
-            "amount"            => $result["transaction_amount"],
-            "amountRefunded"    => $result["transaction_amount_refunded"],
+            "id"                => $response->getString("id"),
+            "orderID"           => $response->getDict("order")->getString("id"),
+            "refundedID"        => $refund->getString("id"),
+            "reference"         => $response->getString("external_reference"),
+            "status"            => $response->getString("status"),
+            "createdTime"       => $response->getTime("date_created"),
+            "approvedTime"      => $response->getTime("date_approved"),
+            "refundedTime"      => $refund->getTime("date_created"),
+            "modifiedTime"      => $response->getTime("date_last_updated"),
+            "paymentMethod"     => $response->getString("payment_method_id"),
+            "paymentType"       => $response->getString("payment_type_id"),
+            "cardInitialNumber" => $response->getString("issuer_id"),
+            "cardAuthorization" => $response->getString("authorization_code"),
+            "currency"          => $response->getString("currency_id"),
+            "installments"      => $response->getInt("installments"),
+            "amount"            => $response->getFloat("transaction_amount"),
+            "amountRefunded"    => $response->getFloat("transaction_amount_refunded"),
             "mercadoPagoFee"    => $mercadoPagoFee,
             "applicationFee"    => $applicationFee,
         ];
@@ -273,10 +275,10 @@ class MercadoPago {
      * @return boolean
      */
     public static function cancelPayment(string $paymentID, string $accessToken = ""): bool {
-        $result = self::put("/v1/payments/$paymentID", [
+        $response = self::put("/v1/payments/$paymentID", [
             "status" => "cancelled",
         ], $accessToken);
-        return !empty($result["id"]);
+        return $response->hasValue("id");
     }
 
     /**
@@ -286,50 +288,11 @@ class MercadoPago {
      * @return boolean
      */
     public static function refundPayment(string $paymentID, string $accessToken = ""): bool {
-        $result = self::post("/v1/payments/$paymentID/refunds", [
+        $response = self::post("/v1/payments/$paymentID/refunds", [
             "amount" => null,
         ], [
             "X-Idempotency-Key" => Strings::randomCode(20),
         ], $accessToken);
-        return !empty($result["id"]);
-    }
-
-
-
-    /**
-     * Validates a Signature
-     * @param object $payload
-     * @return boolean
-     */
-    public static function isValidSignature(object $payload): bool {
-        $signature      = Config::getMpSignature();
-        $transactionID  = $payload->transaction_id ?? "";
-        $generationDate = $payload->generation_date ?? "";
-        $password       = "$transactionID-$signature-$generationDate";
-        $hash           = $payload->signature ?? "";
-        $isValid        = password_verify($password, $hash);
-        return $isValid;
-    }
-
-    /**
-     * Downloads a Settlement Report
-     * @param string $fileName
-     * @return string
-     */
-    public static function getSettlementReport(string $fileName): string {
-        return self::get("/v1/account/settlement_report/$fileName", null, false);
-    }
-
-    /**
-     * Requests a Settlement Report
-     * @param integer $fromTime
-     * @param integer $toTime
-     * @return array{}
-     */
-    public static function createSettlementReport(int $fromTime, int $toTime): array {
-        return self::post("/v1/account/settlement_report", [
-            "begin_date" => DateTime::toUTCString($fromTime),
-            "end_date"   => DateTime::toUTCString($toTime),
-        ]);
+        return $response->hasValue("id");
     }
 }
