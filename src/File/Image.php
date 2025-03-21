@@ -6,6 +6,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
+use GdImage;
 use Imagick;
 use Exception;
 
@@ -15,10 +16,9 @@ use Exception;
 class Image {
 
     // The Resize Types
-    const Resize  = "resize";
-    const Maximum = "maximum";
-    const Thumb   = "thumb";
-
+    public const Resize  = "resize";
+    public const Maximum = "maximum";
+    public const Thumb   = "thumb";
 
 
     /** @var int[] The image types */
@@ -26,15 +26,6 @@ class Image {
 
     /** @var int[] The transparent image type */
     private static array $transTypes = [ 1, 3 ];
-
-    /** @var array{string,string,string,string}[] */
-    private static array $imageData  = [
-        1  => [ "imagecreatefromgif",  "imagegif",  "image/gif",  "gif" ],
-        2  => [ "imagecreatefromjpeg", "imagejpeg", "image/jpeg", "jpg" ],
-        3  => [ "imagecreatefrompng",  "imagepng",  "image/png",  "png" ],
-        15 => [ "imagecreatefromwbmp", "imagewbmp", "image/wbmp", "bmp" ],
-        16 => [ "imagecreatefromxbm",  "imagexbm",  "image/xbm",  "xbm" ],
-    ];
 
 
 
@@ -123,7 +114,7 @@ class Image {
         $filePath = File::parsePath(...$pathParts);
         $exif     = @exif_read_data($filePath);
         if ($exif !== false && !empty($exif["Orientation"])) {
-            return $exif["Orientation"];
+            return Numbers::toInt($exif["Orientation"]);
         }
         return 0;
     }
@@ -180,7 +171,10 @@ class Image {
         if ($dimensions === false) {
             return 0;
         }
-        return abs($dimensions[4] - $dimensions[0]);
+
+        $bottomLeft = Numbers::toInt($dimensions[0]);
+        $topRight   = Numbers::toInt($dimensions[4]);
+        return abs($topRight - $bottomLeft);
     }
 
 
@@ -208,6 +202,9 @@ class Image {
         // Resample
         $srcImage = self::createSrcImage($imgType, $src);
         $dstImage = self::createDstImage($imgType, $imgWidth, $imgHeight);
+        if ($srcImage === null || $dstImage === null) {
+            return false;
+        }
         imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $imgWidth, $imgHeight, $imgWidth, $imgHeight);
 
         // Fix Orientation
@@ -217,6 +214,9 @@ class Image {
             8 => imagerotate($dstImage, 90, 0),
             default => $dstImage,
         };
+        if ($dstImage === false) {
+            return false;
+        }
 
         // Create the Image
         self::createImage($imgType, $dstImage, $dst);
@@ -311,7 +311,7 @@ class Image {
         // Creation Process
         $srcResize = self::createSrcImage($imgType, $src);
         $dstResize = self::createDstImage($imgType, $width, $height);
-        if ($dstResize === null) {
+        if ($srcResize === null || $dstResize === null) {
             return false;
         }
         imagecopyresampled($dstResize, $srcResize, 0, 0, $xCorner, $yCorner, $width, $height, $oldWidth, $oldHeight);
@@ -354,6 +354,9 @@ class Image {
         // Resize Image
         $srcResize = self::createSrcImage($imgType, $src);
         $dstResize = self::createDstImage($imgType, $resWidth, $resHeight);
+        if ($srcResize === null || $dstResize === null) {
+            return false;
+        }
         imagecopyresampled($dstResize, $srcResize, 0, 0, 0, 0, $resWidth, $resHeight, $imgWidth, $imgHeight);
 
         // Crop Image
@@ -382,7 +385,14 @@ class Image {
      * @return string
      */
     public static function getContentType(int $imgType): string {
-        return self::$imageData[$imgType][2];
+        return match ($imgType) {
+            1  => "image/gif",
+            2  => "image/jpeg",
+            3  => "image/png",
+            15 => "image/wbmp",
+            16 => "image/xbm",
+            default => "image/unknown",
+        };
     }
 
     /**
@@ -391,21 +401,35 @@ class Image {
      * @return string
      */
     public static function getExtension(int $imgType): string {
-        return self::$imageData[$imgType][3];
+        return match ($imgType) {
+            1  => "gif",
+            2  => "jpg",
+            3  => "png",
+            15 => "bmp",
+            16 => "xbm",
+            default => "unknown",
+        };
     }
 
     /**
      * Creates an Image based on the Type
      * @param integer $imgType
-     * @param mixed   $image
-     * @return mixed
+     * @param string  $fileName
+     * @return GdImage|null
      */
-    public static function createSrcImage(int $imgType, mixed $image): mixed {
-        $functionName = self::$imageData[$imgType][0];
-        if (function_exists($functionName)) {
-            return $functionName($image);
+    public static function createSrcImage(int $imgType, string $fileName): ?GdImage {
+        $result = match ($imgType) {
+            1  => imagecreatefromgif($fileName),
+            2  => imagecreatefromjpeg($fileName),
+            3  => imagecreatefrompng($fileName),
+            15 => imagecreatefromwbmp($fileName),
+            16 => imagecreatefromxbm($fileName),
+            default => null,
+        };
+        if ($result === false) {
+            return null;
         }
-        return null;
+        return $result;
     }
 
     /**
@@ -413,9 +437,9 @@ class Image {
      * @param integer $imgType
      * @param integer $width
      * @param integer $height
-     * @return mixed
+     * @return GdImage|null
      */
-    public static function createDstImage(int $imgType, int $width, int $height): mixed {
+    public static function createDstImage(int $imgType, int $width, int $height): ?GdImage {
         if ($width <= 0 || $height <= 0) {
             return null;
         }
@@ -427,7 +451,7 @@ class Image {
 
         if (Arrays::contains(self::$transTypes, $imgType)) {
             imagealphablending($result, false);
-            imagesavealpha($result,true);
+            imagesavealpha($result, true);
             $transparent = imagecolorallocatealpha($result, 255, 255, 255, 127);
             if ($transparent !== false) {
                 imagefilledrectangle($result, 0, 0, $width, $height, $transparent);
@@ -439,31 +463,32 @@ class Image {
     /**
      * Creates an Image based on the Type
      * @param integer     $imgType
-     * @param mixed       $image
+     * @param GdImage     $image
      * @param string|null $fileName Optional.
      * @param integer     $quality  Optional.
      * @return boolean
      */
-    public static function createImage(int $imgType, mixed $image, ?string $fileName = null, int $quality = 90): bool {
-        $functionName = self::$imageData[$imgType][1];
-        if (!function_exists($functionName)) {
+    public static function createImage(int $imgType, GdImage $image, ?string $fileName = null, int $quality = 90): bool {
+        $result = match ($imgType) {
+            1  => imagegif($image, $fileName),
+            2  => imagejpeg($image, $fileName, $quality),
+            3  => imagepng($image, $fileName),
+            15 => imagewbmp($image, $fileName),
+            16 => imagexbm($image, $fileName),
+            default => false,
+        };
+        if ($result === false) {
             return false;
-        }
-
-        if ($imgType == 2) {
-            $functionName($image, $fileName, $quality);
-        } else {
-            $functionName($image, $fileName);
         }
         return imagedestroy($image);
     }
 
     /**
      * Destroys the Image
-     * @param mixed $image
+     * @param GdImage $image
      * @return boolean
      */
-    public static function destroy(mixed $image): bool {
+    public static function destroy(GdImage $image): bool {
         return imagedestroy($image);
     }
 
