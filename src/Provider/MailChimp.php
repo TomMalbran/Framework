@@ -4,6 +4,7 @@ namespace Framework\Provider;
 
 use Framework\Email\EmailWhiteList;
 use Framework\System\Config;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -40,70 +41,67 @@ class MailChimp {
     }
 
     /**
-     * Returns true if the result is successful
-     * @param array<string|integer,mixed> $result
+     * Returns true if the response is successful
+     * @param Dictionary $response
      * @return boolean
      */
-    private static function isSuccess(array $result): bool {
-        if (isset($result["status"])) {
-            $status = (int)$result["status"];
-            return $status >= 200 && $status <= 299;
-        }
-        return false;
+    private static function isSuccess(Dictionary $response): bool {
+        $status = $response->getInt("status");
+        return $status >= 200 && $status <= 299;
     }
 
     /**
      * Does a GET Request
      * @param string                   $route
      * @param array<string,mixed>|null $request Optional.
-     * @return array<string|integer,mixed>
+     * @return Dictionary
      */
-    private static function get(string $route, ?array $request = null): array {
+    private static function get(string $route, ?array $request = null): Dictionary {
         $result = Curl::execute("GET", self::getUrl($route), $request, self::getHeaders());
-        return is_array($result) ? $result : [];
+        return new Dictionary($result);
     }
 
     /**
      * Does a POST Request
      * @param string                   $route
      * @param array<string,mixed>|null $request Optional.
-     * @return array<string|integer,mixed>
+     * @return Dictionary
      */
-    private static function post(string $route, ?array $request = null): array {
+    private static function post(string $route, ?array $request = null): Dictionary {
         $result = Curl::execute("POST", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
-        return is_array($result) ? $result : [];
+        return new Dictionary($result);
     }
 
     /**
      * Does a PATCH Request
      * @param string                   $route
      * @param array<string,mixed>|null $request Optional.
-     * @return array<string|integer,mixed>
+     * @return Dictionary
      */
-    private static function patch(string $route, ?array $request = null): array {
+    private static function patch(string $route, ?array $request = null): Dictionary {
         $result = Curl::execute("PATCH", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
-        return is_array($result) ? $result : [];
+        return new Dictionary($result);
     }
 
     /**
      * Does a PUT Request
      * @param string                   $route
      * @param array<string,mixed>|null $request Optional.
-     * @return array<string|integer,mixed>
+     * @return Dictionary
      */
-    private static function put(string $route, ?array $request = null): array {
+    private static function put(string $route, ?array $request = null): Dictionary {
         $result = Curl::execute("PUT", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
-        return is_array($result) ? $result : [];
+        return new Dictionary($result);
     }
 
     /**
      * Does a DELETE Request
      * @param string $route
-     * @return array<string|integer,mixed>
+     * @return Dictionary
      */
-    private static function delete(string $route): array {
+    private static function delete(string $route): Dictionary {
         $result = Curl::execute("DELETE", self::getUrl($route), null, self::getHeaders());
-        return is_array($result) ? $result : [];
+        return new Dictionary($result);
     }
 
 
@@ -135,11 +133,11 @@ class MailChimp {
      * Returns all the subscribers
      * @param integer $count  Optional.
      * @param integer $offset Optional.
-     * @return mixed[]
+     * @return Dictionary
      */
-    public static function getAllSubscribers(int $count = 100, int $offset = 0): array {
+    public static function getAllSubscribers(int $count = 100, int $offset = 0): Dictionary {
         if (!Config::isMailchimpActive()) {
-            return [];
+            return new Dictionary();
         }
 
         $route    = self::getSubscribersRoute();
@@ -153,9 +151,9 @@ class MailChimp {
     /**
      * Returns the Subscriber with the given email
      * @param string $email
-     * @return mixed[]|mixed|null
+     * @return Dictionary|null
      */
-    public static function getSubscriber(string $email): mixed {
+    public static function getSubscriber(string $email): ?Dictionary {
         if (!Config::isMailchimpActive()) {
             return null;
         }
@@ -163,7 +161,7 @@ class MailChimp {
         $hash     = self::getSubscriberHash($email);
         $route    = self::getSubscribersRoute($hash);
         $response = self::get($route);
-        return !empty($response) ? $response : null;
+        return !$response->isEmpty() ? $response : null;
     }
 
     /**
@@ -176,7 +174,7 @@ class MailChimp {
         if (empty($subscriber)) {
             return "";
         }
-        return $subscriber["status"];
+        return $subscriber->getString("status");
     }
 
     /**
@@ -280,8 +278,9 @@ class MailChimp {
         }
 
         $response = self::get("templates");
-        if (!empty($response["templates"])) {
-            return Select::create($response["templates"], "id", "name");
+        if ($response->hasValue("templates")) {
+            $templates = $response->getArray("templates");
+            return Select::create($templates, "id", "name");
         }
         return [];
     }
@@ -396,7 +395,7 @@ class MailChimp {
         $response = self::post("campaigns", $post);
 
         if (self::isSuccess($response)) {
-            return $response["id"];
+            return $response->getString("id");
         }
         return "";
     }
@@ -544,7 +543,7 @@ class MailChimp {
         }
 
         $response = self::get("campaigns/{$mailChimpID}/content");
-        return $response;
+        return $response->toArray();
     }
 
     /**
@@ -569,12 +568,15 @@ class MailChimp {
             return $result;
         }
 
+        $opens  = $response->getDict("opens");
+        $clicks = $response->getDict("clicks");
+
         $result["hasReport"]    = true;
-        $result["emailsSent"]   = $response["emails_sent"];
-        $result["opensUnique"]  = $response["opens"]["unique_opens"];
-        $result["opensRate"]    = round($response["opens"]["open_rate"] * 1000) / 10;
-        $result["clicksUnique"] = $response["clicks"]["unique_clicks"];
-        $result["clicksRate"]   = round($response["clicks"]["click_rate"] * 1000) / 10;
+        $result["emailsSent"]   = $response->getInt("emails_sent");
+        $result["opensUnique"]  = $opens->getInt("unique_opens");
+        $result["opensRate"]    = round($opens->getFloat("open_rate") * 1000) / 10;
+        $result["clicksUnique"] = $clicks->getInt("unique_clicks");
+        $result["clicksRate"]   = round($clicks->getFloat("click_rate") * 1000) / 10;
         return $result;
     }
 
@@ -593,8 +595,8 @@ class MailChimp {
             "count" => 2000,
         ]);
 
-        foreach ($response["sent_to"] as $member) {
-            $result[] = $member["email_address"];
+        foreach ($response->getList("sent_to") as $member) {
+            $result[] = $member->getString("email_address");
         }
         return $result;
     }
@@ -614,8 +616,8 @@ class MailChimp {
             "count" => 2000,
         ]);
 
-        foreach ($response["members"] as $member) {
-            $result[] = $member["email_address"];
+        foreach ($response->getList("members") as $member) {
+            $result[] = $member->getString("email_address");
         }
         return $result;
     }
@@ -631,15 +633,17 @@ class MailChimp {
             return $result;
         }
 
-        $response = self::get("reports/{$mailChimpID}/click-details");
-        if (!empty($response["urls_clicked"][0]["id"])) {
-            $clickID = $response["urls_clicked"][0]["id"];
+        $response   = self::get("reports/{$mailChimpID}/click-details");
+        $urlClicked = $response->getFirst("urls_clicked");
+
+        if (!$urlClicked->isEmpty()) {
+            $clickID = $urlClicked->getString("id");
             $report  = self::get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
                 "count" => 2000,
             ]);
 
-            foreach ($report["members"] as $member) {
-                $result[] = $member["email_address"];
+            foreach ($report->getList("members") as $member) {
+                $result[] = $member->getString("email_address");
             }
         }
         return $result;
