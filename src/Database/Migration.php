@@ -10,6 +10,7 @@ use Framework\Database\Factory;
 use Framework\Database\Database;
 use Framework\Database\Structure;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -119,12 +120,12 @@ class Migration {
 
     /**
      * Migrates the Tables
-     * @param Database  $db
-     * @param array{}[] $schemas
-     * @param boolean   $canDelete Optional.
+     * @param Database   $db
+     * @param Dictionary $schemas
+     * @param boolean    $canDelete Optional.
      * @return boolean
      */
-    private static function migrateTables(Database $db, array $schemas, bool $canDelete = false): bool {
+    private static function migrateTables(Database $db, Dictionary $schemas, bool $canDelete = false): bool {
         $tableNames  = $db->getTables();
         $schemaNames = [];
         $didMigrate  = false;
@@ -436,6 +437,7 @@ class Migration {
                 }
             }
         }
+        print("\n");
 
         return $lastMigration;
     }
