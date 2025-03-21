@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Utils\Dictionary;
 
 /**
  * The Mandrill Provider
@@ -69,11 +70,9 @@ class Mandrill {
             "async"   => false,
             "send_at" => date("Y-m-d H:i:s"),
         ];
-        $response = Curl::execute("POST", $url, $params, $headers, jsonBody: true);
+        $result   = Curl::execute("POST", $url, $params, $headers, jsonBody: true);
 
-        if (empty($response["status"])) {
-            return $response["status"] === "sent";
-        }
-        return false;
+        $response = new Dictionary($result);
+        return $response->getString("status") === "sent";
     }
 }
