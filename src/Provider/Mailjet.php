@@ -3,6 +3,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Utils\Dictionary;
 
 /**
  * The Mailjet Provider
@@ -17,13 +18,14 @@ class Mailjet {
      * @param string              $method
      * @param string              $route
      * @param array<string,mixed> $params Optional.
-     * @return array<string,mixed>
+     * @return Dictionary
      */
-    private static function execute(string $method, string $route, array $params = []): array {
+    private static function execute(string $method, string $route, array $params = []): Dictionary {
         $url      = self::BaseUrl . $route;
         $userPass = Config::getMailjetKey() . ":" . Config::getMailjetSecret();
         $headers  = [ "Content-Type" => "application/json" ];
-        return Curl::execute($method, $url, $params, $headers, $userPass, jsonBody: true);
+        $response = Curl::execute($method, $url, $params, $headers, $userPass, jsonBody: true);
+        return new Dictionary($response);
     }
 
 
@@ -67,11 +69,7 @@ class Mailjet {
         $response = self::execute("POST", "/v3.1/send", [
             "Messages" => [ $message ],
         ]);
-
-        if (!empty($response["Messages"][0])) {
-            return $response["Messages"][0]["Status"] == "success";
-        }
-        return false;
+        return $response->getFirst("Messages")->getString("Status") === "success";
     }
 
 
@@ -97,8 +95,7 @@ class Mailjet {
                 "Email"  => $email,
             ]);
         }
-
-        return !empty($response["ErrorMessage"]);
+        return !$response->hasValue("ErrorMessage");
     }
 
     /**
@@ -114,7 +111,7 @@ class Mailjet {
             "Name"  => "$firstName $lastName",
             "Email" => $newEmail,
         ]);
-        if (empty($response["ErrorMessage"])) {
+        if ($response->hasValue("ErrorMessage")) {
             return true;
         }
 
@@ -136,11 +133,12 @@ class Mailjet {
         }
 
         $response = self::execute("GET", "/v3/REST/contact/$email");
-        if (!empty($response["Data"][0])) {
-            $contactID = $response["Data"][0]["ID"];
+        $data     = $response->getFirst("Data");
+
+        if (!$data->isEmpty()) {
+            $contactID = $data->getString("ID");
             self::execute("DELETE", "/v4/contacts/$contactID");
         }
-
         return true;
     }
 }
