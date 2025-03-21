@@ -76,7 +76,7 @@ class Join {
             if ($field->mergeTo !== "") {
                 if (empty($this->merges[$field->mergeTo])) {
                     $key  = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
-                    $glue = $data->getString("mergeGlue");
+                    $glue = $data->getString("mergeGlue", " ");
                     $this->merges[$field->mergeTo] = new Merge($key, $glue);
                 }
                 $this->merges[$field->mergeTo]->fields[] = $field->prefixName;

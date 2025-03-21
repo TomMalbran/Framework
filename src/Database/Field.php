@@ -72,8 +72,8 @@ class Field {
         $this->key        = $key;
 
         $this->type       = $data->getString("type", self::String);
-        $this->length     = $data->getInt("length", $this->length);
-        $this->decimals   = $data->getInt("decimals", $this->decimals);
+        $this->length     = $data->getInt("length", default: $this->length);
+        $this->decimals   = $data->getInt("decimals", default: $this->decimals);
         $this->dateType   = $data->getString("dateType", $this->dateType);
         $this->date       = $data->getString("date", $this->date);
         $this->hour       = $data->getString("hour", $this->hour);

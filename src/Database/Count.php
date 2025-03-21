@@ -41,7 +41,7 @@ class Count {
 
         $this->isSum     = $data->hasValue("isSum");
         $this->value     = $data->getString("value");
-        $this->mult      = $data->getInt("mult");
+        $this->mult      = $data->getInt("mult", default: 1);
 
         $this->table     = Factory::getTableName($data->getString("schema"));
         $this->onTable   = Factory::getTableName($data->getString("onSchema"));
