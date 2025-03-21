@@ -22,7 +22,7 @@ class MediaFile {
     private static bool  $loaded = false;
     private static int   $id     = 0;
 
-    /** @var array{}[] */
+    /** @var array{schema:string,field:string,replace:boolean}[] */
     private static array $data   = [];
 
 
@@ -35,8 +35,11 @@ class MediaFile {
             return false;
         }
 
+        /** @var array{media:array{schema:string,field:string,replace:boolean}[]} */
+        $data = Discovery::loadData(DataFile::Files);
+
         self::$loaded = true;
-        self::$data   = Discovery::loadData(DataFile::Files);
+        self::$data   = $data["media"];
         return true;
     }
 
@@ -58,7 +61,7 @@ class MediaFile {
      */
     public static function update(string $oldPath, string $newPath): bool {
         self::load();
-        if (empty(self::$data["media"])) {
+        if (empty(self::$data)) {
             return true;
         }
 
@@ -74,7 +77,7 @@ class MediaFile {
         ];
 
         $db = Framework::getDatabase();
-        foreach (self::$data["media"] as $field) {
+        foreach (self::$data as $field) {
             $structure = Factory::getStructure($field["schema"]);
 
             foreach ($files as $file) {
