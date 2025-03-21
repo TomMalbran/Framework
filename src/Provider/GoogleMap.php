@@ -3,6 +3,7 @@ namespace Framework\Provider;
 
 use Framework\System\Config;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 
 /**
  * The Google Map Provider
@@ -23,7 +24,7 @@ class GoogleMap {
     /**
      * Returns an Address and Coordinates from the given Address
      * @param string $address
-     * @return array{}
+     * @return array{address:string,latitude:float,longitude:float}|array{}
      */
     public static function getFromAddress(string $address): array {
         return self::getAddress($address, 0, 0);
@@ -33,7 +34,7 @@ class GoogleMap {
      * Returns an Address and Coordinates from the given Latitude and Longitude
      * @param float $latitude
      * @param float $longitude
-     * @return array{}
+     * @return array{address:string,latitude:float,longitude:float}|array{}
      */
     public static function getFromLatLng(float $latitude, float $longitude): array {
         return self::getAddress("", $latitude, $longitude);
@@ -44,7 +45,7 @@ class GoogleMap {
      * @param string $address
      * @param float  $latitude
      * @param float  $longitude
-     * @return array<string,string>
+     * @return array{address:string,latitude:float,longitude:float}|array{}
      */
     public static function getAddress(string $address, float $latitude, float $longitude): array {
         if (!self::isActive()) {
@@ -61,24 +62,26 @@ class GoogleMap {
         }
 
         $url      = self::BaseUrl . "geocode/json";
-        $response = Curl::execute("GET", $url, $params);
+        $result   = Curl::execute("GET", $url, $params);
+        $response = new Dictionary($result);
+        $address  = $response->getFirst("results");
 
-        if (empty($response["results"][0])) {
+        if ($address->isEmpty()) {
             return [];
         }
 
-        $address = $response["results"][0];
-        foreach ($response["results"] as $result) {
-            if (Arrays::contains($result["types"], "premise")) {
+        foreach ($response->getList("results") as $result) {
+            if (Arrays::contains($result->getString("types"), "premise")) {
                 $address = $result;
                 break;
             }
         }
 
+        $location = $address->getFirst("geometry")->getFirst("location");
         return [
-            "address"   => $address["formatted_address"],
-            "latitude"  => $address["geometry"]["location"]["lat"],
-            "longitude" => $address["geometry"]["location"]["lng"],
+            "address"   => $address->getString("formatted_address"),
+            "latitude"  => $location->getFloat("lat"),
+            "longitude" => $location->getFloat("lng"),
         ];
     }
 
@@ -102,12 +105,14 @@ class GoogleMap {
             "units"        => "metric",
         ];
 
-        $url = self::BaseUrl . "distancematrix/json";
-        $response = Curl::execute("GET", $url, $params);
+        $url      = self::BaseUrl . "distancematrix/json";
+        $result   = Curl::execute("GET", $url, $params);
+        $response = new Dictionary($result);
 
-        if (empty($response["rows"][0]["elements"][0]["distance"]["value"])) {
+        $value    = $response->getFirst("rows")->getFirst("elements")->getDict("distance")->getFloat("value");
+        if (empty($value)) {
             return null;
         }
-        return $response["rows"][0]["elements"][0]["distance"]["value"] / 1000;
+        return $value / 1000;
     }
 }
