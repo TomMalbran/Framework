@@ -20,10 +20,13 @@ class FilePath {
     private const Avatars = "avatars";
 
 
-    private static bool  $loaded = false;
+    private static bool  $loaded      = false;
 
-    /** @var array{}[] */
-    private static array $data   = [];
+    /** @var string[] */
+    private static array $paths       = [];
+
+    /** @var string[] */
+    private static array $directories = [];
 
 
     /**
@@ -34,8 +37,13 @@ class FilePath {
         if (self::$loaded) {
             return false;
         }
-        self::$loaded = true;
-        self::$data   = Discovery::loadData(DataFile::Files);
+
+        /** @var array{paths:string[],directories:string[]} */
+        $data = Discovery::loadData(DataFile::Files);
+
+        self::$loaded      = true;
+        self::$paths       = $data["paths"];
+        self::$directories = $data["directories"];
         return true;
     }
 
@@ -176,8 +184,8 @@ class FilePath {
         $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
-        if (!empty(self::$data["paths"])) {
-            $basePaths = array_merge($basePaths, self::$data["paths"]);
+        if (!empty(self::$paths)) {
+            $basePaths = array_merge($basePaths, self::$paths);
         }
         foreach ($basePaths as $basePath) {
             $paths[] = [
@@ -212,8 +220,8 @@ class FilePath {
                 $result[] = "$basePath/$id";
             }
 
-            if (!empty(self::$data["directories"])) {
-                foreach (self::$data["directories"] as $directory) {
+            if (!empty(self::$directories)) {
+                foreach (self::$directories as $directory) {
                     $path = self::getPath($basePath, $id, $directory);
                     if (File::createDir($path)) {
                         $result[] = "$basePath/$id/$directory";
@@ -233,8 +241,8 @@ class FilePath {
         $basePaths = [ self::Temp, self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
-        if (!empty(self::$data["paths"])) {
-            $basePaths = array_merge($basePaths, self::$data["paths"]);
+        if (!empty(self::$paths)) {
+            $basePaths = array_merge($basePaths, self::$paths);
         }
         foreach ($basePaths as $basePath) {
             $path = self::getPath($basePath);
