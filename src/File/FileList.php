@@ -4,6 +4,7 @@ namespace Framework\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Utils\Arrays;
+use Framework\Utils\Strings;
 
 /**
  * The FileList wrapper
@@ -82,10 +83,10 @@ class FileList {
 
     /**
      * Sorts and returns the List
-     * @return array<string,string|boolean>[]
+     * @return array<string,mixed>[]
      */
     public function getSorted(): array {
-        return Arrays::sort($this->list, function ($a, $b) {
+        return Arrays::sort($this->list, function (array $a, array $b) {
             // Back goes first
             if ($a["isBack"] && !$b["isBack"]) {
                 return -1;
@@ -103,7 +104,9 @@ class FileList {
             }
 
             // If the type is the same sort by name
-            return strnatcasecmp($a["name"], $b["name"]);
+            $aName = Strings::toString($a["name"]);
+            $bName = Strings::toString($b["name"]);
+            return strnatcasecmp($aName, $bName);
         });
     }
 }

@@ -155,7 +155,7 @@ class MediaFile {
      * @param string $mediaType Optional.
      * @param string $path      Optional.
      * @param string $basePath  Optional.
-     * @return array{list:array<string,string|boolean>[],path:string}
+     * @return array{list:array<string,mixed>[],path:string}
      */
     public static function getList(string $mediaType = "", string $path = "", string $basePath = ""): array {
         $path   = !empty($path) && self::exists($basePath, $path) ? $path : "";
