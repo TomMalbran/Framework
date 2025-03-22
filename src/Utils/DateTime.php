@@ -571,32 +571,37 @@ class DateTime {
 
     /**
      * Returns the Minutes as a string
-     * @param integer $minutes
+     * @param integer|float $minutes
+     * @param integer       $decimals Optional.
      * @return string
      */
-    public static function toMinString(int $minutes): string {
+    public static function toMinString(int|float $minutes, int $decimals = 0): string {
         if ($minutes < 120) {
             return "{$minutes}m";
         }
-        $hours = floor($minutes / 60);
+
+        $hours = Numbers::divide($minutes, 60, $decimals);
         if ($hours < 72) {
             return "{$hours}h";
         }
-        $days = floor($minutes / (60 * 24));
+
+        $days = Numbers::divide($minutes, 60 * 24, $decimals);
         return "{$days}d";
     }
 
     /**
      * Returns the Seconds as a string
      * @param integer $seconds
+     * @param integer $decimals Optional.
      * @return string
      */
-    public static function toSecString(int $seconds): string {
+    public static function toSecString(int $seconds, int $decimals): string {
         if ($seconds < 120) {
             return "{$seconds}s";
         }
-        $minutes = (int)floor($seconds / 60);
-        return self::toMinString($minutes);
+
+        $minutes = Numbers::divide($seconds, 60, $decimals);
+        return self::toMinString($minutes, $decimals);
     }
 
 
