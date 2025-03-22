@@ -2,7 +2,6 @@
 /* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET, USERPWD, HEADERFUNCTION */
 namespace Framework\Provider;
 
-use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -107,12 +106,12 @@ class Curl {
         // Get the Headers
         $headers = [];
         if ($withHeaders) {
-            $options[CURLOPT_HEADERFUNCTION] = function($curl, $header) use (&$headers) {
+            $options[CURLOPT_HEADERFUNCTION] = function($curl, string $header) use (&$headers) {
                 $parts = Strings::split($header, ":");
                 if (count($parts) == 2) {
                     $headers[strtolower(trim($parts[0]))] = trim($parts[1]);
                 }
-                return strlen($header);
+                return Strings::length($header);
             };
         }
 
@@ -181,10 +180,10 @@ class Curl {
 
         $content = [];
         foreach ($params as $key => $value) {
-            if (Arrays::isArray($value)) {
+            if (is_array($value)) {
                 $content[] = "$key=" . urlencode(JSON::encode($value));
             } elseif ($value !== null) {
-                $content[] = "$key=" . urlencode($value);
+                $content[] = "$key=" . urlencode(Strings::toString($value));
             }
         }
 
