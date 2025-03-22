@@ -22,6 +22,7 @@ class Facebook {
             return null;
         }
 
+        /** @var array<string,string> */
         $response = Curl::execute("GET", self::BaseUrl . "/me", [
             "fields"       => "email,name,first_name,last_name",
             "access_token" => $accessToken,
@@ -30,10 +31,12 @@ class Facebook {
             return null;
         }
 
-        $firstName = !empty($response["first_name"]) ? $response["first_name"] : "";
-        $lastName  = !empty($response["last_name"])  ? $response["last_name"]  : "";
-        if (empty($firstName) && empty($lastName) && !empty($response["name"])) {
-            [ $firstName, $lastName ] = Utils::parseName($response["name"]);
+        $firstName = $response["first_name"] ?? "";
+        $lastName  = $response["last_name"]  ?? "";
+        $name      = $response["name"]       ?? "";
+
+        if ($firstName === "" && $lastName === "" && $name !== "") {
+            [ $firstName, $lastName ] = Utils::parseName($name);
         }
 
         return [
