@@ -22,6 +22,7 @@ class Google {
             return null;
         }
 
+        /** @var array<string,string> */
         $response = Curl::execute("GET", self::BaseUrl . "userinfo", null, [
             "Authorization" => "Bearer $accessToken",
         ]);
@@ -31,8 +32,8 @@ class Google {
 
         return [
             "email"     => $response["email"],
-            "firstName" => $response["given_name"],
-            "lastName"  => !empty($response["family_name"]) ? $response["family_name"] : "",
+            "firstName" => $response["given_name"]  ?? "",
+            "lastName"  => $response["family_name"] ?? "",
         ];
     }
 
