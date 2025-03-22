@@ -27,7 +27,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
             $this->data = $input->data;
         } elseif (is_array($input)) {
             $this->data = $input;
-        } elseif (Arrays::isObject($input)) {
+        } elseif (is_object($input)) {
             $this->data = (array)$input;
         } elseif (JSON::isValid($input)) {
             $this->data = JSON::decodeAsArray($input);

@@ -20,15 +20,6 @@ class Arrays {
     }
 
     /**
-     * Returns true if the given value is an Object
-     * @param mixed $value
-     * @return boolean
-     */
-    public static function isObject(mixed $value): bool {
-        return is_object($value);
-    }
-
-    /**
      * Returns true if the given value is an list
      * @param mixed $array
      * @return boolean
@@ -270,7 +261,7 @@ class Arrays {
         if ($key === null) {
             return Strings::isEqual($row, $value, $caseInsensitive);
         }
-        if (self::isObject($row)) {
+        if (is_object($row)) {
             return isset($row->$key) && Strings::isEqual($row->$key, $value, $caseInsensitive);
         }
         if (is_array($row)) {
@@ -413,9 +404,9 @@ class Arrays {
         $result = [];
         foreach ($array as $elem) {
             $shouldAdd = false;
-            if (self::isObject($elem)) {
+            if (is_object($elem)) {
                 $shouldAdd = !empty($elem->$idKey) && $elem->$idKey != $key;
-            } elseif (is_array($elem) || $elem instanceof ArrayAccess) {
+            } elseif (is_array($elem)) {
                 $shouldAdd = !empty($elem[$idKey]) && $elem[$idKey] != $key;
             } else {
                 $shouldAdd = $elem != $key;
@@ -774,11 +765,11 @@ class Arrays {
      */
     public static function findIndex(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $index => $elem) {
-            if (self::isObject($elem)) {
+            if (is_object($elem)) {
                 if ($elem->$idKey == $idValue) {
                     return $index;
                 }
-            } elseif (is_array($elem) || $elem instanceof ArrayAccess) {
+            } elseif (is_array($elem)) {
                 if ($elem[$idKey] == $idValue) {
                     return $index;
                 }
@@ -797,11 +788,11 @@ class Arrays {
      */
     public static function findValue(array $array, string $idKey, mixed $idValue) {
         foreach ($array as $elem) {
-            if (self::isObject($elem)) {
+            if (is_object($elem)) {
                 if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
                     return $elem;
                 }
-            } elseif (is_array($elem) || $elem instanceof ArrayAccess) {
+            } elseif (is_array($elem)) {
                 if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
                     return $elem;
                 }
@@ -874,7 +865,7 @@ class Arrays {
      * @return mixed
      */
     public static function getOneValue(mixed $array, string $key, bool $useEmpty = false, mixed $default = null): mixed {
-        if (self::isObject($array)) {
+        if (is_object($array)) {
             if ($useEmpty && isset($array->$key)) {
                 return $array->$key;
             }
