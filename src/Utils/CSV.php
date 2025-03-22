@@ -38,9 +38,6 @@ class CSV {
         if (is_array($value)) {
             return self::parseLine($value, $fields);
         }
-        if (!Strings::isString($value)) {
-            return [];
-        }
 
         if (!Strings::contains($value, "\n")) {
             $csv = str_getcsv($value, $separator);
@@ -75,7 +72,7 @@ class CSV {
      * Parses a CSV Line
      * @param string[] $value
      * @param string[] $fields
-     * @return mixed
+     * @return string[]
      */
     private static function parseLine(array $value, array $fields): mixed {
         if (empty($fields)) {
@@ -84,7 +81,7 @@ class CSV {
 
         $result = [];
         foreach ($fields as $index => $field) {
-            $result[$field] = isset($value[$index]) ? $value[$index] : "";
+            $result[$field] = $value[$index] ?? "";
         }
         return $result;
     }
