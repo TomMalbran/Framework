@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Utils;
 
 use Firebase\JWT\JWT;
@@ -22,7 +23,7 @@ class Microsoft {
         }
 
         $tokens = explode(".", $idToken);
-        if (count($tokens) != 3) {
+        if (count($tokens) !== 3) {
             return null;
         }
 
@@ -34,20 +35,22 @@ class Microsoft {
         if ($header === "" || $payload === "" || $signature === "") {
             return null;
         }
-        if ($payload->aud !== Config::getMicrosoftClient()) {
+        $payloadData = new Dictionary($payload);
+
+        if ($payloadData->getString("aud") !== Config::getMicrosoftClient()) {
             return null;
         }
-        if ($payload->exp < time()) {
+        if ($payloadData->getInt("exp") < time()) {
             return null;
         }
-        if (empty($payload->email) || empty($payload->name)) {
+        if (!$payloadData->hasValue("email") || !$payloadData->hasValue("name")) {
             return null;
         }
 
         // Split the Name
-        [ $firstName, $lastName ] = Utils::parseName($payload->name);
+        [ $firstName, $lastName ] = Utils::parseName($payloadData->getString("name"));
         return [
-            "email"     => $payload->email,
+            "email"     => $payloadData->getString("email"),
             "firstName" => $firstName,
             "lastName"  => $lastName,
         ];
