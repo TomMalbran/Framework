@@ -841,7 +841,14 @@ class Arrays {
      * @param mixed|string         $default  Optional.
      * @return mixed
      */
-    public static function getValue(mixed $array, array|string|null $key = null, string $glue = " - ", string $prefix = "", bool $useEmpty = false, mixed $default = ""): mixed {
+    public static function getValue(
+        mixed $array,
+        array|string|null $key = null,
+        string $glue = " - ",
+        string $prefix = "",
+        bool $useEmpty = false,
+        mixed $default = "",
+    ): mixed {
         if (empty($key)) {
             return $array;
         }

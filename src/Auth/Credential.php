@@ -7,6 +7,7 @@ use Framework\System\Access;
 use Framework\System\Status;
 use Framework\System\Path;
 use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
 use Framework\Utils\Search;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -25,13 +26,13 @@ class Credential extends CredentialSchema {
      * Creates a Access Query
      * @param Access[]|Access|null $accessName
      * @param string[]|string|null $filter     Optional.
-     * @param mixed|integer        $value      Optional.
+     * @param string|integer       $value      Optional.
      * @return CredentialQuery
      */
     private static function createAccessQuery(
         array|Access|null $accessName,
         array|string|null $filter = null,
-        mixed $value = 1,
+        string|int $value = 1,
     ): CredentialQuery {
         $accessNames = Access::toStrings($accessName);
         if (empty($accessNames)) {
@@ -96,10 +97,15 @@ class Credential extends CredentialSchema {
      * @param integer              $credentialID
      * @param Access[]|Access      $accessName
      * @param string[]|string|null $filter       Optional.
-     * @param mixed|integer        $value        Optional.
+     * @param string|integer       $value        Optional.
      * @return boolean
      */
-    public static function existsWithAccess(int $credentialID, array|Access $accessName, array|string|null $filter = null, mixed $value = 1): bool {
+    public static function existsWithAccess(
+        int $credentialID,
+        array|Access $accessName,
+        array|string|null $filter = null,
+        string|int $value = 1,
+    ): bool {
         $query = self::createAccessQuery($accessName, $filter, $value);
         if ($query->isEmpty()) {
             return false;
@@ -126,12 +132,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is an Credential with the given Value for the given Field
-     * @param string  $field
-     * @param mixed   $value
-     * @param integer $skipID Optional.
+     * @param string         $field
+     * @param string|integer $value
+     * @param integer        $skipID Optional.
      * @return boolean
      */
-    public static function fieldExists(string $field, mixed $value, int $skipID = 0): bool {
+    public static function fieldExists(string $field, string|int $value, int $skipID = 0): bool {
         $query = new CredentialQuery();
         $query->query->add($field, "=", $value);
         $query->credentialID->notEqualIf($skipID);
@@ -185,11 +191,11 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials for the given Access(s) and filter
      * @param Access[]|Access $accessName
      * @param string          $filter
-     * @param mixed|integer   $value      Optional.
+     * @param string|integer  $value      Optional.
      * @param Request|null    $sort       Optional.
      * @return CredentialEntity[]
      */
-    public static function getAllWithFilter(array|Access $accessName, string $filter, mixed $value = 1, ?Request $sort = null): array {
+    public static function getAllWithFilter(array|Access $accessName, string $filter, string|int $value = 1, ?Request $sort = null): array {
         $query = self::createAccessQuery($accessName, $filter, $value);
         if ($query->isEmpty()) {
             return [];
@@ -219,10 +225,15 @@ class Credential extends CredentialSchema {
      * @param Access[]|Access $accessName
      * @param integer         $amount
      * @param string|null     $filter     Optional.
-     * @param mixed|integer   $value      Optional.
+     * @param string|integer  $value      Optional.
      * @return CredentialEntity[]
      */
-    public static function getLatestForAccess(array|Access $accessName, int $amount, ?string $filter = null, mixed $value = 1): array {
+    public static function getLatestForAccess(
+        array|Access $accessName,
+        int $amount,
+        ?string $filter = null,
+        string|int $value = 1,
+    ): array {
         $query = self::createAccessQuery($accessName, $filter, $value);
         if ($query->isEmpty()) {
             return [];
@@ -265,10 +276,14 @@ class Credential extends CredentialSchema {
      * Returns the total amount of Credentials for the given Access(s)
      * @param Access[]|Access $accessName
      * @param string|null     $filter     Optional.
-     * @param mixed|integer   $value      Optional.
+     * @param string|integer  $value      Optional.
      * @return integer
      */
-    public static function getTotalForAccess(array|Access $accessName, ?string $filter = null, mixed $value = 1): int {
+    public static function getTotalForAccess(
+        array|Access $accessName,
+        ?string $filter = null,
+        string|int $value = 1,
+    ): int {
         $query = self::createAccessQuery($accessName, $filter, $value);
         if ($query->isEmpty()) {
             return 0;
@@ -284,7 +299,11 @@ class Credential extends CredentialSchema {
      * @param boolean              $complete Optional.
      * @return CredentialEntity[]
      */
-    private static function getCredentials(?CredentialQuery $query = null, ?Request $sort = null, bool $complete = false): array {
+    private static function getCredentials(
+        ?CredentialQuery $query = null,
+        ?Request $sort = null,
+        bool $complete = false,
+    ): array {
         $list   = self::getEntityList($query, $sort);
         $result = [];
 
@@ -335,10 +354,14 @@ class Credential extends CredentialSchema {
      * Returns a select of Credentials for the given Access(s)
      * @param Access[]|Access      $accessName
      * @param string[]|string|null $filter     Optional.
-     * @param mixed|integer        $value      Optional.
+     * @param string|integer       $value      Optional.
      * @return Select[]
      */
-    public static function getSelectForAccess(array|Access $accessName, array|string|null $filter = null, mixed $value = 1): array {
+    public static function getSelectForAccess(
+        array|Access $accessName,
+        array|string|null $filter = null,
+        string|int $value = 1,
+    ): array {
         $query = self::createAccessQuery($accessName, $filter, $value);
         if ($query->isEmpty()) {
             return [];
@@ -427,10 +450,14 @@ class Credential extends CredentialSchema {
      * Returns a list of emails of the Credentials with the given Accesses
      * @param Access[]|Access      $accessName
      * @param string[]|string|null $filter     Optional.
-     * @param mixed|integer        $value      Optional.
+     * @param string|integer       $value      Optional.
      * @return array<string,string>
      */
-    public static function getEmailsForAccess(array|Access $accessName, array|string|null $filter = null, mixed $value = 1): array {
+    public static function getEmailsForAccess(
+        array|Access $accessName,
+        array|string|null $filter = null,
+        string|int $value = 1,
+    ): array {
         $query = self::createAccessQuery($accessName, $filter, $value);
         if ($query->isEmpty()) {
             return [];
@@ -492,11 +519,16 @@ class Credential extends CredentialSchema {
      * @param boolean|null             $reqPassChange Optional.
      * @return integer
      */
-    public static function create(?Request $request = null, ?array $fields = null, ?Access $accessName = null, ?bool $reqPassChange = null): int {
+    public static function create(
+        ?Request $request = null,
+        ?array $fields = null,
+        ?Access $accessName = null,
+        ?bool $reqPassChange = null,
+    ): int {
         $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
         $fields["lastLogin"]    = time();
         $fields["currentLogin"] = time();
-        return self::createEntity($request, ...$fields);
+        return self::createSchemaEntity($request, $fields);
     }
 
     /**
@@ -509,7 +541,14 @@ class Credential extends CredentialSchema {
      * @param boolean                  $skipEmpty     Optional.
      * @return boolean
      */
-    public static function edit(int $credentialID, ?Request $request = null, ?array $fields = [], ?Access $accessName = null, ?bool $reqPassChange = null, bool $skipEmpty = false): bool {
+    public static function edit(
+        int $credentialID,
+        ?Request $request = null,
+        ?array $fields = [],
+        ?Access $accessName = null,
+        ?bool $reqPassChange = null,
+        bool $skipEmpty = false,
+    ): bool {
         $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
         return self::editSchemaEntity($credentialID, $request, $fields, skipEmpty: $skipEmpty);
     }
@@ -521,7 +560,7 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function update(int $credentialID, array $fields): bool {
-        return self::editEntity($credentialID, ...$fields);
+        return self::editSchemaEntity($credentialID, fields: $fields);
     }
 
     /**
@@ -574,11 +613,22 @@ class Credential extends CredentialSchema {
      * @param boolean|null             $reqPassChange Optional.
      * @return array<string,mixed>
      */
-    private static function parseFields(?Request $request = null, ?array $fields = null, ?Access $accessName = null, ?bool $reqPassChange = null): array {
-        $password = $request !== null ? $request->getString("password") : (!empty($fields["password"]) ? $fields["password"] : "");
-        $result   = !empty($fields) ? $fields : [];
+    private static function parseFields(
+        ?Request $request = null,
+        ?array $fields = null,
+        ?Access $accessName = null,
+        ?bool $reqPassChange = null,
+    ): array {
+        $result = !empty($fields) ? $fields : [];
 
-        if ($password) {
+        $password = "";
+        if ($request !== null) {
+            $password = $request->getString("password");
+        } elseif (!empty($fields["password"])) {
+            $password = Strings::toString($fields["password"]);
+        }
+
+        if ($password !== "") {
             $hash = self::createHash($password);
             $result["password"] = $hash["password"];
             $result["salt"]     = $hash["salt"];
@@ -765,10 +815,10 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function updateLoginTime(int $credentialID): bool {
-        $current = self::getValue($credentialID, CredentialColumn::CurrentLogin);
+        $currentLogin = self::getValue($credentialID, CredentialColumn::CurrentLogin);
         return self::editEntity(
             $credentialID,
-            lastLogin:    $current,
+            lastLogin:    Numbers::toInt($currentLogin),
             currentLogin: time(),
         );
     }
@@ -809,10 +859,10 @@ class Credential extends CredentialSchema {
      * Sets a Credential Value
      * @param integer          $credentialID
      * @param CredentialColumn $column
-     * @param mixed            $value
+     * @param string|integer   $value
      * @return boolean
      */
-    public static function setValue(int $credentialID, CredentialColumn $column, mixed $value): bool {
+    public static function setValue(int $credentialID, CredentialColumn $column, string|int $value): bool {
         return self::editEntityValue($credentialID, $column, $value);
     }
 
@@ -838,10 +888,10 @@ class Credential extends CredentialSchema {
      * @return string
      */
     public static function getName(mixed $data, bool $withEmail = false, string $prefix = ""): string {
-        $id        = Arrays::getValue($data, "credentialID", "", $prefix);
-        $firstName = Arrays::getValue($data, "firstName",    "", $prefix);
-        $lastName  = Arrays::getValue($data, "lastName",     "", $prefix);
-        $email     = Arrays::getValue($data, "email",        "", $prefix);
+        $id        = Strings::toString(Arrays::getValue($data, "credentialID", prefix: $prefix));
+        $firstName = Strings::toString(Arrays::getValue($data, "firstName",    prefix: $prefix));
+        $lastName  = Strings::toString(Arrays::getValue($data, "lastName",     prefix: $prefix));
+        $email     = Strings::toString(Arrays::getValue($data, "email",        prefix: $prefix));
         $result    = "";
 
         if (!empty($firstName) || !empty($lastName)) {
@@ -864,9 +914,9 @@ class Credential extends CredentialSchema {
      * @return string
      */
     public static function getPhone(mixed $data, string $prefix = "", bool $withPlus = false): string {
-        $phone     = Arrays::getValue($data, "phone",     "", $prefix);
-        $cellphone = Arrays::getValue($data, "cellphone", "", $prefix);
-        $iddRoot   = Arrays::getValue($data, "iddRoot",   "", $prefix);
+        $phone     = Strings::toString(Arrays::getValue($data, "phone",     prefix: $prefix));
+        $cellphone = Strings::toString(Arrays::getValue($data, "cellphone", prefix: $prefix));
+        $iddRoot   = Strings::toString(Arrays::getValue($data, "iddRoot",   prefix: $prefix));
 
         if (!empty($cellphone) && !empty($iddRoot)) {
             return ($withPlus ? "+" : "") . $iddRoot . $cellphone;
