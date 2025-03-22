@@ -3,21 +3,10 @@ namespace Framework\Utils;
 
 use Framework\Utils\Numbers;
 
-use ArrayAccess;
-
 /**
  * Several Array Utils
  */
 class Arrays {
-
-    /**
-     * Returns true if the given value is an Array or ArrayAccess
-     * @param mixed $value
-     * @return boolean
-     */
-    public static function isArrayLike(mixed $value): bool {
-        return is_array($value) || $value instanceof ArrayAccess;
-    }
 
     /**
      * Returns true if the given value is an list
