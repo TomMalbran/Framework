@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -40,7 +39,7 @@ enum VariableType {
      * @return VariableType
      */
     public static function get(mixed $value): VariableType {
-        if (Arrays::isArray($value)) {
+        if (is_array($value)) {
             return self::Array;
         }
         if (gettype($value) == "boolean") {

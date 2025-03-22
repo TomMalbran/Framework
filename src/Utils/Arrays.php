@@ -11,15 +11,6 @@ use ArrayAccess;
 class Arrays {
 
     /**
-     * Returns true if the given value is an Array
-     * @param mixed $value
-     * @return boolean
-     */
-    public static function isArray(mixed $value): bool {
-        return is_array($value);
-    }
-
-    /**
      * Returns true if the given value is an Array or ArrayAccess
      * @param mixed $value
      * @return boolean

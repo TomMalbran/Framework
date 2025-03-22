@@ -344,7 +344,7 @@ class Database {
                 return null;
             }
 
-            if (Arrays::isArray($bindParams) && !empty($bindParams)) {
+            if (is_array($bindParams) && !empty($bindParams)) {
                 $types  = "";
                 $params = [];
                 foreach ($bindParams as $value) {

@@ -1,7 +1,6 @@
 <?php
 namespace Framework;
 
-use Framework\Utils\Arrays;
 use Framework\Utils\Errors;
 use Framework\Utils\Search;
 use Framework\Utils\JSON;
@@ -195,7 +194,7 @@ class Response {
      * @return Response
      */
     public static function error(Errors|string $error, JsonSerializable|array|null $data = null, string $param = ""): Response {
-        if (Arrays::isArray($error)) {
+        if (is_array($error)) {
             return new Response([
                 "errors" => $error,
                 "data"   => $data,
