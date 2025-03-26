@@ -152,10 +152,11 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the request data at the given key as an array of integers
-     * @param string $key
+     * @param string  $key
+     * @param boolean $withoutEmpty Optional.
      * @return int[]
      */
-    public function getInts(string $key): array {
+    public function getInts(string $key, bool $withoutEmpty = true): array {
         $value  = $this->get($key, "");
         $result = [];
         if (JSON::isValid($value)) {
@@ -163,7 +164,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         } elseif (is_string($value)) {
             $result = Strings::split($value, ",");
         }
-        return Arrays::toInts($result, withoutEmpty: true);
+        return Arrays::toInts($result, withoutEmpty: $withoutEmpty);
     }
 
     /**
