@@ -241,18 +241,33 @@ class Query {
             return $this;
         }
 
-        $valueParts = $splitValue ? Strings::split($value, $splitText) : Arrays::toArray($value);
-        $valueParts = Arrays::removeEmpty($valueParts);
-        $columns    = Arrays::toArray($column);
-        $multiParts = Arrays::length($valueParts) > 1;
-        $multiCols  = Arrays::length($columns) > 1;
-        $isFirst    = true;
+        // Prepare the columns
+        $columns   = is_array($column) ? $column : [ $column ];
+        $multiCols = Arrays::length($columns) > 1;
 
+        // Prepare the values
+        $valueParts = [];
+        if (is_array($value)) {
+            $valueParts = Arrays::toStrings($value, withoutEmpty: true);
+        } elseif (is_string($value)) {
+            $valueParts = $splitValue ? Strings::split($value, $splitText) : [ $value ];
+            $valueParts = Arrays::removeEmpty($valueParts);
+        } else {
+            $valueParts = [ Strings::toString($value) ];
+        }
+        if ($caseInsensitive) {
+            foreach ($valueParts as $valuePart) {
+                $valueParts[] = Strings::toLowerCase($valuePart);
+            }
+        }
+        $multiParts = Arrays::length($valueParts) > 1;
+
+        // Handle the search
+        $isFirst = true;
         if ($multiParts) {
             $this->startParen();
         }
         foreach ($valueParts as $valuePart) {
-            $valueSearch = $caseInsensitive ? Strings::toLowerCase($valuePart) : $valuePart;
             if ($multiParts && !$isFirst) {
                 if ($matchAny) {
                     $this->or();
@@ -264,7 +279,7 @@ class Query {
                 $this->startOr();
             }
             foreach ($columns as $columnSearch) {
-                $this->add($columnSearch, $expression, $valueSearch);
+                $this->add($columnSearch, $expression, $valuePart);
             }
             if ($multiCols) {
                 $this->endOr();
