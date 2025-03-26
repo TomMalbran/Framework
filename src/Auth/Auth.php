@@ -46,19 +46,19 @@ class Auth {
 
     /**
      * Validates the Credential
-     * @param string       $accessToken
-     * @param string       $refreshToken Optional.
-     * @param string|null  $langcode     Optional.
-     * @param integer|null $timezone     Optional.
+     * @param string  $accessToken
+     * @param string  $refreshToken
+     * @param string  $langcode
+     * @param integer $timezone
      * @return boolean
      */
-    public static function validateCredential(string $accessToken, string $refreshToken = "", ?string $langcode = null, ?int $timezone = null): bool {
+    public static function validateCredential(string $accessToken, string $refreshToken, string $langcode, int $timezone): bool {
         Reset::deleteOld();
         AuthToken::deleteOld();
 
         // Validate the API Token
         $apiToken = AuthToken::getAPIToken($accessToken);
-        if (!empty($apiToken)) {
+        if ($apiToken !== "") {
             return self::validateAPI($apiToken);
         }
 
@@ -76,14 +76,14 @@ class Auth {
 
         // Retrieve the Admin
         $admin = new CredentialEntity();
-        if (!empty($adminID)) {
+        if ($adminID !== 0) {
             $admin = Credential::getByID($adminID, true);
         }
 
         // Update the Refresh Token
         self::$refreshToken = $refreshToken;
         $newRefreshToken = AuthToken::updateRefreshToken($accessToken, $refreshToken);
-        if (!empty($newRefreshToken) && $newRefreshToken !== $refreshToken) {
+        if ($newRefreshToken !== "" && $newRefreshToken !== $refreshToken) {
             self::$refreshToken = $newRefreshToken;
             self::$sendRefresh  = true;
         }
@@ -103,21 +103,21 @@ class Auth {
      * Sets the Language and Timezone if required
      * @param CredentialEntity $credential
      * @param CredentialEntity $admin
-     * @param string|null      $langcode
-     * @param integer|null     $timezone
+     * @param string           $langcode
+     * @param integer          $timezone
      * @return boolean
      */
-    private static function setLanguageTimezone(CredentialEntity $credential, CredentialEntity $admin, ?string $langcode = null, ?int $timezone = null): bool {
+    private static function setLanguageTimezone(CredentialEntity $credential, CredentialEntity $admin, string $langcode, int $timezone): bool {
         $entity = $credential;
         if (!$admin->isEmpty()) {
             $entity = $admin;
         }
 
-        if (!empty($langcode) && !$entity->hasValue("language")) {
+        if ($langcode !== "" && !$entity->hasValue("language")) {
             Credential::setLanguage($entity->id, $langcode);
             $entity->language = $langcode;
         }
-        if (!empty($timezone)) {
+        if ($timezone !== 0) {
             Credential::setTimezone($entity->id, $timezone);
             $entity->timezone = $timezone;
         }
@@ -266,7 +266,7 @@ class Auth {
         $parts = Strings::split($email, "|");
         $user  = null;
 
-        if (!empty($parts[0]) && !empty($parts[1])) {
+        if (isset($parts[0]) && isset($parts[1])) {
             $admin = Credential::getByEmail($parts[0], true);
             $user  = Credential::getByEmail($parts[1], true);
 
@@ -310,7 +310,7 @@ class Auth {
         self::$credentialID = $credential->id;
         self::$userID       = $userID;
 
-        if (!empty($credential->userAccess)) {
+        if ($credential->userAccess !== "") {
             self::$accessName = Access::from($credential->userAccess);
         } else {
             self::$accessName = Access::from($credential->access);
@@ -318,7 +318,8 @@ class Auth {
 
         $language = $credential->language;
         $timezone = $credential->timezone;
-        if (!empty($admin) && !$admin->isEmpty()) {
+
+        if ($admin !== null && !$admin->isEmpty()) {
             self::$admin   = $admin;
             self::$adminID = $admin->id;
             $language = $admin->language;
@@ -328,11 +329,10 @@ class Auth {
             self::$adminID = 0;
         }
 
-        if (!empty($language)) {
+        if ($language !== "") {
             NLS::setLanguage($language);
         }
-
-        if (!empty($timezone)) {
+        if ($timezone !== 0) {
             DateTime::setTimezone($timezone);
         }
         return true;
