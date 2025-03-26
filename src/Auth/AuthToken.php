@@ -22,7 +22,7 @@ class AuthToken {
     private static int    $shortTerm = 0;
     private static int    $longTerm  = 0;
 
-    private static CredentialRefreshTokenEntity $tokenData;
+    private static ?CredentialRefreshTokenEntity $tokenData = null;
 
 
 
@@ -64,7 +64,7 @@ class AuthToken {
      */
     public static function isValid(string $accessToken, string $refreshToken): bool {
         self::load();
-        if (!empty($refreshToken)) {
+        if ($refreshToken !== "") {
             return !self::getOne($refreshToken)->isEmpty();
         }
         return self::isValidAccessToken($accessToken);
@@ -78,12 +78,12 @@ class AuthToken {
      */
     public static function getCredentials(string $accessToken, string $refreshToken): array {
         $accessData = self::getAccessData($accessToken);
-        if (!empty($accessData->credentialID)) {
+        if ($accessData->hasValue("credentialID")) {
             return [ $accessData->getInt("credentialID"), $accessData->getInt("adminID") ];
         }
 
         $refresh = self::getOne($refreshToken);
-        if (!empty($refresh->credentialID)) {
+        if ($refresh->credentialID !== 0) {
             return [ $refresh->credentialID, 0 ];
         }
 
@@ -142,7 +142,7 @@ class AuthToken {
      * @return CredentialRefreshTokenEntity
      */
     private static function getOne(string $refreshToken): CredentialRefreshTokenEntity {
-        if (!empty(self::$tokenData) && self::$tokenData->refreshToken === $refreshToken) {
+        if (self::$tokenData !== null && self::$tokenData->refreshToken === $refreshToken) {
             return self::$tokenData;
         }
 
