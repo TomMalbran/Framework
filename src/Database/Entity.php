@@ -18,7 +18,7 @@ class Entity implements JsonSerializable {
     protected const ID = "";
 
     private bool $isEmpty = true;
-    private bool $isEdit  = true;
+    private bool $isEdit  = false;
 
 
 
@@ -97,14 +97,14 @@ class Entity implements JsonSerializable {
             return false;
         }
 
-        if ($property === static::ID) {
-            $this->isEdit = true;
-            if (property_exists($this, "id")) {
-                if (is_numeric($request->get($property))) {
-                    $this->{"id"} = $request->getInt($property);
-                } else {
-                    $this->{"id"} = $request->getString($property);
-                }
+        if ($property === static::ID && property_exists($this, "id")) {
+            if (is_numeric($request->get($property))) {
+                $this->{"id"} = $request->getInt($property);
+            } else {
+                $this->{"id"} = $request->getString($property);
+            }
+            if ($this->{"id"} !== "" && $this->{"id"} !== 0) {
+                $this->isEdit = true;
             }
         }
 
@@ -139,14 +139,14 @@ class Entity implements JsonSerializable {
             return false;
         }
 
-        if ($property === static::ID) {
-            $this->isEdit = true;
-            if (property_exists($this, "id")) {
-                if (is_numeric($data->getString($property))) {
-                    $this->{"id"} = $data->getInt($property);
-                } else {
-                    $this->{"id"} = $data->getString($property);
-                }
+        if ($property === static::ID && property_exists($this, "id")) {
+            if (is_numeric($data->getString($property))) {
+                $this->{"id"} = $data->getInt($property);
+            } else {
+                $this->{"id"} = $data->getString($property);
+            }
+            if ($this->{"id"} !== "" && $this->{"id"} !== 0) {
+                $this->isEdit = true;
             }
         }
 
