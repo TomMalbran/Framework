@@ -92,7 +92,7 @@ class File {
      */
     public static function exists(string|int ...$pathParts): bool {
         $fullPath = self::parsePath(...$pathParts);
-        return !empty($fullPath) && file_exists($fullPath);
+        return $fullPath !== "" && file_exists($fullPath);
     }
 
     /**
@@ -102,7 +102,7 @@ class File {
      */
     public static function getModifiedTime(string|int ...$pathParts): int {
         $fullPath = self::parsePath(...$pathParts);
-        if (empty($fullPath) || !file_exists($fullPath)) {
+        if ($fullPath === "" || !file_exists($fullPath)) {
             return 0;
         }
         $time = filemtime($fullPath);
@@ -118,7 +118,7 @@ class File {
      */
     public static function read(string|int ...$pathParts): string {
         $fullPath = self::parsePath(...$pathParts);
-        if (empty($fullPath) || !file_exists($fullPath)) {
+        if ($fullPath === "" || !file_exists($fullPath)) {
             return "";
         }
         $result = file_get_contents($fullPath);
@@ -131,7 +131,7 @@ class File {
      * @return string
      */
     public static function readUrl(string $fileUrl): string {
-        if (empty($fileUrl)) {
+        if ($fileUrl === "") {
             return "";
         }
 
@@ -159,7 +159,7 @@ class File {
      * @return boolean
      */
     public static function uploadPath(string $path, string $tmpFile): bool {
-        if (!empty($path)) {
+        if ($path !== "" && $tmpFile !== "") {
             return move_uploaded_file($tmpFile, $path);
         }
         return false;
@@ -175,7 +175,7 @@ class File {
      */
     public static function create(string $path, string $fileName, array|string $content, bool $createDir = false): bool {
         $fullPath = self::parsePath($path, $fileName);
-        if (empty($fullPath)) {
+        if ($fullPath === "") {
             return false;
         }
 
@@ -217,10 +217,10 @@ class File {
      * @return boolean
      */
     public static function move(string $fromPath, string $toPath): bool {
-        if (!empty($fromPath) && !empty($toPath)) {
-            return rename($fromPath, $toPath);
+        if ($fromPath === "" || $toPath === "") {
+            return false;
         }
-        return false;
+        return rename($fromPath, $toPath);
     }
 
     /**
@@ -231,10 +231,10 @@ class File {
      */
     public static function delete(string $path, string $name = ""): bool {
         $fullPath = self::parsePath($path, $name);
-        if (!empty($fullPath) && file_exists($fullPath)) {
-            return unlink($fullPath);
+        if ($fullPath === "" || !file_exists($fullPath)) {
+            return false;
         }
-        return false;
+        return unlink($fullPath);
     }
 
 
@@ -291,7 +291,8 @@ class File {
     public static function parseName(string $newName, string $oldName): string {
         $newExt = self::getExtension($newName);
         $oldExt = self::getExtension($oldName);
-        if (empty($newExt) && !empty($oldExt)) {
+
+        if ($newExt === "" && $oldExt !== "") {
             return "{$newName}.{$oldExt}";
         }
         return $newName;
@@ -347,7 +348,7 @@ class File {
      */
     public static function getFilesInDir(string $path, bool $recursive = false): array {
         $result = [];
-        if (empty($path)) {
+        if ($path === "") {
             return $result;
         }
         if (is_dir($path)) {
@@ -404,7 +405,7 @@ class File {
         $totalParts  = count($pathParts);
         $partialPath = [];
 
-        if (!is_dir($path)) {
+        if (self::getExtension($path) !== "") {
             $totalParts -= 1;
         }
         for ($i = 0; $i < $totalParts; $i++) {
