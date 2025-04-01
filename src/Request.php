@@ -163,6 +163,8 @@ class Request implements IteratorAggregate, JsonSerializable {
             $result = JSON::decodeAsArray($value);
         } elseif (is_string($value)) {
             $result = Strings::split($value, ",");
+        } elseif (is_array($value)) {
+            $result = $value;
         }
         return Arrays::toInts($result, withoutEmpty: $withoutEmpty);
     }
@@ -179,6 +181,8 @@ class Request implements IteratorAggregate, JsonSerializable {
             $result = JSON::decodeAsArray($value);
         } elseif (is_string($value)) {
             $result = Strings::split($value, ",");
+        } elseif (is_array($value)) {
+            $result = $value;
         }
         return Arrays::toStrings($result, withoutEmpty: true);
     }
