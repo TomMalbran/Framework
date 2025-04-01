@@ -595,7 +595,7 @@ class DateTime {
      * @param integer $decimals Optional.
      * @return string
      */
-    public static function toSecString(int $seconds, int $decimals): string {
+    public static function toSecString(int $seconds, int $decimals = 0): string {
         if ($seconds < 120) {
             return "{$seconds}s";
         }
