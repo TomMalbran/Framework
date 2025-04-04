@@ -25,17 +25,25 @@ class Migration {
      */
     public static function migrateData(bool $canDelete = false): bool {
         $db             = Framework::getDatabase();
-        $migrations     = Discovery::loadData(DataFile::Migrations);
         $schemas        = Factory::getData();
         $startMovement  = Settings::getCore("movement");
         $startRename    = Settings::getCore("rename");
         $startMigration = Settings::getCore("migration");
 
-        $lastMovement   = self::moveTables($db, $startMovement, $migrations["movements"]);
-        $lastRename     = self::renameColumns($db, $startRename, $migrations["renames"]);
+        $lastMovement   = 0;
+        $lastRename     = 0;
 
-        $migrated       = self::migrateTables($db, $schemas, $canDelete);
-        $lastMigration  = self::extraMigrations($db, $startMigration);
+        /** @var array{movements:array{from:string,to:string}[],renames:array{schema:string,from:string,to:string}[]} */
+        $migrations = Discovery::loadData(DataFile::Migrations);
+        if (!Arrays::isEmpty($migrations, "movements")) {
+            $lastMovement = self::moveTables($db, $startMovement, $migrations["movements"]);
+        }
+        if (!Arrays::isEmpty($migrations, "renames")) {
+            $lastRename = self::renameColumns($db, $startRename, $migrations["renames"]);
+        }
+
+        $migrated      = self::migrateTables($db, $schemas, $canDelete);
+        $lastMigration = self::extraMigrations($db, $startMigration);
 
         if ($lastMovement > 0) {
             Settings::setCore("movement", $lastMovement);
