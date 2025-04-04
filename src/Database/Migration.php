@@ -329,7 +329,7 @@ class Migration {
             }
             if (!$found) {
                 $update  = true;
-                $drops[] = (string)$tableKey;
+                $drops[] = $tableKey;
             }
         }
 

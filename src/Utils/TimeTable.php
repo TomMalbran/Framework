@@ -267,14 +267,13 @@ class TimeTable {
             }
 
             foreach ($timeTable->days as $day) {
-                $dayNumber = (int)$day;
-                $weekTime  = DateTime::getWeekStart(0, $day, $this->startMonday, true);
-                $weekDate  = DateTime::toString($weekTime, "dashes");
-                $fromTime  = DateTime::toTimeHour($weekDate, $timeTable->from);
-                $fromHour  = DateTime::toString($fromTime, "time");
-                $toTime    = DateTime::toTimeHour($weekDate, $timeTable->to);
-                $toHour    = DateTime::toString($toTime, "time");
-                $id        = "$fromHour-$toHour";
+                $weekTime = DateTime::getWeekStart(0, $day, $this->startMonday, true);
+                $weekDate = DateTime::toString($weekTime, "dashes");
+                $fromTime = DateTime::toTimeHour($weekDate, $timeTable->from);
+                $fromHour = DateTime::toString($fromTime, "time");
+                $toTime   = DateTime::toTimeHour($weekDate, $timeTable->to);
+                $toHour   = DateTime::toString($toTime, "time");
+                $id       = "$fromHour-$toHour";
 
                 if (empty($schedules[$id])) {
                     $schedules[$id] = [
@@ -285,9 +284,9 @@ class TimeTable {
                         "days"     => [],
                     ];
                 }
-                $schedules[$id]["numbers"][] = $dayNumber;
-                $schedules[$id]["times"][]   = $dayNumber < $maxDay ? $fromTime : 0;
-                $days[$dayNumber] = 1;
+                $schedules[$id]["numbers"][] = $day;
+                $schedules[$id]["times"][]   = $day < $maxDay ? $fromTime : 0;
+                $days[$day] = 1;
             }
         }
         $schedules = array_values($schedules);
@@ -322,9 +321,8 @@ class TimeTable {
                             language:    $isoCode,
                         );
                     } else {
-                        $dayNumber = (int)$elem["numbers"][$index];
                         $schedules[$id]["days"][$index] = DateTime::getDayName(
-                            $dayNumber,
+                            $elem["numbers"][$index],
                             startMonday: $this->startMonday,
                             language:    $isoCode,
                         );

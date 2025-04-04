@@ -903,7 +903,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return array<string,mixed>
      */
     public function __debugInfo(): array {
-        return (array)$this->request;
+        return $this->request;
     }
 
     /**

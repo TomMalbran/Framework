@@ -76,7 +76,7 @@ class Numbers {
      * @return integer
      */
     public static function random(int $length = 8): int {
-        return (int)rand(pow(10, $length - 1), pow(10, $length) - 1);
+        return rand(pow(10, $length - 1), pow(10, $length) - 1);
     }
 
     /**

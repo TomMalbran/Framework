@@ -88,7 +88,7 @@ class Utils {
      * @return boolean
      */
     public static function isValidCUIT(string $value): bool {
-        $cuit = (string)self::cuitToNumber($value);
+        $cuit = self::cuitToNumber($value);
         if (Strings::length($cuit) !== 11) {
             return false;
         }
