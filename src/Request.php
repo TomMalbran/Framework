@@ -142,15 +142,6 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key from a JSON Multi Array
-     * @param string $key
-     * @return array<string|integer,array<string,mixed>>
-     */
-    public function getJSONMulti(string $key): array {
-        return JSON::decodeAsArray($this->get($key, "[]"));
-    }
-
-    /**
      * Returns the request data at the given key as an array of integers
      * @param string  $key
      * @param boolean $withoutEmpty Optional.
