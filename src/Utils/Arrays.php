@@ -266,7 +266,7 @@ class Arrays {
      * @return boolean
      */
     public static function containsKey(array $array, mixed $needle): bool {
-        return in_array($needle, array_keys($array));
+        return in_array($needle, array_keys($array), true);
     }
 
     /**
@@ -515,7 +515,7 @@ class Arrays {
     public static function subArray(array $base, array $array): array {
         $result = [];
         foreach ($array as $value) {
-            if (in_array($value, $base)) {
+            if (in_array($value, $base, true)) {
                 $result[] = $value;
             }
         }
@@ -664,7 +664,7 @@ class Arrays {
         $result = [];
         foreach ($array as $row) {
             $elem = self::getValue($row, $key);
-            if (($distinct && in_array($elem, $result)) || ($skipEmpty && empty($key))) {
+            if (($distinct && in_array($elem, $result, true)) || ($skipEmpty && empty($key))) {
                 continue;
             }
             $result[] = $elem;

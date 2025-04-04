@@ -2,6 +2,7 @@
 namespace Framework\Utils;
 
 use Framework\Request;
+use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Dictionary;
 
@@ -211,11 +212,11 @@ class Period {
 
     /**
      * Returns true if the given value is valid
-     * @param integer $value
+     * @param string $value
      * @return boolean
      */
-    public static function isValid(int $value): bool {
-        return in_array($value, array_keys(self::$names));
+    public static function isValid(string $value): bool {
+        return Arrays::containsKey(self::$names, $value);
     }
 
     /**
