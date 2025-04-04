@@ -27,7 +27,7 @@ class MercadoPago {
      * @return Dictionary
      */
     private static function get(string $route, ?array $request = null, bool $jsonResponse = true, string $accessToken = ""): Dictionary {
-        $accessToken = $accessToken ?: Config::getMpAccessToken();
+        $accessToken = $accessToken !== "" ? $accessToken : Config::getMpAccessToken();
         $response    = Curl::execute("GET", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer $accessToken",
         ], jsonResponse: $jsonResponse);
@@ -43,7 +43,7 @@ class MercadoPago {
      * @return Dictionary
      */
     private static function post(string $route, array $request, array $headers = [], string $accessToken = ""): Dictionary {
-        $accessToken = $accessToken ?: Config::getMpAccessToken();
+        $accessToken = $accessToken !== "" ? $accessToken : Config::getMpAccessToken();
         $response    =  Curl::execute("POST", self::BaseUrl . $route, $request, Arrays::merge([
             "content-type"  => "application/json",
             "Authorization" => "Bearer $accessToken",
@@ -59,7 +59,7 @@ class MercadoPago {
      * @return Dictionary
      */
     private static function put(string $route, array $request, string $accessToken = ""): Dictionary {
-        $accessToken = $accessToken ?: Config::getMpAccessToken();
+        $accessToken = $accessToken !== "" ? $accessToken : Config::getMpAccessToken();
         $response    = Curl::execute("PUT", self::BaseUrl . $route, $request, [
             "content-type"  => "application/json",
             "Authorization" => "Bearer $accessToken",

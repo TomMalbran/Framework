@@ -173,7 +173,7 @@ class Schema {
         $selection->request($query);
         $request = $selection->resolve();
 
-        $keyName = $idColumn ?: self::structure()->idName;
+        $keyName = $idColumn ?? self::structure()->idName;
         $valName = !empty($nameColumn) ? $nameColumn : self::structure()->nameKey;
         return Select::create($request, $keyName, $valName, $useEmpty, $extraColumn, true);
     }

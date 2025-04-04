@@ -160,7 +160,7 @@ class Field {
         case self::Number:
         case self::Date:
             $type       = "int";
-            $length     = $this->length ?: 10;
+            $length     = $this->length > 0 ? $this->length : 10;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
             $default    = 0;
 
@@ -177,7 +177,7 @@ class Field {
         case self::String:
         case self::File:
             $type       = "varchar";
-            $length     = $this->length ?: 255;
+            $length     = $this->length > 0 ? $this->length : 255;
             $attributes = "NOT NULL";
             $default    = "";
             break;
@@ -196,7 +196,7 @@ class Field {
             break;
         case self::Encrypt:
             $type       = "varbinary";
-            $length     = $this->length ?: 255;
+            $length     = $this->length > 0 ? $this->length : 255;
             $attributes = "NOT NULL";
             break;
         }

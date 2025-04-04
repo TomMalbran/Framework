@@ -72,9 +72,9 @@ class EmailQueue extends EmailQueueSchema {
      * @return boolean
      */
     public static function add(EmailTemplateEntity $template, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false, int $dataID = 0): bool {
-        $sendTo  = Arrays::toStrings($sendTo);
-        $subject = $subject ?: $template->subject;
-        $message = $message ?: $template->message;
+        $sendTo    = Arrays::toStrings($sendTo);
+        $subject ??= $template->subject;
+        $message ??= $template->message;
 
         if (empty($sendTo)) {
             return false;

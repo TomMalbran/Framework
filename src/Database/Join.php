@@ -131,7 +131,7 @@ class Join {
      * @return string
      */
     public function getExpression(string $asTable, string $mainKey): string {
-        $onTable  = $this->onTable ?: $mainKey;
+        $onTable  = $this->onTable !== "" ? $this->onTable : $mainKey;
         $leftKey  = $this->leftKey;
         $rightKey = $this->rightKey;
         $and      = $this->getAnd($asTable);
@@ -145,7 +145,7 @@ class Join {
      * @return string
      */
     public function getAnd(string $asTable): string {
-        $onTable = $this->andTable ?: $asTable;
+        $onTable = $this->andTable !== "" ? $this->andTable : $asTable;
         $result  = "";
 
         if (!empty($this->and)) {

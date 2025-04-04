@@ -560,7 +560,7 @@ class Generator {
         foreach ($structure->joins as $join) {
             $addSpace = true;
             foreach ($join->fields as $field) {
-                $table    = $join->asTable ?: $join->table;
+                $table    = $join->asTable !== "" ? $join->asTable : $join->table;
                 $result[] = [
                     "name"     => Strings::upperCaseFirst($field->prefixName),
                     "value"    => "{$table}.{$field->key}",
@@ -642,7 +642,7 @@ class Generator {
 
         foreach ($structure->joins as $join) {
             foreach ($join->fields as $field) {
-                $table  = $join->asTable ?: $join->table;
+                $table  = $join->asTable !== "" ? $join->asTable : $join->table;
                 $list[] = [
                     "type"   => $field->type,
                     "column" => $field->name,

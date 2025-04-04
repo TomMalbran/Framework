@@ -86,10 +86,10 @@ class Email {
         ?string $subject = null,
         bool $sendAlways = false,
     ): EmailResult {
-        $sendTo  = Arrays::toStrings($sendTo);
-        $subject = $subject ?: $template->subject;
-        $message = $message ?: $template->message;
-        $result  = EmailResult::NoEmails;
+        $sendTo    = Arrays::toStrings($sendTo);
+        $subject ??= $template->subject;
+        $message ??= $template->message;
+        $result    = EmailResult::NoEmails;
 
         foreach ($sendTo as $email) {
             $result = self::send($email, $subject, $message, $sendAlways);

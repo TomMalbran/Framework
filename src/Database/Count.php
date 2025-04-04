@@ -63,7 +63,7 @@ class Count {
         $key        = $this->key;
         $what       = $this->isSum ? "SUM({$this->mult} * {$this->value})" : "COUNT(*)";
         $table      = $this->table;
-        $onTable    = $this->onTable ?: $mainKey;
+        $onTable    = $this->onTable !== "" ? $this->onTable : $mainKey;
         $leftKey    = $this->leftKey;
         $rightKey   = $this->rightKey;
         $groupKey   = "$table.$rightKey";
