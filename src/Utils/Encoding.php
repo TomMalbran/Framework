@@ -191,7 +191,7 @@ class Encoding {
                     $buf .= $cc1 . $cc2;
                 }
             // needs conversion
-            } elseif (($c1 & "\xc0") == "\x80") {
+            } elseif (($c1 & "\xc0") === "\x80") {
                 // found in Windows-1252 special cases
                 if (isset(self::$win1252ToUtf8[ord($c1)])) {
                     $buf .= self::$win1252ToUtf8[ord($c1)];
@@ -243,7 +243,7 @@ class Encoding {
      */
     public static function fixUTF8(string $text): string {
         $last = "";
-        while ($last <> $text) {
+        while ($last !== $text) {
             $last = $text;
             $text = self::toUTF8(utf8_decode(str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), $text)));
         }
@@ -270,7 +270,7 @@ class Encoding {
      * @return string
      */
     public static function removeBOM(string $text = ""): string {
-        if (substr($text, 0, 3) == pack("CCC", 0xef, 0xbb, 0xbf)) {
+        if (substr($text, 0, 3) === pack("CCC", 0xef, 0xbb, 0xbf)) {
             $text = substr($text, 3);
         }
         return $text;

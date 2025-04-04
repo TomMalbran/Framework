@@ -98,7 +98,7 @@ class Configs {
             }
 
             $parts = Strings::split($line, " = ");
-            if (count($parts) != 2) {
+            if (count($parts) !== 2) {
                 continue;
             }
 
@@ -175,7 +175,7 @@ class Configs {
         foreach (self::$data as $envKey => $value) {
             $parts  = Strings::split($envKey, "_");
             $prefix = Strings::toLowerCase($parts[0]);
-            if ($prefix == $property) {
+            if ($prefix === $property) {
                 $suffix = Strings::replace($envKey, "{$parts[0]}_", "");
                 $key    = Strings::upperCaseToCamelCase($suffix);
                 $found  = true;

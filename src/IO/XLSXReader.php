@@ -91,7 +91,7 @@ class XLSXReader implements ImporterReader {
                 }
             }
 
-            if ($index == 2) {
+            if ($index === 2) {
                 $data->first = Strings::join($fields, " - ");
             }
             $data->last    = Strings::join($fields, " - ");

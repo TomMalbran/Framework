@@ -420,7 +420,7 @@ class DateTime {
      */
     public static function isToday(mixed $time, ?float $timeZone = null): bool {
         $timeStamp = self::toTimeZone($time, $timeZone);
-        return date("d-m-Y", $timeStamp) == date("d-m-Y");
+        return date("d-m-Y", $timeStamp) === date("d-m-Y");
     }
 
     /**
@@ -507,31 +507,31 @@ class DateTime {
         $secsInWeek   = 7  * $secsInDay;
 
         // Extract the Weeks
-        $weeks       = floor($seconds / $secsInWeek);
+        $weeks       = (int)floor($seconds / $secsInWeek);
 
         // Extract the Days
         $daySeconds  = $seconds % $secsInWeek;
-        $days        = floor($daySeconds / $secsInDay);
+        $days        = (int)floor($daySeconds / $secsInDay);
 
         // Extract the Hours
         $hourSeconds = $daySeconds % $secsInDay;
-        $hours       = floor($hourSeconds / $secsInHour);
+        $hours       = (int)floor($hourSeconds / $secsInHour);
 
         // Extract the Minutes
         $minSeconds  = $daySeconds % $secsInHour;
-        $mins        = floor($minSeconds / $secsInMinute);
+        $mins        = (int)floor($minSeconds / $secsInMinute);
 
         // Generate the Result
-        if ($mins == 0) {
+        if ($mins === 0) {
             return "0";
         }
-        if ($hours == 0) {
+        if ($hours === 0) {
             return "{$mins}m";
         }
-        if ($days == 0) {
+        if ($days === 0) {
             return "{$hours}h";
         }
-        if ($weeks == 0) {
+        if ($weeks === 0) {
             return "{$days}d-{$hours}h";
         }
         return "{$weeks}w-{$days}d-{$hours}h";
@@ -1173,7 +1173,7 @@ class DateTime {
      */
     public static function timeToMinutes(string $time, ?float $timeZone = null): int {
         $parts = Strings::split($time, ":");
-        if (empty($parts) || count($parts) != 2) {
+        if (empty($parts) || count($parts) !== 2) {
             return 0;
         }
         return self::toMinutes((int)$parts[0], (int)$parts[1], $timeZone);
@@ -1288,7 +1288,7 @@ class DateTime {
         $year  = self::getYear();
 
         // Invert the order
-        if ($amount == 3 && $part0 > 1000) {
+        if ($amount === 3 && $part0 > 1000) {
             $day   = $part2;
             $month = $part1;
             $year  = $part0;
@@ -1322,7 +1322,7 @@ class DateTime {
             // Handle the Year
             if (!empty($part2)) {
                 $yearStr = trim((string)$part2);
-                if (Strings::length($yearStr) == 2) {
+                if (Strings::length($yearStr) === 2) {
                     if ((int)$yearStr >= 50) {
                         $year = (int)"19$yearStr";
                     } else {

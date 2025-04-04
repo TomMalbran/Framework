@@ -151,7 +151,7 @@ class Structure {
             if ($field->type === Field::ID) {
                 $this->hasAutoInc = true;
             }
-            if ($key == $idKey) {
+            if ($key === $idKey) {
                 $this->hasID  = true;
                 $this->idKey  = $field->key;
                 $this->idName = $field->name;

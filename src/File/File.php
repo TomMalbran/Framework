@@ -193,7 +193,7 @@ class File {
      */
     public static function write(string $path, mixed $content): bool {
         $result = file_put_contents($path, $content);
-        return $result != false;
+        return $result !== false;
     }
 
     /**
@@ -322,7 +322,7 @@ class File {
         $files  = self::scanPath($path);
         $result = [];
         foreach ($files as $file) {
-            if ($file != "." && $file != "..") {
+            if ($file !== "." && $file !== "..") {
                 $result[] = self::parsePath($path, $file);
             }
         }
@@ -354,7 +354,7 @@ class File {
         if (is_dir($path)) {
             $files = self::scanPath($path);
             foreach ($files as $file) {
-                if ($file == "." || $file == "..") {
+                if ($file === "." || $file === "..") {
                     continue;
                 }
                 if ($recursive) {
@@ -425,7 +425,7 @@ class File {
         if (is_dir($path)) {
             $files = self::scanPath($path);
             foreach ($files as $file) {
-                if ($file != "." && $file != "..") {
+                if ($file !== "." && $file !== "..") {
                     self::deleteDir("$path/$file");
                 }
             }
@@ -493,7 +493,7 @@ class File {
             $zip->addEmptyDir($dst);
             $files = self::scanPath($src);
             foreach ($files as $file) {
-                if ($file != "." && $file != "..") {
+                if ($file !== "." && $file !== "..") {
                     if (!self::addDirToZip($zip, "$src/$file", "$dst/$file")) {
                         $result = false;
                     }

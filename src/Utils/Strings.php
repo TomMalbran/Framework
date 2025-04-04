@@ -106,7 +106,7 @@ class Strings {
      */
     public static function endsWith(string $string, string $needle): bool {
         $length = strlen($needle);
-        if ($length == 0) {
+        if ($length === 0) {
             return true;
         }
         return substr($string, -$length) === $needle;
@@ -599,7 +599,7 @@ class Strings {
      */
     public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true, bool $trimValues = true): bool {
         if (!is_string($string) || !is_string($other)) {
-            return $string == $other;
+            return $string === $other;
         }
 
         if ($caseInsensitive) {
@@ -844,7 +844,7 @@ class Strings {
      * @return boolean
      */
     public static function isAlphaNum(string $string, bool $withDashes = false, ?int $length = null): bool {
-        if ($length !== null && strlen($string) != $length) {
+        if ($length !== null && strlen($string) !== $length) {
             return false;
         }
         if ($withDashes) {

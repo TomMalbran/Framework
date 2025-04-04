@@ -61,8 +61,8 @@ class FileList {
         $dir = dirname($path);
         $this->list[] = [
             "name"      => "...",
-            "path"      => $dir != "." ? $dir : "",
-            "mvPath"    => $dir != "." ? $dir : "/",
+            "path"      => $dir !== "." ? $dir : "",
+            "mvPath"    => $dir !== "." ? $dir : "/",
             "canSelect" => false,
             "isBack"    => true,
             "isFile"    => true,

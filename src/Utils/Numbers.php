@@ -197,7 +197,7 @@ class Numbers {
     public static function map(int|float $number, int|float $fromLow, int|float $fromHigh, int|float $toLow, int|float $toHigh): int|float {
         $fromRange = $fromHigh - $fromLow;
         $toRange   = $toHigh - $toLow;
-        if ($fromRange == 0) {
+        if ($fromRange === 0) {
             return $toLow;
         }
         $scaleFactor = $toRange / $fromRange;
@@ -218,7 +218,7 @@ class Numbers {
      * @return integer|float
      */
     public static function percent(int|float $number, int|float $total, int $decimals = 0): int|float {
-        return $total == 0 ? 0 : self::round($number * 100 / $total, $decimals);
+        return (int)$total === 0 ? 0 : self::round($number * 100 / $total, $decimals);
     }
 
     /**
@@ -229,7 +229,7 @@ class Numbers {
      * @return integer|float
      */
     public static function divide(int|float $numerator, int|float $divisor, int $decimals = 0): int|float {
-        return $divisor == 0 ? 0 : self::round($numerator / $divisor, $decimals);
+        return (int)$divisor === 0 ? 0 : self::round($numerator / $divisor, $decimals);
     }
 
     /**
@@ -239,7 +239,7 @@ class Numbers {
      * @return integer
      */
     public static function divideInt(int $numerator, int $divisor): int {
-        return $divisor == 0 ? 0 : self::roundInt($numerator / $divisor);
+        return $divisor === 0 ? 0 : self::roundInt($numerator / $divisor);
     }
 
     /**
@@ -278,7 +278,7 @@ class Numbers {
      * @return integer|float
      */
     public static function getCommonDivisor(int|float $a, int|float $b): int|float {
-        while ($b != 0) {
+        while ($b !== 0) {
             $m = $a % $b;
             $a = $b;
             $b = $m;
@@ -298,7 +298,7 @@ class Numbers {
      */
     public static function isValidFloat(int|float $number, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
         $mult = 1;
-        if ($decimals != null) {
+        if ($decimals !== null) {
             $numberStr    = (string)$number;
             $decimalCount = strlen($numberStr) - strrpos($numberStr, ".") - 1;
             if (strrpos($numberStr, ".") > 0 && $decimalCount > $decimals) {

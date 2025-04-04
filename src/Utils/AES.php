@@ -209,7 +209,7 @@ class AES {
             $rConPointer += 1;
 
             // Key expansion (for non-256 bit)
-            if ($KC != 8) {
+            if ($KC !== 8) {
                 for ($i = 1; $i < $KC; $i++) {
                     $tk[$i] = self::xor32($tk[$i], $tk[$i - 1]);
                 }

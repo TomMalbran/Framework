@@ -187,7 +187,7 @@ class Image {
      * @return boolean
      */
     public static function resample(string $src, string $dst, ?int $orientation = null): bool {
-        if ($orientation == null) {
+        if ($orientation === null) {
             $orientation = self::getOrientation($src);
         }
         if (empty($orientation)) {

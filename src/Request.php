@@ -280,7 +280,7 @@ class Request implements IteratorAggregate, JsonSerializable {
             return false;
         }
         $value = $this->request[$key];
-        return $value === "true" || $value == 1;
+        return $value === "true" || $value === 1;
     }
 
 
@@ -857,7 +857,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function hasSizeError(string $key): bool {
         if ($this->hasFile($key) && is_array($this->files[$key])) {
-            return !empty($this->files[$key]["error"]) && $this->files[$key]["error"] == UPLOAD_ERR_INI_SIZE;
+            return !empty($this->files[$key]["error"]) && $this->files[$key]["error"] === UPLOAD_ERR_INI_SIZE;
         }
         return true;
     }

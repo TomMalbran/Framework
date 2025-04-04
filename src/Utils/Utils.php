@@ -89,7 +89,7 @@ class Utils {
      */
     public static function isValidCUIT(string $value): bool {
         $cuit = (string)self::cuitToNumber($value);
-        if (Strings::length($cuit) != 11) {
+        if (Strings::length($cuit) !== 11) {
             return false;
         }
 
@@ -105,13 +105,13 @@ class Utils {
 
         // Calculate the left over and value
         $mod = $total % 11;
-        if ($mod == 0) {
-            return $verify == 0;
+        if ($mod === 0) {
+            return $verify === 0;
         }
-        if ($mod == 1) {
-            return $verify == 9;
+        if ($mod === 1) {
+            return $verify === 9;
         }
-        return $verify == 11 - $mod;
+        return $verify === 11 - $mod;
     }
 
     /**
@@ -163,7 +163,7 @@ class Utils {
      * @return string
      */
     public static function parseCUIT(string $value): string {
-        if (Strings::length($value) == 11) {
+        if (Strings::length($value) === 11) {
             return Strings::replacePattern($value, "/^(\d{2})(\d{8})(\d{1})$/", "$1-$2-$3");
         }
         return $value;
@@ -316,9 +316,9 @@ class Utils {
     public static function verifyDelegation(string $domain, string $serverIP = ""): bool {
         $host = gethostbyname($domain);
         if (!empty($serverIP)) {
-            return !empty($host) && $host == $serverIP;
+            return !empty($host) && $host === $serverIP;
         }
-        return !empty($host) && $host != $domain;
+        return !empty($host) && $host !== $domain;
     }
 
 

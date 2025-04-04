@@ -11,9 +11,9 @@ parameters:
     # Strict Rules
     strictRules:
         noVariableVariables: false
-
         disallowedEmpty: false
-        disallowedLooseComparison: false
+
+        disallowedLooseComparison: true
         booleansInConditions: false
         uselessCast: false
         requireParentConstructorCall: false

@@ -81,7 +81,7 @@ class CSVWriter implements ExporterWriter {
 
         $this->line += 1;
         fputcsv($this->file, $values);
-        if ($this->line % 100 == 0) {
+        if ($this->line % 100 === 0) {
             flush();
         }
         return $this;

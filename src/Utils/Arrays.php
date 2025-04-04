@@ -285,7 +285,7 @@ class Arrays {
                 if (!isset($value[$key]) || !self::contains($other, $value[$key], $key)) {
                     return false;
                 }
-            } elseif ($value != $other[$index]) {
+            } elseif ($value !== $other[$index]) {
                 return false;
             }
         }
@@ -317,7 +317,7 @@ class Arrays {
     public static function intersects(array $array, array $other): bool {
         foreach ($array as $mine) {
             foreach ($other as $yours) {
-                if ($mine == $yours) {
+                if ($mine === $yours) {
                     return true;
                 }
             }
@@ -337,7 +337,7 @@ class Arrays {
         $result = [];
         foreach ($array as $row) {
             if (is_array($row) && (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey))) {
-                if ($getKey != null) {
+                if ($getKey !== null) {
                     $result[] = $row[$getKey];
                 } else {
                     $result[] = $row;
@@ -394,11 +394,11 @@ class Arrays {
         foreach ($array as $elem) {
             $shouldAdd = false;
             if (is_object($elem)) {
-                $shouldAdd = !empty($elem->$idKey) && $elem->$idKey != $key;
+                $shouldAdd = !empty($elem->$idKey) && $elem->$idKey !== $key;
             } elseif (is_array($elem)) {
-                $shouldAdd = !empty($elem[$idKey]) && $elem[$idKey] != $key;
+                $shouldAdd = !empty($elem[$idKey]) && $elem[$idKey] !== $key;
             } else {
-                $shouldAdd = $elem != $key;
+                $shouldAdd = $elem !== $key;
             }
             if ($shouldAdd) {
                 $result[] = $elem;
@@ -755,11 +755,11 @@ class Arrays {
     public static function findIndex(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $index => $elem) {
             if (is_object($elem)) {
-                if ($elem->$idKey == $idValue) {
+                if ($elem->$idKey === $idValue) {
                     return $index;
                 }
             } elseif (is_array($elem)) {
-                if ($elem[$idKey] == $idValue) {
+                if ($elem[$idKey] === $idValue) {
                     return $index;
                 }
             }
@@ -778,11 +778,11 @@ class Arrays {
     public static function findValue(array $array, string $idKey, mixed $idValue) {
         foreach ($array as $elem) {
             if (is_object($elem)) {
-                if (!empty($elem->$idKey) && $elem->$idKey == $idValue) {
+                if (!empty($elem->$idKey) && $elem->$idKey === $idValue) {
                     return $elem;
                 }
             } elseif (is_array($elem)) {
-                if (!empty($elem[$idKey]) && $elem[$idKey] == $idValue) {
+                if (!empty($elem[$idKey]) && $elem[$idKey] === $idValue) {
                     return $elem;
                 }
             }

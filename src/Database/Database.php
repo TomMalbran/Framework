@@ -170,7 +170,7 @@ class Database {
      * @return boolean
      */
     public function exists(string $table, Query $query): bool {
-        return $this->getTotal($table, $query) == 1;
+        return $this->getTotal($table, $query) === 1;
     }
 
     /**
@@ -667,7 +667,7 @@ class Database {
     public function tableIsEmpty(string $tableName): bool {
         $sql    = "SELECT COUNT(*) AS count FROM `$tableName`";
         $result = $this->query($sql);
-        return empty($result) || $result[0]["count"] == 0;
+        return empty($result) || $result[0]["count"] === 0;
     }
 
     /**
@@ -966,7 +966,7 @@ class Database {
             // Add a default...?
             if ($default !== "") {
                 // Make a special case of auto-timestamp.
-                if ($default == "CURRENT_TIMESTAMP") {
+                if ($default === "CURRENT_TIMESTAMP") {
                     $result .= " /*!40102 NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP */";
                 } elseif (is_numeric($default)) {
                     $result .= " default $default";
@@ -1000,7 +1000,7 @@ class Database {
                 $row["Key_name"] = "PRIMARY KEY";
             } elseif (empty($row["Non_unique"])) {
                 $row["Key_name"] = "UNIQUE $keyName";
-            } elseif ($row["Comment"] == "FULLTEXT" || (isset($row["Index_type"]) && $row["Index_type"] == "FULLTEXT")) {
+            } elseif ($row["Comment"] === "FULLTEXT" || (isset($row["Index_type"]) && $row["Index_type"] === "FULLTEXT")) {
                 $row["Key_name"] = "FULLTEXT $keyName";
             } else {
                 $row["Key_name"] = "KEY $keyName";

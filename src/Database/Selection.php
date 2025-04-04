@@ -57,7 +57,7 @@ class Selection {
             $this->selects[] = "$mainKey.{$this->structure->idKey} AS id";
         }
         foreach ($this->structure->fields as $field) {
-            if ($decrypted && $field->type == Field::Encrypt) {
+            if ($decrypted && $field->type === Field::Encrypt) {
                 $this->selects[] = "CAST(AES_DECRYPT($mainKey.$field->key, '$masterKey') AS CHAR(255)) {$field->key}Decrypt";
             } elseif ($field->hasName) {
                 $this->selects[] = "$mainKey.$field->key AS $field->name";

@@ -506,7 +506,7 @@ class Credential extends CredentialSchema {
         $query->credentialID->equalIf($credentialID);
         $query->email->equalIf($email);
         $query->endOr();
-        return self::getEntityValue($query, CredentialColumn::ReqPassChange) == 1;
+        return self::getEntityValue($query, CredentialColumn::ReqPassChange) === 1;
     }
 
 

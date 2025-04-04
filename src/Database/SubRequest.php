@@ -104,7 +104,7 @@ class SubRequest {
         foreach ($result as $index => $row) {
             $result[$index][$this->name] = [];
             foreach ($subResult as $key => $subRow) {
-                if ($row[$this->idName] == $key) {
+                if ($row[$this->idName] === $key) {
                     $result[$index][$this->name] = $subRow;
                 }
             }
@@ -144,7 +144,7 @@ class SubRequest {
         $query = Query::create($this->idKey, "IN", $ids);
 
         $total = count($this->where);
-        if ($total % 3 == 0) {
+        if ($total % 3 === 0) {
             for ($i = 0; $i < $total; $i += 3) {
                 $query->add($this->where[$i], $this->where[$i + 1], $this->where[$i + 2]);
             }

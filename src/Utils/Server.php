@@ -41,14 +41,14 @@ class Server {
             return "";
         }
 
-        $ssl         = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on";
+        $ssl         = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on";
         $serverProto = Strings::toString($_SERVER["SERVER_PROTOCOL"]);
         $serverProto = Strings::toLowerCase($serverProto);
         $http        = Strings::substringBefore($serverProto, "/");
         $protocol    = $http . ($ssl ? "s" : "");
 
         $port        = Strings::toString($_SERVER["SERVER_PORT"]);
-        $port        = (!$ssl && $port == "80") || ($ssl && $port == "443") ? "" : ":$port";
+        $port        = (!$ssl && $port === "80") || ($ssl && $port === "443") ? "" : ":$port";
 
         $serverName  = Strings::toString($_SERVER["SERVER_NAME"]);
         $forwardHost = isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? Strings::toString($_SERVER["HTTP_X_FORWARDED_HOST"]) : "";

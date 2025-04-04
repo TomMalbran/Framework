@@ -88,7 +88,7 @@ class Count {
         }
 
         $total = count($this->where);
-        if ($total % 3 == 0) {
+        if ($total % 3 === 0) {
             for ($i = 0; $i < $total; $i += 3) {
                 $query[] = "{$this->where[$i]} {$this->where[$i + 1]} {$this->where[$i + 2]}";
             }
@@ -120,7 +120,7 @@ class Count {
         $key    = $this->key;
         $result = !empty($data[$key]) ? $data[$key] : 0;
 
-        if ($this->field->type == Field::Float) {
+        if ($this->field->type === Field::Float) {
             $result = Numbers::toFloat($result, $this->field->decimals);
         }
         return $result;

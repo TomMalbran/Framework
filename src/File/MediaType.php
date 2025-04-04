@@ -26,28 +26,28 @@ class MediaType {
      * @return boolean
      */
     public static function isValid(string $type, string $file, string $name): bool {
-        if ($type == self::Any && !FileType::isHidden($name)) {
+        if ($type === self::Any && !FileType::isHidden($name)) {
             return true;
         }
-        if ($type == self::Media && (FileType::isImage($name) || FileType::isVideo($name))) {
+        if ($type === self::Media && (FileType::isImage($name) || FileType::isVideo($name))) {
             return true;
         }
-        if ($type == self::Image && FileType::isImage($name)) {
+        if ($type === self::Image && FileType::isImage($name)) {
             return true;
         }
-        if ($type == self::Video && FileType::isVideo($name)) {
+        if ($type === self::Video && FileType::isVideo($name)) {
             return true;
         }
-        if ($type == self::Audio && FileType::isAudio($name)) {
+        if ($type === self::Audio && FileType::isAudio($name)) {
             return true;
         }
-        if ($type == self::Text && FileType::isText($name)) {
+        if ($type === self::Text && FileType::isText($name)) {
             return true;
         }
-        if ($type == self::PDF && FileType::isPDF($name)) {
+        if ($type === self::PDF && FileType::isPDF($name)) {
             return true;
         }
-        if ($type == self::File) {
+        if ($type === self::File) {
             return true;
         }
         if (FileType::isDir($file)) {

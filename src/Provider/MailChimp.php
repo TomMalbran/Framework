@@ -559,7 +559,7 @@ class MailChimp {
             "clicksUnique" => 0,
             "clicksRate"   => 0,
         ];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
             return $result;
         }
 
@@ -587,7 +587,7 @@ class MailChimp {
      */
     public static function getSendDetails(string $mailChimpID): array {
         $result = [];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
             return $result;
         }
 
@@ -608,7 +608,7 @@ class MailChimp {
      */
     public static function getOpenDetails(string $mailChimpID): array {
         $result = [];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
             return $result;
         }
 
@@ -629,7 +629,7 @@ class MailChimp {
      */
     public static function getClickDetails(string $mailChimpID): array {
         $result = [];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID == "disabled") {
+        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
             return $result;
         }
 
