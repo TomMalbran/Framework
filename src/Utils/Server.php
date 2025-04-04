@@ -73,7 +73,7 @@ class Server {
      * @return string
      */
     public static function getIP(): string {
-        if ($_SERVER) {
+        if (!empty($_SERVER)) {
             if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
                 $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
             } elseif (isset($_SERVER["HTTP_CLIENT_IP"])) {
@@ -82,9 +82,9 @@ class Server {
                 $ip = $_SERVER["REMOTE_ADDR"];
             }
         } else {
-            if (getenv("HTTP_X_FORWARDED_FOR")) {
+            if (getenv("HTTP_X_FORWARDED_FOR") !== false) {
                 $ip = getenv("HTTP_X_FORWARDED_FOR");
-            } elseif (getenv("HTTP_CLIENT_IP")) {
+            } elseif (getenv("HTTP_CLIENT_IP") !== false) {
                 $ip = getenv("HTTP_CLIENT_IP");
             } else {
                 $ip = getenv("REMOTE_ADDR");

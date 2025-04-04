@@ -149,7 +149,7 @@ class Encoding {
                 $c4 = $i + 3 >= $max? "\x00" : $text[$i + 3];
 
                 // looks like 2 bytes UTF8
-                if ($c1 >= "\xc0" & $c1 <= "\xdf") {
+                if ($c1 >= "\xc0" && $c1 <= "\xdf") {
                     // yeah, almost sure it's UTF8 already
                     if ($c2 >= "\x80" && $c2 <= "\xbf") {
                         $buf .= $c1 . $c2;
@@ -161,7 +161,7 @@ class Encoding {
                         $buf .= $cc1 . $cc2;
                     }
                 // looks like 3 bytes UTF8
-                } elseif ($c1 >= "\xe0" & $c1 <= "\xef") {
+                } elseif ($c1 >= "\xe0" && $c1 <= "\xef") {
                     // yeah, almost sure it's UTF8 already
                     if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf") {
                         $buf .= $c1 . $c2 . $c3;
@@ -173,7 +173,7 @@ class Encoding {
                         $buf .= $cc1 . $cc2;
                     }
                 // looks like 4 bytes UTF8
-                } elseif ($c1 >= "\xf0" & $c1 <= "\xf7") {
+                } elseif ($c1 >= "\xf0" && $c1 <= "\xf7") {
                     // yeah, almost sure it's UTF8 already
                     if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf" && $c4 >= "\x80" && $c4 <= "\xbf") {
                         $buf .= $c1 . $c2 . $c3;

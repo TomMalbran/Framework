@@ -174,7 +174,7 @@ class Strings {
      */
     public static function getNumber(string $text): int {
         $letter = strtoupper(trim($text));
-        if (preg_match('/^[A-Z]$/', $letter)) {
+        if (preg_match('/^[A-Z]$/', $letter) > 0) {
             return ord($letter) - 64;
         }
         return 0;

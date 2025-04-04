@@ -271,7 +271,7 @@ class AES {
      */
     private static function shiftLeft32(?int $a, ?int $b): int {
         $c = ($a << $b) & 0xffffffff;
-        if ($c & 0x80000000) {
+        if (($c & 0x80000000) !== 0) {
             $c -= 0x100000000;
         }
         return $c;
@@ -285,7 +285,7 @@ class AES {
      */
     private static function xor32(?int $a, ?int $b): int {
         $c = ($a ^ $b) & 0xffffffff;
-        if ($c & 0x80000000) {
+        if (($c & 0x80000000) !== 0) {
             $c -= 0x100000000;
         }
         return $c;

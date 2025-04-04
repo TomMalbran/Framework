@@ -14,7 +14,7 @@ parameters:
         disallowedEmpty: false
 
         disallowedLooseComparison: true
-        booleansInConditions: false
+        booleansInConditions: true
         uselessCast: false
         requireParentConstructorCall: false
         disallowedBacktick: false

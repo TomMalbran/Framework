@@ -466,7 +466,7 @@ class File {
         $zip   = new ZipArchive();
         $files = Arrays::toStrings($files);
 
-        if ($zip->open($name, ZIPARCHIVE::CREATE)) {
+        if ($zip->open($name, ZIPARCHIVE::CREATE) === true) {
             foreach ($files as $file) {
                 self::addDirToZip($zip, $file, pathinfo($file, PATHINFO_BASENAME));
             }
@@ -514,9 +514,10 @@ class File {
      */
     public static function extractZip(string $zipPath, string $extractPath): bool {
         $zip = new ZipArchive();
-        if (!$zip->open($zipPath)) {
+        if ($zip->open($zipPath) !== true) {
             return false;
         }
+
         $zip->extractTo($extractPath);
         $zip->close();
         return true;

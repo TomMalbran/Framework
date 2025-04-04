@@ -275,7 +275,7 @@ class Utils {
         }
         $host = self::getHost($domain);
 
-        if ($host) {
+        if ($host !== "") {
             return Strings::replace($host, "www.", "");
         }
         return "";

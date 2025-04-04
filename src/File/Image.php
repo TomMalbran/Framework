@@ -151,7 +151,7 @@ class Image {
         for ($i = 0; $i < $width; $i++) {
             for ($j = 0; $j < $height; $j++) {
                 $rgba = imagecolorat($imgData, $i, $j);
-                if (($rgba & 0x7F000000) >> 24) {
+                if ((($rgba & 0x7F000000) >> 24) !== 0) {
                     return true;
                 }
             }

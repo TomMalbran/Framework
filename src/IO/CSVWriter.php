@@ -42,7 +42,7 @@ class CSVWriter implements ExporterWriter {
      * @return boolean
      */
     private function start(): bool {
-        if (ob_get_level()) {
+        if (ob_get_level() > 0) {
             ob_end_clean();
         }
 

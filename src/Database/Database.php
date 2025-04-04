@@ -73,7 +73,7 @@ class Database {
      */
     public function connect(): bool {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database);
-        if ($this->mysqli->connect_error) {
+        if ($this->mysqli->connect_error !== null) {
             trigger_error("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}", E_USER_ERROR);
         }
         if (!empty($this->charset)) {
