@@ -1,27 +1,53 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\Utils\Enum;
-
 /**
  * The Colors
  */
-class Color extends Enum {
+enum Color : string {
 
-    const None         = "#f2f2f2";
-    const Red          = "#e8384f";
-    const Orange       = "#fd612c";
-    const YellowOrange = "#fd9a00";
-    const Yellow       = "#eec300";
-    const YellowGreen  = "#a4cf30";
-    const Green        = "#62d26f";
-    const BlueGreen    = "#37c5ab";
-    const Aqua         = "#20aaea";
-    const Blue         = "#4186e0";
-    const Indigo       = "#7a6ff0";
-    const Purple       = "#aa62e3";
-    const Magenta      = "#e362e3";
-    const HotPink      = "#ea4e9d";
-    const Pink         = "#fc91ad";
-    const Gray         = "#8da3a6";
+    case None         = "#f2f2f2";
+    case Red          = "#e8384f";
+    case Orange       = "#fd612c";
+    case YellowOrange = "#fd9a00";
+    case Yellow       = "#eec300";
+    case YellowGreen  = "#a4cf30";
+    case Green        = "#62d26f";
+    case BlueGreen    = "#37c5ab";
+    case Aqua         = "#20aaea";
+    case Blue         = "#4186e0";
+    case Indigo       = "#7a6ff0";
+    case Purple       = "#aa62e3";
+    case Magenta      = "#e362e3";
+    case HotPink      = "#ea4e9d";
+    case Pink         = "#fc91ad";
+    case Gray         = "#8da3a6";
+
+
+
+    /**
+     * Returns true if the Color is valid
+     * @param string $value
+     * @return boolean
+     */
+    public static function isValid(string $value): bool {
+        foreach (self::cases() as $case) {
+            if ($case->value === $value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a list of Colors
+     * @return string[]
+     */
+    public static function getValues(): array {
+        $list = [];
+        foreach (self::cases() as $case) {
+            $list[] = $case->value;
+        }
+        return $list;
+    }
 }
