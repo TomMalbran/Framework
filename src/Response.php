@@ -194,13 +194,6 @@ class Response {
      * @return Response
      */
     public static function error(Errors|string $error, JsonSerializable|array|null $data = null, string $param = ""): Response {
-        if (is_array($error)) {
-            return new Response([
-                "errors" => $error,
-                "data"   => $data,
-            ]);
-        }
-
         if ($error instanceof Errors) {
             if ($error->has("global")) {
                 return new Response([
