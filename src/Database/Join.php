@@ -69,15 +69,15 @@ class Join {
 
 
         // Creates the Fields
-        foreach ($data->getDict("fields") as $key => $value) {
-            $field = new Field($key, $value, $this->prefix);
+        foreach ($data->getDict("fields") as $fieldKey => $value) {
+            $field = new Field($fieldKey, $value, $this->prefix);
             $this->fields[] = $field;
 
             if ($field->mergeTo !== "") {
                 if (empty($this->merges[$field->mergeTo])) {
-                    $key  = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
-                    $glue = $data->getString("mergeGlue", " ");
-                    $this->merges[$field->mergeTo] = new Merge($key, $glue);
+                    $mergeKey = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
+                    $glue     = $data->getString("mergeGlue", " ");
+                    $this->merges[$field->mergeTo] = new Merge($mergeKey, $glue);
                 }
                 $this->merges[$field->mergeTo]->fields[] = $field->prefixName;
             }

@@ -70,9 +70,9 @@ class GoogleMap {
             return [];
         }
 
-        foreach ($response->getList("results") as $result) {
-            if (Arrays::contains($result->getString("types"), "premise")) {
-                $address = $result;
+        foreach ($response->getList("results") as $addressResult) {
+            if (Arrays::contains($addressResult->getString("types"), "premise")) {
+                $address = $addressResult;
                 break;
             }
         }

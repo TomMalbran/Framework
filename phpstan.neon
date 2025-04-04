@@ -20,7 +20,7 @@ parameters:
         disallowedBacktick: true
         disallowedImplicitArrayCreation: true
         disallowedShortTernary: true
-        overwriteVariablesWithLoop: false
+        overwriteVariablesWithLoop: true
         closureUsesThis: false
         matchingInheritedMethodNames: false
         numericOperandsInArithmeticOperators: false
