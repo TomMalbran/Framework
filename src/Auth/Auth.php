@@ -405,7 +405,6 @@ class Auth {
 
         // Add fields from the Config
         $fields = Config::getAuthFields();
-        $fields = Arrays::toStrings($fields);
         foreach ($fields as $field) {
             $data[$field] = self::$credential->get($field);
         }

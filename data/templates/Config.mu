@@ -72,9 +72,9 @@ class Config {
         {{#isFloat}}
         return Configs::getFloat("{{property}}");
         {{/isFloat}}
-        {{#isArray}}
-        return Configs::getArray("{{property}}");
-        {{/isArray}}
+        {{#isList}}
+        return Configs::getList("{{property}}");
+        {{/isList}}
     }
 {{/properties}}
 }

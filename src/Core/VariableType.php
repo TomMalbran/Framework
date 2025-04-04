@@ -12,6 +12,7 @@ enum VariableType {
     case None;
 
     case Array;
+    case List;
     case Boolean;
     case Integer;
     case Float;
@@ -40,15 +41,15 @@ enum VariableType {
      */
     public static function get(mixed $value): VariableType {
         if (is_array($value)) {
-            return self::Array;
+            return array_is_list($value) ? self::List : self::Array;
         }
-        if (gettype($value) == "boolean") {
+        if (gettype($value) === "boolean") {
             return self::Boolean;
         }
-        if (gettype($value) == "integer") {
+        if (gettype($value) === "integer") {
             return self::Integer;
         }
-        if (gettype($value) == "double") {
+        if (gettype($value) === "double") {
             return self::Float;
         }
         return self::String;
@@ -62,6 +63,7 @@ enum VariableType {
     public static function getType(VariableType $type): string {
         return match ($type) {
             self::Array   => "array",
+            self::List    => "array",
             self::Boolean => "bool",
             self::Integer => "int",
             self::Float   => "float",
@@ -77,6 +79,7 @@ enum VariableType {
     public static function getDocType(VariableType $type): string {
         return match ($type) {
             self::Array   => "array<string|integer,mixed>",
+            self::List    => "string[]",
             self::Boolean => "boolean",
             self::Integer => "integer",
             self::Float   => "float",

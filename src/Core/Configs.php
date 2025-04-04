@@ -240,16 +240,20 @@ class Configs {
     }
 
     /**
-     * Returns a Config Property as an Array
+     * Returns a Config Property as a List
      * @param string $property
-     * @return mixed[]
+     * @return string[]
      */
-    public static function getArray(string $property): array {
+    public static function getList(string $property): array {
         $value = self::get($property);
-        if ($value !== null) {
-            $value = Strings::toString($value);
-            return Strings::split($value, ",");
+        if ($value === null) {
+            return [];
         }
-        return [];
+
+        if (is_array($value)) {
+            return Arrays::toStrings($value);
+        }
+        $value = Strings::toString($value);
+        return Strings::split($value, ",");
     }
 }

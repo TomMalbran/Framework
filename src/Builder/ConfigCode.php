@@ -78,7 +78,7 @@ class ConfigCode {
                 "isBoolean" => $variableType === VariableType::Boolean,
                 "isInteger" => $variableType === VariableType::Integer,
                 "isFloat"   => $variableType === VariableType::Float,
-                "isArray"   => $variableType === VariableType::Array,
+                "isList"    => $variableType === VariableType::List,
             ];
         }
 
