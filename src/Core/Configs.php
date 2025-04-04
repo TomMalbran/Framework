@@ -240,16 +240,6 @@ class Configs {
     }
 
     /**
-     * Returns a Config Property as an Object
-     * @param string $property
-     * @return object
-     */
-    public static function getObject(string $property): object {
-        $value = self::get($property);
-        return $value !== null ? (object)$value : (object)[];
-    }
-
-    /**
      * Returns a Config Property as an Array
      * @param string $property
      * @return mixed[]

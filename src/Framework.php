@@ -4,7 +4,6 @@ namespace Framework;
 use Framework\Response;
 use Framework\Auth\Auth;
 use Framework\Builder\Builder;
-use Framework\Core\Configs;
 use Framework\Core\Settings;
 use Framework\Email\EmailTemplate;
 use Framework\File\FilePath;
@@ -12,6 +11,7 @@ use Framework\Log\ErrorLog;
 use Framework\Database\Database;
 use Framework\Database\Migration;
 use Framework\System\Router;
+use Framework\System\Config;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 
@@ -140,8 +140,13 @@ class Framework {
      */
     public static function getDatabase(): Database {
         if (empty(self::$db)) {
-            $config   = Configs::getObject("db");
-            self::$db = new Database($config);
+            self::$db = new Database(
+                Config::getDbHost(),
+                Config::getDbUsername(),
+                Config::getDbPassword(),
+                Config::getDbDatabase(),
+                Config::getDbCharset(),
+            );
         }
         return self::$db;
     }
