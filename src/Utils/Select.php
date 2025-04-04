@@ -36,10 +36,10 @@ class Select implements JsonSerializable {
 
     /**
      * Returns true if the key exists
-     * @param mixed $key
+     * @param string $key
      * @return boolean
      */
-    public function has(mixed $key): bool {
+    public function has(string $key): bool {
         return property_exists($this, $key) || array_key_exists($key, $this->extras);
     }
 
@@ -50,7 +50,7 @@ class Select implements JsonSerializable {
      */
     public function getString(string $key): string {
         if (property_exists($this, $key)) {
-            return (string)$this->$key;
+            return Strings::toString($this->$key);
         }
         if (isset($this->extras[$key])) {
             return Strings::toString($this->extras[$key]);
@@ -65,7 +65,7 @@ class Select implements JsonSerializable {
      */
     public function getInt(string $key): int {
         if (property_exists($this, $key)) {
-            return (int)$this->$key;
+            return Numbers::toInt($this->$key);
         }
         if (isset($this->extras[$key])) {
             return Numbers::toInt($this->extras[$key]);
@@ -137,6 +137,10 @@ class Select implements JsonSerializable {
         foreach ($array as $row) {
             $key   = Arrays::getValue($row, $keyName);
             $value = Arrays::getValue($row, $valName, " - ", "", $useEmpty);
+
+            if ((!is_int($key) && !is_string($key)) || !is_string($value)) {
+                continue;
+            }
             if (($distinct && Arrays::contains($keys, $key)) || (!$useEmpty && empty($value))) {
                 continue;
             }
