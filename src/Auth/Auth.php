@@ -333,7 +333,7 @@ class Auth {
             NLS::setLanguage($language);
         }
         if ($timezone !== 0) {
-            DateTime::setTimezone($timezone);
+            DateTime::setTimeZone($timezone);
         }
         return true;
     }

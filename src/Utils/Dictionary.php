@@ -373,10 +373,12 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Implements the Countable Interface
+     * @phpstan-return 0|positive-int
      * @return integer
      */
     public function count(): int {
-        return count($this->data);
+        $result = count($this->data);
+        return max(0, $result);
     }
 
     /**

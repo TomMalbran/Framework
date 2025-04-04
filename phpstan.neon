@@ -1,6 +1,31 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
 parameters:
     level: 10
     paths:
         - src
     universalObjectCratesClasses:
         - Framework\Utils\Errors
+
+    # Strict Rules
+    strictRules:
+        noVariableVariables: false
+
+        disallowedEmpty: false
+        disallowedLooseComparison: false
+        booleansInConditions: false
+        uselessCast: false
+        requireParentConstructorCall: false
+        disallowedBacktick: false
+        disallowedImplicitArrayCreation: false
+        disallowedShortTernary: false
+        overwriteVariablesWithLoop: false
+        closureUsesThis: false
+        matchingInheritedMethodNames: false
+        numericOperandsInArithmeticOperators: false
+        strictFunctionCalls: false
+        dynamicCallOnStaticMethod: false
+        switchConditionsMatchingType: false
+        strictArrayFilter: false
+        illegalConstructorMethodCall: false

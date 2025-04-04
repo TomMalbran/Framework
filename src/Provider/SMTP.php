@@ -58,7 +58,7 @@ class SMTP {
             $email->addReplyTo($replyTo, $fromName);
         }
         if (!empty($attachment)) {
-            $email->AddAttachment($attachment);
+            $email->addAttachment($attachment);
         }
 
         if (Config::isSmtpDebug()) {

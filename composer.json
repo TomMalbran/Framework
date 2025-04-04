@@ -17,7 +17,9 @@
         "firebase/php-jwt": "^6.10",
         "mustache/mustache": "^2.14",
         "phpmailer/phpmailer": "^6.9",
-        "openspout/openspout": "^4.26"
+        "openspout/openspout": "^4.26",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0"
     },
     "suggest" : {
         "mustache/mustache": "Used for Rendering templates",
