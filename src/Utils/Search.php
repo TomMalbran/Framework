@@ -41,7 +41,7 @@ class Search implements JsonSerializable {
      */
     public function getString(string $key): string {
         if (property_exists($this, $key)) {
-            return (string)$this->$key;
+            return Strings::toString($this->$key);
         }
         if (isset($this->data[$key])) {
             return Strings::toString($this->data[$key]);
@@ -56,7 +56,7 @@ class Search implements JsonSerializable {
      */
     public function getInt(string $key): int {
         if (property_exists($this, $key)) {
-            return (int)$this->$key;
+            return Numbers::toInt($this->$key);
         }
         if (isset($this->data[$key])) {
             return Numbers::toInt($this->data[$key]);
@@ -91,11 +91,16 @@ class Search implements JsonSerializable {
 
         foreach ($array as $row) {
             $id = $row[$idKey];
-            if (!Arrays::contains($ids, $id)) {
-                $title    = Arrays::getValue($row, $nameKey);
-                $result[] = new Search($id, $title, $row);
-                $ids[]    = $id;
+            if (!is_int($id) && !is_string($id)) {
+                continue;
             }
+            if (Arrays::contains($ids, $id)) {
+                continue;
+            }
+
+            $title    = Strings::toString(Arrays::getValue($row, $nameKey));
+            $result[] = new Search($id, $title, $row);
+            $ids[]    = $id;
         }
         return $result;
     }
