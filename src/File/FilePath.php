@@ -6,6 +6,7 @@ use Framework\Discovery\DataFile;
 use Framework\File\File;
 use Framework\System\Package;
 use Framework\System\Config;
+use Framework\Utils\Arrays;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
@@ -40,6 +41,10 @@ class FilePath {
 
         /** @var array{paths:string[],directories:string[]} */
         $data = Discovery::loadData(DataFile::Files);
+        if (Arrays::isEmpty($data, "paths")) {
+            self::$loaded = true;
+            return false;
+        }
 
         self::$loaded      = true;
         self::$paths       = $data["paths"];
