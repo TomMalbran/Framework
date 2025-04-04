@@ -300,7 +300,8 @@ class Numbers {
         $mult = 1;
         if ($decimals !== null) {
             $numberStr    = (string)$number;
-            $decimalCount = strlen($numberStr) - strrpos($numberStr, ".") - 1;
+            $decimalPos   = strrpos($numberStr, ".");
+            $decimalCount = strlen($numberStr) - ($decimalPos !== false ? $decimalPos : 0) - 1;
             if (strrpos($numberStr, ".") > 0 && $decimalCount > $decimals) {
                 return false;
             }

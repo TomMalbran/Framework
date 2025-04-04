@@ -21,9 +21,9 @@ parameters:
         disallowedImplicitArrayCreation: true
         disallowedShortTernary: true
         overwriteVariablesWithLoop: true
-        closureUsesThis: false
-        matchingInheritedMethodNames: false
-        numericOperandsInArithmeticOperators: false
+        closureUsesThis: true
+        matchingInheritedMethodNames: true
+        numericOperandsInArithmeticOperators: true
         strictFunctionCalls: false
         dynamicCallOnStaticMethod: false
         switchConditionsMatchingType: false

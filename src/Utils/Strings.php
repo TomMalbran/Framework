@@ -447,11 +447,11 @@ class Strings {
      * @return string
      */
     public static function substringAfter(string $string, string $needle, bool $useFirst = false): string {
-        if (self::contains($string, $needle)) {
-            $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
-            return substr($string, $position + strlen($needle));
+        $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
+        if ($position === false) {
+            return $string;
         }
-        return $string;
+        return substr($string, $position + strlen($needle));
     }
 
     /**
@@ -789,7 +789,12 @@ class Strings {
             return $result;
         }
 
-        $styles = substr($result, $start, strpos($result, "</style>") + strlen("</style>"));
+        $end = strpos($result, "</style>");
+        if ($end === false) {
+            return $result;
+        }
+
+        $styles = substr($result, $start, $end + strlen("</style>"));
         $result = str_replace($styles, "", $result);
         return $result;
     }
