@@ -11,6 +11,7 @@ use Framework\Database\Assign;
 use Framework\Database\Query;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
 use Framework\Utils\Search;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -36,7 +37,8 @@ class Schema {
      * @return Structure
      */
     private static function structure(): Structure {
-        return Factory::getStructure(static::Schema);
+        $schemaName = Strings::toString(static::Schema);
+        return Factory::getStructure($schemaName);
     }
 
 
@@ -86,9 +88,9 @@ class Schema {
      * Selects the given column from a single table and returns a single value
      * @param Query  $query
      * @param string $column
-     * @return string|integer|float|boolean
+     * @return string|integer
      */
-    protected static function getSchemaValue(Query $query, string $column): string|int|float|bool {
+    protected static function getSchemaValue(Query $query, string $column): string|int {
         return self::db()->getValue(self::structure()->table, $column, $query);
     }
 
@@ -112,8 +114,11 @@ class Schema {
 
         $columnKey = !empty($columnKey) ? $columnKey : Strings::substringAfter($column, ".");
         foreach ($request as $row) {
-            if (!empty($row[$columnKey]) && !Arrays::contains($result, $row[$columnKey])) {
-                $result[] = $row[$columnKey];
+            $value = $row[$columnKey];
+            if (!empty($value) && !Arrays::contains($result, $value)) {
+                if (is_string($value) || is_int($value)) {
+                    $result[] = $value;
+                }
             }
         }
         return $result;
@@ -133,7 +138,7 @@ class Schema {
 
         $request = $selection->request($query);
         if (isset($request[0]["cnt"])) {
-            return (int)$request[0]["cnt"];
+            return Numbers::toInt($request[0]["cnt"]);
         }
         return 0;
     }
@@ -511,8 +516,8 @@ class Schema {
         $isEdit       = !empty($oldFields) && !empty($newFields);
         $isDelete     = !empty($oldFields) && empty($newFields);
 
-        $oldPosition  = Arrays::getOneValue($oldFields, "position", default: 0);
-        $newPosition  = Arrays::getOneValue($newFields, "position", default: 0);
+        $oldPosition  = Numbers::toInt(Arrays::getOneValue($oldFields, "position", default: 0));
+        $newPosition  = Numbers::toInt(Arrays::getOneValue($newFields, "position", default: 0));
         $nextPosition = self::getNextPosition($query);
 
         $oldPosition  = $isCreate ? $nextPosition : $oldPosition;
@@ -568,7 +573,7 @@ class Schema {
 
         $request = $selection->request($query);
         if (!empty($request[0])) {
-            return (int)$request[0]["position"] + 1;
+            return Numbers::toInt($request[0]["position"]) + 1;
         }
         return 1;
     }

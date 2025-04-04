@@ -224,7 +224,6 @@ class Migration {
         $primaryKeys = $db->getPrimaryKeys($structure->table);
         $tableKeys   = $db->getTableKeys($structure->table);
         $tableFields = $db->getTableFields($structure->table);
-        $tableFields = Arrays::createMap($tableFields, "Field");
         $tableNames  = Arrays::toStrings(array_keys($tableFields));
         $update      = false;
         $adds        = [];
@@ -299,9 +298,8 @@ class Migration {
         $newPrev = "";
         foreach ($structure->fields as $field) {
             $oldPrev = "";
-            foreach ($tableFields as $tableKey => $tableField) {
+            foreach ($tableFields as $tableKey => $oldData) {
                 if ($field->key === $tableKey) {
-                    $oldData   = $db->parseColumnType($tableField);
                     $hasLength = Strings::contains($oldData, "(");
                     $newData   = $field->getType($hasLength);
 
@@ -316,7 +314,7 @@ class Migration {
                     }
                     break;
                 }
-                $oldPrev = $tableField["Field"];
+                $oldPrev = $tableKey;
             }
             $newPrev = $field->key;
         }

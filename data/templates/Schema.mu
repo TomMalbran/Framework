@@ -222,9 +222,9 @@ class {{name}}Schema extends Schema {
      * Selects the given column from a single table and returns a single value
      * @param {{query}} $query
      * @param {{column}} $column
-     * @return string|integer|float|boolean
+     * @return string|integer
      */
-    protected static function getEntityValue({{query}} $query, {{column}} $column): string|int|float|bool {
+    protected static function getEntityValue({{query}} $query, {{column}} $column): string|int {
         return self::getSchemaValue($query->query, $column->base());
     }
 

@@ -6,7 +6,9 @@ use Framework\Database\Query;
 use Framework\Log\QueryLog;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
+use Framework\Utils\Numbers;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
@@ -102,7 +104,7 @@ class Database {
      * Process the given expression
      * @param string        $expression
      * @param Query|mixed[] $params     Optional.
-     * @return array<string,mixed>[]
+     * @return array<string,string|integer>[]
      */
     public function query(string $expression, Query|array $params = []): array {
         $startTime = microtime(true);
@@ -117,7 +119,7 @@ class Database {
      * Process the given expression using a Query
      * @param string $expression
      * @param Query  $query
-     * @return array<string,mixed>[]
+     * @return array<string,string|integer>[]
      */
     public function getData(string $expression, Query $query): array {
         $expression .= $query->get(true);
@@ -129,7 +131,7 @@ class Database {
      * @param string          $table
      * @param string[]|string $columns Optional.
      * @param Query|null      $query   Optional.
-     * @return array<string,mixed>[]
+     * @return array<string,string|integer>[]
      */
     public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
         $selection  = Strings::join($columns, ", ");
@@ -148,50 +150,15 @@ class Database {
      * @param string $table
      * @param string $column
      * @param Query  $query
-     * @return string|integer|float|boolean
+     * @return string|integer
      */
-    public function getValue(string $table, string $column, Query $query): string|int|float|bool {
+    public function getValue(string $table, string $column, Query $query): string|int {
         $request = $this->getAll($table, $column, $query->limit(1));
 
         if (isset($request[0][$column])) {
             return $request[0][$column];
         }
         return "";
-    }
-
-    /**
-     * Selects the given columns from a single table and returns the first row
-     * @param string          $table
-     * @param string[]|string $columns
-     * @param Query           $query
-     * @return array{}[]
-     */
-    public function getRow(string $table, array|string $columns, Query $query): array {
-        $request = $this->getAll($table, $columns, $query->limit(1));
-
-        if (isset($request[0])) {
-            return $request[0];
-        }
-        return [];
-    }
-
-    /**
-     * Selects the given column from a single table and returns the entire column
-     * @param string $table
-     * @param string $column
-     * @param Query  $query
-     * @return string[]
-     */
-    public function getColumn(string $table, string $column, Query $query): array {
-        $request = $this->getAll($table, $column, $query);
-        $result  = [];
-
-        foreach ($request as $row) {
-            if (!empty($row[$column]) && !Arrays::contains($result, $row[$column])) {
-                $result[] = $row[$column];
-            }
-        }
-        return $result;
     }
 
 
@@ -217,7 +184,7 @@ class Database {
         $request    = $this->query($expression, $query);
 
         if (isset($request[0]["cnt"])) {
-            return (int)$request[0]["cnt"];
+            return Numbers::toInt($request[0]["cnt"]);
         }
         return 0;
     }
@@ -345,7 +312,7 @@ class Database {
                 return null;
             }
 
-            if (is_array($bindParams) && !empty($bindParams)) {
+            if (!empty($bindParams)) {
                 $types  = "";
                 $params = [];
                 foreach ($bindParams as $value) {
@@ -429,7 +396,7 @@ class Database {
             if (is_string($value)) {
                 $values[] = "'$value'";
             } else {
-                $values[] = $value;
+                $values[] = Strings::toString($value);
             }
         }
         return Strings::replacePattern($expression, $keys, $values, 1);
@@ -437,8 +404,8 @@ class Database {
 
     /**
      * Creates a reference of each value
-     * @param string[] $array
-     * @return string[]
+     * @param mixed[] $array
+     * @return mixed[]
      */
     private function refValues(array $array): array {
         $refs = [];
@@ -451,7 +418,7 @@ class Database {
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
-     * @return array{}[]
+     * @return array<string,string|integer>[]
      */
     private function dynamicBindResults(?mysqli_stmt $statement): array {
         if ($statement === null) {
@@ -478,11 +445,15 @@ class Database {
         while ($statement->fetch()) {
             $x = [];
             foreach ($row as $key => $val) {
-                $string  = (string)$val;
-                // @phpstan-ignore function.impossibleType
-                $x[$key] = ctype_digit($string) && strrpos($string, "0", -strlen($string)) === false ? (int)$val : $val;
+                $key    = Strings::toString($key);
+                $string = Strings::toString($val);
+                if (ctype_digit($string) && strrpos($string, "0", -strlen($string)) === false) {
+                    $x[$key] = (int)$val;
+                } else {
+                    $x[$key] = $string;
+                }
             }
-            array_push($results, $x);
+            $results[] = $x;
         }
         $statement->free_result();
 
@@ -594,8 +565,9 @@ class Database {
 
         foreach ($request as $row) {
             foreach ($row as $value) {
-                if ((!empty($filter) && !Arrays::contains($filter, $value)) || empty($filter)) {
-                    $result[] = $value;
+                $tableName = Strings::toString($value);
+                if ((!empty($filter) && !Arrays::contains($filter, $tableName)) || empty($filter)) {
+                    $result[] = $tableName;
                 }
             }
         }
@@ -622,8 +594,8 @@ class Database {
         $result  = [];
 
         foreach ($request as $row) {
-            if ($row["Key_name"] == "PRIMARY") {
-                $result[] = $row["Column_name"];
+            if ($row["Key_name"] === "PRIMARY") {
+                $result[] = Strings::toString($row["Column_name"]);
             }
         }
         return $result;
@@ -644,8 +616,8 @@ class Database {
                 AND EXTRA like '%auto_increment%'
             LIMIT 1
         ");
-        if (!empty($request[0])) {
-            return $request[0]["COLUMN_NAME"];
+        if (isset($request[0])) {
+            return Strings::toString($request[0]["COLUMN_NAME"]);
         }
         return "";
     }
@@ -662,10 +634,16 @@ class Database {
     /**
      * Returns the Table Fields
      * @param string $tableName
-     * @return array<string,mixed>[]
+     * @return array<string,string>
      */
     public function getTableFields(string $tableName): array {
-        return $this->query("SHOW FIELDS FROM `$tableName`");
+        $request = $this->query("SHOW FIELDS FROM `$tableName`");
+        $result  = [];
+        foreach ($request as $row) {
+            $field = Strings::toString($row["Field"]);
+            $result[$field] = $this->parseColumnType($row);
+        }
+        return $result;
     }
 
 
@@ -766,21 +744,27 @@ class Database {
 
     /**
      * Parses the Column Type
-     * @param array<string,mixed> $data
+     * @param array<string,mixed> $row
      * @return string
      */
-    public function parseColumnType(array $data): string {
-        $result = $data["Type"];
-        if ($data["Null"] === "NO") {
+    private function parseColumnType(array $row): string {
+        $data    = new Dictionary($row);
+        $type    = $data->getString("Type");
+        $null    = $data->getString("Null");
+        $default = $data->getString("Default");
+        $extra   = $data->getString("Extra");
+
+        $result = $type;
+        if ($null === "NO") {
             $result .= " NOT NULL";
         } else {
             $result .= " NULL";
         }
-        if ($data["Default"] !== NULL) {
-            $result .= " DEFAULT '{$data["Default"]}'";
+        if ($row["Default"] !== null) {
+            $result .= " DEFAULT '$default'";
         }
-        if (!empty($data["Extra"])) {
-            $result .= " " . Strings::toUpperCase($data["Extra"]);
+        if ($extra !== "") {
+            $result .= " " . Strings::toUpperCase($extra);
         }
         return $result;
     }
@@ -888,8 +872,8 @@ class Database {
 
     /**
      * Dumps the entire database
-     * @param string[]   $filter Optional.
-     * @param mixed|null $fp     Optional.
+     * @param string[]      $filter Optional.
+     * @param resource|null $fp     Optional.
      * @return boolean
      */
     public function dump(array $filter = [], mixed $fp = null): bool {
@@ -939,18 +923,18 @@ class Database {
                 );
             }
         }
-        $this->write($fp, $crlf . "# Done" . $crlf);
+        $this->write($fp, "$crlf # Done $crlf");
         return true;
     }
 
     /**
      * Writes the content in a file or prints them in the screen
-     * @param mixed  $fp
-     * @param string $content
+     * @param resource|null $fp
+     * @param string        $content
      * @return boolean
      */
     private function write(mixed $fp, string $content): bool {
-        if (!empty($fp)) {
+        if ($fp !== null) {
             fwrite($fp, $content);
         } else {
             print($content);
@@ -965,25 +949,37 @@ class Database {
      */
     private function getTableSQLData(string $tableName): string {
         $crlf    = "\r\n";
-        $result  = "CREATE TABLE `$tableName` (" . $crlf;
+        $result  = "CREATE TABLE `$tableName` ($crlf";
         $request = $this->query("SHOW FIELDS FROM `$tableName`");
 
         foreach ($request as $row) {
+            $data    = new Dictionary($row);
+            $field   = $data->getString("Field");
+            $type    = $data->getString("Type");
+            $null    = $data->getString("Null");
+            $default = $data->getString("Default");
+            $extra   = $data->getString("Extra");
+
             // Make the CREATE for this column.
-            $result .= "  {$row["Field"]} {$row["Type"]}" . ($row["Null"] != "YES" ? " NOT NULL" : "");
+            $result .= "  $field $type" . ($null !== "YES" ? " NOT NULL" : "");
 
             // Add a default...?
-            if (isset($row["Default"])) {
+            if ($default !== "") {
                 // Make a special case of auto-timestamp.
-                if ($row["Default"] == "CURRENT_TIMESTAMP") {
+                if ($default == "CURRENT_TIMESTAMP") {
                     $result .= " /*!40102 NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP */";
+                } elseif (is_numeric($default)) {
+                    $result .= " default $default";
                 } else {
-                    $result .= " default " . (is_numeric($row["Default"]) ? $row["Default"] : "'" . $this->escape($row["Default"]) . "'");
+                    $result .= " default '" . $this->escape($default) . "'";
                 }
             }
 
             // And now any extra information. (such as auto_increment.)
-            $result .= ($row["Extra"] != "" ? " {$row["Extra"]}" : "") . ",$crlf";
+            if ($extra !== "") {
+                $result .= " $extra";
+            }
+            $result .= ",$crlf";
         }
 
         // Take off the last comma.
@@ -994,15 +990,20 @@ class Database {
         $indexes = [];
 
         foreach ($request as $row) {
+            $data       = new Dictionary($row);
+            $keyName    = $data->getString("Key_name");
+            $columnName = $data->getString("Column_name");
+            $subPart    = $data->getString("Sub_part");
+
             // IS this a primary key, unique index, or regular index?
-            if ($row["Key_name"] == "PRIMARY") {
+            if ($keyName === "PRIMARY") {
                 $row["Key_name"] = "PRIMARY KEY";
             } elseif (empty($row["Non_unique"])) {
-                $row["Key_name"] = "UNIQUE {$row["Key_name"]}";
+                $row["Key_name"] = "UNIQUE $keyName";
             } elseif ($row["Comment"] == "FULLTEXT" || (isset($row["Index_type"]) && $row["Index_type"] == "FULLTEXT")) {
-                $row["Key_name"] = "FULLTEXT {$row["Key_name"]}";
+                $row["Key_name"] = "FULLTEXT $keyName";
             } else {
-                $row["Key_name"] = "KEY {$row["Key_name"]}";
+                $row["Key_name"] = "KEY $keyName";
             }
 
             // Is this the first column in the index?
@@ -1011,10 +1012,10 @@ class Database {
             }
 
             // A sub part, like only indexing 15 characters of a varchar.
-            if (!empty($row["Sub_part"])) {
-                $indexes[$row["Key_name"]][$row["Seq_in_index"]] = $row["Column_name"] . "(" . $row["Sub_part"] . ")";
+            if ($subPart !== "") {
+                $indexes[$row["Key_name"]][$row["Seq_in_index"]] = "$columnName($subPart)";
             } else {
-                $indexes[$row["Key_name"]][$row["Seq_in_index"]] = $row["Column_name"];
+                $indexes[$row["Key_name"]][$row["Seq_in_index"]] = $columnName;
             }
         }
 
@@ -1029,9 +1030,15 @@ class Database {
             SHOW TABLE STATUS
             LIKE '" . strtr($tableName, [ '_' => '\\_', '%' => '\\%' ]) . "'
         ");
+        if (isset($request[0])) {
+            $data    = new Dictionary($request[0]);
+            $type    = $data->getString("Type");
+            $engine  = $data->getString("Engine");
+            $comment = $data->getString("Comment");
 
-        $result .= $crlf . ") ENGINE=" . (isset($request[0]["Type"]) ? $request[0]["Type"] : $request[0]["Engine"]);
-        $result .= $request[0]["Comment"] != "" ? " COMMENT='" . $request[0]["Comment"] . "'" : "";
+            $result .= $crlf . ") ENGINE=" . ($type !== "" ? $type : $engine);
+            $result .= $comment !== "" ? " COMMENT='$comment'" : "";
+        }
 
         return $result;
     }
@@ -1057,9 +1064,7 @@ class Database {
                     $fieldList = [];
                     foreach ($row as $value) {
                         // Try to figure out the type of each field. (NULL, number, or 'string'.)
-                        if (!isset($value)) {
-                            $fieldList[] = "NULL";
-                        } elseif (is_numeric($value)) {
+                        if (is_int($value)) {
                             $fieldList[] = $value;
                         } else {
                             $fieldList[] = "'" . $this->escape($value) . "'";
