@@ -67,7 +67,7 @@ class ConfigCode {
                 continue;
             }
 
-            $variableType = VariableType::get($value);
+            $variableType = VariableType::get($value, true);
             $properties[] = [
                 "property"  => $property,
                 "name"      => $name,

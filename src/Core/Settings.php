@@ -187,7 +187,7 @@ class Settings extends SettingsSchema {
         // Add/Update Settings
         foreach ($settings as $section => $data) {
             foreach ($data as $variable => $value) {
-                $variableType = VariableType::get($value);
+                $variableType = VariableType::get($value, false);
                 $found        = false;
 
                 foreach ($list as $elem) {

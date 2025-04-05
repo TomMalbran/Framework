@@ -37,12 +37,13 @@ enum VariableType {
 
     /**
      * Returns the Setting Type based on the value
-     * @param mixed $value
+     * @param mixed   $value
+     * @param boolean $useLists
      * @return VariableType
      */
-    public static function get(mixed $value): VariableType {
+    public static function get(mixed $value, bool $useLists): VariableType {
         if (is_array($value)) {
-            return array_is_list($value) ? self::List : self::Array;
+            return $useLists ? self::List : self::Array;
         }
         if (gettype($value) === "boolean") {
             return self::Boolean;

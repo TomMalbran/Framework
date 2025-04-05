@@ -66,7 +66,7 @@ class SettingCode {
                 $isGeneral    = Strings::isEqual($section, Settings::General);
                 $prefix       = !$isGeneral ? Strings::upperCaseFirst($section) : "";
                 $title        = Strings::camelCaseToPascalCase($variable);
-                $variableType = VariableType::get($value);
+                $variableType = VariableType::get($value, false);
 
                 $result[] = [
                     "isFirst"   => $isFirst,
