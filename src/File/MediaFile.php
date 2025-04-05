@@ -61,7 +61,7 @@ class MediaFile {
      */
     public static function update(string $oldPath, string $newPath): bool {
         self::load();
-        if (empty(self::$data)) {
+        if (count(self::$data) === 0) {
             return true;
         }
 
@@ -84,7 +84,7 @@ class MediaFile {
                 $old = $file["old"];
                 $new = $file["new"];
 
-                if (!empty($field["replace"])) {
+                if ($field["replace"] === true) {
                     $query = Query::create($field["field"], "LIKE", "\"$old\"");
                     $db->update($structure->table, [
                         $field["field"] => Assign::replace($old, $new),
@@ -158,7 +158,7 @@ class MediaFile {
      * @return array{list:array<string,mixed>[],path:string}
      */
     public static function getList(string $mediaType = "", string $path = "", string $basePath = ""): array {
-        $path   = !empty($path) && self::exists($basePath, $path) ? $path : "";
+        $path   = $path !== "" && self::exists($basePath, $path) ? $path : "";
         $source = self::getPath($basePath, $path);
         $files  = File::getAllInDir($source);
         $source = File::addLastSlash($source);
@@ -175,7 +175,7 @@ class MediaFile {
                 $list->add($fileName, $filePath, $isDir, $sourcePath, $sourceUrl, $thumbUrl);
             }
         }
-        if (!empty($path) && $path !== "/") {
+        if ($path !== "" && $path !== "/") {
             $list->addBack($path);
         }
 

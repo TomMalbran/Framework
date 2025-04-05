@@ -377,7 +377,10 @@ class File {
      */
     public static function getFirstFileInDir(string $path): string {
         $files = self::getFilesInDir($path);
-        return !empty($files[0]) ? $path . $files[0] : "";
+        if (isset($files[0]) && $files[0] !== "") {
+            return "$path{$files[0]}";
+        }
+        return "";
     }
 
     /**

@@ -113,7 +113,7 @@ class Image {
 
         $filePath = File::parsePath(...$pathParts);
         $exif     = @exif_read_data($filePath);
-        if ($exif !== false && !empty($exif["Orientation"])) {
+        if ($exif !== false && isset($exif["Orientation"])) {
             return Numbers::toInt($exif["Orientation"]);
         }
         return 0;
@@ -190,7 +190,7 @@ class Image {
         if ($orientation === null) {
             $orientation = self::getOrientation($src);
         }
-        if (empty($orientation)) {
+        if ($orientation === 0) {
             return false;
         }
 

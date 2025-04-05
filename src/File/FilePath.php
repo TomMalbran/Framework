@@ -189,7 +189,7 @@ class FilePath {
         $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
-        if (!empty(self::$paths)) {
+        if (count(self::$paths) > 0) {
             $basePaths = array_merge($basePaths, self::$paths);
         }
         foreach ($basePaths as $basePath) {
@@ -225,12 +225,10 @@ class FilePath {
                 $result[] = "$basePath/$id";
             }
 
-            if (!empty(self::$directories)) {
-                foreach (self::$directories as $directory) {
-                    $path = self::getPath($basePath, $id, $directory);
-                    if (File::createDir($path)) {
-                        $result[] = "$basePath/$id/$directory";
-                    }
+            foreach (self::$directories as $directory) {
+                $path = self::getPath($basePath, $id, $directory);
+                if (File::createDir($path)) {
+                    $result[] = "$basePath/$id/$directory";
                 }
             }
         }
@@ -246,7 +244,7 @@ class FilePath {
         $basePaths = [ self::Temp, self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
-        if (!empty(self::$paths)) {
+        if (count(self::$paths) > 0) {
             $basePaths = array_merge($basePaths, self::$paths);
         }
         foreach ($basePaths as $basePath) {
@@ -258,15 +256,15 @@ class FilePath {
 
         $directories = self::createDirs();
 
-        if (!empty($paths)) {
+        if (count($paths) > 0) {
             print("<br>Added <i>" . count($paths) . " paths</i><br>");
             print(Strings::join($paths, ", ") . "<br>");
         }
-        if (!empty($directories)) {
+        if (count($directories) > 0) {
             print("<br>Added <i>" . count($directories) . " directories</i><br>");
             print(Strings::join($directories, ", ") . "<br>");
         }
-        if (empty($paths) && empty($directories)) {
+        if (count($paths) === 0 && count($directories) === 0) {
             print("<br>No <i>paths</i> added<br>");
         }
         return true;
