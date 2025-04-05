@@ -76,7 +76,7 @@ class EmailQueue extends EmailQueueSchema {
         $subject ??= $template->subject;
         $message ??= $template->message;
 
-        if (empty($sendTo)) {
+        if (count($sendTo) === 0) {
             return false;
         }
         $emailID = self::createEntity(
@@ -122,17 +122,15 @@ class EmailQueue extends EmailQueueSchema {
      */
     public static function send(EmailQueueEntity $email, bool $sendAlways): bool {
         $emailResult = EmailResult::NoEmails;
-        $sendTos     = Arrays::toStrings($email->sendTo);
+        $sendTos     = Arrays::toStrings($email->sendTo, withoutEmpty: true);
 
         foreach ($sendTos as $sendTo) {
-            if (!empty($sendTo)) {
-                $emailResult = Email::send(
-                    $sendTo,
-                    $email->subject,
-                    $email->message,
-                    $sendAlways,
-                );
-            }
+            $emailResult = Email::send(
+                $sendTo,
+                $email->subject,
+                $email->message,
+                $sendAlways,
+            );
         }
         return self::markAsSent($email->emailID, $emailResult);
     }

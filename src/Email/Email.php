@@ -107,7 +107,7 @@ class Email {
      */
     public static function isCaptchaValid(Request $request, bool $withScore = false): bool {
         $recaptchaSecret = Config::getEmailRecaptchaSecret();
-        if (!$request->has("g-recaptcha-response") || empty($recaptchaSecret)) {
+        if (!$request->has("g-recaptcha-response") || $recaptchaSecret === "") {
             return false;
         }
         $secretKey = urlencode($recaptchaSecret);
@@ -115,7 +115,7 @@ class Email {
         $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";
         $response  = JSON::readUrl($url);
 
-        if (empty($response["success"])) {
+        if (!isset($response["success"])) {
             return false;
         }
         if ($withScore && $response["score"] <= 0.5) {

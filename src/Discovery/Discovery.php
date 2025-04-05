@@ -106,7 +106,7 @@ class Discovery {
         if (File::exists($path)) {
             $result = File::read($path);
         }
-        if (empty($result)) {
+        if ($result === "") {
             $path   = self::getFramePath(self::DataDir, self::EmailFile);
             $result = File::read($path);
         }
