@@ -45,7 +45,7 @@ class StatusQuery extends BaseQuery {
      * @return Query
      */
     public function in(array $statuses, ?bool $condition = null): Query {
-        if (empty($statuses)) {
+        if (count($statuses) === 0) {
             return $this->query;
         }
         $values = $this->getValues($statuses);
@@ -59,7 +59,7 @@ class StatusQuery extends BaseQuery {
      * @return Query
      */
     public function notIn(array $statuses, ?bool $condition = null): Query {
-        if (empty($statuses)) {
+        if (count($statuses) === 0) {
             return $this->query;
         }
         $values = $this->getValues($statuses);

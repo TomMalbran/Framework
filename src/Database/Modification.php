@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Database\Structure;
 use Framework\Database\Query;
+use Framework\Utils\Arrays;
 
 /**
  * The Schema Modification
@@ -63,7 +64,7 @@ class Modification {
         if ($request !== null) {
             $this->fields = $this->parseFields($request, $skipEmpty, $skipUnset);
         }
-        if (!empty($fields)) {
+        if (count($fields) > 0) {
             $this->fields = array_merge($this->fields, $fields);
         }
         return $this;
@@ -87,7 +88,7 @@ class Modification {
             }
 
             $value = $field->fromRequest($request);
-            if ($skipEmpty && empty($value)) {
+            if ($skipEmpty && Arrays::isEmpty($value)) {
                 continue;
             }
 
@@ -96,7 +97,7 @@ class Modification {
                     $result[$field->key] = $value;
                 }
             } elseif ($field->noEmpty) {
-                if (!empty($value)) {
+                if (!Arrays::isEmpty($value)) {
                     $result[$field->key] = $value;
                 }
             } elseif ($value !== null) {
@@ -112,15 +113,15 @@ class Modification {
      * @return Modification
      */
     public function addCreation(int $credentialID = 0): Modification {
-        if ($this->structure->canDelete && empty($this->fields["isDeleted"])) {
+        if ($this->structure->canDelete && Arrays::isEmpty($this->fields, "isDeleted")) {
             $this->fields["isDeleted"] = 0;
         }
 
         if ($this->structure->canCreate) {
-            if ($this->structure->hasTimestamps && empty($this->fields["createdTime"])) {
+            if ($this->structure->hasTimestamps && Arrays::isEmpty($this->fields, "createdTime")) {
                 $this->fields["createdTime"] = time();
             }
-            if ($this->structure->hasUsers && !empty($credentialID)) {
+            if ($this->structure->hasUsers && $credentialID !== 0) {
                 $this->fields["createdUser"] = $credentialID;
             }
         }
@@ -137,10 +138,10 @@ class Modification {
             return $this;
         }
 
-        if ($this->structure->hasTimestamps && empty($this->fields["modifiedTime"])) {
+        if ($this->structure->hasTimestamps && Arrays::isEmpty($this->fields, "modifiedTime")) {
             $this->fields["modifiedTime"] = time();
         }
-        if ($this->structure->hasUsers && !empty($credentialID)) {
+        if ($this->structure->hasUsers && $credentialID !== 0) {
             $this->fields["modifiedUser"] = $credentialID;
         }
         return $this;

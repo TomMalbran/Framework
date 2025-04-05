@@ -78,7 +78,7 @@ class Count {
      * @return string
      */
     private function getWhere(): string {
-        if (empty($this->where) && !$this->noDeleted) {
+        if (count($this->where) === 0 && !$this->noDeleted) {
             return "";
         }
 
@@ -94,7 +94,7 @@ class Count {
             }
         }
 
-        if (empty($query)) {
+        if (count($query) === 0) {
             return "";
         }
         return "WHERE " . Strings::join($query, " AND ");
@@ -118,7 +118,7 @@ class Count {
      */
     public function getValue(array $data): mixed {
         $key    = $this->key;
-        $result = !empty($data[$key]) ? $data[$key] : 0;
+        $result = $data[$key] ?? 0;
 
         if ($this->field->type === Field::Float) {
             $result = Numbers::toFloat($result, $this->field->decimals);

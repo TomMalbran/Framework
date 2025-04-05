@@ -60,9 +60,7 @@ class Database {
      * Closes the connection
      */
     public function __destruct() {
-        if (!empty($this->mysqli)) {
-            $this->mysqli->close();
-        }
+        $this->mysqli->close();
     }
 
 
@@ -76,7 +74,7 @@ class Database {
         if ($this->mysqli->connect_error !== null) {
             trigger_error("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}", E_USER_ERROR);
         }
-        if (!empty($this->charset)) {
+        if ($this->charset !== "") {
             $this->mysqli->set_charset($this->charset);
         }
         return true;
@@ -138,7 +136,7 @@ class Database {
         $expression = "SELECT $selection FROM `$table` ";
         $params     = [];
 
-        if (!empty($query)) {
+        if ($query !== null) {
             $expression .= $query->get();
             $params      = $query->params;
         }
@@ -205,7 +203,7 @@ class Database {
         $expression .= $this->buildTableData($fields, $bindParams, true);
         $statement   = $this->processQuery($expression, $bindParams);
 
-        if (empty($statement)) {
+        if ($statement === null) {
             return 0;
         }
         $result = $statement->affected_rows > 0 ? (int)$statement->insert_id : -1;
@@ -312,7 +310,7 @@ class Database {
                 return null;
             }
 
-            if (!empty($bindParams)) {
+            if (count($bindParams) > 0) {
                 $types  = "";
                 $params = [];
                 foreach ($bindParams as $value) {
@@ -560,13 +558,14 @@ class Database {
      * @return string[]
      */
     public function getTables(?array $filter = null): array {
-        $request = $this->query("SHOW TABLES FROM `$this->database`");
-        $result  = [];
+        $request   = $this->query("SHOW TABLES FROM `$this->database`");
+        $hasFilter = $filter !== null;
+        $result    = [];
 
         foreach ($request as $row) {
             foreach ($row as $value) {
                 $tableName = Strings::toString($value);
-                if ((!empty($filter) && !Arrays::contains($filter, $tableName)) || empty($filter)) {
+                if (($hasFilter && !Arrays::contains($filter, $tableName)) || !$hasFilter) {
                     $result[] = $tableName;
                 }
             }
@@ -581,7 +580,7 @@ class Database {
      */
     public function hasTable(string $tableName): bool {
         $request = $this->query("SHOW TABLES LIKE '$tableName'");
-        return !empty($request);
+        return !Arrays::isEmpty($request);
     }
 
     /**
@@ -656,7 +655,7 @@ class Database {
     public function tableExists(string $tableName): bool {
         $sql    = "SHOW TABLES LIKE '$tableName'";
         $result = $this->query($sql);
-        return !empty($result);
+        return !Arrays::isEmpty($result);
     }
 
     /**
@@ -667,7 +666,7 @@ class Database {
     public function tableIsEmpty(string $tableName): bool {
         $sql    = "SELECT COUNT(*) AS count FROM `$tableName`";
         $result = $this->query($sql);
-        return empty($result) || $result[0]["count"] === 0;
+        return !isset($result[0]) || $result[0]["count"] === 0;
     }
 
     /**
@@ -679,7 +678,7 @@ class Database {
      * @return string
      */
     public function createTable(string $tableName, array $fields, array $primary, array $keys): string {
-        $charset = !empty($this->charset) ? $this->charset : "utf8";
+        $charset = $this->charset !== "" ? $this->charset : "utf8";
         $sql     = "CREATE TABLE `$tableName` (\n";
 
         foreach ($fields as $key => $type) {
@@ -727,7 +726,7 @@ class Database {
      */
     public function columnExists(string $tableName, string $column): bool {
         $type = $this->getColumnType($tableName, $column);
-        return !empty($type);
+        return $type !== "";
     }
 
     /**
@@ -739,7 +738,7 @@ class Database {
     public function getColumnType(string $tableName, string $column): string {
         $sql    = "SHOW COLUMNS FROM `$tableName` LIKE '$column'";
         $result = $this->query($sql);
-        return !empty($result) ? $this->parseColumnType($result[0]) : "";
+        return isset($result[0]) ? $this->parseColumnType($result[0]) : "";
     }
 
     /**
@@ -771,15 +770,15 @@ class Database {
 
     /**
      * Renames a Column from the Table
-     * @param string      $tableName
-     * @param string      $column
-     * @param string      $type
-     * @param string|null $afterColumn Optional.
+     * @param string $tableName
+     * @param string $column
+     * @param string $type
+     * @param string $afterColumn Optional.
      * @return string
      */
-    public function addColumn(string $tableName, string $column, string $type, ?string $afterColumn = null): string {
+    public function addColumn(string $tableName, string $column, string $type, string $afterColumn = ""): string {
         $sql  = "ALTER TABLE `$tableName` ADD COLUMN `$column` $type ";
-        $sql .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
+        $sql .= $afterColumn !== "" ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;
     }
@@ -793,7 +792,7 @@ class Database {
      * @return string
      */
     public function renameColumn(string $tableName, string $oldColumn, string $newColumn, string $type = ""): string {
-        if (empty($type)) {
+        if ($type === "") {
             $sql = "ALTER TABLE `$tableName` RENAME COLUMN `$oldColumn` TO `$newColumn`";
         } else {
             $sql = "ALTER TABLE `$tableName` CHANGE `$oldColumn` `$newColumn` $type";
@@ -804,15 +803,15 @@ class Database {
 
     /**
      * Updates a Column from the Table
-     * @param string      $tableName
-     * @param string      $column
-     * @param string      $type
-     * @param string|null $afterColumn Optional.
+     * @param string $tableName
+     * @param string $column
+     * @param string $type
+     * @param string $afterColumn Optional.
      * @return string
      */
-    public function updateColumn(string $tableName, string $column, string $type, ?string $afterColumn = null): string {
+    public function updateColumn(string $tableName, string $column, string $type, string $afterColumn = ""): string {
         $sql  = "ALTER TABLE `$tableName` MODIFY COLUMN `$column` $type ";
-        $sql .= !empty($afterColumn) ? "AFTER `$afterColumn`" : "FIRST";
+        $sql .= $afterColumn !== "" ? "AFTER `$afterColumn`" : "FIRST";
         $this->query($sql);
         return $sql;
     }
@@ -910,7 +909,7 @@ class Database {
 
             // Are there any rows in this table?
             $rows = $this->getTableContent($table);
-            if (!empty($rows)) {
+            if ($rows !== "") {
                 $this->write(
                     $fp,
                     $crlf .
@@ -998,7 +997,7 @@ class Database {
             // IS this a primary key, unique index, or regular index?
             if ($keyName === "PRIMARY") {
                 $row["Key_name"] = "PRIMARY KEY";
-            } elseif (empty($row["Non_unique"])) {
+            } elseif (!isset($row["Non_unique"])) {
                 $row["Key_name"] = "UNIQUE $keyName";
             } elseif ($row["Comment"] === "FULLTEXT" || (isset($row["Index_type"]) && $row["Index_type"] === "FULLTEXT")) {
                 $row["Key_name"] = "FULLTEXT $keyName";
@@ -1007,7 +1006,7 @@ class Database {
             }
 
             // Is this the first column in the index?
-            if (empty($indexes[$row["Key_name"]])) {
+            if (!isset($indexes[$row["Key_name"]])) {
                 $indexes[$row["Key_name"]] = [];
             }
 
@@ -1057,7 +1056,7 @@ class Database {
             $request = $this->query("SELECT /*!40001 SQL_NO_CACHE */ * FROM `$tableName` LIMIT $start, 250");
             $start  += 250;
 
-            if (!empty($request)) {
+            if (!Arrays::isEmpty($request)) {
                 $result .= "INSERT INTO `$tableName` $crlf\t(`" . Strings::joinKeys($request[0], "`, `") . "`) $crlf VALUES ";
 
                 foreach ($request as $index => $row) {
@@ -1078,7 +1077,7 @@ class Database {
                 }
                 $result .= ";$crlf";
             }
-        } while (!empty($request));
+        } while (!Arrays::isEmpty($request));
 
         return $result;
     }

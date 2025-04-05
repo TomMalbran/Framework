@@ -57,7 +57,7 @@ class Schema {
      */
     public static function hasPrimaryKey(): bool {
         $keys = self::db()->getPrimaryKeys(self::structure()->table);
-        return !empty($keys);
+        return count($keys) > 0;
     }
 
     /**
@@ -81,7 +81,7 @@ class Schema {
     protected static function getSchemaEntity(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): array {
         $query   = self::generateQueryID($query, $withDeleted)->limit(1);
         $request = self::requestSchemaData($query, decrypted: $decrypted);
-        return !empty($request[0]) ? $request[0] : [];
+        return isset($request[0]) ? $request[0] : [];
     }
 
     /**
@@ -112,10 +112,10 @@ class Schema {
         $request = $selection->resolve();
         $result  = [];
 
-        $columnKey = !empty($columnKey) ? $columnKey : Strings::substringAfter($column, ".");
+        $columnKey = $columnKey !== "" ? $columnKey : Strings::substringAfter($column, ".");
         foreach ($request as $row) {
             $value = $row[$columnKey];
-            if (!empty($value) && !Arrays::contains($result, $value)) {
+            if (!Arrays::isEmpty($value) && !Arrays::contains($result, $value)) {
                 if (is_string($value) || is_int($value)) {
                     $result[] = $value;
                 }
@@ -174,7 +174,7 @@ class Schema {
         $request = $selection->resolve();
 
         $keyName = $idColumn ?? self::structure()->idName;
-        $valName = !empty($nameColumn) ? $nameColumn : self::structure()->nameKey;
+        $valName = $nameColumn !== null && !Arrays::isEmpty($nameColumn) ? $nameColumn : self::structure()->nameKey;
         return Select::create($request, $keyName, $valName, $useEmpty, $extraColumn, true);
     }
 
@@ -194,9 +194,14 @@ class Schema {
     ): array {
         $query   = self::generateQuery($query)->limit($limit);
         $request = self::requestSchemaData($query);
-        $idKey   = !empty($idColumn)   ? $idColumn   : self::structure()->idName;
-        $nameKey = !empty($nameColumn) ? $nameColumn : self::structure()->nameKey;
-        return Search::create($request, $idKey, $nameKey);
+
+        if ($idColumn === null || $idColumn === "") {
+            $idColumn = self::structure()->idName;
+        }
+        if ($nameColumn === null || Arrays::isEmpty($nameColumn)) {
+            $nameColumn = self::structure()->nameKey;
+        }
+        return Search::create($request, $idColumn, $nameColumn);
     }
 
 
@@ -235,7 +240,7 @@ class Schema {
         $expression = self::structure()->replaceTable($expression);
         $request    = self::db()->getData($expression, $query);
 
-        if (!empty($request[0])) {
+        if (isset($request[0])) {
             return $request[0];
         }
         return [];
@@ -512,9 +517,9 @@ class Schema {
      * @return integer
      */
     protected static function ensureSchemaOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
-        $isCreate     = empty($oldFields)  && !empty($newFields);
-        $isEdit       = !empty($oldFields) && !empty($newFields);
-        $isDelete     = !empty($oldFields) && empty($newFields);
+        $isCreate     = Arrays::isEmpty($oldFields)  && !Arrays::isEmpty($newFields);
+        $isEdit       = !Arrays::isEmpty($oldFields) && !Arrays::isEmpty($newFields);
+        $isDelete     = !Arrays::isEmpty($oldFields) && Arrays::isEmpty($newFields);
 
         $oldPosition  = Numbers::toInt(Arrays::getOneValue($oldFields, "position", default: 0));
         $newPosition  = Numbers::toInt(Arrays::getOneValue($newFields, "position", default: 0));
@@ -572,7 +577,7 @@ class Schema {
         $query->limit(1);
 
         $request = $selection->request($query);
-        if (!empty($request[0])) {
+        if (isset($request[0])) {
             return Numbers::toInt($request[0]["position"]) + 1;
         }
         return 1;
@@ -595,14 +600,14 @@ class Schema {
         ?Query $query = null,
     ): bool {
         $updated = false;
-        if (!empty($newValue) && empty($oldValue)) {
+        if ($newValue !== 0 && $oldValue === 0) {
             $newQuery = new Query($query);
             $newQuery->add(self::structure()->idKey, "<>", $id);
             $newQuery->add($column, "=", 1);
             self::editSchemaEntity($newQuery, null, [ $column => 0 ]);
             $updated = true;
         }
-        if (empty($newValue) && !empty($oldValue)) {
+        if ($newValue === 0 && $oldValue !== 0) {
             $newQuery = self::generateQuery($query, true);
             $newQuery->orderBy(self::structure()->getOrder(), true);
             $newQuery->limit(1);
@@ -636,7 +641,7 @@ class Schema {
     private static function generateQuerySort(?Query $query = null, ?Request $sort = null): Query {
         $query = self::generateQuery($query);
 
-        if (!empty($sort)) {
+        if ($sort !== null) {
             if ($sort->has("orderBy")) {
                 $query->orderBy($sort->getString("orderBy"), $sort->has("orderAsc"));
             }

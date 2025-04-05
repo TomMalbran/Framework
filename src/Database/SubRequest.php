@@ -73,16 +73,16 @@ class SubRequest {
         $subResult = [];
 
         foreach ($request as $row) {
-            if (empty($row[$this->idName])) {
+            if (!isset($row[$this->idName])) {
                 continue;
             }
 
             $name = $row[$this->idName];
-            if (empty($subResult[$name])) {
+            if (!isset($subResult[$name])) {
                 $subResult[$name] = [];
             }
 
-            if (empty($this->field)) {
+            if ($this->field === "") {
                 $subResult[$name][] = $this->getValues($row);
                 continue;
             }
@@ -93,7 +93,7 @@ class SubRequest {
                 continue;
             }
 
-            if (empty($subResult[$name][$field])) {
+            if (!isset($subResult[$name][$field])) {
                 $subResult[$name][$field] = [];
             }
             if (is_array($subResult[$name][$field])) {
@@ -138,7 +138,7 @@ class SubRequest {
      */
     private function createQuery(array $result): ?Query {
         $ids = Arrays::createArray($result, $this->idName);
-        if (empty($ids)) {
+        if (count($ids) === 0) {
             return null;
         }
         $query = Query::create($this->idKey, "IN", $ids);

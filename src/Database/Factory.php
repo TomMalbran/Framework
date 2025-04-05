@@ -37,7 +37,7 @@ class Factory {
         $frameSchemas = Discovery::loadFrameData(DataFile::Schemas);
 
         foreach ($appSchemas as $key => $data) {
-            if (empty($frameSchemas[$key])) {
+            if (!isset($frameSchemas[$key])) {
                 self::$data->set($key, $data);
             }
         }

@@ -99,7 +99,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function in(array $values, ?bool $condition = null): Query {
-        if (empty($values)) {
+        if (count($values) === 0) {
             return $this->query;
         }
         return $this->query->add($this->column, "IN", $values, condition: $condition);
@@ -112,7 +112,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function notIn(array $values, ?bool $condition = null): Query {
-        if (empty($values)) {
+        if (count($values) === 0) {
             return $this->query;
         }
         return $this->query->add($this->column, "NOT IN", $values, condition: $condition);

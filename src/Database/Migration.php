@@ -109,7 +109,7 @@ class Migration {
             }
 
             $type = $db->getColumnType($table, $fromName);
-            if (empty($type)) {
+            if ($type === "") {
                 continue;
             }
 
@@ -234,7 +234,7 @@ class Migration {
         $primary     = [];
         $addPrimary  = false;
         $dropPrimary = false;
-        $canDrop     = !empty($primaryKeys);
+        $canDrop     = count($primaryKeys) > 0;
         $keys        = [];
 
         // Add new Columns
@@ -267,7 +267,7 @@ class Migration {
                 ];
             } elseif (!$found) {
                 $update = true;
-                if ($field->isID && !empty($autoKey)) {
+                if ($field->isID && $autoKey !== "") {
                     $found         = true;
                     $primaryKeys[] = $field->key;
                     $renamed[]     = $autoKey;

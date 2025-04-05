@@ -217,7 +217,7 @@ class Structure {
      * @return string
      */
     public function getOrder(?string $field = null): string {
-        if (!empty($field)) {
+        if ($field !== null && $field !== "") {
             return $field;
         }
         return $this->hasPositions ? "position" : $this->nameKey;

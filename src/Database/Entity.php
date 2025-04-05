@@ -41,7 +41,7 @@ class Entity implements JsonSerializable {
      * @param mixed $data Optional.
      */
     final public function __construct(mixed $data = null) {
-        if (empty($data)) {
+        if ($data === null) {
             return;
         }
 
@@ -218,7 +218,7 @@ class Entity implements JsonSerializable {
      * @return boolean
      */
     final public function hasValue(string $key): bool {
-        return !empty($this->$key);
+        return $this->$key !== "";
     }
 
     /**

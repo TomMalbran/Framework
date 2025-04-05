@@ -121,16 +121,18 @@ class Generator {
      * @return string
      */
     private static function getSchemaCode(Structure $structure, string $namespace, array $folders): string {
-        $idType      = self::getFieldType($structure->idType);
-        $fields      = self::getAllFields($structure);
-        $uniques     = self::getFieldList($structure, "isUnique");
-        $parents     = self::getFieldList($structure, "isParent");
-        $subTypes    = self::getSubTypes($structure->subRequests, $folders);
-        $editParents = $structure->hasPositions ? $parents : [];
-        $queryName   = "{$structure->schema}Query";
+        $idType       = self::getFieldType($structure->idType);
+        $fields       = self::getAllFields($structure);
+        $uniques      = self::getFieldList($structure, "isUnique");
+        $parents      = self::getFieldList($structure, "isParent");
+        $subTypes     = self::getSubTypes($structure->subRequests, $folders);
+        $hasProcessed = count($structure->processed) > 0;
+        $hasParents   = count($parents) > 0;
+        $editParents  = $structure->hasPositions ? $parents : [];
+        $queryName    = "{$structure->schema}Query";
 
-        $template    = Discovery::loadFrameTemplate("Schema.mu");
-        $contents    = Mustache::render($template, [
+        $template     = Discovery::loadFrameTemplate("Schema.mu");
+        $contents     = Mustache::render($template, [
             "appNamespace"     => Package::Namespace,
             "namespace"        => $namespace,
             "name"             => $structure->schema,
@@ -163,9 +165,9 @@ class Generator {
             "canDelete"        => $structure->canDelete,
             "canRemove"        => $structure->canRemove,
             "canConvert"       => $structure->canEdit || $structure->canDelete || $structure->canRemove,
-            "processEntity"    => !empty($subTypes) || !empty($structure->processed) || $structure->hasStatus,
+            "processEntity"    => count($subTypes) > 0 || $hasProcessed || $structure->hasStatus,
             "subTypes"         => $subTypes,
-            "hasProcessed"     => !empty($structure->processed),
+            "hasProcessed"     => $hasProcessed,
             "fields"           => $fields,
             "fieldsCreateList" => self::joinFields($fields, "fieldArgCreate", ", "),
             "fieldsEditList"   => self::joinFields($fields, "fieldArgEdit", ", "),
@@ -177,9 +179,9 @@ class Generator {
             "parentsNullList"  => self::joinFields($parents, "fieldArgNull", ", "),
             "parentsDefList"   => self::joinFields($parents, "fieldArgDefault", ", "),
             "parentsEditList"  => self::joinFields($editParents, "fieldArg", ", "),
-            "hasParents"       => !empty($parents),
-            "hasEditParents"   => $structure->hasPositions && !empty($parents),
-            "hasMainQuery"     => $structure->hasFilters || !empty($parents),
+            "hasParents"       => $hasParents,
+            "hasEditParents"   => $structure->hasPositions && $hasParents,
+            "hasMainQuery"     => $structure->hasFilters || $hasParents,
         ]);
 
         $contents = self::alignParams($contents);
@@ -281,7 +283,7 @@ class Generator {
      * @return string
      */
     private static function joinFields(array $fields, string $key, string $prefix = ""): string {
-        if (empty($fields)) {
+        if (count($fields) === 0) {
             return "";
         }
         $list   = Arrays::createArray($fields, $key);
@@ -489,7 +491,7 @@ class Generator {
         }
 
         foreach ($attributes as $attribute) {
-            if (!empty($parsed[$attribute["name"]])) {
+            if (isset($parsed[$attribute["name"]])) {
                 continue;
             }
             $result[] = [

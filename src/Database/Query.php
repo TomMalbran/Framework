@@ -38,7 +38,7 @@ class Query {
      * @param Query|null $query Optional.
      */
     public function __construct(?Query $query = null) {
-        if (!empty($query)) {
+        if ($query !== null) {
             $this->where     = $query->where;
             $this->params    = $query->params;
             $this->prefix    = $query->prefix;
@@ -64,7 +64,7 @@ class Query {
      */
     public static function create(string $column = "", string $expression = "", array|int|string|null $value = null, bool $caseSensitive = false): Query {
         $query = new Query();
-        if (!empty($column) && $value !== null) {
+        if ($column !== "" && $value !== null) {
             $query->add($column, $expression, $value, $caseSensitive);
         }
         return $query;
@@ -181,7 +181,7 @@ class Query {
     public function addIf(string $column, string $expression, array|int|string|null $value, ?bool $condition = null): Query {
         if ($condition === true && $value !== null) {
             $this->add($column, $expression, $value);
-        } elseif ($condition === null && !empty($value)) {
+        } elseif ($condition === null && $value !== null && !Arrays::isEmpty($value)) {
             $this->add($column, $expression, $value);
         }
         return $this;
@@ -237,7 +237,7 @@ class Query {
         string       $splitText = " ",
         bool         $matchAny = false,
     ): Query {
-        if (empty($value)) {
+        if (Arrays::isEmpty($value)) {
             return $this;
         }
 
@@ -415,7 +415,7 @@ class Query {
      * @return Query
      */
     public function groupBy(string $column): Query {
-        $prefix         = !empty($this->groupBy) ? "," : "";
+        $prefix         = $this->groupBy !== "" ? "," : "";
         $this->groupBy .= "$prefix $column ";
         $this->groups[] = $column;
         return $this;
@@ -428,7 +428,7 @@ class Query {
      * @return Query
      */
     public function orderBy(string $column, bool $isASC = true): Query {
-        $prefix         = !empty($this->orderBy) ? "," : "";
+        $prefix         = $this->orderBy !== "" ? "," : "";
         $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
         $this->orders[] = $column;
         return $this;
@@ -441,7 +441,7 @@ class Query {
      * @return Query
      */
     public function limit(int $from, ?int $to = null): Query {
-        if (!empty($from) || !empty($to)) {
+        if ($from !== 0 || ($to !== null && $to !== 0)) {
             if ($to !== null) {
                 $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
             } else {
@@ -470,7 +470,7 @@ class Query {
      * @return boolean
      */
     public function isEmpty(): bool {
-        return empty($this->where);
+        return $this->where === "";
     }
 
     /**
@@ -488,10 +488,10 @@ class Query {
      * @return boolean
      */
     public function hasOrder(?string $order = null): bool {
-        if (!empty($order)) {
+        if ($order !== null && $order !== "") {
             return Arrays::contains($this->orders, $order);
         }
-        return !empty($this->orderBy);
+        return $this->orderBy !== "";
     }
 
     /**
@@ -500,10 +500,10 @@ class Query {
      * @return boolean
      */
     public function hasGroup(?string $group = null): bool {
-        if (!empty($group)) {
+        if ($group !== null && $group !== "") {
             return Arrays::contains($this->groups, $group);
         }
-        return !empty($this->groupBy);
+        return $this->groupBy !== "";
     }
 
 
@@ -515,16 +515,16 @@ class Query {
      */
     public function get(bool $addWhere = true): string {
         $result = "";
-        if (!empty($this->where)) {
+        if ($this->where !== "") {
             $result .= ($addWhere ? "WHERE " : "AND ") . $this->where;
         }
-        if (!empty($this->groupBy)) {
+        if ($this->groupBy !== "") {
             $result .= " GROUP BY {$this->groupBy}";
         }
-        if (!empty($this->orderBy)) {
+        if ($this->orderBy !== "") {
             $result .= " ORDER BY {$this->orderBy}";
         }
-        if (!empty($this->limit)) {
+        if ($this->limit !== "") {
             $result .= " LIMIT {$this->limit}";
         }
         return Strings::replacePattern($result, "!\s+!", " ");

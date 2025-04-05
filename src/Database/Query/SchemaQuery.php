@@ -132,7 +132,7 @@ class SchemaQuery {
      * @return Query
      */
     public function limit(int $from, ?int $to = null): Query {
-        if (!empty($from) || !empty($to)) {
+        if ($from !== 0 || ($to !== null && $to !== 0)) {
             return $this->query->limit($from, $to);
         }
         return $this->query;

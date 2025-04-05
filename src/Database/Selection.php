@@ -107,7 +107,7 @@ class Selection {
         $mainKey = $this->structure->table;
 
         foreach ($this->structure->joins as $join) {
-            if (!empty($join->asTable)) {
+            if ($join->asTable !== "") {
                 $asTable = $join->asTable;
             } elseif (Arrays::contains($this->tables, $join->table)) {
                 $asTable = chr($this->index++);
@@ -214,7 +214,7 @@ class Selection {
 
             if (!$found) {
                 foreach ($this->structure->counts as $count) {
-                    if (!empty($this->keys[$count->key])) {
+                    if (isset($this->keys[$count->key]) && $this->keys[$count->key] !== "") {
                         $joinKey = $this->keys[$count->key];
                         if ($column === $count->key) {
                             $query->updateColumn($column, "$joinKey.{$count->key}");
@@ -241,11 +241,11 @@ class Selection {
         foreach ($this->request as $row) {
             $fields = [];
             if ($this->structure->hasID) {
-                if (!empty($row["id"])) {
+                if (isset($row["id"])) {
                     $fields["id"] = $row["id"];
-                } elseif (!empty($row[$this->structure->idKey])) {
+                } elseif (isset($row[$this->structure->idKey])) {
                     $fields["id"] = $row[$this->structure->idKey];
-                } elseif (!empty($row[$this->structure->idName])) {
+                } elseif (isset($row[$this->structure->idName])) {
                     $fields["id"] = $row[$this->structure->idName];
                 }
             }
@@ -274,7 +274,7 @@ class Selection {
             }
 
             // Parse the Extras
-            if (!empty($extras)) {
+            if (!Arrays::isEmpty($extras)) {
                 $extras = Arrays::toStrings($extras);
                 foreach ($extras as $extra) {
                     $fields[$extra] = $row[$extra];

@@ -6,6 +6,7 @@ use Framework\File\FilePath;
 use Framework\Database\Assign;
 use Framework\System\Config;
 use Framework\System\Path;
+use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
@@ -120,7 +121,7 @@ class Field {
      */
     private function getFieldKey(): string {
         $result = $this->name;
-        if (!empty($this->prefix) && !$this->noPrefix) {
+        if ($this->prefix !== "" && !$this->noPrefix) {
             $result = $this->prefix . ucfirst($this->name);
         }
         return $result;
@@ -204,7 +205,7 @@ class Field {
         $result = $type;
         if ($withLength && $length > 0) {
             $result = "{$type}({$length}) $attributes";
-        } elseif (!empty($attributes)) {
+        } elseif ($attributes !== "") {
             $result = "$type $attributes";
         }
 
@@ -242,9 +243,9 @@ class Field {
             $result = $request->toInt($this->name, $this->decimals);
             break;
         case self::Date:
-            if (!empty($this->date) && !empty($this->hour)) {
+            if ($this->date !== "" && $this->hour !== "") {
                 $result = $request->toTimeHour($this->date, $this->hour, true);
-            } elseif (!empty($this->date)) {
+            } elseif ($this->date !== "") {
                 $result = $request->toDay($this->date, $this->dateType, true);
             } elseif (Numbers::isValid($request->get($this->name))) {
                 $result = $request->getInt($this->name);
@@ -282,7 +283,7 @@ class Field {
 
         switch ($this->type) {
         case self::Boolean:
-            $result[$key]           = !empty($data[$key]);
+            $result[$key]           = !Arrays::isEmpty($data, $key);
             break;
         case self::ID:
         case self::Number:
@@ -308,11 +309,11 @@ class Field {
             $result[$key]           = $text;
             break;
         case self::Encrypt:
-            $result[$key]           = !empty($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
+            $result[$key]           = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
             break;
         case self::File:
             $result[$key]           = $text;
-            if (!empty($this->path)) {
+            if ($this->path !== "") {
                 $result["{$key}Url"]   = $text !== "" ? FilePath::getUrl($this->path, $text) : "";
             } else {
                 $result["{$key}Url"]   = $text !== "" ? Path::getSourceUrl("0", $text) : "";

@@ -74,7 +74,7 @@ class Join {
             $this->fields[] = $field;
 
             if ($field->mergeTo !== "") {
-                if (empty($this->merges[$field->mergeTo])) {
+                if (!isset($this->merges[$field->mergeTo])) {
                     $mergeKey = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
                     $glue     = $data->getString("mergeGlue", " ");
                     $this->merges[$field->mergeTo] = new Merge($mergeKey, $glue);
@@ -84,7 +84,7 @@ class Join {
 
             if ($field->defaultTo !== "") {
                 $defaultKey = $this->hasPrefix ? $this->prefix . ucfirst($field->defaultTo) : $field->defaultTo;
-                if (empty($this->defaults[$defaultKey])) {
+                if (!isset($this->defaults[$defaultKey])) {
                     $this->defaults[$defaultKey] = [];
                 }
                 $this->defaults[$defaultKey][] = $field->prefixName;
@@ -111,10 +111,10 @@ class Join {
         }
 
         foreach ($this->defaults as $key => $fields) {
-            if (empty($result[$key])) {
+            if (!isset($result[$key])) {
                 $result[$key] = "";
                 foreach ($fields as $fieldKey) {
-                    if (!empty($data[$fieldKey])) {
+                    if (isset($data[$fieldKey])) {
                         $result[$key] = $data[$fieldKey];
                         break;
                     }
@@ -148,27 +148,27 @@ class Join {
         $onTable = $this->andTable !== "" ? $this->andTable : $asTable;
         $result  = "";
 
-        if (!empty($this->and)) {
+        if ($this->and !== "") {
             $result .= " AND {$this->and}";
         }
-        if (!empty($this->andKey)) {
+        if ($this->andKey !== "") {
             $result .= " AND $asTable.{$this->andKey} = $onTable.{$this->andKey}";
         }
-        if (!empty($this->andKeys)) {
+        if (count($this->andKeys) > 0) {
             $parts = [];
             foreach ($this->andKeys as $orKey) {
                 $parts[] = "$asTable.{$orKey} = $onTable.{$orKey}";
             }
             $result .= " AND " . implode(" AND ", $parts);
         }
-        if (!empty($this->orKeys)) {
+        if (count($this->orKeys) > 0) {
             $parts = [];
             foreach ($this->orKeys as $orKey) {
                 $parts[] = "$asTable.{$orKey} = $onTable.{$orKey}";
             }
             $result .= " AND (" . implode(" OR ", $parts) . ")";
         }
-        if (!empty($this->andValue)) {
+        if ($this->andValue !== "") {
             $result .= " AND $asTable.{$this->andValue} = ?";
         }
         if ($this->andDeleted) {
