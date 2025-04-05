@@ -276,7 +276,7 @@ class ErrorLog extends LogErrorSchema {
         for ($i = count($trace) - 1; $i >= 2; $i--) {
             $item       = $trace[$i];
             $backtrace .= "#{$index}- ";
-            $backtrace .= (!empty($item["file"]) ? self::getFilePath($item["file"]) : "<unknown file>") . " ";
+            $backtrace .= (isset($item["file"]) ? self::getFilePath($item["file"]) : "<unknown file>") . " ";
             $backtrace .= "(". ($item["line"] ?? "<unknown line>") . ") ";
             $backtrace .= " -> {$item["function"]}()" . "\n";
             $index     += 1;

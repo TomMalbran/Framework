@@ -72,7 +72,7 @@ class ActionLog extends LogActionSchema {
             $result[$lastIndex]["actions"][] = [
                 "module"      => $elem->module,
                 "action"      => $elem->action,
-                "dataID"      => !empty($elem->dataID) ? JSON::decodeAsArray($elem->dataID) : "",
+                "dataID"      => $elem->dataID !== "" ? JSON::decodeAsArray($elem->dataID) : "",
                 "createdTime" => $elem->createdTime,
             ];
         }
@@ -102,7 +102,7 @@ class ActionLog extends LogActionSchema {
      * @return integer
      */
     private static function getCredentialID(int $credentialID = 0): int {
-        if (!empty($credentialID)) {
+        if ($credentialID !== 0) {
             return $credentialID;
         }
         if (Auth::isLoggedAsUser()) {
@@ -120,10 +120,10 @@ class ActionLog extends LogActionSchema {
         $credentialID = self::getCredentialID();
         $sessionID    = SessionLog::getID($credentialID);
 
-        if ($destroy && !empty($sessionID)) {
+        if ($destroy && $sessionID !== 0) {
             SessionLog::end($sessionID);
         }
-        if ($destroy || empty($sessionID)) {
+        if ($destroy || $sessionID === 0) {
             SessionLog::start($credentialID);
             return true;
         }
@@ -137,7 +137,7 @@ class ActionLog extends LogActionSchema {
     public static function endSession(): bool {
         $credentialID = self::getCredentialID();
         $sessionID    = SessionLog::getID($credentialID);
-        if (empty($sessionID)) {
+        if ($sessionID === 0) {
             return false;
         }
         return SessionLog::end($sessionID);
@@ -154,7 +154,7 @@ class ActionLog extends LogActionSchema {
     public static function add(string $module, string $action, mixed $dataID = 0, int $credentialID = 0): bool {
         $credentialID = self::getCredentialID($credentialID);
         $sessionID    = SessionLog::getID($credentialID);
-        if (empty($sessionID)) {
+        if ($sessionID === 0) {
             return false;
         }
 
