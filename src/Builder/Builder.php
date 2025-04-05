@@ -15,6 +15,7 @@ use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\File\FileType;
 use Framework\Provider\Mustache;
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -110,12 +111,12 @@ class Builder {
                 continue;
             }
 
-            if (empty($dataDir) && Strings::endsWith($file, $schemasFile)) {
+            if ($dataDir === "" && Strings::endsWith($file, $schemasFile)) {
                 $dataDir = Strings::substringBetween($file, "$basePath/", "/$schemasFile");
-            } elseif (empty($templateDir) && Strings::endsWith($file, ".mu")) {
+            } elseif ($templateDir === "" && Strings::endsWith($file, ".mu")) {
                 $templateDir = Strings::substringAfter($file, "$basePath/");
                 $templateDir = Strings::substringBefore($templateDir, "/", false);
-            } elseif (empty($intFilesDir) && FileType::isImage($file)) {
+            } elseif ($intFilesDir === "" && FileType::isImage($file)) {
                 $intFilesDir = Strings::substringAfter($file, "$basePath/");
                 $intFilesDir = Strings::substringBefore($intFilesDir, "/", false);
             }
@@ -142,7 +143,7 @@ class Builder {
      * @return integer
      */
     private static function generateOne(string $writePath, string $name, array $data): int {
-        if (empty($data)) {
+        if (Arrays::isEmpty($data)) {
             return 0;
         }
 

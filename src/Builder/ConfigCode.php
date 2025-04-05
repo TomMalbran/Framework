@@ -3,6 +3,7 @@ namespace Framework\Builder;
 
 use Framework\Core\Configs;
 use Framework\Core\VariableType;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -16,7 +17,7 @@ class ConfigCode {
      */
     public static function getCode(): array {
         $data = Configs::getData();
-        if (empty($data)) {
+        if (Arrays::isEmpty($data)) {
             return [];
         }
 

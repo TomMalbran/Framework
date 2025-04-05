@@ -73,7 +73,7 @@ class SettingCode {
                     "section"   => $section,
                     "variable"  => $variable,
                     "prefix"    => $prefix,
-                    "title"     => !empty($prefix) ? "$prefix $title" : $title,
+                    "title"     => $prefix !== "" ? "$prefix $title" : $title,
                     "name"      => Strings::upperCaseFirst($variable),
                     "type"      => VariableType::getType($variableType),
                     "docType"   => VariableType::getDocType($variableType),

@@ -28,7 +28,7 @@ class SignalCode {
             $methods = $reflection->getMethods();
             foreach ($methods as $method) {
                 $attributes = $method->getAttributes(Listener::class);
-                if (empty($attributes)) {
+                if (!isset($attributes[0])) {
                     continue;
                 }
 
@@ -38,7 +38,7 @@ class SignalCode {
                 foreach ($listener->triggers as $trigger) {
                     $params = self::getParams($method, $uses);
 
-                    if (empty($signals[$trigger])) {
+                    if (!isset($signals[$trigger])) {
                         $signals[$trigger] = [
                             "event"    => $trigger,
                             "params"   => $params,
@@ -62,12 +62,12 @@ class SignalCode {
             return $a["event"] <=> $b["event"];
         });
 
-        if (empty($signals)) {
+        if (Arrays::isEmpty($signals)) {
             return [];
         }
         return [
             "uses"    => array_keys($uses),
-            "hasUses" => !empty($uses),
+            "hasUses" => count($uses) > 0,
             "signals" => $signals,
         ];
     }

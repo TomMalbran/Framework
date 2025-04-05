@@ -4,6 +4,7 @@ namespace Framework\Builder;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\Discovery\Route;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use ReflectionNamedType;
@@ -32,13 +33,13 @@ class RouterCode {
             $methods = $reflection->getMethods();
 
             // Add a space between the classes
-            if (!empty($methods) && !empty($routes)) {
+            if (count($methods) > 0 && count($routes) > 0) {
                 $routes[count($routes) - 1]["addSpace"] = true;
             }
 
             foreach ($methods as $method) {
                 $attributes = $method->getAttributes(Route::class);
-                if (empty($attributes)) {
+                if (!isset($attributes[0])) {
                     continue;
                 }
 
@@ -84,13 +85,13 @@ class RouterCode {
 
                 // Add the Test Route
                 $testMethods[$method->getName()] = $route->access->name;
-                if (empty($baseRoute)) {
+                if ($baseRoute === "") {
                     $baseRoute = Strings::substringBefore($route->route, "/", false);
                 }
             }
 
             // Store the Test Routes
-            if (!empty($testMethods)) {
+            if (count($testMethods) > 0) {
                 $testRoutes[$baseRoute] = [
                     "static" => true,
                     "module" => Strings::substringAfter($className, "App\\"),
@@ -110,12 +111,12 @@ class RouterCode {
 
         // Save the Test Data
         $oldData = Discovery::loadData(DataFile::Route);
-        if (!empty($oldData) && !empty($testRoutes)) {
+        if (!Arrays::isEmpty($oldData) && !Arrays::isEmpty($testRoutes)) {
             Discovery::saveData("routesTest", $testRoutes);
         }
 
         // Show the Error Routes
-        if (!empty($errorRoutes)) {
+        if (count($errorRoutes) > 0) {
             print("\nROUTES WITH ERROR:\n");
             foreach ($errorRoutes as $errorRoute) {
                 print("- $errorRoute\n\n");
@@ -124,7 +125,7 @@ class RouterCode {
         }
 
         return [
-            "hasRoutes" => !empty($routes),
+            "hasRoutes" => count($routes) > 0,
             "routes"    => $routes,
         ];
     }

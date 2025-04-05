@@ -40,7 +40,7 @@ class LanguageCode {
         }
 
         // If no languages are found, add a default one
-        if (empty($languages)) {
+        if (count($languages) === 0) {
             $languages[] = [
                 "code" => "es",
                 "name" => "Español",
