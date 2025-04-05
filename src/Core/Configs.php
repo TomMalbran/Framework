@@ -93,7 +93,7 @@ class Configs {
         $result   = [];
 
         foreach ($lines as $line) {
-            if (empty(trim($line)) || Strings::startsWith($line, "#")) {
+            if (trim($line) === "" || Strings::startsWith($line, "#")) {
                 continue;
             }
 
@@ -208,7 +208,7 @@ class Configs {
      */
     public static function getBoolean(string $property): bool {
         $value = self::get($property);
-        return !empty($value);
+        return !Arrays::isEmpty($value);
     }
 
     /**

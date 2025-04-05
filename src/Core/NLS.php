@@ -38,13 +38,13 @@ class NLS {
     private static function load(string $language): array {
         $langCode = Language::getCode($language);
 
-        if (!empty(self::$data[$langCode])) {
+        if (isset(self::$data[$langCode])) {
             return self::$data[$langCode];
         }
 
         /** @var array<string,mixed> */
         $data = Discovery::loadJSON(Package::StringsDir, $langCode);
-        if (!empty($data)) {
+        if (!Arrays::isEmpty($data)) {
             self::$data[$langCode] = $data;
             return self::$data[$langCode];
         }
@@ -59,12 +59,12 @@ class NLS {
      * @return mixed
      */
     public static function get(string $key, string $language = ""): mixed {
-        if (empty($language)) {
+        if ($language === "") {
             $language = self::$language;
         }
 
         $data = self::load($language);
-        if (!empty($data[$key])) {
+        if (isset($data[$key])) {
             return $data[$key];
         }
         return $key;
@@ -90,7 +90,7 @@ class NLS {
      */
     public static function getIndex(string $key, int|string $index, string $language = ""): string {
         $result = self::get($key, $language);
-        if (is_array($result) && !empty($result[$index])) {
+        if (is_array($result) && isset($result[$index])) {
             return Strings::toString($result[$index]);
         }
         return "";
@@ -151,7 +151,7 @@ class NLS {
     public static function getAll(array $keys, string $language = ""): array {
         $result = [];
         foreach ($keys as $key) {
-            if (!empty($key)) {
+            if ($key !== "") {
                 $result[] = self::getString($key, $language);
             }
         }
@@ -261,7 +261,7 @@ class NLS {
      */
     public static function join(array $strings, bool $useOr = false, string $language = ""): string {
         $strings = array_values($strings);
-        if (empty($strings)) {
+        if (count($strings) === 0) {
             return "";
         }
 

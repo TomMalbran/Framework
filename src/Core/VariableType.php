@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Core;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -95,7 +96,7 @@ enum VariableType {
      */
     public static function encodeValue(VariableType $type, mixed $value): string {
         return match ($type) {
-            self::Boolean => !empty($value) ? "1" : "0",
+            self::Boolean => !Arrays::isEmpty($value) ? "1" : "0",
             self::Array   => JSON::encode($value),
             default       => Strings::toString($value),
         };

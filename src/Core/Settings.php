@@ -113,14 +113,14 @@ class Settings extends SettingsSchema {
         $result = [];
 
         foreach ($list as $elem) {
-            if (empty($result[$elem->section])) {
+            if (!isset($result[$elem->section])) {
                 $result[$elem->section] = [];
             }
             $result[$elem->section][$elem->variable] = $elem->value;
         }
 
-        if (!empty($section)) {
-            $result = !empty($result[$section]) ? $result[$section] : [];
+        if ($section !== null && $section !== "") {
+            $result = $result[$section] ?? [];
         }
         return $asObject ? (object)$result : $result;
     }
@@ -256,7 +256,7 @@ class Settings extends SettingsSchema {
 
         // Process the SQL
         $didUpdate = false;
-        if (!empty($adds)) {
+        if (count($adds) > 0) {
             print("- Added " . count($adds) . " settings\n");
             print("    " . Strings::join($variables, ", ") . "\n");
             foreach ($adds as $add) {
@@ -270,7 +270,7 @@ class Settings extends SettingsSchema {
             $didUpdate = true;
         }
 
-        if (!empty($renames)) {
+        if (count($renames) > 0) {
             print("- Renamed " . count($renames) . " settings\n");
             foreach ($renames as $rename) {
                 $query = new SettingsQuery();
@@ -281,7 +281,7 @@ class Settings extends SettingsSchema {
             $didUpdate = true;
         }
 
-        if (!empty($modifies)) {
+        if (count($modifies) > 0) {
             print("- Modified " . count($modifies) . " settings\n");
             foreach ($modifies as $modify) {
                 $query = new SettingsQuery();
@@ -292,7 +292,7 @@ class Settings extends SettingsSchema {
             $didUpdate = true;
         }
 
-        if (!empty($deletes)) {
+        if (count($deletes) > 0) {
             print("- Deleted " . count($deletes) . " settings\n");
             $variables = [];
             foreach ($deletes as $delete) {
