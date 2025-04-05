@@ -50,7 +50,7 @@ class ImporterRow {
 
         if ($index < 0 || !isset($this->fields[$index])) {
             $result = "";
-        } elseif (!empty($this->fields[$index]) || $this->fields[$index] === "0") {
+        } elseif (!Arrays::isEmpty($this->fields, $index) || $this->fields[$index] === "0") {
             $result = $this->fields[$index];
         }
         return $splitResult ? Strings::split($result, ",", true, true) : $result;
