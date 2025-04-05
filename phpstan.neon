@@ -25,7 +25,7 @@ parameters:
         matchingInheritedMethodNames: true
         numericOperandsInArithmeticOperators: true
         strictFunctionCalls: true
-        dynamicCallOnStaticMethod: false
-        switchConditionsMatchingType: false
-        strictArrayFilter: false
-        illegalConstructorMethodCall: false
+        dynamicCallOnStaticMethod: true
+        switchConditionsMatchingType: true
+        strictArrayFilter: true
+        illegalConstructorMethodCall: true
