@@ -40,7 +40,7 @@ class Notification {
      * @return string|null
      */
     public static function sendToSome(string $title, string $body, string $url, string $dataType, int $dataID, array $playerIDs): ?string {
-        if (empty($playerIDs)) {
+        if (count($playerIDs) === 0) {
             return null;
         }
         return self::send($title, $body, $url, $dataType, $dataID, [
@@ -80,7 +80,7 @@ class Notification {
         }
 
         $icon = Config::getNotificationIcon();
-        if (!empty($icon)) {
+        if ($icon !== "") {
             $icon = FilePath::getInternalPath($icon);
         }
 
@@ -109,7 +109,7 @@ class Notification {
         ];
         $response = Curl::execute("POST", self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
 
-        if (!is_array($response) || empty($response["id"])) {
+        if (!is_array($response) || !isset($response["id"])) {
             return null;
         }
         return Strings::toString($response["id"]);

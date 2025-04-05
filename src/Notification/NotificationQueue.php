@@ -217,7 +217,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
             if (!Config::isNotificationActive()) {
                 $notificationResult = NotificationResult::InactiveSend;
-            } elseif (empty($playerIDs)) {
+            } elseif (count($playerIDs) === 0) {
                 $notificationResult = NotificationResult::NoDevices;
             } else {
                 $externalID = Notification::sendToSome(
@@ -228,7 +228,7 @@ class NotificationQueue extends NotificationQueueSchema {
                     $elem->dataID,
                     $playerIDs,
                 );
-                if (empty($externalID)) {
+                if ($externalID === null) {
                     $notificationResult = NotificationResult::ProviderError;
                 }
             }
