@@ -20,7 +20,7 @@ class Device extends CredentialDeviceSchema {
      */
     public static function has(int $credentialID): bool {
         $devices = self::getAllForCredential($credentialID);
-        return !empty($devices);
+        return count($devices) > 0;
     }
 
     /**
@@ -29,7 +29,7 @@ class Device extends CredentialDeviceSchema {
      * @return string[]
      */
     public static function getAllForCredential(array|int $credentialID): array {
-        if (empty($credentialID)) {
+        if (Arrays::isEmpty($credentialID)) {
             return [];
         }
 

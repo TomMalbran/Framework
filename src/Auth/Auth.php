@@ -430,7 +430,7 @@ class Auth {
      * @return CredentialEntity
      */
     public static function getCredential(): CredentialEntity {
-        if (empty(self::$credential)) {
+        if (self::$credential === null) {
             return new CredentialEntity();
         }
         return self::$credential;

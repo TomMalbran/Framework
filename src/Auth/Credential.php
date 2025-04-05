@@ -35,14 +35,14 @@ class Credential extends CredentialSchema {
         string|int $value = 1,
     ): CredentialQuery {
         $accessNames = Access::toStrings($accessName);
-        if (empty($accessNames)) {
+        if (Arrays::isEmpty($accessNames)) {
             return new CredentialQuery();
         }
 
         $query = new CredentialQuery();
         $query->access->in($accessNames);
 
-        if (!empty($filter)) {
+        if (!Arrays::isEmpty($filter)) {
             $filters = Arrays::toStrings($filter);
             foreach ($filters as $key) {
                 $query->query->add($key, "=", $value);
@@ -178,7 +178,7 @@ class Credential extends CredentialSchema {
      * @return CredentialEntity[]
      */
     public static function getAllWithIDs(array $credentialIDs, ?Request $sort = null): array {
-        if (empty($credentialIDs)) {
+        if (count($credentialIDs) === 0) {
             return [];
         }
 
@@ -311,7 +311,7 @@ class Credential extends CredentialSchema {
             $elem->credentialName = self::getName($elem);
             $elem->accessName     = Access::getName($elem->access);
 
-            if (!empty($elem->avatar)) {
+            if ($elem->avatar !== "") {
                 $elem->avatarFile = $elem->avatar;
                 $elem->avatar     = Path::getAvatarsUrl($elem->avatar);
             }
@@ -334,7 +334,7 @@ class Credential extends CredentialSchema {
      */
     private static function getCredential(?CredentialQuery $query = null, bool $complete = false): CredentialEntity {
         $list = self::getCredentials($query, null, $complete);
-        if (empty($list)) {
+        if (count($list) === 0) {
             return new CredentialEntity();
         }
         return $list[0];
@@ -377,7 +377,7 @@ class Credential extends CredentialSchema {
      * @return Select[]
      */
     public static function getSelectForIDs(array $credentialIDs): array {
-        if (empty($credentialIDs)) {
+        if (count($credentialIDs) === 0) {
             return [];
         }
 
@@ -497,7 +497,7 @@ class Credential extends CredentialSchema {
      * @return boolean
      */
     public static function reqPassChange(int $credentialID = 0, string $email = ""): bool {
-        if (empty($credentialID) && empty($email)) {
+        if ($credentialID === 0 && $email === "") {
             return false;
         }
 
@@ -619,12 +619,12 @@ class Credential extends CredentialSchema {
         ?Access $accessName = null,
         ?bool $reqPassChange = null,
     ): array {
-        $result = !empty($fields) ? $fields : [];
+        $result = $fields ?? [];
 
         $password = "";
         if ($request !== null) {
             $password = $request->getString("password");
-        } elseif (!empty($fields["password"])) {
+        } elseif (isset($fields["password"])) {
             $password = Strings::toString($fields["password"]);
         }
 
@@ -875,7 +875,7 @@ class Credential extends CredentialSchema {
      * @return array{password:string,salt:string}
      */
     public static function createHash(string $pass, string $salt = ""): array {
-        $salt = !empty($salt) ? $salt : Strings::random(50);
+        $salt = $salt !== "" ? $salt : Strings::random(50);
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, true));
         return [ "password" => $hash, "salt" => $salt ];
     }
@@ -894,13 +894,13 @@ class Credential extends CredentialSchema {
         $email     = Strings::toString(Arrays::getValue($data, "email",        prefix: $prefix));
         $result    = "";
 
-        if (!empty($firstName) || !empty($lastName)) {
+        if ($firstName !== "" || $lastName !== "") {
             $result = Strings::merge($firstName, $lastName);
-            if ($withEmail && !empty($email)) {
+            if ($withEmail && $email !== "") {
                 $result .= " ($email)";
             }
         }
-        if (empty($result) && !empty($id)) {
+        if ($result === "" && $id !== "") {
             $result = "#$id";
         }
         return $result;
@@ -918,10 +918,10 @@ class Credential extends CredentialSchema {
         $cellphone = Strings::toString(Arrays::getValue($data, "cellphone", prefix: $prefix));
         $iddRoot   = Strings::toString(Arrays::getValue($data, "iddRoot",   prefix: $prefix));
 
-        if (!empty($cellphone) && !empty($iddRoot)) {
+        if ($cellphone !== "" && $iddRoot !== "") {
             return ($withPlus ? "+" : "") . $iddRoot . $cellphone;
         }
-        if (!empty($cellphone)) {
+        if ($cellphone !== "") {
             return $cellphone;
         }
         return $phone;

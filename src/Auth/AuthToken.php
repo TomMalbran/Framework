@@ -156,7 +156,7 @@ class AuthToken {
      * @return array<string,string|integer>[]
      */
     public static function getAllForCredential(int $credentialID): array {
-        if (empty($credentialID)) {
+        if ($credentialID === 0) {
             return [];
         }
 
@@ -212,7 +212,7 @@ class AuthToken {
      */
     public static function deleteRefreshToken(string $refreshToken): bool {
         self::load();
-        if (empty($refreshToken)) {
+        if ($refreshToken === "") {
             return false;
         }
 
@@ -226,7 +226,7 @@ class AuthToken {
      */
     public static function deleteAllForCredential(int $credentialID): bool {
         self::load();
-        if (empty($credentialID)) {
+        if ($credentialID === 0) {
             return false;
         }
 
