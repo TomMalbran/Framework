@@ -57,6 +57,9 @@ class Numbers {
      * @return integer|float
      */
     public static function round(int|float $number, int $decimals): int|float {
+        if (is_int($number)) {
+            return $number;
+        }
         $padding = pow(10, $decimals);
         return round($number * $padding) / $padding;
     }
@@ -67,6 +70,9 @@ class Numbers {
      * @return integer
      */
     public static function roundInt(int|float $number): int {
+        if (is_int($number)) {
+            return $number;
+        }
         return (int)round($number);
     }
 
