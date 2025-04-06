@@ -49,7 +49,7 @@ class Language {
     public static function getCode(string $langName): string {
         $languages = self::getAll();
         $isoCode   = Strings::toLowerCase($langName);
-        if ($isoCode !== "root" && !empty($languages[$isoCode])) {
+        if ($isoCode !== "root" && isset($languages[$isoCode])) {
             return $isoCode;
         }
         return self::getRootCode();
