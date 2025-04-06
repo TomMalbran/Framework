@@ -83,7 +83,7 @@ class Mailjet {
      */
     public static function createContact(string $firstName, string $lastName, string $email): bool {
         $contactList = Config::getMailjetList();
-        if (empty($contactList)) {
+        if ($contactList === 0) {
             $response = self::execute("POST", "/v3/REST/contact", [
                 "Name"  => "$firstName $lastName",
                 "Email" => $email,
@@ -125,7 +125,7 @@ class Mailjet {
      */
     public static function deleteContact(string $email): bool {
         $contactList = Config::getMailjetList();
-        if (!empty($contactList)) {
+        if ($contactList !== 0) {
             self::execute("POST", "/v3/REST/contactslist/$contactList/managecontact", [
                 "Action" => "remove",
                 "Email"  => $email,

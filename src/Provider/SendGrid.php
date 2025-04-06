@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Utils\Arrays;
 
 /**
  * The SendGrid Provider
@@ -56,6 +57,6 @@ class SendGrid {
         }
         $response = Curl::execute("POST", $url, $params, $headers, jsonBody: true);
 
-        return empty($response);
+        return Arrays::isEmpty($response);
     }
 }

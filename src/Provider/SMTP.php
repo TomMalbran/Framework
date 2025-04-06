@@ -54,10 +54,10 @@ class SMTP {
         $email->Body        = $body;
 
         $email->addAddress($toEmail);
-        if (!empty($replyTo)) {
+        if ($replyTo !== "") {
             $email->addReplyTo($replyTo, $fromName);
         }
-        if (!empty($attachment)) {
+        if ($attachment !== "") {
             $email->addAttachment($attachment);
         }
 

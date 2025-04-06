@@ -18,7 +18,7 @@ class Microsoft {
      * @return array{email:string,firstName:string,lastName:string}|null
      */
     public static function getAuthAccount(string $idToken): ?array {
-        if (empty($idToken)) {
+        if ($idToken === "") {
             return null;
         }
 
@@ -63,9 +63,9 @@ class Microsoft {
      */
     public static function getAuthEmail(string $idToken): string {
         $account = self::getAuthAccount($idToken);
-        if (!empty($account["email"])) {
-            return $account["email"];
+        if ($account === null || $account["email"] === "") {
+            return "";
         }
-        return "";
+        return $account["email"];
     }
 }

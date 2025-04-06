@@ -18,7 +18,7 @@ class Facebook {
      * @return array{email:string,firstName:string,lastName:string}|null
      */
     public static function getAuthAccount(string $accessToken): ?array {
-        if (empty($accessToken)) {
+        if ($accessToken === "") {
             return null;
         }
 
@@ -27,7 +27,7 @@ class Facebook {
             "fields"       => "email,name,first_name,last_name",
             "access_token" => $accessToken,
         ]);
-        if (empty($response["email"])) {
+        if (!isset($response["email"])) {
             return null;
         }
 
@@ -53,7 +53,7 @@ class Facebook {
      */
     public static function getAuthEmail(string $idToken): string {
         $account = self::getAuthAccount($idToken);
-        if (!empty($account["email"])) {
+        if (isset($account["email"])) {
             return $account["email"];
         }
         return "";

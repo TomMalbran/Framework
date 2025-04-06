@@ -101,9 +101,10 @@ class OpenAI {
      * @return boolean
      */
     public static function modelExists(string $model): bool {
-        if (empty($model)) {
+        if ($model === "") {
             return false;
         }
+
         $response = self::get("/models/$model");
         return $response->hasValue("id");
     }

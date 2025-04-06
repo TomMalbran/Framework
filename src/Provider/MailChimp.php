@@ -123,7 +123,7 @@ class MailChimp {
     private static function getSubscribersRoute(string $route = ""): string {
         $listID = Config::getMailchimpList();
         $result = "lists/$listID/members";
-        if (!empty($route)) {
+        if ($route !== "") {
             $result .= "/$route";
         }
         return $result;
@@ -171,7 +171,7 @@ class MailChimp {
      */
     public static function getSubscriberStatus(string $email): string {
         $subscriber = self::getSubscriber($email);
-        if (empty($subscriber)) {
+        if ($subscriber === null) {
             return "";
         }
         return $subscriber->getString("status");
@@ -302,7 +302,7 @@ class MailChimp {
 
         // Create the Campaign
         $mailChimpID = self::createCampaign($subject, $emails, $folderID);
-        if (empty($mailChimpID)) {
+        if ($mailChimpID === "") {
             return null;
         }
 
@@ -317,7 +317,7 @@ class MailChimp {
         }
 
         // Send/Schedule the Campaign
-        if (empty($time) || self::mailCampaign($mailChimpID, $time)) {
+        if ($time === 0 || self::mailCampaign($mailChimpID, $time)) {
             return $mailChimpID;
         }
 
@@ -357,7 +357,7 @@ class MailChimp {
         }
 
         // Send/Schedule the Campaign
-        if (!empty($time) && !self::mailCampaign($mailChimpID, $time)) {
+        if ($time !== 0 && !self::mailCampaign($mailChimpID, $time)) {
             return false;
         }
 
@@ -374,7 +374,7 @@ class MailChimp {
      */
     private static function createCampaign(string $subject, ?array $emails = null, int $folderID = 0): string {
         $recipients = self::parseRecipients($emails);
-        if (empty($recipients)) {
+        if ($recipients === null || count($recipients) === 0) {
             return "";
         }
 
@@ -389,7 +389,7 @@ class MailChimp {
                 "to_name"      => "*|FNAME|*",
             ],
         ];
-        if (!empty($folderID)) {
+        if ($folderID !== 0) {
             $post["settings"]["folder_id"] = $folderID;
         }
         $response = self::post("campaigns", $post);
@@ -410,7 +410,7 @@ class MailChimp {
      */
     private static function editCampaign(string $mailChimpID, string $subject, ?array $emails = null, int $folderID = 0): bool {
         $recipients = self::parseRecipients($emails);
-        if (empty($recipients)) {
+        if ($recipients === null || count($recipients) === 0) {
             return false;
         }
 
@@ -421,7 +421,7 @@ class MailChimp {
                 "title"        => $subject,
             ],
         ];
-        if (!empty($folderID)) {
+        if ($folderID !== 0) {
             $post["settings"]["folder_id"] = $folderID;
         }
 
@@ -436,7 +436,7 @@ class MailChimp {
      */
     private static function parseRecipients(?array $emails = null): ?array {
         $recipients = [ "list_id" => Config::getMailchimpList() ];
-        if (empty($emails)) {
+        if ($emails === null || count($emails) === 0) {
             return $recipients;
         }
 
@@ -452,7 +452,7 @@ class MailChimp {
                 "value"          => $email,
             ];
         }
-        if (empty($conditions)) {
+        if (count($conditions) === 0) {
             return null;
         }
 
@@ -472,7 +472,7 @@ class MailChimp {
      */
     private static function placeContent(string $mailChimpID, int $templateID, ?array $sections = null): bool {
         $post = [ "template" => [ "id" => $templateID ] ];
-        if (!empty($sections)) {
+        if ($sections !== null && count($sections) > 0) {
             $post["template"]["sections"] = $sections;
         }
 
@@ -487,7 +487,7 @@ class MailChimp {
      * @return boolean
      */
     private static function mailCampaign(string $mailChimpID, int $time): bool {
-        if (empty($time)) {
+        if ($time === 0) {
             return false;
         }
 
@@ -559,7 +559,7 @@ class MailChimp {
             "clicksUnique" => 0,
             "clicksRate"   => 0,
         ];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
+        if (!Config::isMailchimpActive() || $mailChimpID === "" || $mailChimpID === "disabled") {
             return $result;
         }
 
@@ -587,7 +587,7 @@ class MailChimp {
      */
     public static function getSendDetails(string $mailChimpID): array {
         $result = [];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
+        if (!Config::isMailchimpActive() || $mailChimpID === "" || $mailChimpID === "disabled") {
             return $result;
         }
 
@@ -608,7 +608,7 @@ class MailChimp {
      */
     public static function getOpenDetails(string $mailChimpID): array {
         $result = [];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
+        if (!Config::isMailchimpActive() || $mailChimpID === "" || $mailChimpID === "disabled") {
             return $result;
         }
 
@@ -629,7 +629,7 @@ class MailChimp {
      */
     public static function getClickDetails(string $mailChimpID): array {
         $result = [];
-        if (!Config::isMailchimpActive() || empty($mailChimpID) || $mailChimpID === "disabled") {
+        if (!Config::isMailchimpActive() || $mailChimpID === "" || $mailChimpID === "disabled") {
             return $result;
         }
 

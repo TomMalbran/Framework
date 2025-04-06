@@ -75,7 +75,7 @@ class MercadoPago {
      * @return string
      */
     public static function getRedirectUrl(string $redirectUrl = ""): string {
-        if (!empty($redirectUrl)) {
+        if ($redirectUrl !== "") {
             return $redirectUrl;
         }
         return Config::getUrl(Config::getMpRedirectPath());
@@ -180,20 +180,20 @@ class MercadoPago {
             "expires"            => false,
         ];
 
-        if (!empty($payer)) {
+        if ($payer !== []) {
             $fields["payer"] = $payer;
         }
-        if (!empty($marketplaceFee)) {
+        if ($marketplaceFee !== 0.0) {
             $fields["marketplace_fee"] = $marketplaceFee;
         }
 
         $notificationPath = Config::getMpNotificationPath();
-        if (!empty($notificationPath)) {
+        if ($notificationPath !== "") {
             $fields["notification_url"] = Config::getUrl($notificationPath);
         }
 
         $backUrl = Config::getMpBackUrl();
-        if (!empty($backUrl)) {
+        if ($backUrl !== "") {
             $fields["back_urls"] = [
                 "success" => $backUrl,
                 "pending" => $backUrl,

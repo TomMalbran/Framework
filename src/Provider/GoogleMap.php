@@ -53,9 +53,9 @@ class GoogleMap {
         }
 
         $params = [ "key" => Config::getGoogleMapApiKey() ];
-        if (!empty($latitude) && !empty($longitude)) {
+        if ($latitude !== 0.0 && $longitude !== 0.0) {
             $params["latlng"] = "$latitude,$longitude";
-        } elseif (!empty($address)) {
+        } elseif ($address !== "") {
             $params["address"] = $address;
         } else {
             return [];
@@ -110,7 +110,7 @@ class GoogleMap {
         $response = new Dictionary($result);
 
         $value    = $response->getFirst("rows")->getFirst("elements")->getDict("distance")->getFloat("value");
-        if (empty($value)) {
+        if ($value === 0.0) {
             return null;
         }
         return $value / 1000;

@@ -18,7 +18,7 @@ class Google {
      * @return array{email:string,firstName:string,lastName:string}|null
      */
     public static function getAuthAccount(string $accessToken): ?array {
-        if (empty($accessToken)) {
+        if ($accessToken === "") {
             return null;
         }
 
@@ -26,7 +26,7 @@ class Google {
         $response = Curl::execute("GET", self::BaseUrl . "userinfo", null, [
             "Authorization" => "Bearer $accessToken",
         ]);
-        if (empty($response["email"])) {
+        if (!isset($response["email"])) {
             return null;
         }
 
@@ -44,7 +44,7 @@ class Google {
      */
     public static function getAuthEmail(string $accessToken): string {
         $account = self::getAuthAccount($accessToken);
-        if (!empty($account["email"])) {
+        if (isset($account["email"])) {
             return $account["email"];
         }
         return "";

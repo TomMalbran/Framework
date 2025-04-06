@@ -2,6 +2,7 @@
 /* code-spell: ignore RETURNTRANSFER, CUSTOMREQUEST, CONNECTTIMEOUT, POSTFIELDS, HTTPHEADER, FOLLOWLOCATION, HTTPGET, USERPWD, HEADERFUNCTION */
 namespace Framework\Provider;
 
+use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -73,10 +74,10 @@ class Curl {
                 $body = self::parseParams($params);
             }
 
-            if (!empty($body)) {
+            if (!Arrays::isEmpty($body)) {
                 $options[CURLOPT_POSTFIELDS] = $body;
             }
-            if (!empty($headers) && is_scalar($body)) {
+            if ($headers !== null && is_scalar($body)) {
                 $headers["Content-Length"] = (string)strlen($body);
             }
 
@@ -94,12 +95,12 @@ class Curl {
         }
 
         // Set the Headers
-        if (!empty($headers)) {
+        if ($headers !== null && count($headers) > 0) {
             $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
         }
 
         // Set the User and Password
-        if (!empty($userPass)) {
+        if ($userPass !== "") {
             $options[CURLOPT_USERPWD] = $userPass;
         }
 
@@ -137,7 +138,7 @@ class Curl {
         // Get the Response
         $response = $result;
         if ($jsonResponse) {
-            if (empty($result)) {
+            if ($result === false || $result === "") {
                 $response = [];
             } elseif (!JSON::isValid($result)) {
                 $response = [ "error" => $result ];
@@ -162,7 +163,7 @@ class Curl {
     private static function parseUrl(string $url, ?array $params = null): string {
         $content = self::parseParams($params);
         $prefix  = Strings::contains($url, "?") ? "&" : "?";
-        if (!empty($content)) {
+        if ($content !== "") {
             $url .= $prefix . $content;
         }
         return $url;
@@ -174,7 +175,7 @@ class Curl {
      * @return string
      */
     private static function parseParams(?array $params = null): string {
-        if (empty($params)) {
+        if ($params === null || count($params) === 0) {
             return "";
         }
 
@@ -230,7 +231,7 @@ class Curl {
         ];
 
         // Set the Headers
-        if (!empty($headers)) {
+        if ($headers !== null && count($headers) > 0) {
             $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
         }
 
@@ -240,7 +241,9 @@ class Curl {
         curl_exec($curl);
         curl_close($curl);
         fclose($file);
-        return !empty(curl_error($curl));
+
+        $error = curl_error($curl);
+        return $error !== "";
     }
 
     /**
@@ -263,7 +266,7 @@ class Curl {
         ];
 
         // Set the Headers
-        if (!empty($headers)) {
+        if ($headers !== null && count($headers) > 0) {
             $options[CURLOPT_HTTPHEADER] = self::parseHeader($headers);
         }
 

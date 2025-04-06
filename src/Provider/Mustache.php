@@ -20,7 +20,7 @@ class Mustache {
      * @return string
      */
     public static function render(string $template, array $data): string {
-        if (empty(self::$engine)) {
+        if (self::$engine === null) {
             Mustache_Autoloader::register();
             self::$engine = new Mustache_Engine();
         }
