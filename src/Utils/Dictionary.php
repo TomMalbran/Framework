@@ -339,6 +339,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         return [];
     }
 
+    /**
+     * Gets the value of the given key as a JSON
+     * @param string $key
+     * @return string
+     */
+    public function getJSON(string $key): string {
+        if ($this->has($key) && is_array($this->data[$key])) {
+            return JSON::encode($this->data[$key]);
+        }
+        return JSON::encode([]);
+    }
+
 
 
     /**
