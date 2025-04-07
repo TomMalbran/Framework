@@ -41,7 +41,7 @@ class Response {
         }
 
         $this->data["xAccessToken"] = $accessToken;
-        if (!empty($refreshToken)) {
+        if ($refreshToken !== "") {
             $this->data["xRefreshToken"] = $refreshToken;
         }
         return $this;
@@ -77,7 +77,7 @@ class Response {
      * @return Response
      */
     public function printData(): Response {
-        if (!empty($this->data["data"])) {
+        if (isset($this->data["data"])) {
             print(JSON::encode($this->data["data"], true));
         }
         return $this;

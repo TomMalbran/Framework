@@ -58,7 +58,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return mixed
      */
     public function get(string $key, mixed $default = ""): mixed {
-        return isset($this->request[$key]) ? $this->request[$key] : $default;
+        return $this->exists($key) ? $this->request[$key] : $default;
     }
 
     /**
@@ -68,7 +68,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return mixed
      */
     public function getOr(string $key, mixed $default): mixed {
-        return !empty($this->request[$key]) ? $this->request[$key] : $default;
+        return $this->has($key) ? $this->request[$key] : $default;
     }
 
     /**
@@ -78,7 +78,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getInt(string $key, int $default = 0): int {
-        if (isset($this->request[$key])) {
+        if ($this->exists($key)) {
             return Numbers::toInt($this->request[$key]);
         }
         return $default;
@@ -91,7 +91,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return float
      */
     public function getFloat(string $key, float $default = 0): float {
-        if (isset($this->request[$key])) {
+        if ($this->exists($key)) {
             return Numbers::toFloat($this->request[$key]);
         }
         return $default;
@@ -104,7 +104,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getString(string $key, string $default = ""): string {
-        if (isset($this->request[$key])) {
+        if ($this->exists($key)) {
             return trim(Strings::toString($this->request[$key]));
         }
         return $default;
@@ -233,11 +233,11 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function has(array|string|null $key = null, ?int $index = null): bool {
         if ($key === null) {
-            return !empty($this->request);
+            return !Arrays::isEmpty($this->request);
         }
         if (is_array($key)) {
             foreach ($key as $keyID) {
-                if (empty($this->request[$keyID])) {
+                if (Arrays::isEmpty($this->request, $keyID)) {
                     return false;
                 }
             }
@@ -245,12 +245,12 @@ class Request implements IteratorAggregate, JsonSerializable {
         }
         if ($index !== null) {
             return (
-                !empty($this->request[$key]) &&
+                isset($this->request[$key]) &&
                 is_array($this->request[$key]) &&
-                !empty($this->request[$key][$index])
+                !Arrays::isEmpty($this->request[$key], $index)
             );
         }
-        return !empty($this->request[$key]);
+        return !Arrays::isEmpty($this->request, $key);
     }
 
     /**
@@ -276,7 +276,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isActive(string $key): bool {
-        if (empty($this->request[$key])) {
+        if (!$this->has($key)) {
             return false;
         }
         $value = $this->request[$key];
@@ -312,7 +312,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isEmptyArray(string $key): bool {
         $array = $this->getArray($key);
-        return empty($array);
+        return Arrays::isEmpty($array);
     }
 
 
@@ -626,7 +626,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function toJSON(string $key): string {
         $value = $this->get($key);
-        if (empty($value)) {
+        if (Arrays::isEmpty($value)) {
             $value = [];
         } elseif (JSON::isValid($value)) {
             $value = JSON::decodeAsArray($value);
@@ -844,9 +844,9 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function hasFile(string $key): bool {
         return (
-            !empty($this->files[$key]) &&
+            isset($this->files[$key]) &&
             is_array($this->files[$key]) &&
-            !empty($this->files[$key]["name"])
+            isset($this->files[$key]["name"])
         );
     }
 
@@ -857,7 +857,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function hasSizeError(string $key): bool {
         if ($this->hasFile($key) && is_array($this->files[$key])) {
-            return !empty($this->files[$key]["error"]) && $this->files[$key]["error"] === UPLOAD_ERR_INI_SIZE;
+            return isset($this->files[$key]["error"]) && $this->files[$key]["error"] === UPLOAD_ERR_INI_SIZE;
         }
         return true;
     }

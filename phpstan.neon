@@ -11,7 +11,7 @@ parameters:
     # Strict Rules
     strictRules:
         noVariableVariables: false
-        disallowedEmpty: false
+        disallowedEmpty: true
 
         disallowedLooseComparison: true
         booleansInConditions: true

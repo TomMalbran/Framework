@@ -22,7 +22,7 @@ use Exception;
  */
 class Framework {
 
-    private static Database  $db;
+    private static ?Database $db       = null;
     private static ?Response $response = null;
 
 
@@ -93,7 +93,7 @@ class Framework {
 
         $data    = new Dictionary($_REQUEST);
         $payload = file_get_contents("php://input");
-        if (!empty($payload) && JSON::isValid($payload)) {
+        if ($payload !== false && $payload !== "" && JSON::isValid($payload)) {
             $data = JSON::decodeAsDictionary($payload);
         }
         return $data;
@@ -139,7 +139,7 @@ class Framework {
      * @return Database
      */
     public static function getDatabase(): Database {
-        if (empty(self::$db)) {
+        if (self::$db === null) {
             self::$db = new Database(
                 Config::getDbHost(),
                 Config::getDbUsername(),
