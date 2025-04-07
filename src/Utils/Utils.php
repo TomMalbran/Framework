@@ -26,7 +26,7 @@ class Utils {
      */
     public static function isValidEmail(string $email): bool {
         $result = filter_var($email, FILTER_VALIDATE_EMAIL);
-        return !empty($result);
+        return $result !== false;
     }
 
     /**
@@ -207,7 +207,7 @@ class Utils {
         $result = Strings::replace($parts[0], [ "-", "ñ" ], [ "", "n" ]);
         $result = Strings::substring($result, 0, 8);
 
-        if (!empty($email) && is_numeric($result[0])) {
+        if ($email !== "" && is_numeric($result[0])) {
             $result = Strings::substring($email[0] . $result, 0, 8);
         }
         return $result;
@@ -287,7 +287,7 @@ class Utils {
      * @return string
      */
     public static function getHost(string $url): string {
-        if (empty($url)) {
+        if ($url === "") {
             return "";
         }
         $result = parse_url($url, PHP_URL_HOST);
@@ -315,10 +315,10 @@ class Utils {
      */
     public static function verifyDelegation(string $domain, string $serverIP = ""): bool {
         $host = gethostbyname($domain);
-        if (!empty($serverIP)) {
-            return !empty($host) && $host === $serverIP;
+        if ($serverIP !== "") {
+            return $host !== "" && $host === $serverIP;
         }
-        return !empty($host) && $host !== $domain;
+        return $host !== "" && $host !== $domain;
     }
 
 
@@ -351,7 +351,7 @@ class Utils {
      * @return string
      */
     public static function getAvatarUrl(string $url, string $email): string {
-        if (!empty($url)) {
+        if ($url !== "") {
             return $url;
         }
         $username = md5($email);

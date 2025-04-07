@@ -59,7 +59,7 @@ class CSV {
         $lines  = Strings::split($value, "\n");
         $result = [];
         foreach ($lines as $line) {
-            if (!empty($line)) {
+            if (trim($line) !== "") {
                 $csv = str_getcsv($line, $separator);
                 $csv = Arrays::toStrings($csv);
                 $result[] = self::parseLine($csv, $fields);
@@ -75,7 +75,7 @@ class CSV {
      * @return string[]
      */
     private static function parseLine(array $value, array $fields): mixed {
-        if (empty($fields)) {
+        if (count($fields) === 0) {
             return $value;
         }
 
@@ -97,14 +97,14 @@ class CSV {
      */
     public static function readFile(string $path, string $separator = ",", bool $skipHeader = false): array {
         $content = File::read($path);
-        if (!empty($content)) {
+        if ($content === "") {
             return [];
         }
 
         $lines  = Strings::split($content, "\n", true);
         $result = [];
         foreach ($lines as $index => $line) {
-            if (!empty($line) && ($index > 0 || !$skipHeader)) {
+            if ($line !== "" && ($index > 0 || !$skipHeader)) {
                 $result[] = self::decode($line, $separator);
             }
         }

@@ -43,7 +43,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isEmpty(): bool {
-        return empty($this->data);
+        return count($this->data) === 0;
     }
 
     /**
@@ -53,7 +53,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      */
     public function isList(string $key = ""): bool {
         if ($key !== "") {
-            return !empty($this->data[$key]) && Arrays::isList($this->data[$key]);
+            return isset($this->data[$key]) && Arrays::isList($this->data[$key]);
         }
         return Arrays::isList($this->data);
     }
@@ -73,7 +73,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function hasValue(string $key): bool {
-        return !empty($this->data[$key]);
+        return !Arrays::isEmpty($this->data, $key);
     }
 
 
@@ -148,7 +148,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      */
     public function getBool(string $key): bool {
         if ($this->has($key) && !is_array($this->data[$key])) {
-            return !empty($this->data[$key]);
+            return $this->hasValue($key);
         }
         return false;
     }

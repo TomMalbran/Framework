@@ -77,7 +77,7 @@ class DateTime {
      * @return integer
      */
     public static function toUserTime(int $value, bool $useTimeZone = true): int {
-        if (!empty($value) && $useTimeZone) {
+        if ($value !== 0 && $useTimeZone) {
             return $value - (int)(self::$timeDiff * 3600);
         }
         return $value;
@@ -90,7 +90,7 @@ class DateTime {
      * @return integer
      */
     public static function toServerTime(int $value, bool $useTimeZone = true): int {
-        if (!empty($value) && $useTimeZone) {
+        if ($value !== 0 && $useTimeZone) {
             return $value + (int)(self::$timeDiff * 3600);
         }
         return $value;
@@ -125,12 +125,12 @@ class DateTime {
     public static function toTime(mixed $time, bool $useTimeZone = true): int {
         $timeStamp = 0;
         if (is_string($time)) {
-            $timeStamp = strtotime($time);
+            $timeStamp = Numbers::toInt(strtotime($time));
         } else {
             $timeStamp = Numbers::toInt($time);
         }
 
-        if (empty($timeStamp) || $timeStamp > 4294967295) {
+        if ($timeStamp === 0 || $timeStamp > 4294967295) {
             return 0;
         }
         return self::toServerTime($timeStamp, $useTimeZone);
@@ -145,12 +145,12 @@ class DateTime {
     public static function toTimeZone(mixed $time, ?float $timeZone = null): int {
         $timeStamp = 0;
         if (is_string($time)) {
-            $timeStamp = strtotime($time);
+            $timeStamp = Numbers::toInt(strtotime($time));
         } else {
             $timeStamp = Numbers::toInt($time);
         }
 
-        if (empty($timeStamp)) {
+        if ($timeStamp === 0) {
             return 0;
         }
         if ($timeZone !== null) {
@@ -166,7 +166,7 @@ class DateTime {
      * @return integer
      */
     public static function getTime(int $timeStamp = 0): int {
-        return !empty($timeStamp) ? $timeStamp : time();
+        return $timeStamp !== 0 ? $timeStamp : time();
     }
 
     /**
@@ -241,7 +241,7 @@ class DateTime {
      */
     public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
         $result = self::toTime($string, $useTimeZone);
-        if (!empty($result)) {
+        if ($result !== 0) {
             return $result + 12 * 3600 - (int)(self::$serverZone * 3600);
         }
         return 0;
@@ -255,7 +255,7 @@ class DateTime {
      */
     public static function toDayEnd(string $string, bool $useTimeZone = true): int {
         $result = self::toTime($string, $useTimeZone);
-        if (!empty($result)) {
+        if ($result !== 0) {
             return $result + 24 * 3600 - 1;
         }
         return 0;
@@ -269,8 +269,12 @@ class DateTime {
      * @return integer
      */
     public static function fromMonthYear(?int $month = null, ?int $year = null, bool $useTimeZone = false): int {
-        $month     = !empty($month) ? $month : self::getMonth();
-        $year      = !empty($year)  ? $year  : self::getYear();
+        if ($month === null || $month < 1 || $month > 12) {
+            $month = self::getMonth();
+        }
+        if ($year === null || $year === 0) {
+            $year = self::getYear();
+        }
         $timeStamp = self::createTime(1, $month, $year);
         return self::toTime($timeStamp, $useTimeZone);
     }
@@ -312,7 +316,7 @@ class DateTime {
         return (
             isset($parts[0]) && Numbers::isValid($parts[0], $minHour, $maxHour) &&
             isset($parts[1]) && Numbers::isValid($parts[1], 0, 59) &&
-            (empty($minutes) || Arrays::contains($minutes, $parts[1]))
+            ($minutes === null || Arrays::contains($minutes, $parts[1]))
         );
     }
 
@@ -455,7 +459,7 @@ class DateTime {
      */
     public static function format(mixed $time, string $format, ?float $timeZone = null): string {
         $timeStamp = self::toTimeZone($time, $timeZone);
-        if (empty($timeStamp)) {
+        if ($timeStamp === 0) {
             return "";
         }
         return date($format, $timeStamp);
@@ -469,7 +473,7 @@ class DateTime {
      * @return string
      */
     public static function toString(mixed $time, string $format, ?float $timeZone = null): string {
-        if (!empty(self::$formats[$format])) {
+        if (isset(self::$formats[$format])) {
             return self::format($time, self::$formats[$format], $timeZone);
         }
         return "";
@@ -809,7 +813,7 @@ class DateTime {
     public static function addMonths(int $timeStamp = 0, int $monthDiff = 0, int $day = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = self::createTime(
-            !empty($day) ? $day : self::getDay($timeStamp),
+            $day !== 0 ? $day : self::getDay($timeStamp),
             self::getMonth($timeStamp) + $monthDiff,
             self::getYear($timeStamp),
             (int)date("h", $timeStamp),
@@ -1145,7 +1149,7 @@ class DateTime {
         } else {
             $result = $hours * 60 + $minutes;
         }
-        if (!empty($timeZone)) {
+        if ($timeZone !== null) {
             $timeDiff = self::$serverZone - $timeZone;
             $result  += Numbers::roundInt($timeDiff * 60);
         }
@@ -1173,7 +1177,7 @@ class DateTime {
      */
     public static function timeToMinutes(string $time, ?float $timeZone = null): int {
         $parts = Strings::split($time, ":");
-        if (empty($parts) || count($parts) !== 2) {
+        if (count($parts) !== 2) {
             return 0;
         }
         return self::toMinutes((int)$parts[0], (int)$parts[1], $timeZone);
@@ -1211,8 +1215,8 @@ class DateTime {
      */
     public static function getAge(mixed $thisTime, mixed $otherTime = null, ?float $timeZone = null): int {
         $thisTimeStamp  = self::toTimeZone($thisTime, $timeZone);
-        $otherTimeStamp = !empty($otherTime) ? self::toTimeZone($otherTime, $timeZone) : time();
-        if (empty($thisTimeStamp)) {
+        $otherTimeStamp = $otherTime !== null ? self::toTimeZone($otherTime, $timeZone) : time();
+        if ($thisTimeStamp === 0) {
             return 0;
         }
 
@@ -1257,8 +1261,14 @@ class DateTime {
      * @return integer
      */
     public static function parseDate(string $text, string $language = ""): int {
-        $glue = Strings::contains($text, "/") ? "/" : (Strings::contains($text, "-") ? "-" : "");
-        if (!empty($glue)) {
+        $glue = "";
+        if (Strings::contains($text, "/")) {
+            $glue = "/";
+        } elseif (Strings::contains($text, "-")) {
+            $glue = "-";
+        }
+
+        if ($glue !== "") {
             return self::parseDateGlue($text, $glue);
         }
         return self::parseDateLang($text, $language);
@@ -1278,7 +1288,7 @@ class DateTime {
         $part2  = $amount > 2 ? (int)$parts[2] : 0;
 
         // We need at least 2 parts
-        if (empty($part0) || empty($part1)) {
+        if ($part0 === 0 || $part1 === 0) {
             return 0;
         }
 
@@ -1320,7 +1330,7 @@ class DateTime {
             }
 
             // Handle the Year
-            if (!empty($part2)) {
+            if ($part2 !== 0 && $part2 !== "") {
                 $yearStr = trim((string)$part2);
                 if (Strings::length($yearStr) === 2) {
                     if ((int)$yearStr >= 50) {
@@ -1356,18 +1366,18 @@ class DateTime {
 
         $numbers = Strings::getAllMatches($text, "!\d+!");
         $numbers = Arrays::toInts($numbers);
-        if (empty($numbers)) {
+        if (count($numbers) === 0) {
             return 0;
         }
 
         $monthNames = NLS::getList("DATE_TIME_MONTHS", $language);
         foreach ($monthNames as $index => $monthName) {
             if (Strings::containsCaseInsensitive($text, $monthName, Strings::substring($monthName, 0, 3))) {
-                $month = $index + 1;
+                $month = (int)$index + 1;
                 break;
             }
         }
-        if (empty($month)) {
+        if ($month === 0) {
             return 0;
         }
 
@@ -1375,7 +1385,7 @@ class DateTime {
             if ($number <= 0) {
                 continue;
             }
-            if (empty($day) && $number <= 31) {
+            if ($day === 0 && $number <= 31) {
                 $day = $number;
             } elseif ($number >= 1000) {
                 $year = $number;
@@ -1388,7 +1398,7 @@ class DateTime {
             }
         }
 
-        if (empty($day) || $year > 2100) {
+        if ($day === 0 || $year > 2100) {
             return 0;
         }
 

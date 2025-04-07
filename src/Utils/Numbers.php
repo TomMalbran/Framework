@@ -160,8 +160,8 @@ class Numbers {
      */
     public static function formatFloat(int|float $number, int $decimals, int $maxForDecimals = 1000, string $default = ""): string {
         $float = floatval($number);
-        if (!empty($float)) {
-            $decimals = (empty($maxForDecimals) || $float < $maxForDecimals) && !is_int($number) ? $decimals : 0;
+        if ($float !== 0.0) {
+            $decimals = ($maxForDecimals === 0 || $float < $maxForDecimals) && !is_int($number) ? $decimals : 0;
             return number_format($float, $decimals, ",", ".");
         }
         return $default;
@@ -255,7 +255,7 @@ class Numbers {
      * @return integer|float
      */
     public static function applyDiscount(int|float $number, int|float $percent): int|float {
-        if (empty($percent)) {
+        if ($percent === 0 || $percent === 0.0) {
             return $number;
         }
         $discount = (100 - min(100, $percent)) / 100;
@@ -269,7 +269,7 @@ class Numbers {
      * @return integer|float
      */
     public static function applyIncrement(int|float $number, int|float $percent): int|float {
-        if (empty($percent)) {
+        if ($percent === 0 || $percent === 0.0) {
             return $number;
         }
         $percent   = max(0, min(100, $percent));
@@ -425,7 +425,7 @@ class Numbers {
      * @return string
      */
     public static function zerosPad(int|float $value, int $amount): string {
-        if (!empty($value)) {
+        if ($value !== 0 && $value !== 0.0) {
             return str_pad((string)$value, $amount, "0", STR_PAD_LEFT);
         }
         return (string)$value;
@@ -480,7 +480,7 @@ class Numbers {
         $expression = Strings::replacePattern($expression, "/([+\-*\/])[+\-*\/]+/", "$1");
 
         // Calculate
-        if (empty($expression)) {
+        if ($expression === "") {
             return 0;
         }
         try {

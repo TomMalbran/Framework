@@ -95,7 +95,7 @@ class JSON {
      */
     public static function readFile(string|int ...$pathParts): array {
         $response = File::read(...$pathParts);
-        if (empty($response)) {
+        if ($response === "") {
             return [];
         }
         return self::decodeAsArray($response);
@@ -108,7 +108,7 @@ class JSON {
      */
     public static function readUrl(string $url): array {
         $response = File::readUrl($url);
-        if (empty($response)) {
+        if ($response === "") {
             return [];
         }
         return self::decodeAsArray($response);
@@ -130,7 +130,7 @@ class JSON {
         ];
         $context  = stream_context_create($options);
         $response = file_get_contents($url, false, $context);
-        if (empty($response)) {
+        if ($response === false || $response === "") {
             return [];
         }
         return self::decodeAsArray($response);

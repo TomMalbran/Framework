@@ -65,7 +65,7 @@ class Errors implements JsonSerializable {
      * @return Errors
      */
     public function incCount(string $section, int $amount = 1): Errors {
-        if (empty($this->counts[$section])) {
+        if (!isset($this->counts[$section])) {
             $this->counts[$section] = 0;
         }
         $this->counts[$section] += $amount;
@@ -102,10 +102,10 @@ class Errors implements JsonSerializable {
      * @return Errors
      */
     public function add(string $error, string $message, string|int|null $value = null): Errors {
-        if (empty($message)) {
+        if ($message === "") {
             return $this;
         }
-        if (!empty($value)) {
+        if ($value !== null) {
             $this->errors[$error] = [ $message, $value ];
         } else {
             $this->errors[$error] = $message;
@@ -136,7 +136,7 @@ class Errors implements JsonSerializable {
      * @return Errors
      */
     public function addFor(string $section, string $error, string $message, ?string $value = null): Errors {
-        if (empty($this->errors[$section])) {
+        if (!isset($this->errors[$section])) {
             $this->errors[$section] = 1;
         } elseif (is_int($this->errors[$section])) {
             $this->errors[$section] += 1;
@@ -152,7 +152,7 @@ class Errors implements JsonSerializable {
      * @return Errors
      */
     public function merge(Errors $errors, string $prefix = "", string $suffix = ""): Errors {
-        if (empty($prefix) && empty($suffix)) {
+        if ($prefix === "" && $suffix === "") {
             $this->errors += $errors->get();
             return $this;
         }
@@ -189,7 +189,7 @@ class Errors implements JsonSerializable {
      */
     public function has(array|string|null $error = null): bool {
         if ($error === null) {
-            return !empty($this->errors);
+            return count($this->errors) > 0;
         }
 
         $errors = Arrays::toStrings($error);
@@ -200,7 +200,7 @@ class Errors implements JsonSerializable {
                         return true;
                     }
                 }
-            } elseif (!empty($this->errors[$errorKey])) {
+            } elseif (isset($this->errors[$errorKey])) {
                 return true;
             }
         }

@@ -37,11 +37,11 @@ class Server {
      * @return string
      */
     public static function getUrl(bool $useForwarded = false): string {
-        if (empty($_SERVER["HTTP_HOST"])) {
+        if (!isset($_SERVER["HTTP_HOST"]) || $_SERVER["HTTP_HOST"] === "") {
             return "";
         }
 
-        $ssl         = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on";
+        $ssl         = isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on";
         $serverProto = Strings::toString($_SERVER["SERVER_PROTOCOL"]);
         $serverProto = Strings::toLowerCase($serverProto);
         $http        = Strings::substringBefore($serverProto, "/");
@@ -73,22 +73,18 @@ class Server {
      * @return string
      */
     public static function getIP(): string {
-        if (!empty($_SERVER)) {
-            if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
-                $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-            } elseif (isset($_SERVER["HTTP_CLIENT_IP"])) {
-                $ip = $_SERVER["HTTP_CLIENT_IP"];
-            } else {
-                $ip = $_SERVER["REMOTE_ADDR"];
-            }
+        if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
+            $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+        } elseif (isset($_SERVER["HTTP_CLIENT_IP"])) {
+            $ip = $_SERVER["HTTP_CLIENT_IP"];
+        } elseif (isset($_SERVER["REMOTE_ADDR"])) {
+            $ip = $_SERVER["REMOTE_ADDR"];
+        } elseif (getenv("HTTP_X_FORWARDED_FOR") !== false) {
+            $ip = getenv("HTTP_X_FORWARDED_FOR");
+        } elseif (getenv("HTTP_CLIENT_IP") !== false) {
+            $ip = getenv("HTTP_CLIENT_IP");
         } else {
-            if (getenv("HTTP_X_FORWARDED_FOR") !== false) {
-                $ip = getenv("HTTP_X_FORWARDED_FOR");
-            } elseif (getenv("HTTP_CLIENT_IP") !== false) {
-                $ip = getenv("HTTP_CLIENT_IP");
-            } else {
-                $ip = getenv("REMOTE_ADDR");
-            }
+            $ip = getenv("REMOTE_ADDR");
         }
         return Strings::toString($ip);
     }
@@ -135,7 +131,7 @@ class Server {
             $result[] = "Fluid";
         }
 
-        if (empty($result)) {
+        if (count($result) === 0) {
             $result[] = "Unknown";
         }
         return Strings::join($result, " ");

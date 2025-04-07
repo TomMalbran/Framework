@@ -141,12 +141,12 @@ class Select implements JsonSerializable {
             if ((!is_int($key) && !is_string($key)) || !is_string($value)) {
                 continue;
             }
-            if (($distinct && Arrays::contains($keys, $key)) || (!$useEmpty && empty($value))) {
+            if (($distinct && Arrays::contains($keys, $key)) || (!$useEmpty && $value === "")) {
                 continue;
             }
 
             $item = new Select($key, $value);
-            if (!empty($extraKey)) {
+            if (!Arrays::isEmpty($extraKey)) {
                 $extraKeyNames = Arrays::toStrings($extraKey);
                 foreach ($extraKeyNames as $extraKeyName) {
                     $item->set($extraKeyName, Arrays::getValue($row, $extraKeyName, useEmpty: true));

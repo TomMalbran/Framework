@@ -80,7 +80,7 @@ class TimeTable {
     public function encode(): string {
         $list = [];
         foreach ($this->timeTables as $timeTable) {
-            if (!empty($timeTable->days)) {
+            if (count($timeTable->days) > 0) {
                 $list[] = $timeTable;
             }
         }
@@ -127,7 +127,7 @@ class TimeTable {
                 $errors->add("$fieldKey-$index-to", "GENERAL_ERROR_PERIOD_TO_TIME");
                 $hasError = true;
             }
-            if (!empty($timeTable->from) && !empty($timeTable->to) && !DateTime::isValidHourPeriod($timeTable->from, $timeTable->to, true)) {
+            if ($timeTable->from !== "" && $timeTable->to !== "" && !DateTime::isValidHourPeriod($timeTable->from, $timeTable->to, true)) {
                 $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TO");
                 $hasError = true;
             }
@@ -145,7 +145,7 @@ class TimeTable {
      * @return boolean
      */
     public function isCurrent(int $timeStamp = 0, int $minuteGap = 0): bool {
-        if (empty($this->timeTables)) {
+        if (count($this->timeTables) === 0) {
             return false;
         }
 
@@ -173,7 +173,7 @@ class TimeTable {
      * @return integer
      */
     public function getCurrentEndTime(int $timeStamp = 0): int {
-        if (empty($this->timeTables)) {
+        if (count($this->timeTables) === 0) {
             return 0;
         }
 
@@ -204,7 +204,7 @@ class TimeTable {
      * @return integer
      */
     public function getNextStartTime(int $timeStamp = 0): int {
-        if (empty($this->timeTables)) {
+        if (count($this->timeTables) === 0) {
             return 0;
         }
 
@@ -252,7 +252,7 @@ class TimeTable {
         string $timeZone = "",
         string $isoCode = "",
     ): array {
-        if (empty($this->timeTables) && !$allDays) {
+        if (count($this->timeTables) === 0 && !$allDays) {
             return [];
         }
 
@@ -262,7 +262,7 @@ class TimeTable {
         $schedules = [];
         $days      = [];
         foreach ($this->timeTables as $timeTable) {
-            if (empty($timeTable->days)) {
+            if (count($timeTable->days) === 0) {
                 continue;
             }
 
@@ -275,7 +275,7 @@ class TimeTable {
                 $toHour   = DateTime::toString($toTime, "time");
                 $id       = "$fromHour-$toHour";
 
-                if (empty($schedules[$id])) {
+                if (!isset($schedules[$id])) {
                     $schedules[$id] = [
                         "fromHour" => $fromHour,
                         "toHour"   => $toHour,
@@ -294,11 +294,11 @@ class TimeTable {
         if ($allDays && count($days) < $maxDay) {
             $numbers = [];
             for ($i = $minDay; $i < $maxDay; $i++) {
-                if (empty($days[$i])) {
+                if (!isset($days[$i])) {
                     $numbers[] = $i;
                 }
             }
-            if (!empty($numbers)) {
+            if (count($numbers) > 0) {
                 $schedules[] = [
                     "fromHour" => "",
                     "toHour"   => "",
@@ -312,9 +312,9 @@ class TimeTable {
         foreach ($schedules as $id => $elem) {
             sort($schedules[$id]["times"]);
             sort($schedules[$id]["numbers"]);
-            if (!empty($elem["times"])) {
+            if (count($elem["times"]) > 0) {
                 foreach ($elem["times"] as $index => $dayTime) {
-                    if (!empty($dayTime)) {
+                    if ($dayTime !== 0) {
                         $schedules[$id]["days"][$index] = DateTime::getDayText(
                             $dayTime,
                             startMonday: $this->startMonday,
@@ -340,7 +340,7 @@ class TimeTable {
         }
 
         $zone = "";
-        if (!empty($timeZone)) {
+        if ($timeZone !== "") {
             $zone = DateTime::parseTimeZone((float)$timeZone);
             $zone = " ($zone)";
         }
@@ -392,7 +392,7 @@ class TimeTable {
                 $toHour = "24:00";
             }
 
-            if (empty($elem["fromHour"])) {
+            if ($elem["fromHour"] === "") {
                 $timeText = NLS::get($closedText, $isoCode);
             } else {
                 $timeText = NLS::format("TIME_TABLE_HOURS", [ $elem["fromHour"], $toHour ], $isoCode);
@@ -419,7 +419,7 @@ class TimeTable {
      */
     public function getText(string $timeZone = "", string $isoCode = ""): string {
         $list = $this->getList(false, $timeZone, $isoCode);
-        if (empty($list)) {
+        if (count($list) === 0) {
             return "";
         }
 

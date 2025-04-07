@@ -131,10 +131,10 @@ class Strings {
      */
     public static function getAllMatches(string $string, string $pattern): array {
         preg_match_all($pattern, $string, $matches);
-        if (empty($matches)) {
+        if (Arrays::isEmpty($matches)) {
             return [];
         }
-        if (count($matches) === 1 && !empty($matches[0])) {
+        if (count($matches) === 1 && isset($matches[0])) {
             return $matches[0];
         }
         return $matches;
@@ -807,7 +807,7 @@ class Strings {
      * @return string
      */
     public static function makeShort(string $string, int $length = 30, bool $asUtf8 = true): string {
-        if (empty($length)) {
+        if ($length === 0) {
             return $string;
         }
 

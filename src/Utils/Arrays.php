@@ -52,7 +52,7 @@ class Arrays {
      * @return mixed
      */
     public static function toObject(?array $array = null): mixed {
-        return !empty($array) ? $array : (object)[];
+        return !self::isEmpty($array) ? $array : (object)[];
     }
 
     /**
@@ -76,7 +76,7 @@ class Arrays {
             if (!Numbers::isValid($value, null)) {
                 continue;
             }
-            if ($withoutEmpty && empty($value)) {
+            if ($withoutEmpty && self::isEmpty($value)) {
                 continue;
             }
             $result[] = Numbers::toInt($value);
@@ -102,7 +102,7 @@ class Arrays {
         $result = [];
         foreach ($array as $row) {
             $value = self::getValue($row, $key);
-            if ($withoutEmpty && empty($value)) {
+            if ($withoutEmpty && self::isEmpty($value)) {
                 continue;
             }
             $result[] = Strings::toString($value);
@@ -171,8 +171,10 @@ class Arrays {
      */
     public static function isEmpty(mixed $array, string|int|null $key = null): bool {
         if ($key !== null && is_array($array)) {
+            // @phpstan-ignore empty.notAllowed
             return empty($array[$key]);
         }
+        // @phpstan-ignore empty.notAllowed
         return empty($array);
     }
 
@@ -191,7 +193,7 @@ class Arrays {
      * @return integer
      */
     public static function max(mixed $array): int {
-        if (empty($array) || !is_array($array)) {
+        if (self::isEmpty($array) || !is_array($array)) {
             return 0;
         }
 
@@ -281,7 +283,7 @@ class Arrays {
             return false;
         }
         foreach ($array as $index => $value) {
-            if (is_array($value) && !empty($key)) {
+            if (is_array($value) && $key !== "") {
                 if (!isset($value[$key]) || !self::contains($other, $value[$key], $key)) {
                     return false;
                 }
@@ -394,9 +396,9 @@ class Arrays {
         foreach ($array as $elem) {
             $shouldAdd = false;
             if (is_object($elem)) {
-                $shouldAdd = !empty($elem->$idKey) && $elem->$idKey !== $key;
+                $shouldAdd = isset($elem->$idKey) && $elem->$idKey !== $key;
             } elseif (is_array($elem)) {
-                $shouldAdd = !empty($elem[$idKey]) && $elem[$idKey] !== $key;
+                $shouldAdd = isset($elem[$idKey]) && $elem[$idKey] !== $key;
             } else {
                 $shouldAdd = $elem !== $key;
             }
@@ -416,7 +418,7 @@ class Arrays {
     public static function removeEmpty(array $array): array {
         $result = [];
         foreach ($array as $value) {
-            if (!empty($value)) {
+            if (!self::isEmpty($value)) {
                 $result[] = $value;
             }
         }
@@ -548,7 +550,7 @@ class Arrays {
      * @return TValue[]
      */
     public static function sort(array $array, ?callable $callback = null): array {
-        if (empty($callback)) {
+        if ($callback === null) {
             sort($array);
         } elseif (self::isList($array)) {
             usort($array, $callback);
@@ -568,7 +570,7 @@ class Arrays {
      */
     public static function sortArray(array &$array, string $field, callable $callback): array {
         foreach ($array as $value) {
-            if (is_array($value) && !empty($value[$field]) && is_array($value[$field])) {
+            if (is_array($value) && isset($value[$field]) && is_array($value[$field])) {
                 usort($value[$field], $callback);
             }
         }
@@ -664,7 +666,7 @@ class Arrays {
         $result = [];
         foreach ($array as $row) {
             $elem = self::getValue($row, $key);
-            if (($distinct && in_array($elem, $result, true)) || ($skipEmpty && empty($key))) {
+            if (($distinct && in_array($elem, $result, true)) || ($skipEmpty && self::isEmpty($key))) {
                 continue;
             }
             $result[] = $elem;
@@ -682,7 +684,7 @@ class Arrays {
      * @return TValue|null
      */
     public static function getFirst(array $array, string $key = ""): mixed {
-        if (empty($array)) {
+        if (self::isEmpty($array)) {
             return null;
         }
         $firstKey = array_key_first($array);
@@ -697,7 +699,7 @@ class Arrays {
      */
     public static function getFirstKey(array $array): mixed {
         $keys = array_keys($array);
-        if (!empty($keys)) {
+        if (isset($keys[0])) {
             return $keys[0];
         }
         return null;
@@ -710,7 +712,7 @@ class Arrays {
      * @return mixed
      */
     public static function getLast(array $array, string $key = ""): mixed {
-        if (empty($array)) {
+        if (self::isEmpty($array)) {
             return null;
         }
         $lastKey = array_key_last($array);
@@ -778,11 +780,11 @@ class Arrays {
     public static function findValue(array $array, string $idKey, mixed $idValue) {
         foreach ($array as $elem) {
             if (is_object($elem)) {
-                if (!empty($elem->$idKey) && $elem->$idKey === $idValue) {
+                if (isset($elem->$idKey) && $elem->$idKey === $idValue) {
                     return $elem;
                 }
             } elseif (is_array($elem)) {
-                if (!empty($elem[$idKey]) && $elem[$idKey] === $idValue) {
+                if (isset($elem[$idKey]) && $elem[$idKey] === $idValue) {
                     return $elem;
                 }
             }
@@ -799,7 +801,7 @@ class Arrays {
      * @return string
      */
     public static function getKey(string $key, string $prefix = ""): string {
-        return !empty($prefix) ? $prefix . ucfirst($key) : $key;
+        return $prefix !== "" ? $prefix . ucfirst($key) : $key;
     }
 
     /**
@@ -820,7 +822,7 @@ class Arrays {
         bool $useEmpty = false,
         mixed $default = "",
     ): mixed {
-        if (empty($key)) {
+        if ($key === null) {
             return $array;
         }
 
@@ -858,7 +860,7 @@ class Arrays {
             if ($useEmpty && isset($array->$key)) {
                 return $array->$key;
             }
-            if (!$useEmpty && !empty($array->$key)) {
+            if (!$useEmpty && !self::isEmpty($array->$key)) {
                 return $array->$key;
             }
             return $default;
@@ -868,7 +870,7 @@ class Arrays {
             if ($useEmpty && isset($array[$key])) {
                 return $array[$key];
             }
-            if (!$useEmpty && !empty($array[$key])) {
+            if (!$useEmpty && !self::isEmpty($array[$key])) {
                 return $array[$key];
             }
         }
