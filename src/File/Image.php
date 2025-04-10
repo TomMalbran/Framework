@@ -510,11 +510,10 @@ class Image {
         int    $height,
         string $action
     ): bool {
-        $bestFit = $action === self::Maximum;
-        $fill    = $action === self::Thumb;
+        $bestFit = $action === self::Maximum || $action === self::Thumb;
 
         // Do not resize if the image is smaller than the requested size
-        [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
+        [ $imgWidth, $imgHeight ] = self::getSize($src);
         if ($bestFit && $imgWidth <= $width && $imgHeight <= $height) {
             return true;
         }
@@ -527,7 +526,7 @@ class Image {
         // Try to resize with Imagick
         try {
             $image = new Imagick($src);
-            $image->thumbnailImage($width, $height, $bestFit, $fill);
+            $image->thumbnailImage($width, $height, $bestFit);
             $image->writeImage($dst);
         } catch (Exception $e) {
             $error = $e->getMessage();
