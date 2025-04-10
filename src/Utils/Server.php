@@ -16,6 +16,9 @@ class Server {
      * @return boolean
      */
     public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]): bool {
+        if (!isset($_SERVER["REMOTE_ADDR"])) {
+            return false;
+        }
         return Arrays::contains($whitelist, $_SERVER["REMOTE_ADDR"]);
     }
 
