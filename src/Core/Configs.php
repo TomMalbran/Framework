@@ -162,32 +162,8 @@ class Configs {
      */
     private static function get(string $property): mixed {
         self::load();
-
-        // Check if there is a property with the given value
         $upperKey = Strings::camelCaseToUpperCase($property);
-        if (isset(self::$data[$upperKey])) {
-            return self::$data[$upperKey];
-        }
-
-        // Try to get all the properties that start with the value as a prefix
-        $found  = false;
-        $result = [];
-        foreach (self::$data as $envKey => $value) {
-            $parts  = Strings::split($envKey, "_");
-            $prefix = Strings::toLowerCase($parts[0]);
-            if ($prefix === $property) {
-                $suffix = Strings::replace($envKey, "{$parts[0]}_", "");
-                $key    = Strings::upperCaseToCamelCase($suffix);
-                $found  = true;
-                $result[$key] = $value;
-            }
-        }
-        if ($found) {
-            return $result;
-        }
-
-        // We got nothing
-        return null;
+        return self::$data[$upperKey] ?? null;
     }
 
     /**
