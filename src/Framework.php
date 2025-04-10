@@ -142,9 +142,9 @@ class Framework {
         if (self::$db === null) {
             self::$db = new Database(
                 Config::getDbHost(),
+                Config::getDbDatabase(),
                 Config::getDbUsername(),
                 Config::getDbPassword(),
-                Config::getDbDatabase(),
                 Config::getDbCharset(),
             );
         }

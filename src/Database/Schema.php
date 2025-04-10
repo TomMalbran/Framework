@@ -214,7 +214,7 @@ class Schema {
      */
     protected static function getDataWithParams(string $expression, array $params = []): array {
         $expression = self::structure()->replaceTable($expression);
-        $request    = self::db()->query($expression, $params);
+        $request    = self::db()->queryData($expression, $params);
         return $request;
     }
 

@@ -24,9 +24,9 @@ class Database {
     private mysqli $mysqli;
 
     public string $host;
+    public string $database;
     public string $username;
     public string $password;
-    public string $database;
     public string $charset;
 
     public bool $skipLog = false;
@@ -35,22 +35,22 @@ class Database {
     /**
      * Creates a new Database instance
      * @param string $host
+     * @param string $database
      * @param string $username
      * @param string $password
-     * @param string $database
      * @param string $charset
      */
     public function __construct(
         string $host,
+        string $database,
         string $username,
         string $password,
-        string $database,
         string $charset,
     ) {
         $this->host     = $host;
+        $this->database = $database;
         $this->username = $username;
         $this->password = $password;
-        $this->database = $database;
         $this->charset  = $charset;
 
         $this->connect();
@@ -102,7 +102,7 @@ class Database {
      * Process the given expression
      * @param string        $expression
      * @param Query|mixed[] $params     Optional.
-     * @return array<string,string|integer>[]
+     * @return array<string,string|integer|null>[]
      */
     public function query(string $expression, Query|array $params = []): array {
         $startTime = microtime(true);
@@ -114,6 +114,27 @@ class Database {
     }
 
     /**
+     * Process the given expression
+     * @param string        $expression
+     * @param Query|mixed[] $params     Optional.
+     * @return array<string,string|integer>[]
+     */
+    public function queryData(string $expression, Query|array $params = []): array {
+        $request = $this->query($expression, $params);
+        $result  = [];
+        foreach ($request as $index => $row) {
+            foreach ($row as $key => $value) {
+                if ($value === null) {
+                    $result[$index][$key] = "";
+                } else {
+                    $result[$index][$key] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Process the given expression using a Query
      * @param string $expression
      * @param Query  $query
@@ -121,7 +142,7 @@ class Database {
      */
     public function getData(string $expression, Query $query): array {
         $expression .= $query->get(true);
-        return $this->query($expression, $query->params);
+        return $this->queryData($expression, $query->params);
     }
 
     /**
@@ -140,7 +161,7 @@ class Database {
             $expression .= $query->get();
             $params      = $query->params;
         }
-        return $this->query($expression, $params);
+        return $this->queryData($expression, $params);
     }
 
     /**
@@ -416,7 +437,7 @@ class Database {
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
-     * @return array<string,string|integer>[]
+     * @return array<string,string|integer|null>[]
      */
     private function dynamicBindResults(?mysqli_stmt $statement): array {
         if ($statement === null) {
@@ -448,7 +469,7 @@ class Database {
                 if (ctype_digit($string) && strrpos($string, "0", -strlen($string)) === false) {
                     $x[$key] = (int)$val;
                 } else {
-                    $x[$key] = $string;
+                    $x[$key] = $val;
                 }
             }
             $results[] = $x;
@@ -1065,8 +1086,10 @@ class Database {
                         // Try to figure out the type of each field. (NULL, number, or 'string'.)
                         if (is_int($value)) {
                             $fieldList[] = $value;
-                        } else {
+                        } elseif (is_string($value)) {
                             $fieldList[] = "'" . $this->escape($value) . "'";
+                        } else {
+                            $fieldList[] = "NULL";
                         }
                     }
                     $result .= "(" . Strings::join($fieldList, ", ") . ")";
