@@ -516,7 +516,8 @@ class Query {
     public function get(bool $addWhere = true): string {
         $result = "";
         if ($this->where !== "") {
-            $result .= ($addWhere ? "WHERE " : "AND ") . $this->where;
+            $where   = Strings::stripStart($this->where, "AND ");
+            $result .= ($addWhere ? "WHERE " : "AND ") . $where;
         }
         if ($this->groupBy !== "") {
             $result .= " GROUP BY {$this->groupBy}";
