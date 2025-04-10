@@ -822,7 +822,7 @@ class Arrays {
         bool $useEmpty = false,
         mixed $default = "",
     ): mixed {
-        if ($key === null) {
+        if (self::isEmpty($key)) {
             return $array;
         }
 
@@ -856,21 +856,12 @@ class Arrays {
      * @return mixed
      */
     public static function getOneValue(mixed $array, string $key, bool $useEmpty = false, mixed $default = null): mixed {
-        if (is_object($array)) {
-            if ($useEmpty && isset($array->$key)) {
+        if (is_object($array) && property_exists($array, $key)) {
+            if ($useEmpty || (!$useEmpty && !self::isEmpty($array->$key))) {
                 return $array->$key;
             }
-            if (!$useEmpty && !self::isEmpty($array->$key)) {
-                return $array->$key;
-            }
-            return $default;
-        }
-
-        if (is_array($array)) {
-            if ($useEmpty && isset($array[$key])) {
-                return $array[$key];
-            }
-            if (!$useEmpty && !self::isEmpty($array[$key])) {
+        } elseif (is_array($array) && array_key_exists($key, $array)) {
+            if ($useEmpty || (!$useEmpty && !self::isEmpty($array, $key))) {
                 return $array[$key];
             }
         }
