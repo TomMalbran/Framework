@@ -688,7 +688,7 @@ class {{name}}Schema extends Schema {
      */
     protected static function ensureUniqueData({{column}} $column, int $id, int $oldValue, int $newValue, ?{{query}} $query = null): bool {
         $query = $query !== null ? $query->query : null;
-        return self::ensureSchemaUniqueData($column->value, $id, $oldValue, $newValue, $query);
+        return self::ensureSchemaUniqueData($column->base(), $id, $oldValue, $newValue, $query);
     }
 {{#canConvert}}
 
