@@ -233,7 +233,7 @@ class Discovery {
             $className = "\\" . Package::Namespace . $className;
 
             $classKey = Strings::substringAfter($className, "\\");
-            $result[$classKey] = $className;
+            $result[$className] = $classKey;
         }
         return $result;
     }
