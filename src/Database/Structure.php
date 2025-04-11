@@ -77,6 +77,7 @@ class Structure {
             $fields->set("status", [
                 "type"    => Field::String,
                 "noEmpty" => true,
+                "isKey"   => true,
                 "default" => "",
             ]);
         }
