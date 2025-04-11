@@ -218,7 +218,10 @@ class Entity implements JsonSerializable {
      * @return boolean
      */
     final public function hasValue(string $key): bool {
-        return $this->$key !== "";
+        if ($this->has($key)) {
+            return !Arrays::isEmpty($this->$key);
+        }
+        return false;
     }
 
     /**
