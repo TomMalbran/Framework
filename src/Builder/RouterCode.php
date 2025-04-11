@@ -43,13 +43,13 @@ class RouterCode {
                     continue;
                 }
 
-                $attribute    = $attributes[0];
-                $fileName     = $reflection->getFileName();
-                $route        = $attribute->newInstance();
-                $params       = $method->getNumberOfParameters();
-                $response     = $method->getReturnType();
-                $methodName   = $method->getName();
-                $startLine    = $method->getStartLine();
+                $attribute  = $attributes[0];
+                $fileName   = $reflection->getFileName();
+                $route      = $attribute->newInstance();
+                $params     = $method->getNumberOfParameters();
+                $response   = $method->getReturnType();
+                $methodName = $method->getName();
+                $startLine  = $method->getStartLine();
 
                 // Check the Response
                 if ($response === null || !$response instanceof ReflectionNamedType) {
