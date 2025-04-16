@@ -93,6 +93,6 @@ class ImporterRow {
      */
     public function getList(string $key): array {
         $value = $this->getValue($key);
-        return Arrays::toStrings($value);
+        return Arrays::toStrings($value, withoutEmpty: true);
     }
 }
