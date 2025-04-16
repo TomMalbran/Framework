@@ -64,8 +64,12 @@ class Arrays {
      */
     public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
         if (is_int($array)) {
+            if ($withoutEmpty && $array === 0) {
+                return [];
+            }
             return [ $array ];
         }
+
         if (!is_array($array)) {
             return [];
         }
@@ -93,8 +97,12 @@ class Arrays {
      */
     public static function toStrings(mixed $array, string $key = "", bool $withoutEmpty = false): array {
         if (is_string($array)) {
+            if ($withoutEmpty && $array === "") {
+                return [];
+            }
             return [ $array ];
         }
+
         if (!is_array($array)) {
             return [];
         }
