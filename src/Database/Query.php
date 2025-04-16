@@ -255,9 +255,10 @@ class Query {
         } else {
             $valueParts = [ Strings::toString($value) ];
         }
+
         if ($caseInsensitive) {
-            foreach ($valueParts as $valuePart) {
-                $valueParts[] = Strings::toLowerCase($valuePart);
+            foreach ($valueParts as $index => $valuePart) {
+                $valueParts[$index] = Strings::toLowerCase($valuePart);
             }
         }
         $multiParts = Arrays::length($valueParts) > 1;
