@@ -46,7 +46,8 @@ class NotificationQueue extends NotificationQueueSchema {
         $query->search([
             NotificationQueueColumn::Title,
             NotificationQueueColumn::Body,
-            NotificationQueueColumn::CredentialName,
+            NotificationQueueColumn::CredentialFirstName,
+            NotificationQueueColumn::CredentialLastName,
         ], $search);
 
         $query->createdTime->greaterThan($fromTime, $fromTime > 0);
