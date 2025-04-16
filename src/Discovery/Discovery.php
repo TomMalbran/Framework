@@ -248,7 +248,7 @@ class Discovery {
         $classes = self::findClasses($dir, $skipIgnored);
         $result  = [];
 
-        foreach ($classes as $className) {
+        foreach ($classes as $className => $classKey) {
             try {
                 if (class_exists($className)) {
                     $result[$className] = new ReflectionClass($className);
