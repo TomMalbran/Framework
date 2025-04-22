@@ -8,7 +8,7 @@ use Framework\Utils\Utils;
  */
 class Facebook {
 
-    private const BaseUrl = "https://graph.facebook.com/v16.0/";
+    private const BaseUrl = "https://graph.facebook.com/v22.0/";
 
 
 
@@ -23,7 +23,7 @@ class Facebook {
         }
 
         /** @var array<string,string> */
-        $response = Curl::execute("GET", self::BaseUrl . "/me", [
+        $response = Curl::execute("GET", self::BaseUrl . "me", [
             "fields"       => "email,name,first_name,last_name",
             "access_token" => $accessToken,
         ]);
