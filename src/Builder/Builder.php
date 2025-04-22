@@ -9,6 +9,7 @@ use Framework\Builder\RouterCode;
 use Framework\Builder\SettingCode;
 use Framework\Builder\SignalCode;
 use Framework\Builder\StatusCode;
+use Framework\Builder\TemplateCode;
 use Framework\Database\Generator;
 use Framework\Discovery\DataFile;
 use Framework\File\File;
@@ -50,6 +51,7 @@ class Builder {
         $files += self::generateOne($writePath, "Language", LanguageCode::getCode());
         $files += self::generateOne($writePath, "Access",   AccessCode::getCode());
         $files += self::generateOne($writePath, "Status",   StatusCode::getCode());
+        $files += self::generateOne($writePath, "Template", TemplateCode::getCode());
 
 
         print("\nSCHEMA CODES\n");
@@ -61,10 +63,10 @@ class Builder {
 
 
         print("\nFRAMEWORK SEC CODES\n");
-        $files += self::generateOne($writePath, "Setting", SettingCode::getCode());
-        $files += self::generateOne($writePath, "Config",  ConfigCode::getCode());
-        $files += self::generateOne($writePath, "Signal",  SignalCode::getCode());
-        $files += self::generateOne($writePath, "Router",  RouterCode::getCode());
+        $files += self::generateOne($writePath, "Setting",  SettingCode::getCode());
+        $files += self::generateOne($writePath, "Config",   ConfigCode::getCode());
+        $files += self::generateOne($writePath, "Signal",   SignalCode::getCode());
+        $files += self::generateOne($writePath, "Router",   RouterCode::getCode());
 
 
         if (!$willContinue) {

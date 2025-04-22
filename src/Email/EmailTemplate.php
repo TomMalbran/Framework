@@ -6,6 +6,7 @@ use Framework\Provider\Mustache;
 use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
+use Framework\System\Template;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 use Framework\Schema\EmailTemplateSchema;
@@ -19,15 +20,15 @@ class EmailTemplate extends EmailTemplateSchema {
 
     /**
      * Returns an Email Template for the Email Sender
-     * @param string $templateCode
-     * @param string $language     Optional.
+     * @param Template $template
+     * @param string   $language Optional.
      * @return EmailTemplateEntity
      */
-    public static function get(string $templateCode, string $language = "root"): EmailTemplateEntity {
+    public static function get(Template $template, string $language = "root"): EmailTemplateEntity {
         $langCode = Language::getCode($language);
 
         $query = new EmailTemplateQuery();
-        $query->templateCode->equal($templateCode);
+        $query->templateCode->equal($template->value);
         $query->language->equal($langCode);
         return self::getEntity($query);
     }
