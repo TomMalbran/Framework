@@ -28,15 +28,24 @@ class Email {
      * @param string  $toEmail
      * @param string  $subject
      * @param string  $message
-     * @param boolean $sendAlways
+     * @param boolean $sendAlways      Optional.
+     * @param boolean $sendTest        Optional.
+     * @param boolean $withoutTemplate Optional.
      * @return EmailResult
      */
-    public static function send(string $toEmail, string $subject, string $message, bool $sendAlways): EmailResult {
+    public static function send(
+        string $toEmail,
+        string $subject,
+        string $message,
+        bool $sendAlways = false,
+        bool $sendTest = false,
+        bool $withoutTemplate = false,
+    ): EmailResult {
         // Return some possible errors
-        if (!Config::isEmailActive()) {
+        if (!$sendTest && !Config::isEmailActive()) {
             return EmailResult::InactiveSend;
         }
-        if (!$sendAlways && Config::isEmailUseWhiteList() && !EmailWhiteList::emailExists($toEmail)) {
+        if (!$sendTest && !$sendAlways && Config::isEmailUseWhiteList() && !EmailWhiteList::emailExists($toEmail)) {
             return EmailResult::WhiteListFilter;
         }
         if (!Utils::isValidEmail($toEmail)) {
@@ -44,15 +53,19 @@ class Email {
         }
 
         // Create the template
-        $template = Discovery::loadEmailTemplate();
-        $body     = Mustache::render($template, [
-            "url"      => Config::getUrl(),
-            "name"     => Config::getName(),
-            "files"    => FilePath::getInternalUrl(),
-            "logo"     => Config::getEmailLogo(),
-            "siteName" => Config::getName(),
-            "message"  => $message,
-        ]);
+        if ($withoutTemplate) {
+            $body = $message;
+        } else {
+            $template = Discovery::loadEmailTemplate();
+            $body     = Mustache::render($template, [
+                "url"      => Config::getUrl(),
+                "name"     => Config::getName(),
+                "files"    => FilePath::getInternalUrl(),
+                "logo"     => Config::getEmailLogo(),
+                "siteName" => Config::getName(),
+                "message"  => $message,
+            ]);
+        }
 
         // Configure the variables
         $provider  = EmailProvider::from(Config::getEmailProvider());
