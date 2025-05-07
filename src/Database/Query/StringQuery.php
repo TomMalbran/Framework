@@ -45,7 +45,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function equal(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "=", $value, $caseSensitive);
+        return $this->query->add($this->column, "=", $value, caseSensitive: $caseSensitive);
     }
 
     /**
@@ -86,7 +86,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function like(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "LIKE", $value, $caseSensitive);
+        return $this->query->add($this->column, "LIKE", $value, caseSensitive: $caseSensitive);
     }
 
     /**
@@ -96,7 +96,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function likeIf(string $value, bool $caseSensitive = false): Query {
-        return $this->query->addIf($this->column, "LIKE", $value, $caseSensitive);
+        return $this->query->addIf($this->column, "LIKE", $value, caseSensitive: $caseSensitive);
     }
 
     /**
@@ -106,7 +106,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function notLike(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "NOT LIKE", $value, $caseSensitive);
+        return $this->query->add($this->column, "NOT LIKE", $value, caseSensitive: $caseSensitive);
     }
 
     /**
@@ -116,7 +116,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function startsWith(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "STARTS", $value, $caseSensitive);
+        return $this->query->add($this->column, "STARTS", $value, caseSensitive: $caseSensitive);
     }
 
     /**
@@ -126,7 +126,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function endsWith(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "ENDS", $value, $caseSensitive);
+        return $this->query->add($this->column, "ENDS", $value, caseSensitive: $caseSensitive);
     }
 
 

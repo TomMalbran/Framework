@@ -175,14 +175,21 @@ class Query {
      * @param string                      $column
      * @param string                      $expression
      * @param mixed[]|integer|string|null $value
-     * @param boolean|null                $condition  Optional.
+     * @param boolean|null                $condition     Optional.
+     * @param boolean                     $caseSensitive Optional.
      * @return Query
      */
-    public function addIf(string $column, string $expression, array|int|string|null $value, ?bool $condition = null): Query {
+    public function addIf(
+        string $column,
+        string $expression,
+        array|int|string|null $value,
+        ?bool $condition = null,
+        bool $caseSensitive = false,
+    ): Query {
         if ($condition === true && $value !== null) {
-            $this->add($column, $expression, $value);
+            $this->add($column, $expression, $value, $caseSensitive);
         } elseif ($condition === null && $value !== null && !Arrays::isEmpty($value)) {
-            $this->add($column, $expression, $value);
+            $this->add($column, $expression, $value, $caseSensitive);
         }
         return $this;
     }
