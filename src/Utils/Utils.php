@@ -197,6 +197,23 @@ class Utils {
     }
 
     /**
+     * Returns the given Email showing only the first 3 chars hidden
+     * @param string $email
+     * @return string
+     */
+    public static function hideEmail(string $email): string {
+        if ($email === "" || !self::isValidEmail($email)) {
+            return "";
+        }
+
+        $domain = Strings::substringAfter($email, "@");
+        $name   = Strings::substringBefore($email, "@");
+        $length = Strings::length($name);
+        $hidden = Strings::substring($name, 0, 3) . Strings::repeat("*", $length - 3);
+        return "$hidden@$domain";
+    }
+
+    /**
      * Generates a username from a domain
      * @param string $domain
      * @param string $email  Optional.
