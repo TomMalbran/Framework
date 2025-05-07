@@ -24,9 +24,9 @@ class GoogleMap {
     /**
      * Returns an Address and Coordinates from the given Address
      * @param string $address
-     * @return array{address:string,latitude:float,longitude:float}|array{}
+     * @return array{address:string,latitude:float,longitude:float}|null
      */
-    public static function getFromAddress(string $address): array {
+    public static function getFromAddress(string $address): array|null {
         return self::getAddress($address, 0, 0);
     }
 
@@ -34,9 +34,9 @@ class GoogleMap {
      * Returns an Address and Coordinates from the given Latitude and Longitude
      * @param float $latitude
      * @param float $longitude
-     * @return array{address:string,latitude:float,longitude:float}|array{}
+     * @return array{address:string,latitude:float,longitude:float}|null
      */
-    public static function getFromLatLng(float $latitude, float $longitude): array {
+    public static function getFromLatLng(float $latitude, float $longitude): array|null {
         return self::getAddress("", $latitude, $longitude);
     }
 
@@ -45,11 +45,11 @@ class GoogleMap {
      * @param string $address
      * @param float  $latitude
      * @param float  $longitude
-     * @return array{address:string,latitude:float,longitude:float}|array{}
+     * @return array{address:string,latitude:float,longitude:float}|null
      */
-    public static function getAddress(string $address, float $latitude, float $longitude): array {
+    public static function getAddress(string $address, float $latitude, float $longitude): array|null {
         if (!self::isActive()) {
-            return [];
+            return null;
         }
 
         $params = [ "key" => Config::getGoogleMapApiKey() ];
@@ -58,7 +58,7 @@ class GoogleMap {
         } elseif ($address !== "") {
             $params["address"] = $address;
         } else {
-            return [];
+            return null;
         }
 
         $url      = self::BaseUrl . "geocode/json";
@@ -67,17 +67,17 @@ class GoogleMap {
         $address  = $response->getFirst("results");
 
         if ($address->isEmpty()) {
-            return [];
+            return null;
         }
 
         foreach ($response->getList("results") as $addressResult) {
-            if (Arrays::contains($addressResult->getString("types"), "premise")) {
+            if (Arrays::contains($addressResult->getStrings("types"), "premise")) {
                 $address = $addressResult;
                 break;
             }
         }
 
-        $location = $address->getFirst("geometry")->getFirst("location");
+        $location = $address->getDict("geometry")->getDict("location");
         return [
             "address"   => $address->getString("formatted_address"),
             "latitude"  => $location->getFloat("lat"),
