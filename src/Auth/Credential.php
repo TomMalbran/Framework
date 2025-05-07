@@ -483,6 +483,10 @@ class Credential extends CredentialSchema {
         if (!($credential instanceof CredentialEntity)) {
             $credential = self::getByID($credential, true);
         }
+        if ($credential->isEmpty()) {
+            return false;
+        }
+
         if ($credential->passExpiration > 0 && $credential->passExpiration < time()) {
             return false;
         }
