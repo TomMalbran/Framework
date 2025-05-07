@@ -302,10 +302,10 @@ class Query {
 
     /**
      * Adds a param to the Query
-     * @param mixed $param
+     * @param string|integer $param
      * @return Query
      */
-    public function addParam(mixed $param): Query {
+    public function addParam(string|int $param): Query {
         $this->params[] = $param;
         return $this;
     }

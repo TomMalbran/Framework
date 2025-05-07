@@ -29,7 +29,7 @@ class SchemaQuery {
 
     /**
      * Creates a list of question marks for the given array
-     * @param mixed[] $array
+     * @param string[]|integer[] $array
      * @return string
      */
     public function createBinds(array $array): string {
@@ -40,20 +40,20 @@ class SchemaQuery {
 
     /**
      * Adds a param to the Query
-     * @param mixed $param
+     * @param string|integer $param
      * @return Query
      */
-    public function addParam(mixed $param): Query {
+    public function addParam(string|int $param): Query {
         return $this->query->addParam($param);
     }
 
     /**
      * Adds an Expression to the Query
-     * @param string $expression
-     * @param mixed  ...$values
+     * @param string         $expression
+     * @param string|integer ...$values
      * @return Query
      */
-    public function addExp(string $expression, mixed ...$values): Query {
+    public function addExp(string $expression, string|int ...$values): Query {
         return $this->query->addExp($expression, ...$values);
     }
 
