@@ -115,10 +115,12 @@ class OpenAI {
      * Creates a Completion and returns the Response
      * @param string $model
      * @param string $message
-     * @return string
+     * @return OpenAIData
      */
-    public static function createCompletion(string $model, string $message): string {
-        $response = self::post("/chat/completions", [
+    public static function createCompletion(string $model, string $message): OpenAIData {
+        $startTime = microtime(true);
+        $result    = new OpenAIData();
+        $response  = self::post("/chat/completions", [
             "model"    => $model,
             "messages" => [
                 [
@@ -128,11 +130,17 @@ class OpenAI {
             ],
         ]);
 
-        $choice = $response->getFirst("choices");
+        $endTime = microtime(true);
+        $choice  = $response->getFirst("choices");
         if ($choice->isEmpty()) {
-            return "";
+            return $result;
         }
-        return $choice->getDict("message")->getString("content");
+
+        $result->text         = $choice->getDict("message")->getString("content");
+        $result->inputTokens  = $response->getDict("usage")->getInt("prompt_tokens");
+        $result->outputTokens = $response->getDict("usage")->getInt("completion_tokens");
+        $result->runTime      = Numbers::roundInt($endTime - $startTime);
+        return $result;
     }
 
 
