@@ -283,15 +283,13 @@ class {{name}}Schema extends Schema {
     public static function getList({{#hasFilters}}Request $request{{/hasFilters}}{{^hasFilters}}?Request $request = null{{/hasFilters}}{{{parentsDefList}}}): array {
         {{#hasFilters}}
         $query = static::createListQuery($request)->query;
+        {{/hasFilters}}
+        {{^hasFilters}}
+        $query = new Query();
+        {{/hasFilters}}
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
-        {{/hasFilters}}
-        {{^hasFilters}}
-        {{#hasParents}}
-        $query = self::createParentQuery({{parentsList}})->query;
-        {{/hasParents}}
-        {{/hasFilters}}
         $list = self::getSchemaEntities({{#hasMainQuery}}$query, {{/hasMainQuery}}sort: $request);
         return self::constructEntities($list);
     }
