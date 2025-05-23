@@ -114,7 +114,7 @@ class Join {
             if (!isset($result[$key])) {
                 $result[$key] = "";
                 foreach ($fields as $fieldKey) {
-                    if (isset($data[$fieldKey])) {
+                    if (!Arrays::isEmpty($data[$fieldKey])) {
                         $result[$key] = $data[$fieldKey];
                         break;
                     }
