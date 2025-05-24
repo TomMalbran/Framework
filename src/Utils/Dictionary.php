@@ -374,6 +374,17 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns the data as an array of Strings
+     * @return string[]
+     */
+    public function toStrings(): array {
+        if (Arrays::isList($this->data)) {
+            return Arrays::toStrings($this->data);
+        }
+        return [];
+    }
+
+    /**
      * Encodes the data as a JSON
      * @return string
      */
