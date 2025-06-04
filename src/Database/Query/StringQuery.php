@@ -91,12 +91,13 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Like If Query
-     * @param string  $value
-     * @param boolean $caseSensitive Optional.
+     * @param string       $value
+     * @param boolean|null $condition     Optional.
+     * @param boolean      $caseSensitive Optional.
      * @return Query
      */
-    public function likeIf(string $value, bool $caseSensitive = false): Query {
-        return $this->query->addIf($this->column, "LIKE", $value, caseSensitive: $caseSensitive);
+    public function likeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): Query {
+        return $this->query->addIf($this->column, "LIKE", $value, $condition, caseSensitive: $caseSensitive);
     }
 
     /**
@@ -107,6 +108,17 @@ class StringQuery extends BaseQuery {
      */
     public function notLike(string $value, bool $caseSensitive = false): Query {
         return $this->query->add($this->column, "NOT LIKE", $value, caseSensitive: $caseSensitive);
+    }
+
+    /**
+     * Generates a Not Like If Query
+     * @param string       $value
+     * @param boolean|null $condition     Optional.
+     * @param boolean      $caseSensitive Optional.
+     * @return Query
+     */
+    public function notLikeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): Query {
+        return $this->query->add($this->column, "NOT LIKE", $value, $condition, caseSensitive: $caseSensitive);
     }
 
     /**
