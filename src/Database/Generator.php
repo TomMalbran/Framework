@@ -669,7 +669,8 @@ class Generator {
                     Field::Text,
                     Field::LongText,
                     Field::JSON,
-                    Field::HTML    => "StringQuery",
+                    Field::HTML,
+                    Field::File    => "StringQuery",
                     default        => "",
                 };
             }
