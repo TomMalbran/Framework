@@ -462,6 +462,18 @@ class Numbers {
      * @return integer|float
      */
     public static function calcExpression(string $expression): int|float {
+        $expression = Strings::toLowerCase(trim($expression));
+
+        // Check for functions
+        $functions  = [ "floor", "ceil", "round" ];
+        $function   = "";
+        foreach ($functions as $func) {
+            if (Strings::startsWith($expression, $func)) {
+                $expression = Strings::substringAfter($expression, $func);
+                $function   = $func;
+            }
+        }
+
         // Sanitize the input
         $expression = Strings::replacePattern($expression, "/[^0-9.,+\-*\/()%]/", "");
 
@@ -479,10 +491,17 @@ class Numbers {
         $expression = Strings::replacePattern($expression, "/--/", "+");
         $expression = Strings::replacePattern($expression, "/([+\-*\/])[+\-*\/]+/", "$1");
 
-        // Calculate
+        // There is no expression
         if ($expression === "") {
             return 0;
         }
+
+        // Add the function
+        if ($function !== "") {
+            $expression = "$function($expression)";
+        }
+
+        // Calculate
         try {
             $result = @eval("return $expression;");
             return self::toIntOrFloat($result);
