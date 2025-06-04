@@ -21,6 +21,14 @@ class NLS {
 
 
     /**
+     * Gets the Language
+     * @return string
+     */
+    public static function getLanguage(): string {
+        return self::$language;
+    }
+
+    /**
      * Sets the Language
      * @param string $language
      * @return boolean
@@ -29,6 +37,8 @@ class NLS {
         self::$language = $language;
         return true;
     }
+
+
 
     /**
      * Loads an NLS Language
