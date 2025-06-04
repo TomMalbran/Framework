@@ -30,12 +30,16 @@ class Config {
 
     /**
      * Returns the url for the given key and adding the url parts at the end
-     * @param string $urlKey
+     * @param string         $urlKey
      * @param string|integer ...$urlParts
      * @return string
      */
     public static function getUrlWithKey(string $urlKey, string|int ...$urlParts): string {
-        $url  = Configs::getString($urlKey, Configs::getString("url"));
+        $url = Configs::getString($urlKey);
+        if ($url === "") {
+            $url = Configs::getString("url");
+        }
+
         $path = File::parsePath(...$urlParts);
         $path = File::removeFirstSlash($path);
         return $url . $path;

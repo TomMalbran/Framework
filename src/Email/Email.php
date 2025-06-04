@@ -58,7 +58,7 @@ class Email {
         } else {
             $template = Discovery::loadEmailTemplate();
             $body     = Mustache::render($template, [
-                "url"      => Config::getUrl(),
+                "url"      => Config::getEmailUrl(),
                 "name"     => Config::getName(),
                 "files"    => FilePath::getInternalUrl(),
                 "logo"     => Config::getEmailLogo(),
