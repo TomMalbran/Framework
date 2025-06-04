@@ -197,7 +197,32 @@ class Utils {
     }
 
     /**
-     * Returns the given Email showing only the first 3 chars hidden
+     * Returns the given Phone hiding most of the numbers
+     * @param string $phone
+     * @return string
+     */
+    public static function hidePhone(string $phone): string {
+        if ($phone === "" || !self::isValidPhone($phone)) {
+            return "";
+        }
+
+        $length = Strings::length($phone);
+        if ($length < 3) {
+           return $length === 1 ? "*" : "*" . Strings::substring($phone,  - 1);
+        }
+
+        $middle     = "";
+        $partSize   = (int)floor($length / 3);
+        $middleSize = $length - ($partSize * 2);
+
+        for ($i = 0; $i < $middleSize; $i++) {
+            $middle .= "*";
+        }
+        return Strings::substring($phone, 0, $partSize) . $middle . Strings::substring($phone, -$partSize);
+    }
+
+    /**
+     * Returns the given Email hiding most of the name and showing the domain
      * @param string $email
      * @return string
      */
