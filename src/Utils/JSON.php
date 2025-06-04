@@ -31,6 +31,9 @@ class JSON {
      * @return string
      */
     public static function encode(mixed $value, bool $asPretty = false): string {
+        if (is_null($value)) {
+            return "";
+        }
         if (is_string($value) && self::isValid($value)) {
             return $value;
         }
