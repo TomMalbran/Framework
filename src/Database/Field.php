@@ -24,10 +24,10 @@ class Field {
     const Float    = "float";
     const Date     = "date";
     const String   = "string";
-    const JSON     = "json";
-    const HTML     = "html";
     const Text     = "text";
     const LongText = "longtext";
+    const JSON     = "json";
+    const HTML     = "html";
     const Encrypt  = "encrypt";
     const File     = "file";
 
@@ -182,17 +182,17 @@ class Field {
             $attributes = "NOT NULL";
             $default    = "";
             break;
-        case self::JSON:
-        case self::HTML:
-            $type       = "mediumtext";
-            $attributes = "NULL";
-            break;
         case self::Text:
             $type       = "text";
             $attributes = "NULL";
             break;
         case self::LongText:
             $type       = "longtext";
+            $attributes = "NULL";
+            break;
+        case self::JSON:
+        case self::HTML:
+            $type       = "mediumtext";
             $attributes = "NULL";
             break;
         case self::Encrypt:
@@ -303,10 +303,6 @@ class Field {
         case self::HTML:
             $result[$key]           = $text;
             $result["{$key}Html"]   = Strings::toHtml($text);
-            break;
-        case self::Text:
-        case self::LongText:
-            $result[$key]           = $text;
             break;
         case self::Encrypt:
             $result[$key]           = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
