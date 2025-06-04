@@ -231,10 +231,11 @@ class Utils {
             return "";
         }
 
-        $domain = Strings::substringAfter($email, "@");
-        $name   = Strings::substringBefore($email, "@");
-        $length = Strings::length($name);
-        $hidden = Strings::substring($name, 0, 3) . Strings::repeat("*", $length - 3);
+        $domain  = Strings::substringAfter($email, "@");
+        $name    = Strings::substringBefore($email, "@");
+        $length  = Strings::length($name);
+        $nameLen = $length > 3 ? 3 : 1;
+        $hidden  = Strings::substring($name, 0, $nameLen) . Strings::repeat("*", $length - $nameLen);
         return "$hidden@$domain";
     }
 
