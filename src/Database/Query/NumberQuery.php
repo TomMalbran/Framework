@@ -4,6 +4,7 @@ namespace Framework\Database\Query;
 use Framework\Request;
 use Framework\Database\Query;
 use Framework\Database\Query\BaseQuery;
+use Framework\Utils\Period;
 
 /**
  * The Number Query
@@ -120,10 +121,10 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Uses the Period to add a Between expression
-     * @param Request $request
+     * @param Period|Request $period
      * @return Query
      */
-    public function inPeriod(Request $request): Query {
-        return $this->query->addPeriod($this->column, $request);
+    public function inPeriod(Period|Request $period): Query {
+        return $this->query->addPeriod($this->column, $period);
     }
 }

@@ -209,12 +209,15 @@ class Query {
 
     /**
      * Uses the Period to add a Between expression
-     * @param string  $column
-     * @param Request $request
+     * @param string         $column
+     * @param Period|Request $period
      * @return Query
      */
-    public function addPeriod(string $column, Request $request): Query {
-        $period = new Period($request);
+    public function addPeriod(string $column, Period|Request $period): Query {
+        if ($period instanceof Request) {
+            $period = new Period($period);
+        }
+
         if ($period->fromTime > 0) {
             $this->add($column, ">=", $period->fromTime);
         }
