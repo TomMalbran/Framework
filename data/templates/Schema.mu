@@ -301,11 +301,12 @@ class {{name}}Schema extends Schema {
      * @param array<string,string> $selects Optional.
      * @param string[] $joins Optional.{{#hasEncrypt}}
      * @param boolean $decrypted Optional.{{/hasEncrypt}}
+     * @param boolean $skipSubRequest Optional.
      * @return {{entity}}[]
      */
-    protected static function getEntityList(?{{query}} $query = null, ?Request $sort = null, array $selects = [], array $joins = []{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): array {
+    protected static function getEntityList(?{{query}} $query = null, ?Request $sort = null, array $selects = [], array $joins = []{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}, bool $skipSubRequest = false): array {
         $query = $query !== null ? $query->query : null;
-        $list  = self::getSchemaEntities($query, $sort, $selects, $joins{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
+        $list  = self::getSchemaEntities($query, $sort, $selects, $joins{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}}, skipSubRequest: $skipSubRequest);
         return self::constructEntities($list);
     }
 

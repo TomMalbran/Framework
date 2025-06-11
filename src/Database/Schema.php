@@ -248,11 +248,12 @@ class Schema {
 
     /**
      * Returns an array of Entities Data
-     * @param Query|null   $query     Optional.
-     * @param Request|null $sort      Optional.
-     * @param array{}      $selects   Optional.
-     * @param string[]     $joins     Optional.
-     * @param boolean      $decrypted Optional.
+     * @param Query|null   $query          Optional.
+     * @param Request|null $sort           Optional.
+     * @param array{}      $selects        Optional.
+     * @param string[]     $joins          Optional.
+     * @param boolean      $decrypted      Optional.
+     * @param boolean      $skipSubRequest Optional.
      * @return array{}[]
      */
     protected static function getSchemaEntities(
@@ -261,21 +262,29 @@ class Schema {
         array $selects = [],
         array $joins = [],
         bool $decrypted = false,
+        bool $skipSubRequest = false,
     ): array {
         $query   = self::generateQuerySort($query, $sort);
-        $request = self::requestSchemaData($query, $selects, $joins, $decrypted);
+        $request = self::requestSchemaData($query, $selects, $joins, $decrypted, $skipSubRequest);
         return $request;
     }
 
     /**
      * Requests data to the database
      * @param Query                $query
-     * @param array<string,string> $selects   Optional.
-     * @param string[]             $joins     Optional.
-     * @param boolean              $decrypted Optional.
+     * @param array<string,string> $selects        Optional.
+     * @param string[]             $joins          Optional.
+     * @param boolean              $decrypted      Optional.
+     * @param boolean              $skipSubRequest Optional.
      * @return array{}[]
      */
-    private static function requestSchemaData(Query $query, array $selects = [], array $joins = [], bool $decrypted = false): array {
+    private static function requestSchemaData(
+        Query $query,
+        array $selects = [],
+        array $joins = [],
+        bool $decrypted = false,
+        bool $skipSubRequest = false
+    ): array {
         $selection = new Selection(self::structure());
         $selection->addFields($decrypted);
         $selection->addExpressions();
@@ -285,8 +294,10 @@ class Schema {
         $selection->request($query);
 
         $result = $selection->resolve(array_keys($selects));
-        foreach (self::structure()->subRequests as $subRequest) {
-            $result = $subRequest->request($result);
+        if (!$skipSubRequest) {
+            foreach (self::structure()->subRequests as $subRequest) {
+                $result = $subRequest->request($result);
+            }
         }
         return $result;
     }
