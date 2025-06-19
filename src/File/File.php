@@ -29,10 +29,24 @@ class File {
      */
     public static function parsePath(string|int ...$pathParts): string {
         $result = Strings::join($pathParts, "/");
+
+        // Windows path
+        $prefix = "";
+        if (Strings::match($result, "/^[a-zA-Z]:\/\//")) {
+            $prefix = Strings::substring($result, 0, 3);
+            $result = Strings::substring($result, 3);
+        }
+
+        // Remove double slashes and last one
         while (Strings::contains($result, "//")) {
             $result = Strings::replace($result, "//", "/");
         }
         $result = self::removeLastSlash($result);
+
+        // Add the prefix if it exists
+        if ($prefix !== "") {
+            $result = "{$prefix}{$result}";
+        }
         return $result;
     }
 
