@@ -18,14 +18,16 @@ class StatusCode {
     public static function getCode(): array {
         /** @var array{values:array<string,string>,groups:array<string,string[]>} */
         $frameData = Discovery::loadFrameData(DataFile::Status);
-
-        /** @var array{values:array<string,string>,groups:array<string,string[]>} */
-        $appData   = Discovery::loadData(DataFile::Status);
+        if (!isset($frameData["values"]) || !isset($frameData["groups"])) {
+            return [];
+        }
 
         $values = $frameData["values"];
         $groups = $frameData["groups"];
 
-        if (!Arrays::isEmpty($appData)) {
+        /** @var array{values:array<string,string>,groups:array<string,string[]>} */
+        $appData = Discovery::loadData(DataFile::Status);
+        if (!Arrays::isEmpty($appData) && isset($appData["values"]) && isset($appData["groups"])) {
             $values = array_merge($frameData["values"], $appData["values"]);
             $groups = array_merge($frameData["groups"], $appData["groups"]);
         }
