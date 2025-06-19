@@ -800,6 +800,30 @@ class Arrays {
         return null;
     }
 
+    /**
+     * Returns the Values at the given id with the given key
+     * @template TValue
+     * @param TValue[] $array
+     * @param string   $idKey
+     * @param mixed    $idValue
+     * @return TValue[]
+     */
+    public static function findValues(array $array, string $idKey, mixed $idValue): array {
+        $result = [];
+        foreach ($array as $elem) {
+            if (is_object($elem)) {
+                if (isset($elem->$idKey) && $elem->$idKey === $idValue) {
+                    $result[] = $elem;
+                }
+            } elseif (is_array($elem)) {
+                if (isset($elem[$idKey]) && $elem[$idKey] === $idValue) {
+                    $result[] = $elem;
+                }
+            }
+        }
+        return $result;
+    }
+
 
 
     /**
