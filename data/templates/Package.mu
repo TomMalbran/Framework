@@ -1,9 +1,6 @@
 <?php
 namespace {{namespace}};
 
-use Framework\File\File;
-use Framework\Utils\Strings;
-
 /**
  * The Package
  */

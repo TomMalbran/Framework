@@ -58,7 +58,7 @@ class FileList {
      * @return FileList
      */
     public function addBack(string $path): FileList {
-        $dir = dirname($path);
+        $dir = File::getDirectory($path);
         $this->list[] = [
             "name"      => "...",
             "path"      => $dir !== "." ? $dir : "",

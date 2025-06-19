@@ -80,7 +80,7 @@ class Builder {
      * @return array<string,string>
      */
     private static function getPackageData(): array {
-        $framePath = dirname(__FILE__, 3);
+        $framePath = Discovery::getFramePath();
         if (Strings::contains($framePath, "vendor")) {
             $basePath = Strings::substringBefore($framePath, "/vendor");
             $appDir   = Strings::substringAfter($basePath, "/");

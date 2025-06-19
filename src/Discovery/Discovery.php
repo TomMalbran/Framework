@@ -46,7 +46,7 @@ class Discovery {
      * @return string
      */
     public static function getFramePath(string ...$pathParts): string {
-        $path = dirname(__FILE__, 3);
+        $path = File::getDirectory(__FILE__, 3);
         return File::parsePath($path, ...$pathParts);
     }
 
@@ -56,7 +56,7 @@ class Discovery {
      * @return string
      */
     public static function getIndexPath(string ...$pathParts): string {
-        $path = dirname(__FILE__, 3);
+        $path = self::getFramePath();
         if (Strings::contains($path, "vendor")) {
             $path = Strings::substringBefore($path, "/vendor");
             $path = Strings::substringBefore($path, "/", false);

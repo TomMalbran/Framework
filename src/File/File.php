@@ -12,6 +12,17 @@ use ZipArchive;
 class File {
 
     /**
+     * Returns the directory of the given path
+     * @param string  $path
+     * @param integer $levels Optional.
+     * @return string
+     */
+    public static function getDirectory(string $path, int $levels = 1): string {
+        $directory = dirname($path, $levels);
+        return Strings::replace($directory, "\\", "/");
+    }
+
+    /**
      * Returns the path used to store the files
      * @param string|integer ...$pathParts
      * @return string

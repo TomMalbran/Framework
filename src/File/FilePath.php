@@ -84,7 +84,7 @@ class FilePath {
     public static function getBasePath(bool $forFramework = false, bool $forBackend = false, bool $forPrivate = false): string {
         $result = Discovery::getBasePath($forFramework, $forBackend);
         if ($forPrivate && !Server::isLocalHost()) {
-            return dirname($result);
+            return File::getDirectory($result);
         }
         return $result;
     }
