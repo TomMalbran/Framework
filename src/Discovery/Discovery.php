@@ -3,6 +3,7 @@ namespace Framework\Discovery;
 
 use Framework\File\File;
 use Framework\System\Package;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 use Framework\Utils\JSON;
 
@@ -132,6 +133,20 @@ class Discovery {
      */
     public static function loadData(DataFile $file): array {
         return self::loadJSON(Package::DataDir, $file->name());
+    }
+
+    /**
+     * Loads a Custom Data File
+     * @param string $fileName
+     * @return array<string,Dictionary>
+     */
+    public static function loadCustomData(string $fileName): array {
+        $data   = self::loadJSON(Package::DataDir, $fileName);
+        $result = [];
+        foreach ($data as $key => $value) {
+            $result[Strings::toString($key)] = new Dictionary($value);
+        }
+        return $result;
     }
 
     /**
