@@ -16,7 +16,7 @@ class StatusCode {
      * @return array<string,mixed>
      */
     public static function getCode(): array {
-        /** @var array{values:array<string,string>,groups:array<string,string[]>} */
+        /** @var array{values:array<string,string>|null,groups:array<string,string[]>|null} */
         $frameData = Discovery::loadFrameData(DataFile::Status);
         if (!isset($frameData["values"]) || !isset($frameData["groups"])) {
             return [];
@@ -25,7 +25,7 @@ class StatusCode {
         $values = $frameData["values"];
         $groups = $frameData["groups"];
 
-        /** @var array{values:array<string,string>,groups:array<string,string[]>} */
+        /** @var array{values:array<string,string>|null,groups:array<string,string[]>|null} */
         $appData = Discovery::loadData(DataFile::Status);
         if (!Arrays::isEmpty($appData) && isset($appData["values"]) && isset($appData["groups"])) {
             $values = array_merge($frameData["values"], $appData["values"]);

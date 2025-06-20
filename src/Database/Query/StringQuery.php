@@ -118,7 +118,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function notLikeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "NOT LIKE", $value, $condition, caseSensitive: $caseSensitive);
+        return $this->query->addIf($this->column, "NOT LIKE", $value, $condition, caseSensitive: $caseSensitive);
     }
 
     /**

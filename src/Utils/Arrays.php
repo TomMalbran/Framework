@@ -673,7 +673,7 @@ class Arrays {
     public static function createArray(array $array, array|string|null $key = null, bool $skipEmpty = false, bool $distinct = false): array {
         $result = [];
         foreach ($array as $row) {
-            $elem = self::getValue($row, $key);
+            $elem = self::getValue($row, $key ?? "");
             if (($distinct && in_array($elem, $result, true)) || ($skipEmpty && self::isEmpty($key))) {
                 continue;
             }
@@ -838,17 +838,17 @@ class Arrays {
 
     /**
      * Returns one or multiple values as a string
-     * @param mixed                $array
-     * @param string[]|string|null $key      Optional.
-     * @param string               $glue     Optional.
-     * @param string               $prefix   Optional.
-     * @param boolean              $useEmpty Optional.
-     * @param mixed|string         $default  Optional.
+     * @param mixed           $array
+     * @param string[]|string $key
+     * @param string          $glue     Optional.
+     * @param string          $prefix   Optional.
+     * @param boolean         $useEmpty Optional.
+     * @param mixed|string    $default  Optional.
      * @return mixed
      */
     public static function getValue(
         mixed $array,
-        array|string|null $key = null,
+        array|string $key,
         string $glue = " - ",
         string $prefix = "",
         bool $useEmpty = false,
@@ -889,11 +889,11 @@ class Arrays {
      */
     public static function getOneValue(mixed $array, string $key, bool $useEmpty = false, mixed $default = null): mixed {
         if (is_object($array) && property_exists($array, $key)) {
-            if ($useEmpty || (!$useEmpty && !self::isEmpty($array->$key))) {
+            if ($useEmpty || !self::isEmpty($array->$key)) {
                 return $array->$key;
             }
         } elseif (is_array($array) && array_key_exists($key, $array)) {
-            if ($useEmpty || (!$useEmpty && !self::isEmpty($array, $key))) {
+            if ($useEmpty || !self::isEmpty($array, $key)) {
                 return $array[$key];
             }
         }

@@ -43,9 +43,8 @@ class RouterCode {
                     continue;
                 }
 
-                $attribute  = $attributes[0];
+                $route      = $attributes[0]->newInstance();
                 $fileName   = $reflection->getFileName();
-                $route      = $attribute->newInstance();
                 $params     = $method->getNumberOfParameters();
                 $response   = $method->getReturnType();
                 $methodName = $method->getName();
