@@ -5,6 +5,7 @@ use Framework\Database\SchemaFactory;
 use Framework\Database\Field;
 use Framework\Database\Join;
 use Framework\Database\Count;
+use Framework\Database\Model\FieldType;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
@@ -20,8 +21,9 @@ class Structure {
     public bool   $hasAutoInc  = false;
     public string $idKey       = "";
     public string $idName      = "";
-    public string $idType      = "";
     public string $nameKey     = "";
+
+    public FieldType $idType   = FieldType::String;
 
     /** @var Field[] */
     public array $fields       = [];
@@ -75,7 +77,7 @@ class Structure {
         $fields = $data->getDict("fields");
         if ($this->hasStatus) {
             $fields->set("status", [
-                "type"    => Field::String,
+                "type"    => FieldType::String->name,
                 "noEmpty" => true,
                 "isKey"   => true,
                 "default" => "",
@@ -83,41 +85,41 @@ class Structure {
         }
         if ($this->hasPositions) {
             $fields->set("position", [
-                "type"    => Field::Number,
+                "type"    => FieldType::Number->name,
                 "default" => 0,
             ]);
         }
         if ($this->canCreate && $this->hasTimestamps) {
             $fields->set("createdTime", [
-                "type"     => Field::Date,
+                "type"     => FieldType::Date->name,
                 "cantEdit" => true,
                 "default"  => 0,
             ]);
         }
         if ($this->canCreate && $this->hasUsers) {
             $fields->set("createdUser", [
-                "type"     => Field::Number,
+                "type"     => FieldType::Number->name,
                 "cantEdit" => true,
                 "default"  => 0,
             ]);
         }
         if ($this->canEdit && $this->hasTimestamps) {
             $fields->set("modifiedTime", [
-                "type"     => Field::Date,
+                "type"     => FieldType::Date->name,
                 "cantEdit" => true,
                 "default"  => 0,
             ]);
         }
         if ($this->canEdit && $this->hasUsers) {
             $fields->set("modifiedUser", [
-                "type"     => Field::Number,
+                "type"     => FieldType::Number->name,
                 "cantEdit" => true,
                 "default"  => 0,
             ]);
         }
         if ($this->canDelete) {
             $fields->set("isDeleted", [
-                "type"     => Field::Boolean,
+                "type"     => FieldType::Boolean->name,
                 "cantEdit" => true,
                 "default"  => 0,
             ]);
@@ -129,7 +131,8 @@ class Structure {
         $reqMasterKey = false;
 
         foreach ($fields as $key => $value) {
-            if ($value->getString("type") === Field::ID) {
+            $type = FieldType::from($value->getString("type"));
+            if ($type === FieldType::ID) {
                 $idKey         = $key;
                 $primaryCount += 1;
             } elseif ($value->hasValue("isPrimary")) {
@@ -138,7 +141,7 @@ class Structure {
             if ($idKey === "" && $value->hasValue("isPrimary")) {
                 $idKey = $key;
             }
-            if ($value->getString("type") === Field::Encrypt) {
+            if ($type === FieldType::Encrypt) {
                 $reqMasterKey = true;
             }
         }
@@ -149,7 +152,7 @@ class Structure {
         // Create the Fields
         foreach ($fields as $key => $value) {
             $field = new Field($key, $value);
-            if ($field->type === Field::ID) {
+            if ($field->type === FieldType::ID) {
                 $this->hasAutoInc = true;
             }
             if ($key === $idKey) {
@@ -159,7 +162,7 @@ class Structure {
                 $this->idType = $field->type;
             }
             if ($field->isName) {
-                $this->nameKey = $field->type === Field::Text ? "{$field->key}Short" : $field->key;
+                $this->nameKey = $field->key;
             }
             $this->fields[] = $field;
         }

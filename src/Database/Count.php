@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Database\SchemaFactory;
 use Framework\Database\Field;
+use Framework\Database\Model\FieldType;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -120,7 +121,7 @@ class Count {
         $key    = $this->key;
         $result = $data[$key] ?? 0;
 
-        if ($this->field->type === Field::Float) {
+        if ($this->field->type === FieldType::Float) {
             $result = Numbers::toFloat($result, $this->field->decimals);
         }
         return $result;

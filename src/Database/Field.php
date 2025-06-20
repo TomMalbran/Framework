@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Request;
 use Framework\Database\Assign;
+use Framework\Database\Model\FieldType;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\System\Path;
@@ -17,23 +18,10 @@ use Framework\Utils\Strings;
  */
 class Field {
 
-    // The Types
-    const ID       = "id";
-    const Boolean  = "boolean";
-    const Number   = "number";
-    const Float    = "float";
-    const Date     = "date";
-    const String   = "string";
-    const Text     = "text";
-    const LongText = "longtext";
-    const JSON     = "json";
-    const HTML     = "html";
-    const Encrypt  = "encrypt";
-    const File     = "file";
-
     // The Data
+    public FieldType $type    = FieldType::None;
+
     public string $key        = "";
-    public string $type       = "";
     public int    $length     = 0;
     public int    $decimals   = 2;
     public string $dateType   = "middle";
@@ -72,7 +60,7 @@ class Field {
     public function __construct(string $key, Dictionary $data, string $prefix = "") {
         $this->key        = $key;
 
-        $this->type       = $data->getString("type", self::String);
+        $this->type       = FieldType::from($data->getString("type"));
         $this->length     = $data->getInt("length", default: $this->length);
         $this->decimals   = $data->getInt("decimals", default: $this->decimals);
         $this->dateType   = $data->getString("dateType", $this->dateType);
@@ -81,7 +69,7 @@ class Field {
         $this->path       = $data->getString("path", $this->path);
         $this->default    = $data->getString("default", $this->default);
 
-        $this->isID       = $this->type === self::ID;
+        $this->isID       = $this->type === FieldType::ID;
         $this->isPrimary  = $this->isID || $data->hasValue("isPrimary");
         $this->isKey      = $data->hasValue("isKey");
         $this->isName     = $data->hasValue("isName");
@@ -141,25 +129,25 @@ class Field {
         $default    = null;
 
         switch ($this->type) {
-        case self::ID:
+        case FieldType::ID:
             $type       = "int";
             $length     = 10;
             $attributes = "unsigned NOT NULL AUTO_INCREMENT";
             break;
-        case self::Boolean:
+        case FieldType::Boolean:
             $type       = "tinyint";
             $length     = 1;
             $attributes = "unsigned NOT NULL";
             $default    = 0;
             break;
-        case self::Float:
+        case FieldType::Float:
             $type       = "bigint";
             $length     = 20;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
             $default    = 0;
             break;
-        case self::Number:
-        case self::Date:
+        case FieldType::Number:
+        case FieldType::Date:
             $type       = "int";
             $length     = $this->length > 0 ? $this->length : 10;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
@@ -175,27 +163,27 @@ class Field {
                 $type = "bigint";
             }
             break;
-        case self::String:
-        case self::File:
+        case FieldType::String:
+        case FieldType::File:
             $type       = "varchar";
             $length     = $this->length > 0 ? $this->length : 255;
             $attributes = "NOT NULL";
             $default    = "";
             break;
-        case self::Text:
+        case FieldType::Text:
             $type       = "text";
             $attributes = "NULL";
             break;
-        case self::LongText:
+        case FieldType::LongText:
             $type       = "longtext";
             $attributes = "NULL";
             break;
-        case self::JSON:
-        case self::HTML:
+        case FieldType::JSON:
+        case FieldType::HTML:
             $type       = "mediumtext";
             $attributes = "NULL";
             break;
-        case self::Encrypt:
+        case FieldType::Encrypt:
             $type       = "varbinary";
             $length     = $this->length > 0 ? $this->length : 255;
             $attributes = "NOT NULL";
@@ -228,21 +216,21 @@ class Field {
         $result = null;
 
         switch ($this->type) {
-        case self::ID:
+        case FieldType::ID:
             break;
-        case self::Boolean:
+        case FieldType::Boolean:
             $result = $request->toBinary($this->name);
             break;
-        case self::String:
+        case FieldType::String:
             $result = $request->getString($this->name);
             break;
-        case self::Number:
+        case FieldType::Number:
             $result = $request->getInt($this->name);
             break;
-        case self::Float:
+        case FieldType::Float:
             $result = $request->toInt($this->name, $this->decimals);
             break;
-        case self::Date:
+        case FieldType::Date:
             if ($this->date !== "" && $this->hour !== "") {
                 $result = $request->toTimeHour($this->date, $this->hour, true);
             } elseif ($this->date !== "") {
@@ -257,10 +245,10 @@ class Field {
                 $result = $request->toDay($this->name, $this->dateType, true);
             }
             break;
-        case self::JSON:
+        case FieldType::JSON:
             $result = $request->toJSON($this->name);
             break;
-        case self::Encrypt:
+        case FieldType::Encrypt:
             $value  = $request->getString($this->name);
             $result = Assign::encrypt($value, Config::getDbKey());
             break;
@@ -282,32 +270,32 @@ class Field {
         $result = [];
 
         switch ($this->type) {
-        case self::Boolean:
+        case FieldType::Boolean:
             $result[$key]           = !Arrays::isEmpty($data, $key);
             break;
-        case self::ID:
-        case self::Number:
+        case FieldType::ID:
+        case FieldType::Number:
             $result[$key]           = $number;
             break;
-        case self::Float:
+        case FieldType::Float:
             $result[$key]           = Numbers::toFloat($number, $this->decimals);
             break;
-        case self::Date:
+        case FieldType::Date:
             $result[$key]           = $number;
             $result["{$key}Date"]   = $number !== 0 ? date("d-m-Y",     $number) : "";
             $result["{$key}Full"]   = $number !== 0 ? date("d-m-Y H:i", $number) : "";
             break;
-        case self::JSON:
+        case FieldType::JSON:
             $result[$key]           = JSON::decodeAsArray($text);
             break;
-        case self::HTML:
+        case FieldType::HTML:
             $result[$key]           = $text;
             $result["{$key}Html"]   = Strings::toHtml($text);
             break;
-        case self::Encrypt:
+        case FieldType::Encrypt:
             $result[$key]           = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
             break;
-        case self::File:
+        case FieldType::File:
             $result[$key]           = $text;
             if ($this->path !== "") {
                 $result["{$key}Url"]   = $text !== "" ? FilePath::getUrl($this->path, $text) : "";

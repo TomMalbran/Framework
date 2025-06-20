@@ -3,7 +3,7 @@ namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\Database\Structure;
-use Framework\Database\Field;
+use Framework\Database\Model\FieldType;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -57,7 +57,7 @@ class Selection {
             $this->selects[] = "$mainKey.{$this->structure->idKey} AS id";
         }
         foreach ($this->structure->fields as $field) {
-            if ($decrypted && $field->type === Field::Encrypt) {
+            if ($decrypted && $field->type === FieldType::Encrypt) {
                 $this->selects[] = "CAST(AES_DECRYPT($mainKey.$field->key, '$masterKey') AS CHAR(255)) {$field->key}Decrypt";
             } elseif ($field->hasName) {
                 $this->selects[] = "$mainKey.$field->key AS $field->name";

@@ -29,7 +29,7 @@ class {{query}} extends SchemaQuery {
         parent::__construct($query);
 
         {{#properties}}
-        $this->{{constName}} = new {{type}}($this->query, "{{value}}");
+        $this->{{constName}} = new {{queryType}}($this->query, "{{value}}");
         {{/properties}}
     }
 

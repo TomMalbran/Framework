@@ -5,6 +5,7 @@ use Framework\Discovery\Discovery;
 use Framework\Database\SchemaFactory;
 use Framework\Database\Structure;
 use Framework\Database\Field;
+use Framework\Database\Model\FieldType;
 use Framework\File\File;
 use Framework\Provider\Mustache;
 use Framework\System\Package;
@@ -426,29 +427,29 @@ class SchemaBuilder {
         $key = $field->prefixName;
 
         switch ($field->type) {
-        case Field::Boolean:
+        case FieldType::Boolean:
             $result[] = self::getTypeData($key, "bool");
             break;
-        case Field::ID:
-        case Field::Number:
+        case FieldType::ID:
+        case FieldType::Number:
             $result[] = self::getTypeData($key, "int");
             break;
-        case Field::Float:
+        case FieldType::Float:
             $result[] = self::getTypeData($key, "float");
             break;
-        case Field::Date:
+        case FieldType::Date:
             $result[] = self::getTypeData($key, "int");
             $result[] = self::getTypeData("{$key}Date", "string");
             $result[] = self::getTypeData("{$key}Full", "string");
             break;
-        case Field::JSON:
+        case FieldType::JSON:
             $result[] = self::getTypeData($key, "mixed");
             break;
-        case Field::HTML:
+        case FieldType::HTML:
             $result[] = self::getTypeData($key, "string");
             $result[] = self::getTypeData("{$key}Html", "string");
             break;
-        case Field::File:
+        case FieldType::File:
             $result[] = self::getTypeData($key, "string");
             $result[] = self::getTypeData("{$key}Url", "string");
             $result[] = self::getTypeData("{$key}Thumb", "string");
@@ -539,7 +540,7 @@ class SchemaBuilder {
                 "value"    => "{$structure->table}.{$field->key}",
                 "addSpace" => false,
             ];
-            if ($field->type === Field::File) {
+            if ($field->type === FieldType::File) {
                 $result[] = [
                     "name"     => Strings::upperCaseFirst("{$field->name}Url"),
                     "value"    => "{$field->name}Url",
@@ -608,7 +609,7 @@ class SchemaBuilder {
             "name"       => $structure->schema,
             "column"     => "{$structure->schema}Column",
             "query"      => "{$structure->schema}Query",
-            "properties" => self::getProperties($structure),
+            "properties" => self::getQueryProperties($structure),
         ]);
         $contents = self::alignParams($contents);
         return $contents;
@@ -619,7 +620,7 @@ class SchemaBuilder {
      * @param Structure $structure
      * @return array{}
      */
-    private static function getProperties(Structure $structure): array {
+    private static function getQueryProperties(Structure $structure): array {
         $nameLength = 0;
         $typeLength = 0;
         $list       = [];
@@ -658,26 +659,26 @@ class SchemaBuilder {
         foreach ($list as $property) {
             $type = $property["type"];
             if ($property["column"] === "status") {
-                $property["type"] = "StatusQuery";
+                $property["queryType"] = "StatusQuery";
             } else {
-                $property["type"] = match($type) {
-                    Field::Boolean => "BooleanQuery",
-                    Field::ID,
-                    Field::Number,
-                    Field::Float,
-                    Field::Date    => "NumberQuery",
-                    Field::String,
-                    Field::Text,
-                    Field::LongText,
-                    Field::JSON,
-                    Field::HTML,
-                    Field::File    => "StringQuery",
-                    default        => "",
+                $property["queryType"] = match($type) {
+                    FieldType::Boolean => "BooleanQuery",
+                    FieldType::ID,
+                    FieldType::Number,
+                    FieldType::Float,
+                    FieldType::Date    => "NumberQuery",
+                    FieldType::String,
+                    FieldType::Text,
+                    FieldType::LongText,
+                    FieldType::JSON,
+                    FieldType::HTML,
+                    FieldType::File    => "StringQuery",
+                    default            => "",
                 };
             }
-            if ($property["type"] !== "") {
+            if ($property["queryType"] !== "") {
                 $nameLength = max($nameLength, Strings::length($property["name"]));
-                $typeLength = max($typeLength, Strings::length($property["type"]));
+                $typeLength = max($typeLength, Strings::length($property["queryType"]));
 
                 $result[] = $property;
             }
@@ -685,7 +686,7 @@ class SchemaBuilder {
 
         foreach ($result as $index => $property) {
             $result[$index]["propName"]  = Strings::padRight("{$property["name"]};", $nameLength + 1);
-            $result[$index]["propType"]  = Strings::padRight($property["type"], $typeLength);
+            $result[$index]["propType"]  = Strings::padRight($property["queryType"], $typeLength);
             $result[$index]["constName"] = Strings::padRight($property["name"], $nameLength);
         }
         return $result;
@@ -695,15 +696,17 @@ class SchemaBuilder {
 
     /**
      * Returns the Field type for the Schema
-     * @param string $type
+     * @param FieldType $type
      * @return string
      */
-    private static function getFieldType(string $type): string {
+    private static function getFieldType(FieldType $type): string {
         return match ($type) {
-            Field::Boolean => "bool",
-            Field::ID, Field::Number, Field::Date => "int",
-            Field::Float => "float",
-            default => "string",
+            FieldType::Boolean => "bool",
+            FieldType::ID,
+            FieldType::Number,
+            FieldType::Date    => "int",
+            FieldType::Float   => "float",
+            default            => "string",
         };
     }
 
