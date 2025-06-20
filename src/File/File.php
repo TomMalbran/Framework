@@ -18,7 +18,7 @@ class File {
      * @return string
      */
     public static function getDirectory(string $path, int $levels = 1): string {
-        $directory = dirname($path, $levels);
+        $directory = dirname($path, max(1, $levels));
         return Strings::replace($directory, "\\", "/");
     }
 
