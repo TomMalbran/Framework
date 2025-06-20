@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\Request;
+use Framework\Database\SchemaFactory;
 use Framework\Database\Database;
 use Framework\Database\Structure;
 use Framework\Database\Selection;
@@ -38,7 +39,7 @@ class Schema {
      */
     private static function structure(): Structure {
         $schemaName = Strings::toString(static::Schema);
-        return Factory::getStructure($schemaName);
+        return SchemaFactory::getStructure($schemaName);
     }
 
 

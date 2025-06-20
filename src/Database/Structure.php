@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\Factory;
+use Framework\Database\SchemaFactory;
 use Framework\Database\Field;
 use Framework\Database\Join;
 use Framework\Database\Count;
@@ -60,7 +60,7 @@ class Structure {
      */
     public function __construct(string $schema, Dictionary $data) {
         $this->schema        = $schema;
-        $this->table         = Factory::getTableName($schema);
+        $this->table         = SchemaFactory::getTableName($schema);
         $this->hasStatus     = $data->hasValue("hasStatus");
         $this->hasPositions  = $data->hasValue("hasPositions");
         $this->hasTimestamps = $data->hasValue("hasTimestamps");
@@ -187,7 +187,7 @@ class Structure {
 
         // Create the SubRequests
         foreach ($data->getDict("subrequests") as $key => $value) {
-            $subStructure = Factory::getStructure($key);
+            $subStructure = SchemaFactory::getStructure($key);
             $this->subRequests[] = new SubRequest($subStructure, $value, $this->idKey, $this->idName);
         }
 

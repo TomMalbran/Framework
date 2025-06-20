@@ -2,9 +2,10 @@
 namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
-use Framework\File\File;
+use Framework\Database\SchemaFactory;
 use Framework\Database\Structure;
 use Framework\Database\Field;
+use Framework\File\File;
 use Framework\Provider\Mustache;
 use Framework\System\Package;
 use Framework\Utils\Arrays;
@@ -24,7 +25,7 @@ class SchemaBuilder {
      * @return integer
      */
     public static function generateCode(string $baseNamespace, string $writePath, bool $forFramework): int {
-        $schemas = Factory::getData();
+        $schemas = SchemaFactory::getData();
         $created = 0;
 
         File::createDir($writePath);

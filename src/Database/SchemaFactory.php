@@ -11,7 +11,7 @@ use Framework\Utils\Strings;
 /**
  * The Schema Factory
  */
-class Factory {
+class SchemaFactory {
 
     private static ?Dictionary $data = null;
 

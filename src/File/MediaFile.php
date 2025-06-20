@@ -5,12 +5,12 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
+use Framework\Database\SchemaFactory;
+use Framework\Database\Assign;
+use Framework\Database\Query;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
-use Framework\Database\Factory;
-use Framework\Database\Assign;
-use Framework\Database\Query;
 use Framework\System\Path;
 use Framework\Utils\Strings;
 
@@ -78,7 +78,7 @@ class MediaFile {
 
         $db = Framework::getDatabase();
         foreach (self::$data as $field) {
-            $structure = Factory::getStructure($field["schema"]);
+            $structure = SchemaFactory::getStructure($field["schema"]);
 
             foreach ($files as $file) {
                 $old = $file["old"];

@@ -4,11 +4,11 @@ namespace Framework\Database;
 use Framework\Framework;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
-use Framework\Core\Settings;
-use Framework\File\File;
-use Framework\Database\Factory;
+use Framework\Database\SchemaFactory;
 use Framework\Database\Database;
 use Framework\Database\Structure;
+use Framework\Core\Settings;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -25,7 +25,7 @@ class Migration {
      */
     public static function migrateData(bool $canDelete = false): bool {
         $db             = Framework::getDatabase();
-        $schemas        = Factory::getData();
+        $schemas        = SchemaFactory::getData();
         $startMovement  = Settings::getCore("movement");
         $startRename    = Settings::getCore("rename");
         $startMigration = Settings::getCore("migration");
@@ -70,8 +70,8 @@ class Migration {
         $didMove      = false;
 
         for ($i = $startMovement; $i < $lastMovement; $i++) {
-            $fromName = Factory::getTableName($movements[$i]["from"]);
-            $toName   = Factory::getTableName($movements[$i]["to"]);
+            $fromName = SchemaFactory::getTableName($movements[$i]["from"]);
+            $toName   = SchemaFactory::getTableName($movements[$i]["to"]);
 
             if ($db->tableExists($fromName)) {
                 $db->renameTable($fromName, $toName);
@@ -100,7 +100,7 @@ class Migration {
         $didRename  = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
-            $table    = Factory::getTableName($renames[$i]["schema"]);
+            $table    = SchemaFactory::getTableName($renames[$i]["schema"]);
             $fromName = $renames[$i]["from"];
             $toName   = $renames[$i]["to"];
 
