@@ -179,7 +179,6 @@ class Field {
             $attributes = "NULL";
             break;
         case FieldType::JSON:
-        case FieldType::HTML:
             $type       = "mediumtext";
             $attributes = "NULL";
             break;
@@ -287,10 +286,6 @@ class Field {
             break;
         case FieldType::JSON:
             $result[$key]           = JSON::decodeAsArray($text);
-            break;
-        case FieldType::HTML:
-            $result[$key]           = $text;
-            $result["{$key}Html"]   = Strings::toHtml($text);
             break;
         case FieldType::Encrypt:
             $result[$key]           = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";

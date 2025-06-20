@@ -445,10 +445,6 @@ class SchemaBuilder {
         case FieldType::JSON:
             $result[] = self::getTypeData($key, "mixed");
             break;
-        case FieldType::HTML:
-            $result[] = self::getTypeData($key, "string");
-            $result[] = self::getTypeData("{$key}Html", "string");
-            break;
         case FieldType::File:
             $result[] = self::getTypeData($key, "string");
             $result[] = self::getTypeData("{$key}Url", "string");
@@ -671,7 +667,6 @@ class SchemaBuilder {
                     FieldType::Text,
                     FieldType::LongText,
                     FieldType::JSON,
-                    FieldType::HTML,
                     FieldType::File    => "StringQuery",
                     default            => "",
                 };

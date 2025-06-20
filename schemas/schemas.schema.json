@@ -238,7 +238,6 @@
                 "date",
                 "string",
                 "json",
-                "html",
                 "text",
                 "longtext",
                 "encrypt",

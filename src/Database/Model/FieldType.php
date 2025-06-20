@@ -19,7 +19,6 @@ enum FieldType {
     case Text;
     case LongText;
     case JSON;
-    case HTML;
     case Encrypt;
     case File;
 
