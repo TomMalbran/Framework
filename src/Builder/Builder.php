@@ -10,7 +10,7 @@ use Framework\Builder\SettingCode;
 use Framework\Builder\SignalCode;
 use Framework\Builder\StatusCode;
 use Framework\Builder\TemplateCode;
-use Framework\Database\Generator;
+use Framework\Database\SchemaBuilder;
 use Framework\Discovery\DataFile;
 use Framework\File\File;
 use Framework\File\FilePath;
@@ -56,10 +56,10 @@ class Builder {
 
         print("\nSCHEMA CODES\n");
         $schemaWritePath = File::parsePath($package["basePath"], $package["sourceDir"], self::SchemaDir);
-        $files += Generator::generateCode($package["appNamespace"], $schemaWritePath, false);
+        $files += SchemaBuilder::generateCode($package["appNamespace"], $schemaWritePath, false);
 
         $schemaWritePath = File::parsePath($package["framePath"], "src", self::SchemaDir);
-        $files += Generator::generateCode(self::Namespace, $schemaWritePath, true);
+        $files += SchemaBuilder::generateCode(self::Namespace, $schemaWritePath, true);
 
 
         print("\nFRAMEWORK SEC CODES\n");

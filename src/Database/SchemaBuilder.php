@@ -12,9 +12,9 @@ use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
- * The Schema Generator
+ * The Schema Builder
  */
-class Generator {
+class SchemaBuilder {
 
     /**
      * Generates the Code for the Schemas
