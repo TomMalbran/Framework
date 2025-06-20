@@ -28,9 +28,6 @@ class TemplateCode {
                 break;
             }
         }
-        if (Arrays::isEmpty($data)) {
-            return [];
-        }
 
         $templates = [];
         $maxLength = 0;
@@ -47,7 +44,8 @@ class TemplateCode {
         }
 
         return [
-            "templates" => $templates,
+            "hasTemplates" => count($templates) > 0,
+            "templates"    => $templates,
         ];
     }
 }
