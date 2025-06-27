@@ -16,6 +16,8 @@ class Select implements JsonSerializable {
     public string|int $key;
     public string     $value;
 
+    public string     $description = "";
+
     /** @var array<string,mixed> */
     private array $extras = [];
 
@@ -105,6 +107,9 @@ class Select implements JsonSerializable {
             "key"   => $this->key,
             "value" => $this->value,
         ];
+        if ($this->description !== "") {
+            $result["description"] = $this->description;
+        }
         foreach ($this->extras as $key => $value) {
             $result[$key] = $value;
         }
@@ -118,8 +123,9 @@ class Select implements JsonSerializable {
      * @param mixed[]              $array
      * @param string               $keyName
      * @param string[]|string      $valName
-     * @param boolean              $useEmpty Optional.
+     * @param string|null          $descName Optional.
      * @param string[]|string|null $extraKey Optional.
+     * @param boolean              $useEmpty Optional.
      * @param boolean              $distinct Optional.
      * @return Select[]
      */
@@ -127,8 +133,9 @@ class Select implements JsonSerializable {
         array $array,
         string $keyName,
         array|string $valName,
-        bool $useEmpty = false,
+        string|null $descName = null,
         array|string|null $extraKey = null,
+        bool $useEmpty = false,
         bool $distinct = false,
     ): array {
         $result = [];
@@ -146,6 +153,9 @@ class Select implements JsonSerializable {
             }
 
             $item = new Select($key, $value);
+            if ($descName !== null) {
+                $item->set("description", Arrays::getValue($row, $descName, useEmpty: true));
+            }
             if (!Arrays::isEmpty($extraKey)) {
                 $extraKeyNames = Arrays::toStrings($extraKey);
                 foreach ($extraKeyNames as $extraKeyName) {

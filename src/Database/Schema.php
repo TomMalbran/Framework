@@ -149,6 +149,7 @@ class Schema {
      * @param Query|null           $query          Optional.
      * @param string|null          $idColumn       Optional.
      * @param string[]|string|null $nameColumn     Optional.
+     * @param string|null          $descColumn     Optional.
      * @param string[]|string|null $extraColumn    Optional.
      * @param string|null          $distinctColumn Optional.
      * @param boolean              $useEmpty       Optional.
@@ -158,6 +159,7 @@ class Schema {
         ?Query $query = null,
         ?string $idColumn = null,
         array|string|null $nameColumn = null,
+        ?string $descColumn = null,
         array|string|null $extraColumn = null,
         ?string $distinctColumn = null,
         bool $useEmpty = false,
@@ -174,9 +176,15 @@ class Schema {
         $selection->request($query);
         $request = $selection->resolve();
 
-        $keyName = $idColumn ?? self::structure()->idName;
-        $valName = $nameColumn !== null && !Arrays::isEmpty($nameColumn) ? $nameColumn : self::structure()->nameKey;
-        return Select::create($request, $keyName, $valName, $useEmpty, $extraColumn, true);
+        return Select::create(
+            $request,
+            keyName:  $idColumn ?? self::structure()->idName,
+            valName:  $nameColumn !== null && !Arrays::isEmpty($nameColumn) ? $nameColumn : self::structure()->nameKey,
+            descName: $descColumn,
+            extraKey: $extraColumn,
+            useEmpty: $useEmpty,
+            distinct: true,
+        );
     }
 
     /**

@@ -362,6 +362,7 @@ class {{name}}Schema extends Schema {
      * @param {{query}} $query
      * @param {{column}}|null $idColumn Optional.
      * @param {{column}}[]|{{column}}|null $nameColumn Optional.
+     * @param {{column}}|null $descColumn Optional.
      * @param {{column}}[]|{{column}}|null $extraColumn Optional.
      * @param {{column}}|null $distinctColumn Optional.
      * @param boolean $useEmpty Optional.
@@ -371,15 +372,20 @@ class {{name}}Schema extends Schema {
         {{query}} $query,
         ?{{column}} $idColumn = null,
         array|{{column}}|null $nameColumn = null,
+        ?{{column}} $descColumn = null,
         array|{{column}}|null $extraColumn = null,
         ?{{column}} $distinctColumn = null,
         bool $useEmpty = false,
     ): array {
-        $idKey       = $idColumn       !== null ? $idColumn->key()       : null;
-        $distinctKey = $distinctColumn !== null ? $distinctColumn->value : null;
-        $nameKey     = {{column}}::toKeys($nameColumn);
-        $extraKey    = {{column}}::toKeys($extraColumn);
-        return self::getSchemaSelect($query->query, $idKey, $nameKey, $extraKey, $distinctKey, $useEmpty);
+        return self::getSchemaSelect(
+            $query->query,
+            idColumn:       $idColumn !== null ? $idColumn->key() : null,
+            nameColumn:     {{column}}::toKeys($nameColumn),
+            descColumn:     $descColumn !== null ? $descColumn->key() : null,
+            extraColumn:    {{column}}::toKeys($extraColumn),
+            distinctColumn: $distinctColumn !== null ? $distinctColumn->value : null,
+            useEmpty:       $useEmpty,
+        );
     }
 
     /**
