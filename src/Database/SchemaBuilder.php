@@ -82,32 +82,28 @@ class SchemaBuilder {
      * @return array<string,string>
      */
     private static function generateFolders(Dictionary $schemas, string $writePath, bool $forFramework): array {
-        $groups  = [];
-        $folders = [];
+        $schemaKeys = [];
+        $folders    = [];
 
         foreach ($schemas as $schemaKey => $schemaData) {
             $fromFramework = $schemaData->hasValue("fromFramework");
-            if ($fromFramework) {
-                continue;
+            if (!$fromFramework) {
+                $schemaKeys[] = $schemaKey;
             }
+        }
 
-            $newGroup = "";
-            foreach ($groups as $group) {
-                if (Strings::startsWith($schemaKey, $group)) {
-                    $newGroup = $group;
-                    break;
+        foreach ($schemaKeys as $schemaKey) {
+            $minSchema = $schemaKey;
+            foreach ($schemaKeys as $otherSchemaKey) {
+                if (Strings::startsWith($schemaKey, $otherSchemaKey) && Strings::length($otherSchemaKey) < Strings::length($minSchema)) {
+                    $minSchema = $otherSchemaKey;
                 }
             }
-            if ($newGroup !== "") {
-                $folders[$schemaKey] = $newGroup;
-                continue;
-            }
 
-            $groups[]            = $schemaKey;
-            $folders[$schemaKey] = $schemaKey;
+            $folders[$schemaKey] = $minSchema;
 
             if (!$forFramework) {
-                File::createDir("$writePath/$schemaKey");
+                File::createDir("$writePath/$minSchema");
             }
         }
         return $folders;
