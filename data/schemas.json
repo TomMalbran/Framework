@@ -4,6 +4,7 @@
             "CREDENTIAL_ID"    : { "type" : "id"                                            },
             "currentUser"      : { "type" : "number",                     "cantEdit" : true },
             "email"            : { "type" : "string"                                        },
+            "name"             : { "type" : "string",                     "cantEdit" : true },
             "firstName"        : { "type" : "string"                                        },
             "lastName"         : { "type" : "string"                                        },
             "phone"            : { "type" : "string",                     "noExists" : true },
@@ -243,9 +244,10 @@
                 "schema" : "Credential",
                 "prefix" : "credential",
                 "fields" : {
-                    "firstName" : { "type" : "string", "mergeTo" : "name" },
-                    "lastName"  : { "type" : "string", "mergeTo" : "name" },
-                    "email"     : { "type" : "string"                     }
+                    "name"      : { "type" : "string" },
+                    "firstName" : { "type" : "string" },
+                    "lastName"  : { "type" : "string" },
+                    "email"     : { "type" : "string" }
                 }
             }
         },
@@ -279,9 +281,10 @@
                 "schema" : "Credential",
                 "prefix" : "credential",
                 "fields" : {
-                    "firstName" : { "type" : "string", "mergeTo" : "name" },
-                    "lastName"  : { "type" : "string", "mergeTo" : "name" },
-                    "email"     : { "type" : "string"                     }
+                    "name"      : { "type" : "string" },
+                    "firstName" : { "type" : "string" },
+                    "lastName"  : { "type" : "string" },
+                    "email"     : { "type" : "string" }
                 }
             }
         },

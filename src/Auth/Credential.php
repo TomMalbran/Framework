@@ -625,18 +625,29 @@ class Credential extends CredentialSchema {
     ): array {
         $result = $fields;
 
+        // Parse the Name
+        $firstName = isset($result["firstName"]) ? Strings::toString($result["firstName"]) : "";
+        $lastName  = isset($result["lastName"])  ? Strings::toString($result["lastName"])  : "";
+        if ($request !== null) {
+            $firstName = $request->getString("firstName");
+            $lastName  = $request->getString("lastName");
+        }
+        $result["name"] = Strings::merge($firstName, $lastName);
+
+        // Parse the Password
         $password = "";
         if ($request !== null) {
             $password = $request->getString("password");
         } elseif (isset($fields["password"])) {
             $password = Strings::toString($fields["password"]);
         }
-
         if ($password !== "") {
             $hash = self::createHash($password);
             $result["password"] = $hash["password"];
             $result["salt"]     = $hash["salt"];
         }
+
+        // Parse the Access and Request Password Change
         if ($accessName !== null) {
             $result["access"] = $accessName->name;
         }
