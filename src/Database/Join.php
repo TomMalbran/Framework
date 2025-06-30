@@ -29,9 +29,6 @@ class Join {
     /** @var Field[] */
     public array   $fields     = [];
 
-    /** @var array<string,string[]> */
-    public array   $defaults   = [];
-
     /** @var string[] */
     private array  $andKeys    = [];
 
@@ -60,19 +57,10 @@ class Join {
         $this->andDeleted = $data->hasValue("andDeleted");
         $this->prefix     = $data->getString("prefix");
 
-
         // Creates the Fields
         foreach ($data->getDict("fields") as $fieldKey => $value) {
             $field = new Field($fieldKey, $value, $this->prefix);
             $this->fields[] = $field;
-
-            if ($field->defaultTo !== "") {
-                $defaultKey = $this->hasPrefix ? $this->prefix . ucfirst($field->defaultTo) : $field->defaultTo;
-                if (!isset($this->defaults[$defaultKey])) {
-                    $this->defaults[$defaultKey] = [];
-                }
-                $this->defaults[$defaultKey][] = $field->prefixName;
-            }
         }
     }
 
@@ -88,18 +76,6 @@ class Join {
         foreach ($this->fields as $field) {
             $values = $field->toValues($data);
             $result = array_merge($result, $values);
-        }
-
-        foreach ($this->defaults as $key => $fields) {
-            if (!isset($result[$key])) {
-                $result[$key] = "";
-                foreach ($fields as $fieldKey) {
-                    if (!Arrays::isEmpty($data[$fieldKey])) {
-                        $result[$key] = $data[$fieldKey];
-                        break;
-                    }
-                }
-            }
         }
         return $result;
     }

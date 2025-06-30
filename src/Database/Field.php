@@ -42,8 +42,6 @@ class Field {
     public bool   $noPrefix   = false;
     public bool   $canEdit    = false;
 
-    public string $defaultTo  = "";
-
     public bool   $hasName    = false;
     public string $name       = "";
     public string $prefix     = "";
@@ -79,8 +77,6 @@ class Field {
         $this->isSigned   = $data->hasValue("isSigned");
         $this->noPrefix   = $data->hasValue("noPrefix");
         $this->canEdit    = !$data->hasValue("cantEdit");
-
-        $this->defaultTo  = $data->getString("defaultTo");
 
         $this->hasName    = Strings::isUpperCase($key);
         $this->name       = $this->getFieldName();

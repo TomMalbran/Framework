@@ -392,9 +392,6 @@ class SchemaBuilder {
             foreach ($join->fields as $field) {
                 self::addAttribute($result, $field);
             }
-            foreach ($join->defaults as $key => $values) {
-                $result[] = self::getTypeData($key, "string");
-            }
         }
         foreach ($structure->counts as $count) {
             self::addAttribute($result, $count->field);

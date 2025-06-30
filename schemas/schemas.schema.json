@@ -190,10 +190,9 @@
                     "additionalProperties" : false,
                     "required"             : [ "type" ],
                     "properties"           : {
-                        "type"      : { "$ref" : "#/$defs/type"  },
-                        "decimals"  : { "type" : "number"        },
-                        "noPrefix"  : { "type" : "boolean"       },
-                        "defaultTo" : { "$ref" : "#/$defs/field" }
+                        "type"      : { "$ref" : "#/$defs/type" },
+                        "decimals"  : { "type" : "number"       },
+                        "noPrefix"  : { "type" : "boolean"      }
                     }
                 }
             }
