@@ -42,7 +42,6 @@ class Field {
     public bool   $noPrefix   = false;
     public bool   $canEdit    = false;
 
-    public string $mergeTo    = "";
     public string $defaultTo  = "";
 
     public bool   $hasName    = false;
@@ -81,7 +80,6 @@ class Field {
         $this->noPrefix   = $data->hasValue("noPrefix");
         $this->canEdit    = !$data->hasValue("cantEdit");
 
-        $this->mergeTo    = $data->getString("mergeTo");
         $this->defaultTo  = $data->getString("defaultTo");
 
         $this->hasName    = Strings::isUpperCase($key);

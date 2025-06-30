@@ -175,8 +175,7 @@
                         "andValue"   : { "type" : "string"             },
                         "andDeleted" : { "type" : "boolean"            },
                         "prefix"     : { "$ref" : "#/$defs/field"      },
-                        "fields"     : { "$ref" : "#/$defs/joinFields" },
-                        "mergeGlue"  : { "type" : "string"             }
+                        "fields"     : { "$ref" : "#/$defs/joinFields" }
                     }
                 }
             }
@@ -194,7 +193,6 @@
                         "type"      : { "$ref" : "#/$defs/type"  },
                         "decimals"  : { "type" : "number"        },
                         "noPrefix"  : { "type" : "boolean"       },
-                        "mergeTo"   : { "$ref" : "#/$defs/field" },
                         "defaultTo" : { "$ref" : "#/$defs/field" }
                     }
                 }

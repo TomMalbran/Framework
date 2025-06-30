@@ -3,7 +3,6 @@ namespace Framework\Database;
 
 use Framework\Database\SchemaFactory;
 use Framework\Database\Field;
-use Framework\Database\Merge;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
@@ -25,14 +24,10 @@ class Join {
     private string $andValue   = "";
     private bool   $andDeleted = false;
 
-    private bool   $hasPrefix  = false;
     private string $prefix     = "";
 
     /** @var Field[] */
     public array   $fields     = [];
-
-    /** @var Merge[] */
-    public array   $merges     = [];
 
     /** @var array<string,string[]> */
     public array   $defaults   = [];
@@ -63,8 +58,6 @@ class Join {
         $this->orKeys     = $data->getStrings("orKeys");
         $this->andValue   = $data->getString("andValue");
         $this->andDeleted = $data->hasValue("andDeleted");
-
-        $this->hasPrefix  = $data->hasValue("prefix");
         $this->prefix     = $data->getString("prefix");
 
 
@@ -72,15 +65,6 @@ class Join {
         foreach ($data->getDict("fields") as $fieldKey => $value) {
             $field = new Field($fieldKey, $value, $this->prefix);
             $this->fields[] = $field;
-
-            if ($field->mergeTo !== "") {
-                if (!isset($this->merges[$field->mergeTo])) {
-                    $mergeKey = $this->hasPrefix ? $this->prefix . ucfirst($field->mergeTo) : $field->mergeTo;
-                    $glue     = $data->getString("mergeGlue", " ");
-                    $this->merges[$field->mergeTo] = new Merge($mergeKey, $glue);
-                }
-                $this->merges[$field->mergeTo]->fields[] = $field->prefixName;
-            }
 
             if ($field->defaultTo !== "") {
                 $defaultKey = $this->hasPrefix ? $this->prefix . ucfirst($field->defaultTo) : $field->defaultTo;
@@ -104,10 +88,6 @@ class Join {
         foreach ($this->fields as $field) {
             $values = $field->toValues($data);
             $result = array_merge($result, $values);
-        }
-
-        foreach ($this->merges as $merge) {
-            $result[$merge->key] = Arrays::getValue($data, $merge->fields, $merge->glue);
         }
 
         foreach ($this->defaults as $key => $fields) {

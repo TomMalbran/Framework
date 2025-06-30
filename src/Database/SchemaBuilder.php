@@ -392,9 +392,6 @@ class SchemaBuilder {
             foreach ($join->fields as $field) {
                 self::addAttribute($result, $field);
             }
-            foreach ($join->merges as $merge) {
-                $result[] = self::getTypeData($merge->key, "string");
-            }
             foreach ($join->defaults as $key => $values) {
                 $result[] = self::getTypeData($key, "string");
             }
@@ -563,16 +560,6 @@ class SchemaBuilder {
                     "addSpace" => $addSpace,
                 ];
                 $addSpace = false;
-            }
-            foreach ($join->merges as $merge) {
-                $mergeName = Strings::upperCaseFirst($merge->key);
-                if (!Arrays::contains($result, $mergeName, "name")) {
-                    $result[] = [
-                        "name"     => $mergeName,
-                        "value"    => $merge->key,
-                        "addSpace" => false,
-                    ];
-                }
             }
         }
 
