@@ -150,7 +150,6 @@ class SchemaBuilder {
             "convertDocType"   => $structure->hasID ? "Query|" . self::getDocType($idType) : "Query",
             "hasName"          => $structure->nameKey !== "" && !Arrays::contains($uniques, $structure->nameKey, "fieldName"),
             "nameKey"          => $structure->nameKey,
-            "hasSelect"        => $structure->nameKey !== "",
             "hasPositions"     => $structure->hasPositions,
             "hasTimestamps"    => $structure->hasTimestamps,
             "hasStatus"        => $structure->hasStatus,

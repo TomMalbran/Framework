@@ -328,20 +328,6 @@ class {{name}}Schema extends Schema {
 
 
 
-{{#hasSelect}}
-    /**
-     * Returns a Select of {{name}} Entities{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}
-     * @return Select[]
-     */
-    public static function getSelect({{{parentsDefList}}}): array {
-        {{#hasParents}}
-        $query = self::createParentQuery({{parentsList}})->query;
-        {{/hasParents}}
-        return self::getSchemaSelect({{#hasParents}}$query{{/hasParents}});
-    }
-
-{{/hasSelect}}
     /**
      * Returns a Select of {{name}} Entities
      * @param {{query}} $query
