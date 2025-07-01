@@ -65,7 +65,6 @@ class {{name}}Schema extends Schema {
         return $result;
     }
 
-{{#hasFilters}}
     /**
      * Creates the List Query
      * @param Request $request
@@ -75,7 +74,6 @@ class {{name}}Schema extends Schema {
         return new {{query}}();
     }
 
-{{/hasFilters}}
 {{#hasParents}}
     /**
      * Returns the Parents Query{{#parents}}
@@ -274,23 +272,17 @@ class {{name}}Schema extends Schema {
 
 {{/hasID}}
     /**
-     * Returns a list of {{name}} Entities{{#hasFilters}}
-     * @param Request $request{{/hasFilters}}{{^hasFilters}}
-     * @param Request|null $request Optional.{{/hasFilters}}{{#parents}}
+     * Returns a list of {{name}} Entities
+     * @param Request $request{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
      * @return {{entity}}[]
      */
-    public static function getList({{#hasFilters}}Request $request{{/hasFilters}}{{^hasFilters}}?Request $request = null{{/hasFilters}}{{{parentsDefList}}}): array {
-        {{#hasFilters}}
+    public static function getList(Request $request{{{parentsDefList}}}): array {
         $query = static::createListQuery($request)->query;
-        {{/hasFilters}}
-        {{^hasFilters}}
-        $query = new Query();
-        {{/hasFilters}}
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
-        $list = self::getSchemaEntities({{#hasMainQuery}}$query, {{/hasMainQuery}}sort: $request);
+        $list = self::getSchemaEntities($query, sort: $request);
         return self::constructEntities($list);
     }
 
@@ -311,24 +303,17 @@ class {{name}}Schema extends Schema {
     }
 
     /**
-     * Returns a Total number of {{name}} Entities{{#hasFilters}}
-     * @param Request $request{{/hasFilters}}{{#parents}}
+     * Returns a Total number of {{name}} Entities
+     * @param Request $request{{#parents}}
      * @param {{fieldDoc}} Optional.{{/parents}}
      * @return integer
      */
-    public static function getTotal({{#hasFilters}}Request $request{{/hasFilters}}{{{parentsDefList}}}): int {
-        {{#hasFilters}}
+    public static function getTotal(Request $request{{{parentsDefList}}}): int {
         $query = static::createListQuery($request)->query;
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
-        {{/hasFilters}}
-        {{^hasFilters}}
-        {{#hasParents}}
-        $query = self::createParentQuery({{parentsList}})->query;
-        {{/hasParents}}
-        {{/hasFilters}}
-        return self::getSchemaTotal({{#hasMainQuery}}$query{{/hasMainQuery}});
+        return self::getSchemaTotal($query);
     }
 
     /**

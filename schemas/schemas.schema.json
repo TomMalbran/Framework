@@ -18,7 +18,6 @@
                 "subrequests"   : { "$ref" : "#/$defs/subrequests" },
                 "foreigns"      : { "$ref" : "#/$defs/foreigns"    },
                 "hasUsers"      : { "type" : "boolean"             },
-                "hasFilters"    : { "type" : "boolean"             },
                 "hasStatus"     : { "type" : "boolean"             },
                 "hasPositions"  : { "type" : "boolean"             },
                 "hasTimestamps" : { "type" : "boolean"             },

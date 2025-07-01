@@ -268,7 +268,7 @@ class Credential extends CredentialSchema {
      * @param CredentialQuery|null $query Optional.
      * @return integer
      */
-    public static function getTotal(?CredentialQuery $query = null): int {
+    public static function getTotalForQuery(?CredentialQuery $query = null): int {
         return self::getEntityTotal($query);
     }
 

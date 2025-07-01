@@ -155,7 +155,6 @@ class SchemaBuilder {
             "hasTimestamps"    => $structure->hasTimestamps,
             "hasStatus"        => $structure->hasStatus,
             "hasUsers"         => $structure->hasUsers,
-            "hasFilters"       => $structure->hasFilters,
             "hasEncrypt"       => $structure->hasEncrypt,
             "canCreate"        => $structure->canCreate,
             "canEdit"          => $structure->canEdit,
@@ -179,7 +178,6 @@ class SchemaBuilder {
             "parentsEditList"  => self::joinFields($editParents, "fieldArg", ", "),
             "hasParents"       => $hasParents,
             "hasEditParents"   => $structure->hasPositions && $hasParents,
-            "hasMainQuery"     => $structure->hasFilters || $hasParents,
         ]);
 
         $contents = self::alignParams($contents);

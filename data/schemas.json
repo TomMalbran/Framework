@@ -148,7 +148,6 @@
                 "type"       : "boolean"
             }
         },
-        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
@@ -207,7 +206,6 @@
                 }
             }
         },
-        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
@@ -306,7 +304,6 @@
             "CREDENTIAL_ID" : { "schema" : "Credential"       },
             "playerID"      : { "schema" : "CredentialDevice" }
         },
-        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
@@ -325,7 +322,6 @@
             "updatedTime" : { "type" : "number"  },
             "updatedUser" : { "type" : "number"  }
         },
-        "hasFilters"    : true,
         "hasUsers"      : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
@@ -348,7 +344,6 @@
             "isResolved"  : { "type" : "boolean"  },
             "updatedTime" : { "type" : "date"     }
         },
-        "hasFilters"    : true,
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,

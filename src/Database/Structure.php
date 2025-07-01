@@ -47,7 +47,6 @@ class Structure {
     public bool $hasPositions  = false;
     public bool $hasTimestamps = false;
     public bool $hasUsers      = false;
-    public bool $hasFilters    = false;
     public bool $hasEncrypt    = false;
     public bool $canCreate     = false;
     public bool $canEdit       = false;
@@ -67,7 +66,6 @@ class Structure {
         $this->hasPositions  = $data->hasValue("hasPositions");
         $this->hasTimestamps = $data->hasValue("hasTimestamps");
         $this->hasUsers      = $data->hasValue("hasUsers");
-        $this->hasFilters    = $data->hasValue("hasFilters");
         $this->canCreate     = $data->hasValue("canCreate");
         $this->canEdit       = $data->hasValue("canEdit");
         $this->canDelete     = $data->hasValue("canDelete");
