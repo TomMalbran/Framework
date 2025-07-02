@@ -230,7 +230,8 @@ class DateTime {
      * @return integer
      */
     public static function toDayStart(string $string, bool $useTimeZone = true): int {
-        return self::toTime($string, $useTimeZone);
+        $result = self::toTime($string, $useTimeZone);
+        return self::getDayStart($result);
     }
 
     /**
@@ -240,9 +241,9 @@ class DateTime {
      * @return integer
      */
     public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
-        $result = self::toTime($string, $useTimeZone);
+        $result = self::toDayStart($string, $useTimeZone);
         if ($result !== 0) {
-            return $result + 12 * 3600 - (int)(self::$serverZone * 3600);
+            return $result + 12 * 3600 - (int)(self::$timeDiff * 3600);
         }
         return 0;
     }
@@ -254,7 +255,7 @@ class DateTime {
      * @return integer
      */
     public static function toDayEnd(string $string, bool $useTimeZone = true): int {
-        $result = self::toTime($string, $useTimeZone);
+        $result = self::toDayStart($string, $useTimeZone);
         if ($result !== 0) {
             return $result + 24 * 3600 - 1;
         }
