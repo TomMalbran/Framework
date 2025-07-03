@@ -33,7 +33,6 @@ class Field {
     public bool   $isID       = false;
     public bool   $isPrimary  = false;
     public bool   $isKey      = false;
-    public bool   $isName     = false;
     public bool   $isUnique   = false;
     public bool   $isParent   = false;
     public bool   $noExists   = false;
@@ -69,7 +68,6 @@ class Field {
         $this->isID       = $this->type === FieldType::ID;
         $this->isPrimary  = $this->isID || $data->hasValue("isPrimary");
         $this->isKey      = $data->hasValue("isKey");
-        $this->isName     = $data->hasValue("isName");
         $this->isUnique   = $data->hasValue("isUnique");
         $this->isParent   = $data->hasValue("isParent");
         $this->noExists   = $data->hasValue("noExists");

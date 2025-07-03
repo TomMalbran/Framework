@@ -148,8 +148,6 @@ class SchemaBuilder {
             "editDocType"      => $structure->hasID ? "$queryName|" . self::getDocType($idType) : $queryName,
             "convertType"      => $structure->hasID ? "Query|$idType" : "Query",
             "convertDocType"   => $structure->hasID ? "Query|" . self::getDocType($idType) : "Query",
-            "hasName"          => $structure->nameKey !== "" && !Arrays::contains($uniques, $structure->nameKey, "fieldName"),
-            "nameKey"          => $structure->nameKey,
             "hasPositions"     => $structure->hasPositions,
             "hasTimestamps"    => $structure->hasTimestamps,
             "hasStatus"        => $structure->hasStatus,

@@ -60,7 +60,6 @@
                         "default"   : { "type" : "string"           },
                         "isPrimary" : { "type" : "boolean"          },
                         "isKey"     : { "type" : "boolean"          },
-                        "isName"    : { "type" : "boolean"          },
                         "isUnique"  : { "type" : "boolean"          },
                         "isParent"  : { "type" : "boolean"          },
                         "noExists"  : { "type" : "boolean"          },

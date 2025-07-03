@@ -146,9 +146,9 @@ class Schema {
 
     /**
      * Returns a Select array
-     * @param Query|null           $query          Optional.
+     * @param Query                $query
+     * @param string[]|string      $nameColumn
      * @param string|null          $idColumn       Optional.
-     * @param string[]|string|null $nameColumn     Optional.
      * @param string|null          $descColumn     Optional.
      * @param string[]|string|null $extraColumn    Optional.
      * @param string|null          $distinctColumn Optional.
@@ -156,9 +156,9 @@ class Schema {
      * @return Select[]
      */
     protected static function getSchemaSelect(
-        ?Query $query = null,
+        Query $query,
+        array|string $nameColumn,
         ?string $idColumn = null,
-        array|string|null $nameColumn = null,
         ?string $descColumn = null,
         array|string|null $extraColumn = null,
         ?string $distinctColumn = null,
@@ -179,7 +179,7 @@ class Schema {
         return Select::create(
             $request,
             keyName:  $idColumn ?? self::structure()->idName,
-            valName:  $nameColumn !== null && !Arrays::isEmpty($nameColumn) ? $nameColumn : self::structure()->nameKey,
+            valName:  $nameColumn,
             descName: $descColumn,
             extraKey: $extraColumn,
             useEmpty: $useEmpty,
@@ -189,16 +189,16 @@ class Schema {
 
     /**
      * Returns the Search results
-     * @param Query                $query
-     * @param string|null          $idColumn   Optional.
-     * @param string[]|string|null $nameColumn Optional.
-     * @param integer              $limit      Optional.
+     * @param Query           $query
+     * @param string[]|string $nameColumn
+     * @param string|null     $idColumn   Optional.
+     * @param integer         $limit      Optional.
      * @return Search[]
      */
     protected static function getSchemaSearch(
         Query $query,
+        array|string $nameColumn,
         ?string $idColumn = null,
-        array|string|null $nameColumn = null,
         int $limit = 0,
     ): array {
         $query   = self::generateQuery($query)->limit($limit);
@@ -206,9 +206,6 @@ class Schema {
 
         if ($idColumn === null || $idColumn === "") {
             $idColumn = self::structure()->idName;
-        }
-        if ($nameColumn === null || Arrays::isEmpty($nameColumn)) {
-            $nameColumn = self::structure()->nameKey;
         }
         return Search::create($request, $idColumn, $nameColumn);
     }
@@ -605,19 +602,19 @@ class Schema {
 
     /**
      * Ensures that only one Entity has the Unique column set
-     * @param string     $column
-     * @param integer    $id
-     * @param integer    $oldValue
-     * @param integer    $newValue
-     * @param Query|null $query    Optional.
+     * @param Query   $query
+     * @param string  $column
+     * @param integer $id
+     * @param integer $oldValue
+     * @param integer $newValue
      * @return boolean
      */
     protected static function ensureSchemaUniqueData(
+        Query $query,
         string $column,
         int $id,
         int $oldValue,
         int $newValue,
-        ?Query $query = null,
     ): bool {
         $updated = false;
         if ($newValue !== 0 && $oldValue === 0) {
@@ -629,7 +626,6 @@ class Schema {
         }
         if ($newValue === 0 && $oldValue !== 0) {
             $newQuery = self::generateQuery($query, true);
-            $newQuery->orderBy(self::structure()->getOrder(), true);
             $newQuery->limit(1);
             self::editSchemaEntity($newQuery, null, [ $column => 1 ]);
             $updated = true;

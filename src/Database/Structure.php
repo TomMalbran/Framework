@@ -21,7 +21,6 @@ class Structure {
     public bool   $hasAutoInc  = false;
     public string $idKey       = "";
     public string $idName      = "";
-    public string $nameKey     = "";
 
     public FieldType $idType   = FieldType::String;
 
@@ -159,9 +158,6 @@ class Structure {
                 $this->idName = $field->name;
                 $this->idType = $field->type;
             }
-            if ($field->isName) {
-                $this->nameKey = $field->key;
-            }
             $this->fields[] = $field;
         }
 
@@ -211,18 +207,6 @@ class Structure {
             return "{$mainKey}.{$key}";
         }
         return $key;
-    }
-
-    /**
-     * Returns the Order Field
-     * @param string|null $field Optional.
-     * @return string
-     */
-    public function getOrder(?string $field = null): string {
-        if ($field !== null && $field !== "") {
-            return $field;
-        }
-        return $this->hasPositions ? "position" : $this->nameKey;
     }
 
     /**

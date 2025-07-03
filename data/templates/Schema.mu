@@ -168,23 +168,6 @@ class {{name}}Schema extends Schema {
     }
 
 {{/hasID}}
-{{#hasName}}
-    /**
-     * Returns the {{name}} Entity the given Name
-     * @param string ${{nameKey}}{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}
-     * @return {{entity}}
-     */
-    public static function getByName(string ${{nameKey}}{{{parentsDefList}}}): {{entity}} {
-        $query = Query::create("{{nameKey}}", "=", ${{nameKey}});
-        {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
-        {{/parents}}
-        $data = self::getSchemaEntity($query);
-        return self::constructEntity($data);
-    }
-
-{{/hasName}}
 {{#uniques}}
     /**
      * Returns the {{name}} Entity with the given {{fieldText}}
@@ -331,8 +314,8 @@ class {{name}}Schema extends Schema {
     /**
      * Returns a Select of {{name}} Entities
      * @param {{query}} $query
+     * @param {{column}}[]|{{column}} $nameColumn
      * @param {{column}}|null $idColumn Optional.
-     * @param {{column}}[]|{{column}}|null $nameColumn Optional.
      * @param {{column}}|null $descColumn Optional.
      * @param {{column}}[]|{{column}}|null $extraColumn Optional.
      * @param {{column}}|null $distinctColumn Optional.
@@ -341,8 +324,8 @@ class {{name}}Schema extends Schema {
      */
     protected static function getEntitySelect(
         {{query}} $query,
+        array|{{column}} $nameColumn,
         ?{{column}} $idColumn = null,
-        array|{{column}}|null $nameColumn = null,
         ?{{column}} $descColumn = null,
         array|{{column}}|null $extraColumn = null,
         ?{{column}} $distinctColumn = null,
@@ -350,8 +333,8 @@ class {{name}}Schema extends Schema {
     ): array {
         return self::getSchemaSelect(
             $query->query,
-            idColumn:       $idColumn !== null ? $idColumn->key() : null,
             nameColumn:     {{column}}::toKeys($nameColumn),
+            idColumn:       $idColumn !== null ? $idColumn->key() : null,
             descColumn:     $descColumn !== null ? $descColumn->key() : null,
             extraColumn:    {{column}}::toKeys($extraColumn),
             distinctColumn: $distinctColumn !== null ? $distinctColumn->value : null,
@@ -362,20 +345,23 @@ class {{name}}Schema extends Schema {
     /**
      * Returns the Search results for the {{name}} Entities
      * @param {{query}} $query
+     * @param {{column}}[]|{{column}} $nameColumn
      * @param {{column}}|null $idColumn Optional.
-     * @param {{column}}[]|{{column}}|null $nameColumn Optional.
      * @param integer $limit Optional.
      * @return Search[]
      */
     public static function getEntitySearch(
         {{query}} $query,
+        array|{{column}} $nameColumn,
         ?{{column}} $idColumn = null,
-        array|{{column}}|null $nameColumn = null,
         int $limit = 0,
     ): array {
-        $idKey   = $idColumn !== null ? $idColumn->key() : null;
-        $nameKey = {{column}}::toKeys($nameColumn);
-        return self::getSchemaSearch($query->query, $idKey, $nameKey, $limit);
+        return self::getSchemaSearch(
+            $query->query,
+            nameColumn: {{column}}::toKeys($nameColumn),
+            idColumn:   $idColumn !== null ? $idColumn->key() : null,
+            limit:      $limit,
+        );
     }
 
     /**
@@ -655,16 +641,15 @@ class {{name}}Schema extends Schema {
 
     /**
      * Ensures that only one Entity has the Unique column set
+     * @param {{query}} $query
      * @param {{column}} $column
      * @param integer $id
      * @param integer $oldValue
      * @param integer $newValue
-     * @param {{query}}|null $query Optional.
      * @return boolean
      */
-    protected static function ensureUniqueData({{column}} $column, int $id, int $oldValue, int $newValue, ?{{query}} $query = null): bool {
-        $query = $query !== null ? $query->query : null;
-        return self::ensureSchemaUniqueData($column->base(), $id, $oldValue, $newValue, $query);
+    protected static function ensureUniqueData({{query}} $query, {{column}} $column, int $id, int $oldValue, int $newValue): bool {
+        return self::ensureSchemaUniqueData($query->query, $column->base(), $id, $oldValue, $newValue);
     }
 {{#canConvert}}
 
