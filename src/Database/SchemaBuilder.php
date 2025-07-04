@@ -32,7 +32,7 @@ class SchemaBuilder {
         File::createDir($writePath);
         File::emptyDir($writePath);
 
-        $folders = self::generateFolders($schemas, $writePath, $forFramework);
+        [ $paths, $namespaces ] = self::generateFolders($schemas, $writePath, $forFramework);
 
         foreach ($schemas as $schemaKey => $schemaData) {
             $fromFramework = $schemaData->hasValue("fromFramework");
@@ -45,17 +45,16 @@ class SchemaBuilder {
             $path      = $writePath;
 
             if (!$forFramework) {
-                $folder     = $folders[$schemaKey];
-                $path      .= "/$folder";
-                $namespace .= "\\$folder";
+                $path      = $paths[$schemaKey];
+                $namespace = $namespaces[$schemaKey];
             }
 
             $schemaName = "{$structure->schema}Schema.php";
-            $schemaCode = self::getSchemaCode($structure, $namespace, $folders);
+            $schemaCode = self::getSchemaCode($structure, $namespace, $namespaces);
             File::create($path, $schemaName, $schemaCode);
 
             $entityName = "{$structure->schema}Entity.php";
-            $entityCode = self::getEntityCode($structure, $namespace, $folders);
+            $entityCode = self::getEntityCode($structure, $namespace, $namespaces);
             File::create($path, $entityName, $entityCode);
 
             $columnName = "{$structure->schema}Column.php";
@@ -79,15 +78,25 @@ class SchemaBuilder {
      * @param Dictionary $schemas
      * @param string     $writePath
      * @param boolean    $forFramework
-     * @return array<string,string>
+     * @return array{array<string,string>,array<string,string>}
      */
     private static function generateFolders(Dictionary $schemas, string $writePath, bool $forFramework): array {
         $schemaKeys = [];
-        $folders    = [];
+        $paths      = [];
+        $namespaces = [];
 
         foreach ($schemas as $schemaKey => $schemaData) {
-            $fromFramework = $schemaData->hasValue("fromFramework");
-            if (!$fromFramework) {
+            if ($schemaData->hasValue("fromFramework")) {
+                continue;
+            }
+
+            $path = $schemaData->getString("path");
+            if (!$forFramework && $path !== "") {
+                $paths[$schemaKey]      = $path;
+                $namespaces[$schemaKey] = $schemaData->getString("namespace");
+                File::createDir($path);
+                File::emptyDir($path);
+            } else {
                 $schemaKeys[] = $schemaKey;
             }
         }
@@ -100,13 +109,14 @@ class SchemaBuilder {
                 }
             }
 
-            $folders[$schemaKey] = $minSchema;
-
+            $paths[$schemaKey]      = "$writePath/$minSchema";
+            $namespaces[$schemaKey] = Package::Namespace . "Schema\\$minSchema";
             if (!$forFramework) {
                 File::createDir("$writePath/$minSchema");
             }
         }
-        return $folders;
+
+        return [ $paths, $namespaces ];
     }
 
 
@@ -115,15 +125,15 @@ class SchemaBuilder {
      * Returns the Schema code
      * @param Structure            $structure
      * @param string               $namespace
-     * @param array<string,string> $folders
+     * @param array<string,string> $nameSpaces
      * @return string
      */
-    private static function getSchemaCode(Structure $structure, string $namespace, array $folders): string {
+    private static function getSchemaCode(Structure $structure, string $namespace, array $nameSpaces): string {
         $idType       = self::getFieldType($structure->idType);
         $fields       = self::getAllFields($structure);
         $uniques      = self::getFieldList($structure, "isUnique");
         $parents      = self::getFieldList($structure, "isParent");
-        $subTypes     = self::getSubTypes($structure->subRequests, $folders);
+        $subTypes     = self::getSubTypes($structure->subRequests, $nameSpaces);
         $hasProcessed = count($structure->processed) > 0;
         $hasParents   = count($parents) > 0;
         $editParents  = $structure->hasPositions ? $parents : [];
@@ -131,7 +141,6 @@ class SchemaBuilder {
 
         $template     = Discovery::loadFrameTemplate("Schema.mu");
         $contents     = Mustache::render($template, [
-            "appNamespace"     => Package::Namespace,
             "namespace"        => $namespace,
             "name"             => $structure->schema,
             "column"           => "{$structure->schema}Column",
@@ -184,17 +193,17 @@ class SchemaBuilder {
     /**
      * Returns the Sub Types from the Sub Requests
      * @param SubRequest[]         $subRequests
-     * @param array<string,string> $folders
-     * @return array{name:string,type:string,folder:string}[]
+     * @param array<string,string> $namespaces
+     * @return array{name:string,type:string,namespace:string}[]
      */
-    private static function getSubTypes(array $subRequests, array $folders): array {
+    private static function getSubTypes(array $subRequests, array $namespaces): array {
         $result = [];
         foreach ($subRequests as $subRequest) {
             if (!Strings::contains($subRequest->type, "<", "[")) {
                 $result[] = [
-                    "name"   => $subRequest->name,
-                    "type"   => $subRequest->type,
-                    "folder" => $folders[$subRequest->type] ?? "",
+                    "name"      => $subRequest->name,
+                    "type"      => $subRequest->type,
+                    "namespace" => $namespaces[$subRequest->type] ?? "",
                 ];
             }
         }
@@ -343,18 +352,17 @@ class SchemaBuilder {
      * Returns the Entity code
      * @param Structure            $structure
      * @param string               $namespace
-     * @param array<string,string> $folders
+     * @param array<string,string> $namespaces
      * @return string
      */
-    private static function getEntityCode(Structure $structure, string $namespace, array $folders): string {
+    private static function getEntityCode(Structure $structure, string $namespace, array $namespaces): string {
         $template = Discovery::loadFrameTemplate("Entity.mu");
         $contents = Mustache::render($template, [
-            "appNamespace" => Package::Namespace,
-            "namespace"    => $namespace,
-            "name"         => $structure->schema,
-            "id"           => $structure->idName,
-            "subTypes"     => self::getSubTypes($structure->subRequests, $folders),
-            "attributes"   => self::getAttributes($structure),
+            "namespace"  => $namespace,
+            "name"       => $structure->schema,
+            "id"         => $structure->idName,
+            "subTypes"   => self::getSubTypes($structure->subRequests, $namespaces),
+            "attributes" => self::getAttributes($structure),
         ]);
         return $contents;
     }

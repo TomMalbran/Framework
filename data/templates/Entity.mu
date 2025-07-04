@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}};
 
-{{#subTypes}}use {{appNamespace}}Schema\{{folder}}\{{type}}Entity;
+{{#subTypes}}use {{namespace}}\{{type}}Entity;
 {{/subTypes}}
 use Framework\Database\Entity;
 
