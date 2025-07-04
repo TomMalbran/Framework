@@ -320,22 +320,34 @@ class OpenAI {
 
     /**
      * Adds a Message to a Thread
-     * @param string $threadID
-     * @param string $message
-     * @return boolean
+     * @param string  $threadID
+     * @param string  $message
+     * @param boolean $fromUser Optional.
+     * @return string
      */
-    public static function addThreadMessage(string $threadID, string $message): bool {
+    public static function addThreadMessage(string $threadID, string $message, bool $fromUser = true): string {
         $response = self::post("/threads/$threadID/messages", [
-            "role"    => "user",
+            "role"    => $fromUser ? "user" : "assistant",
             "content" => $message,
         ]);
+        return $response->getString("id");
+    }
+
+    /**
+     * Deletes a Message to a Thread
+     * @param string $threadID
+     * @param string $messageID
+     * @return boolean
+     */
+    public static function deleteThreadMessage(string $threadID, string $messageID): bool {
+        $response = self::delete("/threads/$threadID/messages/$messageID");
         return $response->hasValue("id");
     }
 
     /**
      * Returns the last Message in a Thread
      * @param string $threadID
-     * @return array{string,string} [Message, FileIDs]
+     * @return array{string,string,string} [MessageID, Message, FileIDs]
      */
     public static function getLastMessage(string $threadID): array {
         $response = self::get("/threads/$threadID/messages", [
@@ -344,7 +356,7 @@ class OpenAI {
         ]);
         $data = $response->getFirst("data");
         if ($data->isEmpty()) {
-            return [ "", "" ];
+            return [ "", "", "" ];
         }
 
         $messages = [];
@@ -365,6 +377,7 @@ class OpenAI {
             }
         }
         return [
+            $data->getString("id"),
             Strings::join($messages, "\n"),
             Strings::join($fileIDs, ", "),
         ];
