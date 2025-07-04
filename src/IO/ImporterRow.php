@@ -53,7 +53,7 @@ class ImporterRow {
         } elseif (!Arrays::isEmpty($this->fields, $index) || $this->fields[$index] === "0") {
             $result = $this->fields[$index];
         }
-        return $splitResult ? Strings::split($result, ",", true, true) : $result;
+        return $splitResult ? Strings::split($result, ",", trim: true, skipEmpty: true) : $result;
     }
 
     /**
@@ -92,7 +92,7 @@ class ImporterRow {
      * @return string[]
      */
     public function getList(string $key): array {
-        $value = $this->getValue($key);
+        $value = $this->getValue($key, splitResult: true);
         return Arrays::toStrings($value, withoutEmpty: true);
     }
 }
