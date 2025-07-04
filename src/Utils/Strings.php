@@ -500,16 +500,14 @@ class Strings {
             return [];
         }
 
-        $content = explode($needle, $string);
-        if (!$trim) {
-            return $content;
-        }
-
-        $parts  = self::split($content, ",");
+        $parts  = explode($needle, $string);
         $result = [];
         foreach ($parts as $part) {
+            if ($trim) {
+                $part = trim($part);
+            }
             if (!$skipEmpty || $part !== "") {
-                $result[] = trim($part);
+                $result[] = $part;
             }
         }
         return $result;
