@@ -124,7 +124,7 @@ class DateTime {
      */
     public static function toTime(mixed $time, bool $useTimeZone = true): int {
         $timeStamp = 0;
-        if (is_string($time)) {
+        if (is_string($time) && $time !== "") {
             $timeStamp = Numbers::toInt(strtotime($time));
         } else {
             $timeStamp = Numbers::toInt($time);
@@ -230,8 +230,11 @@ class DateTime {
      * @return integer
      */
     public static function toDayStart(string $string, bool $useTimeZone = true): int {
-        $result = self::toTime($string, $useTimeZone);
-        return self::getDayStart($result);
+        $timeStamp = self::toTime($string, $useTimeZone);
+        if ($timeStamp !== 0) {
+            return self::getDayStart($timeStamp);
+        }
+        return 0;
     }
 
     /**
@@ -241,9 +244,9 @@ class DateTime {
      * @return integer
      */
     public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
-        $result = self::toDayStart($string, $useTimeZone);
-        if ($result !== 0) {
-            return $result + 12 * 3600 - (int)(self::$timeDiff * 3600);
+        $timeStamp = self::toDayStart($string, $useTimeZone);
+        if ($timeStamp !== 0) {
+            return $timeStamp + 12 * 3600 - (int)(self::$timeDiff * 3600);
         }
         return 0;
     }
@@ -255,9 +258,9 @@ class DateTime {
      * @return integer
      */
     public static function toDayEnd(string $string, bool $useTimeZone = true): int {
-        $result = self::toDayStart($string, $useTimeZone);
-        if ($result !== 0) {
-            return $result + 24 * 3600 - 1;
+        $timeStamp = self::toDayStart($string, $useTimeZone);
+        if ($timeStamp !== 0) {
+            return $timeStamp + 24 * 3600 - 1;
         }
         return 0;
     }
