@@ -10,26 +10,6 @@ use Framework\Utils\Strings;
 class Utils {
 
     /**
-     * Returns true if the given Full Name is valid
-     * @param string $fullName
-     * @return boolean
-     */
-    public static function isValidFullName(string $fullName): bool {
-        $nameParts = Strings::split(trim($fullName), " ");
-        return count($nameParts) > 1;
-    }
-
-    /**
-     * Returns true if the given Email is valid
-     * @param string $email
-     * @return boolean
-     */
-    public static function isValidEmail(string $email): bool {
-        $result = filter_var($email, FILTER_VALIDATE_EMAIL);
-        return $result !== false;
-    }
-
-    /**
      * Returns true if the given Password is valid
      * @param string  $password
      * @param string  $checkSets Optional.
@@ -56,24 +36,6 @@ class Utils {
     }
 
     /**
-     * Returns true if the given Domain is valid
-     * @param string $domain
-     * @return boolean
-     */
-    public static function isValidDomain(string $domain): bool {
-        return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
-    }
-
-    /**
-     * Returns true if the given Username is valid
-     * @param string $username
-     * @return boolean
-     */
-    public static function isValidUsername(string $username): bool {
-        return Strings::match($username, '/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i');
-    }
-
-    /**
      * Returns true if the given Color is valid
      * @param string $color
      * @return boolean
@@ -82,63 +44,17 @@ class Utils {
         return Strings::match($color, '/#([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?\b/');
     }
 
-    /**
-     * Returns true if the given CUIT is valid
-     * @param string $value
-     * @return boolean
-     */
-    public static function isValidCUIT(string $value): bool {
-        $cuit = self::cuitToNumber($value);
-        if (Strings::length($cuit) !== 11) {
-            return false;
-        }
 
-        // The last number is the verifier
-        $verify = (int)$cuit[10];
-        $mult   = [ 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 ];
-        $total  = 0;
-
-        // Multiply each number by the multiplier (except the last one)
-		for ($i = 0; $i < count($mult); $i++) {
-            $total += (int)$cuit[$i] * $mult[$i];
-		}
-
-        // Calculate the left over and value
-        $mod = $total % 11;
-        if ($mod === 0) {
-            return $verify === 0;
-        }
-        if ($mod === 1) {
-            return $verify === 9;
-        }
-        return $verify === 11 - $mod;
-    }
 
     /**
-     * Returns true if the given DNI is valid
-     * @param string $value
+     * Returns true if the given Full Name is valid
+     * @param string $fullName
      * @return boolean
      */
-    public static function isValidDNI(string $value): bool {
-        $dni    = self::dniToNumber($value);
-        $length = Strings::length($dni);
-        if ($length < 6 || $length > 9) {
-            return false;
-        }
-        return is_numeric($dni);
+    public static function isValidFullName(string $fullName): bool {
+        $nameParts = Strings::split(trim($fullName), " ");
+        return count($nameParts) > 1;
     }
-
-    /**
-     * Returns true if the given Phone is valid
-     * @param string $value
-     * @return boolean
-     */
-    public static function isValidPhone(string $value): bool {
-        $phone = self::phoneToNumber($value);
-        return is_numeric($phone);
-    }
-
-
 
     /**
      * Parses a Full Name into a First and Last Name
@@ -157,34 +73,85 @@ class Utils {
         return [ $firstName, $lastName ];
     }
 
+
+
     /**
-     * Parses the given CUIT if it has 11 chars
-     * @param string $value
+     * Returns true if the given Username is valid
+     * @param string $username
+     * @return boolean
+     */
+    public static function isValidUsername(string $username): bool {
+        return Strings::match($username, '/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i');
+    }
+
+    /**
+     * Generates a username from a domain
+     * @param string $domain
+     * @param string $email  Optional.
      * @return string
      */
-    public static function parseCUIT(string $value): string {
-        if (Strings::length($value) === 11) {
-            return Strings::replacePattern($value, "/^(\d{2})(\d{8})(\d{1})$/", "$1-$2-$3");
+    public static function generateUsername(string $domain, string $email = ""): string {
+        $parts  = Strings::split($domain, ".");
+        $result = Strings::replace($parts[0], [ "-", "ñ" ], [ "", "n" ]);
+        $result = Strings::substring($result, 0, 8);
+
+        if ($email !== "" && is_numeric($result[0])) {
+            $result = Strings::substring($email[0] . $result, 0, 8);
         }
-        return $value;
+        return $result;
+    }
+
+
+
+    /**
+     * Returns true if the given Email is valid
+     * @param string $email
+     * @return boolean
+     */
+    public static function isValidEmail(string $email): bool {
+        $result = filter_var($email, FILTER_VALIDATE_EMAIL);
+        return $result !== false;
     }
 
     /**
-     * Removes spaces and dots in the CUIT
-     * @param string $value
+     * Extracts the first Email from the given text
+     * @param string $text
      * @return string
      */
-    public static function cuitToNumber(string $value): string {
-        return Strings::toNumber($value);
+    public static function extractEmail(string $text): string {
+        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $text, $matches);
+        $result = $matches[0][0] ?? "";
+        return Strings::toString($result);
     }
 
     /**
-     * Removes spaces and dots in the DNI
-     * @param string $value
+     * Returns the given Email hiding most of the name and showing the domain
+     * @param string $email
      * @return string
      */
-    public static function dniToNumber(string $value): string {
-        return Strings::toNumber($value);
+    public static function hideEmail(string $email): string {
+        if ($email === "" || !self::isValidEmail($email)) {
+            return "";
+        }
+
+        $domain  = Strings::substringAfter($email, "@");
+        $name    = Strings::substringBefore($email, "@");
+        $length  = Strings::length($name);
+        $nameLen = $length > 3 ? 3 : 1;
+        $hidden  = Strings::substring($name, 0, $nameLen) . Strings::repeat("*", $length - $nameLen);
+        return "$hidden@$domain";
+    }
+
+
+
+    /**
+     * Returns true if the given Phone is valid
+     * @param string $value
+     * @return boolean
+     */
+    public static function isValidPhone(string $value): bool {
+        $phone = self::phoneToNumber($value);
+        return is_numeric($phone);
     }
 
     /**
@@ -221,39 +188,95 @@ class Utils {
         return Strings::substring($phone, 0, $partSize) . $middle . Strings::substring($phone, -$partSize);
     }
 
+
+
     /**
-     * Returns the given Email hiding most of the name and showing the domain
-     * @param string $email
-     * @return string
+     * Returns true if the given CUIT is valid
+     * @param string $value
+     * @return boolean
      */
-    public static function hideEmail(string $email): string {
-        if ($email === "" || !self::isValidEmail($email)) {
-            return "";
+    public static function isValidCUIT(string $value): bool {
+        $cuit = self::cuitToNumber($value);
+        if (Strings::length($cuit) !== 11) {
+            return false;
         }
 
-        $domain  = Strings::substringAfter($email, "@");
-        $name    = Strings::substringBefore($email, "@");
-        $length  = Strings::length($name);
-        $nameLen = $length > 3 ? 3 : 1;
-        $hidden  = Strings::substring($name, 0, $nameLen) . Strings::repeat("*", $length - $nameLen);
-        return "$hidden@$domain";
+        // The last number is the verifier
+        $verify = (int)$cuit[10];
+        $mult   = [ 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 ];
+        $total  = 0;
+
+        // Multiply each number by the multiplier (except the last one)
+		for ($i = 0; $i < count($mult); $i++) {
+            $total += (int)$cuit[$i] * $mult[$i];
+		}
+
+        // Calculate the left over and value
+        $mod = $total % 11;
+        if ($mod === 0) {
+            return $verify === 0;
+        }
+        if ($mod === 1) {
+            return $verify === 9;
+        }
+        return $verify === 11 - $mod;
     }
 
     /**
-     * Generates a username from a domain
-     * @param string $domain
-     * @param string $email  Optional.
+     * Parses the given CUIT if it has 11 chars
+     * @param string $value
      * @return string
      */
-    public static function generateUsername(string $domain, string $email = ""): string {
-        $parts  = Strings::split($domain, ".");
-        $result = Strings::replace($parts[0], [ "-", "ñ" ], [ "", "n" ]);
-        $result = Strings::substring($result, 0, 8);
-
-        if ($email !== "" && is_numeric($result[0])) {
-            $result = Strings::substring($email[0] . $result, 0, 8);
+    public static function parseCUIT(string $value): string {
+        if (Strings::length($value) === 11) {
+            return Strings::replacePattern($value, "/^(\d{2})(\d{8})(\d{1})$/", "$1-$2-$3");
         }
-        return $result;
+        return $value;
+    }
+
+    /**
+     * Removes spaces and dots in the CUIT
+     * @param string $value
+     * @return string
+     */
+    public static function cuitToNumber(string $value): string {
+        return Strings::toNumber($value);
+    }
+
+
+
+    /**
+     * Returns true if the given DNI is valid
+     * @param string $value
+     * @return boolean
+     */
+    public static function isValidDNI(string $value): bool {
+        $dni    = self::dniToNumber($value);
+        $length = Strings::length($dni);
+        if ($length < 6 || $length > 9) {
+            return false;
+        }
+        return is_numeric($dni);
+    }
+
+    /**
+     * Removes spaces and dots in the DNI
+     * @param string $value
+     * @return string
+     */
+    public static function dniToNumber(string $value): string {
+        return Strings::toNumber($value);
+    }
+
+
+
+    /**
+     * Returns true if the given Domain is valid
+     * @param string $domain
+     * @return boolean
+     */
+    public static function isValidDomain(string $domain): bool {
+        return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
     }
 
     /**
