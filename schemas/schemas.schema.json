@@ -23,8 +23,7 @@
                 "hasTimestamps" : { "type" : "boolean"             },
                 "canCreate"     : { "type" : "boolean"             },
                 "canEdit"       : { "type" : "boolean"             },
-                "canDelete"     : { "type" : "boolean"             },
-                "canRemove"     : { "type" : "boolean"             }
+                "canDelete"     : { "type" : "boolean"             }
             },
             "dependentRequired" : {
                 "fields" : [
@@ -32,8 +31,7 @@
                     "hasTimestamps",
                     "canCreate",
                     "canEdit",
-                    "canDelete",
-                    "canRemove"
+                    "canDelete"
                 ]
             }
         }

@@ -50,7 +50,6 @@ class Structure {
     public bool $canCreate     = false;
     public bool $canEdit       = false;
     public bool $canDelete     = false;
-    public bool $canRemove     = false;
 
 
     /**
@@ -68,7 +67,6 @@ class Structure {
         $this->canCreate     = $data->hasValue("canCreate");
         $this->canEdit       = $data->hasValue("canEdit");
         $this->canDelete     = $data->hasValue("canDelete");
-        $this->canRemove     = $data->hasValue("canRemove");
 
         // Add additional Fields
         $fields = $data->getDict("fields");

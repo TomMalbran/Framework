@@ -591,7 +591,6 @@ class {{name}}Schema extends Schema {
         {{/hasPositions}}
     }
 {{/canDelete}}
-{{#canRemove}}
 
     /**
      * Removes the {{name}} Entity
@@ -621,7 +620,6 @@ class {{name}}Schema extends Schema {
         return self::removeSchemaEntity(self::toQuery($query));
     }
 {{/hasPositions}}
-{{/canRemove}}
 {{#hasPositions}}
 
     /**
@@ -651,7 +649,6 @@ class {{name}}Schema extends Schema {
     protected static function ensureUniqueData({{query}} $query, {{column}} $column, int $id, int $oldValue, int $newValue): bool {
         return self::ensureSchemaUniqueData($query->query, $column->base(), $id, $oldValue, $newValue);
     }
-{{#canConvert}}
 
     /**
      * Converts the {{query}} to a Query
@@ -666,5 +663,4 @@ class {{name}}Schema extends Schema {
         return $query->query;
         {{/hasID}}
     }
-{{/canConvert}}
 }

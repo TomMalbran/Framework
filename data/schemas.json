@@ -45,8 +45,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : true,
-        "canRemove"     : false
+        "canDelete"     : true
     },
     "CredentialDevice" : {
         "fields" : {
@@ -60,8 +59,7 @@
         "hasTimestamps" : true,
         "canCreate"     : false,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "CredentialRefreshToken" : {
         "fields" : {
@@ -76,8 +74,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "CredentialReset" : {
         "fields" : {
@@ -92,8 +89,7 @@
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "CredentialSpam" : {
         "fields" : {
@@ -103,8 +99,7 @@
         "hasTimestamps" : false,
         "canCreate"     : false,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
 
 
@@ -123,8 +118,7 @@
         "hasTimestamps" : false,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false,
-        "canRemove"     : false
+        "canDelete"     : false
     },
     "EmailQueue" : {
         "fields" : {
@@ -151,8 +145,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "EmailWhiteList" : {
         "fields" : {
@@ -163,8 +156,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "NotificationQueue" : {
         "fields" : {
@@ -209,8 +201,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "Settings" : {
         "fields" : {
@@ -222,8 +213,7 @@
         "hasTimestamps" : true,
         "canCreate"     : false,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
 
 
@@ -252,8 +242,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "LogAction" : {
         "fields" : {
@@ -289,8 +278,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "LogDevice" : {
         "fields" : {
@@ -307,8 +295,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : false,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "LogQuery" : {
         "fields" : {
@@ -326,8 +313,7 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     },
     "LogError" : {
         "fields" : {
@@ -347,7 +333,6 @@
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
-        "canDelete"     : false,
-        "canRemove"     : true
+        "canDelete"     : false
     }
 }

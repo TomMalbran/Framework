@@ -166,8 +166,6 @@ class SchemaBuilder {
             "canEdit"          => $structure->canEdit,
             "canReplace"       => $structure->canEdit && !$structure->hasAutoInc,
             "canDelete"        => $structure->canDelete,
-            "canRemove"        => $structure->canRemove,
-            "canConvert"       => $structure->canEdit || $structure->canDelete || $structure->canRemove,
             "processEntity"    => count($subTypes) > 0 || $hasProcessed || $structure->hasStatus,
             "subTypes"         => $subTypes,
             "hasProcessed"     => $hasProcessed,
