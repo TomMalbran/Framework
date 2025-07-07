@@ -86,7 +86,7 @@ class Structure {
         }
         if ($this->canCreate && $this->hasTimestamps) {
             $fields->set("createdTime", [
-                "type"     => FieldType::Date->name,
+                "type"     => FieldType::Number->name,
                 "cantEdit" => true,
                 "default"  => 0,
             ]);
@@ -100,7 +100,7 @@ class Structure {
         }
         if ($this->canEdit && $this->hasTimestamps) {
             $fields->set("modifiedTime", [
-                "type"     => FieldType::Date->name,
+                "type"     => FieldType::Number->name,
                 "cantEdit" => true,
                 "default"  => 0,
             ]);

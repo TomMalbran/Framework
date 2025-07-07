@@ -428,11 +428,6 @@ class SchemaBuilder {
         case FieldType::Float:
             $result[] = self::getTypeData($key, "float");
             break;
-        case FieldType::Date:
-            $result[] = self::getTypeData($key, "int");
-            $result[] = self::getTypeData("{$key}Date", "string");
-            $result[] = self::getTypeData("{$key}Full", "string");
-            break;
         case FieldType::JSON:
             $result[] = self::getTypeData($key, "mixed");
             break;
@@ -642,8 +637,7 @@ class SchemaBuilder {
                     FieldType::Boolean => "BooleanQuery",
                     FieldType::ID,
                     FieldType::Number,
-                    FieldType::Float,
-                    FieldType::Date    => "NumberQuery",
+                    FieldType::Float   => "NumberQuery",
                     FieldType::String,
                     FieldType::Text,
                     FieldType::LongText,
@@ -679,8 +673,7 @@ class SchemaBuilder {
         return match ($type) {
             FieldType::Boolean => "bool",
             FieldType::ID,
-            FieldType::Number,
-            FieldType::Date    => "int",
+            FieldType::Number  => "int",
             FieldType::Float   => "float",
             default            => "string",
         };

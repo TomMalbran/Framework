@@ -14,7 +14,6 @@ enum FieldType {
     case Boolean;
     case Number;
     case Float;
-    case Date;
     case String;
     case Text;
     case LongText;

@@ -25,8 +25,8 @@ class Field {
     public int    $length     = 0;
     public int    $decimals   = 2;
     public string $dateType   = "middle";
-    public string $date       = "";
-    public string $hour       = "";
+    public string $dateInput  = "";
+    public string $hourInput  = "";
     public string $path       = "";
     public string $default    = "";
 
@@ -60,8 +60,8 @@ class Field {
         $this->length     = $data->getInt("length", default: $this->length);
         $this->decimals   = $data->getInt("decimals", default: $this->decimals);
         $this->dateType   = $data->getString("dateType", $this->dateType);
-        $this->date       = $data->getString("date", $this->date);
-        $this->hour       = $data->getString("hour", $this->hour);
+        $this->dateInput  = $data->getString("dateInput", $this->dateInput);
+        $this->hourInput  = $data->getString("hourInput", $this->hourInput);
         $this->path       = $data->getString("path", $this->path);
         $this->default    = $data->getString("default", $this->default);
 
@@ -139,7 +139,6 @@ class Field {
             $default    = 0;
             break;
         case FieldType::Number:
-        case FieldType::Date:
             $type       = "int";
             $length     = $this->length > 0 ? $this->length : 10;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
@@ -216,25 +215,16 @@ class Field {
             $result = $request->getString($this->name);
             break;
         case FieldType::Number:
-            $result = $request->getInt($this->name);
+            if ($this->dateInput !== "" && $this->hourInput !== "") {
+                $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
+            } elseif ($this->dateInput !== "") {
+                $result = $request->toDay($this->dateInput, $this->dateType, true);
+            } else {
+                $result = $request->getInt($this->name);
+            }
             break;
         case FieldType::Float:
             $result = $request->toInt($this->name, $this->decimals);
-            break;
-        case FieldType::Date:
-            if ($this->date !== "" && $this->hour !== "") {
-                $result = $request->toTimeHour($this->date, $this->hour, true);
-            } elseif ($this->date !== "") {
-                $result = $request->toDay($this->date, $this->dateType, true);
-            } elseif (Numbers::isValid($request->get($this->name))) {
-                $result = $request->getInt($this->name);
-            } elseif ($request->has("{$this->name}Date") && $request->has("{$this->name}Hour")) {
-                $result = $request->toTimeHour("{$this->name}Date", "{$this->name}Hour", true);
-            } elseif ($request->has("{$this->name}Date")) {
-                $result = $request->toDay("{$this->name}Date", $this->dateType, true);
-            } else {
-                $result = $request->toDay($this->name, $this->dateType, true);
-            }
             break;
         case FieldType::JSON:
             $result = $request->toJSON($this->name);
@@ -270,11 +260,6 @@ class Field {
             break;
         case FieldType::Float:
             $result[$key]           = Numbers::toFloat($number, $this->decimals);
-            break;
-        case FieldType::Date:
-            $result[$key]           = $number;
-            $result["{$key}Date"]   = $number !== 0 ? date("d-m-Y",     $number) : "";
-            $result["{$key}Full"]   = $number !== 0 ? date("d-m-Y H:i", $number) : "";
             break;
         case FieldType::JSON:
             $result[$key]           = JSON::decodeAsArray($text);
