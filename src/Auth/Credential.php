@@ -537,8 +537,9 @@ class Credential extends CredentialSchema {
         ?bool $reqPassChange = null,
     ): int {
         $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
-        $fields["lastLogin"]    = time();
-        $fields["currentLogin"] = time();
+        $fields["lastLogin"]        = time();
+        $fields["currentLogin"]     = time();
+        $fields["askNotifications"] = 1;
         return self::createSchemaEntity($request, $fields);
     }
 
