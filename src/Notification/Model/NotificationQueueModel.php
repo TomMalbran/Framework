@@ -39,7 +39,7 @@ class NotificationQueueModel {
 
     public string $externalID = "";
 
-    public int $sendTime = 0;
+    public int $sentTime = 0;
 
     public bool $isRead = false;
 

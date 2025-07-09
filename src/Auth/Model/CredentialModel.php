@@ -56,7 +56,7 @@ class CredentialModel {
     public bool $reqPassChange = false;
 
     #[Field(canEdit: false)]
-    public bool $passExpiration = false;
+    public int $passExpiration = 0;
 
     #[Field(canEdit: false)]
     public string $accessToken = "";

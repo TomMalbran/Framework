@@ -35,8 +35,6 @@ class LogActionModel {
     #[Field(isText: true)]
     public string $dataID = "";
 
-    public bool $isOpen = false;
-
 
 
     #[Relation(fieldNames: [ "createdTime", "ip", "userAgent" ])]
