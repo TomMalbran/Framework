@@ -112,34 +112,134 @@ class OpenAI {
 
 
     /**
-     * Creates a Completion and returns the Response
-     * @param string $model
-     * @param string $message
-     * @return OpenAIData
+     * Creates a Completion and returns the Result
+     * @param string                              $model
+     * @param string                              $prompt
+     * @param array{role:string,content:string}[] $context Optional.
+     * @param mixed                               $schema  Optional.
+     * @return OpenAIOutput
      */
-    public static function createCompletion(string $model, string $message): OpenAIData {
+    public static function createCompletion(
+        string $model,
+        string $prompt,
+        array $context = [],
+        mixed $schema = null,
+    ): OpenAIOutput {
         $startTime = microtime(true);
-        $result    = new OpenAIData();
-        $response  = self::post("/chat/completions", [
+        $params    = [
             "model"    => $model,
-            "messages" => [
+            "messages" => array_merge($context, [
                 [
                     "role"    => "user",
-                    "content" => $message,
+                    "content" => $prompt,
                 ],
-            ],
-        ]);
+            ]),
+        ];
 
-        $endTime = microtime(true);
-        $choice  = $response->getFirst("choices");
+        if ($schema !== null && is_array($schema)) {
+            $params["response_format"] = [
+                "type"        => "json_schema",
+                "json_schema" => [
+                    "name"   => "Schema",
+                    "strict" => true,
+                    "schema" => [
+                        "type"                 => "object",
+                        "properties"           => $schema,
+                        "required"             => array_keys($schema),
+                        "additionalProperties" => false,
+                    ],
+                ],
+            ];
+        }
+
+        $result   = new OpenAIOutput();
+        $response = self::post("/chat/completions", $params);
+        $endTime  = microtime(true);
+        $choice   = $response->getFirst("choices");
         if ($choice->isEmpty()) {
             return $result;
         }
 
+        $result->externalID   = $response->getString("id");
         $result->text         = $choice->getDict("message")->getString("content");
         $result->inputTokens  = $response->getDict("usage")->getInt("prompt_tokens");
         $result->outputTokens = $response->getDict("usage")->getInt("completion_tokens");
         $result->runTime      = Numbers::roundInt($endTime - $startTime);
+        return $result;
+    }
+
+    /**
+     * Creates a Response and returns the Result
+     * @param string                              $model
+     * @param string                              $prompt
+     * @param array{role:string,content:string}[] $context       Optional.
+     * @param mixed                               $schema        Optional.
+     * @param string                              $vectorStoreID Optional.
+     * @return OpenAIOutput
+     */
+    public static function createResponse(
+        string $model,
+        string $prompt,
+        array $context = [],
+        mixed $schema = null,
+        string $vectorStoreID = "",
+    ): OpenAIOutput {
+        $startTime = microtime(true);
+        $params    = [
+            "model" => $model,
+            "input" => array_merge($context, [
+                [
+                    "role"    => "user",
+                    "content" => $prompt,
+                ],
+            ]),
+        ];
+
+        if ($schema !== null && is_array($schema)) {
+            $params["text"] = [
+                "format" => [
+                    "type"   => "json_schema",
+                    "name"   => "Schema",
+                    "strict" => true,
+                    "schema" => [
+                        "type"                 => "object",
+                        "properties"           => $schema,
+                        "required"             => array_keys($schema),
+                        "additionalProperties" => false,
+                    ],
+                ],
+            ];
+        }
+
+        if ($vectorStoreID !== "") {
+            $params["tool_choice"] = "required";
+            $params["tools"]       = [ [
+                "type"             => "file_search",
+                "vector_store_ids" => [ $vectorStoreID ]
+            ] ];
+        }
+
+        $result   = new OpenAIOutput();
+        $response = self::post("/responses", $params);
+        $endTime  = microtime(true);
+        $outputs  = $response->getList("output");
+        $text     = "";
+
+        foreach ($outputs as $output) {
+            if ($output->getString("type") === "message") {
+                $text = $output->getFirst("content")->getString("text");
+                break;
+            }
+        }
+
+        if ($text !== "") {
+            $result->externalID    = $response->getString("id");
+            $result->vectorStoreID = $vectorStoreID;
+            $result->text          = $text;
+            $result->inputTokens   = $response->getDict("usage")->getInt("input_tokens");
+            $result->outputTokens  = $response->getDict("usage")->getInt("output_tokens");
+            $result->runTime       = Numbers::roundInt($endTime - $startTime);
+        }
         return $result;
     }
 
@@ -347,7 +447,7 @@ class OpenAI {
     /**
      * Returns the last Message in a Thread
      * @param string $threadID
-     * @return array{string,string,string} [MessageID, Message, FileIDs]
+     * @return array{string,string} [Message, FileIDs]
      */
     public static function getLastMessage(string $threadID): array {
         $response = self::get("/threads/$threadID/messages", [
@@ -377,7 +477,6 @@ class OpenAI {
             }
         }
         return [
-            $data->getString("id"),
             Strings::join($messages, "\n"),
             Strings::join($fileIDs, ", "),
         ];
@@ -397,22 +496,28 @@ class OpenAI {
 
     /**
      * Creates a Thread and a Run
-     * @param string  $assistantID
-     * @param string  $message
-     * @param boolean $requiresFiles Optional.
+     * @param string                              $assistantID
+     * @param string                              $message
+     * @param array{role:string,content:string}[] $context       Optional.
+     * @param boolean                             $requiresFiles Optional.
      * @return array{string,string} [RunID, ThreadID]
      */
-    public static function createRun(string $assistantID, string $message, bool $requiresFiles = false): array {
+    public static function createRun(
+        string $assistantID,
+        string $message,
+        array $context = [],
+        bool $requiresFiles = false,
+    ): array {
         $response = self::post("/threads/runs", [
             "assistant_id" => $assistantID,
             "tool_choice"  => $requiresFiles ? "required" : "auto",
             "thread"       => [
-                "messages" => [
+                "messages" => array_merge($context, [
                     [
                         "role"    => "user",
                         "content" => $message,
                     ],
-                ],
+                ]),
             ],
         ]);
 
@@ -451,18 +556,25 @@ class OpenAI {
     }
 
     /**
-     * Returns the total tokens of a Run
+     * Returns the output of a Run
      * @param string $threadID
      * @param string $runID
-     * @return OpenAIData
+     * @return OpenAIOutput
      */
-    public static function getRunData(string $threadID, string $runID): OpenAIData {
-        $result   = new OpenAIData();
+    public static function getRunOutput(string $threadID, string $runID): OpenAIOutput {
+        $result   = new OpenAIOutput();
         $response = self::get("/threads/$threadID/runs/$runID");
         if (!$response->hasValue("usage")) {
             return $result;
         }
 
+        [ $message, $fileIDs ] = self::getLastMessage($threadID);
+
+        $result->externalID   = $runID;
+        $result->threadID     = $threadID;
+        $result->fileIDs      = $fileIDs;
+
+        $result->text         = $message;
         $result->runTime      = $response->getInt("completed_at") - $response->getInt("started_at");
         $result->inputTokens  = $response->getDict("usage")->getInt("prompt_tokens");
         $result->outputTokens = $response->getDict("usage")->getInt("completion_tokens");
@@ -487,10 +599,10 @@ class OpenAI {
      * @param string $fileContent
      * @param string $fileName
      * @param string $language
-     * @return OpenAIData
+     * @return OpenAIOutput
      */
-    public static function transcribeAudio(string $fileContent, string $fileName, string $language): OpenAIData {
-        $result    = new OpenAIData();
+    public static function transcribeAudio(string $fileContent, string $fileName, string $language): OpenAIOutput {
+        $result    = new OpenAIOutput();
         $timeStart = microtime(true);
         $response  = self::upload("/audio/transcriptions", [
             "file"            => new CURLStringFile($fileContent, $fileName),
@@ -520,14 +632,19 @@ class OpenAI {
 /**
  * The OpenAI Data
  */
-class OpenAIData {
+class OpenAIOutput {
 
-    public string $text         = "";
-    public string $language     = "";
-    public int    $duration     = 0;
+    public string $externalID    = "";
+    public string $threadID      = "";
+    public string $vectorStoreID = "";
+    public string $fileIDs       = "";
 
-    public int    $runTime      = 0;
-    public int    $inputTokens  = 0;
-    public int    $outputTokens = 0;
+    public string $text          = "";
+    public string $language      = "";
+    public int    $duration      = 0;
+
+    public int    $runTime       = 0;
+    public int    $inputTokens   = 0;
+    public int    $outputTokens  = 0;
 
 }
