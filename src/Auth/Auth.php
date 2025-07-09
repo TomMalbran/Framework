@@ -392,7 +392,7 @@ class Auth {
             "adminID"          => self::$adminID,
             "userID"           => self::$userID,
             "email"            => self::$credential->email,
-            "name"             => self::$credential->credentialName,
+            "name"             => self::$credential->name,
             "language"         => self::$credential->language,
             "avatar"           => self::$credential->avatar,
             "appearance"       => self::$credential->appearance,

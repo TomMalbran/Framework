@@ -1,7 +1,7 @@
 {
     "Credential" : {
         "fields" : {
-            "CREDENTIAL_ID"    : { "type" : "id"                                            },
+            "CREDENTIAL_ID"    : { "type" : "number", "isID"      : true                    },
             "currentUser"      : { "type" : "number",                     "cantEdit" : true },
             "email"            : { "type" : "string"                                        },
             "name"             : { "type" : "string",                     "cantEdit" : true },
@@ -15,31 +15,24 @@
             "password"         : { "type" : "string",                     "cantEdit" : true },
             "salt"             : { "type" : "string",                     "cantEdit" : true },
             "reqPassChange"    : { "type" : "boolean",                    "cantEdit" : true },
-            "passExpiration"   : { "type" : "date",                       "cantEdit" : true },
+            "passExpiration"   : { "type" : "number",                     "cantEdit" : true },
             "accessToken"      : { "type" : "string",                     "cantEdit" : true },
-            "tokenExpiration"  : { "type" : "date",                       "cantEdit" : true },
+            "tokenExpiration"  : { "type" : "number",                     "cantEdit" : true },
             "observations"     : { "type" : "text",                       "noExists" : true },
             "sendEmails"       : { "type" : "boolean",                    "noExists" : true },
             "sendEmailNotis"   : { "type" : "boolean",                    "noExists" : true },
             "sendTickets"      : { "type" : "boolean",                    "noExists" : true },
             "timezone"         : { "type" : "number",  "isSigned" : true, "cantEdit" : true },
-            "currentLogin"     : { "type" : "date",                       "cantEdit" : true },
-            "lastLogin"        : { "type" : "date",                       "cantEdit" : true },
+            "currentLogin"     : { "type" : "number",                     "cantEdit" : true },
+            "lastLogin"        : { "type" : "number",                     "cantEdit" : true },
             "askNotifications" : { "type" : "boolean", "default"  : "1",  "cantEdit" : true },
             "progressValue"    : { "type" : "number",                     "cantEdit" : true }
         },
         "processed" : {
-            "adminID"        : { "type" : "number" },
-            "userAccess"     : { "type" : "string" },
-            "credentialName" : { "type" : "string" },
-            "avatarFile"     : { "type" : "string" },
-            "accessName"     : { "type" : "string" }
-        },
-        "expressions" : {
-            "fullName" : {
-                "expression" : "IF(credential.lastName <> '' AND credential.firstName <> '', CONCAT(credential.firstName, ' ', credential.lastName), IF(credential.firstName <> '', credential.firstName, credential.lastName))",
-                "type"       : "string"
-            }
+            "adminID"    : { "type" : "number" },
+            "userAccess" : { "type" : "string" },
+            "avatarFile" : { "type" : "string" },
+            "accessName" : { "type" : "string" }
         },
         "hasStatus"     : true,
         "hasTimestamps" : true,
@@ -66,7 +59,7 @@
             "CREDENTIAL_ID"  : { "type" : "number"                     },
             "refreshToken"   : { "type" : "string", "isPrimary" : true },
             "userAgent"      : { "type" : "string"                     },
-            "expirationTime" : { "type" : "date"                       }
+            "expirationTime" : { "type" : "number"                     }
         },
         "foreigns" : {
             "CREDENTIAL_ID" : { "schema" : "Credential" }
@@ -106,15 +99,15 @@
 
     "EmailTemplate" : {
         "fields" : {
-            "TEMPLATE_ID"  : { "type" : "id"     },
-            "templateCode" : { "type" : "string" },
-            "language"     : { "type" : "string" },
-            "languageName" : { "type" : "string" },
-            "description"  : { "type" : "string" },
-            "subject"      : { "type" : "string" },
-            "message"      : { "type" : "text"   },
-            "position"     : { "type" : "number" }
+            "TEMPLATE_ID"  : { "type" : "number", "isID" : true },
+            "templateCode" : { "type" : "string"                },
+            "language"     : { "type" : "string"                },
+            "languageName" : { "type" : "string"                },
+            "description"  : { "type" : "string"                },
+            "subject"      : { "type" : "string"                },
+            "message"      : { "type" : "text"                  }
         },
+        "hasPositions"  : true,
         "hasTimestamps" : false,
         "canCreate"     : true,
         "canEdit"       : false,
@@ -122,15 +115,15 @@
     },
     "EmailQueue" : {
         "fields" : {
-            "EMAIL_ID"     : { "type" : "id"     },
-            "templateCode" : { "type" : "string" },
-            "sendTo"       : { "type" : "json"   },
-            "subject"      : { "type" : "string" },
-            "message"      : { "type" : "text"   },
-            "emailResult"  : { "type" : "string" },
-            "sendTime"     : { "type" : "date"   },
-            "sentTime"     : { "type" : "date"   },
-            "dataID"       : { "type" : "number" }
+            "EMAIL_ID"     : { "type" : "number", "isID" : true },
+            "templateCode" : { "type" : "string"                },
+            "sendTo"       : { "type" : "json"                  },
+            "subject"      : { "type" : "string"                },
+            "message"      : { "type" : "text"                  },
+            "emailResult"  : { "type" : "string"                },
+            "sendTime"     : { "type" : "number"                },
+            "sentTime"     : { "type" : "number"                },
+            "dataID"       : { "type" : "number"                }
         },
         "expressions" : {
             "isPending" : {
@@ -149,36 +142,35 @@
     },
     "EmailWhiteList" : {
         "fields" : {
-            "EMAIL_ID"    : { "type" : "id"     },
-            "email"       : { "type" : "string" },
-            "description" : { "type" : "string" }
+            "EMAIL_ID"    : { "type" : "number", "isID" : true },
+            "email"       : { "type" : "string"                },
+            "description" : { "type" : "string"                }
         },
         "hasTimestamps" : true,
         "canCreate"     : true,
         "canEdit"       : true,
         "canDelete"     : false
     },
+
+
+
     "NotificationQueue" : {
         "fields" : {
-            "NOTIFICATION_ID"    : { "type" : "id"      },
-            "CREDENTIAL_ID"      : { "type" : "number"  },
-            "currentUser"        : { "type" : "number"  },
-            "title"              : { "type" : "string"  },
-            "body"               : { "type" : "string"  },
-            "url"                : { "type" : "string"  },
-            "dataType"           : { "type" : "string"  },
-            "dataID"             : { "type" : "number"  },
-            "notificationResult" : { "type" : "string"  },
-            "externalID"         : { "type" : "string"  },
-            "sentTime"           : { "type" : "number"  },
-            "isRead"             : { "type" : "boolean" },
-            "isDiscarded"        : { "type" : "boolean" }
+            "NOTIFICATION_ID"    : { "type" : "number", "isID" : true },
+            "CREDENTIAL_ID"      : { "type" : "number"                },
+            "currentUser"        : { "type" : "number"                },
+            "title"              : { "type" : "string"                },
+            "body"               : { "type" : "string"                },
+            "url"                : { "type" : "string"                },
+            "dataType"           : { "type" : "string"                },
+            "dataID"             : { "type" : "number"                },
+            "notificationResult" : { "type" : "string"                },
+            "externalID"         : { "type" : "string"                },
+            "sentTime"           : { "type" : "number"                },
+            "isRead"             : { "type" : "boolean"               },
+            "isDiscarded"        : { "type" : "boolean"               }
         },
         "expressions" : {
-            "credentialName" : {
-                "expression" : "IF(credential.lastName <> '' AND credential.firstName <> '', CONCAT(credential.firstName, ' ', credential.lastName), IF(credential.firstName <> '', credential.firstName, credential.lastName))",
-                "type"       : "string"
-            },
             "isPending" : {
                 "expression" : "IF(notificationResult = 'NotProcessed', 1, 0)",
                 "type"       : "boolean"
@@ -193,6 +185,7 @@
                 "schema" : "Credential",
                 "prefix" : "credential",
                 "fields" : {
+                    "name"      : { "type" : "string" },
                     "firstName" : { "type" : "string" },
                     "lastName"  : { "type" : "string" }
                 }
@@ -220,7 +213,7 @@
 
     "LogSession" : {
         "fields" : {
-            "SESSION_ID"    : { "type" : "id"                     },
+            "SESSION_ID"    : { "type" : "number", "isID"  : true },
             "CREDENTIAL_ID" : { "type" : "number", "isKey" : true },
             "USER_ID"       : { "type" : "number"                 },
             "ip"            : { "type" : "string"                 },
@@ -246,7 +239,7 @@
     },
     "LogAction" : {
         "fields" : {
-            "ACTION_ID"     : { "type" : "id"                     },
+            "ACTION_ID"     : { "type" : "number", "isID"  : true },
             "SESSION_ID"    : { "type" : "number", "isKey" : true },
             "CREDENTIAL_ID" : { "type" : "number", "isKey" : true },
             "USER_ID"       : { "type" : "number"                 },
@@ -259,7 +252,7 @@
                 "schema" : "LogSession",
                 "prefix" : "session",
                 "fields" : {
-                    "createdTime" : { "type" : "date"   },
+                    "createdTime" : { "type" : "number" },
                     "ip"          : { "type" : "string" },
                     "userAgent"   : { "type" : "string" }
                 }
@@ -282,11 +275,11 @@
     },
     "LogDevice" : {
         "fields" : {
-            "LOG_ID"        : { "type" : "id"      },
-            "CREDENTIAL_ID" : { "type" : "number"  },
-            "userAgent"     : { "type" : "string"  },
-            "playerID"      : { "type" : "string"  },
-            "wasAdded"      : { "type" : "boolean" }
+            "LOG_ID"        : { "type" : "number", "isID" : true },
+            "CREDENTIAL_ID" : { "type" : "number"                },
+            "userAgent"     : { "type" : "string"                },
+            "playerID"      : { "type" : "string"                },
+            "wasAdded"      : { "type" : "boolean"               }
         },
         "foreigns" : {
             "CREDENTIAL_ID" : { "schema" : "Credential"       },
@@ -299,15 +292,15 @@
     },
     "LogQuery" : {
         "fields" : {
-            "LOG_ID"      : { "type" : "id"      },
-            "expression"  : { "type" : "text"    },
-            "environment" : { "type" : "string"  },
-            "amount"      : { "type" : "number"  },
-            "isResolved"  : { "type" : "boolean" },
-            "elapsedTime" : { "type" : "number"  },
-            "totalTime"   : { "type" : "number"  },
-            "updatedTime" : { "type" : "number"  },
-            "updatedUser" : { "type" : "number"  }
+            "LOG_ID"      : { "type" : "number", "isID" : true },
+            "expression"  : { "type" : "text"                  },
+            "environment" : { "type" : "string"                },
+            "amount"      : { "type" : "number"                },
+            "isResolved"  : { "type" : "boolean"               },
+            "elapsedTime" : { "type" : "number"                },
+            "totalTime"   : { "type" : "number"                },
+            "updatedTime" : { "type" : "number"                },
+            "updatedUser" : { "type" : "number"                }
         },
         "hasUsers"      : true,
         "hasTimestamps" : true,
@@ -317,18 +310,18 @@
     },
     "LogError" : {
         "fields" : {
-            "LOG_ID"      : { "type" : "id"       },
-            "errorCode"   : { "type" : "number"   },
-            "errorText"   : { "type" : "string"   },
-            "errorLevel"  : { "type" : "number"   },
-            "environment" : { "type" : "string"   },
-            "file"        : { "type" : "string"   },
-            "line"        : { "type" : "number"   },
-            "description" : { "type" : "longtext" },
-            "backtrace"   : { "type" : "longtext" },
-            "amount"      : { "type" : "number"   },
-            "isResolved"  : { "type" : "boolean"  },
-            "updatedTime" : { "type" : "date"     }
+            "LOG_ID"      : { "type" : "number", "isID" : true },
+            "errorCode"   : { "type" : "number"                },
+            "errorText"   : { "type" : "string"                },
+            "errorLevel"  : { "type" : "number"                },
+            "environment" : { "type" : "string"                },
+            "file"        : { "type" : "string"                },
+            "line"        : { "type" : "number"                },
+            "description" : { "type" : "longtext"              },
+            "backtrace"   : { "type" : "longtext"              },
+            "amount"      : { "type" : "number"                },
+            "isResolved"  : { "type" : "boolean"               },
+            "updatedTime" : { "type" : "number"                }
         },
         "hasTimestamps" : true,
         "canCreate"     : true,

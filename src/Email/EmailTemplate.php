@@ -97,6 +97,7 @@ class EmailTemplate extends EmailTemplateSchema {
                 subject:      Strings::replace($template["subject"], "[site]", $siteName),
                 message:      Strings::replace($message, "[site]", $siteName),
                 position:     $position,
+                skipOrder:    true,
             );
         }
 

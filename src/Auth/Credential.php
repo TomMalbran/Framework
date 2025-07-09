@@ -195,7 +195,12 @@ class Credential extends CredentialSchema {
      * @param Request|null    $sort       Optional.
      * @return CredentialEntity[]
      */
-    public static function getAllWithFilter(array|Access $accessName, string $filter, string|int $value = 1, ?Request $sort = null): array {
+    public static function getAllWithFilter(
+        array|Access $accessName,
+        string $filter,
+        string|int $value = 1,
+        ?Request $sort = null,
+    ): array {
         $query = self::createAccessQuery($accessName, $filter, $value);
         if ($query->isEmpty()) {
             return [];
@@ -210,7 +215,10 @@ class Credential extends CredentialSchema {
      * @param Request|null    $sort       Optional.
      * @return CredentialEntity[]
      */
-    public static function getActiveForAccess(array|Access $accessName, ?Request $sort = null): array {
+    public static function getActiveForAccess(
+        array|Access $accessName,
+        ?Request $sort = null,
+    ): array {
         $query = self::createAccessQuery($accessName);
         if ($query->isEmpty()) {
             return [];
@@ -308,8 +316,7 @@ class Credential extends CredentialSchema {
         $result = [];
 
         foreach ($list as $elem) {
-            $elem->credentialName = self::getName($elem);
-            $elem->accessName     = Access::getName($elem->access);
+            $elem->accessName = Access::getName($elem->access);
 
             if ($elem->avatar !== "") {
                 $elem->avatarFile = $elem->avatar;
