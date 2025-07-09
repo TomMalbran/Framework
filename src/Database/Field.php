@@ -65,7 +65,7 @@ class Field {
         $this->path       = $data->getString("path", $this->path);
         $this->default    = $data->getString("default", $this->default);
 
-        $this->isID       = $this->type === FieldType::ID;
+        $this->isID       = $data->hasValue("isID");
         $this->isPrimary  = $this->isID || $data->hasValue("isPrimary");
         $this->isKey      = $data->hasValue("isKey");
         $this->isUnique   = $data->hasValue("isUnique");
@@ -121,10 +121,27 @@ class Field {
         $default    = null;
 
         switch ($this->type) {
-        case FieldType::ID:
-            $type       = "int";
-            $length     = 10;
-            $attributes = "unsigned NOT NULL AUTO_INCREMENT";
+        case FieldType::Number:
+            $type    = "int";
+            $length  = $this->length > 0 ? $this->length : 10;
+            $default = 0;
+
+            if ($length < 3) {
+                $type = "tinyint";
+            } elseif ($length < 5) {
+                $type = "smallint";
+            } elseif ($length < 8) {
+                $type = "mediumint";
+            } elseif ($length > 10) {
+                $type = "bigint";
+            }
+
+            if ($this->isID) {
+                $attributes = "unsigned NOT NULL AUTO_INCREMENT";
+                $default    = null;
+            } else {
+                $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
+            }
             break;
         case FieldType::Boolean:
             $type       = "tinyint";
@@ -137,22 +154,6 @@ class Field {
             $length     = 20;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
             $default    = 0;
-            break;
-        case FieldType::Number:
-            $type       = "int";
-            $length     = $this->length > 0 ? $this->length : 10;
-            $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
-            $default    = 0;
-
-            if ($length < 3) {
-                $type = "tinyint";
-            } elseif ($length < 5) {
-                $type = "smallint";
-            } elseif ($length < 8) {
-                $type = "mediumint";
-            } elseif ($length > 10) {
-                $type = "bigint";
-            }
             break;
         case FieldType::String:
         case FieldType::File:
@@ -206,15 +207,10 @@ class Field {
         $result = null;
 
         switch ($this->type) {
-        case FieldType::ID:
-            break;
-        case FieldType::Boolean:
-            $result = $request->toBinary($this->name);
-            break;
-        case FieldType::String:
-            $result = $request->getString($this->name);
-            break;
         case FieldType::Number:
+            if ($this->isID) {
+                break;
+            }
             if ($this->dateInput !== "" && $this->hourInput !== "") {
                 $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
             } elseif ($this->dateInput !== "") {
@@ -222,6 +218,12 @@ class Field {
             } else {
                 $result = $request->getInt($this->name);
             }
+            break;
+        case FieldType::Boolean:
+            $result = $request->toBinary($this->name);
+            break;
+        case FieldType::String:
+            $result = $request->getString($this->name);
             break;
         case FieldType::Float:
             $result = $request->toInt($this->name, $this->decimals);
@@ -251,12 +253,11 @@ class Field {
         $result = [];
 
         switch ($this->type) {
-        case FieldType::Boolean:
-            $result[$key]           = !Arrays::isEmpty($data, $key);
-            break;
-        case FieldType::ID:
         case FieldType::Number:
             $result[$key]           = $number;
+            break;
+        case FieldType::Boolean:
+            $result[$key]           = !Arrays::isEmpty($data, $key);
             break;
         case FieldType::Float:
             $result[$key]           = Numbers::toFloat($number, $this->decimals);

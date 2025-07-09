@@ -10,9 +10,8 @@ enum FieldType {
 
     case None;
 
-    case ID;
-    case Boolean;
     case Number;
+    case Boolean;
     case Float;
     case String;
     case Text;

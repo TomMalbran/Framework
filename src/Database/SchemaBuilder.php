@@ -421,7 +421,6 @@ class SchemaBuilder {
         case FieldType::Boolean:
             $result[] = self::getTypeData($key, "bool");
             break;
-        case FieldType::ID:
         case FieldType::Number:
             $result[] = self::getTypeData($key, "int");
             break;
@@ -635,7 +634,6 @@ class SchemaBuilder {
             } else {
                 $property["queryType"] = match($type) {
                     FieldType::Boolean => "BooleanQuery",
-                    FieldType::ID,
                     FieldType::Number,
                     FieldType::Float   => "NumberQuery",
                     FieldType::String,
@@ -672,7 +670,6 @@ class SchemaBuilder {
     private static function getFieldType(FieldType $type): string {
         return match ($type) {
             FieldType::Boolean => "bool",
-            FieldType::ID,
             FieldType::Number  => "int",
             FieldType::Float   => "float",
             default            => "string",

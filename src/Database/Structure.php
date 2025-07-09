@@ -127,7 +127,7 @@ class Structure {
 
         foreach ($fields as $key => $value) {
             $type = FieldType::from($value->getString("type"));
-            if ($type === FieldType::ID) {
+            if ($value->hasValue("isID")) {
                 $idKey         = $key;
                 $primaryCount += 1;
             } elseif ($value->hasValue("isPrimary")) {
@@ -147,7 +147,7 @@ class Structure {
         // Create the Fields
         foreach ($fields as $key => $value) {
             $field = new Field($key, $value);
-            if ($field->type === FieldType::ID) {
+            if ($field->isID && $field->type === FieldType::Number) {
                 $this->hasAutoInc = true;
             }
             if ($key === $idKey) {

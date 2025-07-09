@@ -48,6 +48,7 @@
                     "required"             : [ "type" ],
                     "properties"           : {
                         "type"      : { "$ref" : "#/$defs/type"     },
+                        "isID"      : { "type" : "boolean"          },
                         "length"    : { "type" : "number"           },
                         "isSigned"  : { "type" : "boolean"          },
                         "decimals"  : { "type" : "number"           },
@@ -224,7 +225,6 @@
         },
         "type" : {
             "enum" : [
-                "id",
                 "boolean",
                 "number",
                 "float",
