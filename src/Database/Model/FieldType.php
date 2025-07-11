@@ -35,4 +35,27 @@ enum FieldType {
         }
         return self::String;
     }
+
+    /**
+     * Creates an FieldType from a Type
+     * @param string $type
+     * @return FieldType
+     */
+    public static function fromType(string $type): FieldType {
+        return match ($type) {
+            "bool"   => FieldType::Boolean,
+            "float"  => FieldType::Float,
+            "int"    => FieldType::Number,
+            "string" => FieldType::String,
+            default  => FieldType::None,
+        };
+    }
+
+    /**
+     * Returns the Name of the FieldType
+     * @return string
+     */
+    public function getName(): string {
+        return Strings::toLowerCase($this->name);
+    }
 }
