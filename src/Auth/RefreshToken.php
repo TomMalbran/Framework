@@ -1,11 +1,11 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Auth\Schema\CredentialRefreshTokenSchema;
+use Framework\Auth\Schema\CredentialRefreshTokenEntity;
+use Framework\Auth\Schema\CredentialRefreshTokenQuery;
 use Framework\Utils\Strings;
 use Framework\Utils\Server;
-use Framework\Schema\CredentialRefreshTokenSchema;
-use Framework\Schema\CredentialRefreshTokenEntity;
-use Framework\Schema\CredentialRefreshTokenQuery;
 
 /**
  * The Refresh Tokens

@@ -1,9 +1,9 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Auth\Schema\CredentialSpamSchema;
+use Framework\Auth\Schema\CredentialSpamQuery;
 use Framework\Utils\Server;
-use Framework\Schema\CredentialSpamSchema;
-use Framework\Schema\CredentialSpamQuery;
 
 /**
  * The Auth Spam

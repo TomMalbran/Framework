@@ -6,6 +6,7 @@ use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Reset;
 use Framework\Auth\Spam;
+use Framework\Auth\Schema\CredentialEntity;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
@@ -14,7 +15,6 @@ use Framework\System\Config;
 use Framework\System\Status;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
-use Framework\Schema\CredentialEntity;
 
 /**
  * The Auth

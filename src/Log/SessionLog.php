@@ -2,11 +2,11 @@
 namespace Framework\Log;
 
 use Framework\Auth\Auth;
+use Framework\Log\Schema\LogSessionSchema;
+use Framework\Log\Schema\LogSessionQuery;
 use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
-use Framework\Schema\LogSessionSchema;
-use Framework\Schema\LogSessionQuery;
 
 /**
  * The Sessions Log

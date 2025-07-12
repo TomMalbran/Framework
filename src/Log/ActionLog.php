@@ -4,13 +4,13 @@ namespace Framework\Log;
 use Framework\Request;
 use Framework\Auth\Auth;
 use Framework\Log\SessionLog;
+use Framework\Log\Schema\LogActionSchema;
+use Framework\Log\Schema\LogActionQuery;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
-use Framework\Schema\LogActionSchema;
-use Framework\Schema\LogActionQuery;
 
 /**
  * The Actions Log

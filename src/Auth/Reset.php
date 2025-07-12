@@ -1,12 +1,12 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Auth\Schema\CredentialResetSchema;
+use Framework\Auth\Schema\CredentialResetColumn;
+use Framework\Auth\Schema\CredentialResetQuery;
 use Framework\Utils\DateTime;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
-use Framework\Schema\CredentialResetSchema;
-use Framework\Schema\CredentialResetColumn;
-use Framework\Schema\CredentialResetQuery;
 
 /**
  * The Auth Reset

@@ -4,12 +4,12 @@ namespace Framework\Core;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\Core\VariableType;
+use Framework\Core\Schema\SettingsSchema;
+use Framework\Core\Schema\SettingsEntity;
+use Framework\Core\Schema\SettingsColumn;
+use Framework\Core\Schema\SettingsQuery;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
-use Framework\Schema\SettingsSchema;
-use Framework\Schema\SettingsEntity;
-use Framework\Schema\SettingsColumn;
-use Framework\Schema\SettingsQuery;
 
 /**
  * The Settings

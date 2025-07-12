@@ -6,6 +6,7 @@ use Framework\Discovery\Discovery;
 use Framework\Email\EmailWhiteList;
 use Framework\Email\EmailProvider;
 use Framework\Email\EmailResult;
+use Framework\Email\Schema\EmailTemplateEntity;
 use Framework\Provider\Mustache;
 use Framework\Provider\SMTP;
 use Framework\Provider\Mandrill;
@@ -16,7 +17,6 @@ use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Utils;
-use Framework\Schema\EmailTemplateEntity;
 
 /**
  * The Email Provider

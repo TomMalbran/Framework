@@ -2,10 +2,10 @@
 namespace Framework\Auth;
 
 use Framework\Auth\RefreshToken;
+use Framework\Auth\Schema\CredentialRefreshTokenEntity;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Server;
-use Framework\Schema\CredentialRefreshTokenEntity;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
