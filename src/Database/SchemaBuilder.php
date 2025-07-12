@@ -20,34 +20,26 @@ class SchemaBuilder {
 
     /**
      * Generates the Code for the Schemas
-     * @param string  $baseNamespace
-     * @param string  $writePath
      * @param boolean $forFramework
      * @return integer
      */
-    public static function generateCode(string $baseNamespace, string $writePath, bool $forFramework): int {
-        $schemas = SchemaFactory::getData();
-        $created = 0;
-
-        File::createDir($writePath);
-        File::emptyDir($writePath);
-
-        [ $paths, $namespaces ] = self::generateFolders($schemas, $writePath, $forFramework);
+    public static function generateCode(bool $forFramework): int {
+        $schemas    = SchemaFactory::getData($forFramework, true);
+        $namespaces = [];
+        $created    = 0;
 
         foreach ($schemas as $schemaKey => $schemaData) {
-            $fromFramework = $schemaData->hasValue("fromFramework");
-            if (($forFramework && !$fromFramework) || (!$forFramework && $fromFramework)) {
-                continue;
-            }
+            $namespaces[$schemaKey] = $schemaData->getString("namespace");
 
+            $path = $schemaData->getString("path");
+            File::createDir($path);
+            File::emptyDir($path);
+        }
+
+        foreach ($schemas as $schemaKey => $schemaData) {
             $structure = new Structure($schemaKey, $schemaData);
-            $namespace = "{$baseNamespace}Schema";
-            $path      = $writePath;
-
-            if (!$forFramework) {
-                $path      = $paths[$schemaKey];
-                $namespace = $namespaces[$schemaKey];
-            }
+            $path      = $schemaData->getString("path");
+            $namespace = $schemaData->getString("namespace");
 
             $schemaName = "{$structure->schema}Schema.php";
             $schemaCode = self::getSchemaCode($structure, $namespace, $namespaces);
@@ -71,52 +63,6 @@ class SchemaBuilder {
         $name = $forFramework ? "Framework" : "App";
         print("- Generated the $name codes -> $created schemas\n");
         return $created * 4;
-    }
-
-    /**
-     * Generates the Folders for the Schemas
-     * @param Dictionary $schemas
-     * @param string     $writePath
-     * @param boolean    $forFramework
-     * @return array{array<string,string>,array<string,string>}
-     */
-    private static function generateFolders(Dictionary $schemas, string $writePath, bool $forFramework): array {
-        $schemaKeys = [];
-        $paths      = [];
-        $namespaces = [];
-
-        foreach ($schemas as $schemaKey => $schemaData) {
-            if ($schemaData->hasValue("fromFramework")) {
-                continue;
-            }
-
-            $path = $schemaData->getString("path");
-            if (!$forFramework && $path !== "") {
-                $paths[$schemaKey]      = $path;
-                $namespaces[$schemaKey] = $schemaData->getString("namespace");
-                File::createDir($path);
-                File::emptyDir($path);
-            } else {
-                $schemaKeys[] = $schemaKey;
-            }
-        }
-
-        foreach ($schemaKeys as $schemaKey) {
-            $minSchema = $schemaKey;
-            foreach ($schemaKeys as $otherSchemaKey) {
-                if (Strings::startsWith($schemaKey, $otherSchemaKey) && Strings::length($otherSchemaKey) < Strings::length($minSchema)) {
-                    $minSchema = $otherSchemaKey;
-                }
-            }
-
-            $paths[$schemaKey]      = "$writePath/$minSchema";
-            $namespaces[$schemaKey] = Package::Namespace . "Schema\\$minSchema";
-            if (!$forFramework) {
-                File::createDir("$writePath/$minSchema");
-            }
-        }
-
-        return [ $paths, $namespaces ];
     }
 
 

@@ -5,9 +5,8 @@
 **/vendor
 
 # generated files
-src/Schema
-src/*/Schema
 src/System
+src/*/Schema
 
 # tests
 data/schemasOld.json

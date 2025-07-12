@@ -2,11 +2,21 @@
 namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
-use Framework\Discovery\DataFile;
 use Framework\Database\Structure;
-use Framework\Utils\Arrays;
+use Framework\Database\SchemaModel;
+use Framework\Database\Model\Model;
+use Framework\Database\Model\Field;
+use Framework\Database\Model\Expression;
+use Framework\Database\Model\Virtual;
+use Framework\Database\Model\Count;
+use Framework\Database\Model\Relation;
+use Framework\Database\Model\SubRequest;
+use Framework\File\File;
+use Framework\System\Status;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
+
+use ReflectionNamedType;
 
 /**
  * The Schema Factory
@@ -22,42 +32,218 @@ class SchemaFactory {
 
     /**
      * Gets the Schema data
+     * @param bool $forFramework Optional.
+     * @param bool $rebuild      Optional.
      * @return Dictionary
      */
-    public static function getData(): Dictionary {
-        if (self::$data !== null) {
+    public static function getData(bool $forFramework = false, bool $rebuild = false): Dictionary {
+        if (!$rebuild && self::$data !== null) {
             return self::$data;
         }
         self::$data = new Dictionary();
 
-        /** @var array<string,mixed> */
-        $appSchemas   = Discovery::loadData(DataFile::Schemas);
+        $reflections = Discovery::getReflectionClasses(
+            skipIgnored:  true,
+            forFramework: $forFramework,
+        );
 
-        /** @var array<string,mixed> */
-        $frameSchemas = Discovery::loadFrameData(DataFile::Schemas);
+        // Parse the Reflections
+        $models   = [];
+        $modelIDs = [];
 
-        foreach ($appSchemas as $key => $data) {
-            if (!isset($frameSchemas[$key])) {
-                self::$data->set($key, $data);
+        foreach ($reflections as $className => $reflection) {
+            $parent    = $reflection->getParentClass();
+            $fileName  = "";
+            $namespace = "";
+            $modelAttr = null;
+
+            // Get the Data from the Class
+            if ($parent === false) {
+                $fileName   = $reflection->getFileName();
+                $namespace  = $reflection->getNamespaceName();
+                $attributes = $reflection->getAttributes(Model::class);
+                $modelAttr  = $attributes[0] ?? null;
+
+            // Get some data from the Parent Class
+            } else {
+                $fileName    = $parent->getFileName();
+                $namespace   = $parent->getNamespaceName();
+                $parentAttrs = $parent->getAttributes(Model::class);
+                $modelAttr   = $parentAttrs[0] ?? null;
             }
-        }
-
-        foreach ($frameSchemas as $key => $data) {
-            if (!is_array($data)) {
+            if ($fileName === false || $modelAttr === null) {
                 continue;
             }
 
-            $schemaData = [];
-            if (isset($appSchemas[$key]) && is_array($appSchemas[$key])) {
-                $schemaData = Arrays::extend($data, $appSchemas[$key]);
-            } else {
-                $schemaData = $data;
-            }
-            $schemaData["fromFramework"] = true;
+            /** @var Model */
+            $model = $modelAttr->newInstance();
 
-            self::$data->set($key, $schemaData);
+            // Get the Path
+            $path  = File::getDirectory($fileName, 1);
+            $path  = Strings::stripEnd($path, "/Model");
+            $path .= "/Schema";
+
+            // Set the Namespace
+            $namespace  = Strings::stripEnd($namespace, "\\Model");
+            $namespace .= "\\Schema";
+
+            // Set the Name
+            $name = Strings::substringAfter($className, "\\");
+            $name = Strings::stripEnd($name, "Model");
+
+            // Get from the Props
+            $hasStatus     = false;
+            $hasPositions  = false;
+            $fields        = [];
+            $virtualFields = [];
+            $expressions   = [];
+            $counts        = [];
+            $relations     = [];
+            $subRequests   = [];
+
+            // Parse the Properties
+            $props = $reflection->getProperties();
+            foreach ($props as $prop) {
+                $propType  = $prop->getType();
+                $fieldName = $prop->getName();
+                if ($propType === null || !$propType instanceof ReflectionNamedType) {
+                    continue;
+                }
+
+                // Get the Attributes
+                $typeName       = $propType->getName();
+                $propAttributes = $prop->getAttributes();
+                $field          = new Field();
+                $relation       = new Relation();
+                $subRequest     = new SubRequest();
+                $virtual        = null;
+                $expression     = null;
+                $count          = null;
+
+                if (isset($propAttributes[0])) {
+                    $instance = $propAttributes[0]->newInstance();
+                    if ($instance instanceof Field) {
+                        $field = $instance;
+                    } elseif ($instance instanceof Expression) {
+                        $expression = $instance;
+                    } elseif ($instance instanceof Virtual) {
+                        $virtual = $instance;
+                    } elseif ($instance instanceof Count) {
+                        $count = $instance;
+                    } elseif ($instance instanceof Relation) {
+                        $relation = $instance;
+                    } elseif ($instance instanceof SubRequest) {
+                        $subRequest = $instance;
+                    }
+                }
+
+                // If the Type is Status, mark it in the Model
+                if ($typeName === Status::class) {
+                    $hasStatus = true;
+
+                // If the Name is Position, mark it in the Model
+                } elseif ($fieldName === "position") {
+                    $hasPositions = true;
+
+                // If is not a Built-in Type, is a Join to be parsed later
+                } elseif (!$propType->isBuiltin()) {
+                    $relSchema   = Strings::substringAfter($typeName, "\\");
+                    $relSchema   = Strings::stripEnd($relSchema, "Model");
+                    $relations[] = $relation->setData($relSchema, $fieldName);
+
+                // If is an Array, is a SubRequest
+                } elseif ($typeName === "array") {
+                    $comment = $prop->getDocComment();
+                    if ($comment !== false) {
+                        $subType   = trim(Strings::substringBetween($comment, "@var", "*/"));
+                        $subSchema = "";
+                        if (Strings::endsWith($subType, "Model[]")) {
+                            $subSchema = Strings::stripEnd($subType, "Model[]");
+                            $subType   = "";
+                        }
+                        $subRequests[] = $subRequest->setData($fieldName, $subType, $subSchema);
+                    }
+
+                // If is an Expression, add it to the Model
+                } elseif ($expression !== null) {
+                    $expressions[] = $expression->setData($fieldName, $typeName);
+
+                // If is a Virtual, add it to the Model
+                } elseif ($virtual !== null) {
+                    $virtualFields[] = $virtual->setData($fieldName, $typeName);
+
+                // If is a Count, add it to the Model
+                } elseif ($count !== null) {
+                    $counts[] = $count->setData($fieldName, $typeName);
+
+                // Add the Field
+                } else {
+                    $fields[] = $field->setData($fieldName, $typeName);
+                }
+            }
+
+            // Add the Model
+            $schemaModel = new SchemaModel(
+                name:          $name,
+                path:          $path,
+                namespace:     $namespace,
+                hasUsers:      $model->hasUsers,
+                hasTimestamps: $model->hasTimestamps,
+                hasPositions:  $hasPositions,
+                hasStatus:     $hasStatus,
+                canCreate:     $model->canCreate,
+                canEdit:       $model->canEdit,
+                canDelete:     $model->canDelete,
+                fields:        $fields,
+                virtualFields: $virtualFields,
+                expressions:   $expressions,
+                relations:     $relations,
+                counts:        $counts,
+                subRequests:   $subRequests,
+            );
+            $models[$name] = $schemaModel;
+
+            if ($schemaModel->idField !== "") {
+                $modelIDs[$schemaModel->idField] = $schemaModel->name;
+            }
         }
 
+        // Parse the Models using the Models created
+        foreach ($models as $model) {
+            foreach ($model->relations as $relation) {
+                $joinModel = $models[$relation->schemaName] ?? null;
+                if ($joinModel !== null) {
+                    $relation->model = $joinModel;
+                }
+            }
+            foreach ($model->counts as $count) {
+                $countModel = $models[$count->schemaName] ?? null;
+                if ($countModel !== null) {
+                    $count->model = $countModel;
+                }
+            }
+            foreach ($model->fields as $field) {
+                if ($field->name !== $model->idField && $field->belongsTo === "") {
+                    $field->belongsTo = $modelIDs[$field->name] ?? "";
+                }
+            }
+        }
+
+        // Generate the Schemas
+        $schemas = [];
+        foreach ($models as $schemaName => $model) {
+            $schemaData = $model->toArray();
+            $schemas[$schemaName] = $schemaData;
+
+            $schemaData["path"]      = $model->path;
+            $schemaData["namespace"] = $model->namespace;
+            self::$data->set($schemaName, $schemaData);
+        }
+
+        // Save the Test Data
+        if (count($schemas) > 0) {
+            Discovery::saveData("schemasTest", $schemas);
+        }
         return self::$data;
     }
 
