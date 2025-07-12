@@ -5,8 +5,12 @@
 **/vendor
 
 # generated files
-src/Schema
+src/*/Schema
 src/System
+
+# tests
+data/schemasOld.json
+data/schemasTest.json
 
 # misc
 .DS_Store

@@ -27,7 +27,6 @@ class Builder {
 
     private const Namespace = "Framework\\";
     private const SystemDir = "System";
-    private const SchemaDir = "Schema";
 
 
 
@@ -55,11 +54,8 @@ class Builder {
 
 
         print("\nSCHEMA CODES\n");
-        $schemaWritePath = File::parsePath($package["basePath"], $package["sourceDir"], self::SchemaDir);
-        $files += SchemaBuilder::generateCode($package["appNamespace"], $schemaWritePath, false);
-
-        $schemaWritePath = File::parsePath($package["framePath"], "src", self::SchemaDir);
-        $files += SchemaBuilder::generateCode(self::Namespace, $schemaWritePath, true);
+        $files += SchemaBuilder::generateCode(forFramework: true);
+        $files += SchemaBuilder::generateCode(forFramework: false);
 
 
         print("\nFRAMEWORK SEC CODES\n");
