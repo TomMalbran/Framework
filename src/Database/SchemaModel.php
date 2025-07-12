@@ -1,0 +1,320 @@
+<?php
+namespace Framework\Database;
+
+use Framework\Database\Model\Field;
+use Framework\Database\Model\FieldType;
+use Framework\Database\Model\Expression;
+use Framework\Database\Model\Virtual;
+use Framework\Database\Model\Count;
+use Framework\Database\Model\Relation;
+use Framework\Database\Model\SubRequest;
+use Framework\Utils\Arrays;
+
+/**
+ * The Schema Model
+ */
+class SchemaModel {
+
+    public string $name         = "";
+    public string $path         = "";
+    public string $namespace    = "";
+    public string $idField      = "";
+
+    public bool $hasUsers       = false;
+    public bool $hasTimestamps  = false;
+    public bool $hasPositions   = false;
+    public bool $hasStatus      = false;
+    public bool $canCreate      = false;
+    public bool $canEdit        = false;
+    public bool $canDelete      = false;
+
+
+    /** @var Field[] */
+    public array $fields        = [];
+
+    /** @var Field[] */
+    public array $extraFields   = [];
+
+    /** @var Virtual[] */
+    public array $virtualFields = [];
+
+    /** @var Expression[] */
+    public array $expressions   = [];
+
+    /** @var Count[] */
+    public array $counts        = [];
+
+    /** @var Relation[] */
+    public array $relations     = [];
+
+    /** @var SubRequest[] */
+    public array $subRequests   = [];
+
+
+
+    /**
+     * The Schema Model
+     * @param string       $name          Optional.
+     * @param string       $path          Optional.
+     * @param string       $namespace     Optional.
+     * @param boolean      $hasUsers      Optional.
+     * @param boolean      $hasTimestamps Optional.
+     * @param boolean      $hasPositions  Optional.
+     * @param boolean      $hasStatus     Optional.
+     * @param boolean      $canCreate     Optional.
+     * @param boolean      $canEdit       Optional.
+     * @param boolean      $canDelete     Optional.
+     * @param Field[]      $fields        Optional.
+     * @param Virtual[]    $virtualFields Optional.
+     * @param Expression[] $expressions   Optional.
+     * @param Count[]      $counts        Optional.
+     * @param Relation[]   $relations     Optional.
+     * @param SubRequest[] $subRequests   Optional.
+     */
+    public function __construct(
+        string $name         = "",
+        string $path         = "",
+        string $namespace    = "",
+
+        bool $hasUsers       = false,
+        bool $hasTimestamps  = false,
+        bool $hasPositions   = false,
+        bool $hasStatus      = false,
+        bool $canCreate      = false,
+        bool $canEdit        = false,
+        bool $canDelete      = false,
+
+        array $fields        = [],
+        array $virtualFields = [],
+        array $expressions   = [],
+        array $counts        = [],
+        array $relations     = [],
+        array $subRequests   = [],
+    ) {
+        $this->name          = $name;
+        $this->path          = $path;
+        $this->namespace     = $namespace;
+
+        $this->hasUsers      = $hasUsers;
+        $this->hasTimestamps = $hasTimestamps;
+        $this->hasPositions  = $hasPositions;
+        $this->hasStatus     = $hasStatus;
+        $this->canCreate     = $canCreate;
+        $this->canEdit       = $canEdit;
+        $this->canDelete     = $canDelete;
+
+        $this->fields        = $fields;
+        $this->virtualFields = $virtualFields;
+        $this->expressions   = $expressions;
+        $this->counts        = $counts;
+        $this->relations     = $relations;
+        $this->subRequests   = $subRequests;
+
+        $this->setExtraFields();
+        $this->setIDField();
+    }
+
+    /**
+     * Sets extra fields based on the model attributes
+     * @return SchemaModel
+     */
+    private function setExtraFields(): SchemaModel {
+        if ($this->hasPositions) {
+            $this->extraFields[] = new Field(
+                name: "position",
+                type: FieldType::Number,
+            );
+        }
+        if ($this->hasStatus) {
+            $this->extraFields[] = new Field(
+                name:    "status",
+                type:    FieldType::String,
+                noEmpty: true,
+                isKey:   true,
+            );
+        }
+
+        if ($this->hasTimestamps && $this->canCreate) {
+            $this->extraFields[] = new Field(
+                name:    "createdTime",
+                type:    FieldType::Number,
+                canEdit: false,
+            );
+        }
+        if ($this->hasTimestamps && $this->canEdit) {
+            $this->extraFields[] = new Field(
+                name:    "modifiedTime",
+                type:    FieldType::Number,
+                canEdit: false,
+            );
+        }
+        if ($this->canDelete) {
+            $this->extraFields[] = new Field(
+                name:    "isDeleted",
+                type:    FieldType::Boolean,
+                canEdit: false,
+            );
+        }
+        return $this;
+    }
+
+    /**
+     * Returns the ID Field of the Model
+     * @return boolean
+     */
+    private function setIDField(): bool {
+        foreach ($this->fields as $field) {
+            if ($field->isID) {
+                $this->idField = $field->name;
+                break;
+            }
+        }
+        return true;
+    }
+
+
+
+    /**
+     * Returns the Fields of the Model
+     * @param boolean $withTimestamps
+     * @param boolean $withDeleted
+     * @return Field[]
+     */
+    public function getFields(bool $withTimestamps, bool $withDeleted): array {
+        $result = [];
+        foreach ($this->fields as $field) {
+            $result[] = $field;
+        }
+
+        foreach ($this->extraFields as $field) {
+            $fieldName = $field->getName();
+            if (!$withTimestamps && ($fieldName === "createdTime" || $fieldName === "modifiedTime")) {
+                continue;
+            }
+            if (!$withDeleted && $fieldName === "isDeleted") {
+                continue;
+            }
+            $result[] = $field;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns true if there is an Encrypt Field in the Model
+     * @return bool
+     */
+    public function hasEncrypt(): bool {
+        foreach ($this->fields as $field) {
+            if ($field->type === FieldType::Encrypt) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    /**
+     * Returns the Data as an Array
+     * @return array<string,mixed>
+     */
+    public function toArray(): array {
+        $data = [
+            "fields"      => [],
+            "expressions" => [],
+            "processed"   => [],
+            "counts"      => [],
+            "joins"       => [],
+            "subrequests" => [],
+            "foreigns"    => [],
+        ];
+        $fieldNames = [];
+        $relations  = [];
+
+        // Add the fields
+        foreach ($this->fields as $field) {
+            $fieldNames[] = $field->getName();
+            $data["fields"][$field->getName()] = $field->toArray();
+        }
+
+        // Add the extra fields
+        foreach ($this->extraFields as $field) {
+            $fieldNames[] = $field->getName();
+        }
+
+        // Add the expressions
+        foreach ($this->expressions as $expression) {
+            $fieldNames[] = $expression->name;
+            $data["expressions"][$expression->name] = $expression->toArray();
+        }
+
+        // Add the virtual fields
+        foreach ($this->virtualFields as $virtual) {
+            $fieldNames[] = $virtual->name;
+            $data["processed"][$virtual->name] = $virtual->toArray();
+        }
+
+        // Add the expressions
+        foreach ($this->expressions as $expression) {
+            $fieldNames[] = $expression->name;
+            $data["expressions"][$expression->name] = $expression->toArray();
+        }
+
+        // Parse the counts and add the necessary values
+        foreach ($this->counts as $count) {
+            $fieldNames[] = $count->name;
+            $data["counts"][$count->name] = $count->toArray();
+        }
+
+        // Parse the relations and add the necessary joins
+        foreach ($this->relations as $relation) {
+            if ($relation->model !== null) {
+                $relationKey = $relation->getKey();
+                $relations[] = $relationKey;
+                $data["joins"][$relationKey] = $relation->toArray($fieldNames);
+            }
+        }
+
+        // Parse the sub requests and add the necessary values
+        foreach ($this->subRequests as $subRequest) {
+            $data["subrequests"][$subRequest->schemaName] = $subRequest->toArray();
+        }
+
+        // Add the foreign fields
+        foreach ($this->fields as $field) {
+            $name = $field->getName();
+            if ($field->belongsTo !== "" && !Arrays::contains($relations, $name)) {
+                $data["foreigns"][$name] = [
+                    "schema" => $field->belongsTo,
+                ];
+                if ($field->otherKey !== "") {
+                    $data["foreigns"][$name]["leftKey"] = Field::generateName($field->otherKey);
+                }
+            }
+        }
+
+
+        // Generate the result
+        $result = [
+            "hasTimestamps" => $this->hasTimestamps,
+            "canCreate"     => $this->canCreate,
+            "canEdit"       => $this->canEdit,
+            "canDelete"     => $this->canDelete,
+        ];
+
+        $optionals = [ "hasUsers", "hasStatus", "hasPositions" ];
+        foreach ($optionals as $name) {
+            if ($this->$name) {
+                $result[$name] = $this->$name;
+            }
+        }
+
+        foreach ($data as $name => $value) {
+            if (count($value) > 0) {
+                $result[$name] = $value;
+            }
+        }
+
+        return $result;
+    }
+}
