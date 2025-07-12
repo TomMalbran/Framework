@@ -218,7 +218,10 @@ class SchemaBuilder {
         $result   = [];
 
         foreach ($structure->fields as $field) {
-            if ($field->isID || Arrays::contains($skipKeys, $field->key)) {
+            if (Arrays::contains($skipKeys, $field->key)) {
+                continue;
+            }
+            if ($field->isAutoInc) {
                 continue;
             }
             if ($structure->hasStatus && $field->key === "status") {

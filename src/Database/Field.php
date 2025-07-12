@@ -31,6 +31,7 @@ class Field {
     public string $default    = "";
 
     public bool   $isID       = false;
+    public bool   $isAutoInc  = false;
     public bool   $isPrimary  = false;
     public bool   $isKey      = false;
     public bool   $isUnique   = false;
@@ -66,6 +67,7 @@ class Field {
         $this->default    = $data->getString("default", $this->default);
 
         $this->isID       = $data->hasValue("isID");
+        $this->isAutoInc  = $this->isID && $this->type === FieldType::Number;
         $this->isPrimary  = $this->isID || $data->hasValue("isPrimary");
         $this->isKey      = $data->hasValue("isKey");
         $this->isUnique   = $data->hasValue("isUnique");
@@ -136,7 +138,7 @@ class Field {
                 $type = "bigint";
             }
 
-            if ($this->isID) {
+            if ($this->isAutoInc) {
                 $attributes = "unsigned NOT NULL AUTO_INCREMENT";
                 $default    = null;
             } else {
@@ -205,12 +207,12 @@ class Field {
      */
     public function fromRequest(Request $request): mixed {
         $result = null;
+        if ($this->isAutoInc) {
+            return $result;
+        }
 
         switch ($this->type) {
         case FieldType::Number:
-            if ($this->isID) {
-                break;
-            }
             if ($this->dateInput !== "" && $this->hourInput !== "") {
                 $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
             } elseif ($this->dateInput !== "") {
