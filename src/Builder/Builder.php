@@ -103,7 +103,6 @@ class Builder {
 
         // Find the Data and Template directories
         $files       = File::getFilesInDir($basePath, true);
-        $schemasFile = DataFile::Schemas->fileName();
         $dataDir     = "";
         $templateDir = "";
         $intFilesDir = "";
@@ -113,8 +112,9 @@ class Builder {
                 continue;
             }
 
-            if ($dataDir === "" && Strings::endsWith($file, $schemasFile)) {
-                $dataDir = Strings::substringBetween($file, "$basePath/", "/$schemasFile");
+            $dataFile = DataFile::getFileName($file);
+            if ($dataDir === "" && $dataFile !== "") {
+                $dataDir = Strings::substringBetween($file, "$basePath/", "/$dataFile");
             } elseif ($templateDir === "" && Strings::endsWith($file, ".mu")) {
                 $templateDir = Strings::substringAfter($file, "$basePath/");
                 $templateDir = Strings::substringBefore($templateDir, "/", false);
