@@ -222,15 +222,28 @@ class Discovery {
 
     /**
      * Finds the Classes in the given Directory
-     * @param string  $dir         Optional.
-     * @param boolean $skipIgnored Optional.
+     * @param string  $dir          Optional.
+     * @param boolean $skipIgnored  Optional.
+     * @param boolean $forFramework Optional.
      * @return array<string,string>
      */
-    public static function findClasses(string $dir = "", bool $skipIgnored = false): array {
-        $sourcePath = self::getAppPath(Package::SourceDir);
-        $basePath   = self::getAppPath(Package::SourceDir, $dir);
-        $files      = File::getFilesInDir($basePath, true);
-        $result     = [];
+    public static function findClasses(
+        string $dir = "",
+        bool $skipIgnored = false,
+        bool $forFramework = false,
+    ): array {
+        if ($forFramework) {
+            $namespace  = "Framework\\";
+            $sourcePath = self::getFramePath(Package::SourceDir);
+            $filesPath  = self::getFramePath(Package::SourceDir, $dir);
+        } else {
+            $namespace  = Package::Namespace;
+            $sourcePath = self::getAppPath(Package::SourceDir);
+            $filesPath  = self::getAppPath(Package::SourceDir, $dir);
+        }
+
+        $files  = File::getFilesInDir($filesPath, true);
+        $result = [];
 
         foreach ($files as $file) {
             if (!Strings::endsWith($file, ".php")) {
@@ -245,7 +258,7 @@ class Discovery {
             $className = Strings::replace($file, [ $sourcePath, ".php" ], "");
             $className = Strings::substringAfter($className, "/", true);
             $className = Strings::replace($className, "/", "\\");
-            $className = "\\" . Package::Namespace . $className;
+            $className = "\\{$namespace}{$className}";
 
             $classKey = Strings::substringAfter($className, "\\");
             $result[$className] = $classKey;
@@ -255,12 +268,17 @@ class Discovery {
 
     /**
      * Returns the Reflection Classes in the given Directory
-     * @param string  $dir         Optional.
-     * @param boolean $skipIgnored Optional.
+     * @param string  $dir          Optional.
+     * @param boolean $skipIgnored  Optional.
+     * @param boolean $forFramework Optional.
      * @return array<string,ReflectionClass<object>>
      */
-    public static function getReflectionClasses(string $dir = "", bool $skipIgnored = false): array {
-        $classes = self::findClasses($dir, $skipIgnored);
+    public static function getReflectionClasses(
+        string $dir = "",
+        bool $skipIgnored = false,
+        bool $forFramework = false,
+    ): array {
+        $classes = self::findClasses($dir, $skipIgnored, $forFramework);
         $result  = [];
 
         foreach ($classes as $className => $classKey) {
