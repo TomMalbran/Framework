@@ -4,6 +4,7 @@ namespace Framework\Database;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Database\Database;
 use Framework\Database\Structure;
 use Framework\Database\Selection;
@@ -22,7 +23,16 @@ use Framework\Utils\Strings;
  */
 class Schema {
 
-    protected const Schema = "";
+    protected static ?SchemaModel $model = null;
+
+    protected static string $schemaName   = "";
+    protected static string $tableName    = "";
+    protected static string $idKey        = "";
+    protected static string $idName       = "";
+
+    protected static bool   $hasPositions = false;
+    protected static bool   $canDelete    = false;
+
 
 
     /**
@@ -38,8 +48,28 @@ class Schema {
      * @return Structure
      */
     private static function structure(): Structure {
-        $schemaName = Strings::toString(static::Schema);
-        return SchemaFactory::getStructure($schemaName);
+        return SchemaFactory::getStructure(static::$schemaName);
+    }
+
+    /**
+     * Returns the Model
+     * @return SchemaModel
+     */
+    protected static function getModel(): SchemaModel {
+        if (static::$model === null) {
+            static::$model = new SchemaModel();
+        }
+        return static::$model;
+    }
+
+    /**
+     * Replaces the Table in the Expression
+     * @param string $expression
+     * @return string
+     */
+    private static function replaceTable(string $expression): string {
+        $tableName = static::$tableName;
+        return Strings::replace($expression, "{table}", "`{$tableName}`");
     }
 
 
@@ -49,7 +79,7 @@ class Schema {
      * @return boolean
      */
     public static function tableExists(): bool {
-        return self::db()->tableExists(self::structure()->table);
+        return self::db()->tableExists(static::$tableName);
     }
 
     /**
@@ -57,7 +87,7 @@ class Schema {
      * @return boolean
      */
     public static function hasPrimaryKey(): bool {
-        $keys = self::db()->getPrimaryKeys(self::structure()->table);
+        $keys = self::db()->getPrimaryKeys(static::$tableName);
         return count($keys) > 0;
     }
 
@@ -92,7 +122,7 @@ class Schema {
      * @return string|integer
      */
     protected static function getSchemaValue(Query $query, string $column): string|int {
-        return self::db()->getValue(self::structure()->table, $column, $query);
+        return self::db()->getValue(static::$tableName, $column, $query);
     }
 
     /**
@@ -178,7 +208,7 @@ class Schema {
 
         return Select::create(
             $request,
-            keyName:  $idColumn ?? self::structure()->idName,
+            keyName:  $idColumn ?? static::$idName,
             valName:  $nameColumn,
             descName: $descColumn,
             extraKey: $extraColumn,
@@ -205,7 +235,7 @@ class Schema {
         $request = self::requestSchemaData($query);
 
         if ($idColumn === null || $idColumn === "") {
-            $idColumn = self::structure()->idName;
+            $idColumn = static::$idName;
         }
         return Search::create($request, $idColumn, $nameColumn);
     }
@@ -219,7 +249,7 @@ class Schema {
      * @return array<string,string|integer>[]
      */
     protected static function getDataWithParams(string $expression, array $params = []): array {
-        $expression = self::structure()->replaceTable($expression);
+        $expression = self::replaceTable($expression);
         $request    = self::db()->queryData($expression, $params);
         return $request;
     }
@@ -231,7 +261,7 @@ class Schema {
      * @return array<string,string|integer>[]
      */
     protected static function getSchemaData(Query $query, string $expression): array {
-        $expression = self::structure()->replaceTable($expression);
+        $expression = self::replaceTable($expression);
         $request    = self::db()->getData($expression, $query);
         return $request;
     }
@@ -243,7 +273,7 @@ class Schema {
      * @return array<string,string|integer>
      */
     protected static function getSchemaRow(Query $query, string $expression): array {
-        $expression = self::structure()->replaceTable($expression);
+        $expression = self::replaceTable($expression);
         $request    = self::db()->getData($expression, $query);
 
         if (isset($request[0])) {
@@ -345,7 +375,7 @@ class Schema {
      * @return string
      */
     protected static function getDataExpression(Query $query, string $expression): string {
-        $expression  = self::structure()->replaceTable($expression);
+        $expression  = self::replaceTable($expression);
         $expression .= $query->get();
         return self::db()->interpolateQuery($expression, $query);
     }
@@ -357,7 +387,7 @@ class Schema {
      * @return boolean
      */
     protected static function truncateData(): bool {
-        return self::db()->truncate(self::structure()->table);
+        return self::db()->truncate(static::$tableName);
     }
 
     /**
@@ -423,7 +453,7 @@ class Schema {
      */
     protected static function deleteSchemaEntity(Query|int|string $query, int $credentialID = 0): bool {
         $query = self::generateQueryID($query, false);
-        if (self::structure()->canDelete) {
+        if (static::$canDelete) {
             return self::editSchemaEntity($query, null, [ "isDeleted" => 1 ], $credentialID);
         }
         return false;
@@ -436,7 +466,7 @@ class Schema {
      */
     protected static function removeSchemaEntity(Query|int|string $query): bool {
         $query = self::generateQueryID($query, false);
-        return self::db()->delete(self::structure()->table, $query);
+        return self::db()->delete(static::$tableName, $query);
     }
 
 
@@ -568,7 +598,7 @@ class Schema {
             $assign = Assign::increase(1);
         }
 
-        self::db()->update(self::structure()->table, [
+        self::db()->update(static::$tableName, [
             "position" => $assign,
         ], $newQuery);
         return $savePosition;
@@ -581,7 +611,7 @@ class Schema {
      * @return integer
      */
     private static function getNextPosition(?Query $query = null, bool $withDeleted = true): int {
-        if (!self::structure()->hasPositions) {
+        if (!static::$hasPositions) {
             return 0;
         }
 
@@ -619,7 +649,7 @@ class Schema {
         $updated = false;
         if ($newValue !== 0 && $oldValue === 0) {
             $newQuery = new Query($query);
-            $newQuery->add(self::structure()->idKey, "<>", $id);
+            $newQuery->add(static::$idKey, "<>", $id);
             $newQuery->add($column, "=", 1);
             self::editSchemaEntity($newQuery, null, [ $column => 0 ]);
             $updated = true;
@@ -643,7 +673,7 @@ class Schema {
      */
     private static function generateQueryID(Query|int|string $query, bool $withDeleted = true): Query {
         if (!($query instanceof Query)) {
-            $query = Query::create(self::structure()->idKey, "=", $query);
+            $query = Query::create(static::$idKey, "=", $query);
         }
         return self::generateQuery($query, $withDeleted);
     }
@@ -664,8 +694,8 @@ class Schema {
             if ($sort->exists("page")) {
                 $query->paginate($sort->getInt("page"), $sort->getInt("amount"));
             }
-        } elseif (!$query->hasOrder() && self::structure()->hasID) {
-            $query->orderBy(self::structure()->idKey, true);
+        } elseif (!$query->hasOrder() && static::$idKey !== "") {
+            $query->orderBy(static::$idKey, true);
         }
         return $query;
     }
@@ -680,7 +710,7 @@ class Schema {
         $query     = new Query($query);
         $isDeleted = self::structure()->getKey("isDeleted");
 
-        if ($withDeleted && self::structure()->canDelete && !$query->hasColumn($isDeleted) && !$query->hasColumn("isDeleted")) {
+        if ($withDeleted && static::$canDelete && !$query->hasColumn($isDeleted) && !$query->hasColumn("isDeleted")) {
             $query->add($isDeleted, "=", 0);
         }
         return $query;
