@@ -10,6 +10,7 @@ use {{namespace}}\{{query}};
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
+use Framework\Database\SchemaModel;
 use Framework\Database\Query;{{#canEdit}}
 use Framework\Database\Assign;{{/canEdit}}{{#hasStatus}}
 use Framework\System\Status;{{/hasStatus}}
@@ -23,8 +24,34 @@ use Framework\Utils\Numbers;{{/hasIntID}}
  */
 class {{name}}Schema extends Schema {
 
-    protected const Schema = "{{name}}";
+    protected static string $schemaName   = "{{name}}";
+    protected static string $tableName    = "{{table}}";
+    protected static string $idKey        = "{{idKey}}";
+    protected static string $idName       = "{{idName}}";
 
+    protected static bool   $hasPositions = {{hasPositionsValue}};
+    protected static bool   $canDelete    = {{canDeleteValue}};
+
+
+
+    /**
+     * Returns the SchemaModel
+     * @return SchemaModel
+     */
+    protected static function getModel(): SchemaModel {
+        if (static::$model === null) {
+            static::$model = new SchemaModel(
+                hasUsers:      {{hasUsersValue}},
+                hasTimestamps: {{hasTimestampsValue}},
+                hasPositions:  {{hasPositionsValue}},
+                hasStatus:     {{hasStatusValue}},
+                canCreate:     {{canCreateValue}},
+                canEdit:       {{canEditValue}},
+                canDelete:     {{canDeleteValue}},
+            );
+        }
+        return static::$model;
+    }
 
     /**
      * Constructs the {{name}} Entity

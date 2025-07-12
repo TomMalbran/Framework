@@ -206,13 +206,4 @@ class Structure {
         }
         return $key;
     }
-
-    /**
-     * Replaces the Table in the Expression
-     * @param string $expression
-     * @return string
-     */
-    public function replaceTable(string $expression): string {
-        return Strings::replace($expression, "{table}", "`{$this->table}`");
-    }
 }
