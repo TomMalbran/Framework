@@ -2,8 +2,8 @@
 namespace Framework\Email;
 
 use Framework\Request;
-use Framework\Schema\EmailWhiteListSchema;
-use Framework\Schema\EmailWhiteListQuery;
+use Framework\Email\Schema\EmailWhiteListSchema;
+use Framework\Email\Schema\EmailWhiteListQuery;
 
 /**
  * The Email White List

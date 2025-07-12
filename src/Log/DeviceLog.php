@@ -2,12 +2,12 @@
 namespace Framework\Log;
 
 use Framework\Request;
+use Framework\Log\Schema\LogDeviceSchema;
+use Framework\Log\Schema\LogDeviceColumn;
+use Framework\Log\Schema\LogDeviceQuery;
 use Framework\System\Config;
 use Framework\Utils\DateTime;
 use Framework\Utils\Server;
-use Framework\Schema\LogDeviceSchema;
-use Framework\Schema\LogDeviceColumn;
-use Framework\Schema\LogDeviceQuery;
 
 /**
  * The Devices Log

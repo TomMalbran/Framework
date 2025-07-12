@@ -3,6 +3,10 @@ namespace Framework\Auth;
 
 use Framework\Request;
 use Framework\Core\NLS;
+use Framework\Auth\Schema\CredentialSchema;
+use Framework\Auth\Schema\CredentialEntity;
+use Framework\Auth\Schema\CredentialColumn;
+use Framework\Auth\Schema\CredentialQuery;
 use Framework\System\Access;
 use Framework\System\Status;
 use Framework\System\Path;
@@ -12,10 +16,6 @@ use Framework\Utils\Search;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
-use Framework\Schema\CredentialSchema;
-use Framework\Schema\CredentialEntity;
-use Framework\Schema\CredentialColumn;
-use Framework\Schema\CredentialQuery;
 
 /**
  * The Auth Credential

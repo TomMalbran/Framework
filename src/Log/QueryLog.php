@@ -6,12 +6,12 @@ use Framework\Discovery\Discovery;
 use Framework\Auth\Auth;
 use Framework\Database\Assign;
 use Framework\System\Config;
+use Framework\Log\Schema\LogQuerySchema;
+use Framework\Log\Schema\LogQueryColumn;
+use Framework\Log\Schema\LogQueryQuery;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
-use Framework\Schema\LogQuerySchema;
-use Framework\Schema\LogQueryColumn;
-use Framework\Schema\LogQueryQuery;
 
 /**
  * The Query Log

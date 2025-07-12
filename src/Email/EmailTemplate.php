@@ -2,6 +2,9 @@
 namespace Framework\Email;
 
 use Framework\Discovery\Discovery;
+use Framework\Email\Schema\EmailTemplateSchema;
+use Framework\Email\Schema\EmailTemplateEntity;
+use Framework\Email\Schema\EmailTemplateQuery;
 use Framework\Provider\Mustache;
 use Framework\System\Package;
 use Framework\System\Config;
@@ -9,9 +12,6 @@ use Framework\System\Language;
 use Framework\System\Template;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Schema\EmailTemplateSchema;
-use Framework\Schema\EmailTemplateEntity;
-use Framework\Schema\EmailTemplateQuery;
 
 /**
  * The Email Templates

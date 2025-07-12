@@ -4,15 +4,15 @@ namespace Framework\Email;
 use Framework\Request;
 use Framework\Email\Email;
 use Framework\Email\EmailResult;
+use Framework\Email\Schema\EmailQueueSchema;
+use Framework\Email\Schema\EmailQueueEntity;
+use Framework\Email\Schema\EmailQueueColumn;
+use Framework\Email\Schema\EmailQueueQuery;
+use Framework\Email\Schema\EmailTemplateEntity;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
-use Framework\Schema\EmailQueueSchema;
-use Framework\Schema\EmailQueueEntity;
-use Framework\Schema\EmailQueueColumn;
-use Framework\Schema\EmailQueueQuery;
-use Framework\Schema\EmailTemplateEntity;
 
 /**
  * The Email Queue

@@ -1,12 +1,12 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\Auth\Schema\CredentialDeviceSchema;
+use Framework\Auth\Schema\CredentialDeviceColumn;
+use Framework\Auth\Schema\CredentialDeviceQuery;
 use Framework\Log\DeviceLog;
 use Framework\Utils\Arrays;
 use Framework\Utils\Server;
-use Framework\Schema\CredentialDeviceSchema;
-use Framework\Schema\CredentialDeviceColumn;
-use Framework\Schema\CredentialDeviceQuery;
 
 /**
  * The Credential Devices

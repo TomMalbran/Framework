@@ -5,12 +5,12 @@ use Framework\Request;
 use Framework\Auth\Device;
 use Framework\Notification\Notification;
 use Framework\Notification\NotificationResult;
+use Framework\Notification\Schema\NotificationQueueSchema;
+use Framework\Notification\Schema\NotificationQueueEntity;
+use Framework\Notification\Schema\NotificationQueueColumn;
+use Framework\Notification\Schema\NotificationQueueQuery;
 use Framework\System\Config;
 use Framework\Utils\DateTime;
-use Framework\Schema\NotificationQueueSchema;
-use Framework\Schema\NotificationQueueEntity;
-use Framework\Schema\NotificationQueueColumn;
-use Framework\Schema\NotificationQueueQuery;
 
 /**
  * The Notification Queue

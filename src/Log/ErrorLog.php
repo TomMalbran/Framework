@@ -4,13 +4,13 @@ namespace Framework\Log;
 use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Database\Assign;
+use Framework\Log\Schema\LogErrorSchema;
+use Framework\Log\Schema\LogErrorColumn;
+use Framework\Log\Schema\LogErrorQuery;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\DateTime;
 use Framework\Utils\Strings;
-use Framework\Schema\LogErrorSchema;
-use Framework\Schema\LogErrorColumn;
-use Framework\Schema\LogErrorQuery;
 
 /**
  * The Errors Log
