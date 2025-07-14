@@ -33,13 +33,22 @@ class SchemaFactory {
     /**
      * Gets the Schema data
      * @param bool $forFramework Optional.
-     * @param bool $rebuild      Optional.
      * @return Dictionary
      */
-    public static function getData(bool $forFramework = false, bool $rebuild = false): Dictionary {
-        if (!$rebuild && self::$data !== null) {
-            return self::$data;
+    public static function getData(bool $forFramework = false): Dictionary {
+        if (self::$data === null) {
+            self::$data = new Dictionary();
+            self::buildData($forFramework);
         }
+        return self::$data;
+    }
+
+    /**
+     * Builds the Schema data
+     * @param bool $forFramework Optional.
+     * @return SchemaModel[]
+     */
+    public static function buildData(bool $forFramework = false): array {
         self::$data = new Dictionary();
 
         $reflections = Discovery::getReflectionClasses(
@@ -203,17 +212,17 @@ class SchemaFactory {
             );
             $models[$name] = $schemaModel;
 
-            if ($schemaModel->idField !== "") {
-                $modelIDs[$schemaModel->idField] = $schemaModel->name;
+            if ($schemaModel->hasID) {
+                $modelIDs[$schemaModel->idName] = $schemaModel->name;
             }
         }
 
         // Parse the Models using the Models created
         foreach ($models as $model) {
             foreach ($model->relations as $relation) {
-                $joinModel = $models[$relation->schemaName] ?? null;
-                if ($joinModel !== null) {
-                    $relation->model = $joinModel;
+                $relatedModel = $models[$relation->schemaName] ?? null;
+                if ($relatedModel !== null) {
+                    $relation->setModel($relatedModel, $model);
                 }
             }
             foreach ($model->counts as $count) {
@@ -223,7 +232,7 @@ class SchemaFactory {
                 }
             }
             foreach ($model->fields as $field) {
-                if ($field->name !== $model->idField && $field->belongsTo === "") {
+                if (!$field->isID && $field->belongsTo === "") {
                     $field->belongsTo = $modelIDs[$field->name] ?? "";
                 }
             }
@@ -232,11 +241,8 @@ class SchemaFactory {
         // Generate the Schemas
         $schemas = [];
         foreach ($models as $schemaName => $model) {
-            $schemaData = $model->toArray();
+            $schemaData           = $model->toArray();
             $schemas[$schemaName] = $schemaData;
-
-            $schemaData["path"]      = $model->path;
-            $schemaData["namespace"] = $model->namespace;
             self::$data->set($schemaName, $schemaData);
         }
 
@@ -244,7 +250,7 @@ class SchemaFactory {
         if (count($schemas) > 0) {
             Discovery::saveData("schemasTest", $schemas);
         }
-        return self::$data;
+        return $models;
     }
 
 
@@ -260,14 +266,5 @@ class SchemaFactory {
             self::$structures[$schema] = new Structure($schema, $data);
         }
         return self::$structures[$schema];
-    }
-
-    /**
-     * Gets the Table Name for the Schema
-     * @param string $schema
-     * @return string
-     */
-    public static function getTableName(string $schema): string {
-        return Strings::pascalCaseToSnakeCase($schema);
     }
 }

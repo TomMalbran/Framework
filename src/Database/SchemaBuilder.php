@@ -3,14 +3,13 @@ namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
 use Framework\Database\SchemaFactory;
-use Framework\Database\Structure;
-use Framework\Database\Field;
+use Framework\Database\SchemaModel;
+use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Model\SubRequest;
 use Framework\File\File;
 use Framework\Provider\Mustache;
-use Framework\System\Package;
 use Framework\Utils\Arrays;
-use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -24,38 +23,33 @@ class SchemaBuilder {
      * @return integer
      */
     public static function generateCode(bool $forFramework): int {
-        $schemas    = SchemaFactory::getData($forFramework, true);
+        $schemas    = SchemaFactory::buildData($forFramework);
         $namespaces = [];
         $created    = 0;
 
-        foreach ($schemas as $schemaKey => $schemaData) {
-            $namespaces[$schemaKey] = $schemaData->getString("namespace");
+        foreach ($schemas as $schemaModel) {
+            $namespaces[$schemaModel->name] = $schemaModel->namespace;
 
-            $path = $schemaData->getString("path");
-            File::createDir($path);
-            File::emptyDir($path);
+            File::createDir($schemaModel->path);
+            File::emptyDir($schemaModel->path);
         }
 
-        foreach ($schemas as $schemaKey => $schemaData) {
-            $structure = new Structure($schemaKey, $schemaData);
-            $path      = $schemaData->getString("path");
-            $namespace = $schemaData->getString("namespace");
+        foreach ($schemas as $schemaModel) {
+            $schemaName = "{$schemaModel->name}Schema.php";
+            $schemaCode = self::getSchemaCode($schemaModel, $namespaces);
+            File::create($schemaModel->path, $schemaName, $schemaCode);
 
-            $schemaName = "{$structure->schema}Schema.php";
-            $schemaCode = self::getSchemaCode($structure, $namespace, $namespaces);
-            File::create($path, $schemaName, $schemaCode);
+            $entityName = "{$schemaModel->name}Entity.php";
+            $entityCode = self::getEntityCode($schemaModel, $namespaces);
+            File::create($schemaModel->path, $entityName, $entityCode);
 
-            $entityName = "{$structure->schema}Entity.php";
-            $entityCode = self::getEntityCode($structure, $namespace, $namespaces);
-            File::create($path, $entityName, $entityCode);
+            $columnName = "{$schemaModel->name}Column.php";
+            $columnCode = self::getColumnCode($schemaModel);
+            File::create($schemaModel->path, $columnName, $columnCode);
 
-            $columnName = "{$structure->schema}Column.php";
-            $columnCode = self::getColumnCode($structure, $namespace);
-            File::create($path, $columnName, $columnCode);
-
-            $queryName = "{$structure->schema}Query.php";
-            $queryCode = self::getQueryCode($structure, $namespace);
-            File::create($path, $queryName, $queryCode);
+            $queryName = "{$schemaModel->name}Query.php";
+            $queryCode = self::getQueryCode($schemaModel);
+            File::create($schemaModel->path, $queryName, $queryCode);
 
             $created += 1;
         }
@@ -69,60 +63,59 @@ class SchemaBuilder {
 
     /**
      * Returns the Schema code
-     * @param Structure            $structure
-     * @param string               $namespace
+     * @param SchemaModel          $schemaModel
      * @param array<string,string> $nameSpaces
      * @return string
      */
-    private static function getSchemaCode(Structure $structure, string $namespace, array $nameSpaces): string {
-        $idType       = self::getFieldType($structure->idType);
-        $fields       = self::getAllFields($structure);
-        $uniques      = self::getFieldList($structure, "isUnique");
-        $parents      = self::getFieldList($structure, "isParent");
-        $subTypes     = self::getSubTypes($structure->subRequests, $nameSpaces);
-        $hasProcessed = count($structure->processed) > 0;
-        $hasParents   = count($parents) > 0;
-        $editParents  = $structure->hasPositions ? $parents : [];
-        $queryName    = "{$structure->schema}Query";
+    private static function getSchemaCode(SchemaModel $schemaModel, array $nameSpaces): string {
+        $idType      = self::getFieldType($schemaModel->idType);
+        $fields      = self::getAllFields($schemaModel);
+        $uniques     = self::getFieldList($schemaModel, "isUnique");
+        $parents     = self::getFieldList($schemaModel, "isParent");
+        $subTypes    = self::getSubTypes($schemaModel->subRequests, $nameSpaces);
+        $hasVirtuals = count($schemaModel->virtualFields) > 0;
+        $hasParents  = count($parents) > 0;
+        $editParents = $schemaModel->hasPositions ? $parents : [];
+        $queryName   = "{$schemaModel->name}Query";
 
-        $template     = Discovery::loadFrameTemplate("Schema.mu");
-        $contents     = Mustache::render($template, [
-            "namespace"          => $namespace,
-            "name"               => $structure->schema,
-            "table"              => SchemaFactory::getTableName($structure->schema),
-            "column"             => "{$structure->schema}Column",
-            "entity"             => "{$structure->schema}Entity",
+        $template    = Discovery::loadFrameTemplate("Schema.mu");
+        $contents    = Mustache::render($template, [
+            "namespace"          => $schemaModel->namespace,
+            "name"               => $schemaModel->name,
+            "table"              => $schemaModel->tableName,
+            "column"             => "{$schemaModel->name}Column",
+            "entity"             => "{$schemaModel->name}Entity",
             "query"              => $queryName,
-            "hasID"              => $structure->hasID,
-            "idKey"              => $structure->idKey,
-            "idName"             => $structure->idName,
+            "hasID"              => $schemaModel->hasID,
+            "idKey"              => $schemaModel->idKey,
+            "idName"             => $schemaModel->idName,
             "idType"             => $idType,
             "idDocType"          => self::getDocType($idType),
-            "hasIntID"           => $structure->hasID && $idType === "int",
-            "idText"             => Strings::upperCaseFirst($structure->idName),
-            "editType"           => $structure->hasID ? "$queryName|$idType" : $queryName,
-            "editDocType"        => $structure->hasID ? "$queryName|" . self::getDocType($idType) : $queryName,
-            "convertType"        => $structure->hasID ? "Query|$idType" : "Query",
-            "convertDocType"     => $structure->hasID ? "Query|" . self::getDocType($idType) : "Query",
-            "hasPositions"       => $structure->hasPositions,
-            "hasPositionsValue"  => $structure->hasPositions ? "true" : "false",
-            "hasTimestamps"      => $structure->hasTimestamps,
-            "hasTimestampsValue" => $structure->hasTimestamps ? "true" : "false",
-            "hasStatus"          => $structure->hasStatus,
-            "hasStatusValue"     => $structure->hasStatus ? "true" : "false",
-            "hasUsers"           => $structure->hasUsers,
-            "hasUsersValue"      => $structure->hasUsers ? "true" : "false",
-            "hasEncrypt"         => $structure->hasEncrypt,
-            "canCreate"          => $structure->canCreate,
-            "canCreateValue"     => $structure->canCreate ? "true" : "false",
-            "canEdit"            => $structure->canEdit,
-            "canEditValue"       => $structure->canEdit ? "true" : "false",
-            "canReplace"         => $structure->canEdit && !$structure->hasAutoInc,
-            "canDelete"          => $structure->canDelete,
-            "canDeleteValue"     => $structure->canDelete ? "true" : "false",
-            "processEntity"      => count($subTypes) > 0 || $hasProcessed || $structure->hasStatus,
+            "hasIntID"           => $schemaModel->hasID && $idType === "int",
+            "idText"             => Strings::upperCaseFirst($schemaModel->idName),
+            "editType"           => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
+            "editDocType"        => $schemaModel->hasID ? "$queryName|" . self::getDocType($idType) : $queryName,
+            "convertType"        => $schemaModel->hasID ? "Query|$idType" : "Query",
+            "convertDocType"     => $schemaModel->hasID ? "Query|" . self::getDocType($idType) : "Query",
+            "hasPositions"       => $schemaModel->hasPositions,
+            "hasPositionsValue"  => $schemaModel->hasPositions ? "true" : "false",
+            "hasTimestamps"      => $schemaModel->hasTimestamps,
+            "hasTimestampsValue" => $schemaModel->hasTimestamps ? "true" : "false",
+            "hasStatus"          => $schemaModel->hasStatus,
+            "hasStatusValue"     => $schemaModel->hasStatus ? "true" : "false",
+            "hasUsers"           => $schemaModel->hasUsers,
+            "hasUsersValue"      => $schemaModel->hasUsers ? "true" : "false",
+            "hasEncrypt"         => $schemaModel->hasEncrypt(),
+            "canCreate"          => $schemaModel->canCreate,
+            "canCreateValue"     => $schemaModel->canCreate ? "true" : "false",
+            "canEdit"            => $schemaModel->canEdit,
+            "canEditValue"       => $schemaModel->canEdit ? "true" : "false",
+            "canReplace"         => $schemaModel->canEdit && !$schemaModel->hasAutoInc,
+            "canDelete"          => $schemaModel->canDelete,
+            "canDeleteValue"     => $schemaModel->canDelete ? "true" : "false",
+            "processEntity"      => count($subTypes) > 0 || $hasVirtuals || $schemaModel->hasStatus,
             "subTypes"           => $subTypes,
-            "hasProcessed"       => $hasProcessed,
+            "hasVirtuals"        => $hasVirtuals,
             "fields"             => $fields,
             "fieldsCreateList"   => self::joinFields($fields, "fieldArgCreate", ", "),
             "fieldsEditList"     => self::joinFields($fields, "fieldArgEdit", ", "),
@@ -135,7 +128,7 @@ class SchemaBuilder {
             "parentsDefList"     => self::joinFields($parents, "fieldArgDefault", ", "),
             "parentsEditList"    => self::joinFields($editParents, "fieldArg", ", "),
             "hasParents"         => $hasParents,
-            "hasEditParents"     => $structure->hasPositions && $hasParents,
+            "hasEditParents"     => $schemaModel->hasPositions && $hasParents,
         ]);
 
         $contents = self::alignParams($contents);
@@ -164,21 +157,21 @@ class SchemaBuilder {
 
     /**
      * Returns a list of all the Fields to set
-     * @param Structure $structure
+     * @param SchemaModel $schemaModel
      * @return array{}[]
      */
-    private static function getAllFields(Structure $structure): array {
+    private static function getAllFields(SchemaModel $schemaModel): array {
         $skipKeys = [ "createdTime", "createdUser", "modifiedTime", "modifiedUser", "isDeleted" ];
         $result   = [];
 
-        foreach ($structure->fields as $field) {
+        foreach ($schemaModel->getAllFields() as $field) {
             if (Arrays::contains($skipKeys, $field->key)) {
                 continue;
             }
-            if ($field->isAutoInc) {
+            if ($field->isAutoInc()) {
                 continue;
             }
-            if ($structure->hasStatus && $field->key === "status") {
+            if ($schemaModel->hasStatus && $field->key === "status") {
                 continue;
             }
             $result[] = self::getField($field);
@@ -188,13 +181,13 @@ class SchemaBuilder {
 
     /**
      * Returns a list of Fields with the given property
-     * @param Structure $structure
-     * @param string    $property
+     * @param SchemaModel $schemaModel
+     * @param string      $property
      * @return array{}[]
      */
-    private static function getFieldList(Structure $structure, string $property): array {
+    private static function getFieldList(SchemaModel $schemaModel, string $property): array {
         $result = [];
-        foreach ($structure->fields as $field) {
+        foreach ($schemaModel->getAllFields() as $field) {
             if ($field->{$property}) {
                 $result[] = self::getField($field);
             }
@@ -305,56 +298,57 @@ class SchemaBuilder {
 
     /**
      * Returns the Entity code
-     * @param Structure            $structure
-     * @param string               $namespace
+     * @param SchemaModel          $schemaModel
      * @param array<string,string> $namespaces
      * @return string
      */
-    private static function getEntityCode(Structure $structure, string $namespace, array $namespaces): string {
+    private static function getEntityCode(SchemaModel $schemaModel, array $namespaces): string {
         $template = Discovery::loadFrameTemplate("Entity.mu");
         $contents = Mustache::render($template, [
-            "namespace"  => $namespace,
-            "name"       => $structure->schema,
-            "id"         => $structure->idName,
-            "subTypes"   => self::getSubTypes($structure->subRequests, $namespaces),
-            "attributes" => self::getAttributes($structure),
+            "namespace"  => $schemaModel->namespace,
+            "name"       => $schemaModel->name,
+            "id"         => $schemaModel->idName,
+            "subTypes"   => self::getSubTypes($schemaModel->subRequests, $namespaces),
+            "attributes" => self::getAttributes($schemaModel),
         ]);
         return $contents;
     }
 
     /**
      * Returns the Field attributes for the Entity
-     * @param Structure $structure
+     * @param SchemaModel $schemaModel
      * @return array{name:string,type:string,subType:string,default:string}[]
      */
-    private static function getAttributes(Structure $structure): array {
+    private static function getAttributes(SchemaModel $schemaModel): array {
         $result = [];
-        if ($structure->hasID) {
-            $type     = self::getFieldType($structure->idType);
+        if ($schemaModel->hasID) {
+            $type     = self::getFieldType($schemaModel->idType);
             $result[] = self::getTypeData("id", $type);
         }
-        foreach ($structure->fields as $field) {
-            self::addAttribute($result, $field);
+
+        foreach ($schemaModel->getAllFields() as $field) {
+            self::addAttribute($result, $field->name, $field->type);
         }
-        if ($structure->hasStatus) {
+        foreach ($schemaModel->virtualFields as $field) {
+            self::addAttribute($result, $field->name, $field->type);
+        }
+        if ($schemaModel->hasStatus) {
             $result[] = self::getTypeData("statusName", "string");
             $result[] = self::getTypeData("statusColor", "string");
         }
-        foreach ($structure->processed as $field) {
-            self::addAttribute($result, $field);
+
+        foreach ($schemaModel->expressions as $expression) {
+            self::addAttribute($result, $expression->name, $expression->type);
         }
-        foreach ($structure->expressions as $field) {
-            self::addAttribute($result, $field);
+        foreach ($schemaModel->counts as $count) {
+            self::addAttribute($result, $count->name, $count->type);
         }
-        foreach ($structure->joins as $join) {
-            foreach ($join->fields as $field) {
-                self::addAttribute($result, $field);
+        foreach ($schemaModel->relations as $relation) {
+            foreach ($relation->fields as $field) {
+                self::addAttribute($result, $field->prefixName, $field->type);
             }
         }
-        foreach ($structure->counts as $count) {
-            self::addAttribute($result, $count->field);
-        }
-        foreach ($structure->subRequests as $subRequest) {
+        foreach ($schemaModel->subRequests as $subRequest) {
             $type = $subRequest->type;
             if (!Strings::contains($type, "<", "[")) {
                 $type .= "Entity[]";
@@ -368,32 +362,31 @@ class SchemaBuilder {
     /**
      * Adds the Field types for the Entity
      * @param array{name:string,type:string,subType:string,default:string}[] $result
-     * @param Field                                                          $field
+     * @param string                                                         $fieldKey
+     * @param FieldType                                                      $fieldType
      * @return boolean
      */
-    private static function addAttribute(array &$result, Field $field): bool {
-        $key = $field->prefixName;
-
-        switch ($field->type) {
+    private static function addAttribute(array &$result, string $fieldKey, FieldType $fieldType): bool {
+        switch ($fieldType) {
         case FieldType::Boolean:
-            $result[] = self::getTypeData($key, "bool");
+            $result[] = self::getTypeData($fieldKey, "bool");
             break;
         case FieldType::Number:
-            $result[] = self::getTypeData($key, "int");
+            $result[] = self::getTypeData($fieldKey, "int");
             break;
         case FieldType::Float:
-            $result[] = self::getTypeData($key, "float");
+            $result[] = self::getTypeData($fieldKey, "float");
             break;
         case FieldType::JSON:
-            $result[] = self::getTypeData($key, "mixed");
+            $result[] = self::getTypeData($fieldKey, "mixed");
             break;
         case FieldType::File:
-            $result[] = self::getTypeData($key, "string");
-            $result[] = self::getTypeData("{$key}Url", "string");
-            $result[] = self::getTypeData("{$key}Thumb", "string");
+            $result[] = self::getTypeData($fieldKey, "string");
+            $result[] = self::getTypeData("{$fieldKey}Url", "string");
+            $result[] = self::getTypeData("{$fieldKey}Thumb", "string");
             break;
         default:
-            $result[] = self::getTypeData($key, "string");
+            $result[] = self::getTypeData($fieldKey, "string");
         }
         return true;
     }
@@ -449,33 +442,32 @@ class SchemaBuilder {
 
     /**
      * Returns the Column code
-     * @param Structure $structure
-     * @param string    $namespace
+     * @param SchemaModel $schemaModel
      * @return string
      */
-    private static function getColumnCode(Structure $structure, string $namespace): string {
+    private static function getColumnCode(SchemaModel $schemaModel): string {
         $template = Discovery::loadFrameTemplate("Column.mu");
         $contents = Mustache::render($template, [
-            "namespace" => $namespace,
-            "name"      => $structure->schema,
-            "columns"   => self::getColumns($structure),
+            "namespace" => $schemaModel->namespace,
+            "name"      => $schemaModel->name,
+            "columns"   => self::getColumns($schemaModel),
         ]);
         return $contents;
     }
 
     /**
      * Returns the Field columns for the Column
-     * @param Structure $structure
+     * @param SchemaModel $schemaModel
      * @return array{}
      */
-    private static function getColumns(Structure $structure): array {
+    private static function getColumns(SchemaModel $schemaModel): array {
         $addSpace = true;
         $result   = [];
 
-        foreach ($structure->fields as $field) {
+        foreach ($schemaModel->getAllFields() as $field) {
             $result[] = [
                 "name"     => Strings::upperCaseFirst($field->name),
-                "value"    => "{$structure->table}.{$field->key}",
+                "value"    => "{$schemaModel->tableName}.{$field->key}",
                 "addSpace" => false,
             ];
             if ($field->type === FieldType::File) {
@@ -487,25 +479,25 @@ class SchemaBuilder {
             }
         }
 
-        foreach ($structure->expressions as $expression) {
-            $expName = Strings::upperCaseFirst($expression->prefixName);
+        foreach ($schemaModel->expressions as $expression) {
+            $expName = Strings::upperCaseFirst($expression->name);
             if (!Arrays::contains($result, $expName, "name")) {
                 $result[] = [
                     "name"     => $expName,
-                    "value"    => $expression->key,
+                    "value"    => $expression->name,
                     "addSpace" => $addSpace,
                 ];
             }
             $addSpace = false;
         }
 
-        foreach ($structure->joins as $join) {
-            $addSpace = true;
-            foreach ($join->fields as $field) {
-                $table    = $join->asTable !== "" ? $join->asTable : $join->table;
+        foreach ($schemaModel->relations as $relation) {
+            $addSpace  = true;
+            $tableName = $relation->getTableName();
+            foreach ($relation->fields as $field) {
                 $result[] = [
                     "name"     => Strings::upperCaseFirst($field->prefixName),
-                    "value"    => "{$table}.{$field->key}",
+                    "value"    => "{$tableName}.{$field->key}",
                     "addSpace" => $addSpace,
                 ];
                 $addSpace = false;
@@ -526,18 +518,17 @@ class SchemaBuilder {
 
     /**
      * Returns the Query code
-     * @param Structure $structure
-     * @param string    $namespace
+     * @param SchemaModel $schemaModel
      * @return string
      */
-    private static function getQueryCode(Structure $structure, string $namespace): string {
+    private static function getQueryCode(SchemaModel $schemaModel): string {
         $template = Discovery::loadFrameTemplate("Query.mu");
         $contents = Mustache::render($template, [
-            "namespace"  => $namespace,
-            "name"       => $structure->schema,
-            "column"     => "{$structure->schema}Column",
-            "query"      => "{$structure->schema}Query",
-            "properties" => self::getQueryProperties($structure),
+            "namespace"  => $schemaModel->namespace,
+            "name"       => $schemaModel->name,
+            "column"     => "{$schemaModel->name}Column",
+            "query"      => "{$schemaModel->name}Query",
+            "properties" => self::getQueryProperties($schemaModel),
         ]);
         $contents = self::alignParams($contents);
         return $contents;
@@ -545,41 +536,41 @@ class SchemaBuilder {
 
     /**
      * Returns the Field properties for the Query
-     * @param Structure $structure
+     * @param SchemaModel $schemaModel
      * @return array{}
      */
-    private static function getQueryProperties(Structure $structure): array {
+    private static function getQueryProperties(SchemaModel $schemaModel): array {
         $nameLength = 0;
         $typeLength = 0;
         $list       = [];
         $result     = [];
 
-        foreach ($structure->fields as $field) {
+        foreach ($schemaModel->getAllFields() as $field) {
             $list[] = [
                 "type"   => $field->type,
                 "column" => $field->name,
                 "name"   => $field->name,
-                "value"  => "{$structure->table}.{$field->key}",
+                "value"  => "{$schemaModel->tableName}.{$field->key}",
             ];
         }
 
-        foreach ($structure->expressions as $expression) {
+        foreach ($schemaModel->expressions as $expression) {
             $list[] = [
                 "type"   => $expression->type,
                 "column" => $expression->name,
-                "name"   => $expression->prefixName,
-                "value"  => $expression->key,
+                "name"   => $expression->name,
+                "value"  => $expression->name,
             ];
         }
 
-        foreach ($structure->joins as $join) {
-            foreach ($join->fields as $field) {
-                $table  = $join->asTable !== "" ? $join->asTable : $join->table;
+        foreach ($schemaModel->relations as $relation) {
+            $tableName = $relation->getTableName();
+            foreach ($relation->fields as $field) {
                 $list[] = [
                     "type"   => $field->type,
                     "column" => $field->name,
                     "name"   => $field->prefixName,
-                    "value"  => "{$table}.{$field->key}",
+                    "value"  => "{$tableName}.{$field->key}",
                 ];
             }
         }

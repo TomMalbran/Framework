@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Database\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Utils\Dictionary;
@@ -44,8 +44,8 @@ class Count {
         $this->value     = $data->getString("value");
         $this->mult      = $data->getInt("mult", default: 1);
 
-        $this->table     = SchemaFactory::getTableName($data->getString("schema"));
-        $this->onTable   = SchemaFactory::getTableName($data->getString("onSchema"));
+        $this->table     = SchemaModel::getTableName($data->getString("schema"));
+        $this->onTable   = SchemaModel::getTableName($data->getString("onSchema"));
         $this->rightKey  = $data->getString("rightKey", $whereKey);
         $this->leftKey   = $data->getString("leftKey", $whereKey);
         $this->where     = $data->getStrings("where");

@@ -89,8 +89,11 @@ class Field {
 
 
     // Used internally when parsing the Model
-    public FieldType $type    = FieldType::String;
-    public string    $name    = "";
+    public FieldType $type       = FieldType::String;
+    public string    $key        = "";
+    public string    $name       = "";
+    public string    $prefixName = "";
+    public bool      $noPrefix   = false;
 
 
 
@@ -181,6 +184,7 @@ class Field {
         $this->noExists   = $noExists;
         $this->notPrimary = $notPrimary;
 
+        $this->key        = self::generateKey($name);
         $this->name       = $name;
         $this->type       = $type;
     }
@@ -194,6 +198,7 @@ class Field {
      * @return Field
      */
     public function setData(string $name, string $typeName): Field {
+        $this->key  = self::generateKey($name);
         $this->name = $name;
 
         switch ($typeName) {
@@ -246,7 +251,7 @@ class Field {
 
         // Assume is a primary field if is an ID or Number and ends with "ID"
         if ($this->isSchemaID()) {
-            $name = self::generateName($name);
+            $name = self::generateKey($name);
         }
         return $name;
     }
@@ -262,11 +267,19 @@ class Field {
     }
 
     /**
-     * Generates the name of the field for the Schema
+     * Returns true if the field is an Auto Increment
+     * @return bool
+     */
+    public function isAutoInc(): bool {
+        return $this->isID && $this->type === FieldType::Number;
+    }
+
+    /**
+     * Generates the key of the field for the Schema
      * @param string $name
      * @return string
      */
-    public static function generateName(string $name): string {
+    public static function generateKey(string $name): string {
         if (Strings::endsWith($name, "ID")) {
             $name = Strings::replace($name, "ID", "Id");
             $name = Strings::camelCaseToUpperCase($name);
@@ -281,7 +294,7 @@ class Field {
      * @return array<string,mixed>
      */
     public function toArray(): array {
-        $skips      = [ "name", "type", "belongsTo", "otherKey", "isText", "isLongText", "isEncrypt", "isJSON", "isFile", "notPrimary" ];
+        $skips      = [ "key", "name", "prefixName", "type", "belongsTo", "otherKey", "isText", "isLongText", "isEncrypt", "isJSON", "isFile", "notPrimary" ];
         $properties = Discovery::getProperties($this);
         $defaults   = new Field();
         $result     = [

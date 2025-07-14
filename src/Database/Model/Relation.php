@@ -46,10 +46,10 @@ class Relation {
 
     // Used when the join requires a secondary condition
     /** @var string[] */
-    public array  $andKeys     = [];
+    public array  $andKeys      = [];
 
     // Used when the join requires a secondary condition
-    public bool   $andDeleted  = false;
+    public bool   $andDeleted   = false;
 
 
     // By default a prefix is added to the field names but it can be disabled
@@ -72,7 +72,11 @@ class Relation {
 
 
     // Used internally when parsing the Model
-    public ?SchemaModel $model = null;
+    public ?SchemaModel $relatedModel = null;
+    public ?SchemaModel $parentModel  = null;
+
+    /** @var Field[] */
+    public array $fields = [];
 
 
 
@@ -152,17 +156,67 @@ class Relation {
     }
 
     /**
+     * Sets the Model for the Relation and creates the fields
+     * @param SchemaModel $relatedModel
+     * @param SchemaModel $parentModel
+     * @return Relation
+     */
+    public function setModel(SchemaModel $relatedModel, SchemaModel $parentModel): Relation {
+        $this->relatedModel = $relatedModel;
+        $this->parentModel  = $parentModel;
+
+        $withTimestamps = Arrays::contains($this->fieldNames, [ "createdTime", "modifiedTime" ], atLeastOne: true);
+        $withDeleted    = $this->withDeleted || Arrays::contains($this->fieldNames, "isDeleted");
+        $fields         = $relatedModel->getFields($withTimestamps, $withDeleted);
+        $parentFields   = $parentModel->getFields(true, true);
+        $hasFields      = count($this->fieldNames) > 0;
+
+        foreach ($fields as $field) {
+            if ($field->isID) {
+                continue;
+            }
+
+            $fieldName  = $field->getName();
+            $prefixName = $fieldName;
+            if ($this->withPrefix) {
+                $prefixName = $this->prefix . Strings::upperCaseFirst($fieldName);
+            }
+
+            if ($hasFields && !Arrays::contains($this->fieldNames, $field->name)) {
+                continue;
+            }
+            if (!$hasFields && Arrays::contains($parentFields, $prefixName)) {
+                continue;
+            }
+
+            if ($this->withPrefix && !Arrays::contains($parentFields, $fieldName) && (
+                $field->isSchemaID() ||
+                Strings::startsWith($field->name, $this->prefix) ||
+                Arrays::contains($this->withoutPrefix, $field->name)
+            )) {
+                $field->noPrefix = true;
+                $prefixName      = $fieldName;
+            }
+
+            $field->prefixName = $prefixName;
+            $this->fields[]    = $field;
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns the fields from the Model
      * @return Field[]
      */
     public function getFields(): array {
-        if ($this->model === null) {
+        if ($this->relatedModel === null) {
             return [];
         }
 
         $withTimestamps = Arrays::contains($this->fieldNames, [ "createdTime", "modifiedTime" ], atLeastOne: true);
         $withDeleted    = $this->withDeleted || Arrays::contains($this->fieldNames, "isDeleted");
-        return $this->model->getFields($withTimestamps, $withDeleted);
+        return $this->relatedModel->getFields($withTimestamps, $withDeleted);
     }
 
     /**
@@ -171,65 +225,49 @@ class Relation {
      */
     public function getKey(): string {
         if ($this->key !== "") {
-            return Field::generateName($this->key);
+            return Field::generateKey($this->key);
         }
         if ($this->myKey !== "") {
-            return Field::generateName($this->myKey);
+            return Field::generateKey($this->myKey);
         }
-        if ($this->model !== null) {
-            return Field::generateName($this->model->idField);
+        if ($this->relatedModel !== null) {
+            return $this->relatedModel->idKey;
         }
         return "";
     }
 
     /**
+     * Returns the Name of the Table
+     * @return string
+     */
+    public function getTableName(): string {
+        $schemaName = $this->schemaName;
+        if ($this->asSchema !== "") {
+            $schemaName = $this->asSchema;
+        }
+        return SchemaModel::getTableName($schemaName);
+    }
+
+    /**
      * Returns the Data as an Array
-     * @param string[] $modelFields
      * @return array<string,mixed>
      */
-    public function toArray(array &$modelFields): array {
-        if ($this->model === null) {
+    public function toArray(): array {
+        if ($this->relatedModel === null) {
             return [];
         }
 
-        $hasFields = count($this->fieldNames) > 0;
-        $fields    = [];
-
-        foreach ($this->getFields() as $field) {
-            $fieldName = $field->getName();
-            if ($field->isID) {
-                continue;
-            }
-
-            $name = $fieldName;
-            if ($this->withPrefix) {
-                $name = $this->prefix . Strings::upperCaseFirst($fieldName);
-            }
-
-            if ($hasFields && !Arrays::contains($this->fieldNames, $field->name)) {
-                continue;
-            }
-            if (!$hasFields && Arrays::contains($modelFields, $name)) {
-                continue;
-            }
-
+        $fields = [];
+        foreach ($this->fields as $field) {
             $fieldData = [ "type" => $field->type->getName() ];
+            if ($field->noPrefix) {
+                $fieldData["noPrefix"] = true;
+            }
             if ($field->decimals !== 2) {
                 $fieldData["decimals"] = $field->decimals;
             }
 
-            if ($this->withPrefix && !Arrays::contains($modelFields, $fieldName) && (
-                $field->isSchemaID() ||
-                Strings::startsWith($field->name, $this->prefix) ||
-                Arrays::contains($this->withoutPrefix, $field->name)
-            )) {
-                $fieldData["noPrefix"] = true;
-                $modelFields[] = $fieldName;
-            } else {
-                $modelFields[] = $name;
-            }
-
-            $fields[$fieldName] = $fieldData;
+            $fields[$field->name] = $fieldData;
         }
 
         $result = [
@@ -245,23 +283,23 @@ class Relation {
         }
 
         if ($this->myKey !== "") {
-            $result["rightKey"] = Field::generateName($this->myKey);
+            $result["rightKey"] = Field::generateKey($this->myKey);
         }
         if ($this->otherKey !== "") {
-            $result["leftKey"] = Field::generateName($this->otherKey);
+            $result["leftKey"] = Field::generateKey($this->otherKey);
         }
 
         if ($this->andSchema !== "") {
             $result["andSchema"] = $this->andSchema;
         }
         if ($this->andKey !== "") {
-            $result["andKey"] = Field::generateName($this->andKey);
+            $result["andKey"] = Field::generateKey($this->andKey);
         }
         if ($this->andValue !== "") {
-            $result["andValue"] = Field::generateName($this->andValue);
+            $result["andValue"] = Field::generateKey($this->andValue);
         }
         if (count($this->andKeys) > 0) {
-            $result["andKeys"] = array_map(fn($key) => Field::generateName($key), $this->andKeys);
+            $result["andKeys"] = array_map(fn($key) => Field::generateKey($key), $this->andKeys);
         }
         if ($this->andDeleted) {
             $result["andDeleted"] = true;

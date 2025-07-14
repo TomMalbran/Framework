@@ -5,6 +5,7 @@ use Framework\Framework;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
 use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Database\Database;
 use Framework\Database\Structure;
 use Framework\Core\Settings;
@@ -70,8 +71,8 @@ class Migration {
         $didMove      = false;
 
         for ($i = $startMovement; $i < $lastMovement; $i++) {
-            $fromName = SchemaFactory::getTableName($movements[$i]["from"]);
-            $toName   = SchemaFactory::getTableName($movements[$i]["to"]);
+            $fromName = SchemaModel::getTableName($movements[$i]["from"]);
+            $toName   = SchemaModel::getTableName($movements[$i]["to"]);
 
             if ($db->tableExists($fromName)) {
                 $db->renameTable($fromName, $toName);
@@ -100,7 +101,7 @@ class Migration {
         $didRename  = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
-            $table    = SchemaFactory::getTableName($renames[$i]["schema"]);
+            $table    = SchemaModel::getTableName($renames[$i]["schema"]);
             $fromName = $renames[$i]["from"];
             $toName   = $renames[$i]["to"];
 

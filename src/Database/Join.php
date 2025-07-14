@@ -1,9 +1,8 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Database\Field;
-use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
 /**
@@ -43,12 +42,12 @@ class Join {
      */
     public function __construct(string $key, Dictionary $data) {
         $this->key        = $key;
-        $this->table      = SchemaFactory::getTableName($data->getString("schema"));
-        $this->asTable    = SchemaFactory::getTableName($data->getString("asSchema"));
-        $this->onTable    = SchemaFactory::getTableName($data->getString("onSchema"));
+        $this->table      = SchemaModel::getTableName($data->getString("schema"));
+        $this->asTable    = SchemaModel::getTableName($data->getString("asSchema"));
+        $this->onTable    = SchemaModel::getTableName($data->getString("onSchema"));
         $this->leftKey    = $data->getString("leftKey", $key);
         $this->rightKey   = $data->getString("rightKey", $key);
-        $this->andTable   = SchemaFactory::getTableName($data->getString("andSchema"));
+        $this->andTable   = SchemaModel::getTableName($data->getString("andSchema"));
         $this->and        = $data->getString("and");
         $this->andKey     = $data->getString("andKey");
         $this->andKeys    = $data->getStrings("andKeys");
