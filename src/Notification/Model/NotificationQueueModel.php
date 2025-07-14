@@ -33,6 +33,7 @@ class NotificationQueueModel {
 
     public string $dataType = "";
 
+    #[Field(notPrimary: true)]
     public int $dataID = 0;
 
     public string $notificationResult = "";
@@ -50,7 +51,7 @@ class NotificationQueueModel {
     #[Expression("IF(notificationResult = 'NotProcessed', 1, 0)")]
     public bool $isPending = false;
 
-    #[Expression("IF(notificationResult = 'Sent', 1, 0)")]
+    #[Expression("IF(notificationResult <> 'Sent', 1, 0)")]
     public bool $isError = false;
 
 
