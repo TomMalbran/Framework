@@ -821,6 +821,7 @@ class Arrays {
                 }
             }
         }
+        // @phpstan-ignore return.type
         return $result;
     }
 
