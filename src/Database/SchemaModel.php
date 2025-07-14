@@ -9,46 +9,55 @@ use Framework\Database\Model\Count;
 use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
 use Framework\Utils\Arrays;
+use Framework\Utils\Strings;
 
 /**
  * The Schema Model
  */
 class SchemaModel {
 
-    public string $name         = "";
-    public string $path         = "";
-    public string $namespace    = "";
-    public string $idField      = "";
+    public string $name          = "";
+    public string $tableName     = "";
+    public string $path          = "";
+    public string $namespace     = "";
 
-    public bool $hasUsers       = false;
-    public bool $hasTimestamps  = false;
-    public bool $hasPositions   = false;
-    public bool $hasStatus      = false;
-    public bool $canCreate      = false;
-    public bool $canEdit        = false;
-    public bool $canDelete      = false;
+    public bool $hasUsers        = false;
+    public bool $hasTimestamps   = false;
+    public bool $hasPositions    = false;
+    public bool $hasStatus       = false;
+    public bool $canCreate       = false;
+    public bool $canEdit         = false;
+    public bool $canDelete       = false;
+
+
+    // Main column data
+    public bool      $hasID      = false;
+    public bool      $hasAutoInc = false;
+    public string    $idKey      = "";
+    public string    $idName     = "";
+    public FieldType $idType     = FieldType::None;
 
 
     /** @var Field[] */
-    public array $fields        = [];
+    public array $fields         = [];
 
     /** @var Field[] */
-    public array $extraFields   = [];
+    public array $extraFields    = [];
 
     /** @var Virtual[] */
-    public array $virtualFields = [];
+    public array $virtualFields  = [];
 
     /** @var Expression[] */
-    public array $expressions   = [];
+    public array $expressions    = [];
 
     /** @var Count[] */
-    public array $counts        = [];
+    public array $counts         = [];
 
     /** @var Relation[] */
-    public array $relations     = [];
+    public array $relations      = [];
 
     /** @var SubRequest[] */
-    public array $subRequests   = [];
+    public array $subRequests    = [];
 
 
 
@@ -92,6 +101,7 @@ class SchemaModel {
         array $subRequests   = [],
     ) {
         $this->name          = $name;
+        $this->tableName     = self::getTableName($name);
         $this->path          = $path;
         $this->namespace     = $namespace;
 
@@ -165,14 +175,26 @@ class SchemaModel {
     private function setIDField(): bool {
         foreach ($this->fields as $field) {
             if ($field->isID) {
-                $this->idField = $field->name;
-                break;
+                $this->hasID      = true;
+                $this->hasAutoInc = $field->isAutoInc();
+                $this->idKey      = $field->key;
+                $this->idName     = $field->name;
+                $this->idType     = $field->type;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 
+
+    /**
+     * Returns all the Fields of the Model
+     * @return Field[]
+     */
+    public function getAllFields(): array {
+        return array_merge($this->fields, $this->extraFields);
+    }
 
     /**
      * Returns the Fields of the Model
@@ -195,6 +217,33 @@ class SchemaModel {
                 continue;
             }
             $result[] = $field;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns all the Field Names of the Model
+     * @return string[]
+     */
+    public function getFieldNames(): array {
+        $result = [];
+        foreach ($this->fields as $field) {
+            $result[] = $field->getName();
+        }
+        foreach ($this->extraFields as $field) {
+            $result[] = $field->getName();
+        }
+        foreach ($this->expressions as $expression) {
+            $result[] = $expression->name;
+        }
+        foreach ($this->virtualFields as $virtual) {
+            $result[] = $virtual->name;
+        }
+        foreach ($this->expressions as $expression) {
+            $result[] = $expression->name;
+        }
+        foreach ($this->counts as $count) {
+            $result[] = $count->name;
         }
         return $result;
     }
@@ -228,50 +277,39 @@ class SchemaModel {
             "subrequests" => [],
             "foreigns"    => [],
         ];
-        $fieldNames = [];
-        $relations  = [];
+        $relations = [];
 
         // Add the fields
         foreach ($this->fields as $field) {
-            $fieldNames[] = $field->getName();
             $data["fields"][$field->getName()] = $field->toArray();
-        }
-
-        // Add the extra fields
-        foreach ($this->extraFields as $field) {
-            $fieldNames[] = $field->getName();
         }
 
         // Add the expressions
         foreach ($this->expressions as $expression) {
-            $fieldNames[] = $expression->name;
             $data["expressions"][$expression->name] = $expression->toArray();
         }
 
         // Add the virtual fields
         foreach ($this->virtualFields as $virtual) {
-            $fieldNames[] = $virtual->name;
             $data["processed"][$virtual->name] = $virtual->toArray();
         }
 
         // Add the expressions
         foreach ($this->expressions as $expression) {
-            $fieldNames[] = $expression->name;
             $data["expressions"][$expression->name] = $expression->toArray();
         }
 
         // Parse the counts and add the necessary values
         foreach ($this->counts as $count) {
-            $fieldNames[] = $count->name;
             $data["counts"][$count->name] = $count->toArray();
         }
 
         // Parse the relations and add the necessary joins
         foreach ($this->relations as $relation) {
-            if ($relation->model !== null) {
+            if ($relation->relatedModel !== null) {
                 $relationKey = $relation->getKey();
                 $relations[] = $relationKey;
-                $data["joins"][$relationKey] = $relation->toArray($fieldNames);
+                $data["joins"][$relationKey] = $relation->toArray();
             }
         }
 
@@ -288,7 +326,7 @@ class SchemaModel {
                     "schema" => $field->belongsTo,
                 ];
                 if ($field->otherKey !== "") {
-                    $data["foreigns"][$name]["leftKey"] = Field::generateName($field->otherKey);
+                    $data["foreigns"][$name]["leftKey"] = Field::generateKey($field->otherKey);
                 }
             }
         }
@@ -316,5 +354,16 @@ class SchemaModel {
         }
 
         return $result;
+    }
+
+
+
+    /**
+     * Gets the Table Name for the Schema
+     * @param string $schema
+     * @return string
+     */
+    public static function getTableName(string $schema): string {
+        return Strings::pascalCaseToSnakeCase($schema);
     }
 }

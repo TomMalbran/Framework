@@ -71,9 +71,9 @@ class {{name}}Schema extends Schema {
             $entity->statusName  = Status::getName($entity->status);
             $entity->statusColor = Status::getColor($entity->status);
             {{/hasStatus}}
-            {{#hasProcessed}}
+            {{#hasVirtuals}}
             $entity = static::postProcess($entity);
-            {{/hasProcessed}}
+            {{/hasVirtuals}}
         }
         {{/processEntity}}
         return $entity;
@@ -116,7 +116,7 @@ class {{name}}Schema extends Schema {
     }
 
 {{/hasParents}}
-{{#hasProcessed}}
+{{#hasVirtuals}}
     /**
      * Post Process the Result
      * @param {{entity}} $entity
@@ -126,7 +126,7 @@ class {{name}}Schema extends Schema {
         return $entity;
     }
 
-{{/hasProcessed}}
+{{/hasVirtuals}}
 
 
 {{#hasID}}

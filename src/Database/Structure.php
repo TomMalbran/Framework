@@ -2,6 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Database\Field;
 use Framework\Database\Join;
 use Framework\Database\Count;
@@ -59,7 +60,7 @@ class Structure {
      */
     public function __construct(string $schema, Dictionary $data) {
         $this->schema        = $schema;
-        $this->table         = SchemaFactory::getTableName($schema);
+        $this->table         = SchemaModel::getTableName($schema);
         $this->hasStatus     = $data->hasValue("hasStatus");
         $this->hasPositions  = $data->hasValue("hasPositions");
         $this->hasTimestamps = $data->hasValue("hasTimestamps");
