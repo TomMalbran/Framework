@@ -19,6 +19,7 @@ class CredentialDeviceModel {
     #[Field(isPrimary: true)]
     public string $userAgent = "";
 
+    #[Field(belongsTo: "LogDevice")]
     public string $playerID = "";
 
 }

@@ -20,6 +20,7 @@ class LogDeviceModel {
 
     public string $userAgent = "";
 
+    #[Field(belongsTo: "CredentialDevice")]
     public string $playerID = "";
 
     public bool $wasAdded = false;

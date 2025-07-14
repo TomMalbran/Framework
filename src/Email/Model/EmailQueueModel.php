@@ -34,6 +34,7 @@ class EmailQueueModel {
 
     public int $sentTime = 0;
 
+    #[Field(notPrimary: true)]
     public int $dataID = 0;
 
 
@@ -41,7 +42,7 @@ class EmailQueueModel {
     #[Expression("IF(emailResult = 'NotProcessed', 1, 0)")]
     public bool $isPending = false;
 
-    #[Expression("IF(emailResult = 'Sent', 1, 0)")]
+    #[Expression("IF(emailResult <> 'Sent', 1, 0)")]
     public bool $isError = false;
 
 }
