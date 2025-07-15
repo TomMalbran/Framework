@@ -59,15 +59,23 @@ class EmailTemplate extends EmailTemplateSchema {
     public static function migrateData(): bool {
         self::truncateData();
 
-        $position  = 0;
         $languages = Language::getAll();
+        $position  = 0;
+        $didUpdate = false;
+
         foreach ($languages as $language => $languageName) {
             /** @var array<string,string>[] */
             $templates = Discovery::loadJSON(Package::EmailsDir, $language);
 
             if (!Arrays::isEmpty($templates)) {
-                $position = self::migrateLanguage($templates, $language, $languageName, $position);
+                $position  = self::migrateLanguage($templates, $language, $languageName, $position);
+                $didUpdate = true;
             }
+        }
+
+        if (!$didUpdate) {
+            print("- No emails updated\n");
+            return false;
         }
         return true;
     }
