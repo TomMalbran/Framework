@@ -29,7 +29,8 @@ class Database {
     public string $password;
     public string $charset;
 
-    public bool $skipLog = false;
+    public bool $skipLog     = false;
+    public bool $isConnected = false;
 
 
     /**
@@ -73,7 +74,10 @@ class Database {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database);
         if ($this->mysqli->connect_error !== null) {
             trigger_error("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}", E_USER_ERROR);
+        } elseif ($this->database !== "") {
+            $this->isConnected = true;
         }
+
         if ($this->charset !== "") {
             $this->mysqli->set_charset($this->charset);
         }
@@ -323,8 +327,11 @@ class Database {
      * @return mysqli_stmt|null
      */
     private function processQuery(string $expression, array $bindParams = []): ?mysqli_stmt {
-        $query = Strings::replace(trim($expression), "\n", "");
+        if (!$this->isConnected) {
+            return null;
+        }
 
+        $query = Strings::replace(trim($expression), "\n", "");
         try {
             $statement = $this->mysqli->prepare($expression);
             if ($statement === false) {
@@ -579,7 +586,7 @@ class Database {
      * @return string[]
      */
     public function getTables(?array $filter = null): array {
-        $request   = $this->query("SHOW TABLES FROM `$this->database`");
+        $request   = $this->query("SHOW TABLES FROM `{$this->database}`");
         $hasFilter = $filter !== null;
         $result    = [];
 
@@ -674,6 +681,9 @@ class Database {
      * @return boolean
      */
     public function tableExists(string $tableName): bool {
+        if ($tableName === "") {
+            return false;
+        }
         $sql    = "SHOW TABLES LIKE '$tableName'";
         $result = $this->query($sql);
         return !Arrays::isEmpty($result);
