@@ -23,18 +23,18 @@ class SchemaBuilder {
      * @return integer
      */
     public static function generateCode(bool $forFramework): int {
-        $schemas    = SchemaFactory::buildData($forFramework);
-        $namespaces = [];
-        $created    = 0;
+        $schemaModels = SchemaFactory::buildData($forFramework);
+        $namespaces   = [];
+        $created      = 0;
 
-        foreach ($schemas as $schemaModel) {
+        foreach ($schemaModels as $schemaModel) {
             $namespaces[$schemaModel->name] = $schemaModel->namespace;
 
             File::createDir($schemaModel->path);
             File::emptyDir($schemaModel->path);
         }
 
-        foreach ($schemas as $schemaModel) {
+        foreach ($schemaModels as $schemaModel) {
             $schemaName = "{$schemaModel->name}Schema.php";
             $schemaCode = self::getSchemaCode($schemaModel, $namespaces);
             File::create($schemaModel->path, $schemaName, $schemaCode);
@@ -68,18 +68,19 @@ class SchemaBuilder {
      * @return string
      */
     private static function getSchemaCode(SchemaModel $schemaModel, array $nameSpaces): string {
-        $idType      = self::getFieldType($schemaModel->idType);
-        $fields      = self::getAllFields($schemaModel);
-        $uniques     = self::getFieldList($schemaModel, "isUnique");
-        $parents     = self::getFieldList($schemaModel, "isParent");
-        $subTypes    = self::getSubTypes($schemaModel->subRequests, $nameSpaces);
-        $hasVirtuals = count($schemaModel->virtualFields) > 0;
-        $hasParents  = count($parents) > 0;
-        $editParents = $schemaModel->hasPositions ? $parents : [];
-        $queryName   = "{$schemaModel->name}Query";
+        $idType       = self::getFieldType($schemaModel->idType);
+        $schemaFields = self::getSchemaFields($schemaModel);
+        $fields       = self::getAllFields($schemaModel);
+        $uniques      = self::getSomeFields($schemaModel, isUnique: true);
+        $parents      = self::getSomeFields($schemaModel, isParent: true);
+        $subTypes     = self::getSubTypes($schemaModel->subRequests, $nameSpaces);
+        $hasVirtual   = count($schemaModel->virtualFields) > 0;
+        $hasParents   = count($parents) > 0;
+        $editParents  = $schemaModel->hasPositions ? $parents : [];
+        $queryName    = "{$schemaModel->name}Query";
 
-        $template    = Discovery::loadFrameTemplate("Schema.mu");
-        $contents    = Mustache::render($template, [
+        $template     = Discovery::loadFrameTemplate("Schema.mu");
+        $contents     = Mustache::render($template, [
             "namespace"          => $schemaModel->namespace,
             "name"               => $schemaModel->name,
             "table"              => $schemaModel->tableName,
@@ -113,9 +114,10 @@ class SchemaBuilder {
             "canReplace"         => $schemaModel->canEdit && !$schemaModel->hasAutoInc,
             "canDelete"          => $schemaModel->canDelete,
             "canDeleteValue"     => $schemaModel->canDelete ? "true" : "false",
-            "processEntity"      => count($subTypes) > 0 || $hasVirtuals || $schemaModel->hasStatus,
+            "processEntity"      => count($subTypes) > 0 || $hasVirtual || $schemaModel->hasStatus,
             "subTypes"           => $subTypes,
-            "hasVirtuals"        => $hasVirtuals,
+            "hasVirtual"         => $hasVirtual,
+            "schemaFields"       => $schemaFields,
             "fields"             => $fields,
             "fieldsCreateList"   => self::joinFields($fields, "fieldArgCreate", ", "),
             "fieldsEditList"     => self::joinFields($fields, "fieldArgEdit", ", "),
@@ -156,25 +158,34 @@ class SchemaBuilder {
     }
 
     /**
+     * Returns a list of Fields for the Schema
+     * @param SchemaModel $schemaModel
+     * @return string[]
+     */
+    private static function getSchemaFields(SchemaModel $schemaModel): array {
+        $result = [];
+        foreach ($schemaModel->mainFields as $field) {
+            $result[] = $field->getBuildData();
+        }
+        return $result;
+    }
+
+    /**
      * Returns a list of all the Fields to set
      * @param SchemaModel $schemaModel
-     * @return array{}[]
+     * @return array<string,string>[]
      */
     private static function getAllFields(SchemaModel $schemaModel): array {
-        $skipKeys = [ "createdTime", "createdUser", "modifiedTime", "modifiedUser", "isDeleted" ];
-        $result   = [];
-
-        foreach ($schemaModel->getAllFields() as $field) {
-            if (Arrays::contains($skipKeys, $field->key)) {
-                continue;
+        $result = [];
+        foreach ($schemaModel->mainFields as $field) {
+            if (!$field->isAutoInc()) {
+                $result[] = self::getField($field);
             }
-            if ($field->isAutoInc()) {
-                continue;
+        }
+        foreach ($schemaModel->extraFields as $field) {
+            if ($field->name === "position") {
+                $result[] = self::getField($field);
             }
-            if ($schemaModel->hasStatus && $field->key === "status") {
-                continue;
-            }
-            $result[] = self::getField($field);
         }
         return $result;
     }
@@ -182,13 +193,16 @@ class SchemaBuilder {
     /**
      * Returns a list of Fields with the given property
      * @param SchemaModel $schemaModel
-     * @param string      $property
-     * @return array{}[]
+     * @param boolean     $isUnique    Optional.
+     * @param boolean     $isParent    Optional.
+     * @return array<string,string>[]
      */
-    private static function getFieldList(SchemaModel $schemaModel, string $property): array {
+    private static function getSomeFields(SchemaModel $schemaModel, bool $isUnique = false, bool $isParent = false): array {
         $result = [];
-        foreach ($schemaModel->getAllFields() as $field) {
-            if ($field->{$property}) {
+        foreach ($schemaModel->fields as $field) {
+            if ($isUnique && $field->isUnique) {
+                $result[] = self::getField($field);
+            } elseif ($isParent && $field->isParent) {
                 $result[] = self::getField($field);
             }
         }
@@ -209,7 +223,7 @@ class SchemaBuilder {
         $param     = "\${$field->name}";
 
         return [
-            "fieldKey"        => $field->key,
+            "fieldKey"        => $field->dbName,
             "fieldName"       => $field->name,
             "fieldText"       => Strings::upperCaseFirst($field->name),
             "fieldDoc"        => "$docType $param",
@@ -326,7 +340,7 @@ class SchemaBuilder {
             $result[] = self::getTypeData("id", $type);
         }
 
-        foreach ($schemaModel->getAllFields() as $field) {
+        foreach ($schemaModel->fields as $field) {
             self::addAttribute($result, $field->name, $field->type);
         }
         foreach ($schemaModel->virtualFields as $field) {
@@ -464,10 +478,10 @@ class SchemaBuilder {
         $addSpace = true;
         $result   = [];
 
-        foreach ($schemaModel->getAllFields() as $field) {
+        foreach ($schemaModel->fields as $field) {
             $result[] = [
                 "name"     => Strings::upperCaseFirst($field->name),
-                "value"    => "{$schemaModel->tableName}.{$field->key}",
+                "value"    => "{$schemaModel->tableName}.{$field->dbName}",
                 "addSpace" => false,
             ];
             if ($field->type === FieldType::File) {
@@ -497,7 +511,7 @@ class SchemaBuilder {
             foreach ($relation->fields as $field) {
                 $result[] = [
                     "name"     => Strings::upperCaseFirst($field->prefixName),
-                    "value"    => "{$tableName}.{$field->key}",
+                    "value"    => "{$tableName}.{$field->dbName}",
                     "addSpace" => $addSpace,
                 ];
                 $addSpace = false;
@@ -545,12 +559,12 @@ class SchemaBuilder {
         $list       = [];
         $result     = [];
 
-        foreach ($schemaModel->getAllFields() as $field) {
+        foreach ($schemaModel->fields as $field) {
             $list[] = [
                 "type"   => $field->type,
                 "column" => $field->name,
                 "name"   => $field->name,
-                "value"  => "{$schemaModel->tableName}.{$field->key}",
+                "value"  => "{$schemaModel->tableName}.{$field->dbName}",
             ];
         }
 
@@ -570,7 +584,7 @@ class SchemaBuilder {
                     "type"   => $field->type,
                     "column" => $field->name,
                     "name"   => $field->prefixName,
-                    "value"  => "{$tableName}.{$field->key}",
+                    "value"  => "{$tableName}.{$field->dbName}",
                 ];
             }
         }

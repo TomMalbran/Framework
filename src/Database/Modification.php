@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\Request;
+use Framework\Database\SchemaModel;
 use Framework\Database\Structure;
 use Framework\Database\Query;
 use Framework\Utils\Arrays;
@@ -12,7 +13,8 @@ use Framework\Utils\Arrays;
  */
 class Modification {
 
-    private Structure $structure;
+    private SchemaModel $model;
+    private Structure   $structure;
 
     /** @var array<string,mixed> */
     private array $fields;
@@ -20,9 +22,11 @@ class Modification {
 
     /**
      * Creates a new Modification instance
-     * @param Structure $structure
+     * @param SchemaModel $model
+     * @param Structure   $structure
      */
-    public function __construct(Structure $structure) {
+    public function __construct(SchemaModel $model, Structure $structure) {
+        $this->model     = $model;
         $this->structure = $structure;
         $this->fields    = [];
     }
@@ -113,15 +117,15 @@ class Modification {
      * @return Modification
      */
     public function addCreation(int $credentialID = 0): Modification {
-        if ($this->structure->canDelete && Arrays::isEmpty($this->fields, "isDeleted")) {
+        if ($this->model->canDelete && Arrays::isEmpty($this->fields, "isDeleted")) {
             $this->fields["isDeleted"] = 0;
         }
 
-        if ($this->structure->canCreate) {
-            if ($this->structure->hasTimestamps && Arrays::isEmpty($this->fields, "createdTime")) {
+        if ($this->model->canCreate) {
+            if ($this->model->hasTimestamps && Arrays::isEmpty($this->fields, "createdTime")) {
                 $this->fields["createdTime"] = time();
             }
-            if ($this->structure->hasUsers && $credentialID !== 0) {
+            if ($this->model->hasUsers && $credentialID !== 0) {
                 $this->fields["createdUser"] = $credentialID;
             }
         }
@@ -134,14 +138,14 @@ class Modification {
      * @return Modification
      */
     public function addModification(int $credentialID = 0): Modification {
-        if (!$this->structure->canEdit) {
+        if (!$this->model->canEdit) {
             return $this;
         }
 
-        if ($this->structure->hasTimestamps && Arrays::isEmpty($this->fields, "modifiedTime")) {
+        if ($this->model->hasTimestamps && Arrays::isEmpty($this->fields, "modifiedTime")) {
             $this->fields["modifiedTime"] = time();
         }
-        if ($this->structure->hasUsers && $credentialID !== 0) {
+        if ($this->model->hasUsers && $credentialID !== 0) {
             $this->fields["modifiedUser"] = $credentialID;
         }
         return $this;
@@ -155,7 +159,7 @@ class Modification {
      */
     public function insert(): int {
         return Framework::getDatabase()->insert(
-            $this->structure->table,
+            $this->model->tableName,
             $this->fields,
         );
     }
@@ -166,7 +170,7 @@ class Modification {
      */
     public function replace(): int {
         return Framework::getDatabase()->insert(
-            $this->structure->table,
+            $this->model->tableName,
             $this->fields,
             "REPLACE",
         );
@@ -179,7 +183,7 @@ class Modification {
      */
     public function update(Query $query): bool {
         return Framework::getDatabase()->update(
-            $this->structure->table,
+            $this->model->tableName,
             $this->fields,
             $query,
         );

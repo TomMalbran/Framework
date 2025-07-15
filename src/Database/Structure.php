@@ -18,21 +18,14 @@ class Structure {
     public string $schema      = "";
 
     public string $table       = "";
-    public bool   $hasID       = false;
-    public bool   $hasAutoInc  = false;
     public string $idKey       = "";
     public string $idName      = "";
-
-    public FieldType $idType   = FieldType::String;
 
     /** @var Field[] */
     public array $fields       = [];
 
     /** @var Field[] */
     public array $expressions  = [];
-
-    /** @var Field[] */
-    public array $processed    = [];
 
     /** @var Join[] */
     public array $joins        = [];
@@ -47,7 +40,6 @@ class Structure {
     public bool $hasPositions  = false;
     public bool $hasTimestamps = false;
     public bool $hasUsers      = false;
-    public bool $hasEncrypt    = false;
     public bool $canCreate     = false;
     public bool $canEdit       = false;
     public bool $canDelete     = false;
@@ -124,10 +116,8 @@ class Structure {
         // Parse the Fields
         $idKey        = "";
         $primaryCount = 0;
-        $reqMasterKey = false;
 
         foreach ($fields as $key => $value) {
-            $type = FieldType::from($value->getString("type"));
             if ($value->hasValue("isID")) {
                 $idKey         = $key;
                 $primaryCount += 1;
@@ -137,9 +127,6 @@ class Structure {
             if ($idKey === "" && $value->hasValue("isPrimary")) {
                 $idKey = $key;
             }
-            if ($type === FieldType::Encrypt) {
-                $reqMasterKey = true;
-            }
         }
         if ($primaryCount > 1) {
             $idKey = "";
@@ -148,14 +135,9 @@ class Structure {
         // Create the Fields
         foreach ($fields as $key => $value) {
             $field = new Field($key, $value);
-            if ($field->isID && $field->type === FieldType::Number) {
-                $this->hasAutoInc = true;
-            }
             if ($key === $idKey) {
-                $this->hasID  = true;
                 $this->idKey  = $field->key;
                 $this->idName = $field->name;
-                $this->idType = $field->type;
             }
             $this->fields[] = $field;
         }
@@ -164,11 +146,6 @@ class Structure {
         foreach ($data->getDict("expressions") as $key => $value) {
             $expression = $value->getString("expression");
             $this->expressions[$expression] = new Field($key, $value);
-        }
-
-        // Create the Processed
-        foreach ($data->getDict("processed") as $key => $value) {
-            $this->processed[] = new Field($key, $value);
         }
 
         // Create the Joins
@@ -185,11 +162,6 @@ class Structure {
         foreach ($data->getDict("subrequests") as $key => $value) {
             $subStructure = SchemaFactory::getStructure($key);
             $this->subRequests[] = new SubRequest($subStructure, $value, $this->idKey, $this->idName);
-        }
-
-        // Set the Master Key
-        if ($reqMasterKey) {
-            $this->hasEncrypt = true;
         }
     }
 

@@ -32,13 +32,18 @@ class SchemaFactory {
 
     /**
      * Gets the Schema data
-     * @param bool $forFramework Optional.
      * @return Dictionary
      */
-    public static function getData(bool $forFramework = false): Dictionary {
-        if (self::$data === null) {
-            self::$data = new Dictionary();
-            self::buildData($forFramework);
+    public static function getData(): Dictionary {
+        if (self::$data !== null) {
+            return self::$data;
+        }
+
+        $schemaModels = self::buildData();
+
+        self::$data = new Dictionary();
+        foreach ($schemaModels as $schemaModel) {
+            self::$data->set($schemaModel->name, $schemaModel->toArray());
         }
         return self::$data;
     }
@@ -49,7 +54,8 @@ class SchemaFactory {
      * @return SchemaModel[]
      */
     public static function buildData(bool $forFramework = false): array {
-        self::$data = new Dictionary();
+        $schemaModels = [];
+        $modelIDs     = [];
 
         $reflections = Discovery::getReflectionClasses(
             skipIgnored:  true,
@@ -57,9 +63,6 @@ class SchemaFactory {
         );
 
         // Parse the Reflections
-        $models   = [];
-        $modelIDs = [];
-
         foreach ($reflections as $className => $reflection) {
             $parent    = $reflection->getParentClass();
             $fileName  = "";
@@ -103,7 +106,7 @@ class SchemaFactory {
             // Get from the Props
             $hasStatus     = false;
             $hasPositions  = false;
-            $fields        = [];
+            $mainFields    = [];
             $virtualFields = [];
             $expressions   = [];
             $counts        = [];
@@ -185,9 +188,9 @@ class SchemaFactory {
                 } elseif ($count !== null) {
                     $counts[] = $count->setData($fieldName, $typeName);
 
-                // Add the Field
+                // Add the Main Field
                 } else {
-                    $fields[] = $field->setData($fieldName, $typeName);
+                    $mainFields[] = $field->setData($fieldName, $typeName);
                 }
             }
 
@@ -203,14 +206,14 @@ class SchemaFactory {
                 canCreate:     $model->canCreate,
                 canEdit:       $model->canEdit,
                 canDelete:     $model->canDelete,
-                fields:        $fields,
+                mainFields:    $mainFields,
                 virtualFields: $virtualFields,
                 expressions:   $expressions,
                 relations:     $relations,
                 counts:        $counts,
                 subRequests:   $subRequests,
             );
-            $models[$name] = $schemaModel;
+            $schemaModels[$name] = $schemaModel;
 
             if ($schemaModel->hasID) {
                 $modelIDs[$schemaModel->idName] = $schemaModel->name;
@@ -218,20 +221,20 @@ class SchemaFactory {
         }
 
         // Parse the Models using the Models created
-        foreach ($models as $model) {
-            foreach ($model->relations as $relation) {
-                $relatedModel = $models[$relation->schemaName] ?? null;
+        foreach ($schemaModels as $schemaModel) {
+            foreach ($schemaModel->relations as $relation) {
+                $relatedModel = $schemaModels[$relation->schemaName] ?? null;
                 if ($relatedModel !== null) {
-                    $relation->setModel($relatedModel, $model);
+                    $relation->setModel($relatedModel, $schemaModel);
                 }
             }
-            foreach ($model->counts as $count) {
-                $countModel = $models[$count->schemaName] ?? null;
+            foreach ($schemaModel->counts as $count) {
+                $countModel = $schemaModels[$count->schemaName] ?? null;
                 if ($countModel !== null) {
                     $count->model = $countModel;
                 }
             }
-            foreach ($model->fields as $field) {
+            foreach ($schemaModel->mainFields as $field) {
                 if (!$field->isID && $field->belongsTo === "") {
                     $field->belongsTo = $modelIDs[$field->name] ?? "";
                 }
@@ -240,17 +243,14 @@ class SchemaFactory {
 
         // Generate the Schemas
         $schemas = [];
-        foreach ($models as $schemaName => $model) {
-            $schemaData           = $model->toArray();
-            $schemas[$schemaName] = $schemaData;
-            self::$data->set($schemaName, $schemaData);
+        foreach ($schemaModels as $schemaName => $schemaModel) {
+            $schemas[$schemaName] = $schemaModel->toArray();
         }
-
-        // Save the Test Data
         if (count($schemas) > 0) {
             Discovery::saveData("schemasTest", $schemas);
         }
-        return $models;
+
+        return $schemaModels;
     }
 
 

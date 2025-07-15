@@ -134,7 +134,7 @@ class Schema {
      */
     protected static function getSchemaColumn(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
-        $selection = new Selection(self::structure());
+        $selection = new Selection(self::getModel(), self::structure());
         $selection->addFields();
         $selection->addSelects($column, true);
         $selection->addJoins();
@@ -163,7 +163,7 @@ class Schema {
      */
     protected static function getSchemaTotal(?Query $query = null, bool $withDeleted = true): int {
         $query     = self::generateQuery($query, $withDeleted);
-        $selection = new Selection(self::structure());
+        $selection = new Selection(self::getModel(), self::structure());
         $selection->addSelects("COUNT(*) AS cnt");
         $selection->addJoins(withSelects: false);
 
@@ -195,7 +195,7 @@ class Schema {
         bool $useEmpty = false,
     ): array {
         $query     = self::generateQuery($query);
-        $selection = new Selection(self::structure());
+        $selection = new Selection(self::getModel(), self::structure());
         if ($distinctColumn !== null) {
             $selection->addSelects("DISTINCT($distinctColumn)");
         }
@@ -321,7 +321,7 @@ class Schema {
         bool $decrypted = false,
         bool $skipSubRequest = false
     ): array {
-        $selection = new Selection(self::structure());
+        $selection = new Selection(self::getModel(), self::structure());
         $selection->addFields($decrypted);
         $selection->addExpressions();
         $selection->addSelects(array_values($selects));
@@ -357,7 +357,7 @@ class Schema {
         bool $decrypted = false,
     ): string {
         $query     = self::generateQuerySort($query, $sort);
-        $selection = new Selection(self::structure());
+        $selection = new Selection(self::getModel(), self::structure());
         $selection->addFields($decrypted);
         $selection->addExpressions();
         $selection->addSelects(array_values($selects));
@@ -398,7 +398,7 @@ class Schema {
      * @return integer
      */
     protected static function createSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
-        $modification = new Modification(self::structure());
+        $modification = new Modification(self::getModel(), self::structure());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
         $modification->addModification();
@@ -413,7 +413,7 @@ class Schema {
      * @return integer
      */
     protected static function replaceSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
-        $modification = new Modification(self::structure());
+        $modification = new Modification(self::getModel(), self::structure());
         $modification->addFields($request, $fields);
         $modification->addModification($credentialID);
         return $modification->replace();
@@ -437,7 +437,7 @@ class Schema {
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
-        $modification = new Modification(self::structure());
+        $modification = new Modification(self::getModel(), self::structure());
         $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
         $modification->addModification($credentialID);
 
@@ -480,7 +480,7 @@ class Schema {
      * @return integer
      */
     protected static function createSchemaEntityWithOrder(?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
-        $modification = new Modification(self::structure());
+        $modification = new Modification(self::getModel(), self::structure());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
         $modification->addModification();
@@ -510,7 +510,7 @@ class Schema {
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
-        $modification = new Modification(self::structure());
+        $modification = new Modification(self::getModel(), self::structure());
         $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
         $modification->addModification($credentialID);
 
@@ -615,7 +615,7 @@ class Schema {
             return 0;
         }
 
-        $selection = new Selection(self::structure());
+        $selection = new Selection(self::getModel(), self::structure());
         $selection->addSelects("position", true);
         $selection->addJoins(withSelects: false);
 
@@ -708,7 +708,7 @@ class Schema {
      */
     private static function generateQuery(?Query $query = null, bool $withDeleted = true): Query {
         $query     = new Query($query);
-        $isDeleted = self::structure()->getKey("isDeleted");
+        $isDeleted = self::getModel()->getKey("isDeleted");
 
         if ($withDeleted && static::$canDelete && !$query->hasColumn($isDeleted) && !$query->hasColumn("isDeleted")) {
             $query->add($isDeleted, "=", 0);

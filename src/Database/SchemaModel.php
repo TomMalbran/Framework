@@ -42,6 +42,9 @@ class SchemaModel {
     public array $fields         = [];
 
     /** @var Field[] */
+    public array $mainFields     = [];
+
+    /** @var Field[] */
     public array $extraFields    = [];
 
     /** @var Virtual[] */
@@ -73,7 +76,7 @@ class SchemaModel {
      * @param boolean      $canCreate     Optional.
      * @param boolean      $canEdit       Optional.
      * @param boolean      $canDelete     Optional.
-     * @param Field[]      $fields        Optional.
+     * @param Field[]      $mainFields    Optional.
      * @param Virtual[]    $virtualFields Optional.
      * @param Expression[] $expressions   Optional.
      * @param Count[]      $counts        Optional.
@@ -93,7 +96,7 @@ class SchemaModel {
         bool $canEdit        = false,
         bool $canDelete      = false,
 
-        array $fields        = [],
+        array $mainFields    = [],
         array $virtualFields = [],
         array $expressions   = [],
         array $counts        = [],
@@ -113,7 +116,7 @@ class SchemaModel {
         $this->canEdit       = $canEdit;
         $this->canDelete     = $canDelete;
 
-        $this->fields        = $fields;
+        $this->mainFields    = $mainFields;
         $this->virtualFields = $virtualFields;
         $this->expressions   = $expressions;
         $this->counts        = $counts;
@@ -122,6 +125,11 @@ class SchemaModel {
 
         $this->setExtraFields();
         $this->setIDField();
+
+        $this->fields = array_merge(
+            $this->mainFields,
+            $this->extraFields,
+        );
     }
 
     /**
@@ -144,20 +152,36 @@ class SchemaModel {
             );
         }
 
-        if ($this->hasTimestamps && $this->canCreate) {
+        if ($this->canCreate && $this->hasTimestamps) {
             $this->extraFields[] = new Field(
                 name:    "createdTime",
                 type:    FieldType::Number,
                 canEdit: false,
             );
         }
-        if ($this->hasTimestamps && $this->canEdit) {
+        if ($this->canCreate && $this->hasUsers) {
+            $this->extraFields[] = new Field(
+                name:    "createdUser",
+                type:    FieldType::Number,
+                canEdit: false,
+            );
+        }
+
+        if ($this->canEdit && $this->hasTimestamps) {
             $this->extraFields[] = new Field(
                 name:    "modifiedTime",
                 type:    FieldType::Number,
                 canEdit: false,
             );
         }
+        if ($this->canEdit && $this->hasUsers) {
+            $this->extraFields[] = new Field(
+                name:    "modifiedUser",
+                type:    FieldType::Number,
+                canEdit: false,
+            );
+        }
+
         if ($this->canDelete) {
             $this->extraFields[] = new Field(
                 name:    "isDeleted",
@@ -173,11 +197,11 @@ class SchemaModel {
      * @return boolean
      */
     private function setIDField(): bool {
-        foreach ($this->fields as $field) {
+        foreach ($this->mainFields as $field) {
             if ($field->isID) {
                 $this->hasID      = true;
                 $this->hasAutoInc = $field->isAutoInc();
-                $this->idKey      = $field->key;
+                $this->idKey      = $field->dbName;
                 $this->idName     = $field->name;
                 $this->idType     = $field->type;
                 return true;
@@ -189,14 +213,6 @@ class SchemaModel {
 
 
     /**
-     * Returns all the Fields of the Model
-     * @return Field[]
-     */
-    public function getAllFields(): array {
-        return array_merge($this->fields, $this->extraFields);
-    }
-
-    /**
      * Returns the Fields of the Model
      * @param boolean $withTimestamps
      * @param boolean $withDeleted
@@ -204,12 +220,12 @@ class SchemaModel {
      */
     public function getFields(bool $withTimestamps, bool $withDeleted): array {
         $result = [];
-        foreach ($this->fields as $field) {
+        foreach ($this->mainFields as $field) {
             $result[] = $field;
         }
 
         foreach ($this->extraFields as $field) {
-            $fieldName = $field->getName();
+            $fieldName = $field->dbName;
             if (!$withTimestamps && ($fieldName === "createdTime" || $fieldName === "modifiedTime")) {
                 continue;
             }
@@ -227,11 +243,11 @@ class SchemaModel {
      */
     public function getFieldNames(): array {
         $result = [];
-        foreach ($this->fields as $field) {
-            $result[] = $field->getName();
+        foreach ($this->mainFields as $field) {
+            $result[] = $field->dbName;
         }
         foreach ($this->extraFields as $field) {
-            $result[] = $field->getName();
+            $result[] = $field->dbName;
         }
         foreach ($this->expressions as $expression) {
             $result[] = $expression->name;
@@ -253,12 +269,25 @@ class SchemaModel {
      * @return bool
      */
     public function hasEncrypt(): bool {
-        foreach ($this->fields as $field) {
+        foreach ($this->mainFields as $field) {
             if ($field->type === FieldType::Encrypt) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Returns the Key adding the table as the prefix
+     * @param string $key
+     * @return string
+     */
+    public function getKey(string $key): string {
+        if (!Strings::contains($key, ".")) {
+            $mainKey = $this->tableName;
+            return "{$mainKey}.{$key}";
+        }
+        return $key;
     }
 
 
@@ -280,8 +309,8 @@ class SchemaModel {
         $relations = [];
 
         // Add the fields
-        foreach ($this->fields as $field) {
-            $data["fields"][$field->getName()] = $field->toArray();
+        foreach ($this->mainFields as $field) {
+            $data["fields"][$field->dbName] = $field->toArray();
         }
 
         // Add the expressions
@@ -319,8 +348,8 @@ class SchemaModel {
         }
 
         // Add the foreign fields
-        foreach ($this->fields as $field) {
-            $name = $field->getName();
+        foreach ($this->mainFields as $field) {
+            $name = $field->dbName;
             if ($field->belongsTo !== "" && !Arrays::contains($relations, $name)) {
                 $data["foreigns"][$name] = [
                     "schema" => $field->belongsTo,

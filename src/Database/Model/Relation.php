@@ -176,7 +176,7 @@ class Relation {
                 continue;
             }
 
-            $fieldName  = $field->getName();
+            $fieldName  = $field->dbName;
             $prefixName = $fieldName;
             if ($this->withPrefix) {
                 $prefixName = $this->prefix . Strings::upperCaseFirst($fieldName);

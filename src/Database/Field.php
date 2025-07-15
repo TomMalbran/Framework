@@ -22,7 +22,6 @@ class Field {
     public FieldType $type    = FieldType::None;
 
     public string $key        = "";
-    public int    $length     = 0;
     public int    $decimals   = 2;
     public string $dateType   = "middle";
     public string $dateInput  = "";
@@ -32,13 +31,8 @@ class Field {
 
     public bool   $isID       = false;
     public bool   $isAutoInc  = false;
-    public bool   $isPrimary  = false;
-    public bool   $isKey      = false;
-    public bool   $isUnique   = false;
-    public bool   $isParent   = false;
     public bool   $noExists   = false;
     public bool   $noEmpty    = false;
-    public bool   $isSigned   = false;
     public bool   $noPrefix   = false;
     public bool   $canEdit    = false;
 
@@ -58,7 +52,6 @@ class Field {
         $this->key        = $key;
 
         $this->type       = FieldType::from($data->getString("type"));
-        $this->length     = $data->getInt("length", default: $this->length);
         $this->decimals   = $data->getInt("decimals", default: $this->decimals);
         $this->dateType   = $data->getString("dateType", $this->dateType);
         $this->dateInput  = $data->getString("dateInput", $this->dateInput);
@@ -68,13 +61,8 @@ class Field {
 
         $this->isID       = $data->hasValue("isID");
         $this->isAutoInc  = $this->isID && $this->type === FieldType::Number;
-        $this->isPrimary  = $this->isID || $data->hasValue("isPrimary");
-        $this->isKey      = $data->hasValue("isKey");
-        $this->isUnique   = $data->hasValue("isUnique");
-        $this->isParent   = $data->hasValue("isParent");
         $this->noExists   = $data->hasValue("noExists");
         $this->noEmpty    = $data->hasValue("noEmpty");
-        $this->isSigned   = $data->hasValue("isSigned");
         $this->noPrefix   = $data->hasValue("noPrefix");
         $this->canEdit    = !$data->hasValue("cantEdit");
 
@@ -110,95 +98,6 @@ class Field {
     }
 
 
-
-    /**
-     * Returns the Field Type from the Data
-     * @param boolean $withLength Optional.
-     * @return string
-     */
-    public function getType(bool $withLength = true): string {
-        $type       = "unknown";
-        $length     = 0;
-        $attributes = "";
-        $default    = null;
-
-        switch ($this->type) {
-        case FieldType::Number:
-            $type    = "int";
-            $length  = $this->length > 0 ? $this->length : 10;
-            $default = 0;
-
-            if ($length < 3) {
-                $type = "tinyint";
-            } elseif ($length < 5) {
-                $type = "smallint";
-            } elseif ($length < 8) {
-                $type = "mediumint";
-            } elseif ($length > 10) {
-                $type = "bigint";
-            }
-
-            if ($this->isAutoInc) {
-                $attributes = "unsigned NOT NULL AUTO_INCREMENT";
-                $default    = null;
-            } else {
-                $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
-            }
-            break;
-        case FieldType::Boolean:
-            $type       = "tinyint";
-            $length     = 1;
-            $attributes = "unsigned NOT NULL";
-            $default    = 0;
-            break;
-        case FieldType::Float:
-            $type       = "bigint";
-            $length     = 20;
-            $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
-            $default    = 0;
-            break;
-        case FieldType::String:
-        case FieldType::File:
-            $type       = "varchar";
-            $length     = $this->length > 0 ? $this->length : 255;
-            $attributes = "NOT NULL";
-            $default    = "";
-            break;
-        case FieldType::Text:
-            $type       = "text";
-            $attributes = "NULL";
-            break;
-        case FieldType::LongText:
-            $type       = "longtext";
-            $attributes = "NULL";
-            break;
-        case FieldType::JSON:
-            $type       = "mediumtext";
-            $attributes = "NULL";
-            break;
-        case FieldType::Encrypt:
-            $type       = "varbinary";
-            $length     = $this->length > 0 ? $this->length : 255;
-            $attributes = "NOT NULL";
-            break;
-        }
-
-        $result = $type;
-        if ($withLength && $length > 0) {
-            $result = "{$type}({$length}) $attributes";
-        } elseif ($attributes !== "") {
-            $result = "$type $attributes";
-        }
-
-        if ($result !== "unknown") {
-            if ($this->default !== "") {
-                $result .= " DEFAULT '{$this->default}'";
-            } elseif ($default !== null) {
-                $result .= " DEFAULT '{$default}'";
-            }
-        }
-        return $result;
-    }
 
     /**
      * Returns the Field Value from the given Request

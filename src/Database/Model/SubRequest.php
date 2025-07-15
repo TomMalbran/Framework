@@ -80,7 +80,7 @@ class SubRequest {
             $result["type"] = $this->type;
         }
         if ($this->idName !== "") {
-            $result["idKey"]  = Field::generateName($this->idName);
+            $result["idKey"]  = Field::generateKey($this->idName);
             $result["idName"] = $this->idName;
         }
         if ($this->fieldName !== "") {
