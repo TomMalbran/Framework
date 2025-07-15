@@ -2,6 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Framework;
+use Framework\Database\SchemaModel;
 use Framework\Database\Structure;
 use Framework\Database\Model\FieldType;
 use Framework\System\Config;
@@ -13,7 +14,8 @@ use Framework\Utils\Strings;
  */
 class Selection {
 
-    private Structure $structure;
+    private SchemaModel $schemaModel;
+    private Structure   $structure;
 
     private int $index   = 66;
 
@@ -35,11 +37,13 @@ class Selection {
 
     /**
      * Creates a new Selection instance
-     * @param Structure $structure
+     * @param SchemaModel $schemaModel
+     * @param Structure   $structure
      */
-    public function __construct(Structure $structure) {
-        $this->structure = $structure;
-        $this->tables    = [ $structure->table ];
+    public function __construct(SchemaModel $schemaModel, Structure $structure) {
+        $this->schemaModel = $schemaModel;
+        $this->structure   = $structure;
+        $this->tables      = [ $schemaModel->tableName ];
     }
 
 
@@ -51,18 +55,18 @@ class Selection {
      */
     public function addFields(bool $decrypted = false): Selection {
         $masterKey = Config::getDbKey();
-        $mainKey   = $this->structure->table;
+        $mainKey   = $this->schemaModel->tableName;
 
-        if ($this->structure->hasID) {
-            $this->selects[] = "$mainKey.{$this->structure->idKey} AS id";
+        if ($this->schemaModel->hasID) {
+            $this->selects[] = "$mainKey.{$this->schemaModel->idKey} AS id";
         }
-        foreach ($this->structure->fields as $field) {
+        foreach ($this->schemaModel->fields as $field) {
             if ($decrypted && $field->type === FieldType::Encrypt) {
-                $this->selects[] = "CAST(AES_DECRYPT($mainKey.$field->key, '$masterKey') AS CHAR(255)) {$field->key}Decrypt";
-            } elseif ($field->hasName) {
-                $this->selects[] = "$mainKey.$field->key AS $field->name";
+                $this->selects[] = "CAST(AES_DECRYPT($mainKey.$field->name, '$masterKey') AS CHAR(255)) {$field->name}Decrypt";
+            } elseif ($field->dbName !== $field->name) {
+                $this->selects[] = "$mainKey.$field->dbName AS $field->name";
             } else {
-                $this->selects[] = "$mainKey.$field->key";
+                $this->selects[] = "$mainKey.$field->name";
             }
         }
         return $this;
@@ -89,7 +93,7 @@ class Selection {
         $selects = Arrays::toStrings($selects);
         foreach ($selects as $select) {
             if ($addMainKey) {
-                $this->selects[] = $this->structure->getKey($select);
+                $this->selects[] = $this->schemaModel->getKey($select);
             } else {
                 $this->selects[] = $select;
             }
@@ -104,8 +108,6 @@ class Selection {
      * @return Selection
      */
     public function addJoins(array $extraJoins = [], bool $withSelects = true): Selection {
-        $mainKey = $this->structure->table;
-
         foreach ($this->structure->joins as $join) {
             if ($join->asTable !== "") {
                 $asTable = $join->asTable;
@@ -116,7 +118,7 @@ class Selection {
                 $this->tables[] = $join->table;
             }
 
-            $this->joins[]          = $join->getExpression($asTable, $mainKey);
+            $this->joins[]          = $join->getExpression($asTable, $this->schemaModel->tableName);
             $this->keys[$join->key] = $asTable;
 
             if ($withSelects) {
@@ -136,11 +138,9 @@ class Selection {
      * @return Selection
      */
     public function addCounts(): Selection {
-        $mainKey = $this->structure->table;
-
         foreach ($this->structure->counts as $count) {
             $asTable                 = chr($this->index++);
-            $this->joins[]           = $count->getExpression($asTable, $mainKey);
+            $this->joins[]           = $count->getExpression($asTable, $this->schemaModel->tableName);
             $this->selects[]         = $count->getSelect($asTable);
             $this->keys[$count->key] = $asTable;
         }
@@ -157,7 +157,7 @@ class Selection {
     public function getExpression(Query $query): string {
         $this->setTableKeys($query);
 
-        $mainKey    = $this->structure->table;
+        $mainKey    = $this->schemaModel->tableName;
         $selects    = Strings::join($this->selects, ", ");
         $joins      = Strings::join($this->joins, " ");
         $where      = $query->get();
@@ -187,13 +187,13 @@ class Selection {
      */
     private function setTableKeys(Query $query): Selection {
         $columns = $query->getColumns();
-        $mainKey = $this->structure->table;
+        $mainKey = $this->schemaModel->tableName;
 
         foreach ($columns as $column) {
             $found = false;
-            foreach ($this->structure->fields as $field) {
-                if ($column === $field->key) {
-                    $query->updateColumn($column, "$mainKey.{$field->key}");
+            foreach ($this->schemaModel->fields as $field) {
+                if ($column === $field->dbName) {
+                    $query->updateColumn($column, "$mainKey.{$field->dbName}");
                     $found = true;
                     break;
                 }
@@ -240,18 +240,18 @@ class Selection {
 
         foreach ($this->request as $row) {
             $fields = [];
-            if ($this->structure->hasID) {
+            if ($this->schemaModel->hasID) {
                 if (isset($row["id"])) {
                     $fields["id"] = $row["id"];
-                } elseif (isset($row[$this->structure->idKey])) {
-                    $fields["id"] = $row[$this->structure->idKey];
-                } elseif (isset($row[$this->structure->idName])) {
-                    $fields["id"] = $row[$this->structure->idName];
+                } elseif (isset($row[$this->schemaModel->idKey])) {
+                    $fields["id"] = $row[$this->schemaModel->idKey];
+                } elseif (isset($row[$this->schemaModel->idName])) {
+                    $fields["id"] = $row[$this->schemaModel->idName];
                 }
             }
 
             // Parse the Fields
-            foreach ($this->structure->fields as $field) {
+            foreach ($this->schemaModel->fields as $field) {
                 $values = $field->toValues($row);
                 $fields = array_merge($fields, $values);
             }

@@ -4,14 +4,12 @@ namespace Framework\Database;
 use Framework\Framework;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
+use Framework\Database\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
-use Framework\Database\Database;
-use Framework\Database\Structure;
 use Framework\Core\Settings;
 use Framework\File\File;
 use Framework\Utils\Arrays;
-use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -26,7 +24,7 @@ class Migration {
      */
     public static function migrateData(bool $canDelete = false): bool {
         $db             = Framework::getDatabase();
-        $schemas        = SchemaFactory::getData();
+        $schemaModels   = SchemaFactory::buildData();
         $startMovement  = Settings::getCore("movement");
         $startRename    = Settings::getCore("rename");
         $startMigration = Settings::getCore("migration");
@@ -43,7 +41,7 @@ class Migration {
             $lastRename = self::renameColumns($db, $startRename, $migrations["renames"]);
         }
 
-        $migrated      = self::migrateTables($db, $schemas, $canDelete);
+        $migrated      = self::migrateTables($db, $schemaModels, $canDelete);
         $lastMigration = self::extraMigrations($db, $startMigration);
 
         if ($lastMovement > 0) {
@@ -129,26 +127,25 @@ class Migration {
 
     /**
      * Migrates the Tables
-     * @param Database   $db
-     * @param Dictionary $schemas
-     * @param boolean    $canDelete Optional.
+     * @param Database      $db
+     * @param SchemaModel[] $schemaModels
+     * @param boolean       $canDelete    Optional.
      * @return boolean
      */
-    private static function migrateTables(Database $db, Dictionary $schemas, bool $canDelete = false): bool {
+    private static function migrateTables(Database $db, array $schemaModels, bool $canDelete = false): bool {
         $tableNames  = $db->getTables();
         $schemaNames = [];
         $didMigrate  = false;
 
         // Create or update the Tables
-        foreach ($schemas as $schemaKey => $schemaData) {
+        foreach ($schemaModels as $schemaModel) {
             $didUpdate     = false;
-            $structure     = new Structure($schemaKey, $schemaData);
-            $schemaNames[] = $structure->table;
+            $schemaNames[] = $schemaModel->tableName;
 
-            if (!Arrays::contains($tableNames, $structure->table)) {
-                $didUpdate = self::createTable($db, $structure);
+            if (!Arrays::contains($tableNames, $schemaModel->tableName)) {
+                $didUpdate = self::createTable($db, $schemaModel);
             } else {
-                $didUpdate = self::updateTable($db, $structure, $canDelete);
+                $didUpdate = self::updateTable($db, $schemaModel, $canDelete);
             }
             if ($didUpdate) {
                 $didMigrate = true;
@@ -162,28 +159,28 @@ class Migration {
 
     /**
      * Creates a New Table
-     * @param Database  $db
-     * @param Structure $structure
+     * @param Database    $db
+     * @param SchemaModel $schemaModel
      * @return boolean
      */
-    private static function createTable(Database $db, Structure $structure): bool {
+    private static function createTable(Database $db, SchemaModel $schemaModel): bool {
         $fields  = [];
         $primary = [];
         $keys    = [];
 
-        foreach ($structure->fields as $field) {
-            $fields[$field->key] = $field->getType();
+        foreach ($schemaModel->fields as $field) {
+            $fields[$field->dbName] = $field->getType();
             if ($field->isPrimary) {
-                $primary[] = $field->key;
+                $primary[] = $field->dbName;
             }
             if ($field->isKey) {
-                $keys[] = $field->key;
+                $keys[] = $field->dbName;
             }
         }
 
-        $sql = $db->createTable($structure->table, $fields, $primary, $keys);
-        print("\n- Created table {$structure->table} ... \n");
-        print(Strings::toHtml($sql) . "\n\n");
+        $sql = $db->createTable($schemaModel->tableName, $fields, $primary, $keys);
+        print("\n- Created table {$schemaModel->tableName} ... \n");
+        print("$sql\n\n");
         return true;
     }
 
@@ -215,16 +212,16 @@ class Migration {
 
     /**
      * Updates the Table
-     * @param Database  $db
-     * @param Structure $structure
-     * @param boolean   $canDelete
+     * @param Database    $db
+     * @param SchemaModel $schemaModel
+     * @param boolean     $canDelete
      * @return boolean
      */
-    private static function updateTable(Database $db, Structure $structure, bool $canDelete): bool {
-        $autoKey     = $db->getAutoIncrement($structure->table);
-        $primaryKeys = $db->getPrimaryKeys($structure->table);
-        $tableKeys   = $db->getTableKeys($structure->table);
-        $tableFields = $db->getTableFields($structure->table);
+    private static function updateTable(Database $db, SchemaModel $schemaModel, bool $canDelete): bool {
+        $autoKey     = $db->getAutoIncrement($schemaModel->tableName);
+        $primaryKeys = $db->getPrimaryKeys($schemaModel->tableName);
+        $tableKeys   = $db->getTableKeys($schemaModel->tableName);
+        $tableFields = $db->getTableFields($schemaModel->tableName);
         $tableNames  = Arrays::toStrings(array_keys($tableFields));
         $update      = false;
         $adds        = [];
@@ -240,18 +237,18 @@ class Migration {
 
         // Add new Columns
         $prev = "";
-        foreach ($structure->fields as $field) {
+        foreach ($schemaModel->fields as $field) {
             $found       = false;
             $isRename    = false;
             $renameTable = "";
 
             foreach ($tableNames as $tableKey) {
-                if (Strings::isEqual($field->key, $tableKey) && $field->key !== $tableKey) {
+                if (Strings::isEqual($field->dbName, $tableKey) && $field->dbName !== $tableKey) {
                     $isRename    = true;
                     $renameTable = $tableKey;
                     break;
                 }
-                if ($field->key === $tableKey) {
+                if ($field->dbName === $tableKey) {
                     $found = true;
                     break;
                 }
@@ -263,18 +260,18 @@ class Migration {
                 $found     = true;
                 $renames[] = [
                     "key"  => $renameTable,
-                    "new"  => $field->key,
+                    "new"  => $field->dbName,
                     "type" => $type,
                 ];
             } elseif (!$found) {
                 $update = true;
                 if ($field->isID && $autoKey !== "") {
                     $found         = true;
-                    $primaryKeys[] = $field->key;
+                    $primaryKeys[] = $field->dbName;
                     $renamed[]     = $autoKey;
                     $renames[]     = [
                         "key"  => $autoKey,
-                        "new"  => $field->key,
+                        "new"  => $field->dbName,
                         "type" => $type,
                     ];
                 }
@@ -283,31 +280,31 @@ class Migration {
             if (!$found) {
                 if ($field->isID) {
                     $dropPrimary   = true;
-                    $primaryKeys[] = $field->key;
+                    $primaryKeys[] = $field->dbName;
                     $type         .= " PRIMARY KEY";
                 }
                 $adds[] = [
-                    "key"   => $field->key,
+                    "key"   => $field->dbName,
                     "type"  => $type,
                     "after" => $prev,
                 ];
             }
-            $prev = $field->key;
+            $prev = $field->dbName;
         }
 
         // Modify Columns
         $newPrev = "";
-        foreach ($structure->fields as $field) {
+        foreach ($schemaModel->fields as $field) {
             $oldPrev = "";
             foreach ($tableFields as $tableKey => $oldData) {
-                if ($field->key === $tableKey) {
+                if ($field->dbName === $tableKey) {
                     $hasLength = Strings::contains($oldData, "(");
                     $newData   = $field->getType($hasLength);
 
                     if ($newData !== $oldData || $newPrev !== $oldPrev) {
                         $update     = true;
                         $modifies[] = [
-                            "key"    => $field->key,
+                            "key"    => $field->dbName,
                             "type"   => $newData,
                             "after"  => $newPrev,
                             "toInts" => Strings::contains($newData, "int") && Strings::contains($oldData, "varchar"),
@@ -317,14 +314,14 @@ class Migration {
                 }
                 $oldPrev = $tableKey;
             }
-            $newPrev = $field->key;
+            $newPrev = $field->dbName;
         }
 
         // Remove Columns
         foreach ($tableFields as $tableKey => $tableField) {
             $found = false;
-            foreach ($structure->fields as $field) {
-                if (Strings::isEqual($field->key, $tableKey) || Arrays::contains($renamed, $tableKey)) {
+            foreach ($schemaModel->fields as $field) {
+                if (Strings::isEqual($field->dbName, $tableKey) || Arrays::contains($renamed, $tableKey)) {
                     $found = true;
                 }
             }
@@ -335,10 +332,10 @@ class Migration {
         }
 
         // Update the Table Primary Keys and Index Keys
-        foreach ($structure->fields as $field) {
+        foreach ($schemaModel->fields as $field) {
             if ($field->isPrimary) {
-                $primary[] = $field->key;
-                if (!Arrays::contains($primaryKeys, $field->key)) {
+                $primary[] = $field->dbName;
+                if (!Arrays::contains($primaryKeys, $field->dbName)) {
                     $update     = true;
                     $addPrimary = true;
                 }
@@ -346,55 +343,55 @@ class Migration {
             if ($field->isKey) {
                 $found = false;
                 foreach ($tableKeys as $tableKey) {
-                    if ($tableKey["Key_name"] === $field->key) {
+                    if ($tableKey["Key_name"] === $field->dbName) {
                         $found = true;
                     }
                 }
                 if (!$found) {
                     $update = true;
-                    $keys[] = $field->key;
+                    $keys[] = $field->dbName;
                 }
             }
         }
 
         // Nothing to change
         if (!$update) {
-            print("- No changes for {$structure->table}\n");
+            print("- No changes for {$schemaModel->tableName}\n");
             return false;
         }
 
         // Update the Table
-        print("\n- Updated table {$structure->table} ... \n");
+        print("\n- Updated table {$schemaModel->tableName} ... \n");
         if ($dropPrimary && $canDrop) {
-            $sql = $db->dropPrimary($structure->table);
-            print("    $sql\n");
+            $sql = $db->dropPrimary($schemaModel->tableName);
+            print("$sql\n");
         }
         foreach ($renames as $rename) {
-            $sql = $db->renameColumn($structure->table, $rename["key"], $rename["new"], $rename["type"]);
-            print("    $sql\n");
+            $sql = $db->renameColumn($schemaModel->tableName, $rename["key"], $rename["new"], $rename["type"]);
+            print("$sql\n");
         }
         foreach ($adds as $add) {
-            $sql = $db->addColumn($structure->table, $add["key"], $add["type"], $add["after"]);
-            print("    $sql\n");
+            $sql = $db->addColumn($schemaModel->tableName, $add["key"], $add["type"], $add["after"]);
+            print("$sql\n");
         }
         foreach ($modifies as $modify) {
             if ($modify["toInts"]) {
-                $db->query("UPDATE `$structure->table` SET `{$modify["key"]}` = '0' WHERE `{$modify["key"]}` = ''");
+                $db->query("UPDATE `{$schemaModel->tableName}` SET `{$modify["key"]}` = '0' WHERE `{$modify["key"]}` = ''");
             }
-            $sql = $db->updateColumn($structure->table, $modify["key"], $modify["type"], $modify["after"]);
-            print("    $sql\n");
+            $sql = $db->updateColumn($schemaModel->tableName, $modify["key"], $modify["type"], $modify["after"]);
+            print("$sql\n");
         }
         foreach ($drops as $drop) {
-            $sql = $db->deleteColumn($structure->table, $drop, $canDelete);
-            print("    $sql" . (!$canDelete ? " (manually)" : "") . "\n");
+            $sql = $db->deleteColumn($schemaModel->tableName, $drop, $canDelete);
+            print("$sql" . (!$canDelete ? " (manually)" : "") . "\n");
         }
         foreach ($keys as $key) {
-            $sql = $db->createIndex($structure->table, $key);
-            print("    $sql\n");
+            $sql = $db->createIndex($schemaModel->tableName, $key);
+            print("$sql\n");
         }
         if ($addPrimary) {
-            $sql = $db->updatePrimary($structure->table, $primary);
-            print("    $sql\n");
+            $sql = $db->updatePrimary($schemaModel->tableName, $primary);
+            print("$sql\n");
         }
         print("\n");
         return true;

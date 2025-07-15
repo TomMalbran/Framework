@@ -3,7 +3,11 @@ namespace Framework\Database\Model;
 
 use Framework\Discovery\Discovery;
 use Framework\Database\Model\FieldType;
+use Framework\File\FilePath;
+use Framework\System\Path;
 use Framework\Utils\Arrays;
+use Framework\Utils\JSON;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -78,6 +82,9 @@ class Field {
     // Used with the 'dateInput' to indicate that the hour comes from an input
     public string $hourInput  = "";
 
+    // Used to generate the path and url of the file
+    public string $filePath   = "";
+
 
     // Used to indicate that the field should not change when using the edit functions with a Request
     public bool   $canEdit    = true;
@@ -90,8 +97,8 @@ class Field {
 
     // Used internally when parsing the Model
     public FieldType $type       = FieldType::String;
-    public string    $key        = "";
     public string    $name       = "";
+    public string    $dbName     = "";
     public string    $prefixName = "";
     public bool      $noPrefix   = false;
 
@@ -117,6 +124,7 @@ class Field {
      * @param string    $dateType   Optional.
      * @param string    $dateInput  Optional.
      * @param string    $hourInput  Optional.
+     * @param string    $filePath   Optional.
      * @param boolean   $canEdit    Optional.
      * @param boolean   $noEmpty    Optional.
      * @param boolean   $noExists   Optional.
@@ -147,6 +155,7 @@ class Field {
         string $dateType   = "",
         string $dateInput  = "",
         string $hourInput  = "",
+        string $filePath   = "",
 
         bool   $canEdit    = true,
         bool   $noEmpty    = false,
@@ -162,7 +171,7 @@ class Field {
         $this->otherKey   = $otherKey;
 
         $this->isID       = $isID;
-        $this->isPrimary  = $isPrimary;
+        $this->isPrimary  = $isID || $isPrimary;
         $this->isKey      = $isKey;
 
         $this->length     = $length;
@@ -178,18 +187,17 @@ class Field {
         $this->dateType   = $dateType;
         $this->dateInput  = $dateInput;
         $this->hourInput  = $hourInput;
+        $this->filePath   = $filePath;
 
         $this->canEdit    = $canEdit;
         $this->noEmpty    = $noEmpty;
         $this->noExists   = $noExists;
         $this->notPrimary = $notPrimary;
 
-        $this->key        = self::generateKey($name);
-        $this->name       = $name;
         $this->type       = $type;
+        $this->name       = $name;
+        $this->dbName     = $this->getDbName($name);
     }
-
-
 
     /**
      * Sets the Data from the Model
@@ -198,9 +206,6 @@ class Field {
      * @return Field
      */
     public function setData(string $name, string $typeName): Field {
-        $this->key  = self::generateKey($name);
-        $this->name = $name;
-
         switch ($typeName) {
         case "bool":
             $this->type = FieldType::Boolean;
@@ -234,27 +239,31 @@ class Field {
             $this->type = FieldType::String;
             break;
         }
+
+        $this->name   = $name;
+        $this->dbName = $this->getDbName($name);
         return $this;
     }
 
     /**
-     * Returns the name of the field for the Schema
+     * Returns the name of the field for the Database
+     * @param string $name
      * @return string
      */
-    public function getName(): string {
-        $name = $this->name;
-
+    private function getDbName(string $name): string {
         // If the field is not a primary key, we don't convert the name
         if ($this->notPrimary) {
             return $name;
         }
-
-        // Assume is a primary field if is an ID or Number and ends with "ID"
+        // Assume is a primary field if is an ID or Number that ends with "ID"
         if ($this->isSchemaID()) {
-            $name = self::generateKey($name);
+            return self::generateKey($name);
         }
+        // Use the name as it is
         return $name;
     }
+
+
 
     /**
      * Returns true if the field is a Schema ID
@@ -275,6 +284,138 @@ class Field {
     }
 
     /**
+     * Returns the Field Type from the Data
+     * @param boolean $withLength Optional.
+     * @return string
+     */
+    public function getType(bool $withLength = true): string {
+        $type       = "unknown";
+        $length     = 0;
+        $attributes = "";
+        $default    = null;
+
+        switch ($this->type) {
+        case FieldType::Number:
+            $type    = "int";
+            $length  = $this->length > 0 ? $this->length : 10;
+            $default = 0;
+
+            if ($length < 3) {
+                $type = "tinyint";
+            } elseif ($length < 5) {
+                $type = "smallint";
+            } elseif ($length < 8) {
+                $type = "mediumint";
+            } elseif ($length > 10) {
+                $type = "bigint";
+            }
+
+            if ($this->isAutoInc()) {
+                $attributes = "unsigned NOT NULL AUTO_INCREMENT";
+                $default    = null;
+            } else {
+                $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
+            }
+            break;
+        case FieldType::Boolean:
+            $type       = "tinyint";
+            $length     = 1;
+            $attributes = "unsigned NOT NULL";
+            $default    = 0;
+            break;
+        case FieldType::Float:
+            $type       = "bigint";
+            $length     = 20;
+            $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
+            $default    = 0;
+            break;
+        case FieldType::String:
+        case FieldType::File:
+            $type       = "varchar";
+            $length     = $this->length > 0 ? $this->length : 255;
+            $attributes = "NOT NULL";
+            $default    = "";
+            break;
+        case FieldType::Text:
+            $type       = "text";
+            $attributes = "NULL";
+            break;
+        case FieldType::LongText:
+            $type       = "longtext";
+            $attributes = "NULL";
+            break;
+        case FieldType::JSON:
+            $type       = "mediumtext";
+            $attributes = "NULL";
+            break;
+        case FieldType::Encrypt:
+            $type       = "varbinary";
+            $length     = $this->length > 0 ? $this->length : 255;
+            $attributes = "NOT NULL";
+            break;
+        }
+
+        $result = $type;
+        if ($withLength && $length > 0) {
+            $result = "{$type}({$length}) $attributes";
+        } elseif ($attributes !== "") {
+            $result = "$type $attributes";
+        }
+
+        if ($result !== "unknown" && $default !== null) {
+            if (is_numeric($default)) {
+                $result .= " DEFAULT {$default}";
+            } else {
+                $result .= " DEFAULT '{$default}'";
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Field Values from the given Data
+     * @param array<string,mixed> $data
+     * @return array<string,string|integer|float|boolean|array<string|integer,mixed>>
+     */
+    public function toValues(array $data): array {
+        $key    = $this->prefixName;
+        $text   = isset($data[$key]) ? Strings::toString($data[$key]) : "";
+        $number = isset($data[$key]) ? Numbers::toInt($data[$key])    : 0;
+        $result = [];
+
+        switch ($this->type) {
+        case FieldType::Number:
+            $result[$key]           = $number;
+            break;
+        case FieldType::Boolean:
+            $result[$key]           = !Arrays::isEmpty($data, $key);
+            break;
+        case FieldType::Float:
+            $result[$key]           = Numbers::toFloat($number, $this->decimals);
+            break;
+        case FieldType::JSON:
+            $result[$key]           = JSON::decodeAsArray($text);
+            break;
+        case FieldType::Encrypt:
+            $result[$key]           = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
+            break;
+        case FieldType::File:
+            $result[$key]           = $text;
+            if ($this->filePath !== "") {
+                $result["{$key}Url"]   = $text !== "" ? FilePath::getUrl($this->filePath, $text) : "";
+            } else {
+                $result["{$key}Url"]   = $text !== "" ? Path::getSourceUrl("0", $text) : "";
+                $result["{$key}Thumb"] = $text !== "" ? Path::getThumbsUrl("0", $text) : "";
+            }
+            break;
+        default:
+            $result[$key]           = $text;
+        }
+
+        return $result;
+    }
+
+    /**
      * Generates the key of the field for the Schema
      * @param string $name
      * @return string
@@ -290,11 +431,57 @@ class Field {
 
 
     /**
+     * Returns the Data to build the Field
+     * @return string
+     */
+    public function getBuildData(): string {
+        $params = [
+            "name" => $this->name,
+            "type" => $this->type,
+        ];
+        if ($this->isID) {
+            $params["isID"] = $this->isID;
+        }
+        if ($this->notPrimary) {
+            $params["notPrimary"] = $this->notPrimary;
+        }
+        if ($this->decimals !== 2) {
+            $params["decimals"] = $this->decimals;
+        }
+        if ($this->filePath !== "") {
+            $params["filePath"] = $this->filePath;
+        }
+        if (!$this->canEdit) {
+            $params["canEdit"] = $this->canEdit;
+        }
+        if ($this->noEmpty) {
+            $params["noEmpty"] = $this->noEmpty;
+        }
+        if ($this->noExists) {
+            $params["noExists"] = $this->noExists;
+        }
+
+        $result = [];
+        foreach ($params as $key => $value) {
+            if ($value instanceof FieldType) {
+                $result[] = "$key: FieldType::{$value->name}";
+            } elseif (is_string($value)) {
+                $result[] = "$key: \"$value\"";
+            } elseif (is_bool($value)) {
+                $result[] = "$key: " . ($value ? "true" : "false");
+            } else {
+                $result[] = "$key: $value";
+            }
+        }
+        return Strings::join($result, ", ");
+    }
+
+    /**
      * Returns the Data as an Array
      * @return array<string,mixed>
      */
     public function toArray(): array {
-        $skips      = [ "key", "name", "prefixName", "type", "belongsTo", "otherKey", "isText", "isLongText", "isEncrypt", "isJSON", "isFile", "notPrimary" ];
+        $skips      = [ "name", "dbName", "prefixName", "type", "belongsTo", "otherKey", "isText", "isLongText", "isEncrypt", "isJSON", "isFile", "notPrimary" ];
         $properties = Discovery::getProperties($this);
         $defaults   = new Field();
         $result     = [

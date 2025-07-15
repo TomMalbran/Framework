@@ -12,7 +12,9 @@ use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
 use Framework\Database\SchemaModel;
 use Framework\Database\Query;{{#canEdit}}
-use Framework\Database\Assign;{{/canEdit}}{{#hasStatus}}
+use Framework\Database\Assign;{{/canEdit}}
+use Framework\Database\Model\Field;
+use Framework\Database\Model\FieldType;{{#hasStatus}}
 use Framework\System\Status;{{/hasStatus}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
@@ -41,6 +43,7 @@ class {{name}}Schema extends Schema {
     protected static function getModel(): SchemaModel {
         if (static::$model === null) {
             static::$model = new SchemaModel(
+                name:          "{{name}}",
                 hasUsers:      {{hasUsersValue}},
                 hasTimestamps: {{hasTimestampsValue}},
                 hasPositions:  {{hasPositionsValue}},
@@ -48,6 +51,11 @@ class {{name}}Schema extends Schema {
                 canCreate:     {{canCreateValue}},
                 canEdit:       {{canEditValue}},
                 canDelete:     {{canDeleteValue}},
+                mainFields:    [
+                {{#schemaFields}}
+                    new Field({{{.}}}),
+                {{/schemaFields}}
+                ],
             );
         }
         return static::$model;
@@ -71,9 +79,9 @@ class {{name}}Schema extends Schema {
             $entity->statusName  = Status::getName($entity->status);
             $entity->statusColor = Status::getColor($entity->status);
             {{/hasStatus}}
-            {{#hasVirtuals}}
+            {{#hasVirtual}}
             $entity = static::postProcess($entity);
-            {{/hasVirtuals}}
+            {{/hasVirtual}}
         }
         {{/processEntity}}
         return $entity;
@@ -116,7 +124,7 @@ class {{name}}Schema extends Schema {
     }
 
 {{/hasParents}}
-{{#hasVirtuals}}
+{{#hasVirtual}}
     /**
      * Post Process the Result
      * @param {{entity}} $entity
@@ -126,7 +134,7 @@ class {{name}}Schema extends Schema {
         return $entity;
     }
 
-{{/hasVirtuals}}
+{{/hasVirtual}}
 
 
 {{#hasID}}

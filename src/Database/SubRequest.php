@@ -11,7 +11,8 @@ use Framework\Utils\Dictionary;
  */
 class SubRequest {
 
-    private Structure $structure;
+    private SchemaModel $schemaModel;
+    private Structure   $structure;
 
     public  string $type     = "";
     public  string $name     = "";
@@ -36,13 +37,15 @@ class SubRequest {
 
     /**
      * Creates a new SubRequest instance
-     * @param Structure  $structure
-     * @param Dictionary $data
-     * @param string     $idKey
-     * @param string     $idName
+     * @param SchemaModel $schemaModel
+     * @param Structure   $structure
+     * @param Dictionary  $data
+     * @param string      $idKey
+     * @param string      $idName
      */
-    public function __construct(Structure $structure, Dictionary $data, string $idKey, string $idName) {
-        $this->structure = $structure;
+    public function __construct(SchemaModel $schemaModel, Structure $structure, Dictionary $data, string $idKey, string $idName) {
+        $this->schemaModel = $schemaModel;
+        $this->structure   = $structure;
 
         $this->name      = $data->getString("name");
         $this->type      = $data->getString("type", $structure->schema);
@@ -122,7 +125,7 @@ class SubRequest {
             return [];
         }
 
-        $selection = new Selection($this->structure);
+        $selection = new Selection($this->schemaModel, $this->structure);
         $selection->addFields();
         $selection->addExpressions();
         $selection->addJoins();
