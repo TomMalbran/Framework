@@ -34,7 +34,6 @@ class EmailQueueModel {
 
     public int $sentTime = 0;
 
-    #[Field(notPrimary: true)]
     public int $dataID = 0;
 
 

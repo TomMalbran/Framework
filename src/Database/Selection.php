@@ -77,8 +77,8 @@ class Selection {
      * @return Selection
      */
     public function addExpressions(): Selection {
-        foreach ($this->structure->expressions as $expression => $field) {
-            $this->selects[] = "($expression) AS $field->key";
+        foreach ($this->schemaModel->expressions as $expression) {
+            $this->selects[] = "({$expression->expression}) AS {$expression->name}";
         }
         return $this;
     }
@@ -138,11 +138,11 @@ class Selection {
      * @return Selection
      */
     public function addCounts(): Selection {
-        foreach ($this->structure->counts as $count) {
-            $asTable                 = chr($this->index++);
-            $this->joins[]           = $count->getExpression($asTable, $this->schemaModel->tableName);
-            $this->selects[]         = $count->getSelect($asTable);
-            $this->keys[$count->key] = $asTable;
+        foreach ($this->schemaModel->counts as $count) {
+            $asTable                  = chr($this->index++);
+            $this->joins[]            = $count->getExpression($asTable, $this->schemaModel->tableName);
+            $this->selects[]          = $count->getSelect($asTable);
+            $this->keys[$count->name] = $asTable;
         }
         return $this;
     }
@@ -213,11 +213,11 @@ class Selection {
             }
 
             if (!$found) {
-                foreach ($this->structure->counts as $count) {
-                    if (isset($this->keys[$count->key]) && $this->keys[$count->key] !== "") {
-                        $joinKey = $this->keys[$count->key];
-                        if ($column === $count->key) {
-                            $query->updateColumn($column, "$joinKey.{$count->key}");
+                foreach ($this->schemaModel->counts as $count) {
+                    if (isset($this->keys[$count->name]) && $this->keys[$count->name] !== "") {
+                        $joinKey = $this->keys[$count->name];
+                        if ($column === $count->name) {
+                            $query->updateColumn($column, $count->getSelect($joinKey));
                             $found = true;
                             break;
                         }
@@ -257,20 +257,20 @@ class Selection {
             }
 
             // Parse the Expressions
-            foreach ($this->structure->expressions as $field) {
-                $values = $field->toValues($row);
+            foreach ($this->schemaModel->expressions as $expression) {
+                $values = $expression->toValues($row);
                 $fields = array_merge($fields, $values);
             }
 
-            // Parse the Joins
+            // Parse the Relations
             foreach ($this->structure->joins as $join) {
                 $values = $join->toValues($row);
                 $fields = array_merge($fields, $values);
             }
 
             // Parse the Counts
-            foreach ($this->structure->counts as $count) {
-                $fields[$count->key] = $count->getValue($row);
+            foreach ($this->schemaModel->counts as $count) {
+                $fields[$count->name] = $count->getValue($row);
             }
 
             // Parse the Extras

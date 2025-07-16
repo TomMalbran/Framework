@@ -5,7 +5,6 @@ use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 use Framework\Database\Field;
 use Framework\Database\Join;
-use Framework\Database\Count;
 use Framework\Database\Model\FieldType;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -24,14 +23,8 @@ class Structure {
     /** @var Field[] */
     public array $fields       = [];
 
-    /** @var Field[] */
-    public array $expressions  = [];
-
     /** @var Join[] */
     public array $joins        = [];
-
-    /** @var Count[] */
-    public array $counts       = [];
 
     /** @var SubRequest[] */
     public array $subRequests  = [];
@@ -52,7 +45,7 @@ class Structure {
      */
     public function __construct(string $schema, Dictionary $data) {
         $this->schema        = $schema;
-        $this->table         = SchemaModel::getTableName($schema);
+        $this->table         = SchemaModel::getDbTableName($schema);
         $this->hasStatus     = $data->hasValue("hasStatus");
         $this->hasPositions  = $data->hasValue("hasPositions");
         $this->hasTimestamps = $data->hasValue("hasTimestamps");
@@ -142,20 +135,9 @@ class Structure {
             $this->fields[] = $field;
         }
 
-        // Create the Expressions
-        foreach ($data->getDict("expressions") as $key => $value) {
-            $expression = $value->getString("expression");
-            $this->expressions[$expression] = new Field($key, $value);
-        }
-
         // Create the Joins
         foreach ($data->getDict("joins") as $key => $value) {
             $this->joins[] = new Join($key, $value);
-        }
-
-        // Create the Counts
-        foreach ($data->getDict("counts") as $key => $value) {
-            $this->counts[] = new Count($key, $value);
         }
 
         // Create the SubRequests

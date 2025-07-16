@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Model;
 
-use Framework\Database\Model\Field;
+use Framework\Database\SchemaModel;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -22,6 +22,7 @@ class SubRequest {
     // Used internally when parsing the Model
     public string $name       = "";
     public string $type       = "";
+    public string $namespace  = "";
 
 
 
@@ -69,6 +70,18 @@ class SubRequest {
     }
 
     /**
+     * Sets the Model for the SubRequest
+     * @param SchemaModel $relatedModel
+     * @return SubRequest
+     */
+    public function setModel(SchemaModel $relatedModel): SubRequest {
+        $this->namespace = $relatedModel->namespace;
+        return $this;
+    }
+
+
+
+    /**
      * Returns the Data as an Array
      * @return array<string,mixed>
      */
@@ -80,7 +93,7 @@ class SubRequest {
             $result["type"] = $this->type;
         }
         if ($this->idName !== "") {
-            $result["idKey"]  = Field::generateKey($this->idName);
+            $result["idKey"]  = SchemaModel::getDbFieldName($this->idName);
             $result["idName"] = $this->idName;
         }
         if ($this->fieldName !== "") {

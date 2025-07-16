@@ -69,8 +69,8 @@ class Migration {
         $didMove      = false;
 
         for ($i = $startMovement; $i < $lastMovement; $i++) {
-            $fromName = SchemaModel::getTableName($movements[$i]["from"]);
-            $toName   = SchemaModel::getTableName($movements[$i]["to"]);
+            $fromName = SchemaModel::getDbTableName($movements[$i]["from"]);
+            $toName   = SchemaModel::getDbTableName($movements[$i]["to"]);
 
             if ($db->tableExists($fromName)) {
                 $db->renameTable($fromName, $toName);
@@ -99,7 +99,7 @@ class Migration {
         $didRename  = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
-            $table    = SchemaModel::getTableName($renames[$i]["schema"]);
+            $table    = SchemaModel::getDbTableName($renames[$i]["schema"]);
             $fromName = $renames[$i]["from"];
             $toName   = $renames[$i]["to"];
 

@@ -42,12 +42,12 @@ class Join {
      */
     public function __construct(string $key, Dictionary $data) {
         $this->key        = $key;
-        $this->table      = SchemaModel::getTableName($data->getString("schema"));
-        $this->asTable    = SchemaModel::getTableName($data->getString("asSchema"));
-        $this->onTable    = SchemaModel::getTableName($data->getString("onSchema"));
+        $this->table      = SchemaModel::getDbTableName($data->getString("schema"));
+        $this->asTable    = SchemaModel::getDbTableName($data->getString("asSchema"));
+        $this->onTable    = SchemaModel::getDbTableName($data->getString("onSchema"));
         $this->leftKey    = $data->getString("leftKey", $key);
         $this->rightKey   = $data->getString("rightKey", $key);
-        $this->andTable   = SchemaModel::getTableName($data->getString("andSchema"));
+        $this->andTable   = SchemaModel::getDbTableName($data->getString("andSchema"));
         $this->and        = $data->getString("and");
         $this->andKey     = $data->getString("andKey");
         $this->andKeys    = $data->getStrings("andKeys");
