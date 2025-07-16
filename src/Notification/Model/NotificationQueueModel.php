@@ -33,7 +33,6 @@ class NotificationQueueModel {
 
     public string $dataType = "";
 
-    #[Field(notPrimary: true)]
     public int $dataID = 0;
 
     public string $notificationResult = "";

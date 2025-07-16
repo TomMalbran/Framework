@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Model;
 
-use Framework\Discovery\Discovery;
+use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
 use Framework\File\FilePath;
 use Framework\System\Path;
@@ -92,45 +92,32 @@ class Field {
     // FIXME: Remove this temporary properties
     public bool   $noEmpty    = false;
     public bool   $noExists   = false;
-    public bool   $notPrimary = false;
-
-
-    // Used internally when parsing the Model
-    public FieldType $type       = FieldType::String;
-    public string    $name       = "";
-    public string    $dbName     = "";
-    public string    $prefixName = "";
-    public bool      $noPrefix   = false;
-
 
 
     /**
      * The Field Attribute
-     * @param boolean   $isParent   Optional.
-     * @param boolean   $isUnique   Optional.
-     * @param string    $belongsTo  Optional.
-     * @param string    $otherKey   Optional.
-     * @param boolean   $isID       Optional.
-     * @param boolean   $isPrimary  Optional.
-     * @param boolean   $isKey      Optional.
-     * @param int       $length     Optional.
-     * @param boolean   $isSigned   Optional.
-     * @param int       $decimals   Optional.
-     * @param boolean   $isText     Optional.
-     * @param boolean   $isLongText Optional.
-     * @param boolean   $isEncrypt  Optional.
-     * @param boolean   $isJSON     Optional.
-     * @param boolean   $isFile     Optional.
-     * @param string    $dateType   Optional.
-     * @param string    $dateInput  Optional.
-     * @param string    $hourInput  Optional.
-     * @param string    $filePath   Optional.
-     * @param boolean   $canEdit    Optional.
-     * @param boolean   $noEmpty    Optional.
-     * @param boolean   $noExists   Optional.
-     * @param boolean   $notPrimary Optional.
-     * @param string    $name       Optional.
-     * @param FieldType $type       Optional.
+     * @param boolean $isParent   Optional.
+     * @param boolean $isUnique   Optional.
+     * @param string  $belongsTo  Optional.
+     * @param string  $otherKey   Optional.
+     * @param boolean $isID       Optional.
+     * @param boolean $isPrimary  Optional.
+     * @param boolean $isKey      Optional.
+     * @param int     $length     Optional.
+     * @param boolean $isSigned   Optional.
+     * @param int     $decimals   Optional.
+     * @param boolean $isText     Optional.
+     * @param boolean $isLongText Optional.
+     * @param boolean $isEncrypt  Optional.
+     * @param boolean $isJSON     Optional.
+     * @param boolean $isFile     Optional.
+     * @param string  $dateType   Optional.
+     * @param string  $dateInput  Optional.
+     * @param string  $hourInput  Optional.
+     * @param string  $filePath   Optional.
+     * @param boolean $canEdit    Optional.
+     * @param boolean $noEmpty    Optional.
+     * @param boolean $noExists   Optional.
      */
     public function __construct(
         bool   $isParent   = false,
@@ -160,10 +147,6 @@ class Field {
         bool   $canEdit    = true,
         bool   $noEmpty    = false,
         bool   $noExists   = false,
-        bool   $notPrimary = false,
-
-        string    $name    = "",
-        FieldType $type    = FieldType::String,
     ) {
         $this->isParent   = $isParent;
         $this->isUnique   = $isUnique;
@@ -192,11 +175,78 @@ class Field {
         $this->canEdit    = $canEdit;
         $this->noEmpty    = $noEmpty;
         $this->noExists   = $noExists;
-        $this->notPrimary = $notPrimary;
+    }
 
-        $this->type       = $type;
-        $this->name       = $name;
-        $this->dbName     = $this->getDbName($name);
+
+
+    // Used internally when parsing the Model
+    public FieldType $type       = FieldType::String;
+    public string    $name       = "";
+    public string    $dbName     = "";
+    public string    $prefixName = "";
+
+
+    /**
+     * Creates a Field
+     * @param string    $name      Optional.
+     * @param string    $dbName    Optional.
+     * @param FieldType $type      Optional.
+     * @param boolean   $isID      Optional.
+     * @param boolean   $isPrimary Optional.
+     * @param boolean   $isKey     Optional.
+     * @param int       $length    Optional.
+     * @param boolean   $isSigned  Optional.
+     * @param int       $decimals  Optional.
+     * @param string    $dateType  Optional.
+     * @param string    $dateInput Optional.
+     * @param string    $hourInput Optional.
+     * @param string    $filePath  Optional.
+     * @param boolean   $canEdit   Optional.
+     * @param boolean   $noEmpty   Optional.
+     * @param boolean   $noExists  Optional.
+     * @return Field
+     */
+    public static function create(
+        string    $name   = "",
+        string    $dbName = "",
+        FieldType $type   = FieldType::String,
+
+        bool   $isID      = false,
+        bool   $isPrimary = false,
+        bool   $isKey     = false,
+
+        int    $length    = 0,
+        bool   $isSigned  = false,
+        int    $decimals  = 2,
+
+        string $dateType  = "",
+        string $dateInput = "",
+        string $hourInput = "",
+        string $filePath  = "",
+
+        bool   $canEdit   = true,
+        bool   $noEmpty   = false,
+        bool   $noExists  = false,
+    ): Field {
+        $result = new self(
+            isID:      $isID,
+            isPrimary: $isPrimary,
+            isKey:     $isKey,
+            length:    $length,
+            isSigned:  $isSigned,
+            decimals:  $decimals,
+            dateType:  $dateType,
+            dateInput: $dateInput,
+            hourInput: $hourInput,
+            filePath:  $filePath,
+            canEdit:   $canEdit,
+            noEmpty:   $noEmpty,
+            noExists:  $noExists,
+        );
+        $result->type   = $type;
+        $result->name   = $name;
+        $result->dbName = $dbName !== "" ? $dbName : $name;
+        return $result;
     }
 
     /**
@@ -206,6 +256,9 @@ class Field {
      * @return Field
      */
     public function setData(string $name, string $typeName): Field {
+        $this->name   = $name;
+        $this->dbName = $name;
+
         switch ($typeName) {
         case "bool":
             $this->type = FieldType::Boolean;
@@ -240,27 +293,16 @@ class Field {
             break;
         }
 
-        $this->name   = $name;
-        $this->dbName = $this->getDbName($name);
         return $this;
     }
 
     /**
-     * Returns the name of the field for the Database
-     * @param string $name
-     * @return string
+     * Sets the Database Name of the Field
+     * @return Field
      */
-    private function getDbName(string $name): string {
-        // If the field is not a primary key, we don't convert the name
-        if ($this->notPrimary) {
-            return $name;
-        }
-        // Assume is a primary field if is an ID or Number that ends with "ID"
-        if ($this->isSchemaID()) {
-            return self::generateKey($name);
-        }
-        // Use the name as it is
-        return $name;
+    public function setDbName(): Field {
+        $this->dbName = SchemaModel::getDbFieldName($this->name);
+        return $this;
     }
 
 
@@ -270,9 +312,7 @@ class Field {
      * @return bool
      */
     public function isSchemaID(): bool {
-        return $this->isID || (
-            $this->type === FieldType::Number && Strings::endsWith($this->name, "ID")
-        );
+        return $this->name !== $this->dbName;
     }
 
     /**
@@ -385,22 +425,22 @@ class Field {
 
         switch ($this->type) {
         case FieldType::Number:
-            $result[$key]           = $number;
+            $result[$key] = $number;
             break;
         case FieldType::Boolean:
-            $result[$key]           = !Arrays::isEmpty($data, $key);
+            $result[$key] = !Arrays::isEmpty($data, $key);
             break;
         case FieldType::Float:
-            $result[$key]           = Numbers::toFloat($number, $this->decimals);
+            $result[$key] = Numbers::toFloat($number, $this->decimals);
             break;
         case FieldType::JSON:
-            $result[$key]           = JSON::decodeAsArray($text);
+            $result[$key] = JSON::decodeAsArray($text);
             break;
         case FieldType::Encrypt:
-            $result[$key]           = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
+            $result[$key] = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
             break;
         case FieldType::File:
-            $result[$key]           = $text;
+            $result[$key] = $text;
             if ($this->filePath !== "") {
                 $result["{$key}Url"]   = $text !== "" ? FilePath::getUrl($this->filePath, $text) : "";
             } else {
@@ -409,71 +449,54 @@ class Field {
             }
             break;
         default:
-            $result[$key]           = $text;
+            $result[$key] = $text;
         }
 
         return $result;
     }
 
-    /**
-     * Generates the key of the field for the Schema
-     * @param string $name
-     * @return string
-     */
-    public static function generateKey(string $name): string {
-        if (Strings::endsWith($name, "ID")) {
-            $name = Strings::replace($name, "ID", "Id");
-            $name = Strings::camelCaseToUpperCase($name);
-        }
-        return $name;
-    }
-
 
 
     /**
-     * Returns the Data to build the Field
-     * @return string
+     * Returns the Data to build a Field
+     * @return array<string,mixed>
      */
-    public function getBuildData(): string {
-        $params = [
+    public function toBuildData(): array {
+        $result = [
             "name" => $this->name,
             "type" => $this->type,
         ];
-        if ($this->isID) {
-            $params["isID"] = $this->isID;
+        if ($this->name !== $this->dbName) {
+            $result["dbName"] = $this->dbName;
         }
-        if ($this->notPrimary) {
-            $params["notPrimary"] = $this->notPrimary;
+        if ($this->isID) {
+            $result["isID"] = $this->isID;
         }
         if ($this->decimals !== 2) {
-            $params["decimals"] = $this->decimals;
+            $result["decimals"] = $this->decimals;
+        }
+        if ($this->dateType !== "") {
+            $result["dateType"] = $this->dateType;
+        }
+        if ($this->dateInput !== "") {
+            $result["dateInput"] = $this->dateInput;
+        }
+        if ($this->hourInput !== "") {
+            $result["hourInput"] = $this->hourInput;
         }
         if ($this->filePath !== "") {
-            $params["filePath"] = $this->filePath;
+            $result["filePath"] = $this->filePath;
         }
         if (!$this->canEdit) {
-            $params["canEdit"] = $this->canEdit;
+            $result["canEdit"] = $this->canEdit;
         }
         if ($this->noEmpty) {
-            $params["noEmpty"] = $this->noEmpty;
+            $result["noEmpty"] = $this->noEmpty;
         }
         if ($this->noExists) {
-            $params["noExists"] = $this->noExists;
+            $result["noExists"] = $this->noExists;
         }
-
-        $result = [];
-        foreach ($params as $key => $value) {
-            if ($value instanceof FieldType) {
-                $result[] = "$key: FieldType::{$value->name}";
-            } elseif (is_string($value)) {
-                $result[] = "$key: \"$value\"";
-            } elseif (is_bool($value)) {
-                $result[] = "$key: " . ($value ? "true" : "false");
-            } else {
-                $result[] = "$key: $value";
-            }
-        }
-        return Strings::join($result, ", ");
+        return $result;
     }
 
     /**
@@ -481,23 +504,56 @@ class Field {
      * @return array<string,mixed>
      */
     public function toArray(): array {
-        $skips      = [ "name", "dbName", "prefixName", "type", "belongsTo", "otherKey", "isText", "isLongText", "isEncrypt", "isJSON", "isFile", "notPrimary" ];
-        $properties = Discovery::getProperties($this);
-        $defaults   = new Field();
-        $result     = [
+        $result = [
             "type" => $this->type->getName(),
         ];
+        if ($this->isID) {
+            $result["isID"] = true;
+        }
+        if ($this->isPrimary && !$this->isID) {
+            $result["isPrimary"] = true;
+        }
+        if ($this->isKey) {
+            $result["isKey"] = true;
+        }
 
-        foreach ($properties as $name => $type) {
-            if (Arrays::contains($skips, $name)) {
-                continue;
-            }
+        if ($this->length > 0) {
+            $result["length"] = $this->length;
+        }
+        if ($this->isSigned) {
+            $result["isSigned"] = true;
+        }
+        if ($this->decimals !== 2) {
+            $result["decimals"] = $this->decimals;
+        }
 
-            if ($name === "canEdit" && !$this->canEdit) {
-                $result["cantEdit"] = true;
-            } elseif ($defaults->$name !== $this->$name) {
-                $result[$name] = $this->$name;
-            }
+        if ($this->dateType !== "") {
+            $result["dateType"] = $this->dateType;
+        }
+        if ($this->dateInput !== "") {
+            $result["dateInput"] = $this->dateInput;
+        }
+        if ($this->hourInput !== "") {
+            $result["hourInput"] = $this->hourInput;
+        }
+        if ($this->filePath !== "") {
+            $result["path"] = $this->filePath;
+        }
+
+        if ($this->isUnique) {
+            $result["isUnique"] = true;
+        }
+        if ($this->isParent) {
+            $result["isParent"] = true;
+        }
+        if ($this->noExists) {
+            $result["noExists"] = true;
+        }
+        if ($this->noEmpty) {
+            $result["noEmpty"] = true;
+        }
+        if (!$this->canEdit) {
+            $result["cantEdit"] = true;
         }
         return $result;
     }

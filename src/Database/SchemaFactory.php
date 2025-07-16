@@ -64,10 +64,11 @@ class SchemaFactory {
 
         // Parse the Reflections
         foreach ($reflections as $className => $reflection) {
-            $parent    = $reflection->getParentClass();
-            $fileName  = "";
-            $namespace = "";
-            $modelAttr = null;
+            $parent        = $reflection->getParentClass();
+            $fileName      = "";
+            $namespace     = "";
+            $fromFramework = false;
+            $modelAttr     = null;
 
             // Get the Data from the Class
             if ($parent === false) {
@@ -78,10 +79,11 @@ class SchemaFactory {
 
             // Get some data from the Parent Class
             } else {
-                $fileName    = $parent->getFileName();
-                $namespace   = $parent->getNamespaceName();
-                $parentAttrs = $parent->getAttributes(Model::class);
-                $modelAttr   = $parentAttrs[0] ?? null;
+                $fileName      = $parent->getFileName();
+                $namespace     = $parent->getNamespaceName();
+                $parentAttrs   = $parent->getAttributes(Model::class);
+                $modelAttr     = $parentAttrs[0] ?? null;
+                $fromFramework = true;
             }
             if ($fileName === false || $modelAttr === null) {
                 continue;
@@ -199,6 +201,7 @@ class SchemaFactory {
                 name:          $name,
                 path:          $path,
                 namespace:     $namespace,
+                fromFramework: $fromFramework,
                 hasUsers:      $model->hasUsers,
                 hasTimestamps: $model->hasTimestamps,
                 hasPositions:  $hasPositions,
@@ -220,6 +223,26 @@ class SchemaFactory {
             }
         }
 
+        // Update the Models using the Models IDs
+        foreach ($schemaModels as $schemaModel) {
+            foreach ($schemaModel->mainFields as $field) {
+                if (!$field->isID && $field->belongsTo === "") {
+                    $field->belongsTo = $modelIDs[$field->name] ?? "";
+                }
+                if (isset($modelIDs[$field->name]) || $field->belongsTo !== "") {
+                    $field->setDbName();
+                } else {
+                    foreach ($schemaModel->relations as $relation) {
+                        if ($relation->myKey === $field->name && isset($modelIDs[$relation->otherKey])) {
+                            $field->setDbName();
+                            break;
+                        }
+                    }
+                }
+            }
+            $schemaModel->setIDField();
+        }
+
         // Parse the Models using the Models created
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->relations as $relation) {
@@ -229,14 +252,15 @@ class SchemaFactory {
                 }
             }
             foreach ($schemaModel->counts as $count) {
-                $countModel = $schemaModels[$count->schemaName] ?? null;
-                if ($countModel !== null) {
-                    $count->model = $countModel;
+                $relatedModel = $schemaModels[$count->schemaName] ?? null;
+                if ($relatedModel !== null) {
+                    $count->setModel($relatedModel);
                 }
             }
-            foreach ($schemaModel->mainFields as $field) {
-                if (!$field->isID && $field->belongsTo === "") {
-                    $field->belongsTo = $modelIDs[$field->name] ?? "";
+            foreach ($schemaModel->subRequests as $subRequest) {
+                $relatedModel = $schemaModels[$subRequest->schemaName] ?? null;
+                if ($relatedModel !== null) {
+                    $subRequest->setModel($relatedModel);
                 }
             }
         }

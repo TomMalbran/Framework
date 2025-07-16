@@ -168,38 +168,40 @@ class Relation {
         $withTimestamps = Arrays::contains($this->fieldNames, [ "createdTime", "modifiedTime" ], atLeastOne: true);
         $withDeleted    = $this->withDeleted || Arrays::contains($this->fieldNames, "isDeleted");
         $fields         = $relatedModel->getFields($withTimestamps, $withDeleted);
-        $parentFields   = $parentModel->getFields(true, true);
+        $parentFields   = $parentModel->getFields(false, false);
         $hasFields      = count($this->fieldNames) > 0;
+
+        $parentFieldNames = [];
+        foreach ($parentFields as $field) {
+            $parentFieldNames[] = $field->name;
+        }
 
         foreach ($fields as $field) {
             if ($field->isID) {
                 continue;
             }
 
-            $fieldName  = $field->dbName;
-            $prefixName = $fieldName;
-            if ($this->withPrefix) {
-                $prefixName = $this->prefix . Strings::upperCaseFirst($fieldName);
-            }
+            $prefixName = $this->prefix . Strings::upperCaseFirst($field->name);
+            $fieldName  = $this->withPrefix ? $prefixName : $field->name;
 
             if ($hasFields && !Arrays::contains($this->fieldNames, $field->name)) {
                 continue;
             }
-            if (!$hasFields && Arrays::contains($parentFields, $prefixName)) {
+            if (!$hasFields && Arrays::contains($parentFieldNames, $fieldName)) {
                 continue;
             }
 
-            if ($this->withPrefix && !Arrays::contains($parentFields, $fieldName) && (
+            if ($this->withPrefix && !Arrays::contains($parentFieldNames, $field->name) && (
                 $field->isSchemaID() ||
                 Strings::startsWith($field->name, $this->prefix) ||
                 Arrays::contains($this->withoutPrefix, $field->name)
             )) {
-                $field->noPrefix = true;
-                $prefixName      = $fieldName;
+                $fieldName = $field->name;
             }
 
-            $field->prefixName = $prefixName;
-            $this->fields[]    = $field;
+            $newField = clone $field;
+            $newField->prefixName = $fieldName;
+            $this->fields[] = $newField;
         }
 
         return $this;
@@ -225,10 +227,10 @@ class Relation {
      */
     public function getKey(): string {
         if ($this->key !== "") {
-            return Field::generateKey($this->key);
+            return SchemaModel::getDbFieldName($this->key);
         }
         if ($this->myKey !== "") {
-            return Field::generateKey($this->myKey);
+            return SchemaModel::getDbFieldName($this->myKey);
         }
         if ($this->relatedModel !== null) {
             return $this->relatedModel->idKey;
@@ -240,12 +242,12 @@ class Relation {
      * Returns the Name of the Table
      * @return string
      */
-    public function getTableName(): string {
+    public function getDbTableName(): string {
         $schemaName = $this->schemaName;
         if ($this->asSchema !== "") {
             $schemaName = $this->asSchema;
         }
-        return SchemaModel::getTableName($schemaName);
+        return SchemaModel::getDbTableName($schemaName);
     }
 
     /**
@@ -260,14 +262,13 @@ class Relation {
         $fields = [];
         foreach ($this->fields as $field) {
             $fieldData = [ "type" => $field->type->getName() ];
-            if ($field->noPrefix) {
+            if ($this->withPrefix && $field->name === $field->prefixName) {
                 $fieldData["noPrefix"] = true;
             }
             if ($field->decimals !== 2) {
                 $fieldData["decimals"] = $field->decimals;
             }
-
-            $fields[$field->name] = $fieldData;
+            $fields[$field->dbName] = $fieldData;
         }
 
         $result = [
@@ -283,23 +284,23 @@ class Relation {
         }
 
         if ($this->myKey !== "") {
-            $result["rightKey"] = Field::generateKey($this->myKey);
+            $result["rightKey"] = SchemaModel::getDbFieldName($this->myKey);
         }
         if ($this->otherKey !== "") {
-            $result["leftKey"] = Field::generateKey($this->otherKey);
+            $result["leftKey"] = SchemaModel::getDbFieldName($this->otherKey);
         }
 
         if ($this->andSchema !== "") {
             $result["andSchema"] = $this->andSchema;
         }
         if ($this->andKey !== "") {
-            $result["andKey"] = Field::generateKey($this->andKey);
+            $result["andKey"] = SchemaModel::getDbFieldName($this->andKey);
         }
         if ($this->andValue !== "") {
-            $result["andValue"] = Field::generateKey($this->andValue);
+            $result["andValue"] = SchemaModel::getDbFieldName($this->andValue);
         }
         if (count($this->andKeys) > 0) {
-            $result["andKeys"] = array_map(fn($key) => Field::generateKey($key), $this->andKeys);
+            $result["andKeys"] = array_map(fn($key) => SchemaModel::getDbFieldName($key), $this->andKeys);
         }
         if ($this->andDeleted) {
             $result["andDeleted"] = true;

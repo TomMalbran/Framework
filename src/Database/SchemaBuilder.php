@@ -6,7 +6,6 @@ use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
-use Framework\Database\Model\SubRequest;
 use Framework\File\File;
 use Framework\Provider\Mustache;
 use Framework\Utils\Arrays;
@@ -24,23 +23,22 @@ class SchemaBuilder {
      */
     public static function generateCode(bool $forFramework): int {
         $schemaModels = SchemaFactory::buildData($forFramework);
-        $namespaces   = [];
         $created      = 0;
 
         foreach ($schemaModels as $schemaModel) {
-            $namespaces[$schemaModel->name] = $schemaModel->namespace;
-
-            File::createDir($schemaModel->path);
-            File::emptyDir($schemaModel->path);
+            if (!$schemaModel->fromFramework) {
+                File::createDir($schemaModel->path);
+                File::emptyDir($schemaModel->path);
+            }
         }
 
         foreach ($schemaModels as $schemaModel) {
             $schemaName = "{$schemaModel->name}Schema.php";
-            $schemaCode = self::getSchemaCode($schemaModel, $namespaces);
+            $schemaCode = self::getSchemaCode($schemaModel);
             File::create($schemaModel->path, $schemaName, $schemaCode);
 
             $entityName = "{$schemaModel->name}Entity.php";
-            $entityCode = self::getEntityCode($schemaModel, $namespaces);
+            $entityCode = self::getEntityCode($schemaModel);
             File::create($schemaModel->path, $entityName, $entityCode);
 
             $columnName = "{$schemaModel->name}Column.php";
@@ -63,24 +61,25 @@ class SchemaBuilder {
 
     /**
      * Returns the Schema code
-     * @param SchemaModel          $schemaModel
-     * @param array<string,string> $nameSpaces
+     * @param SchemaModel $schemaModel
      * @return string
      */
-    private static function getSchemaCode(SchemaModel $schemaModel, array $nameSpaces): string {
-        $idType       = self::getFieldType($schemaModel->idType);
-        $schemaFields = self::getSchemaFields($schemaModel);
-        $fields       = self::getAllFields($schemaModel);
-        $uniques      = self::getSomeFields($schemaModel, isUnique: true);
-        $parents      = self::getSomeFields($schemaModel, isParent: true);
-        $subTypes     = self::getSubTypes($schemaModel->subRequests, $nameSpaces);
-        $hasVirtual   = count($schemaModel->virtualFields) > 0;
-        $hasParents   = count($parents) > 0;
-        $editParents  = $schemaModel->hasPositions ? $parents : [];
-        $queryName    = "{$schemaModel->name}Query";
+    private static function getSchemaCode(SchemaModel $schemaModel): string {
+        $mainFields  = $schemaModel->toBuildData("mainFields");
+        $expressions = $schemaModel->toBuildData("expressions");
+        $counts      = $schemaModel->toBuildData("counts");
+        $idType      = self::getFieldType($schemaModel->idType);
+        $fields      = self::getAllFields($schemaModel);
+        $uniques     = self::getSomeFields($schemaModel, isUnique: true);
+        $parents     = self::getSomeFields($schemaModel, isParent: true);
+        $subTypes    = self::getSubTypes($schemaModel);
+        $hasVirtual  = count($schemaModel->virtualFields) > 0;
+        $hasParents  = count($parents) > 0;
+        $editParents = $schemaModel->hasPositions ? $parents : [];
+        $queryName   = "{$schemaModel->name}Query";
 
-        $template     = Discovery::loadFrameTemplate("Schema.mu");
-        $contents     = Mustache::render($template, [
+        $template    = Discovery::loadFrameTemplate("Schema.mu");
+        $contents    = Mustache::render($template, [
             "namespace"          => $schemaModel->namespace,
             "name"               => $schemaModel->name,
             "table"              => $schemaModel->tableName,
@@ -117,7 +116,11 @@ class SchemaBuilder {
             "processEntity"      => count($subTypes) > 0 || $hasVirtual || $schemaModel->hasStatus,
             "subTypes"           => $subTypes,
             "hasVirtual"         => $hasVirtual,
-            "schemaFields"       => $schemaFields,
+            "mainFields"         => $mainFields,
+            "hasExpressions"     => count($expressions) > 0,
+            "expressions"        => $expressions,
+            "hasCounts"          => count($counts) > 0,
+            "counts"             => $counts,
             "fields"             => $fields,
             "fieldsCreateList"   => self::joinFields($fields, "fieldArgCreate", ", "),
             "fieldsEditList"     => self::joinFields($fields, "fieldArgEdit", ", "),
@@ -139,33 +142,19 @@ class SchemaBuilder {
 
     /**
      * Returns the Sub Types from the Sub Requests
-     * @param SubRequest[]         $subRequests
-     * @param array<string,string> $namespaces
+     * @param SchemaModel $schemaModel
      * @return array{name:string,type:string,namespace:string}[]
      */
-    private static function getSubTypes(array $subRequests, array $namespaces): array {
+    private static function getSubTypes(SchemaModel $schemaModel): array {
         $result = [];
-        foreach ($subRequests as $subRequest) {
-            if (!Strings::contains($subRequest->type, "<", "[")) {
+        foreach ($schemaModel->subRequests as $subRequest) {
+            if ($subRequest->type === "") {
                 $result[] = [
                     "name"      => $subRequest->name,
-                    "type"      => $subRequest->type,
-                    "namespace" => $namespaces[$subRequest->type] ?? "",
+                    "type"      => $subRequest->schemaName,
+                    "namespace" => $subRequest->namespace,
                 ];
             }
-        }
-        return $result;
-    }
-
-    /**
-     * Returns a list of Fields for the Schema
-     * @param SchemaModel $schemaModel
-     * @return string[]
-     */
-    private static function getSchemaFields(SchemaModel $schemaModel): array {
-        $result = [];
-        foreach ($schemaModel->mainFields as $field) {
-            $result[] = $field->getBuildData();
         }
         return $result;
     }
@@ -312,17 +301,16 @@ class SchemaBuilder {
 
     /**
      * Returns the Entity code
-     * @param SchemaModel          $schemaModel
-     * @param array<string,string> $namespaces
+     * @param SchemaModel $schemaModel
      * @return string
      */
-    private static function getEntityCode(SchemaModel $schemaModel, array $namespaces): string {
+    private static function getEntityCode(SchemaModel $schemaModel): string {
         $template = Discovery::loadFrameTemplate("Entity.mu");
         $contents = Mustache::render($template, [
             "namespace"  => $schemaModel->namespace,
             "name"       => $schemaModel->name,
             "id"         => $schemaModel->idName,
-            "subTypes"   => self::getSubTypes($schemaModel->subRequests, $namespaces),
+            "subTypes"   => self::getSubTypes($schemaModel),
             "attributes" => self::getAttributes($schemaModel),
         ]);
         return $contents;
@@ -364,8 +352,8 @@ class SchemaBuilder {
         }
         foreach ($schemaModel->subRequests as $subRequest) {
             $type = $subRequest->type;
-            if (!Strings::contains($type, "<", "[")) {
-                $type .= "Entity[]";
+            if ($type === "") {
+                $type = "{$subRequest->schemaName}Entity[]";
             }
             $result[] = self::getTypeData($subRequest->name, "array", $type);
         }
@@ -507,7 +495,7 @@ class SchemaBuilder {
 
         foreach ($schemaModel->relations as $relation) {
             $addSpace  = true;
-            $tableName = $relation->getTableName();
+            $tableName = $relation->getDbTableName();
             foreach ($relation->fields as $field) {
                 $result[] = [
                     "name"     => Strings::upperCaseFirst($field->prefixName),
@@ -578,7 +566,7 @@ class SchemaBuilder {
         }
 
         foreach ($schemaModel->relations as $relation) {
-            $tableName = $relation->getTableName();
+            $tableName = $relation->getDbTableName();
             foreach ($relation->fields as $field) {
                 $list[] = [
                     "type"   => $field->type,

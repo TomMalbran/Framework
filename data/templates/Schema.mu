@@ -14,7 +14,9 @@ use Framework\Database\SchemaModel;
 use Framework\Database\Query;{{#canEdit}}
 use Framework\Database\Assign;{{/canEdit}}
 use Framework\Database\Model\Field;
-use Framework\Database\Model\FieldType;{{#hasStatus}}
+use Framework\Database\Model\FieldType;{{#hasExpressions}}
+use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
+use Framework\Database\Model\Count;{{/hasCounts}}{{#hasStatus}}
 use Framework\System\Status;{{/hasStatus}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
@@ -52,10 +54,24 @@ class {{name}}Schema extends Schema {
                 canEdit:       {{canEditValue}},
                 canDelete:     {{canDeleteValue}},
                 mainFields:    [
-                {{#schemaFields}}
-                    new Field({{{.}}}),
-                {{/schemaFields}}
+                {{#mainFields}}
+                    Field::create({{{.}}}),
+                {{/mainFields}}
                 ],
+                {{#hasExpressions}}
+                expressions:   [
+                {{#expressions}}
+                    Expression::create({{{.}}}),
+                {{/expressions}}
+                ],
+                {{/hasExpressions}}
+                {{#hasCounts}}
+                counts:        [
+                {{#counts}}
+                    Count::create({{{.}}}),
+                {{/counts}}
+                ],
+                {{/hasCounts}}
             );
         }
         return static::$model;

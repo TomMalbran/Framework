@@ -20,7 +20,10 @@ class SchemaModel {
     public string $tableName     = "";
     public string $path          = "";
     public string $namespace     = "";
+    public bool   $fromFramework = false;
 
+
+    // Special flags
     public bool $hasUsers        = false;
     public bool $hasTimestamps   = false;
     public bool $hasPositions    = false;
@@ -69,6 +72,7 @@ class SchemaModel {
      * @param string       $name          Optional.
      * @param string       $path          Optional.
      * @param string       $namespace     Optional.
+     * @param boolean      $fromFramework Optional.
      * @param boolean      $hasUsers      Optional.
      * @param boolean      $hasTimestamps Optional.
      * @param boolean      $hasPositions  Optional.
@@ -84,29 +88,31 @@ class SchemaModel {
      * @param SubRequest[] $subRequests   Optional.
      */
     public function __construct(
-        string $name         = "",
-        string $path         = "",
-        string $namespace    = "",
+        string $name          = "",
+        string $path          = "",
+        string $namespace     = "",
+        bool   $fromFramework = false,
 
-        bool $hasUsers       = false,
-        bool $hasTimestamps  = false,
-        bool $hasPositions   = false,
-        bool $hasStatus      = false,
-        bool $canCreate      = false,
-        bool $canEdit        = false,
-        bool $canDelete      = false,
+        bool   $hasUsers      = false,
+        bool   $hasTimestamps = false,
+        bool   $hasPositions  = false,
+        bool   $hasStatus     = false,
+        bool   $canCreate     = false,
+        bool   $canEdit       = false,
+        bool   $canDelete     = false,
 
-        array $mainFields    = [],
-        array $virtualFields = [],
-        array $expressions   = [],
-        array $counts        = [],
-        array $relations     = [],
-        array $subRequests   = [],
+        array  $mainFields    = [],
+        array  $virtualFields = [],
+        array  $expressions   = [],
+        array  $counts        = [],
+        array  $relations     = [],
+        array  $subRequests   = [],
     ) {
         $this->name          = $name;
-        $this->tableName     = self::getTableName($name);
+        $this->tableName     = self::getDbTableName($name);
         $this->path          = $path;
         $this->namespace     = $namespace;
+        $this->fromFramework = $fromFramework;
 
         $this->hasUsers      = $hasUsers;
         $this->hasTimestamps = $hasTimestamps;
@@ -138,54 +144,54 @@ class SchemaModel {
      */
     private function setExtraFields(): SchemaModel {
         if ($this->hasPositions) {
-            $this->extraFields[] = new Field(
-                name: "position",
+            $this->extraFields[] = Field::create(
                 type: FieldType::Number,
+                name: "position",
             );
         }
         if ($this->hasStatus) {
-            $this->extraFields[] = new Field(
-                name:    "status",
+            $this->extraFields[] = Field::create(
                 type:    FieldType::String,
+                name:    "status",
                 noEmpty: true,
                 isKey:   true,
             );
         }
 
         if ($this->canCreate && $this->hasTimestamps) {
-            $this->extraFields[] = new Field(
-                name:    "createdTime",
+            $this->extraFields[] = Field::create(
                 type:    FieldType::Number,
+                name:    "createdTime",
                 canEdit: false,
             );
         }
         if ($this->canCreate && $this->hasUsers) {
-            $this->extraFields[] = new Field(
-                name:    "createdUser",
+            $this->extraFields[] = Field::create(
                 type:    FieldType::Number,
+                name:    "createdUser",
                 canEdit: false,
             );
         }
 
         if ($this->canEdit && $this->hasTimestamps) {
-            $this->extraFields[] = new Field(
-                name:    "modifiedTime",
+            $this->extraFields[] = Field::create(
                 type:    FieldType::Number,
+                name:    "modifiedTime",
                 canEdit: false,
             );
         }
         if ($this->canEdit && $this->hasUsers) {
-            $this->extraFields[] = new Field(
-                name:    "modifiedUser",
+            $this->extraFields[] = Field::create(
                 type:    FieldType::Number,
+                name:    "modifiedUser",
                 canEdit: false,
             );
         }
 
         if ($this->canDelete) {
-            $this->extraFields[] = new Field(
-                name:    "isDeleted",
+            $this->extraFields[] = Field::create(
                 type:    FieldType::Boolean,
+                name:    "isDeleted",
                 canEdit: false,
             );
         }
@@ -196,7 +202,7 @@ class SchemaModel {
      * Returns the ID Field of the Model
      * @return boolean
      */
-    private function setIDField(): bool {
+    public function setIDField(): bool {
         foreach ($this->mainFields as $field) {
             if ($field->isID) {
                 $this->hasID      = true;
@@ -293,6 +299,58 @@ class SchemaModel {
 
 
     /**
+     * Returns the Build Data for the Schema Builder
+     * @param string $name
+     * @return string[]
+     */
+    public function toBuildData(string $name): array {
+        $result = [];
+        switch ($name) {
+        case "mainFields":
+            foreach ($this->mainFields as $field) {
+                $result[] = $this->generateBuildData($field->toBuildData(), true);
+            }
+            break;
+        case "expressions":
+            foreach ($this->expressions as $expression) {
+                $result[] = $this->generateBuildData($expression->toBuildData(), false);
+            }
+            break;
+        case "counts":
+            foreach ($this->counts as $count) {
+                $result[] = $this->generateBuildData($count->toBuildData(), false);
+            }
+            break;
+        default:
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Build Data for the Schema Builder
+     * @param array<string,mixed> $params
+     * @param boolean             $withKey
+     * @return string
+     */
+    private function generateBuildData(array $params, bool $withKey): string {
+        $result = [];
+        foreach ($params as $key => $value) {
+            $text = "";
+            if ($value instanceof FieldType) {
+                $text = "FieldType::{$value->name}";
+            } elseif (is_string($value)) {
+                $text = "\"$value\"";
+            } elseif (is_bool($value)) {
+                $text = $value ? "true" : "false";
+            } elseif (is_numeric($value)) {
+                $text = $value;
+            }
+            $result[] = $withKey ? "$key: $text" : $text;
+        }
+        return Strings::join($result, ", ");
+    }
+
+    /**
      * Returns the Data as an Array
      * @return array<string,mixed>
      */
@@ -355,7 +413,7 @@ class SchemaModel {
                     "schema" => $field->belongsTo,
                 ];
                 if ($field->otherKey !== "") {
-                    $data["foreigns"][$name]["leftKey"] = Field::generateKey($field->otherKey);
+                    $data["foreigns"][$name]["leftKey"] = self::getDbFieldName($field->otherKey);
                 }
             }
         }
@@ -392,7 +450,20 @@ class SchemaModel {
      * @param string $schema
      * @return string
      */
-    public static function getTableName(string $schema): string {
+    public static function getDbTableName(string $schema): string {
         return Strings::pascalCaseToSnakeCase($schema);
+    }
+
+    /**
+     * Generates the name of the field for the Database
+     * @param string $name
+     * @return string
+     */
+    public static function getDbFieldName(string $name): string {
+        if (Strings::endsWith($name, "ID")) {
+            $name = Strings::replace($name, "ID", "Id");
+            $name = Strings::camelCaseToUpperCase($name);
+        }
+        return $name;
     }
 }
