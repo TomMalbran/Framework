@@ -52,7 +52,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String contains all of the given Needles
+     * Returns true if the given String contains any of the given Needles
      * @param string $string
      * @param string ...$needles
      * @return boolean
@@ -67,7 +67,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String contains all of the given Needles in Case Insensitive
+     * Returns true if the given String contains any of the given Needles in Case Insensitive
      * @param string $string
      * @param string ...$needles
      * @return boolean
@@ -83,7 +83,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String starts with the given Needle
+     * Returns true if the given String starts any of the given Needles
      * @param string $string
      * @param string ...$needles
      * @return boolean
