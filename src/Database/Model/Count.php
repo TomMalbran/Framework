@@ -14,33 +14,33 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Count {
 
-    public string $schemaName = "";
-    public string $onSchema   = "";
-    public string $fieldName  = "";
-    public string $query      = "";
-    public int    $decimals   = 2;
+    public string $modelName      = "";
+    public string $otherModelName = "";
+    public string $fieldName      = "";
+    public string $query          = "";
+    public int    $decimals       = 2;
 
 
     /**
      * The Count Attribute
-     * @param string $schemaName Optional.
-     * @param string $onSchema   Optional.
-     * @param string $fieldName  Optional.
-     * @param string $query      Optional.
-     * @param int    $decimals   Optional.
+     * @param string $modelName      Optional.
+     * @param string $otherModelName Optional.
+     * @param string $fieldName      Optional.
+     * @param string $query          Optional.
+     * @param int    $decimals       Optional.
      */
     public function __construct(
-        string $schemaName = "",
-        string $onSchema   = "",
-        string $fieldName  = "",
-        string $query      = "",
-        int    $decimals   = 2,
+        string $modelName      = "",
+        string $otherModelName = "",
+        string $fieldName      = "",
+        string $query          = "",
+        int    $decimals       = 2,
     ) {
-        $this->schemaName = $schemaName;
-        $this->onSchema   = $onSchema;
-        $this->fieldName  = $fieldName;
-        $this->query      = $query;
-        $this->decimals   = $decimals;
+        $this->modelName      = SchemaModel::getBaseModelName($modelName);
+        $this->otherModelName = SchemaModel::getBaseModelName($otherModelName);
+        $this->fieldName      = $fieldName;
+        $this->query          = $query;
+        $this->decimals       = $decimals;
     }
 
 
@@ -55,8 +55,8 @@ class Count {
      * Creates a Count
      * @param string    $name
      * @param FieldType $type
-     * @param string    $schemaName
-     * @param string    $onSchema
+     * @param string    $modelName
+     * @param string    $otherModelName
      * @param string    $fieldName
      * @param string    $query
      * @param int       $decimals
@@ -65,13 +65,13 @@ class Count {
     public static function create(
         string    $name,
         FieldType $type,
-        string    $schemaName,
-        string    $onSchema,
+        string    $modelName,
+        string    $otherModelName,
         string    $fieldName,
         string    $query,
         int       $decimals,
     ): Count {
-        $result = new self($schemaName, $onSchema, $fieldName, $query, $decimals);
+        $result = new self($modelName, $otherModelName, $fieldName, $query, $decimals);
         $result->name = $name;
         $result->type = $type;
         return $result;
@@ -110,8 +110,8 @@ class Count {
     public function getExpression(string $asTable, string $mainKey): string {
         $name       = $this->name;
         $what       = "COUNT(*)";
-        $table      = SchemaModel::getDbTableName($this->schemaName);
-        $onTable    = $this->onSchema !== "" ? SchemaModel::getDbTableName($this->onSchema) : $mainKey;
+        $table      = SchemaModel::getDbTableName($this->modelName);
+        $onTable    = $this->otherModelName !== "" ? SchemaModel::getDbTableName($this->otherModelName) : $mainKey;
         $leftKey    = SchemaModel::getDbFieldName($this->fieldName);
         $rightKey   = SchemaModel::getDbFieldName($this->fieldName);
         $groupKey   = "$table.$rightKey";
@@ -170,13 +170,13 @@ class Count {
      */
     public function toBuildData(): array {
         return [
-            "name"       => $this->name,
-            "type"       => $this->type,
-            "schemaName" => $this->schemaName,
-            "onSchema"   => $this->onSchema,
-            "fieldName"  => $this->fieldName,
-            "query"      => $this->query,
-            "decimals"   => $this->decimals,
+            "name"           => $this->name,
+            "type"           => $this->type,
+            "modelName"      => $this->modelName,
+            "otherModelName" => $this->otherModelName,
+            "fieldName"      => $this->fieldName,
+            "query"          => $this->query,
+            "decimals"       => $this->decimals,
         ];
     }
 
@@ -187,13 +187,13 @@ class Count {
     public function toArray(): array {
         $result = [
             "isSum"     => false,
-            "schema"    => $this->schemaName,
+            "schema"    => $this->modelName,
             "key"       => SchemaModel::getDbFieldName($this->fieldName),
             "type"      => "number",
             "noDeleted" => $this->hasDeleted,
         ];
-        if ($this->onSchema !== "") {
-            $result["onSchema"] = $this->onSchema;
+        if ($this->otherModelName !== "") {
+            $result["onSchema"] = $this->otherModelName;
         }
         if ($this->query !== "") {
             $result["where"] = Strings::split($this->query, " ");

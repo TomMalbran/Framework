@@ -133,14 +133,14 @@ class Migration {
      * @return boolean
      */
     private static function migrateTables(Database $db, array $schemaModels, bool $canDelete = false): bool {
-        $tableNames  = $db->getTables();
-        $schemaNames = [];
-        $didMigrate  = false;
+        $tableNames = $db->getTables();
+        $modelNames = [];
+        $didMigrate = false;
 
         // Create or update the Tables
         foreach ($schemaModels as $schemaModel) {
-            $didUpdate     = false;
-            $schemaNames[] = $schemaModel->tableName;
+            $didUpdate    = false;
+            $modelNames[] = $schemaModel->tableName;
 
             if (!Arrays::contains($tableNames, $schemaModel->tableName)) {
                 $didUpdate = self::createTable($db, $schemaModel);
@@ -153,7 +153,7 @@ class Migration {
         }
 
         // Delete the Tables or show which to delete
-        $didDelete = self::deleteTables($db, $tableNames, $schemaNames, $canDelete);
+        $didDelete = self::deleteTables($db, $tableNames, $modelNames, $canDelete);
         return $didMigrate || $didDelete;
     }
 
@@ -188,15 +188,15 @@ class Migration {
      * Delete the Tables or show which to delete
      * @param Database $db
      * @param string[] $tableNames
-     * @param string[] $schemaNames
+     * @param string[] $modelNames
      * @param boolean  $canDelete
      * @return boolean
      */
-    private static function deleteTables(Database $db, array $tableNames, array $schemaNames, bool $canDelete): bool {
+    private static function deleteTables(Database $db, array $tableNames, array $modelNames, bool $canDelete): bool {
         $deleted  = 0;
         $preBreak = "\n";
         foreach ($tableNames as $tableName) {
-            if (!Arrays::contains($schemaNames, $tableName)) {
+            if (!Arrays::contains($modelNames, $tableName)) {
                 if ($canDelete) {
                     $db->deleteTable($tableName);
                     print("{$preBreak}- Deleted table $tableName\n");

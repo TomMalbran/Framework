@@ -151,7 +151,7 @@ class SchemaBuilder {
             if ($subRequest->type === "") {
                 $result[] = [
                     "name"      => $subRequest->name,
-                    "type"      => $subRequest->schemaName,
+                    "type"      => $subRequest->modelName,
                     "namespace" => $subRequest->namespace,
                 ];
             }
@@ -353,7 +353,7 @@ class SchemaBuilder {
         foreach ($schemaModel->subRequests as $subRequest) {
             $type = $subRequest->type;
             if ($type === "") {
-                $type = "{$subRequest->schemaName}Entity[]";
+                $type = "{$subRequest->modelName}Entity[]";
             }
             $result[] = self::getTypeData($subRequest->name, "array", $type);
         }

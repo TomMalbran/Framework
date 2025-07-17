@@ -12,40 +12,40 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class SubRequest {
 
-    public string $schemaName = "";
-    public string $idName     = "";
-    public string $fieldName  = "";
-    public string $valueName  = "";
-    public string $query      = "";
+    public string $modelName = "";
+    public string $idName    = "";
+    public string $fieldName = "";
+    public string $valueName = "";
+    public string $query     = "";
 
 
     // Used internally when parsing the Model
-    public string $name       = "";
-    public string $type       = "";
-    public string $namespace  = "";
+    public string $name      = "";
+    public string $type      = "";
+    public string $namespace = "";
 
 
 
     /**
      * The SubRequest Attribute
-     * @param string $schemaName Optional.
-     * @param string $idName     Optional.
-     * @param string $fieldName  Optional.
-     * @param string $valueName  Optional.
-     * @param string $query      Optional.
+     * @param string $modelName Optional.
+     * @param string $idName    Optional.
+     * @param string $fieldName Optional.
+     * @param string $valueName Optional.
+     * @param string $query     Optional.
      */
     public function __construct(
-        string $schemaName = "",
-        string $idName     = "",
-        string $fieldName  = "",
-        string $valueName  = "",
-        string $query      = "",
+        string $modelName = "",
+        string $idName    = "",
+        string $fieldName = "",
+        string $valueName = "",
+        string $query     = "",
     ) {
-        $this->schemaName = $schemaName;
-        $this->idName     = $idName;
-        $this->fieldName  = $fieldName;
-        $this->valueName  = $valueName;
-        $this->query      = $query;
+        $this->modelName = SchemaModel::getBaseModelName($modelName);
+        $this->idName    = $idName;
+        $this->fieldName = $fieldName;
+        $this->valueName = $valueName;
+        $this->query     = $query;
     }
 
 
@@ -53,18 +53,18 @@ class SubRequest {
     /**
      * Sets the Data from the Model
      * @param string $name
-     * @param string $schemaName
+     * @param string $modelName
      * @param string $type
      * @return SubRequest
      */
-    public function setData(string $name, string $type, string $schemaName): SubRequest {
+    public function setData(string $name, string $type, string $modelName): SubRequest {
         $this->name = $name;
 
         if ($type !== "") {
             $this->type = $type;
         }
-        if ($schemaName !== "") {
-            $this->schemaName = $schemaName;
+        if ($modelName !== "") {
+            $this->modelName = $modelName;
         }
         return $this;
     }

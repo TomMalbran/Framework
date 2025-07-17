@@ -159,7 +159,7 @@ class SchemaFactory {
                 } elseif ($fieldName === "position") {
                     $hasPositions = true;
 
-                // If is not a Built-in Type, is a Join to be parsed later
+                // If is not a Built-in Type, is a Relation to be parsed later
                 } elseif (!$propType->isBuiltin()) {
                     $relSchema   = Strings::substringAfter($typeName, "\\");
                     $relSchema   = Strings::stripEnd($relSchema, "Model");
@@ -233,7 +233,9 @@ class SchemaFactory {
                     $field->setDbName();
                 } else {
                     foreach ($schemaModel->relations as $relation) {
-                        if ($relation->myKey === $field->name && isset($modelIDs[$relation->otherKey])) {
+                        $myKey    = $relation->getMyFieldName();
+                        $otherKey = $relation->getOtherFieldName();
+                        if ($myKey === $field->name && isset($modelIDs[$otherKey])) {
                             $field->setDbName();
                             break;
                         }
@@ -245,30 +247,33 @@ class SchemaFactory {
 
         // Parse the Models using the Models created
         foreach ($schemaModels as $schemaModel) {
+            // Set the Model of each Relation
             foreach ($schemaModel->relations as $relation) {
-                $relatedModel = $schemaModels[$relation->schemaName] ?? null;
-                if ($relatedModel !== null) {
-                    $relation->setModel($relatedModel, $schemaModel);
+                if (isset($schemaModels[$relation->modelName])) {
+                    $relation->setModel($schemaModels[$relation->modelName], $schemaModel);
                 }
             }
+            $schemaModel->setConnections();
+
+            // Set the Model of each Count
             foreach ($schemaModel->counts as $count) {
-                $relatedModel = $schemaModels[$count->schemaName] ?? null;
-                if ($relatedModel !== null) {
-                    $count->setModel($relatedModel);
+                if (isset($schemaModels[$count->modelName])) {
+                    $count->setModel($schemaModels[$count->modelName]);
                 }
             }
+
+            // Set the Model of each SubRequest
             foreach ($schemaModel->subRequests as $subRequest) {
-                $relatedModel = $schemaModels[$subRequest->schemaName] ?? null;
-                if ($relatedModel !== null) {
-                    $subRequest->setModel($relatedModel);
+                if (isset($schemaModels[$subRequest->modelName])) {
+                    $subRequest->setModel($schemaModels[$subRequest->modelName]);
                 }
             }
         }
 
         // Generate the Schemas
         $schemas = [];
-        foreach ($schemaModels as $schemaName => $schemaModel) {
-            $schemas[$schemaName] = $schemaModel->toArray();
+        foreach ($schemaModels as $modelName => $schemaModel) {
+            $schemas[$modelName] = $schemaModel->toArray();
         }
         if (count($schemas) > 0) {
             Discovery::saveData("schemasTest", $schemas);

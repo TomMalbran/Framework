@@ -25,7 +25,7 @@ class Schema {
 
     protected static ?SchemaModel $model = null;
 
-    protected static string $schemaName   = "";
+    protected static string $modelName    = "";
     protected static string $tableName    = "";
     protected static string $idKey        = "";
     protected static string $idName       = "";
@@ -48,7 +48,7 @@ class Schema {
      * @return Structure
      */
     private static function structure(): Structure {
-        return SchemaFactory::getStructure(static::$schemaName);
+        return SchemaFactory::getStructure(static::$modelName);
     }
 
     /**

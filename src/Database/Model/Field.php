@@ -18,22 +18,6 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Field {
 
-    // The field is the key of a parent Schema and is used in several Schema functions
-    public bool   $isParent   = false;
-
-    // The field values are unique which adds special functions in the Schema
-    public bool   $isUnique   = false;
-
-    // Marks the field as being the ID of a different Schema
-    // Is not used in the code, but it can be used to create a DER
-    public string $belongsTo  = "";
-
-    // Name of the column in the Model it belongs to
-    // If not set, it will be the same as the name of the field
-    // Is not used in the code, but it can be used to create a DER
-    public string $otherKey   = "";
-
-
     // Makes the field a primary key and auto-increment
     public bool   $isID       = false;
 
@@ -42,6 +26,22 @@ class Field {
 
     // Makes the field an index key in SQL
     public bool   $isKey      = false;
+
+
+    // The field is the key of a parent Model and is used in several Schema functions
+    public bool   $isParent   = false;
+
+    // The field values are unique which adds special functions in the Schema
+    public bool   $isUnique   = false;
+
+    // Marks the field as being the ID of a different Model
+    // Is not used in the code, but it can be used to create a DER
+    public string $belongsTo  = "";
+
+    // Name of the column in the Model it belongs to
+    // If not set, it will be the same as the name of the field
+    // Is not used in the code, but it can be used to create a DER
+    public string $otherField = "";
 
 
     // Indicates the length of the number or string which determines the SQL type
@@ -96,13 +96,13 @@ class Field {
 
     /**
      * The Field Attribute
-     * @param boolean $isParent   Optional.
-     * @param boolean $isUnique   Optional.
-     * @param string  $belongsTo  Optional.
-     * @param string  $otherKey   Optional.
      * @param boolean $isID       Optional.
      * @param boolean $isPrimary  Optional.
      * @param boolean $isKey      Optional.
+     * @param boolean $isParent   Optional.
+     * @param boolean $isUnique   Optional.
+     * @param string  $belongsTo  Optional.
+     * @param string  $otherField Optional.
      * @param int     $length     Optional.
      * @param boolean $isSigned   Optional.
      * @param int     $decimals   Optional.
@@ -120,14 +120,14 @@ class Field {
      * @param boolean $noExists   Optional.
      */
     public function __construct(
-        bool   $isParent   = false,
-        bool   $isUnique   = false,
-        string $belongsTo  = "",
-        string $otherKey   = "",
-
         bool   $isID       = false,
         bool   $isPrimary  = false,
         bool   $isKey      = false,
+
+        bool   $isParent   = false,
+        bool   $isUnique   = false,
+        string $belongsTo  = "",
+        string $otherField = "",
 
         int    $length     = 0,
         bool   $isSigned   = false,
@@ -148,14 +148,14 @@ class Field {
         bool   $noEmpty    = false,
         bool   $noExists   = false,
     ) {
-        $this->isParent   = $isParent;
-        $this->isUnique   = $isUnique;
-        $this->belongsTo  = $belongsTo;
-        $this->otherKey   = $otherKey;
-
         $this->isID       = $isID;
         $this->isPrimary  = $isID || $isPrimary;
         $this->isKey      = $isKey;
+
+        $this->isParent   = $isParent;
+        $this->isUnique   = $isUnique;
+        $this->belongsTo  = SchemaModel::getBaseModelName($belongsTo);
+        $this->otherField = $otherField;
 
         $this->length     = $length;
         $this->isSigned   = $isSigned;
@@ -554,6 +554,20 @@ class Field {
         }
         if (!$this->canEdit) {
             $result["cantEdit"] = true;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Data as an Array
+     * @return array<string,mixed>
+     */
+    public function toForeignArray(): array {
+        $result = [
+            "schema" => $this->belongsTo,
+        ];
+        if ($this->otherField !== "") {
+            $result["leftKey"] = SchemaModel::getDbFieldName($this->otherField);
         }
         return $result;
     }
