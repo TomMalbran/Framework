@@ -28,7 +28,7 @@ use Framework\Utils\Numbers;{{/hasIntID}}
  */
 class {{name}}Schema extends Schema {
 
-    protected static string $schemaName   = "{{name}}";
+    protected static string $modelName    = "{{name}}";
     protected static string $tableName    = "{{table}}";
     protected static string $idKey        = "{{idKey}}";
     protected static string $idName       = "{{idName}}";

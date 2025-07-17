@@ -216,6 +216,45 @@ class SchemaModel {
         return false;
     }
 
+    /**
+     * Updates the Relations to have the connections
+     * @return boolean
+     */
+    public function setConnections(): bool {
+        foreach ($this->relations as $relation) {
+            if ($relation->relatedModel === null || $relation->getOtherModelName() !== "") {
+                continue;
+            }
+
+            // First try to find if a Main Field is the ID of the related Model
+            $idName = $relation->getMyKey();
+            $hasKey = false;
+            foreach ($this->mainFields as $field) {
+                if ($field->name === $idName) {
+                    $hasKey = true;
+                    break;
+                }
+            }
+            if ($hasKey) {
+                continue;
+            }
+
+            // Then check if a Field from another Relation has the ID of the related Model
+            foreach ($this->relations as $otherRelation) {
+                if ($otherRelation === $relation || $otherRelation->relatedModel === null) {
+                    continue;
+                }
+                foreach ($otherRelation->relatedModel->fields as $field) {
+                    if ($field->name === $idName) {
+                        $relation->otherModelName = $otherRelation->relatedModel->name;
+                        break 2;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
 
 
     /**
@@ -250,10 +289,10 @@ class SchemaModel {
     public function getFieldNames(): array {
         $result = [];
         foreach ($this->mainFields as $field) {
-            $result[] = $field->dbName;
+            $result[] = $field->name;
         }
         foreach ($this->extraFields as $field) {
-            $result[] = $field->dbName;
+            $result[] = $field->name;
         }
         foreach ($this->expressions as $expression) {
             $result[] = $expression->name;
@@ -266,6 +305,11 @@ class SchemaModel {
         }
         foreach ($this->counts as $count) {
             $result[] = $count->name;
+        }
+        foreach ($this->relations as $relation) {
+            foreach ($relation->fields as $field) {
+                $result[] = $field->prefixName;
+            }
         }
         return $result;
     }
@@ -364,7 +408,7 @@ class SchemaModel {
             "subrequests" => [],
             "foreigns"    => [],
         ];
-        $relations = [];
+        $relationKeys = [];
 
         // Add the fields
         foreach ($this->mainFields as $field) {
@@ -394,27 +438,21 @@ class SchemaModel {
         // Parse the relations and add the necessary joins
         foreach ($this->relations as $relation) {
             if ($relation->relatedModel !== null) {
-                $relationKey = $relation->getKey();
-                $relations[] = $relationKey;
+                $relationKey    = $relation->getKey($relationKeys);
+                $relationKeys[] = $relationKey;
                 $data["joins"][$relationKey] = $relation->toArray();
             }
         }
 
         // Parse the sub requests and add the necessary values
         foreach ($this->subRequests as $subRequest) {
-            $data["subrequests"][$subRequest->schemaName] = $subRequest->toArray();
+            $data["subrequests"][$subRequest->modelName] = $subRequest->toArray();
         }
 
         // Add the foreign fields
         foreach ($this->mainFields as $field) {
-            $name = $field->dbName;
-            if ($field->belongsTo !== "" && !Arrays::contains($relations, $name)) {
-                $data["foreigns"][$name] = [
-                    "schema" => $field->belongsTo,
-                ];
-                if ($field->otherKey !== "") {
-                    $data["foreigns"][$name]["leftKey"] = self::getDbFieldName($field->otherKey);
-                }
+            if ($field->belongsTo !== "" && !Arrays::contains($relationKeys, $field->dbName)) {
+                $data["foreigns"][$field->dbName] = $field->toForeignArray();
             }
         }
 
@@ -446,12 +484,25 @@ class SchemaModel {
 
 
     /**
-     * Gets the Table Name for the Schema
-     * @param string $schema
+     * Gets the name of the model without the class stuff
+     * @param string $modelName
      * @return string
      */
-    public static function getDbTableName(string $schema): string {
-        return Strings::pascalCaseToSnakeCase($schema);
+    public static function getBaseModelName(string $modelName): string {
+        $result = Strings::stripEnd($modelName, "Model");
+        if (Strings::contains($result, "\\")) {
+            $result = Strings::substringAfter($result, "\\");
+        }
+        return $result;
+    }
+
+    /**
+     * Gets the name of the table for the Database
+     * @param string $modelName
+     * @return string
+     */
+    public static function getDbTableName(string $modelName): string {
+        return Strings::pascalCaseToSnakeCase($modelName);
     }
 
     /**
