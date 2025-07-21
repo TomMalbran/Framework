@@ -27,8 +27,8 @@ class Schema {
 
     protected static string $modelName    = "";
     protected static string $tableName    = "";
-    protected static string $idKey        = "";
     protected static string $idName       = "";
+    protected static string $idDbName     = "";
 
     protected static bool   $hasPositions = false;
     protected static bool   $canDelete    = false;
@@ -134,7 +134,7 @@ class Schema {
      */
     protected static function getSchemaColumn(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
-        $selection = new Selection(static::getModel(), self::structure());
+        $selection = new Selection(static::getModel());
         $selection->addFields();
         $selection->addSelects($column, true);
         $selection->addJoins();
@@ -163,7 +163,7 @@ class Schema {
      */
     protected static function getSchemaTotal(?Query $query = null, bool $withDeleted = true): int {
         $query     = self::generateQuery($query, $withDeleted);
-        $selection = new Selection(static::getModel(), self::structure());
+        $selection = new Selection(static::getModel());
         $selection->addSelects("COUNT(*) AS cnt");
         $selection->addJoins(withSelects: false);
 
@@ -195,7 +195,7 @@ class Schema {
         bool $useEmpty = false,
     ): array {
         $query     = self::generateQuery($query);
-        $selection = new Selection(static::getModel(), self::structure());
+        $selection = new Selection(static::getModel());
         if ($distinctColumn !== null) {
             $selection->addSelects("DISTINCT($distinctColumn)");
         }
@@ -321,7 +321,7 @@ class Schema {
         bool $decrypted = false,
         bool $skipSubRequest = false
     ): array {
-        $selection = new Selection(static::getModel(), self::structure());
+        $selection = new Selection(static::getModel());
         $selection->addFields($decrypted);
         $selection->addExpressions();
         $selection->addSelects(array_values($selects));
@@ -357,7 +357,7 @@ class Schema {
         bool $decrypted = false,
     ): string {
         $query     = self::generateQuerySort($query, $sort);
-        $selection = new Selection(static::getModel(), self::structure());
+        $selection = new Selection(static::getModel());
         $selection->addFields($decrypted);
         $selection->addExpressions();
         $selection->addSelects(array_values($selects));
@@ -398,7 +398,7 @@ class Schema {
      * @return integer
      */
     protected static function createSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
-        $modification = new Modification(static::getModel(), self::structure());
+        $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
         $modification->addModification();
@@ -413,7 +413,7 @@ class Schema {
      * @return integer
      */
     protected static function replaceSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
-        $modification = new Modification(static::getModel(), self::structure());
+        $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields);
         $modification->addModification($credentialID);
         return $modification->replace();
@@ -437,7 +437,7 @@ class Schema {
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
-        $modification = new Modification(static::getModel(), self::structure());
+        $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
         $modification->addModification($credentialID);
 
@@ -480,7 +480,7 @@ class Schema {
      * @return integer
      */
     protected static function createSchemaEntityWithOrder(?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
-        $modification = new Modification(static::getModel(), self::structure());
+        $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
         $modification->addModification();
@@ -510,7 +510,7 @@ class Schema {
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
-        $modification = new Modification(static::getModel(), self::structure());
+        $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
         $modification->addModification($credentialID);
 
@@ -615,7 +615,7 @@ class Schema {
             return 0;
         }
 
-        $selection = new Selection(static::getModel(), self::structure());
+        $selection = new Selection(static::getModel());
         $selection->addSelects("position", true);
         $selection->addJoins(withSelects: false);
 
@@ -649,7 +649,7 @@ class Schema {
         $updated = false;
         if ($newValue !== 0 && $oldValue === 0) {
             $newQuery = new Query($query);
-            $newQuery->add(static::$idKey, "<>", $id);
+            $newQuery->add(static::$idDbName, "<>", $id);
             $newQuery->add($column, "=", 1);
             self::editSchemaEntity($newQuery, null, [ $column => 0 ]);
             $updated = true;
@@ -673,7 +673,7 @@ class Schema {
      */
     private static function generateQueryID(Query|int|string $query, bool $withDeleted = true): Query {
         if (!($query instanceof Query)) {
-            $query = Query::create(static::$idKey, "=", $query);
+            $query = Query::create(static::$idDbName, "=", $query);
         }
         return self::generateQuery($query, $withDeleted);
     }
@@ -694,8 +694,8 @@ class Schema {
             if ($sort->exists("page")) {
                 $query->paginate($sort->getInt("page"), $sort->getInt("amount"));
             }
-        } elseif (!$query->hasOrder() && static::$idKey !== "") {
-            $query->orderBy(static::$idKey, true);
+        } elseif (!$query->hasOrder() && static::$idDbName !== "") {
+            $query->orderBy(static::$idDbName, true);
         }
         return $query;
     }

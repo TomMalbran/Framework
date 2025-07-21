@@ -13,8 +13,7 @@ use Framework\Utils\Arrays;
  */
 class Modification {
 
-    private SchemaModel $model;
-    private Structure   $structure;
+    private SchemaModel $schemaModel;
 
     /** @var array<string,mixed> */
     private array $fields;
@@ -22,13 +21,11 @@ class Modification {
 
     /**
      * Creates a new Modification instance
-     * @param SchemaModel $model
-     * @param Structure   $structure
+     * @param SchemaModel $schemaModel
      */
-    public function __construct(SchemaModel $model, Structure $structure) {
-        $this->model     = $model;
-        $this->structure = $structure;
-        $this->fields    = [];
+    public function __construct(SchemaModel $schemaModel) {
+        $this->schemaModel = $schemaModel;
+        $this->fields      = [];
     }
 
 
@@ -79,11 +76,11 @@ class Modification {
      * @param Request $request
      * @param boolean $skipEmpty Optional.
      * @param boolean $skipUnset Optional.
-     * @return array{}
+     * @return array<string,mixed>
      */
     private function parseFields(Request $request, bool $skipEmpty = false, bool $skipUnset = false): array {
         $result = [];
-        foreach ($this->structure->fields as $field) {
+        foreach ($this->schemaModel->fields as $field) {
             if (!$field->canEdit) {
                 continue;
             }
@@ -98,14 +95,14 @@ class Modification {
 
             if ($field->noExists) {
                 if ($request->exists($field->name)) {
-                    $result[$field->key] = $value;
+                    $result[$field->dbName] = $value;
                 }
             } elseif ($field->noEmpty) {
                 if (!Arrays::isEmpty($value)) {
-                    $result[$field->key] = $value;
+                    $result[$field->dbName] = $value;
                 }
             } elseif ($value !== null) {
-                $result[$field->key] = $value;
+                $result[$field->dbName] = $value;
             }
         }
         return $result;
@@ -117,15 +114,15 @@ class Modification {
      * @return Modification
      */
     public function addCreation(int $credentialID = 0): Modification {
-        if ($this->model->canDelete && Arrays::isEmpty($this->fields, "isDeleted")) {
+        if ($this->schemaModel->canDelete && Arrays::isEmpty($this->fields, "isDeleted")) {
             $this->fields["isDeleted"] = 0;
         }
 
-        if ($this->model->canCreate) {
-            if ($this->model->hasTimestamps && Arrays::isEmpty($this->fields, "createdTime")) {
+        if ($this->schemaModel->canCreate) {
+            if ($this->schemaModel->hasTimestamps && Arrays::isEmpty($this->fields, "createdTime")) {
                 $this->fields["createdTime"] = time();
             }
-            if ($this->model->hasUsers && $credentialID !== 0) {
+            if ($this->schemaModel->hasUsers && $credentialID !== 0) {
                 $this->fields["createdUser"] = $credentialID;
             }
         }
@@ -138,14 +135,14 @@ class Modification {
      * @return Modification
      */
     public function addModification(int $credentialID = 0): Modification {
-        if (!$this->model->canEdit) {
+        if (!$this->schemaModel->canEdit) {
             return $this;
         }
 
-        if ($this->model->hasTimestamps && Arrays::isEmpty($this->fields, "modifiedTime")) {
+        if ($this->schemaModel->hasTimestamps && Arrays::isEmpty($this->fields, "modifiedTime")) {
             $this->fields["modifiedTime"] = time();
         }
-        if ($this->model->hasUsers && $credentialID !== 0) {
+        if ($this->schemaModel->hasUsers && $credentialID !== 0) {
             $this->fields["modifiedUser"] = $credentialID;
         }
         return $this;
@@ -159,7 +156,7 @@ class Modification {
      */
     public function insert(): int {
         return Framework::getDatabase()->insert(
-            $this->model->tableName,
+            $this->schemaModel->tableName,
             $this->fields,
         );
     }
@@ -170,7 +167,7 @@ class Modification {
      */
     public function replace(): int {
         return Framework::getDatabase()->insert(
-            $this->model->tableName,
+            $this->schemaModel->tableName,
             $this->fields,
             "REPLACE",
         );
@@ -183,7 +180,7 @@ class Modification {
      */
     public function update(Query $query): bool {
         return Framework::getDatabase()->update(
-            $this->model->tableName,
+            $this->schemaModel->tableName,
             $this->fields,
             $query,
         );

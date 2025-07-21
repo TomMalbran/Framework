@@ -36,8 +36,8 @@ class SchemaModel {
     // Main column data
     public bool      $hasID      = false;
     public bool      $hasAutoInc = false;
-    public string    $idKey      = "";
     public string    $idName     = "";
+    public string    $idDbName   = "";
     public FieldType $idType     = FieldType::None;
 
 
@@ -207,8 +207,8 @@ class SchemaModel {
             if ($field->isID) {
                 $this->hasID      = true;
                 $this->hasAutoInc = $field->isAutoInc();
-                $this->idKey      = $field->dbName;
                 $this->idName     = $field->name;
+                $this->idDbName   = $field->dbName;
                 $this->idType     = $field->type;
                 return true;
             }
@@ -217,17 +217,17 @@ class SchemaModel {
     }
 
     /**
-     * Updates the Relations to have the connections
+     * Sets the Owner Models of the Relations that require it
      * @return boolean
      */
-    public function setConnections(): bool {
+    public function setRelationOwners(): bool {
         foreach ($this->relations as $relation) {
-            if ($relation->relatedModel === null || $relation->getOtherModelName() !== "") {
+            if ($relation->relationModel === null || $relation->ownerModelName !== "") {
                 continue;
             }
 
             // First try to find if a Main Field is the ID of the related Model
-            $idName = $relation->getMyKey();
+            $idName = $relation->getOwnerKey();
             $hasKey = false;
             foreach ($this->mainFields as $field) {
                 if ($field->name === $idName) {
@@ -241,15 +241,18 @@ class SchemaModel {
 
             // Then check if a Field from another Relation has the ID of the related Model
             foreach ($this->relations as $otherRelation) {
-                if ($otherRelation === $relation || $otherRelation->relatedModel === null) {
-                    continue;
+                if ($relation->setOwnerModelName($otherRelation)) {
+                    break;
                 }
-                foreach ($otherRelation->relatedModel->fields as $field) {
-                    if ($field->name === $idName) {
-                        $relation->otherModelName = $otherRelation->relatedModel->name;
-                        break 2;
-                    }
-                }
+                // if ($otherRelation === $relation || $otherRelation->relationModel === null) {
+                //     continue;
+                // }
+                // foreach ($otherRelation->relationModel->fields as $field) {
+                //     if ($field->name === $idName) {
+                //         $relation->ownerModelName = $otherRelation->relationModel->name;
+                //         break 2;
+                //     }
+                // }
             }
         }
         return true;
@@ -345,7 +348,7 @@ class SchemaModel {
     /**
      * Returns the Build Data for the Schema Builder
      * @param string $name
-     * @return string[]
+     * @return array{params:string,fields:array{}}[]
      */
     public function toBuildData(string $name): array {
         $result = [];
@@ -365,6 +368,11 @@ class SchemaModel {
                 $result[] = $this->generateBuildData($count->toBuildData(), false);
             }
             break;
+        case "relations":
+            foreach ($this->relations as $relation) {
+                $result[] = $this->generateBuildData($relation->toBuildData(), false);
+            }
+            break;
         default:
         }
         return $result;
@@ -372,13 +380,17 @@ class SchemaModel {
 
     /**
      * Returns the Build Data for the Schema Builder
-     * @param array<string,mixed> $params
+     * @param array<string,mixed> $data
      * @param boolean             $withKey
-     * @return string
+     * @return array{params:string,fields:array{}}
      */
-    private function generateBuildData(array $params, bool $withKey): string {
-        $result = [];
-        foreach ($params as $key => $value) {
+    private function generateBuildData(array $data, bool $withKey): array {
+        $params = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                continue;
+            }
+
             $text = "";
             if ($value instanceof FieldType) {
                 $text = "FieldType::{$value->name}";
@@ -389,9 +401,21 @@ class SchemaModel {
             } elseif (is_numeric($value)) {
                 $text = $value;
             }
-            $result[] = $withKey ? "$key: $text" : $text;
+            $params[] = $withKey ? "$key: $text" : $text;
         }
-        return Strings::join($result, ", ");
+
+        $fields = [];
+        if (isset($data["fields"]) && is_array($data["fields"])) {
+            foreach ($data["fields"] as $value) {
+                $value    = Arrays::toStringMixedMap($value);
+                $fields[] = self::generateBuildData($value, true);
+            }
+        }
+
+        return [
+            "params" => Strings::join($params, ", "),
+            "fields" => $fields,
+        ];
     }
 
     /**
@@ -408,7 +432,7 @@ class SchemaModel {
             "subrequests" => [],
             "foreigns"    => [],
         ];
-        $relationKeys = [];
+        $relationNames = [];
 
         // Add the fields
         foreach ($this->mainFields as $field) {
@@ -437,10 +461,9 @@ class SchemaModel {
 
         // Parse the relations and add the necessary joins
         foreach ($this->relations as $relation) {
-            if ($relation->relatedModel !== null) {
-                $relationKey    = $relation->getKey($relationKeys);
-                $relationKeys[] = $relationKey;
-                $data["joins"][$relationKey] = $relation->toArray();
+            if ($relation->relationModel !== null) {
+                $relationNames[] = $relation->name;
+                $data["joins"][$relation->name] = $relation->toArray();
             }
         }
 
@@ -451,7 +474,7 @@ class SchemaModel {
 
         // Add the foreign fields
         foreach ($this->mainFields as $field) {
-            if ($field->belongsTo !== "" && !Arrays::contains($relationKeys, $field->dbName)) {
+            if ($field->belongsTo !== "" && !Arrays::contains($relationNames, $field->dbName)) {
                 $data["foreigns"][$field->dbName] = $field->toForeignArray();
             }
         }
@@ -511,7 +534,7 @@ class SchemaModel {
      * @return string
      */
     public static function getDbFieldName(string $name): string {
-        if (Strings::endsWith($name, "ID")) {
+        if (Strings::endsWith($name, "ID") && !Strings::isUpperCase($name)) {
             $name = Strings::replace($name, "ID", "Id");
             $name = Strings::camelCaseToUpperCase($name);
         }

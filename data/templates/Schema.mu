@@ -16,7 +16,8 @@ use Framework\Database\Assign;{{/canEdit}}
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
-use Framework\Database\Model\Count;{{/hasCounts}}{{#hasStatus}}
+use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
+use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasStatus}}
 use Framework\System\Status;{{/hasStatus}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
@@ -28,10 +29,12 @@ use Framework\Utils\Numbers;{{/hasIntID}}
  */
 class {{name}}Schema extends Schema {
 
+    protected static ?SchemaModel $model = null;
+
     protected static string $modelName    = "{{name}}";
     protected static string $tableName    = "{{table}}";
-    protected static string $idKey        = "{{idKey}}";
     protected static string $idName       = "{{idName}}";
+    protected static string $idDbName     = "{{idDbName}}";
 
     protected static bool   $hasPositions = {{hasPositionsValue}};
     protected static bool   $canDelete    = {{canDeleteValue}};
@@ -55,23 +58,34 @@ class {{name}}Schema extends Schema {
                 canDelete:     {{canDeleteValue}},
                 mainFields:    [
                 {{#mainFields}}
-                    Field::create({{{.}}}),
+                    Field::create({{{params}}}),
                 {{/mainFields}}
                 ],
                 {{#hasExpressions}}
                 expressions:   [
                 {{#expressions}}
-                    Expression::create({{{.}}}),
+                    Expression::create({{{params}}}),
                 {{/expressions}}
                 ],
                 {{/hasExpressions}}
                 {{#hasCounts}}
                 counts:        [
                 {{#counts}}
-                    Count::create({{{.}}}),
+                    Count::create({{{params}}}),
                 {{/counts}}
                 ],
                 {{/hasCounts}}
+                {{#hasRelations}}
+                relations:     [
+                {{#relations}}
+                    Relation::create({{{params}}}, fields: [
+                        {{#fields}}
+                        Field::create({{{params}}}),
+                        {{/fields}}
+                    ]),
+                {{/relations}}
+                ],
+                {{/hasRelations}}
             );
         }
         return static::$model;
@@ -162,7 +176,7 @@ class {{name}}Schema extends Schema {
      * @return boolean
      */
     public static function exists({{idType}} ${{idName}}{{{parentsDefList}}}{{#hasDeleted}}, bool $withDeleted = true{{/hasDeleted}}): bool {
-        $query = Query::create("{{idKey}}", "=", ${{idName}});
+        $query = Query::create("{{idDbName}}", "=", ${{idName}});
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
@@ -183,7 +197,7 @@ class {{name}}Schema extends Schema {
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
-        $query->addIf("{{idKey}}", "<>", $skipID);
+        $query->addIf("{{idDbName}}", "<>", $skipID);
         return self::getSchemaTotal($query) > 0;
     }
 
@@ -210,7 +224,7 @@ class {{name}}Schema extends Schema {
      * @return {{entity}}
      */
     public static function getByID({{idType}} ${{idName}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
-        $query = Query::create("{{idKey}}", "=", ${{idName}});
+        $query = Query::create("{{idDbName}}", "=", ${{idName}});
         {{#parents}}
         $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
         {{/parents}}
@@ -279,7 +293,7 @@ class {{name}}Schema extends Schema {
      * @return {{idDocType}}
      */
     public static function get{{idText}}({{query}} $query): {{idType}} {
-        $result = self::getSchemaValue($query->query, "{{idKey}}");
+        $result = self::getSchemaValue($query->query, "{{idDbName}}");
         {{#hasIntID}}
         return Numbers::toInt($result);
         {{/hasIntID}}
@@ -295,7 +309,7 @@ class {{name}}Schema extends Schema {
      */
     public static function get{{idText}}s(?{{query}} $query = null): array {
         $query  = $query !== null ? $query->query : null;
-        $result = self::getSchemaColumn($query, "{{idKey}}", "{{idName}}");
+        $result = self::getSchemaColumn($query, "{{idDbName}}", "{{idName}}");
         {{#hasIntID}}
         return Arrays::toInts($result);
         {{/hasIntID}}

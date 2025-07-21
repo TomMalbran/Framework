@@ -3,7 +3,6 @@ namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\Database\SchemaModel;
-use Framework\Database\Structure;
 use Framework\Database\Model\FieldType;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
@@ -15,7 +14,6 @@ use Framework\Utils\Strings;
 class Selection {
 
     private SchemaModel $schemaModel;
-    private Structure   $structure;
 
     private int $index   = 66;
 
@@ -38,11 +36,9 @@ class Selection {
     /**
      * Creates a new Selection instance
      * @param SchemaModel $schemaModel
-     * @param Structure   $structure
      */
-    public function __construct(SchemaModel $schemaModel, Structure $structure) {
+    public function __construct(SchemaModel $schemaModel) {
         $this->schemaModel = $schemaModel;
-        $this->structure   = $structure;
         $this->tables      = [ $schemaModel->tableName ];
     }
 
@@ -58,7 +54,7 @@ class Selection {
         $mainKey   = $this->schemaModel->tableName;
 
         if ($this->schemaModel->hasID) {
-            $this->selects[] = "$mainKey.{$this->schemaModel->idKey} AS id";
+            $this->selects[] = "$mainKey.{$this->schemaModel->idDbName} AS id";
         }
         foreach ($this->schemaModel->fields as $field) {
             if ($decrypted && $field->type === FieldType::Encrypt) {
@@ -108,22 +104,25 @@ class Selection {
      * @return Selection
      */
     public function addJoins(array $extraJoins = [], bool $withSelects = true): Selection {
-        foreach ($this->structure->joins as $join) {
-            if ($join->asTable !== "") {
-                $asTable = $join->asTable;
-            } elseif (Arrays::contains($this->tables, $join->table)) {
+        foreach ($this->schemaModel->relations as $relation) {
+            $tableName     = $relation->getDbTableName(false);
+            $ownerTableName = $relation->getOwnerTableName();
+
+            if ($ownerTableName !== "") {
+                $asTable = $ownerTableName;
+            } elseif (Arrays::contains($this->tables, $tableName)) {
                 $asTable = chr($this->index++);
             } else {
-                $asTable        = $join->table;
-                $this->tables[] = $join->table;
+                $asTable        = $tableName;
+                $this->tables[] = $tableName;
             }
 
-            $this->joins[]          = $join->getExpression($asTable, $this->schemaModel->tableName);
-            $this->keys[$join->key] = $asTable;
+            $this->joins[]               = $relation->getExpression($asTable, $this->schemaModel->tableName);
+            $this->keys[$relation->name] = $asTable;
 
             if ($withSelects) {
-                foreach ($join->fields as $field) {
-                    $this->selects[] = "$asTable.{$field->key} AS $field->prefixName";
+                foreach ($relation->fields as $field) {
+                    $this->selects[] = "$asTable.{$field->dbName} AS $field->prefixName";
                 }
             }
         }
@@ -200,11 +199,11 @@ class Selection {
             }
 
             if (!$found) {
-                foreach ($this->structure->joins as $join) {
-                    $joinKey = $this->keys[$join->key];
-                    foreach ($join->fields as $field) {
-                        if ($column === $field->key) {
-                            $query->updateColumn($column, "$joinKey.{$field->key}");
+                foreach ($this->schemaModel->relations as $relation) {
+                    $relationKey = $this->keys[$relation->name];
+                    foreach ($relation->fields as $field) {
+                        if ($column === $field->dbName) {
+                            $query->updateColumn($column, "$relationKey.{$field->dbName}");
                             $found = true;
                             break;
                         }
@@ -243,8 +242,8 @@ class Selection {
             if ($this->schemaModel->hasID) {
                 if (isset($row["id"])) {
                     $fields["id"] = $row["id"];
-                } elseif (isset($row[$this->schemaModel->idKey])) {
-                    $fields["id"] = $row[$this->schemaModel->idKey];
+                } elseif (isset($row[$this->schemaModel->idDbName])) {
+                    $fields["id"] = $row[$this->schemaModel->idDbName];
                 } elseif (isset($row[$this->schemaModel->idName])) {
                     $fields["id"] = $row[$this->schemaModel->idName];
                 }
@@ -263,8 +262,8 @@ class Selection {
             }
 
             // Parse the Relations
-            foreach ($this->structure->joins as $join) {
-                $values = $join->toValues($row);
+            foreach ($this->schemaModel->relations as $relation) {
+                $values = $relation->toValues($row);
                 $fields = array_merge($fields, $values);
             }
 
