@@ -4,7 +4,6 @@ namespace Framework\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 use Framework\Database\Field;
-use Framework\Database\Join;
 use Framework\Database\Model\FieldType;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -17,14 +16,11 @@ class Structure {
     public string $schema      = "";
 
     public string $table       = "";
-    public string $idKey       = "";
     public string $idName      = "";
+    public string $idDbName    = "";
 
     /** @var Field[] */
     public array $fields       = [];
-
-    /** @var Join[] */
-    public array $joins        = [];
 
     /** @var SubRequest[] */
     public array $subRequests  = [];
@@ -107,43 +103,38 @@ class Structure {
         }
 
         // Parse the Fields
-        $idKey        = "";
+        $idDbName     = "";
         $primaryCount = 0;
 
         foreach ($fields as $key => $value) {
             if ($value->hasValue("isID")) {
-                $idKey         = $key;
+                $idDbName      = $key;
                 $primaryCount += 1;
             } elseif ($value->hasValue("isPrimary")) {
                 $primaryCount += 1;
             }
-            if ($idKey === "" && $value->hasValue("isPrimary")) {
-                $idKey = $key;
+            if ($idDbName === "" && $value->hasValue("isPrimary")) {
+                $idDbName = $key;
             }
         }
         if ($primaryCount > 1) {
-            $idKey = "";
+            $idDbName = "";
         }
 
         // Create the Fields
         foreach ($fields as $key => $value) {
             $field = new Field($key, $value);
-            if ($key === $idKey) {
-                $this->idKey  = $field->key;
-                $this->idName = $field->name;
+            if ($key === $idDbName) {
+                $this->idName   = $field->name;
+                $this->idDbName = $field->key;
             }
             $this->fields[] = $field;
-        }
-
-        // Create the Joins
-        foreach ($data->getDict("joins") as $key => $value) {
-            $this->joins[] = new Join($key, $value);
         }
 
         // Create the SubRequests
         foreach ($data->getDict("subrequests") as $key => $value) {
             $subStructure = SchemaFactory::getStructure($key);
-            $this->subRequests[] = new SubRequest($subStructure, $value, $this->idKey, $this->idName);
+            $this->subRequests[] = new SubRequest($subStructure, $value, $this->idDbName, $this->idName);
         }
     }
 

@@ -68,6 +68,7 @@ class SchemaBuilder {
         $mainFields  = $schemaModel->toBuildData("mainFields");
         $expressions = $schemaModel->toBuildData("expressions");
         $counts      = $schemaModel->toBuildData("counts");
+        $relations   = $schemaModel->toBuildData("relations");
         $idType      = self::getFieldType($schemaModel->idType);
         $fields      = self::getAllFields($schemaModel);
         $uniques     = self::getSomeFields($schemaModel, isUnique: true);
@@ -87,8 +88,8 @@ class SchemaBuilder {
             "entity"             => "{$schemaModel->name}Entity",
             "query"              => $queryName,
             "hasID"              => $schemaModel->hasID,
-            "idKey"              => $schemaModel->idKey,
             "idName"             => $schemaModel->idName,
+            "idDbName"           => $schemaModel->idDbName,
             "idType"             => $idType,
             "idDocType"          => self::getDocType($idType),
             "hasIntID"           => $schemaModel->hasID && $idType === "int",
@@ -121,6 +122,8 @@ class SchemaBuilder {
             "expressions"        => $expressions,
             "hasCounts"          => count($counts) > 0,
             "counts"             => $counts,
+            "hasRelations"       => count($relations) > 0,
+            "relations"          => $relations,
             "fields"             => $fields,
             "fieldsCreateList"   => self::joinFields($fields, "fieldArgCreate", ", "),
             "fieldsEditList"     => self::joinFields($fields, "fieldArgEdit", ", "),
@@ -343,7 +346,7 @@ class SchemaBuilder {
             self::addAttribute($result, $expression->name, $expression->type);
         }
         foreach ($schemaModel->counts as $count) {
-            self::addAttribute($result, $count->name, $count->type);
+            self::addAttribute($result, $count->name, FieldType::Number);
         }
         foreach ($schemaModel->relations as $relation) {
             foreach ($relation->fields as $field) {
@@ -495,7 +498,7 @@ class SchemaBuilder {
 
         foreach ($schemaModel->relations as $relation) {
             $addSpace  = true;
-            $tableName = $relation->getDbTableName();
+            $tableName = $relation->getDbTableName(true);
             foreach ($relation->fields as $field) {
                 $result[] = [
                     "name"     => Strings::upperCaseFirst($field->prefixName),
@@ -566,7 +569,7 @@ class SchemaBuilder {
         }
 
         foreach ($schemaModel->relations as $relation) {
-            $tableName = $relation->getDbTableName();
+            $tableName = $relation->getDbTableName(true);
             foreach ($relation->fields as $field) {
                 $list[] = [
                     "type"   => $field->type,

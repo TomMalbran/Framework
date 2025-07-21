@@ -1,9 +1,12 @@
 <?php
 namespace Framework\Database\Model;
 
+use Framework\Request;
 use Framework\Database\SchemaModel;
+use Framework\Database\Assign;
 use Framework\Database\Model\FieldType;
 use Framework\File\FilePath;
+use Framework\System\Config;
 use Framework\System\Path;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -188,45 +191,47 @@ class Field {
 
     /**
      * Creates a Field
-     * @param string    $name      Optional.
-     * @param string    $dbName    Optional.
-     * @param FieldType $type      Optional.
-     * @param boolean   $isID      Optional.
-     * @param boolean   $isPrimary Optional.
-     * @param boolean   $isKey     Optional.
-     * @param int       $length    Optional.
-     * @param boolean   $isSigned  Optional.
-     * @param int       $decimals  Optional.
-     * @param string    $dateType  Optional.
-     * @param string    $dateInput Optional.
-     * @param string    $hourInput Optional.
-     * @param string    $filePath  Optional.
-     * @param boolean   $canEdit   Optional.
-     * @param boolean   $noEmpty   Optional.
-     * @param boolean   $noExists  Optional.
+     * @param string    $name       Optional.
+     * @param string    $dbName     Optional.
+     * @param string    $prefixName Optional.
+     * @param FieldType $type       Optional.
+     * @param boolean   $isID       Optional.
+     * @param boolean   $isPrimary  Optional.
+     * @param boolean   $isKey      Optional.
+     * @param int       $length     Optional.
+     * @param boolean   $isSigned   Optional.
+     * @param int       $decimals   Optional.
+     * @param string    $dateType   Optional.
+     * @param string    $dateInput  Optional.
+     * @param string    $hourInput  Optional.
+     * @param string    $filePath   Optional.
+     * @param boolean   $canEdit    Optional.
+     * @param boolean   $noEmpty    Optional.
+     * @param boolean   $noExists   Optional.
      * @return Field
      */
     public static function create(
-        string    $name   = "",
-        string    $dbName = "",
-        FieldType $type   = FieldType::String,
+        string    $name       = "",
+        string    $dbName     = "",
+        string    $prefixName = "",
+        FieldType $type       = FieldType::String,
 
-        bool   $isID      = false,
-        bool   $isPrimary = false,
-        bool   $isKey     = false,
+        bool      $isID       = false,
+        bool      $isPrimary  = false,
+        bool      $isKey      = false,
 
-        int    $length    = 0,
-        bool   $isSigned  = false,
-        int    $decimals  = 2,
+        int       $length     = 0,
+        bool      $isSigned   = false,
+        int       $decimals   = 2,
 
-        string $dateType  = "",
-        string $dateInput = "",
-        string $hourInput = "",
-        string $filePath  = "",
+        string    $dateType   = "",
+        string    $dateInput  = "",
+        string    $hourInput  = "",
+        string    $filePath   = "",
 
-        bool   $canEdit   = true,
-        bool   $noEmpty   = false,
-        bool   $noExists  = false,
+        bool      $canEdit    = true,
+        bool      $noEmpty    = false,
+        bool      $noExists   = false,
     ): Field {
         $result = new self(
             isID:      $isID,
@@ -243,9 +248,10 @@ class Field {
             noEmpty:   $noEmpty,
             noExists:  $noExists,
         );
-        $result->type   = $type;
-        $result->name   = $name;
-        $result->dbName = $dbName !== "" ? $dbName : $name;
+        $result->type       = $type;
+        $result->name       = $name;
+        $result->dbName     = $dbName !== "" ? $dbName : $name;
+        $result->prefixName = $prefixName !== "" ? $prefixName : $name;
         return $result;
     }
 
@@ -408,6 +414,49 @@ class Field {
             } else {
                 $result .= " DEFAULT '{$default}'";
             }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Field Value from the given Request
+     * @param Request $request
+     * @return mixed
+     */
+    public function fromRequest(Request $request): mixed {
+        $result = null;
+        if ($this->isAutoInc()) {
+            return $result;
+        }
+
+        switch ($this->type) {
+        case FieldType::Number:
+            if ($this->dateInput !== "" && $this->hourInput !== "") {
+                $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
+            } elseif ($this->dateInput !== "") {
+                $result = $request->toDay($this->dateInput, $this->dateType, true);
+            } else {
+                $result = $request->getInt($this->name);
+            }
+            break;
+        case FieldType::Boolean:
+            $result = $request->toBinary($this->name);
+            break;
+        case FieldType::String:
+            $result = $request->getString($this->name);
+            break;
+        case FieldType::Float:
+            $result = $request->toInt($this->name, $this->decimals);
+            break;
+        case FieldType::JSON:
+            $result = $request->toJSON($this->name);
+            break;
+        case FieldType::Encrypt:
+            $value  = $request->getString($this->name);
+            $result = Assign::encrypt($value, Config::getDbKey());
+            break;
+        default:
+            $result = $request->get($this->name);
         }
         return $result;
     }

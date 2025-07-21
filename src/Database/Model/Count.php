@@ -14,11 +14,19 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Count {
 
+    // The name of the Model where the count is applied
     public string $modelName      = "";
+
+    // The name of the Model used in the Join
+    // If empty, the join is done with the parent Model
     public string $otherModelName = "";
+
+    // The name of the Field used in the Count
     public string $fieldName      = "";
+
+    // An additional Query to filter the Count
     public string $query          = "";
-    public int    $decimals       = 2;
+
 
 
     /**
@@ -27,65 +35,54 @@ class Count {
      * @param string $otherModelName Optional.
      * @param string $fieldName      Optional.
      * @param string $query          Optional.
-     * @param int    $decimals       Optional.
      */
     public function __construct(
         string $modelName      = "",
         string $otherModelName = "",
         string $fieldName      = "",
         string $query          = "",
-        int    $decimals       = 2,
     ) {
         $this->modelName      = SchemaModel::getBaseModelName($modelName);
         $this->otherModelName = SchemaModel::getBaseModelName($otherModelName);
         $this->fieldName      = $fieldName;
         $this->query          = $query;
-        $this->decimals       = $decimals;
     }
 
 
 
     // Used internally when parsing the Model
-    public FieldType $type       = FieldType::String;
-    public string    $name       = "";
-    public bool      $hasDeleted = false;
+    public string $name       = "";
+    public bool   $hasDeleted = false;
 
 
     /**
      * Creates a Count
-     * @param string    $name
-     * @param FieldType $type
-     * @param string    $modelName
-     * @param string    $otherModelName
-     * @param string    $fieldName
-     * @param string    $query
-     * @param int       $decimals
+     * @param string $name
+     * @param string $modelName
+     * @param string $otherModelName
+     * @param string $fieldName
+     * @param string $query
      * @return Count
      */
     public static function create(
-        string    $name,
-        FieldType $type,
-        string    $modelName,
-        string    $otherModelName,
-        string    $fieldName,
-        string    $query,
-        int       $decimals,
+        string $name,
+        string $modelName,
+        string $otherModelName,
+        string $fieldName,
+        string $query,
     ): Count {
-        $result = new self($modelName, $otherModelName, $fieldName, $query, $decimals);
+        $result = new self($modelName, $otherModelName, $fieldName, $query);
         $result->name = $name;
-        $result->type = $type;
         return $result;
     }
 
     /**
      * Sets the Data from the Model
      * @param string $name
-     * @param string $typeName
      * @return Count
      */
-    public function setData(string $name, string $typeName): Count {
+    public function setData(string $name): Count {
         $this->name = $name;
-        $this->type = FieldType::fromType($typeName);
         return $this;
     }
 
@@ -155,10 +152,6 @@ class Count {
     public function getValue(array $data): mixed {
         $key    = $this->name;
         $result = $data[$key] ?? 0;
-
-        if ($this->type === FieldType::Float) {
-            $result = Numbers::toFloat($result, $this->decimals);
-        }
         return $result;
     }
 
@@ -171,12 +164,10 @@ class Count {
     public function toBuildData(): array {
         return [
             "name"           => $this->name,
-            "type"           => $this->type,
             "modelName"      => $this->modelName,
             "otherModelName" => $this->otherModelName,
             "fieldName"      => $this->fieldName,
             "query"          => $this->query,
-            "decimals"       => $this->decimals,
         ];
     }
 

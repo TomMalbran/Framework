@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\Structure;
 use Framework\Database\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
@@ -12,13 +11,12 @@ use Framework\Utils\Dictionary;
 class SubRequest {
 
     private SchemaModel $schemaModel;
-    private Structure   $structure;
 
     public  string $type     = "";
     public  string $name     = "";
 
-    private string $idKey    = "";
     private string $idName   = "";
+    private string $idDbName = "";
 
     /** @var string[] */
     private array  $where    = [];
@@ -38,18 +36,16 @@ class SubRequest {
     /**
      * Creates a new SubRequest instance
      * @param SchemaModel $schemaModel
-     * @param Structure   $structure
      * @param Dictionary  $data
-     * @param string      $idKey
+     * @param string      $idDbName
      * @param string      $idName
      */
-    public function __construct(SchemaModel $schemaModel, Structure $structure, Dictionary $data, string $idKey, string $idName) {
+    public function __construct(SchemaModel $schemaModel, Dictionary $data, string $idDbName, string $idName) {
         $this->schemaModel = $schemaModel;
-        $this->structure   = $structure;
 
         $this->name      = $data->getString("name");
-        $this->type      = $data->getString("type", $structure->schema);
-        $this->idKey     = $data->getString("idKey", $idKey);
+        $this->type      = $data->getString("type", $schemaModel->name);
+        $this->idDbName  = $data->getString("idKey", $idDbName);
         $this->idName    = $data->getString("idName", $idName);
         $this->where     = $data->getStrings("where");
 
@@ -125,7 +121,7 @@ class SubRequest {
             return [];
         }
 
-        $selection = new Selection($this->schemaModel, $this->structure);
+        $selection = new Selection($this->schemaModel);
         $selection->addFields();
         $selection->addExpressions();
         $selection->addJoins();
@@ -144,7 +140,7 @@ class SubRequest {
         if (count($ids) === 0) {
             return null;
         }
-        $query = Query::create($this->idKey, "IN", $ids);
+        $query = Query::create($this->idDbName, "IN", $ids);
 
         $total = count($this->where);
         if ($total % 3 === 0) {
@@ -157,8 +153,8 @@ class SubRequest {
             $query->orderBy($this->orderBy, $this->isAsc);
         }
 
-        if ($this->structure->canDelete) {
-            $isDeleted = $this->structure->getKey("isDeleted");
+        if ($this->schemaModel->canDelete) {
+            $isDeleted = $this->schemaModel->getKey("isDeleted");
             $query->add($isDeleted, "=", 0);
         }
         return $query;
