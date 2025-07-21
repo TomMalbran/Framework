@@ -714,6 +714,10 @@ class Strings {
      * @return string
      */
     public static function upperCaseToCamelCase(string $string, bool $capitalizeFirst = false): string {
+        if (!self::isUpperCase($string)) {
+            return $string;
+        }
+
         $result = ucwords(strtolower($string), "_");
         $result = str_replace("_", "", $result);
         if (!$capitalizeFirst) {
@@ -728,6 +732,10 @@ class Strings {
      * @return string
      */
     public static function camelCaseToUpperCase(string $string): string {
+        if (self::isUpperCase($string)) {
+            return $string;
+        }
+
         $parts = preg_split('/(?=[A-Z])/', $string);
         if ($parts === false) {
             return strtoupper($string);
