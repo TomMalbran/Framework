@@ -1,8 +1,13 @@
 <?php
 namespace {{namespace}};
 
+{{#hasSubRequests}}
+{{#subSchemas}}use {{namespace}}\{{type}}Schema;
+{{/subSchemas}}
 {{#subTypes}}use {{namespace}}\{{type}}Entity;
 {{/subTypes}}
+
+{{/hasSubRequests}}
 use {{namespace}}\{{entity}};
 use {{namespace}}\{{column}};
 use {{namespace}}\{{query}};
@@ -17,7 +22,8 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
 use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
-use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasStatus}}
+use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
+use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasStatus}}
 use Framework\System\Status;{{/hasStatus}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
@@ -31,21 +37,23 @@ class {{name}}Schema extends Schema {
 
     protected static ?SchemaModel $model = null;
 
-    protected static string $modelName    = "{{name}}";
-    protected static string $tableName    = "{{table}}";
-    protected static string $idName       = "{{idName}}";
-    protected static string $idDbName     = "{{idDbName}}";
+    protected static string $modelName      = "{{name}}";
+    protected static string $tableName      = "{{table}}";
+    protected static string $idName         = "{{idName}}";
+    protected static string $idDbName       = "{{idDbName}}";
 
-    protected static bool   $hasPositions = {{hasPositionsValue}};
-    protected static bool   $canDelete    = {{canDeleteValue}};
+    protected static bool   $hasPositions   = {{hasPositionsValue}};
+    protected static bool   $canDelete      = {{canDeleteValue}};
+    protected static bool   $hasSubRequests = {{hasSubRequestsValue}};
 
 
 
     /**
-     * Returns the SchemaModel
+     * Creates a new Schema Model instance
      * @return SchemaModel
      */
-    protected static function getModel(): SchemaModel {
+    #[\Override]
+    public static function getModel(): SchemaModel {
         if (static::$model === null) {
             static::$model = new SchemaModel(
                 name:          "{{name}}",
@@ -90,6 +98,23 @@ class {{name}}Schema extends Schema {
         }
         return static::$model;
     }
+
+{{#hasSubRequests}}
+    /**
+     * Returns a list of SubRequests
+     * @return SubRequest[]
+     */
+    #[\Override]
+    public static function getSubRequests(): array {
+        return [
+        {{#subRequests}}
+            SubRequest::create({{{params}}}),
+        {{/subRequests}}
+        ];
+    }
+
+{{/hasSubRequests}}
+
 
     /**
      * Constructs the {{name}} Entity

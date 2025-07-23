@@ -69,10 +69,13 @@ class SchemaBuilder {
         $expressions = $schemaModel->toBuildData("expressions");
         $counts      = $schemaModel->toBuildData("counts");
         $relations   = $schemaModel->toBuildData("relations");
+        $subRequests = $schemaModel->toBuildData("subRequests");
+
         $idType      = self::getFieldType($schemaModel->idType);
         $fields      = self::getAllFields($schemaModel);
         $uniques     = self::getSomeFields($schemaModel, isUnique: true);
         $parents     = self::getSomeFields($schemaModel, isParent: true);
+        $subSchemas  = self::getSubTypes($schemaModel, forSchemas: true);
         $subTypes    = self::getSubTypes($schemaModel);
         $hasVirtual  = count($schemaModel->virtualFields) > 0;
         $hasParents  = count($parents) > 0;
@@ -81,62 +84,66 @@ class SchemaBuilder {
 
         $template    = Discovery::loadFrameTemplate("Schema.mu");
         $contents    = Mustache::render($template, [
-            "namespace"          => $schemaModel->namespace,
-            "name"               => $schemaModel->name,
-            "table"              => $schemaModel->tableName,
-            "column"             => "{$schemaModel->name}Column",
-            "entity"             => "{$schemaModel->name}Entity",
-            "query"              => $queryName,
-            "hasID"              => $schemaModel->hasID,
-            "idName"             => $schemaModel->idName,
-            "idDbName"           => $schemaModel->idDbName,
-            "idType"             => $idType,
-            "idDocType"          => self::getDocType($idType),
-            "hasIntID"           => $schemaModel->hasID && $idType === "int",
-            "idText"             => Strings::upperCaseFirst($schemaModel->idName),
-            "editType"           => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
-            "editDocType"        => $schemaModel->hasID ? "$queryName|" . self::getDocType($idType) : $queryName,
-            "convertType"        => $schemaModel->hasID ? "Query|$idType" : "Query",
-            "convertDocType"     => $schemaModel->hasID ? "Query|" . self::getDocType($idType) : "Query",
-            "hasPositions"       => $schemaModel->hasPositions,
-            "hasPositionsValue"  => $schemaModel->hasPositions ? "true" : "false",
-            "hasTimestamps"      => $schemaModel->hasTimestamps,
-            "hasTimestampsValue" => $schemaModel->hasTimestamps ? "true" : "false",
-            "hasStatus"          => $schemaModel->hasStatus,
-            "hasStatusValue"     => $schemaModel->hasStatus ? "true" : "false",
-            "hasUsers"           => $schemaModel->hasUsers,
-            "hasUsersValue"      => $schemaModel->hasUsers ? "true" : "false",
-            "hasEncrypt"         => $schemaModel->hasEncrypt(),
-            "canCreate"          => $schemaModel->canCreate,
-            "canCreateValue"     => $schemaModel->canCreate ? "true" : "false",
-            "canEdit"            => $schemaModel->canEdit,
-            "canEditValue"       => $schemaModel->canEdit ? "true" : "false",
-            "canReplace"         => $schemaModel->canEdit && !$schemaModel->hasAutoInc,
-            "canDelete"          => $schemaModel->canDelete,
-            "canDeleteValue"     => $schemaModel->canDelete ? "true" : "false",
-            "processEntity"      => count($subTypes) > 0 || $hasVirtual || $schemaModel->hasStatus,
-            "subTypes"           => $subTypes,
-            "hasVirtual"         => $hasVirtual,
-            "mainFields"         => $mainFields,
-            "hasExpressions"     => count($expressions) > 0,
-            "expressions"        => $expressions,
-            "hasCounts"          => count($counts) > 0,
-            "counts"             => $counts,
-            "hasRelations"       => count($relations) > 0,
-            "relations"          => $relations,
-            "fields"             => $fields,
-            "fieldsCreateList"   => self::joinFields($fields, "fieldArgCreate", ", "),
-            "fieldsEditList"     => self::joinFields($fields, "fieldArgEdit", ", "),
-            "uniques"            => $uniques,
-            "parents"            => $parents,
-            "editParents"        => $editParents,
-            "parentsList"        => self::joinFields($parents, "fieldParam"),
-            "parentsArgList"     => self::joinFields($parents, "fieldArg"),
-            "parentsNullList"    => self::joinFields($parents, "fieldArgNull", ", "),
-            "parentsDefList"     => self::joinFields($parents, "fieldArgDefault", ", "),
-            "parentsEditList"    => self::joinFields($editParents, "fieldArg", ", "),
-            "hasParents"         => $hasParents,
-            "hasEditParents"     => $schemaModel->hasPositions && $hasParents,
+            "namespace"           => $schemaModel->namespace,
+            "name"                => $schemaModel->name,
+            "table"               => $schemaModel->tableName,
+            "column"              => "{$schemaModel->name}Column",
+            "entity"              => "{$schemaModel->name}Entity",
+            "query"               => $queryName,
+            "hasID"               => $schemaModel->hasID,
+            "idName"              => $schemaModel->idName,
+            "idDbName"            => $schemaModel->idDbName,
+            "idType"              => $idType,
+            "idDocType"           => self::getDocType($idType),
+            "hasIntID"            => $schemaModel->hasID && $idType === "int",
+            "idText"              => Strings::upperCaseFirst($schemaModel->idName),
+            "editType"            => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
+            "editDocType"         => $schemaModel->hasID ? "$queryName|" . self::getDocType($idType) : $queryName,
+            "convertType"         => $schemaModel->hasID ? "Query|$idType" : "Query",
+            "convertDocType"      => $schemaModel->hasID ? "Query|" . self::getDocType($idType) : "Query",
+            "hasPositions"        => $schemaModel->hasPositions,
+            "hasPositionsValue"   => $schemaModel->hasPositions ? "true" : "false",
+            "hasTimestamps"       => $schemaModel->hasTimestamps,
+            "hasTimestampsValue"  => $schemaModel->hasTimestamps ? "true" : "false",
+            "hasStatus"           => $schemaModel->hasStatus,
+            "hasStatusValue"      => $schemaModel->hasStatus ? "true" : "false",
+            "hasUsers"            => $schemaModel->hasUsers,
+            "hasUsersValue"       => $schemaModel->hasUsers ? "true" : "false",
+            "hasEncrypt"          => $schemaModel->hasEncrypt(),
+            "canCreate"           => $schemaModel->canCreate,
+            "canCreateValue"      => $schemaModel->canCreate ? "true" : "false",
+            "canEdit"             => $schemaModel->canEdit,
+            "canEditValue"        => $schemaModel->canEdit ? "true" : "false",
+            "canReplace"          => $schemaModel->canEdit && !$schemaModel->hasAutoInc,
+            "canDelete"           => $schemaModel->canDelete,
+            "canDeleteValue"      => $schemaModel->canDelete ? "true" : "false",
+            "subSchemas"          => $subSchemas,
+            "subTypes"            => $subTypes,
+            "processEntity"       => count($subTypes) > 0 || $hasVirtual || $schemaModel->hasStatus,
+            "hasVirtual"          => $hasVirtual,
+            "mainFields"          => $mainFields,
+            "hasExpressions"      => count($expressions) > 0,
+            "expressions"         => $expressions,
+            "hasCounts"           => count($counts) > 0,
+            "counts"              => $counts,
+            "hasRelations"        => count($relations) > 0,
+            "relations"           => $relations,
+            "hasSubRequests"      => count($subRequests) > 0,
+            "hasSubRequestsValue" => count($subRequests) > 0 ? "true" : "false",
+            "subRequests"         => $subRequests,
+            "fields"              => $fields,
+            "fieldsCreateList"    => self::joinFields($fields, "fieldArgCreate", ", "),
+            "fieldsEditList"      => self::joinFields($fields, "fieldArgEdit", ", "),
+            "uniques"             => $uniques,
+            "parents"             => $parents,
+            "editParents"         => $editParents,
+            "parentsList"         => self::joinFields($parents, "fieldParam"),
+            "parentsArgList"      => self::joinFields($parents, "fieldArg"),
+            "parentsNullList"     => self::joinFields($parents, "fieldArgNull", ", "),
+            "parentsDefList"      => self::joinFields($parents, "fieldArgDefault", ", "),
+            "parentsEditList"     => self::joinFields($editParents, "fieldArg", ", "),
+            "hasParents"          => $hasParents,
+            "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
         ]);
 
         $contents = self::alignParams($contents);
@@ -146,12 +153,13 @@ class SchemaBuilder {
     /**
      * Returns the Sub Types from the Sub Requests
      * @param SchemaModel $schemaModel
+     * @param boolean     $forSchemas  Optional.
      * @return array{name:string,type:string,namespace:string}[]
      */
-    private static function getSubTypes(SchemaModel $schemaModel): array {
+    private static function getSubTypes(SchemaModel $schemaModel, bool $forSchemas = false): array {
         $result = [];
         foreach ($schemaModel->subRequests as $subRequest) {
-            if ($subRequest->type === "") {
+            if ($forSchemas || $subRequest->type === "") {
                 $result[] = [
                     "name"      => $subRequest->name,
                     "type"      => $subRequest->modelName,

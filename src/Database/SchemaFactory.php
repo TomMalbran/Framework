@@ -2,7 +2,6 @@
 namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
-use Framework\Database\Structure;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
@@ -13,7 +12,6 @@ use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
 use Framework\File\File;
 use Framework\System\Status;
-use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 use ReflectionNamedType;
@@ -22,31 +20,6 @@ use ReflectionNamedType;
  * The Schema Factory
  */
 class SchemaFactory {
-
-    private static ?Dictionary $data = null;
-
-    /** @var Structure[] */
-    private static array $structures = [];
-
-
-
-    /**
-     * Gets the Schema data
-     * @return Dictionary
-     */
-    public static function getData(): Dictionary {
-        if (self::$data !== null) {
-            return self::$data;
-        }
-
-        $schemaModels = self::buildData();
-
-        self::$data = new Dictionary();
-        foreach ($schemaModels as $schemaModel) {
-            self::$data->set($schemaModel->name, $schemaModel->toArray());
-        }
-        return self::$data;
-    }
 
     /**
      * Builds the Schema data
@@ -286,20 +259,5 @@ class SchemaFactory {
         }
 
         return $schemaModels;
-    }
-
-
-
-    /**
-     * Creates and Returns the Structure for the given Key
-     * @param string $schema
-     * @return Structure
-     */
-    public static function getStructure(string $schema): Structure {
-        if (!isset(self::$structures[$schema])) {
-            $data = self::getData()->getDict($schema);
-            self::$structures[$schema] = new Structure($schema, $data);
-        }
-        return self::$structures[$schema];
     }
 }
