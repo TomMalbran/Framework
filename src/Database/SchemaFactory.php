@@ -163,7 +163,10 @@ class SchemaFactory {
                 } elseif (!$propType->isBuiltin()) {
                     $relationModelName = Strings::substringAfter($typeName, "\\");
                     $relationModelName = Strings::stripEnd($relationModelName, "Model");
-                    $relations[]       = $relation->setDataFromAttribute($relationModelName, $fieldName);
+                    $relation->setDataFromAttribute($relationModelName, $fieldName);
+                    $relation->parseRelationJoin();
+                    $relation->parseOwnerJoin();
+                    $relations[] = $relation;
 
                 // If is an Array, is a SubRequest
                 } elseif ($typeName === "array") {
@@ -233,8 +236,8 @@ class SchemaFactory {
                     $field->setDbName();
                 } else {
                     foreach ($schemaModel->relations as $relation) {
-                        $ownerKey    = $relation->getOwnerFieldName();
-                        $relationKey = $relation->getRelationFieldName();
+                        $relationKey = $relation->relationFieldName;
+                        $ownerKey    = $relation->ownerFieldName;
                         if ($ownerKey === $field->name && isset($modelIDs[$relationKey])) {
                             $field->setDbName();
                             break;
@@ -248,15 +251,15 @@ class SchemaFactory {
         // Parse the Models using the Models created
         foreach ($schemaModels as $schemaModel) {
             // Set the Model of each Relation
-            $relationNames = [];
             foreach ($schemaModel->relations as $relation) {
                 if (isset($schemaModels[$relation->relationModelName])) {
                     $relation->setModels($schemaModels[$relation->relationModelName], $schemaModel);
                     $relation->generateFields();
-                    $relationNames[] = $relation->setName($relationNames);
                 }
             }
-            $schemaModel->setRelationOwners();
+            foreach ($schemaModel->relations as $relation) {
+                $relation->inferOwnerModelName();
+            }
 
             // Set the Model of each Count
             foreach ($schemaModel->counts as $count) {

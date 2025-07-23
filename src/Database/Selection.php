@@ -18,9 +18,6 @@ class Selection {
     private int $index   = 66;
 
     /** @var string[] */
-    private array $tables  = [];
-
-    /** @var string[] */
     private array $keys    = [];
 
     /** @var string[] */
@@ -39,7 +36,6 @@ class Selection {
      */
     public function __construct(SchemaModel $schemaModel) {
         $this->schemaModel = $schemaModel;
-        $this->tables      = [ $schemaModel->tableName ];
     }
 
 
@@ -105,24 +101,12 @@ class Selection {
      */
     public function addJoins(array $extraJoins = [], bool $withSelects = true): Selection {
         foreach ($this->schemaModel->relations as $relation) {
-            $tableName     = $relation->getDbTableName(false);
-            $ownerTableName = $relation->getOwnerTableName();
-
-            if ($ownerTableName !== "") {
-                $asTable = $ownerTableName;
-            } elseif (Arrays::contains($this->tables, $tableName)) {
-                $asTable = chr($this->index++);
-            } else {
-                $asTable        = $tableName;
-                $this->tables[] = $tableName;
-            }
-
-            $this->joins[]               = $relation->getExpression($asTable, $this->schemaModel->tableName);
-            $this->keys[$relation->name] = $asTable;
+            $this->joins[] = $relation->getExpression();
 
             if ($withSelects) {
+                $tableName = $relation->getDbTableName();
                 foreach ($relation->fields as $field) {
-                    $this->selects[] = "$asTable.{$field->dbName} AS $field->prefixName";
+                    $this->selects[] = "$tableName.{$field->dbName} AS {$field->prefixName}";
                 }
             }
         }
@@ -200,10 +184,10 @@ class Selection {
 
             if (!$found) {
                 foreach ($this->schemaModel->relations as $relation) {
-                    $relationKey = $this->keys[$relation->name];
                     foreach ($relation->fields as $field) {
                         if ($column === $field->dbName) {
-                            $query->updateColumn($column, "$relationKey.{$field->dbName}");
+                            $tableName = $relation->getDbTableName();
+                            $query->updateColumn($column, "$tableName.{$field->dbName}");
                             $found = true;
                             break;
                         }

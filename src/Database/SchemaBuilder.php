@@ -498,7 +498,7 @@ class SchemaBuilder {
 
         foreach ($schemaModel->relations as $relation) {
             $addSpace  = true;
-            $tableName = $relation->getDbTableName(true);
+            $tableName = $relation->getDbTableName();
             foreach ($relation->fields as $field) {
                 $result[] = [
                     "name"     => Strings::upperCaseFirst($field->prefixName),
@@ -569,7 +569,7 @@ class SchemaBuilder {
         }
 
         foreach ($schemaModel->relations as $relation) {
-            $tableName = $relation->getDbTableName(true);
+            $tableName = $relation->getDbTableName();
             foreach ($relation->fields as $field) {
                 $list[] = [
                     "type"   => $field->type,

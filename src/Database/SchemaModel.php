@@ -216,48 +216,6 @@ class SchemaModel {
         return false;
     }
 
-    /**
-     * Sets the Owner Models of the Relations that require it
-     * @return boolean
-     */
-    public function setRelationOwners(): bool {
-        foreach ($this->relations as $relation) {
-            if ($relation->relationModel === null || $relation->ownerModelName !== "") {
-                continue;
-            }
-
-            // First try to find if a Main Field is the ID of the related Model
-            $idName = $relation->getOwnerKey();
-            $hasKey = false;
-            foreach ($this->mainFields as $field) {
-                if ($field->name === $idName) {
-                    $hasKey = true;
-                    break;
-                }
-            }
-            if ($hasKey) {
-                continue;
-            }
-
-            // Then check if a Field from another Relation has the ID of the related Model
-            foreach ($this->relations as $otherRelation) {
-                if ($relation->setOwnerModelName($otherRelation)) {
-                    break;
-                }
-                // if ($otherRelation === $relation || $otherRelation->relationModel === null) {
-                //     continue;
-                // }
-                // foreach ($otherRelation->relationModel->fields as $field) {
-                //     if ($field->name === $idName) {
-                //         $relation->ownerModelName = $otherRelation->relationModel->name;
-                //         break 2;
-                //     }
-                // }
-            }
-        }
-        return true;
-    }
-
 
 
     /**
@@ -462,8 +420,9 @@ class SchemaModel {
         // Parse the relations and add the necessary joins
         foreach ($this->relations as $relation) {
             if ($relation->relationModel !== null) {
-                $relationNames[] = $relation->name;
-                $data["joins"][$relation->name] = $relation->toArray();
+                $relationName    = $relation->getName($relationNames);
+                $relationNames[] = $relationName;
+                $data["joins"][$relationName] = $relation->toArray($relationName);
             }
         }
 
