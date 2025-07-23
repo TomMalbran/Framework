@@ -4,7 +4,6 @@ namespace Framework\Database;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Database\SchemaModel;
-use Framework\Database\Structure;
 use Framework\Database\Query;
 use Framework\Utils\Arrays;
 

@@ -3,14 +3,12 @@ namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\Request;
-use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
-use Framework\Database\Database;
-use Framework\Database\Structure;
 use Framework\Database\Selection;
 use Framework\Database\Modification;
 use Framework\Database\Assign;
 use Framework\Database\Query;
+use Framework\Database\Model\SubRequest;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
@@ -25,41 +23,34 @@ class Schema {
 
     protected static ?SchemaModel $model = null;
 
-    protected static string $modelName    = "";
-    protected static string $tableName    = "";
-    protected static string $idName       = "";
-    protected static string $idDbName     = "";
+    protected static string $modelName      = "";
+    protected static string $tableName      = "";
+    protected static string $idName         = "";
+    protected static string $idDbName       = "";
 
-    protected static bool   $hasPositions = false;
-    protected static bool   $canDelete    = false;
+    protected static bool   $hasPositions   = false;
+    protected static bool   $canDelete      = false;
+    protected static bool   $hasSubRequests = false;
 
 
-
-    /**
-     * Returns the Database
-     * @return Database
-     */
-    private static function db(): Database {
-        return Framework::getDatabase();
-    }
-
-    /**
-     * Returns the Structure
-     * @return Structure
-     */
-    private static function structure(): Structure {
-        return SchemaFactory::getStructure(static::$modelName);
-    }
 
     /**
      * Returns the Model
      * @return SchemaModel
      */
-    protected static function getModel(): SchemaModel {
+    public static function getModel(): SchemaModel {
         if (static::$model === null) {
             static::$model = new SchemaModel();
         }
         return static::$model;
+    }
+
+    /**
+     * Returns a list of SubRequests
+     * @return SubRequest[]
+     */
+    public static function getSubRequests(): array {
+        return [];
     }
 
     /**
@@ -79,7 +70,7 @@ class Schema {
      * @return boolean
      */
     public static function tableExists(): bool {
-        return self::db()->tableExists(static::$tableName);
+        return Framework::getDatabase()->tableExists(static::$tableName);
     }
 
     /**
@@ -87,7 +78,7 @@ class Schema {
      * @return boolean
      */
     public static function hasPrimaryKey(): bool {
-        $keys = self::db()->getPrimaryKeys(static::$tableName);
+        $keys = Framework::getDatabase()->getPrimaryKeys(static::$tableName);
         return count($keys) > 0;
     }
 
@@ -122,7 +113,7 @@ class Schema {
      * @return string|integer
      */
     protected static function getSchemaValue(Query $query, string $column): string|int {
-        return self::db()->getValue(static::$tableName, $column, $query);
+        return Framework::getDatabase()->getValue(static::$tableName, $column, $query);
     }
 
     /**
@@ -250,7 +241,7 @@ class Schema {
      */
     protected static function getDataWithParams(string $expression, array $params = []): array {
         $expression = self::replaceTable($expression);
-        $request    = self::db()->queryData($expression, $params);
+        $request    = Framework::getDatabase()->queryData($expression, $params);
         return $request;
     }
 
@@ -262,7 +253,7 @@ class Schema {
      */
     protected static function getSchemaData(Query $query, string $expression): array {
         $expression = self::replaceTable($expression);
-        $request    = self::db()->getData($expression, $query);
+        $request    = Framework::getDatabase()->getData($expression, $query);
         return $request;
     }
 
@@ -274,7 +265,7 @@ class Schema {
      */
     protected static function getSchemaRow(Query $query, string $expression): array {
         $expression = self::replaceTable($expression);
-        $request    = self::db()->getData($expression, $query);
+        $request    = Framework::getDatabase()->getData($expression, $query);
 
         if (isset($request[0])) {
             return $request[0];
@@ -330,8 +321,8 @@ class Schema {
         $selection->request($query);
 
         $result = $selection->resolve(array_keys($selects));
-        if (!$skipSubRequest) {
-            foreach (self::structure()->subRequests as $subRequest) {
+        if (!$skipSubRequest && static::$hasSubRequests) {
+            foreach (static::getSubRequests() as $subRequest) {
                 $result = $subRequest->request($result);
             }
         }
@@ -365,7 +356,7 @@ class Schema {
         $selection->addCounts();
 
         $expression = $selection->getExpression($query);
-        return self::db()->interpolateQuery($expression, $query);
+        return Framework::getDatabase()->interpolateQuery($expression, $query);
     }
 
     /**
@@ -377,7 +368,7 @@ class Schema {
     protected static function getDataExpression(Query $query, string $expression): string {
         $expression  = self::replaceTable($expression);
         $expression .= $query->get();
-        return self::db()->interpolateQuery($expression, $query);
+        return Framework::getDatabase()->interpolateQuery($expression, $query);
     }
 
 
@@ -387,7 +378,7 @@ class Schema {
      * @return boolean
      */
     protected static function truncateData(): bool {
-        return self::db()->truncate(static::$tableName);
+        return Framework::getDatabase()->truncate(static::$tableName);
     }
 
     /**
@@ -466,7 +457,7 @@ class Schema {
      */
     protected static function removeSchemaEntity(Query|int|string $query): bool {
         $query = self::generateQueryID($query, false);
-        return self::db()->delete(static::$tableName, $query);
+        return Framework::getDatabase()->delete(static::$tableName, $query);
     }
 
 
@@ -598,7 +589,7 @@ class Schema {
             $assign = Assign::increase(1);
         }
 
-        self::db()->update(static::$tableName, [
+        Framework::getDatabase()->update(static::$tableName, [
             "position" => $assign,
         ], $newQuery);
         return $savePosition;

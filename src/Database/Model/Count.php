@@ -2,8 +2,6 @@
 namespace Framework\Database\Model;
 
 use Framework\Database\SchemaModel;
-use Framework\Database\Model\FieldType;
-use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -26,7 +24,6 @@ class Count {
 
     // An additional Query to filter the Count
     public string $query          = "";
-
 
 
     /**

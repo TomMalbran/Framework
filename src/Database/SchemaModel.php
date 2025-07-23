@@ -331,6 +331,11 @@ class SchemaModel {
                 $result[] = $this->generateBuildData($relation->toBuildData(), false);
             }
             break;
+        case "subRequests":
+            foreach ($this->subRequests as $subRequest) {
+                $result[] = $this->generateBuildData($subRequest->toBuildData(), false);
+            }
+            break;
         default:
         }
         return $result;
@@ -352,6 +357,8 @@ class SchemaModel {
             $text = "";
             if ($value instanceof FieldType) {
                 $text = "FieldType::{$value->name}";
+            } elseif (is_string($value) && Strings::endsWith($value, "Schema")) {
+                $text = "{$value}::getModel()";
             } elseif (is_string($value)) {
                 $text = "\"$value\"";
             } elseif (is_bool($value)) {
