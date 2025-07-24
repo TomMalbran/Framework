@@ -5,7 +5,7 @@ use Framework\Framework;
 use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
-use Framework\Database\SchemaFactory;
+use Framework\Database\SchemaModel;
 use Framework\Database\Assign;
 use Framework\Database\Query;
 use Framework\File\File;
@@ -78,7 +78,7 @@ class MediaFile {
 
         $db = Framework::getDatabase();
         foreach (self::$data as $field) {
-            $structure = SchemaFactory::getStructure($field["schema"]);
+            $tableName = SchemaModel::getDbTableName($field["schema"]);
 
             foreach ($files as $file) {
                 $old = $file["old"];
@@ -86,12 +86,12 @@ class MediaFile {
 
                 if ($field["replace"] === true) {
                     $query = Query::create($field["field"], "LIKE", "\"$old\"");
-                    $db->update($structure->table, [
+                    $db->update($tableName, [
                         $field["field"] => Assign::replace($old, $new),
                     ], $query);
                 } else {
                     $query = Query::create($field["field"], "=", $old);
-                    $db->update($structure->table, [
+                    $db->update($tableName, [
                         $field["field"] => $new,
                     ], $query);
                 }
