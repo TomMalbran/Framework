@@ -244,7 +244,7 @@ class SchemaFactory {
             // Set the Model of each SubRequest
             foreach ($schemaModel->subRequests as $subRequest) {
                 if (isset($schemaModels[$subRequest->modelName])) {
-                    $subRequest->setModel($schemaModels[$subRequest->modelName]);
+                    $subRequest->setModel($schemaModels[$subRequest->modelName], $schemaModel);
                 }
             }
         }

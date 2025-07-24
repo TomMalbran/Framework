@@ -48,7 +48,9 @@ class SubRequest {
 
     // Used internally when parsing the Model
     public ?SchemaModel $schemaModel = null;
+    public ?SchemaModel $parentModel = null;
     public string $name      = "";
+    public string $idDbName  = "";
     public string $type      = "";
     public string $namespace = "";
     public string $className = "";
@@ -59,6 +61,7 @@ class SubRequest {
      * @param SchemaModel $schemaModel
      * @param string      $name
      * @param string      $idName
+     * @param string      $idDbName
      * @param string      $fieldName
      * @param string      $valueName
      * @param string      $query
@@ -68,12 +71,14 @@ class SubRequest {
         SchemaModel $schemaModel,
         string      $name,
         string      $idName,
+        string      $idDbName,
         string      $fieldName,
         string      $valueName,
         string      $query,
     ): SubRequest {
         $result = new self("", $idName, $fieldName, $valueName, $query);
         $result->name        = $name;
+        $result->idDbName    = $idDbName;
         $result->schemaModel = $schemaModel;
         return $result;
     }
@@ -100,11 +105,13 @@ class SubRequest {
     /**
      * Sets the Model for the SubRequest
      * @param SchemaModel $relatedModel
+     * @param SchemaModel $parentModel
      * @return SubRequest
      */
-    public function setModel(SchemaModel $relatedModel): SubRequest {
-        $this->namespace = $relatedModel->namespace;
-        $this->className = "{$relatedModel->name}Schema";
+    public function setModel(SchemaModel $relatedModel, SchemaModel $parentModel): SubRequest {
+        $this->parentModel = $parentModel;
+        $this->namespace   = $relatedModel->namespace;
+        $this->className   = "{$relatedModel->name}Schema";
         return $this;
     }
 
@@ -116,8 +123,18 @@ class SubRequest {
      * @return array<string,mixed>[]
      */
     public function request(array $result): array {
-        $query     = $this->createQuery($result);
-        $request   = $this->getData($query);
+        $query = $this->createQuery($result);
+        if ($query === null || $this->schemaModel === null) {
+            return [];
+        }
+
+        $selection = new Selection($this->schemaModel);
+        $selection->addFields();
+        $selection->addExpressions();
+        $selection->addJoins();
+        $selection->addCounts();
+        $selection->request($query);
+        $request   = $selection->resolve();
         $subResult = [];
 
         foreach ($request as $row) {
@@ -151,25 +168,6 @@ class SubRequest {
     }
 
     /**
-     * Returns the Data from the Query
-     * @param Query|null $query
-     * @return array<string,mixed>[]
-     */
-    private function getData(?Query $query): array {
-        if ($query === null || $this->schemaModel === null) {
-            return [];
-        }
-
-        $selection = new Selection($this->schemaModel);
-        $selection->addFields();
-        $selection->addExpressions();
-        $selection->addJoins();
-        $selection->addCounts();
-        $selection->request($query);
-        return $selection->resolve();
-    }
-
-    /**
      * Does the Request with a Sub Request
      * @param mixed[] $result
      * @return Query|null
@@ -180,15 +178,14 @@ class SubRequest {
             return null;
         }
 
-        $idDbName = SchemaModel::getDbFieldName($this->idName);
-        $query    = Query::create($idDbName, "IN", $ids);
+        $query = Query::create($this->idDbName, "IN", $ids);
 
         if ($this->query !== "") {
-            $where = Strings::split($this->query, " ");
-            $total = count($where);
+            $queryParts = Strings::split($this->query, " ");
+            $total      = count($queryParts);
             if ($total % 3 === 0) {
                 for ($i = 0; $i < $total; $i += 3) {
-                    $query->add($where[$i], $where[$i + 1], $where[$i + 2]);
+                    $query->add($queryParts[$i], $queryParts[$i + 1], $queryParts[$i + 2]);
                 }
             }
         }
@@ -219,10 +216,21 @@ class SubRequest {
      * @return array<string,mixed>
      */
     public function toBuildData(): array {
+        $idName   = "";
+        $idDbName = "";
+        if ($this->idName !== "") {
+            $idName   = $this->idName;
+            $idDbName = SchemaModel::getDbFieldName($this->idName);
+        } elseif ($this->parentModel !== null) {
+            $idName   = $this->parentModel->idName;
+            $idDbName = $this->parentModel->idDbName;
+        }
+
         return [
             "schemaModel" => $this->className,
             "name"        => $this->name,
-            "idName"      => $this->idName,
+            "idName"      => $idName,
+            "idDbName"    => $idDbName,
             "fieldName"   => $this->fieldName,
             "valueName"   => $this->valueName,
             "query"       => $this->query,
