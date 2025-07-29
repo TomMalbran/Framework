@@ -24,6 +24,10 @@ class Field {
     // Makes the field a primary key and auto-increment
     public bool   $isID       = false;
 
+    // By default when using isID on a number field, it will be auto-incremented
+    // Using this property will prevent the auto-increment
+    public bool   $notAutoInc = false;
+
     // Makes the field a primary key in SQL
     public bool   $isPrimary  = false;
 
@@ -100,6 +104,7 @@ class Field {
     /**
      * The Field Attribute
      * @param boolean $isID       Optional.
+     * @param boolean $notAutoInc Optional.
      * @param boolean $isPrimary  Optional.
      * @param boolean $isKey      Optional.
      * @param boolean $isParent   Optional.
@@ -124,6 +129,7 @@ class Field {
      */
     public function __construct(
         bool   $isID       = false,
+        bool   $notAutoInc = false,
         bool   $isPrimary  = false,
         bool   $isKey      = false,
 
@@ -152,6 +158,7 @@ class Field {
         bool   $noExists   = false,
     ) {
         $this->isID       = $isID;
+        $this->notAutoInc = $notAutoInc;
         $this->isPrimary  = $isID || $isPrimary;
         $this->isKey      = $isKey;
 
@@ -326,7 +333,7 @@ class Field {
      * @return bool
      */
     public function isAutoInc(): bool {
-        return $this->isID && $this->type === FieldType::Number;
+        return $this->isID && !$this->notAutoInc && $this->type === FieldType::Number;
     }
 
     /**
