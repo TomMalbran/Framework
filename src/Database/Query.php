@@ -110,31 +110,41 @@ class Query {
 
         switch ($expression) {
         case "=":
-            if (is_array($value)) {
+            if (is_array($value) && count($value) === 1) {
+                $value      = $value[0];
+            } elseif (is_array($value) && count($value) > 1) {
                 $expression = "IN";
                 $binds      = $this->createBinds($value);
             }
             break;
 
         case "<>":
-            if (is_array($value)) {
+            if (is_array($value) && count($value) === 1) {
+                $value      = $value[0];
+            } elseif (is_array($value) && count($value) > 1) {
                 $expression = "NOT IN";
                 $binds      = $this->createBinds($value);
             }
             break;
 
         case "IN":
-            if (is_array($value)) {
+            if (is_array($value) && count($value) > 1) {
                 $binds = $this->createBinds($value);
-            } else {
+            } elseif (is_array($value) && count($value) === 1) {
+                $value      = $value[0];
+                $expression = "=";
+            } elseif (!is_array($value)) {
                 $expression = "=";
             }
             break;
 
         case "NOT IN":
-            if (is_array($value)) {
+            if (is_array($value) && count($value) > 1) {
                 $binds = $this->createBinds($value);
-            } else {
+            } elseif (is_array($value) && count($value) === 1) {
+                $value      = $value[0];
+                $expression = "<>";
+            } elseif (!is_array($value)) {
                 $expression = "<>";
             }
             break;
