@@ -10,7 +10,8 @@ namespace {{namespace}};
 {{/hasSubRequests}}
 use {{namespace}}\{{entity}};
 use {{namespace}}\{{column}};
-use {{namespace}}\{{query}};
+use {{namespace}}\{{query}};{{#hasStatus}}
+use {{namespace}}\{{status}};{{/hasStatus}}
 
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
@@ -23,8 +24,7 @@ use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
 use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
 use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
-use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasStatus}}
-use Framework\System\Status;{{/hasStatus}}
+use Framework\Database\Model\SubRequest;{{/hasSubRequests}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
@@ -131,8 +131,8 @@ class {{name}}Schema extends Schema {
             }
             {{/subTypes}}
             {{#hasStatus}}
-            $entity->statusName  = Status::getName($entity->status);
-            $entity->statusColor = Status::getColor($entity->status);
+            $entity->statusName  = {{status}}::getName($entity->status);
+            $entity->statusColor = {{status}}::getColor($entity->status);
             {{/hasStatus}}
             {{#hasVirtual}}
             $entity = static::postProcess($entity);
@@ -481,13 +481,13 @@ class {{name}}Schema extends Schema {
      * Creates a new {{name}} Entity
      * @param Request|null $entityRequest Optional.{{#fields}}
      * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
-     * @param Status|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
+     * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
      * @param integer $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}{{#hasPositions}}
      * @param boolean $skipOrder Optional.{{/hasPositions}}
      * @return integer
      */
-    protected static function createEntity(?Request $entityRequest = null{{{fieldsCreateList}}}{{#hasStatus}}, ?Status $status = null{{/hasStatus}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): int {
+    protected static function createEntity(?Request $entityRequest = null{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): int {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -530,11 +530,11 @@ class {{name}}Schema extends Schema {
      * Replaces the {{name}} Entity
      * @param Request|null $entityRequest Optional.{{#fields}}
      * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
-     * @param Status|null $status Optional.{{/hasStatus}}{{#hasUsers}}
+     * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
      * @return boolean
      */
-    protected static function replaceEntity(?Request $entityRequest = null{{{fieldsCreateList}}}{{#hasStatus}}, ?Status $status = null{{/hasStatus}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
+    protected static function replaceEntity(?Request $entityRequest = null{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -563,7 +563,7 @@ class {{name}}Schema extends Schema {
      * @param {{editDocType}} $query
      * @param Request|null $entityRequest Optional.{{#fields}}
      * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasStatus}}
-     * @param Status|null $status Optional.{{/hasStatus}}{{#hasUsers}}
+     * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param integer $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
      * @param boolean|null $isDeleted Optional.{{/canDelete}}{{#hasPositions}}
      * @param boolean $skipOrder Optional.{{/hasPositions}}
@@ -571,7 +571,7 @@ class {{name}}Schema extends Schema {
      * @param boolean $skipUnset Optional.
      * @return boolean
      */
-    protected static function editEntity({{editType}} $query, ?Request $entityRequest = null{{{fieldsEditList}}}{{#hasStatus}}, ?Status $status = null{{/hasStatus}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}, bool $skipEmpty = false, bool $skipUnset = false): bool {
+    protected static function editEntity({{editType}} $query, ?Request $entityRequest = null{{{fieldsEditList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}, bool $skipEmpty = false, bool $skipUnset = false): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {

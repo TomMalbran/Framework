@@ -1,7 +1,8 @@
 <?php
 namespace {{namespace}};
 
-use {{namespace}}\{{column}};
+use {{namespace}}\{{column}};{{#statuses}}
+use {{namespace}}\{{status}};{{/statuses}}
 
 use Framework\Database\Query;
 use Framework\Database\Query\SchemaQuery;
@@ -80,4 +81,29 @@ class {{query}} extends SchemaQuery {
         $this->query->search($columns, $value, $expression, $caseInsensitive, $splitValue, $splitText, $matchAny);
         return $this;
     }
+{{#statuses}}
+
+
+    /**
+     * Adds a {{name}} Equals condition
+     * @param {{status}} ...$statuses
+     * @return {{query}}
+     */
+    public function {{name}}Equal({{status}} ...$statuses): {{query}} {
+        $values = {{status}}::toNames($statuses);
+        $this->query->add("{{value}}", "=", $values);
+        return $this;
+    }
+
+    /**
+     * Adds a {{name}} Not Equals condition
+     * @param {{status}} ...$statuses
+     * @return {{query}}
+     */
+    public function {{name}}NotEqual({{status}} ...$statuses): {{query}} {
+        $values = {{status}}::toNames($statuses);
+        $this->query->add("{{value}}", "<>", $values);
+        return $this;
+    }
+{{/statuses}}
 }

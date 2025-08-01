@@ -82,7 +82,7 @@ class SchemaBuilder {
         $editParents = $schemaModel->hasPositions ? $parents : [];
         $queryName   = "{$schemaModel->name}Query";
 
-        $template    = Discovery::loadFrameTemplate("Schema.mu");
+        $template    = Discovery::loadFrameTemplate("database/Schema");
         $contents    = Mustache::render($template, [
             "namespace"           => $schemaModel->namespace,
             "name"                => $schemaModel->name,
@@ -316,7 +316,7 @@ class SchemaBuilder {
      * @return string
      */
     private static function getEntityCode(SchemaModel $schemaModel): string {
-        $template = Discovery::loadFrameTemplate("Entity.mu");
+        $template = Discovery::loadFrameTemplate("database/Entity");
         $contents = Mustache::render($template, [
             "namespace"  => $schemaModel->namespace,
             "name"       => $schemaModel->name,
@@ -459,7 +459,7 @@ class SchemaBuilder {
      * @return string
      */
     private static function getColumnCode(SchemaModel $schemaModel): string {
-        $template = Discovery::loadFrameTemplate("Column.mu");
+        $template = Discovery::loadFrameTemplate("database/Column");
         $contents = Mustache::render($template, [
             "namespace" => $schemaModel->namespace,
             "name"      => $schemaModel->name,
@@ -535,7 +535,7 @@ class SchemaBuilder {
      * @return string
      */
     private static function getQueryCode(SchemaModel $schemaModel): string {
-        $template = Discovery::loadFrameTemplate("Query.mu");
+        $template = Discovery::loadFrameTemplate("database/Query");
         $contents = Mustache::render($template, [
             "namespace"  => $schemaModel->namespace,
             "name"       => $schemaModel->name,
