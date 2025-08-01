@@ -194,6 +194,7 @@ class Field {
     public string    $name       = "";
     public string    $dbName     = "";
     public string    $prefixName = "";
+    public bool      $isStatus   = false;
 
 
     /**
@@ -215,6 +216,7 @@ class Field {
      * @param boolean   $canEdit    Optional.
      * @param boolean   $noEmpty    Optional.
      * @param boolean   $noExists   Optional.
+     * @param boolean   $isStatus   Optional.
      * @return Field
      */
     public static function create(
@@ -239,6 +241,7 @@ class Field {
         bool      $canEdit    = true,
         bool      $noEmpty    = false,
         bool      $noExists   = false,
+        bool      $isStatus   = false,
     ): Field {
         $result = new self(
             isID:      $isID,
@@ -259,6 +262,7 @@ class Field {
         $result->name       = $name;
         $result->dbName     = $dbName !== "" ? $dbName : $name;
         $result->prefixName = $prefixName !== "" ? $prefixName : $name;
+        $result->isStatus   = $isStatus;
         return $result;
     }
 

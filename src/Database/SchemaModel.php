@@ -8,6 +8,7 @@ use Framework\Database\Model\Virtual;
 use Framework\Database\Model\Count;
 use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
+use Framework\Database\Status\State;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -65,6 +66,9 @@ class SchemaModel {
     /** @var SubRequest[] */
     public array $subRequests    = [];
 
+    /** @var State[] */
+    public array $states         = [];
+
 
 
     /**
@@ -86,6 +90,7 @@ class SchemaModel {
      * @param Count[]      $counts        Optional.
      * @param Relation[]   $relations     Optional.
      * @param SubRequest[] $subRequests   Optional.
+     * @param State[]      $states        Optional.
      */
     public function __construct(
         string $name          = "",
@@ -107,6 +112,7 @@ class SchemaModel {
         array  $counts        = [],
         array  $relations     = [],
         array  $subRequests   = [],
+        array  $states        = [],
     ) {
         $this->name          = $name;
         $this->tableName     = self::getDbTableName($name);
@@ -128,6 +134,7 @@ class SchemaModel {
         $this->counts        = $counts;
         $this->relations     = $relations;
         $this->subRequests   = $subRequests;
+        $this->states        = $states;
 
         $this->setExtraFields();
         $this->setIDField();
@@ -151,10 +158,11 @@ class SchemaModel {
         }
         if ($this->hasStatus) {
             $this->extraFields[] = Field::create(
-                type:    FieldType::String,
-                name:    "status",
-                noEmpty: true,
-                isKey:   true,
+                type:     FieldType::String,
+                name:     "status",
+                noEmpty:  true,
+                isKey:    true,
+                isStatus: true,
             );
         }
 

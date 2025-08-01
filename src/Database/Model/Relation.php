@@ -85,7 +85,7 @@ class Relation {
     //   - `relationModelName.relationFieldName` where there is a Model Name and a field name
     //   - `relationAliasName.relationFieldName` where the Model Name as an alias and the field name
     // - ownerJoin: Join associates with the Model that owns a Column referencing the Relation. It can be in the form of:
-    //   - `ownerFieldName` where only the field name is used and the Model is infered
+    //   - `ownerFieldName` where only the field name is used and the Model is inferred
     //   - `ownerModelName.ownerFieldName` where there is a Model Name and a field name
     //   - `ownerModelName.ownerFieldName AND andModelName.andFieldName` where there is a Model Name, a field name and an AND extra condition
     //   - `ownerModelName.ownerFieldName AND andTableName.isDeleted = 1` where there is a Model Name, a field name and an AND extra condition

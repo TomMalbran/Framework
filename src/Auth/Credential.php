@@ -6,9 +6,9 @@ use Framework\Core\NLS;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialColumn;
+use Framework\Auth\Schema\CredentialStatus;
 use Framework\Auth\Schema\CredentialQuery;
 use Framework\System\Access;
-use Framework\System\Status;
 use Framework\System\Path;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
@@ -224,7 +224,7 @@ class Credential extends CredentialSchema {
             return [];
         }
 
-        $query->status->equal(Status::Active);
+        $query->statusEqual(CredentialStatus::Active);
         return self::getCredentials($query, $sort, false);
     }
 
@@ -612,7 +612,7 @@ class Credential extends CredentialSchema {
             currentLogin:     0,
             lastLogin:        0,
             askNotifications: false,
-            status:           Status::Inactive,
+            status:           CredentialStatus::Inactive,
             isDeleted:        true,
         );
     }
@@ -858,11 +858,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Status
-     * @param integer $credentialID
-     * @param Status  $status
+     * @param integer          $credentialID
+     * @param CredentialStatus $status
      * @return boolean
      */
-    public static function setStatus(int $credentialID, Status $status): bool {
+    public static function setStatus(int $credentialID, CredentialStatus $status): bool {
         return self::editEntity($credentialID, status: $status);
     }
 

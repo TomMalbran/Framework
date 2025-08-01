@@ -4,7 +4,7 @@ namespace Framework\Auth\Model;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Virtual;
-use Framework\System\Status;
+use Framework\Database\Status\Status;
 
 /**
  * The Credential Model

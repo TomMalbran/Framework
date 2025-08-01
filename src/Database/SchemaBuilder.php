@@ -6,6 +6,7 @@ use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Status\Status;
 use Framework\File\File;
 use Framework\Provider\Mustache;
 use Framework\Utils\Arrays;
@@ -36,25 +37,34 @@ class SchemaBuilder {
             $schemaName = "{$schemaModel->name}Schema.php";
             $schemaCode = self::getSchemaCode($schemaModel);
             File::create($schemaModel->path, $schemaName, $schemaCode);
+            $created += 1;
 
             $entityName = "{$schemaModel->name}Entity.php";
             $entityCode = self::getEntityCode($schemaModel);
             File::create($schemaModel->path, $entityName, $entityCode);
+            $created += 1;
 
             $columnName = "{$schemaModel->name}Column.php";
             $columnCode = self::getColumnCode($schemaModel);
             File::create($schemaModel->path, $columnName, $columnCode);
+            $created += 1;
 
             $queryName = "{$schemaModel->name}Query.php";
             $queryCode = self::getQueryCode($schemaModel);
             File::create($schemaModel->path, $queryName, $queryCode);
-
             $created += 1;
+
+            if ($schemaModel->hasStatus) {
+                $statusName = "{$schemaModel->name}Status.php";
+                $statusCode = self::getStatusCode($schemaModel);
+                File::create($schemaModel->path, $statusName, $statusCode);
+                $created += 1;
+            }
         }
 
         $name = $forFramework ? "Framework" : "App";
         print("- Generated the $name codes -> $created schemas\n");
-        return $created * 4;
+        return $created;
     }
 
 
@@ -89,6 +99,7 @@ class SchemaBuilder {
             "table"               => $schemaModel->tableName,
             "column"              => "{$schemaModel->name}Column",
             "entity"              => "{$schemaModel->name}Entity",
+            "status"              => "{$schemaModel->name}Status",
             "query"               => $queryName,
             "hasID"               => $schemaModel->hasID,
             "idName"              => $schemaModel->idName,
@@ -541,7 +552,9 @@ class SchemaBuilder {
             "name"       => $schemaModel->name,
             "column"     => "{$schemaModel->name}Column",
             "query"      => "{$schemaModel->name}Query",
+            "status"     => "{$schemaModel->name}Status",
             "properties" => self::getQueryProperties($schemaModel),
+            "statuses"   => self::getQueryStatuses($schemaModel),
         ]);
         $contents = self::alignParams($contents);
         return $contents;
@@ -559,12 +572,14 @@ class SchemaBuilder {
         $result     = [];
 
         foreach ($schemaModel->fields as $field) {
-            $list[] = [
-                "type"   => $field->type,
-                "column" => $field->name,
-                "name"   => $field->name,
-                "value"  => "{$schemaModel->tableName}.{$field->dbName}",
-            ];
+            if (!$field->isStatus) {
+                $list[] = [
+                    "type"   => $field->type,
+                    "column" => $field->name,
+                    "name"   => $field->name,
+                    "value"  => "{$schemaModel->tableName}.{$field->dbName}",
+                ];
+            }
         }
 
         foreach ($schemaModel->expressions as $expression) {
@@ -579,32 +594,29 @@ class SchemaBuilder {
         foreach ($schemaModel->relations as $relation) {
             $tableName = $relation->getDbTableName();
             foreach ($relation->fields as $field) {
-                $list[] = [
-                    "type"   => $field->type,
-                    "column" => $field->name,
-                    "name"   => $field->prefixName,
-                    "value"  => "{$tableName}.{$field->dbName}",
-                ];
+                if (!$field->isStatus) {
+                    $list[] = [
+                        "type"   => $field->type,
+                        "column" => $field->name,
+                        "name"   => $field->prefixName,
+                        "value"  => "{$tableName}.{$field->dbName}",
+                    ];
+                }
             }
         }
 
         foreach ($list as $property) {
-            $type = $property["type"];
-            if ($property["column"] === "status") {
-                $property["queryType"] = "StatusQuery";
-            } else {
-                $property["queryType"] = match($type) {
-                    FieldType::Boolean => "BooleanQuery",
-                    FieldType::Number,
-                    FieldType::Float   => "NumberQuery",
-                    FieldType::String,
-                    FieldType::Text,
-                    FieldType::LongText,
-                    FieldType::JSON,
-                    FieldType::File    => "StringQuery",
-                    default            => "",
-                };
-            }
+            $property["queryType"] = match($property["type"]) {
+                FieldType::Boolean => "BooleanQuery",
+                FieldType::Number,
+                FieldType::Float   => "NumberQuery",
+                FieldType::String,
+                FieldType::Text,
+                FieldType::LongText,
+                FieldType::JSON,
+                FieldType::File    => "StringQuery",
+                default            => "",
+            };
             if ($property["queryType"] !== "") {
                 $nameLength = max($nameLength, Strings::length($property["name"]));
                 $typeLength = max($typeLength, Strings::length($property["queryType"]));
@@ -619,6 +631,114 @@ class SchemaBuilder {
             $result[$index]["constName"] = Strings::padRight($property["name"], $nameLength);
         }
         return $result;
+    }
+
+    /**
+     * Returns the Query Statuses for the Query
+     * @param SchemaModel $schemaModel
+     * @return array{status:string,name:string,value:string}[]
+     */
+    private static function getQueryStatuses(SchemaModel $schemaModel): array {
+        $result = [];
+        foreach ($schemaModel->fields as $field) {
+            if ($field->isStatus) {
+                $result[] = [
+                    "status" => "{$schemaModel->name}Status",
+                    "name"   => $field->name,
+                    "value"  => "{$schemaModel->tableName}.{$field->dbName}",
+                ];
+            }
+        }
+        foreach ($schemaModel->relations as $relation) {
+            $tableName = $relation->getDbTableName();
+            foreach ($relation->fields as $field) {
+                if ($field->isStatus && $relation->relationModel !== null) {
+                    $result[] = [
+                        "namespace" => $relation->relationModel->namespace,
+                        "status"    => "{$relation->relationModelName}Status",
+                        "name"      => $field->prefixName,
+                        "value"     => "{$tableName}.{$field->dbName}",
+                    ];
+                }
+            }
+        }
+        return $result;
+    }
+
+
+
+    /**
+     * Returns the Status code
+     * @param SchemaModel $schemaModel
+     * @return string
+     */
+    private static function getStatusCode(SchemaModel $schemaModel): string {
+        $template = Discovery::loadFrameTemplate("database/Status");
+        $contents = Mustache::render($template, [
+            "namespace" => $schemaModel->namespace,
+            "name"      => $schemaModel->name,
+            "status"    => "{$schemaModel->name}Status",
+            "statuses"  => self::getStatusList($schemaModel),
+            "values"    => self::getStatusValues($schemaModel),
+        ]);
+        $contents = self::alignParams($contents);
+        return $contents;
+    }
+
+    /**
+     * Generates the Status list
+     * @param SchemaModel $schemaModel
+     * @return array{name:string,color:string,constant:string}[]
+     */
+    private static function getStatusList(SchemaModel $schemaModel): array {
+        $result    = [];
+        $maxLength = 0;
+
+        if (count($schemaModel->states) > 0) {
+            foreach ($schemaModel->states as $state) {
+                $result[] = [
+                    "name"     => $state->name,
+                    "color"    => $state->color->getColor(),
+                    "constant" => "",
+                ];
+                $maxLength = max($maxLength, Strings::length($state->name));
+            }
+        } else {
+            foreach (Status::getValues() as $statusName => $statusColor) {
+                $result[] = [
+                    "name"     => $statusName,
+                    "color"    => $statusColor,
+                    "constant" => "",
+                ];
+                $maxLength = max($maxLength, Strings::length($statusName));
+            }
+        }
+
+        foreach ($result as $index => $elem) {
+            $result[$index]["constant"] = Strings::padRight($elem["name"], $maxLength);
+        }
+        return $result;
+    }
+
+    /**
+     * Generates the Status values
+     * @param SchemaModel $schemaModel
+     * @return string
+     */
+    private static function getStatusValues(SchemaModel $schemaModel): string {
+        $result = [];
+        if (count($schemaModel->states) > 0) {
+            foreach ($schemaModel->states as $state) {
+                if (!$state->isHidden) {
+                    $result[] = $state->name;
+                }
+            }
+        } else {
+            foreach (Status::getValues() as $statusName => $statusColor) {
+                $result[] = $statusName;
+            }
+        }
+        return "self::" . Strings::join($result, ", self::");
     }
 
 

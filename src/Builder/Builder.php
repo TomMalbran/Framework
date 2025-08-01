@@ -8,7 +8,6 @@ use Framework\Builder\LanguageCode;
 use Framework\Builder\RouterCode;
 use Framework\Builder\SettingCode;
 use Framework\Builder\SignalCode;
-use Framework\Builder\StatusCode;
 use Framework\Builder\TemplateCode;
 use Framework\Database\SchemaBuilder;
 use Framework\Discovery\DataFile;
@@ -49,7 +48,6 @@ class Builder {
         $files += self::generateOne($writePath, "Path",     FilePath::getCode());
         $files += self::generateOne($writePath, "Language", LanguageCode::getCode());
         $files += self::generateOne($writePath, "Access",   AccessCode::getCode());
-        $files += self::generateOne($writePath, "Status",   StatusCode::getCode());
         $files += self::generateOne($writePath, "Template", TemplateCode::getCode());
 
 

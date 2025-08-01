@@ -1,9 +1,0 @@
-{
-    "values" : {
-        "Active"   : "green",
-        "Inactive" : "red"
-    },
-    "groups" : {
-        "General" : [ "Active", "Inactive" ]
-    }
-}

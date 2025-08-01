@@ -11,7 +11,6 @@ enum DataFile {
     case Route;
     case Schemas;
     case Migrations;
-    case Status;
     case Access;
     case Files;
     case Settings;

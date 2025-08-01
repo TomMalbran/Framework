@@ -10,8 +10,9 @@ use Framework\Database\Model\Virtual;
 use Framework\Database\Model\Count;
 use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
+use Framework\Database\Status\Status;
+use Framework\Database\Status\State;
 use Framework\File\File;
-use Framework\System\Status;
 use Framework\Utils\Strings;
 
 use ReflectionNamedType;
@@ -87,6 +88,7 @@ class SchemaFactory {
             $counts        = [];
             $relations     = [];
             $subRequests   = [];
+            $states        = [];
 
             // Parse the Properties
             $props = $reflection->getProperties();
@@ -127,6 +129,12 @@ class SchemaFactory {
                 // If the Type is Status, mark it in the Model
                 if ($typeName === Status::class) {
                     $hasStatus = true;
+                    foreach ($propAttributes as $attribute) {
+                        $instance = $attribute->newInstance();
+                        if ($instance instanceof State) {
+                            $states[] = $instance;
+                        }
+                    }
 
                 // If the Name is Position, mark it in the Model
                 } elseif ($fieldName === "position") {
@@ -191,6 +199,7 @@ class SchemaFactory {
                 relations:     $relations,
                 counts:        $counts,
                 subRequests:   $subRequests,
+                states:        $states,
             );
             $schemaModels[$name] = $schemaModel;
 
