@@ -8,7 +8,7 @@ use Attribute;
 /**
  * The Route Attribute
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_METHOD)]
 class Route {
 
     public string $route;

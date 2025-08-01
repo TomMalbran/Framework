@@ -6,7 +6,7 @@ use Attribute;
 /**
  * The Listener Attribute
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_METHOD)]
 class Listener {
 
     /** @var string[] */

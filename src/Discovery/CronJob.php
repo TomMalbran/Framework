@@ -6,7 +6,7 @@ use Attribute;
 /**
  * The CronJob Attribute
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_METHOD)]
 class CronJob {
 
     public string $minute;
