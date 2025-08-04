@@ -257,15 +257,15 @@ class FilePath {
         $directories = self::createDirs();
 
         if (count($paths) > 0) {
-            print("<br>Added <i>" . count($paths) . " paths</i><br>");
-            print(Strings::join($paths, ", ") . "<br>");
+            print("- Added " . count($paths) . " paths\n");
+            print(Strings::join($paths, ", ") . "\n");
         }
         if (count($directories) > 0) {
-            print("<br>Added <i>" . count($directories) . " directories</i><br>");
-            print(Strings::join($directories, ", ") . "<br>");
+            print("- Added " . count($directories) . " directories\n");
+            print(Strings::join($directories, ", ") . "\n");
         }
         if (count($paths) === 0 && count($directories) === 0) {
-            print("<br>No <i>paths</i> added<br>");
+            print("- No paths added\n");
         }
         return true;
     }

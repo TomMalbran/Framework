@@ -202,6 +202,7 @@ class Framework {
      * @return boolean
      */
     public static function ensurePaths(): bool {
+        print("\nENSURE PATHS\n");
         FilePath::ensurePaths();
         return true;
     }
