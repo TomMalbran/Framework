@@ -8,7 +8,6 @@ use Framework\Utils\Strings;
  */
 enum DataFile {
 
-    case Route;
     case Schemas;
     case Migrations;
     case Access;

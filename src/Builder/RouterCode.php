@@ -2,7 +2,6 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
-use Framework\Discovery\DataFile;
 use Framework\Discovery\Route;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -109,8 +108,7 @@ class RouterCode {
         }
 
         // Save the Test Data
-        $oldData = Discovery::loadData(DataFile::Route);
-        if (!Arrays::isEmpty($oldData) && !Arrays::isEmpty($testRoutes)) {
+        if (Discovery::hasDataFile("route") && !Arrays::isEmpty($testRoutes)) {
             Discovery::saveData("routesTest", $testRoutes);
         }
 
