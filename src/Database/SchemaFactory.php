@@ -263,7 +263,7 @@ class SchemaFactory {
         foreach ($schemaModels as $modelName => $schemaModel) {
             $schemas[$modelName] = $schemaModel->toArray();
         }
-        if (count($schemas) > 0) {
+        if (count($schemas) > 0 && Discovery::hasDataFile("schemasOld")) {
             Discovery::saveData("schemasTest", $schemas);
         }
 

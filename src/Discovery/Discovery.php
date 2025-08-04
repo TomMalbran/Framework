@@ -98,6 +98,17 @@ class Discovery {
     }
 
     /**
+     * Checks if the given File exists in the App Data Directory
+     * @param string $fileName
+     * @return boolean
+     */
+    public static function hasDataFile(string $fileName): bool {
+        $file = Strings::addSuffix($fileName, ".json");
+        $path = self::getAppPath(Package::DataDir, $file);
+        return File::exists($path);
+    }
+
+    /**
      * Loads a File from the App or defaults to the Framework
      * @return string
      */

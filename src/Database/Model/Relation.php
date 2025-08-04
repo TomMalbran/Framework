@@ -117,6 +117,7 @@ class Relation {
     public string $ownerModelName     = "";
     public string $ownerFieldName     = "";
     public string $ownerAndQuery      = "";
+    public string $fieldName          = "";
 
     // Model associated to the type of the Attribute
     public ?SchemaModel $relationModel = null;
@@ -152,29 +153,30 @@ class Relation {
         array  $fields,
     ): Relation {
         $result = new self();
-        $result->relationModelName  = $relationModelName;
-        $result->relationAliasName  = $relationAliasName;
-        $result->relationFieldName  = $relationFieldName;
+        $result->relationModelName = $relationModelName;
+        $result->relationAliasName = $relationAliasName;
+        $result->relationFieldName = $relationFieldName;
 
-        $result->ownerModelName     = $ownerModelName;
-        $result->ownerFieldName     = $ownerFieldName;
-        $result->ownerAndQuery      = $ownerAndQuery;
+        $result->ownerModelName    = $ownerModelName;
+        $result->ownerFieldName    = $ownerFieldName;
+        $result->ownerAndQuery     = $ownerAndQuery;
 
-        $result->fields             = $fields;
+        $result->fields            = $fields;
         return $result;
     }
 
     /**
      * BUILD STEP 1: When parsing the attributes of a Model, set the name of the Relation Model and prefix
      * @param string $relationModelName The Relation Model Name comes from the type of the attribute.
-     * @param string $prefix            The prefix is the name of the attribute.
+     * @param string $fieldName         The name of the attribute used as the prefix.
      * @return boolean
      */
-    public function setDataFromAttribute(string $relationModelName, string $prefix): bool {
+    public function setDataFromAttribute(string $relationModelName, string $fieldName): bool {
         $this->relationModelName = $relationModelName;
+        $this->fieldName         = $fieldName;
 
         if ($this->prefix === "") {
-            $this->prefix = $prefix;
+            $this->prefix = $fieldName;
         }
         return true;
     }
@@ -558,6 +560,9 @@ class Relation {
         }
         if ($result === "" || Arrays::contains($otherRelationNames, $result)) {
             $result = $this->prefix;
+        }
+        if ($result === "" || Arrays::contains($otherRelationNames, $result)) {
+            $result = $this->fieldName;
         }
         return $result;
     }

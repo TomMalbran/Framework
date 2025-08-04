@@ -104,14 +104,15 @@ class SubRequest {
 
     /**
      * Sets the Model for the SubRequest
-     * @param SchemaModel $relatedModel
+     * @param SchemaModel $schemaModel
      * @param SchemaModel $parentModel
      * @return SubRequest
      */
-    public function setModel(SchemaModel $relatedModel, SchemaModel $parentModel): SubRequest {
+    public function setModel(SchemaModel $schemaModel, SchemaModel $parentModel): SubRequest {
+        $this->schemaModel = $schemaModel;
         $this->parentModel = $parentModel;
-        $this->namespace   = $relatedModel->namespace;
-        $this->className   = "{$relatedModel->name}Schema";
+        $this->namespace   = $schemaModel->namespace;
+        $this->className   = "{$schemaModel->name}Schema";
         return $this;
     }
 
@@ -190,9 +191,14 @@ class SubRequest {
             }
         }
 
-        if ($this->schemaModel !== null && $this->schemaModel->canDelete) {
-            $isDeleted = $this->schemaModel->getKey("isDeleted");
-            $query->add($isDeleted, "=", 0);
+        if ($this->schemaModel !== null) {
+            if ($this->schemaModel->canDelete) {
+                $isDeleted = $this->schemaModel->getKey("isDeleted");
+                $query->add($isDeleted, "=", 0);
+            }
+            if ($this->schemaModel->hasPositions) {
+                $query->orderBy($this->schemaModel->getKey("position"), true);
+            }
         }
         return $query;
     }
@@ -260,6 +266,10 @@ class SubRequest {
         }
         if ($this->query !== "") {
             $result["where"] = Strings::split($this->query, " ");
+        }
+        if ($this->schemaModel !== null && $this->schemaModel->hasPositions) {
+            $result["orderBy"] = "position";
+            $result["isAsc"]   = true;
         }
         return $result;
     }
