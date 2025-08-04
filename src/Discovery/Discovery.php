@@ -17,12 +17,30 @@ use Throwable;
  */
 class Discovery {
 
+    private const Namespace     = "Framework\\";
+    private const SystemDir     = "System";
     private const DataDir       = "data";
     private const TemplateDir   = "data/templates";
     private const MigrationsDir = "migrations";
     private const EmailFile     = "email.html";
 
 
+
+    /**
+     * Returns the Namespace used in the Builder
+     * @return string
+     */
+    public static function getBuildNamespace(): string {
+        return self::Namespace . self::SystemDir;
+    }
+
+    /**
+     * Returns the Namespace used in the Builder
+     * @return string
+     */
+    public static function getBuildPath(): string {
+        return self::getFramePath("src", self::SystemDir);
+    }
 
     /**
      * Returns the BasePath

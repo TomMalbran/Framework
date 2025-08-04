@@ -1,17 +1,12 @@
 <?php
 namespace Framework\File;
 
-use Framework\Framework;
 use Framework\Request;
-use Framework\Discovery\Discovery;
-use Framework\Discovery\DataFile;
-use Framework\Database\SchemaModel;
-use Framework\Database\Assign;
-use Framework\Database\Query;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\System\Path;
+use Framework\System\MediaSchema;
 use Framework\Utils\Strings;
 
 /**
@@ -19,29 +14,7 @@ use Framework\Utils\Strings;
  */
 class MediaFile {
 
-    private static bool  $loaded = false;
-    private static int   $id     = 0;
-
-    /** @var array{schema:string,field:string,replace:boolean}[] */
-    private static array $data   = [];
-
-
-    /**
-     * Loads the Media Data
-     * @return boolean
-     */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return false;
-        }
-
-        /** @var array{media:array{schema:string,field:string,replace:boolean}[]} */
-        $data = Discovery::loadData(DataFile::Files);
-
-        self::$loaded = true;
-        self::$data   = $data["media"];
-        return true;
-    }
+    private static int $id = 0;
 
     /**
      * Sets the Current ID
@@ -50,53 +23,6 @@ class MediaFile {
      */
     public static function setID(int $id): bool {
         self::$id = $id;
-        return true;
-    }
-
-    /**
-     * Updates the Paths in the Database
-     * @param string $oldPath
-     * @param string $newPath
-     * @return boolean
-     */
-    public static function update(string $oldPath, string $newPath): bool {
-        self::load();
-        if (count(self::$data) === 0) {
-            return true;
-        }
-
-        $files = [
-            [
-                "old" => $oldPath,
-                "new" => $newPath,
-            ],
-            [
-                "old" => File::addFirstSlash($oldPath),
-                "new" => File::addFirstSlash($newPath),
-            ],
-        ];
-
-        $db = Framework::getDatabase();
-        foreach (self::$data as $field) {
-            $tableName = SchemaModel::getDbTableName($field["schema"]);
-
-            foreach ($files as $file) {
-                $old = $file["old"];
-                $new = $file["new"];
-
-                if ($field["replace"] === true) {
-                    $query = Query::create($field["field"], "LIKE", "\"$old\"");
-                    $db->update($tableName, [
-                        $field["field"] => Assign::replace($old, $new),
-                    ], $query);
-                } else {
-                    $query = Query::create($field["field"], "=", $old);
-                    $db->update($tableName, [
-                        $field["field"] => $new,
-                    ], $query);
-                }
-            }
-        }
         return true;
     }
 
@@ -233,7 +159,7 @@ class MediaFile {
         if (!File::deleteDir($source) || !File::deleteDir($thumbs)) {
             return false;
         }
-        return self::update($relPath, "");
+        return MediaSchema::updatePaths($relPath, "");
     }
 
 
@@ -289,6 +215,6 @@ class MediaFile {
             }
         }
 
-        return self::update($oldRelPath, $newRelPath);
+        return MediaSchema::updatePaths($oldRelPath, $newRelPath);
     }
 }

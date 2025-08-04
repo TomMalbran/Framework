@@ -2,6 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DataFile;
 use Framework\Builder\AccessCode;
 use Framework\Builder\ConfigCode;
 use Framework\Builder\LanguageCode;
@@ -10,7 +11,6 @@ use Framework\Builder\SettingCode;
 use Framework\Builder\SignalCode;
 use Framework\Builder\TemplateCode;
 use Framework\Database\SchemaBuilder;
-use Framework\Discovery\DataFile;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\File\FileType;
@@ -24,11 +24,6 @@ use Framework\Utils\Strings;
  */
 class Builder {
 
-    private const Namespace = "Framework\\";
-    private const SystemDir = "System";
-
-
-
     /**
      * Generates all the Code
      * @param boolean $willContinue Optional.
@@ -36,7 +31,7 @@ class Builder {
      */
     public static function generateCode(bool $willContinue = false): int {
         $package   = self::getPackageData();
-        $writePath = File::parsePath($package["framePath"], "src", self::SystemDir);
+        $writePath = Discovery::getBuildPath();
         $files     = 0;
 
         File::createDir($writePath);
@@ -120,7 +115,6 @@ class Builder {
 
         // Return the Package Data
         return [
-            "framePath"    => $framePath,
             "basePath"     => $basePath,
             "appNamespace" => $appNamespace,
             "appDir"       => $appDir,
@@ -145,7 +139,7 @@ class Builder {
 
         $template = Discovery::loadFrameTemplate($name);
         $contents = Mustache::render($template, $data + [
-            "namespace" => self::Namespace . self::SystemDir,
+            "namespace" => Discovery::getBuildNamespace(),
         ]);
 
         File::create($writePath, "$name.php", $contents);

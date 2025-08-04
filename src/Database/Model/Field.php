@@ -56,47 +56,53 @@ class Field {
     // For strings the length is 255 making the type as varchar(255)
     public int    $length     = 0;
 
-    // Indicates that the integer can be negative
+    // Indicates that the integer can be negative.
     public bool   $isSigned   = false;
 
-    // When the type is float, this indicates the number of decimals
+    // When the type is float, this indicates the number of decimals.
     public int    $decimals   = 2;
 
 
-    // Uses the type text in MySQL instead of varchar for strings
+    // Uses the type text in MySQL instead of varchar for strings.
     public bool   $isText     = false;
 
-    // Uses the type longtext in MySQL instead of varchar for strings
+    // Uses the type longtext in MySQL instead of varchar for strings.
     public bool   $isLongText = false;
 
-    // Indicates that the string is encrypted in the database
+    // Indicates that the string is encrypted in the database.
     public bool   $isEncrypt  = false;
 
-    // Indicates that the string is an encoded JSON
+    // Indicates that the string is an encoded JSON.
     public bool   $isJSON     = false;
 
-    // Indicates that the string is a relative path to a file
+
+    // Indicates that the string is a relative path to a file.
+    // The file path is updated automatically when the file is moved.
     public bool   $isFile     = false;
 
+    // Indicates that there might be a file path in the string or text.
+    // The file paths are updated automatically when the file is moved.
+    public bool   $hasFile    = false;
 
-    // Used to convert a date to a timeStamp that comes from an input
+    // Used to generate the path and url of the file.
+    public string $filePath   = "";
+
+
+    // Used to convert a date to a timeStamp that comes from an input.
     public string $dateInput  = "";
 
     // Used with the 'dateInput' to indicate if the hour of the date is at:
     // 'start', 'middle' or 'end'
     public string $dateType   = "";
 
-    // Used with the 'dateInput' to indicate that the hour comes from an input
+    // Used with the 'dateInput' to indicate that the hour comes from an input.
     public string $hourInput  = "";
 
-    // Used to generate the path and url of the file
-    public string $filePath   = "";
 
-
-    // Used to indicate that the field should not change when using the edit functions with a Request
+    // Used to indicate that the field should not change when using the edit functions with a Request.
     public bool   $canEdit    = true;
 
-    // FIXME: Remove this temporary properties
+    // FIXME: Remove this temporary properties.
     public bool   $noEmpty    = false;
     public bool   $noExists   = false;
 
@@ -119,10 +125,11 @@ class Field {
      * @param boolean $isEncrypt  Optional.
      * @param boolean $isJSON     Optional.
      * @param boolean $isFile     Optional.
+     * @param boolean $hasFile    Optional.
+     * @param string  $filePath   Optional.
      * @param string  $dateType   Optional.
      * @param string  $dateInput  Optional.
      * @param string  $hourInput  Optional.
-     * @param string  $filePath   Optional.
      * @param boolean $canEdit    Optional.
      * @param boolean $noEmpty    Optional.
      * @param boolean $noExists   Optional.
@@ -146,12 +153,14 @@ class Field {
         bool   $isLongText = false,
         bool   $isEncrypt  = false,
         bool   $isJSON     = false,
+
         bool   $isFile     = false,
+        bool   $hasFile    = false,
+        string $filePath   = "",
 
         string $dateType   = "",
         string $dateInput  = "",
         string $hourInput  = "",
-        string $filePath   = "",
 
         bool   $canEdit    = true,
         bool   $noEmpty    = false,
@@ -175,12 +184,14 @@ class Field {
         $this->isLongText = $isLongText;
         $this->isEncrypt  = $isEncrypt;
         $this->isJSON     = $isJSON;
+
         $this->isFile     = $isFile;
+        $this->hasFile    = $hasFile;
+        $this->filePath   = $filePath;
 
         $this->dateType   = $dateType;
         $this->dateInput  = $dateInput;
         $this->hourInput  = $hourInput;
-        $this->filePath   = $filePath;
 
         $this->canEdit    = $canEdit;
         $this->noEmpty    = $noEmpty;

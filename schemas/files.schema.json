@@ -2,7 +2,7 @@
     "title"                : "Files",
     "type"                 : "object",
     "additionalProperties" : false,
-    "required"             : [ "paths", "directories", "media" ],
+    "required"             : [ "paths", "directories" ],
     "properties"           : {
         "paths" : {
             "type"  : "array",
@@ -14,25 +14,6 @@
             "type"  : "array",
             "items" : {
                 "type" : "string"
-            }
-        },
-        "media" : {
-            "type"  : "array",
-            "items" : {
-                "type"                 : "object",
-                "additionalProperties" : false,
-                "required"             : [ "schema", "field", "replace" ],
-                "properties"           : {
-                    "schema"  : {
-                        "type"    : "string",
-                        "pattern" : "^[A-Z][A-Za-z]*$"
-                    },
-                    "field"   : {
-                        "type"    : "string",
-                        "pattern" : "^[a-z][A-Za-z]*$"
-                    },
-                    "replace" : { "type" : "boolean" }
-                }
             }
         }
     }

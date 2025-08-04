@@ -62,6 +62,12 @@ class SchemaBuilder {
             }
         }
 
+        if (!$forFramework) {
+            $writePath = Discovery::getBuildPath();
+            $mediaCode = self::getMediaCode($schemaModels);
+            File::create($writePath, "MediaSchema.php", $mediaCode);
+        }
+
         $name = $forFramework ? "Framework" : "App";
         print("- Generated the $name codes -> $created schemas\n");
         return $created;
@@ -739,6 +745,37 @@ class SchemaBuilder {
             }
         }
         return "self::" . Strings::join($result, ", self::");
+    }
+
+
+
+    /**
+     * Generates the Media code for all Schemas with File fields
+     * @param SchemaModel[] $schemaModels
+     * @return string
+     */
+    private static function getMediaCode(array $schemaModels): string {
+        $fields = [];
+        foreach ($schemaModels as $schemaModel) {
+            foreach ($schemaModel->fields as $field) {
+                if ($field->isFile || $field->hasFile) {
+                    $fields[] = [
+                        "name"      => $schemaModel->name,
+                        "query"     => Strings::lowerCaseFirst("{$schemaModel->name}Query"),
+                        "tableName" => $schemaModel->tableName,
+                        "fieldName" => $field->name,
+                        "isReplace" => $field->isText || $field->isLongText || $field->isJSON,
+                    ];
+                }
+            }
+        }
+
+        $template = Discovery::loadFrameTemplate("database/Media");
+        $contents = Mustache::render($template, [
+            "namespace" => Discovery::getBuildNamespace(),
+            "fields"    => $fields,
+        ]);
+        return $contents;
     }
 
 
