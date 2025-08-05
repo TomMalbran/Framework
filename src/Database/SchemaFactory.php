@@ -23,7 +23,17 @@ use ReflectionNamedType;
 class SchemaFactory {
 
     /**
-     * Builds the Schema data
+     * Returns all the Schema Models
+     * @return SchemaModel[]
+     */
+    public static function getData(): array {
+        $frameModels = self::buildData(forFramework: true);
+        $appModels   = self::buildData(forFramework: false);
+        return array_merge($frameModels, $appModels);
+    }
+
+    /**
+     * Builds the Schema Models for the Framework or the Application
      * @param bool $forFramework Optional.
      * @return SchemaModel[]
      */

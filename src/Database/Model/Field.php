@@ -433,11 +433,7 @@ class Field {
         }
 
         if ($result !== "unknown" && $default !== null) {
-            if (is_numeric($default)) {
-                $result .= " DEFAULT {$default}";
-            } else {
-                $result .= " DEFAULT '{$default}'";
-            }
+            $result .= " DEFAULT '{$default}'";
         }
         return $result;
     }

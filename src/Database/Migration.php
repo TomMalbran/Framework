@@ -24,7 +24,7 @@ class Migration {
      */
     public static function migrateData(bool $canDelete = false): bool {
         $db             = Framework::getDatabase();
-        $schemaModels   = SchemaFactory::buildData();
+        $schemaModels   = SchemaFactory::getData();
         $startMovement  = Settings::getCore("movement");
         $startRename    = Settings::getCore("rename");
         $startMigration = Settings::getCore("migration");
