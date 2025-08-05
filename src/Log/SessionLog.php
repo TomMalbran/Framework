@@ -35,7 +35,7 @@ class SessionLog extends LogSessionSchema {
     public static function start(int $credentialID): int {
         return self::createEntity(
             credentialID: $credentialID,
-            userID:       Auth::getUserID(),
+            currentUser:  Auth::getUserID(),
             ip:           Server::getIP(),
             userAgent:    Server::getUserAgent(),
             isOpen:       true,

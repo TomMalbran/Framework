@@ -166,7 +166,7 @@ class ActionLog extends LogActionSchema {
         self::createEntity(
             sessionID:    $sessionID,
             credentialID: $credentialID,
-            userID:       Auth::getUserID(),
+            currentUser:  Auth::getUserID(),
             module:       $module,
             action:       $action,
             dataID:       JSON::encode($dataID),

@@ -23,7 +23,7 @@ class LogSessionModel {
     #[Field(isKey: true)]
     public int $credentialID = 0;
 
-    public int $userID = 0;
+    public int $currentUser = 0;
 
     public string $ip = "";
 

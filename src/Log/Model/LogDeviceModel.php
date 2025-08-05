@@ -3,6 +3,7 @@ namespace Framework\Log\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Auth\Model\CredentialDeviceModel;
 
 /**
  * The Log Device Model
@@ -20,7 +21,7 @@ class LogDeviceModel {
 
     public string $userAgent = "";
 
-    #[Field(belongsTo: "CredentialDevice")]
+    #[Field(belongsTo: CredentialDeviceModel::class)]
     public string $playerID = "";
 
     public bool $wasAdded = false;
