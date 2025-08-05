@@ -224,13 +224,19 @@ class SchemaFactory {
                 if (!$field->isID && $field->belongsTo === "") {
                     $field->belongsTo = $modelIDs[$field->name] ?? "";
                 }
-                if (isset($modelIDs[$field->name]) || $field->belongsTo !== "") {
+
+                // Set the DB Name (Name in uppercase) for the Field when:
+                // 1. The main field is an ID of a Model
+                if (isset($modelIDs[$field->name])) {
                     $field->setDbName();
+                // 2. The field belongs to a Model and the otherField is an ID of a Model
+                } elseif ($field->belongsTo !== "" && isset($modelIDs[$field->otherField])) {
+                    $field->setDbName();
+                // 3. There is a Relation where the Field is the Owner
                 } else {
                     foreach ($schemaModel->relations as $relation) {
-                        $relationKey = $relation->relationFieldName;
-                        $ownerKey    = $relation->ownerFieldName;
-                        if ($ownerKey === $field->name && isset($modelIDs[$relationKey])) {
+                        $ownerKey = $relation->ownerFieldName;
+                        if ($ownerKey === $field->name && isset($modelIDs[$relation->relationFieldName])) {
                             $field->setDbName();
                             break;
                         }
