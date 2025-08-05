@@ -246,7 +246,7 @@ class SchemaFactory {
             // Set the Model of each Count
             foreach ($schemaModel->counts as $count) {
                 if (isset($schemaModels[$count->modelName])) {
-                    $count->setModel($schemaModels[$count->modelName]);
+                    $count->setModel($schemaModels[$count->modelName], $schemaModel);
                 }
             }
 

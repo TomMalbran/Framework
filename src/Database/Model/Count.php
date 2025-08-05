@@ -16,10 +16,11 @@ class Count {
     public string $modelName      = "";
 
     // The name of the Model used in the Join
-    // If empty, the join is done with the parent Model
+    // If empty, the join is done with the Model where the Count is defined
     public string $otherModelName = "";
 
     // The name of the Field used in the Count
+    // If empty, the field is the ID field of the Model where the Count is defined
     public string $fieldName      = "";
 
     // An additional Query to filter the Count
@@ -85,11 +86,16 @@ class Count {
 
     /**
      * Sets the Model for the Count
-     * @param SchemaModel $relatedModel
+     * @param SchemaModel $schemaModel
+     * @param SchemaModel $parentModel
      * @return Count
      */
-    public function setModel(SchemaModel $relatedModel): Count {
-        $this->hasDeleted = $relatedModel->canDelete;
+    public function setModel(SchemaModel $schemaModel, SchemaModel $parentModel): Count {
+        $this->hasDeleted = $schemaModel->canDelete;
+
+        if ($this->fieldName === "") {
+            $this->fieldName = $parentModel->idName;
+        }
         return $this;
     }
 
