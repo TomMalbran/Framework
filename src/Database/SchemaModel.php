@@ -482,10 +482,14 @@ class SchemaModel {
 
     /**
      * Gets the name of the model without the class stuff
-     * @param string $modelName
+     * @param string|null $modelName
      * @return string
      */
-    public static function getBaseModelName(string $modelName): string {
+    public static function getBaseModelName(?string $modelName): string {
+        if ($modelName === null) {
+            return "";
+        }
+
         $result = Strings::stripEnd($modelName, "Model");
         if (Strings::contains($result, "\\")) {
             $result = Strings::substringAfter($result, "\\");

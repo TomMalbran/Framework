@@ -29,16 +29,19 @@ class Count {
 
     /**
      * The Count Attribute
-     * @param string $modelName      Optional.
-     * @param string $otherModelName Optional.
-     * @param string $fieldName      Optional.
-     * @param string $query          Optional.
+     * @phpstan-param class-string|null $modelName
+     * @phpstan-param class-string|null $otherModelName
+     *
+     * @param string|null $modelName      Optional.
+     * @param string|null $otherModelName Optional.
+     * @param string      $fieldName      Optional.
+     * @param string      $query          Optional.
      */
     public function __construct(
-        string $modelName      = "",
-        string $otherModelName = "",
-        string $fieldName      = "",
-        string $query          = "",
+        ?string $modelName      = null,
+        ?string $otherModelName = null,
+        string  $fieldName       = "",
+        string  $query           = "",
     ) {
         $this->modelName      = SchemaModel::getBaseModelName($modelName);
         $this->otherModelName = SchemaModel::getBaseModelName($otherModelName);
@@ -69,8 +72,12 @@ class Count {
         string $fieldName,
         string $query,
     ): Count {
-        $result = new self($modelName, $otherModelName, $fieldName, $query);
-        $result->name = $name;
+        $result = new self();
+        $result->name           = $name;
+        $result->modelName      = $modelName;
+        $result->otherModelName = $otherModelName;
+        $result->fieldName      = $fieldName;
+        $result->query          = $query;
         return $result;
     }
 

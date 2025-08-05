@@ -109,62 +109,64 @@ class Field {
 
     /**
      * The Field Attribute
-     * @param boolean $isID       Optional.
-     * @param boolean $notAutoInc Optional.
-     * @param boolean $isPrimary  Optional.
-     * @param boolean $isKey      Optional.
-     * @param boolean $isParent   Optional.
-     * @param boolean $isUnique   Optional.
-     * @param string  $belongsTo  Optional.
-     * @param string  $otherField Optional.
-     * @param int     $length     Optional.
-     * @param boolean $isSigned   Optional.
-     * @param int     $decimals   Optional.
-     * @param boolean $isText     Optional.
-     * @param boolean $isLongText Optional.
-     * @param boolean $isEncrypt  Optional.
-     * @param boolean $isJSON     Optional.
-     * @param boolean $isFile     Optional.
-     * @param boolean $hasFile    Optional.
-     * @param string  $filePath   Optional.
-     * @param string  $dateType   Optional.
-     * @param string  $dateInput  Optional.
-     * @param string  $hourInput  Optional.
-     * @param boolean $canEdit    Optional.
-     * @param boolean $noEmpty    Optional.
-     * @param boolean $noExists   Optional.
+     * @phpstan-param class-string|null $belongsTo
+     *
+     * @param boolean     $isID       Optional.
+     * @param boolean     $notAutoInc Optional.
+     * @param boolean     $isPrimary  Optional.
+     * @param boolean     $isKey      Optional.
+     * @param boolean     $isParent   Optional.
+     * @param boolean     $isUnique   Optional.
+     * @param string|null $belongsTo  Optional.
+     * @param string      $otherField Optional.
+     * @param int         $length     Optional.
+     * @param boolean     $isSigned   Optional.
+     * @param int         $decimals   Optional.
+     * @param boolean     $isText     Optional.
+     * @param boolean     $isLongText Optional.
+     * @param boolean     $isEncrypt  Optional.
+     * @param boolean     $isJSON     Optional.
+     * @param boolean     $isFile     Optional.
+     * @param boolean     $hasFile    Optional.
+     * @param string      $filePath   Optional.
+     * @param string      $dateType   Optional.
+     * @param string      $dateInput  Optional.
+     * @param string      $hourInput  Optional.
+     * @param boolean     $canEdit    Optional.
+     * @param boolean     $noEmpty    Optional.
+     * @param boolean     $noExists   Optional.
      */
     public function __construct(
-        bool   $isID       = false,
-        bool   $notAutoInc = false,
-        bool   $isPrimary  = false,
-        bool   $isKey      = false,
+        bool    $isID       = false,
+        bool    $notAutoInc = false,
+        bool    $isPrimary  = false,
+        bool    $isKey      = false,
 
-        bool   $isParent   = false,
-        bool   $isUnique   = false,
-        string $belongsTo  = "",
-        string $otherField = "",
+        bool    $isParent   = false,
+        bool    $isUnique   = false,
+        ?string $belongsTo  = null,
+        string  $otherField = "",
 
-        int    $length     = 0,
-        bool   $isSigned   = false,
-        int    $decimals   = 2,
+        int     $length     = 0,
+        bool    $isSigned   = false,
+        int     $decimals   = 2,
 
-        bool   $isText     = false,
-        bool   $isLongText = false,
-        bool   $isEncrypt  = false,
-        bool   $isJSON     = false,
+        bool    $isText     = false,
+        bool    $isLongText = false,
+        bool    $isEncrypt  = false,
+        bool    $isJSON     = false,
 
-        bool   $isFile     = false,
-        bool   $hasFile    = false,
-        string $filePath   = "",
+        bool    $isFile     = false,
+        bool    $hasFile    = false,
+        string  $filePath   = "",
 
-        string $dateType   = "",
-        string $dateInput  = "",
-        string $hourInput  = "",
+        string  $dateType   = "",
+        string  $dateInput  = "",
+        string  $hourInput  = "",
 
-        bool   $canEdit    = true,
-        bool   $noEmpty    = false,
-        bool   $noExists   = false,
+        bool    $canEdit    = true,
+        bool    $noEmpty    = false,
+        bool    $noExists   = false,
     ) {
         $this->isID       = $isID;
         $this->notAutoInc = $notAutoInc;

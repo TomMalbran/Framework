@@ -24,18 +24,20 @@ class SubRequest {
 
     /**
      * The SubRequest Attribute
-     * @param string $modelName Optional.
-     * @param string $idName    Optional.
-     * @param string $fieldName Optional.
-     * @param string $valueName Optional.
-     * @param string $query     Optional.
+     * @phpstan-param class-string|null $modelName
+     *
+     * @param string|null $modelName Optional.
+     * @param string      $idName    Optional.
+     * @param string      $fieldName Optional.
+     * @param string      $valueName Optional.
+     * @param string      $query     Optional.
      */
     public function __construct(
-        string $modelName = "",
-        string $idName    = "",
-        string $fieldName = "",
-        string $valueName = "",
-        string $query     = "",
+        ?string $modelName = null,
+        string  $idName    = "",
+        string  $fieldName = "",
+        string  $valueName = "",
+        string  $query     = "",
     ) {
         $this->modelName = SchemaModel::getBaseModelName($modelName);
         $this->idName    = $idName;
@@ -76,10 +78,10 @@ class SubRequest {
         string      $valueName,
         string      $query,
     ): SubRequest {
-        $result = new self("", $idName, $fieldName, $valueName, $query);
+        $result = new self(null, $idName, $fieldName, $valueName, $query);
+        $result->schemaModel = $schemaModel;
         $result->name        = $name;
         $result->idDbName    = $idDbName;
-        $result->schemaModel = $schemaModel;
         return $result;
     }
 
