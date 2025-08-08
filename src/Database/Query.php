@@ -106,45 +106,56 @@ class Query {
 
         $prefix = $this->getPrefix();
         $suffix = $caseSensitive ? "BINARY" : "";
+        $param  = null;
         $binds  = "?";
 
         switch ($expression) {
         case "=":
             if (is_array($value) && count($value) === 1) {
-                $value      = $value[0];
+                $param      = $value[0];
             } elseif (is_array($value) && count($value) > 1) {
+                $param      = $value;
                 $expression = "IN";
                 $binds      = $this->createBinds($value);
+            } elseif (!is_array($value)) {
+                $param      = $value;
             }
             break;
 
         case "<>":
             if (is_array($value) && count($value) === 1) {
-                $value      = $value[0];
+                $param      = $value[0];
             } elseif (is_array($value) && count($value) > 1) {
+                $param      = $value;
                 $expression = "NOT IN";
                 $binds      = $this->createBinds($value);
+            } elseif (!is_array($value)) {
+                $param      = $value;
             }
             break;
 
         case "IN":
             if (is_array($value) && count($value) > 1) {
-                $binds = $this->createBinds($value);
+                $param      = $value;
+                $binds      = $this->createBinds($value);
             } elseif (is_array($value) && count($value) === 1) {
-                $value      = $value[0];
+                $param      = $value[0];
                 $expression = "=";
             } elseif (!is_array($value)) {
+                $param      = $value;
                 $expression = "=";
             }
             break;
 
         case "NOT IN":
             if (is_array($value) && count($value) > 1) {
-                $binds = $this->createBinds($value);
+                $param      = $value;
+                $binds      = $this->createBinds($value);
             } elseif (is_array($value) && count($value) === 1) {
-                $value      = $value[0];
+                $param      = $value[0];
                 $expression = "<>";
             } elseif (!is_array($value)) {
+                $param      = $value;
                 $expression = "<>";
             }
             break;
@@ -152,30 +163,36 @@ class Query {
         case "LIKE":
         case "NOT LIKE":
             if (!is_array($value)) {
-                $value = "%" . trim(strtolower((string)$value)) . "%";
+                $param = "%" . trim(strtolower((string)$value)) . "%";
             }
             break;
 
         case "STARTS":
         case "NOT STARTS":
             if (!is_array($value)) {
+                $param      = trim(strtolower((string)$value)) . "%";
                 $expression = Strings::replace($expression, "STARTS", "LIKE");
-                $value      = trim(strtolower((string)$value)) . "%";
             }
             break;
 
         case "ENDS":
         case "NOT ENDS":
             if (!is_array($value)) {
+                $param      = "%" . trim(strtolower((string)$value));
                 $expression = Strings::replace($expression, "ENDS", "LIKE");
-                $value      = "%" . trim(strtolower((string)$value));
             }
             break;
+
         default:
+            $param = $value;
+        }
+
+        if ($param === null) {
+            return $this;
         }
 
         $this->where    .= "$prefix $column $expression $suffix $binds ";
-        $this->params    = array_merge($this->params, Arrays::toArray($value));
+        $this->params    = array_merge($this->params, Arrays::toArray($param));
         $this->columns[] = $column;
         return $this;
     }

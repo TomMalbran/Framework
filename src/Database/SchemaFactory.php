@@ -40,6 +40,7 @@ class SchemaFactory {
     public static function buildData(bool $forFramework = false): array {
         $schemaModels = [];
         $modelIDs     = [];
+        $dbNames      = [];
 
         $reflections = Discovery::getReflectionClasses(
             skipIgnored:  true,
@@ -136,8 +137,12 @@ class SchemaFactory {
                     }
                 }
 
-                // If the Type is Status, mark it in the Model
-                if ($typeName === Status::class) {
+                // POSITION: If the Name is Position, mark it in the Model
+                if ($fieldName === "position") {
+                    $hasPositions = true;
+
+                // STATUS: If the Type is Status, mark it in the Model
+                } elseif ($typeName === Status::class) {
                     $hasStatus = true;
                     foreach ($propAttributes as $attribute) {
                         $instance = $attribute->newInstance();
@@ -146,11 +151,7 @@ class SchemaFactory {
                         }
                     }
 
-                // If the Name is Position, mark it in the Model
-                } elseif ($fieldName === "position") {
-                    $hasPositions = true;
-
-                // If is not a Built-in Type, is a Relation to be parsed later
+                // Relation: If the type is not a Built-in Type
                 } elseif (!$propType->isBuiltin()) {
                     $relationModelName = Strings::substringAfter($typeName, "\\");
                     $relationModelName = Strings::stripEnd($relationModelName, "Model");
@@ -159,7 +160,7 @@ class SchemaFactory {
                     $relation->parseOwnerJoin();
                     $relations[] = $relation;
 
-                // If is an Array, is a SubRequest
+                // SubRequest: If the type is an Array (No SubRequest attribute required)
                 } elseif ($typeName === "array") {
                     $comment = $prop->getDocComment();
                     if ($comment !== false) {
@@ -172,19 +173,19 @@ class SchemaFactory {
                         $subRequests[] = $subRequest->setData($fieldName, $subType, $subSchema);
                     }
 
-                // If is an Expression, add it to the Model
+                // Expression: If it has an Expression attribute
                 } elseif ($expression !== null) {
                     $expressions[] = $expression->setData($fieldName, $typeName);
 
-                // If is a Virtual, add it to the Model
+                // Virtual: If it has a Virtual attribute
                 } elseif ($virtual !== null) {
                     $virtualFields[] = $virtual->setData($fieldName, $typeName);
 
-                // If is a Count, add it to the Model
+                // Count: If it has a Count attribute
                 } elseif ($count !== null) {
                     $counts[] = $count->setData($fieldName);
 
-                // Add the Main Field
+                // Field: Anything else is a Main Field and can have a Field attribute
                 } else {
                     $mainFields[] = $field->setData($fieldName, $typeName);
                 }
@@ -218,7 +219,26 @@ class SchemaFactory {
             }
         }
 
-        // Update the Models using the Models IDs
+        // Set the Models in the Relations, Counts and SubRequests
+        foreach ($schemaModels as $schemaModel) {
+            foreach ($schemaModel->relations as $relation) {
+                if (isset($schemaModels[$relation->relationModelName])) {
+                    $relation->setModels($schemaModels[$relation->relationModelName], $schemaModel);
+                }
+            }
+            foreach ($schemaModel->counts as $count) {
+                if (isset($schemaModels[$count->modelName])) {
+                    $count->setModel($schemaModels[$count->modelName], $schemaModel);
+                }
+            }
+            foreach ($schemaModel->subRequests as $subRequest) {
+                if (isset($schemaModels[$subRequest->modelName])) {
+                    $subRequest->setModel($schemaModels[$subRequest->modelName], $schemaModel);
+                }
+            }
+        }
+
+        // Set the BelongsTo and the DB Names of the Main Fields
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->mainFields as $field) {
                 if (!$field->isID && $field->belongsTo === "") {
@@ -228,16 +248,16 @@ class SchemaFactory {
                 // Set the DB Name (Name in uppercase) for the Field when:
                 // 1. The main field is an ID of a Model
                 if (isset($modelIDs[$field->name])) {
-                    $field->setDbName();
+                    $dbNames[$field->name] = $field->setDbName();
                 // 2. The field belongs to a Model and the otherField is an ID of a Model
                 } elseif ($field->belongsTo !== "" && isset($modelIDs[$field->otherField])) {
-                    $field->setDbName();
+                    $dbNames[$field->name] = $field->setDbName();
                 // 3. There is a Relation where the Field is the Owner
                 } else {
                     foreach ($schemaModel->relations as $relation) {
                         $ownerKey = $relation->ownerFieldName;
                         if ($ownerKey === $field->name && isset($modelIDs[$relation->relationFieldName])) {
-                            $field->setDbName();
+                            $dbNames[$field->name] = $field->setDbName();
                             break;
                         }
                     }
@@ -246,31 +266,12 @@ class SchemaFactory {
             $schemaModel->setIDField();
         }
 
-        // Parse the Models using the Models created
+        // Do the final parsing in the Relations
         foreach ($schemaModels as $schemaModel) {
-            // Set the Model of each Relation
             foreach ($schemaModel->relations as $relation) {
-                if (isset($schemaModels[$relation->relationModelName])) {
-                    $relation->setModels($schemaModels[$relation->relationModelName], $schemaModel);
-                    $relation->generateFields();
-                }
-            }
-            foreach ($schemaModel->relations as $relation) {
+                $relation->generateFields();
                 $relation->inferOwnerModelName();
-            }
-
-            // Set the Model of each Count
-            foreach ($schemaModel->counts as $count) {
-                if (isset($schemaModels[$count->modelName])) {
-                    $count->setModel($schemaModels[$count->modelName], $schemaModel);
-                }
-            }
-
-            // Set the Model of each SubRequest
-            foreach ($schemaModel->subRequests as $subRequest) {
-                if (isset($schemaModels[$subRequest->modelName])) {
-                    $subRequest->setModel($schemaModels[$subRequest->modelName], $schemaModel);
-                }
+                $relation->setDbNames($dbNames);
             }
         }
 

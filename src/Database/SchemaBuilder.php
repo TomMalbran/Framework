@@ -68,8 +68,9 @@ class SchemaBuilder {
             File::create($writePath, "MediaSchema.php", $mediaCode);
         }
 
-        $name = $forFramework ? "Framework" : "App";
-        print("- Generated the $name codes -> $created schemas\n");
+        $name   = $forFramework ? "Framework" : "App";
+        $models = count($schemaModels);
+        print("- Generated the $name codes -> $models models ($created files)\n");
         return $created;
     }
 

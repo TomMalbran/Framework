@@ -328,11 +328,11 @@ class Field {
 
     /**
      * Sets the Database Name of the Field
-     * @return Field
+     * @return string
      */
-    public function setDbName(): Field {
+    public function setDbName(): string {
         $this->dbName = SchemaModel::getDbFieldName($this->name);
-        return $this;
+        return $this->dbName;
     }
 
 

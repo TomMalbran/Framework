@@ -111,13 +111,15 @@ class Relation {
 
 
     // Used internally when parsing the Model
-    public string $relationModelName  = "";
-    public string $relationAliasName  = "";
-    public string $relationFieldName  = "";
-    public string $ownerModelName     = "";
-    public string $ownerFieldName     = "";
-    public string $ownerAndQuery      = "";
-    public string $fieldName          = "";
+    public string $relationModelName   = "";
+    public string $relationAliasName   = "";
+    public string $relationFieldName   = "";
+    public string $relationFieldDbName = "";
+    public string $ownerModelName      = "";
+    public string $ownerFieldName      = "";
+    public string $ownerFieldDbName    = "";
+    public string $ownerAndQuery       = "";
+    public string $fieldName           = "";
 
     // Model associated to the type of the Attribute
     public ?SchemaModel $relationModel = null;
@@ -134,9 +136,9 @@ class Relation {
      * Creates a Relation
      * @param string  $relationModelName
      * @param string  $relationAliasName
-     * @param string  $relationFieldName
+     * @param string  $relationFieldDbName
      * @param string  $ownerModelName
-     * @param string  $ownerFieldName
+     * @param string  $ownerFieldDbName
      * @param string  $ownerAndQuery
      * @param Field[] $fields
      * @return Relation
@@ -144,24 +146,24 @@ class Relation {
     public static function create(
         string $relationModelName,
         string $relationAliasName,
-        string $relationFieldName,
+        string $relationFieldDbName,
 
         string $ownerModelName,
-        string $ownerFieldName,
+        string $ownerFieldDbName,
         string $ownerAndQuery,
 
         array  $fields,
     ): Relation {
         $result = new self();
-        $result->relationModelName = $relationModelName;
-        $result->relationAliasName = $relationAliasName;
-        $result->relationFieldName = $relationFieldName;
+        $result->relationModelName   = $relationModelName;
+        $result->relationAliasName   = $relationAliasName;
+        $result->relationFieldDbName = $relationFieldDbName;
 
-        $result->ownerModelName    = $ownerModelName;
-        $result->ownerFieldName    = $ownerFieldName;
-        $result->ownerAndQuery     = $ownerAndQuery;
+        $result->ownerModelName      = $ownerModelName;
+        $result->ownerFieldDbName    = $ownerFieldDbName;
+        $result->ownerAndQuery       = $ownerAndQuery;
 
-        $result->fields            = $fields;
+        $result->fields              = $fields;
         return $result;
     }
 
@@ -329,9 +331,9 @@ class Relation {
             return false;
         }
 
-        // First try to find if a Main Field is the ID of the related Model
+        // First try to find if a Field (Main or Extra) is the ID of the related Model
         $hasKey = false;
-        foreach ($this->parentModel->mainFields as $field) {
+        foreach ($this->parentModel->fields as $field) {
             if ($field->name === $this->ownerFieldName) {
                 $hasKey = true;
                 break;
@@ -355,6 +357,26 @@ class Relation {
             }
         }
         return false;
+    }
+
+    /**
+     * BUILD STEP 7: Sets the relationFieldDbName and ownerFieldDbName using the modelIDs
+     * @param array<string,string> $dbNames A list with all the Database Field Names
+     * @return bool
+     */
+    public function setDbNames(array $dbNames): bool {
+        if (isset($dbNames[$this->relationFieldName])) {
+            $this->relationFieldDbName = $dbNames[$this->relationFieldName];
+        } else {
+            $this->relationFieldDbName = $this->relationFieldName;
+        }
+
+        if (isset($dbNames[$this->ownerFieldName])) {
+            $this->ownerFieldDbName = $dbNames[$this->ownerFieldName];
+        } else {
+            $this->ownerFieldDbName = $this->ownerFieldName;
+        }
+        return true;
     }
 
 
@@ -454,9 +476,9 @@ class Relation {
         $asTable        = $this->relationAliasName !== "" ? " AS " . SchemaModel::getDbTableName($this->relationAliasName) : "";
         $tableName      = $this->getDbTableName();
 
-        $relationColumn = SchemaModel::getDbFieldName($this->relationFieldName);
+        $relationColumn = $this->relationFieldDbName;
         $ownerTableName = SchemaModel::getDbTableName($this->ownerModelName);
-        $ownerColumn    = SchemaModel::getDbFieldName($this->ownerFieldName);
+        $ownerColumn    = $this->ownerFieldDbName;
         $and            = $this->getAndExpression($tableName);
 
         return "LEFT JOIN `{$joinTable}`{$asTable} ON ($tableName.$relationColumn = $ownerTableName.$ownerColumn{$and})";
@@ -533,13 +555,13 @@ class Relation {
         }
 
         return [
-            "relationModelName" => $this->relationModelName,
-            "relationAliasName" => $this->relationAliasName,
-            "relationFieldName" => $this->relationFieldName,
-            "ownerModelName"    => $this->ownerModelName,
-            "ownerFieldName"    => $this->ownerFieldName,
-            "ownerAndQuery"     => $this->ownerAndQuery,
-            "fields"            => $fields,
+            "relationModelName"   => $this->relationModelName,
+            "relationAliasName"   => $this->relationAliasName,
+            "relationFieldDbName" => $this->relationFieldDbName,
+            "ownerModelName"      => $this->ownerModelName,
+            "ownerFieldDbName"    => $this->ownerFieldDbName,
+            "ownerAndQuery"       => $this->ownerAndQuery,
+            "fields"              => $fields,
         ];
     }
 
@@ -598,26 +620,24 @@ class Relation {
         }
 
         // Parse the Joins
-        $relationFieldName = SchemaModel::getDbFieldName($this->relationFieldName);
-        $ownerFieldName    = SchemaModel::getDbFieldName($this->ownerFieldName);
-        $andModelName      = $this->getAndModelName();
-        $andFieldNames     = $this->getAndFieldNames();
-        $andValue          = $this->getAndValue();
-        $andDeleted        = $this->getAndIsDeleted();
+        $andModelName  = $this->getAndModelName();
+        $andFieldNames = $this->getAndFieldNames();
+        $andValue      = $this->getAndValue();
+        $andDeleted    = $this->getAndIsDeleted();
 
         if ($this->relationAliasName !== "") {
             $result["asSchema"] = $this->relationAliasName;
         }
 
-        if ($relationFieldName !== $dbName) {
-            $result["leftKey"] = $relationFieldName;
+        if ($this->relationFieldDbName !== $dbName) {
+            $result["leftKey"] = $this->relationFieldDbName;
         }
 
         if ($this->ownerModelName !== $this->parentModel->name) {
             $result["onSchema"] = $this->ownerModelName;
         }
-        if ($ownerFieldName !== $dbName) {
-            $result["rightKey"] = $ownerFieldName;
+        if ($this->ownerFieldDbName !== $dbName) {
+            $result["rightKey"] = $this->ownerFieldDbName;
         }
 
         if ($andModelName !== "") {
