@@ -562,6 +562,7 @@ class SchemaBuilder {
             "status"     => "{$schemaModel->name}Status",
             "properties" => self::getQueryProperties($schemaModel),
             "statuses"   => self::getQueryStatuses($schemaModel),
+            "imports"    => self::getQueryImports($schemaModel),
         ]);
         $contents = self::alignParams($contents);
         return $contents;
@@ -661,15 +662,38 @@ class SchemaBuilder {
             foreach ($relation->fields as $field) {
                 if ($field->isStatus && $relation->relationModel !== null) {
                     $result[] = [
-                        "namespace" => $relation->relationModel->namespace,
-                        "status"    => "{$relation->relationModelName}Status",
-                        "name"      => $field->prefixName,
-                        "value"     => "{$tableName}.{$field->dbName}",
+                        "status" => "{$relation->relationModelName}Status",
+                        "name"   => $field->prefixName,
+                        "value"  => "{$tableName}.{$field->dbName}",
                     ];
                 }
             }
         }
         return $result;
+    }
+
+    /**
+     * Returns the Query Imports for the Query
+     * @param SchemaModel $schemaModel
+     * @return string[]
+     */
+    private static function getQueryImports(SchemaModel $schemaModel): array {
+        $result = [];
+        foreach ($schemaModel->fields as $field) {
+            if ($field->isStatus) {
+                $name = "{$schemaModel->name}Status";
+                $result["{$schemaModel->namespace}\\$name"] = 1;
+            }
+        }
+        foreach ($schemaModel->relations as $relation) {
+            foreach ($relation->fields as $field) {
+                if ($field->isStatus && $relation->relationModel !== null) {
+                    $name = "{$relation->relationModelName}Status";
+                    $result["{$relation->relationModel->namespace}\\$name"] = 1;
+                }
+            }
+        }
+        return array_keys($result);
     }
 
 

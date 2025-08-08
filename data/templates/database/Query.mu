@@ -1,8 +1,8 @@
 <?php
 namespace {{namespace}};
 
-use {{namespace}}\{{column}};{{#statuses}}
-use {{namespace}}\{{status}};{{/statuses}}
+use {{namespace}}\{{column}};{{#imports}}
+use {{.}};{{/imports}}
 
 use Framework\Database\Query;
 use Framework\Database\Query\SchemaQuery;
