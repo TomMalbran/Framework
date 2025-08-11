@@ -8,9 +8,5 @@
 src/System
 src/*/Schema
 
-# tests
-data/schemasOld.json
-data/schemasTest.json
-
 # misc
 .DS_Store
