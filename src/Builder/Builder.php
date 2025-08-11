@@ -137,13 +137,78 @@ class Builder {
             return 0;
         }
 
-        $template = Discovery::loadFrameTemplate($name);
-        $contents = Mustache::render($template, $data + [
+        $contents = self::render($name, $data + [
             "namespace" => Discovery::getBuildNamespace(),
         ]);
 
         File::create($writePath, "$name.php", $contents);
         print("- Generated the $name code\n");
         return 1;
+    }
+
+
+
+    /**
+     * Renders a template with the given data
+     * @param string              $name
+     * @param array<string,mixed> $data
+     * @return string
+     */
+    public static function render(string $name, array $data): string {
+        $template = Discovery::loadFrameTemplate($name);
+        return Mustache::render($template, $data);
+    }
+
+    /**
+     * Aligns the Params of the given content
+     * @param string $contents
+     * @return string
+     */
+    public static function alignParams(string $contents): string {
+        $lines      = Strings::split($contents, "\n");
+        $typeLength = 0;
+        $varLength  = 0;
+        $result     = [];
+
+        foreach ($lines as $index => $line) {
+            if (Strings::contains($line, "/**")) {
+                [ $typeLength, $varLength ] = self::getLongestParam($lines, $index);
+            } elseif (Strings::contains($line, "@param")) {
+                $docType    = Strings::substringBetween($line, "@param ", " ");
+                $docTypePad = Strings::padRight($docType, $typeLength);
+                $line       = Strings::replace($line, $docType, $docTypePad);
+                if (Strings::contains($line, "Optional.")) {
+                    $varName    = Strings::substringBetween($line, "$docTypePad ", " Optional.");
+                    $varNamePad = Strings::padRight($varName, $varLength);
+                    $line       = Strings::replace($line, $varName, $varNamePad);
+                }
+            }
+            $result[] = $line;
+        }
+        return Strings::join($result, "\n");
+    }
+
+    /**
+     * Returns the longest Param and Type of the current Doc comment
+     * @param string[] $lines
+     * @param integer  $index
+     * @return integer[]
+     */
+    private static function getLongestParam(array $lines, int $index): array {
+        $line       = $lines[$index];
+        $typeLength = 0;
+        $varLength  = 0;
+
+        while (!Strings::contains($line, "*/")) {
+            if (Strings::contains($line, "@param")) {
+                $docType    = Strings::substringBetween($line, "@param ", " ");
+                $typeLength = max($typeLength, Strings::length($docType));
+                $varName    = Strings::substringBetween($line, "$docType ", " Optional.");
+                $varLength  = max($varLength, Strings::length($varName));
+            }
+            $index += 1;
+            $line   = $lines[$index];
+        }
+        return [ $typeLength, $varLength ];
     }
 }

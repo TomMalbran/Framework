@@ -52,6 +52,51 @@ enum FieldType {
     }
 
     /**
+     * Returns the PHP Type from the given Field Type
+     * @param FieldType $type
+     * @return string
+     */
+    public static function getCodeType(FieldType $type): string {
+        return match ($type) {
+            FieldType::Boolean => "bool",
+            FieldType::Number  => "int",
+            FieldType::Float   => "float",
+            default            => "string",
+        };
+    }
+
+    /**
+     * Converts a PHP Type to a Document Type
+     * @param string $type
+     * @return string
+     */
+    public static function getDocType(string $type): string {
+        return match ($type) {
+            "bool"  => "boolean",
+            "int"   => "integer",
+            default => $type,
+        };
+    }
+
+    /**
+     * Returns the Default value for the given PHP Type
+     * @param string $type
+     * @return string
+     */
+    public static function getDefault(string $type): string {
+        return match ($type) {
+            "boolean", "bool" => "false",
+            "integer", "int"  => "0",
+            "float"           => "0",
+            "string"          => '""',
+            "array"           => '[]',
+            default           => "null",
+        };
+    }
+
+
+
+    /**
      * Returns the Name of the FieldType
      * @return string
      */
