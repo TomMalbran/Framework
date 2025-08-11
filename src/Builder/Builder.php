@@ -137,7 +137,7 @@ class Builder {
             return 0;
         }
 
-        $contents = self::render($name, $data + [
+        $contents = self::render("system/$name", $data + [
             "namespace" => Discovery::getBuildNamespace(),
         ]);
 
