@@ -44,7 +44,9 @@ class Notification {
             return null;
         }
         return self::send($title, $body, $url, $dataType, $dataID, [
-            "include_player_ids" => $playerIDs,
+            "include_aliases" => [
+                "onesignal_id" => $playerIDs,
+            ],
         ]);
     }
 
@@ -60,7 +62,9 @@ class Notification {
      */
     public static function sendToOne(string $title, string $body, string $url, string $dataType, int $dataID, string $playerID): ?string {
         return self::send($title, $body, $url, $dataType, $dataID, [
-            "include_player_ids" => [ $playerID ],
+            "include_aliases" => [
+                "onesignal_id" => [ $playerID ],
+            ],
         ]);
     }
 
@@ -91,6 +95,7 @@ class Notification {
 
         $data = [
             "app_id"         => Config::getOnesignalAppId(),
+            "target_channel" => "push",
             "headings"       => [ "en" => $title ],
             "contents"       => [ "en" => $body  ],
             "url"            => $fullUrl,
