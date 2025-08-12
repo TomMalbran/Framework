@@ -3,6 +3,7 @@ namespace Framework\Date;
 
 use Framework\Core\NLS;
 use Framework\Date\DateType;
+use Framework\Date\DateFormat;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -11,18 +12,6 @@ use Framework\Utils\Strings;
  * Several Date Time functions
  */
 class DateTime {
-
-    /** @var array<string,string> The Date Formats */
-    public static array $formats = [
-        "time"           => "H:i",
-        "dashes"         => "d-m-Y",
-        "dashesReverse"  => "Y-m-d",
-        "dashesTime"     => "d-m-Y H:i",
-        "dashesSeconds"  => "d-m-Y H:i:s",
-        "slashes"        => "d/m/Y",
-        "slashesTime"    => "d/m/Y H:i",
-        "slashesSeconds" => "d/m/Y H:i:s",
-    ];
 
     /** @var float[] */
     public static array $stackZones = [];
@@ -476,15 +465,12 @@ class DateTime {
     /**
      * Returns the Time as a string
      * @param mixed      $time
-     * @param string     $format
+     * @param DateFormat $format
      * @param float|null $timeZone Optional.
      * @return string
      */
-    public static function toString(mixed $time, string $format, ?float $timeZone = null): string {
-        if (isset(self::$formats[$format])) {
-            return self::format($time, self::$formats[$format], $timeZone);
-        }
-        return "";
+    public static function toString(mixed $time, DateFormat $format, ?float $timeZone = null): string {
+        return self::format($time, $format->value, $timeZone);
     }
 
     /**
@@ -1062,7 +1048,7 @@ class DateTime {
             $dayName = self::getDayText($timeStamp, $startMonday, $timeZone, $language);
         }
 
-        $hour = self::toString($timeStamp, "time", $timeZone);
+        $hour = self::toString($timeStamp, DateFormat::Time, $timeZone);
         return NLS::format("DATE_TIME_DAY_HOUR", [ $dayName, $hour ], $language);
     }
 
