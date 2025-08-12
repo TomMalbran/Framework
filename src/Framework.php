@@ -3,12 +3,9 @@ namespace Framework;
 
 use Framework\Response;
 use Framework\Auth\Auth;
-use Framework\Core\Settings;
-use Framework\Email\EmailTemplate;
 use Framework\File\FilePath;
 use Framework\Log\ErrorLog;
 use Framework\Database\Database;
-use Framework\Database\Migration;
 use Framework\System\Router;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
@@ -169,23 +166,6 @@ class Framework {
     }
 
 
-
-    /**
-     * Migrates the Data for the Framework
-     * @param boolean $canDelete Optional.
-     * @return boolean
-     */
-    public static function migrateData(bool $canDelete = false): bool {
-        print("\nDATABASE MIGRATIONS\n");
-        Migration::migrateData($canDelete);
-
-        print("\nSETTINGS MIGRATIONS\n");
-        Settings::migrateData();
-
-        print("\nEMAIL MIGRATIONS\n");
-        EmailTemplate::migrateData();
-        return true;
-    }
 
     /**
      * Ensures that the Paths are created for the Framework
