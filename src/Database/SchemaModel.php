@@ -9,6 +9,7 @@ use Framework\Database\Model\Count;
 use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
 use Framework\Database\Status\State;
+use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -365,6 +366,8 @@ class SchemaModel {
             $text = "";
             if ($value instanceof FieldType) {
                 $text = "FieldType::{$value->name}";
+            } elseif ($value instanceof DateType) {
+                $text = "DateType::{$value->name}";
             } elseif (is_string($value) && Strings::endsWith($value, "Schema")) {
                 $text = "{$value}::getModel()";
             } elseif (is_string($value)) {

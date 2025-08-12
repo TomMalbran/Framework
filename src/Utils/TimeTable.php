@@ -3,6 +3,7 @@ namespace Framework\Utils;
 
 use Framework\Core\NLS;
 use Framework\Date\DateTime;
+use Framework\Date\DateFormat;
 use Framework\Utils\Arrays;
 use Framework\Utils\Errors;
 use Framework\Utils\JSON;
@@ -268,11 +269,11 @@ class TimeTable {
 
             foreach ($timeTable->days as $day) {
                 $weekTime = DateTime::getWeekStart(0, $day, $this->startMonday, true);
-                $weekDate = DateTime::toString($weekTime, "dashes");
+                $weekDate = DateTime::toString($weekTime, DateFormat::Dashes);
                 $fromTime = DateTime::toTimeHour($weekDate, $timeTable->from);
-                $fromHour = DateTime::toString($fromTime, "time");
+                $fromHour = DateTime::toString($fromTime, DateFormat::Time);
                 $toTime   = DateTime::toTimeHour($weekDate, $timeTable->to);
-                $toHour   = DateTime::toString($toTime, "time");
+                $toHour   = DateTime::toString($toTime, DateFormat::Time);
                 $id       = "$fromHour-$toHour";
 
                 if (!isset($schedules[$id])) {

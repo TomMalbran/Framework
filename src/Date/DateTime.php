@@ -2,6 +2,7 @@
 namespace Framework\Date;
 
 use Framework\Core\NLS;
+use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -212,17 +213,17 @@ class DateTime {
 
     /**
      * Returns the given string as a time
-     * @param string  $string
-     * @param string  $dateType    Optional.
-     * @param boolean $useTimeZone Optional.
+     * @param string   $string
+     * @param DateType $dateType    Optional.
+     * @param boolean  $useTimeZone Optional.
      * @return integer
      */
-    public static function toDay(string $string, string $dateType = "start", bool $useTimeZone = true): int {
+    public static function toDay(string $string, DateType $dateType = DateType::Start, bool $useTimeZone = true): int {
         return match ($dateType) {
-            "start"  => self::toDayStart($string, $useTimeZone),
-            "middle" => self::toDayMiddle($string, $useTimeZone),
-            "end"    => self::toDayEnd($string, $useTimeZone),
-            "none"   => 0,
+            DateType::Start  => self::toDayStart($string, $useTimeZone),
+            DateType::Middle => self::toDayMiddle($string, $useTimeZone),
+            DateType::End    => self::toDayEnd($string, $useTimeZone),
+            DateType::None   => 0,
         };
     }
 
@@ -402,12 +403,12 @@ class DateTime {
 
     /**
      * Returns true if the given Date is in the future
-     * @param string  $date
-     * @param string  $dateType    Optional.
-     * @param boolean $useTimeZone Optional.
+     * @param string   $date
+     * @param DateType $dateType    Optional.
+     * @param boolean  $useTimeZone Optional.
      * @return boolean
      */
-    public static function isFutureDate(string $date, string $dateType = "middle", bool $useTimeZone = true): bool {
+    public static function isFutureDate(string $date, DateType $dateType = DateType::Middle, bool $useTimeZone = true): bool {
         $timeStamp = self::toDay($date, $dateType, $useTimeZone);
         return self::isFutureTime($timeStamp);
     }

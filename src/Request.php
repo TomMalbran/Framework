@@ -5,6 +5,7 @@ use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Date\DateTime;
+use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
@@ -573,13 +574,13 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the date at the given key is in the Future
-     * @param string $key
-     * @param string $type Optional.
+     * @param string   $key
+     * @param DateType $dateType Optional.
      * @return boolean
      */
-    public function isFutureDate(string $key, string $type = "middle"): bool {
+    public function isFutureDate(string $key, DateType $dateType = DateType::Middle): bool {
         $value = $this->getString($key);
-        return DateTime::isFutureDate($value, $type);
+        return DateTime::isFutureDate($value, $dateType);
     }
 
 
@@ -709,14 +710,14 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given string as a time
-     * @param string  $key
-     * @param string  $type        Optional.
-     * @param boolean $useTimezone Optional.
+     * @param string   $key
+     * @param DateType $dateType    Optional.
+     * @param boolean  $useTimezone Optional.
      * @return integer
      */
-    public function toDay(string $key, string $type = "start", bool $useTimezone = true): int {
+    public function toDay(string $key, DateType $dateType = DateType::Start, bool $useTimezone = true): int {
         $value = $this->getString($key);
-        return DateTime::toDay($value, $type, $useTimezone);
+        return DateTime::toDay($value, $dateType, $useTimezone);
     }
 
     /**

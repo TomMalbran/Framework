@@ -8,6 +8,7 @@ use Framework\Database\Model\FieldType;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\System\Path;
+use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
@@ -92,8 +93,8 @@ class Field {
     public string $dateInput  = "";
 
     // Used with the 'dateInput' to indicate if the hour of the date is at:
-    // 'start', 'middle' or 'end'
-    public string $dateType   = "";
+    // 'Start', 'Middle' or 'End'
+    public DateType $dateType = DateType::None;
 
     // Used with the 'dateInput' to indicate that the hour comes from an input.
     public string $hourInput  = "";
@@ -129,7 +130,7 @@ class Field {
      * @param boolean     $isFile     Optional.
      * @param boolean     $hasFile    Optional.
      * @param string      $filePath   Optional.
-     * @param string      $dateType   Optional.
+     * @param DateType    $dateType   Optional.
      * @param string      $dateInput  Optional.
      * @param string      $hourInput  Optional.
      * @param boolean     $canEdit    Optional.
@@ -137,36 +138,36 @@ class Field {
      * @param boolean     $noExists   Optional.
      */
     public function __construct(
-        bool    $isID       = false,
-        bool    $notAutoInc = false,
-        bool    $isPrimary  = false,
-        bool    $isKey      = false,
+        bool     $isID       = false,
+        bool     $notAutoInc = false,
+        bool     $isPrimary  = false,
+        bool     $isKey      = false,
 
-        bool    $isParent   = false,
-        bool    $isUnique   = false,
-        ?string $belongsTo  = null,
-        string  $otherField = "",
+        bool     $isParent   = false,
+        bool     $isUnique   = false,
+        ?string  $belongsTo  = null,
+        string   $otherField = "",
 
-        int     $length     = 0,
-        bool    $isSigned   = false,
-        int     $decimals   = 2,
+        int      $length     = 0,
+        bool     $isSigned   = false,
+        int      $decimals   = 2,
 
-        bool    $isText     = false,
-        bool    $isLongText = false,
-        bool    $isEncrypt  = false,
-        bool    $isJSON     = false,
+        bool     $isText     = false,
+        bool     $isLongText = false,
+        bool     $isEncrypt  = false,
+        bool     $isJSON     = false,
 
-        bool    $isFile     = false,
-        bool    $hasFile    = false,
-        string  $filePath   = "",
+        bool     $isFile     = false,
+        bool     $hasFile    = false,
+        string   $filePath   = "",
 
-        string  $dateType   = "",
-        string  $dateInput  = "",
-        string  $hourInput  = "",
+        DateType $dateType   = DateType::None,
+        string   $dateInput  = "",
+        string   $hourInput  = "",
 
-        bool    $canEdit    = true,
-        bool    $noEmpty    = false,
-        bool    $noExists   = false,
+        bool     $canEdit    = true,
+        bool     $noEmpty    = false,
+        bool     $noExists   = false,
     ) {
         $this->isID       = $isID;
         $this->notAutoInc = $notAutoInc;
@@ -222,7 +223,7 @@ class Field {
      * @param int       $length     Optional.
      * @param boolean   $isSigned   Optional.
      * @param int       $decimals   Optional.
-     * @param string    $dateType   Optional.
+     * @param DateType  $dateType   Optional.
      * @param string    $dateInput  Optional.
      * @param string    $hourInput  Optional.
      * @param string    $filePath   Optional.
@@ -246,7 +247,7 @@ class Field {
         bool      $isSigned   = false,
         int       $decimals   = 2,
 
-        string    $dateType   = "",
+        DateType  $dateType   = DateType::None,
         string    $dateInput  = "",
         string    $hourInput  = "",
         string    $filePath   = "",
@@ -544,7 +545,7 @@ class Field {
         if ($this->decimals !== 2) {
             $result["decimals"] = $this->decimals;
         }
-        if ($this->dateType !== "") {
+        if ($this->dateType !== DateType::None) {
             $result["dateType"] = $this->dateType;
         }
         if ($this->dateInput !== "") {
@@ -596,8 +597,8 @@ class Field {
             $result["decimals"] = $this->decimals;
         }
 
-        if ($this->dateType !== "") {
-            $result["dateType"] = $this->dateType;
+        if ($this->dateType !== DateType::None) {
+            $result["dateType"] = $this->dateType->getName();
         }
         if ($this->dateInput !== "") {
             $result["dateInput"] = $this->dateInput;

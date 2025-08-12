@@ -5,6 +5,7 @@ use Framework\Database\SchemaModel;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Builder\Builder;
+use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -33,6 +34,7 @@ class SchemaCode {
         $subTypes    = self::getSubTypes($schemaModel);
         $hasVirtual  = count($schemaModel->virtualFields) > 0;
         $hasParents  = count($parents) > 0;
+        $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
         $editParents = $schemaModel->hasPositions ? $parents : [];
         $queryName   = "{$schemaModel->name}Query";
 
@@ -98,6 +100,7 @@ class SchemaCode {
             "parentsEditList"     => self::joinFields($editParents, "fieldArg", ", "),
             "hasParents"          => $hasParents,
             "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
+            "hasDate"             => $hasDate,
         ]);
 
         $contents = Builder::alignParams($contents);
@@ -149,14 +152,22 @@ class SchemaCode {
      * @param SchemaModel $schemaModel
      * @param boolean     $isUnique    Optional.
      * @param boolean     $isParent    Optional.
+     * @param boolean     $isDate      Optional.
      * @return array<string,string>[]
      */
-    private static function getSomeFields(SchemaModel $schemaModel, bool $isUnique = false, bool $isParent = false): array {
+    private static function getSomeFields(
+        SchemaModel $schemaModel,
+        bool $isUnique = false,
+        bool $isParent = false,
+        bool $isDate = false,
+    ): array {
         $result = [];
         foreach ($schemaModel->fields as $field) {
             if ($isUnique && $field->isUnique) {
                 $result[] = self::getField($field);
             } elseif ($isParent && $field->isParent) {
+                $result[] = self::getField($field);
+            } elseif ($isDate && $field->dateType !== DateType::None) {
                 $result[] = self::getField($field);
             }
         }

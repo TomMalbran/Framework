@@ -24,7 +24,8 @@ use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
 use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
 use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
-use Framework\Database\Model\SubRequest;{{/hasSubRequests}}
+use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasDate}}
+use Framework\Date\DateType;{{/hasDate}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
