@@ -5,7 +5,7 @@ use Framework\Auth\Auth;
 use Framework\Log\Schema\LogSessionSchema;
 use Framework\Log\Schema\LogSessionQuery;
 use Framework\System\Config;
-use Framework\Utils\DateTime;
+use Framework\Date\DateTime;
 use Framework\Utils\Server;
 
 /**

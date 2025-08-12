@@ -6,7 +6,7 @@ use Framework\Log\Schema\LogDeviceSchema;
 use Framework\Log\Schema\LogDeviceColumn;
 use Framework\Log\Schema\LogDeviceQuery;
 use Framework\System\Config;
-use Framework\Utils\DateTime;
+use Framework\Date\DateTime;
 use Framework\Utils\Server;
 
 /**

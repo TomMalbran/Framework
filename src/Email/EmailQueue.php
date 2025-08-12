@@ -10,8 +10,8 @@ use Framework\Email\Schema\EmailQueueColumn;
 use Framework\Email\Schema\EmailQueueQuery;
 use Framework\Email\Schema\EmailTemplateEntity;
 use Framework\System\Config;
+use Framework\Date\DateTime;
 use Framework\Utils\Arrays;
-use Framework\Utils\DateTime;
 use Framework\Utils\JSON;
 
 /**

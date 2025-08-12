@@ -3,8 +3,8 @@ namespace Framework\Provider;
 
 use Framework\Provider\Curl;
 use Framework\System\Config;
+use Framework\Date\DateTime;
 use Framework\Utils\Arrays;
-use Framework\Utils\DateTime;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 

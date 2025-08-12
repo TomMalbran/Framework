@@ -2,9 +2,9 @@
 namespace Framework\Database;
 
 use Framework\Request;
+use Framework\Date\Period;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-use Framework\Utils\Period;
 
 /**
  * The Database Query

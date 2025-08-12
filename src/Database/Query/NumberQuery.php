@@ -4,7 +4,7 @@ namespace Framework\Database\Query;
 use Framework\Request;
 use Framework\Database\Query;
 use Framework\Database\Query\BaseQuery;
-use Framework\Utils\Period;
+use Framework\Date\Period;
 
 /**
  * The Number Query

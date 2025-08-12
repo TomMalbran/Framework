@@ -1,7 +1,9 @@
 <?php
-namespace Framework\Utils;
+namespace Framework\Date;
 
 use Framework\Core\NLS;
+use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 /**
@@ -211,15 +213,16 @@ class DateTime {
     /**
      * Returns the given string as a time
      * @param string  $string
-     * @param string  $type        Optional.
+     * @param string  $dateType    Optional.
      * @param boolean $useTimeZone Optional.
      * @return integer
      */
-    public static function toDay(string $string, string $type = "start", bool $useTimeZone = true): int {
-        return match ($type) {
-            "start" => self::toDayStart($string, $useTimeZone),
-            "end"   => self::toDayEnd($string, $useTimeZone),
-            default => self::toDayMiddle($string, $useTimeZone),
+    public static function toDay(string $string, string $dateType = "start", bool $useTimeZone = true): int {
+        return match ($dateType) {
+            "start"  => self::toDayStart($string, $useTimeZone),
+            "middle" => self::toDayMiddle($string, $useTimeZone),
+            "end"    => self::toDayEnd($string, $useTimeZone),
+            "none"   => 0,
         };
     }
 
@@ -400,12 +403,12 @@ class DateTime {
     /**
      * Returns true if the given Date is in the future
      * @param string  $date
-     * @param string  $type        Optional.
+     * @param string  $dateType    Optional.
      * @param boolean $useTimeZone Optional.
      * @return boolean
      */
-    public static function isFutureDate(string $date, string $type = "middle", bool $useTimeZone = true): bool {
-        $timeStamp = self::toDay($date, $type, $useTimeZone);
+    public static function isFutureDate(string $date, string $dateType = "middle", bool $useTimeZone = true): bool {
+        $timeStamp = self::toDay($date, $dateType, $useTimeZone);
         return self::isFutureTime($timeStamp);
     }
 

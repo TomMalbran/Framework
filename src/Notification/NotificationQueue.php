@@ -10,7 +10,7 @@ use Framework\Notification\Schema\NotificationQueueEntity;
 use Framework\Notification\Schema\NotificationQueueColumn;
 use Framework\Notification\Schema\NotificationQueueQuery;
 use Framework\System\Config;
-use Framework\Utils\DateTime;
+use Framework\Date\DateTime;
 
 /**
  * The Notification Queue

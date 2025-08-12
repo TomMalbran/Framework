@@ -4,7 +4,7 @@ namespace Framework\Auth;
 use Framework\Auth\Schema\CredentialResetSchema;
 use Framework\Auth\Schema\CredentialResetColumn;
 use Framework\Auth\Schema\CredentialResetQuery;
-use Framework\Utils\DateTime;
+use Framework\Date\DateTime;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
