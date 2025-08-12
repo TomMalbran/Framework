@@ -323,6 +323,49 @@ class Discovery {
     }
 
     /**
+     * Returns the Reflection Classes that implement the given interface
+     * @param string  $interface
+     * @param string  $dir          Optional.
+     * @param boolean $skipIgnored  Optional.
+     * @param boolean $forFramework Optional.
+     * @return array{}
+     */
+    public static function getClassesWithInterface(
+        string $interface,
+        string $dir = "",
+        bool $skipIgnored = true,
+        bool $forFramework = false,
+    ): array {
+        $reflections = self::getReflectionClasses($dir, $skipIgnored, $forFramework);
+        $priorities  = [];
+        $instances   = [];
+        $result      = [];
+
+        foreach ($reflections as $reflection) {
+            if ($reflection->implementsInterface($interface)) {
+                $attributes = $reflection->getAttributes(Priority::class);
+                $priority   = Priority::Normal;
+                if (isset($attributes[0])) {
+                    $priority = $attributes[0]->newInstance()->priority;
+                }
+
+                if (!isset($instances[$priority])) {
+                    $priorities[] = $priority;
+                }
+                $instances[$priority][] = $reflection->newInstance();
+            }
+        }
+        sort($priorities);
+
+        foreach ($priorities as $priority) {
+            foreach ($instances[$priority] as $instance) {
+                $result[] = $instance;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Returns the Properties of the given Class
      * @param object       $class
      * @param integer|null $filter Optional.

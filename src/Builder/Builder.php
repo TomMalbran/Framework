@@ -2,6 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\DataFile;
 use Framework\Builder\AccessCode;
 use Framework\Builder\ConfigCode;
@@ -25,15 +26,29 @@ use Framework\Utils\Strings;
 class Builder {
 
     /**
-     * Generates all the Code
-     * @param boolean $willContinue Optional.
-     * @return integer
+     * Builds all the Code
+     * @param boolean $deleteCode Optional.
+     * @return boolean
      */
-    public static function generateCode(bool $willContinue = false): int {
-        $package   = self::getPackageData();
-        $writePath = Discovery::getBuildPath();
-        $files     = 0;
+    public static function build(bool $deleteCode = false): bool {
+        $writePath   = Discovery::getBuildPath();
+        $package     = self::getPackageData();
+        $files       = 0;
 
+        /** @var DiscoveryBuilder[] */
+        $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
+        $hasBuilders = count($appBuilders) > 0;
+
+
+        if ($deleteCode && $hasBuilders) {
+            foreach ($appBuilders as $builder) {
+                $builder::resetCode();
+            }
+            print("\nDeleted the APP CODES\n\n");
+            return false;
+        }
+
+        print("Building the Code...\n");
         File::createDir($writePath);
         File::emptyDir($writePath);
 
@@ -58,10 +73,15 @@ class Builder {
         $files += self::generateOne($writePath, "Router",   RouterCode::getCode());
 
 
-        if (!$willContinue) {
-            print("\nGenerated $files files\n");
+        if ($hasBuilders) {
+            print("\nAPP CODES\n");
+            foreach ($appBuilders as $builder) {
+                $files += $builder::generateCode();
+            }
         }
-        return $files;
+
+        print("\nGenerated $files files\n");
+        return true;
     }
 
     /**

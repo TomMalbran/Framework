@@ -3,7 +3,6 @@ namespace Framework;
 
 use Framework\Response;
 use Framework\Auth\Auth;
-use Framework\Builder\Builder;
 use Framework\Core\Settings;
 use Framework\Email\EmailTemplate;
 use Framework\File\FilePath;
@@ -170,15 +169,6 @@ class Framework {
     }
 
 
-
-    /**
-     * Generates the Codes for the Framework
-     * @return boolean
-     */
-    public static function generateCode(): bool {
-        Builder::generateCode();
-        return true;
-    }
 
     /**
      * Migrates the Data for the Framework
