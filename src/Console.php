@@ -2,6 +2,7 @@
 namespace Framework;
 
 use Framework\Builder\Builder;
+use Framework\Builder\Watcher;
 use Framework\Database\Migration;
 use Framework\System\Package;
 
@@ -34,8 +35,11 @@ class Console {
             print("Migrating data...\n");
             Migration::migrate($canDelete);
             break;
+        case "watch":
+            print("Watching for changes...\n");
+            Watcher::watch();
         default:
-            echo "Available utilities: build, migrate\n";
+            echo "Available utilities: build, migrate, watch\n";
         }
     }
 }
