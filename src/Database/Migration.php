@@ -18,8 +18,6 @@ class Migration {
      * @return boolean
      */
     public static function migrate(bool $canDelete = false): bool {
-        print("Migrating data...\n");
-
         print("\nDATABASE MIGRATIONS\n");
         SchemaMigration::migrateData($canDelete);
 

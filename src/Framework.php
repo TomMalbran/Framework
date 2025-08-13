@@ -14,7 +14,7 @@ use Framework\Utils\JSON;
 use Exception;
 
 /**
- * The FrameWork Service
+ * The Framework Service
  */
 class Framework {
 

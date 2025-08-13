@@ -48,7 +48,6 @@ class Builder {
             return false;
         }
 
-        print("Building the Code...\n");
         File::createDir($writePath);
         File::emptyDir($writePath);
 
@@ -112,6 +111,7 @@ class Builder {
 
         // Find the Data and Template directories
         $files       = File::getFilesInDir($basePath, true);
+        $version     = Strings::toString($composer["version"] ?? "0.1.0");
         $dataDir     = "";
         $templateDir = "";
         $intFilesDir = "";
@@ -135,6 +135,7 @@ class Builder {
 
         // Return the Package Data
         return [
+            "version"      => $version,
             "basePath"     => $basePath,
             "appNamespace" => $appNamespace,
             "appDir"       => $appDir,

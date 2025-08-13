@@ -34,13 +34,7 @@ class Discovery {
         return self::Namespace . self::SystemDir;
     }
 
-    /**
-     * Returns the Namespace used in the Builder
-     * @return string
-     */
-    public static function getBuildPath(): string {
-        return self::getFramePath("src", self::SystemDir);
-    }
+
 
     /**
      * Returns the BasePath
@@ -97,6 +91,14 @@ class Discovery {
      */
     public static function getMigrationsPath(): string {
         return self::getAppPath(Package::DataDir, self::MigrationsDir);
+    }
+
+    /**
+     * Returns the Namespace used in the Builder
+     * @return string
+     */
+    public static function getBuildPath(): string {
+        return self::getFramePath("src", self::SystemDir);
     }
 
 

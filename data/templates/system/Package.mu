@@ -6,10 +6,11 @@ namespace {{namespace}};
  */
 class Package {
 
+    public const Version     = "{{version}}";
     public const Namespace   = "{{appNamespace}}\";
+
     public const AppDir      = "{{appDir}}";
     public const SourceDir   = "{{sourceDir}}";
-
     public const DataDir     = "{{dataDir}}";
     public const TemplateDir = "{{templateDir}}";
     public const IntFilesDir = "{{intFilesDir}}";
