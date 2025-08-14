@@ -2,7 +2,7 @@
 namespace Framework\Database\Query;
 
 use Framework\Request;
-use Framework\Database\Query;
+use Framework\Database\Query\Query;
 use Framework\Database\Query\BaseQuery;
 use Framework\Date\Period;
 
@@ -125,6 +125,16 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function inPeriod(Period|Request $period): Query {
-        return $this->query->addPeriod($this->column, $period);
+        if ($period instanceof Request) {
+            $period = new Period($period);
+        }
+
+        if ($period->fromTime > 0) {
+            $this->query->add($this->column, ">=", $period->fromTime);
+        }
+        if ($period->toTime > 0) {
+            $this->query->add($this->column, "<=", $period->toTime);
+        }
+        return $this->query;
     }
 }

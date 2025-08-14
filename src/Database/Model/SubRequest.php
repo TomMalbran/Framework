@@ -3,7 +3,7 @@ namespace Framework\Database\Model;
 
 use Framework\Database\SchemaModel;
 use Framework\Database\Selection;
-use Framework\Database\Query;
+use Framework\Database\Query\Query;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 

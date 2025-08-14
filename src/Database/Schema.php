@@ -7,7 +7,7 @@ use Framework\Database\SchemaModel;
 use Framework\Database\Selection;
 use Framework\Database\Modification;
 use Framework\Database\Assign;
-use Framework\Database\Query;
+use Framework\Database\Query\Query;
 use Framework\Database\Model\SubRequest;
 use Framework\System\Config;
 use Framework\Utils\Arrays;

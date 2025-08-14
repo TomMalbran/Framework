@@ -4,6 +4,7 @@ namespace Framework\Database;
 use Framework\Framework;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Query\Query;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;

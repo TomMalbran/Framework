@@ -3,7 +3,7 @@ namespace {{namespace}};
 
 use Framework\Framework;
 use Framework\Database\Assign;
-use Framework\Database\Query;
+use Framework\Database\Query\Query;
 use Framework\File\File;
 
 /**

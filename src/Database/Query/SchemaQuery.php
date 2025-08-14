@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Database\Query;
+use Framework\Database\Query\Query;
 
 /**
  * The Schema Query
@@ -60,7 +60,7 @@ class SchemaQuery {
 
 
     /**
-     * Adds a Open Parenthesis
+     * Adds an Open Parenthesis
      * @return Query
      */
     public function startParen(): Query {
@@ -126,7 +126,7 @@ class SchemaQuery {
 
 
     /**
-     * Adds an Limit
+     * Adds a Limit
      * @param integer      $from
      * @param integer|null $to   Optional.
      * @return Query

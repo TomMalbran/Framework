@@ -1,8 +1,6 @@
 <?php
-namespace Framework\Database;
+namespace Framework\Database\Query;
 
-use Framework\Request;
-use Framework\Date\Period;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -77,7 +75,7 @@ class Query {
      * @return string
      */
     public function getPrefix(): string {
-        $prefix = $this->addPrefix ? $this->prefix . " " : "";
+        $prefix = $this->addPrefix ? "{$this->prefix} " : "";
         if (!$this->addPrefix) {
             $this->addPrefix = true;
         }
@@ -231,26 +229,6 @@ class Query {
         $prefix       = $this->getPrefix();
         $this->where .= "{$prefix}{$expression} ";
         $this->params = array_merge($this->params, $values);
-        return $this;
-    }
-
-    /**
-     * Uses the Period to add a Between expression
-     * @param string         $column
-     * @param Period|Request $period
-     * @return Query
-     */
-    public function addPeriod(string $column, Period|Request $period): Query {
-        if ($period instanceof Request) {
-            $period = new Period($period);
-        }
-
-        if ($period->fromTime > 0) {
-            $this->add($column, ">=", $period->fromTime);
-        }
-        if ($period->toTime > 0) {
-            $this->add($column, "<=", $period->toTime);
-        }
         return $this;
     }
 
@@ -567,18 +545,6 @@ class Query {
             $result .= " LIMIT {$this->limit}";
         }
         return Strings::replacePattern($result, "!\s+!", " ");
-    }
-
-    /**
-     * Returns the params part of the Query to use with the Database
-     * @param boolean $duplicate Optional.
-     * @return mixed[]
-     */
-    public function getParams(bool $duplicate = false): array {
-        if ($duplicate) {
-            return array_merge($this->params, $this->params);
-        }
-        return $this->params;
     }
 
     /**

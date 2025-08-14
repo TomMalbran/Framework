@@ -2,7 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Database\Assign;
-use Framework\Database\Query;
+use Framework\Database\Query\Query;
 use Framework\Log\QueryLog;
 use Framework\System\Config;
 use Framework\Utils\Arrays;

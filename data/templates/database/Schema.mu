@@ -16,9 +16,9 @@ use {{namespace}}\{{status}};{{/hasStatus}}
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
-use Framework\Database\SchemaModel;
-use Framework\Database\Query;{{#canEdit}}
+use Framework\Database\SchemaModel;{{#canEdit}}
 use Framework\Database\Assign;{{/canEdit}}
+use Framework\Database\Query\Query;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}

@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Database\Query;
+use Framework\Database\Query\Query;
 use Framework\Database\Query\BaseQuery;
 
 /**
