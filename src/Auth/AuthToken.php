@@ -16,31 +16,26 @@ use Exception;
  */
 class AuthToken {
 
-    private static bool   $loaded    = false;
-    private static string $algorithm = "HS256";
-    private static string $secretKey = "";
-    private static int    $shortTerm = 0;
-    private static int    $longTerm  = 0;
+    private const Algorithm = "HS256";
 
     private static ?CredentialRefreshTokenEntity $tokenData = null;
 
 
 
     /**
-     * Loads the Auth Token Config
-     * @return boolean
+     * Returns the duration of the Access Token
+     * @return integer
      */
-    private static function load(): bool {
-        if (self::$loaded) {
-            return false;
-        }
-        JWT::$leeway = 1000;
+    private static function getAccessTokenDuration(): int {
+        return Config::getAuthHours() * 3600;
+    }
 
-        self::$loaded    = true;
-        self::$secretKey = Config::getAuthKey();
-        self::$shortTerm = Config::getAuthHours() * 3600;
-        self::$longTerm  = Config::getAuthDays() * 24 * 3600;
-        return true;
+    /**
+     * Returns the duration of the Refresh Token
+     * @return integer
+     */
+    private static function getRefreshTokenDuration(): int {
+        return Config::getAuthDays() * 24 * 3600;
     }
 
 
@@ -63,7 +58,6 @@ class AuthToken {
      * @return boolean
      */
     public static function isValid(string $accessToken, string $refreshToken): bool {
-        self::load();
         if ($refreshToken !== "") {
             return !self::getOne($refreshToken)->isEmpty();
         }
@@ -82,9 +76,11 @@ class AuthToken {
             return [ $accessData->getInt("credentialID"), $accessData->getInt("adminID") ];
         }
 
-        $refresh = self::getOne($refreshToken);
-        if ($refresh->credentialID !== 0) {
-            return [ $refresh->credentialID, 0 ];
+        if ($refreshToken !== "") {
+            $refresh = self::getOne($refreshToken);
+            if ($refresh->credentialID !== 0) {
+                return [ $refresh->credentialID, 0 ];
+            }
         }
 
         return [ 0, 0 ];
@@ -108,9 +104,9 @@ class AuthToken {
      * @return Dictionary
      */
     private static function getAccessData(string $accessToken): Dictionary {
-        self::load();
+        JWT::$leeway = 1000;
         try {
-            $jwt = JWT::decode($accessToken, new Key(self::$secretKey, self::$algorithm));
+            $jwt = JWT::decode($accessToken, new Key(Config::getAuthKey(), self::Algorithm));
         } catch (Exception $e) {
             return new Dictionary();
         }
@@ -123,15 +119,16 @@ class AuthToken {
      * @return string
      */
     public static function createAccessToken(array $data): string {
-        self::load();
+        JWT::$leeway = 1000;
+
         $time  = time();
         $token = [
-            "iat"  => $time,                     // Issued at: time when the token was generated
-            "nbf"  => $time + 10,                // Not before: 10 seconds
-            "exp"  => $time + self::$shortTerm,  // Expire: In x hour
+            "iat"  => $time,                                   // Issued at: time when the token was generated
+            "nbf"  => $time + 10,                              // Not before: 10 seconds
+            "exp"  => $time + self::getAccessTokenDuration(),  // Expire: In x hour
             "data" => $data,
         ];
-        return JWT::encode($token, self::$secretKey, self::$algorithm);
+        return JWT::encode($token, Config::getAuthKey(), self::Algorithm);
     }
 
 
@@ -181,8 +178,7 @@ class AuthToken {
      * @return string
      */
     public static function createRefreshToken(int $credentialID): string {
-        self::load();
-        return RefreshToken::create($credentialID, self::$longTerm);
+        return RefreshToken::create($credentialID, self::getRefreshTokenDuration());
     }
 
     /**
@@ -192,8 +188,10 @@ class AuthToken {
      * @return string
      */
     public static function updateRefreshToken(string $accessToken, string $refreshToken): string {
-        self::load();
         if (self::isValidAccessToken($accessToken)) {
+            return "";
+        }
+        if ($refreshToken === "") {
             return "";
         }
 
@@ -202,7 +200,7 @@ class AuthToken {
             return "";
         }
 
-        return RefreshToken::recreate($refreshToken, self::$longTerm);
+        return RefreshToken::recreate($refreshToken, self::getRefreshTokenDuration());
     }
 
     /**
@@ -211,12 +209,10 @@ class AuthToken {
      * @return boolean
      */
     public static function deleteRefreshToken(string $refreshToken): bool {
-        self::load();
-        if ($refreshToken === "") {
-            return false;
+        if ($refreshToken !== "") {
+            return RefreshToken::remove($refreshToken);
         }
-
-        return RefreshToken::remove($refreshToken);
+        return false;
     }
 
     /**
@@ -225,12 +221,10 @@ class AuthToken {
      * @return boolean
      */
     public static function deleteAllForCredential(int $credentialID): bool {
-        self::load();
-        if ($credentialID === 0) {
-            return false;
+        if ($credentialID !== 0) {
+            return RefreshToken::removeAll($credentialID);
         }
-
-        return RefreshToken::removeAll($credentialID);
+        return false;
     }
 
     /**
@@ -238,7 +232,6 @@ class AuthToken {
      * @return boolean
      */
     public static function deleteOld(): bool {
-        self::load();
-        return RefreshToken::removeOld(self::$longTerm);
+        return RefreshToken::removeOld(self::getRefreshTokenDuration());
     }
 }
