@@ -4,6 +4,7 @@ namespace Framework\Builder;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\DataFile;
+use Framework\Discovery\ConsoleCommand;
 use Framework\Builder\AccessCode;
 use Framework\Builder\ConfigCode;
 use Framework\Builder\LanguageCode;
@@ -30,7 +31,10 @@ class Builder {
      * @param boolean $deleteCode Optional.
      * @return boolean
      */
+    #[ConsoleCommand("build")]
     public static function build(bool $deleteCode = false): bool {
+        print("Building the Code...\n");
+
         $writePath   = Discovery::getBuildPath();
         $package     = self::getPackageData();
         $files       = 0;

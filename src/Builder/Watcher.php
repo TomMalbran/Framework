@@ -2,6 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\ConsoleCommand;
 use Framework\File\File;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -19,7 +20,10 @@ class Watcher {
      * Watches the App source for changes
      * @return never
      */
+    #[ConsoleCommand("watch")]
     public static function watch(): never {
+        print("Watching for changes...\n");
+
         $watchPath      = Discovery::getAppPath();
         $basePath       = Discovery::getBasePath();
 

@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryMigration;
+use Framework\Discovery\ConsoleCommand;
 use Framework\Database\SchemaMigration;
 use Framework\Core\Settings;
 use Framework\Email\EmailTemplate;
@@ -17,7 +18,10 @@ class Migration {
      * @param boolean $canDelete Optional.
      * @return boolean
      */
+    #[ConsoleCommand("migrate")]
     public static function migrate(bool $canDelete = false): bool {
+        print("Migrating data...\n");
+
         print("\nDATABASE MIGRATIONS\n");
         SchemaMigration::migrateData($canDelete);
 

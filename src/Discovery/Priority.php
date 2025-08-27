@@ -6,7 +6,7 @@ use Attribute;
 /**
  * The Priority Attribute
  */
-#[Attribute(Attribute::TARGET_CLASS)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class Priority {
 
     public const Highest = 0;

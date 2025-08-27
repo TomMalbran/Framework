@@ -8,6 +8,7 @@ use Framework\Utils\Strings;
 use Framework\Utils\JSON;
 
 use ReflectionClass;
+use ReflectionMethod;
 use ReflectionProperty;
 use ReflectionNamedType;
 use Throwable;
@@ -345,12 +346,7 @@ class Discovery {
 
         foreach ($reflections as $reflection) {
             if ($reflection->implementsInterface($interface)) {
-                $attributes = $reflection->getAttributes(Priority::class);
-                $priority   = Priority::Normal;
-                if (isset($attributes[0])) {
-                    $priority = $attributes[0]->newInstance()->priority;
-                }
-
+                $priority = self::getPriority($reflection);
                 if (!isset($instances[$priority])) {
                     $priorities[] = $priority;
                 }
@@ -389,5 +385,18 @@ class Discovery {
             $result[$prop->getName()] = $typeName;
         }
         return $result;
+    }
+
+    /**
+     * Returns the priority from a ReflectionClass or ReflectionMethod.
+     * @param ReflectionClass<object>|ReflectionMethod $reflection
+     * @return integer
+     */
+    public static function getPriority(ReflectionClass|ReflectionMethod $reflection): int {
+        $attributes = $reflection->getAttributes(Priority::class);
+        if (isset($attributes[0])) {
+            return $attributes[0]->newInstance()->priority;
+        }
+        return Priority::Normal;
     }
 }
