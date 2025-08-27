@@ -47,7 +47,11 @@ class Configs {
         // Read using the getenv function
         $fileName = getenv("ENV_FILENAME");
         if ($fileName !== false) {
-            $replace = self::loadENV($appPath, $fileName);
+            $replace     = self::loadENV($appPath, $fileName);
+            $environment = Strings::replace($fileName, ".env.", "");
+            if (Arrays::contains(self::$environments, $environment)) {
+                self::$environment = $environment;
+            }
 
         // Read all the .env files in the App Path
         } else {
