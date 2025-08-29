@@ -413,11 +413,12 @@ class Schema {
     /**
      * Edits the Data of an Entity
      * @param Query|integer|string $query
-     * @param Request|null         $request      Optional.
-     * @param array<string,mixed>  $fields       Optional.
-     * @param integer              $credentialID Optional.
-     * @param boolean              $skipEmpty    Optional.
-     * @param boolean              $skipUnset    Optional.
+     * @param Request|null         $request        Optional.
+     * @param array<string,mixed>  $fields         Optional.
+     * @param integer              $credentialID   Optional.
+     * @param boolean              $skipTimestamps Optional.
+     * @param boolean              $skipEmpty      Optional.
+     * @param boolean              $skipUnset      Optional.
      * @return boolean
      */
     protected static function editSchemaEntity(
@@ -425,12 +426,15 @@ class Schema {
         ?Request $request = null,
         array $fields = [],
         int $credentialID = 0,
+        bool $skipTimestamps = false,
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
         $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
-        $modification->addModification($credentialID);
+        if (!$skipTimestamps) {
+            $modification->addModification($credentialID);
+        }
 
         $query = self::generateQueryID($query, false);
         return $modification->update($query);
@@ -485,11 +489,12 @@ class Schema {
      * Edits the Data of an Entity and ensures the Order
      * @param Query|integer|string $query
      * @param Request|null         $request
-     * @param array<string,mixed>  $fields       Optional.
-     * @param integer              $credentialID Optional.
-     * @param Query|null           $orderQuery   Optional.
-     * @param boolean              $skipEmpty    Optional.
-     * @param boolean              $skipUnset    Optional.
+     * @param array<string,mixed>  $fields         Optional.
+     * @param integer              $credentialID   Optional.
+     * @param Query|null           $orderQuery     Optional.
+     * @param boolean              $skipTimestamps Optional.
+     * @param boolean              $skipEmpty      Optional.
+     * @param boolean              $skipUnset      Optional.
      * @return boolean
      */
     protected static function editSchemaEntityWithOrder(
@@ -498,12 +503,15 @@ class Schema {
         array $fields = [],
         int $credentialID = 0,
         ?Query $orderQuery = null,
+        bool $skipTimestamps = false,
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
         $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
-        $modification->addModification($credentialID);
+        if (!$skipTimestamps) {
+            $modification->addModification($credentialID);
+        }
 
         $fields = $modification->getFields();
         if (isset($fields["position"])) {
