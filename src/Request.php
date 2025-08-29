@@ -106,7 +106,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function getString(string $key, string $default = ""): string {
         if ($this->exists($key)) {
-            return trim(Strings::toString($this->request[$key]));
+            return Strings::normalized($this->request[$key]);
         }
         return $default;
     }

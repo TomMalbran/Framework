@@ -34,12 +34,22 @@ class Strings {
     }
 
     /**
-     * Returns the given value as a string
+     * Returns the given value as a Trimmed String
      * @param mixed $value
      * @return string
      */
     public static function trim(mixed $value): string {
         return trim(self::toString($value));
+    }
+
+    /**
+     * Returns the given value as a Normalized String
+     * @param mixed $value
+     * @return string
+     */
+    public static function normalized(mixed $value): string {
+        $result = trim(self::toString($value));
+        return self::replace($result, "\r\n", "\n");
     }
 
     /**
