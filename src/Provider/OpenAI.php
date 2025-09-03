@@ -346,6 +346,13 @@ class OpenAI {
             $result->inputTokens   = $response->getDict("usage")->getInt("input_tokens");
             $result->outputTokens  = $response->getDict("usage")->getInt("output_tokens");
             $result->runTime       = Numbers::roundInt($endTime - $startTime);
+
+            foreach ($response->getList("tools") as $tool) {
+                if ($tool->getString("type") === "web_search_preview") {
+                    $result->didSearchCall = true;
+                    break;
+                }
+            }
         }
         return $result;
     }
