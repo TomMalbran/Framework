@@ -721,7 +721,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the given string as a time of the start of the day
+     * Returns the given string as a time at the start of the day
      * @param string  $key
      * @param boolean $useTimezone Optional.
      * @return integer
@@ -732,7 +732,22 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the given string as a time of the middle of the day
+     * Returns the given string as a time at the given hour or the start of the day
+     * @param string  $dateKey
+     * @param string  $hourKey
+     * @param boolean $useTimezone Optional.
+     * @return integer
+     */
+    public function toDayStartHour(string $dateKey, string $hourKey, bool $useTimezone = true): int {
+        $value = $this->getString($dateKey);
+        if ($this->has($hourKey)) {
+            return DateTime::toTimeHour($value, $this->getString($hourKey), $useTimezone);
+        }
+        return DateTime::toDayStart($value, $useTimezone);
+    }
+
+    /**
+     * Returns the given string as a time at the middle of the day
      * @param string  $key
      * @param boolean $useTimezone Optional.
      * @return integer
@@ -743,7 +758,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the given string as a time of the end of the day
+     * Returns the given string as a time at the end of the day
      * @param string  $key
      * @param boolean $useTimezone Optional.
      * @return integer
@@ -754,7 +769,22 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the given integer as a time of the start of the day
+     * Returns the given string as a time at the given hour or the end of the day
+     * @param string  $dateKey
+     * @param string  $hourKey
+     * @param boolean $useTimezone Optional.
+     * @return integer
+     */
+    public function toDayEndHour(string $dateKey, string $hourKey, bool $useTimezone = true): int {
+        $value = $this->getString($dateKey);
+        if ($this->has($hourKey)) {
+            return DateTime::toTimeHour($value, $this->getString($hourKey), $useTimezone);
+        }
+        return DateTime::toDayEnd($value, $useTimezone);
+    }
+
+    /**
+     * Returns the given integer as a time at the start of the day
      * @param string  $key
      * @param boolean $useTimezone Optional.
      * @return integer
@@ -765,7 +795,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the given integer as a time of the end of the day
+     * Returns the given integer as a time at the end of the day
      * @param string  $key
      * @param boolean $useTimezone Optional.
      * @return integer
