@@ -310,9 +310,9 @@ class Auth {
         self::$userID       = $userID;
 
         if ($credential->userAccess !== "") {
-            self::$accessName = Access::from($credential->userAccess);
+            self::$accessName = Access::fromValue($credential->userAccess);
         } else {
-            self::$accessName = Access::from($credential->access);
+            self::$accessName = Access::fromValue($credential->access);
         }
 
         $language = $credential->language;
@@ -360,7 +360,7 @@ class Auth {
      */
     public static function setCurrentUser(int $userID, Access|string $accessName): bool {
         self::$userID     = $userID;
-        self::$accessName = Access::from($accessName);
+        self::$accessName = Access::fromValue($accessName);
 
         ActionLog::endSession();
         ActionLog::startSession(true);

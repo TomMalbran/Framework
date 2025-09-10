@@ -23,11 +23,11 @@ enum FieldType {
 
 
     /**
-     * Creates an FieldType from a String
+     * Creates a Field Type from a String
      * @param string $value
      * @return FieldType
      */
-    public static function from(string $value): FieldType {
+    public static function fromValue(string $value): FieldType {
         foreach (self::cases() as $case) {
             if (Strings::isEqual($case->name, $value)) {
                 return $case;

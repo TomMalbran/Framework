@@ -24,7 +24,7 @@ enum {{status}} {
      * @param {{status}} $default Optional.
      * @return {{status}}
      */
-    public static function from({{status}}|string $value, {{status}} $default = self::None): {{status}} {
+    public static function fromValue({{status}}|string $value, {{status}} $default = self::None): {{status}} {
         if ($value instanceof {{status}}) {
             return $value;
         }
@@ -44,7 +44,7 @@ enum {{status}} {
     public static function fromList(array $values): array {
         $result = [];
         foreach ($values as $value) {
-            $result[] = self::from($value);
+            $result[] = self::fromValue($value);
         }
         return $result;
     }
@@ -83,7 +83,7 @@ enum {{status}} {
      * @return string
      */
     public static function getColor({{status}}|string $value): string {
-        return match (self::from($value)) {
+        return match (self::fromValue($value)) {
         {{#statuses}}
             self::{{constant}} => "{{color}}",
         {{/statuses}}
@@ -97,7 +97,7 @@ enum {{status}} {
      * @return boolean
      */
     public static function isValid({{status}}|string $value): bool {
-        return Arrays::contains([ {{values}} ], self::from($value));
+        return Arrays::contains([ {{values}} ], self::fromValue($value));
     }
 
     /**
@@ -126,7 +126,7 @@ enum {{status}} {
      * @return boolean
      */
     public static function is{{name}}({{status}}|string $value): bool {
-        return self::{{name}} === self::from($value);
+        return self::{{name}} === self::fromValue($value);
     }
 {{/statuses}}
 }

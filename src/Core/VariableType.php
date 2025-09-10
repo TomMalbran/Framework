@@ -26,7 +26,7 @@ enum VariableType {
      * @param string $value
      * @return VariableType
      */
-    public static function from(string $value): VariableType {
+    public static function fromValue(string $value): VariableType {
         foreach (self::cases() as $case) {
             if ($case->name === $value) {
                 return $case;

@@ -21,7 +21,7 @@ enum DateType {
      * @param string $value
      * @return DateType
      */
-    public static function from(string $value): DateType {
+    public static function fromValue(string $value): DateType {
         foreach (self::cases() as $case) {
             if ($case->name === $value) {
                 return $case;

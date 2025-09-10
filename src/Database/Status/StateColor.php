@@ -21,7 +21,7 @@ enum StateColor {
      * @param string $value
      * @return StateColor
      */
-    public static function from(string $value): StateColor {
+    public static function fromValue(string $value): StateColor {
         foreach (self::cases() as $case) {
             if ($case->name === $value) {
                 return $case;

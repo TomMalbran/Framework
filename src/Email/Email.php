@@ -68,7 +68,7 @@ class Email {
         }
 
         // Configure the variables
-        $provider  = EmailProvider::from(Config::getEmailProvider());
+        $provider  = EmailProvider::fromValue(Config::getEmailProvider());
         $fromName  = Config::getName();
         $fromEmail = Config::getEmailEmail();
         $replyTo   = Config::getEmailReplyTo();

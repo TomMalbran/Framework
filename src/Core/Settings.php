@@ -139,7 +139,7 @@ class Settings extends SettingsSchema {
                 continue;
             }
 
-            $variableType = VariableType::from($elem->variableType);
+            $variableType = VariableType::fromValue($elem->variableType);
             self::replaceEntity(
                 section:      $elem->section,
                 variable:     $elem->variable,

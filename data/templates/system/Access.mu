@@ -27,7 +27,7 @@ enum Access {
      * @param Access|string $value
      * @return Access
      */
-    public static function from(Access|string $value): Access {
+    public static function fromValue(Access|string $value): Access {
         if ($value instanceof Access) {
             return $value;
         }
@@ -56,7 +56,7 @@ enum Access {
      * @return integer
      */
     public static function getLevel(Access|string $value): int {
-        return match (self::from($value)) {
+        return match (self::fromValue($value)) {
         {{#accesses}}
             self::{{constant}} => {{level}},
         {{/accesses}}
@@ -130,7 +130,7 @@ enum Access {
      * @return boolean
      */
     public static function isValid{{name}}(Access|string $value): bool {
-        return Arrays::contains([ {{values}} ], self::from($value));
+        return Arrays::contains([ {{values}} ], self::fromValue($value));
     }
 
     /**
