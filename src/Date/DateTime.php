@@ -891,6 +891,28 @@ class DateTime {
         return 365 + (int)date("L", $timeStamp);
     }
 
+    /**
+     * Add the given Years to the given Time Stamp
+     * @param integer $timeStamp   Optional.
+     * @param integer $yearDiff    Optional.
+     * @param integer $month       Optional.
+     * @param integer $day         Optional.
+     * @param boolean $useTimeZone Optional.
+     * @return integer
+     */
+    public static function addYears(int $timeStamp = 0, int $yearDiff = 0, int $month = 0, int $day = 0, bool $useTimeZone = false): int {
+        $timeStamp = self::getTime($timeStamp);
+        $result    = self::createTime(
+            $day   > 0 ? $day   : self::getDay($timeStamp),
+            $month > 0 ? $month : self::getMonth($timeStamp),
+            self::getYear($timeStamp) + $yearDiff,
+            self::getHour($timeStamp),
+            (int)date("i", $timeStamp),
+            (int)date("s", $timeStamp),
+        );
+        return self::toServerTime($result, $useTimeZone);
+    }
+
 
 
     /**
