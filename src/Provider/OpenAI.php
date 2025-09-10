@@ -6,6 +6,7 @@ use Framework\System\Config;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
 use Framework\Utils\Select;
+use Framework\Utils\Strings;
 
 use CURLStringFile;
 
@@ -207,8 +208,9 @@ class OpenAI {
      * Creates a Completion and returns the Result
      * @param string                              $model
      * @param string                              $prompt
-     * @param array{role:string,content:string}[] $context Optional.
-     * @param Dictionary|null                     $schema  Optional.
+     * @param array{role:string,content:string}[] $context          Optional.
+     * @param Dictionary|null                     $schema           Optional.
+     * @param boolean                             $removeReferences Optional.
      * @return OpenAIOutput
      */
     public static function createCompletion(
@@ -216,6 +218,7 @@ class OpenAI {
         string $prompt,
         array $context = [],
         ?Dictionary $schema = null,
+        bool $removeReferences = true,
     ): OpenAIOutput {
         $startTime = microtime(true);
         $params    = [
@@ -252,8 +255,13 @@ class OpenAI {
             return $result;
         }
 
+        $text = $choice->getDict("message")->getString("content");
+        if ($removeReferences) {
+            $text = Strings::replace($text, '/【.*?†.*?】/', "");
+        }
+
         $result->externalID   = $response->getString("id");
-        $result->text         = $choice->getDict("message")->getString("content");
+        $result->text         = $text;
         $result->inputTokens  = $response->getDict("usage")->getInt("prompt_tokens");
         $result->outputTokens = $response->getDict("usage")->getInt("completion_tokens");
         $result->runTime      = Numbers::roundInt($endTime - $startTime);
@@ -264,10 +272,11 @@ class OpenAI {
      * Creates a Response and returns the Result
      * @param string                              $model
      * @param string                              $prompt
-     * @param array{role:string,content:string}[] $context        Optional.
-     * @param Dictionary|null                     $schema         Optional.
-     * @param string                              $vectorStoreID  Optional.
-     * @param boolean                             $allowWebSearch Optional.
+     * @param array{role:string,content:string}[] $context          Optional.
+     * @param Dictionary|null                     $schema           Optional.
+     * @param string                              $vectorStoreID    Optional.
+     * @param boolean                             $allowWebSearch   Optional.
+     * @param boolean                             $removeReferences Optional.
      * @return OpenAIOutput
      */
     public static function createResponse(
@@ -277,6 +286,7 @@ class OpenAI {
         ?Dictionary $schema = null,
         string $vectorStoreID = "",
         bool $allowWebSearch = false,
+        bool $removeReferences = true,
     ): OpenAIOutput {
         $startTime = microtime(true);
         $params    = [
@@ -337,6 +347,9 @@ class OpenAI {
                 $text = $output->getFirst("content")->getString("text");
                 break;
             }
+        }
+        if ($removeReferences) {
+            $text = Strings::replace($text, '/【.*?†.*?】/', "");
         }
 
         if ($text !== "") {
