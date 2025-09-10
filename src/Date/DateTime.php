@@ -1088,7 +1088,7 @@ class DateTime {
         $result = NLS::getIndex($key, $day, $language);
 
         if ($length > 0) {
-            $result = Strings::substring($result, 0, $length);
+            $result = Strings::substring($result, 0, $length, true);
         }
         if ($inUpperCase) {
             $result = Strings::toUpperCase($result);

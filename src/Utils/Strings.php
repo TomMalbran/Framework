@@ -443,9 +443,13 @@ class Strings {
      * @param string       $string
      * @param integer      $start
      * @param integer|null $length Optional.
+     * @param boolean      $asUtf8 Optional.
      * @return string
      */
-    public static function substring(string $string, int $start, ?int $length = null): string {
+    public static function substring(string $string, int $start, ?int $length = null, bool $asUtf8 = false): string {
+        if ($asUtf8) {
+            return mb_substr($string, $start, $length, "utf-8");
+        }
         return substr($string, $start, $length);
     }
 
