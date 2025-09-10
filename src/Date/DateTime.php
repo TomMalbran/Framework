@@ -807,10 +807,10 @@ class DateTime {
     public static function addMonths(int $timeStamp = 0, int $monthDiff = 0, int $day = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = self::createTime(
-            $day !== 0 ? $day : self::getDay($timeStamp),
+            $day > 0 ? $day : self::getDay($timeStamp),
             self::getMonth($timeStamp) + $monthDiff,
             self::getYear($timeStamp),
-            (int)date("h", $timeStamp),
+            self::getHour($timeStamp),
             (int)date("i", $timeStamp),
             (int)date("s", $timeStamp),
         );
@@ -1091,6 +1091,16 @@ class DateTime {
 
 
     /**
+     * Returns the Hour of the given Time Stamp
+     * @param integer $timeStamp Optional.
+     * @return integer
+     */
+    public static function getHour(int $timeStamp = 0): int {
+        $timeStamp = self::getTime($timeStamp);
+        return (int)date("G", $timeStamp);
+    }
+
+    /**
      * Adds the given Hours to the given Time Stamp
      * @param integer $timeStamp   Optional.
      * @param integer $hourDiff    Optional.
@@ -1151,7 +1161,7 @@ class DateTime {
      */
     public static function toMinutes(?int $hours = null, ?int $minutes = null, ?float $timeZone = null): int {
         if ($hours === null || $minutes === null) {
-            $result = (int)date("H") * 60 + (int)date("i");
+            $result = self::getHour() * 60 + (int)date("i");
         } else {
             $result = $hours * 60 + $minutes;
         }
@@ -1170,7 +1180,7 @@ class DateTime {
      */
     public static function timeStampToMinutes(int $timeStamp, ?float $timeZone = null): int {
         $timeStamp = self::getTime($timeStamp);
-        $hours     = (int)date("H", $timeStamp);
+        $hours     = self::getHour($timeStamp);
         $minutes   = (int)date("i", $timeStamp);
         return self::toMinutes($hours, $minutes, $timeZone);
     }
