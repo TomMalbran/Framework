@@ -20,6 +20,7 @@ class Migration {
      */
     #[ConsoleCommand("migrate")]
     public static function migrate(bool $canDelete = false): bool {
+        $timeStart = microtime(true);
         print("Migrating data...\n");
 
         print("\nDATABASE MIGRATIONS\n");
@@ -41,7 +42,11 @@ class Migration {
             }
         }
 
-        print("\n\nMigrations completed\n\n");
+        // Calculate and show the time taken
+        $timeEnd = microtime(true);
+        $seconds = $timeEnd - $timeStart;
+        $minutes = round(($seconds / 60) * 100) / 100;
+        print("\n\nMigrations completed in $minutes m ($seconds s)\n\n");
         return true;
     }
 }
