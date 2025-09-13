@@ -17,7 +17,6 @@ class OpenAI {
 
     private const BaseUrl = "https://api.openai.com/v1";
 
-    public  const MaxAssistantFiles = 20;
 
 
     /**
