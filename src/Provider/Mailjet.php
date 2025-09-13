@@ -13,6 +13,7 @@ class Mailjet {
     private const BaseUrl = "https://api.mailjet.com";
 
 
+
     /**
      * Executes a Request
      * @param string              $method
@@ -140,5 +141,95 @@ class Mailjet {
             self::execute("DELETE", "/v4/contacts/$contactID");
         }
         return true;
+    }
+
+
+
+    /**
+     * Returns a Sender
+     * @param string $domain
+     * @return Dictionary
+     */
+    public static function getSender(string $domain): Dictionary {
+        $response = self::execute("GET", "/v3/REST/sender/*@$domain");
+        $data     = $response->getFirst("Data");
+        return $data;
+    }
+
+    /**
+     * Creates a Sender
+     * @param string $name
+     * @param string $email
+     * @param string $emailType Optional.
+     * @return boolean
+     */
+    public static function createSender(string $name, string $email, string $emailType = "unknown"): bool {
+        $response = self::execute("POST", "/v3/REST/sender", [
+            "Name"            => $name,
+            "Email"           => $email,
+            "EmailType"       => $emailType,
+            "IsDefaultSender" => "false",
+        ]);
+        return !$response->hasValue("ErrorMessage");
+    }
+
+    /**
+     * Edits a Sender
+     * @param string $domain
+     * @param string $name
+     * @return boolean
+     */
+    public static function editSender(string $domain, string $name): bool {
+        $response = self::execute("PUT", "/v3/REST/sender/*@$domain", [
+            "Name" => $name,
+        ]);
+        return !$response->hasValue("ErrorMessage");
+    }
+
+    /**
+     * Deletes a Sender
+     * @param string $domain
+     * @return boolean
+     */
+    public static function deleteSender(string $domain): bool {
+        $response = self::execute("DELETE", "/v3/REST/sender/*@$domain");
+        return !$response->hasValue("ErrorMessage");
+    }
+
+    /**
+     * Validates a Sender
+     * @param string $domain
+     * @return boolean
+     */
+    public static function validateSender(string $domain): bool {
+        $response = self::execute("POST", "/v3/REST/sender/*@$domain/validate");
+        return $response->getString("GlobalError") === "";
+    }
+
+
+
+    /**
+     * Returns a DNS
+     * @param integer $senderID
+     * @return Dictionary
+     */
+    public static function getDNS(string $domain): Dictionary {
+        $response = self::execute("GET", "/v3/REST/dns/$domain");
+        $data     = $response->getFirst("Data");
+        return $data;
+    }
+
+    /**
+     * Checks a DNS
+     * @param integer $senderID
+     * @return array{boolean,boolean} [SPF, DKIM]
+     */
+    public static function checkDNS(string $domain): array {
+        $response = self::execute("POST", "/v3/REST/dns/$domain/check");
+        $data     = $response->getFirst("Data");
+        return [
+            $data->getString("SPFStatus")  === "OK",
+            $data->getString("DKIMStatus") === "OK",
+        ];
     }
 }
