@@ -4,6 +4,7 @@ namespace Framework\Database\Builder;
 use Framework\Database\SchemaModel;
 use Framework\Builder\Builder;
 use Framework\Database\Model\FieldType;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -157,9 +158,17 @@ class EntityCode {
      * @return array{namespace:string,type:string}[]
      */
     private static function getSubTypes(SchemaModel $schemaModel): array {
+        $models = [];
         $result = [];
+
         foreach ($schemaModel->subRequests as $subRequest) {
+            $model = "{$subRequest->namespace}/{$subRequest->modelName}";
+            if (Arrays::contains($models, $model)) {
+                continue;
+            }
+
             if ($subRequest->type === "") {
+                $models[] = $model;
                 $result[] = [
                     "namespace" => $subRequest->namespace,
                     "type"      => $subRequest->modelName,

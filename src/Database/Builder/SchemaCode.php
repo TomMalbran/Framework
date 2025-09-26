@@ -114,9 +114,17 @@ class SchemaCode {
      * @return array{name:string,type:string,namespace:string}[]
      */
     private static function getSubTypes(SchemaModel $schemaModel, bool $forSchemas = false): array {
+        $models = [];
         $result = [];
+
         foreach ($schemaModel->subRequests as $subRequest) {
+            $model = "{$subRequest->namespace}/{$subRequest->modelName}";
+            if (Arrays::contains($models, $model)) {
+                continue;
+            }
+
             if ($forSchemas || $subRequest->type === "") {
+                $models[] = $model;
                 $result[] = [
                     "name"      => $subRequest->name,
                     "type"      => $subRequest->modelName,
