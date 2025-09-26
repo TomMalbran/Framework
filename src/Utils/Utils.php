@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -277,47 +276,6 @@ class Utils {
      */
     public static function isValidDomain(string $domain): bool {
         return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
-    }
-
-    /**
-     * Generates a domain from an email
-     * @param string $email
-     * @return string
-     */
-    public static function generateDomain(string $email): string {
-        /** spell-checker: disable */
-        $domains = [
-            /* Default domains included */
-            "aol.com", "att.net", "comcast.net", "facebook.com", "fb.com", "gmail.com", "gmx.com", "googlemail.com",
-            "google.com", "hotmail.com", "hotmail.co.uk", "hotmail.es", "mac.com", "me.com", "mail.com", "msn.com",
-            "live.com", "sbcglobal.net", "verizon.net", "yahoo.com", "yahoo.co.uk",
-
-            /* Other global domains */
-            "email.com", "fastmail.fm", "games.com" /* AOL */, "gmx.net", "hush.com", "hushmail.com", "icloud.com",
-            "iname.com", "inbox.com", "lavabit.com", "love.com" /* AOL */, "outlook.com", "pobox.com", "protonmail.com",
-            "rocketmail.com" /* Yahoo */, "safe-mail.net", "wow.com" /* AOL */, "ygm.com" /* AOL */,
-            "ymail.com" /* Yahoo */, "zoho.com", "yandex.com",
-
-            /* Argentinian ISP domains */
-            "hotmail.com.ar", "live.com.ar", "yahoo.com.ar", "fibertel.com.ar", "speedy.com.ar", "arnet.com.ar",
-            "ciudad.com.ar", "flash.com.ar", "outlook.com.ar",
-
-            /* Other countries */
-            "yahoo.es", "yahoo.com.br", "outlook.es", "hotmail.es",
-
-            /* Special domain */
-            "unbounce.com", "webadictos.net", "telefonica.com", "prueba.com", "tester.com", "demo.com",
-        ];
-        /** spell-checker: enable */
-
-        if (self::isValidEmail($email)) {
-            $domain = Strings::substringAfter($email, "@");
-            $domain = Strings::toLowerCase($domain);
-            if (!Arrays::contains($domains, $domain)) {
-                return $domain;
-            }
-        }
-        return "";
     }
 
     /**
