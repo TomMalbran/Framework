@@ -134,7 +134,7 @@ class Utils {
             return "";
         }
 
-        $domain  = Strings::substringAfter($email, "@");
+        $domain  = self::getEmailDomain($email);
         $name    = Strings::substringBefore($email, "@");
         $length  = Strings::length($name);
         $nameLen = $length > 3 ? 3 : 1;
@@ -318,6 +318,21 @@ class Utils {
             }
         }
         return "";
+    }
+
+    /**
+     * Extracts the Domain from the given email
+     * @param string $email
+     * @return string
+     */
+    public static function getEmailDomain(string $email): string {
+        if (!self::isValidEmail($email)) {
+            return "";
+        }
+
+        $result = Strings::substringAfter($email, "@");
+        $result = Strings::toLowerCase($result);
+        return $result;
     }
 
     /**
