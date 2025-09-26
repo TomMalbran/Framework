@@ -2,6 +2,7 @@
 // spell-checker: ignore  contactslist, managecontact, addforce
 namespace Framework\Provider;
 
+use Framework\Provider\Type\DomainData;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
 
@@ -146,40 +147,72 @@ class Mailjet {
 
 
     /**
-     * Returns a Sender
+     * Returns a Domain
      * @param string $domain
-     * @return Dictionary
+     * @return DomainData
      */
-    public static function getSender(string $domain): Dictionary {
+    public static function getDomain(string $domain): DomainData {
         $response = self::execute("GET", "/v3/REST/sender/*@$domain");
         $data     = $response->getFirst("Data");
-        return $data;
+        $result   = new DomainData();
+        if ($data->isEmpty()) {
+            return $result;
+        }
+
+        // Get the DNS data
+        $response = self::execute("GET", "/v3/REST/dns/$domain");
+        $dnsData  = $response->getFirst("Data");
+
+        // Basic Domain Data
+        $result->isEmpty  = false;
+        $result->isActive = $data->getString("Status") === "Active";
+        $result->id       = $data->getString("ID");
+        $result->domain   = $domain;
+
+        // Owner DNS Record
+        $result->ownerValid = $result->isActive;
+        $result->ownerType  = "TXT";
+        $result->ownerHost  = $dnsData->getString("OwnerShipTokenRecordName");
+        $result->ownerValue = $dnsData->getString("OwnerShipToken");
+
+        // SPF DNS Record
+        $result->spfValid   = $dnsData->getString("SPFStatus")  === "OK";
+        $result->spfType    = "TXT";
+        $result->spfHost    = "@";
+        $result->spfValue   = $dnsData->getString("SPFRecordValue");
+
+        // DKIM DNS Record
+        $result->dkimValid  = $dnsData->getString("DKIMStatus") === "OK";
+        $result->dkimType   = "TXT";
+        $result->dkimHost   = $dnsData->getString("DKIMRecordName");
+        $result->dkimValue  = $dnsData->getString("DKIMRecordValue");
+
+        return $result;
     }
 
     /**
-     * Creates a Sender
+     * Creates a Domain
      * @param string $name
-     * @param string $email
-     * @param string $emailType Optional.
+     * @param string $domain
      * @return boolean
      */
-    public static function createSender(string $name, string $email, string $emailType = "unknown"): bool {
+    public static function createDomain(string $name, string $domain): bool {
         $response = self::execute("POST", "/v3/REST/sender", [
             "Name"            => $name,
-            "Email"           => $email,
-            "EmailType"       => $emailType,
+            "Email"           => "*@$domain",
+            "EmailType"       => "unknown",
             "IsDefaultSender" => "false",
         ]);
         return !$response->hasValue("ErrorMessage");
     }
 
     /**
-     * Edits a Sender
+     * Edits a Domain
      * @param string $domain
      * @param string $name
      * @return boolean
      */
-    public static function editSender(string $domain, string $name): bool {
+    public static function editDomain(string $domain, string $name): bool {
         $response = self::execute("PUT", "/v3/REST/sender/*@$domain", [
             "Name" => $name,
         ]);
@@ -187,49 +220,36 @@ class Mailjet {
     }
 
     /**
-     * Deletes a Sender
+     * Validates a Domain
      * @param string $domain
      * @return boolean
      */
-    public static function deleteSender(string $domain): bool {
-        $response = self::execute("DELETE", "/v3/REST/sender/*@$domain");
-        return !$response->hasValue("ErrorMessage");
-    }
-
-    /**
-     * Validates a Sender
-     * @param string $domain
-     * @return boolean
-     */
-    public static function validateSender(string $domain): bool {
+    public static function validateDomain(string $domain): bool {
         $response = self::execute("POST", "/v3/REST/sender/*@$domain/validate");
         return $response->getString("GlobalError") === "";
     }
 
-
-
     /**
-     * Returns a DNS
-     * @param integer $senderID
-     * @return Dictionary
-     */
-    public static function getDNS(string $domain): Dictionary {
-        $response = self::execute("GET", "/v3/REST/dns/$domain");
-        $data     = $response->getFirst("Data");
-        return $data;
-    }
-
-    /**
-     * Checks a DNS
+     * Checks a Domain DNS
      * @param integer $senderID
      * @return array{boolean,boolean} [SPF, DKIM]
      */
-    public static function checkDNS(string $domain): array {
+    public static function checkDomainDNS(string $domain): array {
         $response = self::execute("POST", "/v3/REST/dns/$domain/check");
         $data     = $response->getFirst("Data");
         return [
             $data->getString("SPFStatus")  === "OK",
             $data->getString("DKIMStatus") === "OK",
         ];
+    }
+
+    /**
+     * Deletes a Domain
+     * @param string $domain
+     * @return boolean
+     */
+    public static function deleteDomain(string $domain): bool {
+        $response = self::execute("DELETE", "/v3/REST/sender/*@$domain");
+        return !$response->hasValue("ErrorMessage");
     }
 }
