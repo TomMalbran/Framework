@@ -28,11 +28,11 @@ class Builder {
 
     /**
      * Builds all the Code
-     * @param boolean $deleteCode Optional.
+     * @param boolean $delete Optional.
      * @return boolean
      */
     #[ConsoleCommand("build")]
-    public static function build(bool $deleteCode = false): bool {
+    public static function build(bool $delete = false): bool {
         print("Building the Code...\n");
 
         $writePath   = Discovery::getBuildPath();
@@ -44,7 +44,7 @@ class Builder {
         $hasBuilders = count($appBuilders) > 0;
 
 
-        if ($deleteCode && $hasBuilders) {
+        if ($delete && $hasBuilders) {
             foreach ($appBuilders as $builder) {
                 $builder::resetCode();
             }

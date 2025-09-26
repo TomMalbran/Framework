@@ -1,8 +1,12 @@
 <?php
 namespace Framework\Discovery;
 
+use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
+
 use Attribute;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 /**
  * The Console Command Attribute
@@ -42,6 +46,26 @@ class ConsoleCommand {
     }
 
     /**
+     * Returns the Command Arguments
+     * @return string
+     */
+    public function getArguments(): string {
+        $params    = $this->handler->getParameters();
+        $argValues = [];
+        foreach ($params as $param) {
+            $name = $param->getName();
+            $type = $param->getType();
+            if ($type instanceof ReflectionNamedType && $type->getName() === "bool") {
+                $name = "--$name";
+            } else {
+                $name = "--$name=<value>";
+            }
+            $argValues[] = $name;
+        }
+        return Strings::join($argValues, " ");
+    }
+
+    /**
      * Checks if the command should be invoked
      * @param string $name
      * @return boolean
@@ -63,10 +87,52 @@ class ConsoleCommand {
 
     /**
      * Invokes the command handler
-     * @param mixed ...$args
-     * @return mixed
+     * @param string[] $arguments
+     * @return boolean
      */
-    public function invoke(mixed ...$args): mixed {
-        return $this->handler->invoke(null, ...$args);
+    public function invoke(array $arguments): bool {
+        // Parse the Arguments
+        $argsData = [];
+        foreach ($arguments as $argument) {
+            $name  = Strings::substringBefore($argument, "=");
+            $name  = Strings::stripStart($name, "--");
+            $name  = Strings::toLowerCase($name);
+
+            $value = true;
+            if (Strings::contains($argument, "=")) {
+                $value = Strings::substringAfter($argument, "=");
+                if (Numbers::isValid($value)) {
+                    $value = (int)$value;
+                } elseif (Strings::toLowerCase($value) === "true") {
+                    $value = true;
+                } elseif (Strings::toLowerCase($value) === "false") {
+                    $value = false;
+                }
+            }
+            $argsData[$name] = $value;
+        }
+
+        // Match the Arguments to the Parameters
+        $params    = $this->handler->getParameters();
+        $minParams = 0;
+        $argValues = [];
+        foreach ($params as $param) {
+            $name    = $param->getName();
+            $nameIdx = Strings::toLowerCase($name);
+            if (isset($argsData[$nameIdx])) {
+                $argValues[$name] = $argsData[$nameIdx];
+            }
+            if (!$param->isOptional()) {
+                $minParams += 1;
+            }
+        }
+
+        // Check if we have enough arguments
+        if (count($argValues) < $minParams) {
+            return false;
+        }
+
+        $this->handler->invokeArgs(null, $argValues);
+        return true;
     }
 }

@@ -4,8 +4,9 @@ namespace Framework;
 use Framework\System\Package;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\ConsoleCommand;
-use Framework\Utils\Strings;
 use Framework\Discovery\Priority;
+use Framework\Utils\Arrays;
+use Framework\Utils\Strings;
 
 /**
  * The Framework Console
@@ -18,16 +19,19 @@ class Console {
      */
     public static function run(): void {
         echo "FRAMEWORK\n";
-        $commands  = self::getCommands();
+        $commands = self::getCommands();
 
-        $argv      = is_array($_SERVER["argv"] ?? null) ? $_SERVER["argv"] : [];
-        $name      = Strings::toString($argv[1] ?? "");
-        $canDelete = ($argv[2] ?? "") === "--delete";
+        $argv = is_array($_SERVER["argv"] ?? null) ? $_SERVER["argv"] : [];
+        $name = Strings::toString($argv[1] ?? "");
+        $args = Arrays::toStrings(array_slice($argv, 2));
 
         // Try to execute one of the commands
         foreach ($commands as $command) {
             if ($command->shouldInvoke($name)) {
-                $command->invoke($canDelete);
+                if (!$command->invoke($args)) {
+                    echo "Invalid arguments\n";
+                    echo "  Usage: {$command->getName()} {$command->getArguments()}\n";
+                }
                 return;
             }
         }
@@ -35,7 +39,7 @@ class Console {
         // Show the usage
         echo "Available commands: \n";
         foreach ($commands as $command) {
-            echo " - {$command->getName()}\n";
+            echo " - {$command->getName()} {$command->getArguments()}\n";
         }
     }
 
