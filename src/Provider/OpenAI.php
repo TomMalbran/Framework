@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Provider\OpenAIOutput;
+use Framework\Provider\Type\OpenAIOutput;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;

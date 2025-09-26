@@ -1,8 +1,8 @@
 <?php
-namespace Framework\Provider;
+namespace Framework\Provider\Type;
 
 /**
- * The OpenAI Data
+ * The OpenAI Output
  */
 class OpenAIOutput {
 
