@@ -16,6 +16,7 @@ class Configs {
 
     private static bool   $loaded      = false;
     private static string $environment = "local";
+    private static string $fileName    = "";
 
     /** @var array<string,mixed> */
     private static array $data         = [];
@@ -24,6 +25,16 @@ class Configs {
     private static array $environments = [];
 
 
+
+    /**
+     * Sets the Config File Name
+     * @param string $fileName
+     * @return boolean
+     */
+    public static function setFileName(string $fileName): bool {
+        self::$fileName = $fileName;
+        return true;
+    }
 
     /**
      * Loads the Config Data
@@ -44,8 +55,11 @@ class Configs {
         $currentHost = Utils::getHost($currentUrl);
         $replace     = [];
 
-        // Read using the getenv function
+        // Read using the getenv function or the saved file name
         $fileName = getenv("ENV_FILENAME");
+        if (self::$fileName !== "") {
+            $fileName = self::$fileName;
+        }
         if ($fileName !== false) {
             $replace     = self::loadENV($appPath, $fileName);
             $environment = Strings::replace($fileName, ".env.", "");
