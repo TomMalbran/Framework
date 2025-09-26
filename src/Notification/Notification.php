@@ -4,6 +4,7 @@ namespace Framework\Notification;
 use Framework\Provider\Curl;
 use Framework\File\FilePath;
 use Framework\System\Config;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -43,29 +44,19 @@ class Notification {
         if (count($playerIDs) === 0) {
             return null;
         }
-        return self::send($title, $body, $url, $dataType, $dataID, [
-            "include_aliases" => [
-                "onesignal_id" => $playerIDs,
-            ],
-        ]);
-    }
 
-    /**
-     * Send to Some
-     * @param string  $title
-     * @param string  $body
-     * @param string  $url
-     * @param string  $dataType
-     * @param integer $dataID
-     * @param string  $playerID
-     * @return string|null
-     */
-    public static function sendToOne(string $title, string $body, string $url, string $dataType, int $dataID, string $playerID): ?string {
-        return self::send($title, $body, $url, $dataType, $dataID, [
-            "include_aliases" => [
-                "onesignal_id" => [ $playerID ],
-            ],
-        ]);
+        $params = [
+            "include_subscription_ids" => $playerIDs,
+        ];
+        if (Config::isNotificationUseAlias()) {
+            $params = [
+                "include_aliases" => [
+                    "onesignal_id" => $playerIDs,
+                ],
+            ];
+        }
+
+        return self::send($title, $body, $url, $dataType, $dataID, $params);
     }
 
     /**
@@ -114,7 +105,7 @@ class Notification {
         ];
         $response = Curl::execute("POST", self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
 
-        if (!is_array($response) || !isset($response["id"])) {
+        if (!is_array($response) || !isset($response["id"]) || Arrays::isEmpty($response["id"])) {
             return null;
         }
         return Strings::toString($response["id"]);

@@ -39,6 +39,9 @@ class NotificationQueueModel {
 
     public string $externalID = "";
 
+    #[Field(isJSON: true)]
+    public string $playerIDs = "";
+
     public int $sentTime = 0;
 
     public bool $isRead = false;
