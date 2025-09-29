@@ -57,14 +57,20 @@ class Utils {
 
     /**
      * Parses a Full Name into a First and Last Name
-     * @param string $fullName
+     * @param string  $fullName
+     * @param boolean $lastNameFirst Optional.
      * @return array{string,string}
      */
-    public static function parseName(string $fullName): array {
+    public static function parseName(string $fullName, bool $lastNameFirst = false): array {
         $nameParts = Strings::split(trim($fullName), " ");
         if (count($nameParts) > 1) {
-            $lastName  = array_pop($nameParts);
-            $firstName = Strings::join($nameParts, " ");
+            if ($lastNameFirst) {
+                $lastName  = array_shift($nameParts);
+                $firstName = Strings::join($nameParts, " ");
+            } else {
+                $lastName  = array_pop($nameParts);
+                $firstName = Strings::join($nameParts, " ");
+            }
         } else {
             $firstName = $fullName;
             $lastName  = "";
