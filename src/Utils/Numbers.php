@@ -67,11 +67,15 @@ class Numbers {
     /**
      * Rounds the given number to the nearest integer
      * @param integer|float $number
+     * @param boolean       $useFloor Optional.
      * @return integer
      */
-    public static function roundInt(int|float $number): int {
+    public static function roundInt(int|float $number, bool $useFloor = false): int {
         if (is_int($number)) {
             return $number;
+        }
+        if ($useFloor) {
+            return (int)floor($number);
         }
         return (int)round($number);
     }
@@ -242,10 +246,11 @@ class Numbers {
      * Returns a division from the given values as an integer
      * @param integer $numerator
      * @param integer $divisor
+     * @param boolean $useFloor Optional.
      * @return integer
      */
-    public static function divideInt(int $numerator, int $divisor): int {
-        return $divisor === 0 ? 0 : self::roundInt($numerator / $divisor);
+    public static function divideInt(int $numerator, int $divisor, bool $useFloor = false): int {
+        return $divisor === 0 ? 0 : self::roundInt($numerator / $divisor, $useFloor);
     }
 
     /**
