@@ -27,15 +27,53 @@ class Mailgun {
     private static function execute(string $method, string $route, array $params = []): Dictionary {
         $url      = self::BaseUrl . $route;
         $userPass = "api:" . Config::getMailgunKey();
-        $headers  = [ "Content-Type" => "application/json" ];
-        $response = Curl::execute($method, $url, $params, $headers, $userPass, jsonBody: true);
+        $response = Curl::execute($method, $url, $params, userPass: $userPass);
         return new Dictionary($response);
     }
 
 
 
     /**
-     * Sends the Email
+     * Sends the Email (used for external calls)
+     * @param string $toEmail
+     * @param string $fromEmail
+     * @param string $fromName
+     * @param string $subject
+     * @param string $body
+     * @param string $replyTo   Optional.
+     * @return string
+     */
+    public static function send(
+        string $toEmail,
+        string $fromEmail,
+        string $fromName,
+        string $subject,
+        string $body,
+        string $replyTo = "",
+    ): string {
+        $params = [
+            "from"    => "$fromName <{$fromEmail}>",
+            "to"      => $toEmail,
+            "subject" => $subject,
+            "html"    => $body,
+        ];
+
+        if ($replyTo !== "") {
+            $params["h:Reply-To"] = [
+                "Email" => $replyTo,
+                "Name"  => $fromName,
+            ];
+        }
+
+        $domain   = Utils::getEmailDomain($fromEmail);
+        $response = self::execute("POST", "/v3/$domain/messages", $params);
+        $uuid     = $response->getString("id");
+        $uuid     = Strings::replace($uuid, [ "<", ">" ], "");
+        return $uuid;
+    }
+
+    /**
+     * Sends the Email (used for the Email class)
      * @param string $toEmail
      * @param string $fromEmail
      * @param string $fromName
@@ -50,24 +88,10 @@ class Mailgun {
         string $fromName,
         string $replyTo,
         string $subject,
-        string $body
+        string $body,
     ): bool {
-        $params = [
-            "from"    => "$fromName <$fromEmail>",
-            "to"      => $toEmail,
-            "subject" => $subject,
-            "html"    => $body,
-        ];
-        if ($replyTo !== "") {
-            $params["h:Reply-To"] = [
-                "Email" => $replyTo,
-                "Name"  => $fromName,
-            ];
-        }
-
-        $domain   = Utils::getEmailDomain($fromEmail);
-        $response = self::execute("POST", "/v3/$domain/messages", $params);
-        return $response->hasValue("id");
+        $result = self::send($toEmail, $fromEmail, $fromName, $subject, $body, $replyTo);
+        return $result !== "";
     }
 
 

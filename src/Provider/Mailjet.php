@@ -48,7 +48,7 @@ class Mailjet {
         string $fromName,
         string $replyTo,
         string $subject,
-        string $body
+        string $body,
     ): bool {
         $message = [
             "From"     => [

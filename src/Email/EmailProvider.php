@@ -9,6 +9,7 @@ enum EmailProvider {
     case SMTP;
     case Mandrill;
     case Mailjet;
+    case Mailgun;
     case SendGrid;
 
 

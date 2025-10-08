@@ -28,7 +28,7 @@ class SendGrid {
         string $fromName,
         string $replyTo,
         string $subject,
-        string $body
+        string $body,
     ): bool {
         $url     = self::BaseUrl . "mail/send";
         $headers = [

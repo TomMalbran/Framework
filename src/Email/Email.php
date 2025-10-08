@@ -11,6 +11,7 @@ use Framework\Provider\Mustache;
 use Framework\Provider\SMTP;
 use Framework\Provider\Mandrill;
 use Framework\Provider\Mailjet;
+use Framework\Provider\Mailgun;
 use Framework\Provider\SendGrid;
 use Framework\File\FilePath;
 use Framework\System\Config;
@@ -77,6 +78,7 @@ class Email {
         $wasSent = match ($provider) {
             EmailProvider::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
             EmailProvider::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            EmailProvider::Mailgun  => Mailgun::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
             EmailProvider::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
             default                 => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
         };
