@@ -106,31 +106,59 @@ class Mailgun {
             "h:extended" => "true",
             "h:with_dns" => "true",
         ]);
+        return self::generateDomainData($response);
+    }
+
+    /**
+     * Generates a Domain Data object from the API response
+     * @param Dictionary $response
+     * @return DomainData
+     */
+    private static function generateDomainData(Dictionary $response): DomainData {
         $result = new DomainData();
+        if (!$response->hasValue("domain")) {
+            return $result;
+        }
+
         $result->isEmpty = false;
-        $result->domain  = $domain;
+        $result->domain  = $response->getDict("domain")->getString("name");
 
         foreach ($response->getList("sending_dns_records") as $record) {
-            $type  = $record->getString("record_type");
-            $name  = $record->getString("name");
-            $value = $record->getString("value");
+            $type    = $record->getString("record_type");
+            $name    = $record->getString("name");
+            $value   = $record->getString("value");
+            $isValid = $record->getString("valid") === "valid";
 
             if (Strings::contains($value, "spf")) {
                 $result->spfType  = $type;
                 $result->spfHost  = $name;
                 $result->spfValue = $value;
+                $result->spfValid = $isValid;
             } elseif (Strings::contains($value, "rsa")) {
                 $result->dkimType  = $type;
                 $result->dkimHost  = $name;
                 $result->dkimValue = $value;
+                $result->dkimValid = $isValid;
             } elseif (Strings::contains($value, "mailgun")) {
                 $result->trackingType  = $type;
                 $result->trackingHost  = $name;
                 $result->trackingValue = $value;
+                $result->trackingValid = $isValid;
             }
+        }
+
+        // Finally get the DMARC record
+        $response = self::execute("GET", "/v1/dmarc/records/$result->domain");
+        if ($response->hasValue("entry")) {
+            $result->dmarcType  = "TXT";
+            $result->dmarcHost  = "_dmarc.{$result->domain}";
+            $result->dmarcValue = $response->getString("entry");
+            $result->dmarcValid = $response->getBool("configured");
         }
         return $result;
     }
+
+
 
     /**
      * Creates a Domain
@@ -145,13 +173,53 @@ class Mailgun {
     }
 
     /**
-     * Verifies a Domain
-     * @param string $domain
+     * Sets the Tracking for a Domain
+     * @param string  $domain
+     * @param boolean $tracking
      * @return boolean
      */
-    public static function verifyDomain(string $domain): bool {
+    public static function setDomainTracking(string $domain, bool $tracking): bool {
+        $response = self::execute("PUT", "/v3/domains/$domain/tracking/open", [
+            "active" => $tracking ? "true" : "false",
+        ]);
+        if (!$response->hasValue("open")) {
+            return false;
+        }
+
+        $response = self::execute("PUT", "/v3/domains/$domain/tracking/unsubscribe", [
+            "active" => $tracking ? "true" : "false",
+        ]);
+        return $response->hasValue("unsubscribe");
+    }
+
+    /**
+     * Sets the Webhooks for a Domain
+     * @param string $domain
+     * @param string $url
+     * @return boolean
+     */
+    public static function setDomainWebhooks(string $domain, string $url): bool {
+        $types = [ "delivered", "opened", "permanent_fail", "unsubscribed" ];
+        foreach ($types as $type) {
+            $response = self::execute("POST", "/v3/$domain/webhooks", [
+                "id"  => $type,
+                "url" => $url,
+            ]);
+            if (!$response->hasValue("webhook")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Verifies a Domain
+     * @param string $domain
+     * @return DomainData
+     */
+    public static function verifyDomain(string $domain): DomainData {
         $response = self::execute("PUT", "/v4/domains/$domain/verify");
-        return $response->hasValue("domain");
+        return self::generateDomainData($response);
     }
 
     /**
@@ -160,7 +228,7 @@ class Mailgun {
      * @return boolean
      */
     public static function deleteDomain(string $domain): bool {
-        $response = self::execute("DELETE", "/v4/domains/$domain");
-        return !$response->hasValue("message");
+        $response = self::execute("DELETE", "/v3/domains/$domain");
+        return Strings::contains($response->getString("message"), "deleted");
     }
 }
