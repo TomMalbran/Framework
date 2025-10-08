@@ -220,27 +220,26 @@ class Mailjet {
     }
 
     /**
-     * Validates a Domain
-     * @param string $domain
-     * @return boolean
+     * Verifies a Domain
+     * @param string  $domain
+     * @param boolean $validateOwner
+     * @return DomainData
      */
-    public static function validateDomain(string $domain): bool {
-        $response = self::execute("POST", "/v3/REST/sender/*@$domain/validate");
-        return $response->getString("GlobalError") === "";
-    }
+    public static function verifyDomain(string $domain, bool $validateOwner): DomainData {
+        $result = new DomainData();
 
-    /**
-     * Checks a Domain DNS
-     * @param integer $senderID
-     * @return array{boolean,boolean} [SPF, DKIM]
-     */
-    public static function checkDomainDNS(string $domain): array {
-        $response = self::execute("POST", "/v3/REST/dns/$domain/check");
-        $data     = $response->getFirst("Data");
-        return [
-            $data->getString("SPFStatus")  === "OK",
-            $data->getString("DKIMStatus") === "OK",
-        ];
+        if ($validateOwner) {
+            $response = self::execute("POST", "/v3/REST/sender/*@$domain/validate");
+            $result->ownerValid = $response->getString("GlobalError") === "";
+        } else {
+            $response = self::execute("POST", "/v3/REST/dns/$domain/check");
+            $data     = $response->getFirst("Data");
+
+            $result->spfValid  = $data->getString("SPFStatus")  === "OK";
+            $result->dkimValid = $data->getString("DKIMStatus") === "OK";
+        }
+
+        return $result;
     }
 
     /**
