@@ -17,7 +17,7 @@ class JSON {
      * @return boolean
      */
     public static function isValid(mixed $value): bool {
-        if (is_string($value)) {
+        if (is_string($value) && !is_numeric($value)) {
             json_decode($value);
             return json_last_error() === JSON_ERROR_NONE;
         }
