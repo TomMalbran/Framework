@@ -46,6 +46,21 @@ class Select implements JsonSerializable {
     }
 
     /**
+     * Returns true if the key has a value
+     * @param string $key
+     * @return boolean
+     */
+    public function hasValue(string $key): bool {
+        if (property_exists($this, $key)) {
+            return !Arrays::isEmpty($this->$key);
+        }
+        if (isset($this->extras[$key])) {
+            return !Arrays::isEmpty($this->extras[$key]);
+        }
+        return false;
+    }
+
+    /**
      * Returns the value as a string
      * @param string $key
      * @return string
