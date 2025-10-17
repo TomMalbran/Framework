@@ -455,7 +455,8 @@ class Field {
             if ($this->dateInput !== "" && $this->hourInput !== "") {
                 $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
             } elseif ($this->dateInput !== "") {
-                $result = $request->toDay($this->dateInput, $this->dateType, true);
+                $dateType = $this->dateType !== DateType::None ? $this->dateType : DateType::Start;
+                $result   = $request->toDay($this->dateInput, $dateType, true);
             } else {
                 $result = $request->getInt($this->name);
             }
