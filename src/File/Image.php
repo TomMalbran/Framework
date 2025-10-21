@@ -240,7 +240,7 @@ class Image {
         string $dst,
         int    $width,
         int    $height,
-        string $action
+        string $action,
     ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
         if (!self::hasType($imgType)) {
@@ -344,7 +344,7 @@ class Image {
         int    $cropX,
         int    $cropY,
         int    $cropWidth,
-        int    $cropHeight
+        int    $cropHeight,
     ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
         if (!self::hasType($imgType) || $resWidth <= 0 || $resHeight <= 0 || $cropWidth <= 0 || $cropHeight <= 0) {
@@ -508,13 +508,17 @@ class Image {
         string $dst,
         int    $width,
         int    $height,
-        string $action
+        string $action,
     ): bool {
         $bestFit = $action === self::Maximum || $action === self::Thumb;
 
         // Do not resize if the image is smaller than the requested size
         [ $imgWidth, $imgHeight ] = self::getSize($src);
         if ($bestFit && $imgWidth <= $width && $imgHeight <= $height) {
+            // If is a thumb, just copy the file
+            if ($action === self::Thumb) {
+                File::copy($src, $dst);
+            }
             return true;
         }
 

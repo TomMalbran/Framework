@@ -249,6 +249,19 @@ class File {
     }
 
     /**
+     * Copies a file from one path to another
+     * @param string $fromPath
+     * @param string $toPath
+     * @return boolean
+     */
+    public static function copy(string $fromPath, string $toPath): bool {
+        if ($fromPath === "" || $toPath === "") {
+            return false;
+        }
+        return copy($fromPath, $toPath);
+    }
+
+    /**
      * Deletes the given file/directory
      * @param string $path
      * @param string $name Optional.
