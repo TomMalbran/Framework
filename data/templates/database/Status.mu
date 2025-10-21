@@ -4,6 +4,7 @@ namespace {{namespace}};
 use Framework\Core\NLS;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
+use Framework\Utils\Strings;
 
 /**
  * The {{name}} Status
@@ -29,7 +30,7 @@ enum {{status}} {
             return $value;
         }
         foreach (self::cases() as $case) {
-            if ($case->name === $value) {
+            if (Strings::isEqual($case->name, $value)) {
                 return $case;
             }
         }
