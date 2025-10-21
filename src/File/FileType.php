@@ -196,6 +196,9 @@ class FileType {
      * @return string
      */
     public static function getIcon(string $name): string {
+        if (self::isImage($name)) {
+            return "file-image";
+        }
         if (self::isVideo($name)) {
             return "file-video";
         }

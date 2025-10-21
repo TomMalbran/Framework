@@ -93,12 +93,15 @@ class MediaFile {
         foreach ($files as $file) {
             $fileName = Strings::replace($file, $source, "");
             if (MediaType::isValid($mediaType, $file, $fileName)) {
-                $isDir      = FileType::isDir($file);
-                $sourcePath = self::getPath($basePath, $path, $fileName);
-                $sourceUrl  = self::getUrl($basePath, $path, $fileName);
-                $thumbUrl   = self::getThumbUrl($basePath, $path, $fileName);
-                $filePath   = File::parsePath($path, $fileName);
-                $list->add($fileName, $filePath, $isDir, $sourcePath, $sourceUrl, $thumbUrl);
+                $list->add(
+                    name       : $fileName,
+                    path       : File::parsePath($path, $fileName),
+                    isDir      : FileType::isDir($file),
+                    sourcePath : self::getPath($basePath, $path, $fileName),
+                    sourceUrl  : self::getUrl($basePath, $path, $fileName),
+                    thumbPath  : self::getThumbPath($basePath, $path, $fileName),
+                    thumbUrl   : self::getThumbUrl($basePath, $path, $fileName),
+                );
             }
         }
         if ($path !== "" && $path !== "/") {

@@ -22,11 +22,20 @@ class FileList {
      * @param boolean $isDir
      * @param string  $sourcePath
      * @param string  $sourceUrl
+     * @param string  $thumbPath
      * @param string  $thumbUrl
      * @return FileList
      */
-    public function add(string $name, string $path, bool $isDir, string $sourcePath, string $sourceUrl, string $thumbUrl): FileList {
-        $isImage = !$isDir && FileType::isImage($name);
+    public function add(
+        string $name,
+        string $path,
+        bool $isDir,
+        string $sourcePath,
+        string $sourceUrl,
+        string $thumbPath,
+        string $thumbUrl,
+    ): FileList {
+        $isImage = !$isDir && FileType::isImage($name) && File::exists($thumbPath);
         [ $imgWidth, $imgHeight ] = Image::getSize($sourcePath);
 
         $this->list[] = [
