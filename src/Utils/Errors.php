@@ -136,6 +136,9 @@ class Errors implements JsonSerializable {
      * @return Errors
      */
     public function addFor(string $section, string $error, string $message, ?string $value = null): Errors {
+        if ($message === "") {
+            return $this;
+        }
         if (!isset($this->errors[$section])) {
             $this->errors[$section] = 1;
         } elseif (is_int($this->errors[$section])) {
