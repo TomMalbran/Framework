@@ -6,6 +6,7 @@ namespace Framework\Provider\Type;
  */
 class DomainData {
 
+    public bool   $wasCreated    = false;
     public bool   $isEmpty       = true;
     public bool   $isActive      = true;
     public string $id            = "";
