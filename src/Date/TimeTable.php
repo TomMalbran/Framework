@@ -1,12 +1,14 @@
 <?php
-namespace Framework\Utils;
+namespace Framework\Date;
 
 use Framework\Core\NLS;
 use Framework\Date\DateTime;
 use Framework\Date\DateFormat;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Arrays;
 use Framework\Utils\Errors;
 use Framework\Utils\JSON;
+use Framework\Utils\Strings;
 
 /**
  * The Time Table Data class
@@ -53,6 +55,9 @@ class TimeTable {
             return new TimeTable($data->timeTables, $data->startMonday);
         }
 
+        if ($data instanceof Dictionary) {
+            $data = $data->toArray();
+        }
         if (!is_array($data)) {
             return new TimeTable();
         }
