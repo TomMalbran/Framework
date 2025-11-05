@@ -33,6 +33,7 @@ class SchemaModel {
     public bool $canCreate       = false;
     public bool $canEdit         = false;
     public bool $canDelete       = false;
+    public bool $usesRequest     = true;
 
 
     // Main column data
@@ -85,6 +86,7 @@ class SchemaModel {
      * @param boolean      $canCreate     Optional.
      * @param boolean      $canEdit       Optional.
      * @param boolean      $canDelete     Optional.
+     * @param boolean      $usesRequest   Optional.
      * @param Field[]      $mainFields    Optional.
      * @param Virtual[]    $virtualFields Optional.
      * @param Expression[] $expressions   Optional.
@@ -106,6 +108,7 @@ class SchemaModel {
         bool   $canCreate     = false,
         bool   $canEdit       = false,
         bool   $canDelete     = false,
+        bool   $usesRequest   = true,
 
         array  $mainFields    = [],
         array  $virtualFields = [],
@@ -128,6 +131,7 @@ class SchemaModel {
         $this->canCreate     = $canCreate;
         $this->canEdit       = $canEdit;
         $this->canDelete     = $canDelete;
+        $this->usesRequest   = $usesRequest;
 
         $this->mainFields    = $mainFields;
         $this->virtualFields = $virtualFields;

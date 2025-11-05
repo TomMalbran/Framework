@@ -479,8 +479,8 @@ class {{name}}Schema extends Schema {
 {{#canCreate}}
 
     /**
-     * Creates a new {{name}} Entity
-     * @param Request|null $entityRequest Optional.{{#fields}}
+     * Creates a new {{name}} Entity{{#usesRequest}}
+     * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
      * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
      * @param integer $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
@@ -488,7 +488,7 @@ class {{name}}Schema extends Schema {
      * @param boolean $skipOrder Optional.{{/hasPositions}}
      * @return integer
      */
-    protected static function createEntity(?Request $entityRequest = null{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): int {
+    protected static function createEntity({{#usesRequest}}?Request $entityRequest = null{{/usesRequest}}{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): int {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -513,29 +513,39 @@ class {{name}}Schema extends Schema {
 
         {{#hasPositions}}
         if ($skipOrder) {
-            return self::createSchemaEntity($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+            return self::createSchemaEntity({{#usesRequest}}
+                request: $entityRequest,{{/usesRequest}}
+                fields: $entityFields,{{#hasUsers}}
+                credentialID: $createdUser,{{/hasUsers}}
+            );
         }
-        {{#hasEditParents}}
-        $orderQuery = self::createParentQuery({{parentsList}});
-        {{/hasEditParents}}
-        return self::createSchemaEntityWithOrder($entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery->query{{/hasEditParents}}{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::createSchemaEntityWithOrder({{#usesRequest}}
+            request: $entityRequest,{{/usesRequest}}
+            fields: $entityFields,{{#hasEditParents}}
+            orderQuery: self::createParentQuery({{parentsList}})->query,{{/hasEditParents}}{{#hasUsers}}
+            credentialID: $createdUser,{{/hasUsers}}
+        );
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::createSchemaEntity($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        return self::createSchemaEntity({{#usesRequest}}
+            request: $entityRequest,{{/usesRequest}}
+            fields: $entityFields,{{#hasUsers}}
+            credentialID: $createdUser,{{/hasUsers}}
+        );
         {{/hasPositions}}
     }
 {{/canCreate}}
 {{#canReplace}}
 
     /**
-     * Replaces the {{name}} Entity
-     * @param Request|null $entityRequest Optional.{{#fields}}
+     * Replaces the {{name}} Entity{{#usesRequest}}
+     * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
      * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param integer $createdUser Optional.{{/hasUsers}}
      * @return boolean
      */
-    protected static function replaceEntity(?Request $entityRequest = null{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
+    protected static function replaceEntity({{#usesRequest}}?Request $entityRequest = null{{/usesRequest}}{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -553,7 +563,11 @@ class {{name}}Schema extends Schema {
         }
         {{/hasUsers}}
 
-        $result = self::replaceSchemaEntity($entityRequest, $entityFields{{#hasUsers}}, credentialID: $createdUser{{/hasUsers}});
+        $result = self::replaceSchemaEntity({{#usesRequest}}
+            request: $entityRequest,{{/usesRequest}}
+            fields: $entityFields,{{#hasUsers}}
+            credentialID: $createdUser,{{/hasUsers}}
+        );
         return $result > 0;
     }
 {{/canReplace}}
@@ -561,8 +575,8 @@ class {{name}}Schema extends Schema {
 
     /**
      * Edits a {{name}} Entity
-     * @param {{editDocType}} $query
-     * @param Request|null $entityRequest Optional.{{#fields}}
+     * @param {{editDocType}} $query{{#usesRequest}}
+     * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
      * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param integer $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
@@ -573,7 +587,7 @@ class {{name}}Schema extends Schema {
      * @param boolean $skipUnset Optional.
      * @return boolean
      */
-    protected static function editEntity({{editType}} $query, ?Request $entityRequest = null{{{fieldsEditList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}{{#hasTimestamps}}, bool $skipTimestamps = false{{/hasTimestamps}}, bool $skipEmpty = false, bool $skipUnset = false): bool {
+    protected static function editEntity({{editType}} $query{{#usesRequest}}, ?Request $entityRequest = null{{/usesRequest}}{{{fieldsEditList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}{{#hasTimestamps}}, bool $skipTimestamps = false{{/hasTimestamps}}, bool $skipEmpty = false, bool $skipUnset = false): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -598,17 +612,37 @@ class {{name}}Schema extends Schema {
 
         {{#hasPositions}}
         if ($skipOrder) {
-            return self::editSchemaEntity(self::toQuery($query), $entityRequest, $entityFields{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}}{{#hasTimestamps}}, skipTimestamps: $skipTimestamps{{/hasTimestamps}}, skipEmpty: $skipEmpty, skipUnset: $skipUnset);
+            return self::editSchemaEntity(
+                query: self::toQuery($query),{{#usesRequest}}
+                request: $entityRequest,{{/usesRequest}}
+                fields: $entityFields,{{#hasUsers}}
+                credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
+                skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
+                skipEmpty: $skipEmpty,
+                skipUnset: $skipUnset,
+            );
         }
-        {{#hasEditParents}}
-        $orderQuery = self::createParentQuery({{parentsList}});
-        {{/hasEditParents}}
-        return self::editSchemaEntityWithOrder(self::toQuery($query), $entityRequest, $entityFields{{#hasEditParents}}, orderQuery: $orderQuery->query{{/hasEditParents}}{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}}{{#hasTimestamps}}, skipTimestamps: $skipTimestamps{{/hasTimestamps}}, skipEmpty: $skipEmpty, skipUnset: $skipUnset);
+        return self::editSchemaEntityWithOrder(
+            query: self::toQuery($query),{{#usesRequest}}
+            request: $entityRequest,{{/usesRequest}}
+            fields: $entityFields,{{#hasEditParents}}
+            orderQuery: self::createParentQuery({{parentsList}})->query,{{/hasEditParents}}{{#hasUsers}}
+            credentialID: $modifiedUser,{{/hasUsers}}
+            {{#hasTimestamps}}skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
+            skipEmpty: $skipEmpty,
+            skipUnset: $skipUnset,
+        );
         {{/hasPositions}}
         {{^hasPositions}}
-        {{/hasPositions}}
-        {{^hasPositions}}
-        return self::editSchemaEntity(self::toQuery($query), $entityRequest, $entityFields{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}}{{#hasTimestamps}}, skipTimestamps: $skipTimestamps{{/hasTimestamps}}, skipEmpty: $skipEmpty, skipUnset: $skipUnset);
+        return self::editSchemaEntity(
+            query: self::toQuery($query),{{#usesRequest}}
+            request: $entityRequest,{{/usesRequest}}
+            fields: $entityFields,{{#hasUsers}}
+            credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
+            skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
+            skipEmpty: $skipEmpty,
+            skipUnset: $skipUnset,
+        );
         {{/hasPositions}}
     }
 

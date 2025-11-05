@@ -204,6 +204,7 @@ class SchemaFactory {
                 canCreate:     $model->canCreate,
                 canEdit:       $model->canEdit,
                 canDelete:     $model->canDelete,
+                usesRequest:   $model->usesRequest,
                 mainFields:    $mainFields,
                 virtualFields: $virtualFields,
                 expressions:   $expressions,

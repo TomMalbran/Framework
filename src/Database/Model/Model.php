@@ -14,6 +14,7 @@ class Model {
     public bool $canCreate;
     public bool $canEdit;
     public bool $canDelete;
+    public bool $usesRequest;
 
 
 
@@ -24,6 +25,7 @@ class Model {
      * @param boolean $canCreate     Optional.
      * @param boolean $canEdit       Optional.
      * @param boolean $canDelete     Optional.
+     * @param boolean $usesRequest   Optional.
      */
     public function __construct(
         bool $hasUsers      = false,
@@ -31,11 +33,13 @@ class Model {
         bool $canCreate     = false,
         bool $canEdit       = false,
         bool $canDelete     = false,
+        bool $usesRequest   = true,
     ) {
         $this->hasUsers      = $hasUsers;
         $this->hasTimestamps = $hasTimestamps;
         $this->canCreate     = $canCreate;
         $this->canEdit       = $canEdit;
         $this->canDelete     = $canDelete;
+        $this->usesRequest   = $usesRequest;
     }
 }
