@@ -20,75 +20,66 @@ class CredentialModel {
     #[Field(isID: true)]
     public int $credentialID = 0;
 
-    #[Field(canEdit: false)]
     public int $currentUser = 0;
 
-    public string $email = "";
-
-    #[Field(canEdit: false)]
     public string $name = "";
 
+
+    #[Field(fromRequest: true)]
     public string $firstName = "";
 
+    #[Field(fromRequest: true)]
     public string $lastName = "";
 
-    #[Field(noExists: true)]
+    #[Field(fromRequest: true)]
+    public string $email = "";
+
+    #[Field(fromRequest: true, noExists: true)]
     public string $phone = "";
 
+    #[Field(fromRequest: true)]
     public string $language = "";
 
-    #[Field(canEdit: false)]
-    public string $avatar = "";
-
-    #[Field(canEdit: false)]
-    public string $appearance = "";
-
-    #[Field(canEdit: false)]
-    public string $access = "";
-
-    #[Field(canEdit: false)]
-    public string $password = "";
-
-    #[Field(canEdit: false)]
-    public string $salt = "";
-
-    #[Field(canEdit: false)]
-    public bool $reqPassChange = false;
-
-    #[Field(canEdit: false)]
-    public int $passExpiration = 0;
-
-    #[Field(canEdit: false)]
-    public string $accessToken = "";
-
-    #[Field(canEdit: false)]
-    public int $tokenExpiration = 0;
-
-    #[Field(isText: true, noExists: true)]
+    #[Field(isText: true, fromRequest: true, noExists: true)]
     public string $observations = "";
 
-    #[Field(noExists: true)]
+    #[Field(fromRequest: true, noExists: true)]
     public bool $sendEmails = false;
 
     #[Field(noExists: true)]
     public bool $sendEmailNotis = false;
 
-    #[Field(noExists: true)]
+    #[Field(fromRequest: true, noExists: true)]
     public bool $sendTickets = false;
 
-    #[Field(isSigned: true, canEdit: false)]
+    #[Field(fromRequest: true, isSigned: true)]
     public int $timezone = 0;
 
-    #[Field(canEdit: false)]
+
+    public string $avatar = "";
+
+    public string $appearance = "";
+
+    public string $access = "";
+
+    public string $password = "";
+
+    public string $salt = "";
+
+    public bool $reqPassChange = false;
+
+    public int $passExpiration = 0;
+
+    public string $accessToken = "";
+
+    public int $tokenExpiration = 0;
+
     public int $currentLogin = 0;
 
-    #[Field(canEdit: false)]
     public int $lastLogin = 0;
 
-    #[Field(canEdit: false)]
     public bool $askNotifications = true;
 
-    #[Field(canEdit: false)]
     public int $progressValue = 0;
 
     public Status $status = Status::None;

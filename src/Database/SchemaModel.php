@@ -157,55 +157,52 @@ class SchemaModel {
     private function setExtraFields(): SchemaModel {
         if ($this->hasPositions) {
             $this->extraFields[] = Field::create(
-                type: FieldType::Number,
-                name: "position",
+                type:        FieldType::Number,
+                name:        "position",
+                fromRequest: true,
             );
         }
         if ($this->hasStatus) {
             $this->extraFields[] = Field::create(
-                type:     FieldType::String,
-                name:     "status",
-                noEmpty:  true,
-                isKey:    true,
-                isStatus: true,
+                type:        FieldType::String,
+                name:        "status",
+                noEmpty:     true,
+                isKey:       true,
+                isStatus:    true,
+                fromRequest: true,
             );
         }
 
         if ($this->canCreate && $this->hasTimestamps) {
             $this->extraFields[] = Field::create(
-                type:    FieldType::Number,
-                name:    "createdTime",
-                canEdit: false,
+                type: FieldType::Number,
+                name: "createdTime",
             );
         }
         if ($this->canCreate && $this->hasUsers) {
             $this->extraFields[] = Field::create(
-                type:    FieldType::Number,
-                name:    "createdUser",
-                canEdit: false,
+                type: FieldType::Number,
+                name: "createdUser",
             );
         }
 
         if ($this->canEdit && $this->hasTimestamps) {
             $this->extraFields[] = Field::create(
-                type:    FieldType::Number,
-                name:    "modifiedTime",
-                canEdit: false,
+                type: FieldType::Number,
+                name: "modifiedTime",
             );
         }
         if ($this->canEdit && $this->hasUsers) {
             $this->extraFields[] = Field::create(
-                type:    FieldType::Number,
-                name:    "modifiedUser",
-                canEdit: false,
+                type: FieldType::Number,
+                name: "modifiedUser",
             );
         }
 
         if ($this->canDelete) {
             $this->extraFields[] = Field::create(
-                type:    FieldType::Boolean,
-                name:    "isDeleted",
-                canEdit: false,
+                type: FieldType::Boolean,
+                name: "isDeleted",
             );
         }
         return $this;

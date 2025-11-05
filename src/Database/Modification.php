@@ -80,14 +80,14 @@ class Modification {
     private function parseFields(Request $request, bool $skipEmpty = false, bool $skipUnset = false): array {
         $result = [];
         foreach ($this->schemaModel->fields as $field) {
-            if (!$field->canEdit) {
+            if (!$field->fromRequest) {
                 continue;
             }
             if ($skipUnset && !$request->exists($field->name)) {
                 continue;
             }
 
-            $value = $field->fromRequest($request);
+            $value = $field->getValue($request);
             if ($skipEmpty && Arrays::isEmpty($value)) {
                 continue;
             }

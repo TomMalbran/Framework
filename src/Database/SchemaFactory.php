@@ -16,6 +16,7 @@ use Framework\File\File;
 use Framework\Utils\Strings;
 
 use ReflectionNamedType;
+use Throwable;
 
 /**
  * The Schema Factory
@@ -38,6 +39,7 @@ class SchemaFactory {
      * @return SchemaModel[]
      */
     public static function buildData(bool $forFramework = false): array {
+        $errorModels  = [];
         $schemaModels = [];
         $modelIDs     = [];
         $dbNames      = [];
@@ -74,25 +76,34 @@ class SchemaFactory {
                 continue;
             }
 
-            /** @var Model */
-            $model = $modelAttr->newInstance();
 
             // Get the Path
             $path  = File::getDirectory($fileName, 1);
             $path  = Strings::stripEnd($path, "/Model");
             $path .= "/Schema";
 
-            // Set the Namespace
+            // Get the Namespace
             $namespace  = Strings::stripEnd($namespace, "\\Model");
             $namespace .= "\\Schema";
 
-            // Set the Name
+            // Get the Name
             $name = Strings::substringAfter($className, "\\");
             $name = Strings::stripEnd($name, "Model");
+
+
+            // Instantiate the Model
+            try {
+                /** @var Model */
+                $model = $modelAttr->newInstance();
+            } catch (Throwable $e) {
+                $errorModels[] = "$name: Model attribute could not be instantiated ($fileName)";
+                continue;
+            }
 
             // Get from the Props
             $hasStatus     = false;
             $hasPositions  = false;
+            $usesRequest   = false;
             $mainFields    = [];
             $virtualFields = [];
             $expressions   = [];
@@ -121,7 +132,13 @@ class SchemaFactory {
                 $count          = null;
 
                 if (isset($propAttributes[0])) {
-                    $instance = $propAttributes[0]->newInstance();
+                    try {
+                        $instance = $propAttributes[0]->newInstance();
+                    } catch (Throwable $e) {
+                        $errorModels[] = "$name: $fieldName attribute could not be instantiated ($fileName)";
+                        continue 2;
+                    }
+
                     if ($instance instanceof Field) {
                         $field = $instance;
                     } elseif ($instance instanceof Expression) {
@@ -187,6 +204,9 @@ class SchemaFactory {
 
                 // Field: Anything else is a Main Field and can have a Field attribute
                 } else {
+                    if ($field->fromRequest) {
+                        $usesRequest = true;
+                    }
                     $mainFields[] = $field->setData($fieldName, $typeName);
                 }
             }
@@ -204,7 +224,7 @@ class SchemaFactory {
                 canCreate:     $model->canCreate,
                 canEdit:       $model->canEdit,
                 canDelete:     $model->canDelete,
-                usesRequest:   $model->usesRequest,
+                usesRequest:   $usesRequest,
                 mainFields:    $mainFields,
                 virtualFields: $virtualFields,
                 expressions:   $expressions,
@@ -283,6 +303,15 @@ class SchemaFactory {
         }
         if (count($schemas) > 0 && Discovery::hasDataFile("schemasOld")) {
             Discovery::saveData("schemasTest", $schemas);
+        }
+
+        // Show the Error Models
+        if (count($errorModels) > 0) {
+            print("\nMODELS WITH ERROR:\n");
+            foreach ($errorModels as $errorModel) {
+                print("- $errorModel\n\n");
+            }
+            print("\n");
         }
 
         return $schemaModels;

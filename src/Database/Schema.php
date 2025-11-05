@@ -468,13 +468,13 @@ class Schema {
 
     /**
      * Creates an Entity and ensures the Order
-     * @param Request|null        $request
+     * @param Request|null        $request      Optional.
      * @param array<string,mixed> $fields       Optional.
      * @param integer             $credentialID Optional.
      * @param Query|null          $orderQuery   Optional.
      * @return integer
      */
-    protected static function createSchemaEntityWithOrder(?Request $request, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
+    protected static function createSchemaEntityWithOrder(?Request $request = null, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
         $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
@@ -488,7 +488,7 @@ class Schema {
     /**
      * Edits the Data of an Entity and ensures the Order
      * @param Query|integer|string $query
-     * @param Request|null         $request
+     * @param Request|null         $request        Optional.
      * @param array<string,mixed>  $fields         Optional.
      * @param integer              $credentialID   Optional.
      * @param Query|null           $orderQuery     Optional.
@@ -499,7 +499,7 @@ class Schema {
      */
     protected static function editSchemaEntityWithOrder(
         Query|int|string $query,
-        ?Request $request,
+        ?Request $request = null,
         array $fields = [],
         int $credentialID = 0,
         ?Query $orderQuery = null,
