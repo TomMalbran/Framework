@@ -27,21 +27,29 @@ class EmailWhiteList extends EmailWhiteListSchema {
 
     /**
      * Adds the given Email to the White List
-     * @param Request $request
+     * @param string $email
+     * @param string $description
      * @return integer
      */
-    public static function add(Request $request): int {
-        return self::createEntity($request);
+    public static function add(string $email, string $description): int {
+        return self::createEntity(
+            email:       $email,
+            description: $description,
+        );
     }
 
     /**
      * Edits the given Email in the White List
      * @param integer $emailID
-     * @param Request $request
+     * @param string  $email
+     * @param string  $description
      * @return boolean
      */
-    public static function edit(int $emailID, Request $request): bool {
-        return self::editEntity($emailID, $request);
+    public static function edit(int $emailID, string $email, string $description): bool {
+        return self::editEntity($emailID,
+            email:       $email,
+            description: $description,
+        );
     }
 
     /**

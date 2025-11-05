@@ -6,7 +6,7 @@ use Framework\Discovery\Discovery;
 use Framework\Email\EmailWhiteList;
 use Framework\Email\EmailProvider;
 use Framework\Email\EmailResult;
-use Framework\Email\Schema\EmailTemplateEntity;
+use Framework\Email\Schema\EmailContentEntity;
 use Framework\Provider\Mustache;
 use Framework\Provider\SMTP;
 use Framework\Provider\Mandrill;
@@ -86,24 +86,24 @@ class Email {
     }
 
     /**
-     * Sends the given Template Email
-     * @param EmailTemplateEntity $template
-     * @param string[]|string     $sendTo
-     * @param string|null         $message    Optional.
-     * @param string|null         $subject    Optional.
-     * @param boolean             $sendAlways Optional.
+     * Sends the given Email Content
+     * @param EmailContentEntity $content
+     * @param string[]|string    $sendTo
+     * @param string|null        $message    Optional.
+     * @param string|null        $subject    Optional.
+     * @param boolean            $sendAlways Optional.
      * @return EmailResult
      */
-    public static function sendTemplate(
-        EmailTemplateEntity $template,
+    public static function sendContent(
+        EmailContentEntity $content,
         array|string $sendTo,
         ?string $message = null,
         ?string $subject = null,
         bool $sendAlways = false,
     ): EmailResult {
         $sendTo    = Arrays::toStrings($sendTo);
-        $subject ??= $template->subject;
-        $message ??= $template->message;
+        $subject ??= $content->subject;
+        $message ??= $content->message;
         $result    = EmailResult::NoEmails;
 
         foreach ($sendTo as $email) {

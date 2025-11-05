@@ -8,9 +8,9 @@ use Framework\System\Language;
 use Framework\System\Package;
 
 /**
- * The Template Code
+ * The Email Code
  */
-class TemplateCode {
+class EmailCode {
 
     /**
      * Returns the Code variables
@@ -29,23 +29,23 @@ class TemplateCode {
             }
         }
 
-        $templates = [];
-        $maxLength = 0;
-        foreach ($data as $templateCode => $template) {
-            $templates[] = [
-                "name"  => Strings::upperCaseFirst($templateCode),
-                "value" => $templateCode,
+        $emailCodes = [];
+        $maxLength  = 0;
+        foreach ($data as $emailCode => $email) {
+            $emailCodes[] = [
+                "name"  => Strings::upperCaseFirst($emailCode),
+                "value" => $emailCode,
             ];
-            $maxLength = max($maxLength, Strings::length($templateCode));
+            $maxLength = max($maxLength, Strings::length($emailCode));
         }
 
-        foreach ($templates as $index => $template) {
-            $templates[$index]["name"] = Strings::padRight($template["name"], $maxLength);
+        foreach ($emailCodes as $index => $emailCode) {
+            $emailCodes[$index]["name"] = Strings::padRight($emailCode["name"], $maxLength);
         }
 
         return [
-            "hasTemplates" => count($templates) > 0,
-            "templates"    => $templates,
+            "hasEmailCodes" => count($emailCodes) > 0,
+            "emailCodes"    => $emailCodes,
         ];
     }
 }

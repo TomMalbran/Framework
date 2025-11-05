@@ -7,7 +7,7 @@ use Framework\Discovery\ConsoleCommand;
 use Framework\Database\SchemaMigration;
 use Framework\Core\Configs;
 use Framework\Core\Settings;
-use Framework\Email\EmailTemplate;
+use Framework\Email\EmailContent;
 
 /**
  * The Database Migration
@@ -37,7 +37,7 @@ class Migration {
         Settings::migrateData();
 
         print("\nEMAIL MIGRATIONS\n");
-        EmailTemplate::migrateData();
+        EmailContent::migrateData();
 
 
         /** @var DiscoveryMigration[] */

@@ -2,33 +2,33 @@
 namespace Framework\Email;
 
 use Framework\Discovery\Discovery;
-use Framework\Email\Schema\EmailTemplateSchema;
-use Framework\Email\Schema\EmailTemplateEntity;
-use Framework\Email\Schema\EmailTemplateQuery;
+use Framework\Email\Schema\EmailContentSchema;
+use Framework\Email\Schema\EmailContentEntity;
+use Framework\Email\Schema\EmailContentQuery;
 use Framework\Provider\Mustache;
 use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
-use Framework\System\Template;
+use Framework\System\EmailCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Email Templates
+ * The Email Contents
  */
-class EmailTemplate extends EmailTemplateSchema {
+class EmailContent extends EmailContentSchema {
 
     /**
-     * Returns an Email Template for the Email Sender
-     * @param Template $template
-     * @param string   $language Optional.
-     * @return EmailTemplateEntity
+     * Returns an Email Content for the Email Sender
+     * @param EmailCode $emailCode
+     * @param string    $language  Optional.
+     * @return EmailContentEntity
      */
-    public static function get(Template $template, string $language = "root"): EmailTemplateEntity {
+    public static function get(EmailCode $emailCode, string $language = "root"): EmailContentEntity {
         $langCode = Language::getCode($language);
 
-        $query = new EmailTemplateQuery();
-        $query->templateCode->equal($template->value);
+        $query = new EmailContentQuery();
+        $query->emailCode->equal($emailCode->value);
         $query->language->equal($langCode);
         return self::getEntity($query);
     }
@@ -36,7 +36,7 @@ class EmailTemplate extends EmailTemplateSchema {
 
 
     /**
-     * Renders the Email Template message with Mustache
+     * Renders the Email Content message with Mustache
      * @param string              $message
      * @param array<string,mixed> $data    Optional.
      * @return string
@@ -53,7 +53,7 @@ class EmailTemplate extends EmailTemplateSchema {
     }
 
     /**
-     * Migrates the Email Templates data
+     * Migrates the Email Contents data
      * @return boolean
      */
     public static function migrateData(): bool {
@@ -65,10 +65,10 @@ class EmailTemplate extends EmailTemplateSchema {
 
         foreach ($languages as $language => $languageName) {
             /** @var array<string,string>[] */
-            $templates = Discovery::loadJSON(Package::EmailsDir, $language);
+            $emails = Discovery::loadJSON(Package::EmailsDir, $language);
 
-            if (!Arrays::isEmpty($templates)) {
-                $position  = self::migrateLanguage($templates, $language, $languageName, $position);
+            if (!Arrays::isEmpty($emails)) {
+                $position  = self::migrateLanguage($emails, $language, $languageName, $position);
                 $didUpdate = true;
             }
         }
@@ -82,27 +82,27 @@ class EmailTemplate extends EmailTemplateSchema {
 
     /**
      * Migrates the Email Templates for the given Language
-     * @param array<string,string>[] $templates
+     * @param array<string,string>[] $emails
      * @param string                 $language
      * @param string                 $languageName
      * @param integer                $position
      * @return integer
      */
-    private static function migrateLanguage(array $templates, string $language, string $languageName, int $position): int {
+    private static function migrateLanguage(array $emails, string $language, string $languageName, int $position): int {
         $siteName = Config::getName();
         $total    = 0;
 
-        foreach ($templates as $templateCode => $template) {
-            $message   = Strings::join($template["message"], "\n\n");
+        foreach ($emails as $emailCode => $email) {
+            $message   = Strings::join($email["message"], "\n\n");
             $position += 1;
             $total    += 1;
 
             self::createEntity(
-                templateCode: $templateCode,
+                emailCode:    $emailCode,
                 language:     $language,
                 languageName: $languageName,
-                description:  $template["description"],
-                subject:      Strings::replace($template["subject"], "[site]", $siteName),
+                description:  $email["description"],
+                subject:      Strings::replace($email["subject"], "[site]", $siteName),
                 message:      Strings::replace($message, "[site]", $siteName),
                 position:     $position,
                 skipOrder:    true,

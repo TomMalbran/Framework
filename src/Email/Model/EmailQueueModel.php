@@ -18,7 +18,7 @@ class EmailQueueModel {
     #[Field(isID: true)]
     public int $emailID = 0;
 
-    public string $templateCode = "";
+    public string $emailCode = "";
 
     #[Field(isJSON: true)]
     public string $sendTo = "";

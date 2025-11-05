@@ -8,7 +8,7 @@ use Framework\Email\Schema\EmailQueueSchema;
 use Framework\Email\Schema\EmailQueueEntity;
 use Framework\Email\Schema\EmailQueueColumn;
 use Framework\Email\Schema\EmailQueueQuery;
-use Framework\Email\Schema\EmailTemplateEntity;
+use Framework\Email\Schema\EmailContentEntity;
 use Framework\System\Config;
 use Framework\Date\DateTime;
 use Framework\Utils\Arrays;
@@ -63,31 +63,31 @@ class EmailQueue extends EmailQueueSchema {
 
     /**
      * Adds the given Email to the Queue
-     * @param EmailTemplateEntity $template
-     * @param string[]|string     $sendTo
-     * @param string|null         $message  Optional.
-     * @param string|null         $subject  Optional.
-     * @param boolean             $sendNow  Optional.
-     * @param integer             $dataID   Optional.
+     * @param EmailContentEntity $content
+     * @param string[]|string    $sendTo
+     * @param string|null        $message  Optional.
+     * @param string|null        $subject  Optional.
+     * @param boolean            $sendNow  Optional.
+     * @param integer            $dataID   Optional.
      * @return boolean
      */
-    public static function add(EmailTemplateEntity $template, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false, int $dataID = 0): bool {
+    public static function add(EmailContentEntity $content, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false, int $dataID = 0): bool {
         $sendTo    = Arrays::toStrings($sendTo);
-        $subject ??= $template->subject;
-        $message ??= $template->message;
+        $subject ??= $content->subject;
+        $message ??= $content->message;
 
         if (count($sendTo) === 0) {
             return false;
         }
         $emailID = self::createEntity(
-            templateCode: $template->templateCode,
-            sendTo:       JSON::encode($sendTo),
-            subject:      $subject,
-            message:      $message,
-            emailResult:  EmailResult::NotProcessed->name,
-            sendTime:     time(),
-            sentTime:     0,
-            dataID:       $dataID,
+            emailCode:   $content->emailCode,
+            sendTo:      JSON::encode($sendTo),
+            subject:     $subject,
+            message:     $message,
+            emailResult: EmailResult::NotProcessed->name,
+            sendTime:    time(),
+            sentTime:    0,
+            dataID:      $dataID,
         );
 
         if (!$sendNow) {

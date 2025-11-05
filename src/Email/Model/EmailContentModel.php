@@ -5,17 +5,17 @@ use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 
 /**
- * The Email Template Model
+ * The Email Content Model
  */
 #[Model(
     canCreate: true,
 )]
-class EmailTemplateModel {
+class EmailContentModel {
 
     #[Field(isID: true)]
-    public int $templateID = 0;
+    public int $emailContentID = 0;
 
-    public string $templateCode = "";
+    public string $emailCode = "";
 
     public string $language = "";
 
