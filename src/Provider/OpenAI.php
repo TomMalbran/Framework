@@ -327,7 +327,7 @@ class OpenAI {
         if ($allowWebSearch) {
             $tools[] = [
                 "type"                => "web_search",
-                "search_context_size" => "low",
+                "search_context_size" => "medium",
             ];
         }
         if (count($tools) > 0) {
@@ -360,7 +360,8 @@ class OpenAI {
             $result->runTime       = Numbers::roundInt($endTime - $startTime);
 
             foreach ($response->getList("tools") as $tool) {
-                if ($tool->getString("type") === "web_search_preview") {
+                $type = $tool->getString("type");
+                if ($type  === "web_search" || $type  === "web_search_preview") {
                     $result->didSearchCall = true;
                     break;
                 }
