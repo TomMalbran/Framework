@@ -5,6 +5,7 @@ use Framework\Request;
 use Framework\Auth\Auth;
 use Framework\Log\SessionLog;
 use Framework\Log\Schema\LogActionSchema;
+use Framework\Log\Schema\LogActionColumn;
 use Framework\Log\Schema\LogActionQuery;
 use Framework\System\Config;
 use Framework\Date\DateTime;
@@ -25,17 +26,20 @@ class ActionLog extends LogActionSchema {
      */
     private static function createQuery(Request $request, array $mappings = []): LogActionQuery {
         $credentialID = $request->getInt("credentialID");
-        $fromTime     = $request->toDayStart("fromDate");
-        $toTime       = $request->toDayEnd("toDate");
+        $search       = $request->getString("search");
 
         $query = new LogActionQuery();
         foreach ($mappings as $key => $value) {
             $query->query->addIf($value, "=", $request->getString($key));
         }
+        $query->search([
+            LogActionColumn::CredentialName,
+            LogActionColumn::Module,
+            LogActionColumn::Action,
+        ], $search);
 
         $query->credentialID->equalIf($credentialID);
-        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
-        $query->createdTime->lessThan($toTime, $toTime > 0);
+        $query->createdTime->inPeriod($request);
         return $query;
     }
 
