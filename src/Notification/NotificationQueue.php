@@ -40,8 +40,9 @@ class NotificationQueue extends NotificationQueueSchema {
      */
     protected static function createListQuery(Request $request): NotificationQueueQuery {
         $search   = $request->getString("search");
-        $fromTime = $request->toDayStart("fromDate");
-        $toTime   = $request->toDayEnd("toDate");
+        $fromTime = $request->toDayStartHour("fromDate", "fromHour");
+        $toTime   = $request->toDayEndHour("toDate", "toHour");
+        $results  = $request->getStrings("results");
 
         $query = new NotificationQueueQuery();
         $query->search([
@@ -53,6 +54,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
         $query->createdTime->greaterThan($fromTime, $fromTime > 0);
         $query->createdTime->lessThan($toTime, $toTime > 0);
+        $query->notificationResult->in($results);
         return $query;
     }
 
