@@ -65,7 +65,9 @@ class Period {
     public function __construct(Request $request) {
         $this->period = self::Custom;
 
-        if ($request->has("fromDate")) {
+        if ($request->has("fromDate") && $request->has("fromHour")) {
+            $this->fromTime = DateTime::toTimeHour($request->getString("fromDate"), $request->getString("fromHour"));
+        } elseif ($request->has("fromDate")) {
             $this->fromTime = DateTime::toDayStart($request->getString("fromDate"));
         } elseif ($request->has("fromTime")) {
             $this->fromTime = $request->getInt("fromTime");
@@ -74,7 +76,9 @@ class Period {
             $this->fromTime = $this->getFromTime();
         }
 
-        if ($request->has("toDate")) {
+        if ($request->has("toDate") && $request->has("toHour")) {
+            $this->toTime = DateTime::toTimeHour($request->getString("toDate"), $request->getString("toHour"));
+        } elseif ($request->has("toDate")) {
             $this->toTime = DateTime::toDayEnd($request->getString("toDate"));
         } elseif ($request->has("toTime")) {
             $this->toTime = $request->getInt("toTime");
