@@ -81,10 +81,11 @@ class SchemaMigration {
 
         if ($didMove) {
             print("\n");
-        } else {
-            print("- No movements required\n");
+            return $lastMovement;
         }
-        return $didMove ? $lastMovement : 0;
+
+        print("- No movements required\n");
+        return 0;
     }
 
     /**
@@ -100,10 +101,14 @@ class SchemaMigration {
 
         for ($i = $startRename; $i < $lastRename; $i++) {
             $table    = SchemaModel::getDbTableName($renames[$i]["schema"]);
-            $fromName = $renames[$i]["from"];
-            $toName   = $renames[$i]["to"];
+            $fromName = SchemaModel::getDbFieldName($renames[$i]["from"]);
+            $toName   = SchemaModel::getDbFieldName($renames[$i]["to"]);
 
             if (!$db->tableExists($table)) {
+                continue;
+            }
+            if ($db->columnExists($table, $toName)) {
+                $didRename = true;
                 continue;
             }
 
@@ -119,10 +124,11 @@ class SchemaMigration {
 
         if ($didRename) {
             print("\n");
-        } else {
-            print("- No column renames required\n\n");
+            return $lastRename;
         }
-        return $didRename ? $lastRename : 0;
+
+        print("- No column renames required\n\n");
+        return 0;
     }
 
     /**
