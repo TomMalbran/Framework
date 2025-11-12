@@ -24,9 +24,10 @@ class QueryLog extends LogQuerySchema {
      * @return LogQueryQuery
      */
     protected static function createListQuery(Request $request): LogQueryQuery {
-        $search   = $request->getString("search");
-        $fromTime = $request->toDayStart("fromDate");
-        $toTime   = $request->toDayEnd("toDate");
+        $search     = $request->getString("search");
+        $fromTime   = $request->toDayStartHour("fromDate", "fromHour");
+        $toTime     = $request->toDayEndHour("toDate", "toHour");
+        $isResolved = $request->getString("isResolved");
 
         $query = new LogQueryQuery();
         $query->search([
@@ -35,6 +36,12 @@ class QueryLog extends LogQuerySchema {
 
         $query->createdTime->greaterThan($fromTime, $fromTime > 0);
         $query->createdTime->lessThan($toTime, $toTime > 0);
+
+        if ($isResolved === "yes") {
+            $query->isResolved->isTrue();
+        } elseif ($isResolved === "no") {
+            $query->isResolved->isFalse();
+        }
         return $query;
     }
 
