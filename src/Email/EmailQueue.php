@@ -26,9 +26,10 @@ class EmailQueue extends EmailQueueSchema {
      */
     protected static function createListQuery(Request $request): EmailQueueQuery {
         $search   = $request->getString("search");
-        $fromTime = $request->toDayStart("fromDate");
-        $toTime   = $request->toDayEnd("toDate");
+        $fromTime = $request->toDayStartHour("fromDate", "fromHour");
+        $toTime   = $request->toDayEndHour("toDate", "toHour");
         $dataID   = $request->getInt("dataID");
+        $results  = $request->getStrings("results");
 
         $query = new EmailQueueQuery();
         $query->search([
@@ -40,6 +41,7 @@ class EmailQueue extends EmailQueueSchema {
         $query->createdTime->greaterThan($fromTime, $fromTime > 0);
         $query->createdTime->lessThan($toTime, $toTime > 0);
         $query->dataID->equalIf($dataID);
+        $query->emailResult->in($results);
         return $query;
     }
 
