@@ -49,9 +49,10 @@ class ErrorLog extends LogErrorSchema {
      * @return LogErrorQuery
      */
     protected static function createListQuery(Request $request): LogErrorQuery {
-        $search   = $request->getString("search");
-        $fromTime = $request->toDayStart("fromDate");
-        $toTime   = $request->toDayEnd("toDate");
+        $search     = $request->getString("search");
+        $fromTime   = $request->toDayStartHour("fromDate", "fromHour");
+        $toTime     = $request->toDayEndHour("toDate", "toHour");
+        $isResolved = $request->getString("isResolved");
 
         $query = new LogErrorQuery();
         $query->search([
@@ -61,6 +62,12 @@ class ErrorLog extends LogErrorSchema {
 
         $query->createdTime->greaterThan($fromTime, $fromTime > 0);
         $query->createdTime->lessThan($toTime, $toTime > 0);
+
+        if ($isResolved === "yes") {
+            $query->isResolved->isTrue();
+        } elseif ($isResolved === "no") {
+            $query->isResolved->isFalse();
+        }
         return $query;
     }
 
