@@ -375,6 +375,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns the data as a Mixed Map
+     * @return array<string,mixed>
+     */
+    public function toMixedMap(): array {
+        $result = [];
+        foreach ($this->data as $key => $value) {
+            $result[(string)$key] = $value;
+        }
+        return $result;
+    }
+
+    /**
      * Returns the data as an array of Strings
      * @return string[]
      */
