@@ -105,4 +105,38 @@ class {{query}} extends SchemaQuery {
         return $this;
     }
 {{/statuses}}
+{{#subRequests}}
+
+
+    /**
+     * Adds a {{name}} Exists condition
+     * @param {{subQuery}} $subQuery
+     * @return {{query}}
+     */
+    public function has{{name}}({{subQuery}} $subQuery): {{query}} {
+        $subQuery->addExp("{{relatedField}} = {{schemaField}}");
+        $this->query->addExp("EXISTS (
+            SELECT 1 FROM {{tableName}}
+            " . $subQuery->query->get() . "
+        )", ...$subQuery->query->params);
+        return $this;
+    }
+
+    /**
+     * Adds a {{name}} Not Exists condition
+     * @param {{subQuery}}|null $subQuery Optional.
+     * @return {{query}}
+     */
+    public function notHas{{name}}(?{{subQuery}} $subQuery = null): {{query}} {
+        if ($subQuery === null) {
+            $subQuery = new {{subQuery}}();
+        }
+        $subQuery->addExp("{{relatedField}} = {{schemaField}}");
+        $this->query->addExp("NOT EXISTS (
+            SELECT 1 FROM {{tableName}}
+            " . $subQuery->query->get() . "
+        )", ...$subQuery->query->params);
+        return $this;
+    }
+{{/subRequests}}
 }

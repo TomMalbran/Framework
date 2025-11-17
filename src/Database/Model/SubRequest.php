@@ -118,6 +118,14 @@ class SubRequest {
         return $this;
     }
 
+    /**
+     * Returns the Name of the Table
+     * @return string
+     */
+    public function getDbTableName(): string {
+        return SchemaModel::getDbTableName($this->modelName);
+    }
+
 
 
     /**
