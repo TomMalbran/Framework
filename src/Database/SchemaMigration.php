@@ -32,24 +32,27 @@ class SchemaMigration {
         $lastMovement   = 0;
         $lastRename     = 0;
 
+        // Apply the Movements (Table renames)
         /** @var array{movements:array{from:string,to:string}[],renames:array{schema:string,from:string,to:string}[]} */
         $migrations = Discovery::loadData(DataFile::Migrations);
         if (!Arrays::isEmpty($migrations, "movements")) {
             $lastMovement = self::moveTables($db, $startMovement, $migrations["movements"]);
+            if ($lastMovement > 0) {
+                Settings::setCore("movement", $lastMovement);
+            }
         }
+
+        // Apply the Renames (Column renames)
         if (!Arrays::isEmpty($migrations, "renames")) {
             $lastRename = self::renameColumns($db, $startRename, $migrations["renames"]);
+            if ($lastRename > 0) {
+                Settings::setCore("rename", $lastRename);
+            }
         }
 
+        // Migrate the Tables
         $migrated      = self::migrateTables($db, $schemaModels, $canDelete);
         $lastMigration = self::extraMigrations($db, $startMigration);
-
-        if ($lastMovement > 0) {
-            Settings::setCore("movement", $lastMovement);
-        }
-        if ($lastRename > 0) {
-            Settings::setCore("rename", $lastRename);
-        }
         if ($lastMigration > 0) {
             Settings::setCore("migration", $lastMigration);
         }
@@ -72,7 +75,7 @@ class SchemaMigration {
             $fromName = SchemaModel::getDbTableName($movements[$i]["from"]);
             $toName   = SchemaModel::getDbTableName($movements[$i]["to"]);
 
-            if ($db->tableExists($fromName)) {
+            if ($db->tableExists($fromName) && !$db->tableExists($toName)) {
                 $db->renameTable($fromName, $toName);
                 print("- Renamed table $fromName -> $toName\n");
                 $didMove = true;
