@@ -11,12 +11,14 @@ class Query {
 
     public string $where     = "";
     public string $prefix    = "AND";
-    public string $oldPrefix = "";
     public bool   $addPrefix = false;
 
     public string $limit     = "";
     public string $groupBy   = "";
     public string $orderBy   = "";
+
+    /** @var string[] */
+    public array  $prefixes  = [];
 
     /** @var mixed[] */
     public array  $params    = [];
@@ -356,11 +358,11 @@ class Query {
      * @return Query
      */
     public function startAnd(): Query {
-        $prefix          = $this->getPrefix();
-        $this->where    .= "{$prefix}(";
-        $this->oldPrefix = $this->prefix;
-        $this->prefix    = "AND";
-        $this->addPrefix = false;
+        $prefix           = $this->getPrefix();
+        $this->where     .= "{$prefix}(";
+        $this->prefixes[] = $this->prefix;
+        $this->prefix     = "AND";
+        $this->addPrefix  = false;
         return $this;
     }
 
@@ -387,11 +389,11 @@ class Query {
      * @return Query
      */
     public function startOr(): Query {
-        $prefix          = $this->getPrefix();
-        $this->where    .= "{$prefix}(";
-        $this->oldPrefix = $this->prefix;
-        $this->prefix    = "OR";
-        $this->addPrefix = false;
+        $prefix           = $this->getPrefix();
+        $this->where     .= "{$prefix}(";
+        $this->prefixes[] = $this->prefix;
+        $this->prefix     = "OR";
+        $this->addPrefix  = false;
         return $this;
     }
 
@@ -418,7 +420,7 @@ class Query {
             $this->where .= ") ";
         }
 
-        $this->prefix    = $this->oldPrefix;
+        $this->prefix    = array_pop($this->prefixes) ?? "AND";
         $this->addPrefix = true;
         return $this;
     }
