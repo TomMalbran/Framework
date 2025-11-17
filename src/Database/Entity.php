@@ -225,6 +225,18 @@ class Entity implements JsonSerializable {
     }
 
     /**
+     * Returns the Type of the Data at the given key
+     * @param string $key
+     * @return string
+     */
+    final public function getType(string $key): string {
+        if ($this->has($key)) {
+            return gettype($this->$key);
+        }
+        return "";
+    }
+
+    /**
      * Gets the Data at the given key
      * @param string     $key
      * @param mixed|null $default Optional.
