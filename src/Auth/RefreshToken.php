@@ -38,7 +38,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
 
 
     /**
-     * Adds a Refresh Token
+     * Creates a Refresh Token
      * @param integer $credentialID
      * @param integer $expiration
      * @return string
@@ -55,22 +55,20 @@ class RefreshToken extends CredentialRefreshTokenSchema {
     }
 
     /**
-     * Recreates a Refresh Token
+     * Updates the expiration of a Refresh Token
      * @param string  $refreshToken
      * @param integer $expiration
      * @return string
      */
-    public static function recreate(string $refreshToken, int $expiration): string {
+    public static function update(string $refreshToken, int $expiration): string {
         $query = new CredentialRefreshTokenQuery();
         $query->refreshToken->equal($refreshToken);
 
-        $newRefreshToken = Strings::randomCode(20);
         self::editEntity(
             $query,
-            refreshToken:   $newRefreshToken,
             expirationTime: time() + $expiration,
         );
-        return $newRefreshToken;
+        return $refreshToken;
     }
 
     /**
@@ -97,12 +95,11 @@ class RefreshToken extends CredentialRefreshTokenSchema {
 
     /**
      * Removes the old Refresh Tokens
-     * @param integer $expiration
      * @return boolean
      */
-    public static function removeOld(int $expiration): bool {
+    public static function removeOld(): bool {
         $query = new CredentialRefreshTokenQuery();
-        $query->expirationTime->lessThan(time() - $expiration);
+        $query->expirationTime->lessThan(time());
         return self::removeEntity($query);
     }
 }

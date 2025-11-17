@@ -183,24 +183,20 @@ class AuthToken {
 
     /**
      * Updates a Refresh Token
-     * @param string $accessToken
      * @param string $refreshToken
      * @return string
      */
-    public static function updateRefreshToken(string $accessToken, string $refreshToken): string {
-        if (self::isValidAccessToken($accessToken)) {
-            return "";
-        }
+    public static function updateRefreshToken(string $refreshToken): string {
         if ($refreshToken === "") {
             return "";
         }
 
         $currentToken = self::getOne($refreshToken);
-        if ($currentToken->isEmpty() || $currentToken->modifiedTime > time() - 24 * 3600) {
+        if ($currentToken->isEmpty() || $currentToken->modifiedTime > time() - 3600) {
             return "";
         }
 
-        return RefreshToken::recreate($refreshToken, self::getRefreshTokenDuration());
+        return RefreshToken::update($refreshToken, self::getRefreshTokenDuration());
     }
 
     /**
@@ -232,6 +228,6 @@ class AuthToken {
      * @return boolean
      */
     public static function deleteOld(): bool {
-        return RefreshToken::removeOld(self::getRefreshTokenDuration());
+        return RefreshToken::removeOld();
     }
 }
