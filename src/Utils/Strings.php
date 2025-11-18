@@ -782,6 +782,9 @@ class Strings {
      * @return string
      */
     public static function pascalCaseToSnakeCase(string $string): string {
+        if (self::contains($string, "_")) {
+            return strtolower($string);
+        }
         $result = self::replacePattern($string, '/(?<!^)[A-Z]/', '_$0');
         return strtolower($result);
     }
