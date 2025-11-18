@@ -392,13 +392,25 @@ class DateTime {
 
     /**
      * Returns true if the given Date is in the future
-     * @param string   $date
+     * @param string   $dateString
      * @param DateType $dateType    Optional.
      * @param boolean  $useTimeZone Optional.
      * @return boolean
      */
-    public static function isFutureDate(string $date, DateType $dateType = DateType::Middle, bool $useTimeZone = true): bool {
-        $timeStamp = self::toDay($date, $dateType, $useTimeZone);
+    public static function isFutureDate(string $dateString, DateType $dateType = DateType::Middle, bool $useTimeZone = true): bool {
+        $timeStamp = self::toDay($dateString, $dateType, $useTimeZone);
+        return self::isFutureTime($timeStamp);
+    }
+
+    /**
+     * Returns true if the given Date and Hour is in the future
+     * @param string  $dateString
+     * @param string  $hourString
+     * @param boolean $useTimeZone Optional.
+     * @return boolean
+     */
+    public static function isFutureDateHour(string $dateString, string $hourString, bool $useTimeZone = true): bool {
+        $timeStamp = self::toTimeHour($dateString, $hourString, $useTimeZone);
         return self::isFutureTime($timeStamp);
     }
 
