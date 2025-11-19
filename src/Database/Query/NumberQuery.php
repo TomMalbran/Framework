@@ -122,11 +122,12 @@ class NumberQuery extends BaseQuery {
     /**
      * Uses the Period to add a Between expression
      * @param Period|Request $period
+     * @param string         $prefix Optional.
      * @return Query
      */
-    public function inPeriod(Period|Request $period): Query {
+    public function inPeriod(Period|Request $period, string $prefix = ""): Query {
         if ($period instanceof Request) {
-            $period = new Period($period);
+            $period = new Period($period, $prefix);
         }
 
         if ($period->fromTime > 0) {

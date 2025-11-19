@@ -61,29 +61,48 @@ class Period {
     /**
      * Creates a new Period instance
      * @param Request $request
+     * @param string  $prefix  Optional.
      */
-    public function __construct(Request $request) {
+    public function __construct(Request $request, string $prefix = "") {
+        $period   = $request->getString("period");
+        $fromDate = $request->getString("fromDate");
+        $fromHour = $request->getString("fromHour");
+        $fromTime = $request->getInt("fromTime");
+        $toDate   = $request->getString("toDate");
+        $toHour   = $request->getString("toHour");
+        $toTime   = $request->getInt("toTime");
+
+        if ($prefix !== "") {
+            $period   = $request->getString($prefix);
+            $fromDate = $request->getString("{$prefix}FromDate");
+            $fromHour = $request->getString("{$prefix}FromHour");
+            $fromTime = $request->getInt("{$prefix}FromTime");
+            $toDate   = $request->getString("{$prefix}ToDate");
+            $toHour   = $request->getString("{$prefix}ToHour");
+            $toTime   = $request->getInt("{$prefix}ToTime");
+        }
+
         $this->period = self::Custom;
 
-        if ($request->has("fromDate") && $request->has("fromHour")) {
-            $this->fromTime = DateTime::toTimeHour($request->getString("fromDate"), $request->getString("fromHour"));
-        } elseif ($request->has("fromDate")) {
-            $this->fromTime = DateTime::toDayStart($request->getString("fromDate"));
-        } elseif ($request->has("fromTime")) {
-            $this->fromTime = $request->getInt("fromTime");
-        } elseif ($request->has("period")) {
-            $this->period   = $request->getString("period");
+        if ($fromDate !== "" && $fromHour !== "") {
+            $this->fromTime = DateTime::toTimeHour($fromDate, $fromHour);
+        } elseif ($fromDate !== "") {
+            $this->fromTime = DateTime::toDayStart($fromDate);
+        } elseif ($fromTime !== 0) {
+            $this->fromTime = $fromTime;
+        } elseif ($period !== "") {
+            $this->period   = $period;
             $this->fromTime = $this->getFromTime();
         }
 
-        if ($request->has("toDate") && $request->has("toHour")) {
-            $this->toTime = DateTime::toTimeHour($request->getString("toDate"), $request->getString("toHour"));
-        } elseif ($request->has("toDate")) {
-            $this->toTime = DateTime::toDayEnd($request->getString("toDate"));
-        } elseif ($request->has("toTime")) {
-            $this->toTime = $request->getInt("toTime");
-        } elseif ($request->has("period")) {
-            $this->period = $request->getString("period");
+        if ($toDate !== "" && $toHour !== "") {
+            $this->toTime = DateTime::toTimeHour($toDate, $toHour);
+        } elseif ($toDate !== "") {
+            $this->toTime = DateTime::toDayEnd($toDate);
+        } elseif ($toTime !== 0) {
+            $this->toTime = $toTime;
+        } elseif ($period !== "") {
+            $this->period = $period;
             $this->toTime = $this->getToTime();
         }
     }
