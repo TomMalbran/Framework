@@ -779,9 +779,10 @@ class Strings {
     /**
      * Transforms a PascalCase string to SnakeCase
      * @param string $string
+     * @param string $separator Optional.
      * @return string
      */
-    public static function pascalCaseToSnakeCase(string $string): string {
+    public static function pascalCaseToSnakeCase(string $string, string $separator = "_"): string {
         if (self::contains($string, "_")) {
             return strtolower($string);
         }
@@ -789,12 +790,11 @@ class Strings {
         // Insert an underscore before any uppercase letter that is not followed by another uppercase letter,
         // or before an uppercase letter that is followed by a lowercase letter.
         // This handles cases like "CamelCase" -> "camel_case" and "SomeID" -> "some_id".
-        $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', '_$1');
+        $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', $separator . '$1');
 
         // Insert an underscore before any sequence of two or more uppercase letters that is preceded by a lowercase letter.
         // This handles cases like "someXMLData" -> "some_xml_data".
-        $result = self::replacePattern($result, '/(?<=[a-z])([A-Z]{2,})/', '_$1');
-
+        $result = self::replacePattern($result, '/(?<=[a-z])([A-Z]{2,})/', $separator . '$1');
         // Convert the entire string to lowercase.
         return strtolower($result);
     }
