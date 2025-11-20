@@ -44,8 +44,7 @@ class EmailCode {
         }
 
         return [
-            "hasEmailCodes" => count($emailCodes) > 0,
-            "emailCodes"    => $emailCodes,
+            "emailCodes" => $emailCodes,
         ];
     }
 }
