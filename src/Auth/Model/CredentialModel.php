@@ -40,13 +40,13 @@ class CredentialModel {
     #[Field(fromRequest: true)]
     public string $language = "";
 
-    #[Field(isText: true, fromRequest: true, noExists: true)]
+    #[Field(fromRequest: true, noExists: true, isText: true)]
     public string $observations = "";
 
     #[Field(fromRequest: true, noExists: true)]
     public bool $sendEmails = false;
 
-    #[Field(noExists: true)]
+    #[Field(fromRequest: true, noExists: true)]
     public bool $sendEmailNotis = false;
 
     #[Field(fromRequest: true, noExists: true)]
