@@ -4,6 +4,7 @@ namespace Framework\Database\Model;
 use Framework\Database\SchemaModel;
 use Framework\Database\Selection;
 use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryOperator;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -189,14 +190,16 @@ class SubRequest {
             return null;
         }
 
-        $query = Query::create($this->idDbName, "IN", $ids);
+        $query = new Query();
+        $query->add($this->idDbName, QueryOperator::In, $ids);
 
         if ($this->query !== "") {
             $queryParts = Strings::split($this->query, " ");
             $total      = count($queryParts);
             if ($total % 3 === 0) {
                 for ($i = 0; $i < $total; $i += 3) {
-                    $query->add($queryParts[$i], $queryParts[$i + 1], $queryParts[$i + 2]);
+                    $operator = QueryOperator::fromValue($queryParts[$i + 1]);
+                    $query->add($queryParts[$i], $operator, $queryParts[$i + 2]);
                 }
             }
         }
@@ -204,7 +207,7 @@ class SubRequest {
         if ($this->schemaModel !== null) {
             if ($this->schemaModel->canDelete) {
                 $isDeleted = $this->schemaModel->getKey("isDeleted");
-                $query->add($isDeleted, "=", 0);
+                $query->add($isDeleted, QueryOperator::Equal, 0);
             }
             if ($this->schemaModel->hasPositions) {
                 $query->orderBy($this->schemaModel->getKey("position"), true);

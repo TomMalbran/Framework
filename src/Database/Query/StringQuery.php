@@ -1,8 +1,9 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Database\Query\Query;
 use Framework\Database\Query\BaseQuery;
+use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryOperator;
 
 /**
  * The String Query
@@ -11,26 +12,26 @@ class StringQuery extends BaseQuery {
 
     /**
      * Adds a Search expression
-     * @param mixed   $value
-     * @param string  $expression      Optional.
-     * @param boolean $caseInsensitive Optional.
-     * @param boolean $splitValue      Optional.
-     * @param string  $splitText       Optional.
-     * @param boolean $matchAny        Optional.
+     * @param mixed         $value
+     * @param QueryOperator $operator        Optional.
+     * @param boolean       $caseInsensitive Optional.
+     * @param boolean       $splitValue      Optional.
+     * @param string        $splitText       Optional.
+     * @param boolean       $matchAny        Optional.
      * @return Query
      */
     public function search(
-        mixed  $value,
-        string $expression = "LIKE",
-        bool   $caseInsensitive = true,
-        bool   $splitValue = false,
+        mixed $value,
+        QueryOperator $operator = QueryOperator::Like,
+        bool $caseInsensitive = true,
+        bool $splitValue = false,
         string $splitText = " ",
-        bool   $matchAny = false,
+        bool $matchAny = false,
     ): Query {
         return $this->query->search(
             $this->column,
             $value,
-            $expression,
+            $operator,
             $caseInsensitive,
             $splitValue,
             $splitText,
@@ -39,13 +40,61 @@ class StringQuery extends BaseQuery {
     }
 
     /**
+     * Generates a Compare Query
+     * @param QueryOperator   $operator
+     * @param string[]|string $value
+     * @param boolean         $caseSensitive Optional.
+     * @param boolean|null    $condition     Optional.
+     * @return Query
+     */
+    public function compare(
+        QueryOperator $operator,
+        array|string $value,
+        bool $caseSensitive = false,
+        ?bool $condition = null,
+    ): Query {
+        return $this->query->add(
+            $this->column,
+            $operator,
+            $value,
+            $caseSensitive,
+            $condition,
+        );
+    }
+
+    /**
+     * Generates a Compare If Query
+     * @param QueryOperator   $operator
+     * @param string[]|string $value
+     * @param boolean|null    $condition     Optional.
+     * @param boolean         $caseSensitive Optional.
+     * @return Query
+     */
+    public function compareIf(
+        QueryOperator $operator,
+        array|string $value,
+        ?bool $condition = null,
+        bool $caseSensitive = false,
+    ): Query {
+        return $this->query->addIf(
+            $this->column,
+            $operator,
+            $value,
+            $condition,
+            $caseSensitive,
+        );
+    }
+
+
+
+    /**
      * Generates an Equal Query
      * @param string  $value
      * @param boolean $caseSensitive Optional.
      * @return Query
      */
     public function equal(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "=", $value, caseSensitive: $caseSensitive);
+        return $this->compare(QueryOperator::Equal, $value, $caseSensitive);
     }
 
     /**
@@ -55,7 +104,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function equalIf(string $value, ?bool $condition = null): Query {
-        return $this->query->addIf($this->column, "=", $value, $condition);
+        return $this->compareIf(QueryOperator::Equal, $value, $condition);
     }
 
     /**
@@ -64,7 +113,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function notEqual(string $value): Query {
-        return $this->query->add($this->column, "<>", $value);
+        return $this->compare(QueryOperator::NotEqual, $value);
     }
 
     /**
@@ -74,7 +123,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function notEqualIf(string $value, ?bool $condition = null): Query {
-        return $this->query->addIf($this->column, "<>", $value, $condition);
+        return $this->compareIf(QueryOperator::NotEqual, $value, $condition);
     }
 
 
@@ -86,7 +135,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function like(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "LIKE", $value, caseSensitive: $caseSensitive);
+        return $this->compare(QueryOperator::Like, $value, $caseSensitive);
     }
 
     /**
@@ -97,7 +146,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function likeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): Query {
-        return $this->query->addIf($this->column, "LIKE", $value, $condition, caseSensitive: $caseSensitive);
+        return $this->compareIf(QueryOperator::Like, $value, $condition, $caseSensitive);
     }
 
     /**
@@ -107,7 +156,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function notLike(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "NOT LIKE", $value, caseSensitive: $caseSensitive);
+        return $this->compare(QueryOperator::NotLike, $value, $caseSensitive);
     }
 
     /**
@@ -118,7 +167,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function notLikeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): Query {
-        return $this->query->addIf($this->column, "NOT LIKE", $value, $condition, caseSensitive: $caseSensitive);
+        return $this->compareIf(QueryOperator::NotLike, $value, $condition, $caseSensitive);
     }
 
     /**
@@ -128,7 +177,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function startsWith(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "STARTS", $value, caseSensitive: $caseSensitive);
+        return $this->compare(QueryOperator::StartsWith, $value, $caseSensitive);
     }
 
     /**
@@ -138,7 +187,7 @@ class StringQuery extends BaseQuery {
      * @return Query
      */
     public function endsWith(string $value, bool $caseSensitive = false): Query {
-        return $this->query->add($this->column, "ENDS", $value, caseSensitive: $caseSensitive);
+        return $this->compare(QueryOperator::EndsWith, $value, $caseSensitive);
     }
 
 
@@ -153,7 +202,7 @@ class StringQuery extends BaseQuery {
         if (count($values) === 0) {
             return $this->query;
         }
-        return $this->query->add($this->column, "IN", $values, condition: $condition);
+        return $this->compare(QueryOperator::In, $values, false, $condition);
     }
 
     /**
@@ -166,6 +215,6 @@ class StringQuery extends BaseQuery {
         if (count($values) === 0) {
             return $this->query;
         }
-        return $this->query->add($this->column, "NOT IN", $values, condition: $condition);
+        return $this->compare(QueryOperator::NotIn, $values, false, $condition);
     }
 }

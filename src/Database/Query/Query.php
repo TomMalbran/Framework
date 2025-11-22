@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
+use Framework\Database\Query\QueryOperator;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -57,15 +58,20 @@ class Query {
     /**
      * Creates a new Query with the given values
      * @param string                      $column        Optional.
-     * @param string                      $expression    Optional.
+     * @param QueryOperator               $operator      Optional.
      * @param mixed[]|integer|string|null $value         Optional.
      * @param boolean                     $caseSensitive Optional.
      * @return Query
      */
-    public static function create(string $column = "", string $expression = "", array|int|string|null $value = null, bool $caseSensitive = false): Query {
+    public static function create(
+        string $column = "",
+        QueryOperator $operator = QueryOperator::Equal,
+        array|int|string|null $value = null,
+        bool $caseSensitive = false,
+    ): Query {
         $query = new Query();
         if ($column !== "" && $value !== null) {
-            $query->add($column, $expression, $value, $caseSensitive);
+            $query->add($column, $operator, $value, $caseSensitive);
         }
         return $query;
     }
@@ -87,7 +93,7 @@ class Query {
     /**
      * Adds an expression as an and
      * @param string                 $column
-     * @param string                 $expression
+     * @param QueryOperator          $operator
      * @param mixed[]|string|integer $value
      * @param boolean                $caseSensitive Optional.
      * @param boolean|null           $condition     Optional.
@@ -95,7 +101,7 @@ class Query {
      */
     public function add(
         string $column,
-        string $expression,
+        QueryOperator $operator,
         array|int|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -104,82 +110,83 @@ class Query {
             return $this;
         }
 
-        $prefix = $this->getPrefix();
-        $suffix = $caseSensitive ? "BINARY" : "";
-        $param  = null;
-        $binds  = "?";
+        $prefix  = $this->getPrefix();
+        $suffix  = $caseSensitive ? "BINARY" : "";
+        $compare = $operator->value;
+        $param   = null;
+        $binds   = "?";
 
-        switch ($expression) {
-        case "=":
+        switch ($operator) {
+        case QueryOperator::Equal:
             if (is_array($value) && count($value) === 1) {
-                $param      = $value[0];
+                $param   = $value[0];
             } elseif (is_array($value) && count($value) > 1) {
-                $param      = $value;
-                $expression = "IN";
-                $binds      = $this->createBinds($value);
+                $param   = $value;
+                $compare = "IN";
+                $binds   = $this->createBinds($value);
             } elseif (!is_array($value)) {
-                $param      = $value;
+                $param   = $value;
             }
             break;
 
-        case "<>":
+        case QueryOperator::NotEqual:
             if (is_array($value) && count($value) === 1) {
-                $param      = $value[0];
+                $param   = $value[0];
             } elseif (is_array($value) && count($value) > 1) {
-                $param      = $value;
-                $expression = "NOT IN";
-                $binds      = $this->createBinds($value);
+                $param   = $value;
+                $compare = "NOT IN";
+                $binds   = $this->createBinds($value);
             } elseif (!is_array($value)) {
-                $param      = $value;
+                $param   = $value;
             }
             break;
 
-        case "IN":
+        case QueryOperator::In:
             if (is_array($value) && count($value) > 1) {
-                $param      = $value;
-                $binds      = $this->createBinds($value);
+                $param   = $value;
+                $binds   = $this->createBinds($value);
             } elseif (is_array($value) && count($value) === 1) {
-                $param      = $value[0];
-                $expression = "=";
+                $param   = $value[0];
+                $compare = "=";
             } elseif (!is_array($value)) {
-                $param      = $value;
-                $expression = "=";
+                $param   = $value;
+                $compare = "=";
             }
             break;
 
-        case "NOT IN":
+        case QueryOperator::NotIn:
             if (is_array($value) && count($value) > 1) {
-                $param      = $value;
-                $binds      = $this->createBinds($value);
+                $param   = $value;
+                $binds   = $this->createBinds($value);
             } elseif (is_array($value) && count($value) === 1) {
-                $param      = $value[0];
-                $expression = "<>";
+                $param   = $value[0];
+                $compare = "<>";
             } elseif (!is_array($value)) {
-                $param      = $value;
-                $expression = "<>";
+                $param   = $value;
+                $compare = "<>";
             }
             break;
 
-        case "LIKE":
-        case "NOT LIKE":
+        case QueryOperator::Like:
+        case QueryOperator::NotLike:
             if (!is_array($value)) {
                 $param = "%" . trim(strtolower((string)$value)) . "%";
             }
             break;
 
-        case "STARTS":
-        case "NOT STARTS":
+        case QueryOperator::StartsWith:
+        case QueryOperator::NotStartsWith:
             if (!is_array($value)) {
-                $param      = trim(strtolower((string)$value)) . "%";
-                $expression = Strings::replace($expression, "STARTS", "LIKE");
+                $param   = trim(strtolower((string)$value)) . "%";
+                $compare = Strings::replace($operator->value, "STARTS", "LIKE");
             }
             break;
 
-        case "ENDS":
-        case "NOT ENDS":
+        case QueryOperator::EndsWith:
+        case QueryOperator::NotEndsWith:
             if (!is_array($value)) {
-                $param      = "%" . trim(strtolower((string)$value));
-                $expression = Strings::replace($expression, "ENDS", "LIKE");
+                $param   = "%" . trim(strtolower((string)$value));
+                $compare = Strings::replace($operator->value, "ENDS", "LIKE");
             }
             break;
 
@@ -191,7 +198,7 @@ class Query {
             return $this;
         }
 
-        $this->where    .= "$prefix $column $expression $suffix $binds ";
+        $this->where    .= "$prefix $column $compare $suffix $binds ";
         $this->params    = array_merge($this->params, Arrays::toArray($param));
         $this->columns[] = $column;
         return $this;
@@ -200,7 +207,7 @@ class Query {
     /**
      * Adds an expression as an and if the value is not empty
      * @param string                      $column
-     * @param string                      $expression
+     * @param QueryOperator               $operator
      * @param mixed[]|integer|string|null $value
      * @param boolean|null                $condition     Optional.
      * @param boolean                     $caseSensitive Optional.
@@ -208,15 +215,15 @@ class Query {
      */
     public function addIf(
         string $column,
-        string $expression,
+        QueryOperator $operator,
         array|int|string|null $value,
         ?bool $condition = null,
         bool $caseSensitive = false,
     ): Query {
         if ($condition === true && $value !== null) {
-            $this->add($column, $expression, $value, $caseSensitive);
+            $this->add($column, $operator, $value, $caseSensitive);
         } elseif ($condition === null && $value !== null && !Arrays::isEmpty($value)) {
-            $this->add($column, $expression, $value, $caseSensitive);
+            $this->add($column, $operator, $value, $caseSensitive);
         }
         return $this;
     }
@@ -238,7 +245,7 @@ class Query {
      * Adds a Search expression
      * @param string[]|string $column
      * @param mixed           $value
-     * @param string          $expression      Optional.
+     * @param QueryOperator   $operator       Optional.
      * @param boolean         $caseInsensitive Optional.
      * @param boolean         $splitValue      Optional.
      * @param string          $splitText       Optional.
@@ -247,12 +254,12 @@ class Query {
      */
     public function search(
         array|string $column,
-        mixed        $value,
-        string       $expression = "LIKE",
-        bool         $caseInsensitive = true,
-        bool         $splitValue = false,
-        string       $splitText = " ",
-        bool         $matchAny = false,
+        mixed $value,
+        QueryOperator $operator = QueryOperator::Like,
+        bool $caseInsensitive = true,
+        bool $splitValue = false,
+        string $splitText = " ",
+        bool $matchAny = false,
     ): Query {
         if (Arrays::isEmpty($value)) {
             return $this;
@@ -297,7 +304,7 @@ class Query {
                 $this->startOr();
             }
             foreach ($columns as $columnSearch) {
-                $this->add($columnSearch, $expression, $valuePart);
+                $this->add($columnSearch, $operator, $valuePart);
             }
             if ($multiCols) {
                 $this->endOr();

@@ -3,6 +3,7 @@ namespace Framework\Log;
 
 use Framework\Request;
 use Framework\Auth\Auth;
+use Framework\Database\Query\QueryOperator;
 use Framework\Log\SessionLog;
 use Framework\Log\Schema\LogActionSchema;
 use Framework\Log\Schema\LogActionColumn;
@@ -30,7 +31,7 @@ class ActionLog extends LogActionSchema {
 
         $query = new LogActionQuery();
         foreach ($mappings as $key => $value) {
-            $query->query->addIf($value, "=", $request->getString($key));
+            $query->query->addIf($value, QueryOperator::Equal, $request->getString($key));
         }
         $query->search([
             LogActionColumn::CredentialName,

@@ -1,8 +1,9 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Database\Query\Query;
 use Framework\Database\Query\BaseQuery;
+use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryOperator;
 
 /**
  * The Boolean Query
@@ -16,7 +17,12 @@ class BooleanQuery extends BaseQuery {
      * @return Query
      */
     public function equal(bool $value, ?bool $condition = null): Query {
-        return $this->query->add($this->column, "=", (int)$value, condition: $condition);
+        return $this->query->add(
+            $this->column,
+            QueryOperator::Equal,
+            (int)$value,
+            condition: $condition,
+        );
     }
 
 
@@ -26,7 +32,7 @@ class BooleanQuery extends BaseQuery {
      * @return Query
      */
     public function isAny(): Query {
-        return $this->query->add($this->column, ">=", 0);
+        return $this->query->add($this->column, QueryOperator::GreaterOrEqual, 0);
     }
 
     /**
@@ -34,7 +40,7 @@ class BooleanQuery extends BaseQuery {
      * @return Query
      */
     public function isTrue(): Query {
-        return $this->query->add($this->column, "=", 1);
+        return $this->query->add($this->column, QueryOperator::Equal, 1);
     }
 
     /**
@@ -42,6 +48,6 @@ class BooleanQuery extends BaseQuery {
      * @return Query
      */
     public function isFalse(): Query {
-        return $this->query->add($this->column, "=", 0);
+        return $this->query->add($this->column, QueryOperator::Equal, 0);
     }
 }

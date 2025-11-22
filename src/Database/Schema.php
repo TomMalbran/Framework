@@ -8,6 +8,7 @@ use Framework\Database\Selection;
 use Framework\Database\Modification;
 use Framework\Database\Assign;
 use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryOperator;
 use Framework\Database\Model\SubRequest;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
@@ -588,12 +589,12 @@ class Schema {
 
         $newQuery = self::generateQuery($query);
         if ($newPosition > $oldPosition) {
-            $newQuery->add("position", ">",  $oldPosition);
-            $newQuery->add("position", "<=", $newPosition);
+            $newQuery->add("position", QueryOperator::GreaterThan, $oldPosition);
+            $newQuery->add("position", QueryOperator::LessOrEqual, $newPosition);
             $assign = Assign::decrease(1);
         } else {
-            $newQuery->add("position", ">=", $newPosition);
-            $newQuery->add("position", "<",  $oldPosition);
+            $newQuery->add("position", QueryOperator::GreaterOrEqual, $newPosition);
+            $newQuery->add("position", QueryOperator::LessThan, $oldPosition);
             $assign = Assign::increase(1);
         }
 
@@ -648,8 +649,8 @@ class Schema {
         $updated = false;
         if ($newValue !== 0 && $oldValue === 0) {
             $newQuery = new Query($query);
-            $newQuery->add(static::$idDbName, "<>", $id);
-            $newQuery->add($column, "=", 1);
+            $newQuery->add(static::$idDbName, QueryOperator::NotEqual, $id);
+            $newQuery->add($column, QueryOperator::Equal, 1);
             self::editSchemaEntity($newQuery, null, [ $column => 0 ]);
             $updated = true;
         }
@@ -672,7 +673,7 @@ class Schema {
      */
     private static function generateQueryID(Query|int|string $query, bool $withDeleted = true): Query {
         if (!($query instanceof Query)) {
-            $query = Query::create(static::$idDbName, "=", $query);
+            $query = Query::create(static::$idDbName, QueryOperator::Equal, $query);
         }
         return self::generateQuery($query, $withDeleted);
     }
@@ -710,7 +711,7 @@ class Schema {
         $isDeleted = static::getModel()->getKey("isDeleted");
 
         if ($withDeleted && static::$canDelete && !$query->hasColumn($isDeleted) && !$query->hasColumn("isDeleted")) {
-            $query->add($isDeleted, "=", 0);
+            $query->add($isDeleted, QueryOperator::Equal, 0);
         }
         return $query;
     }

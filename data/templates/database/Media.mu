@@ -4,6 +4,7 @@ namespace {{namespace}};
 use Framework\Framework;
 use Framework\Database\Assign;
 use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryOperator;
 use Framework\File\File;
 
 /**
@@ -37,13 +38,13 @@ class MediaSchema {
 
             // Replace the File Path in {{name}}.{{fieldName}}
             {{#isReplace}}
-            ${{query}} = Query::create("{{fieldName}}", "LIKE", "\"$old\"");
+            ${{query}} = Query::create("{{fieldName}}", QueryOperator::Like, "\"$old\"");
             $db->update("{{tableName}}", [
                 "{{fieldName}}" => Assign::replace($old, $new),
             ], ${{query}});
             {{/isReplace}}
             {{^isReplace}}
-            ${{query}} = Query::create("{{fieldName}}", "=", $old);
+            ${{query}} = Query::create("{{fieldName}}", QueryOperator::Equal, $old);
             $db->update("{{tableName}}", [
                 "{{fieldName}}" => $new,
             ], ${{query}});

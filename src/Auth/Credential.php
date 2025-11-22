@@ -3,6 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Request;
 use Framework\Core\NLS;
+use Framework\Database\Query\QueryOperator;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialColumn;
@@ -45,7 +46,7 @@ class Credential extends CredentialSchema {
         if (!Arrays::isEmpty($filter)) {
             $filters = Arrays::toStrings($filter);
             foreach ($filters as $key) {
-                $query->query->add($key, "=", $value);
+                $query->query->add($key, QueryOperator::Equal, $value);
             }
         }
         return $query;
@@ -132,14 +133,14 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is an Credential with the given Value for the given Field
-     * @param string         $field
-     * @param string|integer $value
-     * @param integer        $skipID Optional.
+     * @param CredentialColumn $column
+     * @param string|integer   $value
+     * @param integer          $skipID Optional.
      * @return boolean
      */
-    public static function fieldExists(string $field, string|int $value, int $skipID = 0): bool {
+    public static function fieldExists(CredentialColumn $column, string|int $value, int $skipID = 0): bool {
         $query = new CredentialQuery();
-        $query->query->add($field, "=", $value);
+        $query->add($column, QueryOperator::Equal, $value);
         $query->credentialID->notEqualIf($skipID);
         return self::entityExists($query);
     }

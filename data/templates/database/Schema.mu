@@ -19,6 +19,7 @@ use Framework\Database\Schema;
 use Framework\Database\SchemaModel;{{#canEdit}}
 use Framework\Database\Assign;{{/canEdit}}
 use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryOperator;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
@@ -174,7 +175,7 @@ class {{name}}Schema extends Schema {
     protected static function createParentQuery({{parentsNullList}}): {{query}} {
         $query = new {{query}}();
         {{#parents}}
-        $query->query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}}, {{fieldParam}} !== null);
+        $query->query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}}, {{fieldParam}} !== null);
         {{/parents}}
         return $query;
     }
@@ -202,9 +203,9 @@ class {{name}}Schema extends Schema {
      * @return boolean
      */
     public static function exists({{idType}} ${{idName}}{{{parentsDefList}}}{{#hasDeleted}}, bool $withDeleted = true{{/hasDeleted}}): bool {
-        $query = Query::create("{{idDbName}}", "=", ${{idName}});
+        $query = Query::create("{{idDbName}}", QueryOperator::Equal, ${{idName}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
         return self::getSchemaTotal($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}}) > 0;
     }
@@ -219,11 +220,11 @@ class {{name}}Schema extends Schema {
      * @return boolean
      */
     public static function {{fieldName}}Exists({{fieldArg}}{{{parentsDefList}}}, int $skipID = 0): bool {
-        $query = Query::create("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
-        $query->addIf("{{idDbName}}", "<>", $skipID);
+        $query->addIf("{{idDbName}}", QueryOperator::NotEqual, $skipID);
         return self::getSchemaTotal($query) > 0;
     }
 
@@ -250,9 +251,9 @@ class {{name}}Schema extends Schema {
      * @return {{entity}}
      */
     public static function getByID({{idType}} ${{idName}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
-        $query = Query::create("{{idDbName}}", "=", ${{idName}});
+        $query = Query::create("{{idDbName}}", QueryOperator::Equal, ${{idName}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
         $data = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -269,9 +270,9 @@ class {{name}}Schema extends Schema {
      * @return {{entity}}
      */
     public static function getBy{{fieldText}}({{fieldArg}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entity}} {
-        $query = Query::create("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
         $data = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -354,7 +355,7 @@ class {{name}}Schema extends Schema {
     public static function getList(Request $request{{{parentsDefList}}}): array {
         $query = static::createListQuery($request)->query;
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
         $list = self::getSchemaEntities($query, sort: $request);
         return self::constructEntities($list);
@@ -385,7 +386,7 @@ class {{name}}Schema extends Schema {
     public static function getTotal(Request $request{{{parentsDefList}}}): int {
         $query = static::createListQuery($request)->query;
         {{#parents}}
-        $query->addIf("{{fieldKey}}", "=", {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
         return self::getSchemaTotal($query);
     }

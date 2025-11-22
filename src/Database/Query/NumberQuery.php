@@ -2,8 +2,9 @@
 namespace Framework\Database\Query;
 
 use Framework\Request;
-use Framework\Database\Query\Query;
 use Framework\Database\Query\BaseQuery;
+use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryOperator;
 use Framework\Date\Period;
 
 /**
@@ -12,12 +13,46 @@ use Framework\Date\Period;
 class NumberQuery extends BaseQuery {
 
     /**
+     * Generates a Compare Query
+     * @param QueryOperator     $operator
+     * @param integer[]|integer $value
+     * @param boolean|null      $condition Optional.
+     * @return Query
+     */
+    public function compare(QueryOperator $operator, array|int $value, ?bool $condition = null): Query {
+        return $this->query->add(
+            $this->column,
+            $operator,
+            $value,
+            condition: $condition,
+        );
+    }
+
+    /**
+     * Generates a Compare If Query
+     * @param QueryOperator     $operator
+     * @param integer[]|integer $value
+     * @param boolean|null      $condition Optional.
+     * @return Query
+     */
+    public function compareIf(QueryOperator $operator, array|int $value, ?bool $condition = null): Query {
+        return $this->query->addIf(
+            $this->column,
+            $operator,
+            $value,
+            $condition,
+        );
+    }
+
+
+
+    /**
      * Generates an Equal Query
      * @param integer $value
      * @return Query
      */
     public function equal(int $value): Query {
-        return $this->query->add($this->column, "=", $value);
+        return $this->compare(QueryOperator::Equal, $value);
     }
 
     /**
@@ -27,7 +62,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function equalIf(int $value, ?bool $condition = null): Query {
-        return $this->query->addIf($this->column, "=", $value, $condition);
+        return $this->compareIf(QueryOperator::Equal, $value, $condition);
     }
 
     /**
@@ -36,7 +71,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function notEqual(int $value): Query {
-        return $this->query->add($this->column, "<>", $value);
+        return $this->compare(QueryOperator::NotEqual, $value);
     }
 
     /**
@@ -46,7 +81,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function notEqualIf(int $value, ?bool $condition = null): Query {
-        return $this->query->addIf($this->column, "<>", $value, $condition);
+        return $this->compareIf(QueryOperator::NotEqual, $value, $condition);
     }
 
 
@@ -58,7 +93,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function greaterThan(int $value, ?bool $condition = null): Query {
-        return $this->query->add($this->column, ">", $value, condition: $condition);
+        return $this->compare(QueryOperator::GreaterThan, $value, $condition);
     }
 
     /**
@@ -68,7 +103,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function greaterOrEqual(int $value, ?bool $condition = null): Query {
-        return $this->query->add($this->column, ">=", $value, condition: $condition);
+        return $this->compare(QueryOperator::GreaterOrEqual, $value, $condition);
     }
 
     /**
@@ -78,7 +113,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function lessThan(int $value, ?bool $condition = null): Query {
-        return $this->query->add($this->column, "<", $value, condition: $condition);
+        return $this->compare(QueryOperator::LessThan, $value, $condition);
     }
 
     /**
@@ -88,7 +123,7 @@ class NumberQuery extends BaseQuery {
      * @return Query
      */
     public function lessOrEqual(int $value, ?bool $condition = null): Query {
-        return $this->query->add($this->column, "<=", $value, condition: $condition);
+        return $this->compare(QueryOperator::LessOrEqual, $value, $condition);
     }
 
 
@@ -103,7 +138,7 @@ class NumberQuery extends BaseQuery {
         if (count($values) === 0) {
             return $this->query;
         }
-        return $this->query->add($this->column, "IN", $values, condition: $condition);
+        return $this->compare(QueryOperator::In, $values, $condition);
     }
 
     /**
@@ -116,7 +151,7 @@ class NumberQuery extends BaseQuery {
         if (count($values) === 0) {
             return $this->query;
         }
-        return $this->query->add($this->column, "NOT IN", $values, condition: $condition);
+        return $this->compare(QueryOperator::NotIn, $values, $condition);
     }
 
     /**
@@ -131,10 +166,10 @@ class NumberQuery extends BaseQuery {
         }
 
         if ($period->fromTime > 0) {
-            $this->query->add($this->column, ">=", $period->fromTime);
+            $this->compare(QueryOperator::GreaterOrEqual, $period->fromTime);
         }
         if ($period->toTime > 0) {
-            $this->query->add($this->column, "<=", $period->toTime);
+            $this->compare(QueryOperator::LessOrEqual, $period->toTime);
         }
         return $this->query;
     }

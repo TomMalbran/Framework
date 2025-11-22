@@ -139,7 +139,7 @@ class QueryCode {
     /**
      * Returns the Sub Request fields for the Query
      * @param SchemaModel $schemaModel
-     * @return array{string:string}[]
+     * @return array{name:string,subQuery:string,schemaField:string,relatedField:string,tableName:string}[]
      */
     private static function getSubRequests(SchemaModel $schemaModel): array {
         $result = [];
