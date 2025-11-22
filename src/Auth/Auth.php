@@ -81,7 +81,7 @@ class Auth {
 
         // Update the Refresh Token
         self::$refreshToken = $refreshToken;
-        AuthToken::updateRefreshToken($accessToken, $refreshToken);
+        AuthToken::updateRefreshToken($refreshToken);
 
         // Set the new Language and Timezone if required
         self::setLanguageTimezone($credential, $admin, $langcode, $timezone);
