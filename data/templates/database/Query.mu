@@ -50,7 +50,9 @@ class {{query}} extends SchemaQuery {
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): {{query}} {
-        $this->query->add($column->value, $operator, $value, $caseSensitive, $condition);
+        if ($column !== {{column}}::None) {
+            $this->query->add($column->value, $operator, $value, $caseSensitive, $condition);
+        }
         return $this;
     }
 
