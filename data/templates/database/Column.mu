@@ -8,6 +8,8 @@ use Framework\Utils\Strings;
  */
 enum {{name}}Column : string {
 
+    case None = "";
+
 {{#columns}}
     {{#addSpace}}
 
@@ -16,6 +18,20 @@ enum {{name}}Column : string {
 {{/columns}}
 
 
+
+    /**
+     * Creates a {{name}} Column from a String
+     * @param string $value
+     * @return {{name}}Column
+     */
+    public static function fromValue(string $value): {{name}}Column {
+        foreach (self::cases() as $case) {
+            if ($case->name === $value) {
+                return $case;
+            }
+        }
+        return self::None;
+    }
 
     /**
      * Get the key of the column
