@@ -275,6 +275,7 @@ class OpenAI {
      * @param Dictionary|null                     $schema           Optional.
      * @param string                              $vectorStoreID    Optional.
      * @param boolean                             $allowWebSearch   Optional.
+     * @param string                              $allowedDomain    Optional.
      * @param boolean                             $removeReferences Optional.
      * @return OpenAIOutput
      */
@@ -285,6 +286,7 @@ class OpenAI {
         ?Dictionary $schema = null,
         string $vectorStoreID = "",
         bool $allowWebSearch = false,
+        string $allowedDomain = "",
         bool $removeReferences = true,
     ): OpenAIOutput {
         $startTime = microtime(true);
@@ -325,10 +327,17 @@ class OpenAI {
             ];
         }
         if ($allowWebSearch) {
-            $tools[] = [
+            $searchTool = [
                 "type"                => "web_search",
                 "search_context_size" => "medium",
+                "external_web_access" => true,
             ];
+            if ($allowedDomain !== "") {
+                $searchTool["filters"] = [
+                    "allowed_domains" => [ $allowedDomain ],
+                ];
+            }
+            $tools[] = $searchTool;
         }
         if (count($tools) > 0) {
             $params["tools"] = $tools;
