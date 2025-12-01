@@ -16,6 +16,10 @@ use Framework\Database\Query\StringQuery;
  */
 class {{query}} extends SchemaQuery {
 
+    public string $tableName = "{{tableName}}";
+    public string $idDbName  = "{{idDbName}}";
+
+
 {{#properties}}
     public {{propType}} ${{propName}} // {{value}}
 {{/properties}}
@@ -83,6 +87,34 @@ class {{query}} extends SchemaQuery {
         $this->query->search($columns, $value, $operator, $caseInsensitive, $splitValue, $splitText, $matchAny);
         return $this;
     }
+
+    /**
+     * Adds an Exists expression
+     * @param SchemaQuery $subQuery
+     * @return {{query}}
+     */
+    public function exists(SchemaQuery $subQuery): {{query}} {
+        $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $this->query->addExp("EXISTS (
+            SELECT 1 FROM {$subQuery->tableName}
+            " . $subQuery->query->get() . "
+        )", ...$subQuery->query->params);
+        return $this;
+    }
+
+    /**
+     * Adds an Not Exists expression
+     * @param SchemaQuery $subQuery
+     * @return {{query}}
+     */
+    public function notExists(SchemaQuery $subQuery): {{query}} {
+        $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $this->query->addExp("NOT EXISTS (
+            SELECT 1 FROM {$subQuery->tableName}
+            " . $subQuery->query->get() . "
+        )", ...$subQuery->query->params);
+        return $this;
+    }
 {{#statuses}}
 
 
@@ -108,38 +140,4 @@ class {{query}} extends SchemaQuery {
         return $this;
     }
 {{/statuses}}
-{{#subRequests}}
-
-
-    /**
-     * Adds a {{name}} Exists condition
-     * @param {{subQuery}} $subQuery
-     * @return {{query}}
-     */
-    public function has{{name}}({{subQuery}} $subQuery): {{query}} {
-        $subQuery->addExp("{{relatedField}} = {{schemaField}}");
-        $this->query->addExp("EXISTS (
-            SELECT 1 FROM {{tableName}}
-            " . $subQuery->query->get() . "
-        )", ...$subQuery->query->params);
-        return $this;
-    }
-
-    /**
-     * Adds a {{name}} Not Exists condition
-     * @param {{subQuery}}|null $subQuery Optional.
-     * @return {{query}}
-     */
-    public function notHas{{name}}(?{{subQuery}} $subQuery = null): {{query}} {
-        if ($subQuery === null) {
-            $subQuery = new {{subQuery}}();
-        }
-        $subQuery->addExp("{{relatedField}} = {{schemaField}}");
-        $this->query->addExp("NOT EXISTS (
-            SELECT 1 FROM {{tableName}}
-            " . $subQuery->query->get() . "
-        )", ...$subQuery->query->params);
-        return $this;
-    }
-{{/subRequests}}
 }

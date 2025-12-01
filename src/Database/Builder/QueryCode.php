@@ -18,15 +18,16 @@ class QueryCode {
      */
     public static function getCode(SchemaModel $schemaModel): string {
         $contents = Builder::render("database/Query", [
-            "namespace"   => $schemaModel->namespace,
-            "name"        => $schemaModel->name,
-            "column"      => "{$schemaModel->name}Column",
-            "query"       => "{$schemaModel->name}Query",
-            "status"      => "{$schemaModel->name}Status",
-            "properties"  => self::getProperties($schemaModel),
-            "statuses"    => self::getStatuses($schemaModel),
-            "subRequests" => self::getSubRequests($schemaModel),
-            "imports"     => self::getImports($schemaModel),
+            "namespace"  => $schemaModel->namespace,
+            "name"       => $schemaModel->name,
+            "tableName"  => $schemaModel->tableName,
+            "idDbName"   => $schemaModel->idDbName,
+            "column"     => "{$schemaModel->name}Column",
+            "query"      => "{$schemaModel->name}Query",
+            "status"     => "{$schemaModel->name}Status",
+            "properties" => self::getProperties($schemaModel),
+            "statuses"   => self::getStatuses($schemaModel),
+            "imports"    => self::getImports($schemaModel),
         ]);
         $contents = Builder::alignParams($contents);
         return $contents;
@@ -137,26 +138,6 @@ class QueryCode {
     }
 
     /**
-     * Returns the Sub Request fields for the Query
-     * @param SchemaModel $schemaModel
-     * @return array{name:string,subQuery:string,schemaField:string,relatedField:string,tableName:string}[]
-     */
-    private static function getSubRequests(SchemaModel $schemaModel): array {
-        $result = [];
-        foreach ($schemaModel->subRequests as $subRequest) {
-            $tableName = $subRequest->getDbTableName();
-            $result[]  = [
-                "name"         => Strings::replace($subRequest->modelName, $schemaModel->name, ""),
-                "subQuery"     => "{$subRequest->modelName}Query",
-                "schemaField"  => "{$schemaModel->tableName}.{$schemaModel->idDbName}",
-                "relatedField" => "{$tableName}.{$schemaModel->idDbName}",
-                "tableName"    => $tableName,
-            ];
-        }
-        return $result;
-    }
-
-    /**
      * Returns the Query Imports for the Query
      * @param SchemaModel $schemaModel
      * @return string[]
@@ -176,13 +157,6 @@ class QueryCode {
                     $name = "{$relation->relationModelName}Status";
                     $result["{$relation->relationModel->namespace}\\$name"] = 1;
                 }
-            }
-        }
-
-        foreach ($schemaModel->subRequests as $subRequest) {
-            if ($subRequest->namespace !== $schemaModel->namespace) {
-                $name = "{$subRequest->modelName}Query";
-                $result["{$subRequest->namespace}\\$name"] = 1;
             }
         }
 
