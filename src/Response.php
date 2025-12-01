@@ -190,16 +190,24 @@ class Response {
      * Creates an Error Response
      * @param Errors|string                             $error
      * @param JsonSerializable|array<string,mixed>|null $data  Optional.
-     * @param string                                    $param Optional.
+     * @param string[]|string                           $param Optional.
      * @return Response
      */
-    public static function error(Errors|string $error, JsonSerializable|array|null $data = null, string $param = ""): Response {
+    public static function error(
+        Errors|string $error,
+        JsonSerializable|array|null $data = null,
+        array|string $param = "",
+    ): Response {
+        $params = is_array($param) ? $param : [ $param ];
+        $param  = $params[0] ?? "";
+
         if ($error instanceof Errors) {
             if ($error->has("global")) {
                 return new Response([
-                    "error" => $error->global,
-                    "param" => $param,
-                    "data"  => $data,
+                    "error"  => $error->global,
+                    "param"  => $param,
+                    "params" => $params,
+                    "data"   => $data,
                 ]);
             }
             return new Response([
@@ -209,9 +217,10 @@ class Response {
         }
 
         return new Response([
-            "error" => $error,
-            "param" => $param,
-            "data"  => $data,
+            "error"  => $error,
+            "param"  => $param,
+            "params" => $params,
+            "data"   => $data,
         ]);
     }
 }
