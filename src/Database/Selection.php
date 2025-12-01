@@ -208,6 +208,16 @@ class Selection {
                     }
                 }
             }
+
+            if (!$found) {
+                foreach ($this->schemaModel->expressions as $expression) {
+                    if ($column === $expression->name) {
+                        $query->updateColumn($column, "({$expression->expression})");
+                        $found = true;
+                        break;
+                    }
+                }
+            }
         }
         return $this;
     }
