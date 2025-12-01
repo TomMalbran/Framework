@@ -661,7 +661,7 @@ class Strings {
     }
 
     /**
-     * Transforms a String to LowerCase
+     * Transforms a String to lowercase
      * @param string $string
      * @return string
      */
@@ -670,7 +670,7 @@ class Strings {
     }
 
     /**
-     * Returns true if a String is UpperCase
+     * Returns true if a String is UPPERCASE
      * @param string $string
      * @return boolean
      */
@@ -679,7 +679,7 @@ class Strings {
     }
 
     /**
-     * Transforms a String to UpperCase
+     * Transforms a String to UPPERCASE
      * @param string $string
      * @return string
      */
@@ -697,7 +697,7 @@ class Strings {
     }
 
     /**
-     * Transforms a String to CamelCase
+     * Transforms a String to camelCase
      * @param string $string
      * @return string
      */
@@ -711,7 +711,7 @@ class Strings {
     }
 
     /**
-     * Transforms an UpperCase string to PascalCase
+     * Transforms an UPPER_CASE string to PascalCase
      * @param string $string
      * @return string
      */
@@ -722,7 +722,7 @@ class Strings {
     }
 
     /**
-     * Transforms an UpperCase string to CamelCase
+     * Transforms an UPPER_CASE string to camelCase
      * @param string  $string
      * @param boolean $capitalizeFirst Optional.
      * @return string
@@ -741,7 +741,7 @@ class Strings {
     }
 
     /**
-     * Transforms a CamelCase string to UpperCase
+     * Transforms a camelCase string to UPPER_CASE
      * @param string $string
      * @return string
      */
@@ -761,7 +761,7 @@ class Strings {
     }
 
     /**
-     * Transforms a CamelCase string to PascalCase
+     * Transforms a camelCase string to PascalCase
      * @param string $string
      * @return string
      */
@@ -777,7 +777,7 @@ class Strings {
     }
 
     /**
-     * Transforms a PascalCase string to SnakeCase
+     * Transforms a PascalCase string to snake_case
      * @param string $string
      * @param string $separator Optional.
      * @return string
@@ -797,6 +797,16 @@ class Strings {
         $result = self::replacePattern($result, '/(?<=[a-z])([A-Z]{2,})/', $separator . '$1');
         // Convert the entire string to lowercase.
         return strtolower($result);
+    }
+
+    /**
+     * Transforms a PascalCase string to UPPER_CASE
+     * @param string $string
+     * @return string
+     */
+    public static function pascalCaseToUpperCase(string $string): string {
+        $result = self::pascalCaseToSnakeCase($string);
+        return strtoupper($result);
     }
 
 
