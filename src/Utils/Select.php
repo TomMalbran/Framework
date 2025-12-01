@@ -157,7 +157,7 @@ class Select implements JsonSerializable {
         $keys   = [];
 
         foreach ($array as $row) {
-            $key   = Arrays::getValue($row, $keyName);
+            $key   = Arrays::getValue($row, $keyName, useEmpty: true);
             $value = Arrays::getValue($row, $valName, " - ", "", $useEmpty);
 
             if ((!is_int($key) && !is_string($key)) || !is_string($value)) {
