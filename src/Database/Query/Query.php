@@ -58,14 +58,14 @@ class Query {
     /**
      * Creates a new Query with the given values
      * @param string                      $column        Optional.
-     * @param QueryOperator               $operator      Optional.
+     * @param QueryOperator|string        $operator      Optional.
      * @param mixed[]|integer|string|null $value         Optional.
      * @param boolean                     $caseSensitive Optional.
      * @return Query
      */
     public static function create(
         string $column = "",
-        QueryOperator $operator = QueryOperator::Equal,
+        QueryOperator|string $operator = QueryOperator::Equal,
         array|int|string|null $value = null,
         bool $caseSensitive = false,
     ): Query {
@@ -93,7 +93,7 @@ class Query {
     /**
      * Adds an expression as an and
      * @param string                 $column
-     * @param QueryOperator          $operator
+     * @param QueryOperator|string   $operator
      * @param mixed[]|string|integer $value
      * @param boolean                $caseSensitive Optional.
      * @param boolean|null           $condition     Optional.
@@ -101,7 +101,7 @@ class Query {
      */
     public function add(
         string $column,
-        QueryOperator $operator,
+        QueryOperator|string $operator,
         array|int|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -110,11 +110,12 @@ class Query {
             return $this;
         }
 
-        $prefix  = $this->getPrefix();
-        $suffix  = $caseSensitive ? "BINARY" : "";
-        $compare = $operator->value;
-        $param   = null;
-        $binds   = "?";
+        $prefix   = $this->getPrefix();
+        $suffix   = $caseSensitive ? "BINARY" : "";
+        $operator = QueryOperator::fromValue($operator);
+        $compare  = $operator->value;
+        $param    = null;
+        $binds    = "?";
 
         switch ($operator) {
         case QueryOperator::Equal:
@@ -207,7 +208,7 @@ class Query {
     /**
      * Adds an expression as an and if the value is not empty
      * @param string                      $column
-     * @param QueryOperator               $operator
+     * @param QueryOperator|string        $operator
      * @param mixed[]|integer|string|null $value
      * @param boolean|null                $condition     Optional.
      * @param boolean                     $caseSensitive Optional.
@@ -215,7 +216,7 @@ class Query {
      */
     public function addIf(
         string $column,
-        QueryOperator $operator,
+        QueryOperator|string $operator,
         array|int|string|null $value,
         ?bool $condition = null,
         bool $caseSensitive = false,
@@ -243,19 +244,19 @@ class Query {
 
     /**
      * Adds a Search expression
-     * @param string[]|string $column
-     * @param mixed           $value
-     * @param QueryOperator   $operator       Optional.
-     * @param boolean         $caseInsensitive Optional.
-     * @param boolean         $splitValue      Optional.
-     * @param string          $splitText       Optional.
-     * @param boolean         $matchAny        Optional.
+     * @param string[]|string      $column
+     * @param mixed                $value
+     * @param QueryOperator|string $operator       Optional.
+     * @param boolean              $caseInsensitive Optional.
+     * @param boolean              $splitValue      Optional.
+     * @param string               $splitText       Optional.
+     * @param boolean              $matchAny        Optional.
      * @return Query
      */
     public function search(
         array|string $column,
         mixed $value,
-        QueryOperator $operator = QueryOperator::Like,
+        QueryOperator|string $operator = QueryOperator::Like,
         bool $caseInsensitive = true,
         bool $splitValue = false,
         string $splitText = " ",

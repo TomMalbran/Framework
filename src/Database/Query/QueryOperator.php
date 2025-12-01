@@ -29,10 +29,13 @@ enum QueryOperator : string {
 
     /**
      * Creates an Query Operator from a String
-     * @param string $value
+     * @param QueryOperator|string $value
      * @return QueryOperator
      */
-    public static function fromValue(string $value): QueryOperator {
+    public static function fromValue(QueryOperator|string $value): QueryOperator {
+        if ($value instanceof QueryOperator) {
+            return $value;
+        }
         foreach (self::cases() as $case) {
             if ($case->value === $value) {
                 return $case;
