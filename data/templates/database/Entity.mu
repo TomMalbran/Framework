@@ -3,7 +3,7 @@ namespace {{namespace}};
 
 {{#subTypes}}use {{namespace}}\{{type}}Entity;
 {{/subTypes}}
-use Framework\Database\Entity;
+use Framework\Database\Type\Entity;
 
 /**
  * The {{name}} Entity

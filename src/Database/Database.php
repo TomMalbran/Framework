@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\Assign;
 use Framework\Database\Query\Query;
+use Framework\Database\Type\Assign;
 use Framework\Log\QueryLog;
 use Framework\System\Config;
 use Framework\Utils\Arrays;

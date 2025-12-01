@@ -3,8 +3,8 @@ namespace Framework\Database\Model;
 
 use Framework\Request;
 use Framework\Database\SchemaModel;
-use Framework\Database\Assign;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Type\Assign;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\System\Path;

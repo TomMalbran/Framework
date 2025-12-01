@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Database;
+namespace Framework\Database\Type;
 
 use Framework\Request;
 use Framework\Discovery\Discovery;
@@ -11,7 +11,7 @@ use Framework\Utils\Strings;
 use JsonSerializable;
 
 /**
- * The Schema Entity
+ * The Database Entity
  */
 class Entity implements JsonSerializable {
 

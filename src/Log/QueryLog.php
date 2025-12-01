@@ -3,8 +3,8 @@ namespace Framework\Log;
 
 use Framework\Request;
 use Framework\Discovery\Discovery;
+use Framework\Database\Type\Assign;
 use Framework\Auth\Auth;
-use Framework\Database\Assign;
 use Framework\System\Config;
 use Framework\Log\Schema\LogQuerySchema;
 use Framework\Log\Schema\LogQueryColumn;

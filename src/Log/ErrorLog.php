@@ -3,7 +3,7 @@ namespace Framework\Log;
 
 use Framework\Request;
 use Framework\Discovery\Discovery;
-use Framework\Database\Assign;
+use Framework\Database\Type\Assign;
 use Framework\Log\Schema\LogErrorSchema;
 use Framework\Log\Schema\LogErrorColumn;
 use Framework\Log\Schema\LogErrorQuery;

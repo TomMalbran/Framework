@@ -16,8 +16,7 @@ use {{namespace}}\{{status}};{{/hasStatus}}
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
-use Framework\Database\SchemaModel;{{#canEdit}}
-use Framework\Database\Assign;{{/canEdit}}
+use Framework\Database\SchemaModel;
 use Framework\Database\Query\Query;
 use Framework\Database\Query\QueryOperator;
 use Framework\Database\Model\Field;
@@ -25,7 +24,8 @@ use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
 use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
 use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
-use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasDate}}
+use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#canEdit}}
+use Framework\Database\Type\Assign;{{/canEdit}}{{#hasDate}}
 use Framework\Date\DateType;{{/hasDate}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;

@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Database;
+namespace Framework\Database\Type;
 
 /**
  * The Database Assign
