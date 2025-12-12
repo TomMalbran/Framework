@@ -111,15 +111,17 @@ class Strings {
     /**
      * Returns true if the given String ends with the given Needle
      * @param string $string
-     * @param string $needle
+     * @param string ...$needles
      * @return boolean
      */
-    public static function endsWith(string $string, string $needle): bool {
-        $length = strlen($needle);
-        if ($length === 0) {
-            return true;
+    public static function endsWith(string $string, string ...$needles): bool {
+        foreach ($needles as $needle) {
+            $length = strlen($needle);
+            if (substr($string, -$length) === $needle) {
+                return true;
+            }
         }
-        return substr($string, -$length) === $needle;
+        return false;
     }
 
     /**
@@ -350,13 +352,15 @@ class Strings {
     /**
      * Removes the Needle from the start of the String
      * @param string $string
-     * @param string $needle
+     * @param string ...$needles
      * @return string
      */
-    public static function stripStart(string $string, string $needle): string {
-        if (self::startsWith($string, $needle)) {
-            $length = strlen($needle);
-            return substr($string, $length, strlen($string) - $length);
+    public static function stripStart(string $string, string ...$needles): string {
+        foreach ($needles as $needle) {
+            if (self::startsWith($string, $needle)) {
+                $length = strlen($needle);
+                return substr($string, $length, strlen($string) - $length);
+            }
         }
         return $string;
     }
@@ -364,13 +368,15 @@ class Strings {
     /**
      * Removes the Needle from the end of the String
      * @param string $string
-     * @param string $needle
+     * @param string ...$needles
      * @return string
      */
-    public static function stripEnd(string $string, string $needle): string {
-        if (self::endsWith($string, $needle)) {
-            $length = strlen($needle);
-            return substr($string, 0, strlen($string) - $length);
+    public static function stripEnd(string $string, string ...$needles): string {
+        foreach ($needles as $needle) {
+            if (self::endsWith($string, $needle)) {
+                $length = strlen($needle);
+                return substr($string, 0, strlen($string) - $length);
+            }
         }
         return $string;
     }
