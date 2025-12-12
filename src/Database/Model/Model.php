@@ -9,16 +9,18 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS)]
 class Model {
 
-    public bool $hasUsers;
-    public bool $hasTimestamps;
-    public bool $canCreate;
-    public bool $canEdit;
-    public bool $canDelete;
+    public string $fantasyName;
+    public bool   $hasUsers;
+    public bool   $hasTimestamps;
+    public bool   $canCreate;
+    public bool   $canEdit;
+    public bool   $canDelete;
 
 
 
     /**
      * The Model Attribute
+     * @param string  $fantasyName   Optional.
      * @param boolean $hasUsers      Optional.
      * @param boolean $hasTimestamps Optional.
      * @param boolean $canCreate     Optional.
@@ -26,12 +28,14 @@ class Model {
      * @param boolean $canDelete     Optional.
      */
     public function __construct(
-        bool $hasUsers      = false,
-        bool $hasTimestamps = false,
-        bool $canCreate     = false,
-        bool $canEdit       = false,
-        bool $canDelete     = false,
+        string $fantasyName   = "",
+        bool   $hasUsers      = false,
+        bool   $hasTimestamps = false,
+        bool   $canCreate     = false,
+        bool   $canEdit       = false,
+        bool   $canDelete     = false,
     ) {
+        $this->fantasyName   = $fantasyName;
         $this->hasUsers      = $hasUsers;
         $this->hasTimestamps = $hasTimestamps;
         $this->canCreate     = $canCreate;

@@ -1,6 +1,11 @@
 <?php
 namespace {{namespace}};
 
+{{#hasValidation}}
+{{#validateImports}}use {{.}};
+{{/validateImports}}
+
+{{/hasValidation}}
 {{#hasSubRequests}}
 {{#subSchemas}}use {{namespace}}\{{type}}Schema;
 {{/subSchemas}}
@@ -25,12 +30,16 @@ use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
 use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
 use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
 use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#canEdit}}
-use Framework\Database\Type\Assign;{{/canEdit}}{{#hasDate}}
+use Framework\Database\Type\Assign;{{/canEdit}}{{#hasValidation}}
+use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
 use Framework\Date\DateType;{{/hasDate}}
 use Framework\Utils\Arrays;
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
-use Framework\Utils\Numbers;{{/hasIntID}}
+use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
+use Framework\Utils\Errors;
+use Framework\Utils\Color;
+use Framework\Utils\Strings;{{/hasValidation}}
 
 /**
  * The {{name}} Schema
@@ -116,6 +125,160 @@ class {{name}}Schema extends Schema {
     }
 
 {{/hasSubRequests}}
+{{#hasValidation}}
+
+
+    /**
+     * Returns true if the {{name}} Entity can be edited{{#parents}}
+     * @param {{fieldDoc}}{{/parents}}
+     * @return boolean
+     */
+    public static function canEdit({{parentsArgList}}): bool {
+        return true;
+    }
+
+    /**
+     * Validates the {{name}} Request
+     * @param Request $request{{#parents}}
+     * @param {{fieldDoc}} Optional.{{/parents}}
+     * @return Result
+     */
+    public static function validateRequest(Request $request{{{parentsDefList}}}): Result {
+        $isEdit      = $request->has("{{idName}}");
+        $id          = $request->{{#hasIntID}}getInt{{/hasIntID}}{{^hasIntID}}getString{{/hasIntID}}("{{idName}}");
+        $errors      = new Errors();
+        $canValidate = false;
+
+        if (!self::canEdit({{parentsList}})) {
+            $errors->form = "{{errorPrefix}}EDIT";
+        } elseif ($isEdit && !self::exists($id{{parentsSecList}})) {
+            $errors->form = "{{errorPrefix}}EXISTS";
+        } else {
+        {{#validations}}
+        {{#isString}}
+            if (!$request->isValidString("{{fieldName}}")) {
+                $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
+            {{#typeOf}}
+            } elseif (!{{typeOf}}::{{method}}($request->getString("{{fieldName}}"))) {
+                $errors->{{fieldName}} = "{{fieldError}}_INVALID";
+            {{/typeOf}}
+            {{#isUnique}}
+            } elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
+                $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
+            {{/isUnique}}
+            {{#maxLength}}
+            } elseif (Strings::length($request->getString("{{fieldName}}")) > {{maxLength}}) {
+                $errors->add("{{fieldName}}", "{{fieldError}}_LENGTH", {{maxLength}});
+            {{/maxLength}}
+            }
+
+        {{/isString}}
+        {{#isEmail}}
+            {{#isRequired}}
+            if (!$request->isValidString("{{fieldName}}")) {
+                $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_EMPTY";
+            {{/isRequired}}
+            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidEmail("{{fieldName}}")) {
+                $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_INVALID";
+            {{#isUnique}}
+            } elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
+                $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
+            {{/isUnique}}
+            }
+
+        {{/isEmail}}
+        {{#isUrl}}
+            {{#isRequired}}
+            if (!$request->isValidString("{{fieldName}}")) {
+                $errors->{{fieldName}} = "GENERAL_ERROR_URL_EMPTY";
+            {{/isRequired}}
+            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidUrl("{{fieldName}}")) {
+                $errors->{{fieldName}} = "GENERAL_ERROR_URL_INVALID";
+            }
+
+        {{/isUrl}}
+        {{#isColor}}
+            if (!Color::isValid($request->getString("{{fieldName}}"))) {
+                $errors->{{fieldName}} = "GENERAL_ERROR_COLOR";
+            }
+
+        {{/isColor}}
+        {{#isNumber}}
+            {{#isRequired}}
+            if (!$request->has("{{fieldName}}")) {
+                $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
+            {{/isRequired}}
+            {{#typeOf}}
+            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{typeOf}}::{{method}}($request->getInt("{{fieldName}}"))) {
+                $errors->{{fieldName}} = "{{typeError}}_ERROR_EXISTS";
+            {{/typeOf}}
+            {{#belongsTo}}
+            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{belongsTo}}::{{method}}($request->getInt("{{fieldName}}"{{#withParent}}{{parentsSecList}}{{/withParent}}))) {
+                $errors->{{fieldName}} = "{{belongsError}}";
+            {{/belongsTo}}
+            {{#isNumeric}}
+            {{#isRequired}}} else{{/isRequired}}if (!$request->isNumeric("{{fieldName}}"{{numericParams}})) {
+                $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefx}}_INVALID{{/invalidPrefx}}";
+            {{/isNumeric}}
+            {{#isUnique}}
+            } elseif (self::{{fieldName}}Exists($request->getInt("{{fieldName}}"){{parentsSecList}}, $id)) {
+                $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
+            {{/isUnique}}
+            }
+
+        {{/isNumber}}
+        {{#isDate}}
+            if (!$request->has("{{dateName}}")) {
+                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_EMPTY";
+            } elseif (!$request->isValidDate("{{dateName}}")) {
+                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_INVALID";
+            } elseif (!$request->has("{{hourName}}")) {
+                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_EMPTY";
+            } elseif (!$request->isValidHour("{{hourName}}")) {
+                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_INVALID";
+            }
+
+        {{/isDate}}
+        {{#isPeriod}}
+            if (!$request->isValidFullPeriod("{{fromDateName}}", "{{fromHourName}}", "{{toDateName}}", "{{toHourName}}")) {
+                $errors->toDate = "GENERAL_ERROR_DATE_PERIOD";
+            }
+
+        {{/isPeriod}}
+        {{#isPrice}}
+            if (!$request->isValidPrice("{{fieldName}}", 0)) {
+                $errors->{{fieldName}} = "{{fieldError}}";
+            }
+
+        {{/isPrice}}
+        {{#isStatus}}
+            if (!{{status}}::isValid($request->getString("status"))) {
+                $errors->status = "GENERAL_ERROR_STATUS";
+            }
+
+        {{/isStatus}}
+        {{/validations}}
+        {{#hasPositions}}
+            if (!$request->isValidPosition("position")) {
+                $errors->position = "GENERAL_ERROR_POSITION";
+            }
+
+        {{/hasPositions}}
+            $canValidate = true;
+        }
+
+        return new Result(
+            isEdit:      $isEdit,{{#hasIntID}}
+            id:          $id,{{/hasIntID}}{{^hasIntID}}
+            code:        $id,{{/hasIntID}}
+            name:        $request->getString("name"),
+            status:      $request->getString("status"),
+            canValidate: $canValidate,
+            errors:      $errors,
+        );
+    }
+{{/hasValidation}}
+
 
 
     /**
@@ -697,7 +860,7 @@ class {{name}}Schema extends Schema {
      * @param boolean $skipOrder Optional.{{/hasPositions}}
      * @return boolean
      */
-    protected static function deleteEntity({{editType}} $query{{parentsEditList}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): bool {
+    protected static function deleteEntity({{editType}} $query{{editParentsList}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): bool {
         {{#hasUsers}}
         if ($modifiedUser === 0) {
             $modifiedUser = Auth::getID();
@@ -725,7 +888,7 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}}{{/editParents}}
      * @return boolean
      */
-    protected static function removeEntity({{editType}} $query{{parentsEditList}}): bool {
+    protected static function removeEntity({{editType}} $query{{editParentsList}}): bool {
         {{#hasPositions}}
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
@@ -756,7 +919,7 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}}{{/parents}}
      * @return integer
      */
-    protected static function ensureEntityOrder(?{{entity}} $entity, Request|array|null $fields{{parentsEditList}}): int {
+    protected static function ensureEntityOrder(?{{entity}} $entity, Request|array|null $fields{{editParentsList}}): int {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}

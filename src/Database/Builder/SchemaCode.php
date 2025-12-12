@@ -4,6 +4,7 @@ namespace Framework\Database\Builder;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Model\ValidateType;
 use Framework\Builder\Builder;
 use Framework\Date\DateType;
 use Framework\Utils\Arrays;
@@ -32,6 +33,7 @@ class SchemaCode {
         $parents     = self::getSomeFields($schemaModel, isParent: true);
         $subSchemas  = self::getSubTypes($schemaModel, forSchemas: true);
         $subTypes    = self::getSubTypes($schemaModel);
+        $validations = self::getValidations($schemaModel);
         $hasVirtual  = count($schemaModel->virtualFields) > 0;
         $hasParents  = count($parents) > 0;
         $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
@@ -46,6 +48,10 @@ class SchemaCode {
             "entity"              => "{$schemaModel->name}Entity",
             "status"              => "{$schemaModel->name}Status",
             "query"               => $queryName,
+            "hasValidation"       => count($validations) > 0,
+            "validations"         => $validations,
+            "validateImports"     => self::getValidationImports($schemaModel),
+            "errorPrefix"         => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
             "hasID"               => $schemaModel->hasID,
             "idName"              => $schemaModel->idName,
             "idDbName"            => $schemaModel->idDbName,
@@ -92,15 +98,16 @@ class SchemaCode {
             "fieldsCreateList"    => self::joinFields($fields, "fieldArgCreate", $schemaModel->usesRequest ? ", " : ""),
             "fieldsEditList"      => self::joinFields($fields, "fieldArgEdit", ", "),
             "uniques"             => $uniques,
+            "hasParents"          => $hasParents,
             "parents"             => $parents,
-            "editParents"         => $editParents,
             "parentsList"         => self::joinFields($parents, "fieldParam"),
+            "parentsSecList"      => self::joinFields($parents, "fieldParam", ", "),
             "parentsArgList"      => self::joinFields($parents, "fieldArg"),
             "parentsNullList"     => self::joinFields($parents, "fieldArgNull", ", "),
             "parentsDefList"      => self::joinFields($parents, "fieldArgDefault", ", "),
-            "parentsEditList"     => self::joinFields($editParents, "fieldArg", ", "),
-            "hasParents"          => $hasParents,
             "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
+            "editParents"         => $editParents,
+            "editParentsList"     => self::joinFields($editParents, "fieldArg", ", "),
             "hasDate"             => $hasDate,
         ]);
 
@@ -227,5 +234,143 @@ class SchemaCode {
         $list   = Arrays::createArray($fields, $key);
         $result = Strings::join($list, ", ");
         return $prefix . $result;
+    }
+
+
+
+    /**
+     * Returns the Validations for the Schema
+     * @param SchemaModel $schemaModel
+     * @return array{}[]
+     */
+    private static function getValidations(SchemaModel $schemaModel): array {
+        $hasFromDate = false;
+        $result      = [];
+
+        foreach ($schemaModel->validates as $validate) {
+            switch ($validate->type) {
+            case ValidateType::String:
+                $result[] = [
+                    "isString"    => true,
+                    "isRequired"  => $validate->isRequired,
+                    "isUnique"    => $validate->isUnique,
+                    "typeOf"      => Strings::substringAfter($validate->typeOf, "\\"),
+                    "method"      => $validate->method,
+                    "emptySuffix" => $validate->isUnique || $validate->typeOf !== "" || $validate->maxLength > 0,
+                    "maxLength"   => $validate->maxLength,
+                    "fieldName"   => $validate->name,
+                    "fieldError"  => $validate->getFieldError(),
+                ];
+                break;
+
+            case ValidateType::Email:
+                $result[] = [
+                    "isEmail"    => true,
+                    "isRequired" => $validate->isRequired,
+                    "isUnique"   => $validate->isUnique,
+                    "fieldName"  => $validate->name,
+                    "fieldError" => $validate->getFieldError(),
+                ];
+                break;
+
+            case ValidateType::Url:
+                $result[] = [
+                    "isUrl"      => true,
+                    "isRequired" => $validate->isRequired,
+                    "fieldName"  => $validate->name,
+                    "fieldError" => $validate->getFieldError(),
+                ];
+                break;
+
+            case ValidateType::Color:
+                $result[] = [
+                    "isColor"    => true,
+                    "isRequired" => $validate->isRequired,
+                    "fieldName"  => $validate->name,
+                    "fieldError" => $validate->getFieldError(),
+                ];
+                break;
+
+            case ValidateType::Number:
+                $result[] = [
+                    "isNumber"      => true,
+                    "isRequired"    => $validate->isRequired,
+                    "isUnique"      => $validate->isUnique,
+                    "emptySuffix"   => $validate->isUnique || $validate->prefix !== "",
+                    "typeOf"        => Strings::substringAfter($validate->typeOf, "\\"),
+                    "typeError"     => $validate->getTypeError(),
+                    "belongsTo"     => Strings::substringAfter($validate->belongsTo, "\\"),
+                    "belongsError"  => $validate->getBelongsToError(),
+                    "method"        => $validate->method,
+                    "withParent"    => $validate->withParent,
+                    "isNumeric"     => $validate->typeOf === "" && $validate->belongsTo === "",
+                    "invalidPrefix" => $validate->isRequired,
+                    "numericParams" => $validate->getNumericParams(),
+                    "fieldName"     => $validate->name,
+                    "fieldError"    => $validate->getFieldError(),
+                ];
+                break;
+
+            case ValidateType::Date:
+                $result[] = [
+                    "isDate"     => true,
+                    "isRequired" => $validate->isRequired,
+                    "dateName"   => $validate->dateInput,
+                    "hourName"   => $validate->hourInput,
+                    "errorText"  => Strings::startsWith($validate->name, "from") ? "FROM" : "TO",
+                    "fieldError" => $validate->getFieldError(),
+                ];
+                if (Strings::startsWith($validate->name, "from")) {
+                    $hasFromDate = true;
+                } elseif (Strings::startsWith($validate->name, "to") && $hasFromDate) {
+                    $result[] = [
+                        "isPeriod"     => true,
+                        "fromDateName" => "fromDate",
+                        "fromHourName" => "fromHour",
+                        "toDateName"   => "toDate",
+                        "toHourName"   => "toHour",
+                    ];
+                    $hasFromDate = false;
+                }
+                break;
+
+            case ValidateType::Price:
+                $result[] = [
+                    "isPrice"    => true,
+                    "isRequired" => $validate->isRequired,
+                    "fieldName"  => $validate->name,
+                    "fieldError" => $validate->getFieldError(),
+                ];
+                break;
+
+            case ValidateType::Status:
+                $result[] = [
+                    "isStatus" => true,
+                ];
+                break;
+
+            default:
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Validation Imports for the Schema
+     * @param SchemaModel $schemaModel
+     * @return array<string>
+     */
+    private static function getValidationImports(SchemaModel $schemaModel): array {
+        $uses = [];
+        foreach ($schemaModel->validates as $validate) {
+            if ($validate->typeOf !== "") {
+                $uses[] = $validate->typeOf;
+            } elseif ($validate->belongsTo !== "") {
+                $uses[] = $validate->belongsTo;
+            }
+        }
+
+        sort($uses);
+        return $uses;
     }
 }

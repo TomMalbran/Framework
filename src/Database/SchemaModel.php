@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Model\Validate;
 use Framework\Database\Model\Expression;
 use Framework\Database\Model\Virtual;
 use Framework\Database\Model\Count;
@@ -20,6 +21,7 @@ class SchemaModel {
 
     public string $name          = "";
     public string $tableName     = "";
+    public string $fantasyName   = "";
     public string $path          = "";
     public string $namespace     = "";
     public bool   $fromFramework = false;
@@ -53,6 +55,9 @@ class SchemaModel {
     /** @var Field[] */
     public array $extraFields    = [];
 
+    /** @var Validate[] */
+    public array $validates      = [];
+
     /** @var Virtual[] */
     public array $virtualFields  = [];
 
@@ -76,6 +81,7 @@ class SchemaModel {
     /**
      * The Schema Model
      * @param string       $name          Optional.
+     * @param string       $fantasyName   Optional.
      * @param string       $path          Optional.
      * @param string       $namespace     Optional.
      * @param boolean      $fromFramework Optional.
@@ -88,6 +94,7 @@ class SchemaModel {
      * @param boolean      $canDelete     Optional.
      * @param boolean      $usesRequest   Optional.
      * @param Field[]      $mainFields    Optional.
+     * @param Validate[]   $validates     Optional.
      * @param Virtual[]    $virtualFields Optional.
      * @param Expression[] $expressions   Optional.
      * @param Count[]      $counts        Optional.
@@ -97,6 +104,7 @@ class SchemaModel {
      */
     public function __construct(
         string $name          = "",
+        string $fantasyName   = "",
         string $path          = "",
         string $namespace     = "",
         bool   $fromFramework = false,
@@ -111,6 +119,7 @@ class SchemaModel {
         bool   $usesRequest   = true,
 
         array  $mainFields    = [],
+        array  $validates     = [],
         array  $virtualFields = [],
         array  $expressions   = [],
         array  $counts        = [],
@@ -119,6 +128,7 @@ class SchemaModel {
         array  $states        = [],
     ) {
         $this->name          = $name;
+        $this->fantasyName   = $fantasyName;
         $this->tableName     = self::getDbTableName($name);
         $this->path          = $path;
         $this->namespace     = $namespace;
@@ -134,6 +144,7 @@ class SchemaModel {
         $this->usesRequest   = $usesRequest;
 
         $this->mainFields    = $mainFields;
+        $this->validates     = $validates;
         $this->virtualFields = $virtualFields;
         $this->expressions   = $expressions;
         $this->counts        = $counts;

@@ -51,6 +51,22 @@ enum FieldType {
         };
     }
 
+
+
+    /**
+     * Returns true if the Field Type is a String type
+     * @param FieldType $type
+     * @return bool
+     */
+    public static function isString(FieldType $type): bool {
+        return match ($type) {
+            FieldType::String,
+            FieldType::Text,
+            FieldType::LongText => true,
+            default => false,
+        };
+    }
+
     /**
      * Returns the PHP Type from the given Field Type
      * @param FieldType $type
@@ -93,8 +109,6 @@ enum FieldType {
             default           => "null",
         };
     }
-
-
 
     /**
      * Returns the Name of the FieldType

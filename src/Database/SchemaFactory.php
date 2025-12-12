@@ -5,6 +5,7 @@ use Framework\Discovery\Discovery;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Validate;
 use Framework\Database\Model\Expression;
 use Framework\Database\Model\Virtual;
 use Framework\Database\Model\Count;
@@ -83,12 +84,12 @@ class SchemaFactory {
             $path .= "/Schema";
 
             // Get the Namespace
-            $namespace  = Strings::stripEnd($namespace, "\\Model");
-            $namespace .= "\\Schema";
+            $namespace = Strings::stripEnd($namespace, "\\Model");
+            $namespace = "$namespace\\Schema";
 
-            // Get the Name
-            $name = Strings::substringAfter($className, "\\");
-            $name = Strings::stripEnd($name, "Model");
+            // Get the Model Name
+            $modelName = Strings::substringAfter($className, "\\");
+            $modelName = Strings::stripEnd($modelName, "Model");
 
 
             // Instantiate the Model
@@ -96,15 +97,22 @@ class SchemaFactory {
                 /** @var Model */
                 $model = $modelAttr->newInstance();
             } catch (Throwable $e) {
-                $errorModels[] = "$name: Model attribute could not be instantiated ($fileName)";
+                $errorModels[] = "$modelName: Model attribute could not be instantiated ($fileName)";
                 continue;
             }
 
-            // Get from the Props
+            // Get the Fantasy Name
+            $fantasyName = $model->fantasyName;
+            if ($fantasyName === "") {
+                $fantasyName = $modelName;
+            }
+
+            // Get data from the Properties
             $hasStatus     = false;
             $hasPositions  = false;
             $usesRequest   = false;
             $mainFields    = [];
+            $validates     = [];
             $virtualFields = [];
             $expressions   = [];
             $counts        = [];
@@ -127,20 +135,23 @@ class SchemaFactory {
                 $field          = new Field();
                 $relation       = new Relation();
                 $subRequest     = new SubRequest();
+                $validate       = null;
                 $virtual        = null;
                 $expression     = null;
                 $count          = null;
 
-                if (isset($propAttributes[0])) {
+                foreach ($propAttributes as $propAttribute) {
                     try {
-                        $instance = $propAttributes[0]->newInstance();
+                        $instance = $propAttribute->newInstance();
                     } catch (Throwable $e) {
-                        $errorModels[] = "$name: $fieldName attribute could not be instantiated ($fileName)";
+                        $errorModels[] = "$modelName: $fieldName attribute could not be instantiated ($fileName)";
                         continue 2;
                     }
 
                     if ($instance instanceof Field) {
                         $field = $instance;
+                    } elseif ($instance instanceof Validate) {
+                        $validate = $instance;
                     } elseif ($instance instanceof Expression) {
                         $expression = $instance;
                     } elseif ($instance instanceof Virtual) {
@@ -154,11 +165,11 @@ class SchemaFactory {
                     }
                 }
 
-                // POSITION: If the Name is Position, mark it in the Model
+                // POSITION: If the Name is Position, mark it in the Model.
                 if ($fieldName === "position") {
                     $hasPositions = true;
 
-                // STATUS: If the Type is Status, mark it in the Model
+                // STATUS: If the Type is Status, mark it in the Model.
                 } elseif ($typeName === Status::class) {
                     $hasStatus = true;
                     foreach ($propAttributes as $attribute) {
@@ -167,8 +178,11 @@ class SchemaFactory {
                             $states[] = $instance;
                         }
                     }
+                    if ($validate !== null) {
+                        $validates[] = $validate->setStatus();
+                    }
 
-                // Relation: If the type is not a Built-in Type
+                // RELATION: If the type is not a Built-in Type.
                 } elseif (!$propType->isBuiltin()) {
                     $relationModelName = Strings::substringAfter($typeName, "\\");
                     $relationModelName = Strings::stripEnd($relationModelName, "Model");
@@ -177,7 +191,7 @@ class SchemaFactory {
                     $relation->parseOwnerJoin();
                     $relations[] = $relation;
 
-                // SubRequest: If the type is an Array (No SubRequest attribute required)
+                // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
                 } elseif ($typeName === "array") {
                     $comment = $prop->getDocComment();
                     if ($comment !== false) {
@@ -190,30 +204,37 @@ class SchemaFactory {
                         $subRequests[] = $subRequest->setData($fieldName, $subType, $subSchema);
                     }
 
-                // Expression: If it has an Expression attribute
+                // EXPRESSION: If it has an Expression attribute.
                 } elseif ($expression !== null) {
                     $expressions[] = $expression->setData($fieldName, $typeName);
 
-                // Virtual: If it has a Virtual attribute
+                // VIRTUAL: If it has a Virtual attribute.
                 } elseif ($virtual !== null) {
                     $virtualFields[] = $virtual->setData($fieldName, $typeName);
 
-                // Count: If it has a Count attribute
+                // COUNT: If it has a Count attribute.
                 } elseif ($count !== null) {
                     $counts[] = $count->setData($fieldName);
 
-                // Field: Anything else is a Main Field and can have a Field attribute
+                // FIELD: Anything else is a Main Field and can have a Field attribute.
+                // VALIDATE: A Main Field can also have a Validate attribute.
                 } else {
                     if ($field->fromRequest) {
                         $usesRequest = true;
                     }
-                    $mainFields[] = $field->setData($fieldName, $typeName);
+                    $mainField    = $field->setData($fieldName, $typeName);
+                    $mainFields[] = $mainField;
+
+                    if ($validate !== null) {
+                        $validates[] = $validate->setField($mainField, $fantasyName);
+                    }
                 }
             }
 
             // Add the Model
             $schemaModel = new SchemaModel(
-                name:          $name,
+                name:          $modelName,
+                fantasyName:   $fantasyName,
                 path:          $path,
                 namespace:     $namespace,
                 fromFramework: $fromFramework,
@@ -226,6 +247,7 @@ class SchemaFactory {
                 canDelete:     $model->canDelete,
                 usesRequest:   $usesRequest,
                 mainFields:    $mainFields,
+                validates:     $validates,
                 virtualFields: $virtualFields,
                 expressions:   $expressions,
                 relations:     $relations,
@@ -233,10 +255,10 @@ class SchemaFactory {
                 subRequests:   $subRequests,
                 states:        $states,
             );
-            $schemaModels[$name] = $schemaModel;
+            $schemaModels[$modelName] = $schemaModel;
 
             if ($schemaModel->hasID) {
-                $modelIDs[$schemaModel->idName] = $schemaModel->name;
+                $modelIDs[$schemaModel->idName] = $modelName;
             }
         }
 
