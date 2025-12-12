@@ -10,12 +10,16 @@ class SchemaQuery {
 
     public Query $query;
 
+    public string $tableName;
+    public string $idDbName;
+
+
 
     /**
      * Creates a new SchemaQuery instance
      * @param Query|null $query Optional.
      */
-    public function __construct(?Query $query = null) {
+    protected function __construct(?Query $query = null) {
         $this->query = new Query($query);
     }
 
