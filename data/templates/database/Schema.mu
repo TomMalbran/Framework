@@ -1,11 +1,11 @@
 <?php
 namespace {{namespace}};
 
-{{#hasValidation}}
+{{#hasValidateImports}}
 {{#validateImports}}use {{.}};
 {{/validateImports}}
 
-{{/hasValidation}}
+{{/hasValidateImports}}
 {{#hasSubRequests}}
 {{#subSchemas}}use {{namespace}}\{{type}}Schema;
 {{/subSchemas}}

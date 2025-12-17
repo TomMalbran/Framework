@@ -34,6 +34,7 @@ class SchemaCode {
         $subSchemas  = self::getSubTypes($schemaModel, forSchemas: true);
         $subTypes    = self::getSubTypes($schemaModel);
         $validations = self::getValidations($schemaModel);
+        $valImports  = self::getValidationImports($schemaModel);
         $hasVirtual  = count($schemaModel->virtualFields) > 0;
         $hasParents  = count($parents) > 0;
         $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
@@ -50,7 +51,8 @@ class SchemaCode {
             "query"               => $queryName,
             "hasValidation"       => count($validations) > 0,
             "validations"         => $validations,
-            "validateImports"     => self::getValidationImports($schemaModel),
+            "hasValidateImports"  => count($valImports) > 0,
+            "validateImports"     => $valImports,
             "errorPrefix"         => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
             "hasID"               => $schemaModel->hasID,
             "idName"              => $schemaModel->idName,
