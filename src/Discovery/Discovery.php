@@ -388,6 +388,25 @@ class Discovery {
     }
 
     /**
+     * Returns the Properties of the given Class, starting from the Base Class
+     * @param ReflectionClass<object> $class
+     * @return array<ReflectionProperty>
+     */
+    public static function getPropertiesBaseFirst(ReflectionClass $class): array {
+        $result = [];
+        do {
+            $properties = [];
+            foreach ($class->getProperties() as $property) {
+                if ($property->getDeclaringClass()->getName() === $class->getName()) {
+                    $properties[] = $property;
+                }
+            }
+            $result = array_merge($properties, $result);
+        } while ($class = $class->getParentClass());
+        return $result;
+    }
+
+    /**
      * Returns the priority from a ReflectionClass or ReflectionMethod.
      * @param ReflectionClass<object>|ReflectionMethod $reflection
      * @return integer

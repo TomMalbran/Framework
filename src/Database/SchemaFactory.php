@@ -121,7 +121,7 @@ class SchemaFactory {
             $states        = [];
 
             // Parse the Properties
-            $props = $reflection->getProperties();
+            $props = Discovery::getPropertiesBaseFirst($reflection);
             foreach ($props as $prop) {
                 $propType  = $prop->getType();
                 $fieldName = $prop->getName();
