@@ -171,14 +171,14 @@ class Query {
         case QueryOperator::Like:
         case QueryOperator::NotLike:
             if (!is_array($value)) {
-                $param = "%" . trim(strtolower((string)$value)) . "%";
+                $param = Strings::addPrefixSuffix(trim(strtolower((string)$value)), "%", "%");
             }
             break;
 
         case QueryOperator::StartsWith:
         case QueryOperator::NotStartsWith:
             if (!is_array($value)) {
-                $param   = trim(strtolower((string)$value)) . "%";
+                $param   = Strings::addSuffix(trim(strtolower((string)$value)), "%");
                 $compare = Strings::replace($operator->value, "STARTS", "LIKE");
             }
             break;
@@ -186,7 +186,7 @@ class Query {
         case QueryOperator::EndsWith:
         case QueryOperator::NotEndsWith:
             if (!is_array($value)) {
-                $param   = "%" . trim(strtolower((string)$value));
+                $param   = Strings::addPrefix(trim(strtolower((string)$value)), "%");
                 $compare = Strings::replace($operator->value, "ENDS", "LIKE");
             }
             break;

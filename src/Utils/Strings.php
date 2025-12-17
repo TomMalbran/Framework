@@ -417,29 +417,42 @@ class Strings {
     }
 
     /**
-     * Adds the Needle to the start of the String if not there
+     * Adds the Prefix to the start of the String if not there
      * @param string $string
-     * @param string $needle
+     * @param string $prefix
      * @return string
      */
-    public static function addPrefix(string $string, string $needle): string {
-        if (!self::startsWith($string, $needle)) {
-            return $needle . $string;
+    public static function addPrefix(string $string, string $prefix): string {
+        if (!self::startsWith($string, $prefix)) {
+            return $prefix . $string;
         }
         return $string;
     }
 
     /**
-     * Adds the Needle to the start of the String if not there
+     * Adds the Suffix to the end of the String if not there
      * @param string $string
-     * @param string $needle
+     * @param string $suffix
      * @return string
      */
-    public static function addSuffix(string $string, string $needle): string {
-        if (!self::endsWith($string, $needle)) {
-            return $string . $needle;
+    public static function addSuffix(string $string, string $suffix): string {
+        if (!self::endsWith($string, $suffix)) {
+            return $string . $suffix;
         }
         return $string;
+    }
+
+    /**
+     * Adds the Prefix to the start and the Suffix to the end of the String if not there
+     * @param string $string
+     * @param string $prefix
+     * @param string $suffix
+     * @return string
+     */
+    public static function addPrefixSuffix(string $string, string $prefix, string $suffix): string {
+        $result = self::addPrefix($string, $prefix);
+        $result = self::addSuffix($result, $suffix);
+        return $result;
     }
 
 
