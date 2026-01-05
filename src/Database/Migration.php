@@ -38,6 +38,14 @@ class Migration {
 
         print("\nEMAIL MIGRATIONS\n");
         EmailContent::migrateData();
+        /** @var DiscoveryMigration[] */
+        $frameMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class, forFramework: true);
+        if (count($frameMigrations) > 0) {
+            print("\nFRAMEWORK MIGRATIONS\n");
+            foreach ($frameMigrations as $migration) {
+                $migration::migrateData();
+            }
+        }
 
 
         /** @var DiscoveryMigration[] */
