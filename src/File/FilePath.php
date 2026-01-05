@@ -2,26 +2,24 @@
 namespace Framework\File;
 
 use Framework\Discovery\Discovery;
-use Framework\Discovery\DataFile;
+use Framework\Discovery\DiscoveryConfig;
+use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\Package;
 use Framework\File\File;
 use Framework\System\Config;
-use Framework\Utils\Arrays;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
 /**
  * The File Paths
  */
-class FilePath {
+class FilePath implements DiscoveryCode {
 
     private const Temp    = "temp";
     private const Source  = "source";
     private const Thumbs  = "thumbs";
     private const Avatars = "avatars";
 
-
-    private static bool  $loaded      = false;
 
     /** @var string[] */
     private static array $paths       = [];
@@ -31,24 +29,30 @@ class FilePath {
 
 
     /**
-     * Loads the Path Data
+     * Registers a Path
+     * @param string $name
      * @return boolean
      */
-    public static function load(): bool {
-        if (self::$loaded) {
+    public static function register(string $name): bool {
+        if ($name === "" || $name === "example") {
             return false;
         }
 
-        /** @var array{paths:string[],directories:string[]} */
-        $data = Discovery::loadData(DataFile::Files);
-        if (Arrays::isEmpty($data, "paths")) {
-            self::$loaded = true;
+        self::$paths[] = $name;
+        return true;
+    }
+
+    /**
+     * Registers a Directory
+     * @param string $name
+     * @return boolean
+     */
+    public static function registerDirectory(string $name): bool {
+        if ($name === "" || $name === "example") {
             return false;
         }
 
-        self::$loaded      = true;
-        self::$paths       = $data["paths"];
-        self::$directories = $data["directories"];
+        self::$directories[] = $name;
         return true;
     }
 
@@ -181,11 +185,18 @@ class FilePath {
 
 
     /**
-     * Returns the Code variables
+     * Returns the File Name to Generate
+     * @return string
+     */
+    public static function getFileName(): string {
+        return "Path";
+    }
+
+    /**
+     * Returns the File Code to Generate
      * @return array<string,mixed>
      */
-    public static function getCode(): array {
-        self::load();
+    public static function getFileCode(): array {
         $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
@@ -201,38 +212,8 @@ class FilePath {
 
         return [
             "paths" => $paths,
+            "total" => count($paths),
         ];
-    }
-
-    /**
-     * Creates the Directories for the given ID
-     * @param integer $id Optional.
-     * @return string[]
-     */
-    public static function createDirs(int $id = 0): array {
-        self::load();
-        $basePaths = [ self::Source, self::Thumbs ];
-        $result    = [];
-
-        foreach ($basePaths as $basePath) {
-            $path = self::getPath($basePath);
-            if (File::createDir($path)) {
-                $result[] = $basePath;
-            }
-
-            $path = self::getPath($basePath, $id);
-            if (File::createDir($path)) {
-                $result[] = "$basePath/$id";
-            }
-
-            foreach (self::$directories as $directory) {
-                $path = self::getPath($basePath, $id, $directory);
-                if (File::createDir($path)) {
-                    $result[] = "$basePath/$id/$directory";
-                }
-            }
-        }
-        return $result;
     }
 
     /**
@@ -240,7 +221,7 @@ class FilePath {
      * @return boolean
      */
     public static function ensurePaths(): bool {
-        self::load();
+        DiscoveryConfig::load();
         $basePaths = [ self::Temp, self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
@@ -268,5 +249,36 @@ class FilePath {
             print("- No paths added\n");
         }
         return true;
+    }
+
+    /**
+     * Creates the Directories for the given ID
+     * @param integer $id Optional.
+     * @return string[]
+     */
+    public static function createDirs(int $id = 0): array {
+        DiscoveryConfig::load();
+        $basePaths = [ self::Source, self::Thumbs ];
+        $result    = [];
+
+        foreach ($basePaths as $basePath) {
+            $path = self::getPath($basePath);
+            if (File::createDir($path)) {
+                $result[] = $basePath;
+            }
+
+            $path = self::getPath($basePath, $id);
+            if (File::createDir($path)) {
+                $result[] = "$basePath/$id";
+            }
+
+            foreach (self::$directories as $directory) {
+                $path = self::getPath($basePath, $id, $directory);
+                if (File::createDir($path)) {
+                    $result[] = "$basePath/$id/$directory";
+                }
+            }
+        }
+        return $result;
     }
 }

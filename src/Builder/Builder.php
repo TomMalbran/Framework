@@ -11,7 +11,6 @@ use Framework\Builder\RouterCode;
 use Framework\Builder\SignalCode;
 use Framework\Database\SchemaBuilder;
 use Framework\File\File;
-use Framework\File\FilePath;
 use Framework\Provider\Mustache;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -38,7 +37,6 @@ class Builder {
 
 
         print("\nFRAMEWORK MAIN CODES\n");
-        $created += self::generateOne($writePath, "Path",     FilePath::getCode());
         $created += self::generateOne($writePath, "Language", LanguageCode::getCode());
 
 
