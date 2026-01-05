@@ -250,7 +250,7 @@ class Discovery {
      * @return boolean
      */
     public static function logFile(string $file, mixed $contents): bool {
-        $path = self::getAppPath(Package::DataDir, Package::LogDir);
+        $path = self::getAppPath(Package::LogDir);
         File::createDir($path);
         return File::write("$path/$file.json", JSON::encode($contents, true));
     }

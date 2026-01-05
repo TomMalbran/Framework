@@ -25,6 +25,7 @@ class Package {
     public const DataFilesDir     = "data/files";
     public const TemplateDir      = "data/templates";
     public const MigrationsDir    = "data/migrations";
+    public const LogDir           = "data/logs";
     public const EmailFile        = "email.html";
 
     // NLS Directories
@@ -34,7 +35,6 @@ class Package {
 
     // Other Directories
     public const FilesDir         = "files";
-    public const LogDir           = "logs";
     public const FTPDir           = "public_ftp";
 
 
