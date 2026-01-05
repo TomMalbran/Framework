@@ -26,29 +26,16 @@ class Builder {
 
     /**
      * Builds all the Code
-     * @param boolean $delete Optional.
      * @return boolean
      */
     #[ConsoleCommand("build")]
-    public static function build(bool $delete = false): bool {
+    public static function build(): bool {
         print("Building the Code...\n");
 
-        $writePath   = Discovery::getBuildPath();
-        $package     = self::getPackageData();
-        $files       = 0;
+        $writePath = Discovery::getBuildPath();
+        $package   = self::getPackageData();
+        $files     = 0;
 
-        /** @var DiscoveryBuilder[] */
-        $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
-        $hasBuilders = count($appBuilders) > 0;
-
-
-        if ($delete && $hasBuilders) {
-            foreach ($appBuilders as $builder) {
-                $builder::resetCode();
-            }
-            print("\nDeleted the APP CODES\n\n");
-            return false;
-        }
 
         File::createDir($writePath);
         File::emptyDir($writePath);
@@ -81,7 +68,9 @@ class Builder {
         $files += self::generateOne($writePath, "Router", RouterCode::getCode());
 
 
-        if ($hasBuilders) {
+        /** @var DiscoveryBuilder[] */
+        $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
+        if (count($appBuilders) > 0) {
             print("\nAPP CODES\n");
             foreach ($appBuilders as $builder) {
                 $files += $builder::generateCode();
