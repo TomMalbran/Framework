@@ -2,6 +2,7 @@
 namespace Framework\Core;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryMigration;
 use Framework\Discovery\DataFile;
 use Framework\Core\VariableType;
@@ -9,13 +10,14 @@ use Framework\Core\Schema\SettingsSchema;
 use Framework\Core\Schema\SettingsEntity;
 use Framework\Core\Schema\SettingsColumn;
 use Framework\Core\Schema\SettingsQuery;
+use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 /**
  * The Settings
  */
-class Settings extends SettingsSchema implements DiscoveryMigration {
+class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigration {
 
     public const Core    = "Core";
     public const General = "General";
@@ -163,6 +165,97 @@ class Settings extends SettingsSchema implements DiscoveryMigration {
             $fields["$section-$key"] = $value;
         }
         return self::saveAll($fields);
+    }
+
+
+
+    /**
+     * Returns the File Name to Generate
+     * @return string
+     */
+    public static function getFileName(): string {
+        return "Setting";
+    }
+
+    /**
+     * Returns the File Code to Generate
+     * @return array<string,mixed>
+     */
+    public static function getFileCode(): array {
+        /** @var array<string,array<string,mixed>> */
+        $data = Discovery::loadData(DataFile::Settings);
+        if (Arrays::isEmpty($data)) {
+            return [];
+        }
+
+        [ $variables, $hasJSON ] = self::getVariables($data);
+        return [
+            "sections"  => self::getSections($data),
+            "variables" => $variables,
+            "hasJSON"   => $hasJSON,
+        ];
+    }
+
+    /**
+     * Returns the Settings Sections for the generator
+     * @param array<string,mixed> $data
+     * @return mixed[]
+     */
+    private static function getSections(array $data): array {
+        $result  = [];
+
+        foreach (array_keys($data) as $section) {
+            if (!Strings::isEqual($section, Settings::General)) {
+                $result[] = [
+                    "section" => $section,
+                    "name"    => Strings::upperCaseFirst($section),
+                ];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Settings Variables for the generator
+     * @param array<string,array<string,mixed>> $data
+     * @return mixed[]
+     */
+    private static function getVariables(array $data): array {
+        $result  = [];
+        $isFirst = true;
+        $hasJSON = false;
+
+        foreach ($data as $section => $variables) {
+            foreach ($variables as $variable => $value) {
+                $isGeneral    = Strings::isEqual($section, Settings::General);
+                $prefix       = !$isGeneral ? Strings::upperCaseFirst($section) : "";
+                $title        = Strings::camelCaseToPascalCase($variable);
+                $variableType = VariableType::get($value, false);
+
+                $result[] = [
+                    "isFirst"   => $isFirst,
+                    "section"   => $section,
+                    "variable"  => $variable,
+                    "prefix"    => $prefix,
+                    "title"     => $prefix !== "" ? "$prefix $title" : $title,
+                    "name"      => Strings::upperCaseFirst($variable),
+                    "type"      => VariableType::getType($variableType),
+                    "docType"   => VariableType::getDocType($variableType),
+                    "getter"    => $variableType === VariableType::Boolean ? "is" : "get",
+                    "isBoolean" => $variableType === VariableType::Boolean,
+                    "isInteger" => $variableType === VariableType::Integer,
+                    "isFloat"   => $variableType === VariableType::Float,
+                    "isString"  => $variableType === VariableType::String,
+                    "isArray"   => $variableType === VariableType::Array,
+                ];
+
+                $isFirst = false;
+                if ($variableType === VariableType::Array) {
+                    $hasJSON = true;
+                }
+            }
+        }
+        return [ $result, $hasJSON ];
     }
 
 

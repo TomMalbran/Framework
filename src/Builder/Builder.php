@@ -10,7 +10,6 @@ use Framework\Builder\AccessCode;
 use Framework\Builder\ConfigCode;
 use Framework\Builder\LanguageCode;
 use Framework\Builder\RouterCode;
-use Framework\Builder\SettingCode;
 use Framework\Builder\SignalCode;
 use Framework\Database\SchemaBuilder;
 use Framework\File\File;
@@ -79,10 +78,9 @@ class Builder {
 
 
         print("\nFRAMEWORK FINAL CODES\n");
-        $files += self::generateOne($writePath, "Setting",  SettingCode::getCode());
-        $files += self::generateOne($writePath, "Config",   ConfigCode::getCode());
-        $files += self::generateOne($writePath, "Signal",   SignalCode::getCode());
-        $files += self::generateOne($writePath, "Router",   RouterCode::getCode());
+        $files += self::generateOne($writePath, "Config", ConfigCode::getCode());
+        $files += self::generateOne($writePath, "Signal", SignalCode::getCode());
+        $files += self::generateOne($writePath, "Router", RouterCode::getCode());
 
 
         if ($hasBuilders) {
