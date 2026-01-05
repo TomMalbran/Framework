@@ -197,6 +197,16 @@ class Discovery {
     }
 
     /**
+     * Loads the Notifications File for the given Language
+     * @param string $langCode
+     * @return array<string,mixed>
+     */
+    public static function loadNotifications(string $langCode): array {
+        $result = self::loadJSON(Package::NotificationsDir, $langCode);
+        return Arrays::toStringMixedMap($result);
+    }
+
+    /**
      * Loads a Custom Data File
      * @param string $fileName
      * @return array<string,Dictionary>
