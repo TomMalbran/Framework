@@ -26,7 +26,7 @@ class NotificationContentModel {
     public string $title = "";
 
     #[Field(isText: true)]
-    public string $body = "";
+    public string $message = "";
 
     public int $position = 0;
 

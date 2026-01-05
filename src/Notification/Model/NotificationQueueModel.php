@@ -27,7 +27,7 @@ class NotificationQueueModel {
 
     public string $title = "";
 
-    public string $body = "";
+    public string $message = "";
 
     public string $url = "";
 

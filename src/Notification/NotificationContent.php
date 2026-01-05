@@ -91,7 +91,7 @@ class NotificationContent extends NotificationContentSchema implements Discovery
                 languageName:     $languageName,
                 description:      $data["description"],
                 title:            $data["title"],
-                body:             $data["body"],
+                message:          $data["message"],
                 position:         $position,
                 skipOrder:        true,
             );

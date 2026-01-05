@@ -47,7 +47,7 @@ class NotificationQueue extends NotificationQueueSchema {
         $query = new NotificationQueueQuery();
         $query->search([
             NotificationQueueColumn::Title,
-            NotificationQueueColumn::Body,
+            NotificationQueueColumn::Message,
             NotificationQueueColumn::CredentialFirstName,
             NotificationQueueColumn::CredentialLastName,
         ], $search);
@@ -129,7 +129,7 @@ class NotificationQueue extends NotificationQueueSchema {
      * @param integer $credentialID
      * @param integer $currentUser
      * @param string  $title
-     * @param string  $body
+     * @param string  $message
      * @param string  $url
      * @param string  $dataType
      * @param integer $dataID
@@ -139,7 +139,7 @@ class NotificationQueue extends NotificationQueueSchema {
         int $credentialID,
         int $currentUser,
         string $title,
-        string $body,
+        string $message,
         string $url,
         string $dataType,
         int $dataID
@@ -148,7 +148,7 @@ class NotificationQueue extends NotificationQueueSchema {
             credentialID:       $credentialID,
             currentUser:        $currentUser,
             title:              $title,
-            body:               $body,
+            message:            $message,
             url:                $url,
             dataType:           $dataType,
             dataID:             $dataID,
@@ -226,7 +226,7 @@ class NotificationQueue extends NotificationQueueSchema {
             } else {
                 $externalID = Notification::sendToSome(
                     $elem->title,
-                    $elem->body,
+                    $elem->message,
                     $elem->url,
                     $elem->dataType,
                     $elem->dataID,

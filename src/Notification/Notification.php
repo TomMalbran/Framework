@@ -18,14 +18,14 @@ class Notification {
     /**
      * Send to All
      * @param string  $title
-     * @param string  $body
+     * @param string  $message
      * @param string  $url
      * @param string  $dataType
      * @param integer $dataID
      * @return string|null
      */
-    public static function sendToAll(string $title, string $body, string $url, string $dataType, int $dataID): ?string {
-        return self::send($title, $body, $dataType, $url, $dataID, [
+    public static function sendToAll(string $title, string $message, string $url, string $dataType, int $dataID): ?string {
+        return self::send($title, $message, $url, $dataType, $dataID, [
             "included_segments" => [ "All" ],
         ]);
     }
@@ -33,14 +33,14 @@ class Notification {
     /**
      * Send to Some
      * @param string   $title
-     * @param string   $body
+     * @param string   $message
      * @param string   $url
      * @param string   $dataType
      * @param integer  $dataID
      * @param string[] $playerIDs
      * @return string|null
      */
-    public static function sendToSome(string $title, string $body, string $url, string $dataType, int $dataID, array $playerIDs): ?string {
+    public static function sendToSome(string $title, string $message, string $url, string $dataType, int $dataID, array $playerIDs): ?string {
         if (count($playerIDs) === 0) {
             return null;
         }
@@ -56,20 +56,20 @@ class Notification {
             ];
         }
 
-        return self::send($title, $body, $url, $dataType, $dataID, $params);
+        return self::send($title, $message, $url, $dataType, $dataID, $params);
     }
 
     /**
      * Sends the Notification
      * @param string              $title
-     * @param string              $body
+     * @param string              $message
      * @param string              $url
      * @param string              $dataType
      * @param integer             $dataID
      * @param array<string,mixed> $params
      * @return string|null
      */
-    private static function send(string $title, string $body, string $url, string $dataType, int $dataID, array $params): ?string {
+    private static function send(string $title, string $message, string $url, string $dataType, int $dataID, array $params): ?string {
         if (!Config::isNotificationActive()) {
             return null;
         }
@@ -88,7 +88,7 @@ class Notification {
             "app_id"         => Config::getOnesignalAppId(),
             "target_channel" => "push",
             "headings"       => [ "en" => $title ],
-            "contents"       => [ "en" => $body  ],
+            "contents"       => [ "en" => $message ],
             "url"            => $fullUrl,
             "large_icon"     => $icon,
             "ios_badgeType"  => "Increase",
