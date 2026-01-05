@@ -97,8 +97,10 @@ enum VariableType {
      */
     public static function encodeValue(VariableType $type, mixed $value): string {
         return match ($type) {
-            self::Boolean => !Arrays::isEmpty($value) ? "1" : "0",
             self::Array   => JSON::encode($value),
+            self::Boolean => !Arrays::isEmpty($value) ? "1" : "0",
+            self::Float,
+            self::Integer => Arrays::isEmpty($value) ? "0" : Strings::toString($value),
             default       => Strings::toString($value),
         };
     }

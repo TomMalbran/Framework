@@ -1,16 +1,13 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryMigration;
-use Framework\Discovery\DataFile;
 use Framework\Core\VariableType;
 use Framework\Core\Schema\SettingsSchema;
 use Framework\Core\Schema\SettingsEntity;
 use Framework\Core\Schema\SettingsColumn;
 use Framework\Core\Schema\SettingsQuery;
-use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
@@ -21,6 +18,38 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
 
     public const Core    = "Core";
     public const General = "General";
+
+
+    /** @var array{variable:string,section:string,variableType:VariableType,value:mixed}[] */
+    private static array $settings = [];
+
+
+    /**
+     * Registers a new Setting
+     * @param string       $variable
+     * @param string       $section
+     * @param VariableType $variableType
+     * @param mixed        $value        Optional.
+     * @return boolean
+     */
+    public static function register(
+        string $variable,
+        string $section,
+        VariableType $variableType,
+        mixed $value = "",
+    ): bool {
+        if ($variable === "" || $variable === "example" || $section === "") {
+            return false;
+        }
+
+        self::$settings[] = [
+            "variable"     => $variable,
+            "section"      => $section,
+            "variableType" => $variableType,
+            "value"        => $value,
+        ];
+        return true;
+    }
 
 
 
@@ -182,15 +211,13 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
      * @return array<string,mixed>
      */
     public static function getFileCode(): array {
-        /** @var array<string,array<string,mixed>> */
-        $data = Discovery::loadData(DataFile::Settings);
-        if (Arrays::isEmpty($data)) {
+        if (count(self::$settings) === 0) {
             return [];
         }
 
-        [ $variables, $hasJSON ] = self::getVariables($data);
+        [ $variables, $hasJSON ] = self::getVariables();
         return [
-            "sections"  => self::getSections($data),
+            "sections"  => self::getSections(),
             "variables" => $variables,
             "hasJSON"   => $hasJSON,
             "total"     => count($variables),
@@ -199,13 +226,13 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
 
     /**
      * Returns the Settings Sections for the generator
-     * @param array<string,mixed> $data
      * @return array{section:string,name:string}[]
      */
-    private static function getSections(array $data): array {
+    private static function getSections(): array {
         $result = [];
 
-        foreach (array_keys($data) as $section) {
+        foreach (self::$settings as $setting) {
+            $section = $setting["section"];
             if (!Strings::isEqual($section, Settings::General)) {
                 $result[] = [
                     "section" => $section,
@@ -218,42 +245,42 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
 
     /**
      * Returns the Settings Variables for the generator
-     * @param array<string,array<string,mixed>> $data
      * @return array{array<string,mixed>[],boolean}
      */
-    private static function getVariables(array $data): array {
+    private static function getVariables(): array {
         $result  = [];
         $isFirst = true;
         $hasJSON = false;
 
-        foreach ($data as $section => $variables) {
-            foreach ($variables as $variable => $value) {
-                $isGeneral    = Strings::isEqual($section, Settings::General);
-                $prefix       = !$isGeneral ? Strings::upperCaseFirst($section) : "";
-                $title        = Strings::camelCaseToPascalCase($variable);
-                $variableType = VariableType::get($value, false);
+        foreach (self::$settings as $setting) {
+            $section      = $setting["section"];
+            $variable     = $setting["variable"];
+            $variableType = $setting["variableType"];
 
-                $result[] = [
-                    "isFirst"   => $isFirst,
-                    "section"   => $section,
-                    "variable"  => $variable,
-                    "prefix"    => $prefix,
-                    "title"     => $prefix !== "" ? "$prefix $title" : $title,
-                    "name"      => Strings::upperCaseFirst($variable),
-                    "type"      => VariableType::getType($variableType),
-                    "docType"   => VariableType::getDocType($variableType),
-                    "getter"    => $variableType === VariableType::Boolean ? "is" : "get",
-                    "isBoolean" => $variableType === VariableType::Boolean,
-                    "isInteger" => $variableType === VariableType::Integer,
-                    "isFloat"   => $variableType === VariableType::Float,
-                    "isString"  => $variableType === VariableType::String,
-                    "isArray"   => $variableType === VariableType::Array,
-                ];
+            $isGeneral    = Strings::isEqual($section, Settings::General);
+            $prefix       = !$isGeneral ? Strings::upperCaseFirst($section) : "";
+            $title        = Strings::camelCaseToPascalCase($variable);
 
-                $isFirst = false;
-                if ($variableType === VariableType::Array) {
-                    $hasJSON = true;
-                }
+            $result[] = [
+                "isFirst"   => $isFirst,
+                "section"   => $section,
+                "variable"  => $variable,
+                "prefix"    => $prefix,
+                "title"     => $prefix !== "" ? "$prefix $title" : $title,
+                "name"      => Strings::upperCaseFirst($variable),
+                "type"      => VariableType::getType($variableType),
+                "docType"   => VariableType::getDocType($variableType),
+                "getter"    => $variableType === VariableType::Boolean ? "is" : "get",
+                "isBoolean" => $variableType === VariableType::Boolean,
+                "isInteger" => $variableType === VariableType::Integer,
+                "isFloat"   => $variableType === VariableType::Float,
+                "isString"  => $variableType === VariableType::String,
+                "isArray"   => $variableType === VariableType::Array,
+            ];
+
+            $isFirst = false;
+            if ($variableType === VariableType::Array) {
+                $hasJSON = true;
             }
         }
         return [ $result, $hasJSON ];
@@ -266,9 +293,6 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
      * @return boolean
      */
     public static function migrateData(): bool {
-        /** @var array<string,array<string,mixed>> */
-        $settings = Discovery::loadData(DataFile::Settings);
-
         $query = new SettingsQuery();
         $query->section->notEqual(self::Core);
         $list = self::getEntityList($query);
@@ -280,65 +304,64 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
         $deletes   = [];
 
         // Add/Update Settings
-        foreach ($settings as $section => $data) {
-            foreach ($data as $variable => $value) {
-                $variableType = VariableType::get($value, false);
-                $found        = false;
+        foreach (self::$settings as $setting) {
+            $section      = $setting["section"];
+            $variable     = $setting["variable"];
+            $variableType = $setting["variableType"];
+            $value        = $setting["value"];
+            $found        = false;
 
-                foreach ($list as $elem) {
-                    if ($elem->section === $section && $elem->variable === $variable) {
-                        if ($elem->variableType !== $variableType->name) {
-                            $modifies[] = (object)[
-                                "section"      => $elem->section,
-                                "variable"     => $elem->variable,
-                                "variableType" => $variableType->name,
-                            ];
-                        }
-                        $found = true;
-                        break;
-                    }
-
-                    if (Strings::isEqual($elem->section, $section) && Strings::isEqual($elem->variable, $variable)) {
-                        $renames[] = (object)[
-                            "section"  => $elem->section,
-                            "variable" => $elem->variable,
-                            "fields"   => [
-                                "section"      => $section,
-                                "variable"     => $variable,
-                                "variableType" => $variableType->name,
-                            ],
+            foreach ($list as $elem) {
+                if ($elem->section === $section && $elem->variable === $variable) {
+                    if ($elem->variableType !== $variableType->name) {
+                        $modifies[] = (object)[
+                            "section"      => $elem->section,
+                            "variable"     => $elem->variable,
+                            "variableType" => $variableType->name,
                         ];
-                        $found = true;
-                        break;
                     }
+                    $found = true;
+                    break;
                 }
 
-                if (!$found) {
-                    $variables[] = "{$section}_{$variable}";
-                    $fields      = [
-                        "section"      => $section,
-                        "variable"     => $variable,
-                        "value"        => VariableType::encodeValue($variableType, $value),
-                        "variableType" => $variableType->name,
-                        "modifiedTime" => time(),
+                if (Strings::isEqual($elem->section, $section) && Strings::isEqual($elem->variable, $variable)) {
+                    $renames[] = (object)[
+                        "section"  => $elem->section,
+                        "variable" => $elem->variable,
+                        "fields"   => [
+                            "section"      => $section,
+                            "variable"     => $variable,
+                            "variableType" => $variableType->name,
+                        ],
                     ];
-                    $list[] = new SettingsEntity($fields);
-                    $adds[] = $fields;
+                    $found = true;
+                    break;
                 }
+            }
+
+            if (!$found) {
+                $variables[] = "{$section}_{$variable}";
+                $fields      = [
+                    "section"      => $section,
+                    "variable"     => $variable,
+                    "value"        => VariableType::encodeValue($variableType, $value),
+                    "variableType" => $variableType->name,
+                    "modifiedTime" => time(),
+                ];
+                $list[] = new SettingsEntity($fields);
+                $adds[] = $fields;
             }
         }
 
         // Remove Settings
         foreach ($list as $elem) {
             $found = false;
-            foreach ($settings as $section => $data) {
-                foreach ($data as $variable => $value) {
-                    if (Strings::isEqual($elem->section, $section) &&
-                        Strings::isEqual($elem->variable, $variable)
-                    ) {
-                        $found = true;
-                        break 2;
-                    }
+            foreach (self::$settings as $setting) {
+                if (Strings::isEqual($elem->section, $setting["section"]) &&
+                    Strings::isEqual($elem->variable, $setting["variable"])
+                ) {
+                    $found = true;
+                    break;
                 }
             }
             if (!$found) {
