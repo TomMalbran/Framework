@@ -28,7 +28,7 @@ class EmailContent extends EmailContentSchema {
         $langCode = Language::getCode($language);
 
         $query = new EmailContentQuery();
-        $query->emailCode->equal($emailCode->value);
+        $query->emailCode->equal($emailCode->name);
         $query->language->equal($langCode);
         return self::getEntity($query);
     }

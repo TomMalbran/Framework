@@ -4,12 +4,12 @@ namespace {{namespace}};
 /**
  * The Email Codes
  */
-enum EmailCode : string {
+enum EmailCode {
 
-    case None = "none";
+    case None;
 
-{{#emailCodes}}
-    case {{name}} = "{{value}}";
-{{/emailCodes}}
+{{#codes}}
+    case {{.}};
+{{/codes}}
 
 }
