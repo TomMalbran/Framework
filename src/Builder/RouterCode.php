@@ -3,7 +3,6 @@ namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Route;
-use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use ReflectionNamedType;
@@ -22,12 +21,8 @@ class RouterCode {
         $routes      = [];
         $usedRoutes  = [];
         $errorRoutes = [];
-        $testRoutes  = [];
 
         foreach ($reflections as $className => $reflection) {
-            $baseRoute   = "";
-            $testMethods = [];
-
             // Get the Methods
             $methods = $reflection->getMethods();
 
@@ -80,21 +75,6 @@ class RouterCode {
                     "addSpace"   => false,
                 ];
                 $usedRoutes[$route->route] = true;
-
-                // Add the Test Route
-                $testMethods[$method->getName()] = $route->access->name;
-                if ($baseRoute === "") {
-                    $baseRoute = Strings::substringBefore($route->route, "/", false);
-                }
-            }
-
-            // Store the Test Routes
-            if (count($testMethods) > 0) {
-                $testRoutes[$baseRoute] = [
-                    "static" => true,
-                    "module" => Strings::substringAfter($className, "App\\"),
-                    "routes" => $testMethods,
-                ];
             }
         }
 
@@ -105,11 +85,6 @@ class RouterCode {
         }
         foreach ($routes as $index => $route) {
             $routes[$index]["route"] = Strings::padRight("\"{$route["route"]}\"", $length);
-        }
-
-        // Save the Test Data
-        if (Discovery::hasDataFile("route") && !Arrays::isEmpty($testRoutes)) {
-            Discovery::saveData("routesTest", $testRoutes);
         }
 
         // Show the Error Routes
