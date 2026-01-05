@@ -2,7 +2,6 @@
 namespace Framework\Core;
 
 use Framework\Discovery\Discovery;
-use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\Utils\Arrays;
@@ -53,7 +52,7 @@ class NLS {
         }
 
         /** @var array<string,mixed> */
-        $data = Discovery::loadJSON(Package::StringsDir, $langCode);
+        $data = Discovery::loadStrings($langCode);
         if (!Arrays::isEmpty($data)) {
             self::$data[$langCode] = $data;
             return self::$data[$langCode];

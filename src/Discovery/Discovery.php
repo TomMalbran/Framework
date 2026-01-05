@@ -169,6 +169,16 @@ class Discovery {
     }
 
     /**
+     * Loads the Strings File for the given Language
+     * @param string $langCode
+     * @return array<string,mixed>
+     */
+    public static function loadStrings(string $langCode): array {
+        $result = self::loadJSON(Package::StringsDir, $langCode);
+        return Arrays::toStringMixedMap($result);
+    }
+
+    /**
      * Loads the Emails File for the given Language
      * @param string $langCode
      * @return array<string,mixed>
