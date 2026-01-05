@@ -3,6 +3,7 @@ namespace Framework\Database\Model;
 
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -72,46 +73,46 @@ class Validate {
 
     /**
      * The Validate Attribute
-     * @phpstan-param class-string $typeOf
-     * @phpstan-param class-string $belongsTo
+     * @phpstan-param class-string|null $typeOf
+     * @phpstan-param class-string|null $belongsTo
      *
-     * @param boolean $isRequired  Optional.
-     * @param boolean $isEmail     Optional.
-     * @param boolean $isUrl       Optional.
-     * @param boolean $isColor     Optional.
-     * @param boolean $isNumeric   Optional.
-     * @param boolean $isSigned    Optional.
-     * @param boolean $isPrice     Optional.
-     * @param string  $typeOf      Optional.
-     * @param string  $belongsTo   Optional.
-     * @param string  $method      Optional.
-     * @param boolean $withParent  Optional.
-     * @param integer $maxLength   Optional.
-     * @param integer $minValue    Optional.
-     * @param integer $maxValue    Optional.
-     * @param string  $prefix      Optional.
-     * @param string  $belongsName Optional.
+     * @param boolean     $isRequired  Optional.
+     * @param boolean     $isEmail     Optional.
+     * @param boolean     $isUrl       Optional.
+     * @param boolean     $isColor     Optional.
+     * @param boolean     $isNumeric   Optional.
+     * @param boolean     $isSigned    Optional.
+     * @param boolean     $isPrice     Optional.
+     * @param string|null $typeOf      Optional.
+     * @param string|null $belongsTo   Optional.
+     * @param string      $method      Optional.
+     * @param boolean     $withParent  Optional.
+     * @param integer     $maxLength   Optional.
+     * @param integer     $minValue    Optional.
+     * @param integer     $maxValue    Optional.
+     * @param string      $prefix      Optional.
+     * @param string      $belongsName Optional.
      */
     public function __construct(
-        bool   $isRequired  = false,
-        bool   $isEmail     = false,
-        bool   $isUrl       = false,
-        bool   $isColor     = false,
-        bool   $isNumeric   = false,
-        bool   $isSigned    = false,
-        bool   $isPrice     = false,
+        bool    $isRequired  = false,
+        bool    $isEmail     = false,
+        bool    $isUrl       = false,
+        bool    $isColor     = false,
+        bool    $isNumeric   = false,
+        bool    $isSigned    = false,
+        bool    $isPrice     = false,
 
-        string $typeOf      = "",
-        string $belongsTo   = "",
-        string $method      = "",
-        bool   $withParent  = false,
+        ?string $typeOf      = null,
+        ?string $belongsTo   = null,
+        string  $method      = "",
+        bool    $withParent  = false,
 
-        int    $maxLength   = 0,
-        int    $minValue    = 0,
-        int    $maxValue    = 0,
+        int     $maxLength   = 0,
+        int     $minValue    = 0,
+        int     $maxValue    = 0,
 
-        string $prefix      = "",
-        string $belongsName = "",
+        string  $prefix      = "",
+        string  $belongsName = "",
     ) {
         $this->isRequired  = $isRequired;
         $this->isEmail     = $isEmail;
@@ -121,8 +122,8 @@ class Validate {
         $this->isSigned    = $isSigned;
         $this->isPrice     = $isPrice;
 
-        $this->typeOf      = $typeOf;
-        $this->belongsTo   = $belongsTo;
+        $this->typeOf      = $typeOf ?? "";
+        $this->belongsTo   = $belongsTo ?? "";
         $this->method      = $method;
         $this->withParent  = $withParent;
 
@@ -133,10 +134,12 @@ class Validate {
         $this->prefix      = Strings::toUpperCase($prefix);
         $this->belongsName = Strings::toUpperCase($belongsName);
 
-        if ($this->method === "" && $this->typeOf !== "") {
-            $this->method = "isValid";
-        } elseif ($this->method === "" && $this->belongsTo !== "") {
-            $this->method = "exists";
+        if ($this->method === "") {
+            if (!Arrays::isEmpty($this->typeOf)) {
+                $this->method = "isValid";
+            } elseif (!Arrays::isEmpty($this->belongsTo)) {
+                $this->method = "exists";
+            }
         }
     }
 
@@ -222,7 +225,7 @@ class Validate {
     public function getFieldError(): string {
         $fieldName = trim(ucfirst($this->name));
         $fieldName = Strings::stripEnd($fieldName, "ID");
-        $fieldName = Strings::PascalCaseToUpperCase($fieldName);
+        $fieldName = Strings::pascalCaseToUpperCase($fieldName);
 
         return "{$this->prefix}_ERROR_{$fieldName}";
     }
@@ -233,7 +236,7 @@ class Validate {
      */
     public function getTypeError(): string {
         $typeName = Strings::substringAfter($this->typeOf, "\\");
-        return Strings::PascalCaseToUpperCase($typeName);
+        return Strings::pascalCaseToUpperCase($typeName);
     }
 
     /**
@@ -244,7 +247,7 @@ class Validate {
         $prefix = $this->belongsName;
         if ($prefix === "") {
             $belongsName = Strings::substringAfter($this->belongsTo, "\\");
-            $prefix      = Strings::PascalCaseToUpperCase($belongsName);
+            $prefix      = Strings::pascalCaseToUpperCase($belongsName);
         }
         return "{$prefix}_ERROR_EXISTS";
     }
