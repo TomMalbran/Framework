@@ -6,7 +6,6 @@ use Framework\Discovery\DiscoveryMigration;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Database\SchemaMigration;
 use Framework\Core\Configs;
-use Framework\Email\EmailContent;
 
 /**
  * The Database Migration
@@ -33,8 +32,6 @@ class Migration {
         SchemaMigration::migrateData($delete);
 
 
-        print("\nEMAIL MIGRATIONS\n");
-        EmailContent::migrateData();
         /** @var DiscoveryMigration[] */
         $frameMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class, forFramework: true);
         if (count($frameMigrations) > 0) {

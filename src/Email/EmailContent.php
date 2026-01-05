@@ -2,11 +2,11 @@
 namespace Framework\Email;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryMigration;
 use Framework\Email\Schema\EmailContentSchema;
 use Framework\Email\Schema\EmailContentEntity;
 use Framework\Email\Schema\EmailContentQuery;
 use Framework\Provider\Mustache;
-use Framework\System\Package;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\System\EmailCode;
@@ -16,7 +16,7 @@ use Framework\Utils\Strings;
 /**
  * The Email Contents
  */
-class EmailContent extends EmailContentSchema {
+class EmailContent extends EmailContentSchema implements DiscoveryMigration {
 
     /**
      * Returns an Email Content for the Email Sender
@@ -32,8 +32,6 @@ class EmailContent extends EmailContentSchema {
         $query->language->equal($langCode);
         return self::getEntity($query);
     }
-
-
 
     /**
      * Renders the Email Content message with Mustache
@@ -52,6 +50,8 @@ class EmailContent extends EmailContentSchema {
         return $result;
     }
 
+
+
     /**
      * Migrates the Email Contents data
      * @return boolean
@@ -64,9 +64,7 @@ class EmailContent extends EmailContentSchema {
         $didUpdate = false;
 
         foreach ($languages as $language => $languageName) {
-            /** @var array<string,string>[] */
-            $emails = Discovery::loadJSON(Package::EmailsDir, $language);
-
+            $emails = Discovery::loadEmails($language);
             if (!Arrays::isEmpty($emails)) {
                 $position  = self::migrateLanguage($emails, $language, $languageName, $position);
                 $didUpdate = true;
@@ -82,18 +80,19 @@ class EmailContent extends EmailContentSchema {
 
     /**
      * Migrates the Email Templates for the given Language
-     * @param array<string,string>[] $emails
-     * @param string                 $language
-     * @param string                 $languageName
-     * @param integer                $position
+     * @param array<string,mixed> $emails
+     * @param string              $language
+     * @param string              $languageName
+     * @param integer             $position
      * @return integer
      */
     private static function migrateLanguage(array $emails, string $language, string $languageName, int $position): int {
         $siteName = Config::getName();
         $total    = 0;
 
-        foreach ($emails as $emailCode => $email) {
-            $message   = Strings::join($email["message"], "\n\n");
+        foreach ($emails as $emailCode => $emailData) {
+            $data      = Arrays::toStringMixedMap($emailData);
+            $message   = Strings::join($data["message"], "\n\n");
             $position += 1;
             $total    += 1;
 
@@ -101,8 +100,8 @@ class EmailContent extends EmailContentSchema {
                 emailCode:    $emailCode,
                 language:     $language,
                 languageName: $languageName,
-                description:  $email["description"],
-                subject:      Strings::replace($email["subject"], "[site]", $siteName),
+                description:  Strings::toString($data["description"]),
+                subject:      Strings::replace(Strings::toString($data["subject"]), "[site]", $siteName),
                 message:      Strings::replace($message, "[site]", $siteName),
                 position:     $position,
                 skipOrder:    true,

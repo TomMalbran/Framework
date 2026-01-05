@@ -3,6 +3,7 @@ namespace Framework\Discovery;
 
 use Framework\File\File;
 use Framework\System\Package;
+use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 use Framework\Utils\JSON;
@@ -165,6 +166,16 @@ class Discovery {
      */
     public static function loadData(DataFile $file): array {
         return self::loadJSON(Package::DataDir, $file->name());
+    }
+
+    /**
+     * Loads the Emails File for the given Language
+     * @param string $langCode
+     * @return array<string,mixed>
+     */
+    public static function loadEmails(string $langCode): array {
+        $result = self::loadJSON(Package::EmailsDir, $langCode);
+        return Arrays::toStringMixedMap($result);
     }
 
     /**
