@@ -72,4 +72,22 @@ class SchemaBuilder {
         print("- Generated the $name codes -> $models models ($created files)\n");
         return $created;
     }
+
+    /**
+     * Destroys the Code for the Schemas
+     * @param boolean $forFramework
+     * @return integer
+     */
+    public static function destroyCode(bool $forFramework): int {
+        $schemaModels = SchemaFactory::buildData($forFramework);
+        $deleted      = 0;
+
+        foreach ($schemaModels as $schemaModel) {
+            if (!$schemaModel->fromFramework) {
+                File::deleteDir($schemaModel->path);
+                $deleted += 1;
+            }
+        }
+        return $deleted;
+    }
 }

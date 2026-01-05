@@ -459,22 +459,28 @@ class File {
 
     /**
      * Deletes a directory and it's content
-     * @param string $path
+     * @param string  $path
+     * @param integer $deleted
      * @return boolean
      */
-    public static function deleteDir(string $path): bool {
+    public static function deleteDir(string $path, int &$deleted = 0): bool {
         if (is_dir($path)) {
             $files = self::scanPath($path);
             foreach ($files as $file) {
                 if ($file !== "." && $file !== "..") {
-                    self::deleteDir("$path/$file");
+                    self::deleteDir("$path/$file", $deleted);
                 }
             }
             rmdir($path);
         } elseif (file_exists($path)) {
             unlink($path);
         }
-        return !file_exists($path);
+
+        if (!file_exists($path)) {
+            $deleted += 1;
+            return true;
+        }
+        return false;
     }
 
     /**

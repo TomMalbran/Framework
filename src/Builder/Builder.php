@@ -82,6 +82,31 @@ class Builder {
     }
 
     /**
+     * Destroys all the Code
+     * @return boolean
+     */
+    #[ConsoleCommand("destroy")]
+    public static function destroy(): bool {
+        $writePath = Discovery::getBuildPath();
+        $deleted   = 0;
+        File::deleteDir($writePath, $deleted);
+
+        $deleted += SchemaBuilder::destroyCode(forFramework: true);
+        $deleted += SchemaBuilder::destroyCode(forFramework: false);
+
+        /** @var DiscoveryBuilder[] */
+        $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
+        foreach ($appBuilders as $builder) {
+            $deleted += $builder::destroyCode();
+        }
+
+        print("\nDestroyed $deleted generated files\n");
+        return true;
+    }
+
+
+
+    /**
      * Returns the Package Data
      * @return array<string,string>
      */
