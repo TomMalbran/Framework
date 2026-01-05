@@ -41,6 +41,7 @@ class NotificationBuilder implements DiscoveryCode {
 
         return [
             "codes" => $codes,
+            "total" => count($codes),
         ];
     }
 }

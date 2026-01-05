@@ -44,6 +44,7 @@ class MediaCode implements DiscoveryCode {
         return [
             "namespace" => Discovery::getBuildNamespace(),
             "fields"    => $fields,
+            "total"     => count($fields),
         ];
     }
 }

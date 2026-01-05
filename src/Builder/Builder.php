@@ -118,9 +118,14 @@ class Builder {
         $contents = self::render("system/$name", $data + [
             "namespace" => Discovery::getBuildNamespace(),
         ]);
-
         File::create($writePath, "$name.php", $contents);
-        print("- Generated the $name code\n");
+
+        $total = "";
+        if (isset($data["total"]) && is_int($data["total"])) {
+            $plural = $data["total"] !== 1 ? "s" : "";
+            $total  = "-> {$data["total"]} item$plural";
+        }
+        print("- Generated the $name code $total\n");
         return 1;
     }
 

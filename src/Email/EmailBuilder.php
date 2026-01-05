@@ -41,6 +41,7 @@ class EmailBuilder implements DiscoveryCode {
 
         return [
             "codes" => $codes,
+            "total" => count($codes),
         ];
     }
 }

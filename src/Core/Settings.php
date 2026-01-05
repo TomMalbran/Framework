@@ -193,16 +193,17 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
             "sections"  => self::getSections($data),
             "variables" => $variables,
             "hasJSON"   => $hasJSON,
+            "total"     => count($variables),
         ];
     }
 
     /**
      * Returns the Settings Sections for the generator
      * @param array<string,mixed> $data
-     * @return mixed[]
+     * @return array{section:string,name:string}[]
      */
     private static function getSections(array $data): array {
-        $result  = [];
+        $result = [];
 
         foreach (array_keys($data) as $section) {
             if (!Strings::isEqual($section, Settings::General)) {
@@ -218,7 +219,7 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
     /**
      * Returns the Settings Variables for the generator
      * @param array<string,array<string,mixed>> $data
-     * @return mixed[]
+     * @return array{array<string,mixed>[],boolean}
      */
     private static function getVariables(array $data): array {
         $result  = [];

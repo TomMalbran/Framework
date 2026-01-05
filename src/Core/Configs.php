@@ -286,13 +286,14 @@ class Configs implements DiscoveryCode {
             "environments" => $environments,
             "urls"         => $urls,
             "properties"   => $properties,
+            "total"        => count($properties),
         ];
     }
 
     /**
      * Returns the Config Properties for the generator
      * @param array<string,mixed> $data
-     * @return mixed[]
+     * @return array{array<string,mixed>[],array<string,mixed>[]}
      */
     private static function getProperties(array $data): array {
         $urls       = [];
