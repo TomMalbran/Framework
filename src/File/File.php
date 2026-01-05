@@ -460,7 +460,7 @@ class File {
     /**
      * Deletes a directory and it's content
      * @param string  $path
-     * @param integer $deleted
+     * @param integer $deleted Optional.
      * @return boolean
      */
     public static function deleteDir(string $path, int &$deleted = 0): bool {
@@ -481,15 +481,16 @@ class File {
 
     /**
      * Deletes all the content from a directory
-     * @param string $path
+     * @param string  $path
+     * @param integer $deleted Optional.
      * @return boolean
      */
-    public static function emptyDir(string $path): bool {
+    public static function emptyDir(string $path, int &$deleted = 0): bool {
         $files  = self::scanPath($path);
         $result = true;
         foreach ($files as $file) {
             if ($file !== "." && $file !== "..") {
-                if (!self::deleteDir("$path/$file")) {
+                if (!self::deleteDir("$path/$file", $deleted)) {
                     $result = false;
                 }
             }
