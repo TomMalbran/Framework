@@ -7,7 +7,6 @@ use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\DataFile;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Builder\AccessCode;
-use Framework\Builder\ConfigCode;
 use Framework\Builder\LanguageCode;
 use Framework\Builder\RouterCode;
 use Framework\Builder\SignalCode;
@@ -78,7 +77,6 @@ class Builder {
 
 
         print("\nFRAMEWORK FINAL CODES\n");
-        $files += self::generateOne($writePath, "Config", ConfigCode::getCode());
         $files += self::generateOne($writePath, "Signal", SignalCode::getCode());
         $files += self::generateOne($writePath, "Router", RouterCode::getCode());
 

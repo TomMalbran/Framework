@@ -2,6 +2,8 @@
 namespace Framework\Core;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryCode;
+use Framework\Core\VariableType;
 use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
@@ -12,7 +14,7 @@ use Framework\Utils\Utils;
 /**
  * The Configs
  */
-class Configs {
+class Configs implements DiscoveryCode {
 
     private static bool   $loaded      = false;
     private static string $environment = "local";
@@ -249,5 +251,83 @@ class Configs {
         }
         $value = Strings::toString($value);
         return Strings::split($value, ",");
+    }
+
+
+
+    /**
+     * Returns the File Name to Generate
+     * @return string
+     */
+    public static function getFileName(): string {
+        return "Config";
+    }
+
+    /**
+     * Returns the File Code to Generate
+     * @return array<string,mixed>
+     */
+    public static function getFileCode(): array {
+        $data = self::getData();
+        if (Arrays::isEmpty($data)) {
+            return [];
+        }
+
+        $environments = [];
+        foreach (self::getEnvironments() as $environment) {
+            $environments[] = [
+                "name"        => Strings::upperCaseFirst($environment),
+                "environment" => $environment,
+            ];
+        }
+
+        [ $urls, $properties ] = self::getProperties($data);
+        return [
+            "environments" => $environments,
+            "urls"         => $urls,
+            "properties"   => $properties,
+        ];
+    }
+
+    /**
+     * Returns the Config Properties for the generator
+     * @param array<string,mixed> $data
+     * @return mixed[]
+     */
+    private static function getProperties(array $data): array {
+        $urls       = [];
+        $properties = [];
+
+        foreach ($data as $envKey => $value) {
+            $property = Strings::upperCaseToCamelCase($envKey);
+            $title    = Strings::upperCaseToPascalCase($envKey);
+            $name     = Strings::upperCaseFirst($property);
+
+            if (Strings::endsWith($envKey, "URL")) {
+                $urls[] = [
+                    "property" => $property,
+                    "name"     => $name,
+                    "title"    => $title,
+                ];
+                continue;
+            }
+
+            $variableType = VariableType::get($value, true);
+            $properties[] = [
+                "property"  => $property,
+                "name"      => $name,
+                "title"     => $title,
+                "type"      => VariableType::getType($variableType),
+                "docType"   => VariableType::getDocType($variableType),
+                "getter"    => $variableType === VariableType::Boolean ? "is" : "get",
+                "isString"  => $variableType === VariableType::String,
+                "isBoolean" => $variableType === VariableType::Boolean,
+                "isInteger" => $variableType === VariableType::Integer,
+                "isFloat"   => $variableType === VariableType::Float,
+                "isList"    => $variableType === VariableType::List,
+            ];
+        }
+
+        return [ $urls, $properties ];
     }
 }
