@@ -58,11 +58,12 @@ class Count {
 
     /**
      * Creates a Count
-     * @param string $name
-     * @param string $modelName
-     * @param string $otherModelName
-     * @param string $fieldName
-     * @param string $query
+     * @param string  $name
+     * @param string  $modelName
+     * @param string  $otherModelName
+     * @param string  $fieldName
+     * @param string  $query
+     * @param boolean $hasDeleted
      * @return Count
      */
     public static function create(
@@ -71,6 +72,7 @@ class Count {
         string $otherModelName,
         string $fieldName,
         string $query,
+        bool   $hasDeleted,
     ): Count {
         $result = new self();
         $result->name           = $name;
@@ -78,6 +80,7 @@ class Count {
         $result->otherModelName = $otherModelName;
         $result->fieldName      = $fieldName;
         $result->query          = $query;
+        $result->hasDeleted     = $hasDeleted;
         return $result;
     }
 
@@ -134,13 +137,16 @@ class Count {
      * @return string
      */
     private function getWhere(): string {
-        if ($this->query === "" && !$this->hasDeleted) {
-            return "";
+        $query = [];
+        if ($this->query !== "") {
+            $query[] = $this->query;
         }
-
-        $query = [ $this->query ];
         if ($this->hasDeleted) {
             $query[] = "isDeleted = 0";
+        }
+
+        if (count($query) === 0) {
+            return "";
         }
         return "WHERE " . Strings::join($query, " AND ");
     }
@@ -178,6 +184,7 @@ class Count {
             "otherModelName" => $this->otherModelName,
             "fieldName"      => $this->fieldName,
             "query"          => $this->query,
+            "hasDeleted"     => $this->hasDeleted,
         ];
     }
 
