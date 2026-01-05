@@ -1,14 +1,12 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Discovery\Discovery;
 use Framework\Database\SchemaFactory;
 use Framework\Database\Builder\SchemaCode;
 use Framework\Database\Builder\EntityCode;
 use Framework\Database\Builder\ColumnCode;
 use Framework\Database\Builder\QueryCode;
 use Framework\Database\Builder\StatusCode;
-use Framework\Database\Builder\MediaCode;
 use Framework\File\File;
 
 /**
@@ -61,12 +59,6 @@ class SchemaBuilder {
             }
         }
 
-        if (!$forFramework) {
-            $writePath = Discovery::getBuildPath();
-            $mediaCode = MediaCode::getCode($schemaModels);
-            File::create($writePath, "MediaSchema.php", $mediaCode);
-        }
-
         $name   = $forFramework ? "Framework" : "App";
         $models = count($schemaModels);
         print("- Generated the $name codes -> $models models ($created files)\n");
@@ -80,14 +72,13 @@ class SchemaBuilder {
      */
     public static function destroyCode(bool $forFramework): int {
         $schemaModels = SchemaFactory::buildData($forFramework);
-        $deleted      = 0;
+        $deletedFiles = 0;
 
         foreach ($schemaModels as $schemaModel) {
             if (!$schemaModel->fromFramework) {
-                File::deleteDir($schemaModel->path);
-                $deleted += 1;
+                File::deleteDir($schemaModel->path, $deletedFiles);
             }
         }
-        return $deleted;
+        return $deletedFiles;
     }
 }

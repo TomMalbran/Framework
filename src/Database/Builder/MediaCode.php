@@ -2,21 +2,30 @@
 namespace Framework\Database\Builder;
 
 use Framework\Discovery\Discovery;
-use Framework\Database\SchemaModel;
-use Framework\Builder\Builder;
+use Framework\Discovery\DiscoveryCode;
+use Framework\Database\SchemaFactory;
 use Framework\Utils\Strings;
 
 /**
  * The Media Code
  */
-class MediaCode {
+class MediaCode implements DiscoveryCode {
 
     /**
-     * Generates the Media code for all Schemas with File fields
-     * @param SchemaModel[] $schemaModels
+     * Returns the File Name to Generate
      * @return string
      */
-    public static function getCode(array $schemaModels): string {
+    public static function getFileName(): string {
+        return "MediaSchema";
+    }
+
+    /**
+     * Returns the File Code to Generate
+     * @return array<string,mixed>
+     */
+    public static function getFileCode(): array {
+        $schemaModels = SchemaFactory::buildData(false);
+
         $fields = [];
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->fields as $field) {
@@ -32,10 +41,9 @@ class MediaCode {
             }
         }
 
-        $contents = Builder::render("database/Media", [
+        return [
             "namespace" => Discovery::getBuildNamespace(),
             "fields"    => $fields,
-        ]);
-        return $contents;
+        ];
     }
 }
