@@ -30,22 +30,21 @@ class Builder {
         print("Building the Code...\n");
 
         $writePath = Discovery::getBuildPath();
-        $files     = 0;
-
+        $created   = 0;
 
         File::createDir($writePath);
         File::emptyDir($writePath);
 
 
         print("\nFRAMEWORK MAIN CODES\n");
-        $files += self::generateOne($writePath, "Path",     FilePath::getCode());
-        $files += self::generateOne($writePath, "Language", LanguageCode::getCode());
-        $files += self::generateOne($writePath, "Access",   AccessCode::getCode());
+        $created += self::generateOne($writePath, "Path",     FilePath::getCode());
+        $created += self::generateOne($writePath, "Language", LanguageCode::getCode());
+        $created += self::generateOne($writePath, "Access",   AccessCode::getCode());
 
 
         print("\nFRAMEWORK SCHEMA CODES\n");
-        $files += SchemaBuilder::generateCode(forFramework: true);
-        $files += SchemaBuilder::generateCode(forFramework: false);
+        $created += SchemaBuilder::generateCode(forFramework: true);
+        $created += SchemaBuilder::generateCode(forFramework: false);
 
 
         /** @var DiscoveryCode[] */
@@ -53,14 +52,14 @@ class Builder {
         if (count($frameCodes) > 0) {
             print("\nFRAMEWORK BUILDER CODES\n");
             foreach ($frameCodes as $code) {
-                $files += self::generateOne($writePath, $code::getFileName(), $code::getFileCode());
+                $created += self::generateOne($writePath, $code::getFileName(), $code::getFileCode());
             }
         }
 
 
         print("\nFRAMEWORK FINAL CODES\n");
-        $files += self::generateOne($writePath, "Signal", SignalCode::getCode());
-        $files += self::generateOne($writePath, "Router", RouterCode::getCode());
+        $created += self::generateOne($writePath, "Signal", SignalCode::getCode());
+        $created += self::generateOne($writePath, "Router", RouterCode::getCode());
 
 
         /** @var DiscoveryBuilder[] */
@@ -68,11 +67,11 @@ class Builder {
         if (count($appBuilders) > 0) {
             print("\nAPP CODES\n");
             foreach ($appBuilders as $builder) {
-                $files += $builder::generateCode();
+                $created += $builder::generateCode();
             }
         }
 
-        print("\nGenerated $files files\n");
+        print("\nGenerated $created files\n");
         return true;
     }
 

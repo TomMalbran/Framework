@@ -474,13 +474,9 @@ class File {
             rmdir($path);
         } elseif (file_exists($path)) {
             unlink($path);
-        }
-
-        if (!file_exists($path)) {
             $deleted += 1;
-            return true;
         }
-        return false;
+        return !file_exists($path);
     }
 
     /**
