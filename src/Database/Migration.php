@@ -6,7 +6,6 @@ use Framework\Discovery\DiscoveryMigration;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Database\SchemaMigration;
 use Framework\Core\Configs;
-use Framework\Core\Settings;
 use Framework\Email\EmailContent;
 
 /**
@@ -33,8 +32,6 @@ class Migration {
         print("\nDATABASE MIGRATIONS\n");
         SchemaMigration::migrateData($delete);
 
-        print("\nSETTINGS MIGRATIONS\n");
-        Settings::migrateData();
 
         print("\nEMAIL MIGRATIONS\n");
         EmailContent::migrateData();

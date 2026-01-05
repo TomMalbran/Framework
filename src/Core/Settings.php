@@ -2,6 +2,7 @@
 namespace Framework\Core;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryMigration;
 use Framework\Discovery\DataFile;
 use Framework\Core\VariableType;
 use Framework\Core\Schema\SettingsSchema;
@@ -14,7 +15,7 @@ use Framework\Utils\Strings;
 /**
  * The Settings
  */
-class Settings extends SettingsSchema {
+class Settings extends SettingsSchema implements DiscoveryMigration {
 
     public const Core    = "Core";
     public const General = "General";
