@@ -12,7 +12,6 @@ use Framework\Builder\LanguageCode;
 use Framework\Builder\RouterCode;
 use Framework\Builder\SettingCode;
 use Framework\Builder\SignalCode;
-use Framework\Builder\EmailCode;
 use Framework\Database\SchemaBuilder;
 use Framework\File\File;
 use Framework\File\FilePath;
@@ -58,11 +57,10 @@ class Builder {
 
 
         print("\nFRAMEWORK MAIN CODES\n");
-        $files += self::generateOne($writePath, "Package",   $package);
-        $files += self::generateOne($writePath, "Path",      FilePath::getCode());
-        $files += self::generateOne($writePath, "Language",  LanguageCode::getCode());
-        $files += self::generateOne($writePath, "Access",    AccessCode::getCode());
-        $files += self::generateOne($writePath, "EmailCode", EmailCode::getCode());
+        $files += self::generateOne($writePath, "Package",  $package);
+        $files += self::generateOne($writePath, "Path",     FilePath::getCode());
+        $files += self::generateOne($writePath, "Language", LanguageCode::getCode());
+        $files += self::generateOne($writePath, "Access",   AccessCode::getCode());
 
 
         print("\nnFRAMEWORK SCHEMA CODES\n");
