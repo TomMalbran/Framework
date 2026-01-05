@@ -306,34 +306,78 @@ class Discovery {
         if ($forFramework) {
             $namespace  = Package::FrameNamespace;
             $sourcePath = self::getFramePath(Package::FrameSourceDir);
-            $filesPath  = self::getFramePath(Package::FrameSourceDir, $dir);
         } else {
             $namespace  = Package::getAppNamespace();
             $sourcePath = self::getSourcePath();
-            $filesPath  = self::getSourcePath($dir);
         }
 
-        $filePaths  = File::getFilesInDir($filesPath, true);
+        $filePaths  = File::getFilesInDir($sourcePath, true);
         $classPaths = [];
         $result     = [];
 
-        foreach ($files as $file) {
-            if (!Strings::endsWith($file, ".php")) {
+        // Find all the Classes
+        foreach ($filePaths as $filePath) {
+            if (!Strings::endsWith($filePath, ".php")) {
                 continue;
             }
 
-            // Skip some ignored directories
-            if ($skipIgnored && Strings::contains($file, "/Schema/", "/System/")) {
-                continue;
-            }
-
-            $className = Strings::replace($file, [ $sourcePath, ".php" ], "");
+            $className = Strings::replace($filePath, [ $sourcePath, ".php" ], "");
             $className = Strings::substringAfter($className, "/", true);
             $className = Strings::replace($className, "/", "\\");
-            $className = "\\{$namespace}{$className}";
+            $className = "{$namespace}{$className}";
 
-            $classKey = Strings::substringAfter($className, "\\");
-            $result[$className] = $classKey;
+            $classPaths[$className] = $filePath;
+        }
+
+        // Filter the Classes that have all their dependencies available
+        foreach ($classPaths as $className => $filePath) {
+            // Skip some ignored directories
+            if ($skipIgnored && Strings::contains($filePath, "/Schema/", "/System/")) {
+                continue;
+            }
+
+            // Skip using the given Directory
+            if ($dir !== "" && !Strings::contains($filePath, "/$dir/")) {
+                continue;
+            }
+
+            $file        = File::read($filePath);
+            $lines       = Strings::split($file, "\n", trim: true, skipEmpty: true);
+            $usedClasses = [];
+            $isValid     = true;
+
+            foreach ($lines as $line) {
+                if (Strings::startsWith($line, "use ")) {
+                    $usedClass     = Strings::substringBetween($line, "use ", ";");
+                    $usedClassName = Strings::substringAfter($usedClass, "\\");
+                    $usedClasses[$usedClassName] = $usedClass;
+                    continue;
+                }
+
+                // Only Validate the Classes for the current Namespace
+                $namespace = Package::FrameNamespace;
+                if (!$forFramework) {
+                    $namespace = Package::getAppNamespace();
+                }
+
+                // Check that the used Class exists
+                if (Strings::startsWith($line, "class") && Strings::contains($line, "extends")) {
+                    $parentExtends = Strings::substringBetween($line, "extends ", " ");
+                    $parentClasses = Strings::split($parentExtends, ",", trim: true);
+                    foreach ($parentClasses as $parentClass) {
+                        $fullClassName = $usedClasses[$parentClass] ?? "";
+                        if (Strings::startsWith($fullClassName, $namespace) && !isset($classPaths[$fullClassName])) {
+                            $isValid = false;
+                            break 2;
+                        }
+                    }
+                }
+            }
+
+            if ($isValid) {
+                $classKey = Strings::substringAfter($className, "\\");
+                $result["\\$className"] = $classKey;
+            }
         }
         return $result;
     }
