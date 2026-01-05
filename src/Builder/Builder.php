@@ -6,7 +6,6 @@ use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\ConsoleCommand;
-use Framework\Builder\AccessCode;
 use Framework\Builder\LanguageCode;
 use Framework\Builder\RouterCode;
 use Framework\Builder\SignalCode;
@@ -41,7 +40,6 @@ class Builder {
         print("\nFRAMEWORK MAIN CODES\n");
         $created += self::generateOne($writePath, "Path",     FilePath::getCode());
         $created += self::generateOne($writePath, "Language", LanguageCode::getCode());
-        $created += self::generateOne($writePath, "Access",   AccessCode::getCode());
 
 
         print("\nFRAMEWORK SCHEMA CODES\n");

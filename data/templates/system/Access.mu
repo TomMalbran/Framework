@@ -12,13 +12,13 @@ use Framework\Utils\Select;
 enum Access {
 
     case None;
-{{#accesses}}
+{{#roles}}
 {{#addSpace}}
 
     // {{group}}
 {{/addSpace}}
     case {{name}};
-{{/accesses}}
+{{/roles}}
 
 
 
@@ -57,9 +57,9 @@ enum Access {
      */
     public static function getLevel(Access|string $value): int {
         return match (self::fromValue($value)) {
-        {{#accesses}}
+        {{#roles}}
             self::{{constant}} => {{level}},
-        {{/accesses}}
+        {{/roles}}
             {{default}} => 0,
         };
     }
@@ -83,7 +83,7 @@ enum Access {
 
 
 
-{{#accesses}}
+{{#roles}}
     /**
      * Returns true if the current user is an {{name}}
      * @return boolean
@@ -110,7 +110,7 @@ enum Access {
 
 
 
-{{/accesses}}
+{{/roles}}
 {{#groups}}
     /**
      * Returns true if the current user is in the group {{name}}
@@ -125,7 +125,7 @@ enum Access {
 
 
     /**
-     * Returns true if the given value is one of: {{accesses}}
+     * Returns true if the given value is one of: {{roles}}
      * @param Access|string $value
      * @return boolean
      */
@@ -134,7 +134,7 @@ enum Access {
     }
 
     /**
-     * Returns an array with the values of: {{accesses}}
+     * Returns an array with the values of: {{roles}}
      * @return Access[]
      */
     public static function get{{name}}s(): array {
@@ -142,7 +142,7 @@ enum Access {
     }
 
     /**
-     * Returns a Select for the values: {{accesses}}
+     * Returns a Select for the values: {{roles}}
      * @param string $isoCode Optional.
      * @return Select[]
      */

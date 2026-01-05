@@ -270,15 +270,6 @@ class Discovery {
     }
 
     /**
-     * Loads a Data File
-     * @param DataFile $file
-     * @return array<string,mixed>
-     */
-    public static function loadFrameData(DataFile $file): array {
-        return self::loadFrameJSON(Package::DataDir, $file->name());
-    }
-
-    /**
      * Loads a Template File
      * @param string $fileName
      * @return string

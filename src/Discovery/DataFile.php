@@ -9,7 +9,6 @@ use Framework\Utils\Strings;
 enum DataFile {
 
     case Migrations;
-    case Access;
     case Files;
     case Settings;
 
