@@ -2,6 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\DataFile;
 use Framework\Discovery\ConsoleCommand;
@@ -64,12 +65,22 @@ class Builder {
         $files += self::generateOne($writePath, "EmailCode", EmailCode::getCode());
 
 
-        print("\nSCHEMA CODES\n");
+        print("\nnFRAMEWORK SCHEMA CODES\n");
         $files += SchemaBuilder::generateCode(forFramework: true);
         $files += SchemaBuilder::generateCode(forFramework: false);
 
 
-        print("\nFRAMEWORK SEC CODES\n");
+        /** @var DiscoveryCode[] */
+        $frameCodes = Discovery::getClassesWithInterface(DiscoveryCode::class, forFramework: true);
+        if (count($frameCodes) > 0) {
+            print("\nFRAMEWORK BUILDER CODES\n");
+            foreach ($frameCodes as $code) {
+                $files += self::generateOne($writePath, $code::getFileName(), $code::getFileCode());
+            }
+        }
+
+
+        print("\nFRAMEWORK FINAL CODES\n");
         $files += self::generateOne($writePath, "Setting",  SettingCode::getCode());
         $files += self::generateOne($writePath, "Config",   ConfigCode::getCode());
         $files += self::generateOne($writePath, "Signal",   SignalCode::getCode());
