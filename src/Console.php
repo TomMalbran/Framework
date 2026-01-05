@@ -1,10 +1,10 @@
 <?php
 namespace Framework;
 
-use Framework\System\Package;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Discovery\Priority;
+use Framework\Discovery\Package;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -50,7 +50,8 @@ class Console {
     #[ConsoleCommand("version", "-v")]
     #[Priority(Priority::Highest)]
     public static function version(): bool {
-        print("Version: " . Package::Version . "\n");
+        $version = Package::getVersion();
+        print("Version: $version\n");
         return true;
     }
 

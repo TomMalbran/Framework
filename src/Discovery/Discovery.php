@@ -2,7 +2,7 @@
 namespace Framework\Discovery;
 
 use Framework\File\File;
-use Framework\System\Package;
+use Framework\Discovery\Package;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -19,21 +19,12 @@ use Throwable;
  */
 class Discovery {
 
-    private const Namespace     = "Framework\\";
-    private const SystemDir     = "System";
-    private const DataDir       = "data";
-    private const TemplateDir   = "data/templates";
-    private const MigrationsDir = "migrations";
-    private const EmailFile     = "email.html";
-
-
-
     /**
      * Returns the Namespace used in the Builder
      * @return string
      */
     public static function getBuildNamespace(): string {
-        return self::Namespace . self::SystemDir;
+        return Package::FrameNamespace . Package::SystemDir;
     }
 
 
@@ -49,7 +40,7 @@ class Discovery {
             return self::getFramePath();
         }
         if ($forBackend) {
-            return self::getIndexPath(Package::AppDir);
+            return self::getIndexPath(Package::getAppBaseDir());
         }
         return self::getIndexPath();
     }
@@ -84,7 +75,16 @@ class Discovery {
      * @return string
      */
     public static function getAppPath(string ...$pathParts): string {
-        return self::getIndexPath(Package::AppDir, ...$pathParts);
+        return self::getIndexPath(Package::getAppBaseDir(), ...$pathParts);
+    }
+
+    /**
+     * Returns the path to the Source Directory
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function getSourcePath(string ...$pathParts): string {
+        return self::getAppPath(Package::getAppSourceDir(), ...$pathParts);
     }
 
     /**
@@ -100,7 +100,7 @@ class Discovery {
      * @return string
      */
     public static function getMigrationsPath(): string {
-        return self::getAppPath(Package::DataDir, self::MigrationsDir);
+        return self::getAppPath(Package::MigrationsDir);
     }
 
     /**
@@ -108,7 +108,7 @@ class Discovery {
      * @return string
      */
     public static function getBuildPath(): string {
-        return self::getFramePath("src", self::SystemDir);
+        return self::getFramePath(Package::getAppSourceDir(), Package::SystemDir);
     }
 
 
@@ -143,13 +143,13 @@ class Discovery {
      * @return string
      */
     public static function loadEmailTemplate(): string {
-        $path   = self::getAppPath(Package::DataDir, self::EmailFile);
+        $path   = self::getAppPath(Package::DataDir, Package::EmailFile);
         $result = "";
         if (File::exists($path)) {
             $result = File::read($path);
         }
         if ($result === "") {
-            $path   = self::getFramePath(self::DataDir, self::EmailFile);
+            $path   = self::getFramePath(Package::DataDir, Package::EmailFile);
             $result = File::read($path);
         }
         return $result;
@@ -265,7 +265,7 @@ class Discovery {
      * @return array<string,mixed>
      */
     public static function loadFrameData(DataFile $file): array {
-        return self::loadFrameJSON(self::DataDir, $file->name());
+        return self::loadFrameJSON(Package::DataDir, $file->name());
     }
 
     /**
@@ -275,7 +275,7 @@ class Discovery {
      */
     public static function loadFrameTemplate(string $fileName): string {
         $file = Strings::addSuffix($fileName, ".mu");
-        $path = self::getFramePath(self::TemplateDir, $file);
+        $path = self::getFramePath(Package::TemplateDir, $file);
         return File::read($path);
     }
 
@@ -294,17 +294,18 @@ class Discovery {
         bool $forFramework = false,
     ): array {
         if ($forFramework) {
-            $namespace  = "Framework\\";
-            $sourcePath = self::getFramePath(Package::SourceDir);
-            $filesPath  = self::getFramePath(Package::SourceDir, $dir);
+            $namespace  = Package::FrameNamespace;
+            $sourcePath = self::getFramePath(Package::FrameSourceDir);
+            $filesPath  = self::getFramePath(Package::FrameSourceDir, $dir);
         } else {
-            $namespace  = Package::Namespace;
-            $sourcePath = self::getAppPath(Package::SourceDir);
-            $filesPath  = self::getAppPath(Package::SourceDir, $dir);
+            $namespace  = Package::getAppNamespace();
+            $sourcePath = self::getSourcePath();
+            $filesPath  = self::getSourcePath($dir);
         }
 
-        $files  = File::getFilesInDir($filesPath, true);
-        $result = [];
+        $filePaths  = File::getFilesInDir($filesPath, true);
+        $classPaths = [];
+        $result     = [];
 
         foreach ($files as $file) {
             if (!Strings::endsWith($file, ".php")) {

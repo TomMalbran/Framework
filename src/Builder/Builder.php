@@ -4,7 +4,6 @@ namespace Framework\Builder;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryBuilder;
-use Framework\Discovery\DataFile;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Builder\AccessCode;
 use Framework\Builder\LanguageCode;
@@ -13,10 +12,8 @@ use Framework\Builder\SignalCode;
 use Framework\Database\SchemaBuilder;
 use Framework\File\File;
 use Framework\File\FilePath;
-use Framework\File\FileType;
 use Framework\Provider\Mustache;
 use Framework\Utils\Arrays;
-use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
 /**
@@ -33,7 +30,6 @@ class Builder {
         print("Building the Code...\n");
 
         $writePath = Discovery::getBuildPath();
-        $package   = self::getPackageData();
         $files     = 0;
 
 
@@ -42,13 +38,12 @@ class Builder {
 
 
         print("\nFRAMEWORK MAIN CODES\n");
-        $files += self::generateOne($writePath, "Package",  $package);
         $files += self::generateOne($writePath, "Path",     FilePath::getCode());
         $files += self::generateOne($writePath, "Language", LanguageCode::getCode());
         $files += self::generateOne($writePath, "Access",   AccessCode::getCode());
 
 
-        print("\nnFRAMEWORK SCHEMA CODES\n");
+        print("\nFRAMEWORK SCHEMA CODES\n");
         $files += SchemaBuilder::generateCode(forFramework: true);
         $files += SchemaBuilder::generateCode(forFramework: false);
 
@@ -107,69 +102,6 @@ class Builder {
 
 
     /**
-     * Returns the Package Data
-     * @return array<string,string>
-     */
-    private static function getPackageData(): array {
-        $framePath = Discovery::getFramePath();
-        if (Strings::contains($framePath, "vendor")) {
-            $basePath = Strings::substringBefore($framePath, "/vendor");
-            $appDir   = Strings::substringAfter($basePath, "/");
-        } else {
-            $basePath = $framePath;
-            $appDir   = "";
-        }
-
-        // Read the Composer File
-        $composer     = JSON::readFile($basePath, "composer.json");
-        $psr          = [];
-        $appNamespace = "";
-        $sourceDir    = "";
-
-        if (isset($composer["autoload"]) && is_array($composer["autoload"]) && is_array($composer["autoload"]["psr-4"])) {
-            $psr          = $composer["autoload"]["psr-4"];
-            $appNamespace = Strings::toString(key($psr));
-            $sourceDir    = Strings::toString($psr[$appNamespace]);
-        }
-
-        // Find the Data and Template directories
-        $files       = File::getFilesInDir($basePath, true);
-        $version     = Strings::toString($composer["version"] ?? "0.1.0");
-        $dataDir     = "";
-        $templateDir = "";
-        $intFilesDir = "";
-
-        foreach ($files as $file) {
-            if (Strings::contains($file, "vendor") || File::hasExtension($file, "php")) {
-                continue;
-            }
-
-            $dataFile = DataFile::getFileName($file);
-            if ($dataDir === "" && $dataFile !== "") {
-                $dataDir = Strings::substringBetween($file, "$basePath/", "/$dataFile");
-            } elseif ($templateDir === "" && Strings::endsWith($file, ".mu")) {
-                $templateDir = Strings::substringAfter($file, "$basePath/");
-                $templateDir = Strings::substringBefore($templateDir, "/", false);
-            } elseif ($intFilesDir === "" && FileType::isImage($file)) {
-                $intFilesDir = Strings::substringAfter($file, "$basePath/");
-                $intFilesDir = Strings::substringBefore($intFilesDir, "/", false);
-            }
-        }
-
-        // Return the Package Data
-        return [
-            "version"      => $version,
-            "basePath"     => $basePath,
-            "appNamespace" => $appNamespace,
-            "appDir"       => $appDir,
-            "sourceDir"    => $sourceDir,
-            "dataDir"      => $dataDir,
-            "templateDir"  => $templateDir,
-            "intFilesDir"  => $intFilesDir,
-        ];
-    }
-
-    /**
      * Generates a single System Code
      * @param string              $writePath
      * @param string              $name
@@ -178,6 +110,7 @@ class Builder {
      */
     private static function generateOne(string $writePath, string $name, array $data): int {
         if (Arrays::isEmpty($data)) {
+            print("- Skipping the $name code\n");
             return 0;
         }
 
@@ -189,8 +122,6 @@ class Builder {
         print("- Generated the $name code\n");
         return 1;
     }
-
-
 
     /**
      * Renders a template with the given data

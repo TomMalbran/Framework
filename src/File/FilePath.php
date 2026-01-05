@@ -3,8 +3,8 @@ namespace Framework\File;
 
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DataFile;
+use Framework\Discovery\Package;
 use Framework\File\File;
-use Framework\System\Package;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Server;
@@ -71,7 +71,7 @@ class FilePath {
      */
     public static function getInternalPath(string|int ...$pathParts): string {
         $basePath = self::getBasePath(forBackend: true);
-        return File::parsePath($basePath, Package::IntFilesDir, ...$pathParts);
+        return File::parsePath($basePath, Package::DataFilesDir, ...$pathParts);
     }
 
     /**
@@ -126,7 +126,7 @@ class FilePath {
      * @return string
      */
     public static function getInternalDir(string|int ...$pathParts): string {
-        return File::parsePath(Package::AppDir, Package::FilesDir, ...$pathParts);
+        return File::parsePath(Package::getAppBaseDir(), Package::FilesDir, ...$pathParts);
     }
 
 
@@ -146,7 +146,7 @@ class FilePath {
      * @return string
      */
     public static function getInternalUrl(string|int ...$pathParts): string {
-        return Config::getUrl(Package::AppDir, Package::IntFilesDir, ...$pathParts);
+        return Config::getUrl(Package::getAppBaseDir(), Package::DataFilesDir, ...$pathParts);
     }
 
 

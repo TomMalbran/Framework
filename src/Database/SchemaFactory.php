@@ -2,6 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\Package;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
@@ -80,12 +81,12 @@ class SchemaFactory {
 
             // Get the Path
             $path  = File::getDirectory($fileName, 1);
-            $path  = Strings::stripEnd($path, "/Model");
-            $path .= "/Schema";
+            $path  = Strings::stripEnd($path, "/" . Package::ModelDir);
+            $path .= "/" . Package::SchemaDir;
 
             // Get the Namespace
-            $namespace = Strings::stripEnd($namespace, "\\Model");
-            $namespace = "$namespace\\Schema";
+            $namespace = Strings::stripEnd($namespace, "\\" . Package::ModelDir);
+            $namespace = "$namespace\\" . Package::SchemaDir;
 
             // Get the Model Name
             $modelName = Strings::substringAfter($className, "\\");
