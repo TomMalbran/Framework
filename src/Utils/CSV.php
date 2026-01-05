@@ -101,7 +101,7 @@ class CSV {
             return [];
         }
 
-        $lines  = Strings::split($content, "\n", true);
+        $lines  = Strings::split($content, "\n", trim: true);
         $result = [];
         foreach ($lines as $index => $line) {
             if ($line !== "" && ($index > 0 || !$skipHeader)) {
