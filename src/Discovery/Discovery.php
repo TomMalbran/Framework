@@ -88,6 +88,14 @@ class Discovery {
     }
 
     /**
+     * Returns the path to the Strings Directory
+     * @return string
+     */
+    public static function getStringsPath(): string {
+        return self::getAppPath(Package::StringsDir);
+    }
+
+    /**
      * Returns the path to the Migrations
      * @return string
      */
