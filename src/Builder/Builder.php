@@ -2,6 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\ConsoleCommand;
@@ -29,6 +30,7 @@ class Builder {
     public static function build(): bool {
         print("Building the Code...\n");
 
+        DiscoveryConfig::load();
         $writePath = Discovery::getBuildPath();
         $created   = 0;
 
