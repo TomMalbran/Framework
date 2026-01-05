@@ -1,0 +1,28 @@
+{
+    "title" : "Emails",
+    "type"  : "object",
+    "propertyNames" : {
+        "pattern" : "^[A-Z][A-Za-z]*$"
+    },
+    "patternProperties" : {
+        "^[A-Z][A-Za-z]*$" : {
+            "type"                 : "object",
+            "additionalProperties" : false,
+            "required"             : [ "description", "subject", "message" ],
+            "properties"           : {
+                "description" : {
+                    "type" : "string"
+                },
+                "subject" : {
+                    "type" : "string"
+                },
+                "message" : {
+                    "type"  : "array",
+                    "items" : {
+                        "type" : "string"
+                    }
+                }
+            }
+        }
+    }
+}
