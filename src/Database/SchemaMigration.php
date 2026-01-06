@@ -3,7 +3,6 @@ namespace Framework\Database;
 
 use Framework\Framework;
 use Framework\Discovery\Discovery;
-use Framework\Discovery\DataFile;
 use Framework\Database\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
@@ -19,93 +18,86 @@ class SchemaMigration {
 
     /**
      * Migrates the Tables
-     * @param boolean $canDelete Optional.
+     * @param array{from:string,to:string}[]              $tableRenames
+     * @param array{table:string,from:string,to:string}[] $columnRenames
+     * @param boolean                                     $canDelete     Optional.
      * @return boolean
      */
-    public static function migrateData(bool $canDelete = false): bool {
+    public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): bool {
         $db             = Framework::getDatabase();
         $schemaModels   = SchemaFactory::getData();
         $startMovement  = Settings::getCore("movement");
         $startRename    = Settings::getCore("rename");
         $startMigration = Settings::getCore("migration");
 
-        $lastMovement   = 0;
-        $lastRename     = 0;
-
-        // Apply the Movements (Table renames)
-        /** @var array{movements:array{from:string,to:string}[],renames:array{schema:string,from:string,to:string}[]} */
-        $migrations = Discovery::loadData(DataFile::Migrations);
-        if (!Arrays::isEmpty($migrations, "movements")) {
-            $lastMovement = self::moveTables($db, $startMovement, $migrations["movements"]);
-            if ($lastMovement > 0) {
-                Settings::setCore("movement", $lastMovement);
-            }
+        // Rename the Tables
+        if (count($tableRenames) > 0) {
+            $lastMovement = self::renameTables($db, $startMovement, $tableRenames);
+            Settings::setCore("movement", $lastMovement);
         }
 
-        // Apply the Renames (Column renames)
-        if (!Arrays::isEmpty($migrations, "renames")) {
-            $lastRename = self::renameColumns($db, $startRename, $migrations["renames"]);
-            if ($lastRename > 0) {
-                Settings::setCore("rename", $lastRename);
-            }
+        // Rename the Columns
+        if (count($columnRenames) > 0) {
+            $lastRename = self::renameColumns($db, $startRename, $columnRenames);
+            Settings::setCore("rename", $lastRename);
         }
 
         // Migrate the Tables
-        $migrated      = self::migrateTables($db, $schemaModels, $canDelete);
+        self::migrateTables($db, $schemaModels, $canDelete);
         $lastMigration = self::extraMigrations($db, $startMigration);
         if ($lastMigration > 0) {
             Settings::setCore("migration", $lastMigration);
         }
 
-        return $lastMovement > 0 || $lastRename > 0 || $migrated || $lastMigration > 0;
+        return true;
     }
 
     /**
-     * Moves the Tables
+     * Renames the Tables
      * @param Database                       $db
-     * @param integer                        $startMovement
-     * @param array{from:string,to:string}[] $movements
+     * @param integer                        $startRename
+     * @param array{from:string,to:string}[] $tableRenames
      * @return integer
      */
-    private static function moveTables(Database $db, int $startMovement, array $movements): int {
-        $lastMovement = count($movements);
-        $didMove      = false;
+    private static function renameTables(Database $db, int $startRename, array $tableRenames): int {
+        $lastRename = count($tableRenames);
+        $didRename  = false;
 
-        for ($i = $startMovement; $i < $lastMovement; $i++) {
-            $fromName = SchemaModel::getDbTableName($movements[$i]["from"]);
-            $toName   = SchemaModel::getDbTableName($movements[$i]["to"]);
+        for ($i = $startRename; $i < $lastRename; $i++) {
+            $fromName = SchemaModel::getDbTableName($tableRenames[$i]["from"]);
+            $toName   = SchemaModel::getDbTableName($tableRenames[$i]["to"]);
 
             if ($db->tableExists($fromName) && !$db->tableExists($toName)) {
                 $db->renameTable($fromName, $toName);
                 print("- Renamed table $fromName -> $toName\n");
-                $didMove = true;
+                $didRename = true;
             }
         }
 
-        if ($didMove) {
+        if ($didRename) {
             print("\n");
-            return $lastMovement;
+            return $lastRename;
         }
 
-        print("- No movements required\n");
-        return 0;
+        print("- No table renames required\n");
+        return $lastRename;
     }
 
     /**
      * Renames the Table Columns
-     * @param Database                                     $db
-     * @param integer                                      $startRename
-     * @param array{schema:string,from:string,to:string}[] $renames
+     * @param Database                                    $db
+     * @param integer                                     $startRename
+     * @param array{table:string,from:string,to:string}[] $columnRenames
      * @return integer
      */
-    private static function renameColumns(Database $db, int $startRename, array $renames): int {
-        $lastRename = count($renames);
+    private static function renameColumns(Database $db, int $startRename, array $columnRenames): int {
+        $lastRename = count($columnRenames);
         $didRename  = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
-            $table    = SchemaModel::getDbTableName($renames[$i]["schema"]);
-            $fromName = SchemaModel::getDbFieldName($renames[$i]["from"]);
-            $toName   = SchemaModel::getDbFieldName($renames[$i]["to"]);
+            $table    = SchemaModel::getDbTableName($columnRenames[$i]["table"]);
+            $fromName = SchemaModel::getDbFieldName($columnRenames[$i]["from"]);
+            $toName   = SchemaModel::getDbFieldName($columnRenames[$i]["to"]);
 
             if (!$db->tableExists($table)) {
                 continue;
@@ -131,7 +123,7 @@ class SchemaMigration {
         }
 
         print("- No column renames required\n\n");
-        return 0;
+        return $lastRename;
     }
 
     /**

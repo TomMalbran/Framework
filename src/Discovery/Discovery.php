@@ -168,15 +168,6 @@ class Discovery {
     }
 
     /**
-     * Loads a Data File
-     * @param DataFile $file
-     * @return array<string|integer,mixed>
-     */
-    public static function loadData(DataFile $file): array {
-        return self::loadJSON(Package::DataDir, $file->name());
-    }
-
-    /**
      * Loads the Strings File for the given Language
      * @param string $langCode
      * @return array<string,mixed>

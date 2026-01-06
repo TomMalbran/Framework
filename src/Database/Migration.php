@@ -2,6 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryMigration;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Database\SchemaMigration;
@@ -12,6 +13,45 @@ use Framework\Core\Configs;
  */
 class Migration {
 
+    /** @var array{from:string,to:string}[] */
+    private static array $tableRenames  = [];
+
+    /** @var array{table:string,from:string,to:string}[] */
+    private static array $columnRenames = [];
+
+
+    /**
+     * Renames a Table
+     * @param string $from
+     * @param string $to
+     * @return boolean
+     */
+    public static function renameTable(string $from, string $to): bool {
+        self::$tableRenames[] = [
+            "from" => $from,
+            "to"   => $to,
+        ];
+        return true;
+    }
+
+    /**
+     * Renames a Column
+     * @param string $table
+     * @param string $from
+     * @param string $to
+     * @return boolean
+     */
+    public static function renameColumn(string $table, string $from, string $to): bool {
+        self::$columnRenames[] = [
+            "table" => $table,
+            "from"  => $from,
+            "to"    => $to,
+        ];
+        return true;
+    }
+
+
+
     /**
      * Migrates the Data
      * @param string  $envFile Optional.
@@ -20,6 +60,8 @@ class Migration {
      */
     #[ConsoleCommand("migrate")]
     public static function migrate(string $envFile = "", bool $delete = false): bool {
+        DiscoveryConfig::load();
+
         $timeStart = microtime(true);
         print("Migrating data...\n");
 
@@ -29,7 +71,7 @@ class Migration {
         }
 
         print("\nDATABASE MIGRATIONS\n");
-        SchemaMigration::migrateData($delete);
+        SchemaMigration::migrateData(self::$tableRenames, self::$columnRenames, $delete);
 
 
         /** @var DiscoveryMigration[] */
