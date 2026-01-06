@@ -381,10 +381,11 @@ class File {
     /**
      * Returns all the Files inside the given path
      * @param string  $path
-     * @param boolean $recursive Optional.
+     * @param boolean $recursive  Optional.
+     * @param boolean $skipVendor Optional.
      * @return string[]
      */
-    public static function getFilesInDir(string $path, bool $recursive = false): array {
+    public static function getFilesInDir(string $path, bool $recursive = false, bool $skipVendor = false): array {
         $result = [];
         if ($path === "") {
             return $result;
@@ -395,8 +396,11 @@ class File {
                 if ($file === "." || $file === "..") {
                     continue;
                 }
+                if ($skipVendor && $file === "vendor") {
+                    continue;
+                }
                 if ($recursive) {
-                    $response = self::getFilesInDir("$path/$file", true);
+                    $response = self::getFilesInDir("$path/$file", true, $skipVendor);
                     $result   = array_merge($result, $response);
                 } else {
                     $result[] = $file;

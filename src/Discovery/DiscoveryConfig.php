@@ -36,20 +36,9 @@ class DiscoveryConfig {
             return false;
         }
 
-        // Read all the files skipping the main vendor directory
-        $basePaths = File::getFilesInDir($appPath, false);
-        $filePaths = [];
-        foreach ($basePaths as $basePath) {
-            $fullPath = "$appPath/$basePath";
-            if (is_dir($fullPath) && $basePath !== "vendor") {
-                $subFiles  = File::getFilesInDir($fullPath, true);
-                $filePaths = array_merge($filePaths, $subFiles);
-            } else {
-                $filePaths[] = $fullPath;
-            }
-        }
 
         // Load all the Config files
+        $filePaths = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
         foreach ($filePaths as $filePath) {
             if (Strings::endsWith($filePath, self::Extension)) {
                 include_once $filePath;
