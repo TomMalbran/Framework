@@ -13,10 +13,10 @@ use ReflectionNamedType;
 class RouterCode {
 
     /**
-     * Returns the Code variables
+     * Returns the File Code to Generate
      * @return array<string,mixed>
      */
-    public static function getCode(): array {
+    public static function getFileCode(): array {
         $reflections = Discovery::getReflectionClasses(skipIgnored: true);
         $routes      = [];
         $usedRoutes  = [];

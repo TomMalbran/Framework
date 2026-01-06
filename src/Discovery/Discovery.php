@@ -20,16 +20,6 @@ use Throwable;
 class Discovery {
 
     /**
-     * Returns the Namespace used in the Builder
-     * @return string
-     */
-    public static function getBuildNamespace(): string {
-        return Package::FrameNamespace . Package::SystemDir;
-    }
-
-
-
-    /**
      * Returns the BasePath
      * @param boolean $forFramework Optional.
      * @param boolean $forBackend   Optional.
@@ -40,23 +30,13 @@ class Discovery {
             return self::getFramePath();
         }
         if ($forBackend) {
-            return self::getIndexPath(Package::getAppBaseDir());
+            return self::getAppPath();
         }
         return self::getIndexPath();
     }
 
     /**
-     * Returns the path to the Framework
-     * @param string ...$pathParts
-     * @return string
-     */
-    public static function getFramePath(string ...$pathParts): string {
-        $path = File::getDirectory(__FILE__, 3);
-        return File::parsePath($path, ...$pathParts);
-    }
-
-    /**
-     * Returns the path to the App
+     * Returns the path to the Index
      * @param string ...$pathParts
      * @return string
      */
@@ -66,6 +46,16 @@ class Discovery {
             $path = Strings::substringBefore($path, "/vendor");
             $path = Strings::substringBefore($path, "/", false);
         }
+        return File::parsePath($path, ...$pathParts);
+    }
+
+    /**
+     * Returns the path to the Framework
+     * @param string ...$pathParts
+     * @return string
+     */
+    public static function getFramePath(string ...$pathParts): string {
+        $path = File::getDirectory(__FILE__, 3);
         return File::parsePath($path, ...$pathParts);
     }
 
@@ -244,31 +234,6 @@ class Discovery {
         $path = self::getAppPath(Package::LogDir);
         File::createDir($path);
         return File::write("$path/$file.json", JSON::encode($contents, true));
-    }
-
-
-
-    /**
-     * Loads a Framework JSON File
-     * @param string $dir
-     * @param string $fileName
-     * @return array{}
-     */
-    public static function loadFrameJSON(string $dir, string $fileName): array {
-        $file = Strings::addSuffix($fileName, ".json");
-        $path = self::getFramePath($dir, $file);
-        return JSON::readFile($path);
-    }
-
-    /**
-     * Loads a Template File
-     * @param string $fileName
-     * @return string
-     */
-    public static function loadFrameTemplate(string $fileName): string {
-        $file = Strings::addSuffix($fileName, ".mu");
-        $path = self::getFramePath(Package::TemplateDir, $file);
-        return File::read($path);
     }
 
 

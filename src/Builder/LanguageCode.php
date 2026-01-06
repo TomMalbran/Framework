@@ -11,10 +11,10 @@ use Framework\Utils\Strings;
 class LanguageCode {
 
     /**
-     * Returns the Code variables
+     * Returns the File Code to Generate
      * @return array<string,mixed>
      */
-    public static function getCode(): array {
+    public static function getFileCode(): array {
         $path      = Discovery::getStringsPath();
         $files     = File::getFilesInDir($path);
         $rootCode  = "es";
@@ -68,6 +68,7 @@ class LanguageCode {
         return [
             "languages" => $languages,
             "rootCode"  => $rootCode,
+            "total"     => count($languages),
         ];
     }
 }

@@ -6,6 +6,7 @@ use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\ConsoleCommand;
+use Framework\Discovery\Package;
 use Framework\Builder\LanguageCode;
 use Framework\Builder\RouterCode;
 use Framework\Builder\SignalCode;
@@ -37,7 +38,7 @@ class Builder {
 
 
         print("\nFRAMEWORK MAIN CODES\n");
-        $created += self::generateOne($writePath, "Language", LanguageCode::getCode());
+        $created += self::generateOne($writePath, "Language", LanguageCode::getFileCode());
 
 
         print("\nFRAMEWORK SCHEMA CODES\n");
@@ -56,8 +57,8 @@ class Builder {
 
 
         print("\nFRAMEWORK FINAL CODES\n");
-        $created += self::generateOne($writePath, "Signal", SignalCode::getCode());
-        $created += self::generateOne($writePath, "Router", RouterCode::getCode());
+        $created += self::generateOne($writePath, "Signal", SignalCode::getFileCode());
+        $created += self::generateOne($writePath, "Router", RouterCode::getFileCode());
 
 
         /** @var DiscoveryBuilder[] */
@@ -112,7 +113,7 @@ class Builder {
         }
 
         $contents = self::render("system/$name", $data + [
-            "namespace" => Discovery::getBuildNamespace(),
+            "namespace" => Package::FrameNamespace . Package::SystemDir,
         ]);
         File::create($writePath, "$name.php", $contents);
 
@@ -132,8 +133,10 @@ class Builder {
      * @return string
      */
     public static function render(string $name, array $data): string {
-        $template = Discovery::loadFrameTemplate($name);
-        return Mustache::render($template, $data);
+        $file = Strings::addSuffix($name, ".mu");
+        $path = Discovery::getFramePath(Package::FrameTemplateDir, $file);
+        $code = File::read($path);
+        return Mustache::render($code, $data);
     }
 
     /**

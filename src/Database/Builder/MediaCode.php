@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database\Builder;
 
-use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Database\SchemaFactory;
 use Framework\Utils\Strings;
@@ -42,9 +41,8 @@ class MediaCode implements DiscoveryCode {
         }
 
         return [
-            "namespace" => Discovery::getBuildNamespace(),
-            "fields"    => $fields,
-            "total"     => count($fields),
+            "fields" => $fields,
+            "total"  => count($fields),
         ];
     }
 }

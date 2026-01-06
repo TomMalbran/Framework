@@ -16,10 +16,10 @@ use ReflectionUnionType;
 class SignalCode {
 
     /**
-     * Returns the Code variables
+     * Returns the File Code to Generate
      * @return array<string,mixed>
      */
-    public static function getCode(): array {
+    public static function getFileCode(): array {
         $reflections = Discovery::getReflectionClasses(skipIgnored: true);
         $signals     = [];
         $uses        = [];
