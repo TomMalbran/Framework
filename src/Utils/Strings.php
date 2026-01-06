@@ -802,7 +802,7 @@ class Strings {
      * @return string
      */
     public static function pascalCaseToSnakeCase(string $string, string $separator = "_"): string {
-        if (self::contains($string, "_")) {
+        if (self::contains($string, $separator)) {
             return strtolower($string);
         }
 
