@@ -202,17 +202,6 @@ class Discovery {
     }
 
     /**
-     * Loads a Template File
-     * @param string $fileName
-     * @return string
-     */
-    public static function loadTemplate(string $fileName): string {
-        $file = Strings::addSuffix($fileName, ".mu");
-        $path = self::getAppPath(Package::TemplateDir, $file);
-        return File::read($path);
-    }
-
-    /**
      * Saves a Data File
      * @param string $fileName
      * @param mixed  $contents

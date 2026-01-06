@@ -1,8 +1,6 @@
 <?php
 namespace Framework\Discovery;
 
-use Framework\File\File;
-use Framework\File\FileType;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -11,10 +9,11 @@ use Framework\Utils\Strings;
  */
 class Package {
 
-    // Frame Constants
+    // Framework Constants
     public const FrameNamespace   = "Framework\\";
     public const FrameSourceDir   = "src";
     public const FrameConfigDir   = "config";
+    public const FrameTemplateDir = "data/templates";
 
     // Source Directories
     public const SystemDir        = "System";
@@ -24,7 +23,6 @@ class Package {
     // Data Directories
     public const DataDir          = "data";
     public const DataFilesDir     = "data/files";
-    public const TemplateDir      = "data/templates";
     public const MigrationsDir    = "data/migrations";
     public const LogDir           = "data/logs";
     public const EmailFile        = "email.html";
