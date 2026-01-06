@@ -34,10 +34,6 @@ class FilePath implements DiscoveryCode {
      * @return boolean
      */
     public static function register(string $name): bool {
-        if ($name === "" || $name === "example") {
-            return false;
-        }
-
         self::$paths[] = $name;
         return true;
     }
@@ -212,7 +208,7 @@ class FilePath implements DiscoveryCode {
 
         return [
             "paths" => $paths,
-            "total" => count($paths),
+            "total" => count(self::$paths),
         ];
     }
 

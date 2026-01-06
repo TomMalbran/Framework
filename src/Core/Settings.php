@@ -38,10 +38,6 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
         VariableType $variableType,
         mixed $value = "",
     ): bool {
-        if ($variable === "" || $variable === "example" || $section === "") {
-            return false;
-        }
-
         self::$settings[] = [
             "variable"     => $variable,
             "section"      => $section,

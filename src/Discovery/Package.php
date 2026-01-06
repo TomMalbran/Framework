@@ -14,6 +14,7 @@ class Package {
     // Frame Constants
     public const FrameNamespace   = "Framework\\";
     public const FrameSourceDir   = "src";
+    public const FrameConfigDir   = "config";
 
     // Source Directories
     public const SystemDir        = "System";

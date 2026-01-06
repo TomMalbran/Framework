@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Core;
 
+use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -26,10 +27,6 @@ class AccessRole implements DiscoveryCode {
      * @return boolean
      */
     public static function register(string $roleName, string $groupName, int $level = -1): bool {
-        if ($roleName === "" || $groupName === "") {
-            return false;
-        }
-
         if ($level >= 0) {
             self::$level = $level;
         } else {
@@ -62,6 +59,10 @@ class AccessRole implements DiscoveryCode {
      * @return array<string,mixed>
      */
     public static function getFileCode(): array {
+        if (count(self::$roles) === 0) {
+            DiscoveryConfig::loadDefault("access");
+        }
+
         $roleList  = self::getAccesses(self::$groups, self::$roles);
         $maxLength = self::alignNames($roleList);
 
