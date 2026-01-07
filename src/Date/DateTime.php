@@ -1258,23 +1258,29 @@ class DateTime {
 
     /**
      * Returns the amount of years between given date and today AKA the age
-     * @param mixed      $thisTime
-     * @param mixed|null $otherTime Optional.
-     * @param float|null $timeZone  Optional.
+     * @param mixed      $ageTime
+     * @param mixed|null $nowTime  Optional.
+     * @param float|null $timeZone Optional.
      * @return integer
      */
-    public static function getAge(mixed $thisTime, mixed $otherTime = null, ?float $timeZone = null): int {
-        $thisTimeStamp  = self::toTimeZone($thisTime, $timeZone);
-        $otherTimeStamp = $otherTime !== null ? self::toTimeZone($otherTime, $timeZone) : time();
-        if ($thisTimeStamp === 0) {
+    public static function getAge(mixed $ageTime, mixed $nowTime = null, ?float $timeZone = null): int {
+        $ageTimeStamp = self::toTimeZone($ageTime, $timeZone);
+        $nowTimeStamp = $nowTime !== null ? self::toTimeZone($nowTime, $timeZone) : time();
+        if ($ageTimeStamp === 0) {
             return 0;
         }
 
-        $thisYear  = self::getYear($thisTimeStamp);
-        $otherYear = self::getYear($otherTimeStamp);
-        $result    = $otherYear - $thisYear;
-        if ($thisTimeStamp > $otherTimeStamp) {
-            $result += 1;
+        $ageYear  = self::getYear($ageTimeStamp);
+        $ageMonth = self::getMonth($ageTimeStamp);
+        $ageDay   = self::getDay($ageTimeStamp);
+
+        $nowYear  = self::getYear($nowTimeStamp);
+        $nowMonth = self::getMonth($nowTimeStamp);
+        $nowDay   = self::getDay($nowTimeStamp);
+
+        $result   = $nowYear - $ageYear;
+        if ($ageMonth > $nowMonth || ($ageMonth === $nowMonth && $ageDay > $nowDay)) {
+            $result -= 1;
         }
         return $result;
     }
