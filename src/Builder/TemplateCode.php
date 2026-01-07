@@ -28,9 +28,11 @@ class TemplateCode {
 
             $fileName    = File::getBaseName(File::getName($filePath));
             $maxLength   = max($maxLength, Strings::length($fileName));
+            $relPath     = Strings::replace($filePath, $path, "");
+
             $templates[] = [
-                "name" => $fileName,
-                "path" => $filePath,
+                "name"    => $fileName,
+                "relPath" => $relPath,
             ];
         }
 

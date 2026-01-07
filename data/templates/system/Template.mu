@@ -1,6 +1,7 @@
 <?php
 namespace {{namespace}};
 
+use Framework\Discovery\Discovery;
 use Framework\Provider\Mustache;
 use Framework\File\File;
 
@@ -33,16 +34,17 @@ enum Template {
      * @return string
      */
     public function render(array $data): string {
-        $path = match ($this) {
+        $relPath = match ($this) {
         {{#templates}}
-            self::{{constant}} => "{{path}}",
+            self::{{constant}} => "{{relPath}}",
         {{/templates}}
             default => "",
         };
-        if ($path === "") {
+        if ($relPath === "") {
             return "";
         }
 
+        $path = Discovery::getAppPath($relPath);
         $code = File::read($path);
         return Mustache::render($code, $data);
     }
