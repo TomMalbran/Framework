@@ -62,8 +62,8 @@ class Console {
      * @return ConsoleCommand[]
      */
     private static function getCommands(): array {
-        $frameReflections = Discovery::getReflectionClasses(skipIgnored: true, forFramework: true);
-        $appReflections   = Discovery::getReflectionClasses(skipIgnored: true, forFramework: false);
+        $frameReflections = Discovery::getReflectionClasses(forFramework: true);
+        $appReflections   = Discovery::getReflectionClasses(forFramework: false);
         $reflections      = array_merge($frameReflections, $appReflections);
         $priorities       = [];
         $instances        = [];

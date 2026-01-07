@@ -230,13 +230,11 @@ class Discovery {
     /**
      * Finds the Classes in the given Directory
      * @param string  $dir          Optional.
-     * @param boolean $skipIgnored  Optional.
      * @param boolean $forFramework Optional.
      * @return array<string,string>
      */
     public static function findClasses(
         string $dir = "",
-        bool $skipIgnored = false,
         bool $forFramework = false,
     ): array {
         if ($forFramework) {
@@ -268,7 +266,7 @@ class Discovery {
         // Filter the Classes that have all their dependencies available
         foreach ($classPaths as $className => $filePath) {
             // Skip some ignored directories
-            if ($skipIgnored && Strings::contains($filePath, "/Schema/", "/System/")) {
+            if (Strings::contains($filePath, "/Schema/", "/System/")) {
                 continue;
             }
 
@@ -321,16 +319,14 @@ class Discovery {
     /**
      * Returns the Reflection Classes in the given Directory
      * @param string  $dir          Optional.
-     * @param boolean $skipIgnored  Optional.
      * @param boolean $forFramework Optional.
      * @return array<string,ReflectionClass<object>>
      */
     public static function getReflectionClasses(
         string $dir = "",
-        bool $skipIgnored = false,
         bool $forFramework = false,
     ): array {
-        $classes = self::findClasses($dir, $skipIgnored, $forFramework);
+        $classes = self::findClasses($dir, $forFramework);
         $result  = [];
 
         foreach ($classes as $className => $classKey) {
@@ -349,17 +345,15 @@ class Discovery {
      * Returns the Reflection Classes that implement the given interface
      * @param string  $interface
      * @param string  $dir          Optional.
-     * @param boolean $skipIgnored  Optional.
      * @param boolean $forFramework Optional.
      * @return array{}
      */
     public static function getClassesWithInterface(
         string $interface,
         string $dir = "",
-        bool $skipIgnored = true,
         bool $forFramework = false,
     ): array {
-        $reflections = self::getReflectionClasses($dir, $skipIgnored, $forFramework);
+        $reflections = self::getReflectionClasses($dir, $forFramework);
         $priorities  = [];
         $instances   = [];
         $result      = [];

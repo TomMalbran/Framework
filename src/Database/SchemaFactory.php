@@ -41,15 +41,11 @@ class SchemaFactory {
      * @return SchemaModel[]
      */
     public static function buildData(bool $forFramework = false): array {
+        $reflections  = Discovery::getReflectionClasses(forFramework: $forFramework);
         $errorModels  = [];
         $schemaModels = [];
         $modelIDs     = [];
         $dbNames      = [];
-
-        $reflections = Discovery::getReflectionClasses(
-            skipIgnored:  true,
-            forFramework: $forFramework,
-        );
 
         // Parse the Reflections
         foreach ($reflections as $className => $reflection) {

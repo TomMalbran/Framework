@@ -20,7 +20,7 @@ class SignalCode {
      * @return array<string,mixed>
      */
     public static function getFileCode(): array {
-        $reflections = Discovery::getReflectionClasses(skipIgnored: true);
+        $reflections = Discovery::getReflectionClasses();
         $signals     = [];
         $uses        = [];
 
