@@ -22,7 +22,6 @@ class Package {
 
     // Data Directories
     public const DataDir          = "data";
-    public const LogDir           = "data/logs";
 
     // NLS Directories
     public const StringsDir       = "nls/strings";
