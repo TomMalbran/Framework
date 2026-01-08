@@ -156,11 +156,11 @@ class Selection {
     /**
      * Does a Request to the Query
      * @param Query $query
-     * @return array<string,mixed>[]
+     * @return array<string,string|integer|null>[]
      */
     public function request(Query $query): array {
         $expression    = $this->getExpression($query);
-        $this->request = Framework::getDatabase()->query($expression, $query);
+        $this->request = Framework::getDatabase()->queryData($expression, $query);
         return $this->request;
     }
 

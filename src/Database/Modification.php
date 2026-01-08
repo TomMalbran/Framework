@@ -165,10 +165,9 @@ class Modification {
      * @return integer
      */
     public function replace(): int {
-        return Framework::getDatabase()->insert(
+        return Framework::getDatabase()->replace(
             $this->schemaModel->tableName,
             $this->fields,
-            "REPLACE",
         );
     }
 
