@@ -2,19 +2,23 @@
 namespace Framework\Builder;
 
 use Framework\Application;
+use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Priority;
+use Framework\Builder\Builder;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
 /**
  * The Template Code
  */
-class TemplateCode {
+#[Priority(Priority::High)]
+class TemplateCode implements DiscoveryBuilder {
 
     /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
+     * Generates the code
+     * @return integer
      */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $path      = Application::getAppPath();
         $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
         $templates = [];
@@ -40,11 +44,18 @@ class TemplateCode {
             $templates[$index]["constant"] = Strings::padRight($template["name"], $maxLength, " ");
         }
 
-
-        // Return the Templates
-        return [
+        // Builds the code
+        return Builder::generateCode("Template", [
             "templates" => $templates,
             "total"     => count($templates),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 }

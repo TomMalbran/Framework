@@ -2,14 +2,15 @@
 namespace Framework\Core;
 
 use Framework\Discovery\DiscoveryConfig;
-use Framework\Discovery\DiscoveryCode;
+use Framework\Discovery\DiscoveryBuilder;
+use Framework\Builder\Builder;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
  * The Access Role
  */
-class AccessRole implements DiscoveryCode {
+class AccessRole implements DiscoveryBuilder {
 
     private static int   $level  = -1;
 
@@ -47,18 +48,10 @@ class AccessRole implements DiscoveryCode {
 
 
     /**
-     * Returns the File Name to Generate
-     * @return string
+     * Generates the code
+     * @return integer
      */
-    public static function getFileName(): string {
-        return "Access";
-    }
-
-    /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
-     */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         if (count(self::$roles) === 0) {
             DiscoveryConfig::loadDefault("access");
         }
@@ -66,12 +59,21 @@ class AccessRole implements DiscoveryCode {
         $roleList  = self::getAccesses(self::$groups, self::$roles);
         $maxLength = self::alignNames($roleList);
 
-        return [
+        // Builds the code
+        return Builder::generateCode("Access", [
             "roles"   => $roleList,
             "groups"  => self::getGroups(self::$groups),
             "default" => Strings::padRight("default", $maxLength + 6),
             "total"   => count(self::$roles),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 
     /**

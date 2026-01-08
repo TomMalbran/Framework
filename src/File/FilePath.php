@@ -3,8 +3,9 @@ namespace Framework\File;
 
 use Framework\Application;
 use Framework\Discovery\DiscoveryConfig;
-use Framework\Discovery\DiscoveryCode;
+use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\Package;
+use Framework\Builder\Builder;
 use Framework\File\File;
 use Framework\System\Config;
 use Framework\Utils\Server;
@@ -13,7 +14,7 @@ use Framework\Utils\Strings;
 /**
  * The File Paths
  */
-class FilePath implements DiscoveryCode {
+class FilePath implements DiscoveryBuilder {
 
     private const Temp    = "temp";
     private const Source  = "source";
@@ -160,18 +161,10 @@ class FilePath implements DiscoveryCode {
 
 
     /**
-     * Returns the File Name to Generate
-     * @return string
+     * Generates the code
+     * @return integer
      */
-    public static function getFileName(): string {
-        return "Path";
-    }
-
-    /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
-     */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
@@ -185,10 +178,19 @@ class FilePath implements DiscoveryCode {
             ];
         }
 
-        return [
+        // Builds the code
+        return Builder::generateCode("Path", [
             "paths" => $paths,
             "total" => count(self::$paths),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 
     /**

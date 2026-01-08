@@ -2,6 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Database\SchemaFactory;
+use Framework\Discovery\DiscoveryBuilder;
 use Framework\Database\Builder\SchemaCode;
 use Framework\Database\Builder\EntityCode;
 use Framework\Database\Builder\ColumnCode;
@@ -12,14 +13,26 @@ use Framework\File\File;
 /**
  * The Schema Builder
  */
-class SchemaBuilder {
+class SchemaBuilder implements DiscoveryBuilder {
+
+    /**
+     * Generates the code
+     * @return integer
+     */
+    public static function generateCode(): int {
+        print("\n");
+        $created  = self::generateSchemaCode(forFramework: true);
+        $created += self::generateSchemaCode(forFramework: false);
+        print("\n");
+        return $created;
+    }
 
     /**
      * Generates the Code for the Schemas
      * @param boolean $forFramework
      * @return integer
      */
-    public static function generateCode(bool $forFramework): int {
+    private static function generateSchemaCode(bool $forFramework): int {
         $schemaModels = SchemaFactory::buildData($forFramework);
         $created      = 0;
 
@@ -61,8 +74,20 @@ class SchemaBuilder {
 
         $name   = $forFramework ? "Framework" : "App";
         $models = count($schemaModels);
-        print("- Generated the $name codes -> $models models ($created files)\n");
+        print("- Generated the Schema $name codes -> $models models ($created files)\n");
         return $created;
+    }
+
+
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        $deleted  = self::destroySchemaCode(forFramework: true);
+        $deleted += self::destroySchemaCode(forFramework: false);
+        return $deleted;
     }
 
     /**
@@ -70,7 +95,7 @@ class SchemaBuilder {
      * @param boolean $forFramework
      * @return integer
      */
-    public static function destroyCode(bool $forFramework): int {
+    private static function destroySchemaCode(bool $forFramework): int {
         $schemaModels = SchemaFactory::buildData($forFramework);
         $deletedFiles = 0;
 

@@ -2,7 +2,9 @@
 namespace Framework\Core;
 
 use Framework\Application;
-use Framework\Discovery\DiscoveryCode;
+use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Priority;
+use Framework\Builder\Builder;
 use Framework\Core\VariableType;
 use Framework\File\File;
 use Framework\Utils\Arrays;
@@ -14,7 +16,8 @@ use Framework\Utils\Utils;
 /**
  * The Configs
  */
-class Configs implements DiscoveryCode {
+#[Priority(Priority::Highest)]
+class Configs implements DiscoveryBuilder {
 
     private static bool   $loaded      = false;
     private static string $environment = "local";
@@ -256,21 +259,13 @@ class Configs implements DiscoveryCode {
 
 
     /**
-     * Returns the File Name to Generate
-     * @return string
+     * Generates the code
+     * @return integer
      */
-    public static function getFileName(): string {
-        return "Config";
-    }
-
-    /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
-     */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $data = self::getData();
         if (Arrays::isEmpty($data)) {
-            return [];
+            return Builder::generateCode("Config");
         }
 
         $environments = [];
@@ -281,13 +276,22 @@ class Configs implements DiscoveryCode {
             ];
         }
 
+        // Builds the code
         [ $urls, $properties ] = self::getProperties($data);
-        return [
+        return Builder::generateCode("Config", [
             "environments" => $environments,
             "urls"         => $urls,
             "properties"   => $properties,
             "total"        => count($properties),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 
     /**

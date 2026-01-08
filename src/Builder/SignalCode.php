@@ -2,7 +2,10 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Priority;
 use Framework\Discovery\Listener;
+use Framework\Builder\Builder;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -13,13 +16,14 @@ use ReflectionUnionType;
 /**
  * The Signal Code
  */
-class SignalCode {
+#[Priority(Priority::Lowest)]
+class SignalCode implements DiscoveryBuilder {
 
     /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
+     * Generates the code
+     * @return integer
      */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $reflections = Discovery::getReflectionClasses();
         $signals     = [];
         $uses        = [];
@@ -62,15 +66,28 @@ class SignalCode {
             return $a["event"] <=> $b["event"];
         });
 
+
+        // Builds the code if required
         if (Arrays::isEmpty($signals)) {
-            return [];
+            return Builder::generateCode("Signal");
         }
-        return [
+        return Builder::generateCode("Signal", [
             "uses"    => array_keys($uses),
             "hasUses" => count($uses) > 0,
             "signals" => $signals,
-        ];
+            "total"   => count($signals),
+        ]);
     }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
+    }
+
+
 
     /**
      * Generates the Params of the Method

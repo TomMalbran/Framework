@@ -1,8 +1,10 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Discovery\DiscoveryCode;
+use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\DiscoveryMigration;
+use Framework\Discovery\Priority;
+use Framework\Builder\Builder;
 use Framework\Core\VariableType;
 use Framework\Core\Schema\SettingsSchema;
 use Framework\Core\Schema\SettingsEntity;
@@ -14,7 +16,8 @@ use Framework\Utils\Strings;
 /**
  * The Settings
  */
-class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigration {
+#[Priority(Priority::Highest)]
+class Settings extends SettingsSchema implements DiscoveryBuilder, DiscoveryMigration {
 
     public const Core    = "Core";
     public const General = "General";
@@ -195,29 +198,29 @@ class Settings extends SettingsSchema implements DiscoveryCode, DiscoveryMigrati
 
 
     /**
-     * Returns the File Name to Generate
-     * @return string
+     * Generates the code
+     * @return integer
      */
-    public static function getFileName(): string {
-        return "Setting";
-    }
-
-    /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
-     */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         if (count(self::$settings) === 0) {
-            return [];
+            return Builder::generateCode("Setting");
         }
 
         [ $variables, $hasJSON ] = self::getVariables();
-        return [
+        return Builder::generateCode("Setting", [
             "sections"  => self::getSections(),
             "variables" => $variables,
             "hasJSON"   => $hasJSON,
             "total"     => count($variables),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 
     /**

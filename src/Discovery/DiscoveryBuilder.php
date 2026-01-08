@@ -13,7 +13,7 @@ interface DiscoveryBuilder {
     public static function generateCode(): int;
 
     /**
-     * Resets the Code
+     * Destroys the Code
      * @return integer The amount of files deleted.
      */
     public static function destroyCode(): int;

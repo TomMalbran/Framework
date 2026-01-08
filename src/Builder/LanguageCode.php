@@ -3,19 +3,23 @@ namespace Framework\Builder;
 
 use Framework\Application;
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Priority;
+use Framework\Builder\Builder;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
 /**
  * The Language Code
  */
-class LanguageCode {
+#[Priority(Priority::High)]
+class LanguageCode implements DiscoveryBuilder {
 
     /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
+     * Generates the code
+     * @return integer
      */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $path      = Application::getStringsPath();
         $files     = File::getFilesInDir($path);
         $rootCode  = "es";
@@ -65,11 +69,19 @@ class LanguageCode {
         });
 
 
-        // Return the Languages
-        return [
+        // Builds the code
+        return Builder::generateCode("Language", [
             "languages" => $languages,
             "rootCode"  => $rootCode,
             "total"     => count($languages),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 }

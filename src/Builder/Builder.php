@@ -4,15 +4,9 @@ namespace Framework\Builder;
 use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
-use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Discovery\Package;
-use Framework\Builder\LanguageCode;
-use Framework\Builder\TemplateCode;
-use Framework\Builder\RouterCode;
-use Framework\Builder\SignalCode;
-use Framework\Database\SchemaBuilder;
 use Framework\File\File;
 use Framework\Provider\Mustache;
 use Framework\Utils\Arrays;
@@ -39,37 +33,24 @@ class Builder {
         File::emptyDir($writePath);
 
 
-        print("\nFRAMEWORK MAIN CODES\n");
-        $created += self::generateOne($writePath, "Language", LanguageCode::getFileCode());
-        $created += self::generateOne($writePath, "Template", TemplateCode::getFileCode());
-
-
-        print("\nFRAMEWORK SCHEMA CODES\n");
-        $created += SchemaBuilder::generateCode(forFramework: true);
-        $created += SchemaBuilder::generateCode(forFramework: false);
-
-
-        /** @var DiscoveryCode[] */
-        $frameCodes = Discovery::getClassesWithInterface(DiscoveryCode::class, forFramework: true);
-        if (count($frameCodes) > 0) {
-            print("\nFRAMEWORK BUILDER CODES\n");
-            foreach ($frameCodes as $code) {
-                $created += self::generateOne($writePath, $code::getFileName(), $code::getFileCode());
+        /** @var DiscoveryBuilder[] */
+        $frameBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class, forFramework: true);
+        if (count($frameBuilders) > 0) {
+            print("\nFRAMEWORK CODES\n");
+            foreach ($frameBuilders as $builder) {
+                $created += $builder::generateCode();
             }
         }
 
 
-        print("\nFRAMEWORK FINAL CODES\n");
-        $created += self::generateOne($writePath, "Signal", SignalCode::getFileCode());
-        $created += self::generateOne($writePath, "Router", RouterCode::getFileCode());
-
-
-        /** @var DiscoveryBuilder[] */
-        $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
-        if (count($appBuilders) > 0) {
-            print("\nAPP CODES\n");
-            foreach ($appBuilders as $builder) {
-                $created += $builder::generateCode();
+        if (!Application::isFramework()) {
+            /** @var DiscoveryBuilder[] */
+            $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
+            if (count($appBuilders) > 0) {
+                print("\nAPP CODES\n");
+                foreach ($appBuilders as $builder) {
+                    $created += $builder::generateCode();
+                }
             }
         }
 
@@ -87,13 +68,18 @@ class Builder {
         $deleted   = 0;
         File::deleteDir($writePath, $deleted);
 
-        $deleted += SchemaBuilder::destroyCode(forFramework: true);
-        $deleted += SchemaBuilder::destroyCode(forFramework: false);
-
         /** @var DiscoveryBuilder[] */
-        $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
-        foreach ($appBuilders as $builder) {
+        $frameBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class, forFramework: true);
+        foreach ($frameBuilders as $builder) {
             $deleted += $builder::destroyCode();
+        }
+
+        if (!Application::isFramework()) {
+            /** @var DiscoveryBuilder[] */
+            $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
+            foreach ($appBuilders as $builder) {
+                $deleted += $builder::destroyCode();
+            }
         }
 
         print("\nDestroyed $deleted generated files\n");
@@ -104,18 +90,18 @@ class Builder {
 
     /**
      * Generates a single System Code
-     * @param string              $writePath
      * @param string              $name
-     * @param array<string,mixed> $data
+     * @param array<string,mixed> $data Optional.
      * @return integer
      */
-    private static function generateOne(string $writePath, string $name, array $data): int {
+    public static function generateCode(string $name, array $data = []): int {
         if (Arrays::isEmpty($data)) {
             print("- Skipping the $name code\n");
             return 0;
         }
 
-        $contents = self::render("system/$name", $data + [
+        $writePath = Application::getBuildPath();
+        $contents  = self::render("system/$name", $data + [
             "namespace" => Package::FrameNamespace . Package::SystemDir,
         ]);
         File::create($writePath, "$name.php", $contents);

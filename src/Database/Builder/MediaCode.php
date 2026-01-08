@@ -1,28 +1,21 @@
 <?php
 namespace Framework\Database\Builder;
 
-use Framework\Discovery\DiscoveryCode;
+use Framework\Discovery\DiscoveryBuilder;
 use Framework\Database\SchemaFactory;
+use Framework\Builder\Builder;
 use Framework\Utils\Strings;
 
 /**
  * The Media Code
  */
-class MediaCode implements DiscoveryCode {
+class MediaCode implements DiscoveryBuilder {
 
     /**
-     * Returns the File Name to Generate
-     * @return string
+     * Generates the code
+     * @return integer
      */
-    public static function getFileName(): string {
-        return "MediaSchema";
-    }
-
-    /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
-     */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $schemaModels = SchemaFactory::buildData(false);
 
         $fields = [];
@@ -40,9 +33,18 @@ class MediaCode implements DiscoveryCode {
             }
         }
 
-        return [
+        // Builds the code
+        return Builder::generateCode("MediaSchema", [
             "fields" => $fields,
             "total"  => count($fields),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 }

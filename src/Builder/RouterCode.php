@@ -2,7 +2,10 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
+use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Priority;
 use Framework\Discovery\Route;
+use Framework\Builder\Builder;
 use Framework\Utils\Strings;
 
 use ReflectionNamedType;
@@ -10,13 +13,14 @@ use ReflectionNamedType;
 /**
  * The Router Code
  */
-class RouterCode {
+#[Priority(Priority::Lowest)]
+class RouterCode implements DiscoveryBuilder {
 
     /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
+     * Generates the code
+     * @return integer
      */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $reflections = Discovery::getReflectionClasses();
         $routes      = [];
         $usedRoutes  = [];
@@ -96,9 +100,20 @@ class RouterCode {
             print("\n");
         }
 
-        return [
-            "hasRoutes" => count($routes) > 0,
+        // Builds the code
+        $total = count($routes);
+        return Builder::generateCode("Router", [
+            "hasRoutes" => $total > 0,
             "routes"    => $routes,
-        ];
+            "total"     => $total,
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 }

@@ -2,28 +2,21 @@
 namespace Framework\Notification;
 
 use Framework\Discovery\Discovery;
-use Framework\Discovery\DiscoveryCode;
+use Framework\Discovery\DiscoveryBuilder;
+use Framework\Builder\Builder;
 use Framework\System\Language;
 use Framework\Utils\Arrays;
 
 /**
  * The Notification Builder
  */
-class NotificationBuilder implements DiscoveryCode {
+class NotificationBuilder implements DiscoveryBuilder {
 
     /**
-     * Returns the File Name to Generate
-     * @return string
+     * Generates the code
+     * @return integer
      */
-    public static function getFileName(): string {
-        return "NotificationCode";
-    }
-
-    /**
-     * Returns the File Code to Generate
-     * @return array<string,mixed>
-     */
-    public static function getFileCode(): array {
+    public static function generateCode(): int {
         $languages = Language::getAll();
         $data      = [];
 
@@ -39,9 +32,18 @@ class NotificationBuilder implements DiscoveryCode {
             $codes[] = $notificationCode;
         }
 
-        return [
+        // Builds the code
+        return Builder::generateCode("NotificationCode", [
             "codes" => $codes,
             "total" => count($codes),
-        ];
+        ]);
+    }
+
+    /**
+     * Destroys the Code
+     * @return integer
+     */
+    public static function destroyCode(): int {
+        return 1;
     }
 }
