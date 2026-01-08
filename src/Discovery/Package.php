@@ -23,7 +23,6 @@ class Package {
     // Data Directories
     public const DataDir          = "data";
     public const DataFilesDir     = "data/files";
-    public const MigrationsDir    = "data/migrations";
     public const LogDir           = "data/logs";
     public const EmailFile        = "email.html";
 

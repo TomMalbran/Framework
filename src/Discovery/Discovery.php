@@ -86,14 +86,6 @@ class Discovery {
     }
 
     /**
-     * Returns the path to the Migrations
-     * @return string
-     */
-    public static function getMigrationsPath(): string {
-        return self::getAppPath(Package::MigrationsDir);
-    }
-
-    /**
      * Returns the Namespace used in the Builder
      * @return string
      */

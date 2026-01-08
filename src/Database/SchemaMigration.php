@@ -2,12 +2,10 @@
 namespace Framework\Database;
 
 use Framework\Framework;
-use Framework\Discovery\Discovery;
 use Framework\Database\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
 use Framework\Core\Settings;
-use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -24,11 +22,10 @@ class SchemaMigration {
      * @return boolean
      */
     public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): bool {
-        $db             = Framework::getDatabase();
-        $schemaModels   = SchemaFactory::getData();
-        $startMovement  = Settings::getCore("movement");
-        $startRename    = Settings::getCore("rename");
-        $startMigration = Settings::getCore("migration");
+        $db            = Framework::getDatabase();
+        $schemaModels  = SchemaFactory::getData();
+        $startMovement = Settings::getCore("movement");
+        $startRename   = Settings::getCore("rename");
 
         // Rename the Tables
         if (count($tableRenames) > 0) {
@@ -44,11 +41,6 @@ class SchemaMigration {
 
         // Migrate the Tables
         self::migrateTables($db, $schemaModels, $canDelete);
-        $lastMigration = self::extraMigrations($db, $startMigration);
-        if ($lastMigration > 0) {
-            Settings::setCore("migration", $lastMigration);
-        }
-
         return true;
     }
 
@@ -377,7 +369,7 @@ class SchemaMigration {
         }
         foreach ($modifies as $modify) {
             if ($modify["toInts"]) {
-                $db->query("UPDATE `{$schemaModel->tableName}` SET `{$modify["key"]}` = '0' WHERE `{$modify["key"]}` = ''");
+                $db->execute("UPDATE `{$schemaModel->tableName}` SET `{$modify["key"]}` = '0' WHERE `{$modify["key"]}` = ''");
             }
             $sql = $db->updateColumn($schemaModel->tableName, $modify["key"], $modify["type"], $modify["after"]);
             print("$sql\n");
@@ -396,54 +388,5 @@ class SchemaMigration {
         }
         print("\n");
         return true;
-    }
-
-
-
-    /**
-     * Runs extra Migrations
-     * @param Database $db
-     * @param integer  $startMigration
-     * @return integer
-     */
-    private static function extraMigrations(Database $db, int $startMigration): int {
-        $path = Discovery::getMigrationsPath();
-
-        if (!File::exists($path)) {
-            print("\n- No extra migrations required\n");
-            return 0;
-        }
-
-        /** @var integer[] */
-        $names = [];
-        $files = File::getFilesInDir($path);
-
-        foreach ($files as $file) {
-            if (File::hasExtension($file, "php")) {
-                $names[] = (int)File::getName($file);
-            }
-        }
-        sort($names);
-
-        $firstMigration = $startMigration + 1;
-        $lastMigration  = (int)end($names);
-        if (count($names) === 0 || $firstMigration > $lastMigration) {
-            print("\n- No extra migrations required\n");
-            return 0;
-        }
-
-        print("\n- Running migrations $firstMigration -> $lastMigration\n");
-        foreach ($names as $name) {
-            if ($name >= $firstMigration) {
-                include_once "$path/$name.php";
-                $functionName = "migration$name";
-                if (function_exists($functionName)) {
-                    $functionName($db);
-                }
-            }
-        }
-        print("\n");
-
-        return $lastMigration;
     }
 }

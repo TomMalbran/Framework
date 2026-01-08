@@ -1,12 +1,19 @@
 <?php
 namespace Framework\Database;
 
+use Framework\Framework;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryMigration;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Database\SchemaMigration;
+use Framework\Database\DataMigration;
 use Framework\Core\Configs;
+use Framework\Core\Settings;
+use Framework\File\File;
+use Framework\Utils\Strings;
+
+use ReflectionClass;
 
 /**
  * The Database Migration
@@ -74,6 +81,10 @@ class Migration {
         SchemaMigration::migrateData(self::$tableRenames, self::$columnRenames, $delete);
 
 
+        print("\nDATA MIGRATIONS\n");
+        self::migrateData();
+
+
         /** @var DiscoveryMigration[] */
         $frameMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class, forFramework: true);
         if (count($frameMigrations) > 0) {
@@ -99,6 +110,78 @@ class Migration {
         $seconds = $timeEnd - $timeStart;
         $minutes = round(($seconds / 60) * 100) / 100;
         print("\n\nMigrations completed in $minutes m ($seconds s)\n\n");
+        return true;
+    }
+
+    /**
+     * Migrates the Data
+     * @return boolean
+     */
+    public static function migrateData(): bool {
+        $appPath    = Discovery::getAppPath();
+        $filePaths  = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
+        $migrations = [];
+
+        // Find all the Migrations
+        foreach ($filePaths as $filePath) {
+            if (!Strings::endsWith($filePath, ".php")) {
+                continue;
+            }
+
+            $content = File::read($filePath);
+            if (Strings::contains($content, DataMigration::class) && Strings::contains($content, " implements ")) {
+                $className = trim(Strings::substringBetween($content, "class", "implements"));
+                $migrations[$className] = $filePath;
+            }
+        }
+
+        // No Migrations Found
+        if (count($migrations) === 0) {
+            print("\n- No data migrations found\n");
+            return false;
+        }
+
+        // Sort the Migrations using the Class Name
+        ksort($migrations);
+
+        // Determine the Migrations to Run
+        $startMigration = Settings::getCore("migration");
+        $firstMigration = $startMigration + 1;
+        $lastMigration  = count($migrations);
+        if ($firstMigration > $lastMigration) {
+            print("\n- No data migrations required\n");
+            return false;
+        }
+
+        // Run the Migrations
+        print("\nRunning migrations $firstMigration -> $lastMigration\n");
+
+        $db    = Framework::getDatabase();
+        $index = 0;
+        foreach ($migrations as $className => $filePath) {
+            $index += 1;
+            if ($index < $firstMigration) {
+                continue;
+            }
+
+            include_once $filePath;
+            if (!class_exists($className)) {
+                continue;
+            }
+
+            $reflection = new ReflectionClass($className);
+            $instance   = $reflection->newInstance();
+            if (!($instance instanceof DataMigration)) {
+                continue;
+            }
+
+            $title = $instance::getTitle();
+            print("- $index: $title\n");
+            $instance::migrate($db);
+        }
+
+        // Save the Last Migration
+        Settings::setCore("migration", $lastMigration);
         return true;
     }
 }
