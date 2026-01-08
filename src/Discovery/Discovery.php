@@ -3,6 +3,7 @@ namespace Framework\Discovery;
 
 use Framework\File\File;
 use Framework\Discovery\Package;
+use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -96,6 +97,15 @@ class Discovery {
 
 
     /**
+     * Returns the url for the given internal path
+     * @param string|integer ...$pathParts
+     * @return string
+     */
+    public static function getApplUrl(string|int ...$pathParts): string {
+        return Config::getUrl(Package::getAppBaseDir(), ...$pathParts);
+    }
+
+    /**
      * Returns the Environment
      * @return string
      */
@@ -122,16 +132,17 @@ class Discovery {
 
     /**
      * Loads a File from the App or defaults to the Framework
+     * @param string $fileName
      * @return string
      */
-    public static function loadEmailTemplate(): string {
-        $path   = self::getAppPath(Package::DataDir, Package::EmailFile);
+    public static function loadEmailTemplate(string $fileName): string {
+        $path   = self::getAppPath($fileName);
         $result = "";
         if (File::exists($path)) {
             $result = File::read($path);
         }
         if ($result === "") {
-            $path   = self::getFramePath(Package::DataDir, Package::EmailFile);
+            $path   = self::getFramePath($fileName);
             $result = File::read($path);
         }
         return $result;

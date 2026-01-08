@@ -22,9 +22,7 @@ class Package {
 
     // Data Directories
     public const DataDir          = "data";
-    public const DataFilesDir     = "data/files";
     public const LogDir           = "data/logs";
-    public const EmailFile        = "email.html";
 
     // NLS Directories
     public const StringsDir       = "nls/strings";

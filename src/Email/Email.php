@@ -13,7 +13,6 @@ use Framework\Provider\Mandrill;
 use Framework\Provider\Mailjet;
 use Framework\Provider\Mailgun;
 use Framework\Provider\SendGrid;
-use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -61,7 +60,7 @@ class Email {
             $body     = Mustache::render($template, [
                 "url"        => Config::getEmailUrl(),
                 "name"       => Config::getName(),
-                "files"      => FilePath::getInternalUrl(),
+                "files"      => Discovery::getApplUrl(),
                 "logo"       => Config::getEmailLogo(),
                 "logoHeight" => Config::getEmailLogoHeight(),
                 "siteName"   => Config::getName(),

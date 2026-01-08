@@ -65,16 +65,6 @@ class FilePath implements DiscoveryCode {
     }
 
     /**
-     * Returns the Internal Files Path with the given path parts
-     * @param string|integer ...$pathParts
-     * @return string
-     */
-    public static function getInternalPath(string|int ...$pathParts): string {
-        $basePath = self::getBasePath(forBackend: true);
-        return File::parsePath($basePath, Package::DataFilesDir, ...$pathParts);
-    }
-
-    /**
      * Returns the base path used to store the files
      * @param boolean $forFramework Optional.
      * @param boolean $forBackend   Optional.
@@ -129,8 +119,6 @@ class FilePath implements DiscoveryCode {
         return File::parsePath(Package::getAppBaseDir(), Package::FilesDir, ...$pathParts);
     }
 
-
-
     /**
      * Returns the url for the given path
      * @param string|integer ...$pathParts
@@ -138,15 +126,6 @@ class FilePath implements DiscoveryCode {
      */
     public static function getUrl(string|int ...$pathParts): string {
         return Config::getFileUrl(Package::FilesDir, ...$pathParts);
-    }
-
-    /**
-     * Returns the url for the given internal path
-     * @param string|integer ...$pathParts
-     * @return string
-     */
-    public static function getInternalUrl(string|int ...$pathParts): string {
-        return Config::getUrl(Package::getAppBaseDir(), Package::DataFilesDir, ...$pathParts);
     }
 
 

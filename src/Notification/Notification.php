@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Notification;
 
+use Framework\Discovery\Discovery;
 use Framework\Provider\Curl;
-use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -76,7 +76,7 @@ class Notification {
 
         $icon = Config::getNotificationIcon();
         if ($icon !== "") {
-            $icon = FilePath::getInternalPath($icon);
+            $icon = Discovery::getApplUrl($icon);
         }
 
         $fullUrl = $url;
