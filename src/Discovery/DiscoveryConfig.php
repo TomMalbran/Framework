@@ -27,18 +27,14 @@ class DiscoveryConfig {
             return false;
         }
 
-        // Determine the Base Path
-        $appPath   = Application::getAppPath();
-        $framePath = Application::getFramePath();
-
         // Dont load the Config inside the Framework
-        if ($appPath === $framePath) {
+        if (Application::isFramework()) {
             self::$loaded = true;
             return false;
         }
 
-
         // Load all the Config files
+        $appPath   = Application::getAppPath();
         $filePaths = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
         foreach ($filePaths as $filePath) {
             if (Strings::endsWith($filePath, self::Extension)) {

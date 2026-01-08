@@ -12,6 +12,18 @@ use Framework\Utils\Strings;
 class Application {
 
     /**
+     * Checks if the Application is the Framework itself
+     * @return boolean
+     */
+    public static function isFramework(): bool {
+        $appPath   = self::getAppPath();
+        $framePath = self::getFramePath();
+        return $appPath === $framePath;
+    }
+
+
+
+    /**
      * Returns the BasePath
      * @param boolean $forFramework Optional.
      * @param boolean $forBackend   Optional.
