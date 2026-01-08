@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Discovery;
 
+use Framework\Application;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -52,7 +53,7 @@ class Package {
         }
 
         // Determine the Base Path
-        $framePath = Discovery::getFramePath();
+        $framePath = Application::getFramePath();
         if (Strings::contains($framePath, "vendor")) {
             $basePath   = Strings::substringBefore($framePath, "/vendor");
             $appBaseDir = Strings::substringAfter($basePath, "/");

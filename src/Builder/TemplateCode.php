@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Discovery\Discovery;
+use Framework\Application;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
@@ -15,7 +15,7 @@ class TemplateCode {
      * @return array<string,mixed>
      */
     public static function getFileCode(): array {
-        $path      = Discovery::getAppPath();
+        $path      = Application::getAppPath();
         $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
         $templates = [];
         $maxLength = 0;

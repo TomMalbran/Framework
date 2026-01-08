@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Builder;
 
+use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryCode;
@@ -31,7 +32,7 @@ class Builder {
         print("Building the Code...\n");
 
         DiscoveryConfig::load();
-        $writePath = Discovery::getBuildPath();
+        $writePath = Application::getBuildPath();
         $created   = 0;
 
         File::createDir($writePath);
@@ -82,7 +83,7 @@ class Builder {
      */
     #[ConsoleCommand("destroy")]
     public static function destroy(): bool {
-        $writePath = Discovery::getBuildPath();
+        $writePath = Application::getBuildPath();
         $deleted   = 0;
         File::deleteDir($writePath, $deleted);
 
@@ -136,7 +137,7 @@ class Builder {
      */
     public static function render(string $name, array $data): string {
         $file = Strings::addSuffix($name, ".mu");
-        $path = Discovery::getFramePath(Package::FrameTemplateDir, $file);
+        $path = Application::getFramePath(Package::FrameTemplateDir, $file);
         $code = File::read($path);
         return Mustache::render($code, $data);
     }

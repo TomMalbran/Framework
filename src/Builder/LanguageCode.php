@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Builder;
 
+use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\File\File;
 use Framework\Utils\Strings;
@@ -15,7 +16,7 @@ class LanguageCode {
      * @return array<string,mixed>
      */
     public static function getFileCode(): array {
-        $path      = Discovery::getStringsPath();
+        $path      = Application::getStringsPath();
         $files     = File::getFilesInDir($path);
         $rootCode  = "es";
         $rootFound = false;

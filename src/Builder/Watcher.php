@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Discovery\Discovery;
+use Framework\Application;
 use Framework\Discovery\ConsoleCommand;
 use Framework\File\File;
 use Framework\Utils\Numbers;
@@ -24,8 +24,8 @@ class Watcher {
     public static function watch(): never {
         print("Watching for changes...\n");
 
-        $watchPath      = Discovery::getAppPath();
-        $basePath       = Discovery::getBasePath();
+        $watchPath      = Application::getAppPath();
+        $basePath       = Application::getBasePath();
 
         $ignorePatterns = self::parseGitignore($basePath);
         $previousState  = self::scanDirectory($watchPath, $basePath, $ignorePatterns);

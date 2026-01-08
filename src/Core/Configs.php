@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Discovery\Discovery;
+use Framework\Application;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Core\VariableType;
 use Framework\File\File;
@@ -47,10 +47,10 @@ class Configs implements DiscoveryCode {
             return false;
         }
 
-        $framePath   = Discovery::getFramePath();
+        $framePath   = Application::getFramePath();
         $frameData   = self::loadENV($framePath, ".env.example");
 
-        $appPath     = Discovery::getAppPath();
+        $appPath     = Application::getAppPath();
         $appData     = self::loadENV($appPath, ".env");
 
         $currentUrl  = Server::getUrl();

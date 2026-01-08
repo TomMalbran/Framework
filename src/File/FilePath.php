@@ -1,7 +1,7 @@
 <?php
 namespace Framework\File;
 
-use Framework\Discovery\Discovery;
+use Framework\Application;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryCode;
 use Framework\Discovery\Package;
@@ -72,7 +72,7 @@ class FilePath implements DiscoveryCode {
      * @return string
      */
     public static function getBasePath(bool $forFramework = false, bool $forBackend = false, bool $forPrivate = false): string {
-        $result = Discovery::getBasePath($forFramework, $forBackend);
+        $result = Application::getBasePath($forFramework, $forBackend);
         if ($forPrivate && !Server::isLocalHost()) {
             return File::getDirectory($result);
         }

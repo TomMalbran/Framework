@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Discovery;
 
+use Framework\Application;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
@@ -27,8 +28,8 @@ class DiscoveryConfig {
         }
 
         // Determine the Base Path
-        $appPath   = Discovery::getAppPath();
-        $framePath = Discovery::getFramePath();
+        $appPath   = Application::getAppPath();
+        $framePath = Application::getFramePath();
 
         // Dont load the Config inside the Framework
         if ($appPath === $framePath) {
@@ -56,7 +57,7 @@ class DiscoveryConfig {
      * @return boolean
      */
     public static function loadDefault(string $file): bool {
-        $configPath = Discovery::getFramePath(Package::FrameConfigDir, $file . self::Extension);
+        $configPath = Application::getFramePath(Package::FrameConfigDir, $file . self::Extension);
         if (file_exists($configPath)) {
             include_once $configPath;
             return true;

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database;
 
+use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
 use Framework\Database\SchemaModel;

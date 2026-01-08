@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Email;
 
+use Framework\Application;
 use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Email\EmailWhiteList;
@@ -56,11 +57,12 @@ class Email {
         if ($withoutTemplate) {
             $body = $message;
         } else {
-            $template = Discovery::loadEmailTemplate();
+            $tempFile = Config::getEmailTemplate();
+            $template = Discovery::loadEmailTemplate($tempFile);
             $body     = Mustache::render($template, [
                 "url"        => Config::getEmailUrl(),
                 "name"       => Config::getName(),
-                "files"      => Discovery::getApplUrl(),
+                "files"      => Application::getApplUrl(),
                 "logo"       => Config::getEmailLogo(),
                 "logoHeight" => Config::getEmailLogoHeight(),
                 "siteName"   => Config::getName(),

@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}};
 
-use Framework\Discovery\Discovery;
+use Framework\Application;
 use Framework\Provider\Mustache;
 use Framework\File\File;
 
@@ -22,9 +22,9 @@ enum Template {
      * Creates a File rendering the Template
      * @param string $path
      * @param array<string,mixed> $data
-     * @return string
+     * @return boolean
      */
-    public function create(string $path, array $data): string {
+    public function create(string $path, array $data): bool {
         return File::create($path, "{$this->name}.php", $this->render($data));
     }
 
@@ -44,7 +44,7 @@ enum Template {
             return "";
         }
 
-        $path = Discovery::getAppPath($relPath);
+        $path = Application::getAppPath($relPath);
         $code = File::read($path);
         return Mustache::render($code, $data);
     }

@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Log;
 
+use Framework\Application;
 use Framework\Request;
-use Framework\Discovery\Discovery;
 use Framework\Database\Type\Assign;
 use Framework\Log\Schema\LogErrorSchema;
 use Framework\Log\Schema\LogErrorColumn;
@@ -33,8 +33,8 @@ class ErrorLog extends LogErrorSchema {
         }
 
         self::$loaded    = true;
-        self::$framePath = Discovery::getBasePath(true);
-        self::$basePath  = Discovery::getBasePath(false);
+        self::$framePath = Application::getBasePath(true);
+        self::$basePath  = Application::getBasePath(false);
 
         register_shutdown_function("\\Framework\\Log\\ErrorLog::shutdown");
         set_error_handler("\\Framework\\Log\\ErrorLog::handler");
@@ -164,7 +164,7 @@ class ErrorLog extends LogErrorSchema {
                 errorCode:   $errorCode,
                 errorText:   $errorText,
                 errorLevel:  $errorLevel,
-                environment: Discovery::getEnvironment(),
+                environment: Application::getEnvironment(),
                 file:        $filePath,
                 line:        $line,
                 description: $description,

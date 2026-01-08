@@ -2,6 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Framework;
+use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryMigration;
@@ -118,7 +119,7 @@ class Migration {
      * @return boolean
      */
     public static function migrateData(): bool {
-        $appPath    = Discovery::getAppPath();
+        $appPath    = Application::getAppPath();
         $filePaths  = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
         $migrations = [];
 
