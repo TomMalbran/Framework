@@ -97,7 +97,7 @@ class Discovery {
      * @return array<string,Dictionary>
      */
     public static function loadCustomData(string $fileName): array {
-        $data   = self::loadJSON(Package::DataDir, $fileName);
+        $data   = self::loadJSON("", $fileName);
         $result = [];
         foreach ($data as $key => $value) {
             $result[Strings::toString($key)] = new Dictionary($value);
