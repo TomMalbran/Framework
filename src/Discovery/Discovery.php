@@ -21,17 +21,6 @@ use Throwable;
 class Discovery {
 
     /**
-     * Checks if the given File exists in the App Data Directory
-     * @param string $fileName
-     * @return boolean
-     */
-    public static function hasDataFile(string $fileName): bool {
-        $file = Strings::addSuffix($fileName, ".json");
-        $path = Application::getAppPath(Package::DataDir, $file);
-        return File::exists($path);
-    }
-
-    /**
      * Loads a File from the App or defaults to the Framework
      * @param string $fileName
      * @return string
@@ -105,18 +94,6 @@ class Discovery {
         return $result;
     }
 
-    /**
-     * Saves a Data File
-     * @param string $fileName
-     * @param mixed  $contents
-     * @return boolean
-     */
-    public static function saveData(string $fileName, mixed $contents): bool {
-        $file = Strings::addSuffix($fileName, ".json");
-        $path = Application::getAppPath(Package::DataDir, $file);
-        return JSON::writeFile($path, $contents);
-    }
-
 
 
     /**
@@ -125,10 +102,7 @@ class Discovery {
      * @param boolean $forFramework Optional.
      * @return array<string,string>
      */
-    public static function findClasses(
-        string $dir = "",
-        bool $forFramework = false,
-    ): array {
+    public static function findClasses(string $dir = "", bool $forFramework = false): array {
         if ($forFramework) {
             $namespace  = Package::FrameNamespace;
             $sourcePath = Application::getFramePath(Package::FrameSourceDir);
@@ -214,10 +188,7 @@ class Discovery {
      * @param boolean $forFramework Optional.
      * @return array<string,ReflectionClass<object>>
      */
-    public static function getReflectionClasses(
-        string $dir = "",
-        bool $forFramework = false,
-    ): array {
+    public static function getReflectionClasses(string $dir = "", bool $forFramework = false): array {
         $classes = self::findClasses($dir, $forFramework);
         $result  = [];
 
