@@ -572,74 +572,27 @@ class Field {
 
     /**
      * Returns the Data as an Array
-     * @return array<string,mixed>
+     * @return array<string,string|integer|boolean>
      */
     public function toArray(): array {
-        $result = [
-            "type" => $this->type->getName(),
+        return [
+            "name"      => $this->dbName,
+            "type"      => $this->type->getName(),
+            "length"    => $this->length,
+            "isPrimary" => $this->isPrimary || $this->isID,
+            "isKey"     => $this->isKey,
         ];
-        if ($this->isID) {
-            $result["isID"] = true;
-        }
-        if ($this->isPrimary && !$this->isID) {
-            $result["isPrimary"] = true;
-        }
-        if ($this->isKey) {
-            $result["isKey"] = true;
-        }
-
-        if ($this->length > 0) {
-            $result["length"] = $this->length;
-        }
-        if ($this->isSigned) {
-            $result["isSigned"] = true;
-        }
-        if ($this->decimals !== 2) {
-            $result["decimals"] = $this->decimals;
-        }
-
-        if ($this->dateType !== DateType::None) {
-            $result["dateType"] = $this->dateType->getName();
-        }
-        if ($this->dateInput !== "") {
-            $result["dateInput"] = $this->dateInput;
-        }
-        if ($this->hourInput !== "") {
-            $result["hourInput"] = $this->hourInput;
-        }
-        if ($this->filePath !== "") {
-            $result["path"] = $this->filePath;
-        }
-
-        if ($this->isUnique) {
-            $result["isUnique"] = true;
-        }
-        if ($this->isParent) {
-            $result["isParent"] = true;
-        }
-        if ($this->noExists) {
-            $result["noExists"] = true;
-        }
-        if ($this->noEmpty) {
-            $result["noEmpty"] = true;
-        }
-        if (!$this->fromRequest) {
-            $result["cantEdit"] = false;
-        }
-        return $result;
     }
 
     /**
      * Returns the Data as an Array
-     * @return array<string,mixed>
+     * @return array<string,string>
      */
     public function toForeignArray(): array {
-        $result = [
-            "schema" => $this->belongsTo,
+        return [
+            "fromField" => $this->dbName,
+            "toTable"   => SchemaModel::getDbTableName($this->belongsTo),
+            "toField"   => $this->otherField !== "" ? SchemaModel::getDbFieldName($this->otherField) : $this->dbName,
         ];
-        if ($this->otherField !== "") {
-            $result["leftKey"] = SchemaModel::getDbFieldName($this->otherField);
-        }
-        return $result;
     }
 }

@@ -595,65 +595,14 @@ class Relation {
      * @return array<string,mixed>
      */
     public function toArray(string $dbName): array {
-        if ($this->relationModel === null || $this->parentModel === null) {
+        if ($this->relationModel === null || $this->parentModel === null || $this->ownerModelName !== $this->parentModel->name) {
             return [];
         }
 
-        $fields = [];
-        foreach ($this->fields as $field) {
-            $fieldData = [ "type" => $field->type->getName() ];
-            if ($this->withPrefix && $field->name === $field->prefixName) {
-                $fieldData["noPrefix"] = true;
-            }
-            if ($field->decimals !== 2) {
-                $fieldData["decimals"] = $field->decimals;
-            }
-            $fields[$field->dbName] = $fieldData;
-        }
-
-        $result = [
-            "schema" => $this->relationModelName,
-            "fields" => $fields,
+        return [
+            "fromField" => $this->ownerFieldDbName !== $dbName ? $this->ownerFieldDbName : $dbName,
+            "toTable"   => SchemaModel::getDbTableName($this->relationModelName),
+            "toField"   => $this->relationFieldDbName !== $dbName ? $this->relationFieldDbName : $dbName,
         ];
-        if ($this->withPrefix) {
-            $result["prefix"] = $this->prefix;
-        }
-
-        // Parse the Joins
-        $andModelName  = $this->getAndModelName();
-        $andFieldNames = $this->getAndFieldNames();
-        $andValue      = $this->getAndValue();
-        $andDeleted    = $this->getAndIsDeleted();
-
-        if ($this->relationAliasName !== "") {
-            $result["asSchema"] = $this->relationAliasName;
-        }
-
-        if ($this->relationFieldDbName !== $dbName) {
-            $result["leftKey"] = $this->relationFieldDbName;
-        }
-
-        if ($this->ownerModelName !== $this->parentModel->name) {
-            $result["onSchema"] = $this->ownerModelName;
-        }
-        if ($this->ownerFieldDbName !== $dbName) {
-            $result["rightKey"] = $this->ownerFieldDbName;
-        }
-
-        if ($andModelName !== "") {
-            $result["andSchema"] = $andModelName;
-        }
-        if (count($andFieldNames) === 1) {
-            $result["andKey"] = SchemaModel::getDbFieldName($andFieldNames[0]);
-        } elseif (count($andFieldNames) > 1) {
-            $result["andKeys"] = array_map(fn($key) => SchemaModel::getDbFieldName($key), $andFieldNames);
-        }
-        if ($andValue !== "") {
-            $result["andValue"] = SchemaModel::getDbFieldName($andValue);
-        }
-        if ($andDeleted) {
-            $result["andDeleted"] = true;
-        }
-        return $result;
     }
 }

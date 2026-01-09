@@ -187,25 +187,4 @@ class Count {
             "hasDeleted"     => $this->hasDeleted,
         ];
     }
-
-    /**
-     * Returns the Data as an Array
-     * @return array<string,mixed>
-     */
-    public function toArray(): array {
-        $result = [
-            "isSum"     => false,
-            "schema"    => $this->modelName,
-            "key"       => SchemaModel::getDbFieldName($this->fieldName),
-            "type"      => "number",
-            "noDeleted" => $this->hasDeleted,
-        ];
-        if ($this->otherModelName !== "") {
-            $result["onSchema"] = $this->otherModelName;
-        }
-        if ($this->query !== "") {
-            $result["where"] = Strings::split($this->query, " ");
-        }
-        return $result;
-    }
 }

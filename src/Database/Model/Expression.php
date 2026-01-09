@@ -97,15 +97,4 @@ class Expression {
             "expression" => $this->expression,
         ];
     }
-
-    /**
-     * Returns the Data as an Array
-     * @return array<string,string>
-     */
-    public function toArray(): array {
-        return [
-            "expression" => $this->expression,
-            "type"       => $this->type->getName(),
-        ];
-    }
 }

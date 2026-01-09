@@ -41,14 +41,4 @@ class Virtual {
         }
         return $this;
     }
-
-    /**
-     * Returns the Data as an Array
-     * @return array<string,string>
-     */
-    public function toArray(): array {
-        return [
-            "type" => $this->type->getName(),
-        ];
-    }
 }

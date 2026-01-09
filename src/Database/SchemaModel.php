@@ -411,82 +411,38 @@ class SchemaModel {
      * @return array<string,mixed>
      */
     public function toArray(): array {
-        $data = [
-            "fields"      => [],
-            "expressions" => [],
-            "processed"   => [],
-            "counts"      => [],
-            "joins"       => [],
-            "subrequests" => [],
-            "foreigns"    => [],
+        $result = [
+            "hasTimestamps" => $this->hasTimestamps,
+            "hasStatus"     => $this->hasStatus,
+            "hasPositions"  => $this->hasPositions,
+            "hasUsers"      => $this->hasUsers,
+            "canCreate"     => $this->canCreate,
+            "canEdit"       => $this->canEdit,
+            "canDelete"     => $this->canDelete,
+            "fields"        => [],
+            "joins"         => [],
+            "foreigns"      => [],
         ];
         $relationNames = [];
 
         // Add the fields
         foreach ($this->mainFields as $field) {
-            $data["fields"][$field->dbName] = $field->toArray();
-        }
-
-        // Add the expressions
-        foreach ($this->expressions as $expression) {
-            $data["expressions"][$expression->name] = $expression->toArray();
-        }
-
-        // Add the virtual fields
-        foreach ($this->virtualFields as $virtual) {
-            $data["processed"][$virtual->name] = $virtual->toArray();
-        }
-
-        // Add the expressions
-        foreach ($this->expressions as $expression) {
-            $data["expressions"][$expression->name] = $expression->toArray();
-        }
-
-        // Parse the counts and add the necessary values
-        foreach ($this->counts as $count) {
-            $data["counts"][$count->name] = $count->toArray();
+            $result["fields"][] = $field->toArray();
         }
 
         // Parse the relations and add the necessary joins
         foreach ($this->relations as $relation) {
             if ($relation->relationModel !== null) {
-                $relationName    = $relation->getName($relationNames);
-                $relationNames[] = $relationName;
-                $data["joins"][$relationName] = $relation->toArray($relationName);
+                $relationName      = $relation->getName($relationNames);
+                $relationNames[]   = $relationName;
+                $result["joins"][] = $relation->toArray($relationName);
             }
-        }
-
-        // Parse the sub requests and add the necessary values
-        foreach ($this->subRequests as $subRequest) {
-            $data["subrequests"][$subRequest->modelName] = $subRequest->toArray();
         }
 
         // Add the foreign fields
         foreach ($this->mainFields as $field) {
             if ($field->belongsTo !== "" && !Arrays::contains($relationNames, $field->dbName)) {
-                $data["foreigns"][$field->dbName] = $field->toForeignArray();
-            }
-        }
-
-
-        // Generate the result
-        $result = [
-            "hasTimestamps" => $this->hasTimestamps,
-            "canCreate"     => $this->canCreate,
-            "canEdit"       => $this->canEdit,
-            "canDelete"     => $this->canDelete,
-        ];
-
-        $optionals = [ "hasUsers", "hasStatus", "hasPositions" ];
-        foreach ($optionals as $name) {
-            if ($this->$name) {
-                $result[$name] = $this->$name;
-            }
-        }
-
-        foreach ($data as $name => $value) {
-            if (count($value) > 0) {
-                $result[$name] = $value;
+                $result["foreigns"][] = $field->toForeignArray();
             }
         }
 

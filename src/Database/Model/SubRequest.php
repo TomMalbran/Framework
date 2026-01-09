@@ -255,35 +255,4 @@ class SubRequest {
             "query"       => $this->query,
         ];
     }
-
-    /**
-     * Returns the Data as an Array
-     * @return array<string,mixed>
-     */
-    public function toArray(): array {
-        $result = [
-            "name" => $this->name,
-        ];
-        if ($this->type !== "") {
-            $result["type"] = $this->type;
-        }
-        if ($this->idName !== "") {
-            $result["idKey"]  = SchemaModel::getDbFieldName($this->idName);
-            $result["idName"] = $this->idName;
-        }
-        if ($this->fieldName !== "") {
-            $result["field"] = $this->fieldName;
-        }
-        if ($this->valueName !== "") {
-            $result["value"] = $this->valueName;
-        }
-        if ($this->query !== "") {
-            $result["where"] = Strings::split($this->query, " ");
-        }
-        if ($this->schemaModel !== null && $this->schemaModel->hasPositions) {
-            $result["orderBy"] = "position";
-            $result["isAsc"]   = true;
-        }
-        return $result;
-    }
 }

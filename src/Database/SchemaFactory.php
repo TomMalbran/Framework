@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
 use Framework\Database\SchemaModel;
@@ -260,6 +259,7 @@ class SchemaFactory {
             }
         }
 
+
         // Set the Models in the Relations, Counts and SubRequests
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->relations as $relation) {
@@ -278,6 +278,7 @@ class SchemaFactory {
                 }
             }
         }
+
 
         // Set the BelongsTo and the DB Names of the Main Fields
         foreach ($schemaModels as $schemaModel) {
@@ -307,6 +308,7 @@ class SchemaFactory {
             $schemaModel->setIDField();
         }
 
+
         // Do the final parsing in the Relations
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->relations as $relation) {
@@ -316,16 +318,8 @@ class SchemaFactory {
             }
         }
 
-        // Generate the Schemas
-        $schemas = [];
-        foreach ($schemaModels as $modelName => $schemaModel) {
-            $schemas[$modelName] = $schemaModel->toArray();
-        }
-        if (count($schemas) > 0 && Discovery::hasDataFile("schemasOld")) {
-            Discovery::saveData("schemasTest", $schemas);
-        }
 
-        // Show the Error Models
+        // Show the Models with Errors
         if (count($errorModels) > 0) {
             print("\nMODELS WITH ERROR:\n");
             foreach ($errorModels as $errorModel) {
