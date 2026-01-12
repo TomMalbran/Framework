@@ -35,12 +35,15 @@ class Field {
     // Makes the field an index key in SQL
     public bool   $isKey       = false;
 
-
     // The field is the key of a parent Model and is used in several Schema functions
     public bool   $isParent    = false;
 
     // The field values are unique which adds special functions in the Schema
     public bool   $isUnique    = false;
+
+    // Used to skip the prefix when doing a Join
+    public bool   $isCode      = false;
+
 
     // Marks the field as being the ID of a different Model
     // Is not used in the code, but it can be used to create a DER
@@ -118,6 +121,7 @@ class Field {
      * @param boolean     $isKey       Optional.
      * @param boolean     $isParent    Optional.
      * @param boolean     $isUnique    Optional.
+     * @param boolean     $isCode      Optional.
      * @param string|null $belongsTo   Optional.
      * @param string      $otherField  Optional.
      * @param int         $length      Optional.
@@ -142,9 +146,10 @@ class Field {
         bool     $notAutoInc  = false,
         bool     $isPrimary   = false,
         bool     $isKey       = false,
-
         bool     $isParent    = false,
         bool     $isUnique    = false,
+        bool     $isCode      = false,
+
         ?string  $belongsTo   = null,
         string   $otherField  = "",
 
@@ -173,9 +178,10 @@ class Field {
         $this->notAutoInc  = $notAutoInc;
         $this->isPrimary   = $isID || $isPrimary;
         $this->isKey       = $isKey;
-
         $this->isParent    = $isParent;
         $this->isUnique    = $isUnique;
+        $this->isCode      = $isCode;
+
         $this->belongsTo   = SchemaModel::getBaseModelName($belongsTo);
         $this->otherField  = $otherField;
 
@@ -571,10 +577,10 @@ class Field {
     }
 
     /**
-     * Returns the Data as an Array
+     * Returns the Data for the Schema JSON
      * @return array<string,string|integer|boolean>
      */
-    public function toArray(): array {
+    public function toSchemaJSON(): array {
         return [
             "name"      => $this->dbName,
             "type"      => $this->type->getName(),
@@ -585,10 +591,10 @@ class Field {
     }
 
     /**
-     * Returns the Data as an Array
+     * Returns the Data for the Schema JSON Foreign
      * @return array<string,string>
      */
-    public function toForeignArray(): array {
+    public function toSchemaForeign(): array {
         return [
             "fromField" => $this->dbName,
             "toTable"   => SchemaModel::getDbTableName($this->belongsTo),

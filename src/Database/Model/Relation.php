@@ -297,8 +297,10 @@ class Relation {
                 }
             }
 
+            // Dont add a prefix in this cases
             if ($this->withPrefix && !Arrays::contains($parentFields, $field->name) && (
                 $field->isSchemaID() ||
+                $field->isCode ||
                 Strings::startsWith($field->name, $this->prefix) ||
                 Arrays::contains($this->withoutPrefix, $field->name)
             )) {
