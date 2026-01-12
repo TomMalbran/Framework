@@ -6,8 +6,8 @@ use Framework\Discovery\Package;
 use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
-use Framework\Utils\Strings;
 use Framework\Utils\JSON;
+use Framework\Utils\Strings;
 
 use ReflectionClass;
 use ReflectionMethod;
@@ -205,40 +205,75 @@ class Discovery {
     }
 
     /**
-     * Returns the Reflection Classes that implement the given interface
+     * Returns the Reflection Classes that implement the given Interface
+     * @phpstan-param class-string $interface
+     *
      * @param string  $interface
      * @param string  $dir          Optional.
      * @param boolean $forFramework Optional.
-     * @return array{}
+     * @return object[]
      */
-    public static function getClassesWithInterface(
-        string $interface,
-        string $dir = "",
-        bool $forFramework = false,
-    ): array {
+    public static function getClassesWithInterface(string $interface, string $dir = "", bool $forFramework = false): array {
         $reflections = self::getReflectionClasses($dir, $forFramework);
-        $priorities  = [];
-        $instances   = [];
         $result      = [];
 
         foreach ($reflections as $reflection) {
             if ($reflection->implementsInterface($interface)) {
-                $priority = self::getPriority($reflection);
-                if (!isset($instances[$priority])) {
-                    $priorities[] = $priority;
-                }
-                $instances[$priority][] = $reflection->newInstance();
+                $result[] = $reflection;
             }
         }
-        sort($priorities);
+        return self::sortClassesByPriority($result);
+    }
 
+    /**
+     * Returns the Reflection Classes that implement the given Parent
+     * @phpstan-param class-string $parentClass
+     *
+     * @param string  $parentClass
+     * @param string  $dir          Optional.
+     * @param boolean $forFramework Optional.
+     * @return object[]
+     */
+    public static function getClassesWithParent(string $parentClass, string $dir = "", bool $forFramework = false): array {
+        $reflections = self::getReflectionClasses($dir, $forFramework);
+        $result      = [];
+
+        foreach ($reflections as $reflection) {
+            if ($reflection->isSubclassOf($parentClass)) {
+                $result[] = $reflection;
+            }
+        }
+        return self::sortClassesByPriority($result);
+    }
+
+    /**
+     * Sorts the given Classes by their Priority
+     * @param ReflectionClass<object>[] $reflections
+     * @return object[]
+     */
+    private static function sortClassesByPriority(array $reflections): array {
+        $priorities = [];
+        $instances  = [];
+        $result     = [];
+
+        foreach ($reflections as $reflection) {
+            $priority = self::getPriority($reflection);
+            if (!isset($instances[$priority])) {
+                $priorities[] = $priority;
+            }
+            $instances[$priority][] = $reflection->newInstance();
+        }
+
+        sort($priorities);
         foreach ($priorities as $priority) {
-            foreach ($instances[$priority] as $instance) {
-                $result[] = $instance;
+            foreach ($instances[$priority] as $class) {
+                $result[] = $class;
             }
         }
         return $result;
     }
+
+
 
     /**
      * Returns the Properties of the given Class
