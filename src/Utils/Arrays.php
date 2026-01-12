@@ -753,10 +753,12 @@ class Arrays {
      * @return integer
      */
     public static function getIndex(array $array, mixed $needle, bool $caseInsensitive = false): int {
-        foreach ($array as $index => $elem) {
+        $index = 0;
+        foreach ($array as $elem) {
             if (Strings::isEqual($elem, $needle, $caseInsensitive)) {
                 return $index;
             }
+            $index += 1;
         }
         return -1;
     }

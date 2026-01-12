@@ -117,15 +117,21 @@ class Curl {
         }
 
         // Execute the Curl
-        $curl = curl_init();
-        curl_setopt_array($curl, $options);
-        $result = curl_exec($curl);
-        curl_close($curl);
+        $curl   = curl_init();
+        $result = false;
+        if ($curl !== false) {
+            curl_setopt_array($curl, $options);
+            $result = curl_exec($curl);
+            curl_close($curl);
+        }
 
 
         // Return the Error
         if ($returnError && $result === false) {
-            $error = curl_errno($curl) . ": " . curl_error($curl);
+            $error = "Cannot initialize cURL";
+            if ($curl !== false) {
+                $error = curl_errno($curl) . ": " . curl_error($curl);
+            }
             if ($withHeaders) {
                 return [ "error" => $error, "headers" => $headers ];
             }
@@ -237,6 +243,11 @@ class Curl {
 
         // Execute the Curl
         $curl = curl_init();
+        if ($curl === false) {
+            fclose($file);
+            return false;
+        }
+
         curl_setopt_array($curl, $options);
         curl_exec($curl);
         curl_close($curl);
@@ -272,6 +283,10 @@ class Curl {
 
         // Execute the Curl
         $curl = curl_init();
+        if ($curl === false) {
+            return [];
+        }
+
         curl_setopt_array($curl, $options);
         curl_exec($curl);
         $output = curl_exec($curl);

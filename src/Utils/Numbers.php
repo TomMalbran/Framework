@@ -86,7 +86,9 @@ class Numbers {
      * @return integer
      */
     public static function random(int $length = 8): int {
-        return rand(pow(10, $length - 1), pow(10, $length) - 1);
+        $min = (int)pow(10, $length - 1);
+        $max = (int)pow(10, $length) - 1;
+        return rand($min, $max);
     }
 
     /**

@@ -140,6 +140,9 @@ class Image {
 
         if ($width > 50 || $height > 50) {
             $thumb = imagecreatetruecolor(10, 10);
+            if ($thumb === false) {
+                return false;
+            }
             imagealphablending($thumb, FALSE);
             imagecopyresized($thumb, $imgData, 0, 0, 0, 0, 10, 10, $width, $height);
 
@@ -361,6 +364,9 @@ class Image {
 
         // Crop Image
         $dstCrop = imagecreatetruecolor($cropWidth, $cropHeight);
+        if ($dstCrop === false) {
+            return false;
+        }
         $bgColor = imagecolorallocate($dstCrop, 255, 255, 255);
         if ($bgColor === false) {
             return false;

@@ -69,7 +69,8 @@ class Redis {
         try {
             $key   = "$module-$id";
             $value = JSON::encode($data);
-            return self::$client->set($key, $value);
+            self::$client->set($key, $value);
+            return true;
         } catch (Exception $e) {
             return false;
         }

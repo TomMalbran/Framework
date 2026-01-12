@@ -285,8 +285,11 @@ class Strings {
      */
     public static function replace(string $string, array|string $search, array|string|null $replace = null): string {
         if ($replace === null && is_array($search)) {
-            return str_replace(array_keys($search), array_values($search), $string);
+            $keys   = self::toString(array_keys($search));
+            $values = array_values($search);
+            return str_replace($keys, $values, $string);
         }
+
         if ($replace !== null) {
             return str_replace($search, $replace, $string);
         }

@@ -144,7 +144,7 @@ class Builder {
 
         foreach ($lines as $index => $line) {
             if (Strings::contains($line, "/**")) {
-                [ $typeLength, $varLength ] = self::getLongestParam($lines, $index);
+                [ $typeLength, $varLength ] = self::getLongestParam($lines, (int)$index);
             } elseif (Strings::contains($line, "@param")) {
                 $docType    = Strings::substringBetween($line, "@param ", " ");
                 $docTypePad = Strings::padRight($docType, $typeLength);

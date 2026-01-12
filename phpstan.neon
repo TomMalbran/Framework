@@ -11,6 +11,7 @@ parameters:
 
     # Extra Rules
     checkUninitializedProperties: true
+    checkBenevolentUnionTypes: true
     # Strict Rules
     strictRules:
         noVariableVariables: false

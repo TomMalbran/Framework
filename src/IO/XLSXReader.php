@@ -118,7 +118,7 @@ class XLSXReader implements ImporterReader {
 
         foreach ($headerRow as $key => $value) {
             if ($value !== "") {
-                $columns[] = new Select($key + 1, $value);
+                $columns[] = new Select((int)$key + 1, $value);
             }
         }
         return $columns;

@@ -2,6 +2,7 @@
 namespace Framework\File;
 
 use Framework\File\Image;
+use Framework\Utils\Numbers;
 
 use GdImage;
 
@@ -69,7 +70,7 @@ class Picture {
 
         if ($centered) {
             $textWidth = Image::getTextWidth($text, $fontFile, $fontSize);
-            $x -= $textWidth / 2;
+            $x -= Numbers::roundInt($textWidth / 2);
         }
 
         $result = imagettftext($this->image, $fontSize, 0, $x, $y, $color, $fontFile, $text);
