@@ -138,7 +138,7 @@ class Migration {
 
         // No Migrations Found
         if (count($migrations) === 0) {
-            print("\n- No data migrations found\n");
+            print("- No data migrations found\n");
             return false;
         }
 
@@ -150,12 +150,12 @@ class Migration {
         $firstMigration = $startMigration + 1;
         $lastMigration  = count($migrations);
         if ($firstMigration > $lastMigration) {
-            print("\n- No data migrations required\n");
+            print("- No data migrations required\n");
             return false;
         }
 
         // Run the Migrations
-        print("\nRunning migrations $firstMigration -> $lastMigration\n");
+        print("Running migrations $firstMigration -> $lastMigration\n");
 
         $db    = Framework::getDatabase();
         $index = 0;
