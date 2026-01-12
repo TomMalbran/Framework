@@ -14,8 +14,8 @@ class CSVWriter implements ExporterWriter {
     private string $fileName;
     private string $lang;
 
-    /** @var resource */
-    private mixed  $file;
+    /** @var resource|null */
+    private mixed  $file = null;
     private int    $line = 0;
 
 
@@ -26,6 +26,7 @@ class CSVWriter implements ExporterWriter {
      * @param string $lang     Optional.
      */
     public function __construct(string $fileName, string $lang = "root") {
+        $this->headers  = [];
         $this->fileName = $fileName;
         $this->lang     = $lang;
 
@@ -62,9 +63,11 @@ class CSVWriter implements ExporterWriter {
      * @return CSVWriter
      */
     public function writeHeader(array $headers): CSVWriter {
-        $this->headers = $headers;
-        $values = NLS::getAll(array_values($headers), $this->lang);
-        fputcsv($this->file, $values);
+        if ($this->file !== null) {
+            $this->headers = $headers;
+            $values = NLS::getAll(array_values($headers), $this->lang);
+            fputcsv($this->file, $values);
+        }
         return $this;
     }
 
@@ -74,6 +77,10 @@ class CSVWriter implements ExporterWriter {
      * @return CSVWriter
      */
     public function writeLine(array $line): CSVWriter {
+        if ($this->file === null) {
+            return $this;
+        }
+
         $values = [];
         foreach (array_keys($this->headers) as $key) {
             $values[] = $line[$key] ?? "";
@@ -92,8 +99,10 @@ class CSVWriter implements ExporterWriter {
      * @return CSVWriter
      */
     public function downloadFile(): CSVWriter {
-        fclose($this->file);
-        flush();
+        if ($this->file !== null) {
+            fclose($this->file);
+            flush();
+        }
         return $this;
     }
 }

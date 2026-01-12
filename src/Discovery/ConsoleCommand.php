@@ -17,7 +17,7 @@ class ConsoleCommand {
     public string $name  = "";
     public string $alias = "";
 
-    private ReflectionMethod $handler;
+    private ?ReflectionMethod $handler = null;
 
 
 
@@ -50,6 +50,10 @@ class ConsoleCommand {
      * @return string
      */
     public function getArguments(): string {
+        if ($this->handler === null) {
+            return "";
+        }
+
         $params    = $this->handler->getParameters();
         $argValues = [];
         foreach ($params as $param) {
@@ -91,6 +95,10 @@ class ConsoleCommand {
      * @return boolean
      */
     public function invoke(array $arguments): bool {
+        if ($this->handler === null) {
+            return false;
+        }
+
         // Parse the Arguments
         $argsData = [];
         foreach ($arguments as $argument) {

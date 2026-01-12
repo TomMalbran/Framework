@@ -29,7 +29,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     private array $request;
 
     /** @var array<string,mixed> */
-    private array $files;
+    private array $files = [];
 
 
     /**

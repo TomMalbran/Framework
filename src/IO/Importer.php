@@ -4,6 +4,7 @@ namespace Framework\IO;
 use Framework\IO\ImporterReader;
 use Framework\IO\ImporterData;
 use Framework\IO\ImporterRow;
+use Framework\IO\InvalidReader;
 use Framework\IO\XLSXReader;
 use Framework\Utils\Select;
 
@@ -18,7 +19,7 @@ class Importer implements Iterator {
     private ImporterReader $reader;
 
     /** @var array<string,integer> */
-    private array          $columns = [];
+    private array $columns = [];
 
 
 
@@ -30,7 +31,7 @@ class Importer implements Iterator {
         if (XLSXReader::isAvailable()) {
             $this->reader = new XLSXReader($path);
         } else {
-            // $this->reader = new CSVReader($path);
+            $this->reader = new InvalidReader();
         }
     }
 
@@ -44,7 +45,7 @@ class Importer implements Iterator {
 
     /**
      * Returns some data
-     * @param integer $amount
+     * @param integer $amount Optional.
      * @return ImporterData
      */
     public function getData(int $amount = 3): ImporterData {

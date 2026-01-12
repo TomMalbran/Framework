@@ -10,8 +10,8 @@ class SchemaQuery {
 
     public Query $query;
 
-    public string $tableName;
-    public string $idDbName;
+    public string $tableName = "";
+    public string $idDbName  = "";
 
 
 

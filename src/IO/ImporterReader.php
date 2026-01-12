@@ -20,7 +20,7 @@ interface ImporterReader extends Iterator {
 
     /**
      * Returns some data
-     * @param integer $amount
+     * @param integer $amount Optional.
      * @return ImporterData
      */
     public function getData(int $amount = 3): ImporterData;

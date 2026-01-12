@@ -9,6 +9,8 @@ parameters:
     universalObjectCratesClasses:
         - Framework\Utils\Errors
 
+    # Extra Rules
+    checkUninitializedProperties: true
     # Strict Rules
     strictRules:
         noVariableVariables: false

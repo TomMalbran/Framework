@@ -15,7 +15,7 @@ use OpenSpout\Common\Entity\Style\Style;
 class XLSXWriter implements ExporterWriter {
 
     /** @var array<string,string> */
-    private array  $headers;
+    private array  $headers = [];
     private string $title;
     private string $lang;
     private Writer $writer;

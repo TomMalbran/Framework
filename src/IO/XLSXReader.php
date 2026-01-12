@@ -21,9 +21,9 @@ use Exception;
  */
 class XLSXReader implements ImporterReader {
 
-    private Reader      $reader;
-    private ?Sheet      $sheet;
-    private RowIterator $iterator;
+    private Reader       $reader;
+    private ?Sheet       $sheet;
+    private ?RowIterator $iterator = null;
 
 
 
@@ -64,7 +64,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns some data
-     * @param integer $amount
+     * @param integer $amount Optional.
      * @return ImporterData
      */
     public function getData(int $amount = 3): ImporterData {
@@ -163,7 +163,10 @@ class XLSXReader implements ImporterReader {
      * @return string[]
      */
     public function current(): array {
-        return $this->parseRow($this->iterator->current());
+        if ($this->iterator !== null) {
+            return $this->parseRow($this->iterator->current());
+        }
+        return [];
     }
 
     /**
@@ -171,7 +174,10 @@ class XLSXReader implements ImporterReader {
      * @return integer
      */
     public function key(): int {
-        return $this->iterator->key();
+        if ($this->iterator !== null) {
+            return $this->iterator->key();
+        }
+        return 0;
     }
 
     /**
@@ -179,7 +185,9 @@ class XLSXReader implements ImporterReader {
      * @return void
      */
     public function next(): void {
-        $this->iterator->next();
+        if ($this->iterator !== null) {
+            $this->iterator->next();
+        }
     }
 
     /**
@@ -187,6 +195,9 @@ class XLSXReader implements ImporterReader {
      * @return boolean
      */
     public function valid(): bool {
-        return $this->iterator->valid();
+        if ($this->iterator !== null) {
+            return $this->iterator->valid();
+        }
+        return false;
     }
 }
