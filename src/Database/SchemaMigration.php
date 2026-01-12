@@ -5,7 +5,7 @@ use Framework\Framework;
 use Framework\Database\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
-use Framework\Core\Settings;
+use Framework\Core\SettingData;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -24,19 +24,19 @@ class SchemaMigration {
     public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): bool {
         $db            = Framework::getDatabase();
         $schemaModels  = SchemaFactory::getData();
-        $startMovement = Settings::getCore("movement");
-        $startRename   = Settings::getCore("rename");
+        $startMovement = SettingData::getCore("movement");
+        $startRename   = SettingData::getCore("rename");
 
         // Rename the Tables
         if (count($tableRenames) > 0) {
             $lastMovement = self::renameTables($db, $startMovement, $tableRenames);
-            Settings::setCore("movement", $lastMovement);
+            SettingData::setCore("movement", $lastMovement);
         }
 
         // Rename the Columns
         if (count($columnRenames) > 0) {
             $lastRename = self::renameColumns($db, $startRename, $columnRenames);
-            Settings::setCore("rename", $lastRename);
+            SettingData::setCore("rename", $lastRename);
         }
 
         // Migrate the Tables

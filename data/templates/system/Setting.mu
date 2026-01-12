@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}};
 
-use Framework\Core\Settings;{{#hasJSON}}
+use Framework\Core\SettingData;{{#hasJSON}}
 use Framework\Utils\JSON;{{/hasJSON}}
 
 /**
@@ -14,7 +14,7 @@ class Setting {
      * @return array{}
      */
     public static function getAll(): array {
-        return Settings::getAll();
+        return SettingData::getAll();
     }
 
     /**
@@ -23,7 +23,7 @@ class Setting {
      * @return boolean
      */
     public static function saveAll(array $data): bool {
-        return Settings::saveAll($data);
+        return SettingData::saveAll($data);
     }
 
 
@@ -35,7 +35,7 @@ class Setting {
      * @return array{}|object
      */
     public static function getAll{{name}}(bool $asObject = false): array|object {
-        return Settings::getAll("{{section}}", $asObject);
+        return SettingData::getAll("{{section}}", $asObject);
     }
 
     /**
@@ -44,7 +44,7 @@ class Setting {
      * @return boolean
      */
     public static function save{{name}}(array $data): bool {
-        return Settings::saveSection("{{section}}", $data);
+        return SettingData::saveSection("{{section}}", $data);
     }
 
 {{/sections}}
@@ -59,7 +59,7 @@ class Setting {
      * @return {{{docType}}}
      */
     public static function {{getter}}{{prefix}}{{name}}(): {{type}} {
-        $result = Settings::get("{{section}}", "{{variable}}");
+        $result = SettingData::get("{{section}}", "{{variable}}");
         {{#isBoolean}}
         return !empty($result);
         {{/isBoolean}}
@@ -89,7 +89,7 @@ class Setting {
         {{#isArray}}
         $value = JSON::encode($value);
         {{/isArray}}
-        return Settings::set("{{section}}", "{{variable}}", (string)$value);
+        return SettingData::set("{{section}}", "{{variable}}", (string)$value);
     }
 {{/variables}}
 }

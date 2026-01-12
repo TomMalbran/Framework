@@ -10,7 +10,7 @@ use Framework\Discovery\ConsoleCommand;
 use Framework\Database\SchemaMigration;
 use Framework\Database\DataMigration;
 use Framework\Core\Configs;
-use Framework\Core\Settings;
+use Framework\Core\SettingData;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
@@ -146,7 +146,7 @@ class Migration {
         ksort($migrations);
 
         // Determine the Migrations to Run
-        $startMigration = Settings::getCore("migration");
+        $startMigration = SettingData::getCore("migration");
         $firstMigration = $startMigration + 1;
         $lastMigration  = count($migrations);
         if ($firstMigration > $lastMigration) {
@@ -182,7 +182,7 @@ class Migration {
         }
 
         // Save the Last Migration
-        Settings::setCore("migration", $lastMigration);
+        SettingData::setCore("migration", $lastMigration);
         return true;
     }
 }
