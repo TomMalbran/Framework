@@ -19,13 +19,21 @@ enum Template {
 
 
     /**
+     * Returns the File Name of the Template
+     * @return string
+     */
+    public function getFileName(): string {
+        return "{$this->name}.php";
+    }
+
+    /**
      * Creates a File rendering the Template
      * @param string $path
      * @param array<string,mixed> $data
      * @return boolean
      */
     public function create(string $path, array $data): bool {
-        return File::create($path, "{$this->name}.php", $this->render($data));
+        return File::create($path, $this->getFileName(), $this->render($data));
     }
 
     /**
