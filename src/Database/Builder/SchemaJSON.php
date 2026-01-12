@@ -29,10 +29,10 @@ class SchemaJSON implements DiscoveryBuilder {
 
         $schemas = [];
         foreach ($frameModels as $schemaModel) {
-            $schemas[$schemaModel->tableName] = $schemaModel->toArray();
+            $schemas[$schemaModel->tableName] = $schemaModel->toSchemaJSON();
         }
         foreach ($appModels as $schemaModel) {
-            $schemas[$schemaModel->tableName] = $schemaModel->toArray();
+            $schemas[$schemaModel->tableName] = $schemaModel->toSchemaJSON();
         }
         ksort($schemas);
 

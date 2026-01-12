@@ -407,10 +407,10 @@ class SchemaModel {
     }
 
     /**
-     * Returns the Data as an Array
+     * Returns the Data for the Schema JSON
      * @return array<string,mixed>
      */
-    public function toArray(): array {
+    public function toSchemaJSON(): array {
         $result = [
             "hasTimestamps" => $this->hasTimestamps,
             "hasStatus"     => $this->hasStatus,
@@ -427,7 +427,7 @@ class SchemaModel {
 
         // Add the fields
         foreach ($this->mainFields as $field) {
-            $result["fields"][] = $field->toArray();
+            $result["fields"][] = $field->toSchemaJSON();
         }
 
         // Parse the relations and add the necessary joins
@@ -435,14 +435,14 @@ class SchemaModel {
             if ($relation->relationModel !== null) {
                 $relationName      = $relation->getName($relationNames);
                 $relationNames[]   = $relationName;
-                $result["joins"][] = $relation->toArray($relationName);
+                $result["joins"][] = $relation->toSchemaJSON($relationName);
             }
         }
 
         // Add the foreign fields
         foreach ($this->mainFields as $field) {
             if ($field->belongsTo !== "" && !Arrays::contains($relationNames, $field->dbName)) {
-                $result["foreigns"][] = $field->toForeignArray();
+                $result["foreigns"][] = $field->toSchemaForeign();
             }
         }
 

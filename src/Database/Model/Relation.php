@@ -590,11 +590,11 @@ class Relation {
     }
 
     /**
-     * Returns the Data as an Array
+     * Returns the Data for the Schema JSON
      * @param string $dbName
      * @return array<string,mixed>
      */
-    public function toArray(string $dbName): array {
+    public function toSchemaJSON(string $dbName): array {
         if ($this->relationModel === null || $this->parentModel === null || $this->ownerModelName !== $this->parentModel->name) {
             return [];
         }
