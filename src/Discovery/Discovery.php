@@ -100,9 +100,10 @@ class Discovery {
      * Finds the Classes in the given Directory
      * @param string  $dir          Optional.
      * @param boolean $forFramework Optional.
+     * @param boolean $withError    Optional.
      * @return array<string,string>
      */
-    public static function findClasses(string $dir = "", bool $forFramework = false): array {
+    public static function findClasses(string $dir = "", bool $forFramework = false, bool $withError = false): array {
         if ($forFramework) {
             $namespace  = Package::FrameNamespace;
             $sourcePath = Application::getFramePath(Package::FrameSourceDir);
@@ -177,6 +178,8 @@ class Discovery {
             if ($isValid) {
                 $classKey = Strings::substringAfter($className, "\\");
                 $result["\\$className"] = $classKey;
+            } elseif ($withError) {
+                var_dump("Skipping class $className due to missing dependencies.");
             }
         }
         return $result;
@@ -186,10 +189,11 @@ class Discovery {
      * Returns the Reflection Classes in the given Directory
      * @param string  $dir          Optional.
      * @param boolean $forFramework Optional.
+     * @param boolean $withError    Optional.
      * @return array<string,ReflectionClass<object>>
      */
-    public static function getReflectionClasses(string $dir = "", bool $forFramework = false): array {
-        $classes = self::findClasses($dir, $forFramework);
+    public static function getReflectionClasses(string $dir = "", bool $forFramework = false, bool $withError = false): array {
+        $classes = self::findClasses($dir, $forFramework, $withError);
         $result  = [];
 
         foreach ($classes as $className => $classKey) {
@@ -198,6 +202,9 @@ class Discovery {
                     $result[$className] = new ReflectionClass($className);
                 }
             } catch (Throwable $e) {
+                if ($withError) {
+                    var_dump("Error loading class: $className: " . $e->getMessage());
+                }
                 continue;
             }
         }
@@ -211,10 +218,11 @@ class Discovery {
      * @param string  $interface
      * @param string  $dir          Optional.
      * @param boolean $forFramework Optional.
+     * @param boolean $withError    Optional.
      * @return object[]
      */
-    public static function getClassesWithInterface(string $interface, string $dir = "", bool $forFramework = false): array {
-        $reflections = self::getReflectionClasses($dir, $forFramework);
+    public static function getClassesWithInterface(string $interface, string $dir = "", bool $forFramework = false, bool $withError = false): array {
+        $reflections = self::getReflectionClasses($dir, $forFramework, $withError);
         $result      = [];
 
         foreach ($reflections as $reflection) {
@@ -232,10 +240,11 @@ class Discovery {
      * @param string  $parentClass
      * @param string  $dir          Optional.
      * @param boolean $forFramework Optional.
+     * @param boolean $withError    Optional.
      * @return object[]
      */
-    public static function getClassesWithParent(string $parentClass, string $dir = "", bool $forFramework = false): array {
-        $reflections = self::getReflectionClasses($dir, $forFramework);
+    public static function getClassesWithParent(string $parentClass, string $dir = "", bool $forFramework = false, bool $withError = false): array {
+        $reflections = self::getReflectionClasses($dir, $forFramework, $withError);
         $result      = [];
 
         foreach ($reflections as $reflection) {
