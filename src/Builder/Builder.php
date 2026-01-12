@@ -66,21 +66,24 @@ class Builder {
     public static function destroy(): bool {
         $writePath = Application::getBuildPath();
         $deleted   = 0;
-        File::deleteDir($writePath, $deleted);
-
-        /** @var DiscoveryBuilder[] */
-        $frameBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class, forFramework: true);
-        foreach ($frameBuilders as $builder) {
-            $deleted += $builder::destroyCode();
-        }
 
         if (!Application::isFramework()) {
             /** @var DiscoveryBuilder[] */
             $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
+            $appBuilders = array_reverse($appBuilders);
             foreach ($appBuilders as $builder) {
                 $deleted += $builder::destroyCode();
             }
         }
+
+        /** @var DiscoveryBuilder[] */
+        $frameBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class, forFramework: true);
+        $frameBuilders = array_reverse($frameBuilders);
+        foreach ($frameBuilders as $builder) {
+            $deleted += $builder::destroyCode();
+        }
+
+        File::deleteDir($writePath, $deleted);
 
         print("\nDestroyed $deleted generated files\n");
         return true;
