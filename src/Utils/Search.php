@@ -68,6 +68,7 @@ class Search implements JsonSerializable {
      * Implements the JSON Serializable Interface
      * @return mixed
      */
+    #[\Override]
     public function jsonSerialize(): mixed {
         return [
             "id"    => $this->id,

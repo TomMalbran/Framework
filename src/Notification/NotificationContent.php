@@ -48,6 +48,7 @@ class NotificationContent extends NotificationContentSchema implements Discovery
      * Migrates the Notification Contents data
      * @return boolean
      */
+    #[\Override]
     public static function migrateData(): bool {
         self::truncateData();
 

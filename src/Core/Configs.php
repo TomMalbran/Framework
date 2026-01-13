@@ -262,6 +262,7 @@ class Configs implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $data = self::getData();
         if (Arrays::isEmpty($data)) {
@@ -290,6 +291,7 @@ class Configs implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

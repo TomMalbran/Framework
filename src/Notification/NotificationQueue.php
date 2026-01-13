@@ -38,6 +38,7 @@ class NotificationQueue extends NotificationQueueSchema {
      * @param Request $request
      * @return NotificationQueueQuery
      */
+    #[\Override]
     protected static function createListQuery(Request $request): NotificationQueueQuery {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStartHour("fromDate", "fromHour");

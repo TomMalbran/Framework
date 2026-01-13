@@ -317,6 +317,7 @@ class Entity implements JsonSerializable {
      * Implements the JSON Serializable Interface
      * @return mixed
      */
+    #[\Override]
     public function jsonSerialize(): mixed {
         return $this->toArray();
     }

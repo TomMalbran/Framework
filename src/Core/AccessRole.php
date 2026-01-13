@@ -51,6 +51,7 @@ class AccessRole implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         if (count(self::$roles) === 0) {
             DiscoveryConfig::loadDefault("access");
@@ -72,6 +73,7 @@ class AccessRole implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

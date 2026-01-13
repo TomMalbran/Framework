@@ -19,6 +19,7 @@ class LanguageCode implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $path      = Application::getStringsPath();
         $files     = File::getFilesInDir($path);
@@ -81,6 +82,7 @@ class LanguageCode implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

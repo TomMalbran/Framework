@@ -15,6 +15,7 @@ class MediaCode implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $schemaModels = SchemaFactory::buildData(false);
 
@@ -44,6 +45,7 @@ class MediaCode implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

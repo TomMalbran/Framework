@@ -13,6 +13,7 @@ class InvalidReader implements ImporterReader {
      * Returns true if the Reader is valid
      * @return boolean
      */
+    #[\Override]
     public function isValid(): bool {
         return false;
     }
@@ -22,6 +23,7 @@ class InvalidReader implements ImporterReader {
      * @param integer $amount
      * @return ImporterData
      */
+    #[\Override]
     public function getData(int $amount = 0): ImporterData {
         return new ImporterData(
             columns: [],
@@ -35,6 +37,7 @@ class InvalidReader implements ImporterReader {
      * Returns the Header
      * @return Select[]
      */
+    #[\Override]
     public function getHeader(): array {
         return [];
     }
@@ -45,6 +48,7 @@ class InvalidReader implements ImporterReader {
      * Starts the Iterator
      * @return void
      */
+    #[\Override]
     public function rewind(): void {
         // Nothing to do
     }
@@ -53,6 +57,7 @@ class InvalidReader implements ImporterReader {
      * Returns the current Row
      * @return string[]
      */
+    #[\Override]
     public function current(): array {
         return [];
     }
@@ -61,6 +66,7 @@ class InvalidReader implements ImporterReader {
      * Returns the current Key
      * @return integer
      */
+    #[\Override]
     public function key(): int {
         return 0;
     }
@@ -69,6 +75,7 @@ class InvalidReader implements ImporterReader {
      * Moves to the next Row
      * @return void
      */
+    #[\Override]
     public function next(): void {
         // Nothing to do
     }
@@ -77,6 +84,7 @@ class InvalidReader implements ImporterReader {
      * Returns true if the current Row is valid
      * @return boolean
      */
+    #[\Override]
     public function valid(): bool {
         return false;
     }

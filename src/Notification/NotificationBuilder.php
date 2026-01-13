@@ -16,6 +16,7 @@ class NotificationBuilder implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $languages = Language::getAll();
         $data      = [];
@@ -43,6 +44,7 @@ class NotificationBuilder implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

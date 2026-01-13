@@ -58,6 +58,7 @@ class SettingConfig implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         if (count(self::$settings) === 0) {
             return Builder::generateCode("Setting");
@@ -76,6 +77,7 @@ class SettingConfig implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

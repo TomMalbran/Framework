@@ -62,6 +62,7 @@ class CSVWriter implements ExporterWriter {
      * @param array<string,string> $headers
      * @return CSVWriter
      */
+    #[\Override]
     public function writeHeader(array $headers): CSVWriter {
         if ($this->file !== null) {
             $this->headers = $headers;
@@ -76,6 +77,7 @@ class CSVWriter implements ExporterWriter {
      * @param array<string,string> $line
      * @return CSVWriter
      */
+    #[\Override]
     public function writeLine(array $line): CSVWriter {
         if ($this->file === null) {
             return $this;
@@ -98,6 +100,7 @@ class CSVWriter implements ExporterWriter {
      * Downloads the File
      * @return CSVWriter
      */
+    #[\Override]
     public function downloadFile(): CSVWriter {
         if ($this->file !== null) {
             fclose($this->file);

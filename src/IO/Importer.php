@@ -90,6 +90,7 @@ class Importer implements Iterator {
      * Starts the Iterator
      * @return void
      */
+    #[\Override]
     public function rewind(): void {
         $this->reader->rewind();
     }
@@ -98,6 +99,7 @@ class Importer implements Iterator {
      * Returns the current Row
      * @return ImporterRow
      */
+    #[\Override]
     public function current(): ImporterRow {
         $data = $this->reader->current();
         return new ImporterRow($data, $this->columns);
@@ -107,6 +109,7 @@ class Importer implements Iterator {
      * Returns the current Key
      * @return integer
      */
+    #[\Override]
     public function key(): int {
         return $this->reader->key();
     }
@@ -115,6 +118,7 @@ class Importer implements Iterator {
      * Moves to the next Row
      * @return void
      */
+    #[\Override]
     public function next(): void {
         $this->reader->next();
     }
@@ -123,6 +127,7 @@ class Importer implements Iterator {
      * Returns true if the current Row is valid
      * @return boolean
      */
+    #[\Override]
     public function valid(): bool {
         return $this->reader->valid();
     }

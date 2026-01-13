@@ -57,6 +57,7 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
      * Migrates the Email Contents data
      * @return boolean
      */
+    #[\Override]
     public static function migrateData(): bool {
         self::truncateData();
 

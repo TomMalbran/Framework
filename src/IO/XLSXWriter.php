@@ -56,6 +56,7 @@ class XLSXWriter implements ExporterWriter {
      * @param array<string,string> $headers
      * @return XLSXWriter
      */
+    #[\Override]
     public function writeHeader(array $headers): XLSXWriter {
         $this->headers = $headers;
 
@@ -70,6 +71,7 @@ class XLSXWriter implements ExporterWriter {
      * @param array<string,string> $line
      * @return XLSXWriter
      */
+    #[\Override]
     public function writeLine(array $line): XLSXWriter {
         $values = [];
         foreach (array_keys($this->headers) as $key) {
@@ -85,6 +87,7 @@ class XLSXWriter implements ExporterWriter {
      * Downloads the File
      * @return XLSXWriter
      */
+    #[\Override]
     public function downloadFile(): XLSXWriter {
         $this->writer->close();
         return $this;

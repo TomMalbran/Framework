@@ -20,6 +20,7 @@ class RouterCode implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $reflections = Discovery::getReflectionClasses();
         $routes      = [];
@@ -113,6 +114,7 @@ class RouterCode implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

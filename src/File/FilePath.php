@@ -164,6 +164,7 @@ class FilePath implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
@@ -189,6 +190,7 @@ class FilePath implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

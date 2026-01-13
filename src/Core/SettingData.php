@@ -165,6 +165,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
      * Migrates the Settings data
      * @return boolean
      */
+    #[\Override]
     public static function migrateData(): bool {
         $query = new SettingsQuery();
         $query->section->notEqual(SettingConfig::Core);

@@ -23,6 +23,7 @@ class QueryLog extends LogQuerySchema {
      * @param Request $request
      * @return LogQueryQuery
      */
+    #[\Override]
     protected static function createListQuery(Request $request): LogQueryQuery {
         $search     = $request->getString("search");
         $fromTime   = $request->toDayStartHour("fromDate", "fromHour");

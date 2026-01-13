@@ -60,6 +60,7 @@ class Credential extends CredentialSchema {
      * @param boolean $complete     Optional.
      * @return CredentialEntity
      */
+    #[\Override]
     public static function getByID(int $credentialID, bool $complete = false): CredentialEntity {
         $query = new CredentialQuery();
         $query->credentialID->equal($credentialID);

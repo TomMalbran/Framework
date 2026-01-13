@@ -48,6 +48,7 @@ class ErrorLog extends LogErrorSchema {
      * @param Request $request
      * @return LogErrorQuery
      */
+    #[\Override]
     protected static function createListQuery(Request $request): LogErrorQuery {
         $search     = $request->getString("search");
         $fromTime   = $request->toDayStartHour("fromDate", "fromHour");

@@ -947,6 +947,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Implements the Iterator Aggregate Interface
      * @return ArrayIterator<string,mixed>
      */
+    #[\Override]
     public function getIterator(): Traversable {
         return new ArrayIterator($this->request);
     }
@@ -955,6 +956,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Implements the JSON Serializable Interface
      * @return mixed
      */
+    #[\Override]
     public function jsonSerialize(): mixed {
         return $this->request;
     }

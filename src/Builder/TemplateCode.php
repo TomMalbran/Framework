@@ -18,6 +18,7 @@ class TemplateCode implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $path      = Application::getAppPath();
         $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
@@ -55,6 +56,7 @@ class TemplateCode implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         return 1;
     }

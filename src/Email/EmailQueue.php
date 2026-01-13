@@ -24,6 +24,7 @@ class EmailQueue extends EmailQueueSchema {
      * @param Request $request
      * @return EmailQueueQuery
      */
+    #[\Override]
     protected static function createListQuery(Request $request): EmailQueueQuery {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStartHour("fromDate", "fromHour");

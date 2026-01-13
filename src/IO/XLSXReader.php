@@ -58,6 +58,7 @@ class XLSXReader implements ImporterReader {
      * Returns true if the Reader is valid
      * @return boolean
      */
+    #[\Override]
     public function isValid(): bool {
         return $this->sheet !== null;
     }
@@ -67,6 +68,7 @@ class XLSXReader implements ImporterReader {
      * @param integer $amount Optional.
      * @return ImporterData
      */
+    #[\Override]
     public function getData(int $amount = 3): ImporterData {
         $data = new ImporterData(
             columns: $this->getHeader(),
@@ -106,6 +108,7 @@ class XLSXReader implements ImporterReader {
      * Returns the Header
      * @return Select[]
      */
+    #[\Override]
     public function getHeader(): array {
         $columns = [];
         if ($this->sheet === null) {
@@ -148,6 +151,7 @@ class XLSXReader implements ImporterReader {
      * Starts the Iterator
      * @return void
      */
+    #[\Override]
     public function rewind(): void {
         if ($this->sheet === null) {
             return;
@@ -162,6 +166,7 @@ class XLSXReader implements ImporterReader {
      * Returns the current Row
      * @return string[]
      */
+    #[\Override]
     public function current(): array {
         if ($this->iterator !== null) {
             return $this->parseRow($this->iterator->current());
@@ -173,6 +178,7 @@ class XLSXReader implements ImporterReader {
      * Returns the current Key
      * @return integer
      */
+    #[\Override]
     public function key(): int {
         if ($this->iterator !== null) {
             return $this->iterator->key();
@@ -184,6 +190,7 @@ class XLSXReader implements ImporterReader {
      * Moves to the next Row
      * @return void
      */
+    #[\Override]
     public function next(): void {
         if ($this->iterator !== null) {
             $this->iterator->next();
@@ -194,6 +201,7 @@ class XLSXReader implements ImporterReader {
      * Returns true if the current Row is valid
      * @return boolean
      */
+    #[\Override]
     public function valid(): bool {
         if ($this->iterator !== null) {
             return $this->iterator->valid();

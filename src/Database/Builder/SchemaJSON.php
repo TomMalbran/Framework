@@ -18,6 +18,7 @@ class SchemaJSON implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         $schemaFile = Config::getDbSchemaFile();
         if ($schemaFile === "") {
@@ -46,6 +47,7 @@ class SchemaJSON implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         $schemaFile = Config::getDbSchemaFile();
         if ($schemaFile === "") {

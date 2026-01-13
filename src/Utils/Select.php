@@ -117,6 +117,7 @@ class Select implements JsonSerializable {
      * Implements the JSON Serializable Interface
      * @return mixed
      */
+    #[\Override]
     public function jsonSerialize(): mixed {
         $result = [
             "key"   => $this->key,

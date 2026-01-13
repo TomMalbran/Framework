@@ -19,6 +19,7 @@ class SchemaBuilder implements DiscoveryBuilder {
      * Generates the code
      * @return integer
      */
+    #[\Override]
     public static function generateCode(): int {
         print("\n");
         $created  = self::generateSchemaCode(forFramework: true);
@@ -84,6 +85,7 @@ class SchemaBuilder implements DiscoveryBuilder {
      * Destroys the Code
      * @return integer
      */
+    #[\Override]
     public static function destroyCode(): int {
         $deleted  = self::destroySchemaCode(forFramework: true);
         $deleted += self::destroySchemaCode(forFramework: false);

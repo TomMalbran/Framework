@@ -19,6 +19,7 @@ class DeviceLog extends LogDeviceSchema {
      * @param Request $request
      * @return LogDeviceQuery
      */
+    #[\Override]
     protected static function createListQuery(Request $request): LogDeviceQuery {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStart("fromDate");

@@ -438,6 +438,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @phpstan-return 0|positive-int
      * @return integer
      */
+    #[\Override]
     public function count(): int {
         $result = count($this->data);
         return max(0, $result);
@@ -447,6 +448,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * Returns an Iterator
      * @return Traversable<string,Dictionary>
      */
+    #[\Override]
     public function getIterator(): Traversable {
         return (function () {
             foreach ($this->data as $key => $value) {
@@ -459,6 +461,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * Implements the JSON Serializable Interface
      * @return mixed
      */
+    #[\Override]
     public function jsonSerialize(): mixed {
         return $this->data;
     }

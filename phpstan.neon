@@ -16,6 +16,8 @@ parameters:
     reportPossiblyNonexistentConstantArrayOffset: true
     checkTooWideReturnTypesInProtectedAndPublicMethods: true
     reportAnyTypeWideningInVarTag: true
+    checkMissingOverrideMethodAttribute: true
+
     # Strict Rules
     strictRules:
         noVariableVariables: false
