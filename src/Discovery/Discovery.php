@@ -296,7 +296,7 @@ class Discovery {
         $result     = [];
         $reflection = new ReflectionClass($class);
 
-        /** @var ReflectionProperty[] */
+        /** @var list<ReflectionProperty> */
         $props = $reflection->getProperties($filter ?? ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
 
         foreach ($props as $prop) {
