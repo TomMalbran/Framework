@@ -59,7 +59,10 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return mixed
      */
     public function get(string $key, mixed $default = ""): mixed {
-        return $this->exists($key) ? $this->request[$key] : $default;
+        if (isset($this->request[$key])) {
+            return $this->request[$key];
+        }
+        return $default;
     }
 
     /**
@@ -69,7 +72,10 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return mixed
      */
     public function getOr(string $key, mixed $default): mixed {
-        return $this->has($key) ? $this->request[$key] : $default;
+        if (isset($this->request[$key]) && $this->has($key)) {
+            return $this->request[$key];
+        }
+        return $default;
     }
 
     /**
@@ -79,7 +85,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getInt(string $key, int $default = 0): int {
-        if ($this->exists($key)) {
+        if (isset($this->request[$key])) {
             return Numbers::toInt($this->request[$key]);
         }
         return $default;
@@ -92,7 +98,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return float
      */
     public function getFloat(string $key, float $default = 0): float {
-        if ($this->exists($key)) {
+        if (isset($this->request[$key])) {
             return Numbers::toFloat($this->request[$key]);
         }
         return $default;
@@ -105,7 +111,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getString(string $key, string $default = ""): string {
-        if ($this->exists($key)) {
+        if (isset($this->request[$key])) {
             return Strings::normalized($this->request[$key]);
         }
         return $default;
@@ -277,11 +283,11 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function isActive(string $key): bool {
-        if (!$this->has($key)) {
-            return false;
+        if (isset($this->request[$key])) {
+            $value = $this->request[$key];
+            return $value === "true" || $value === 1;
         }
-        $value = $this->request[$key];
-        return $value === "true" || $value === 1;
+        return false;
     }
 
 
@@ -822,8 +828,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getFileName(string $key): string {
-        if ($this->hasFile($key) && is_array($this->files[$key])) {
-            return Strings::toString($this->files[$key]["name"]);
+        if (isset($this->files[$key]) && is_array($this->files[$key])) {
+            return Strings::toString($this->files[$key]["name"] ?? "");
         }
         return "";
     }
@@ -834,8 +840,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getFileType(string $key): string {
-        if ($this->hasFile($key) && is_array($this->files[$key])) {
-            return Strings::toString($this->files[$key]["type"]);
+        if (isset($this->files[$key]) && is_array($this->files[$key])) {
+            return Strings::toString($this->files[$key]["type"] ?? "");
         }
         return "";
     }
@@ -846,8 +852,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getTmpName(string $key): string {
-        if ($this->hasFile($key) && is_array($this->files[$key])) {
-            return Strings::toString($this->files[$key]["tmp_name"]);
+        if (isset($this->files[$key]) && is_array($this->files[$key])) {
+            return Strings::toString($this->files[$key]["tmp_name"] ?? "");
         }
         return "";
     }
@@ -887,8 +893,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function hasSizeError(string $key): bool {
-        if ($this->hasFile($key) && is_array($this->files[$key])) {
-            return isset($this->files[$key]["error"]) && $this->files[$key]["error"] === UPLOAD_ERR_INI_SIZE;
+        if (isset($this->files[$key]) && is_array($this->files[$key]) && isset($this->files[$key]["error"])) {
+            return $this->files[$key]["error"] === UPLOAD_ERR_INI_SIZE;
         }
         return true;
     }

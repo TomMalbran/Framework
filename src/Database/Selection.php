@@ -271,7 +271,9 @@ class Selection {
             if (!Arrays::isEmpty($extras)) {
                 $extras = Arrays::toStrings($extras);
                 foreach ($extras as $extra) {
-                    $fields[$extra] = $row[$extra];
+                    if (isset($row[$extra])) {
+                        $fields[$extra] = $row[$extra];
+                    }
                 }
             }
 

@@ -342,10 +342,10 @@ class Credential extends CredentialSchema {
      */
     private static function getCredential(?CredentialQuery $query = null, bool $complete = false): CredentialEntity {
         $list = self::getCredentials($query, null, $complete);
-        if (count($list) === 0) {
-            return new CredentialEntity();
+        if (isset($list[0])) {
+            return $list[0];
         }
-        return $list[0];
+        return new CredentialEntity();
     }
 
 

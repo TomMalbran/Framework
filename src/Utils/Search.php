@@ -90,7 +90,7 @@ class Search implements JsonSerializable {
         $ids    = [];
 
         foreach ($array as $row) {
-            $id = $row[$idKey];
+            $id = $row[$idKey] ?? null;
             if (!is_int($id) && !is_string($id)) {
                 continue;
             }

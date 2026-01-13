@@ -13,7 +13,7 @@ use Framework\Utils\Strings;
  */
 class DateTime {
 
-    /** @var float[] */
+    /** @var list<float> */
     public static array $stackZones = [];
     public static float $serverZone = -3;
     public static float $timeDiff   = 0;
@@ -55,8 +55,10 @@ class DateTime {
     public static function popTimeZone(): float {
         if (count(self::$stackZones) > 1) {
             $timeZone = array_pop(self::$stackZones);
-        } else {
+        } elseif (count(self::$stackZones) === 1) {
             $timeZone = self::$stackZones[0];
+        } else {
+            $timeZone = self::$serverZone;
         }
         self::$timeDiff = self::$serverZone - $timeZone;
         return self::$timeDiff;
@@ -1339,9 +1341,9 @@ class DateTime {
     private static function parseDateGlue(string $text, string $glue): int {
         $parts  = Strings::split($text, $glue);
         $amount = count($parts);
-        $part0  = (int)$parts[0];
-        $part1  = $amount > 1 ? (int)$parts[1] : 0;
-        $part2  = $amount > 2 ? (int)$parts[2] : 0;
+        $part0  = isset($parts[0]) ? (int)$parts[0] : 0;
+        $part1  = isset($parts[1]) ? (int)$parts[1] : 0;
+        $part2  = isset($parts[2]) ? (int)$parts[2] : 0;
 
         // We need at least 2 parts
         if ($part0 === 0 || $part1 === 0) {

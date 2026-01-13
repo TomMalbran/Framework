@@ -250,7 +250,7 @@ class TimeTable {
      * @param string  $closedText Optional.
      * @param string  $timeZone   Optional.
      * @param string  $isoCode    Optional.
-     * @return array<string,mixed>[]
+     * @return array{days:integer[],fromHour:string,toHour:string,daysText:string,timeText:string,zone:string}[]
      */
     public function getList(
         bool $allDays = false,
@@ -328,7 +328,7 @@ class TimeTable {
                         );
                     } else {
                         $schedules[$id]["days"][$index] = DateTime::getDayName(
-                            $elem["numbers"][$index],
+                            $elem["numbers"][$index] ?? 0,
                             startMonday: $this->startMonday,
                             language:    $isoCode,
                         );
@@ -356,13 +356,13 @@ class TimeTable {
             $daysText = "";
             $amount   = count($elem["days"]);
             if ($amount > 7) {
-                $daysText = NLS::get("TIME_TABLE_ALL_HOLIDAYS", $isoCode);
+                $daysText = NLS::getString("TIME_TABLE_ALL_HOLIDAYS", $isoCode);
             } elseif ($amount === 7) {
-                $daysText = NLS::get("TIME_TABLE_ALL_DAYS", $isoCode);
+                $daysText = NLS::getString("TIME_TABLE_ALL_DAYS", $isoCode);
             } elseif ($amount === 2) {
                 $daysText = NLS::join($elem["days"], false, $isoCode);
             } elseif ($amount === 1) {
-                $daysText = $elem["days"][0];
+                $daysText = $elem["days"][0] ?? "";
             } else {
                 $parts = [];
                 $count = 0;
@@ -370,22 +370,23 @@ class TimeTable {
                     $first = $count;
                     $last  = $count;
                     for ($i = $count + 1; $i < $amount; $i++) {
-                        if ($elem["numbers"][$i] === $maxDay) {
+                        $number = $elem["numbers"][$i] ?? 0;
+                        if ($number === $maxDay) {
                             break;
                         }
-                        if ($elem["numbers"][$i] - 1 !== $elem["numbers"][$last]) {
+                        if ($number - 1 !== ($elem["numbers"][$last] ?? 0)) {
                             break;
                         }
                         $last = $i;
                     }
                     if ($last - $first > 1) {
                         $parts[] = NLS::format("TIME_TABLE_SOME_DAYS", [
-                            $elem["days"][$first],
-                            $elem["days"][$last],
+                            $elem["days"][$first] ?? "",
+                            $elem["days"][$last]  ?? "",
                         ], $isoCode);
                         $count = $last + 1;
                     } else {
-                        $parts[] = $elem["days"][$first];
+                        $parts[] = $elem["days"][$first] ?? "";
                         $count++;
                     }
                     $daysText = NLS::join($parts, false, $isoCode);
@@ -399,7 +400,7 @@ class TimeTable {
             }
 
             if ($elem["fromHour"] === "") {
-                $timeText = NLS::get($closedText, $isoCode);
+                $timeText = NLS::getString($closedText, $isoCode);
             } else {
                 $timeText = NLS::format("TIME_TABLE_HOURS", [ $elem["fromHour"], $toHour ], $isoCode);
             }

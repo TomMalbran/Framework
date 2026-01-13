@@ -61,7 +61,7 @@ class ActionLog extends LogActionSchema {
         $lastIndex = -1;
 
         foreach ($list as $elem) {
-            if ($lastIndex < 0 || $result[$lastIndex]["sessionID"] !== $elem->sessionID) {
+            if ($lastIndex < 0 || (isset($result[$lastIndex]) && $result[$lastIndex]["sessionID"] !== $elem->sessionID)) {
                 $result[] = [
                     "sessionID"      => $elem->sessionID,
                     "credentialID"   => $elem->credentialID,

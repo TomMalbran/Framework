@@ -56,6 +56,10 @@ class SchemaMigration {
         $didRename  = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
+            if (!isset($tableRenames[$i])) {
+                continue;
+            }
+
             $fromName = SchemaModel::getDbTableName($tableRenames[$i]["from"]);
             $toName   = SchemaModel::getDbTableName($tableRenames[$i]["to"]);
 
@@ -87,6 +91,10 @@ class SchemaMigration {
         $didRename  = false;
 
         for ($i = $startRename; $i < $lastRename; $i++) {
+            if (!isset($columnRenames[$i])) {
+                continue;
+            }
+
             $table    = SchemaModel::getDbTableName($columnRenames[$i]["table"]);
             $fromName = SchemaModel::getDbFieldName($columnRenames[$i]["from"]);
             $toName   = SchemaModel::getDbFieldName($columnRenames[$i]["to"]);
@@ -336,7 +344,7 @@ class SchemaMigration {
             if ($field->isKey) {
                 $found = false;
                 foreach ($tableKeys as $tableKey) {
-                    if ($tableKey["Key_name"] === $field->dbName) {
+                    if (isset($tableKey["Key_name"]) && $tableKey["Key_name"] === $field->dbName) {
                         $found = true;
                     }
                 }

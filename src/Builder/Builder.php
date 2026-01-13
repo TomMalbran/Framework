@@ -144,7 +144,7 @@ class Builder {
 
         foreach ($lines as $index => $line) {
             if (Strings::contains($line, "/**")) {
-                [ $typeLength, $varLength ] = self::getLongestParam($lines, (int)$index);
+                [ $typeLength, $varLength ] = self::getLongestParam($lines, $index);
             } elseif (Strings::contains($line, "@param")) {
                 $docType    = Strings::substringBetween($line, "@param ", " ");
                 $docTypePad = Strings::padRight($docType, $typeLength);
@@ -164,10 +164,10 @@ class Builder {
      * Returns the longest Param and Type of the current Doc comment
      * @param string[] $lines
      * @param integer  $index
-     * @return integer[]
+     * @return array{integer,integer}
      */
     private static function getLongestParam(array $lines, int $index): array {
-        $line       = $lines[$index];
+        $line       = $lines[$index] ?? "";
         $typeLength = 0;
         $varLength  = 0;
 
@@ -179,7 +179,7 @@ class Builder {
                 $varLength  = max($varLength, Strings::length($varName));
             }
             $index += 1;
-            $line   = $lines[$index];
+            $line   = $lines[$index] ?? "";
         }
         return [ $typeLength, $varLength ];
     }

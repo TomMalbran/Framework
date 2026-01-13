@@ -269,6 +269,10 @@ class Database {
      * @return boolean
      */
     public function batch(string $table, array $fields, string $method = "REPLACE"): bool {
+        if (!isset($fields[0])) {
+            return false;
+        }
+
         $bindParams  = [];
         $expression  = "$method INTO `$table` ";
         $expression .= $this->buildInsertHeader($fields[0]);
@@ -642,12 +646,12 @@ class Database {
      * @return string[]
      */
     public function getPrimaryKeys(string $tableName): array {
-        $request = $this->queryData("SHOW KEYS FROM `$tableName`");
+        $request = $this->getDictionary("SHOW KEYS FROM `$tableName`");
         $result  = [];
 
         foreach ($request as $row) {
-            if ($row["Key_name"] === "PRIMARY") {
-                $result[] = Strings::toString($row["Column_name"]);
+            if ($row->getString("Key_name") === "PRIMARY") {
+                $result[] = $row->getString("Column_name");
             }
         }
         return $result;
@@ -659,7 +663,7 @@ class Database {
      * @return string
      */
     public function getAutoIncrement(string $tableName): string {
-        $request = $this->queryData("
+        $request = $this->getDictionary("
             SELECT *
             FROM INFORMATION_SCHEMA.COLUMNS
             WHERE TABLE_NAME = '$tableName'
@@ -668,11 +672,8 @@ class Database {
                 AND IS_NULLABLE = 'NO'
                 AND EXTRA like '%auto_increment%'
             LIMIT 1
-        ");
-        if (isset($request[0])) {
-            return Strings::toString($request[0]["COLUMN_NAME"]);
-        }
-        return "";
+        ")->getFirst();
+        return $request->getString("COLUMN_NAME");
     }
 
     /**
@@ -693,7 +694,7 @@ class Database {
         $request = $this->queryData("SHOW FIELDS FROM `$tableName`");
         $result  = [];
         foreach ($request as $row) {
-            $field = Strings::toString($row["Field"]);
+            $field = Strings::toString($row["Field"] ?? "");
             $result[$field] = $this->parseColumnType($row);
         }
         return $result;
@@ -710,8 +711,8 @@ class Database {
         if ($tableName === "") {
             return false;
         }
-        $result = $this->queryData("SHOW TABLES LIKE '$tableName'");
-        return !Arrays::isEmpty($result);
+        $request = $this->getDictionary("SHOW TABLES LIKE '$tableName'");
+        return !$request->isEmpty();
     }
 
     /**
@@ -720,8 +721,11 @@ class Database {
      * @return boolean
      */
     public function tableIsEmpty(string $tableName): bool {
-        $result = $this->queryData("SELECT COUNT(*) AS count FROM `$tableName`");
-        return !isset($result[0]) || $result[0]["count"] === 0;
+        $request = $this->getDictionary("
+            SELECT COUNT(*) AS count
+            FROM `$tableName`
+        ")->getFirst();
+        return $request->getInt("count") === 0;
     }
 
     /**
@@ -813,7 +817,7 @@ class Database {
         } else {
             $result .= " NULL";
         }
-        if ($row["Default"] !== null) {
+        if (isset($row["Default"]) && (is_string($row["Default"]) || is_int($row["Default"]))) {
             $result .= " DEFAULT '$default'";
         }
         if ($extra !== "") {
@@ -1047,28 +1051,29 @@ class Database {
             $keyName    = $data->getString("Key_name");
             $columnName = $data->getString("Column_name");
             $subPart    = $data->getString("Sub_part");
+            $seqIndex   = $data->getString("Seq_in_index");
 
             // IS this a primary key, unique index, or regular index?
             if ($keyName === "PRIMARY") {
                 $row["Key_name"] = "PRIMARY KEY";
             } elseif (!isset($row["Non_unique"])) {
                 $row["Key_name"] = "UNIQUE $keyName";
-            } elseif ($row["Comment"] === "FULLTEXT" || (isset($row["Index_type"]) && $row["Index_type"] === "FULLTEXT")) {
+            } elseif ($data->getString("Comment") === "FULLTEXT" || $data->getString("Index_type") === "FULLTEXT") {
                 $row["Key_name"] = "FULLTEXT $keyName";
             } else {
                 $row["Key_name"] = "KEY $keyName";
             }
 
             // Is this the first column in the index?
-            if (!isset($indexes[$row["Key_name"]])) {
-                $indexes[$row["Key_name"]] = [];
+            if (!isset($indexes[$keyName])) {
+                $indexes[$keyName] = [];
             }
 
             // A sub part, like only indexing 15 characters of a varchar.
             if ($subPart !== "") {
-                $indexes[$row["Key_name"]][$row["Seq_in_index"]] = "$columnName($subPart)";
+                $indexes[$keyName][$seqIndex] = "$columnName($subPart)";
             } else {
-                $indexes[$row["Key_name"]][$row["Seq_in_index"]] = $columnName;
+                $indexes[$keyName][$seqIndex] = $columnName;
             }
         }
 
@@ -1110,7 +1115,7 @@ class Database {
             $request = $this->queryData("SELECT /*!40001 SQL_NO_CACHE */ * FROM `$tableName` LIMIT $start, 250");
             $start  += 250;
 
-            if (!Arrays::isEmpty($request)) {
+            if (!Arrays::isEmpty($request) && isset($request[0])) {
                 $result .= "INSERT INTO `$tableName` $crlf\t(`" . Strings::joinKeys($request[0], "`, `") . "`) $crlf VALUES ";
 
                 foreach ($request as $index => $row) {

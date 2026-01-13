@@ -175,8 +175,8 @@ class Image {
             return 0;
         }
 
-        $bottomLeft = Numbers::toInt($dimensions[0]);
-        $topRight   = Numbers::toInt($dimensions[4]);
+        $bottomLeft = Numbers::toInt($dimensions[0] ?? 0);
+        $topRight   = Numbers::toInt($dimensions[4] ?? 0);
         return abs($topRight - $bottomLeft);
     }
 

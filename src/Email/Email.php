@@ -135,7 +135,7 @@ class Email {
         if (!isset($response["success"])) {
             return false;
         }
-        if ($withScore && $response["score"] <= 0.5) {
+        if ($withScore && isset($response["score"]) && $response["score"] <= 0.5) {
             return false;
         }
         return true;

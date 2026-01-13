@@ -65,10 +65,14 @@ class Package {
         $appNamespace = "";
         $appSourceDir = "";
 
-        if (isset($composer["autoload"]) && is_array($composer["autoload"]) && is_array($composer["autoload"]["psr-4"])) {
+        if (isset($composer["autoload"]) &&
+            is_array($composer["autoload"]) &&
+            isset($composer["autoload"]["psr-4"]) &&
+            is_array($composer["autoload"]["psr-4"])
+        ) {
             $psr          = $composer["autoload"]["psr-4"];
             $appNamespace = Strings::toString(key($psr));
-            $appSourceDir = Strings::toString($psr[$appNamespace]);
+            $appSourceDir = Strings::toString($psr[$appNamespace] ?? "");
         }
 
 

@@ -119,52 +119,60 @@ class Query {
 
         switch ($operator) {
         case QueryOperator::Equal:
-            if (is_array($value) && count($value) === 1) {
-                $param   = $value[0];
-            } elseif (is_array($value) && count($value) > 1) {
+            if (!is_array($value)) {
                 $param   = $value;
-                $compare = "IN";
-                $binds   = $this->createBinds($value);
-            } elseif (!is_array($value)) {
-                $param   = $value;
+            } elseif (array_is_list($value)) {
+                if (count($value) === 1) {
+                    $param   = $value[0];
+                } elseif (count($value) > 1) {
+                    $param   = $value;
+                    $compare = "IN";
+                    $binds   = $this->createBinds($value);
+                }
             }
             break;
 
         case QueryOperator::NotEqual:
-            if (is_array($value) && count($value) === 1) {
-                $param   = $value[0];
-            } elseif (is_array($value) && count($value) > 1) {
+            if (!is_array($value)) {
                 $param   = $value;
-                $compare = "NOT IN";
-                $binds   = $this->createBinds($value);
-            } elseif (!is_array($value)) {
-                $param   = $value;
+            } elseif (array_is_list($value)) {
+                if (count($value) === 1) {
+                    $param   = $value[0];
+                } elseif (count($value) > 1) {
+                    $param   = $value;
+                    $compare = "NOT IN";
+                    $binds   = $this->createBinds($value);
+                }
             }
             break;
 
         case QueryOperator::In:
-            if (is_array($value) && count($value) > 1) {
-                $param   = $value;
-                $binds   = $this->createBinds($value);
-            } elseif (is_array($value) && count($value) === 1) {
-                $param   = $value[0];
-                $compare = "=";
-            } elseif (!is_array($value)) {
+            if (!is_array($value)) {
                 $param   = $value;
                 $compare = "=";
+            } elseif (array_is_list($value)) {
+                if (count($value) === 1) {
+                    $param   = $value[0];
+                    $compare = "=";
+                } elseif (count($value) > 1) {
+                    $param   = $value;
+                    $binds   = $this->createBinds($value);
+                }
             }
             break;
 
         case QueryOperator::NotIn:
-            if (is_array($value) && count($value) > 1) {
-                $param   = $value;
-                $binds   = $this->createBinds($value);
-            } elseif (is_array($value) && count($value) === 1) {
-                $param   = $value[0];
-                $compare = "<>";
-            } elseif (!is_array($value)) {
+            if (!is_array($value)) {
                 $param   = $value;
                 $compare = "<>";
+            } elseif (array_is_list($value)) {
+                if (count($value) === 1) {
+                    $param   = $value[0];
+                    $compare = "<>";
+                } elseif (count($value) > 1) {
+                    $param   = $value;
+                    $binds   = $this->createBinds($value);
+                }
             }
             break;
 

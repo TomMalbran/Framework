@@ -258,11 +258,13 @@ class ErrorLog extends LogErrorSchema {
     /**
      * Parses and returns the Backtrace
      * @param string $description
-     * @return string[]
+     * @return array{string,string}
      */
     private static function getBacktrace(string $description): array {
         if (Strings::contains($description, "Stack trace")) {
-            [ $description, $stacktrace ] = Strings::split($description, "Stack trace:\n");
+            $desParts    = Strings::split($description, "Stack trace:\n");
+            $description = $desParts[0] ?? $description;
+            $stacktrace  = $desParts[1] ?? "";
 
             $trace     = Strings::split($stacktrace, "\n");
             $trace     = Arrays::reverse($trace);
@@ -281,11 +283,13 @@ class ErrorLog extends LogErrorSchema {
         $backtrace = "";
         $index     = 1;
         for ($i = count($trace) - 1; $i >= 2; $i--) {
-            $item       = $trace[$i];
+            $item       = $trace[$i] ?? [];
+            $function   = $item["function"] ?? "";
+
             $backtrace .= "#{$index}- ";
             $backtrace .= (isset($item["file"]) ? self::getFilePath($item["file"]) : "<unknown file>") . " ";
             $backtrace .= "(". ($item["line"] ?? "<unknown line>") . ") ";
-            $backtrace .= " -> {$item["function"]}()" . "\n";
+            $backtrace .= " -> {$function}()" . "\n";
             $index     += 1;
         }
         return [ $description, $backtrace ];

@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore  fips
 namespace Framework\Utils;
 
 /**
@@ -118,7 +119,9 @@ class AES {
                     }
                 }
             }
-            $result[$n] = self::xor32($result[$n], $remaining[$counterIndex++]);
+
+            $result[$n]    = self::xor32($result[$n], $remaining[$counterIndex]);
+            $counterIndex += 1;
         }
         return $result;
     }

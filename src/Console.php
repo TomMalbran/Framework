@@ -87,8 +87,10 @@ class Console {
         sort($priorities);
 
         foreach ($priorities as $priority) {
-            foreach ($instances[$priority] as $instance) {
-                $result[] = $instance;
+            if (isset($instances[$priority])) {
+                foreach ($instances[$priority] as $instance) {
+                    $result[] = $instance;
+                }
             }
         }
         return $result;

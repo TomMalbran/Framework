@@ -55,7 +55,7 @@ class NLS {
         $data = Discovery::loadStrings($langCode);
         if (!Arrays::isEmpty($data)) {
             self::$data[$langCode] = $data;
-            return self::$data[$langCode];
+            return $data;
         }
 
         return [];
@@ -216,6 +216,9 @@ class NLS {
     public static function format(string $key, array $args, string $language = ""): string {
         $subject = self::getString($key, $language);
         return Strings::replaceCallback($subject, "/\{(\d+)\}/", function (array $match) use ($args) {
+            if (!isset($match[1])) {
+                return "";
+            }
             return $args[$match[1]] ?? "";
         });
     }
@@ -282,7 +285,8 @@ class NLS {
         $glue   = self::getString($useOr ? "GENERAL_OR" : "GENERAL_AND", $language);
         $result = $strings[0];
         for ($i = 1; $i < $count; $i++) {
-            $result .= ($i < $count - 1 ? ", " : " $glue ") . $strings[$i];
+            $string  = $strings[$i] ?? "";
+            $result .= ($i < $count - 1 ? ", " : " $glue ") . $string;
         }
         return $result;
     }

@@ -258,7 +258,7 @@ class Strings {
 
         $all = str_split($all);
         for ($i = 0; $i < $length - count($sets); $i++) {
-            $result .= $all[array_rand($all)];
+            $result .= Arrays::random($all);
         }
 
         $result = str_shuffle($result);
@@ -526,11 +526,11 @@ class Strings {
      * @param string          $needle
      * @param boolean         $trim      Optional.
      * @param boolean         $skipEmpty Optional.
-     * @return string[]
+     * @return list<string>
      */
     public static function split(array|string $string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
         if (is_array($string)) {
-            return $string;
+            return array_is_list($string) ? $string : [];
         }
         if ($string === "" || $needle === "") {
             return [];
@@ -962,10 +962,10 @@ class Strings {
     public static function replaceUrls(string $string, string $url): string {
         $regex = '/<(img|audio|video)([^>]*?)src=["\']((?!https?:\/\/|\/\/|data:)[^"\']+)["\']([^>]*?)>/i';
         return self::replaceCallback($string, $regex, function (array $matches) use ($url) {
-            $tag          = self::toString($matches[1]);
-            $beforeSrc    = self::toString($matches[2]);
-            $relativePath = self::toString($matches[3]);
-            $afterSrc     = self::toString($matches[4]);
+            $tag          = self::toString($matches[1] ?? "");
+            $beforeSrc    = self::toString($matches[2] ?? "");
+            $relativePath = self::toString($matches[3] ?? "");
+            $afterSrc     = self::toString($matches[4] ?? "");
             $absolutePath = "$url/{$relativePath}";
             return "<$tag{$beforeSrc}src=\"$absolutePath\"{$afterSrc}>";
         });

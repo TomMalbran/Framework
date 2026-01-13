@@ -1,17 +1,15 @@
 <?php
 namespace Framework\File;
 
-use Framework\File\FileType;
-use Framework\File\Image;
+use Framework\File\FileItem;
 use Framework\Utils\Arrays;
-use Framework\Utils\Strings;
 
 /**
  * The FileList wrapper
  */
 class FileList {
 
-    /** @var array<string,mixed>[] */
+    /** @var FileItem[] */
     private array $list = [];
 
 
@@ -29,35 +27,21 @@ class FileList {
     public function add(
         string $name,
         string $path,
-        bool $isDir,
+        bool   $isDir,
         string $sourcePath,
         string $sourceUrl,
         string $thumbPath,
         string $thumbUrl,
     ): FileList {
-        $isImage = !$isDir && FileType::isImage($name) && File::exists($thumbPath);
-        [ $imgWidth, $imgHeight ] = Image::getSize($sourcePath);
-
-        $this->list[] = [
-            "name"          => $name,
-            "path"          => $path,
-            "mvPath"        => $path !== "" ? $path : "/",
-            "canSelect"     => !$isDir,
-            "isBack"        => false,
-            "isDir"         => $isDir,
-            "isImage"       => $isImage,
-            "isTransparent" => Image::hasTransparency($sourcePath),
-            "isFile"        => !$isImage,
-            "isPDF"         => FileType::isPDF($name),
-            "isAudio"       => FileType::isAudio($name),
-            "isDocument"    => FileType::isDocument($name),
-            "icon"          => $isDir ? "directory" : FileType::getIcon($name),
-            "source"        => $sourceUrl,
-            "url"           => $sourceUrl,
-            "thumb"         => $thumbUrl,
-            "width"         => $imgWidth,
-            "height"        => $imgHeight,
-        ];
+        $this->list[] = FileItem::createFile(
+            name:       $name,
+            path:       $path,
+            isDir:      $isDir,
+            sourcePath: $sourcePath,
+            sourceUrl:  $sourceUrl,
+            thumbPath:  $thumbPath,
+            thumbUrl:   $thumbUrl,
+        );
         return $this;
     }
 
@@ -67,16 +51,7 @@ class FileList {
      * @return FileList
      */
     public function addBack(string $path): FileList {
-        $dir = File::getDirectory($path);
-        $this->list[] = [
-            "name"      => "...",
-            "path"      => $dir !== "." ? $dir : "",
-            "mvPath"    => $dir !== "." ? $dir : "/",
-            "canSelect" => false,
-            "isBack"    => true,
-            "isFile"    => true,
-            "icon"      => "back",
-        ];
+        $this->list[] = FileItem::createBack($path);
         return $this;
     }
 
@@ -84,7 +59,7 @@ class FileList {
 
     /**
      * Returns the List
-     * @return array{}[]
+     * @return FileItem[]
      */
     public function get(): array {
         return $this->list;
@@ -92,30 +67,28 @@ class FileList {
 
     /**
      * Sorts and returns the List
-     * @return array<string,mixed>[]
+     * @return FileItem[]
      */
     public function getSorted(): array {
-        return Arrays::sort($this->list, function (array $a, array $b) {
+        return Arrays::sort($this->list, function (FileItem $a, FileItem $b) {
             // Back goes first
-            if ($a["isBack"] && !$b["isBack"]) {
+            if ($a->isBack && !$b->isBack) {
                 return -1;
             }
-            if (!$a["isBack"] && $b["isBack"]) {
+            if (!$a->isBack && $b->isBack) {
                 return 1;
             }
 
             // Directories go on top
-            if ($a["isDir"] && !$b["isDir"]) {
+            if ($a->isDir && !$b->isDir) {
                 return -1;
             }
-            if (!$a["isDir"] && $b["isDir"]) {
+            if (!$a->isDir && $b->isDir) {
                 return 1;
             }
 
             // If the type is the same sort by name
-            $aName = Strings::toString($a["name"]);
-            $bName = Strings::toString($b["name"]);
-            return strnatcasecmp($aName, $bName);
+            return strnatcasecmp($a->name, $b->name);
         });
     }
 }

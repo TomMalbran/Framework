@@ -12,6 +12,8 @@ parameters:
     # Extra Rules
     checkUninitializedProperties: true
     checkBenevolentUnionTypes: true
+    reportPossiblyNonexistentGeneralArrayOffset: true
+    reportPossiblyNonexistentConstantArrayOffset: true
     # Strict Rules
     strictRules:
         noVariableVariables: false
@@ -33,3 +35,8 @@ parameters:
         switchConditionsMatchingType: true
         strictArrayFilter: true
         illegalConstructorMethodCall: true
+
+    ignoreErrors:
+        -
+            identifier: offsetAccess.notFound
+            path: src/Utils/AES.php

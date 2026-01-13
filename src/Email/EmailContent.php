@@ -11,6 +11,7 @@ use Framework\System\Config;
 use Framework\System\Language;
 use Framework\System\EmailCode;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -80,19 +81,18 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
 
     /**
      * Migrates the Email Templates for the given Language
-     * @param array<string,mixed> $emails
-     * @param string              $language
-     * @param string              $languageName
-     * @param integer             $position
+     * @param Dictionary $emails
+     * @param string     $language
+     * @param string     $languageName
+     * @param integer    $position
      * @return integer
      */
-    private static function migrateLanguage(array $emails, string $language, string $languageName, int $position): int {
+    private static function migrateLanguage(Dictionary $emails, string $language, string $languageName, int $position): int {
         $siteName = Config::getName();
         $total    = 0;
 
-        foreach ($emails as $emailCode => $emailData) {
-            $data      = Arrays::toStringMixedMap($emailData);
-            $message   = Strings::join($data["message"], "\n\n");
+        foreach ($emails as $emailCode => $email) {
+            $message   = Strings::join($email->getStrings("message"), "\n\n");
             $position += 1;
             $total    += 1;
 
@@ -100,8 +100,8 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
                 emailCode:    $emailCode,
                 language:     $language,
                 languageName: $languageName,
-                description:  Strings::toString($data["description"]),
-                subject:      Strings::replace(Strings::toString($data["subject"]), "[site]", $siteName),
+                description:  $email->getString("description"),
+                subject:      Strings::replace($email->getString("subject"), "[site]", $siteName),
                 message:      Strings::replace($message, "[site]", $siteName),
                 position:     $position,
                 skipOrder:    true,

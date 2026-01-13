@@ -4,7 +4,7 @@ namespace Framework\Utils;
 use Framework\Utils\Numbers;
 
 /**
- * Several Array Utils
+ * The Array Utils
  */
 class Arrays {
 
@@ -32,7 +32,11 @@ class Arrays {
      * @return boolean
      */
     public static function isMap(mixed $array): bool {
-        return is_array($array) && is_array(array_values($array)[0]);
+        if (!is_array($array)) {
+            return false;
+        }
+        $values = array_values($array);
+        return isset($values[0]) && is_array($values[0]);
     }
 
 
@@ -226,7 +230,7 @@ class Arrays {
         if ($length > 1) {
             return Numbers::toInt(max(...$array));
         }
-        return Numbers::toInt($array[0]);
+        return Numbers::toInt($array[0] ?? 0);
     }
 
     /**
@@ -312,7 +316,7 @@ class Arrays {
                 if (!isset($value[$key]) || !self::contains($other, $value[$key], $key)) {
                     return false;
                 }
-            } elseif ($value !== $other[$index]) {
+            } elseif (isset($other[$index]) && $value !== $other[$index]) {
                 return false;
             }
         }
@@ -365,7 +369,7 @@ class Arrays {
         foreach ($array as $row) {
             if (is_array($row) && (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey))) {
                 if ($getKey !== null) {
-                    $result[] = $row[$getKey];
+                    $result[] = $row[$getKey] ?? "";
                 } else {
                     $result[] = $row;
                 }
@@ -380,10 +384,14 @@ class Arrays {
      * Returns a random value from the array
      * @template TValue
      * @param TValue[] $array
-     * @return TValue
+     * @return TValue|null
      */
     public static function random(array $array): mixed {
-        return $array[array_rand($array)];
+        $index = array_rand($array);
+        if (isset($array[$index])) {
+            return $array[$index];
+        }
+        return null;
     }
 
     /**
@@ -570,8 +578,8 @@ class Arrays {
     /**
      * Sorts an array using the given callback
      * @template TValue
-     * @param TValue[]      $array
-     * @param callable|null $callback Optional.
+     * @param TValue[]                         $array
+     * @param callable(TValue,TValue):int|null $callback Optional.
      * @return TValue[]
      */
     public static function sort(array $array, ?callable $callback = null): array {
@@ -712,8 +720,13 @@ class Arrays {
         if (self::isEmpty($array)) {
             return null;
         }
+
         $firstKey = array_key_first($array);
-        $value    = $array[$firstKey];
+        if (!isset($array[$firstKey])) {
+            return null;
+        }
+
+        $value = $array[$firstKey];
         return self::getValue($value, $key);
     }
 
@@ -740,8 +753,13 @@ class Arrays {
         if (self::isEmpty($array)) {
             return null;
         }
+
         $lastKey = array_key_last($array);
-        $value   = $array[$lastKey];
+        if (!isset($array[$lastKey])) {
+            return null;
+        }
+
+        $value = $array[$lastKey];
         return self::getValue($value, $key);
     }
 
@@ -788,7 +806,7 @@ class Arrays {
                     return $index;
                 }
             } elseif (is_array($elem)) {
-                if ($elem[$idKey] === $idValue) {
+                if (isset($elem[$idKey]) && $elem[$idKey] === $idValue) {
                     return $index;
                 }
             }

@@ -63,21 +63,21 @@ class Discovery {
     /**
      * Loads the Emails File for the given Language
      * @param string $langCode
-     * @return array<string,mixed>
+     * @return Dictionary
      */
-    public static function loadEmails(string $langCode): array {
+    public static function loadEmails(string $langCode): Dictionary {
         $result = self::loadJSON(Package::EmailsDir, $langCode);
-        return Arrays::toStringMixedMap($result);
+        return new Dictionary($result);
     }
 
     /**
      * Loads the Notifications File for the given Language
      * @param string $langCode
-     * @return array<string,mixed>
+     * @return Dictionary
      */
-    public static function loadNotifications(string $langCode): array {
+    public static function loadNotifications(string $langCode): Dictionary {
         $result = self::loadJSON(Package::NotificationsDir, $langCode);
-        return Arrays::toStringMixedMap($result);
+        return new Dictionary($result);
     }
 
     /**
@@ -275,8 +275,10 @@ class Discovery {
 
         sort($priorities);
         foreach ($priorities as $priority) {
-            foreach ($instances[$priority] as $class) {
-                $result[] = $class;
+            if (isset($instances[$priority])) {
+                foreach ($instances[$priority] as $class) {
+                    $result[] = $class;
+                }
             }
         }
         return $result;

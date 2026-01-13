@@ -167,10 +167,10 @@ class MercadoPago {
         $itemList = [];
         foreach ($items as $item) {
             $itemList[] = [
-                "id"          => $item["id"],
-                "title"       => $item["name"],
-                "quantity"    => $item["quantity"],
-                "unit_price"  => $item["price"],
+                "id"          => $item["id"]       ?? "",
+                "title"       => $item["name"]     ?? "",
+                "quantity"    => $item["quantity"] ?? 0,
+                "unit_price"  => $item["price"]    ?? 0.0,
                 "currency_id" => "ARS",
             ];
         }

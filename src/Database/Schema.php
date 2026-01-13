@@ -137,6 +137,9 @@ class Schema {
 
         $columnKey = $columnKey !== "" ? $columnKey : Strings::substringAfter($column, ".");
         foreach ($request as $row) {
+            if (!isset($row[$columnKey])) {
+                continue;
+            }
             $value = $row[$columnKey];
             if (!Arrays::isEmpty($value) && !Arrays::contains($result, $value)) {
                 if (is_string($value) || is_int($value)) {
@@ -624,7 +627,7 @@ class Schema {
         $query->limit(1);
 
         $request = $selection->request($query);
-        if (isset($request[0])) {
+        if (isset($request[0]) && isset($request[0]["position"])) {
             return Numbers::toInt($request[0]["position"]) + 1;
         }
         return 1;

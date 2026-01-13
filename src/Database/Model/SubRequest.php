@@ -164,14 +164,16 @@ class SubRequest {
                 continue;
             }
 
-            $field = $row[$this->fieldName];
-            $subResult[$name][$field] = $this->getValues($row);
+            if (isset($row[$this->fieldName])) {
+                $field = $row[$this->fieldName];
+                $subResult[$name][$field] = $this->getValues($row);
+            }
         }
 
         foreach ($result as $index => $row) {
             $result[$index][$this->name] = [];
             foreach ($subResult as $key => $subRow) {
-                if ($row[$this->idName] === $key) {
+                if (isset($row[$this->idName]) && $row[$this->idName] === $key) {
                     $result[$index][$this->name] = $subRow;
                 }
             }
@@ -198,8 +200,11 @@ class SubRequest {
             $total      = count($queryParts);
             if ($total % 3 === 0) {
                 for ($i = 0; $i < $total; $i += 3) {
-                    $operator = QueryOperator::fromValue($queryParts[$i + 1]);
-                    $query->add($queryParts[$i], $operator, $queryParts[$i + 2]);
+                    $next = $i + 1;
+                    if (isset($queryParts[$i]) && isset($queryParts[$next])) {
+                        $operator = QueryOperator::fromValue($queryParts[$next]);
+                        $query->add($queryParts[$i], $operator, $queryParts[$next]);
+                    }
                 }
             }
         }
@@ -222,7 +227,7 @@ class SubRequest {
      * @return mixed
      */
     private function getValues(array $row): mixed {
-        if ($this->valueName !== "") {
+        if ($this->valueName !== "" && isset($row[$this->valueName])) {
             return $row[$this->valueName];
         }
         return $row;

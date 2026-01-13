@@ -92,7 +92,7 @@ class AccessRole implements DiscoveryBuilder {
                     "group"    => $groupName,
                     "name"     => $accessName,
                     "constant" => "",
-                    "level"    => $roles[$accessName],
+                    "level"    => $roles[$accessName] ?? 0,
                 ];
                 $addSpace  = false;
             }

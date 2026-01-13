@@ -454,9 +454,11 @@ class File {
             $totalParts -= 1;
         }
         for ($i = 0; $i < $totalParts; $i++) {
-            $partialPath[] = $pathParts[$i];
-            $fullPath      = self::parsePath($basePath, ...$partialPath);
-            self::createDir($fullPath);
+            if (isset($pathParts[$i])) {
+                $partialPath[] = $pathParts[$i];
+                $fullPath      = self::parsePath($basePath, ...$partialPath);
+                self::createDir($fullPath);
+            }
         }
         return self::parsePath($basePath, ...$pathParts);
     }

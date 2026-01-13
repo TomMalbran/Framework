@@ -11,15 +11,35 @@ use Framework\Utils\Strings;
 class Server {
 
     /**
+     * Returns true if the given key exists in the $_SERVER
+     * @param string $key
+     * @return boolean
+     */
+    public static function has(string $key): bool {
+        return isset($_SERVER[$key]);
+    }
+
+    /**
+     * Returns the given key from the $_SERVER
+     * @param string $key
+     * @return string
+     */
+    public static function getString(string $key): string {
+        if (isset($_SERVER[$key])) {
+            return Strings::toString($_SERVER[$key]);
+        }
+        return "";
+    }
+
+
+
+    /**
      * Returns true if running on Localhost
      * @param string[] $whitelist
      * @return boolean
      */
     public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]): bool {
-        if (!isset($_SERVER["REMOTE_ADDR"])) {
-            return false;
-        }
-        return Arrays::contains($whitelist, $_SERVER["REMOTE_ADDR"]);
+        return Arrays::contains($whitelist, self::getString("REMOTE_ADDR"));
     }
 
     /**
@@ -28,7 +48,7 @@ class Server {
      * @return boolean
      */
     public static function hostStartsWith(string $prefix): bool {
-        $host = Strings::toString($_SERVER["HTTP_HOST"]);
+        $host = self::getString("HTTP_HOST");
         return Strings::startsWith($host, $prefix);
     }
 
@@ -40,24 +60,28 @@ class Server {
      * @return string
      */
     public static function getUrl(bool $useForwarded = false): string {
-        if (!isset($_SERVER["HTTP_HOST"]) || $_SERVER["HTTP_HOST"] === "") {
+        if (self::getString("HTTP_HOST") === "") {
             return "";
         }
 
-        $ssl         = isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on";
-        $serverProto = Strings::toString($_SERVER["SERVER_PROTOCOL"]);
+        $ssl         = self::getString("HTTPS") === "on";
+        $serverProto = self::getString("SERVER_PROTOCOL");
         $serverProto = Strings::toLowerCase($serverProto);
         $http        = Strings::substringBefore($serverProto, "/");
         $protocol    = $http . ($ssl ? "s" : "");
 
-        $port        = Strings::toString($_SERVER["SERVER_PORT"]);
+        $port        = self::getString("SERVER_PORT");
         $port        = (!$ssl && $port === "80") || ($ssl && $port === "443") ? "" : ":$port";
 
-        $serverName  = Strings::toString($_SERVER["SERVER_NAME"]);
-        $forwardHost = isset($_SERVER["HTTP_X_FORWARDED_HOST"]) ? Strings::toString($_SERVER["HTTP_X_FORWARDED_HOST"]) : "";
-        $httpHost    = Strings::toString($_SERVER["HTTP_HOST"]);
-        $host        = $useForwarded && $forwardHost !== "" ? $forwardHost : $httpHost;
-        $host        = $host !== "" ? $host : $serverName . $port;
+        $forwardHost = self::getString("HTTP_X_FORWARDED_HOST");
+        $httpHost    = self::getString("HTTP_HOST");
+
+        $host = "";
+        if ($useForwarded && $forwardHost !== "") {
+            $host = $forwardHost;
+        } else {
+            $host = $httpHost;
+        }
 
         return "$protocol://$host";
     }
@@ -68,7 +92,7 @@ class Server {
      * @return string
      */
     public static function getFullUrl(bool $useForwarded = false): string {
-        return self::getUrl($useForwarded) . Strings::toString($_SERVER["REQUEST_URI"]);
+        return self::getUrl($useForwarded) . self::getString("REQUEST_URI");
     }
 
     /**
@@ -76,12 +100,12 @@ class Server {
      * @return string
      */
     public static function getIP(): string {
-        if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
-            $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-        } elseif (isset($_SERVER["HTTP_CLIENT_IP"])) {
-            $ip = $_SERVER["HTTP_CLIENT_IP"];
-        } elseif (isset($_SERVER["REMOTE_ADDR"])) {
-            $ip = $_SERVER["REMOTE_ADDR"];
+        if (self::has("HTTP_X_FORWARDED_FOR")) {
+            $ip = self::getString("HTTP_X_FORWARDED_FOR");
+        } elseif (self::has("HTTP_CLIENT_IP")) {
+            $ip = self::getString("HTTP_CLIENT_IP");
+        } elseif (self::has("REMOTE_ADDR")) {
+            $ip = self::getString("REMOTE_ADDR");
         } elseif (getenv("HTTP_X_FORWARDED_FOR") !== false) {
             $ip = getenv("HTTP_X_FORWARDED_FOR");
         } elseif (getenv("HTTP_CLIENT_IP") !== false) {
@@ -97,7 +121,7 @@ class Server {
      * @return string
      */
     public static function getUserAgent(): string {
-        return Strings::toString($_SERVER["HTTP_USER_AGENT"]);
+        return self::getString("HTTP_USER_AGENT");
     }
 
     /**

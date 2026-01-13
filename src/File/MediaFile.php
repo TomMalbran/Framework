@@ -4,6 +4,7 @@ namespace Framework\File;
 use Framework\Request;
 use Framework\File\File;
 use Framework\File\FileType;
+use Framework\File\FileItem;
 use Framework\File\Image;
 use Framework\System\Path;
 use Framework\System\MediaSchema;
@@ -81,7 +82,7 @@ class MediaFile {
      * @param string $mediaType Optional.
      * @param string $path      Optional.
      * @param string $basePath  Optional.
-     * @return array{list:array<string,mixed>[],path:string}
+     * @return array{list:FileItem[],path:string}
      */
     public static function getList(string $mediaType = "", string $path = "", string $basePath = ""): array {
         $path   = $path !== "" && self::exists($basePath, $path) ? $path : "";

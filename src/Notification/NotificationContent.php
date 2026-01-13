@@ -10,6 +10,7 @@ use Framework\Provider\Mustache;
 use Framework\System\Language;
 use Framework\System\NotificationCode;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 
 /**
  * The Notification Contents
@@ -71,17 +72,16 @@ class NotificationContent extends NotificationContentSchema implements Discovery
 
     /**
      * Migrates the Notification Templates for the given Language
-     * @param array<string,mixed> $notifications
-     * @param string              $language
-     * @param string              $languageName
-     * @param integer             $position
+     * @param Dictionary $notifications
+     * @param string     $language
+     * @param string     $languageName
+     * @param integer    $position
      * @return integer
      */
-    private static function migrateLanguage(array $notifications, string $language, string $languageName, int $position): int {
+    private static function migrateLanguage(Dictionary $notifications, string $language, string $languageName, int $position): int {
         $total = 0;
 
-        foreach ($notifications as $notificationCode => $notificationData) {
-            $data      = Arrays::toStringsMap($notificationData);
+        foreach ($notifications as $notificationCode => $notification) {
             $position += 1;
             $total    += 1;
 
@@ -89,9 +89,9 @@ class NotificationContent extends NotificationContentSchema implements Discovery
                 notificationCode: $notificationCode,
                 language:         $language,
                 languageName:     $languageName,
-                description:      $data["description"],
-                title:            $data["title"],
-                message:          $data["message"],
+                description:      $notification->getString("description"),
+                title:            $notification->getString("title"),
+                message:          $notification->getString("message"),
                 position:         $position,
                 skipOrder:        true,
             );

@@ -203,8 +203,11 @@ class Relation {
 
         // If the Relation Join contains a dot: "ModelName.fieldName"
         // If the ModelName is different from the Relation Model Name, then is an alias
-        [ $relationModelName, $relationFieldName ] = Strings::split($this->relationJoin, ".");
+        $relationJoinParts = Strings::split($this->relationJoin, ".");
+        $relationModelName = $relationJoinParts[0] ?? "";
+        $relationFieldName = $relationJoinParts[1] ?? "";
         $relationModelName = SchemaModel::getBaseModelName($relationModelName);
+
         if ($this->relationModelName !== $relationModelName) {
             $this->relationAliasName = $relationModelName;
         }
@@ -238,7 +241,10 @@ class Relation {
         }
 
         // The Owner Join is in the format "ModelName.fieldName" and both belong to the Owner Model
-        [ $ownerModelName, $ownerFieldName ] = Strings::split($ownerJoin, ".");
+        $ownerJoinParts = Strings::split($ownerJoin, ".");
+        $ownerModelName = $ownerJoinParts[0] ?? "";
+        $ownerFieldName = $ownerJoinParts[1] ?? "";
+
         $this->ownerModelName = SchemaModel::getBaseModelName($ownerModelName);
         $this->ownerFieldName = $ownerFieldName;
         return true;
@@ -441,7 +447,7 @@ class Relation {
         $andParts = Strings::split($this->ownerAndQuery, " AND ");
         $result   = [];
         for ($i = 0; $i < count($andParts); $i++) {
-            if (Strings::contains($andParts[$i], ".")) {
+            if (isset($andParts[$i]) && Strings::contains($andParts[$i], ".")) {
                 $result[] = trim(Strings::substringAfter($andParts[$i], "."));
             }
         }

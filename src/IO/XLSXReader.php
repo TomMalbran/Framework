@@ -86,7 +86,7 @@ class XLSXReader implements ImporterReader {
             $values = $this->parseRow($row);
             $fields = [];
             for ($i = 0; $i < $amount; $i++) {
-                if (!Arrays::isEmpty($values, $i)) {
+                if (isset($values[$i]) && !Arrays::isEmpty($values, $i)) {
                     $fields[] = $values[$i];
                 }
             }

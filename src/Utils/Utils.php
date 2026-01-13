@@ -97,7 +97,8 @@ class Utils {
      */
     public static function generateUsername(string $domain, string $email = ""): string {
         $parts  = Strings::split($domain, ".");
-        $result = Strings::replace($parts[0], [ "-", "ñ" ], [ "", "n" ]);
+        $result = $parts[0] ?? $domain;
+        $result = Strings::replace($result, [ "-", "ñ" ], [ "", "n" ]);
         $result = Strings::substring($result, 0, 8);
 
         if ($email !== "" && is_numeric($result[0])) {
@@ -384,7 +385,7 @@ class Utils {
      */
     public static function encodeUrl(string $url): string {
         return Strings::replaceCallback($url, "/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function (array $match) {
-            $value = Strings::toString($match[0]);
+            $value = Strings::toString($match[0] ?? "");
             return rawurlencode($value);
         });
     }

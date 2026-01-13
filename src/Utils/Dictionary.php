@@ -134,7 +134,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return Dictionary
      */
     public function remove(string $key): Dictionary {
-        if ($this->has($key)) {
+        if (isset($this->data[$key])) {
             unset($this->data[$key]);
         }
         return $this;
@@ -148,7 +148,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return boolean
      */
     public function getBool(string $key): bool {
-        if ($this->has($key) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return $this->hasValue($key);
         }
         return false;
@@ -162,7 +162,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getInt(string $key, int $decimals = 0, int $default = 0): int {
-        if ($this->has($key) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Numbers::toInt($this->data[$key], $decimals);
         }
         return $default;
@@ -175,7 +175,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return float
      */
     public function getFloat(string $key, float $default = 0.0): float {
-        if ($this->has($key) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Numbers::toFloat($this->data[$key]);
         }
         return $default;
@@ -188,7 +188,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return float
      */
     public function getPrice(string $key, float $default = 0.0): float {
-        if ($this->has($key) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Numbers::fromCents($this->data[$key]);
         }
         return $default;
@@ -201,7 +201,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getString(string $key, string $default = ""): string {
-        if ($this->has($key) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Strings::toString($this->data[$key]);
         }
         return $default;
@@ -214,7 +214,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getTime(string $key, int $default = 0): int {
-        if ($this->has($key) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return DateTime::toTime($this->data[$key]);
         }
         return $default;
@@ -227,7 +227,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return integer
      */
     public function getTimeParsed(string $key, int $default = 0): int {
-        if ($this->has($key) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             $value = Strings::toString($this->data[$key]);
             return DateTime::parseDate($value);
         }
@@ -251,7 +251,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return Dictionary
      */
     public function getDict(string $key): Dictionary {
-        if ($this->has($key)) {
+        if (isset($this->data[$key])) {
             return new Dictionary($this->data[$key]);
         }
         return new Dictionary();
@@ -264,7 +264,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      */
     public function getList(string $key): array {
         $result = [];
-        if ($this->has($key) && is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && is_array($this->data[$key])) {
             foreach ($this->data[$key] as $item) {
                 $result[] = new Dictionary($item);
             }
@@ -293,9 +293,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return Dictionary
      */
     public function findDict(string $key, string $value): Dictionary {
-        if (Arrays::isList($this->data)) {
+        if (array_is_list($this->data)) {
             foreach ($this->data as $elem) {
-                if (is_array($elem) && $elem[$key] === $value) {
+                if (is_array($elem) && isset($elem[$key]) && $elem[$key] === $value) {
                     return new Dictionary($elem);
                 }
             }
@@ -309,7 +309,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return integer[]
      */
     public function getInts(string $key): array {
-        if ($this->has($key)) {
+        if (isset($this->data[$key])) {
             return Arrays::toInts($this->data[$key]);
         }
         return [];
@@ -322,7 +322,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return string[]
      */
     public function getStrings(string $key, bool $withoutEmpty = false): array {
-        if ($this->has($key)) {
+        if (isset($this->data[$key])) {
             return Arrays::toStrings($this->data[$key], withoutEmpty: $withoutEmpty);
         }
         return [];
@@ -334,7 +334,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return array<string|integer,mixed>
      */
     public function getArray(string $key): array {
-        if ($this->has($key) && is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && is_array($this->data[$key])) {
             return $this->data[$key];
         }
         return [];
@@ -346,7 +346,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return string
      */
     public function getJSON(string $key): string {
-        if ($this->has($key) && is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && is_array($this->data[$key])) {
             return JSON::encode($this->data[$key]);
         }
         return JSON::encode([]);
@@ -360,7 +360,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return array<string|integer,mixed>
      */
     public function decodeAsArray(string $key): array {
-        if ($this->has($key) && is_string($this->data[$key])) {
+        if (isset($this->data[$key]) && is_string($this->data[$key])) {
             return JSON::decodeAsArray($this->data[$key]);
         }
         return [];
@@ -372,7 +372,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return string[]
      */
     public function decodeAsStrings(string $key): array {
-        if ($this->has($key) && is_string($this->data[$key])) {
+        if (isset($this->data[$key]) && is_string($this->data[$key])) {
             return JSON::decodeAsStrings($this->data[$key]);
         }
         return [];
