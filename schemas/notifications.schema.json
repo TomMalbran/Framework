@@ -1,9 +1,7 @@
 {
     "title" : "Notifications",
     "type"  : "object",
-    "propertyNames" : {
-        "pattern" : "^[A-Z][A-Za-z]*$"
-    },
+    "additionalProperties" : false,
     "patternProperties" : {
         "^[A-Z][A-Za-z]*$" : {
             "type"                 : "object",

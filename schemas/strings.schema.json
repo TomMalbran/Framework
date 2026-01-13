@@ -1,0 +1,31 @@
+{
+    "title" : "Strings",
+    "type"  : "object",
+    "additionalProperties" : false,
+    "patternProperties" : {
+        "^SELECT_[A-Z][A-Z_]*[A-Z]$" : {
+            "type" : "object",
+            "additionalProperties" : false,
+            "patternProperties" : {
+                "\\d" : {
+                    "type" : "string"
+                },
+                "^[A-Z][A-Z_]*[A-Z]$" : {
+                    "type" : "string"
+                },
+                "^[A-Za-z]*$" : {
+                    "type" : "string"
+                }
+            }
+        },
+        "^DATE_[A-Z][A-Z_]*[A-Z]$" : {
+            "type"  : [ "string", "array" ],
+            "items" : {
+                "type" : "string"
+            }
+        },
+        "^(?!SELECT_|DATE_)[A-Z][A-Z_]*[A-Z]$" : {
+            "type" : "string"
+        }
+    }
+}
