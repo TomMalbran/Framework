@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Date;
 
-use Framework\Core\NLS;
+use Framework\Intl\NLS;
 use Framework\Date\DateTime;
 use Framework\Date\DateFormat;
 use Framework\Utils\Dictionary;

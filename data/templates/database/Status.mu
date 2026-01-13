@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}};
 
-use Framework\Core\NLS;
+use Framework\Intl\NLS;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;

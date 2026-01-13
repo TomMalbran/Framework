@@ -1,19 +1,18 @@
 <?php
-namespace Framework\Builder;
+namespace Framework\Intl;
 
-use Framework\Application;
-use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\Priority;
 use Framework\Builder\Builder;
+use Framework\Intl\NLSConfig;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
 /**
- * The Language Code
+ * The Language Builder
  */
 #[Priority(Priority::High)]
-class LanguageCode implements DiscoveryBuilder {
+class LanguageBuilder implements DiscoveryBuilder {
 
     /**
      * Generates the code
@@ -21,7 +20,7 @@ class LanguageCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $path      = Application::getStringsPath();
+        $path      = NLSConfig::getStringsPath();
         $files     = File::getFilesInDir($path);
         $rootCode  = "es";
         $rootFound = false;
@@ -30,14 +29,14 @@ class LanguageCode implements DiscoveryBuilder {
         // Load all the languages
         foreach ($files as $file) {
             $code = Strings::stripEnd($file, ".json");
-            $data = Discovery::loadStrings($code);
-            if (!isset($data["NAME"])) {
+            $data = NLSConfig::loadStrings($code);
+            if (!$data->has("NAME")) {
                 continue;
             }
 
             $languages[] = [
                 "code" => $code,
-                "name" => Strings::toString($data["NAME"]),
+                "name" => $data->getString("NAME"),
             ];
             if ($code === $rootCode) {
                 $rootFound = true;

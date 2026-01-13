@@ -82,14 +82,6 @@ class Application {
     }
 
     /**
-     * Returns the path to the Strings Directory
-     * @return string
-     */
-    public static function getStringsPath(): string {
-        return self::getAppPath(Package::StringsDir);
-    }
-
-    /**
      * Returns the Namespace used in the Builder
      * @return string
      */

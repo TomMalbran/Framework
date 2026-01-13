@@ -1,15 +1,14 @@
 <?php
 namespace Framework\Notification;
 
-use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryMigration;
 use Framework\Notification\Schema\NotificationContentSchema;
 use Framework\Notification\Schema\NotificationContentEntity;
 use Framework\Notification\Schema\NotificationContentQuery;
 use Framework\Provider\Mustache;
+use Framework\Intl\NLSConfig;
 use Framework\System\Language;
 use Framework\System\NotificationCode;
-use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
 /**
@@ -57,8 +56,8 @@ class NotificationContent extends NotificationContentSchema implements Discovery
         $didUpdate = false;
 
         foreach ($languages as $language => $languageName) {
-            $notifications = Discovery::loadNotifications($language);
-            if (!Arrays::isEmpty($notifications)) {
+            $notifications = NLSConfig::loadNotifications($language);
+            if (!$notifications->isEmpty()) {
                 $position  = self::migrateLanguage($notifications, $language, $languageName, $position);
                 $didUpdate = true;
             }

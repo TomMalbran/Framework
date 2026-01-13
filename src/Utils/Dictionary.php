@@ -393,11 +393,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return array<string,string>
      */
     public function toMap(): array {
-        $result = [];
-        foreach ($this->data as $key => $value) {
-            $result[(string)$key] = Strings::toString($value);
-        }
-        return $result;
+        return Arrays::toStringsMap($this->data);
     }
 
     /**
@@ -405,11 +401,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return array<string,mixed>
      */
     public function toMixedMap(): array {
-        $result = [];
-        foreach ($this->data as $key => $value) {
-            $result[(string)$key] = $value;
-        }
-        return $result;
+        return Arrays::toStringMixedMap($this->data);
     }
 
     /**
@@ -419,6 +411,10 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     public function toStrings(): array {
         if (Arrays::isList($this->data)) {
             return Arrays::toStrings($this->data);
+        }
+        $values = array_values($this->data);
+        if (Arrays::isList($values)) {
+            return Arrays::toStrings($values);
         }
         return [];
     }

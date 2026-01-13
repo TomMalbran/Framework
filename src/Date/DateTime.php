@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Date;
 
-use Framework\Core\NLS;
+use Framework\Intl\NLS;
 use Framework\Date\DateType;
 use Framework\Date\DateFormat;
 use Framework\Utils\Arrays;
@@ -1079,7 +1079,7 @@ class DateTime {
         string $language = "",
     ): string {
         if ($useToday && self::isToday($timeStamp, $timeZone)) {
-            $dayName = NLS::get("DATE_TIME_TODAY", $language);
+            $dayName = NLS::getString("DATE_TIME_TODAY", $language);
         } else {
             $dayName = self::getDayText($timeStamp, $startMonday, $timeZone, $language);
         }

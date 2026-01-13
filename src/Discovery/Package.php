@@ -21,11 +21,6 @@ class Package {
     public const SchemaDir        = "Schema";
     public const ModelDir         = "Model";
 
-    // NLS Directories
-    public const StringsDir       = "nls/strings";
-    public const EmailsDir        = "nls/emails";
-    public const NotificationsDir = "nls/notifications";
-
     // Other Directories
     public const FilesDir         = "files";
     public const FTPDir           = "public_ftp";

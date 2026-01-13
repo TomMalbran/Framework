@@ -1,8 +1,8 @@
 <?php
 namespace {{namespace}};
 
-use Framework\Core\NLS;
 use Framework\Auth\Auth;
+use Framework\Intl\NLS;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 

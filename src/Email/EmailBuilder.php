@@ -1,11 +1,11 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Builder\Builder;
+use Framework\Intl\NLSConfig;
 use Framework\System\Language;
-use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 
 /**
  * The Email Builder
@@ -19,11 +19,11 @@ class EmailBuilder implements DiscoveryBuilder {
     #[\Override]
     public static function generateCode(): int {
         $languages = Language::getAll();
-        $data      = [];
+        $data      = new Dictionary();
 
         foreach ($languages as $language => $languageName) {
-            $data = Discovery::loadEmails($language);
-            if (!Arrays::isEmpty($data)) {
+            $data = NLSConfig::loadEmails($language);
+            if (!$data->isEmpty()) {
                 break;
             }
         }

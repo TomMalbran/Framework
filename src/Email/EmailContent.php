@@ -1,16 +1,15 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryMigration;
 use Framework\Email\Schema\EmailContentSchema;
 use Framework\Email\Schema\EmailContentEntity;
 use Framework\Email\Schema\EmailContentQuery;
+use Framework\Intl\NLSConfig;
 use Framework\Provider\Mustache;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\System\EmailCode;
-use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
@@ -66,8 +65,8 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
         $didUpdate = false;
 
         foreach ($languages as $language => $languageName) {
-            $emails = Discovery::loadEmails($language);
-            if (!Arrays::isEmpty($emails)) {
+            $emails = NLSConfig::loadEmails($language);
+            if (!$emails->isEmpty()) {
                 $position  = self::migrateLanguage($emails, $language, $languageName, $position);
                 $didUpdate = true;
             }

@@ -2,13 +2,13 @@
 namespace Framework\Auth;
 
 use Framework\Request;
-use Framework\Core\NLS;
 use Framework\Database\Query\QueryOperator;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialColumn;
 use Framework\Auth\Schema\CredentialStatus;
 use Framework\Auth\Schema\CredentialQuery;
+use Framework\Intl\NLS;
 use Framework\System\Access;
 use Framework\System\Path;
 use Framework\Utils\Arrays;

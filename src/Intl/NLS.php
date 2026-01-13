@@ -1,10 +1,10 @@
 <?php
-namespace Framework\Core;
+namespace Framework\Intl;
 
-use Framework\Discovery\Discovery;
+use Framework\Intl\NLSConfig;
 use Framework\System\Config;
 use Framework\System\Language;
-use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -13,7 +13,7 @@ use Framework\Utils\Strings;
  */
 class NLS {
 
-    /** @var array<string,array<string,mixed>> */
+    /** @var array<string,Dictionary> */
     private static array  $data     = [];
     private static string $language = "root";
 
@@ -41,42 +41,26 @@ class NLS {
 
     /**
      * Loads an NLS Language
-     * @param string $language
-     * @return array<string,mixed>
+     * @param string $language Optional.
+     * @return Dictionary
      */
-    private static function load(string $language): array {
+    private static function load(string $language = ""): Dictionary {
+        if ($language === "") {
+            $language = self::$language;
+        }
         $langCode = Language::getCode($language);
 
         if (isset(self::$data[$langCode])) {
             return self::$data[$langCode];
         }
 
-        /** @var array<string,mixed> */
-        $data = Discovery::loadStrings($langCode);
-        if (!Arrays::isEmpty($data)) {
+        $data = NLSConfig::loadStrings($langCode);
+        if (!$data->isEmpty()) {
             self::$data[$langCode] = $data;
             return $data;
         }
 
-        return [];
-    }
-
-    /**
-     * Returns a value from the data
-     * @param string $key
-     * @param string $language Optional.
-     * @return mixed
-     */
-    public static function get(string $key, string $language = ""): mixed {
-        if ($language === "") {
-            $language = self::$language;
-        }
-
-        $data = self::load($language);
-        if (isset($data[$key])) {
-            return $data[$key];
-        }
-        return $key;
+        return new Dictionary();
     }
 
     /**
@@ -86,8 +70,8 @@ class NLS {
      * @return string
      */
     public static function getString(string $key, string $language = ""): string {
-        $result = self::get($key, $language);
-        return Strings::toString($result);
+        $data = self::load($language);
+        return $data->getString($key);
     }
 
     /**
@@ -98,11 +82,9 @@ class NLS {
      * @return string
      */
     public static function getIndex(string $key, int|string $index, string $language = ""): string {
-        $result = self::get($key, $language);
-        if (is_array($result) && isset($result[$index])) {
-            return Strings::toString($result[$index]);
-        }
-        return "";
+        $data = self::load($language);
+        $dict = $data->getDict($key);
+        return $dict->getString((string)$index);
     }
 
     /**
@@ -112,14 +94,9 @@ class NLS {
      * @return string[]
      */
     public static function getList(string $key, string $language = ""): array {
-        $result = self::get($key, $language);
-        if (!is_array($result)) {
-            return [];
-        }
-        if (array_is_list($result)) {
-            return Arrays::toStrings($result);
-        }
-        return Arrays::toStrings(array_values($result));
+        $data = self::load($language);
+        $dict = $data->getDict($key);
+        return $dict->toStrings();
     }
 
     /**
@@ -129,11 +106,9 @@ class NLS {
      * @return array<string,string>
      */
     public static function getMap(string $key, string $language = ""): array {
-        $result = self::get($key, $language);
-        if (Arrays::isDict($result)) {
-            return Arrays::toStringsMap($result);
-        }
-        return [];
+        $data = self::load($language);
+        $dict = $data->getDict($key);
+        return $dict->toMap();
     }
 
     /**
@@ -143,12 +118,10 @@ class NLS {
      * @return Select[]
      */
     public static function getSelect(string $key, string $language = ""): array {
-        $result = self::get($key, $language);
-        if (is_array($result)) {
-            $result = Arrays::toStringsMap($result);
-            return Select::createFromMap($result);
-        }
-        return [];
+        $data = self::load($language);
+        $dict = $data->getDict($key);
+        $map  = $dict->toMap();
+        return Select::createFromMap($map);
     }
 
     /**

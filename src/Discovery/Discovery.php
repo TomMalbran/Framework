@@ -4,7 +4,6 @@ namespace Framework\Discovery;
 use Framework\Application;
 use Framework\Discovery\Package;
 use Framework\File\File;
-use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
@@ -48,36 +47,6 @@ class Discovery {
         $file = Strings::addSuffix($fileName, ".json");
         $path = Application::getAppPath($dir, $file);
         return JSON::readFile($path);
-    }
-
-    /**
-     * Loads the Strings File for the given Language
-     * @param string $langCode
-     * @return array<string,mixed>
-     */
-    public static function loadStrings(string $langCode): array {
-        $result = self::loadJSON(Package::StringsDir, $langCode);
-        return Arrays::toStringMixedMap($result);
-    }
-
-    /**
-     * Loads the Emails File for the given Language
-     * @param string $langCode
-     * @return Dictionary
-     */
-    public static function loadEmails(string $langCode): Dictionary {
-        $result = self::loadJSON(Package::EmailsDir, $langCode);
-        return new Dictionary($result);
-    }
-
-    /**
-     * Loads the Notifications File for the given Language
-     * @param string $langCode
-     * @return Dictionary
-     */
-    public static function loadNotifications(string $langCode): Dictionary {
-        $result = self::loadJSON(Package::NotificationsDir, $langCode);
-        return new Dictionary($result);
     }
 
     /**

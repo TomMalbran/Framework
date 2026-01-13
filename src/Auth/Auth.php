@@ -1,13 +1,13 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\Core\NLS;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Reset;
 use Framework\Auth\Spam;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialStatus;
+use Framework\Intl\NLS;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
