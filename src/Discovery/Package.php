@@ -20,10 +20,6 @@ class Package {
     public const SchemaDir   = "Schema";
     public const ModelDir    = "Model";
 
-    // Other Directories
-    public const FilesDir    = "files";
-    public const FTPDir      = "public_ftp";
-
 
     // Composer Data
     private static bool   $loaded    = false;

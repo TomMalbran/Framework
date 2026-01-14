@@ -62,7 +62,7 @@ class FilePath implements DiscoveryBuilder {
      */
     public static function getPath(string|int ...$pathParts): string {
         $basePath = self::getBasePath();
-        return File::parsePath($basePath, Package::FilesDir, ...$pathParts);
+        return File::parsePath($basePath, Config::getFileDir(), ...$pathParts);
     }
 
     /**
@@ -104,7 +104,7 @@ class FilePath implements DiscoveryBuilder {
      */
     public static function getFTPPath(string|int ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
-        return File::parsePath($basePath, Package::FTPDir, ...$pathParts);
+        return File::parsePath($basePath, Config::getFileFtp(), ...$pathParts);
     }
 
 
@@ -115,7 +115,7 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getDir(string|int ...$pathParts): string {
-        return File::parsePath(Package::FilesDir, ...$pathParts);
+        return File::parsePath(Config::getFileDir(), ...$pathParts);
     }
 
     /**
@@ -124,7 +124,7 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getInternalDir(string|int ...$pathParts): string {
-        return File::parsePath(Application::getBaseDir(), Package::FilesDir, ...$pathParts);
+        return File::parsePath(Application::getBaseDir(), Config::getFileDir(), ...$pathParts);
     }
 
     /**
@@ -133,7 +133,7 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getUrl(string|int ...$pathParts): string {
-        return Config::getFileUrl(Package::FilesDir, ...$pathParts);
+        return Config::getFileUrl(Config::getFileDir(), ...$pathParts);
     }
 
 
