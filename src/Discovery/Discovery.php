@@ -281,7 +281,8 @@ class Discovery {
 
     /**
      * Returns the Properties of the given Class, starting from the Base Class
-     * @param ReflectionClass<object> $class
+     * @phpstan-param ReflectionClass<object> $class
+     * @param ReflectionClass $class
      * @return array<ReflectionProperty>
      */
     public static function getPropertiesBaseFirst(ReflectionClass $class): array {

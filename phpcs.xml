@@ -2,7 +2,7 @@
 <ruleset name="My Standards">
     <description>My Coding Standards</description>
 
-    <!-- Remove theese Rules -->
+    <!-- Remove these Rules -->
     <rule ref="Generic.Functions.OpeningFunctionBraceBsdAllman">
         <severity>0</severity>
     </rule>
@@ -122,13 +122,6 @@
         <exclude name="Generic.Strings.UnnecessaryStringConcat.Found)"/>
     </rule>
 
-    <file>app</file>
-    <file>config</file>
-    <file>public</file>
-    <file>resources</file>
-    <file>routes</file>
-    <file>tests</file>
-
     <exclude-pattern>*/database/*</exclude-pattern>
     <exclude-pattern>*/cache/*</exclude-pattern>
     <exclude-pattern>*/*.js</exclude-pattern>
@@ -138,11 +131,12 @@
     <exclude-pattern>*/docs/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/migrations/*</exclude-pattern>
+    <exclude-pattern>*/config/*</exclude-pattern>
     <exclude-pattern>*/public/index.php</exclude-pattern>
 
+    <ini name="memory_limit" value="128M"/>
     <arg name="colors"/>
     <arg value="spvnl"/>
-    <ini name="memory_limit" value="128M"/>
 
     <rule ref="PSR2"/>
 </ruleset>

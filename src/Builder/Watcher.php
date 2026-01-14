@@ -138,7 +138,7 @@ class Watcher {
      * @param string   $filePath
      * @param string   $basePath
      * @param string[] $ignorePatterns
-     * @return bool
+     * @return boolean
      */
     private static function isIgnored(string $filePath, string $basePath, array $ignorePatterns): bool {
         $relativePath = Strings::stripStart($filePath, "$basePath/");

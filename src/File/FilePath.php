@@ -157,8 +157,8 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Creates an url to the files temp directory
-     * @param integer         $credentialID
-     * @param string|integer  ...$pathParts
+     * @param integer        $credentialID
+     * @param string|integer ...$pathParts
      * @return string
      */
     public static function getTempUrl(int $credentialID, string|int ...$pathParts): string {
