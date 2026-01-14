@@ -61,6 +61,62 @@ class Strings {
         return mb_strlen($string, "UTF-8");
     }
 
+
+
+    /**
+     * Returns true if the values are Equal
+     * @param mixed   $string
+     * @param mixed   $other
+     * @param boolean $caseInsensitive Optional.
+     * @param boolean $trimValues      Optional.
+     * @return boolean
+     */
+    public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true, bool $trimValues = true): bool {
+        if (!is_string($string) || !is_string($other)) {
+            return $string === $other;
+        }
+
+        if ($caseInsensitive) {
+            $string = strtolower($string);
+            $other  = strtolower($other);
+        }
+        if ($trimValues) {
+            $string = trim($string);
+            $other  = trim($other);
+        }
+        return $string === $other;
+    }
+
+    /**
+     * Returns true if the given String is equal to any of the Needles
+     * @param string $string
+     * @param string ...$needles
+     * @return boolean
+     */
+    public static function equals(string $string, string ...$needles): bool {
+        foreach ($needles as $needle) {
+            if (self::isEqual($string, $needle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the given String is equal to any of the Needles as Case Insensitive
+     * @param string $string
+     * @param string ...$needles
+     * @return boolean
+     */
+    public static function equalsCaseInsensitive(string $string, string ...$needles): bool {
+        foreach ($needles as $needle) {
+            if (self::isEqual($string, $needle, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns true if the given String contains any of the given Needles
      * @param string $string
@@ -77,7 +133,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String contains any of the given Needles in Case Insensitive
+     * Returns true if the given String contains any of the given Needles as Case Insensitive
      * @param string $string
      * @param string ...$needles
      * @return boolean
@@ -109,6 +165,23 @@ class Strings {
     }
 
     /**
+     * Returns true if the given String starts any of the given Needles as Case Insensitive
+     * @param string $string
+     * @param string ...$needles
+     * @return boolean
+     */
+    public static function startsWithCaseInsensitive(string $string, string ...$needles): bool {
+        $string = strtolower($string);
+        foreach ($needles as $needle) {
+            $length = strlen($needle);
+            if (substr($string, 0, $length) === strtolower($needle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns true if the given String ends with the given Needle
      * @param string $string
      * @param string ...$needles
@@ -118,6 +191,23 @@ class Strings {
         foreach ($needles as $needle) {
             $length = strlen($needle);
             if (substr($string, -$length) === $needle) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the given String ends with the given Needle as Case Insensitive
+     * @param string $string
+     * @param string ...$needles
+     * @return boolean
+     */
+    public static function endsWithCaseInsensitive(string $string, string ...$needles): bool {
+        $string = strtolower($string);
+        foreach ($needles as $needle) {
+            $length = strlen($needle);
+            if (substr($string, -$length) === strtolower($needle)) {
                 return true;
             }
         }
@@ -153,7 +243,7 @@ class Strings {
     }
 
     /**
-     * Returns true if the given String if created with only the given Needle
+     * Returns true if the given String is created with only the given Needle
      * @param string $string
      * @param string $needle
      * @return boolean
@@ -166,6 +256,23 @@ class Strings {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns < 0 if string is less than other; > 0 if string is greater than other, and 0 if they are equal
+     * @param string  $string
+     * @param string  $other
+     * @param boolean $orderAsc        Optional.
+     * @param boolean $caseInsensitive Optional.
+     * @return integer
+     */
+    public static function compare(string $string, string $other, bool $orderAsc = true, bool $caseInsensitive = false): int {
+        if ($caseInsensitive) {
+            $result = strcasecmp($string, $other);
+        } else {
+            $result = strcmp($string, $other);
+        }
+        return $orderAsc ? $result : $result * -1;
     }
 
 
@@ -622,47 +729,6 @@ class Strings {
     }
 
 
-
-    /**
-     * Returns true if the values are Equal
-     * @param mixed   $string
-     * @param mixed   $other
-     * @param boolean $caseInsensitive Optional.
-     * @param boolean $trimValues      Optional.
-     * @return boolean
-     */
-    public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true, bool $trimValues = true): bool {
-        if (!is_string($string) || !is_string($other)) {
-            return $string === $other;
-        }
-
-        if ($caseInsensitive) {
-            $string = strtolower($string);
-            $other  = strtolower($other);
-        }
-        if ($trimValues) {
-            $string = trim($string);
-            $other  = trim($other);
-        }
-        return $string === $other;
-    }
-
-    /**
-     * Returns < 0 if string is less than other; > 0 if string is greater than other, and 0 if they are equal
-     * @param string  $string
-     * @param string  $other
-     * @param boolean $orderAsc        Optional.
-     * @param boolean $caseInsensitive Optional.
-     * @return integer
-     */
-    public static function compare(string $string, string $other, bool $orderAsc = true, bool $caseInsensitive = false): int {
-        if ($caseInsensitive) {
-            $result = strcasecmp($string, $other);
-        } else {
-            $result = strcmp($string, $other);
-        }
-        return $orderAsc ? $result : $result * -1;
-    }
 
     /**
      * Transforms the first Character to LowerCase
