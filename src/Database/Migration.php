@@ -119,7 +119,7 @@ class Migration {
      * @return boolean
      */
     public static function migrateData(): bool {
-        $appPath    = Application::getAppPath();
+        $appPath    = Application::getBasePath();
         $filePaths  = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
         $migrations = [];
 

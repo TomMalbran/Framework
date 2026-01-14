@@ -25,13 +25,13 @@ class Discovery {
      * @return string
      */
     public static function loadEmailTemplate(string $fileName): string {
-        $path   = Application::getAppPath($fileName);
+        $path   = Application::getBasePath($fileName);
         $result = "";
         if (File::exists($path)) {
             $result = File::read($path);
         }
         if ($result === "") {
-            $path   = Application::getFramePath($fileName);
+            $path   = Package::getBasePath($fileName);
             $result = File::read($path);
         }
         return $result;
@@ -45,7 +45,7 @@ class Discovery {
      */
     public static function loadJSON(string $dir, string $fileName): array {
         $file = Strings::addSuffix($fileName, ".json");
-        $path = Application::getAppPath($dir, $file);
+        $path = Application::getBasePath($dir, $file);
         return JSON::readFile($path);
     }
 
@@ -74,10 +74,10 @@ class Discovery {
      */
     public static function findClasses(string $dir = "", bool $forFramework = false, bool $withError = false): array {
         if ($forFramework) {
-            $namespace  = Package::FrameNamespace;
-            $sourcePath = Application::getFramePath(Package::FrameSourceDir);
+            $namespace  = Package::Namespace;
+            $sourcePath = Package::getSourcePath();
         } else {
-            $namespace  = Package::getAppNamespace();
+            $namespace  = Application::getNamespace();
             $sourcePath = Application::getSourcePath();
         }
 
@@ -125,9 +125,9 @@ class Discovery {
                 }
 
                 // Only Validate the Classes for the current Namespace
-                $namespace = Package::FrameNamespace;
+                $namespace = Package::Namespace;
                 if (!$forFramework) {
-                    $namespace = Package::getAppNamespace();
+                    $namespace = Application::getNamespace();
                 }
 
                 // Check that the used Class exists

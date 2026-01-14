@@ -50,7 +50,7 @@ class Console {
     #[ConsoleCommand("version", "-v")]
     #[Priority(Priority::Highest)]
     public static function version(): bool {
-        $version = Package::getVersion();
+        $version = Application::getVersion();
         print("Version: $version\n");
         return true;
     }

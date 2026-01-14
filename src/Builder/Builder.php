@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Builder;
 
-use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryBuilder;
@@ -26,7 +25,7 @@ class Builder {
         print("Building the Code...\n");
 
         DiscoveryConfig::load();
-        $writePath = Application::getBuildPath();
+        $writePath = Package::getBuildPath();
         $created   = 0;
 
         File::createDir($writePath);
@@ -43,7 +42,7 @@ class Builder {
         }
 
 
-        if (!Application::isFramework()) {
+        if (!Package::isFramework()) {
             /** @var DiscoveryBuilder[] */
             $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
             if (count($appBuilders) > 0) {
@@ -64,10 +63,10 @@ class Builder {
      */
     #[ConsoleCommand("destroy")]
     public static function destroy(): bool {
-        $writePath = Application::getBuildPath();
+        $writePath = Package::getBuildPath();
         $deleted   = 0;
 
-        if (!Application::isFramework()) {
+        if (!Package::isFramework()) {
             /** @var DiscoveryBuilder[] */
             $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
             $appBuilders = array_reverse($appBuilders);
@@ -103,9 +102,9 @@ class Builder {
             return 0;
         }
 
-        $writePath = Application::getBuildPath();
+        $writePath = Package::getBuildPath();
         $contents  = self::render("system/$name", $data + [
-            "namespace" => Package::FrameNamespace . Package::SystemDir,
+            "namespace" => Package::Namespace . Package::SystemDir,
         ]);
         File::create($writePath, "$name.php", $contents);
 

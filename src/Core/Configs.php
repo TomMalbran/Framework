@@ -3,6 +3,7 @@ namespace Framework\Core;
 
 use Framework\Application;
 use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Package;
 use Framework\Discovery\Priority;
 use Framework\Builder\Builder;
 use Framework\Core\VariableType;
@@ -50,10 +51,10 @@ class Configs implements DiscoveryBuilder {
             return false;
         }
 
-        $framePath   = Application::getFramePath();
+        $framePath   = Package::getBasePath();
         $frameData   = self::loadENV($framePath, ".env.example");
 
-        $appPath     = Application::getAppPath();
+        $appPath     = Application::getBasePath();
         $appData     = self::loadENV($appPath, ".env");
 
         $currentUrl  = Server::getUrl();

@@ -73,7 +73,14 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getBasePath(bool $forFramework = false, bool $forBackend = false, bool $forPrivate = false): string {
-        $result = Application::getBasePath($forFramework, $forBackend);
+        if ($forFramework) {
+            $result = Package::getBasePath();
+        } elseif ($forBackend) {
+            $result = Application::getBasePath();
+        } else {
+            $result = Application::getIndexPath();
+        }
+
         if ($forPrivate && !Server::isLocalHost()) {
             return File::getDirectory($result);
         }
@@ -117,7 +124,7 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getInternalDir(string|int ...$pathParts): string {
-        return File::parsePath(Package::getAppBaseDir(), Package::FilesDir, ...$pathParts);
+        return File::parsePath(Application::getBaseDir(), Package::FilesDir, ...$pathParts);
     }
 
     /**

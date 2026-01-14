@@ -20,7 +20,7 @@ class TemplateCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $path      = Application::getAppPath();
+        $path      = Application::getBasePath();
         $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
         $templates = [];
         $maxLength = 0;

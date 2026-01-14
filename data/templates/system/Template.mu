@@ -52,7 +52,7 @@ enum Template {
             return "";
         }
 
-        $path = Application::getAppPath($relPath);
+        $path = Application::getBasePath($relPath);
         $code = File::read($path);
         return Mustache::render($code, $data);
     }

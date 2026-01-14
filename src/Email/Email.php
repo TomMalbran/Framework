@@ -62,7 +62,7 @@ class Email {
             $body     = Mustache::render($template, [
                 "url"        => Config::getEmailUrl(),
                 "name"       => Config::getName(),
-                "files"      => Application::getApplUrl(),
+                "files"      => Application::getUrl(),
                 "logo"       => Config::getEmailLogo(),
                 "logoHeight" => Config::getEmailLogoHeight(),
                 "siteName"   => Config::getName(),

@@ -3,6 +3,7 @@ namespace Framework\Log;
 
 use Framework\Application;
 use Framework\Request;
+use Framework\Discovery\Package;
 use Framework\Database\Type\Assign;
 use Framework\Log\Schema\LogErrorSchema;
 use Framework\Log\Schema\LogErrorColumn;
@@ -33,8 +34,8 @@ class ErrorLog extends LogErrorSchema {
         }
 
         self::$loaded    = true;
-        self::$framePath = Application::getBasePath(true);
-        self::$basePath  = Application::getBasePath(false);
+        self::$framePath = Package::getBasePath();
+        self::$basePath  = Application::getIndexPath();
 
         register_shutdown_function("\\Framework\\Log\\ErrorLog::shutdown");
         set_error_handler("\\Framework\\Log\\ErrorLog::handler");

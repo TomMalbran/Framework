@@ -38,7 +38,7 @@ class SchemaJSON implements DiscoveryBuilder {
         ksort($schemas);
 
         $file = Strings::addSuffix($schemaFile, ".json");
-        $path = Application::getAppPath($file);
+        $path = Application::getBasePath($file);
         JSON::writeFile($path, $schemas);
         return 1;
     }
@@ -55,7 +55,7 @@ class SchemaJSON implements DiscoveryBuilder {
         }
 
         $file = Strings::addSuffix($schemaFile, ".json");
-        $path = Application::getAppPath();
+        $path = Application::getBasePath();
         File::delete($path, $file);
         return 1;
     }

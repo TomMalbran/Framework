@@ -52,7 +52,7 @@ class NLSConfig {
      * @return string
      */
     public static function getStringsPath(): string {
-        return Application::getAppPath(self::$stringsDir);
+        return Application::getBasePath(self::$stringsDir);
     }
 
 

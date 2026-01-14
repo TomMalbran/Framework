@@ -24,8 +24,8 @@ class Watcher {
     public static function watch(): never {
         print("Watching for changes...\n");
 
-        $watchPath      = Application::getAppPath();
-        $basePath       = Application::getBasePath();
+        $watchPath      = Application::getBasePath();
+        $basePath       = Application::getIndexPath();
 
         $ignorePatterns = self::parseGitignore($basePath);
         $previousState  = self::scanDirectory($watchPath, $basePath, $ignorePatterns);

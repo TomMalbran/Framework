@@ -2,6 +2,7 @@
 namespace Framework\Discovery;
 
 use Framework\Application;
+use Framework\Discovery\Package;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
@@ -28,19 +29,18 @@ class DiscoveryConfig {
         }
 
         // Dont load the Config inside the Framework
-        if (Application::isFramework()) {
+        if (Package::isFramework()) {
             self::$loaded = true;
             return false;
         }
 
         // Load all the Config files
-        $appPath   = Application::getAppPath();
+        $appPath   = Application::getBasePath();
         $filePaths = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
         foreach ($filePaths as $filePath) {
             if (Strings::endsWith($filePath, self::Extension)) {
                 include_once $filePath;
             }
-
         }
 
         self::$loaded = true;
@@ -53,7 +53,7 @@ class DiscoveryConfig {
      * @return boolean
      */
     public static function loadDefault(string $file): bool {
-        $configPath = Application::getFramePath(Package::FrameConfigDir, $file . self::Extension);
+        $configPath = Package::getBasePath(Package::ConfigDir, $file . self::Extension);
         if (file_exists($configPath)) {
             include_once $configPath;
             return true;

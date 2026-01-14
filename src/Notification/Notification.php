@@ -76,7 +76,7 @@ class Notification {
 
         $icon = Config::getNotificationIcon();
         if ($icon !== "") {
-            $icon = Application::getApplUrl($icon);
+            $icon = Application::getUrl($icon);
         }
 
         $fullUrl = $url;

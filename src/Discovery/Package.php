@@ -2,41 +2,38 @@
 namespace Framework\Discovery;
 
 use Framework\Application;
-use Framework\Utils\JSON;
+use Framework\File\File;
 use Framework\Utils\Strings;
 
 /**
- * The Package
+ * The Framework Package
  */
 class Package {
 
     // Framework Constants
-    public const FrameNamespace   = "Framework\\";
-    public const FrameSourceDir   = "src";
-    public const FrameConfigDir   = "config";
-    public const FrameTemplateDir = "data/templates";
+    public const Namespace   = "Framework\\";
+    public const ConfigDir   = "config";
+    public const TemplateDir = "data/templates";
 
     // Source Directories
-    public const SystemDir        = "System";
-    public const SchemaDir        = "Schema";
-    public const ModelDir         = "Model";
+    public const SystemDir   = "System";
+    public const SchemaDir   = "Schema";
+    public const ModelDir    = "Model";
 
     // Other Directories
-    public const FilesDir         = "files";
-    public const FTPDir           = "public_ftp";
+    public const FilesDir    = "files";
+    public const FTPDir      = "public_ftp";
 
 
     // Composer Data
-    private static bool   $loaded       = false;
-    private static string $version      = "";
-    private static string $appNamespace = "";
-    private static string $appBaseDir   = "";
-    private static string $appSourceDir = "";
+    private static bool   $loaded    = false;
+    private static string $version   = "";
+    private static string $sourceDir = "";
 
 
 
     /**
-     * Loads the Package Data
+     * Loads the Framework Composer Data
      * @return boolean
      */
     private static function load(): bool {
@@ -45,43 +42,25 @@ class Package {
         }
 
         // Determine the Base Path
-        $framePath = Application::getFramePath();
+        $framePath = File::getDirectory(__FILE__, 3);
         if (Strings::contains($framePath, "vendor")) {
-            $basePath   = Strings::substringBefore($framePath, "/vendor");
-            $appBaseDir = Strings::substringAfter($basePath, "/");
+            $basePath = Strings::substringBefore($framePath, "/vendor");
         } else {
-            $basePath   = $framePath;
-            $appBaseDir = "";
+            $basePath = $framePath;
         }
 
         // Read the Composer File
-        $composer     = JSON::readFile($basePath, "composer.json");
-        $version      = Strings::toString($composer["version"] ?? "0.1.0");
-        $appNamespace = "";
-        $appSourceDir = "";
-
-        if (isset($composer["autoload"]) &&
-            is_array($composer["autoload"]) &&
-            isset($composer["autoload"]["psr-4"]) &&
-            is_array($composer["autoload"]["psr-4"])
-        ) {
-            $psr          = $composer["autoload"]["psr-4"];
-            $appNamespace = Strings::toString(key($psr));
-            $appSourceDir = Strings::toString($psr[$appNamespace] ?? "");
-        }
-
+        $composer = Composer::readFile($basePath);
 
         // Save the Data
-        self::$loaded       = true;
-        self::$version      = $version;
-        self::$appNamespace = $appNamespace;
-        self::$appBaseDir   = $appBaseDir;
-        self::$appSourceDir = $appSourceDir;
+        self::$loaded    = true;
+        self::$version   = $composer["version"];
+        self::$sourceDir = $composer["sourceDir"];
         return true;
     }
 
     /**
-     * Returns the Application Version
+     * Returns the Framework Version
      * @return string
      */
     public static function getVersion(): string {
@@ -90,29 +69,50 @@ class Package {
     }
 
     /**
-     * Returns the Application Namespace
+     * Returns the Framework Source Directory
      * @return string
      */
-    public static function getAppNamespace(): string {
+    public static function getSourceDir(): string {
         self::load();
-        return self::$appNamespace;
+        return self::$sourceDir;
+    }
+
+
+
+    /**
+     * Checks if the Application is the Framework itself
+     * @return boolean
+     */
+    public static function isFramework(): bool {
+        $appPath   = Application::getBasePath();
+        $framePath = self::getBasePath();
+        return $appPath === $framePath;
     }
 
     /**
-     * Returns the Application Base Directory
+     * Returns the base path to the Framework
+     * @param string ...$pathParts
      * @return string
      */
-    public static function getAppBaseDir(): string {
-        self::load();
-        return self::$appBaseDir;
+    public static function getBasePath(string ...$pathParts): string {
+        $path = File::getDirectory(__FILE__, 3);
+        return File::parsePath($path, ...$pathParts);
     }
 
     /**
-     * Returns the Application Source Directory
+     * Returns the path to the Source Directory
+     * @param string ...$pathParts
      * @return string
      */
-    public static function getAppSourceDir(): string {
-        self::load();
-        return self::$appSourceDir;
+    public static function getSourcePath(string ...$pathParts): string {
+        return self::getBasePath(self::getSourceDir(), ...$pathParts);
+    }
+
+    /**
+     * Returns the Namespace used in the Builder
+     * @return string
+     */
+    public static function getBuildPath(): string {
+        return self::getSourcePath(self::SystemDir);
     }
 }
