@@ -37,15 +37,8 @@ class Package {
             return false;
         }
 
-        // Determine the Base Path
-        $framePath = File::getDirectory(__FILE__, 3);
-        if (Strings::contains($framePath, "vendor")) {
-            $basePath = Strings::substringBefore($framePath, "/vendor");
-        } else {
-            $basePath = $framePath;
-        }
-
         // Read the Composer File
+        $basePath = self::getBasePath();
         $composer = Composer::readFile($basePath);
 
         // Save the Data
@@ -105,7 +98,7 @@ class Package {
     }
 
     /**
-     * Returns the Namespace used in the Builder
+     * Returns the Path used to store the Built files
      * @return string
      */
     public static function getBuildPath(): string {
