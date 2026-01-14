@@ -84,7 +84,7 @@ class Builder {
 
         File::deleteDir($writePath, $deleted);
 
-        print("\nDestroyed $deleted generated files\n");
+        print("\nDestroyed $deleted generated files\n\n");
         return true;
     }
 

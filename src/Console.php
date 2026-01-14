@@ -57,6 +57,34 @@ class Console {
         return true;
     }
 
+    /**
+     * Installs the Framework
+     * @return boolean
+     */
+    #[ConsoleCommand("install")]
+    #[Priority(Priority::High)]
+    public static function install(): bool {
+        print("Installing the Framework...\n\n");
+        $framePath = dirname(__DIR__);
+        $appPath   = getcwd();
+
+        if (self::confirm("- Install Framework console command?")) {
+            $fromPath = "$framePath/framework";
+            $toPath   = "$appPath/framework";
+            File::copy($fromPath, $toPath);
+            chmod($toPath, 0755);
+        }
+
+        if (self::confirm("- Install phpcs file?")) {
+            $fromPath = "$framePath/phpcs.xml";
+            $toPath   = "$appPath/phpcs.xml";
+            File::copy($fromPath, $toPath);
+        }
+
+        print("\nInstallation completed.\n");
+        return true;
+    }
+
 
 
     /**
@@ -114,5 +142,38 @@ class Console {
         print("|_|  |_|  \__,_|_| |_| |_|\___| \_/\_/ \___/|_|  |_|\_\ \n");
         print("$version\n\n");
         echo "\033[0m";
+    }
+
+    /**
+     * Prompts the user in the console
+     * @param string $prompt
+     * @return string
+     */
+    public static function prompt(string $prompt): string {
+        $handle = fopen("php://stdin", "r");
+        if ($handle === false) {
+            return "";
+        }
+
+        print("$prompt: ");
+        $line = fgets($handle);
+        fclose($handle);
+
+        $result = "";
+        if (is_string($line)) {
+            $result = rtrim($line, "\r\n");
+        }
+        return $result;
+    }
+
+    /**
+     * Prompts the user for confirmation in the console
+     * @param string $prompt
+     * @return boolean
+     */
+    public static function confirm(string $prompt): bool {
+        $response = self::prompt("$prompt (y/n)");
+        $response = Strings::toLowerCase($response);
+        return $response === "y" || $response === "yes";
     }
 }
