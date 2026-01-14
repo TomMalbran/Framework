@@ -5,6 +5,7 @@ use Framework\Discovery\Discovery;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Discovery\Priority;
 use Framework\Discovery\Package;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -18,9 +19,10 @@ class Console {
      * @return void
      */
     public static function run(): void {
-        echo "FRAMEWORK\n";
+        self::printLogo();
         $commands = self::getCommands();
 
+        // Get the command line arguments
         $argv = is_array($_SERVER["argv"] ?? null) ? $_SERVER["argv"] : [];
         $name = Strings::toString($argv[1] ?? "");
         $args = Arrays::toStrings(array_slice($argv, 2));
@@ -29,17 +31,17 @@ class Console {
         foreach ($commands as $command) {
             if ($command->shouldInvoke($name)) {
                 if (!$command->invoke($args)) {
-                    echo "Invalid arguments\n";
-                    echo "  Usage: {$command->getName()} {$command->getArguments()}\n";
+                    print("Invalid arguments\n");
+                    print("  Usage: {$command->getName()} {$command->getArguments()}\n");
                 }
                 return;
             }
         }
 
         // Show the usage
-        echo "Available commands: \n";
+        print("Available commands: \n");
         foreach ($commands as $command) {
-            echo " - {$command->getName()} {$command->getArguments()}\n";
+            print(" - {$command->getName()} {$command->getArguments()}\n");
         }
     }
 
@@ -94,5 +96,23 @@ class Console {
             }
         }
         return $result;
+    }
+
+    /**
+     * Prints the Framework Logo
+     * @return void
+     */
+    private static function printLogo(): void {
+        $version = Package::getVersion();
+
+        echo "\033[33m";
+        print(" ______                                           _     \n");
+        print("|  ____|                                         | |    \n");
+        print("| |__ _ __ __ _ _ __ ___   _____      _____  _ __| | __ \n");
+        print("|  __| '__/ _` | '_ ` _ \ / _ \ \ /\ / / _ \| '__| |/ / \n");
+        print("| |  | | | (_| | | | | | |  __/\ V  V / (_) | |  |   <  \n");
+        print("|_|  |_|  \__,_|_| |_| |_|\___| \_/\_/ \___/|_|  |_|\_\ \n");
+        print("$version\n\n");
+        echo "\033[0m";
     }
 }
