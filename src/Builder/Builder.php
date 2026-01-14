@@ -124,10 +124,11 @@ class Builder {
      * @return string
      */
     public static function render(string $name, array $data): string {
-        $file = Strings::addSuffix($name, ".mu");
-        $path = Application::getFramePath(Package::FrameTemplateDir, $file);
-        $code = File::read($path);
-        return Mustache::render($code, $data);
+        $file   = Strings::addSuffix($name, ".mu");
+        $path   = Package::getBasePath(Package::TemplateDir, $file);
+        $code   = File::read($path);
+        $result = Mustache::render($code, $data);
+        return self::alignParams($result);
     }
 
     /**
