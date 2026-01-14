@@ -27,6 +27,9 @@
         "phpmailer/phpmailer": "Used for Mailing with SMTP",
         "openspout/openspout": "Used to Import/Export XLSX data"
     },
+    "bin": [
+        "framework"
+    ],
     "autoload": {
         "psr-4": {
             "Framework\\": "src"
