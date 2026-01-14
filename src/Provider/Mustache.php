@@ -1,8 +1,7 @@
 <?php
 namespace Framework\Provider;
 
-use Mustache_Autoloader;
-use Mustache_Engine;
+use Mustache\Engine;
 use Exception;
 
 /**
@@ -10,17 +9,16 @@ use Exception;
  */
 class Mustache {
 
-    private static ?Mustache_Engine $engine = null;
+    private static ?Engine $engine = null;
 
 
     /**
      * Returns the Mustache Engine instance
-     * @return Mustache_Engine
+     * @return Engine
      */
-    private static function getEngine(): Mustache_Engine {
+    private static function getEngine(): Engine {
         if (self::$engine === null) {
-            Mustache_Autoloader::register();
-            self::$engine = new Mustache_Engine();
+            self::$engine = new Engine();
         }
         return self::$engine;
     }

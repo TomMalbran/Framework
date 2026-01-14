@@ -15,7 +15,7 @@
     },
     "require-dev": {
         "firebase/php-jwt": "^6.10",
-        "mustache/mustache": "^2.14",
+        "mustache/mustache": "^3.0",
         "phpmailer/phpmailer": "^6.9",
         "openspout/openspout": "^4.26",
         "phpstan/phpstan": "^2.1",
