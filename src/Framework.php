@@ -9,6 +9,7 @@ use Framework\System\Router;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
+use Framework\Utils\Server;
 
 use Exception;
 
@@ -85,13 +86,7 @@ class Framework {
     public static function executeInternal(): Dictionary {
         ErrorLog::init();
         Auth::validateInternal();
-
-        $data    = new Dictionary($_REQUEST);
-        $payload = file_get_contents("php://input");
-        if ($payload !== false && $payload !== "" && JSON::isValid($payload)) {
-            $data = JSON::decodeAsDictionary($payload);
-        }
-        return $data;
+        return Server::getPayload();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Framework\Utils;
 
 use Framework\Utils\Arrays;
+use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
 /**
@@ -54,6 +55,21 @@ class Server {
         }
         return trim(Strings::substringAfter($auth, "Bearer "));
     }
+
+    /**
+     * Returns the current Payload
+     * @return Dictionary
+     */
+    public static function getPayload(): Dictionary {
+        $data    = new Dictionary($_REQUEST);
+        $payload = file_get_contents("php://input");
+        if ($payload !== false && $payload !== "" && JSON::isValid($payload)) {
+            $data = JSON::decodeAsDictionary($payload);
+        }
+        return $data;
+    }
+
+
 
     /**
      * Returns true if running on Localhost
