@@ -43,6 +43,19 @@ class Server {
     }
 
     /**
+     * Returns the Authorization Token
+     * @return string
+     */
+    public static function getAuthToken(): string {
+        $headers = getallheaders();
+        $auth    = Strings::toString($headers["Authorization"] ?? "");
+        if ($auth === "") {
+            $auth = self::getString("HTTP_AUTHORIZATION");
+        }
+        return trim(Strings::substringAfter($auth, "Bearer "));
+    }
+
+    /**
      * Returns true if running on Localhost
      * @param string[] $whitelist
      * @return boolean
