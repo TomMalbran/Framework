@@ -24,7 +24,6 @@ class StatusCode {
             "statuses"  => self::getList($schemaModel),
             "values"    => self::getValues($schemaModel),
         ]);
-        $contents = Builder::alignParams($contents);
         return $contents;
     }
 

@@ -29,7 +29,6 @@ class QueryCode {
             "statuses"   => self::getStatuses($schemaModel),
             "imports"    => self::getImports($schemaModel),
         ]);
-        $contents = Builder::alignParams($contents);
         return $contents;
     }
 

@@ -30,7 +30,7 @@ class Config {
 
     /**
      * Returns the url for the given key and adding the url parts at the end
-     * @param string         $urlKey
+     * @param string $urlKey
      * @param string|integer ...$urlParts
      * @return string
      */

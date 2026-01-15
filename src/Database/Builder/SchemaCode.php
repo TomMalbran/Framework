@@ -112,8 +112,6 @@ class SchemaCode {
             "editParentsList"     => self::joinFields($editParents, "fieldArg", ", "),
             "hasDate"             => $hasDate,
         ]);
-
-        $contents = Builder::alignParams($contents);
         return Strings::replace($contents, "(, ", "(");
     }
 
