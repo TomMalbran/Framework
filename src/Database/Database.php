@@ -442,15 +442,21 @@ class Database {
      * Replaces any parameter placeholders in a query with the value of that
      * parameter. Useful for debugging. Assumes anonymous parameters from
      * $params are are in the same order as specified in $query
-     * @param string $expression
-     * @param Query  $query
+     * @param string        $expression
+     * @param Query|mixed[] $query
      * @return string
      */
-    public function interpolateQuery(string $expression, Query $query): string {
+    public function interpolateQuery(string $expression, Query|array $query): string {
         $expression = Strings::replace(trim($expression), "\n", "");
-        $params     = $query->params;
-        $keys       = [];
-        $values     = [];
+        if ($query instanceof Query) {
+            $expression .= $query->get(true);
+            $params      = $query->params;
+        } else {
+            $params = $query;
+        }
+
+        $keys   = [];
+        $values = [];
 
         foreach ($params as $key => $value) {
             if (is_string($key)) {

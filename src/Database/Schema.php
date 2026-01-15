@@ -360,7 +360,7 @@ class Schema {
         $selection->addCounts();
 
         $expression = $selection->getExpression($query);
-        return Framework::getDatabase()->interpolateQuery($expression, $query);
+        return Framework::getDatabase()->interpolateQuery($expression, $query->params);
     }
 
     /**
@@ -370,8 +370,7 @@ class Schema {
      * @return string
      */
     protected static function getDataExpression(Query $query, string $expression): string {
-        $expression  = self::replaceTable($expression);
-        $expression .= $query->get();
+        $expression = self::replaceTable($expression);
         return Framework::getDatabase()->interpolateQuery($expression, $query);
     }
 
