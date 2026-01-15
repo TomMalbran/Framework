@@ -18,6 +18,7 @@ use Exception;
 class Framework {
 
     private static ?Database $db       = null;
+    private static ?Request  $request  = null;
     private static ?Response $response = null;
 
 
@@ -30,7 +31,7 @@ class Framework {
         ErrorLog::init();
 
         // Parse the Request
-        $request      = new Request(withRequest: true, withFiles: true);
+        $request      = self::getRequest();
         $route        = $request->getString("route");
         $token        = $request->getString("token");
         $accessToken  = $request->getString("xAccessToken");
@@ -145,6 +146,17 @@ class Framework {
             );
         }
         return self::$db;
+    }
+
+    /**
+     * Returns the current Request
+     * @return Request
+     */
+    public static function getRequest(): Request {
+        if (self::$request === null) {
+            self::$request = new Request(withRequest: true, withFiles: true);
+        }
+        return self::$request;
     }
 
     /**
