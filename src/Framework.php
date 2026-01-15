@@ -142,6 +142,7 @@ class Framework {
                 Config::getDbUsername(),
                 Config::getDbPassword(),
                 Config::getDbCharset(),
+                Config::getDbPort(),
             );
         }
         return self::$db;

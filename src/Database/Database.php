@@ -24,6 +24,7 @@ class Database {
     private mysqli $mysqli;
 
     public string $host;
+    public int    $port;
     public string $database;
     public string $username;
     public string $password;
@@ -35,11 +36,12 @@ class Database {
 
     /**
      * Creates a new Database instance
-     * @param string $host
-     * @param string $database
-     * @param string $username
-     * @param string $password
-     * @param string $charset
+     * @param string  $host
+     * @param string  $database
+     * @param string  $username
+     * @param string  $password
+     * @param string  $charset
+     * @param integer $port     Optional.
      */
     public function __construct(
         string $host,
@@ -47,12 +49,14 @@ class Database {
         string $username,
         string $password,
         string $charset,
+        int    $port = 3306,
     ) {
         $this->host     = $host;
         $this->database = $database;
         $this->username = $username;
         $this->password = $password;
         $this->charset  = $charset;
+        $this->port     = $port;
 
         $this->connect();
     }
@@ -71,7 +75,7 @@ class Database {
      * @return boolean
      */
     public function connect(): bool {
-        $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database);
+        $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database, $this->port);
         if ($this->mysqli->connect_error !== null) {
             trigger_error("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}", E_USER_ERROR);
         } elseif ($this->database !== "") {
