@@ -56,23 +56,6 @@ class Response {
     }
 
     /**
-     * Returns the Data as String
-     * @return string
-     */
-    public function toString(): string {
-        return JSON::encode($this->data, true);
-    }
-
-    /**
-     * Prints the Data
-     * @return Response
-     */
-    public function print(): Response {
-        print($this->toString());
-        return $this;
-    }
-
-    /**
      * Prints the Data Data
      * @return Response
      */

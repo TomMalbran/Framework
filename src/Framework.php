@@ -68,9 +68,8 @@ class Framework {
 
         // Perform the Request
         try {
-            header("Content-Type:application/json;charset=utf-8");
             $response = self::request($route, $request);
-            $response->print();
+            self::output($response->toArray());
             return true;
         } catch (Exception $e) {
             http_response_code(400);
@@ -126,6 +125,17 @@ class Framework {
         // Add the Token and return the Response
         $response->addTokens(Auth::getAccessToken(), Auth::getRefreshToken());
         return $response;
+    }
+
+    /**
+     * Outputs the given data as JSON
+     * @param array<string|integer,mixed> $data
+     * @return void
+     */
+    public static function output(array $data): void {
+        http_response_code(200);
+        header("Content-Type: application/json;charset=utf-8");
+        print(JSON::encode($data, true));
     }
 
 
