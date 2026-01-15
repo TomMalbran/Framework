@@ -30,7 +30,7 @@ class Application {
         }
 
         // Determine the Base Path
-        $framePath = self::getIndexPath();
+        $framePath = File::getDirectory(__FILE__, 2);
         if (Strings::contains($framePath, "vendor")) {
             $basePath = Strings::substringBefore($framePath, "/vendor");
             $baseDir  = Strings::substringAfter($basePath, "/");
