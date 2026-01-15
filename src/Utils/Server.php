@@ -34,6 +34,15 @@ class Server {
 
 
     /**
+     * Returns true if the request method is POST
+     * @return boolean
+     */
+    public static function isPostRequest(): bool {
+        $method = self::getString("REQUEST_METHOD");
+        return Strings::toUpperCase($method) === "POST";
+    }
+
+    /**
      * Returns true if running on Localhost
      * @param string[] $whitelist
      * @return boolean
