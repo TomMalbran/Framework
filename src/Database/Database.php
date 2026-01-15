@@ -89,19 +89,25 @@ class Database {
     }
 
     /**
+     * Sets the database to use
+     * @param string $database
+     * @return boolean
+     */
+    public function setDatabase(string $database): bool {
+        $this->database = $database;
+        if ($this->mysqli->select_db($database)) {
+            $this->isConnected = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Closes the connection
      * @return boolean
      */
     public function close(): bool {
         return $this->mysqli->close();
-    }
-
-    /**
-     * Returns the connection
-     * @return mixed
-     */
-    public function get(): mixed {
-        return $this->mysqli;
     }
 
 
