@@ -4,6 +4,7 @@ namespace Framework\File;
 use Framework\Application;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\ConsoleCommand;
 use Framework\Discovery\Package;
 use Framework\Builder\Builder;
 use Framework\File\File;
@@ -206,7 +207,10 @@ class FilePath implements DiscoveryBuilder {
      * Ensures that the Paths are created
      * @return boolean
      */
+    #[ConsoleCommand("ensurePaths")]
     public static function ensurePaths(): bool {
+        print("\nENSURE PATHS\n");
+
         DiscoveryConfig::load();
         $basePaths = [ self::Temp, self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];

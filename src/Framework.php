@@ -3,7 +3,6 @@ namespace Framework;
 
 use Framework\Response;
 use Framework\Auth\Auth;
-use Framework\File\FilePath;
 use Framework\Log\ErrorLog;
 use Framework\Database\Database;
 use Framework\System\Router;
@@ -164,17 +163,5 @@ class Framework {
      */
     public static function getResponse(): ?Response {
         return self::$response;
-    }
-
-
-
-    /**
-     * Ensures that the Paths are created for the Framework
-     * @return boolean
-     */
-    public static function ensurePaths(): bool {
-        print("\nENSURE PATHS\n");
-        FilePath::ensurePaths();
-        return true;
     }
 }
