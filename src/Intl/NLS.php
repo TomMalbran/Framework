@@ -188,12 +188,16 @@ class NLS {
      */
     public static function format(string $key, array $args, string $language = ""): string {
         $subject = self::getString($key, $language);
-        return Strings::replaceCallback($subject, "/\{(\d+)\}/", function (array $match) use ($args) {
-            if (!isset($match[1])) {
-                return "";
-            }
-            return $args[$match[1]] ?? "";
-        });
+        return Strings::replaceCallback(
+            $subject,
+            "/\{(\d+)\}/",
+            function (array $match) use ($args): string {
+                if (!isset($match[1])) {
+                    return "";
+                }
+                return Strings::toString($args[$match[1]] ?? "");
+            },
+        );
     }
 
     /**

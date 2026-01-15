@@ -235,21 +235,21 @@ class Arrays {
 
     /**
      * Returns true if the array contains the needle
-     * @param mixed      $array
-     * @param mixed      $needle
-     * @param mixed|null $key             Optional.
-     * @param boolean    $caseInsensitive Optional.
-     * @param boolean    $atLeastOne      Optional.
+     * @param mixed               $array
+     * @param mixed               $needle
+     * @param integer|string|null $key             Optional.
+     * @param boolean             $caseInsensitive Optional.
+     * @param boolean             $atLeastOne      Optional.
      * @return boolean
      */
-    public static function contains(mixed $array, mixed $needle, mixed $key = null, bool $caseInsensitive = true, bool $atLeastOne = false): bool {
+    public static function contains(mixed $array, mixed $needle, int|string|null $key = null, bool $caseInsensitive = true, bool $atLeastOne = false): bool {
         $array = self::toArray($array);
 
         if (is_array($needle)) {
             $count = 0;
             foreach ($array as $row) {
                 foreach ($needle as $value) {
-                    if (self::isEqualContains($key, $row, $value, $caseInsensitive)) {
+                    if (self::isEqualContains($row, $key, $value, $caseInsensitive)) {
                         $count++;
                         break;
                     }
@@ -262,7 +262,7 @@ class Arrays {
         }
 
         foreach ($array as $row) {
-            if (self::isEqualContains($key, $row, $needle, $caseInsensitive)) {
+            if (self::isEqualContains($row, $key, $needle, $caseInsensitive)) {
                 return true;
             }
         }
@@ -271,21 +271,29 @@ class Arrays {
 
     /**
      * Does the Contains compare
-     * @param mixed   $key
-     * @param mixed   $row
-     * @param mixed   $value
-     * @param boolean $caseInsensitive Optional.
+     * @param mixed               $row
+     * @param integer|string|null $key
+     * @param mixed               $value
+     * @param boolean             $caseInsensitive Optional.
      * @return boolean
      */
-    private static function isEqualContains(mixed $key, mixed $row, mixed $value, bool $caseInsensitive = true): bool {
+    private static function isEqualContains(mixed $row, int|string|null $key, mixed $value, bool $caseInsensitive = true): bool {
         if ($key === null) {
             return Strings::isEqual($row, $value, $caseInsensitive);
         }
+
         if (is_object($row)) {
-            return isset($row->$key) && Strings::isEqual($row->$key, $value, $caseInsensitive);
+            if (!isset($row->$key)) {
+                return false;
+            }
+            return Strings::isEqual($row->$key, $value, $caseInsensitive);
         }
+
         if (is_array($row)) {
-            return isset($row[$key]) && Strings::isEqual($row[$key], $value, $caseInsensitive);
+            if (!isset($row[$key])) {
+                return false;
+            }
+            return Strings::isEqual($row[$key], $value, $caseInsensitive);
         }
         return false;
     }
@@ -682,7 +690,9 @@ class Arrays {
         $result = [];
         foreach ($array as $row) {
             $keyValue = self::getOneValue($row, $key);
-            $result[$keyValue] = $row;
+            if (is_string($keyValue) || is_int($keyValue)) {
+                $result[$keyValue] = $row;
+            }
         }
         return $result;
     }

@@ -21,22 +21,24 @@ parameters:
     # Strict Rules
     strictRules:
         noVariableVariables: false
-        disallowedEmpty: true
 
-        disallowedLooseComparison: true
         booleansInConditions: true
-        uselessCast: true
-        requireParentConstructorCall: true
-        disallowedBacktick: true
-        disallowedImplicitArrayCreation: true
-        disallowedShortTernary: true
-        overwriteVariablesWithLoop: true
-        closureUsesThis: true
-        matchingInheritedMethodNames: true
+        booleansInLoopConditions: true
         numericOperandsInArithmeticOperators: true
         strictFunctionCalls: true
-        dynamicCallOnStaticMethod: true
+        overwriteVariablesWithLoop: true
         switchConditionsMatchingType: true
+        dynamicCallOnStaticMethod: true
+        disallowedEmpty: true
+        disallowedShortTernary: true
+        matchingInheritedMethodNames: true
+        requireParentConstructorCall: true
+        disallowedBacktick: true
+        closureUsesThis: true
+
+        disallowedLooseComparison: true
+        uselessCast: true
+        disallowedImplicitArrayCreation: true
         strictArrayFilter: true
         illegalConstructorMethodCall: true
 

@@ -200,7 +200,7 @@ class Curl {
     /**
      * Parses the Header
      * @param array<string,string> $headers
-     * @return string[]
+     * @return array<integer,string>
      */
     private static function parseHeader(array $headers): array {
         $result = [];
@@ -221,7 +221,7 @@ class Curl {
      */
     public static function read(string $url, string $filePath, ?array $headers = null): bool {
         $file = fopen($filePath, "wb");
-        if ($file === false) {
+        if ($url === "" || $file === false) {
             return false;
         }
 
@@ -265,6 +265,10 @@ class Curl {
      * @return mixed
      */
     public static function write(string $url, string $fileContent, ?array $headers = null): mixed {
+        if ($url === "" || $fileContent === "") {
+            return [];
+        }
+
         $options = [
             CURLOPT_URL             => $url,
             CURLOPT_RETURNTRANSFER  => true,

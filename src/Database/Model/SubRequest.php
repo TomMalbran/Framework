@@ -154,7 +154,7 @@ class SubRequest {
                 continue;
             }
 
-            $name = $row[$this->idName];
+            $name = Strings::toString($row[$this->idName]);
             if (!isset($subResult[$name])) {
                 $subResult[$name] = [];
             }
@@ -165,7 +165,7 @@ class SubRequest {
             }
 
             if (isset($row[$this->fieldName])) {
-                $field = $row[$this->fieldName];
+                $field = Strings::toString($row[$this->fieldName]);
                 $subResult[$name][$field] = $this->getValues($row);
             }
         }

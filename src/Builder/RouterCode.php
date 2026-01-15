@@ -27,13 +27,15 @@ class RouterCode implements DiscoveryBuilder {
         $usedRoutes  = [];
         $errorRoutes = [];
 
+
         foreach ($reflections as $className => $reflection) {
             // Get the Methods
             $methods = $reflection->getMethods();
 
             // Add a space between the classes
-            if (count($methods) > 0 && count($routes) > 0) {
-                $routes[count($routes) - 1]["addSpace"] = true;
+            $total = count($routes);
+            if (count($methods) > 0 && $total > 0 && isset($routes[$total - 1])) {
+                $routes[$total - 1]["addSpace"] = true;
             }
 
             foreach ($methods as $method) {

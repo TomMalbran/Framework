@@ -154,7 +154,9 @@ class SignalCode implements DiscoveryBuilder {
         foreach ($params as $index => $param) {
             $params[$index]["docType"] = Strings::padRight($param["docType"], $typeLength);
         }
-        $params[0]["isFirst"] = true;
+        if (isset($params[0])) {
+            $params[0]["isFirst"] = true;
+        }
 
         return $params;
     }

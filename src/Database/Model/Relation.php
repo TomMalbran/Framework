@@ -447,7 +447,7 @@ class Relation {
         $andParts = Strings::split($this->ownerAndQuery, " AND ");
         $result   = [];
         for ($i = 0; $i < count($andParts); $i++) {
-            if (isset($andParts[$i]) && Strings::contains($andParts[$i], ".")) {
+            if (Strings::contains($andParts[$i], ".")) {
                 $result[] = trim(Strings::substringAfter($andParts[$i], "."));
             }
         }

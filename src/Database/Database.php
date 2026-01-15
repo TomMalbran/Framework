@@ -505,15 +505,17 @@ class Database {
             return [];
         }
 
-        $row = [];
-        while ($field = $meta->fetch_field()) {
+        $row   = [];
+        $field = $meta->fetch_field();
+        while ($field !== false) {
             $row[$field->name] = null;
             $parameters[]      = & $row[$field->name];
+            $field             = $meta->fetch_field();
         }
         $statement->bind_result(...$parameters);
 
         $statement->store_result();
-        while ($statement->fetch()) {
+        while ($statement->fetch() === true) {
             $x = [];
             foreach ($row as $key => $val) {
                 $key    = Strings::toString($key);

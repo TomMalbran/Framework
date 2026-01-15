@@ -185,7 +185,7 @@ class AES {
         }
 
         $roundKeyCount = ($rounds + 1) * 4;
-        $KC = count($key) / 4;
+        $KC = (int)(count($key) / 4);
 
         // Convert the key into ints
         $tk = self::convertToInt32($key);

@@ -446,10 +446,10 @@ class Strings {
 
     /**
      * Replaces in the String the pattern using the callback
-     * @param string          $string
-     * @param string[]|string $pattern
-     * @param callable        $callback
-     * @param integer         $limit    Optional.
+     * @param string                    $string
+     * @param string[]|string           $pattern
+     * @param callable(string[]):string $callback
+     * @param integer                   $limit    Optional.
      * @return string
      */
     public static function replaceCallback(string $string, array|string $pattern, callable $callback, int $limit = -1): string {

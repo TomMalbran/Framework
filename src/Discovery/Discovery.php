@@ -295,7 +295,8 @@ class Discovery {
                 }
             }
             $result = array_merge($properties, $result);
-        } while ($class = $class->getParentClass());
+            $class  = $class->getParentClass();
+        } while ($class !== false);
         return $result;
     }
 
