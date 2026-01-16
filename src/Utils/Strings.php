@@ -1110,6 +1110,26 @@ class Strings {
     }
 
     /**
+     * Returns true if the given Text has only Emojis
+     * @param string $text
+     * @return boolean
+     */
+    public static function isOnlyEmojis(string $text): bool {
+        $emojiPattern = '/^('
+            . '[\x{1F600}-\x{1F64F}]|' // Emoticons
+            . '[\x{1F680}-\x{1F6FF}]|' // Transport and Map
+            . '[\x{1F300}-\x{1F5FF}]|' // Misc Symbols and Pictographs
+            . '[\x{1F30D}-\x{1F567}]|'
+            . '[\x{1F900}-\x{1F9FF}]|'
+            . '[\x{1FA70}-\x{1FAF6}]|'
+            . '[\x{2700}-\x{27BF}]|'   // Dingbats
+            . '[\x{24C2}-\x{1F251}]'
+            . ')+$/u';
+
+        return self::match($text, $emojiPattern);
+    }
+
+    /**
      * Converts the Encoding from HTML to UTF8 of the given String
      * @param string $string
      * @return string
