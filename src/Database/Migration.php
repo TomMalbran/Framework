@@ -79,14 +79,12 @@ class Migration {
         }
 
 
+        // Migrate the Schema
         print("\nDATABASE MIGRATIONS\n");
         SchemaMigration::migrateData(self::$tableRenames, self::$columnRenames, $delete);
 
 
-        print("\nDATA MIGRATIONS\n");
-        self::migrateData();
-
-
+        // Apply other Migrations from the Framework
         /** @var DiscoveryMigration[] */
         $frameMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class, forFramework: true);
         if (count($frameMigrations) > 0) {
@@ -97,6 +95,7 @@ class Migration {
         }
 
 
+        // Apply the Migrations from the App
         /** @var DiscoveryMigration[] */
         $appMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class);
         if (count($appMigrations) > 0) {
@@ -107,9 +106,14 @@ class Migration {
         }
 
 
+        // Execute the required Data Migrations
+        print("\nDATA MIGRATIONS\n");
+        self::migrateData();
+
+
         // Calculate and show the time taken
         $time = $timer->getElapsedText();
-        print("\n\nMigrations completed in $time\n");
+        print("\nMigrations completed in $time\n");
         return true;
     }
 
@@ -142,7 +146,7 @@ class Migration {
         }
 
         // Sort the Migrations using the Class Name
-        ksort($migrations);
+        ksort($migrations, SORT_NATURAL|SORT_FLAG_CASE);
 
         // Determine the Migrations to Run
         $startMigration = SettingData::getCore("migration");
