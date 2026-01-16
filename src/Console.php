@@ -30,7 +30,9 @@ class Console {
         // Try to execute one of the commands
         foreach ($commands as $command) {
             if ($command->shouldInvoke($name)) {
-                if (!$command->invoke($args)) {
+                if ($command->invoke($args)) {
+                    echo "\033[32m" . "\nDone!\n" . "\033[0m";
+                } else {
                     print("Invalid arguments\n");
                     print("  Usage: {$command->getName()} {$command->getArguments()}\n");
                 }
@@ -38,7 +40,7 @@ class Console {
             }
         }
 
-        // Show the usage
+        // Show the usage since no command matched
         print("Available commands: \n");
         foreach ($commands as $command) {
             print(" - {$command->getName()} {$command->getArguments()}\n");

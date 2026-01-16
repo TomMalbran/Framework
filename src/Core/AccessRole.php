@@ -23,8 +23,9 @@ class AccessRole implements DiscoveryBuilder {
 
     /**
      * Registers an Access Role
-     * @param string $roleName
-     * @param string $groupName
+     * @param string  $roleName
+     * @param string  $groupName
+     * @param integer $level     Optional.
      * @return boolean
      */
     public static function register(string $roleName, string $groupName, int $level = -1): bool {

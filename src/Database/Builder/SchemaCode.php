@@ -41,7 +41,7 @@ class SchemaCode {
         $editParents = $schemaModel->hasPositions ? $parents : [];
         $queryName   = "{$schemaModel->name}Query";
 
-        $contents    = Builder::render("database/Schema", [
+        $contents    = Builder::render("Schema", [
             "namespace"           => $schemaModel->namespace,
             "name"                => $schemaModel->name,
             "table"               => $schemaModel->tableName,

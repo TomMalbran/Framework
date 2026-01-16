@@ -18,7 +18,7 @@ class ColumnCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $contents = Builder::render("database/Column", [
+        $contents = Builder::render("Column", [
             "namespace" => $schemaModel->namespace,
             "name"      => $schemaModel->name,
             "columns"   => self::getColumns($schemaModel),

@@ -17,7 +17,7 @@ class StatusCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $contents = Builder::render("database/Status", [
+        $contents = Builder::render("Status", [
             "namespace" => $schemaModel->namespace,
             "name"      => $schemaModel->name,
             "status"    => "{$schemaModel->name}Status",

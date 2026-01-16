@@ -18,7 +18,7 @@ class EntityCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $contents = Builder::render("database/Entity", [
+        $contents = Builder::render("Entity", [
             "namespace"  => $schemaModel->namespace,
             "name"       => $schemaModel->name,
             "id"         => $schemaModel->idName,

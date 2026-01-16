@@ -17,7 +17,7 @@ class QueryCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $contents = Builder::render("database/Query", [
+        $contents = Builder::render("Query", [
             "namespace"  => $schemaModel->namespace,
             "name"       => $schemaModel->name,
             "tableName"  => $schemaModel->tableName,

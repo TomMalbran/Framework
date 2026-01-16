@@ -16,6 +16,10 @@ use Framework\Utils\Strings;
  */
 class Builder {
 
+    /** @var array<string,string> */
+    private static array $templates = [];
+
+
     /**
      * Builds all the Code
      * @return boolean
@@ -25,6 +29,7 @@ class Builder {
         print("Building the Code...\n");
 
         DiscoveryConfig::load();
+        self::loadTemplates();
         $writePath = Package::getBuildPath();
         $created   = 0;
 
@@ -91,6 +96,23 @@ class Builder {
 
 
     /**
+     * Loads all the Templates
+     * @return boolean
+     */
+    private static function loadTemplates(): bool {
+        $path      = Package::getBasePath();
+        $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
+
+        foreach ($filePaths as $filePath) {
+            if (Strings::endsWith($filePath, ".mu")) {
+                $fileName = File::getBaseName(File::getName($filePath));
+                self::$templates[$fileName] = File::read($filePath);
+            }
+        }
+        return true;
+    }
+
+    /**
      * Generates a single System Code
      * @param string              $name
      * @param array<string,mixed> $data Optional.
@@ -103,7 +125,7 @@ class Builder {
         }
 
         $writePath = Package::getBuildPath();
-        $contents  = self::render("system/$name", $data + [
+        $contents  = self::render($name, $data + [
             "namespace" => Package::Namespace . Package::SystemDir,
         ]);
         File::create($writePath, "$name.php", $contents);
@@ -124,10 +146,12 @@ class Builder {
      * @return string
      */
     public static function render(string $name, array $data): string {
-        $file   = Strings::addSuffix($name, ".mu");
-        $path   = Package::getBasePath(Package::TemplateDir, $file);
-        $code   = File::read($path);
-        $result = Mustache::render($code, $data);
+        if (!isset(self::$templates[$name])) {
+            return "";
+        }
+
+        $content = self::$templates[$name];
+        $result  = Mustache::render($content, $data);
         return self::alignParams($result);
     }
 
