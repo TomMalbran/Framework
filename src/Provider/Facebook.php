@@ -11,7 +11,6 @@ class Facebook {
     private const BaseUrl = "https://graph.facebook.com/v22.0/";
 
 
-
     /**
      * Returns the Account from the given Token
      * @param string $accessToken

@@ -18,7 +18,6 @@ class OpenAI {
     private const BaseUrl = "https://api.openai.com/v1";
 
 
-
     /**
      * Does a GET Request
      * @param string                   $route

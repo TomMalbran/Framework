@@ -178,8 +178,8 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Float
-     * @param string  $key
-     * @param float   $default Optional.
+     * @param string $key
+     * @param float  $default Optional.
      * @return float
      */
     public function getFloat(string $key, float $default = 0.0): float {
@@ -298,6 +298,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Finds an element in the list at the given key
      * @param string $key
+     * @param string $value
      * @return Dictionary
      */
     public function findDict(string $key, string $value): Dictionary {

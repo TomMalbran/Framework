@@ -11,7 +11,6 @@ class Google {
     private const BaseUrl = "https://www.googleapis.com/oauth2/v1/";
 
 
-
     /**
      * Returns the Data from the given Token
      * @param string $accessToken

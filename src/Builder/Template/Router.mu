@@ -44,7 +44,7 @@ class Router {
 
     /**
      * Calls the given Route with the given params, if it exists
-     * @param string  $route
+     * @param string $route
      * @param Request $request
      * @return Response
      */

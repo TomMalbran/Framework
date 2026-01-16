@@ -68,10 +68,10 @@ class EmailQueue extends EmailQueueSchema {
      * Adds the given Email to the Queue
      * @param EmailContentEntity $content
      * @param string[]|string    $sendTo
-     * @param string|null        $message  Optional.
-     * @param string|null        $subject  Optional.
-     * @param boolean            $sendNow  Optional.
-     * @param integer            $dataID   Optional.
+     * @param string|null        $message Optional.
+     * @param string|null        $subject Optional.
+     * @param boolean            $sendNow Optional.
+     * @param integer            $dataID  Optional.
      * @return boolean
      */
     public static function add(EmailContentEntity $content, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false, int $dataID = 0): bool {

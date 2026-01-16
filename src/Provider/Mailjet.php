@@ -14,7 +14,6 @@ class Mailjet {
     private const BaseUrl = "https://api.mailjet.com";
 
 
-
     /**
      * Executes a Request
      * @param string              $method

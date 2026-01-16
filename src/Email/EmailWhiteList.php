@@ -46,7 +46,8 @@ class EmailWhiteList extends EmailWhiteListSchema {
      * @return boolean
      */
     public static function edit(int $emailID, string $email, string $description): bool {
-        return self::editEntity($emailID,
+        return self::editEntity(
+            $emailID,
             email:       $email,
             description: $description,
         );

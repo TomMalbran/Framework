@@ -18,16 +18,16 @@ class ImporterData {
 
     /**
      * Creates a new ImporterData instance
-     * @param Select[] $columns
-     * @param integer  $amount
-     * @param string   $first
-     * @param string   $last
+     * @param Select[] $columns Optional.
+     * @param integer  $amount  Optional.
+     * @param string   $first   Optional.
+     * @param string   $last    Optional.
      */
     public function __construct(
         array  $columns = [],
-        int    $amount  = 0,
-        string $first   = "",
-        string $last    = "",
+        int    $amount = 0,
+        string $first = "",
+        string $last = "",
     ) {
         $this->columns = $columns;
         $this->amount  = $amount;

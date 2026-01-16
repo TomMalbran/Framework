@@ -18,6 +18,7 @@ class MailChimp {
 
     /**
      * Returns the Base Url
+     * @param string $route
      * @return string
      */
     private static function getUrl(string $route): string {

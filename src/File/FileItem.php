@@ -41,6 +41,7 @@ class FileItem {
      * @param string  $sourcePath
      * @param string  $sourceUrl
      * @param string  $thumbPath
+     * @param string  $thumbUrl
      * @return FileItem
      */
     public static function createFile(

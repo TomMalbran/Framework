@@ -128,8 +128,8 @@ class MediaFile {
 
     /**
      * Uploads a File
-     * @param Request         $request
-     * @param string|integer  ...$pathParts
+     * @param Request        $request
+     * @param string|integer ...$pathParts
      * @return boolean
      */
     public static function uploadFile(Request $request, string|int ...$pathParts): bool {

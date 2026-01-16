@@ -8,14 +8,14 @@ use Framework\File\FileType;
  */
 class MediaType {
 
-    const Any   = "";
-    const Media = "media";
-    const Image = "image";
-    const Video = "video";
-    const Audio = "audio";
-    const PDF   = "pdf";
-    const Text  = "text";
-    const File  = "file";
+    public const Any   = "";
+    public const Media = "media";
+    public const Image = "image";
+    public const Video = "video";
+    public const Audio = "audio";
+    public const PDF   = "pdf";
+    public const Text  = "text";
+    public const File  = "file";
 
 
     /**

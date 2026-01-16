@@ -42,7 +42,7 @@ enum Access {
     /**
      * Returns the Name of the given Access
      * @param Access|string $value
-     * @param string        $isoCode Optional.
+     * @param string $isoCode Optional.
      * @return string
      */
     public static function getName(Access|string $value, string $isoCode = ""): string {

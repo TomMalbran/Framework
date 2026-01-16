@@ -17,7 +17,6 @@ class MercadoPago {
     private const AuthUrl = "https://auth.mercadopago.com/authorization";
 
 
-
     /**
      * Does a GET Request
      * @param string       $route

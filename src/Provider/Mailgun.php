@@ -16,7 +16,6 @@ class Mailgun {
     private const BaseUrl = "https://api.mailgun.net";
 
 
-
     /**
      * Executes a Request
      * @param string              $method
@@ -98,7 +97,7 @@ class Mailgun {
 
     /**
      * Returns a Domain
-     * @param string  $domain
+     * @param string $domain
      * @return DomainData
      */
     public static function getDomain(string $domain): DomainData {
