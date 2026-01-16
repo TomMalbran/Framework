@@ -248,7 +248,7 @@ class Numbers {
      * Returns a division from the given values as an integer
      * @param integer $numerator
      * @param integer $divisor
-     * @param boolean $useFloor Optional.
+     * @param boolean $useFloor  Optional.
      * @return integer
      */
     public static function divideInt(int $numerator, int $divisor, bool $useFloor = false): int {

@@ -604,9 +604,9 @@ class Arrays {
     /**
      * Sorts the arrays at the given key of the given array using the given callback
      * @template TValue
-     * @param TValue[] $array
-     * @param string   $field
-     * @param callable $callback
+     * @param TValue[]                  $array
+     * @param string                    $field
+     * @param callable(mixed,mixed):int $callback
      * @return TValue[]
      */
     public static function sortArray(array &$array, string $field, callable $callback): array {
@@ -630,8 +630,8 @@ class Arrays {
 
     /**
      * Applies the given callback to the elements of the given array
-     * @param mixed[]  $array
-     * @param callable $callback
+     * @param mixed[]               $array
+     * @param callable(mixed):mixed $callback
      * @return mixed[]
      */
     public static function map(array $array, callable $callback): array {
