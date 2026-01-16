@@ -188,6 +188,14 @@ class Entity implements JsonSerializable {
 
 
     /**
+     * Returns true if the Entity Exists
+     * @return boolean
+     */
+    final public function exists(): bool {
+        return !$this->isEmpty;
+    }
+
+    /**
      * Returns true if the Entity is Empty
      * @return boolean
      */

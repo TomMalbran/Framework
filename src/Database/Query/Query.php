@@ -508,6 +508,14 @@ class Query {
     }
 
     /**
+     * Returns true if the Query is not empty
+     * @return boolean
+     */
+    public function isNotEmpty(): bool {
+        return $this->where !== "";
+    }
+
+    /**
      * Returns true if the given Column is in the Query
      * @param string $column
      * @return boolean

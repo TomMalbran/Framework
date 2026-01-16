@@ -48,6 +48,14 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns true if the data is not empty
+     * @return boolean
+     */
+    public function isNotEmpty(): bool {
+        return count($this->data) !== 0;
+    }
+
+    /**
      * Returns true if the data is a list
      * @param string $key Optional.
      * @return boolean

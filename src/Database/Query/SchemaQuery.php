@@ -32,6 +32,14 @@ class SchemaQuery {
     }
 
     /**
+     * Returns true if the Query is not empty
+     * @return boolean
+     */
+    public function isNotEmpty(): bool {
+        return $this->query->isNotEmpty();
+    }
+
+    /**
      * Creates a list of question marks for the given array
      * @param string[]|integer[] $array
      * @return string
