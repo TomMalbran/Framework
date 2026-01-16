@@ -289,7 +289,7 @@ class {{name}}Schema extends Schema {
     protected static function constructEntity(array $data): {{entity}} {
         $entity = new {{entity}}($data);
         {{#processEntity}}
-        if (!$entity->isEmpty()) {
+        if ($entity->exists()) {
             {{#subTypes}}
             foreach ($entity->{{name}} as $index => $subEntity) {
                 $entity->{{name}}[$index] = new {{type}}Entity($subEntity);

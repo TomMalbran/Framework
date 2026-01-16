@@ -104,7 +104,7 @@ class Auth {
      */
     private static function setLanguageTimezone(CredentialEntity $credential, CredentialEntity $admin, string $langcode, int $timezone): bool {
         $entity = $credential;
-        if (!$admin->isEmpty()) {
+        if ($admin->exists()) {
             $entity = $admin;
         }
 
@@ -208,7 +208,7 @@ class Auth {
      */
     public static function canLogin(CredentialEntity $credential): bool {
         return (
-            !$credential->isEmpty() &&
+            $credential->exists() &&
             !$credential->isDeleted &&
             CredentialStatus::isActive($credential->status)
         );
@@ -285,7 +285,7 @@ class Auth {
     public static function canLoginAs(CredentialEntity $admin, CredentialEntity $user): bool {
         return (
             self::canLogin($admin) &&
-            !$user->isEmpty() &&
+            $user->exists() &&
             Access::getLevel($admin->access) >= Access::getLevel($user->access) &&
             Access::isValidAdmin($admin->access)
         );
@@ -314,7 +314,7 @@ class Auth {
         $language = $credential->language;
         $timezone = $credential->timezone;
 
-        if ($admin !== null && !$admin->isEmpty()) {
+        if ($admin !== null && $admin->exists()) {
             self::$admin   = $admin;
             self::$adminID = $admin->id;
             $language = $admin->language;
@@ -340,7 +340,7 @@ class Auth {
     public static function updateCredential(): bool {
         if (self::$credentialID !== 0) {
             $credential = Credential::getByID(self::$credentialID, true);
-            if (!$credential->isEmpty()) {
+            if ($credential->exists()) {
                 self::$credential = $credential;
                 return true;
             }

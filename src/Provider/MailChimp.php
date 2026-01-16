@@ -161,7 +161,7 @@ class MailChimp {
         $hash     = self::getSubscriberHash($email);
         $route    = self::getSubscribersRoute($hash);
         $response = self::get($route);
-        return !$response->isEmpty() ? $response : null;
+        return $response->isNotEmpty() ? $response : null;
     }
 
     /**
@@ -636,7 +636,7 @@ class MailChimp {
         $response   = self::get("reports/{$mailChimpID}/click-details");
         $urlClicked = $response->getFirst("urls_clicked");
 
-        if (!$urlClicked->isEmpty()) {
+        if ($urlClicked->isNotEmpty()) {
             $clickID = $urlClicked->getString("id");
             $report  = self::get("reports/{$mailChimpID}/click-details/{$clickID}/members", [
                 "count" => 2000,

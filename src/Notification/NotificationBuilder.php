@@ -23,7 +23,7 @@ class NotificationBuilder implements DiscoveryBuilder {
 
         foreach ($languages as $language => $languageName) {
             $data = NLSConfig::loadNotifications($language);
-            if (!$data->isEmpty()) {
+            if ($data->isNotEmpty()) {
                 break;
             }
         }

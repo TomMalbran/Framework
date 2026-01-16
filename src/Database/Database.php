@@ -731,7 +731,7 @@ class Database {
             return false;
         }
         $request = $this->getDictionary("SHOW TABLES LIKE '$tableName'");
-        return !$request->isEmpty();
+        return $request->isNotEmpty();
     }
 
     /**

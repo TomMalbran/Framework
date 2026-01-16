@@ -23,7 +23,7 @@ class EmailBuilder implements DiscoveryBuilder {
 
         foreach ($languages as $language => $languageName) {
             $data = NLSConfig::loadEmails($language);
-            if (!$data->isEmpty()) {
+            if ($data->isNotEmpty()) {
                 break;
             }
         }

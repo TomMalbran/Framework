@@ -137,7 +137,7 @@ class Mailjet {
         $response = self::execute("GET", "/v3/REST/contact/$email");
         $data     = $response->getFirst("Data");
 
-        if (!$data->isEmpty()) {
+        if ($data->isNotEmpty()) {
             $contactID = $data->getString("ID");
             self::execute("DELETE", "/v4/contacts/$contactID");
         }

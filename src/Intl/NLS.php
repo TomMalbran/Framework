@@ -55,7 +55,7 @@ class NLS {
         }
 
         $data = NLSConfig::loadStrings($langCode);
-        if (!$data->isEmpty()) {
+        if ($data->isNotEmpty()) {
             self::$data[$langCode] = $data;
             return $data;
         }
