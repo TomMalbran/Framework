@@ -12,6 +12,7 @@ use Framework\Database\DataMigration;
 use Framework\Core\Configs;
 use Framework\Core\SettingData;
 use Framework\File\File;
+use Framework\Date\Timer;
 use Framework\Utils\Strings;
 
 use ReflectionClass;
@@ -68,15 +69,15 @@ class Migration {
      */
     #[ConsoleCommand("migrate")]
     public static function migrate(string $envFile = "", bool $delete = false): bool {
-        DiscoveryConfig::load();
-
-        $timeStart = microtime(true);
+        $timer = new Timer();
         print("Migrating data...\n");
 
+        DiscoveryConfig::load();
         if ($envFile !== "") {
             print("Using ENV file: $envFile\n");
             Configs::setFileName($envFile);
         }
+
 
         print("\nDATABASE MIGRATIONS\n");
         SchemaMigration::migrateData(self::$tableRenames, self::$columnRenames, $delete);
@@ -107,10 +108,8 @@ class Migration {
 
 
         // Calculate and show the time taken
-        $timeEnd = microtime(true);
-        $seconds = $timeEnd - $timeStart;
-        $minutes = round(($seconds / 60) * 100) / 100;
-        print("\n\nMigrations completed in $minutes m ($seconds s)\n\n");
+        $time = $timer->getElapsedText();
+        print("\n\nMigrations completed in $time\n");
         return true;
     }
 

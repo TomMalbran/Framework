@@ -8,6 +8,7 @@ use Framework\Discovery\ConsoleCommand;
 use Framework\Discovery\Package;
 use Framework\File\File;
 use Framework\Provider\Mustache;
+use Framework\Date\Timer;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -26,6 +27,7 @@ class Builder {
      */
     #[ConsoleCommand("build")]
     public static function build(): bool {
+        $timer = new Timer();
         print("Building the Code...\n");
 
         DiscoveryConfig::load();
@@ -58,7 +60,10 @@ class Builder {
             }
         }
 
-        print("\nGenerated $created files\n");
+
+        // Calculate and show the time taken
+        $time = $timer->getElapsedText();
+        print("\nGenerated $created files in $time\n");
         return true;
     }
 

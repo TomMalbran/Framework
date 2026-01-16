@@ -4,7 +4,7 @@ namespace Framework\Builder;
 use Framework\Application;
 use Framework\Discovery\ConsoleCommand;
 use Framework\File\File;
-use Framework\Utils\Numbers;
+use Framework\Date\Timer;
 use Framework\Utils\Strings;
 
 /**
@@ -59,12 +59,12 @@ class Watcher {
                 continue;
             }
 
-            // Build the project
-            $startTime = microtime(true);
+            // Build the app
             print("\n│ Building app...");
+            $timer    = new Timer();
             $result   = exec("./framework build");
-            $duration = Numbers::round(microtime(true) - $startTime, 1);
-            print("\n│ $result in {$duration}s\n");
+            $duration = $timer->getElapsedText();
+            print("\n│ $result in $duration s\n");
         }
     }
 

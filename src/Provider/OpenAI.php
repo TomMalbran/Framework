@@ -3,8 +3,8 @@ namespace Framework\Provider;
 
 use Framework\Provider\Type\OpenAIOutput;
 use Framework\System\Config;
+use Framework\Date\Timer;
 use Framework\Utils\Dictionary;
-use Framework\Utils\Numbers;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -219,8 +219,8 @@ class OpenAI {
         ?Dictionary $schema = null,
         bool $removeReferences = true,
     ): OpenAIOutput {
-        $startTime = microtime(true);
-        $params    = [
+        $timer  = new Timer();
+        $params = [
             "model"    => $model,
             "messages" => array_merge($context, [
                 [
@@ -248,7 +248,6 @@ class OpenAI {
 
         $result   = new OpenAIOutput();
         $response = self::post("/chat/completions", $params);
-        $endTime  = microtime(true);
         $choice   = $response->getFirst("choices");
         if ($choice->isEmpty()) {
             return $result;
@@ -263,7 +262,7 @@ class OpenAI {
         $result->text         = $text;
         $result->inputTokens  = $response->getDict("usage")->getInt("prompt_tokens");
         $result->outputTokens = $response->getDict("usage")->getInt("completion_tokens");
-        $result->runTime      = Numbers::roundInt($endTime - $startTime);
+        $result->runTime      = $timer->getElapsedSecondsInt();
         return $result;
     }
 
@@ -289,8 +288,8 @@ class OpenAI {
         string $allowedDomain = "",
         bool $removeReferences = true,
     ): OpenAIOutput {
-        $startTime = microtime(true);
-        $params    = [
+        $timer  = new Timer();
+        $params = [
             "model" => $model,
             "input" => array_merge($context, [
                 [
@@ -323,7 +322,7 @@ class OpenAI {
             $params["tool_choice"] = "required";
             $tools[] = [
                 "type"             => "file_search",
-                "vector_store_ids" => [ $vectorStoreID ]
+                "vector_store_ids" => [ $vectorStoreID ],
             ];
         }
         if ($allowWebSearch) {
@@ -346,7 +345,6 @@ class OpenAI {
         // Perform the request and get the Result
         $result   = new OpenAIOutput();
         $response = self::post("/responses", $params);
-        $endTime  = microtime(true);
         $outputs  = $response->getList("output");
         $text     = "";
 
@@ -366,7 +364,7 @@ class OpenAI {
             $result->text          = $text;
             $result->inputTokens   = $response->getDict("usage")->getInt("input_tokens");
             $result->outputTokens  = $response->getDict("usage")->getInt("output_tokens");
-            $result->runTime       = Numbers::roundInt($endTime - $startTime);
+            $result->runTime       = $timer->getElapsedSecondsInt();
 
             foreach ($response->getList("tools") as $tool) {
                 $type = $tool->getString("type");
@@ -387,15 +385,14 @@ class OpenAI {
      * @return OpenAIOutput
      */
     public static function transcribeAudio(string $fileContent, string $fileName, string $language): OpenAIOutput {
-        $result    = new OpenAIOutput();
-        $timeStart = microtime(true);
-        $response  = self::upload("/audio/transcriptions", [
+        $timer    = new Timer();
+        $result   = new OpenAIOutput();
+        $response = self::upload("/audio/transcriptions", [
             "file"            => new CURLStringFile($fileContent, $fileName),
             "model"           => "whisper-1",
             "language"        => $language,
             "response_format" => "verbose_json",
         ]);
-        $timeEnd   = microtime(true);
         if (!$response->hasValue("text")) {
             return $result;
         }
@@ -408,7 +405,7 @@ class OpenAI {
         $result->text         = $response->getString("text");
         $result->language     = $response->getString("language");
         $result->duration     = (int)ceil($response->getFloat("duration"));
-        $result->runTime      = Numbers::roundInt(($timeEnd - $timeStart) / 60);
+        $result->runTime      = $timer->getElapsedSecondsInt();
         $result->outputTokens = $outputTokens;
         return $result;
     }

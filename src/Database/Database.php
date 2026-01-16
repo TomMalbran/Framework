@@ -5,6 +5,7 @@ use Framework\Database\Query\Query;
 use Framework\Database\Type\Assign;
 use Framework\Log\QueryLog;
 use Framework\System\Config;
+use Framework\Date\Timer;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
@@ -118,9 +119,9 @@ class Database {
      * @return boolean
      */
     public function execute(string $expression): bool {
-        $startTime = microtime(true);
+        $timer     = new Timer();
         $statement = $this->processQuery($expression, []);
-        $this->processTime($startTime, $expression, []);
+        $this->processTime($timer, $expression, []);
         return $this->closeQuery($statement);
     }
 
@@ -131,11 +132,11 @@ class Database {
      * @return array<string,string|integer|null>[]
      */
     public function queryData(string $expression, Query|array $params = []): array {
-        $startTime = microtime(true);
+        $timer     = new Timer();
         $binds     = $params instanceof Query ? $params->params : $params;
         $statement = $this->processQuery($expression, $binds);
         $result    = $this->dynamicBindResults($statement);
-        $this->processTime($startTime, $expression, $binds);
+        $this->processTime($timer, $expression, $binds);
         return $result;
     }
 
@@ -607,14 +608,14 @@ class Database {
 
     /**
      * Process a elapsed time and saves it if it last more than 5 seconds
-     * @param float   $startTime
+     * @param Timer   $timer
      * @param string  $expression
      * @param mixed[] $params
      * @return boolean
      */
-    protected function processTime(float $startTime, string $expression, array $params): bool {
+    protected function processTime(Timer $timer, string $expression, array $params): bool {
         $logTime = Config::getDbLogTime();
-        $time    = microtime(true) - $startTime;
+        $time    = $timer->getElapsedSeconds();
         if ($logTime === 0 || $time < $logTime || $this->skipLog) {
             return false;
         }
