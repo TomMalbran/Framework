@@ -26,12 +26,12 @@ class Email {
 
     /**
      * Sends an Email
-     * @param string  $toEmail
-     * @param string  $subject
-     * @param string  $message
-     * @param boolean $sendAlways      Optional.
-     * @param boolean $sendTest        Optional.
-     * @param boolean $withoutTemplate Optional.
+     * @param string $toEmail
+     * @param string $subject
+     * @param string $message
+     * @param bool   $sendAlways      Optional.
+     * @param bool   $sendTest        Optional.
+     * @param bool   $withoutTemplate Optional.
      * @return EmailResult
      */
     public static function send(
@@ -93,7 +93,7 @@ class Email {
      * @param string[]|string    $sendTo
      * @param string|null        $message    Optional.
      * @param string|null        $subject    Optional.
-     * @param boolean            $sendAlways Optional.
+     * @param bool               $sendAlways Optional.
      * @return EmailResult
      */
     public static function sendContent(
@@ -119,8 +119,8 @@ class Email {
     /**
      * Checks if the Recaptcha is Valid
      * @param Request $request
-     * @param boolean $withScore Optional.
-     * @return boolean
+     * @param bool    $withScore Optional.
+     * @return bool
      */
     public static function isCaptchaValid(Request $request, bool $withScore = false): bool {
         $recaptchaSecret = Config::getEmailRecaptchaSecret();

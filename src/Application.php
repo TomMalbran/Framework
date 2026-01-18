@@ -22,7 +22,7 @@ class Application {
 
     /**
      * Loads the Application Composer Data
-     * @return boolean
+     * @return bool
      */
     private static function load(): bool {
         if (self::$loaded) {
@@ -125,7 +125,7 @@ class Application {
 
     /**
      * Returns an Url for the given internal path
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getUrl(string|int ...$pathParts): string {

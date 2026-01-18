@@ -120,7 +120,7 @@ class Watcher {
      * @param string   $path
      * @param string   $basePath
      * @param string[] $ignorePatterns
-     * @return array<string,integer>
+     * @return array<string,int>
      */
     private static function scanDirectory(string $path, string $basePath, array $ignorePatterns): array {
         $files  = File::getFilesInDir($path, true);
@@ -138,7 +138,7 @@ class Watcher {
      * @param string   $filePath
      * @param string   $basePath
      * @param string[] $ignorePatterns
-     * @return boolean
+     * @return bool
      */
     private static function isIgnored(string $filePath, string $basePath, array $ignorePatterns): bool {
         $relativePath = Strings::stripStart($filePath, "$basePath/");

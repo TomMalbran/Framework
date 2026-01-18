@@ -11,7 +11,7 @@ class Arrays {
     /**
      * Returns true if the given value is an list
      * @param mixed $array
-     * @return boolean
+     * @return bool
      */
     public static function isList(mixed $array): bool {
         return is_array($array) && array_is_list($array);
@@ -20,7 +20,7 @@ class Arrays {
     /**
      * Returns true if the given value is a dictionary
      * @param mixed $array
-     * @return boolean
+     * @return bool
      */
     public static function isDict(mixed $array): bool {
         return is_array($array) && !array_is_list($array);
@@ -29,7 +29,7 @@ class Arrays {
     /**
      * Returns true if the given value is a map
      * @param mixed $array
-     * @return boolean
+     * @return bool
      */
     public static function isMap(mixed $array): bool {
         if (!is_array($array)) {
@@ -61,10 +61,10 @@ class Arrays {
 
     /**
      * Converts an array into a list of integers
-     * @param mixed   $array
-     * @param string  $key          Optional.
-     * @param boolean $withoutEmpty Optional.
-     * @return integer[]
+     * @param mixed  $array
+     * @param string $key          Optional.
+     * @param bool   $withoutEmpty Optional.
+     * @return int[]
      */
     public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
         if (is_int($array)) {
@@ -94,9 +94,9 @@ class Arrays {
 
     /**
      * Converts an array into a list of strings
-     * @param mixed   $array
-     * @param string  $key          Optional.
-     * @param boolean $withoutEmpty Optional.
+     * @param mixed  $array
+     * @param string $key          Optional.
+     * @param bool   $withoutEmpty Optional.
      * @return string[]
      */
     public static function toStrings(mixed $array, string $key = "", bool $withoutEmpty = false): array {
@@ -142,7 +142,7 @@ class Arrays {
     /**
      * Converts an array into a Map of int keys and string values
      * @param mixed $array
-     * @return array<integer,string>
+     * @return array<int,string>
      */
     public static function toIntStringMap(mixed $array): array {
         if (!is_array($array)) {
@@ -159,7 +159,7 @@ class Arrays {
     /**
      * Converts an array into a Map of string keys and int values
      * @param mixed $array
-     * @return array<string,integer>
+     * @return array<string,int>
      */
     public static function toStringIntMap(mixed $array): array {
         if (!is_array($array)) {
@@ -194,9 +194,9 @@ class Arrays {
 
     /**
      * Returns true if the given array is empty
-     * @param mixed               $array
-     * @param string|integer|null $key   Optional.
-     * @return boolean
+     * @param mixed           $array
+     * @param string|int|null $key   Optional.
+     * @return bool
      */
     public static function isEmpty(mixed $array, string|int|null $key = null): bool {
         if ($key !== null && is_array($array)) {
@@ -210,7 +210,7 @@ class Arrays {
     /**
      * Returns the length of the given array
      * @param mixed $array
-     * @return integer
+     * @return int
      */
     public static function length(mixed $array): int {
         return is_array($array) ? count($array) : 0;
@@ -219,7 +219,7 @@ class Arrays {
     /**
      * Returns the max value of the given array
      * @param mixed $array
-     * @return integer
+     * @return int
      */
     public static function max(mixed $array): int {
         if (self::isEmpty($array) || !is_array($array)) {
@@ -235,12 +235,12 @@ class Arrays {
 
     /**
      * Returns true if the array contains the needle
-     * @param mixed               $array
-     * @param mixed               $needle
-     * @param integer|string|null $key             Optional.
-     * @param boolean             $caseInsensitive Optional.
-     * @param boolean             $atLeastOne      Optional.
-     * @return boolean
+     * @param mixed           $array
+     * @param mixed           $needle
+     * @param int|string|null $key             Optional.
+     * @param bool            $caseInsensitive Optional.
+     * @param bool            $atLeastOne      Optional.
+     * @return bool
      */
     public static function contains(mixed $array, mixed $needle, int|string|null $key = null, bool $caseInsensitive = true, bool $atLeastOne = false): bool {
         $array = self::toArray($array);
@@ -271,11 +271,11 @@ class Arrays {
 
     /**
      * Does the Contains compare
-     * @param mixed               $row
-     * @param integer|string|null $key
-     * @param mixed               $value
-     * @param boolean             $caseInsensitive Optional.
-     * @return boolean
+     * @param mixed           $row
+     * @param int|string|null $key
+     * @param mixed           $value
+     * @param bool            $caseInsensitive Optional.
+     * @return bool
      */
     private static function isEqualContains(mixed $row, int|string|null $key, mixed $value, bool $caseInsensitive = true): bool {
         if ($key === null) {
@@ -302,7 +302,7 @@ class Arrays {
      * Returns true if the array contains the needle as a key
      * @param mixed[] $array
      * @param mixed   $needle
-     * @return boolean
+     * @return bool
      */
     public static function containsKey(array $array, mixed $needle): bool {
         return in_array($needle, array_keys($array), true);
@@ -313,7 +313,7 @@ class Arrays {
      * @param mixed[] $array
      * @param mixed[] $other
      * @param string  $key   Optional.
-     * @return boolean
+     * @return bool
      */
     public static function isEqual(array $array, array $other, string $key = ""): bool {
         if (self::length($array) !== self::length($other)) {
@@ -336,7 +336,7 @@ class Arrays {
      * @param array<string,mixed> $array
      * @param array<string,mixed> $other
      * @param string[]            $keys
-     * @return boolean
+     * @return bool
      */
     public static function isEqualWithKeys(array $array, array $other, array $keys): bool {
         foreach ($keys as $key) {
@@ -351,7 +351,7 @@ class Arrays {
      * Returns true if the arrays intersect
      * @param mixed[] $array
      * @param mixed[] $other
-     * @return boolean
+     * @return bool
      */
     public static function intersects(array $array, array $other): bool {
         foreach ($array as $mine) {
@@ -427,9 +427,9 @@ class Arrays {
     /**
      * Removes the given value from the array
      * @template TValue
-     * @param TValue[]       $array
-     * @param string|integer $key
-     * @param string|integer $idKey Optional.
+     * @param TValue[]   $array
+     * @param string|int $key
+     * @param string|int $idKey Optional.
      * @return TValue[]
      */
     public static function removeValue(array $array, string|int $key, string|int $idKey = ""): array {
@@ -515,7 +515,7 @@ class Arrays {
      * @phpstan-param TValue ...$elem
      *
      * @param TValue[] $array
-     * @param integer  $position
+     * @param int      $position
      * @param mixed    ...$elem
      * @return TValue[]
      */
@@ -527,9 +527,9 @@ class Arrays {
     /**
      * Slices an Array from the index the amount of items
      * @template TValue
-     * @param TValue[]     $array
-     * @param integer      $from
-     * @param integer|null $amount Optional.
+     * @param TValue[] $array
+     * @param int      $from
+     * @param int|null $amount Optional.
      * @return TValue[]
      */
     public static function slice(array $array, int $from, ?int $amount = null): array {
@@ -540,8 +540,8 @@ class Arrays {
      * Paginates an Array from the page to the amount of items
      * @template TValue
      * @param TValue[] $array
-     * @param integer  $page
-     * @param integer  $amount
+     * @param int      $page
+     * @param int      $amount
      * @return TValue[]
      */
     public static function paginate(array $array, int $page, int $amount): array {
@@ -644,7 +644,7 @@ class Arrays {
      * Returns the sum of the elements of the given array
      * @param mixed[]     $array
      * @param string|null $key   Optional.
-     * @return integer|float
+     * @return int|float
      */
     public static function sum(array $array, ?string $key = null): int|float {
         $result = 0;
@@ -663,7 +663,7 @@ class Arrays {
     /**
      * Returns the average of the elements of the given array
      * @param mixed[]     $array
-     * @param integer     $decimals Optional.
+     * @param int         $decimals Optional.
      * @param string|null $key      Optional.
      * @return float
      */
@@ -684,7 +684,7 @@ class Arrays {
      * @template TValue
      * @param TValue[] $array
      * @param string   $key
-     * @return array<string|integer,TValue>
+     * @return array<string|int,TValue>
      */
     public static function createMap(array $array, string $key): array {
         $result = [];
@@ -701,8 +701,8 @@ class Arrays {
      * Creates an Array using the given Array
      * @param mixed[]              $array
      * @param string[]|string|null $key       Optional.
-     * @param boolean              $skipEmpty Optional.
-     * @param boolean              $distinct  Optional.
+     * @param bool                 $skipEmpty Optional.
+     * @param bool                 $distinct  Optional.
      * @return mixed[]
      */
     public static function createArray(array $array, array|string|null $key = null, bool $skipEmpty = false, bool $distinct = false): array {
@@ -743,7 +743,7 @@ class Arrays {
     /**
      * Returns the first Key of the given array
      * @param mixed[] $array
-     * @return string|integer|mixed|null
+     * @return string|int|mixed|null
      */
     public static function getFirstKey(array $array): mixed {
         $keys = array_keys($array);
@@ -777,8 +777,8 @@ class Arrays {
      * Returns the index of the given needle
      * @param mixed[] $array
      * @param mixed   $needle
-     * @param boolean $caseInsensitive
-     * @return integer
+     * @param bool    $caseInsensitive
+     * @return int
      */
     public static function getIndex(array $array, mixed $needle, bool $caseInsensitive = false): int {
         $index = 0;
@@ -796,7 +796,7 @@ class Arrays {
      * @param mixed[] $array
      * @param string  $idKey
      * @param mixed   $idValue
-     * @return boolean
+     * @return bool
      */
     public static function hasValue(array $array, string $idKey, mixed $idValue): bool {
         return self::findIndex($array, $idKey, $idValue) !== -1;
@@ -807,7 +807,7 @@ class Arrays {
      * @param mixed[] $array
      * @param string  $idKey
      * @param mixed   $idValue
-     * @return string|integer|mixed
+     * @return string|int|mixed
      */
     public static function findIndex(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $index => $elem) {
@@ -890,7 +890,7 @@ class Arrays {
      * @param string[]|string $key
      * @param string          $glue     Optional.
      * @param string          $prefix   Optional.
-     * @param boolean         $useEmpty Optional.
+     * @param bool            $useEmpty Optional.
      * @param mixed|string    $default  Optional.
      * @return mixed
      */
@@ -931,7 +931,7 @@ class Arrays {
      * Returns one value
      * @param mixed      $array
      * @param string     $key
-     * @param boolean    $useEmpty Optional.
+     * @param bool       $useEmpty Optional.
      * @param mixed|null $default  Optional.
      * @return mixed
      */

@@ -135,7 +135,7 @@ class Period {
 
     /**
      * Returns true if the Period is empty
-     * @return boolean
+     * @return bool
      */
     public function isEmpty(): bool {
         return $this->fromTime === 0 && $this->toTime === 0;
@@ -143,7 +143,7 @@ class Period {
 
     /**
      * Returns true if the Period is not empty
-     * @return boolean
+     * @return bool
      */
     public function isNotEmpty(): bool {
         return $this->fromTime !== 0 || $this->toTime !== 0;
@@ -151,8 +151,8 @@ class Period {
 
     /**
      * Returns the From Time depending on the period
-     * @param boolean $useTimeZone Optional.
-     * @return integer
+     * @param bool $useTimeZone Optional.
+     * @return int
      */
     public function getFromTime(bool $useTimeZone = true): int {
         $day    = DateTime::getDay();
@@ -186,8 +186,8 @@ class Period {
 
     /**
      * Returns the To Time depending on the period
-     * @param boolean $useTimeZone Optional.
-     * @return integer
+     * @param bool $useTimeZone Optional.
+     * @return int
      */
     public function getToTime(bool $useTimeZone = true): int {
         $month    = DateTime::getMonth();
@@ -223,7 +223,7 @@ class Period {
 
     /**
      * Returns the amount of days in the Period
-     * @return integer
+     * @return int
      */
     public function getDaysAmount(): int {
         return self::getDays($this->period);
@@ -234,7 +234,7 @@ class Period {
     /**
      * Returns true if the given value is valid
      * @param string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValid(string $value): bool {
         return Arrays::containsKey(self::$names, $value);
@@ -262,7 +262,7 @@ class Period {
     /**
      * Returns the amount of days in the given Period
      * @param string $period
-     * @return integer
+     * @return int
      */
     public static function getDays(string $period): int {
         $month = DateTime::getMonth();

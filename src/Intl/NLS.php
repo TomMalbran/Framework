@@ -30,7 +30,7 @@ class NLS {
     /**
      * Sets the Language
      * @param string $language
-     * @return boolean
+     * @return bool
      */
     public static function setLanguage(string $language): bool {
         self::$language = $language;
@@ -76,9 +76,9 @@ class NLS {
 
     /**
      * Returns a string from the data at the given index
-     * @param string         $key
-     * @param integer|string $index
-     * @param string         $language Optional.
+     * @param string     $key
+     * @param int|string $index
+     * @param string     $language Optional.
      * @return string
      */
     public static function getIndex(string $key, int|string $index, string $language = ""): string {
@@ -204,7 +204,7 @@ class NLS {
      * Format and Joins the given strings to form a sentence
      * @param string   $key
      * @param string[] $strings
-     * @param boolean  $useOr    Optional.
+     * @param bool     $useOr    Optional.
      * @param string   $language Optional.
      * @return string
      */
@@ -216,7 +216,7 @@ class NLS {
     /**
      * Returns a formatted string using the correct plural string
      * @param string  $key
-     * @param integer $count
+     * @param int     $count
      * @param mixed[] $args     Optional.
      * @param string  $language Optional.
      * @return string
@@ -231,7 +231,7 @@ class NLS {
      * Returns a formatted string using the correct plural string
      * @param string   $key
      * @param string[] $strings
-     * @param boolean  $useOr    Optional.
+     * @param bool     $useOr    Optional.
      * @param string   $language Optional.
      * @return string
      */
@@ -244,7 +244,7 @@ class NLS {
     /**
      * Joins the given strings to form a sentence
      * @param string[] $strings
-     * @param boolean  $useOr    Optional.
+     * @param bool     $useOr    Optional.
      * @param string   $language Optional.
      * @return string
      */
@@ -270,8 +270,8 @@ class NLS {
 
     /**
      * Returns the Yes/No string
-     * @param boolean $value
-     * @param string  $language Optional.
+     * @param bool   $value
+     * @param string $language Optional.
      * @return string
      */
     public static function toYesNo(bool $value, string $language = ""): string {

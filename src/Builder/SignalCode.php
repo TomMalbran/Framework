@@ -21,7 +21,7 @@ class SignalCode implements DiscoveryBuilder {
 
     /**
      * Generates the code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function generateCode(): int {
@@ -82,7 +82,7 @@ class SignalCode implements DiscoveryBuilder {
 
     /**
      * Destroys the Code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function destroyCode(): int {
@@ -93,9 +93,9 @@ class SignalCode implements DiscoveryBuilder {
 
     /**
      * Generates the Params of the Method
-     * @param ReflectionMethod      $method
-     * @param array<string,integer> $uses
-     * @return array{isFirst:boolean,name:string,type:string,docType:string}[]
+     * @param ReflectionMethod  $method
+     * @param array<string,int> $uses
+     * @return array{isFirst:bool,name:string,type:string,docType:string}[]
      */
     private static function getParams(ReflectionMethod $method, array &$uses): array {
         $parameters = $method->getParameters();
@@ -126,13 +126,9 @@ class SignalCode implements DiscoveryBuilder {
                     }
                 }
 
-                $docType = match ($name) {
-                    "int"   => "integer",
-                    "bool"  => "boolean",
-                    default => $name,
-                };
+                $docType = $name;
                 if (Strings::endsWith($paramName, "IDs")) {
-                    $docType = "integer[]";
+                    $docType = "int[]";
                 }
 
                 $typeNames[] = $name;

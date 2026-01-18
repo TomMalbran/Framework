@@ -42,7 +42,7 @@ class Timer {
 
     /**
      * Gets the elapsed time in seconds
-     * @return integer
+     * @return int
      */
     public function getElapsedSecondsInt(): int {
         $this->end();

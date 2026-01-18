@@ -43,7 +43,7 @@ class XLSXWriter implements ExporterWriter {
 
     /**
      * Returns true if the XLSXWriter is available
-     * @return boolean
+     * @return bool
      */
     public static function isAvailable(): bool {
         return class_exists(Writer::class);

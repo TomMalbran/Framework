@@ -31,8 +31,8 @@ class Image {
 
     /**
      * Returns true if the given type is valid
-     * @param integer $fileType
-     * @return boolean
+     * @param int $fileType
+     * @return bool
      */
     public static function hasType(int $fileType): bool {
         return Arrays::contains(self::$imageTypes, $fileType);
@@ -41,7 +41,7 @@ class Image {
     /**
      * Returns true if the Image type is invalid
      * @param string $fileName
-     * @return boolean
+     * @return bool
      */
     public static function isValidType(string $fileName): bool {
         $type = self::getType($fileName);
@@ -51,7 +51,7 @@ class Image {
     /**
      * Returns the Type of the Image
      * @param string $fileName
-     * @return integer
+     * @return int
      */
     public static function getType(string $fileName): int {
         $result = exif_imagetype($fileName);
@@ -71,8 +71,8 @@ class Image {
 
     /**
      * Returns the Size of the Image as [ width, height, type ]
-     * @param string|integer ...$pathParts
-     * @return array{integer,integer,integer}
+     * @param string|int ...$pathParts
+     * @return array{int,int,int}
      */
     public static function getSize(string|int ...$pathParts): array {
         $filePath = File::parsePath(...$pathParts);
@@ -90,7 +90,7 @@ class Image {
     /**
      * Returns the Size of the Image as [ width, height, type ]
      * @param string $fileUrl
-     * @return array{integer,integer,integer}
+     * @return array{int,int,int}
      */
     public static function getSizeFromUrl(string $fileUrl): array {
         $fileUrl = Strings::encodeUrl($fileUrl);
@@ -103,8 +103,8 @@ class Image {
 
     /**
      * Returns the Orientation for the given Image
-     * @param string|integer ...$pathParts
-     * @return integer
+     * @param string|int ...$pathParts
+     * @return int
      */
     public static function getOrientation(string|int ...$pathParts): int {
         if (!File::exists(...$pathParts)) {
@@ -112,7 +112,7 @@ class Image {
         }
 
         $filePath = File::parsePath(...$pathParts);
-        $exif     = @exif_read_data($filePath);
+        $exif     = exif_read_data($filePath);
         if ($exif !== false && isset($exif["Orientation"])) {
             return Numbers::toInt($exif["Orientation"]);
         }
@@ -121,8 +121,8 @@ class Image {
 
     /**
      * Returns true if the Image has Transparency
-     * @param string|integer ...$pathParts
-     * @return boolean
+     * @param string|int ...$pathParts
+     * @return bool
      */
     public static function hasTransparency(string|int ...$pathParts): bool {
         $filePath = File::parsePath(...$pathParts);
@@ -143,7 +143,7 @@ class Image {
             if ($thumb === false) {
                 return false;
             }
-            imagealphablending($thumb, FALSE);
+            imagealphablending($thumb, false);
             imagecopyresized($thumb, $imgData, 0, 0, 0, 0, 10, 10, $width, $height);
 
             $imgData = $thumb;
@@ -151,8 +151,8 @@ class Image {
             $height  = imagesy($imgData);
         }
 
-        for ($i = 0; $i < $width; $i++) {
-            for ($j = 0; $j < $height; $j++) {
+        for ($i = 0; $i < $width; $i += 1) {
+            for ($j = 0; $j < $height; $j += 1) {
                 $rgba = imagecolorat($imgData, $i, $j);
                 if ((($rgba & 0x7F000000) >> 24) !== 0) {
                     return true;
@@ -164,10 +164,10 @@ class Image {
 
     /**
      * Returns the Width of the given Text
-     * @param string  $text
-     * @param string  $fontFile
-     * @param integer $fontSize
-     * @return integer
+     * @param string $text
+     * @param string $fontFile
+     * @param int    $fontSize
+     * @return int
      */
     public static function getTextWidth(string $text, string $fontFile, int $fontSize): int {
         $dimensions = imagettfbbox($fontSize, 0, $fontFile, $text);
@@ -184,10 +184,10 @@ class Image {
 
     /**
      * Resamples the given image
-     * @param string       $src
-     * @param string       $dst
-     * @param integer|null $orientation Optional.
-     * @return boolean
+     * @param string   $src
+     * @param string   $dst
+     * @param int|null $orientation Optional.
+     * @return bool
      */
     public static function resample(string $src, string $dst, ?int $orientation = null): bool {
         if ($orientation === null) {
@@ -231,12 +231,12 @@ class Image {
 
     /**
      * Resizes an Image
-     * @param string  $src
-     * @param string  $dst
-     * @param integer $width
-     * @param integer $height
-     * @param string  $action
-     * @return boolean
+     * @param string $src
+     * @param string $dst
+     * @param int    $width
+     * @param int    $height
+     * @param string $action
+     * @return bool
      */
     public static function resize(
         string $src,
@@ -329,15 +329,15 @@ class Image {
 
     /**
      * Resizes and Crops an Image
-     * @param string  $src
-     * @param string  $dst
-     * @param integer $resWidth
-     * @param integer $resHeight
-     * @param integer $cropX
-     * @param integer $cropY
-     * @param integer $cropWidth
-     * @param integer $cropHeight
-     * @return boolean
+     * @param string $src
+     * @param string $dst
+     * @param int    $resWidth
+     * @param int    $resHeight
+     * @param int    $cropX
+     * @param int    $cropY
+     * @param int    $cropWidth
+     * @param int    $cropHeight
+     * @return bool
      */
     public static function resizeCrop(
         string $src,
@@ -387,7 +387,7 @@ class Image {
 
     /**
      * Returns the Image Content Type
-     * @param integer $imgType
+     * @param int $imgType
      * @return string
      */
     public static function getContentType(int $imgType): string {
@@ -403,7 +403,7 @@ class Image {
 
     /**
      * Returns the Image Extension
-     * @param integer $imgType
+     * @param int $imgType
      * @return string
      */
     public static function getExtension(int $imgType): string {
@@ -419,8 +419,8 @@ class Image {
 
     /**
      * Creates an Image based on the Type
-     * @param integer $imgType
-     * @param string  $fileName
+     * @param int    $imgType
+     * @param string $fileName
      * @return GdImage|null
      */
     public static function createSrcImage(int $imgType, string $fileName): ?GdImage {
@@ -440,9 +440,9 @@ class Image {
 
     /**
      * Creates the Destination Image based on the Type
-     * @param integer $imgType
-     * @param integer $width
-     * @param integer $height
+     * @param int $imgType
+     * @param int $width
+     * @param int $height
      * @return GdImage|null
      */
     public static function createDstImage(int $imgType, int $width, int $height): ?GdImage {
@@ -468,11 +468,11 @@ class Image {
 
     /**
      * Creates an Image based on the Type
-     * @param integer     $imgType
+     * @param int         $imgType
      * @param GdImage     $image
      * @param string|null $fileName Optional.
-     * @param integer     $quality  Optional.
-     * @return boolean
+     * @param int         $quality  Optional.
+     * @return bool
      */
     public static function createImage(int $imgType, GdImage $image, ?string $fileName = null, int $quality = 90): bool {
         $result = match ($imgType) {
@@ -492,7 +492,7 @@ class Image {
     /**
      * Destroys the Image
      * @param GdImage $image
-     * @return boolean
+     * @return bool
      */
     public static function destroy(GdImage $image): bool {
         return imagedestroy($image);
@@ -502,12 +502,12 @@ class Image {
 
     /**
      * Creates a Thumbnail using ImageMagick
-     * @param string  $src
-     * @param string  $dst
-     * @param integer $width
-     * @param integer $height
-     * @param string  $action
-     * @return boolean
+     * @param string $src
+     * @param string $dst
+     * @param int    $width
+     * @param int    $height
+     * @param string $action
+     * @return bool
      */
     public static function thumbnail(
         string $src,

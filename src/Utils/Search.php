@@ -19,7 +19,7 @@ class Search implements JsonSerializable {
 
     /**
      * Creates a new Search instance
-     * @param integer|string           $id
+     * @param int|string               $id
      * @param string                   $title
      * @param array<string,mixed>|null $data  Optional.
      */
@@ -52,7 +52,7 @@ class Search implements JsonSerializable {
     /**
      * Returns the value as an integer
      * @param string $key
-     * @return integer
+     * @return int
      */
     public function getInt(string $key): int {
         if (property_exists($this, $key)) {

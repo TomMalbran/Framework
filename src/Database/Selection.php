@@ -43,7 +43,7 @@ class Selection {
 
     /**
      * Adds the Fields to the Selects
-     * @param boolean $decrypted Optional.
+     * @param bool $decrypted Optional.
      * @return Selection
      */
     public function addFields(bool $decrypted = false): Selection {
@@ -79,7 +79,7 @@ class Selection {
     /**
      * Adds extra Selects
      * @param string[]|string $selects
-     * @param boolean         $addMainKey Optional.
+     * @param bool            $addMainKey Optional.
      * @return Selection
      */
     public function addSelects(array|string $selects, bool $addMainKey = false): Selection {
@@ -97,7 +97,7 @@ class Selection {
     /**
      * Adds the Joins
      * @param string[] $extraJoins  Optional.
-     * @param boolean  $withSelects Optional.
+     * @param bool     $withSelects Optional.
      * @return Selection
      */
     public function addJoins(array $extraJoins = [], bool $withSelects = true): Selection {
@@ -156,7 +156,7 @@ class Selection {
     /**
      * Does a Request to the Query
      * @param Query $query
-     * @return array<string,string|integer|null>[]
+     * @return array<string,string|int|null>[]
      */
     public function request(Query $query): array {
         $expression    = $this->getExpression($query);

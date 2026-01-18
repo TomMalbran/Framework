@@ -6,7 +6,7 @@ namespace Framework\Utils;
  */
 class Encoding {
 
-    /** @var array<integer,string> */
+    /** @var array<int,string> */
     private static array $win1252ToUtf8 = [
         128 => "\xe2\x82\xac",
 

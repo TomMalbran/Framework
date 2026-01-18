@@ -95,7 +95,7 @@ enum {{status}} {
     /**
      * Returns true if the given value is valid
      * @param {{status}}|string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValid({{status}}|string $value): bool {
         return Arrays::contains([ {{values}} ], self::fromValue($value));
@@ -124,7 +124,7 @@ enum {{status}} {
     /**
      * Returns true if the given value is the Status {{name}}
      * @param {{status}}|string $value
-     * @return boolean
+     * @return bool
      */
     public static function is{{name}}({{status}}|string $value): bool {
         return self::{{name}} === self::fromValue($value);

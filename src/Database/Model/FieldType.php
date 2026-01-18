@@ -82,19 +82,6 @@ enum FieldType {
     }
 
     /**
-     * Converts a PHP Type to a Document Type
-     * @param string $type
-     * @return string
-     */
-    public static function getDocType(string $type): string {
-        return match ($type) {
-            "bool"  => "boolean",
-            "int"   => "integer",
-            default => $type,
-        };
-    }
-
-    /**
      * Returns the Default value for the given PHP Type
      * @param string $type
      * @return string

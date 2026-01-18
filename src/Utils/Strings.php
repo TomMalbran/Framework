@@ -12,7 +12,7 @@ class Strings {
     /**
      * Returns true if the given value is a string
      * @param mixed $string
-     * @return boolean
+     * @return bool
      */
     public static function isString(mixed $string): bool {
         return is_string($string);
@@ -55,7 +55,7 @@ class Strings {
     /**
      * Returns the length og the given String
      * @param string $string
-     * @return integer
+     * @return int
      */
     public static function length(string $string): int {
         return mb_strlen($string, "UTF-8");
@@ -65,11 +65,11 @@ class Strings {
 
     /**
      * Returns true if the values are Equal
-     * @param mixed   $string
-     * @param mixed   $other
-     * @param boolean $caseInsensitive Optional.
-     * @param boolean $trimValues      Optional.
-     * @return boolean
+     * @param mixed $string
+     * @param mixed $other
+     * @param bool  $caseInsensitive Optional.
+     * @param bool  $trimValues      Optional.
+     * @return bool
      */
     public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true, bool $trimValues = true): bool {
         if (!is_string($string) || !is_string($other)) {
@@ -91,7 +91,7 @@ class Strings {
      * Returns true if the given String is equal to any of the Needles
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function equals(string $string, string ...$needles): bool {
         foreach ($needles as $needle) {
@@ -106,7 +106,7 @@ class Strings {
      * Returns true if the given String is equal to any of the Needles as Case Insensitive
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function equalsCaseInsensitive(string $string, string ...$needles): bool {
         foreach ($needles as $needle) {
@@ -121,11 +121,11 @@ class Strings {
      * Returns true if the given String contains any of the given Needles
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function contains(string $string, string ...$needles): bool {
         foreach ($needles as $needle) {
-            if (strstr($string, $needle) !== FALSE) {
+            if (strstr($string, $needle) !== false) {
                 return true;
             }
         }
@@ -136,7 +136,7 @@ class Strings {
      * Returns true if the given String contains any of the given Needles as Case Insensitive
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function containsCaseInsensitive(string $string, string ...$needles): bool {
         $string = strtolower($string);
@@ -152,7 +152,7 @@ class Strings {
      * Returns true if the given String starts any of the given Needles
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function startsWith(string $string, string ...$needles): bool {
         foreach ($needles as $needle) {
@@ -168,7 +168,7 @@ class Strings {
      * Returns true if the given String starts any of the given Needles as Case Insensitive
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function startsWithCaseInsensitive(string $string, string ...$needles): bool {
         $string = strtolower($string);
@@ -185,7 +185,7 @@ class Strings {
      * Returns true if the given String ends with the given Needle
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function endsWith(string $string, string ...$needles): bool {
         foreach ($needles as $needle) {
@@ -201,7 +201,7 @@ class Strings {
      * Returns true if the given String ends with the given Needle as Case Insensitive
      * @param string $string
      * @param string ...$needles
-     * @return boolean
+     * @return bool
      */
     public static function endsWithCaseInsensitive(string $string, string ...$needles): bool {
         $string = strtolower($string);
@@ -218,7 +218,7 @@ class Strings {
      * Returns true if the given String matches the given Pattern
      * @param string $string
      * @param string $pattern
-     * @return boolean
+     * @return bool
      */
     public static function match(string $string, string $pattern): bool {
         $result = preg_match($pattern, $string);
@@ -246,7 +246,7 @@ class Strings {
      * Returns true if the given String is created with only the given Needle
      * @param string $string
      * @param string $needle
-     * @return boolean
+     * @return bool
      */
     public static function onlyOneCharacter(string $string, string $needle): bool {
         $chars = str_split($string);
@@ -260,11 +260,11 @@ class Strings {
 
     /**
      * Returns < 0 if string is less than other; > 0 if string is greater than other, and 0 if they are equal
-     * @param string  $string
-     * @param string  $other
-     * @param boolean $orderAsc        Optional.
-     * @param boolean $caseInsensitive Optional.
-     * @return integer
+     * @param string $string
+     * @param string $other
+     * @param bool   $orderAsc        Optional.
+     * @param bool   $caseInsensitive Optional.
+     * @return int
      */
     public static function compare(string $string, string $other, bool $orderAsc = true, bool $caseInsensitive = false): int {
         if ($caseInsensitive) {
@@ -279,7 +279,7 @@ class Strings {
 
     /**
      * Returns a char from an index
-     * @param integer $index
+     * @param int $index
      * @return string
      */
     public static function getLetter(int $index): string {
@@ -289,7 +289,7 @@ class Strings {
     /**
      * Returns a number from a letter
      * @param string $text
-     * @return integer
+     * @return int
      */
     public static function getNumber(string $text): int {
         $letter = strtoupper(trim($text));
@@ -301,8 +301,8 @@ class Strings {
 
     /**
      * Repeats the given String the given times
-     * @param string  $string
-     * @param integer $times
+     * @param string $string
+     * @param int    $times
      * @return string
      */
     public static function repeat(string $string, int $times): string {
@@ -311,7 +311,7 @@ class Strings {
 
     /**
      * Returns a random String with the given length
-     * @param integer $length Optional.
+     * @param int $length Optional.
      * @return string
      */
     public static function random(int $length = 50): string {
@@ -332,8 +332,8 @@ class Strings {
 
     /**
      * Generates a random String with the given options
-     * @param integer $length        Optional.
-     * @param string  $availableSets Optional.
+     * @param int    $length        Optional.
+     * @param string $availableSets Optional.
      * @return string
      */
     public static function randomCode(int $length = 8, string $availableSets = "lud"): string {
@@ -436,7 +436,7 @@ class Strings {
      * @param string          $string
      * @param string[]|string $pattern
      * @param string[]|string $replacement
-     * @param integer         $limit       Optional.
+     * @param int             $limit       Optional.
      * @return string
      */
     public static function replacePattern(string $string, array|string $pattern, array|string $replacement, int $limit = -1): string {
@@ -449,7 +449,7 @@ class Strings {
      * @param string                    $string
      * @param string[]|string           $pattern
      * @param callable(string[]):string $callback
-     * @param integer                   $limit    Optional.
+     * @param int                       $limit    Optional.
      * @return string
      */
     public static function replaceCallback(string $string, array|string $pattern, callable $callback, int $limit = -1): string {
@@ -506,9 +506,9 @@ class Strings {
 
     /**
      * Pads left the String with the given string to the given length
-     * @param string  $string
-     * @param integer $length
-     * @param string  $needle Optional.
+     * @param string $string
+     * @param int    $length
+     * @param string $needle Optional.
      * @return string
      */
     public static function padLeft(string $string, int $length, string $needle = " "): string {
@@ -517,9 +517,9 @@ class Strings {
 
     /**
      * Pads right the String with the given string to the given length
-     * @param string  $string
-     * @param integer $length
-     * @param string  $needle Optional.
+     * @param string $string
+     * @param int    $length
+     * @param string $needle Optional.
      * @return string
      */
     public static function padRight(string $string, int $length, string $needle = " "): string {
@@ -569,10 +569,10 @@ class Strings {
 
     /**
      * Returns a Substring from the Start to the Length
-     * @param string       $string
-     * @param integer      $start
-     * @param integer|null $length Optional.
-     * @param boolean      $asUtf8 Optional.
+     * @param string   $string
+     * @param int      $start
+     * @param int|null $length Optional.
+     * @param bool     $asUtf8 Optional.
      * @return string
      */
     public static function substring(string $string, int $start, ?int $length = null, bool $asUtf8 = false): string {
@@ -584,9 +584,9 @@ class Strings {
 
     /**
      * Returns a Substring from the Needle to the end
-     * @param string  $string
-     * @param string  $needle
-     * @param boolean $useFirst Optional.
+     * @param string $string
+     * @param string $needle
+     * @param bool   $useFirst Optional.
      * @return string
      */
     public static function substringAfter(string $string, string $needle, bool $useFirst = false): string {
@@ -599,9 +599,9 @@ class Strings {
 
     /**
      * Returns a Substring from the start to the Needle
-     * @param string  $string
-     * @param string  $needle
-     * @param boolean $useFirst Optional.
+     * @param string $string
+     * @param string $needle
+     * @param bool   $useFirst Optional.
      * @return string
      */
     public static function substringBefore(string $string, string $needle, bool $useFirst = true): string {
@@ -631,8 +631,8 @@ class Strings {
      * Splits the given String at the given Needle
      * @param string[]|string $string
      * @param string          $needle
-     * @param boolean         $trim      Optional.
-     * @param boolean         $skipEmpty Optional.
+     * @param bool            $trim      Optional.
+     * @param bool            $skipEmpty Optional.
      * @return list<string>
      */
     public static function split(array|string $string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
@@ -668,9 +668,9 @@ class Strings {
 
     /**
      * Joins the given Strings using the given glue
-     * @param mixed   $value
-     * @param string  $glue         Optional.
-     * @param boolean $withoutEmpty Optional.
+     * @param mixed  $value
+     * @param string $glue         Optional.
+     * @param bool   $withoutEmpty Optional.
      * @return string
      */
     public static function join(mixed $value, string $glue = "", bool $withoutEmpty = false): string {
@@ -760,7 +760,7 @@ class Strings {
     /**
      * Returns true if a String is UPPERCASE
      * @param string $string
-     * @return boolean
+     * @return bool
      */
     public static function isUpperCase(string $string): bool {
         return preg_match('/^[A-Z_]+$/', $string) === 1;
@@ -811,8 +811,8 @@ class Strings {
 
     /**
      * Transforms an UPPER_CASE string to camelCase
-     * @param string  $string
-     * @param boolean $capitalizeFirst Optional.
+     * @param string $string
+     * @param bool   $capitalizeFirst Optional.
      * @return string
      */
     public static function upperCaseToCamelCase(string $string, bool $capitalizeFirst = false): string {
@@ -932,9 +932,9 @@ class Strings {
 
     /**
      * Returns a short version of the given string
-     * @param string  $string
-     * @param integer $length Optional.
-     * @param boolean $asUtf8 Optional.
+     * @param string $string
+     * @param int    $length Optional.
+     * @param bool   $asUtf8 Optional.
      * @return string
      */
     public static function makeShort(string $string, int $length = 30, bool $asUtf8 = true): string {
@@ -961,10 +961,10 @@ class Strings {
 
     /**
      * Returns true if the short version is different from the string
-     * @param string  $string
-     * @param integer $length Optional.
-     * @param boolean $asUtf8 Optional.
-     * @return boolean
+     * @param string $string
+     * @param int    $length Optional.
+     * @param bool   $asUtf8 Optional.
+     * @return bool
      */
     public static function isShort(string $string, int $length = 30, bool $asUtf8 = true): bool {
         return self::makeShort($string, $length, $asUtf8) !== $string;
@@ -974,10 +974,10 @@ class Strings {
 
     /**
      * Returns true if the given string is alpha-numeric
-     * @param string       $string
-     * @param boolean      $withDashes Optional.
-     * @param integer|null $length     Optional.
-     * @return boolean
+     * @param string   $string
+     * @param bool     $withDashes Optional.
+     * @param int|null $length     Optional.
+     * @return bool
      */
     public static function isAlphaNum(string $string, bool $withDashes = false, ?int $length = null): bool {
         if ($length !== null && strlen($string) !== $length) {
@@ -992,7 +992,7 @@ class Strings {
     /**
      * Returns true if the given string is a valid slug
      * @param string $string
-     * @return boolean
+     * @return bool
      */
     public static function isValidSlug(string $string): bool {
         return self::match($string, '/^[a-z0-9\-]+$/');
@@ -1039,9 +1039,9 @@ class Strings {
 
     /**
      * Sanitizes a String
-     * @param string  $string
-     * @param boolean $lowercase Optional.
-     * @param boolean $anal      Optional.
+     * @param string $string
+     * @param bool   $lowercase Optional.
+     * @param bool   $anal      Optional.
      * @return string
      */
     public static function sanitize(string $string, bool $lowercase = true, bool $anal = false): string {
@@ -1068,7 +1068,7 @@ class Strings {
     /**
      * Returns true if the given Text has an Emoji
      * @param string $string
-     * @return boolean
+     * @return bool
      */
     public static function hasEmoji(string $string): bool {
         $emojis = '/['
@@ -1112,7 +1112,7 @@ class Strings {
     /**
      * Returns true if the given Text has only Emojis
      * @param string $text
-     * @return boolean
+     * @return bool
      */
     public static function isOnlyEmojis(string $text): bool {
         $emojiPattern = '/^('

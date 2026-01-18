@@ -23,13 +23,13 @@ class Result {
 
     /**
      * Creates a new Result
-     * @param bool    $isEdit      Optional.
-     * @param bool    $canValidate Optional.
-     * @param integer $id          Optional.
-     * @param string  $code        Optional.
-     * @param string  $name        Optional.
-     * @param string  $status      Optional.
-     * @param Errors  $errors      Optional.
+     * @param bool   $isEdit      Optional.
+     * @param bool   $canValidate Optional.
+     * @param int    $id          Optional.
+     * @param string $code        Optional.
+     * @param string $name        Optional.
+     * @param string $status      Optional.
+     * @param Errors $errors      Optional.
      */
     public function __construct(
         bool    $isEdit      = false,
@@ -63,9 +63,9 @@ class Result {
 
     /**
      * Adds a new Error
-     * @param string              $field
-     * @param string              $message
-     * @param string|integer|null $value   Optional.
+     * @param string          $field
+     * @param string          $message
+     * @param string|int|null $value   Optional.
      * @return Result
      */
     public function addError(string $field, string $message, string|int|null $value = null): Result {

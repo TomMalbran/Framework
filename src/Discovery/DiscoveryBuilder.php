@@ -8,13 +8,13 @@ interface DiscoveryBuilder {
 
     /**
      * Generates the code
-     * @return integer The amount of files created.
+     * @return int The amount of files created.
      */
     public static function generateCode(): int;
 
     /**
      * Destroys the Code
-     * @return integer The amount of files deleted.
+     * @return int The amount of files deleted.
      */
     public static function destroyCode(): int;
 

@@ -12,9 +12,9 @@ class EmailWhiteList extends EmailWhiteListSchema {
 
     /**
      * Returns true if the given Email exists in the White List
-     * @param string  $email
-     * @param integer $skipID Optional.
-     * @return boolean
+     * @param string $email
+     * @param int    $skipID Optional.
+     * @return bool
      */
     public static function emailExists(string $email, int $skipID = 0): bool {
         $query = new EmailWhiteListQuery();
@@ -29,7 +29,7 @@ class EmailWhiteList extends EmailWhiteListSchema {
      * Adds the given Email to the White List
      * @param string $email
      * @param string $description
-     * @return integer
+     * @return int
      */
     public static function add(string $email, string $description): int {
         return self::createEntity(
@@ -40,10 +40,10 @@ class EmailWhiteList extends EmailWhiteListSchema {
 
     /**
      * Edits the given Email in the White List
-     * @param integer $emailID
-     * @param string  $email
-     * @param string  $description
-     * @return boolean
+     * @param int    $emailID
+     * @param string $email
+     * @param string $description
+     * @return bool
      */
     public static function edit(int $emailID, string $email, string $description): bool {
         return self::editEntity(
@@ -55,8 +55,8 @@ class EmailWhiteList extends EmailWhiteListSchema {
 
     /**
      * Remove the given Email from the White List
-     * @param integer $emailID
-     * @return boolean
+     * @param int $emailID
+     * @return bool
      */
     public static function remove(int $emailID): bool {
         return self::removeEntity($emailID);

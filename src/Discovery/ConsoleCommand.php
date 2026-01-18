@@ -72,7 +72,7 @@ class ConsoleCommand {
     /**
      * Checks if the command should be invoked
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public function shouldInvoke(string $name): bool {
         return $this->name === $name ||
@@ -92,7 +92,7 @@ class ConsoleCommand {
     /**
      * Invokes the command handler
      * @param string[] $arguments
-     * @return boolean
+     * @return bool
      */
     public function invoke(array $arguments): bool {
         if ($this->handler === null) {

@@ -37,8 +37,8 @@ enum VariableType {
 
     /**
      * Returns the Setting Type based on the value
-     * @param mixed   $value
-     * @param boolean $useLists
+     * @param mixed $value
+     * @param bool  $useLists
      * @return VariableType
      */
     public static function get(mixed $value, bool $useLists): VariableType {
@@ -82,8 +82,8 @@ enum VariableType {
         return match ($type) {
             self::Array   => "array<string|integer,mixed>",
             self::List    => "string[]",
-            self::Boolean => "boolean",
-            self::Integer => "integer",
+            self::Boolean => "bool",
+            self::Integer => "int",
             self::Float   => "float",
             default       => "string",
         };

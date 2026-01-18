@@ -50,7 +50,7 @@ class Assign {
 
     /**
      * Generates an Increase Assign of a column
-     * @param integer $amount Optional.
+     * @param int $amount Optional.
      * @return Assign
      */
     public static function increase(int $amount = 1): Assign {
@@ -59,7 +59,7 @@ class Assign {
 
     /**
      * Generates an Decrease Assign of a column
-     * @param integer $amount Optional.
+     * @param int $amount Optional.
      * @return Assign
      */
     public static function decrease(int $amount = 1): Assign {
@@ -96,7 +96,7 @@ class Assign {
 
     /**
      * Method generates a GREATEST function call
-     * @param integer $value
+     * @param int $value
      * @return Assign
      */
     public static function greatest(int $value): Assign {

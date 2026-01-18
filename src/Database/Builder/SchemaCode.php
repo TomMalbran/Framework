@@ -118,7 +118,7 @@ class SchemaCode {
     /**
      * Returns the Sub Types from the Sub Requests
      * @param SchemaModel $schemaModel
-     * @param boolean     $forSchemas  Optional.
+     * @param bool        $forSchemas  Optional.
      * @return array{name:string,type:string,namespace:string}[]
      */
     private static function getSubTypes(SchemaModel $schemaModel, bool $forSchemas = false): array {
@@ -166,9 +166,9 @@ class SchemaCode {
     /**
      * Returns a list of Fields with the given property
      * @param SchemaModel $schemaModel
-     * @param boolean     $isUnique    Optional.
-     * @param boolean     $isParent    Optional.
-     * @param boolean     $isDate      Optional.
+     * @param bool        $isUnique    Optional.
+     * @param bool        $isParent    Optional.
+     * @param bool        $isDate      Optional.
      * @return array<string,string>[]
      */
     private static function getSomeFields(

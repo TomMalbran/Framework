@@ -84,15 +84,15 @@ class SchemaModel {
      * @param string       $fantasyName   Optional.
      * @param string       $path          Optional.
      * @param string       $namespace     Optional.
-     * @param boolean      $fromFramework Optional.
-     * @param boolean      $hasUsers      Optional.
-     * @param boolean      $hasTimestamps Optional.
-     * @param boolean      $hasPositions  Optional.
-     * @param boolean      $hasStatus     Optional.
-     * @param boolean      $canCreate     Optional.
-     * @param boolean      $canEdit       Optional.
-     * @param boolean      $canDelete     Optional.
-     * @param boolean      $usesRequest   Optional.
+     * @param bool         $fromFramework Optional.
+     * @param bool         $hasUsers      Optional.
+     * @param bool         $hasTimestamps Optional.
+     * @param bool         $hasPositions  Optional.
+     * @param bool         $hasStatus     Optional.
+     * @param bool         $canCreate     Optional.
+     * @param bool         $canEdit       Optional.
+     * @param bool         $canDelete     Optional.
+     * @param bool         $usesRequest   Optional.
      * @param Field[]      $mainFields    Optional.
      * @param Validate[]   $validates     Optional.
      * @param Virtual[]    $virtualFields Optional.
@@ -221,7 +221,7 @@ class SchemaModel {
 
     /**
      * Returns the ID Field of the Model
-     * @return boolean
+     * @return bool
      */
     public function setIDField(): bool {
         foreach ($this->mainFields as $field) {
@@ -241,8 +241,8 @@ class SchemaModel {
 
     /**
      * Returns the Fields of the Model
-     * @param boolean $withTimestamps
-     * @param boolean $withDeleted
+     * @param bool $withTimestamps
+     * @param bool $withDeleted
      * @return Field[]
      */
     public function getFields(bool $withTimestamps, bool $withDeleted): array {
@@ -365,7 +365,7 @@ class SchemaModel {
     /**
      * Returns the Build Data for the Schema Builder
      * @param array<string,mixed> $data
-     * @param boolean             $withKey
+     * @param bool                $withKey
      * @return array{params:string,fields:array{}}
      */
     private function generateBuildData(array $data, bool $withKey): array {

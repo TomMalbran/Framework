@@ -46,7 +46,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns true if the XLSXReader is available
-     * @return boolean
+     * @return bool
      */
     public static function isAvailable(): bool {
         return class_exists(Reader::class);
@@ -56,7 +56,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns true if the Reader is valid
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public function isValid(): bool {
@@ -65,7 +65,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns some data
-     * @param integer $amount Optional.
+     * @param int $amount Optional.
      * @return ImporterData
      */
     #[\Override]
@@ -176,7 +176,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns the current Key
-     * @return integer
+     * @return int
      */
     #[\Override]
     public function key(): int {
@@ -199,7 +199,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns true if the current Row is valid
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public function valid(): bool {

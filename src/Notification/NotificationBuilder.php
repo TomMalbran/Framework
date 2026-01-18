@@ -14,7 +14,7 @@ class NotificationBuilder implements DiscoveryBuilder {
 
     /**
      * Generates the code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function generateCode(): int {
@@ -42,7 +42,7 @@ class NotificationBuilder implements DiscoveryBuilder {
 
     /**
      * Destroys the Code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function destroyCode(): int {

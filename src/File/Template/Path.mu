@@ -11,7 +11,7 @@ class Path {
 
     /**
      * Returns the Dir for the {{title}} files
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function get{{title}}Dir(string|int ...$pathParts): string {
@@ -20,7 +20,7 @@ class Path {
 
     /**
      * Returns the Path for the {{title}} files
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function get{{title}}Path(string|int ...$pathParts): string {
@@ -29,7 +29,7 @@ class Path {
 
     /**
      * Returns the Url for the {{title}} files
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function get{{title}}Url(string|int ...$pathParts): string {

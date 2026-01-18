@@ -51,8 +51,8 @@ class Modification {
      * Adds all the Fields
      * @param Request|null        $request
      * @param array<string,mixed> $fields    Optional.
-     * @param boolean             $skipEmpty Optional.
-     * @param boolean             $skipUnset Optional.
+     * @param bool                $skipEmpty Optional.
+     * @param bool                $skipUnset Optional.
      * @return Modification
      */
     public function addFields(
@@ -73,8 +73,8 @@ class Modification {
     /**
      * Parses the data and returns the fields
      * @param Request $request
-     * @param boolean $skipEmpty Optional.
-     * @param boolean $skipUnset Optional.
+     * @param bool    $skipEmpty Optional.
+     * @param bool    $skipUnset Optional.
      * @return array<string,mixed>
      */
     private function parseFields(Request $request, bool $skipEmpty = false, bool $skipUnset = false): array {
@@ -109,7 +109,7 @@ class Modification {
 
     /**
      * Adds the Creation Fields
-     * @param integer $credentialID Optional.
+     * @param int $credentialID Optional.
      * @return Modification
      */
     public function addCreation(int $credentialID = 0): Modification {
@@ -130,7 +130,7 @@ class Modification {
 
     /**
      * Adds the Modification Fields
-     * @param integer $credentialID Optional.
+     * @param int $credentialID Optional.
      * @return Modification
      */
     public function addModification(int $credentialID = 0): Modification {
@@ -151,7 +151,7 @@ class Modification {
 
     /**
      * Inserts the Fields into the Database
-     * @return integer
+     * @return int
      */
     public function insert(): int {
         return Framework::getDatabase()->insert(
@@ -162,7 +162,7 @@ class Modification {
 
     /**
      * Replaces the Fields into the Database
-     * @return integer
+     * @return int
      */
     public function replace(): int {
         return Framework::getDatabase()->replace(
@@ -174,7 +174,7 @@ class Modification {
     /**
      * Updates the Fields in the Database
      * @param Query $query
-     * @return boolean
+     * @return bool
      */
     public function update(Query $query): bool {
         return Framework::getDatabase()->update(

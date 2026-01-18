@@ -39,7 +39,7 @@ class Mailjet {
      * @param string $replyTo
      * @param string $subject
      * @param string $body
-     * @return boolean
+     * @return bool
      */
     public static function sendEmail(
         string $toEmail,
@@ -80,7 +80,7 @@ class Mailjet {
      * @param string $firstName
      * @param string $lastName
      * @param string $email
-     * @return boolean
+     * @return bool
      */
     public static function createContact(string $firstName, string $lastName, string $email): bool {
         $contactList = Config::getMailjetList();
@@ -105,7 +105,7 @@ class Mailjet {
      * @param string $lastName
      * @param string $oldEmail
      * @param string $newEmail
-     * @return boolean
+     * @return bool
      */
     public static function editContact(string $firstName, string $lastName, string $oldEmail, string $newEmail): bool {
         $response = self::execute("PUT", "/v3/REST/contact/$oldEmail", [
@@ -122,7 +122,7 @@ class Mailjet {
     /**
      * Deletes a Contact
      * @param string $email
-     * @return boolean
+     * @return bool
      */
     public static function deleteContact(string $email): bool {
         $contactList = Config::getMailjetList();
@@ -193,7 +193,7 @@ class Mailjet {
      * Creates a Domain
      * @param string $name
      * @param string $domain
-     * @return boolean
+     * @return bool
      */
     public static function createDomain(string $name, string $domain): bool {
         $response = self::execute("POST", "/v3/REST/sender", [
@@ -209,7 +209,7 @@ class Mailjet {
      * Edits a Domain
      * @param string $domain
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public static function editDomain(string $domain, string $name): bool {
         $response = self::execute("PUT", "/v3/REST/sender/*@$domain", [
@@ -220,8 +220,8 @@ class Mailjet {
 
     /**
      * Verifies a Domain
-     * @param string  $domain
-     * @param boolean $validateOwner
+     * @param string $domain
+     * @param bool   $validateOwner
      * @return DomainData
      */
     public static function verifyDomain(string $domain, bool $validateOwner): DomainData {
@@ -244,7 +244,7 @@ class Mailjet {
     /**
      * Deletes a Domain
      * @param string $domain
-     * @return boolean
+     * @return bool
      */
     public static function deleteDomain(string $domain): bool {
         $response = self::execute("DELETE", "/v3/REST/sender/*@$domain");

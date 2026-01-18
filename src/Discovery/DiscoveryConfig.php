@@ -21,7 +21,7 @@ class DiscoveryConfig {
      * Finds and loads all Config files
      * NOTE 1: A config file must end with ".config.php" to be loaded
      * NOTE 2: Only files from the App are loaded
-     * @return boolean
+     * @return bool
      */
     public static function load(): bool {
         if (self::$loaded) {
@@ -50,7 +50,7 @@ class DiscoveryConfig {
     /**
      * Loads a Default Config file from the Framework
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function loadDefault(string $file): bool {
         $configPath = Package::getBasePath(Package::ConfigDir, $file . self::Extension);

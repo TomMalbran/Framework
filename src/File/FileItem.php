@@ -35,13 +35,13 @@ class FileItem {
 
     /**
      * Creates a File/Document instance
-     * @param string  $name
-     * @param string  $path
-     * @param boolean $isDir
-     * @param string  $sourcePath
-     * @param string  $sourceUrl
-     * @param string  $thumbPath
-     * @param string  $thumbUrl
+     * @param string $name
+     * @param string $path
+     * @param bool   $isDir
+     * @param string $sourcePath
+     * @param string $sourceUrl
+     * @param string $thumbPath
+     * @param string $thumbUrl
      * @return FileItem
      */
     public static function createFile(

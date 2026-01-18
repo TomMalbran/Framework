@@ -68,7 +68,7 @@ class Schema {
 
     /**
      * Returns true if a Table exists
-     * @return boolean
+     * @return bool
      */
     public static function tableExists(): bool {
         return Framework::getDatabase()->tableExists(static::$tableName);
@@ -76,7 +76,7 @@ class Schema {
 
     /**
      * Returns true if the Schema has a Primary Key
-     * @return boolean
+     * @return bool
      */
     public static function hasPrimaryKey(): bool {
         $keys = Framework::getDatabase()->getPrimaryKeys(static::$tableName);
@@ -96,9 +96,9 @@ class Schema {
 
     /**
      * Returns the Data of an Entity with the given ID or Query
-     * @param Query|integer|string $query
-     * @param boolean              $withDeleted Optional.
-     * @param boolean              $decrypted   Optional.
+     * @param Query|int|string $query
+     * @param bool             $withDeleted Optional.
+     * @param bool             $decrypted   Optional.
      * @return array{}
      */
     protected static function getSchemaEntity(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): array {
@@ -111,7 +111,7 @@ class Schema {
      * Selects the given column from a single table and returns a single value
      * @param Query  $query
      * @param string $column
-     * @return string|integer
+     * @return string|int
      */
     protected static function getSchemaValue(Query $query, string $column): string|int {
         return Framework::getDatabase()->getValue(static::$tableName, $column, $query);
@@ -122,7 +122,7 @@ class Schema {
      * @param Query|null $query
      * @param string     $column
      * @param string     $columnKey Optional.
-     * @return array<string|integer>
+     * @return array<string|int>
      */
     protected static function getSchemaColumn(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
@@ -153,8 +153,8 @@ class Schema {
     /**
      * Returns a Total using the Joins
      * @param Query|null $query       Optional.
-     * @param boolean    $withDeleted Optional.
-     * @return integer
+     * @param bool       $withDeleted Optional.
+     * @return int
      */
     protected static function getSchemaTotal(?Query $query = null, bool $withDeleted = true): int {
         $query     = self::generateQuery($query, $withDeleted);
@@ -177,7 +177,7 @@ class Schema {
      * @param string|null          $descColumn     Optional.
      * @param string[]|string|null $extraColumn    Optional.
      * @param string|null          $distinctColumn Optional.
-     * @param boolean              $useEmpty       Optional.
+     * @param bool                 $useEmpty       Optional.
      * @return Select[]
      */
     protected static function getSchemaSelect(
@@ -217,7 +217,7 @@ class Schema {
      * @param Query           $query
      * @param string[]|string $nameColumn
      * @param string|null     $idColumn   Optional.
-     * @param integer         $limit      Optional.
+     * @param int             $limit      Optional.
      * @return Search[]
      */
     protected static function getSchemaSearch(
@@ -241,7 +241,7 @@ class Schema {
      * Returns the Data using a basic Expression and Params
      * @param string  $expression
      * @param mixed[] $params     Optional.
-     * @return array<string,string|integer>[]
+     * @return array<string,string|int>[]
      */
     protected static function getDataWithParams(string $expression, array $params = []): array {
         $expression = self::replaceTable($expression);
@@ -253,7 +253,7 @@ class Schema {
      * Returns the Data using a basic Expression and a Query
      * @param Query  $query
      * @param string $expression
-     * @return array<string,string|integer>[]
+     * @return array<string,string|int>[]
      */
     protected static function getSchemaData(Query $query, string $expression): array {
         $expression = self::replaceTable($expression);
@@ -265,7 +265,7 @@ class Schema {
      * Returns the Data using a basic Expression and a Query
      * @param Query  $query
      * @param string $expression
-     * @return array<string,string|integer>
+     * @return array<string,string|int>
      */
     protected static function getSchemaRow(Query $query, string $expression): array {
         $expression = self::replaceTable($expression);
@@ -283,8 +283,8 @@ class Schema {
      * @param Request|null $sort           Optional.
      * @param array{}      $selects        Optional.
      * @param string[]     $joins          Optional.
-     * @param boolean      $decrypted      Optional.
-     * @param boolean      $skipSubRequest Optional.
+     * @param bool         $decrypted      Optional.
+     * @param bool         $skipSubRequest Optional.
      * @return array{}[]
      */
     protected static function getSchemaEntities(
@@ -305,8 +305,8 @@ class Schema {
      * @param Query                $query
      * @param array<string,string> $selects        Optional.
      * @param string[]             $joins          Optional.
-     * @param boolean              $decrypted      Optional.
-     * @param boolean              $skipSubRequest Optional.
+     * @param bool                 $decrypted      Optional.
+     * @param bool                 $skipSubRequest Optional.
      * @return array{}[]
      */
     private static function requestSchemaData(
@@ -314,7 +314,7 @@ class Schema {
         array $selects = [],
         array $joins = [],
         bool $decrypted = false,
-        bool $skipSubRequest = false
+        bool $skipSubRequest = false,
     ): array {
         $selection = new Selection(static::getModel());
         $selection->addFields($decrypted);
@@ -341,7 +341,7 @@ class Schema {
      * @param Request|null         $sort      Optional.
      * @param array<string,string> $selects   Optional.
      * @param string[]             $joins     Optional.
-     * @param boolean              $decrypted Optional.
+     * @param bool                 $decrypted Optional.
      * @return string
      */
     protected static function getExpression(
@@ -378,7 +378,7 @@ class Schema {
 
     /**
      * Truncates all the Entities
-     * @return boolean
+     * @return bool
      */
     protected static function truncateData(): bool {
         return Framework::getDatabase()->truncate(static::$tableName);
@@ -388,8 +388,8 @@ class Schema {
      * Creates a new Entity with data
      * @param Request|null        $request      Optional.
      * @param array<string,mixed> $fields       Optional.
-     * @param integer             $credentialID Optional.
-     * @return integer
+     * @param int                 $credentialID Optional.
+     * @return int
      */
     protected static function createSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
         $modification = new Modification(static::getModel());
@@ -403,8 +403,8 @@ class Schema {
      * Replaces the Data of an Entity
      * @param Request|null        $request      Optional.
      * @param array<string,mixed> $fields       Optional.
-     * @param integer             $credentialID Optional.
-     * @return integer
+     * @param int                 $credentialID Optional.
+     * @return int
      */
     protected static function replaceSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
         $modification = new Modification(static::getModel());
@@ -415,14 +415,14 @@ class Schema {
 
     /**
      * Edits the Data of an Entity
-     * @param Query|integer|string $query
-     * @param Request|null         $request        Optional.
-     * @param array<string,mixed>  $fields         Optional.
-     * @param integer              $credentialID   Optional.
-     * @param boolean              $skipTimestamps Optional.
-     * @param boolean              $skipEmpty      Optional.
-     * @param boolean              $skipUnset      Optional.
-     * @return boolean
+     * @param Query|int|string    $query
+     * @param Request|null        $request        Optional.
+     * @param array<string,mixed> $fields         Optional.
+     * @param int                 $credentialID   Optional.
+     * @param bool                $skipTimestamps Optional.
+     * @param bool                $skipEmpty      Optional.
+     * @param bool                $skipUnset      Optional.
+     * @return bool
      */
     protected static function editSchemaEntity(
         Query|int|string $query,
@@ -445,9 +445,9 @@ class Schema {
 
     /**
      * Deletes the Data of an Entity
-     * @param Query|integer|string $query
-     * @param integer              $credentialID Optional.
-     * @return boolean
+     * @param Query|int|string $query
+     * @param int              $credentialID Optional.
+     * @return bool
      */
     protected static function deleteSchemaEntity(Query|int|string $query, int $credentialID = 0): bool {
         $query = self::generateQueryID($query, false);
@@ -459,8 +459,8 @@ class Schema {
 
     /**
      * Removes the Data of an Entity
-     * @param Query|integer|string $query
-     * @return boolean
+     * @param Query|int|string $query
+     * @return bool
      */
     protected static function removeSchemaEntity(Query|int|string $query): bool {
         $query = self::generateQueryID($query, false);
@@ -473,9 +473,9 @@ class Schema {
      * Creates an Entity and ensures the Order
      * @param Request|null        $request      Optional.
      * @param array<string,mixed> $fields       Optional.
-     * @param integer             $credentialID Optional.
+     * @param int                 $credentialID Optional.
      * @param Query|null          $orderQuery   Optional.
-     * @return integer
+     * @return int
      */
     protected static function createSchemaEntityWithOrder(?Request $request = null, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
         $modification = new Modification(static::getModel());
@@ -490,15 +490,15 @@ class Schema {
 
     /**
      * Edits the Data of an Entity and ensures the Order
-     * @param Query|integer|string $query
-     * @param Request|null         $request        Optional.
-     * @param array<string,mixed>  $fields         Optional.
-     * @param integer              $credentialID   Optional.
-     * @param Query|null           $orderQuery     Optional.
-     * @param boolean              $skipTimestamps Optional.
-     * @param boolean              $skipEmpty      Optional.
-     * @param boolean              $skipUnset      Optional.
-     * @return boolean
+     * @param Query|int|string    $query
+     * @param Request|null        $request        Optional.
+     * @param array<string,mixed> $fields         Optional.
+     * @param int                 $credentialID   Optional.
+     * @param Query|null          $orderQuery     Optional.
+     * @param bool                $skipTimestamps Optional.
+     * @param bool                $skipEmpty      Optional.
+     * @param bool                $skipUnset      Optional.
+     * @return bool
      */
     protected static function editSchemaEntityWithOrder(
         Query|int|string $query,
@@ -529,10 +529,10 @@ class Schema {
 
     /**
      * Deletes the Data of an Entity and ensures the Order
-     * @param Query|integer|string $query
-     * @param integer              $credentialID Optional.
-     * @param Query|null           $orderQuery   Optional.
-     * @return boolean
+     * @param Query|int|string $query
+     * @param int              $credentialID Optional.
+     * @param Query|null       $orderQuery   Optional.
+     * @return bool
      */
     protected static function deleteSchemaEntityWithOrder(Query|int|string $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
         $elem = self::getSchemaEntity($query);
@@ -545,9 +545,9 @@ class Schema {
 
     /**
      * Removes the Data of an Entity and ensures the Order
-     * @param Query|integer|string $query
-     * @param Query|null           $orderQuery Optional.
-     * @return boolean
+     * @param Query|int|string $query
+     * @param Query|null       $orderQuery Optional.
+     * @return bool
      */
     protected static function removeSchemaEntityWithOrder(Query|int|string $query, ?Query $orderQuery = null): bool {
         $elem = self::getSchemaEntity($query);
@@ -563,7 +563,7 @@ class Schema {
      * @param mixed      $oldFields
      * @param mixed      $newFields
      * @param Query|null $query     Optional.
-     * @return integer
+     * @return int
      */
     protected static function ensureSchemaOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
         $isCreate     = Arrays::isEmpty($oldFields)  && !Arrays::isEmpty($newFields);
@@ -609,8 +609,8 @@ class Schema {
     /**
      * Gets the Next Position
      * @param Query|null $query       Optional.
-     * @param boolean    $withDeleted Optional.
-     * @return integer
+     * @param bool       $withDeleted Optional.
+     * @return int
      */
     private static function getNextPosition(?Query $query = null, bool $withDeleted = true): int {
         if (!static::$hasPositions) {
@@ -634,12 +634,12 @@ class Schema {
 
     /**
      * Ensures that only one Entity has the Unique column set
-     * @param Query   $query
-     * @param string  $column
-     * @param integer $id
-     * @param integer $oldValue
-     * @param integer $newValue
-     * @return boolean
+     * @param Query  $query
+     * @param string $column
+     * @param int    $id
+     * @param int    $oldValue
+     * @param int    $newValue
+     * @return bool
      */
     protected static function ensureSchemaUniqueData(
         Query $query,
@@ -669,8 +669,8 @@ class Schema {
 
     /**
      * Generates a Query with the ID or returns the Query
-     * @param Query|integer|string $query
-     * @param boolean              $withDeleted Optional.
+     * @param Query|int|string $query
+     * @param bool             $withDeleted Optional.
      * @return Query
      */
     private static function generateQueryID(Query|int|string $query, bool $withDeleted = true): Query {
@@ -705,7 +705,7 @@ class Schema {
     /**
      * Generates a Query without Deleted if required
      * @param Query|null $query       Optional.
-     * @param boolean    $withDeleted Optional.
+     * @param bool       $withDeleted Optional.
      * @return Query
      */
     private static function generateQuery(?Query $query = null, bool $withDeleted = true): Query {

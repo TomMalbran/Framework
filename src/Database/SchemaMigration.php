@@ -18,8 +18,8 @@ class SchemaMigration {
      * Migrates the Tables
      * @param array{from:string,to:string}[]              $tableRenames
      * @param array{table:string,from:string,to:string}[] $columnRenames
-     * @param boolean                                     $canDelete     Optional.
-     * @return boolean
+     * @param bool                                        $canDelete     Optional.
+     * @return bool
      */
     public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): bool {
         $db            = Framework::getDatabase();
@@ -47,9 +47,9 @@ class SchemaMigration {
     /**
      * Renames the Tables
      * @param Database                       $db
-     * @param integer                        $startRename
+     * @param int                            $startRename
      * @param array{from:string,to:string}[] $tableRenames
-     * @return integer
+     * @return int
      */
     private static function renameTables(Database $db, int $startRename, array $tableRenames): int {
         $lastRename = count($tableRenames);
@@ -82,9 +82,9 @@ class SchemaMigration {
     /**
      * Renames the Table Columns
      * @param Database                                    $db
-     * @param integer                                     $startRename
+     * @param int                                         $startRename
      * @param array{table:string,from:string,to:string}[] $columnRenames
-     * @return integer
+     * @return int
      */
     private static function renameColumns(Database $db, int $startRename, array $columnRenames): int {
         $lastRename = count($columnRenames);
@@ -130,8 +130,8 @@ class SchemaMigration {
      * Migrates the Tables
      * @param Database      $db
      * @param SchemaModel[] $schemaModels
-     * @param boolean       $canDelete    Optional.
-     * @return boolean
+     * @param bool          $canDelete    Optional.
+     * @return bool
      */
     private static function migrateTables(Database $db, array $schemaModels, bool $canDelete = false): bool {
         $tableNames = $db->getTables();
@@ -162,7 +162,7 @@ class SchemaMigration {
      * Creates a New Table
      * @param Database    $db
      * @param SchemaModel $schemaModel
-     * @return boolean
+     * @return bool
      */
     private static function createTable(Database $db, SchemaModel $schemaModel): bool {
         $fields  = [];
@@ -190,8 +190,8 @@ class SchemaMigration {
      * @param Database $db
      * @param string[] $tableNames
      * @param string[] $modelNames
-     * @param boolean  $canDelete
-     * @return boolean
+     * @param bool     $canDelete
+     * @return bool
      */
     private static function deleteTables(Database $db, array $tableNames, array $modelNames, bool $canDelete): bool {
         $deleted  = 0;
@@ -215,8 +215,8 @@ class SchemaMigration {
      * Updates the Table
      * @param Database    $db
      * @param SchemaModel $schemaModel
-     * @param boolean     $canDelete
-     * @return boolean
+     * @param bool        $canDelete
+     * @return bool
      */
     private static function updateTable(Database $db, SchemaModel $schemaModel, bool $canDelete): bool {
         $autoKey     = $db->getAutoIncrement($schemaModel->tableName);

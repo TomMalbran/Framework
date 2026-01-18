@@ -41,7 +41,7 @@ class Discovery {
      * Loads a JSON File
      * @param string $dir
      * @param string $fileName
-     * @return array<string|integer,mixed>
+     * @return array<string|int,mixed>
      */
     public static function loadJSON(string $dir, string $fileName): array {
         $file = Strings::addSuffix($fileName, ".json");
@@ -67,9 +67,9 @@ class Discovery {
 
     /**
      * Finds the Classes in the given Directory
-     * @param string  $dir          Optional.
-     * @param boolean $forFramework Optional.
-     * @param boolean $withError    Optional.
+     * @param string $dir          Optional.
+     * @param bool   $forFramework Optional.
+     * @param bool   $withError    Optional.
      * @return array<string,string>
      */
     public static function findClasses(string $dir = "", bool $forFramework = false, bool $withError = false): array {
@@ -156,9 +156,9 @@ class Discovery {
 
     /**
      * Returns the Reflection Classes in the given Directory
-     * @param string  $dir          Optional.
-     * @param boolean $forFramework Optional.
-     * @param boolean $withError    Optional.
+     * @param string $dir          Optional.
+     * @param bool   $forFramework Optional.
+     * @param bool   $withError    Optional.
      * @return array<string,ReflectionClass<object>>
      */
     public static function getReflectionClasses(string $dir = "", bool $forFramework = false, bool $withError = false): array {
@@ -184,10 +184,10 @@ class Discovery {
      * Returns the Reflection Classes that implement the given Interface
      * @phpstan-param class-string $interface
      *
-     * @param string  $interface
-     * @param string  $dir          Optional.
-     * @param boolean $forFramework Optional.
-     * @param boolean $withError    Optional.
+     * @param string $interface
+     * @param string $dir          Optional.
+     * @param bool   $forFramework Optional.
+     * @param bool   $withError    Optional.
      * @return object[]
      */
     public static function getClassesWithInterface(string $interface, string $dir = "", bool $forFramework = false, bool $withError = false): array {
@@ -206,10 +206,10 @@ class Discovery {
      * Returns the Reflection Classes that implement the given Parent
      * @phpstan-param class-string $parentClass
      *
-     * @param string  $parentClass
-     * @param string  $dir          Optional.
-     * @param boolean $forFramework Optional.
-     * @param boolean $withError    Optional.
+     * @param string $parentClass
+     * @param string $dir          Optional.
+     * @param bool   $forFramework Optional.
+     * @param bool   $withError    Optional.
      * @return object[]
      */
     public static function getClassesWithParent(string $parentClass, string $dir = "", bool $forFramework = false, bool $withError = false): array {
@@ -257,8 +257,8 @@ class Discovery {
 
     /**
      * Returns the Properties of the given Class
-     * @param object       $class
-     * @param integer|null $filter Optional.
+     * @param object   $class
+     * @param int|null $filter Optional.
      * @return array<string,string>
      */
     public static function getProperties(object $class, ?int $filter = null): array {
@@ -303,7 +303,7 @@ class Discovery {
     /**
      * Returns the priority from a ReflectionClass or ReflectionMethod.
      * @param ReflectionClass<object>|ReflectionMethod $reflection
-     * @return integer
+     * @return int
      */
     public static function getPriority(ReflectionClass|ReflectionMethod $reflection): int {
         $attributes = $reflection->getAttributes(Priority::class);

@@ -20,9 +20,9 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Returns true if there is a Notification with the given ID for the given Credential
-     * @param integer $notificationID
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $notificationID
+     * @param int $credentialID
+     * @return bool
      */
     public static function existsForCredential(int $notificationID, int $credentialID): bool {
         $query = new NotificationQueueQuery();
@@ -75,9 +75,9 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Returns the Unset Notifications for the given Credential
-     * @param integer $credentialID
-     * @param integer $currentUser
-     * @param integer $time
+     * @param int $credentialID
+     * @param int $currentUser
+     * @param int $time
      * @return NotificationQueueEntity[]
      */
     public static function getUnsentForCredential(int $credentialID, int $currentUser, int $time): array {
@@ -92,8 +92,8 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Returns all the Notifications for the given Credential
-     * @param integer $credentialID
-     * @param integer $currentUser
+     * @param int     $credentialID
+     * @param int     $currentUser
      * @param Request $sort
      * @return NotificationQueueEntity[]
      */
@@ -109,9 +109,9 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Returns the total amount of unread Notifications
-     * @param integer $credentialID
-     * @param integer $currentUser
-     * @return integer
+     * @param int $credentialID
+     * @param int $currentUser
+     * @return int
      */
     public static function getUnreadAmount(int $credentialID, int $currentUser): int {
         $query = new NotificationQueueQuery();
@@ -127,14 +127,14 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Adds a new Notification
-     * @param integer $credentialID
-     * @param integer $currentUser
-     * @param string  $title
-     * @param string  $message
-     * @param string  $url
-     * @param string  $dataType
-     * @param integer $dataID
-     * @return integer
+     * @param int    $credentialID
+     * @param int    $currentUser
+     * @param string $title
+     * @param string $message
+     * @param string $url
+     * @param string $dataType
+     * @param int    $dataID
+     * @return int
      */
     public static function add(
         int $credentialID,
@@ -159,8 +159,8 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Deletes the given Notification
-     * @param integer $notificationID
-     * @return boolean
+     * @param int $notificationID
+     * @return bool
      */
     public static function delete(int $notificationID): bool {
         $query = new NotificationQueueQuery();
@@ -170,7 +170,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Deletes the items older than some days
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         $days  = Config::getNotificationDeleteDays();
@@ -185,8 +185,8 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Marks the given Notification as read for the given Credential
-     * @param integer $notificationID
-     * @return boolean
+     * @param int $notificationID
+     * @return bool
      */
     public static function markAsRead(int $notificationID): bool {
         $query = new NotificationQueueQuery();
@@ -196,8 +196,8 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Discards the given Notification for the given Credential
-     * @param integer $notificationID
-     * @return boolean
+     * @param int $notificationID
+     * @return bool
      */
     public static function discard(int $notificationID): bool {
         $query = new NotificationQueueQuery();
@@ -209,7 +209,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Sends all the Unsent Notifications
-     * @return boolean
+     * @return bool
      */
     public static function sendAll(): bool {
         $list   = self::getAllUnsent();

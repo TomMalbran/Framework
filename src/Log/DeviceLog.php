@@ -40,9 +40,9 @@ class DeviceLog extends LogDeviceSchema {
 
     /**
      * Logs the given Action
-     * @param integer $credentialID
-     * @param string  $playerID
-     * @return integer
+     * @param int    $credentialID
+     * @param string $playerID
+     * @return int
      */
     public static function added(int $credentialID, string $playerID): int {
         return self::createEntity(
@@ -55,9 +55,9 @@ class DeviceLog extends LogDeviceSchema {
 
     /**
      * Removes a Device
-     * @param integer $credentialID
-     * @param string  $playerID
-     * @return integer
+     * @param int    $credentialID
+     * @param string $playerID
+     * @return int
      */
     public static function removed(int $credentialID, string $playerID): int {
         return self::createEntity(
@@ -70,7 +70,7 @@ class DeviceLog extends LogDeviceSchema {
 
     /**
      * Deletes the items older than 90 days
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         $days  = Config::getDeviceLogDeleteDays();

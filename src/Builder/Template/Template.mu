@@ -30,7 +30,7 @@ enum Template {
      * Creates a File rendering the Template
      * @param string $path
      * @param array<string,mixed> $data
-     * @return boolean
+     * @return bool
      */
     public function create(string $path, array $data): bool {
         return File::create($path, $this->getFileName(), $this->render($data));

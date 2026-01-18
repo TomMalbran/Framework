@@ -115,31 +115,31 @@ class Field {
      * The Field Attribute
      * @phpstan-param class-string|null $belongsTo
      *
-     * @param boolean     $isID        Optional.
-     * @param boolean     $notAutoInc  Optional.
-     * @param boolean     $isPrimary   Optional.
-     * @param boolean     $isKey       Optional.
-     * @param boolean     $isParent    Optional.
-     * @param boolean     $isUnique    Optional.
-     * @param boolean     $isCode      Optional.
+     * @param bool        $isID        Optional.
+     * @param bool        $notAutoInc  Optional.
+     * @param bool        $isPrimary   Optional.
+     * @param bool        $isKey       Optional.
+     * @param bool        $isParent    Optional.
+     * @param bool        $isUnique    Optional.
+     * @param bool        $isCode      Optional.
      * @param string|null $belongsTo   Optional.
      * @param string      $otherField  Optional.
      * @param int         $length      Optional.
-     * @param boolean     $isSigned    Optional.
+     * @param bool        $isSigned    Optional.
      * @param int         $decimals    Optional.
-     * @param boolean     $isText      Optional.
-     * @param boolean     $isLongText  Optional.
-     * @param boolean     $isEncrypt   Optional.
-     * @param boolean     $isJSON      Optional.
-     * @param boolean     $isFile      Optional.
-     * @param boolean     $hasFile     Optional.
+     * @param bool        $isText      Optional.
+     * @param bool        $isLongText  Optional.
+     * @param bool        $isEncrypt   Optional.
+     * @param bool        $isJSON      Optional.
+     * @param bool        $isFile      Optional.
+     * @param bool        $hasFile     Optional.
      * @param string      $filePath    Optional.
      * @param DateType    $dateType    Optional.
      * @param string      $dateInput   Optional.
      * @param string      $hourInput   Optional.
-     * @param boolean     $fromRequest Optional.
-     * @param boolean     $noEmpty     Optional.
-     * @param boolean     $noExists    Optional.
+     * @param bool        $fromRequest Optional.
+     * @param bool        $noEmpty     Optional.
+     * @param bool        $noExists    Optional.
      */
     public function __construct(
         bool     $isID        = false,
@@ -223,20 +223,20 @@ class Field {
      * @param string    $dbName      Optional.
      * @param string    $prefixName  Optional.
      * @param FieldType $type        Optional.
-     * @param boolean   $isID        Optional.
-     * @param boolean   $isPrimary   Optional.
-     * @param boolean   $isKey       Optional.
+     * @param bool      $isID        Optional.
+     * @param bool      $isPrimary   Optional.
+     * @param bool      $isKey       Optional.
      * @param int       $length      Optional.
-     * @param boolean   $isSigned    Optional.
+     * @param bool      $isSigned    Optional.
      * @param int       $decimals    Optional.
      * @param DateType  $dateType    Optional.
      * @param string    $dateInput   Optional.
      * @param string    $hourInput   Optional.
      * @param string    $filePath    Optional.
-     * @param boolean   $fromRequest Optional.
-     * @param boolean   $noEmpty     Optional.
-     * @param boolean   $noExists    Optional.
-     * @param boolean   $isStatus    Optional.
+     * @param bool      $fromRequest Optional.
+     * @param bool      $noEmpty     Optional.
+     * @param bool      $noExists    Optional.
+     * @param bool      $isStatus    Optional.
      * @return Field
      */
     public static function create(
@@ -362,7 +362,7 @@ class Field {
 
     /**
      * Returns the Field Type from the Data
-     * @param boolean $withLength Optional.
+     * @param bool $withLength Optional.
      * @return string
      */
     public function getType(bool $withLength = true): string {
@@ -492,7 +492,7 @@ class Field {
     /**
      * Returns the Field Values from the given Data
      * @param array<string,mixed> $data
-     * @return array<string,string|integer|float|boolean|array<string|integer,mixed>>
+     * @return array<string,string|int|float|bool|array<string|int,mixed>>
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;
@@ -578,7 +578,7 @@ class Field {
 
     /**
      * Returns the Data for the Schema JSON
-     * @return array<string,string|integer|boolean>
+     * @return array{name:string,type:string,length:int,isPrimary:bool,isKey:bool}
      */
     public function toSchemaJSON(): array {
         return [
@@ -592,7 +592,7 @@ class Field {
 
     /**
      * Returns the Data for the Schema JSON Foreign
-     * @return array<string,string>
+     * @return array{fromField:string,toTable:string,toField:string}
      */
     public function toSchemaForeign(): array {
         return [

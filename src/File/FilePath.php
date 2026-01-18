@@ -33,7 +33,7 @@ class FilePath implements DiscoveryBuilder {
     /**
      * Registers a Path
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public static function register(string $name): bool {
         self::$paths[] = $name;
@@ -43,7 +43,7 @@ class FilePath implements DiscoveryBuilder {
     /**
      * Registers a Directory
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public static function registerDirectory(string $name): bool {
         if ($name === "" || $name === "example") {
@@ -58,7 +58,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the Files Path with the given path parts
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getPath(string|int ...$pathParts): string {
@@ -68,9 +68,9 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the base path used to store the files
-     * @param boolean $forFramework Optional.
-     * @param boolean $forBackend   Optional.
-     * @param boolean $forPrivate   Optional.
+     * @param bool $forFramework Optional.
+     * @param bool $forBackend   Optional.
+     * @param bool $forPrivate   Optional.
      * @return string
      */
     public static function getBasePath(bool $forFramework = false, bool $forBackend = false, bool $forPrivate = false): string {
@@ -90,7 +90,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the Private Path
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getPrivatePath(string|int ...$pathParts): string {
@@ -100,7 +100,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the FTP Path
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getFTPPath(string|int ...$pathParts): string {
@@ -112,7 +112,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the directory used to store the files
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getDir(string|int ...$pathParts): string {
@@ -121,7 +121,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the directory used for the internal files
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getInternalDir(string|int ...$pathParts): string {
@@ -130,7 +130,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the url for the given path
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getUrl(string|int ...$pathParts): string {
@@ -141,8 +141,8 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the path used to store the temp files
-     * @param integer $credentialID
-     * @param boolean $create       Optional.
+     * @param int  $credentialID
+     * @param bool $create       Optional.
      * @return string
      */
     public static function getTempPath(int $credentialID, bool $create = true): string {
@@ -158,8 +158,8 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Creates an url to the files temp directory
-     * @param integer        $credentialID
-     * @param string|integer ...$pathParts
+     * @param int        $credentialID
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getTempUrl(int $credentialID, string|int ...$pathParts): string {
@@ -170,7 +170,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Generates the code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function generateCode(): int {
@@ -196,7 +196,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Destroys the Code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function destroyCode(): int {
@@ -205,7 +205,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Ensures that the Paths are created
-     * @return boolean
+     * @return bool
      */
     #[ConsoleCommand("ensurePaths")]
     public static function ensurePaths(): bool {
@@ -243,7 +243,7 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Creates the Directories for the given ID
-     * @param integer $id Optional.
+     * @param int $id Optional.
      * @return string[]
      */
     public static function createDirs(int $id = 0): array {

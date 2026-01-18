@@ -20,7 +20,7 @@ class SendGrid {
      * @param string $replyTo
      * @param string $subject
      * @param string $body
-     * @return boolean
+     * @return bool
      */
     public static function sendEmail(
         string $toEmail,

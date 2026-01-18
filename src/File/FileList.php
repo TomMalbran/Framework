@@ -15,13 +15,13 @@ class FileList {
 
     /**
      * Adds a File/Directory
-     * @param string  $name
-     * @param string  $path
-     * @param boolean $isDir
-     * @param string  $sourcePath
-     * @param string  $sourceUrl
-     * @param string  $thumbPath
-     * @param string  $thumbUrl
+     * @param string $name
+     * @param string $path
+     * @param bool   $isDir
+     * @param string $sourcePath
+     * @param string $sourceUrl
+     * @param string $thumbPath
+     * @param string $thumbUrl
      * @return FileList
      */
     public function add(

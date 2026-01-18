@@ -12,7 +12,7 @@ class Spam extends CredentialSpamSchema {
 
     /**
      * Protection against multiple submits in a few seconds
-     * @return boolean
+     * @return bool
      */
     public static function protect(): bool {
         $ip = Server::getIP();
@@ -43,7 +43,7 @@ class Spam extends CredentialSpamSchema {
     /**
      * Returns true if the given IP has an entry
      * @param string $ip
-     * @return boolean
+     * @return bool
      */
     private static function hasIp(string $ip): bool {
         $query = new CredentialSpamQuery();
@@ -55,7 +55,7 @@ class Spam extends CredentialSpamSchema {
 
     /**
      * Reset the spam protections
-     * @return boolean
+     * @return bool
      */
     public static function reset(): bool {
         $query = new CredentialSpamQuery();

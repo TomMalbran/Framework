@@ -13,15 +13,15 @@ class ImporterRow {
     /** @var string[] */
     private array $fields;
 
-    /** @var array<string,integer> */
+    /** @var array<string,int> */
     private array $columns;
 
 
 
     /**
      * Creates a new ImporterRow instance
-     * @param string[]              $fields
-     * @param array<string,integer> $columns
+     * @param string[]          $fields
+     * @param array<string,int> $columns
      */
     public function __construct(array $fields, array $columns) {
         $this->fields  = $fields;
@@ -40,8 +40,8 @@ class ImporterRow {
 
     /**
      * Returns the Field Value for the given Key
-     * @param string  $key
-     * @param boolean $splitResult Optional.
+     * @param string $key
+     * @param bool   $splitResult Optional.
      * @return string[]|string
      */
     private function getValue(string $key, bool $splitResult = false): array|string {
@@ -69,7 +69,7 @@ class ImporterRow {
     /**
      * Returns the Field Value for the given Key as an Integer
      * @param string $key
-     * @return integer
+     * @return int
      */
     public function getInt(string $key): int {
         $value = $this->getValue($key);

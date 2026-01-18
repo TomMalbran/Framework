@@ -19,7 +19,7 @@ class SMTP {
      * @param string $subject
      * @param string $body
      * @param string $attachment Optional.
-     * @return boolean
+     * @return bool
      */
     public static function sendEmail(
         string $toEmail,

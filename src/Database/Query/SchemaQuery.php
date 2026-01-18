@@ -25,7 +25,7 @@ class SchemaQuery {
 
     /**
      * Returns true if the Query is empty
-     * @return boolean
+     * @return bool
      */
     public function isEmpty(): bool {
         return $this->query->isEmpty();
@@ -33,7 +33,7 @@ class SchemaQuery {
 
     /**
      * Returns true if the Query is not empty
-     * @return boolean
+     * @return bool
      */
     public function isNotEmpty(): bool {
         return $this->query->isNotEmpty();
@@ -41,7 +41,7 @@ class SchemaQuery {
 
     /**
      * Creates a list of question marks for the given array
-     * @param string[]|integer[] $array
+     * @param string[]|int[] $array
      * @return string
      */
     public function createBinds(array $array): string {
@@ -52,7 +52,7 @@ class SchemaQuery {
 
     /**
      * Adds a param to the Query
-     * @param string|integer $param
+     * @param string|int $param
      * @return Query
      */
     public function addParam(string|int $param): Query {
@@ -61,8 +61,8 @@ class SchemaQuery {
 
     /**
      * Adds an Expression to the Query
-     * @param string         $expression
-     * @param string|integer ...$values
+     * @param string     $expression
+     * @param string|int ...$values
      * @return Query
      */
     public function addExp(string $expression, string|int ...$values): Query {
@@ -139,8 +139,8 @@ class SchemaQuery {
 
     /**
      * Adds a Limit
-     * @param integer      $from
-     * @param integer|null $to   Optional.
+     * @param int      $from
+     * @param int|null $to   Optional.
      * @return Query
      */
     public function limit(int $from, ?int $to = null): Query {
@@ -152,8 +152,8 @@ class SchemaQuery {
 
     /**
      * Adds a limit using pagination
-     * @param integer $page   Optional.
-     * @param integer $amount Optional.
+     * @param int $page   Optional.
+     * @param int $amount Optional.
      * @return Query
      */
     public function paginate(int $page = 0, int $amount = 100): Query {

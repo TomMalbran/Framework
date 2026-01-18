@@ -12,8 +12,8 @@ class BooleanQuery extends BaseQuery {
 
     /**
      * Generates an Equal Query
-     * @param bool         $value
-     * @param boolean|null $condition Optional.
+     * @param bool      $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function equal(bool $value, ?bool $condition = null): Query {

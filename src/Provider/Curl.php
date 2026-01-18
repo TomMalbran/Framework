@@ -18,14 +18,14 @@ class Curl {
      * @param array<string,mixed>|null  $params       Optional.
      * @param array<string,string>|null $headers      Optional.
      * @param string                    $userPass     Optional.
-     * @param boolean                   $isCustom     Optional.
-     * @param boolean                   $jsonBody     Optional.
-     * @param boolean                   $urlBody      Optional.
-     * @param boolean                   $jsonResponse Optional.
-     * @param boolean                   $withHeaders  Optional.
-     * @param boolean                   $returnError  Optional.
-     * @param boolean                   $disableSSL   Optional.
-     * @param integer                   $timeout      Optional.
+     * @param bool                      $isCustom     Optional.
+     * @param bool                      $jsonBody     Optional.
+     * @param bool                      $urlBody      Optional.
+     * @param bool                      $jsonResponse Optional.
+     * @param bool                      $withHeaders  Optional.
+     * @param bool                      $returnError  Optional.
+     * @param bool                      $disableSSL   Optional.
+     * @param int                       $timeout      Optional.
      * @return mixed
      */
     public static function execute(
@@ -200,7 +200,7 @@ class Curl {
     /**
      * Parses the Header
      * @param array<string,string> $headers
-     * @return array<integer,string>
+     * @return array<int,string>
      */
     private static function parseHeader(array $headers): array {
         $result = [];
@@ -217,7 +217,7 @@ class Curl {
      * @param string                    $url
      * @param string                    $filePath
      * @param array<string,string>|null $headers  Optional.
-     * @return boolean
+     * @return bool
      */
     public static function read(string $url, string $filePath, ?array $headers = null): bool {
         $file = fopen($filePath, "wb");

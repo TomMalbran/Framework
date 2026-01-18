@@ -16,7 +16,7 @@ class Reset extends CredentialResetSchema {
     /**
      * Returns the Credential ID for the given Code
      * @param string $resetCode
-     * @return integer
+     * @return int
      */
     public static function getCredentialID(string $resetCode): int {
         $query = new CredentialResetQuery();
@@ -43,7 +43,7 @@ class Reset extends CredentialResetSchema {
      * Returns true if the given Reset Code exists
      * @param string $resetCode
      * @param string $email     Optional.
-     * @return boolean
+     * @return bool
      */
     public static function codeExists(string $resetCode, string $email = ""): bool {
         $query = new CredentialResetQuery();
@@ -56,9 +56,9 @@ class Reset extends CredentialResetSchema {
 
     /**
      * Creates and saves a Reset Code for the given Credential
-     * @param integer $credentialID  Optional.
-     * @param string  $email         Optional.
-     * @param string  $availableSets Optional.
+     * @param int    $credentialID  Optional.
+     * @param string $email         Optional.
+     * @param string $availableSets Optional.
      * @return string
      */
     public static function create(int $credentialID = 0, string $email = "", string $availableSets = "ud"): string {
@@ -74,9 +74,9 @@ class Reset extends CredentialResetSchema {
 
     /**
      * Deletes the reset data for the given Credential
-     * @param integer $credentialID Optional.
-     * @param string  $email        Optional.
-     * @return boolean
+     * @param int    $credentialID Optional.
+     * @param string $email        Optional.
+     * @return bool
      */
     public static function delete(int $credentialID = 0, string $email = ""): bool {
         $query = new CredentialResetQuery();
@@ -87,7 +87,7 @@ class Reset extends CredentialResetSchema {
 
     /**
      * Deletes the old reset data for all the Credentials
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         $query = new CredentialResetQuery();

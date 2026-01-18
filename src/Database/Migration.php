@@ -33,7 +33,7 @@ class Migration {
      * Renames a Table
      * @param string $from
      * @param string $to
-     * @return boolean
+     * @return bool
      */
     public static function renameTable(string $from, string $to): bool {
         self::$tableRenames[] = [
@@ -48,7 +48,7 @@ class Migration {
      * @param string $table
      * @param string $from
      * @param string $to
-     * @return boolean
+     * @return bool
      */
     public static function renameColumn(string $table, string $from, string $to): bool {
         self::$columnRenames[] = [
@@ -63,9 +63,9 @@ class Migration {
 
     /**
      * Migrates the Data
-     * @param string  $envFile Optional.
-     * @param boolean $delete  Optional.
-     * @return boolean
+     * @param string $envFile Optional.
+     * @param bool   $delete  Optional.
+     * @return bool
      */
     #[ConsoleCommand("migrate")]
     public static function migrate(string $envFile = "", bool $delete = false): bool {
@@ -119,7 +119,7 @@ class Migration {
 
     /**
      * Migrates the Data
-     * @return boolean
+     * @return bool
      */
     public static function migrateData(): bool {
         $appPath    = Application::getBasePath();

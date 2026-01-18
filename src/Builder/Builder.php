@@ -23,7 +23,7 @@ class Builder {
 
     /**
      * Builds all the Code
-     * @return boolean
+     * @return bool
      */
     #[ConsoleCommand("build")]
     public static function build(): bool {
@@ -69,7 +69,7 @@ class Builder {
 
     /**
      * Destroys all the Code
-     * @return boolean
+     * @return bool
      */
     #[ConsoleCommand("destroy")]
     public static function destroy(): bool {
@@ -102,7 +102,7 @@ class Builder {
 
     /**
      * Loads all the Templates
-     * @return boolean
+     * @return bool
      */
     private static function loadTemplates(): bool {
         $path      = Package::getBasePath();
@@ -121,7 +121,7 @@ class Builder {
      * Generates a single System Code
      * @param string              $name
      * @param array<string,mixed> $data Optional.
-     * @return integer
+     * @return int
      */
     public static function generateCode(string $name, array $data = []): int {
         if (Arrays::isEmpty($data)) {
@@ -192,8 +192,8 @@ class Builder {
     /**
      * Returns the longest Param and Type of the current Doc comment
      * @param string[] $lines
-     * @param integer  $index
-     * @return array{integer,integer}
+     * @param int      $index
+     * @return array{int,int}
      */
     private static function getLongestParam(array $lines, int $index): array {
         $line       = $lines[$index] ?? "";

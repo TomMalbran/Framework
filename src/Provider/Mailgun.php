@@ -79,7 +79,7 @@ class Mailgun {
      * @param string $replyTo
      * @param string $subject
      * @param string $body
-     * @return boolean
+     * @return bool
      */
     public static function sendEmail(
         string $toEmail,
@@ -162,7 +162,7 @@ class Mailgun {
     /**
      * Creates a Domain
      * @param string $domain
-     * @return boolean
+     * @return bool
      */
     public static function createDomain(string $domain): bool {
         $response = self::execute("POST", "/v4/domains", [
@@ -173,9 +173,9 @@ class Mailgun {
 
     /**
      * Sets the Tracking for a Domain
-     * @param string  $domain
-     * @param boolean $tracking
-     * @return boolean
+     * @param string $domain
+     * @param bool   $tracking
+     * @return bool
      */
     public static function setDomainTracking(string $domain, bool $tracking): bool {
         $response = self::execute("PUT", "/v3/domains/$domain/tracking/open", [
@@ -195,7 +195,7 @@ class Mailgun {
      * Sets the Webhooks for a Domain
      * @param string $domain
      * @param string $url
-     * @return boolean
+     * @return bool
      */
     public static function setDomainWebhooks(string $domain, string $url): bool {
         $types = [ "delivered", "opened", "permanent_fail", "unsubscribed" ];
@@ -224,7 +224,7 @@ class Mailgun {
     /**
      * Deletes a Domain
      * @param string $domain
-     * @return boolean
+     * @return bool
      */
     public static function deleteDomain(string $domain): bool {
         $response = self::execute("DELETE", "/v3/domains/$domain");

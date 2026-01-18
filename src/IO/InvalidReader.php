@@ -11,7 +11,7 @@ class InvalidReader implements ImporterReader {
 
     /**
      * Returns true if the Reader is valid
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public function isValid(): bool {
@@ -20,7 +20,7 @@ class InvalidReader implements ImporterReader {
 
     /**
      * Returns some data
-     * @param integer $amount
+     * @param int $amount
      * @return ImporterData
      */
     #[\Override]
@@ -64,7 +64,7 @@ class InvalidReader implements ImporterReader {
 
     /**
      * Returns the current Key
-     * @return integer
+     * @return int
      */
     #[\Override]
     public function key(): int {
@@ -82,7 +82,7 @@ class InvalidReader implements ImporterReader {
 
     /**
      * Returns true if the current Row is valid
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public function valid(): bool {

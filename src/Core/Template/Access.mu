@@ -53,7 +53,7 @@ enum Access {
     /**
      * Returns the Level of the given Access
      * @param Access|string $value
-     * @return integer
+     * @return int
      */
     public static function getLevel(Access|string $value): int {
         return match (self::fromValue($value)) {
@@ -86,7 +86,7 @@ enum Access {
 {{#roles}}
     /**
      * Returns true if the current user is an {{name}}
-     * @return boolean
+     * @return bool
      */
     public static function is{{name}}(): bool {
         return Auth::getAccessName() === self::{{name}};
@@ -94,7 +94,7 @@ enum Access {
 
     /**
      * Returns true if the current user is an {{name}} or Lower
-     * @return boolean
+     * @return bool
      */
     public static function is{{name}}OrLower(): bool {
         return self::getLevel(Auth::getAccessName()) <= self::getLevel(self::{{name}});
@@ -102,7 +102,7 @@ enum Access {
 
     /**
      * Returns true if the current user is an {{name}} or Higher
-     * @return boolean
+     * @return bool
      */
     public static function is{{name}}OrHigher(): bool {
         return self::getLevel(Auth::getAccessName()) >= self::getLevel(self::{{name}});
@@ -114,7 +114,7 @@ enum Access {
 {{#groups}}
     /**
      * Returns true if the current user is in the group {{name}}
-     * @return boolean
+     * @return bool
      */
     public static function in{{name}}s(): bool {
         return self::isValid{{name}}(Auth::getAccessName());
@@ -127,7 +127,7 @@ enum Access {
     /**
      * Returns true if the given value is one of: {{roles}}
      * @param Access|string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValid{{name}}(Access|string $value): bool {
         return Arrays::contains([ {{values}} ], self::fromValue($value));

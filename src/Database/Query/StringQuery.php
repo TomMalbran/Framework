@@ -14,10 +14,10 @@ class StringQuery extends BaseQuery {
      * Adds a Search expression
      * @param mixed         $value
      * @param QueryOperator $operator        Optional.
-     * @param boolean       $caseInsensitive Optional.
-     * @param boolean       $splitValue      Optional.
+     * @param bool          $caseInsensitive Optional.
+     * @param bool          $splitValue      Optional.
      * @param string        $splitText       Optional.
-     * @param boolean       $matchAny        Optional.
+     * @param bool          $matchAny        Optional.
      * @return Query
      */
     public function search(
@@ -43,8 +43,8 @@ class StringQuery extends BaseQuery {
      * Generates a Compare Query
      * @param QueryOperator   $operator
      * @param string[]|string $value
-     * @param boolean         $caseSensitive Optional.
-     * @param boolean|null    $condition     Optional.
+     * @param bool            $caseSensitive Optional.
+     * @param bool|null       $condition     Optional.
      * @return Query
      */
     public function compare(
@@ -66,8 +66,8 @@ class StringQuery extends BaseQuery {
      * Generates a Compare If Query
      * @param QueryOperator   $operator
      * @param string[]|string $value
-     * @param boolean|null    $condition     Optional.
-     * @param boolean         $caseSensitive Optional.
+     * @param bool|null       $condition     Optional.
+     * @param bool            $caseSensitive Optional.
      * @return Query
      */
     public function compareIf(
@@ -89,8 +89,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates an Equal Query
-     * @param string  $value
-     * @param boolean $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return Query
      */
     public function equal(string $value, bool $caseSensitive = false): Query {
@@ -99,8 +99,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates an Equal If Query
-     * @param string       $value
-     * @param boolean|null $condition Optional.
+     * @param string    $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function equalIf(string $value, ?bool $condition = null): Query {
@@ -118,8 +118,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Not Equal If Query
-     * @param string       $value
-     * @param boolean|null $condition Optional.
+     * @param string    $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function notEqualIf(string $value, ?bool $condition = null): Query {
@@ -130,8 +130,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Like Query
-     * @param string  $value
-     * @param boolean $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return Query
      */
     public function like(string $value, bool $caseSensitive = false): Query {
@@ -140,9 +140,9 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Like If Query
-     * @param string       $value
-     * @param boolean|null $condition     Optional.
-     * @param boolean      $caseSensitive Optional.
+     * @param string    $value
+     * @param bool|null $condition     Optional.
+     * @param bool      $caseSensitive Optional.
      * @return Query
      */
     public function likeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): Query {
@@ -151,8 +151,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Not Like Query
-     * @param string  $value
-     * @param boolean $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return Query
      */
     public function notLike(string $value, bool $caseSensitive = false): Query {
@@ -161,9 +161,9 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Not Like If Query
-     * @param string       $value
-     * @param boolean|null $condition     Optional.
-     * @param boolean      $caseSensitive Optional.
+     * @param string    $value
+     * @param bool|null $condition     Optional.
+     * @param bool      $caseSensitive Optional.
      * @return Query
      */
     public function notLikeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): Query {
@@ -172,8 +172,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Starts With Query
-     * @param string  $value
-     * @param boolean $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return Query
      */
     public function startsWith(string $value, bool $caseSensitive = false): Query {
@@ -182,8 +182,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Ends With Query
-     * @param string  $value
-     * @param boolean $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return Query
      */
     public function endsWith(string $value, bool $caseSensitive = false): Query {
@@ -194,8 +194,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates an In Query
-     * @param string[]     $values
-     * @param boolean|null $condition Optional.
+     * @param string[]  $values
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function in(array $values, ?bool $condition = null): Query {
@@ -207,8 +207,8 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Not In Query
-     * @param string[]     $values
-     * @param boolean|null $condition Optional.
+     * @param string[]  $values
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function notIn(array $values, ?bool $condition = null): Query {

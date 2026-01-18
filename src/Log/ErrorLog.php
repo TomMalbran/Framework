@@ -26,7 +26,7 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Initializes the Log
-     * @return boolean
+     * @return bool
      */
     public static function init(): bool {
         if (self::$loaded) {
@@ -75,8 +75,8 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Marks the given Error(s) as Resolved
-     * @param integer[]|integer $logID
-     * @return boolean
+     * @param int[]|int $logID
+     * @return bool
      */
     public static function markResolved(array|int $logID): bool {
         $query = new LogErrorQuery();
@@ -86,8 +86,8 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Deletes the given Error(s)
-     * @param integer[]|integer $logID
-     * @return boolean
+     * @param int[]|int $logID
+     * @return bool
      */
     public static function delete(array|int $logID): bool {
         $query = new LogErrorQuery();
@@ -97,7 +97,7 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Deletes the items older than some days
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         $days  = Config::getErrorLogDeleteDays();
@@ -112,7 +112,7 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Handles the PHP Shutdown
-     * @return boolean
+     * @return bool
      */
     public static function shutdown(): bool {
         $error = error_get_last();
@@ -129,11 +129,11 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Handles the PHP Error
-     * @param integer $errorCode
-     * @param string  $description
-     * @param string  $filePath    Optional.
-     * @param integer $line        Optional.
-     * @return boolean
+     * @param int    $errorCode
+     * @param string $description
+     * @param string $filePath    Optional.
+     * @param int    $line        Optional.
+     * @return bool
      */
     public static function handler(int $errorCode, string $description, string $filePath = "", int $line = 0): bool {
         if (!self::hasPrimaryKey()) {
@@ -190,8 +190,8 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Maps an Error Code into an Error word, and log location.
-     * @param integer $errorCode
-     * @return array{string,integer}
+     * @param int $errorCode
+     * @return array{string,int}
      */
     private static function parseErrorCode(int $errorCode): array {
         $errorText  = "";

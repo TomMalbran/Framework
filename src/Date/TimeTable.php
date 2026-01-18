@@ -36,8 +36,8 @@ class TimeTable {
 
     /**
      * Creates a new Time Table instance
-     * @param TimeTableData[] $timeTables  Optional.
-     * @param boolean         $startMonday Optional.
+     * @param TimeTableItem[] $timeTables  Optional.
+     * @param bool            $startMonday Optional.
      */
     private function __construct(array $timeTables = [], bool $startMonday = false) {
         $this->timeTables  = $timeTables;
@@ -46,8 +46,8 @@ class TimeTable {
 
     /**
      * Creates a new Time Table instance
-     * @param mixed   $data
-     * @param boolean $startMonday Optional.
+     * @param mixed $data
+     * @param bool  $startMonday Optional.
      * @return TimeTable
      */
     public static function create(mixed $data, bool $startMonday = false): TimeTable {
@@ -95,11 +95,11 @@ class TimeTable {
 
     /**
      * Returns true if the Time Tables are valid and adds the Errors
-     * @param Errors  $errors
-     * @param boolean $withHolidays Optional.
-     * @param boolean $isRequired   Optional.
-     * @param string  $fieldKey     Optional.
-     * @return boolean
+     * @param Errors $errors
+     * @param bool   $withHolidays Optional.
+     * @param bool   $isRequired   Optional.
+     * @param string $fieldKey     Optional.
+     * @return bool
      */
     public function isValid(
         Errors $errors,
@@ -146,9 +146,9 @@ class TimeTable {
 
     /**
      * Returns true if the Time Tables are in the Current time
-     * @param integer $timeStamp Optional.
-     * @param integer $minuteGap Optional.
-     * @return boolean
+     * @param int $timeStamp Optional.
+     * @param int $minuteGap Optional.
+     * @return bool
      */
     public function isCurrent(int $timeStamp = 0, int $minuteGap = 0): bool {
         if (count($this->timeTables) === 0) {
@@ -175,8 +175,8 @@ class TimeTable {
 
     /**
      * Returns the end time of the current day for the given Time Tables
-     * @param integer $timeStamp Optional.
-     * @return integer
+     * @param int $timeStamp Optional.
+     * @return int
      */
     public function getCurrentEndTime(int $timeStamp = 0): int {
         if (count($this->timeTables) === 0) {
@@ -206,8 +206,8 @@ class TimeTable {
 
     /**
      * Returns the next start time for the given Time Tables
-     * @param integer $timeStamp Optional.
-     * @return integer
+     * @param int $timeStamp Optional.
+     * @return int
      */
     public function getNextStartTime(int $timeStamp = 0): int {
         if (count($this->timeTables) === 0) {
@@ -246,11 +246,11 @@ class TimeTable {
 
     /**
      * Returns the Time Table as list
-     * @param boolean $allDays    Optional.
-     * @param string  $closedText Optional.
-     * @param string  $timeZone   Optional.
-     * @param string  $isoCode    Optional.
-     * @return array{days:integer[],fromHour:string,toHour:string,daysText:string,timeText:string,zone:string}[]
+     * @param bool   $allDays    Optional.
+     * @param string $closedText Optional.
+     * @param string $timeZone   Optional.
+     * @param string $isoCode    Optional.
+     * @return array{days:int[],fromHour:string,toHour:string,daysText:string,timeText:string,zone:string}[]
      */
     public function getList(
         bool $allDays = false,

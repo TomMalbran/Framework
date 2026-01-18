@@ -35,7 +35,7 @@ class Language {
     /**
      * Returns true if the given Language Value is valid for the given Group
      * @param string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValid(string $value): bool {
         return Arrays::containsKey(self::getAll(), $value);

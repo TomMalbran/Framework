@@ -15,7 +15,7 @@ use JsonSerializable;
  */
 class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
-    /** @var array<string|integer,mixed> */
+    /** @var array<string|int,mixed> */
     private array $data;
 
 
@@ -41,7 +41,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the data is empty
-     * @return boolean
+     * @return bool
      */
     public function isEmpty(): bool {
         return count($this->data) === 0;
@@ -49,7 +49,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the data is not empty
-     * @return boolean
+     * @return bool
      */
     public function isNotEmpty(): bool {
         return count($this->data) !== 0;
@@ -58,7 +58,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the data is a list
      * @param string $key Optional.
-     * @return boolean
+     * @return bool
      */
     public function isList(string $key = ""): bool {
         if ($key !== "") {
@@ -70,7 +70,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the key exits in the data
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function has(string $key): bool {
         return isset($this->data[$key]);
@@ -79,7 +79,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the key exits and has a value in the data
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function hasValue(string $key): bool {
         return !Arrays::isEmpty($this->data, $key);
@@ -127,8 +127,8 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Sets an int value of the given key
-     * @param string  $key
-     * @param integer $value
+     * @param string $key
+     * @param int    $value
      * @return Dictionary
      */
     public function setInt(string $key, int $value): Dictionary {
@@ -153,7 +153,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as a Boolean
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function getBool(string $key): bool {
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
@@ -164,10 +164,10 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as an Integer
-     * @param string  $key
-     * @param integer $decimals Optional.
-     * @param integer $default  Optional.
-     * @return integer
+     * @param string $key
+     * @param int    $decimals Optional.
+     * @param int    $default  Optional.
+     * @return int
      */
     public function getInt(string $key, int $decimals = 0, int $default = 0): int {
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
@@ -217,9 +217,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Timestamp
-     * @param string  $key
-     * @param integer $default Optional.
-     * @return integer
+     * @param string $key
+     * @param int    $default Optional.
+     * @return int
      */
     public function getTime(string $key, int $default = 0): int {
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
@@ -230,9 +230,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Timestamp
-     * @param string  $key
-     * @param integer $default Optional.
-     * @return integer
+     * @param string $key
+     * @param int    $default Optional.
+     * @return int
      */
     public function getTimeParsed(string $key, int $default = 0): int {
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
@@ -315,7 +315,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as a list of Integers
      * @param string $key
-     * @return integer[]
+     * @return int[]
      */
     public function getInts(string $key): array {
         if (isset($this->data[$key])) {
@@ -326,8 +326,8 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a list of Strings
-     * @param string  $key
-     * @param boolean $withoutEmpty Optional.
+     * @param string $key
+     * @param bool   $withoutEmpty Optional.
      * @return string[]
      */
     public function getStrings(string $key, bool $withoutEmpty = false): array {
@@ -340,7 +340,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as an Array
      * @param string $key
-     * @return array<string|integer,mixed>
+     * @return array<string|int,mixed>
      */
     public function getArray(string $key): array {
         if (isset($this->data[$key]) && is_array($this->data[$key])) {
@@ -366,7 +366,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as an Array decoded from JSON
      * @param string $key
-     * @return array<string|integer,mixed>
+     * @return array<string|int,mixed>
      */
     public function decodeAsArray(string $key): array {
         if (isset($this->data[$key]) && is_string($this->data[$key])) {
@@ -391,7 +391,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the data as an Array
-     * @return array<string|integer,mixed>
+     * @return array<string|int,mixed>
      */
     public function toArray(): array {
         return $this->data;
@@ -441,7 +441,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Implements the Countable Interface
      * @phpstan-return 0|positive-int
-     * @return integer
+     * @return int
      */
     #[\Override]
     public function count(): int {

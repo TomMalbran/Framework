@@ -21,7 +21,7 @@ class Priority {
 
     /**
      * The Priority Attribute
-     * @param integer $priority
+     * @param int $priority
      */
     public function __construct(int $priority = self::Normal) {
         $this->priority = $priority;

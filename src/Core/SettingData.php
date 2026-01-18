@@ -35,7 +35,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
      * @param string $section
      * @param string $variable
      * @param string $value
-     * @return boolean
+     * @return bool
      */
     public static function set(string $section, string $variable, string $value): bool {
         $query = new SettingsQuery();
@@ -59,7 +59,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
     /**
      * Returns a Core Setting
      * @param string $variable
-     * @return integer
+     * @return int
      */
     public static function getCore(string $variable): int {
         if (!self::tableExists()) {
@@ -72,9 +72,9 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
 
     /**
      * Sets a Core Preference
-     * @param string  $variable
-     * @param integer $value
-     * @return boolean
+     * @param string $variable
+     * @param int    $value
+     * @return bool
      */
     public static function setCore(string $variable, int $value): bool {
         if (!self::tableExists()) {
@@ -94,7 +94,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
     /**
      * Returns all the Settings
      * @param string|null $section  Optional.
-     * @param boolean     $asObject Optional.
+     * @param bool        $asObject Optional.
      * @return array{}|object
      */
     public static function getAll(?string $section = null, bool $asObject = false): array|object {
@@ -122,7 +122,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
     /**
      * Saves all the Settings
      * @param array<string,string> $data
-     * @return boolean
+     * @return bool
      */
     public static function saveAll(array $data): bool {
         $list = self::getEntityList();
@@ -148,7 +148,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
      * Saves the Settings from the given Section
      * @param string               $section
      * @param array<string,string> $data
-     * @return boolean
+     * @return bool
      */
     public static function saveSection(string $section, array $data): bool {
         $fields = [];
@@ -163,7 +163,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
 
     /**
      * Migrates the Settings data
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public static function migrateData(): bool {

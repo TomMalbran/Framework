@@ -92,7 +92,7 @@ class ActionLog extends LogActionSchema {
      * Returns the total amount of Actions Log items
      * @param Request              $request
      * @param array<string,string> $mappings Optional.
-     * @return integer
+     * @return int
      */
     public static function getAmount(Request $request, array $mappings = []): int {
         $query = self::createQuery($request, $mappings);
@@ -103,8 +103,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns the Credential ID for the current User
-     * @param integer $credentialID Optional.
-     * @return integer
+     * @param int $credentialID Optional.
+     * @return int
      */
     private static function getCredentialID(int $credentialID = 0): int {
         if ($credentialID !== 0) {
@@ -118,8 +118,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Starts a Log Session
-     * @param boolean $destroy Optional.
-     * @return boolean
+     * @param bool $destroy Optional.
+     * @return bool
      */
     public static function startSession(bool $destroy = false): bool {
         $credentialID = self::getCredentialID();
@@ -137,7 +137,7 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Ends the Log Session
-     * @return boolean
+     * @return bool
      */
     public static function endSession(): bool {
         $credentialID = self::getCredentialID();
@@ -150,11 +150,11 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Logs the given Action
-     * @param string        $module
-     * @param string        $action
-     * @param mixed|integer $dataID       Optional.
-     * @param integer       $credentialID Optional.
-     * @return boolean
+     * @param string    $module
+     * @param string    $action
+     * @param mixed|int $dataID       Optional.
+     * @param int       $credentialID Optional.
+     * @return bool
      */
     public static function add(string $module, string $action, mixed $dataID = 0, int $credentialID = 0): bool {
         $credentialID = self::getCredentialID($credentialID);
@@ -183,7 +183,7 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Deletes the items older than some days
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         $days  = Config::getActionLogDeleteDays();

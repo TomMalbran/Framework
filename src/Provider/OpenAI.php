@@ -93,7 +93,7 @@ class OpenAI {
     /**
      * Returns true if the given Model exists
      * @param string $model
-     * @return boolean
+     * @return bool
      */
     public static function modelExists(string $model): bool {
         if ($model === "") {
@@ -123,7 +123,7 @@ class OpenAI {
     /**
      * Deletes the given File
      * @param string $fileID
-     * @return boolean
+     * @return bool
      */
     public static function deleteFile(string $fileID): bool {
         $response = self::delete("/files/$fileID");
@@ -134,7 +134,7 @@ class OpenAI {
 
     /**
      * Lists all the Vector Store
-     * @return array<integer|string,mixed>
+     * @return array<int|string,mixed>
      */
     public static function getAllVectorStores(): array {
         $response = self::get("/vector_stores");
@@ -208,7 +208,7 @@ class OpenAI {
      * @param string                              $prompt
      * @param array{role:string,content:string}[] $context          Optional.
      * @param Dictionary|null                     $schema           Optional.
-     * @param boolean                             $removeReferences Optional.
+     * @param bool                                $removeReferences Optional.
      * @return OpenAIOutput
      */
     public static function createCompletion(
@@ -272,9 +272,9 @@ class OpenAI {
      * @param array{role:string,content:string}[] $context          Optional.
      * @param Dictionary|null                     $schema           Optional.
      * @param string                              $vectorStoreID    Optional.
-     * @param boolean                             $allowWebSearch   Optional.
+     * @param bool                                $allowWebSearch   Optional.
      * @param string                              $allowedDomain    Optional.
-     * @param boolean                             $removeReferences Optional.
+     * @param bool                                $removeReferences Optional.
      * @return OpenAIOutput
      */
     public static function createResponse(

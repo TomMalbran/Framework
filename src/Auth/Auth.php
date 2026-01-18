@@ -37,7 +37,7 @@ class Auth {
 
     /**
      * Returns true if the Auth Login is disabled
-     * @return boolean
+     * @return bool
      */
     public static function isLoginDisabled(): bool {
         return !Config::isAuthActive();
@@ -45,11 +45,11 @@ class Auth {
 
     /**
      * Validates the Credential
-     * @param string  $accessToken
-     * @param string  $refreshToken
-     * @param string  $langcode
-     * @param integer $timezone
-     * @return boolean
+     * @param string $accessToken
+     * @param string $refreshToken
+     * @param string $langcode
+     * @param int    $timezone
+     * @return bool
      */
     public static function validateCredential(string $accessToken, string $refreshToken, string $langcode, int $timezone): bool {
         Reset::deleteOld();
@@ -99,8 +99,8 @@ class Auth {
      * @param CredentialEntity $credential
      * @param CredentialEntity $admin
      * @param string           $langcode
-     * @param integer          $timezone
-     * @return boolean
+     * @param int              $timezone
+     * @return bool
      */
     private static function setLanguageTimezone(CredentialEntity $credential, CredentialEntity $admin, string $langcode, int $timezone): bool {
         $entity = $credential;
@@ -130,7 +130,7 @@ class Auth {
     /**
      * Validates and Sets the auth as API
      * @param string $token
-     * @return boolean
+     * @return bool
      */
     public static function validateAPI(string $token): bool {
         if ($token === self::getApiToken()) {
@@ -143,7 +143,7 @@ class Auth {
 
     /**
      * Validates and Sets the auth as API Internal
-     * @return boolean
+     * @return bool
      */
     public static function validateInternal(): bool {
         self::$accessName = Access::API;
@@ -154,7 +154,7 @@ class Auth {
 
     /**
      * Checks the Spam Protection for the Login
-     * @return boolean
+     * @return bool
      */
     public static function spamProtection(): bool {
         return Spam::protect();
@@ -163,7 +163,7 @@ class Auth {
     /**
      * Logins the given Credential
      * @param CredentialEntity $credential
-     * @return boolean
+     * @return bool
      */
     public static function login(CredentialEntity $credential): bool {
         $isNew = self::$credentialID !== $credential->id;
@@ -185,7 +185,7 @@ class Auth {
 
     /**
      * Logouts the Current Credential
-     * @return boolean
+     * @return bool
      */
     public static function logout(): bool {
         AuthToken::deleteRefreshToken(self::$refreshToken);
@@ -204,7 +204,7 @@ class Auth {
     /**
      * Returns true if the Credential can login
      * @param CredentialEntity $credential
-     * @return boolean
+     * @return bool
      */
     public static function canLogin(CredentialEntity $credential): bool {
         return (
@@ -218,8 +218,8 @@ class Auth {
 
     /**
      * Logins as the given Credential from an Admin account
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function loginAs(int $credentialID): bool {
         if (self::$credential === null) {
@@ -238,7 +238,7 @@ class Auth {
 
     /**
      * Logouts as the current Credential and logins back as the Admin
-     * @return integer
+     * @return int
      */
     public static function logoutAs(): int {
         if (self::$admin === null || self::$credential === null) {
@@ -280,7 +280,7 @@ class Auth {
      * Returns true if the Admin can login as the User
      * @param CredentialEntity $admin
      * @param CredentialEntity $user
-     * @return boolean
+     * @return bool
      */
     public static function canLoginAs(CredentialEntity $admin, CredentialEntity $user): bool {
         return (
@@ -297,8 +297,8 @@ class Auth {
      * Sets the Credential
      * @param CredentialEntity      $credential
      * @param CredentialEntity|null $admin      Optional.
-     * @param integer               $userID     Optional.
-     * @return boolean
+     * @param int                   $userID     Optional.
+     * @return bool
      */
     public static function setCredential(CredentialEntity $credential, ?CredentialEntity $admin = null, int $userID = 0): bool {
         self::$credential   = $credential;
@@ -335,7 +335,7 @@ class Auth {
 
     /**
      * Updates the Credential
-     * @return boolean
+     * @return bool
      */
     public static function updateCredential(): bool {
         if (self::$credentialID !== 0) {
@@ -350,9 +350,9 @@ class Auth {
 
     /**
      * Sets the Current User
-     * @param integer       $userID
+     * @param int           $userID
      * @param Access|string $accessName
-     * @return boolean
+     * @return bool
      */
     public static function setCurrentUser(int $userID, Access|string $accessName): bool {
         self::$userID     = $userID;
@@ -433,7 +433,7 @@ class Auth {
 
     /**
      * Returns the Credential ID
-     * @return integer
+     * @return int
      */
     public static function getID(): int {
         return self::$credentialID;
@@ -441,7 +441,7 @@ class Auth {
 
     /**
      * Returns the Admin ID
-     * @return integer
+     * @return int
      */
     public static function getAdminID(): int {
         return self::$adminID;
@@ -449,7 +449,7 @@ class Auth {
 
     /**
      * Returns the Credential Current User
-     * @return integer
+     * @return int
      */
     public static function getUserID(): int {
         return self::$userID;
@@ -478,7 +478,7 @@ class Auth {
 
     /**
      * Returns true if the User is Logged in
-     * @return boolean
+     * @return bool
      */
     public static function isLoggedIn(): bool {
         return self::hasCredential() || self::hasAPI();
@@ -486,7 +486,7 @@ class Auth {
 
     /**
      * Returns true or false if the admin is logged as an user
-     * @return boolean
+     * @return bool
      */
     public static function isLoggedAsUser(): bool {
         return self::$adminID !== 0;
@@ -494,7 +494,7 @@ class Auth {
 
     /**
      * Returns true if there is a Credential
-     * @return boolean
+     * @return bool
      */
     public static function hasCredential(): bool {
         return self::$credentialID !== 0;
@@ -502,7 +502,7 @@ class Auth {
 
     /**
      * Returns true if there is an API
-     * @return boolean
+     * @return bool
      */
     public static function hasAPI(): bool {
         return self::$accessName === Access::API;
@@ -510,7 +510,7 @@ class Auth {
 
     /**
      * Returns true or false if the current used is actually an admin
-     * @return boolean
+     * @return bool
      */
     public static function isAdmin(): bool {
         return self::$credential !== null && Access::isValidAdmin(self::$credential->access);
@@ -521,7 +521,7 @@ class Auth {
     /**
      * Returns true if the password is correct for the current auth
      * @param string $password
-     * @return boolean
+     * @return bool
      */
     public static function isPasswordCorrect(string $password): bool {
         return Credential::isPasswordCorrect(self::$credentialID, $password);
@@ -530,7 +530,7 @@ class Auth {
     /**
      * Returns true if the current Auth requires login
      * @param Access $accessName
-     * @return boolean
+     * @return bool
      */
     public static function requiresLogin(Access $accessName): bool {
         return $accessName !== Access::General && !self::isLoggedIn();
@@ -539,7 +539,7 @@ class Auth {
     /**
      * Returns true if the user has that Access
      * @param Access $accessName
-     * @return boolean
+     * @return bool
      */
     public static function grant(Access $accessName): bool {
         if (Access::isValidAPI(self::$accessName)) {

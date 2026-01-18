@@ -15,8 +15,8 @@ class Device extends CredentialDeviceSchema {
 
     /**
      * Checks if the Credential has at least one Device
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function has(int $credentialID): bool {
         $devices = self::getAllForCredential($credentialID);
@@ -25,7 +25,7 @@ class Device extends CredentialDeviceSchema {
 
     /**
      * Returns all the Devices for the given Credential
-     * @param integer[]|integer $credentialID
+     * @param int[]|int $credentialID
      * @return string[]
      */
     public static function getAllForCredential(array|int $credentialID): array {
@@ -48,9 +48,9 @@ class Device extends CredentialDeviceSchema {
 
     /**
      * Adds a Device
-     * @param integer $credentialID
-     * @param string  $playerID
-     * @return boolean
+     * @param int    $credentialID
+     * @param string $playerID
+     * @return bool
      */
     public static function add(int $credentialID, string $playerID): bool {
         $result = self::replaceEntity(
@@ -64,9 +64,9 @@ class Device extends CredentialDeviceSchema {
 
     /**
      * Removes a Device
-     * @param integer $credentialID
-     * @param string  $playerID
-     * @return boolean
+     * @param int    $credentialID
+     * @param string $playerID
+     * @return bool
      */
     public static function remove(int $credentialID, string $playerID): bool {
         $query = new CredentialDeviceQuery();

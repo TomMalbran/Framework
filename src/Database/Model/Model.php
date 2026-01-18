@@ -20,12 +20,12 @@ class Model {
 
     /**
      * The Model Attribute
-     * @param string  $fantasyName   Optional.
-     * @param boolean $hasUsers      Optional.
-     * @param boolean $hasTimestamps Optional.
-     * @param boolean $canCreate     Optional.
-     * @param boolean $canEdit       Optional.
-     * @param boolean $canDelete     Optional.
+     * @param string $fantasyName   Optional.
+     * @param bool   $hasUsers      Optional.
+     * @param bool   $hasTimestamps Optional.
+     * @param bool   $canCreate     Optional.
+     * @param bool   $canEdit       Optional.
+     * @param bool   $canDelete     Optional.
      */
     public function __construct(
         string $fantasyName   = "",

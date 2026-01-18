@@ -42,9 +42,9 @@ class {{query}} extends SchemaQuery {
      * Adds an expression
      * @param {{column}} $column
      * @param QueryOperator $operator
-     * @param mixed[]|integer|string $value
-     * @param boolean $caseSensitive Optional.
-     * @param boolean|null $condition Optional.
+     * @param mixed[]|int|string $value
+     * @param bool $caseSensitive Optional.
+     * @param bool|null $condition Optional.
      * @return {{query}}
      */
     public function add(
@@ -65,10 +65,10 @@ class {{query}} extends SchemaQuery {
      * @param {{column}}[] $column
      * @param mixed $value
      * @param QueryOperator $operator Optional.
-     * @param boolean $caseInsensitive Optional.
-     * @param boolean $splitValue Optional.
+     * @param bool $caseInsensitive Optional.
+     * @param bool $splitValue Optional.
      * @param string $splitText Optional.
-     * @param boolean $matchAny Optional.
+     * @param bool $matchAny Optional.
      * @return {{query}}
      */
     public function search(

@@ -11,7 +11,7 @@ class Progress {
 
     /**
      * Gets the Progress
-     * @return integer
+     * @return int
      */
     public static function get(): int {
         return Auth::getCredential()->progressValue;
@@ -19,8 +19,8 @@ class Progress {
 
     /**
      * Sets the Progress
-     * @param integer $value
-     * @return boolean
+     * @param int $value
+     * @return bool
      */
     public static function set(int $value): bool {
         $credentialID = Auth::getID();
@@ -31,7 +31,7 @@ class Progress {
 
     /**
      * Starts the Progress
-     * @return boolean
+     * @return bool
      */
     public static function start(): bool {
         return self::set(0);
@@ -39,8 +39,8 @@ class Progress {
 
     /**
      * Increments the Progress
-     * @param integer $value Optional.
-     * @return boolean
+     * @param int $value Optional.
+     * @return bool
      */
     public static function increment(int $value = 1): bool {
         $currentValue = self::get();
@@ -49,7 +49,7 @@ class Progress {
 
     /**
      * Ends the Progress
-     * @return boolean
+     * @return bool
      */
     public static function end(): bool {
         return self::start();

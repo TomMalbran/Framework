@@ -45,7 +45,7 @@ class NotificationContent extends NotificationContentSchema implements Discovery
 
     /**
      * Migrates the Notification Contents data
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public static function migrateData(): bool {
@@ -75,8 +75,8 @@ class NotificationContent extends NotificationContentSchema implements Discovery
      * @param Dictionary $notifications
      * @param string     $language
      * @param string     $languageName
-     * @param integer    $position
-     * @return integer
+     * @param int        $position
+     * @return int
      */
     private static function migrateLanguage(Dictionary $notifications, string $language, string $languageName, int $position): int {
         $total = 0;

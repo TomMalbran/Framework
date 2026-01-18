@@ -76,20 +76,20 @@ class Validate {
      * @phpstan-param class-string|null $typeOf
      * @phpstan-param class-string|null $belongsTo
      *
-     * @param boolean     $isRequired  Optional.
-     * @param boolean     $isEmail     Optional.
-     * @param boolean     $isUrl       Optional.
-     * @param boolean     $isColor     Optional.
-     * @param boolean     $isNumeric   Optional.
-     * @param boolean     $isSigned    Optional.
-     * @param boolean     $isPrice     Optional.
+     * @param bool        $isRequired  Optional.
+     * @param bool        $isEmail     Optional.
+     * @param bool        $isUrl       Optional.
+     * @param bool        $isColor     Optional.
+     * @param bool        $isNumeric   Optional.
+     * @param bool        $isSigned    Optional.
+     * @param bool        $isPrice     Optional.
      * @param string|null $typeOf      Optional.
      * @param string|null $belongsTo   Optional.
      * @param string      $method      Optional.
-     * @param boolean     $withParent  Optional.
-     * @param integer     $maxLength   Optional.
-     * @param integer     $minValue    Optional.
-     * @param integer     $maxValue    Optional.
+     * @param bool        $withParent  Optional.
+     * @param int         $maxLength   Optional.
+     * @param int         $minValue    Optional.
+     * @param int         $maxValue    Optional.
      * @param string      $prefix      Optional.
      * @param string      $belongsName Optional.
      */

@@ -37,12 +37,12 @@ class Database {
 
     /**
      * Creates a new Database instance
-     * @param string  $host
-     * @param string  $database
-     * @param string  $username
-     * @param string  $password
-     * @param string  $charset
-     * @param integer $port     Optional.
+     * @param string $host
+     * @param string $database
+     * @param string $username
+     * @param string $password
+     * @param string $charset
+     * @param int    $port     Optional.
      */
     public function __construct(
         string $host,
@@ -73,7 +73,7 @@ class Database {
 
     /**
      * Connects with the database
-     * @return boolean
+     * @return bool
      */
     public function connect(): bool {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database, $this->port);
@@ -92,7 +92,7 @@ class Database {
     /**
      * Sets the database to use
      * @param string $database
-     * @return boolean
+     * @return bool
      */
     public function setDatabase(string $database): bool {
         $this->database = $database;
@@ -105,7 +105,7 @@ class Database {
 
     /**
      * Closes the connection
-     * @return boolean
+     * @return bool
      */
     public function close(): bool {
         return $this->mysqli->close();
@@ -116,7 +116,7 @@ class Database {
     /**
      * Executes the given expression
      * @param string $expression
-     * @return boolean
+     * @return bool
      */
     public function execute(string $expression): bool {
         $timer     = new Timer();
@@ -129,7 +129,7 @@ class Database {
      * Process the given expression
      * @param string        $expression
      * @param Query|mixed[] $params     Optional.
-     * @return array<string,string|integer|null>[]
+     * @return array<string,string|int|null>[]
      */
     public function queryData(string $expression, Query|array $params = []): array {
         $timer     = new Timer();
@@ -144,7 +144,7 @@ class Database {
      * Process the given expression using a Query
      * @param string        $expression
      * @param Query|mixed[] $query      Optional.
-     * @return array<string,string|integer>[]
+     * @return array<string,string|int>[]
      */
     public function getData(string $expression, Query|array $query = []): array {
         $params = [];
@@ -186,7 +186,7 @@ class Database {
      * @param string          $table
      * @param string[]|string $columns Optional.
      * @param Query|null      $query   Optional.
-     * @return array<string,string|integer>[]
+     * @return array<string,string|int>[]
      */
     public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
         $selection  = Strings::join($columns, ", ");
@@ -199,7 +199,7 @@ class Database {
      * @param string $table
      * @param string $column
      * @param Query  $query
-     * @return string|integer
+     * @return string|int
      */
     public function getValue(string $table, string $column, Query $query): string|int {
         $request = $this->getAll($table, $column, $query->limit(1));
@@ -216,7 +216,7 @@ class Database {
      * Returns true if the given Data is already in the given table
      * @param string $table
      * @param Query  $query
-     * @return boolean
+     * @return bool
      */
     public function exists(string $table, Query $query): bool {
         return $this->getTotal($table, $query) === 1;
@@ -226,7 +226,7 @@ class Database {
      * Returns the Count in the given table
      * @param string $table
      * @param Query  $query
-     * @return integer
+     * @return int
      */
     public function getTotal(string $table, Query $query): int {
         $expression = "SELECT COUNT(*) AS cnt FROM `$table` " . $query->get();
@@ -245,7 +245,7 @@ class Database {
      * @param string              $table
      * @param array<string,mixed> $fields
      * @param string              $method Optional.
-     * @return integer The Inserted ID or -1
+     * @return int The Inserted ID or -1
      */
     public function insert(string $table, array $fields, string $method = "INSERT"): int {
         $bindParams  = [];
@@ -266,7 +266,7 @@ class Database {
      * Replaces the given content into the given table
      * @param string              $table
      * @param array<string,mixed> $fields
-     * @return integer The Inserted ID or -1
+     * @return int The Inserted ID or -1
      */
     public function replace(string $table, array $fields): int {
         return $this->insert($table, $fields, "REPLACE");
@@ -277,7 +277,7 @@ class Database {
      * @param string    $table
      * @param array{}[] $fields
      * @param string    $method Optional.
-     * @return boolean
+     * @return bool
      */
     public function batch(string $table, array $fields, string $method = "REPLACE"): bool {
         if (!isset($fields[0])) {
@@ -303,7 +303,7 @@ class Database {
      * @param string              $table
      * @param array<string,mixed> $fields
      * @param Query               $query
-     * @return boolean
+     * @return bool
      */
     public function update(string $table, array $fields, Query $query): bool {
         $bindParams  = [];
@@ -319,7 +319,7 @@ class Database {
      * Deletes from the given table
      * @param string $table
      * @param Query  $query
-     * @return boolean
+     * @return bool
      */
     public function delete(string $table, Query $query): bool {
         $expression = "DELETE FROM `$table` " . $query->get();
@@ -330,7 +330,7 @@ class Database {
     /**
      * Deletes from the given table
      * @param string $table
-     * @return boolean
+     * @return bool
      */
     public function deleteAll(string $table): bool {
         $expression = "DELETE FROM `$table`";
@@ -341,7 +341,7 @@ class Database {
     /**
      * Truncates the given table
      * @param string $table
-     * @return boolean
+     * @return bool
      */
     public function truncate(string $table): bool {
         $expression = "TRUNCATE TABLE `$table`";
@@ -428,7 +428,7 @@ class Database {
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
-     * @return boolean
+     * @return bool
      */
     private function closeQuery(?mysqli_stmt $statement): bool {
         if ($statement === null) {
@@ -490,7 +490,7 @@ class Database {
     /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
-     * @return array<string,string|integer|null>[]
+     * @return array<string,string|int|null>[]
      */
     private function dynamicBindResults(?mysqli_stmt $statement): array {
         if ($statement === null) {
@@ -547,7 +547,7 @@ class Database {
      * Process the table data for building the query for inserting or updating
      * @param array<string,mixed> $fields
      * @param mixed[]             $bindParams
-     * @param boolean             $isInsert
+     * @param bool                $isInsert
      * @return string
      */
     private function buildTableData(array $fields, array &$bindParams, bool $isInsert): string {
@@ -611,7 +611,7 @@ class Database {
      * @param Timer   $timer
      * @param string  $expression
      * @param mixed[] $params
-     * @return boolean
+     * @return bool
      */
     protected function processTime(Timer $timer, string $expression, array $params): bool {
         $logTime = Config::getDbLogTime();
@@ -652,7 +652,7 @@ class Database {
     /**
      * Returns an array with all the tables
      * @param string $tableName
-     * @return boolean
+     * @return bool
      */
     public function hasTable(string $tableName): bool {
         $request = $this->queryData("SHOW TABLES LIKE '$tableName'");
@@ -724,7 +724,7 @@ class Database {
     /**
      * Returns true if a Table exists
      * @param string $tableName
-     * @return boolean
+     * @return bool
      */
     public function tableExists(string $tableName): bool {
         if ($tableName === "") {
@@ -737,7 +737,7 @@ class Database {
     /**
      * Returns true if a Table exists
      * @param string $tableName
-     * @return boolean
+     * @return bool
      */
     public function tableIsEmpty(string $tableName): bool {
         $request = $this->getDictionary("
@@ -800,7 +800,7 @@ class Database {
      * Returns true if a Column exists
      * @param string $tableName
      * @param string $column
-     * @return boolean
+     * @return bool
      */
     public function columnExists(string $tableName, string $column): bool {
         $type = $this->getColumnType($tableName, $column);
@@ -895,9 +895,9 @@ class Database {
 
     /**
      * Deletes a Column from the Table
-     * @param string  $tableName
-     * @param string  $column
-     * @param boolean $execute   Optional.
+     * @param string $tableName
+     * @param string $column
+     * @param bool   $execute   Optional.
      * @return string
      */
     public function deleteColumn(string $tableName, string $column, bool $execute = true): string {
@@ -950,7 +950,7 @@ class Database {
      * Dumps the entire database
      * @param string[]      $filter Optional.
      * @param resource|null $fp     Optional.
-     * @return boolean
+     * @return bool
      */
     public function dump(array $filter = [], mixed $fp = null): bool {
         $crlf = "\r\n";
@@ -1007,7 +1007,7 @@ class Database {
      * Writes the content in a file or prints them in the screen
      * @param resource|null $fp
      * @param string        $content
-     * @return boolean
+     * @return bool
      */
     private function write(mixed $fp, string $content): bool {
         if ($fp !== null) {

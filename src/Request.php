@@ -35,8 +35,8 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Creates a new Request instance
      * @param array<string,mixed> $request     Optional.
-     * @param boolean             $withRequest Optional.
-     * @param boolean             $withFiles   Optional.
+     * @param bool                $withRequest Optional.
+     * @param bool                $withFiles   Optional.
      */
     public function __construct(array $request = [], bool $withRequest = false, bool $withFiles = false) {
         if ($withRequest) {
@@ -80,9 +80,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the request data at the given key or the default
-     * @param string  $key
-     * @param integer $default Optional.
-     * @return integer
+     * @param string $key
+     * @param int    $default Optional.
+     * @return int
      */
     public function getInt(string $key, int $default = 0): int {
         if (isset($this->request[$key])) {
@@ -142,7 +142,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns the request data at the given key from a JSON Array
      * @param string $key
-     * @return array<string|integer,mixed>
+     * @return array<string|int,mixed>
      */
     public function getJSONArray(string $key): array {
         return JSON::decodeAsArray($this->get($key, "[]"));
@@ -150,8 +150,8 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the request data at the given key as an array of integers
-     * @param string  $key
-     * @param boolean $withoutEmpty Optional.
+     * @param string $key
+     * @param bool   $withoutEmpty Optional.
      * @return int[]
      */
     public function getInts(string $key, bool $withoutEmpty = true): array {
@@ -198,7 +198,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns the request data at the given key as a map of String-Integer
      * @param string $key
-     * @return array<string,integer>
+     * @return array<string,int>
      */
     public function getStringIntMap(string $key): array {
         $value = $this->getJSONArray($key);
@@ -235,8 +235,8 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the given key exists in the request data
      * @param string[]|string|null $key   Optional.
-     * @param integer|null         $index Optional.
-     * @return boolean
+     * @param int|null             $index Optional.
+     * @return bool
      */
     public function has(array|string|null $key = null, ?int $index = null): bool {
         if ($key === null) {
@@ -263,7 +263,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the given key is set in the request data
      * @param string[]|string $key
-     * @return boolean
+     * @return bool
      */
     public function exists(array|string $key): bool {
         if (is_array($key)) {
@@ -280,7 +280,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the given key exists and is active
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isActive(string $key): bool {
         if (isset($this->request[$key])) {
@@ -296,7 +296,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Checks if all the given keys are not empty or set
      * @param string[] $emptyKeys
      * @param string[] $setKeys   Optional.
-     * @return boolean
+     * @return bool
      */
     public function isEmpty(array $emptyKeys, array $setKeys = []): bool {
         foreach ($emptyKeys as $field) {
@@ -315,7 +315,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the array is empty
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isEmptyArray(string $key): bool {
         $array = $this->getArray($key);
@@ -327,7 +327,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid String
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidString(string $key): bool {
         $value = $this->getString($key);
@@ -337,7 +337,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Number
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidNumber(string $key): bool {
         $value = $this->getString($key);
@@ -346,11 +346,11 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the value at given key is a Number between the min and max
-     * @param string       $key
-     * @param integer|null $min      Optional.
-     * @param integer|null $max      Optional.
-     * @param integer|null $decimals Optional.
-     * @return boolean
+     * @param string   $key
+     * @param int|null $min      Optional.
+     * @param int|null $max      Optional.
+     * @param int|null $decimals Optional.
+     * @return bool
      */
     public function isNumeric(string $key, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
         $value = $this->getFloat($key);
@@ -359,10 +359,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the value at the given key is a valid Price
-     * @param string       $key
-     * @param integer|null $min Optional.
-     * @param integer|null $max Optional.
-     * @return boolean
+     * @param string   $key
+     * @param int|null $min Optional.
+     * @param int|null $max Optional.
+     * @return bool
      */
     public function isValidPrice(string $key, ?int $min = 1, ?int $max = null): bool {
         $value = $this->getFloat($key);
@@ -371,10 +371,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the value at the given key is a Alpha-Numeric
-     * @param string       $key
-     * @param boolean      $withDashes Optional.
-     * @param integer|null $length     Optional.
-     * @return boolean
+     * @param string   $key
+     * @param bool     $withDashes Optional.
+     * @param int|null $length     Optional.
+     * @return bool
      */
     public function isAlphaNum(string $key, bool $withDashes = false, ?int $length = null): bool {
         $value = $this->getString($key);
@@ -384,7 +384,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Slug
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidSlug(string $key): bool {
         $value = $this->getString($key);
@@ -394,7 +394,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Email
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidEmail(string $key): bool {
         $value = $this->getString($key);
@@ -403,10 +403,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the value at the given key is a valid Password
-     * @param string  $key
-     * @param string  $checkSets Optional.
-     * @param integer $minLength Optional.
-     * @return boolean
+     * @param string $key
+     * @param string $checkSets Optional.
+     * @param int    $minLength Optional.
+     * @return bool
      */
     public function isValidPassword(string $key, string $checkSets = "ad", int $minLength = 6): bool {
         $value = $this->getString($key);
@@ -416,7 +416,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Domain
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidDomain(string $key): bool {
         return Utils::isValidDomain($this->toDomain($key));
@@ -425,7 +425,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Username
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidUsername(string $key): bool {
         $value = $this->getString($key);
@@ -435,7 +435,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Color
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidColor(string $key): bool {
         $value = $this->getString($key);
@@ -445,7 +445,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid CUIT
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidCUIT(string $key): bool {
         $value = $this->getString($key);
@@ -455,7 +455,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid DNI
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidDNI(string $key): bool {
         $value = $this->getString($key);
@@ -465,7 +465,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Phone
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidPhone(string $key): bool {
         $value = $this->getString($key);
@@ -475,7 +475,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Url
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidUrl(string $key): bool {
         $value = $this->getString($key);
@@ -485,7 +485,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Position
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidPosition(string $key): bool {
         return !$this->has($key) || $this->isNumeric($key, 0);
@@ -496,7 +496,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the value at the given key is a valid Date
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidDate(string $key): bool {
         $value = $this->getString($key);
@@ -505,11 +505,11 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the value at the given key is a valid Hour
-     * @param string         $key
-     * @param integer[]|null $minutes Optional.
-     * @param integer        $minHour Optional.
-     * @param integer        $maxHour Optional.
-     * @return boolean
+     * @param string     $key
+     * @param int[]|null $minutes Optional.
+     * @param int        $minHour Optional.
+     * @param int        $maxHour Optional.
+     * @return bool
      */
     public function isValidHour(string $key, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
         $value = $this->getString($key);
@@ -520,7 +520,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns true if the dates at the given keys are a valid Period
      * @param string $fromKey
      * @param string $toKey
-     * @return boolean
+     * @return bool
      */
     public function isValidPeriod(string $fromKey, string $toKey): bool {
         if (!$this->isEmpty([ $fromKey, $toKey ])) {
@@ -533,7 +533,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns true if the hours at the given keys are a valid Period
      * @param string $fromKey
      * @param string $toKey
-     * @return boolean
+     * @return bool
      */
     public function isValidHourPeriod(string $fromKey, string $toKey): bool {
         if (!$this->isEmpty([ $fromKey, $toKey ])) {
@@ -548,13 +548,13 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @param string $fromHourKey
      * @param string $toDateKey
      * @param string $toHourKey
-     * @return boolean
+     * @return bool
      */
     public function isValidFullPeriod(
         string $fromDateKey,
         string $fromHourKey,
         string $toDateKey,
-        string $toHourKey
+        string $toHourKey,
     ): bool {
         if (!$this->isEmpty([ $fromDateKey, $fromHourKey, $toDateKey, $toHourKey ])) {
             return DateTime::isValidFullPeriod(
@@ -569,9 +569,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the week day at the given keys are a valid Period
-     * @param string  $key
-     * @param boolean $startMonday Optional.
-     * @return boolean
+     * @param string $key
+     * @param bool   $startMonday Optional.
+     * @return bool
      */
     public function isValidWeekDay(string $key, bool $startMonday = false): bool {
         $value = $this->getInt($key);
@@ -582,7 +582,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns true if the date at the given key is in the Future
      * @param string   $key
      * @param DateType $dateType Optional.
-     * @return boolean
+     * @return bool
      */
     public function isFutureDate(string $key, DateType $dateType = DateType::Middle): bool {
         $value = $this->getString($key);
@@ -593,9 +593,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Converts the request data on the given key to binary
-     * @param string  $key
-     * @param integer $default Optional.
-     * @return integer
+     * @param string $key
+     * @param int    $default Optional.
+     * @return int
      */
     public function toBinary(string $key, int $default = 1): int {
         if (!$this->has($key)) {
@@ -607,9 +607,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given number as an integer using the given decimals
-     * @param string  $key
-     * @param integer $decimals
-     * @return integer
+     * @param string $key
+     * @param int    $decimals
+     * @return int
      */
     public function toInt(string $key, int $decimals): int {
         $value = $this->getFloat($key);
@@ -619,7 +619,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns the given price in Cents
      * @param string $key
-     * @return integer
+     * @return int
      */
     public function toCents(string $key): int {
         $value = $this->getFloat($key);
@@ -687,10 +687,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given strings as a time
-     * @param string  $key
-     * @param boolean $useTimezone Optional.
-     * @param boolean $skipEmpty   Optional.
-     * @return integer
+     * @param string $key
+     * @param bool   $useTimezone Optional.
+     * @param bool   $skipEmpty   Optional.
+     * @return int
      */
     public function toTime(string $key, bool $useTimezone = true, bool $skipEmpty = false): int {
         if ($skipEmpty && !$this->has($key)) {
@@ -701,11 +701,11 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given strings as a time
-     * @param string  $dateKey
-     * @param string  $hourKey
-     * @param boolean $useTimezone Optional.
-     * @param boolean $skipEmpty   Optional.
-     * @return integer
+     * @param string $dateKey
+     * @param string $hourKey
+     * @param bool   $useTimezone Optional.
+     * @param bool   $skipEmpty   Optional.
+     * @return int
      */
     public function toTimeHour(string $dateKey, string $hourKey, bool $useTimezone = true, bool $skipEmpty = false): int {
         if ($skipEmpty && (!$this->has($dateKey) || !$this->has($hourKey))) {
@@ -718,8 +718,8 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns the given string as a time
      * @param string   $key
      * @param DateType $dateType    Optional.
-     * @param boolean  $useTimezone Optional.
-     * @return integer
+     * @param bool     $useTimezone Optional.
+     * @return int
      */
     public function toDay(string $key, DateType $dateType = DateType::Start, bool $useTimezone = true): int {
         $value = $this->getString($key);
@@ -728,9 +728,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given string as a time at the start of the day
-     * @param string  $key
-     * @param boolean $useTimezone Optional.
-     * @return integer
+     * @param string $key
+     * @param bool   $useTimezone Optional.
+     * @return int
      */
     public function toDayStart(string $key, bool $useTimezone = true): int {
         $value = $this->getString($key);
@@ -739,10 +739,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given string as a time at the given hour or the start of the day
-     * @param string  $dateKey
-     * @param string  $hourKey
-     * @param boolean $useTimezone Optional.
-     * @return integer
+     * @param string $dateKey
+     * @param string $hourKey
+     * @param bool   $useTimezone Optional.
+     * @return int
      */
     public function toDayStartHour(string $dateKey, string $hourKey, bool $useTimezone = true): int {
         $value = $this->getString($dateKey);
@@ -754,9 +754,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given string as a time at the middle of the day
-     * @param string  $key
-     * @param boolean $useTimezone Optional.
-     * @return integer
+     * @param string $key
+     * @param bool   $useTimezone Optional.
+     * @return int
      */
     public function toDayMiddle(string $key, bool $useTimezone = true): int {
         $value = $this->getString($key);
@@ -765,9 +765,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given string as a time at the end of the day
-     * @param string  $key
-     * @param boolean $useTimezone Optional.
-     * @return integer
+     * @param string $key
+     * @param bool   $useTimezone Optional.
+     * @return int
      */
     public function toDayEnd(string $key, bool $useTimezone = true): int {
         $value = $this->getString($key);
@@ -776,10 +776,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given string as a time at the given hour or the end of the day
-     * @param string  $dateKey
-     * @param string  $hourKey
-     * @param boolean $useTimezone Optional.
-     * @return integer
+     * @param string $dateKey
+     * @param string $hourKey
+     * @param bool   $useTimezone Optional.
+     * @return int
      */
     public function toDayEndHour(string $dateKey, string $hourKey, bool $useTimezone = true): int {
         $value = $this->getString($dateKey);
@@ -791,9 +791,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given integer as a time at the start of the day
-     * @param string  $key
-     * @param boolean $useTimezone Optional.
-     * @return integer
+     * @param string $key
+     * @param bool   $useTimezone Optional.
+     * @return int
      */
     public function getDayStart(string $key, bool $useTimezone = true): int {
         $value = $this->getInt($key);
@@ -802,9 +802,9 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the given integer as a time at the end of the day
-     * @param string  $key
-     * @param boolean $useTimezone Optional.
-     * @return integer
+     * @param string $key
+     * @param bool   $useTimezone Optional.
+     * @return int
      */
     public function getDayEnd(string $key, bool $useTimezone = true): int {
         $value = $this->getInt($key);
@@ -877,7 +877,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the given key exists in the files data
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function hasFile(string $key): bool {
         return (
@@ -890,7 +890,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if there was a size error in the upload
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function hasSizeError(string $key): bool {
         if (isset($this->files[$key]) && is_array($this->files[$key]) && isset($this->files[$key]["error"])) {
@@ -903,7 +903,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns true if the file at the given key has the given extension
      * @param string          $key
      * @param string[]|string $extensions
-     * @return boolean
+     * @return bool
      */
     public function hasExtension(string $key, array|string $extensions): bool {
         $fileName = $this->getString($key);
@@ -916,7 +916,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns true if the file at the given key is a valid image
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function isValidImage(string $key): bool {
         if ($this->hasFile($key)) {

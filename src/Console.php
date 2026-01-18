@@ -49,7 +49,7 @@ class Console {
 
     /**
      * Displays the version information
-     * @return boolean
+     * @return bool
      */
     #[ConsoleCommand("version", "-v")]
     #[Priority(Priority::Highest)]
@@ -61,7 +61,7 @@ class Console {
 
     /**
      * Installs the Framework
-     * @return boolean
+     * @return bool
      */
     #[ConsoleCommand("install")]
     #[Priority(Priority::High)]
@@ -171,7 +171,7 @@ class Console {
     /**
      * Prompts the user for confirmation in the console
      * @param string $prompt
-     * @return boolean
+     * @return bool
      */
     public static function confirm(string $prompt): bool {
         $response = self::prompt("$prompt (y/n)");

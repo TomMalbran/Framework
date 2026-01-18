@@ -17,16 +17,16 @@ class AccessRole implements DiscoveryBuilder {
     /** @var array<string,string[]> */
     private static array $groups = [];
 
-    /** @var array<string,integer> */
+    /** @var array<string,int> */
     private static array $roles  = [];
 
 
     /**
      * Registers an Access Role
-     * @param string  $roleName
-     * @param string  $groupName
-     * @param integer $level     Optional.
-     * @return boolean
+     * @param string $roleName
+     * @param string $groupName
+     * @param int    $level     Optional.
+     * @return bool
      */
     public static function register(string $roleName, string $groupName, int $level = -1): bool {
         if ($level >= 0) {
@@ -50,7 +50,7 @@ class AccessRole implements DiscoveryBuilder {
 
     /**
      * Generates the code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function generateCode(): int {
@@ -72,7 +72,7 @@ class AccessRole implements DiscoveryBuilder {
 
     /**
      * Destroys the Code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function destroyCode(): int {
@@ -82,8 +82,8 @@ class AccessRole implements DiscoveryBuilder {
     /**
      * Returns the Access Roles for the generator
      * @param array<string,array<string>> $groups
-     * @param array<string,integer>       $roles
-     * @return array{addSpace:boolean,group:string,name:string,constant:string,level:integer}[]
+     * @param array<string,int>           $roles
+     * @return array{addSpace:bool,group:string,name:string,constant:string,level:int}[]
      */
     private static function getAccesses(array $groups, array $roles): array {
         $result = [];
@@ -122,8 +122,8 @@ class AccessRole implements DiscoveryBuilder {
 
     /**
      * Aligns the List Names
-     * @param array{addSpace:boolean,group:string,name:string,constant:string,level:integer}[] $list
-     * @return integer
+     * @param array{addSpace:bool,group:string,name:string,constant:string,level:int}[] $list
+     * @return int
      */
     private static function alignNames(array &$list): int {
         $maxLength = 0;

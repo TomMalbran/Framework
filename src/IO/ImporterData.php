@@ -19,7 +19,7 @@ class ImporterData {
     /**
      * Creates a new ImporterData instance
      * @param Select[] $columns Optional.
-     * @param integer  $amount  Optional.
+     * @param int      $amount  Optional.
      * @param string   $first   Optional.
      * @param string   $last    Optional.
      */

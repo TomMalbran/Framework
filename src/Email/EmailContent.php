@@ -54,7 +54,7 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
 
     /**
      * Migrates the Email Contents data
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public static function migrateData(): bool {
@@ -84,8 +84,8 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
      * @param Dictionary $emails
      * @param string     $language
      * @param string     $languageName
-     * @param integer    $position
-     * @return integer
+     * @param int        $position
+     * @return int
      */
     private static function migrateLanguage(Dictionary $emails, string $language, string $languageName, int $position): int {
         $siteName = Config::getName();

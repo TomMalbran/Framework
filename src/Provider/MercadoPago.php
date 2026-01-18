@@ -21,7 +21,7 @@ class MercadoPago {
      * Does a GET Request
      * @param string       $route
      * @param array{}|null $request      Optional.
-     * @param boolean      $jsonResponse Optional.
+     * @param bool         $jsonResponse Optional.
      * @param string       $accessToken  Optional.
      * @return Dictionary
      */
@@ -211,7 +211,7 @@ class MercadoPago {
      * Cancels a Payment Url
      * @param string $preferenceID
      * @param string $accessToken  Optional.
-     * @return boolean
+     * @return bool
      */
     public static function cancelPaymentUrl(string $preferenceID, string $accessToken = ""): bool {
         $response = self::put("/checkout/preferences/$preferenceID", [
@@ -271,7 +271,7 @@ class MercadoPago {
      * Cancels a Payment
      * @param string $paymentID
      * @param string $accessToken Optional.
-     * @return boolean
+     * @return bool
      */
     public static function cancelPayment(string $paymentID, string $accessToken = ""): bool {
         $response = self::put("/v1/payments/$paymentID", [
@@ -284,7 +284,7 @@ class MercadoPago {
      * Refunds a Payment
      * @param string $paymentID
      * @param string $accessToken Optional.
-     * @return boolean
+     * @return bool
      */
     public static function refundPayment(string $paymentID, string $accessToken = ""): bool {
         $response = self::post("/v1/payments/$paymentID/refunds", [

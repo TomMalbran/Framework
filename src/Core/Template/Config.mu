@@ -11,7 +11,7 @@ class Config {
 
     /**
      * Returns true if the Environment is "Local"
-     * @return boolean
+     * @return bool
      */
     public static function isLocal(): bool {
         return Configs::getEnvironment() === "local";
@@ -20,7 +20,7 @@ class Config {
 
     /**
      * Returns true if the Environment is "{{name}}"
-     * @return boolean
+     * @return bool
      */
     public static function is{{name}}(): bool {
         return Configs::getEnvironment() === "{{environment}}";
@@ -31,7 +31,7 @@ class Config {
     /**
      * Returns the url for the given key and adding the url parts at the end
      * @param string $urlKey
-     * @param string|integer ...$urlParts
+     * @param string|int ...$urlParts
      * @return string
      */
     public static function getUrlWithKey(string $urlKey, string|int ...$urlParts): string {
@@ -48,7 +48,7 @@ class Config {
 
     /**
      * Returns the "{{title}}" using the adding the url parts at the end
-     * @param string|integer ...$urlParts
+     * @param string|int ...$urlParts
      * @return string
      */
     public static function get{{name}}(string|int ...$urlParts): string {

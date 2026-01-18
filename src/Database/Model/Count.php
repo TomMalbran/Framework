@@ -58,12 +58,12 @@ class Count {
 
     /**
      * Creates a Count
-     * @param string  $name
-     * @param string  $modelName
-     * @param string  $otherModelName
-     * @param string  $fieldName
-     * @param string  $query
-     * @param boolean $hasDeleted
+     * @param string $name
+     * @param string $modelName
+     * @param string $otherModelName
+     * @param string $fieldName
+     * @param string $query
+     * @param bool   $hasDeleted
      * @return Count
      */
     public static function create(

@@ -15,7 +15,7 @@ class Signal {
     /**
      * Triggers the {{event}} Signal{{#params}}
      * @param {{docType}} ${{name}}{{/params}}
-     * @return boolean
+     * @return bool
      */
     public static function {{event}}({{#params}}{{^isFirst}}, {{/isFirst}}{{type}} ${{name}}{{/params}}): bool {
         {{#triggers}}

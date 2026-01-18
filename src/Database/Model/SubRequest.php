@@ -89,8 +89,8 @@ class SubRequest {
     /**
      * Sets the Data from the Model
      * @param string $name
-     * @param string $modelName
      * @param string $type
+     * @param string $modelName
      * @return SubRequest
      */
     public function setData(string $name, string $type, string $modelName): SubRequest {

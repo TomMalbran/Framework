@@ -15,7 +15,7 @@ class GoogleMap {
 
     /**
      * Returns true if Google Maps is active
-     * @return boolean
+     * @return bool
      */
     public static function isActive(): bool {
         return Config::isGoogleMapActive();

@@ -30,7 +30,7 @@ class Package {
 
     /**
      * Loads the Framework Composer Data
-     * @return boolean
+     * @return bool
      */
     private static function load(): bool {
         if (self::$loaded) {
@@ -70,7 +70,7 @@ class Package {
 
     /**
      * Checks if the Application is the Framework itself
-     * @return boolean
+     * @return bool
      */
     public static function isFramework(): bool {
         $appPath   = Application::getBasePath();

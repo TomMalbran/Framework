@@ -16,7 +16,7 @@ class MediaSchema {
      * Updates the Paths in the Database
      * @param string $oldPath
      * @param string $newPath
-     * @return boolean
+     * @return bool
      */
     public static function updatePaths(string $oldPath, string $newPath): bool {
         $db    = Framework::getDatabase();

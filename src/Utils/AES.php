@@ -25,7 +25,7 @@ class AES {
     /**
      * Converts the String to UTF8 Bytes
      * @param string $value
-     * @return integer[]
+     * @return int[]
      */
     public static function toUtf8Bytes(string $value): array {
         $text   = rawurlencode($value);
@@ -46,7 +46,7 @@ class AES {
     /**
      * Converts the String to Hex Bytes
      * @param string $value
-     * @return integer[]
+     * @return int[]
      */
     public static function toHexBytes(string $value): array {
         $result = [];
@@ -58,7 +58,7 @@ class AES {
 
     /**
      * Converts the Bytes to a String
-     * @param integer[] $bytes
+     * @param int[] $bytes
      * @return string
      */
     public static function fromBytes(array $bytes): string {
@@ -89,9 +89,9 @@ class AES {
 
     /**
      * Encrypts the given Value using the given Key
-     * @param integer[] $value
-     * @param integer[] $key
-     * @return integer[]
+     * @param int[] $value
+     * @param int[] $key
+     * @return int[]
      */
     public static function encrypt(array $value, array $key): array {
         $counterIndex = 16;
@@ -128,9 +128,9 @@ class AES {
 
     /**
      * Does the Encryption for the CTR algorithm
-     * @param integer[] $counter
-     * @param integer[] $key
-     * @return integer[]
+     * @param int[] $counter
+     * @param int[] $key
+     * @return int[]
      */
     private static function ctrEncrypt(array $counter, array $key): array {
         $Ke = self::prepareEncrypt($key);
@@ -172,8 +172,8 @@ class AES {
 
     /**
      * Prepares the Encryption
-     * @param integer[] $key
-     * @return integer[][]
+     * @param int[] $key
+     * @return int[][]
      */
     private static function prepareEncrypt(array $key): array {
         $rounds = 10;
@@ -250,8 +250,8 @@ class AES {
 
     /**
      * Converts the Bytes to 32-bit Integers
-     * @param integer[] $bytes
-     * @return integer[]
+     * @param int[] $bytes
+     * @return int[]
      */
     private static function convertToInt32(array $bytes): array {
         $result = [];
@@ -268,9 +268,9 @@ class AES {
 
     /**
      * Does a 32-bit Shift Left
-     * @param integer|null $a
-     * @param integer|null $b
-     * @return integer
+     * @param int|null $a
+     * @param int|null $b
+     * @return int
      */
     private static function shiftLeft32(?int $a, ?int $b): int {
         $c = ($a << $b) & 0xffffffff;
@@ -282,9 +282,9 @@ class AES {
 
     /**
      * Does a 32-bit XOR
-     * @param integer|null $a
-     * @param integer|null $b
-     * @return integer
+     * @param int|null $a
+     * @param int|null $b
+     * @return int
      */
     private static function xor32(?int $a, ?int $b): int {
         $c = ($a ^ $b) & 0xffffffff;

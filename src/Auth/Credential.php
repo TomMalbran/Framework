@@ -27,7 +27,7 @@ class Credential extends CredentialSchema {
      * Creates a Access Query
      * @param Access[]|Access|null $accessName
      * @param string[]|string|null $filter     Optional.
-     * @param string|integer       $value      Optional.
+     * @param string|int           $value      Optional.
      * @return CredentialQuery
      */
     private static function createAccessQuery(
@@ -56,8 +56,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credential with the given ID
-     * @param integer $credentialID
-     * @param boolean $complete     Optional.
+     * @param int  $credentialID
+     * @param bool $complete     Optional.
      * @return CredentialEntity
      */
     #[\Override]
@@ -69,8 +69,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credential with the given Email
-     * @param string  $email
-     * @param boolean $complete Optional.
+     * @param string $email
+     * @param bool   $complete Optional.
      * @return CredentialEntity
      */
     public static function getByEmail(string $email, bool $complete = true): CredentialEntity {
@@ -81,8 +81,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credential with the given Access Token
-     * @param string  $accessToken
-     * @param boolean $complete    Optional.
+     * @param string $accessToken
+     * @param bool   $complete    Optional.
      * @return CredentialEntity
      */
     public static function getByAccessToken(string $accessToken, bool $complete = true): CredentialEntity {
@@ -96,11 +96,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is an Credential with the given ID and Access(s)
-     * @param integer              $credentialID
+     * @param int                  $credentialID
      * @param Access[]|Access      $accessName
      * @param string[]|string|null $filter       Optional.
-     * @param string|integer       $value        Optional.
-     * @return boolean
+     * @param string|int           $value        Optional.
+     * @return bool
      */
     public static function existsWithAccess(
         int $credentialID,
@@ -121,9 +121,9 @@ class Credential extends CredentialSchema {
     /**
      * Returns true if there is an Credential with the given Email
      * @param string               $email
-     * @param integer              $skipID     Optional.
+     * @param int                  $skipID     Optional.
      * @param Access[]|Access|null $accessName Optional.
-     * @return boolean
+     * @return bool
      */
     public static function emailExists(string $email, int $skipID = 0, array|Access|null $accessName = null): bool {
         $query = self::createAccessQuery($accessName);
@@ -135,9 +135,9 @@ class Credential extends CredentialSchema {
     /**
      * Returns true if there is an Credential with the given Value for the given Field
      * @param CredentialColumn $column
-     * @param string|integer   $value
-     * @param integer          $skipID Optional.
-     * @return boolean
+     * @param string|int       $value
+     * @param int              $skipID Optional.
+     * @return bool
      */
     public static function fieldExists(CredentialColumn $column, string|int $value, int $skipID = 0): bool {
         $query = new CredentialQuery();
@@ -175,7 +175,7 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials for the given IDs
-     * @param integer[]    $credentialIDs
+     * @param int[]        $credentialIDs
      * @param Request|null $sort          Optional.
      * @return CredentialEntity[]
      */
@@ -193,7 +193,7 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials for the given Access(s) and filter
      * @param Access[]|Access $accessName
      * @param string          $filter
-     * @param string|integer  $value      Optional.
+     * @param string|int      $value      Optional.
      * @param Request|null    $sort       Optional.
      * @return CredentialEntity[]
      */
@@ -233,9 +233,9 @@ class Credential extends CredentialSchema {
     /**
      * Returns the latest Credentials for the given Access(s)
      * @param Access[]|Access $accessName
-     * @param integer         $amount
+     * @param int             $amount
      * @param string|null     $filter     Optional.
-     * @param string|integer  $value      Optional.
+     * @param string|int      $value      Optional.
      * @return CredentialEntity[]
      */
     public static function getLatestForAccess(
@@ -256,9 +256,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the create times for all the Credentials with the given Access
-     * @param integer     $fromTime
+     * @param int         $fromTime
      * @param Access|null $accessName Optional.
-     * @return array<integer,integer>
+     * @return array<int,int>
      */
     public static function getAllCreateTimes(int $fromTime, ?Access $accessName = null): array {
         $query = self::createAccessQuery($accessName);
@@ -276,7 +276,7 @@ class Credential extends CredentialSchema {
     /**
      * Returns the total amount of Credentials
      * @param CredentialQuery|null $query Optional.
-     * @return integer
+     * @return int
      */
     public static function getTotalForQuery(?CredentialQuery $query = null): int {
         return self::getEntityTotal($query);
@@ -286,8 +286,8 @@ class Credential extends CredentialSchema {
      * Returns the total amount of Credentials for the given Access(s)
      * @param Access[]|Access $accessName
      * @param string|null     $filter     Optional.
-     * @param string|integer  $value      Optional.
-     * @return integer
+     * @param string|int      $value      Optional.
+     * @return int
      */
     public static function getTotalForAccess(
         array|Access $accessName,
@@ -306,7 +306,7 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials for the given Query
      * @param CredentialQuery|null $query    Optional.
      * @param Request|null         $sort     Optional.
-     * @param boolean              $complete Optional.
+     * @param bool                 $complete Optional.
      * @return CredentialEntity[]
      */
     private static function getCredentials(
@@ -338,7 +338,7 @@ class Credential extends CredentialSchema {
     /**
      * Requests a single row from the database
      * @param CredentialQuery|null $query    Optional.
-     * @param boolean              $complete Optional.
+     * @param bool                 $complete Optional.
      * @return CredentialEntity
      */
     private static function getCredential(?CredentialQuery $query = null, bool $complete = false): CredentialEntity {
@@ -363,7 +363,7 @@ class Credential extends CredentialSchema {
      * Returns a select of Credentials for the given Access(s)
      * @param Access[]|Access      $accessName
      * @param string[]|string|null $filter     Optional.
-     * @param string|integer       $value      Optional.
+     * @param string|int           $value      Optional.
      * @return Select[]
      */
     public static function getSelectForAccess(
@@ -382,7 +382,7 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a select of Credentials with the given IDs
-     * @param integer[] $credentialIDs
+     * @param int[] $credentialIDs
      * @return Select[]
      */
     public static function getSelectForIDs(array $credentialIDs): array {
@@ -398,12 +398,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credentials that contains the text and the given Accesses
-     * @param string                 $text
-     * @param integer                $amount       Optional.
-     * @param Access[]|Access|null   $accessName   Optional.
-     * @param integer[]|integer|null $credentialID Optional.
-     * @param boolean                $withEmail    Optional.
-     * @param boolean                $splitValue   Optional.
+     * @param string               $text
+     * @param int                  $amount       Optional.
+     * @param Access[]|Access|null $accessName   Optional.
+     * @param int[]|int|null       $credentialID Optional.
+     * @param bool                 $withEmail    Optional.
+     * @param bool                 $splitValue   Optional.
      * @return Search[]
      */
     public static function search(
@@ -459,7 +459,7 @@ class Credential extends CredentialSchema {
      * Returns a list of emails of the Credentials with the given Accesses
      * @param Access[]|Access      $accessName
      * @param string[]|string|null $filter     Optional.
-     * @param string|integer       $value      Optional.
+     * @param string|int           $value      Optional.
      * @return array<string,string>
      */
     public static function getEmailsForAccess(
@@ -484,9 +484,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if the given password is correct for the given Credential ID
-     * @param CredentialEntity|integer $credential
-     * @param string                   $password
-     * @return boolean
+     * @param CredentialEntity|int $credential
+     * @param string               $password
+     * @return bool
      */
     public static function isPasswordCorrect(CredentialEntity|int $credential, string $password): bool {
         if (!($credential instanceof CredentialEntity)) {
@@ -505,9 +505,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if the given Credential requires a password change
-     * @param integer $credentialID Optional.
-     * @param string  $email        Optional.
-     * @return boolean
+     * @param int    $credentialID Optional.
+     * @param string $email        Optional.
+     * @return bool
      */
     public static function reqPassChange(int $credentialID = 0, string $email = ""): bool {
         if ($credentialID === 0 && $email === "") {
@@ -526,11 +526,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Creates a new Credential
-     * @param Request|null                 $request       Optional.
-     * @param array<string,string|integer> $fields        Optional.
-     * @param Access|null                  $accessName    Optional.
-     * @param boolean|null                 $reqPassChange Optional.
-     * @return integer
+     * @param Request|null             $request       Optional.
+     * @param array<string,string|int> $fields        Optional.
+     * @param Access|null              $accessName    Optional.
+     * @param bool|null                $reqPassChange Optional.
+     * @return int
      */
     public static function create(
         ?Request $request = null,
@@ -547,13 +547,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Edits the given Credential
-     * @param integer                      $credentialID
-     * @param Request|null                 $request       Optional.
-     * @param array<string,string|integer> $fields        Optional.
-     * @param Access|null                  $accessName    Optional.
-     * @param boolean|null                 $reqPassChange Optional.
-     * @param boolean                      $skipEmpty     Optional.
-     * @return boolean
+     * @param int                      $credentialID
+     * @param Request|null             $request       Optional.
+     * @param array<string,string|int> $fields        Optional.
+     * @param Access|null              $accessName    Optional.
+     * @param bool|null                $reqPassChange Optional.
+     * @param bool                     $skipEmpty     Optional.
+     * @return bool
      */
     public static function edit(
         int $credentialID,
@@ -569,9 +569,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Updates the given Credential
-     * @param integer             $credentialID
+     * @param int                 $credentialID
      * @param array<string,mixed> $fields
-     * @return boolean
+     * @return bool
      */
     public static function update(int $credentialID, array $fields): bool {
         return self::editSchemaEntity($credentialID, fields: $fields);
@@ -579,8 +579,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Deletes the given Credential
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function delete(int $credentialID): bool {
         return self::deleteEntity($credentialID);
@@ -588,8 +588,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Destroys the Credential
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function destroy(int $credentialID): bool {
         return self::editEntity(
@@ -621,11 +621,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Parses the data and returns the fields
-     * @param Request|null                 $request       Optional.
-     * @param array<string,string|integer> $fields        Optional.
-     * @param Access|null                  $accessName    Optional.
-     * @param boolean|null                 $reqPassChange Optional.
-     * @return array<string,string|integer>
+     * @param Request|null             $request       Optional.
+     * @param array<string,string|int> $fields        Optional.
+     * @param Access|null              $accessName    Optional.
+     * @param bool|null                $reqPassChange Optional.
+     * @return array<string,string|int>
      */
     private static function parseFields(
         ?Request $request = null,
@@ -671,9 +671,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the current User for the given Credential
-     * @param integer $credentialID
-     * @param integer $userID
-     * @return boolean
+     * @param int $credentialID
+     * @param int $userID
+     * @return bool
      */
     public static function setCurrentUser(int $credentialID, int $userID): bool {
         return self::editEntity($credentialID, currentUser: $userID);
@@ -681,9 +681,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Access
-     * @param integer $credentialID
-     * @param string  $access
-     * @return boolean
+     * @param int    $credentialID
+     * @param string $access
+     * @return bool
      */
     public static function setAccess(int $credentialID, string $access): bool {
         return self::editEntity($credentialID, access: $access);
@@ -691,9 +691,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Email
-     * @param integer $credentialID
-     * @param string  $email
-     * @return boolean
+     * @param int    $credentialID
+     * @param string $email
+     * @return bool
      */
     public static function setEmail(int $credentialID, string $email): bool {
         return self::editEntity($credentialID, email: $email);
@@ -701,9 +701,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Updates the Language for the given Credential
-     * @param integer $credentialID
-     * @param string  $language
-     * @return boolean
+     * @param int    $credentialID
+     * @param string $language
+     * @return bool
      */
     public static function setLanguage(int $credentialID, string $language): bool {
         $language = Strings::substringBefore($language, "-");
@@ -712,9 +712,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Updates the Timezone for the given Credential
-     * @param integer $credentialID
-     * @param integer $timezone
-     * @return boolean
+     * @param int $credentialID
+     * @param int $timezone
+     * @return bool
      */
     public static function setTimezone(int $credentialID, int $timezone): bool {
         return self::editEntity($credentialID, timezone: $timezone);
@@ -722,9 +722,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Avatar
-     * @param integer $credentialID
-     * @param string  $avatar
-     * @return boolean
+     * @param int    $credentialID
+     * @param string $avatar
+     * @return bool
      */
     public static function setAvatar(int $credentialID, string $avatar): bool {
         return self::editEntity($credentialID, avatar: $avatar);
@@ -732,9 +732,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Appearance
-     * @param integer $credentialID
-     * @param string  $appearance
-     * @return boolean
+     * @param int    $credentialID
+     * @param string $appearance
+     * @return bool
      */
     public static function setAppearance(int $credentialID, string $appearance): bool {
         return self::editEntity($credentialID, appearance: $appearance);
@@ -742,8 +742,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Password
-     * @param integer $credentialID
-     * @param string  $password
+     * @param int    $credentialID
+     * @param string $password
      * @return array{password:string,salt:string}
      */
     public static function setPassword(int $credentialID, string $password): array {
@@ -760,9 +760,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the require password change for the given Credential
-     * @param integer $credentialID
-     * @param boolean $reqPassChange
-     * @return boolean
+     * @param int  $credentialID
+     * @param bool $reqPassChange
+     * @return bool
      */
     public static function setReqPassChange(int $credentialID, bool $reqPassChange): bool {
         return self::editEntity($credentialID, reqPassChange: $reqPassChange);
@@ -770,8 +770,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets a temporary Password to the given Credential
-     * @param integer $credentialID
-     * @param integer $hours        Optional.
+     * @param int $credentialID
+     * @param int $hours        Optional.
      * @return string
      */
     public static function setTempPass(int $credentialID, int $hours = 48): string {
@@ -789,8 +789,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets an Access Token to the given Credential
-     * @param integer $credentialID
-     * @param integer $hours        Optional.
+     * @param int $credentialID
+     * @param int $hours        Optional.
      * @return string
      */
     public static function setAccessToken(int $credentialID, int $hours = 4): string {
@@ -814,8 +814,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Removes an Access Token of the given Credential
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function removeAccessToken(int $credentialID): bool {
         return self::editEntity(
@@ -827,8 +827,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Stops asking the Credential for Notifications
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function dontAskNotifications(int $credentialID): bool {
         return self::editEntity($credentialID, askNotifications: false);
@@ -836,8 +836,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Updates the login time for the given Credential
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function updateLoginTime(int $credentialID): bool {
         $currentLogin = self::getValue($credentialID, CredentialColumn::CurrentLogin);
@@ -850,9 +850,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Progress
-     * @param integer $credentialID
-     * @param integer $value
-     * @return boolean
+     * @param int $credentialID
+     * @param int $value
+     * @return bool
      */
     public static function setProgress(int $credentialID, int $value): bool {
         return self::editEntity($credentialID, progressValue: $value);
@@ -860,9 +860,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Status
-     * @param integer          $credentialID
+     * @param int              $credentialID
      * @param CredentialStatus $status
-     * @return boolean
+     * @return bool
      */
     public static function setStatus(int $credentialID, CredentialStatus $status): bool {
         return self::editEntity($credentialID, status: $status);
@@ -870,7 +870,7 @@ class Credential extends CredentialSchema {
 
     /**
      * Gets a Credential Value
-     * @param integer          $credentialID
+     * @param int              $credentialID
      * @param CredentialColumn $column
      * @return mixed
      */
@@ -882,10 +882,10 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets a Credential Value
-     * @param integer          $credentialID
+     * @param int              $credentialID
      * @param CredentialColumn $column
-     * @param string|integer   $value
-     * @return boolean
+     * @param string|int       $value
+     * @return bool
      */
     public static function setValue(int $credentialID, CredentialColumn $column, string|int $value): bool {
         return self::editEntityValue($credentialID, $column, $value);
@@ -907,9 +907,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a parsed Name for the given Credential
-     * @param mixed   $data
-     * @param boolean $withEmail Optional.
-     * @param string  $prefix    Optional.
+     * @param mixed  $data
+     * @param bool   $withEmail Optional.
+     * @param string $prefix    Optional.
      * @return string
      */
     public static function getName(mixed $data, bool $withEmail = false, string $prefix = ""): string {
@@ -933,9 +933,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a parsed Phone for the given Credential
-     * @param mixed   $data
-     * @param string  $prefix   Optional.
-     * @param boolean $withPlus Optional.
+     * @param mixed  $data
+     * @param string $prefix   Optional.
+     * @param bool   $withPlus Optional.
      * @return string
      */
     public static function getPhone(mixed $data, string $prefix = "", bool $withPlus = false): string {

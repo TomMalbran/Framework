@@ -25,7 +25,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
 
     /**
      * Returns all the Refresh Tokens for the given Credential
-     * @param integer $credentialID
+     * @param int $credentialID
      * @return CredentialRefreshTokenEntity[]
      */
     public static function getAllForCredential(int $credentialID): array {
@@ -39,8 +39,8 @@ class RefreshToken extends CredentialRefreshTokenSchema {
 
     /**
      * Creates a Refresh Token
-     * @param integer $credentialID
-     * @param integer $expiration
+     * @param int $credentialID
+     * @param int $expiration
      * @return string
      */
     public static function create(int $credentialID, int $expiration): string {
@@ -56,8 +56,8 @@ class RefreshToken extends CredentialRefreshTokenSchema {
 
     /**
      * Updates the expiration of a Refresh Token
-     * @param string  $refreshToken
-     * @param integer $expiration
+     * @param string $refreshToken
+     * @param int    $expiration
      * @return string
      */
     public static function update(string $refreshToken, int $expiration): string {
@@ -74,7 +74,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
     /**
      * Removes a Refresh Token
      * @param string $refreshToken
-     * @return boolean
+     * @return bool
      */
     public static function remove(string $refreshToken): bool {
         $query = new CredentialRefreshTokenQuery();
@@ -84,8 +84,8 @@ class RefreshToken extends CredentialRefreshTokenSchema {
 
     /**
      * Removes all the Refresh Tokens for the given Credential
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function removeAll(int $credentialID): bool {
         $query = new CredentialRefreshTokenQuery();
@@ -95,7 +95,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
 
     /**
      * Removes the old Refresh Tokens
-     * @return boolean
+     * @return bool
      */
     public static function removeOld(): bool {
         $query = new CredentialRefreshTokenQuery();

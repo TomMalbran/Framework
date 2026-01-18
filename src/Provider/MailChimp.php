@@ -44,7 +44,7 @@ class MailChimp {
     /**
      * Returns true if the response is successful
      * @param Dictionary $response
-     * @return boolean
+     * @return bool
      */
     private static function isSuccess(Dictionary $response): bool {
         $status = $response->getInt("status");
@@ -132,8 +132,8 @@ class MailChimp {
 
     /**
      * Returns all the subscribers
-     * @param integer $count  Optional.
-     * @param integer $offset Optional.
+     * @param int $count  Optional.
+     * @param int $offset Optional.
      * @return Dictionary
      */
     public static function getAllSubscribers(int $count = 100, int $offset = 0): Dictionary {
@@ -183,7 +183,7 @@ class MailChimp {
      * @param string $email
      * @param string $firstName
      * @param string $lastName
-     * @return boolean
+     * @return bool
      */
     public static function addSubscriber(string $email, string $firstName, string $lastName): bool {
         if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
@@ -204,7 +204,7 @@ class MailChimp {
     /**
      * Adds a Subscriber Batch
      * @param array<string,string>[] $subscribers
-     * @return boolean
+     * @return bool
      */
     public static function addSubscriberBatch(array $subscribers): bool {
         if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
@@ -231,7 +231,7 @@ class MailChimp {
      * @param string $firstName
      * @param string $lastName
      * @param string $status    Optional.
-     * @return boolean
+     * @return bool
      */
     public static function editSubscriber(string $email, string $firstName, string $lastName, string $status = "subscribed"): bool {
         if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
@@ -254,7 +254,7 @@ class MailChimp {
     /**
      * Deletes a Subscriber
      * @param string $email
-     * @return boolean
+     * @return bool
      */
     public static function deleteSubscriber(string $email): bool {
         if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
@@ -289,11 +289,11 @@ class MailChimp {
     /**
      * Sends a Campaign
      * @param string         $subject
-     * @param integer        $time
-     * @param integer        $templateID
+     * @param int            $time
+     * @param int            $templateID
      * @param array{}[]|null $sections   Optional.
      * @param string[]|null  $emails     Optional.
-     * @param integer        $folderID   Optional.
+     * @param int            $folderID   Optional.
      * @return string|null
      */
     public static function sendCampaign(string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): ?string {
@@ -330,12 +330,12 @@ class MailChimp {
      * Updates a Campaign
      * @param string         $mailChimpID
      * @param string         $subject
-     * @param integer        $time
-     * @param integer        $templateID
+     * @param int            $time
+     * @param int            $templateID
      * @param array{}[]|null $sections    Optional.
      * @param string[]|null  $emails      Optional.
-     * @param integer        $folderID    Optional.
-     * @return boolean
+     * @param int            $folderID    Optional.
+     * @return bool
      */
     public static function updateCampaign(string $mailChimpID, string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): bool {
         if (!Config::isMailchimpActive() || !Config::isMailchimpCreateActive()) {
@@ -370,7 +370,7 @@ class MailChimp {
      * Creates a Campaign
      * @param string        $subject
      * @param string[]|null $emails   Optional.
-     * @param integer       $folderID Optional.
+     * @param int           $folderID Optional.
      * @return string
      */
     private static function createCampaign(string $subject, ?array $emails = null, int $folderID = 0): string {
@@ -406,8 +406,8 @@ class MailChimp {
      * @param string        $mailChimpID
      * @param string        $subject
      * @param string[]|null $emails      Optional.
-     * @param integer       $folderID    Optional.
-     * @return boolean
+     * @param int           $folderID    Optional.
+     * @return bool
      */
     private static function editCampaign(string $mailChimpID, string $subject, ?array $emails = null, int $folderID = 0): bool {
         $recipients = self::parseRecipients($emails);
@@ -467,9 +467,9 @@ class MailChimp {
     /**
      * Puts the content into the given MailChimp campaign
      * @param string         $mailChimpID
-     * @param integer        $templateID
+     * @param int            $templateID
      * @param array{}[]|null $sections    Optional.
-     * @return boolean
+     * @return bool
      */
     private static function placeContent(string $mailChimpID, int $templateID, ?array $sections = null): bool {
         $post = [ "template" => [ "id" => $templateID ] ];
@@ -483,9 +483,9 @@ class MailChimp {
 
     /**
      * Schedules the given MailChimp campaign
-     * @param string  $mailChimpID
-     * @param integer $time
-     * @return boolean
+     * @param string $mailChimpID
+     * @param int    $time
+     * @return bool
      */
     private static function mailCampaign(string $mailChimpID, int $time): bool {
         if ($time === 0) {
@@ -506,7 +506,7 @@ class MailChimp {
     /**
      * Unschedules the given MailChimp campaign
      * @param string $mailChimpID
-     * @return boolean
+     * @return bool
      */
     public static function unscheduleCampaign(string $mailChimpID): bool {
         if (!Config::isMailchimpActive()) {
@@ -520,7 +520,7 @@ class MailChimp {
     /**
      * Deletes the given MailChimp campaign
      * @param string $mailChimpID
-     * @return boolean
+     * @return bool
      */
     public static function deleteCampaign(string $mailChimpID): bool {
         if (!Config::isMailchimpActive()) {
@@ -550,7 +550,7 @@ class MailChimp {
     /**
      * Returns the Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array<string,boolean|integer|float>
+     * @return array<string,bool|int|float>
      */
     public static function getReport(string $mailChimpID): array {
         $result = [

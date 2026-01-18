@@ -90,9 +90,9 @@ class CSV {
 
     /**
      * Reads a CSV file
-     * @param string  $path
-     * @param string  $separator  Optional.
-     * @param boolean $skipHeader Optional.
+     * @param string $path
+     * @param string $separator  Optional.
+     * @param bool   $skipHeader Optional.
      * @return mixed[]
      */
     public static function readFile(string $path, string $separator = ",", bool $skipHeader = false): array {
@@ -116,7 +116,7 @@ class CSV {
      * @param string   $path
      * @param string[] $contents
      * @param string   $separator Optional.
-     * @return boolean
+     * @return bool
      */
     public static function writeFile(string $path, array $contents, string $separator = ","): bool {
         if (!File::exists($path)) {

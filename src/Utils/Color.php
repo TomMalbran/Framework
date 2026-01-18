@@ -28,7 +28,7 @@ enum Color : string {
     /**
      * Returns true if the Color is valid
      * @param string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValid(string $value): bool {
         foreach (self::cases() as $case) {

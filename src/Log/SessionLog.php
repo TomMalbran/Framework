@@ -15,8 +15,8 @@ class SessionLog extends LogSessionSchema {
 
     /**
      * Returns the Session ID for the current Credential
-     * @param integer $credentialID
-     * @return integer
+     * @param int $credentialID
+     * @return int
      */
     public static function getID(int $credentialID): int {
         $query = new LogSessionQuery();
@@ -29,8 +29,8 @@ class SessionLog extends LogSessionSchema {
 
     /**
      * Starts a new Session Log
-     * @param integer $credentialID
-     * @return integer
+     * @param int $credentialID
+     * @return int
      */
     public static function start(int $credentialID): int {
         return self::createEntity(
@@ -44,8 +44,8 @@ class SessionLog extends LogSessionSchema {
 
     /**
      * Ends a Session Log
-     * @param integer $sessionID
-     * @return boolean
+     * @param int $sessionID
+     * @return bool
      */
     public static function end(int $sessionID): bool {
         return self::editEntity($sessionID, isOpen: false);
@@ -53,7 +53,7 @@ class SessionLog extends LogSessionSchema {
 
     /**
      * Deletes the items older than 90 days
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         $days  = Config::getActionLogDeleteDays();

@@ -27,10 +27,10 @@ class Exporter {
 
     /**
      * Creates a new Exporter instance
-     * @param integer $total
-     * @param string  $title
-     * @param string  $fileName
-     * @param string  $lang     Optional.
+     * @param int    $total
+     * @param string $title
+     * @param string $fileName
+     * @param string $lang     Optional.
      */
     public function __construct(int $total, string $title, string $fileName, string $lang = "root") {
         $this->fileName = NLS::getString($fileName, $lang) . "_" . date("Y-m-d");
@@ -60,9 +60,9 @@ class Exporter {
 
     /**
      * Adds a single Header
-     * @param string  $key
-     * @param string  $value
-     * @param boolean $condition Optional.
+     * @param string $key
+     * @param string $value
+     * @param bool   $condition Optional.
      * @return Exporter
      */
     public function addHeader(string $key, string $value, bool $condition = true): Exporter {
@@ -98,7 +98,7 @@ class Exporter {
     /**
      * Starts a Chunk to Export
      * @param Request $request
-     * @param integer $perPage Optional.
+     * @param int     $perPage Optional.
      * @return Exporter
      */
     public function startChunk(Request $request, int $perPage = 2000): Exporter {
@@ -112,7 +112,7 @@ class Exporter {
 
     /**
      * Returns true ig the report is complete
-     * @return boolean
+     * @return bool
      */
     public function isComplete(): bool {
         return $this->requests >= $this->total || $this->line >= $this->total;
@@ -120,7 +120,7 @@ class Exporter {
 
     /**
      * Writes a Line
-     * @param array<string,string|integer|float> $line
+     * @param array<string,string|int|float> $line
      * @return Exporter
      */
     public function writeLine(array $line): Exporter {

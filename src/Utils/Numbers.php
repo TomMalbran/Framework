@@ -12,8 +12,8 @@ class Numbers {
 
     /**
      * Returns the length og the given Number
-     * @param integer $number
-     * @return integer
+     * @param int $number
+     * @return int
      */
     public static function length(int $number): int {
         return strlen((string)$number);
@@ -21,10 +21,10 @@ class Numbers {
 
     /**
      * Returns true if the given value is a number and greater and/or equal to cero
-     * @param mixed        $number
-     * @param integer|null $min    Optional.
-     * @param integer|null $max    Optional.
-     * @return boolean
+     * @param mixed    $number
+     * @param int|null $min    Optional.
+     * @param int|null $max    Optional.
+     * @return bool
      */
     public static function isValid(mixed $number, ?int $min = 1, ?int $max = null): bool {
         if (!is_numeric($number)) {
@@ -41,10 +41,10 @@ class Numbers {
 
     /**
      * Returns < 0 if number is less than other; > 0 if number is greater than other, and 0 if they are equal
-     * @param integer|float $number
-     * @param integer|float $other
-     * @param boolean       $orderAsc Optional.
-     * @return integer|float
+     * @param int|float $number
+     * @param int|float $other
+     * @param bool      $orderAsc Optional.
+     * @return int|float
      */
     public static function compare(int|float $number, int|float $other, bool $orderAsc = true): int|float {
         return ($number - $other) * ($orderAsc ? 1 : -1);
@@ -52,9 +52,9 @@ class Numbers {
 
     /**
      * Rounds the given number to the given decimals
-     * @param integer|float $number
-     * @param integer       $decimals
-     * @return integer|float
+     * @param int|float $number
+     * @param int       $decimals
+     * @return int|float
      */
     public static function round(int|float $number, int $decimals): int|float {
         if (is_int($number)) {
@@ -66,9 +66,9 @@ class Numbers {
 
     /**
      * Rounds the given number to the nearest integer
-     * @param integer|float $number
-     * @param boolean       $useFloor Optional.
-     * @return integer
+     * @param int|float $number
+     * @param bool      $useFloor Optional.
+     * @return int
      */
     public static function roundInt(int|float $number, bool $useFloor = false): int {
         if (is_int($number)) {
@@ -82,8 +82,8 @@ class Numbers {
 
     /**
      * Returns a number with the given length
-     * @param integer $length Optional.
-     * @return integer
+     * @param int $length Optional.
+     * @return int
      */
     public static function random(int $length = 8): int {
         $min = (int)pow(10, $length - 1);
@@ -93,9 +93,9 @@ class Numbers {
 
     /**
      * Returns the given number as an integer using the given decimals
-     * @param mixed   $value
-     * @param integer $decimals Optional.
-     * @return integer
+     * @param mixed $value
+     * @param int   $decimals Optional.
+     * @return int
      */
     public static function toInt(mixed $value, int $decimals = 0): int {
         if (is_numeric($value)) {
@@ -107,8 +107,8 @@ class Numbers {
 
     /**
      * Returns the given number as a float using the given decimals
-     * @param mixed   $number
-     * @param integer $decimals Optional.
+     * @param mixed $number
+     * @param int   $decimals Optional.
      * @return float
      */
     public static function toFloat(mixed $number, int $decimals = 0): float {
@@ -128,7 +128,7 @@ class Numbers {
     /**
      * Returns the given number as an integer or a float
      * @param mixed $number
-     * @return integer|float
+     * @return int|float
      */
     public static function toIntOrFloat(mixed $number): int|float {
         if (is_int($number)) {
@@ -145,10 +145,10 @@ class Numbers {
 
     /**
      * Returns a number using the right format
-     * @param integer|float $number
-     * @param integer       $decimals
-     * @param integer       $maxForDecimals Optional.
-     * @param string        $default        Optional.
+     * @param int|float $number
+     * @param int       $decimals
+     * @param int       $maxForDecimals Optional.
+     * @param string    $default        Optional.
      * @return string
      */
     public static function formatInt(int|float $number, int $decimals = 0, int $maxForDecimals = 1000, string $default = ""): string {
@@ -158,10 +158,10 @@ class Numbers {
 
     /**
      * Returns a number using the right format
-     * @param integer|float $number
-     * @param integer       $decimals
-     * @param integer       $maxForDecimals Optional.
-     * @param string        $default        Optional.
+     * @param int|float $number
+     * @param int       $decimals
+     * @param int       $maxForDecimals Optional.
+     * @param string    $default        Optional.
      * @return string
      */
     public static function formatFloat(int|float $number, int $decimals, int $maxForDecimals = 1000, string $default = ""): string {
@@ -177,10 +177,10 @@ class Numbers {
 
     /**
      * Clamps the given number between the min and max
-     * @param integer $number
-     * @param integer $min
-     * @param integer $max
-     * @return integer
+     * @param int $number
+     * @param int $min
+     * @param int $max
+     * @return int
      */
     public static function clampInt(int $number, int $min, int $max): int {
         return max($min, min($max, $number));
@@ -199,12 +199,12 @@ class Numbers {
 
     /**
      * Maps the given number that is in the from range to the to range
-     * @param integer|float $number
-     * @param integer|float $fromLow
-     * @param integer|float $fromHigh
-     * @param integer|float $toLow
-     * @param integer|float $toHigh
-     * @return integer|float
+     * @param int|float $number
+     * @param int|float $fromLow
+     * @param int|float $fromHigh
+     * @param int|float $toLow
+     * @param int|float $toHigh
+     * @return int|float
      */
     public static function map(int|float $number, int|float $fromLow, int|float $fromHigh, int|float $toLow, int|float $toHigh): int|float {
         $fromRange = $fromHigh - $fromLow;
@@ -224,10 +224,10 @@ class Numbers {
 
     /**
      * Returns a percent from the given values
-     * @param integer|float $number
-     * @param integer|float $total
-     * @param integer       $decimals Optional.
-     * @return integer|float
+     * @param int|float $number
+     * @param int|float $total
+     * @param int       $decimals Optional.
+     * @return int|float
      */
     public static function percent(int|float $number, int|float $total, int $decimals = 0): int|float {
         return (int)$total === 0 ? 0 : self::round($number * 100 / $total, $decimals);
@@ -235,10 +235,10 @@ class Numbers {
 
     /**
      * Returns a division from the given values
-     * @param integer|float $numerator
-     * @param integer|float $divisor
-     * @param integer       $decimals  Optional.
-     * @return integer|float
+     * @param int|float $numerator
+     * @param int|float $divisor
+     * @param int       $decimals  Optional.
+     * @return int|float
      */
     public static function divide(int|float $numerator, int|float $divisor, int $decimals = 0): int|float {
         return (int)$divisor === 0 ? 0 : self::round($numerator / $divisor, $decimals);
@@ -246,10 +246,10 @@ class Numbers {
 
     /**
      * Returns a division from the given values as an integer
-     * @param integer $numerator
-     * @param integer $divisor
-     * @param boolean $useFloor  Optional.
-     * @return integer
+     * @param int  $numerator
+     * @param int  $divisor
+     * @param bool $useFloor  Optional.
+     * @return int
      */
     public static function divideInt(int $numerator, int $divisor, bool $useFloor = false): int {
         return $divisor === 0 ? 0 : self::roundInt($numerator / $divisor, $useFloor);
@@ -257,9 +257,9 @@ class Numbers {
 
     /**
      * Applies the Discount to the given Number
-     * @param integer|float $number
-     * @param integer|float $percent
-     * @return integer|float
+     * @param int|float $number
+     * @param int|float $percent
+     * @return int|float
      */
     public static function applyDiscount(int|float $number, int|float $percent): int|float {
         if ($percent === 0 || $percent === 0.0) {
@@ -271,9 +271,9 @@ class Numbers {
 
     /**
      * Applies the Increment to the given Number
-     * @param integer|float $number
-     * @param integer|float $percent
-     * @return integer|float
+     * @param int|float $number
+     * @param int|float $percent
+     * @return int|float
      */
     public static function applyIncrement(int|float $number, int|float $percent): int|float {
         if ($percent === 0 || $percent === 0.0) {
@@ -286,9 +286,9 @@ class Numbers {
 
     /**
      * Returns the Greatest Common Divisor
-     * @param integer|float $a
-     * @param integer|float $b
-     * @return integer|float
+     * @param int|float $a
+     * @param int|float $b
+     * @return int|float
      */
     public static function getCommonDivisor(int|float $a, int|float $b): int|float {
         while ($b !== 0) {
@@ -303,11 +303,11 @@ class Numbers {
 
     /**
      * Returns true if the given price is valid
-     * @param integer|float $number
-     * @param integer|null  $min      Optional.
-     * @param integer|null  $max      Optional.
-     * @param integer|null  $decimals Optional.
-     * @return boolean
+     * @param int|float $number
+     * @param int|null  $min      Optional.
+     * @param int|null  $max      Optional.
+     * @param int|null  $decimals Optional.
+     * @return bool
      */
     public static function isValidFloat(int|float $number, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
         $mult = 1;
@@ -329,10 +329,10 @@ class Numbers {
 
     /**
      * Returns true if the given price is valid
-     * @param integer|float $price
-     * @param integer|null  $min   Optional.
-     * @param integer|null  $max   Optional.
-     * @return boolean
+     * @param int|float $price
+     * @param int|null  $min   Optional.
+     * @param int|null  $max   Optional.
+     * @return bool
      */
     public static function isValidPrice(int|float $price, ?int $min = 1, ?int $max = null): bool {
         return self::isValidFloat($price, $min, $max, 2);
@@ -340,8 +340,8 @@ class Numbers {
 
     /**
      * Rounds the given price to 2 decimals
-     * @param integer|float $price
-     * @return integer|float
+     * @param int|float $price
+     * @return int|float
      */
     public static function roundCents(int|float $price): int|float {
         return self::round($price, 2);
@@ -350,7 +350,7 @@ class Numbers {
     /**
      * Returns the given price in Cents
      * @param mixed $price
-     * @return integer
+     * @return int
      */
     public static function toCents(mixed $price): int {
         return self::toInt($price, 2);
@@ -367,10 +367,10 @@ class Numbers {
 
     /**
      * Returns a price using the right format
-     * @param integer|float $price
-     * @param integer       $decimals       Optional.
-     * @param integer       $maxForDecimals Optional.
-     * @param string        $default        Optional.
+     * @param int|float $price
+     * @param int       $decimals       Optional.
+     * @param int       $maxForDecimals Optional.
+     * @param string    $default        Optional.
      * @return string
      */
     public static function formatPrice(int|float $price, int $decimals = 2, int $maxForDecimals = 1000, string $default = "0"): string {
@@ -379,8 +379,8 @@ class Numbers {
 
     /**
      * Returns a price using the right format
-     * @param integer $cents
-     * @param integer $decimals Optional.
+     * @param int $cents
+     * @param int $decimals Optional.
      * @return string
      */
     public static function formatCents(int $cents, int $decimals = 2): string {
@@ -390,7 +390,7 @@ class Numbers {
 
     /**
      * Returns a price string
-     * @param integer|float $price
+     * @param int|float $price
      * @return string
      */
     public static function toPriceString(int|float $price): string {
@@ -408,8 +408,8 @@ class Numbers {
 
     /**
      * Returns the memory in MB or GB with the units
-     * @param integer $bytes
-     * @param boolean $inGigas Optional.
+     * @param int  $bytes
+     * @param bool $inGigas Optional.
      * @return string
      */
     public static function toBytesString(int $bytes, bool $inGigas = false): string {
@@ -427,8 +427,8 @@ class Numbers {
 
     /**
      * Adds zeros to the start of the number
-     * @param integer|float $value
-     * @param integer       $amount
+     * @param int|float $value
+     * @param int       $amount
      * @return string
      */
     public static function zerosPad(int|float $value, int $amount): string {
@@ -466,7 +466,7 @@ class Numbers {
     /**
      * Calculates the Expression
      * @param string $expression
-     * @return integer|float
+     * @return int|float
      */
     public static function calcExpression(string $expression): int|float {
         $expression = Strings::toLowerCase(trim($expression));

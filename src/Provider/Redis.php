@@ -20,7 +20,7 @@ class Redis {
 
     /**
      * Creates the Redis Provider
-     * @return boolean
+     * @return bool
      */
     private static function load(): bool {
         if (self::$disabled) {
@@ -56,10 +56,10 @@ class Redis {
 
     /**
      * Sets a Key
-     * @param string  $module
-     * @param integer $id
-     * @param mixed   $data
-     * @return boolean
+     * @param string $module
+     * @param int    $id
+     * @param mixed  $data
+     * @return bool
      */
     public static function set(string $module, int $id, mixed $data): bool {
         if (!self::load()) {
@@ -78,8 +78,8 @@ class Redis {
 
     /**
      * Gets a Key
-     * @param string  $module
-     * @param integer $id
+     * @param string $module
+     * @param int    $id
      * @return Dictionary
      */
     public static function get(string $module, int $id): Dictionary {

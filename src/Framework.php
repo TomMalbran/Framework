@@ -26,7 +26,7 @@ class Framework {
 
     /**
      * Executes the Framework
-     * @return boolean
+     * @return bool
      */
     public static function execute(): bool {
         ErrorLog::init();
@@ -124,7 +124,7 @@ class Framework {
 
     /**
      * Outputs the given data as JSON
-     * @param array<string|integer,mixed> $data
+     * @param array<string|int,mixed> $data
      * @return void
      */
     public static function output(array $data): void {
@@ -167,7 +167,7 @@ class Framework {
     /**
      * Stores a Response
      * @param Response|null $response Optional.
-     * @return boolean
+     * @return bool
      */
     public static function setResponse(?Response $response = null): bool {
         self::$response = $response;

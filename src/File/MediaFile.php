@@ -19,8 +19,8 @@ class MediaFile {
 
     /**
      * Sets the Current ID
-     * @param integer $id
-     * @return boolean
+     * @param int $id
+     * @return bool
      */
     public static function setID(int $id): bool {
         self::$id = $id;
@@ -31,7 +31,7 @@ class MediaFile {
 
     /**
      * Returns the Source Path using the ID
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getPath(string|int ...$pathParts): string {
@@ -40,7 +40,7 @@ class MediaFile {
 
     /**
      * Returns the Thumbs Path using the ID
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     private static function getThumbPath(string|int ...$pathParts): string {
@@ -49,7 +49,7 @@ class MediaFile {
 
     /**
      * Returns the Source Url
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getUrl(string|int ...$pathParts): string {
@@ -58,7 +58,7 @@ class MediaFile {
 
     /**
      * Returns the Thumb Url
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function getThumbUrl(string|int ...$pathParts): string {
@@ -67,8 +67,8 @@ class MediaFile {
 
     /**
      * Returns true if given Source File exists
-     * @param string|integer ...$pathParts
-     * @return boolean
+     * @param string|int ...$pathParts
+     * @return bool
      */
     public static function exists(string|int ...$pathParts): bool {
         $path = self::getPath(...$pathParts);
@@ -117,8 +117,8 @@ class MediaFile {
 
     /**
      * Creates a Directory
-     * @param string|integer ...$pathParts
-     * @return boolean
+     * @param string|int ...$pathParts
+     * @return bool
      */
     public static function createDir(string|int ...$pathParts): bool {
         $source = self::getPath(...$pathParts);
@@ -128,9 +128,9 @@ class MediaFile {
 
     /**
      * Uploads a File
-     * @param Request        $request
-     * @param string|integer ...$pathParts
-     * @return boolean
+     * @param Request    $request
+     * @param string|int ...$pathParts
+     * @return bool
      */
     public static function uploadFile(Request $request, string|int ...$pathParts): bool {
         $fileName = $request->getFileName("file");
@@ -152,8 +152,8 @@ class MediaFile {
 
     /**
      * Deletes a Media Element
-     * @param string|integer ...$pathParts
-     * @return boolean
+     * @param string|int ...$pathParts
+     * @return bool
      */
     public static function deletePath(string|int ...$pathParts): bool {
         $relPath = File::parsePath(...$pathParts);
@@ -173,7 +173,7 @@ class MediaFile {
      * @param string $path
      * @param string $oldName
      * @param string $newName
-     * @return boolean
+     * @return bool
      */
     public static function renamePath(string $path, string $oldName, string $newName): bool {
         return self::updatePath($path, $path, $oldName, $newName);
@@ -184,7 +184,7 @@ class MediaFile {
      * @param string $oldPath
      * @param string $newPath
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public static function movePath(string $oldPath, string $newPath, string $name): bool {
         return self::updatePath($oldPath, $newPath, $name, $name);
@@ -196,7 +196,7 @@ class MediaFile {
      * @param string $newPath
      * @param string $oldName
      * @param string $newName
-     * @return boolean
+     * @return bool
      */
     private static function updatePath(string $oldPath, string $newPath, string $oldName, string $newName): bool {
         $oldRelPath = File::removeFirstSlash(File::parsePath($oldPath, $oldName));

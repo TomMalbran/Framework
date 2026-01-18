@@ -14,7 +14,7 @@ class JSON {
     /**
      * Returns true if the given value is a JSON object
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public static function isValid(mixed $value): bool {
         if (is_string($value) && !is_numeric($value)) {
@@ -26,8 +26,8 @@ class JSON {
 
     /**
      * Encodes an Object as a string if it is not already encoded
-     * @param mixed   $value
-     * @param boolean $asPretty Optional.
+     * @param mixed $value
+     * @param bool  $asPretty Optional.
      * @return string
      */
     public static function encode(mixed $value, bool $asPretty = false): string {
@@ -49,7 +49,7 @@ class JSON {
     /**
      * Decodes a String if it is not already decoded
      * @param mixed $value
-     * @return array<string|integer,mixed>
+     * @return array<string|int,mixed>
      */
     public static function decodeAsArray(mixed $value): array {
         if (!is_string($value) || !self::isValid($value)) {
@@ -70,8 +70,8 @@ class JSON {
 
     /**
      * Decodes a String as a list of Strings
-     * @param mixed   $value
-     * @param boolean $withoutEmpty Optional.
+     * @param mixed $value
+     * @param bool  $withoutEmpty Optional.
      * @return string[]
      */
     public static function decodeAsStrings(mixed $value, bool $withoutEmpty = false): array {
@@ -93,8 +93,8 @@ class JSON {
 
     /**
      * Reads a JSON file
-     * @param string|integer ...$pathParts
-     * @return array<string|integer,mixed>
+     * @param string|int ...$pathParts
+     * @return array<string|int,mixed>
      */
     public static function readFile(string|int ...$pathParts): array {
         $response = File::read(...$pathParts);
@@ -107,7 +107,7 @@ class JSON {
     /**
      * Reads a JSON url
      * @param string $url
-     * @return array<string|integer,mixed>
+     * @return array<string|int,mixed>
      */
     public static function readUrl(string $url): array {
         $response = File::readUrl($url);
@@ -119,9 +119,9 @@ class JSON {
 
     /**
      * Posts to a JSON url
-     * @param string                      $url
-     * @param array<string|integer,mixed> $data
-     * @return array<string|integer,mixed>
+     * @param string                  $url
+     * @param array<string|int,mixed> $data
+     * @return array<string|int,mixed>
      */
     public static function postUrl(string $url, array $data): array {
         $options = [
@@ -143,7 +143,7 @@ class JSON {
      * Writes a JSON File
      * @param string $path
      * @param mixed  $contents
-     * @return boolean
+     * @return bool
      */
     public static function writeFile(string $path, mixed $contents): bool {
         $value = Arrays::toArray($contents);

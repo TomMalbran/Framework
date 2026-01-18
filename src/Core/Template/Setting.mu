@@ -20,7 +20,7 @@ class Setting {
     /**
      * Saves all the Settings
      * @param array{} $data
-     * @return boolean
+     * @return bool
      */
     public static function saveAll(array $data): bool {
         return SettingData::saveAll($data);
@@ -41,7 +41,7 @@ class Setting {
     /**
      * Saves all the Settings for {{name}}
      * @param array{} $data
-     * @return boolean
+     * @return bool
      */
     public static function save{{name}}(array $data): bool {
         return SettingData::saveSection("{{section}}", $data);
@@ -80,7 +80,7 @@ class Setting {
     /**
      * Sets the value of "{{title}}"
      * @param {{{docType}}} $value
-     * @return boolean
+     * @return bool
      */
     public static function set{{prefix}}{{name}}({{type}} $value): bool {
         {{#isBoolean}}

@@ -23,7 +23,7 @@ class MediaType {
      * @param string $type
      * @param string $file
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public static function isValid(string $type, string $file, string $name): bool {
         if ($type === self::Any && !FileType::isHidden($name)) {

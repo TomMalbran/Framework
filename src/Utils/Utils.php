@@ -10,10 +10,10 @@ class Utils {
 
     /**
      * Returns true if the given Password is valid
-     * @param string  $password
-     * @param string  $checkSets Optional.
-     * @param integer $minLength Optional.
-     * @return boolean
+     * @param string $password
+     * @param string $checkSets Optional.
+     * @param int    $minLength Optional.
+     * @return bool
      */
     public static function isValidPassword(string $password, string $checkSets = "ad", int $minLength = 6): bool {
         if (Strings::length($password) < $minLength) {
@@ -37,7 +37,7 @@ class Utils {
     /**
      * Returns true if the given Color is valid
      * @param string $color
-     * @return boolean
+     * @return bool
      */
     public static function isValidColor(string $color): bool {
         return Strings::match($color, '/#([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?\b/');
@@ -48,7 +48,7 @@ class Utils {
     /**
      * Returns true if the given Full Name is valid
      * @param string $fullName
-     * @return boolean
+     * @return bool
      */
     public static function isValidFullName(string $fullName): bool {
         $nameParts = Strings::split(trim($fullName), " ");
@@ -57,8 +57,8 @@ class Utils {
 
     /**
      * Parses a Full Name into a First and Last Name
-     * @param string  $fullName
-     * @param boolean $lastNameFirst Optional.
+     * @param string $fullName
+     * @param bool   $lastNameFirst Optional.
      * @return array{string,string}
      */
     public static function parseName(string $fullName, bool $lastNameFirst = false): array {
@@ -83,7 +83,7 @@ class Utils {
     /**
      * Returns true if the given Username is valid
      * @param string $username
-     * @return boolean
+     * @return bool
      */
     public static function isValidUsername(string $username): bool {
         return Strings::match($username, '/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/i');
@@ -112,7 +112,7 @@ class Utils {
     /**
      * Returns true if the given Email is valid
      * @param string $email
-     * @return boolean
+     * @return bool
      */
     public static function isValidEmail(string $email): bool {
         $result = filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -153,7 +153,7 @@ class Utils {
     /**
      * Returns true if the given Phone is valid
      * @param string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValidPhone(string $value): bool {
         $phone = self::phoneToNumber($value);
@@ -199,7 +199,7 @@ class Utils {
     /**
      * Returns true if the given CUIT is valid
      * @param string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValidCUIT(string $value): bool {
         $cuit = self::cuitToNumber($value);
@@ -254,7 +254,7 @@ class Utils {
     /**
      * Returns true if the given DNI is valid
      * @param string $value
-     * @return boolean
+     * @return bool
      */
     public static function isValidDNI(string $value): bool {
         $dni    = self::dniToNumber($value);
@@ -279,7 +279,7 @@ class Utils {
     /**
      * Returns true if the given Domain is valid
      * @param string $domain
-     * @return boolean
+     * @return bool
      */
     public static function isValidDomain(string $domain): bool {
         return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
@@ -344,7 +344,7 @@ class Utils {
      * Returns true if the given domain or www.domain is delegated
      * @param string $domain
      * @param string $serverIP Optional.
-     * @return boolean
+     * @return bool
      */
     public static function isDelegated(string $domain, string $serverIP = ""): bool {
         if (self::verifyDelegation($domain, $serverIP)) {
@@ -357,7 +357,7 @@ class Utils {
      * Returns true if the given domain is delegated
      * @param string $domain
      * @param string $serverIP Optional.
-     * @return boolean
+     * @return bool
      */
     public static function verifyDelegation(string $domain, string $serverIP = ""): bool {
         $host = gethostbyname($domain);
@@ -372,7 +372,7 @@ class Utils {
     /**
      * Returns true if is a valid Url
      * @param string $url
-     * @return boolean
+     * @return bool
      */
     public static function isValidUrl(string $url): bool {
         return Strings::startsWith($url, "http://", "https://");

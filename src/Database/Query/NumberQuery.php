@@ -14,9 +14,9 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Compare Query
-     * @param QueryOperator     $operator
-     * @param integer[]|integer $value
-     * @param boolean|null      $condition Optional.
+     * @param QueryOperator $operator
+     * @param int[]|int     $value
+     * @param bool|null     $condition Optional.
      * @return Query
      */
     public function compare(QueryOperator $operator, array|int $value, ?bool $condition = null): Query {
@@ -30,9 +30,9 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Compare If Query
-     * @param QueryOperator     $operator
-     * @param integer[]|integer $value
-     * @param boolean|null      $condition Optional.
+     * @param QueryOperator $operator
+     * @param int[]|int     $value
+     * @param bool|null     $condition Optional.
      * @return Query
      */
     public function compareIf(QueryOperator $operator, array|int $value, ?bool $condition = null): Query {
@@ -48,7 +48,7 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates an Equal Query
-     * @param integer $value
+     * @param int $value
      * @return Query
      */
     public function equal(int $value): Query {
@@ -57,8 +57,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates an Equal If Query
-     * @param integer      $value
-     * @param boolean|null $condition Optional.
+     * @param int       $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function equalIf(int $value, ?bool $condition = null): Query {
@@ -67,7 +67,7 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Not Equal Query
-     * @param integer $value
+     * @param int $value
      * @return Query
      */
     public function notEqual(int $value): Query {
@@ -76,8 +76,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Not Equal If Query
-     * @param integer      $value
-     * @param boolean|null $condition Optional.
+     * @param int       $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function notEqualIf(int $value, ?bool $condition = null): Query {
@@ -88,8 +88,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Greater Than Query
-     * @param integer      $value
-     * @param boolean|null $condition Optional.
+     * @param int       $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function greaterThan(int $value, ?bool $condition = null): Query {
@@ -98,8 +98,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Greater or Equal Query
-     * @param integer      $value
-     * @param boolean|null $condition Optional.
+     * @param int       $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function greaterOrEqual(int $value, ?bool $condition = null): Query {
@@ -108,8 +108,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Less Than Query
-     * @param integer      $value
-     * @param boolean|null $condition Optional.
+     * @param int       $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function lessThan(int $value, ?bool $condition = null): Query {
@@ -118,8 +118,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Less or Equal Query
-     * @param integer      $value
-     * @param boolean|null $condition Optional.
+     * @param int       $value
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function lessOrEqual(int $value, ?bool $condition = null): Query {
@@ -130,8 +130,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates an In Query
-     * @param integer[]    $values
-     * @param boolean|null $condition Optional.
+     * @param int[]     $values
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function in(array $values, ?bool $condition = null): Query {
@@ -143,8 +143,8 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Not In Query
-     * @param integer[]    $values
-     * @param boolean|null $condition Optional.
+     * @param int[]     $values
+     * @param bool|null $condition Optional.
      * @return Query
      */
     public function notIn(array $values, ?bool $condition = null): Query {

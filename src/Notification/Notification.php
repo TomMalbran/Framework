@@ -17,11 +17,11 @@ class Notification {
 
     /**
      * Send to All
-     * @param string  $title
-     * @param string  $message
-     * @param string  $url
-     * @param string  $dataType
-     * @param integer $dataID
+     * @param string $title
+     * @param string $message
+     * @param string $url
+     * @param string $dataType
+     * @param int    $dataID
      * @return string|null
      */
     public static function sendToAll(string $title, string $message, string $url, string $dataType, int $dataID): ?string {
@@ -36,7 +36,7 @@ class Notification {
      * @param string   $message
      * @param string   $url
      * @param string   $dataType
-     * @param integer  $dataID
+     * @param int      $dataID
      * @param string[] $playerIDs
      * @return string|null
      */
@@ -65,7 +65,7 @@ class Notification {
      * @param string              $message
      * @param string              $url
      * @param string              $dataType
-     * @param integer             $dataID
+     * @param int                 $dataID
      * @param array<string,mixed> $params
      * @return string|null
      */

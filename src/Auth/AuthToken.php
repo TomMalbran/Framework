@@ -24,7 +24,7 @@ class AuthToken {
 
     /**
      * Returns the duration of the Access Token
-     * @return integer
+     * @return int
      */
     private static function getAccessTokenDuration(): int {
         return Config::getAuthHours() * 3600;
@@ -32,7 +32,7 @@ class AuthToken {
 
     /**
      * Returns the duration of the Refresh Token
-     * @return integer
+     * @return int
      */
     private static function getRefreshTokenDuration(): int {
         return Config::getAuthDays() * 24 * 3600;
@@ -55,7 +55,7 @@ class AuthToken {
      * Returns true if the Refresh Token or the Access Token is valid
      * @param string $accessToken
      * @param string $refreshToken
-     * @return boolean
+     * @return bool
      */
     public static function isValid(string $accessToken, string $refreshToken): bool {
         if ($refreshToken !== "") {
@@ -68,7 +68,7 @@ class AuthToken {
      * Returns the Credentials for the given Refresh Token or JWT
      * @param string $accessToken
      * @param string $refreshToken
-     * @return array{integer,integer}
+     * @return array{int,int}
      */
     public static function getCredentials(string $accessToken, string $refreshToken): array {
         $accessData = self::getAccessData($accessToken);
@@ -91,7 +91,7 @@ class AuthToken {
     /**
      * Returns true if the given Access Token is valid
      * @param string $accessToken
-     * @return boolean
+     * @return bool
      */
     public static function isValidAccessToken(string $accessToken): bool {
         $accessData = self::getAccessData($accessToken);
@@ -149,8 +149,8 @@ class AuthToken {
 
     /**
      * Returns all the Refresh Tokens for the given Credential
-     * @param integer $credentialID
-     * @return array<string,string|integer>[]
+     * @param int $credentialID
+     * @return array<string,string|int>[]
      */
     public static function getAllForCredential(int $credentialID): array {
         if ($credentialID === 0) {
@@ -174,7 +174,7 @@ class AuthToken {
 
     /**
      * Creates a Refresh Token
-     * @param integer $credentialID
+     * @param int $credentialID
      * @return string
      */
     public static function createRefreshToken(int $credentialID): string {
@@ -202,7 +202,7 @@ class AuthToken {
     /**
      * Deletes a Refresh Token
      * @param string $refreshToken
-     * @return boolean
+     * @return bool
      */
     public static function deleteRefreshToken(string $refreshToken): bool {
         if ($refreshToken !== "") {
@@ -213,8 +213,8 @@ class AuthToken {
 
     /**
      * Deletes all the Refresh Tokens for the given Credential
-     * @param integer $credentialID
-     * @return boolean
+     * @param int $credentialID
+     * @return bool
      */
     public static function deleteAllForCredential(int $credentialID): bool {
         if ($credentialID !== 0) {
@@ -225,7 +225,7 @@ class AuthToken {
 
     /**
      * Deletes the old Refresh Tokens
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         return RefreshToken::removeOld();

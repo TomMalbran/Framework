@@ -53,7 +53,7 @@ class QueryLog extends LogQuerySchema {
      * @param float   $time
      * @param string  $expression
      * @param mixed[] $params
-     * @return boolean
+     * @return bool
      */
     public static function createOrEdit(float $time, string $expression, array $params): bool {
         $elapsedTime = (int)floor($time);
@@ -94,8 +94,8 @@ class QueryLog extends LogQuerySchema {
 
     /**
      * Marks the given Query(s) as Resolved
-     * @param integer[]|integer $logID
-     * @return boolean
+     * @param int[]|int $logID
+     * @return bool
      */
     public static function markResolved(array|int $logID): bool {
         $query = new LogQueryQuery();
@@ -105,8 +105,8 @@ class QueryLog extends LogQuerySchema {
 
     /**
      * Deletes the given Query(s)
-     * @param integer[]|integer $logID
-     * @return boolean
+     * @param int[]|int $logID
+     * @return bool
      */
     public static function delete(array|int $logID): bool {
         $query = new LogQueryQuery();
@@ -116,7 +116,7 @@ class QueryLog extends LogQuerySchema {
 
     /**
      * Deletes the items older than some days
-     * @return boolean
+     * @return bool
      */
     public static function deleteOld(): bool {
         $days  = Config::getQueryLogDeleteDays();

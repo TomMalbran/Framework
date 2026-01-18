@@ -35,7 +35,7 @@ class Configs implements DiscoveryBuilder {
     /**
      * Sets the Config File Name
      * @param string $fileName
-     * @return boolean
+     * @return bool
      */
     public static function setFileName(string $fileName): bool {
         self::$fileName = $fileName;
@@ -44,7 +44,7 @@ class Configs implements DiscoveryBuilder {
 
     /**
      * Loads the Config Data
-     * @return boolean
+     * @return bool
      */
     public static function load(): bool {
         if (self::$loaded) {
@@ -204,7 +204,7 @@ class Configs implements DiscoveryBuilder {
     /**
      * Returns a Config Property as a Boolean
      * @param string $property
-     * @return boolean
+     * @return bool
      */
     public static function getBoolean(string $property): bool {
         $value = self::get($property);
@@ -213,9 +213,9 @@ class Configs implements DiscoveryBuilder {
 
     /**
      * Returns a Config Property as an Int
-     * @param string  $property
-     * @param integer $default  Optional.
-     * @return integer
+     * @param string $property
+     * @param int    $default  Optional.
+     * @return int
      */
     public static function getInt(string $property, int $default = 0): int {
         $value = self::get($property);
@@ -261,7 +261,7 @@ class Configs implements DiscoveryBuilder {
 
     /**
      * Generates the code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function generateCode(): int {
@@ -290,7 +290,7 @@ class Configs implements DiscoveryBuilder {
 
     /**
      * Destroys the Code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function destroyCode(): int {

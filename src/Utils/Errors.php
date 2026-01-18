@@ -13,10 +13,10 @@ use AllowDynamicProperties;
 #[AllowDynamicProperties]
 class Errors implements JsonSerializable {
 
-    /** @var array<string,string|integer|array<string|integer>> */
+    /** @var array<string,string|int|array<string|int>> */
     private array $errors = [];
 
-    /** @var array<string,integer> */
+    /** @var array<string,int> */
     private array $counts = [];
 
 
@@ -60,8 +60,8 @@ class Errors implements JsonSerializable {
 
     /**
      * Increases the Errors amount
-     * @param string  $section
-     * @param integer $amount
+     * @param string $section
+     * @param int    $amount
      * @return Errors
      */
     public function incCount(string $section, int $amount = 1): Errors {
@@ -96,9 +96,9 @@ class Errors implements JsonSerializable {
 
     /**
      * Adds a new error
-     * @param string              $error
-     * @param string              $message
-     * @param string|integer|null $value   Optional.
+     * @param string          $error
+     * @param string          $message
+     * @param string|int|null $value   Optional.
      * @return Errors
      */
     public function add(string $error, string $message, string|int|null $value = null): Errors {
@@ -115,9 +115,9 @@ class Errors implements JsonSerializable {
 
     /**
      * Adds a new error if the condition is true
-     * @param boolean $condition
-     * @param string  $error
-     * @param string  $message
+     * @param bool   $condition
+     * @param string $error
+     * @param string $message
      * @return Errors
      */
     public function addIf(bool $condition, string $error, string $message): Errors {
@@ -188,7 +188,7 @@ class Errors implements JsonSerializable {
     /**
      * Returns true if there are errors or if the given error exists
      * @param string[]|string|null $error Optional.
-     * @return boolean
+     * @return bool
      */
     public function has(array|string|null $error = null): bool {
         if ($error === null) {
@@ -212,7 +212,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns the errors as an Object
-     * @return array<string,string|integer|array<string|integer>>
+     * @return array<string,string|int|array<string|int>>
      */
     public function get(): array {
         return $this->errors + $this->counts;
@@ -228,7 +228,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns the amount of errors
-     * @return integer
+     * @return int
      */
     public function getTotal(): int {
         return count($this->errors);

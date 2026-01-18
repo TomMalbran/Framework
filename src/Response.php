@@ -22,7 +22,7 @@ class Response {
     /**
      * Creates a new Response instance
      * @param array<string,mixed> $data       Optional.
-     * @param boolean             $withTokens Optional.
+     * @param bool                $withTokens Optional.
      */
     public function __construct(array $data = [], bool $withTokens = true) {
         $this->data       = $data;
@@ -70,7 +70,7 @@ class Response {
 
     /**
      * Creates an Empty Response
-     * @param boolean $withTokens Optional.
+     * @param bool $withTokens Optional.
      * @return Response
      */
     public static function empty(bool $withTokens = true): Response {
@@ -79,7 +79,7 @@ class Response {
 
     /**
      * Creates an Exit Response
-     * @param integer $exitCode
+     * @param int $exitCode
      * @return Response
      */
     public static function exit(int $exitCode): Response {

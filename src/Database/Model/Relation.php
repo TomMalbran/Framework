@@ -51,9 +51,9 @@ class Relation {
      * @param string[] $withoutPrefix Optional.
      * @param string   $relationJoin  Optional.
      * @param string   $ownerJoin     Optional.
-     * @param boolean  $withPrefix    Optional.
+     * @param bool     $withPrefix    Optional.
      * @param string   $prefix        Optional.
-     * @param boolean  $withDeleted   Optional.
+     * @param bool     $withDeleted   Optional.
      */
     public function __construct(
         array  $fieldNames    = [],
@@ -171,7 +171,7 @@ class Relation {
      * BUILD STEP 1: When parsing the attributes of a Model, set the name of the Relation Model and prefix
      * @param string $relationModelName The Relation Model Name comes from the type of the attribute.
      * @param string $fieldName         The name of the attribute used as the prefix.
-     * @return boolean
+     * @return bool
      */
     public function setDataFromAttribute(string $relationModelName, string $fieldName): bool {
         $this->relationModelName = $relationModelName;
@@ -188,7 +188,7 @@ class Relation {
      * Skip this step is the relationJoin is empty
      * - relationAliasName is set if the Relation Join contains a dot with a different Model Name
      * - relationFieldName can be the RelationModel key or be in the Relation Join
-     * @return boolean
+     * @return bool
      */
     public function parseRelationJoin(): bool {
         if ($this->relationJoin === "") {
@@ -220,7 +220,7 @@ class Relation {
      * Skip this step is the ownerJoin is empty
      * - ownerModelName is extracted if there is an Owner Join with a dot
      * - ownerFieldName can be the RelationModel key or be in the Relation Join
-     * @return boolean
+     * @return bool
      */
     public function parseOwnerJoin(): bool {
         if ($this->ownerJoin === "") {
@@ -275,7 +275,7 @@ class Relation {
     /**
      * BUILD STEP 5: Using the Models from STEP 2, generate the fields of the Relation
      * - The fields come from the Relation Model using the fieldNames or getting all of them
-     * @return boolean
+     * @return bool
      */
     public function generateFields(): bool {
         // At this Build Step the Models must be set
@@ -369,7 +369,7 @@ class Relation {
 
     /**
      * BUILD STEP 7: Sets the relationFieldDbName and ownerFieldDbName using the modelIDs
-     * @param array<string,string> $dbNames A list with all the Database Field Names
+     * @param array<string,string> $dbNames A list with all the Database Field Names.
      * @return bool
      */
     public function setDbNames(array $dbNames): bool {
@@ -576,7 +576,7 @@ class Relation {
 
     /**
      * Returns the Name of the Relation
-     * @param string[] $otherRelationNames List of the names of the Relations in the Parent Model
+     * @param string[] $otherRelationNames List of the names of the Relations in the Parent Model.
      * @return string
      */
     public function getName(array $otherRelationNames): string {

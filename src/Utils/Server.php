@@ -14,7 +14,7 @@ class Server {
     /**
      * Returns true if the given key exists in the $_SERVER
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public static function has(string $key): bool {
         return isset($_SERVER[$key]);
@@ -36,7 +36,7 @@ class Server {
 
     /**
      * Returns true if the request method is POST
-     * @return boolean
+     * @return bool
      */
     public static function isPostRequest(): bool {
         $method = self::getString("REQUEST_METHOD");
@@ -74,7 +74,7 @@ class Server {
     /**
      * Returns true if running on Localhost
      * @param string[] $whitelist
-     * @return boolean
+     * @return bool
      */
     public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]): bool {
         return Arrays::contains($whitelist, self::getString("REMOTE_ADDR"));
@@ -83,7 +83,7 @@ class Server {
     /**
      * Returns true if the Host starts with the given prefix
      * @param string $prefix
-     * @return boolean
+     * @return bool
      */
     public static function hostStartsWith(string $prefix): bool {
         $host = self::getString("HTTP_HOST");
@@ -94,7 +94,7 @@ class Server {
 
     /**
      * Returns the Origin Url
-     * @param boolean $useForwarded
+     * @param bool $useForwarded
      * @return string
      */
     public static function getUrl(bool $useForwarded = false): string {
@@ -126,7 +126,7 @@ class Server {
 
     /**
      * Returns the Full Url
-     * @param boolean $useForwarded
+     * @param bool $useForwarded
      * @return string
      */
     public static function getFullUrl(bool $useForwarded = false): string {

@@ -24,7 +24,7 @@ class Select implements JsonSerializable {
 
     /**
      * Creates a new Select instance
-     * @param string|integer      $key
+     * @param string|int          $key
      * @param string              $value
      * @param array<string,mixed> $extras Optional.
      */
@@ -39,7 +39,7 @@ class Select implements JsonSerializable {
     /**
      * Returns true if the key exists
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function has(string $key): bool {
         return property_exists($this, $key) || array_key_exists($key, $this->extras);
@@ -48,7 +48,7 @@ class Select implements JsonSerializable {
     /**
      * Returns true if the key has a value
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function hasValue(string $key): bool {
         if (property_exists($this, $key)) {
@@ -78,7 +78,7 @@ class Select implements JsonSerializable {
     /**
      * Returns the value as an integer
      * @param string $key
-     * @return integer
+     * @return int
      */
     public function getInt(string $key): int {
         if (property_exists($this, $key)) {
@@ -141,8 +141,8 @@ class Select implements JsonSerializable {
      * @param string[]|string      $valName
      * @param string|null          $descName Optional.
      * @param string[]|string|null $extraKey Optional.
-     * @param boolean              $useEmpty Optional.
-     * @param boolean              $distinct Optional.
+     * @param bool                 $useEmpty Optional.
+     * @param bool                 $distinct Optional.
      * @return Select[]
      */
     public static function create(
@@ -200,7 +200,7 @@ class Select implements JsonSerializable {
 
     /**
      * Creates a select using the given array
-     * @param array<string|integer,string> $array
+     * @param array<string|int,string> $array
      * @return Select[]
      */
     public static function createFromMap(array $array): array {

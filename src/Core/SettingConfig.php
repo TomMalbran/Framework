@@ -27,7 +27,7 @@ class SettingConfig implements DiscoveryBuilder {
      * @param string       $section
      * @param VariableType $variableType
      * @param mixed        $value        Optional.
-     * @return boolean
+     * @return bool
      */
     public static function register(
         string $variable,
@@ -56,7 +56,7 @@ class SettingConfig implements DiscoveryBuilder {
 
     /**
      * Generates the code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function generateCode(): int {
@@ -75,7 +75,7 @@ class SettingConfig implements DiscoveryBuilder {
 
     /**
      * Destroys the Code
-     * @return integer
+     * @return int
      */
     #[\Override]
     public static function destroyCode(): int {
@@ -103,7 +103,7 @@ class SettingConfig implements DiscoveryBuilder {
 
     /**
      * Returns the Settings Variables for the generator
-     * @return array{array<string,mixed>[],boolean}
+     * @return array{array<string,mixed>[],bool}
      */
     private static function getVariables(): array {
         $result  = [];

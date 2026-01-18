@@ -8,19 +8,19 @@ use Iterator;
 
 /**
  * The Importer Reader
- * @extends Iterator<integer,string[]>
+ * @extends Iterator<int,string[]>
  */
 interface ImporterReader extends Iterator {
 
     /**
      * Returns true if the Reader is valid
-     * @return boolean
+     * @return bool
      */
     public function isValid(): bool;
 
     /**
      * Returns some data
-     * @param integer $amount Optional.
+     * @param int $amount Optional.
      * @return ImporterData
      */
     public function getData(int $amount = 3): ImporterData;

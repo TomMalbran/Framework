@@ -13,8 +13,8 @@ class File {
 
     /**
      * Returns the directory of the given path
-     * @param string  $path
-     * @param integer $levels Optional.
+     * @param string $path
+     * @param int    $levels Optional.
      * @return string
      */
     public static function getDirectory(string $path, int $levels = 1): string {
@@ -24,7 +24,7 @@ class File {
 
     /**
      * Returns the path used to store the files
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function parsePath(string|int ...$pathParts): string {
@@ -52,7 +52,7 @@ class File {
 
     /**
      * Returns the path used to store the files
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function parseUrl(string|int ...$pathParts): string {
@@ -112,8 +112,8 @@ class File {
 
     /**
      * Returns true if given file exists
-     * @param string|integer ...$pathParts
-     * @return boolean
+     * @param string|int ...$pathParts
+     * @return bool
      */
     public static function exists(string|int ...$pathParts): bool {
         $fullPath = self::parsePath(...$pathParts);
@@ -122,8 +122,8 @@ class File {
 
     /**
      * Returns the modified time of a file
-     * @param string|integer ...$pathParts
-     * @return integer
+     * @param string|int ...$pathParts
+     * @return int
      */
     public static function getModifiedTime(string|int ...$pathParts): int {
         $fullPath = self::parsePath(...$pathParts);
@@ -138,7 +138,7 @@ class File {
 
     /**
      * Reads the contents of a file
-     * @param string|integer ...$pathParts
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function read(string|int ...$pathParts): string {
@@ -170,7 +170,7 @@ class File {
      * @param string $path
      * @param string $fileName
      * @param string $tmpFile
-     * @return boolean
+     * @return bool
      */
     public static function upload(string $path, string $fileName, string $tmpFile): bool {
         $fullPath = self::parsePath($path, $fileName);
@@ -181,7 +181,7 @@ class File {
      * Uploads the given file to the given path
      * @param string $path
      * @param string $tmpFile
-     * @return boolean
+     * @return bool
      */
     public static function uploadPath(string $path, string $tmpFile): bool {
         if ($path !== "" && $tmpFile !== "") {
@@ -195,8 +195,8 @@ class File {
      * @param string          $path
      * @param string          $fileName
      * @param string[]|string $content
-     * @param boolean         $createDir Optional.
-     * @return boolean
+     * @param bool            $createDir Optional.
+     * @return bool
      */
     public static function create(string $path, string $fileName, array|string $content, bool $createDir = false): bool {
         $fullPath = self::parsePath($path, $fileName);
@@ -214,7 +214,7 @@ class File {
      * Writes the given content in the given file
      * @param string $path
      * @param mixed  $content
-     * @return boolean
+     * @return bool
      */
     public static function write(string $path, mixed $content): bool {
         $result = file_put_contents($path, $content);
@@ -225,7 +225,7 @@ class File {
      * Writes the content from the given Url in the given file
      * @param string $path
      * @param string $fileUrl
-     * @return boolean
+     * @return bool
      */
     public static function writeFromUrl(string $path, string $fileUrl): bool {
         $content = self::readUrl($fileUrl);
@@ -239,7 +239,7 @@ class File {
      * Moves a file from one path to another
      * @param string $fromPath
      * @param string $toPath
-     * @return boolean
+     * @return bool
      */
     public static function move(string $fromPath, string $toPath): bool {
         if ($fromPath === "" || $toPath === "") {
@@ -252,7 +252,7 @@ class File {
      * Copies a file from one path to another
      * @param string $fromPath
      * @param string $toPath
-     * @return boolean
+     * @return bool
      */
     public static function copy(string $fromPath, string $toPath): bool {
         if ($fromPath === "" || $toPath === "") {
@@ -265,7 +265,7 @@ class File {
      * Deletes the given file/directory
      * @param string $path
      * @param string $name Optional.
-     * @return boolean
+     * @return bool
      */
     public static function delete(string $path, string $name = ""): bool {
         $fullPath = self::parsePath($path, $name);
@@ -312,7 +312,7 @@ class File {
      * Returns true if the file has the given extension
      * @param string          $name
      * @param string[]|string $extensions
-     * @return boolean
+     * @return bool
      */
     public static function hasExtension(string $name, array|string $extensions): bool {
         $extension = self::getExtension($name);
@@ -380,9 +380,9 @@ class File {
 
     /**
      * Returns all the Files inside the given path
-     * @param string  $path
-     * @param boolean $recursive  Optional.
-     * @param boolean $skipVendor Optional.
+     * @param string $path
+     * @param bool   $recursive  Optional.
+     * @param bool   $skipVendor Optional.
      * @return string[]
      */
     public static function getFilesInDir(string $path, bool $recursive = false, bool $skipVendor = false): array {
@@ -428,7 +428,7 @@ class File {
     /**
      * Creates a directory at the given path if it doesn't exists
      * @param string $path
-     * @return boolean
+     * @return bool
      */
     public static function createDir(string $path): bool {
         if (!self::exists($path)) {
@@ -440,8 +440,8 @@ class File {
 
     /**
      * Ensures that all the directories are created
-     * @param string         $basePath
-     * @param string|integer ...$pathParts
+     * @param string     $basePath
+     * @param string|int ...$pathParts
      * @return string
      */
     public static function ensureDir(string $basePath, string|int ...$pathParts): string {
@@ -453,7 +453,7 @@ class File {
         if (self::getExtension($path) !== "") {
             $totalParts -= 1;
         }
-        for ($i = 0; $i < $totalParts; $i++) {
+        for ($i = 0; $i < $totalParts; $i += 1) {
             if (isset($pathParts[$i])) {
                 $partialPath[] = $pathParts[$i];
                 $fullPath      = self::parsePath($basePath, ...$partialPath);
@@ -465,9 +465,9 @@ class File {
 
     /**
      * Deletes a directory and it's content
-     * @param string  $path
-     * @param integer $deleted Optional.
-     * @return boolean
+     * @param string $path
+     * @param int    $deleted Optional.
+     * @return bool
      */
     public static function deleteDir(string $path, int &$deleted = 0): bool {
         if (is_dir($path)) {
@@ -487,9 +487,9 @@ class File {
 
     /**
      * Deletes all the content from a directory
-     * @param string  $path
-     * @param integer $deleted Optional.
-     * @return boolean
+     * @param string $path
+     * @param int    $deleted Optional.
+     * @return bool
      */
     public static function emptyDir(string $path, int &$deleted = 0): bool {
         $files  = self::scanPath($path);
@@ -531,7 +531,7 @@ class File {
      * @param ZipArchive $zip
      * @param string     $src
      * @param string     $dst
-     * @return boolean
+     * @return bool
      */
     private static function addDirToZip(ZipArchive $zip, string $src, string $dst): bool {
         if (!file_exists($src)) {
@@ -560,7 +560,7 @@ class File {
      * Extracts the given zip to the given path
      * @param string $zipPath
      * @param string $extractPath
-     * @return boolean
+     * @return bool
      */
     public static function extractZip(string $zipPath, string $extractPath): bool {
         $zip = new ZipArchive();

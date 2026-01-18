@@ -13,7 +13,7 @@ class Router {
     /**
      * Returns true if the give Route exists
      * @param string $route
-     * @return boolean
+     * @return bool
      */
     public static function has(string $route): bool {
         return self::getAccessName($route) !== Access::None;

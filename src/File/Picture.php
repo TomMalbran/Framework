@@ -35,10 +35,10 @@ class Picture {
 
     /**
      * Creates a Color for the given Image
-     * @param integer $red
-     * @param integer $green
-     * @param integer $blue
-     * @return integer
+     * @param int $red
+     * @param int $green
+     * @param int $blue
+     * @return int
      */
     public function createColor(int $red, int $green, int $blue): int {
         if ($this->image === null) {
@@ -54,14 +54,14 @@ class Picture {
 
     /**
      * Writes Text to an Image
-     * @param string  $text
-     * @param integer $x
-     * @param integer $y
-     * @param integer $color
-     * @param string  $fontFile
-     * @param integer $fontSize
-     * @param boolean $centered Optional.
-     * @return boolean
+     * @param string $text
+     * @param int    $x
+     * @param int    $y
+     * @param int    $color
+     * @param string $fontFile
+     * @param int    $fontSize
+     * @param bool   $centered Optional.
+     * @return bool
      */
     public function writeText(string $text, int $x, int $y, int $color, string $fontFile, int $fontSize, bool $centered = false): bool {
         if ($this->image === null) {
@@ -79,9 +79,9 @@ class Picture {
 
     /**
      * Prints the Picture
-     * @param boolean $download Optional.
-     * @param string  $name     Optional.
-     * @return boolean
+     * @param bool   $download Optional.
+     * @param string $name     Optional.
+     * @return bool
      */
     public function print(bool $download = false, string $name = "image"): bool {
         if ($this->image === null) {

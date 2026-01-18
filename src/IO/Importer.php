@@ -12,13 +12,13 @@ use Iterator;
 
 /**
  * The Importer Wrapper
- * @implements Iterator<integer,ImporterRow>
+ * @implements Iterator<int,ImporterRow>
  */
 class Importer implements Iterator {
 
     private ImporterReader $reader;
 
-    /** @var array<string,integer> */
+    /** @var array<string,int> */
     private array $columns = [];
 
 
@@ -37,7 +37,7 @@ class Importer implements Iterator {
 
     /**
      * Returns true if the Importer is valid
-     * @return boolean
+     * @return bool
      */
     public function isValid(): bool {
         return $this->reader->isValid();
@@ -45,7 +45,7 @@ class Importer implements Iterator {
 
     /**
      * Returns some data
-     * @param integer $amount Optional.
+     * @param int $amount Optional.
      * @return ImporterData
      */
     public function getData(int $amount = 3): ImporterData {
@@ -62,7 +62,7 @@ class Importer implements Iterator {
 
     /**
      * Sets the Columns
-     * @param array<string,integer> $columns
+     * @param array<string,int> $columns
      * @return Importer
      */
     public function setColumns(array $columns): Importer {
@@ -107,7 +107,7 @@ class Importer implements Iterator {
 
     /**
      * Returns the current Key
-     * @return integer
+     * @return int
      */
     #[\Override]
     public function key(): int {
@@ -125,7 +125,7 @@ class Importer implements Iterator {
 
     /**
      * Returns true if the current Row is valid
-     * @return boolean
+     * @return bool
      */
     #[\Override]
     public function valid(): bool {

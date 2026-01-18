@@ -52,7 +52,7 @@ class FileType {
     /**
      * Returns true if the given file is a Directory
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isDir(string $file): bool {
         return is_dir($file);
@@ -61,7 +61,7 @@ class FileType {
     /**
      * Returns true if the given file is a Hidden
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isHidden(string $file): bool {
         return Strings::startsWith($file, ".");
@@ -70,7 +70,7 @@ class FileType {
     /**
      * Returns true if the given file is an Image
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isImage(string $file): bool {
         return File::hasExtension($file, self::$imageExts);
@@ -79,7 +79,7 @@ class FileType {
     /**
      * Returns true if the given file is a PNG
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isPNG(string $file): bool {
         return File::hasExtension($file, self::$pngExts);
@@ -88,7 +88,7 @@ class FileType {
     /**
      * Returns true if the given file is a ICO
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isICO(string $file): bool {
         return File::hasExtension($file, self::$icoExts);
@@ -97,7 +97,7 @@ class FileType {
     /**
      * Returns true if the given file is a Video
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isVideo(string $file): bool {
         return File::hasExtension($file, self::$videoExts);
@@ -106,7 +106,7 @@ class FileType {
     /**
      * Returns true if the given file is an Audio
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isAudio(string $file): bool {
         return File::hasExtension($file, self::$audioExts);
@@ -115,7 +115,7 @@ class FileType {
     /**
      * Returns true if the given file is a Code
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isCode(string $file): bool {
         return File::hasExtension($file, self::$codeExts);
@@ -124,7 +124,7 @@ class FileType {
     /**
      * Returns true if the given file is a Code
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isText(string $file): bool {
         return File::hasExtension($file, self::$textExts);
@@ -133,7 +133,7 @@ class FileType {
     /**
      * Returns true if the given file is a Document
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isDocument(string $file): bool {
         return File::hasExtension($file, self::$documentExts);
@@ -142,7 +142,7 @@ class FileType {
     /**
      * Returns true if the given file is a Spreadsheet
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isSpreadsheet(string $file): bool {
         return File::hasExtension($file, self::$spreadsheetExts);
@@ -151,7 +151,7 @@ class FileType {
     /**
      * Returns true if the given file is a Presentation
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isPresentation(string $file): bool {
         return File::hasExtension($file, self::$presentationExts);
@@ -160,7 +160,7 @@ class FileType {
     /**
      * Returns true if the given file is a PDF
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isPDF(string $file): bool {
         return File::hasExtension($file, self::$pdfExts);
@@ -169,7 +169,7 @@ class FileType {
     /**
      * Returns true if the given file is a Zip
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isZip(string $file): bool {
         return File::hasExtension($file, self::$zipExts);
@@ -178,7 +178,7 @@ class FileType {
     /**
      * Returns true if the given file is just a File
      * @param string $file
-     * @return boolean
+     * @return bool
      */
     public static function isFile(string $file): bool {
         return (

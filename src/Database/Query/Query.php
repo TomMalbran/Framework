@@ -57,10 +57,10 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string                      $column        Optional.
-     * @param QueryOperator|string        $operator      Optional.
-     * @param mixed[]|integer|string|null $value         Optional.
-     * @param boolean                     $caseSensitive Optional.
+     * @param string                  $column        Optional.
+     * @param QueryOperator|string    $operator      Optional.
+     * @param mixed[]|int|string|null $value         Optional.
+     * @param bool                    $caseSensitive Optional.
      * @return Query
      */
     public static function create(
@@ -92,11 +92,11 @@ class Query {
 
     /**
      * Adds an expression as an and
-     * @param string                 $column
-     * @param QueryOperator|string   $operator
-     * @param mixed[]|string|integer $value
-     * @param boolean                $caseSensitive Optional.
-     * @param boolean|null           $condition     Optional.
+     * @param string               $column
+     * @param QueryOperator|string $operator
+     * @param mixed[]|string|int   $value
+     * @param bool                 $caseSensitive Optional.
+     * @param bool|null            $condition     Optional.
      * @return Query
      */
     public function add(
@@ -215,11 +215,11 @@ class Query {
 
     /**
      * Adds an expression as an and if the value is not empty
-     * @param string                      $column
-     * @param QueryOperator|string        $operator
-     * @param mixed[]|integer|string|null $value
-     * @param boolean|null                $condition     Optional.
-     * @param boolean                     $caseSensitive Optional.
+     * @param string                  $column
+     * @param QueryOperator|string    $operator
+     * @param mixed[]|int|string|null $value
+     * @param bool|null               $condition     Optional.
+     * @param bool                    $caseSensitive Optional.
      * @return Query
      */
     public function addIf(
@@ -254,11 +254,11 @@ class Query {
      * Adds a Search expression
      * @param string[]|string      $column
      * @param mixed                $value
-     * @param QueryOperator|string $operator       Optional.
-     * @param boolean              $caseInsensitive Optional.
-     * @param boolean              $splitValue      Optional.
+     * @param QueryOperator|string $operator        Optional.
+     * @param bool                 $caseInsensitive Optional.
+     * @param bool                 $splitValue      Optional.
      * @param string               $splitText       Optional.
-     * @param boolean              $matchAny        Optional.
+     * @param bool                 $matchAny        Optional.
      * @return Query
      */
     public function search(
@@ -328,7 +328,7 @@ class Query {
 
     /**
      * Adds a param to the Query
-     * @param string|integer $param
+     * @param string|int $param
      * @return Query
      */
     public function addParam(string|int $param): Query {
@@ -457,8 +457,8 @@ class Query {
 
     /**
      * Adds an Order By
-     * @param string  $column
-     * @param boolean $isASC  Optional.
+     * @param string $column
+     * @param bool   $isASC  Optional.
      * @return Query
      */
     public function orderBy(string $column, bool $isASC = true): Query {
@@ -470,8 +470,8 @@ class Query {
 
     /**
      * Adds an Limit
-     * @param integer      $from
-     * @param integer|null $to   Optional.
+     * @param int      $from
+     * @param int|null $to   Optional.
      * @return Query
      */
     public function limit(int $from, ?int $to = null): Query {
@@ -487,8 +487,8 @@ class Query {
 
     /**
      * Adds a limit using pagination
-     * @param integer $page   Optional.
-     * @param integer $amount Optional.
+     * @param int $page   Optional.
+     * @param int $amount Optional.
      * @return Query
      */
     public function paginate(int $page = 0, int $amount = 100): Query {
@@ -501,7 +501,7 @@ class Query {
 
     /**
      * Returns true if the Query is empty
-     * @return boolean
+     * @return bool
      */
     public function isEmpty(): bool {
         return $this->where === "";
@@ -509,7 +509,7 @@ class Query {
 
     /**
      * Returns true if the Query is not empty
-     * @return boolean
+     * @return bool
      */
     public function isNotEmpty(): bool {
         return $this->where !== "";
@@ -518,7 +518,7 @@ class Query {
     /**
      * Returns true if the given Column is in the Query
      * @param string $column
-     * @return boolean
+     * @return bool
      */
     public function hasColumn(string $column): bool {
         return Arrays::contains($this->columns, $column);
@@ -527,7 +527,7 @@ class Query {
     /**
      * Returns true if there is an Order By
      * @param string|null $order Optional.
-     * @return boolean
+     * @return bool
      */
     public function hasOrder(?string $order = null): bool {
         if ($order !== null && $order !== "") {
@@ -539,7 +539,7 @@ class Query {
     /**
      * Returns true if there is an Group By
      * @param string|null $group Optional.
-     * @return boolean
+     * @return bool
      */
     public function hasGroup(?string $group = null): bool {
         if ($group !== null && $group !== "") {
@@ -552,7 +552,7 @@ class Query {
 
     /**
      * Returns the complete Query to use with the Database
-     * @param boolean $addWhere Optional.
+     * @param bool $addWhere Optional.
      * @return string
      */
     public function get(bool $addWhere = true): string {

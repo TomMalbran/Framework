@@ -78,7 +78,7 @@ class EntityCode {
      * @param array{name:string,type:string,subType:string,default:string}[] $result
      * @param string                                                         $fieldKey
      * @param FieldType                                                      $fieldType
-     * @return boolean
+     * @return bool
      */
     private static function addAttribute(array &$result, string $fieldKey, FieldType $fieldType): bool {
         switch ($fieldType) {
