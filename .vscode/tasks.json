@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PHPCS",
+            "type": "shell",
+            "command": "${workspaceFolder}/vendor/bin/phpcs",
+            "args": [
+                "--report=csv",
+                "--cache",
+                "-q",
+                "."
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": {
+                "owner": "php",
+                "fileLocation": [ "absolute" ],
+                "pattern": {
+                    "regexp": "^\"(.+)\",(\\d+),(\\d+),(error|warning),\"(.*)\",(.*),\\d+,\\d+$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 6,
+                    "code": 5
+                }
+            },
+            "presentation": {
+                "reveal": "never"
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}

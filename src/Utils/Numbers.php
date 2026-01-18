@@ -510,7 +510,7 @@ class Numbers {
 
         // Calculate
         try {
-            $result = @eval("return $expression;");
+            $result = @eval("return $expression;"); // phpcs:ignore
             return self::toIntOrFloat($result);
         } catch (Throwable $e) {
             return 0;

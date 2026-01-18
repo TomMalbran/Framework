@@ -19,13 +19,20 @@
         "phpmailer/phpmailer": "^6.9",
         "openspout/openspout": "^4.26",
         "phpstan/phpstan": "^2.1",
-        "phpstan/phpstan-strict-rules": "^2.0"
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "squizlabs/php_codesniffer": "^4.0",
+        "slevomat/coding-standard": "~8.0"
     },
     "suggest": {
         "mustache/mustache": "Used for Rendering templates",
         "firebase/php-jwt": "Used in Auth",
         "phpmailer/phpmailer": "Used for Mailing with SMTP",
         "openspout/openspout": "Used to Import/Export XLSX data"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     },
     "bin": [
         "framework"

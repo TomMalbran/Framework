@@ -1,37 +1,173 @@
 <?xml version="1.0"?>
 <ruleset name="My Standards">
-    <description>My Coding Standards</description>
+    <config name="installed_paths" value="vendor/slevomat/coding-standard"/>
 
-    <!-- Remove these Rules -->
-    <rule ref="Generic.Functions.OpeningFunctionBraceBsdAllman">
+    <!-- File configuration -->
+    <ini name="memory_limit" value="128M"/>
+    <arg name="extensions" value="php"/>
+
+    <exclude-pattern>*/cache/*</exclude-pattern>
+    <exclude-pattern>*/autoload.php</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+
+    <!-- Use PSR12 as the base config -->
+    <rule ref="PSR12">
+        <!-- Constants should be camel case. -->
+        <exclude name="Generic.NamingConventions.UpperCaseConstantName"/>
+        <!-- Exclude to behave correctly on switches -->
+        <exclude name="Generic.WhiteSpace.ScopeIndent"/>
+    </rule>
+
+    <!-- Lines can be 120 chars long, but never show errors -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="200"/>
+            <property name="absoluteLineLimit" value="300"/>
+        </properties>
+    </rule>
+
+    <!-- Short form of type keywords MUST be used i.e. bool instead of boolean, int instead of integer etc. -->
+    <rule ref="PSR12.Keywords.ShortFormTypeKeywords"/>
+
+    <!-- Validate DOC Comments -->
+    <rule ref="Squiz.Commenting.FunctionComment">
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.Commenting.ClassComment.TagNotAllowed"/>
+        <!-- Exclude sub-rules that strictly demand long names like 'integer' or 'boolean' -->
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectParamVarName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint"/>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionCommentThrowTag"/>
+    <rule ref="Squiz.Commenting.ClassComment"/>
+
+    <!-- There can be more than one space after property type declaration to align the properties -->
+    <rule ref="PSR2.Classes.PropertyDeclaration.SpacingAfterType">
         <severity>0</severity>
     </rule>
-    <rule ref="PSR2.Classes.ClassDeclaration.OpenBraceNewLine">
-        <severity>0</severity>
-    </rule>
+
+    <!-- Function opening brace MUST be on the same line as the function declaration -->
     <rule ref="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine">
         <severity>0</severity>
     </rule>
+
+    <!-- Separate header blocks with a single blank line. -->
+    <rule ref="PSR12.Files.FileHeader">
+        <exclude name="PSR12.Files.FileHeader.SpacingAfterTagBlock"/>
+        <exclude name="PSR12.Files.FileHeader.SpacingInsideUseBlock"/>
+    </rule>
+    <rule ref="PSR12.Files.FileHeader.SpacingAfterNamespaceBlock" />
+
+    <!-- Opening brace of a class MUST be on same line as the definition -->
+    <rule ref="PSR2.Classes.ClassDeclaration.OpenBraceNewLine">
+        <severity>0</severity>
+    </rule>
+
+    <!-- There can be a space at the start of a class body -->
+    <rule ref="PSR12.Classes.OpeningBraceSpace">
+        <severity>0</severity>
+    </rule>
+
+    <!-- The first expression of a multi-line control structure must be on the line of the opening parenthesis -->
+    <rule ref="PSR2.ControlStructures.ControlStructureSpacing"/>
+    <rule ref="PSR12.ControlStructures.ControlStructureSpacing.FirstExpressionLine">
+        <severity>0</severity>
+    </rule>
+
+    <!-- A file SHOULD declare new symbols (classes, functions, constants, etc.) and cause no other side effects, or it SHOULD execute logic with side effects, but SHOULD NOT do both. -->
+    <rule ref="PSR1.Files.SideEffects"/>
+
+    <!-- There must be one blank line after the namespace declaration. -->
+    <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
+
+    <!-- Each use declaration must contain only one namespace and must come after the first namespace declaration.  There should be one blank line after the final use statement. -->
+    <rule ref="PSR2.Namespaces.UseDeclaration"/>
+
+
+    <!-- Duplicate class name check -->
+    <rule ref="Generic.Classes.DuplicateClassName"/>
+
+    <!-- Disallow allow empty statements -->
+    <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+
+    <!-- For loops that have only a second expression (the condition) should be converted to while loops. -->
+    <rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
+
+    <!-- For loops should not call functions inside the test for the loop when they can be computed beforehand. -->
+    <rule ref="Generic.CodeAnalysis.ForLoopWithTestFunctionCall"/>
+
+    <!-- Incrementers in nested loops should use different variable names. -->
+    <rule ref="Generic.CodeAnalysis.JumbledIncrementer"/>
+
+    <!-- If statements that are always evaluated should not be used. -->
+    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+
+    <!-- Methods should not be declared final inside of classes that are declared final. -->
+    <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
+
+    <!-- It is discouraged to override a method if the overriding method only calls the parent method. -->
+    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+
+    <!-- TODO Statements should be taken care of. -->
+    <rule ref="Generic.Commenting.Todo"/>
+
+    <!-- FIXME Statements should be taken care of. -->
+    <rule ref="Generic.Commenting.Fixme"/>
+
+    <!-- There should be no space after a cast. -->
+    <rule ref="Generic.Formatting.SpaceAfterCast">
+        <properties>
+            <property name="spacing" value="0"/>
+        </properties>
+    </rule>
+
+    <!-- Constructors should be named __construct, not after the class. -->
+    <rule ref="Generic.NamingConventions.ConstructorName"/>
+
+    <!-- Deprecated functions should not be used. -->
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+
+    <!-- The forbidden functions sizeof() and delete() should not be used. -->
+    <rule ref="Generic.PHP.ForbiddenFunctions"/>
+
+    <!-- Suppressing Errors is not allowed. -->
+    <rule ref="Generic.PHP.NoSilencedErrors"/>
+
+    <!-- Short array syntax must be used to define arrays. -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+
+
+    <!-- Functions should not have a nesting level greater than 10, and should try to stay below 5. -->
+    <rule ref="Generic.Metrics.NestingLevel">
+        <properties>
+            <property name="nestingLevel" value="5"/>
+            <property name="absoluteNestingLevel" value="10"/>
+        </properties>
+    </rule>
+
+    <!-- Functions should not have a cyclomatic complexity greater than 20, and should try to stay below a complexity of 10. -->
+    <rule ref="Generic.Metrics.CyclomaticComplexity">
+        <properties>
+            <property name="complexity" value="100"/>
+            <property name="absoluteComplexity" value="100"/>
+        </properties>
+    </rule>
+
+
+    <!-- Switch case must have no extra indentation -->
     <rule ref="PSR2.ControlStructures.SwitchDeclaration">
         <properties>
             <property name="indent" value="0"/>
         </properties>
     </rule>
+
+    <!-- Switch break must be indented 4 spaces -->
     <rule ref="PSR2.ControlStructures.SwitchDeclaration.BreakIndent">
         <severity>0</severity>
     </rule>
 
-    <!-- Comments -->
-    <rule ref="Squiz.Commenting.FunctionComment">
-        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
-    </rule>
-    <rule ref="Squiz.Commenting.FunctionCommentThrowTag"/>
-    <rule ref="Squiz.Commenting.ClassComment"/>
-
-    <!-- Types -->
-    <rule ref="/Users/tomas/.composer/vendor/gskema/phpcs-type-sniff/src/Sniffs/CompositeCodeElementSniff.php" />
-
-    <!-- Arrays -->
+    <!-- Array rules -->
     <rule ref="Squiz.Arrays.ArrayDeclaration">
         <exclude name="Squiz.Arrays.ArrayDeclaration.KeyNotAligned"/>
         <exclude name="Squiz.Arrays.ArrayDeclaration.ValueNotAligned"/>
@@ -41,102 +177,23 @@
         <exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
     </rule>
 
-    <!-- Others -->
-    <rule ref="Generic.Formatting.MultipleStatementAlignment">
+
+    <!-- Include short types support in DOC Comments -->
+    <rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints"/>
+
+    <!-- Remove unused imports -->
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
         <properties>
-            <property name="error" value="true" />
+            <property name="searchAnnotations" value="true"/>
         </properties>
     </rule>
 
-    <!-- Laravel options -->
-    <rule ref="Generic.Classes.DuplicateClassName"/>
-    <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
-    <rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
-    <rule ref="Generic.CodeAnalysis.ForLoopWithTestFunctionCall"/>
-    <rule ref="Generic.CodeAnalysis.JumbledIncrementer"/>
-    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
-    <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
-    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
-    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
-    <rule ref="Generic.Commenting.Todo"/>
-    <rule ref="Generic.Commenting.Fixme"/>
-    <rule ref="Generic.ControlStructures.InlineControlStructure"/>
-    <rule ref="Generic.Files.ByteOrderMark"/>
-    <rule ref="Generic.Files.LineEndings"/>
-    <rule ref="Generic.Files.LineLength">
-        <properties>
-            <property name="lineLimit" value="120"/>
-            <property name="absoluteLineLimit" value="150"/>
-        </properties>
-    </rule>
-    <rule ref="Generic.Formatting.DisallowMultipleStatements"/>
-    <rule ref="Generic.Formatting.MultipleStatementAlignment"/>
-    <rule ref="Generic.Formatting.SpaceAfterCast"/>
-    <rule ref="Generic.Functions.CallTimePassByReference"/>
-    <rule ref="Generic.Functions.FunctionCallArgumentSpacing"/>
+    <!-- Disallow the use of increment and decrement operators -->
+    <rule ref="SlevomatCodingStandard.Operators.DisallowIncrementAndDecrementOperators"/>
 
-    <rule ref="Generic.Metrics.CyclomaticComplexity">
-        <properties>
-            <property name="complexity" value="50"/>
-            <property name="absoluteComplexity" value="100"/>
-        </properties>
-    </rule>
-    <rule ref="Generic.Metrics.NestingLevel">
-        <properties>
-            <property name="nestingLevel" value="10"/>
-            <property name="absoluteNestingLevel" value="30"/>
-        </properties>
-    </rule>
-    <rule ref="Generic.NamingConventions.ConstructorName"/>
-    <rule ref="Generic.PHP.LowerCaseConstant"/>
-    <rule ref="Generic.PHP.DeprecatedFunctions"/>
-    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
-    <rule ref="Generic.PHP.ForbiddenFunctions"/>
-    <rule ref="Generic.PHP.NoSilencedErrors"/>
-    <rule ref="Generic.Strings.UnnecessaryStringConcat"/>
-    <rule ref="Generic.WhiteSpace.DisallowTabIndent"/>
-    <rule ref="Generic.WhiteSpace.ScopeIndent">
-        <properties>
-            <property name="indent" value="4"/>
-            <property name="tabIndent" value="true"/>
-        </properties>
-    </rule>
-    <rule ref="MySource.PHP.EvalObjectFactory"/>
-    <rule ref="PSR1.Classes.ClassDeclaration"/>
-    <rule ref="PSR1.Files.SideEffects"/>
-    <rule ref="PSR2.Classes.ClassDeclaration"/>
-    <rule ref="PSR2.Classes.PropertyDeclaration"/>
-    <rule ref="PSR2.ControlStructures.ControlStructureSpacing"/>
-    <rule ref="PSR2.ControlStructures.ElseIfDeclaration"/>
-    <rule ref="PSR2.Files.EndFileNewline"/>
-    <rule ref="PSR2.Methods.MethodDeclaration"/>
-    <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
-    <rule ref="PSR2.Namespaces.UseDeclaration"/>
-    <rule ref="Zend.Files.ClosingTag"/>
-    <rule ref="PSR1">
-        <exclude-pattern>*.php</exclude-pattern>
-        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
-    </rule>
-    <rule ref="Generic">
-        <exclude-pattern>*.php</exclude-pattern>
-        <exclude name="Generic.Strings.UnnecessaryStringConcat.Found)"/>
-    </rule>
+    <!-- Require trailing comma in multi-line function/method call and declaration -->
+    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration"/>
 
-    <exclude-pattern>*/database/*</exclude-pattern>
-    <exclude-pattern>*/cache/*</exclude-pattern>
-    <exclude-pattern>*/*.js</exclude-pattern>
-    <exclude-pattern>*/*.css</exclude-pattern>
-    <exclude-pattern>*/*.xml</exclude-pattern>
-    <exclude-pattern>*/autoload.php</exclude-pattern>
-    <exclude-pattern>*/docs/*</exclude-pattern>
-    <exclude-pattern>*/vendor/*</exclude-pattern>
-    <exclude-pattern>*/migrations/*</exclude-pattern>
-    <exclude-pattern>*/config/*</exclude-pattern>
-    <exclude-pattern>*/public/index.php</exclude-pattern>
-
-    <ini name="memory_limit" value="128M"/>
-    <arg name="colors"/>
-    <arg value="spvnl"/>
-
-    <rule ref="PSR2"/>
+    <!-- Require visibility for all class constants -->
+    <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility"/>
 </ruleset>
