@@ -21,5 +21,4 @@ class CredentialDeviceModel {
 
     #[Field(isPrimary: true)]
     public string $playerID = "";
-
 }

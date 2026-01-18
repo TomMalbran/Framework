@@ -50,7 +50,7 @@ class Database {
         string $username,
         string $password,
         string $charset,
-        int    $port = 3306,
+        int $port = 3306,
     ) {
         $this->host     = $host;
         $this->database = $database;
@@ -383,7 +383,7 @@ class Database {
                 $params = [];
                 foreach ($bindParams as $value) {
                     // NOTE: For bind_params the first parameter is a string with the types of the following parameters:
-	                //       i | corresponding variable has type `int`
+                    //       i | corresponding variable has type `int`
                     //       d | corresponding variable has type `float`
                     //       s | corresponding variable has type `string`
                     //       b | corresponding variable is a blob and will be sent in packets
@@ -480,8 +480,9 @@ class Database {
      * @return mixed[]
      */
     private function refValues(array $array): array {
-        $refs = [];
-        for ($i = 0; $i < count($array); $i++) {
+        $total = count($array);
+        $refs  = [];
+        for ($i = 0; $i < $total; $i += 1) {
             $refs[$i] = & $array[$i];
         }
         return $refs;

@@ -250,7 +250,7 @@ class Arrays {
             foreach ($array as $row) {
                 foreach ($needle as $value) {
                     if (self::isEqualContains($row, $key, $value, $caseInsensitive)) {
-                        $count++;
+                        $count += 1;
                         break;
                     }
                 }

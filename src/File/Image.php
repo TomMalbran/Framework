@@ -241,8 +241,8 @@ class Image {
     public static function resize(
         string $src,
         string $dst,
-        int    $width,
-        int    $height,
+        int $width,
+        int $height,
         string $action,
     ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
@@ -266,7 +266,7 @@ class Image {
             if ($imgWidth > $imgHeight) {
                 $height = Numbers::roundInt($imgHeight * $width / $imgWidth);
             } else {
-                $width  = Numbers::roundInt($imgWidth * $height / $imgHeight);
+                $width = Numbers::roundInt($imgWidth * $height / $imgHeight);
             }
             break;
 
@@ -282,7 +282,7 @@ class Image {
                 if ($imgWidth > $imgHeight) {
                     $height = Numbers::roundInt($imgHeight * $width / $imgWidth);
                 } else {
-                    $width  = Numbers::roundInt($imgWidth * $height / $imgHeight);
+                    $width = Numbers::roundInt($imgWidth * $height / $imgHeight);
                 }
             } else {
                 $width     = $imgWidth;
@@ -342,12 +342,12 @@ class Image {
     public static function resizeCrop(
         string $src,
         string $dst,
-        int    $resWidth,
-        int    $resHeight,
-        int    $cropX,
-        int    $cropY,
-        int    $cropWidth,
-        int    $cropHeight,
+        int $resWidth,
+        int $resHeight,
+        int $cropX,
+        int $cropY,
+        int $cropWidth,
+        int $cropHeight,
     ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
         if (!self::hasType($imgType) || $resWidth <= 0 || $resHeight <= 0 || $cropWidth <= 0 || $cropHeight <= 0) {
@@ -512,8 +512,8 @@ class Image {
     public static function thumbnail(
         string $src,
         string $dst,
-        int    $width,
-        int    $height,
+        int $width,
+        int $height,
         string $action,
     ): bool {
         $bestFit = $action === self::Maximum || $action === self::Thumb;

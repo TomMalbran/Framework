@@ -4,6 +4,7 @@ namespace Framework\Database\Builder;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
 use Framework\Builder\Builder;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -17,7 +18,8 @@ class QueryCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $contents = Builder::render("Query", [
+        $properties = self::getProperties($schemaModel);
+        $contents   = Builder::render("Query", [
             "namespace"  => $schemaModel->namespace,
             "name"       => $schemaModel->name,
             "tableName"  => $schemaModel->tableName,
@@ -25,9 +27,10 @@ class QueryCode {
             "column"     => "{$schemaModel->name}Column",
             "query"      => "{$schemaModel->name}Query",
             "status"     => "{$schemaModel->name}Status",
-            "properties" => self::getProperties($schemaModel),
+            "properties" => $properties,
             "statuses"   => self::getStatuses($schemaModel),
             "imports"    => self::getImports($schemaModel),
+            "queries"    => self::getQueries($properties),
         ]);
         return $contents;
     }
@@ -78,17 +81,7 @@ class QueryCode {
         }
 
         foreach ($list as $property) {
-            $property["queryType"] = match($property["type"]) {
-                FieldType::Boolean => "BooleanQuery",
-                FieldType::Number,
-                FieldType::Float   => "NumberQuery",
-                FieldType::String,
-                FieldType::Text,
-                FieldType::LongText,
-                FieldType::JSON,
-                FieldType::File    => "StringQuery",
-                default            => "",
-            };
+            $property["queryType"] = self::getQueryType($property["type"]);
             if ($property["queryType"] !== "") {
                 $nameLength = max($nameLength, Strings::length($property["name"]));
                 $typeLength = max($typeLength, Strings::length($property["queryType"]));
@@ -160,5 +153,41 @@ class QueryCode {
         }
 
         return array_keys($result);
+    }
+
+    /**
+     * Returns the Queries used in the Query
+     * @param array<string,mixed>[] $properties
+     * @return string[]
+     */
+    private static function getQueries(array $properties): array {
+        $result = [];
+        foreach ($properties as $property) {
+            $queryType = Strings::toString($property["queryType"] ?? "");
+            if ($queryType !== "Query" && !Arrays::contains($result, $queryType)) {
+                $result[] = $queryType;
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * Returns the Query Type for a Field Type
+     * @param FieldType $type
+     * @return string
+     */
+    private static function getQueryType(FieldType $type): string {
+        return match ($type) {
+            FieldType::Boolean => "BooleanQuery",
+            FieldType::Number,
+            FieldType::Float   => "NumberQuery",
+            FieldType::String,
+            FieldType::Text,
+            FieldType::LongText,
+            FieldType::JSON,
+            FieldType::File    => "StringQuery",
+            default            => "Query",
+        };
     }
 }

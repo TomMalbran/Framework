@@ -914,9 +914,9 @@ class Credential extends CredentialSchema {
      */
     public static function getName(mixed $data, bool $withEmail = false, string $prefix = ""): string {
         $id        = Strings::toString(Arrays::getValue($data, "credentialID", prefix: $prefix));
-        $firstName = Strings::toString(Arrays::getValue($data, "firstName",    prefix: $prefix));
-        $lastName  = Strings::toString(Arrays::getValue($data, "lastName",     prefix: $prefix));
-        $email     = Strings::toString(Arrays::getValue($data, "email",        prefix: $prefix));
+        $firstName = Strings::toString(Arrays::getValue($data, "firstName", prefix: $prefix));
+        $lastName  = Strings::toString(Arrays::getValue($data, "lastName", prefix: $prefix));
+        $email     = Strings::toString(Arrays::getValue($data, "email", prefix: $prefix));
         $result    = "";
 
         if ($firstName !== "" || $lastName !== "") {
@@ -939,9 +939,9 @@ class Credential extends CredentialSchema {
      * @return string
      */
     public static function getPhone(mixed $data, string $prefix = "", bool $withPlus = false): string {
-        $phone     = Strings::toString(Arrays::getValue($data, "phone",     prefix: $prefix));
+        $phone     = Strings::toString(Arrays::getValue($data, "phone", prefix: $prefix));
         $cellphone = Strings::toString(Arrays::getValue($data, "cellphone", prefix: $prefix));
-        $iddRoot   = Strings::toString(Arrays::getValue($data, "iddRoot",   prefix: $prefix));
+        $iddRoot   = Strings::toString(Arrays::getValue($data, "iddRoot", prefix: $prefix));
 
         if ($cellphone !== "" && $iddRoot !== "") {
             return ($withPlus ? "+" : "") . $iddRoot . $cellphone;

@@ -24,8 +24,8 @@ class ImporterData {
      * @param string   $last    Optional.
      */
     public function __construct(
-        array  $columns = [],
-        int    $amount = 0,
+        array $columns = [],
+        int $amount = 0,
         string $first = "",
         string $last = "",
     ) {

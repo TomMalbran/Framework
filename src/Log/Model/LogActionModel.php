@@ -42,5 +42,4 @@ class LogActionModel {
 
     #[Relation(fieldNames: [ "name", "firstName", "lastName", "email" ])]
     public ?CredentialModel $credential = null;
-
 }

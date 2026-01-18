@@ -23,5 +23,4 @@ class SettingsModel {
     public string $value = "";
 
     public string $variableType = "";
-
 }

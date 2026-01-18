@@ -10,11 +10,11 @@ use Attribute;
 class Model {
 
     public string $fantasyName;
-    public bool   $hasUsers;
-    public bool   $hasTimestamps;
-    public bool   $canCreate;
-    public bool   $canEdit;
-    public bool   $canDelete;
+    public bool $hasUsers;
+    public bool $hasTimestamps;
+    public bool $canCreate;
+    public bool $canEdit;
+    public bool $canDelete;
 
 
 
@@ -28,12 +28,12 @@ class Model {
      * @param bool   $canDelete     Optional.
      */
     public function __construct(
-        string $fantasyName   = "",
-        bool   $hasUsers      = false,
-        bool   $hasTimestamps = false,
-        bool   $canCreate     = false,
-        bool   $canEdit       = false,
-        bool   $canDelete     = false,
+        string $fantasyName = "",
+        bool $hasUsers = false,
+        bool $hasTimestamps = false,
+        bool $canCreate = false,
+        bool $canEdit = false,
+        bool $canDelete = false,
     ) {
         $this->fantasyName   = $fantasyName;
         $this->hasUsers      = $hasUsers;

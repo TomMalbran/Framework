@@ -146,7 +146,7 @@ class Migration {
         }
 
         // Sort the Migrations using the Class Name
-        ksort($migrations, SORT_NATURAL|SORT_FLAG_CASE);
+        ksort($migrations, SORT_NATURAL | SORT_FLAG_CASE);
 
         // Determine the Migrations to Run
         $startMigration = SettingData::getCore("migration");

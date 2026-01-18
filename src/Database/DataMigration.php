@@ -20,5 +20,4 @@ interface DataMigration {
      * @return void
      */
     public static function migrate(Database $db): void;
-
 }

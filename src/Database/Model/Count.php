@@ -13,7 +13,7 @@ use Attribute;
 class Count {
 
     // The name of the Model where the count is applied
-    public string $modelName      = "";
+    public string $modelName = "";
 
     // The name of the Model used in the Join
     // If empty, the join is done with the Model where the Count is defined
@@ -21,10 +21,10 @@ class Count {
 
     // The name of the Field used in the Count
     // If empty, the field is the ID field of the Model where the Count is defined
-    public string $fieldName      = "";
+    public string $fieldName = "";
 
     // An additional Query to filter the Count
-    public string $query          = "";
+    public string $query = "";
 
 
     /**
@@ -38,10 +38,10 @@ class Count {
      * @param string      $query          Optional.
      */
     public function __construct(
-        ?string $modelName      = null,
+        ?string $modelName = null,
         ?string $otherModelName = null,
-        string  $fieldName       = "",
-        string  $query           = "",
+        string $fieldName = "",
+        string $query = "",
     ) {
         $this->modelName      = SchemaModel::getBaseModelName($modelName);
         $this->otherModelName = SchemaModel::getBaseModelName($otherModelName);
@@ -72,7 +72,7 @@ class Count {
         string $otherModelName,
         string $fieldName,
         string $query,
-        bool   $hasDeleted,
+        bool $hasDeleted,
     ): Count {
         $result = new self();
         $result->name           = $name;

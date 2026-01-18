@@ -60,5 +60,4 @@ class NotificationQueueModel {
 
     #[Relation(fieldNames: [ "name", "firstName", "lastName" ])]
     public ?CredentialModel $credential = null;
-
 }

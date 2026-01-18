@@ -13,5 +13,4 @@ enum EmailResult {
     case WhiteListFilter;
     case InvalidEmail;
     case ProviderError;
-
 }

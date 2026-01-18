@@ -123,10 +123,11 @@ class Selection {
      */
     public function addCounts(): Selection {
         foreach ($this->schemaModel->counts as $count) {
-            $asTable                  = chr($this->index++);
+            $asTable                  = chr($this->index);
             $this->joins[]            = $count->getExpression($asTable, $this->schemaModel->tableName);
             $this->selects[]          = $count->getSelect($asTable);
             $this->keys[$count->name] = $asTable;
+            $this->index            += 1;
         }
         return $this;
     }

@@ -22,8 +22,8 @@ use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
 use Framework\Database\SchemaModel;
-use Framework\Database\Query\Query;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Query;{{#hasQueryOperator}}
+use Framework\Database\Query\QueryOperator;{{/hasQueryOperator}}
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
@@ -32,8 +32,8 @@ use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
 use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#canEdit}}
 use Framework\Database\Type\Assign;{{/canEdit}}{{#hasValidation}}
 use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
-use Framework\Date\DateType;{{/hasDate}}
-use Framework\Utils\Arrays;
+use Framework\Date\DateType;{{/hasDate}}{{#hasID}}
+use Framework\Utils\Arrays;{{/hasID}}
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
 use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
@@ -48,14 +48,14 @@ class {{name}}Schema extends Schema {
 
     protected static ?SchemaModel $model = null;
 
-    protected static string $modelName      = "{{name}}";
-    protected static string $tableName      = "{{table}}";
-    protected static string $idName         = "{{idName}}";
-    protected static string $idDbName       = "{{idDbName}}";
+    protected static string $modelName = "{{name}}";
+    protected static string $tableName = "{{table}}";
+    protected static string $idName    = "{{idName}}";
+    protected static string $idDbName  = "{{idDbName}}";
 
-    protected static bool   $hasPositions   = {{hasPositionsValue}};
-    protected static bool   $canDelete      = {{canDeleteValue}};
-    protected static bool   $hasSubRequests = {{hasSubRequestsValue}};
+    protected static bool $hasPositions   = {{hasPositionsValue}};
+    protected static bool $canDelete      = {{canDeleteValue}};
+    protected static bool $hasSubRequests = {{hasSubRequestsValue}};
 
 
 
@@ -418,7 +418,7 @@ class {{name}}Schema extends Schema {
         {{#parents}}
         $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
-        $data = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
+        $data  = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
     }
 
@@ -520,7 +520,7 @@ class {{name}}Schema extends Schema {
         {{#parents}}
         $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
         {{/parents}}
-        $list = self::getSchemaEntities($query, sort: $request);
+        $list  = self::getSchemaEntities($query, sort: $request);
         return self::constructEntities($list);
     }
 
@@ -534,7 +534,14 @@ class {{name}}Schema extends Schema {
      * @param bool $skipSubRequest Optional.
      * @return {{entity}}[]
      */
-    protected static function getEntityList(?{{query}} $query = null, ?Request $sort = null, array $selects = [], array $joins = []{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}, bool $skipSubRequest = false): array {
+    protected static function getEntityList(
+        ?{{query}} $query = null,
+        ?Request $sort = null,
+        array $selects = [],
+        array $joins = [],{{#hasEncrypt}}
+        bool $decrypted = false,{{/hasEncrypt}}
+        bool $skipSubRequest = false,
+    ): array {
         $query = $query !== null ? $query->query : null;
         $list  = self::getSchemaEntities($query, $sort, $selects, $joins{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}}, skipSubRequest: $skipSubRequest);
         return self::constructEntities($list);
@@ -647,12 +654,19 @@ class {{name}}Schema extends Schema {
      * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
      * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
-     */
-    protected static function createEntity({{#usesRequest}}?Request $entityRequest = null{{/usesRequest}}{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasTimestamps}}, int $createdTime = 0{{/hasTimestamps}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): int {
      * @param int $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}{{#hasPositions}}
      * @param bool $skipOrder Optional.{{/hasPositions}}
      * @return int
+     */
+    protected static function createEntity({{#usesRequest}}
+        ?Request $entityRequest = null,{{/usesRequest}}{{#fields}}
+        {{fieldArgCreate}},{{/fields}}{{#hasStatus}}
+        ?{{status}} $status = null,{{/hasStatus}}{{#hasTimestamps}}
+        int $createdTime = 0,{{/hasTimestamps}}{{#hasUsers}}
+        int $createdUser = 0,{{/hasUsers}}{{#hasPositions}}
+        bool $skipOrder = false,{{/hasPositions}}
+    ): int {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -706,10 +720,15 @@ class {{name}}Schema extends Schema {
      * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
      * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
-     */
-    protected static function replaceEntity({{#usesRequest}}?Request $entityRequest = null{{/usesRequest}}{{{fieldsCreateList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $createdUser = 0{{/hasUsers}}): bool {
      * @param int $createdUser Optional.{{/hasUsers}}
      * @return bool
+     */
+    protected static function replaceEntity({{#usesRequest}}
+        ?Request $entityRequest = null,{{/usesRequest}}{{#fields}}
+        {{fieldArgEdit}},{{/fields}}{{#hasStatus}}
+        ?{{status}} $status = null,{{/hasStatus}}{{#hasUsers}}
+        int $createdUser = 0,{{/hasUsers}}
+    ): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -743,8 +762,6 @@ class {{name}}Schema extends Schema {
      * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
      * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
-     */
-    protected static function editEntity({{editType}} $query{{#usesRequest}}, ?Request $entityRequest = null{{/usesRequest}}{{{fieldsEditList}}}{{#hasStatus}}, ?{{status}} $status = null{{/hasStatus}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#canDelete}}, ?bool $isDeleted = null{{/canDelete}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}{{#hasTimestamps}}, bool $skipTimestamps = false{{/hasTimestamps}}, bool $skipEmpty = false, bool $skipUnset = false): bool {
      * @param int $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
      * @param bool|null $isDeleted Optional.{{/canDelete}}{{#hasPositions}}
      * @param bool $skipOrder Optional.{{/hasPositions}}{{#hasTimestamps}}
@@ -752,6 +769,19 @@ class {{name}}Schema extends Schema {
      * @param bool $skipEmpty Optional.
      * @param bool $skipUnset Optional.
      * @return bool
+     */
+    protected static function editEntity(
+        {{editType}} $query,{{#usesRequest}}
+        ?Request $entityRequest = null,{{/usesRequest}}{{#fields}}
+        {{fieldArgEdit}},{{/fields}}{{#hasStatus}}
+        ?{{status}} $status = null,{{/hasStatus}}{{#hasUsers}}
+        int $modifiedUser = 0,{{/hasUsers}}{{#canDelete}}
+        ?bool $isDeleted = null,{{/canDelete}}{{#hasPositions}}
+        bool $skipOrder = false,{{/hasPositions}}{{#hasTimestamps}}
+        bool $skipTimestamps = false,{{/hasTimestamps}}
+        bool $skipEmpty = false,
+        bool $skipUnset = false,
+    ): bool {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
@@ -814,11 +844,16 @@ class {{name}}Schema extends Schema {
      * Edits a value in a {{name}} Entity
      * @param {{editType}} $query
      * @param {{column}} $column
-     */
-    protected static function editEntityValue({{editType}} $query, {{column}} $column, string|int $value{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
      * @param string|int $value{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}
      * @return bool
+     */
+    protected static function editEntityValue(
+        {{editType}} $query,
+        {{column}} $column,
+        string|int $value,{{#hasUsers}}
+        int $modifiedUser = 0,{{/hasUsers}}
+    ): bool {
         {{#hasUsers}}
         if ($modifiedUser === 0) {
             $modifiedUser = Auth::getID();
@@ -834,11 +869,16 @@ class {{name}}Schema extends Schema {
      * Increments a value in a {{name}} Entity
      * @param {{editType}} $query
      * @param {{column}} $column
-     */
-    protected static function increaseEntity({{editType}} $query, {{column}} $column, int $amount = 1{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}): bool {
      * @param int $amount Optional.{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}
      * @return bool
+     */
+    protected static function increaseEntity(
+        {{editType}} $query,
+        {{column}} $column,
+        int $amount = 1,{{#hasUsers}}
+        int $modifiedUser = 0,{{/hasUsers}}
+    ): bool {
         {{#hasUsers}}
         if ($modifiedUser === 0) {
             $modifiedUser = Auth::getID();
@@ -856,11 +896,16 @@ class {{name}}Schema extends Schema {
      * Deletes the {{name}} Entity
      * @param {{editType}} $query{{#editParents}}
      * @param {{fieldDoc}}{{/editParents}}{{#hasUsers}}
-     */
-    protected static function deleteEntity({{editType}} $query{{editParentsList}}{{#hasUsers}}, int $modifiedUser = 0{{/hasUsers}}{{#hasPositions}}, bool $skipOrder = false{{/hasPositions}}): bool {
      * @param int $modifiedUser Optional.{{/hasUsers}}{{#hasPositions}}
      * @param bool $skipOrder Optional.{{/hasPositions}}
      * @return bool
+     */
+    protected static function deleteEntity(
+        {{editType}} $query,{{#editParents}}
+        {{fieldArg}},{{/editParents}}{{#hasUsers}}
+        int $modifiedUser = 0,{{/hasUsers}}{{#hasPositions}}
+        bool $skipOrder = false,{{/hasPositions}}
+    ): bool {
         {{#hasUsers}}
         if ($modifiedUser === 0) {
             $modifiedUser = Auth::getID();
@@ -888,7 +933,10 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}}{{/editParents}}
      * @return bool
      */
-    protected static function removeEntity({{editType}} $query{{editParentsList}}): bool {
+    protected static function removeEntity(
+        {{editType}} $query,{{#editParents}}
+        {{fieldArg}},{{/editParents}}
+    ): bool {
         {{#hasPositions}}
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
@@ -919,7 +967,11 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}}{{/parents}}
      * @return int
      */
-    protected static function ensureEntityOrder(?{{entity}} $entity, Request|array|null $fields{{editParentsList}}): int {
+    protected static function ensureEntityOrder(
+        ?{{entity}} $entity,
+        Request|array|null $fields,{{#editParents}}
+        {{fieldArg}},{{/editParents}}
+    ): int {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}

@@ -12,7 +12,7 @@ use Framework\Utils\Strings;
  */
 class Notification {
 
-    public const BaseUrl = "https://api.onesignal.com";
+    private const BaseUrl = "https://api.onesignal.com";
 
 
     /**

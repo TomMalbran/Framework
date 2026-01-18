@@ -25,5 +25,4 @@ class LogDeviceModel {
     public string $playerID = "";
 
     public bool $wasAdded = false;
-
 }

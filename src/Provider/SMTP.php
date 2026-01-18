@@ -28,7 +28,7 @@ class SMTP {
         string $replyTo,
         string $subject,
         string $body,
-        string $attachment = ""
+        string $attachment = "",
     ): bool {
         $email = new PHPMailer();
 

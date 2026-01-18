@@ -17,5 +17,4 @@ class {{name}}Entity extends Entity {
     /** @var {{{subType}}} */
 {{/subType}}    public {{type}} ${{name}} = {{{default}}};
 {{/attributes}}
-
 }

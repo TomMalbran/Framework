@@ -32,13 +32,13 @@ class Result {
      * @param Errors $errors      Optional.
      */
     public function __construct(
-        bool    $isEdit      = false,
-        bool    $canValidate = false,
-        int     $id          = 0,
-        string  $code        = "",
-        string  $name        = "",
-        string  $status      = "",
-        ?Errors $errors      = null,
+        bool $isEdit = false,
+        bool $canValidate = false,
+        int $id = 0,
+        string $code = "",
+        string $name = "",
+        string $status = "",
+        ?Errors $errors = null,
     ) {
         $this->isCreate    = !$isEdit;
         $this->isEdit      = $isEdit;

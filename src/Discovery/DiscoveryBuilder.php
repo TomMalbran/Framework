@@ -17,5 +17,4 @@ interface DiscoveryBuilder {
      * @return int The amount of files deleted.
      */
     public static function destroyCode(): int;
-
 }

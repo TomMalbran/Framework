@@ -41,5 +41,4 @@ class DomainData {
     public string $dmarcType     = "";
     public string $dmarcHost     = "";
     public string $dmarcValue    = "";
-
 }

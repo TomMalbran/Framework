@@ -12,13 +12,13 @@ use Framework\Utils\Strings;
  */
 class AccessRole implements DiscoveryBuilder {
 
-    private static int   $level  = -1;
+    private static int $level = -1;
 
     /** @var array<string,string[]> */
     private static array $groups = [];
 
     /** @var array<string,int> */
-    private static array $roles  = [];
+    private static array $roles = [];
 
 
     /**
@@ -97,7 +97,7 @@ class AccessRole implements DiscoveryBuilder {
                     "constant" => "",
                     "level"    => $roles[$accessName] ?? 0,
                 ];
-                $addSpace  = false;
+                $addSpace = false;
             }
         }
         return $result;

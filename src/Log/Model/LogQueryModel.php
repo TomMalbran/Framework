@@ -34,5 +34,4 @@ class LogQueryModel {
     public int $updatedTime = 0;
 
     public int $updatedUser = 0;
-
 }

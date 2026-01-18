@@ -141,7 +141,7 @@ class Strings {
     public static function containsCaseInsensitive(string $string, string ...$needles): bool {
         $string = strtolower($string);
         foreach ($needles as $needle) {
-            if (strstr($string, strtolower($needle)) !== FALSE) {
+            if (strstr($string, strtolower($needle)) !== false) {
                 return true;
             }
         }
@@ -363,8 +363,9 @@ class Strings {
             $all    .= $set;
         }
 
-        $all = str_split($all);
-        for ($i = 0; $i < $length - count($sets); $i++) {
+        $count = $length - count($sets);
+        $all   = str_split($all);
+        for ($i = 0; $i < $count; $i += 1) {
             $result .= Arrays::random($all);
         }
 
@@ -662,7 +663,7 @@ class Strings {
      * @return string[]
      */
     public static function splitToWords(string $string): array {
-        $result = preg_split('/(\.\.\.\s?|[-.?!,;:(){}\[\]\'"]\s?)|\s/', $string, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $result = preg_split('/(\.\.\.\s?|[-.?!,;:(){}\[\]\'"]\s?)|\s/', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         return $result !== false ? $result : [];
     }
 

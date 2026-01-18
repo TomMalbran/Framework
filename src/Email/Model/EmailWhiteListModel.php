@@ -20,5 +20,4 @@ class EmailWhiteListModel {
     public string $email = "";
 
     public string $description = "";
-
 }

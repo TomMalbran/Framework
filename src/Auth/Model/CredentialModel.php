@@ -97,5 +97,4 @@ class CredentialModel {
 
     #[Virtual]
     public string $accessName = "";
-
 }

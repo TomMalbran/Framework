@@ -29,5 +29,4 @@ class EmailContentModel {
     public string $message = "";
 
     public int $position = 0;
-
 }

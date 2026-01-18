@@ -27,7 +27,7 @@ class FileList {
     public function add(
         string $name,
         string $path,
-        bool   $isDir,
+        bool $isDir,
         string $sourcePath,
         string $sourceUrl,
         string $thumbPath,

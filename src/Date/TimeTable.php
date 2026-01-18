@@ -4,6 +4,7 @@ namespace Framework\Date;
 use Framework\Intl\NLS;
 use Framework\Date\DateTime;
 use Framework\Date\DateFormat;
+use Framework\Date\TimeTableItem;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Arrays;
 use Framework\Utils\Errors;
@@ -11,25 +12,11 @@ use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
 /**
- * The Time Table Data class
- */
-class TimeTableData {
-    // phpcs:ignore
-    public function __construct(
-        /** @var int[] */
-        public array $days,
-        public string $from,
-        public string $to,
-    ) {
-    }
-}
-
-/**
  * Several Time Table functions
  */
 class TimeTable {
 
-    /** @var TimeTableData[] */
+    /** @var TimeTableItem[] */
     private array $timeTables  = [];
     private bool  $startMonday = false;
 
@@ -72,7 +59,7 @@ class TimeTable {
             $from = Strings::toString($elem["from"] ?? "");
             $to   = Strings::toString($elem["to"]   ?? "");
 
-            $timeTables[] = new TimeTableData($days, $from, $to);
+            $timeTables[] = new TimeTableItem($days, $from, $to);
         }
         return new TimeTable($timeTables, $startMonday);
     }
@@ -299,7 +286,7 @@ class TimeTable {
 
         if ($allDays && count($days) < $maxDay) {
             $numbers = [];
-            for ($i = $minDay; $i < $maxDay; $i++) {
+            for ($i = $minDay; $i < $maxDay; $i += 1) {
                 if (!isset($days[$i])) {
                     $numbers[] = $i;
                 }
@@ -369,7 +356,7 @@ class TimeTable {
                 while ($count < $amount) {
                     $first = $count;
                     $last  = $count;
-                    for ($i = $count + 1; $i < $amount; $i++) {
+                    for ($i = $count + 1; $i < $amount; $i += 1) {
                         $number = $elem["numbers"][$i] ?? 0;
                         if ($number === $maxDay) {
                             break;
@@ -387,7 +374,7 @@ class TimeTable {
                         $count = $last + 1;
                     } else {
                         $parts[] = $elem["days"][$first] ?? "";
-                        $count++;
+                        $count  += 1;
                     }
                     $daysText = NLS::join($parts, false, $isoCode);
                 }

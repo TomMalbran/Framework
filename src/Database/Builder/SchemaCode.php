@@ -31,14 +31,16 @@ class SchemaCode {
         $fields      = self::getAllFields($schemaModel);
         $uniques     = self::getSomeFields($schemaModel, isUnique: true);
         $parents     = self::getSomeFields($schemaModel, isParent: true);
+        $editParents = $schemaModel->hasPositions ? $parents : [];
         $subSchemas  = self::getSubTypes($schemaModel, forSchemas: true);
         $subTypes    = self::getSubTypes($schemaModel);
         $validations = self::getValidations($schemaModel);
         $valImports  = self::getValidationImports($schemaModel);
+
         $hasVirtual  = count($schemaModel->virtualFields) > 0;
+        $hasUniques  = count($uniques) > 0;
         $hasParents  = count($parents) > 0;
         $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
-        $editParents = $schemaModel->hasPositions ? $parents : [];
         $queryName   = "{$schemaModel->name}Query";
 
         $contents    = Builder::render("Schema", [
@@ -58,13 +60,10 @@ class SchemaCode {
             "idName"              => $schemaModel->idName,
             "idDbName"            => $schemaModel->idDbName,
             "idType"              => $idType,
-            "idDocType"           => FieldType::getDocType($idType),
             "hasIntID"            => $schemaModel->hasID && $idType === "int",
             "idText"              => Strings::upperCaseFirst($schemaModel->idName),
             "editType"            => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
-            "editDocType"         => $schemaModel->hasID ? "$queryName|" . FieldType::getDocType($idType) : $queryName,
             "convertType"         => $schemaModel->hasID ? "Query|$idType" : "Query",
-            "convertDocType"      => $schemaModel->hasID ? "Query|" . FieldType::getDocType($idType) : "Query",
             "hasPositions"        => $schemaModel->hasPositions,
             "hasPositionsValue"   => $schemaModel->hasPositions ? "true" : "false",
             "hasTimestamps"       => $schemaModel->hasTimestamps,
@@ -97,8 +96,6 @@ class SchemaCode {
             "hasSubRequestsValue" => count($subRequests) > 0 ? "true" : "false",
             "subRequests"         => $subRequests,
             "fields"              => $fields,
-            "fieldsCreateList"    => self::joinFields($fields, "fieldArgCreate", $schemaModel->usesRequest ? ", " : ""),
-            "fieldsEditList"      => self::joinFields($fields, "fieldArgEdit", ", "),
             "uniques"             => $uniques,
             "hasParents"          => $hasParents,
             "parents"             => $parents,
@@ -109,8 +106,8 @@ class SchemaCode {
             "parentsDefList"      => self::joinFields($parents, "fieldArgDefault", ", "),
             "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
             "editParents"         => $editParents,
-            "editParentsList"     => self::joinFields($editParents, "fieldArg", ", "),
             "hasDate"             => $hasDate,
+            "hasQueryOperator"    => $schemaModel->hasID || $hasUniques || $hasParents,
         ]);
         return Strings::replace($contents, "(, ", "(");
     }
@@ -197,7 +194,6 @@ class SchemaCode {
      */
     private static function getField(Field $field): array {
         $type      = FieldType::getCodeType($field->type);
-        $docType   = FieldType::getDocType($type);
         $default   = FieldType::getDefault($type);
         $canAssign = !$field->isID && !$field->isParent;
         $assignDoc = $canAssign ? "Assign|" : "";
@@ -207,9 +203,9 @@ class SchemaCode {
             "fieldKey"        => $field->dbName,
             "fieldName"       => $field->name,
             "fieldText"       => Strings::upperCaseFirst($field->name),
-            "fieldDoc"        => "$docType $param",
-            "fieldDocNull"    => "$docType|null $param",
-            "fieldDocEdit"    => "$assignDoc$docType|null $param",
+            "fieldDoc"        => "$type $param",
+            "fieldDocNull"    => "$type|null $param",
+            "fieldDocEdit"    => "$assignDoc$type|null $param",
             "fieldParam"      => $param,
             "fieldParamQuery" => $type === "bool" ? "$param === true ? 1 : 0" : $param,
             "fieldArg"        => "$type $param",

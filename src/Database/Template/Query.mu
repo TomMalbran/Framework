@@ -6,10 +6,8 @@ use {{.}};{{/imports}}
 
 use Framework\Database\Query\Query;
 use Framework\Database\Query\QueryOperator;
-use Framework\Database\Query\SchemaQuery;
-use Framework\Database\Query\BooleanQuery;
-use Framework\Database\Query\NumberQuery;
-use Framework\Database\Query\StringQuery;
+use Framework\Database\Query\SchemaQuery;{{#queries}}
+use Framework\Database\Query\{{.}};{{/queries}}
 
 /**
  * The {{name}} Query

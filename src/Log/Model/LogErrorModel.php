@@ -40,5 +40,4 @@ class LogErrorModel {
     public bool $isResolved = false;
 
     public int $updatedTime = 0;
-
 }

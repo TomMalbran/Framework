@@ -29,5 +29,4 @@ class NotificationContentModel {
     public string $message = "";
 
     public int $position = 0;
-
 }

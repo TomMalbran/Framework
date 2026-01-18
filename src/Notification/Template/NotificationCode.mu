@@ -7,9 +7,7 @@ namespace {{namespace}};
 enum NotificationCode {
 
     case None;
-
 {{#codes}}
     case {{.}};
 {{/codes}}
-
 }

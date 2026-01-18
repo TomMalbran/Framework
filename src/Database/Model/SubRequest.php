@@ -35,10 +35,10 @@ class SubRequest {
      */
     public function __construct(
         ?string $modelName = null,
-        string  $idName    = "",
-        string  $fieldName = "",
-        string  $valueName = "",
-        string  $query     = "",
+        string $idName = "",
+        string $fieldName = "",
+        string $valueName = "",
+        string $query = "",
     ) {
         $this->modelName = SchemaModel::getBaseModelName($modelName);
         $this->idName    = $idName;
@@ -72,12 +72,12 @@ class SubRequest {
      */
     public static function create(
         SchemaModel $schemaModel,
-        string      $name,
-        string      $idName,
-        string      $idDbName,
-        string      $fieldName,
-        string      $valueName,
-        string      $query,
+        string $name,
+        string $idName,
+        string $idDbName,
+        string $fieldName,
+        string $valueName,
+        string $query,
     ): SubRequest {
         $result = new self(null, $idName, $fieldName, $valueName, $query);
         $result->schemaModel = $schemaModel;

@@ -58,7 +58,7 @@ class LanguageBuilder implements DiscoveryBuilder {
 
 
         // Sort the Root Language to the top
-        usort($languages, function(array $a, array $b) use ($rootCode) {
+        usort($languages, function (array $a, array $b) use ($rootCode) {
             if ($a["code"] === $rootCode) {
                 return -1;
             }

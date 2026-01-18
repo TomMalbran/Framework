@@ -21,5 +21,4 @@ class CredentialResetModel {
     public string $resetCode = "";
 
     public int $time = 0;
-
 }

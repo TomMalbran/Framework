@@ -43,5 +43,4 @@ class EmailQueueModel {
 
     #[Expression("IF(emailResult <> 'Sent', 1, 0)")]
     public bool $isError = false;
-
 }

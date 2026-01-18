@@ -369,7 +369,7 @@ class DateTime {
         string $fromHour,
         string $toDate,
         string $toHour,
-        bool $useTimeZone = true
+        bool $useTimeZone = true,
     ): bool {
         $fromTime = self::toTimeHour($fromDate, $fromHour, $useTimeZone);
         $toTime   = self::toTimeHour($toDate, $toHour, $useTimeZone);

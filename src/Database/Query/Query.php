@@ -589,7 +589,7 @@ class Query {
      * @return Query
      */
     public function updateColumn(string $oldColumn, string $newColumn): Query {
-        $this->where   = Strings::replace($this->where,   " $oldColumn ", " $newColumn ");
+        $this->where   = Strings::replace($this->where, " $oldColumn ", " $newColumn ");
         $this->orderBy = Strings::replace($this->orderBy, " $oldColumn ", " $newColumn ");
         $this->groupBy = Strings::replace($this->groupBy, " $oldColumn ", " $newColumn ");
         return $this;
@@ -601,8 +601,9 @@ class Query {
      * @return string
      */
     public function createBinds(array $array): string {
-        $bind = [];
-        for ($i = 0; $i < count($array); $i++) {
+        $count = count($array);
+        $bind  = [];
+        for ($i = 0; $i < $count; $i += 1) {
             $bind[] = "?";
         }
         return "(" . Strings::join($bind, ",") . ")";

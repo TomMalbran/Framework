@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Request;
 use Framework\Email\Schema\EmailWhiteListSchema;
 use Framework\Email\Schema\EmailWhiteListQuery;
 

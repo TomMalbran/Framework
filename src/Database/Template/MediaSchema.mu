@@ -1,10 +1,10 @@
 <?php
 namespace {{namespace}};
 
-use Framework\Framework;
+use Framework\Framework;{{#hasFields}}
 use Framework\Database\Query\Query;
-use Framework\Database\Query\QueryOperator;
-use Framework\Database\Type\Assign;
+use Framework\Database\Query\QueryOperator;{{/hasFields}}{{#hasReplace}}
+use Framework\Database\Type\Assign;{{/hasReplace}}
 use Framework\File\File;
 
 /**

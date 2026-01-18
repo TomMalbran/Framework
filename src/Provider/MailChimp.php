@@ -215,12 +215,12 @@ class MailChimp {
         foreach ($subscribers as $subscriber) {
             self::post($route, [
                 "status"        => "subscribed",
-				"email_address" => $subscriber["email"] ?? "",
+                "email_address" => $subscriber["email"] ?? "",
                 "merge_fields"  => [
                     "FNAME" => $subscriber["firstName"] ?? "",
                     "LNAME" => $subscriber["lastName"] ?? "",
                 ],
-			]);
+            ]);
         }
         return true;
     }

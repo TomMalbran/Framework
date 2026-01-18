@@ -23,92 +23,94 @@ use Attribute;
 class Field {
 
     // Makes the field a primary key and auto-increment
-    public bool   $isID        = false;
+    public bool $isID = false;
 
     // By default when using isID on a number field, it will be auto-incremented
     // Using this property will prevent the auto-increment
-    public bool   $notAutoInc  = false;
+    public bool $notAutoInc = false;
 
     // Makes the field a primary key in SQL
-    public bool   $isPrimary   = false;
+    public bool $isPrimary = false;
 
     // Makes the field an index key in SQL
-    public bool   $isKey       = false;
+    public bool $isKey = false;
 
     // The field is the key of a parent Model and is used in several Schema functions
-    public bool   $isParent    = false;
+    public bool $isParent = false;
 
     // The field values are unique which adds special functions in the Schema
-    public bool   $isUnique    = false;
+    public bool $isUnique = false;
 
     // Used to skip the prefix when doing a Join
-    public bool   $isCode      = false;
+    public bool $isCode = false;
 
 
     // Marks the field as being the ID of a different Model
     // Is not used in the code, but it can be used to create a DER
-    public string $belongsTo   = "";
+    public string $belongsTo = "";
 
     // Name of the column in the Model it belongs to
     // If not set, it will be the same as the name of the field
     // Is not used in the code, but it can be used to create a DER
-    public string $otherField  = "";
+    public string $otherField = "";
 
 
     // Indicates the length of the number or string which determines the SQL type
     // For numbers the length is 10 making the type as int(10)
     // For strings the length is 255 making the type as varchar(255)
-    public int    $length      = 0;
+    public int $length = 0;
 
     // Indicates that the integer can be negative.
-    public bool   $isSigned    = false;
+    public bool $isSigned = false;
 
     // When the type is float, this indicates the number of decimals.
-    public int    $decimals    = 2;
+    public int $decimals = 2;
 
 
     // Uses the type text in MySQL instead of varchar for strings.
-    public bool   $isText      = false;
+    public bool $isText = false;
 
     // Uses the type longtext in MySQL instead of varchar for strings.
-    public bool   $isLongText  = false;
+    public bool $isLongText = false;
 
     // Indicates that the string is encrypted in the database.
-    public bool   $isEncrypt   = false;
+    public bool $isEncrypt = false;
 
     // Indicates that the string is an encoded JSON.
-    public bool   $isJSON      = false;
+    public bool $isJSON = false;
 
 
     // Indicates that the string is a relative path to a file.
     // The file path is updated automatically when the file is moved.
-    public bool   $isFile      = false;
+    public bool $isFile = false;
 
     // Indicates that there might be a file path in the string or text.
     // The file paths are updated automatically when the file is moved.
-    public bool   $hasFile     = false;
+    public bool $hasFile = false;
 
     // Used to generate the path and url of the file.
-    public string $filePath    = "";
+    public string $filePath = "";
 
 
     // Used to convert a date to a timeStamp that comes from an input.
-    public string $dateInput   = "";
+    public string $dateInput = "";
 
     // Used with the 'dateInput' to indicate if the hour of the date is at:
     // 'Start', 'Middle' or 'End'
-    public DateType $dateType  = DateType::None;
+    public DateType $dateType = DateType::None;
 
     // Used with the 'dateInput' to indicate that the hour comes from an input.
-    public string $hourInput   = "";
+    public string $hourInput = "";
 
 
     // Used to indicate that the field can be set directly from a Request
-    public bool   $fromRequest = true;
+    public bool $fromRequest = true;
 
-    // FIXME: Remove this temporary properties.
-    public bool   $noEmpty     = false;
-    public bool   $noExists    = false;
+    // Skip empty values when parsing from Request.
+    public bool $noEmpty = false;
+
+    // Skip non-existing values when parsing from Request.
+    public bool $noExists = false;
 
 
     /**
@@ -142,66 +144,66 @@ class Field {
      * @param bool        $noExists    Optional.
      */
     public function __construct(
-        bool     $isID        = false,
-        bool     $notAutoInc  = false,
-        bool     $isPrimary   = false,
-        bool     $isKey       = false,
-        bool     $isParent    = false,
-        bool     $isUnique    = false,
-        bool     $isCode      = false,
-
-        ?string  $belongsTo   = null,
-        string   $otherField  = "",
-
-        int      $length      = 0,
-        bool     $isSigned    = false,
-        int      $decimals    = 2,
-
-        bool     $isText      = false,
-        bool     $isLongText  = false,
-        bool     $isEncrypt   = false,
-        bool     $isJSON      = false,
-
-        bool     $isFile      = false,
-        bool     $hasFile     = false,
-        string   $filePath    = "",
-
-        DateType $dateType    = DateType::None,
-        string   $dateInput   = "",
-        string   $hourInput   = "",
-
-        bool     $fromRequest = false,
-        bool     $noEmpty     = false,
-        bool     $noExists    = false,
+        bool $isID = false,
+        bool $notAutoInc = false,
+        bool $isPrimary = false,
+        bool $isKey = false,
+        bool $isParent = false,
+        bool $isUnique = false,
+        bool $isCode = false,
+        ?string $belongsTo = null,
+        string $otherField = "",
+        int $length = 0,
+        bool $isSigned = false,
+        int $decimals = 2,
+        bool $isText = false,
+        bool $isLongText = false,
+        bool $isEncrypt = false,
+        bool $isJSON = false,
+        bool $isFile = false,
+        bool $hasFile = false,
+        string $filePath = "",
+        DateType $dateType = DateType::None,
+        string $dateInput = "",
+        string $hourInput = "",
+        bool $fromRequest = false,
+        bool $noEmpty = false,
+        bool $noExists = false,
     ) {
-        $this->isID        = $isID;
-        $this->notAutoInc  = $notAutoInc;
-        $this->isPrimary   = $isID || $isPrimary;
-        $this->isKey       = $isKey;
-        $this->isParent    = $isParent;
-        $this->isUnique    = $isUnique;
-        $this->isCode      = $isCode;
+        $this->isID       = $isID;
+        $this->notAutoInc = $notAutoInc;
+        $this->isPrimary  = $isID || $isPrimary;
+        $this->isKey      = $isKey;
+        $this->isParent   = $isParent;
+        $this->isUnique   = $isUnique;
+        $this->isCode     = $isCode;
 
-        $this->belongsTo   = SchemaModel::getBaseModelName($belongsTo);
-        $this->otherField  = $otherField;
+        // Foreign key
+        $this->belongsTo  = SchemaModel::getBaseModelName($belongsTo);
+        $this->otherField = $otherField;
 
-        $this->length      = $length;
-        $this->isSigned    = $isSigned;
-        $this->decimals    = $decimals;
+        // Number types
+        $this->length   = $length;
+        $this->isSigned = $isSigned;
+        $this->decimals = $decimals;
 
-        $this->isText      = $isText;
-        $this->isLongText  = $isLongText;
-        $this->isEncrypt   = $isEncrypt;
-        $this->isJSON      = $isJSON;
+        // Text types
+        $this->isText     = $isText;
+        $this->isLongText = $isLongText;
+        $this->isEncrypt  = $isEncrypt;
+        $this->isJSON     = $isJSON;
 
-        $this->isFile      = $isFile;
-        $this->hasFile     = $hasFile;
-        $this->filePath    = $filePath;
+        // File types
+        $this->isFile   = $isFile;
+        $this->hasFile  = $hasFile;
+        $this->filePath = $filePath;
 
-        $this->dateType    = $dateType;
-        $this->dateInput   = $dateInput;
-        $this->hourInput   = $hourInput;
+        // Date types
+        $this->dateType  = $dateType;
+        $this->dateInput = $dateInput;
+        $this->hourInput = $hourInput;
 
+        // Request parsing
         $this->fromRequest = $fromRequest;
         $this->noEmpty     = $noEmpty;
         $this->noExists    = $noExists;
@@ -240,28 +242,24 @@ class Field {
      * @return Field
      */
     public static function create(
-        string    $name        = "",
-        string    $dbName      = "",
-        string    $prefixName  = "",
-        FieldType $type        = FieldType::String,
-
-        bool      $isID        = false,
-        bool      $isPrimary   = false,
-        bool      $isKey       = false,
-
-        int       $length      = 0,
-        bool      $isSigned    = false,
-        int       $decimals    = 2,
-
-        DateType  $dateType    = DateType::None,
-        string    $dateInput   = "",
-        string    $hourInput   = "",
-        string    $filePath    = "",
-
-        bool      $fromRequest = false,
-        bool      $noEmpty     = false,
-        bool      $noExists    = false,
-        bool      $isStatus    = false,
+        string $name = "",
+        string $dbName = "",
+        string $prefixName = "",
+        FieldType $type = FieldType::String,
+        bool $isID = false,
+        bool $isPrimary = false,
+        bool $isKey = false,
+        int $length = 0,
+        bool $isSigned = false,
+        int $decimals = 2,
+        DateType $dateType = DateType::None,
+        string $dateInput = "",
+        string $hourInput = "",
+        string $filePath = "",
+        bool $fromRequest = false,
+        bool $noEmpty = false,
+        bool $noExists = false,
+        bool $isStatus = false,
     ): Field {
         $result = new self(
             isID:        $isID,
@@ -278,6 +276,7 @@ class Field {
             noEmpty:     $noEmpty,
             noExists:    $noExists,
         );
+
         $result->type       = $type;
         $result->name       = $name;
         $result->dbName     = $dbName !== "" ? $dbName : $name;
@@ -519,7 +518,7 @@ class Field {
         case FieldType::File:
             $result[$key] = $text;
             if ($this->filePath !== "") {
-                $result["{$key}Url"]   = $text !== "" ? FilePath::getUrl($this->filePath, $text) : "";
+                $result["{$key}Url"] = $text !== "" ? FilePath::getUrl($this->filePath, $text) : "";
             } else {
                 $result["{$key}Url"]   = $text !== "" ? Path::getSourceUrl("0", $text) : "";
                 $result["{$key}Thumb"] = $text !== "" ? Path::getThumbsUrl("0", $text) : "";

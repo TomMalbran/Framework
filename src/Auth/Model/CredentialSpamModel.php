@@ -16,5 +16,4 @@ class CredentialSpamModel {
     public string $ip = "";
 
     public int $time = 0;
-
 }

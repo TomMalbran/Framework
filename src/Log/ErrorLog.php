@@ -284,13 +284,13 @@ class ErrorLog extends LogErrorSchema {
         $trace     = debug_backtrace();
         $backtrace = "";
         $index     = 1;
-        for ($i = count($trace) - 1; $i >= 2; $i--) {
+        for ($i = count($trace) - 1; $i >= 2; $i -= 1) {
             $item       = $trace[$i] ?? [];
             $function   = $item["function"] ?? "";
 
             $backtrace .= "#{$index}- ";
             $backtrace .= (isset($item["file"]) ? self::getFilePath($item["file"]) : "<unknown file>") . " ";
-            $backtrace .= "(". ($item["line"] ?? "<unknown line>") . ") ";
+            $backtrace .= "(" . ($item["line"] ?? "<unknown line>") . ") ";
             $backtrace .= " -> {$function}()" . "\n";
             $index     += 1;
         }

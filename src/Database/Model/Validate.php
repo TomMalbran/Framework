@@ -15,55 +15,55 @@ use Attribute;
 class Validate {
 
     // Indicates that the field is required.
-    public bool   $isRequired  = false;
+    public bool $isRequired = false;
 
     // The field should be validated as an Email.
-    public bool   $isEmail     = false;
+    public bool $isEmail = false;
 
     // The field should be validated as a URL.
-    public bool   $isUrl       = false;
+    public bool $isUrl = false;
 
     // The field should be validated as a Color.
-    public bool   $isColor     = false;
+    public bool $isColor = false;
 
     // The field should be validated as a Number.
     // NOTE: Is only required when the type of the field is a String.
-    public bool   $isNumeric   = false;
+    public bool $isNumeric = false;
 
     // The field should be validated as a Signed Number.
-    public bool   $isSigned    = false;
+    public bool $isSigned = false;
 
     // The field should be validated as a Price.
-    public bool   $isPrice     = false;
+    public bool $isPrice = false;
 
 
     // Indicates the class name of the type of the field.
-    public string $typeOf      = "";
+    public string $typeOf = "";
 
     // Indicates the class name of the module the field belongs to.
-    public string $belongsTo   = "";
+    public string $belongsTo = "";
 
     // The method used for validation in the typeOf or belongsTo class.
     // NOTE: By default it will use "isValid" for typeOf and "exists" for belongsTo.
-    public string $method      = "";
+    public string $method = "";
 
     // Adds the parent of the Model to the validation of the belongsTo.
-    public bool   $withParent  = false;
+    public bool $withParent = false;
 
 
     // The maximum length of a String field.
-    public int    $maxLength   = 0;
+    public int $maxLength = 0;
 
     // The minimum value of a Number field.
-    public int    $minValue    = 0;
+    public int $minValue = 0;
 
     // The maximum value of a Number field.
-    public int    $maxValue    = 0;
+    public int $maxValue = 0;
 
 
     // Used to use a different prefix for error messages.
     // NOTE: The default is to use the name of the Model in uppercase.
-    public string $prefix      = "";
+    public string $prefix = "";
 
     // Used as the prefix of the belongsTo error messages.
     // NOTE: The default is to use the name of the belongsTo Model in uppercase.
@@ -94,25 +94,22 @@ class Validate {
      * @param string      $belongsName Optional.
      */
     public function __construct(
-        bool    $isRequired  = false,
-        bool    $isEmail     = false,
-        bool    $isUrl       = false,
-        bool    $isColor     = false,
-        bool    $isNumeric   = false,
-        bool    $isSigned    = false,
-        bool    $isPrice     = false,
-
-        ?string $typeOf      = null,
-        ?string $belongsTo   = null,
-        string  $method      = "",
-        bool    $withParent  = false,
-
-        int     $maxLength   = 0,
-        int     $minValue    = 0,
-        int     $maxValue    = 0,
-
-        string  $prefix      = "",
-        string  $belongsName = "",
+        bool $isRequired = false,
+        bool $isEmail = false,
+        bool $isUrl = false,
+        bool $isColor = false,
+        bool $isNumeric = false,
+        bool $isSigned = false,
+        bool $isPrice = false,
+        ?string $typeOf = null,
+        ?string $belongsTo = null,
+        string $method = "",
+        bool $withParent = false,
+        int $maxLength = 0,
+        int $minValue = 0,
+        int $maxValue = 0,
+        string $prefix = "",
+        string $belongsName = "",
     ) {
         $this->isRequired  = $isRequired;
         $this->isEmail     = $isEmail;
@@ -269,7 +266,7 @@ class Validate {
         }
 
         if ($this->decimals !== 0) {
-            for ($i = count($result); $i < 2; $i++) {
+            for ($i = count($result); $i < 2; $i += 1) {
                 $result[] = "null";
             }
             $result[] = $this->decimals;

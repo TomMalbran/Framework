@@ -7,9 +7,7 @@ namespace {{namespace}};
 enum EmailCode {
 
     case None;
-
 {{#codes}}
     case {{.}};
 {{/codes}}
-
 }

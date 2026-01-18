@@ -55,7 +55,7 @@ class SchemaMigration {
         $lastRename = count($tableRenames);
         $didRename  = false;
 
-        for ($i = $startRename; $i < $lastRename; $i++) {
+        for ($i = $startRename; $i < $lastRename; $i += 1) {
             if (!isset($tableRenames[$i])) {
                 continue;
             }
@@ -90,7 +90,7 @@ class SchemaMigration {
         $lastRename = count($columnRenames);
         $didRename  = false;
 
-        for ($i = $startRename; $i < $lastRename; $i++) {
+        for ($i = $startRename; $i < $lastRename; $i += 1) {
             if (!isset($columnRenames[$i])) {
                 continue;
             }

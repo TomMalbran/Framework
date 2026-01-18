@@ -181,14 +181,14 @@ class Utils {
 
         $length = Strings::length($phone);
         if ($length < 3) {
-           return $length === 1 ? "*" : "*" . Strings::substring($phone,  - 1);
+           return $length === 1 ? "*" : "*" . Strings::substring($phone, -1);
         }
 
         $middle     = "";
         $partSize   = (int)floor($length / 3);
         $middleSize = $length - ($partSize * 2);
 
-        for ($i = 0; $i < $middleSize; $i++) {
+        for ($i = 0; $i < $middleSize; $i += 1) {
             $middle .= "*";
         }
         return Strings::substring($phone, 0, $partSize) . $middle . Strings::substring($phone, -$partSize);
@@ -213,9 +213,10 @@ class Utils {
         $total  = 0;
 
         // Multiply each number by the multiplier (except the last one)
-		for ($i = 0; $i < count($mult); $i++) {
+        $count = count($mult);
+        for ($i = 0; $i < $count; $i += 1) {
             $total += (int)$cuit[$i] * $mult[$i];
-		}
+        }
 
         // Calculate the left over and value
         $mod = $total % 11;

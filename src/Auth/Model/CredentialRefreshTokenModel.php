@@ -22,5 +22,4 @@ class CredentialRefreshTokenModel {
     public string $userAgent = "";
 
     public int $expirationTime = 0;
-
 }

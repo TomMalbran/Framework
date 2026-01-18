@@ -11,5 +11,4 @@ enum NotificationResult {
     case InactiveSend;
     case NoDevices;
     case ProviderError;
-
 }

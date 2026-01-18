@@ -107,7 +107,7 @@ class Curl {
         // Get the Headers
         $headers = [];
         if ($withHeaders) {
-            $options[CURLOPT_HEADERFUNCTION] = function($curl, string $header) use (&$headers) {
+            $options[CURLOPT_HEADERFUNCTION] = function ($curl, string $header) use (&$headers) {
                 $parts = Strings::split($header, ":");
                 if (count($parts) === 2) {
                     $headers[strtolower(trim($parts[0]))] = trim($parts[1]);

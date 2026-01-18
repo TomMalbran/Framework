@@ -11,5 +11,4 @@ interface DiscoveryMigration {
      * @return bool If the migration was successful.
      */
     public static function migrateData(): bool;
-
 }

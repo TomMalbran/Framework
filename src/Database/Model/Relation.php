@@ -15,7 +15,7 @@ class Relation {
 
     // By default all fields are returned but this allows to specify a list of field names
     /** @var string[] */
-    private array $fieldNames    = [];
+    private array $fieldNames = [];
 
     // Allows to specify which fields should be returned without the prefix
     /** @var string[] */
@@ -31,17 +31,17 @@ class Relation {
     // Name of the column to do the join in the owner Model (parent)
     // If there are 2 relations with the same Model, use "AsModelName.fieldName" to give the Model a different name
     // By default the primary key of the Related Model is used
-    private string $ownerJoin    = "";
+    private string $ownerJoin = "";
 
 
     // By default a prefix is added to the field names but it can be disabled
-    private bool  $withPrefix    = true;
+    private bool $withPrefix = true;
 
     // The prefix to be used for the fields. By default it uses the name of the property
-    private string $prefix       = "";
+    private string $prefix = "";
 
     // Allows to use the 'isDeleted' field of the Model. Is not required when using the fieldNames
-    private bool  $withDeleted   = false;
+    private bool $withDeleted = false;
 
 
 
@@ -56,13 +56,13 @@ class Relation {
      * @param bool     $withDeleted   Optional.
      */
     public function __construct(
-        array  $fieldNames    = [],
-        array  $withoutPrefix = [],
-        string $relationJoin  = "",
-        string $ownerJoin     = "",
-        bool   $withPrefix    = true,
-        string $prefix        = "",
-        bool   $withDeleted   = false,
+        array $fieldNames = [],
+        array $withoutPrefix = [],
+        string $relationJoin = "",
+        string $ownerJoin = "",
+        bool $withPrefix = true,
+        string $prefix = "",
+        bool $withDeleted = false,
     ) {
         $this->fieldNames    = $fieldNames;
         $this->withoutPrefix = $withoutPrefix;
@@ -77,7 +77,11 @@ class Relation {
 
 
     // Need to parse the Model to get an SQL Expression like:
-    // LEFT JOIN `relationModelName` AS `relationAliasName` ON (relationAliasName.relationFieldName = ownerModelName.ownerFieldName AND relationModelName.andFieldName = andTableName.andFieldName AND andTableName.isDeleted = 1)
+    // LEFT JOIN `relationModelName` AS `relationAliasName` ON (
+    //     relationAliasName.relationFieldName = ownerModelName.ownerFieldName AND
+    //     relationModelName.andFieldName = andTableName.andFieldName AND
+    //     andTableName.isDeleted = 1
+    // )
 
     // The joins are in the form of:
     // - relationJoin: Join associated with the Model used as the type of the attribute. It can be in the form of:
@@ -147,12 +151,10 @@ class Relation {
         string $relationModelName,
         string $relationAliasName,
         string $relationFieldDbName,
-
         string $ownerModelName,
         string $ownerFieldDbName,
         string $ownerAndQuery,
-
-        array  $fields,
+        array $fields,
     ): Relation {
         $result = new self();
         $result->relationModelName   = $relationModelName;
@@ -304,12 +306,14 @@ class Relation {
             }
 
             // Dont add a prefix in this cases
-            if ($this->withPrefix && !Arrays::contains($parentFields, $field->name) && (
-                $field->isSchemaID() ||
-                $field->isCode ||
-                Strings::startsWith($field->name, $this->prefix) ||
-                Arrays::contains($this->withoutPrefix, $field->name)
-            )) {
+            if ($this->withPrefix &&
+                !Arrays::contains($parentFields, $field->name) && (
+                    $field->isSchemaID() ||
+                    $field->isCode ||
+                    Strings::startsWith($field->name, $this->prefix) ||
+                    Arrays::contains($this->withoutPrefix, $field->name)
+                )
+            ) {
                 $fieldName = $field->name;
             }
 
@@ -446,9 +450,9 @@ class Relation {
     public function getAndFieldNames(): array {
         $andParts = Strings::split($this->ownerAndQuery, " AND ");
         $result   = [];
-        for ($i = 0; $i < count($andParts); $i++) {
-            if (Strings::contains($andParts[$i], ".")) {
-                $result[] = trim(Strings::substringAfter($andParts[$i], "."));
+        foreach ($andParts as $part) {
+            if (Strings::contains($part, ".")) {
+                $result[] = trim(Strings::substringAfter($part, "."));
             }
         }
         return count($result) > 0 ? $result : [];

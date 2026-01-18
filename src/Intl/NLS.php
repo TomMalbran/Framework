@@ -261,7 +261,7 @@ class NLS {
 
         $glue   = self::getString($useOr ? "GENERAL_OR" : "GENERAL_AND", $language);
         $result = $strings[0];
-        for ($i = 1; $i < $count; $i++) {
+        for ($i = 1; $i < $count; $i += 1) {
             $string  = $strings[$i] ?? "";
             $result .= ($i < $count - 1 ? ", " : " $glue ") . $string;
         }

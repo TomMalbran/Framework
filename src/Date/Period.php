@@ -161,21 +161,21 @@ class Period {
         $year   = DateTime::getYear();
 
         $result = match ($this->period) {
-            self::Today       => DateTime::createTime($day,             $month,     $year),
-            self::Yesterday   => DateTime::createTime($day - 1,         $month,     $year),
-            self::Last7Days   => DateTime::createTime($day - 7,         $month,     $year),
-            self::Last15Days  => DateTime::createTime($day - 15,        $month,     $year),
-            self::Last30Days  => DateTime::createTime($day - 30,        $month,     $year),
-            self::Last60Days  => DateTime::createTime($day - 60,        $month,     $year),
-            self::Last90Days  => DateTime::createTime($day - 90,        $month,     $year),
-            self::Last120Days => DateTime::createTime($day - 120,       $month,     $year),
-            self::LastYear    => DateTime::createTime($day,             $month,     $year - 1),
-            self::ThisWeek    => DateTime::createTime($day - $date,     $month,     $year),
-            self::ThisMonth   => DateTime::createTime(1,                $month,     $year),
-            self::ThisYear    => DateTime::createTime(1,                1,          $year),
-            self::PastWeek    => DateTime::createTime($day - $date - 7, $month,     $year),
-            self::PastMonth   => DateTime::createTime(1,                $month - 1, $year),
-            self::PastYear    => DateTime::createTime(1,                1,          $year - 1),
+            self::Today       => DateTime::createTime($day, $month, $year),
+            self::Yesterday   => DateTime::createTime($day - 1, $month, $year),
+            self::Last7Days   => DateTime::createTime($day - 7, $month, $year),
+            self::Last15Days  => DateTime::createTime($day - 15, $month, $year),
+            self::Last30Days  => DateTime::createTime($day - 30, $month, $year),
+            self::Last60Days  => DateTime::createTime($day - 60, $month, $year),
+            self::Last90Days  => DateTime::createTime($day - 90, $month, $year),
+            self::Last120Days => DateTime::createTime($day - 120, $month, $year),
+            self::LastYear    => DateTime::createTime($day, $month, $year - 1),
+            self::ThisWeek    => DateTime::createTime($day - $date, $month, $year),
+            self::ThisMonth   => DateTime::createTime(1, $month, $year),
+            self::ThisYear    => DateTime::createTime(1, 1, $year),
+            self::PastWeek    => DateTime::createTime($day - $date - 7, $month, $year),
+            self::PastMonth   => DateTime::createTime(1, $month - 1, $year),
+            self::PastYear    => DateTime::createTime(1, 1, $year - 1),
             self::AllPeriod   => 0,
             self::Custom      => $this->fromTime,
             default           => 0,
@@ -197,7 +197,7 @@ class Period {
         $days     = DateTime::getMonthDays(DateTime::createTime(1, $month - 1, $year));
         $pastDays = DateTime::getMonthDays(DateTime::createTime(1, 12, $year - 1));
 
-        $result   = match ($this->period) {
+        $result = match ($this->period) {
             self::Today,
             self::Last7Days,
             self::Last15Days,

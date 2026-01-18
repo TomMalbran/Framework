@@ -18,5 +18,4 @@ class OpenAIOutput {
     public int    $inputTokens   = 0;
     public int    $outputTokens  = 0;
     public bool   $didSearchCall = false;
-
 }

@@ -41,9 +41,9 @@ class Expression {
      * @return Expression
      */
     public static function create(
-        string    $name,
+        string $name,
         FieldType $type,
-        string    $expression,
+        string $expression,
     ): Expression {
         $result = new self($expression);
         $result->name = $name;

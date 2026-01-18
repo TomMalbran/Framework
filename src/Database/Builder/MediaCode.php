@@ -19,25 +19,32 @@ class MediaCode implements DiscoveryBuilder {
     public static function generateCode(): int {
         $schemaModels = SchemaFactory::buildData(false);
 
-        $fields = [];
+        $fields     = [];
+        $hasReplace = false;
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->fields as $field) {
                 if ($field->isFile || $field->hasFile) {
-                    $fields[] = [
+                    $isReplace = $field->isText || $field->isLongText || $field->isJSON;
+                    $fields[]  = [
                         "name"      => $schemaModel->name,
                         "query"     => Strings::lowerCaseFirst("{$schemaModel->name}Query"),
                         "tableName" => $schemaModel->tableName,
                         "fieldName" => $field->name,
-                        "isReplace" => $field->isText || $field->isLongText || $field->isJSON,
+                        "isReplace" => $isReplace,
                     ];
+                    if ($isReplace) {
+                        $hasReplace = true;
+                    }
                 }
             }
         }
 
         // Builds the code
         return Builder::generateCode("MediaSchema", [
-            "fields" => $fields,
-            "total"  => count($fields),
+            "fields"     => $fields,
+            "hasFields"  => count($fields) > 0,
+            "hasReplace" => $hasReplace,
+            "total"      => count($fields),
         ]);
     }
 

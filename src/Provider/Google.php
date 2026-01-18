@@ -1,8 +1,6 @@
 <?php
 namespace Framework\Provider;
 
-use Framework\Config\Config;
-
 /**
  * The Google Provider
  */

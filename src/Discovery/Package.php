@@ -3,7 +3,6 @@ namespace Framework\Discovery;
 
 use Framework\Application;
 use Framework\File\File;
-use Framework\Utils\Strings;
 
 /**
  * The Framework Package

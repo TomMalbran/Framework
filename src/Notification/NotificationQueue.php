@@ -143,7 +143,7 @@ class NotificationQueue extends NotificationQueueSchema {
         string $message,
         string $url,
         string $dataType,
-        int $dataID
+        int $dataID,
     ): int {
         return self::createEntity(
             credentialID:       $credentialID,
