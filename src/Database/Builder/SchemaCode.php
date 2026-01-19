@@ -55,6 +55,7 @@ class SchemaCode {
             "validations"         => $validations,
             "hasValidateImports"  => count($valImports) > 0,
             "validateImports"     => $valImports,
+            "validatesColor"      => self::validatesColor($schemaModel),
             "errorPrefix"         => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
             "hasID"               => $schemaModel->hasID,
             "idName"              => $schemaModel->idName,
@@ -368,5 +369,19 @@ class SchemaCode {
 
         sort($uses);
         return $uses;
+    }
+
+    /**
+     * Returns true if there is a Color validation
+     * @param SchemaModel $schemaModel
+     * @return bool
+     */
+    private static function validatesColor(SchemaModel $schemaModel): bool {
+        foreach ($schemaModel->validates as $validate) {
+            if ($validate->type === ValidateType::Color) {
+                return true;
+            }
+        }
+        return false;
     }
 }

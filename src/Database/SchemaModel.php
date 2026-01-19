@@ -399,8 +399,9 @@ class SchemaModel {
         }
 
         return [
-            "params" => Strings::join($params, ", "),
-            "fields" => $fields,
+            "params"    => Strings::join($params, ", "),
+            "paramList" => $params,
+            "fields"    => $fields,
         ];
     }
 

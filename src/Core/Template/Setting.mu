@@ -31,7 +31,7 @@ class Setting {
 {{#sections}}
     /**
      * Returns all the Settings for {{name}}
-     * @param boolean $asObject Optional.
+     * @param bool    $asObject Optional.
      * @return array{}|object
      */
     public static function getAll{{name}}(bool $asObject = false): array|object {

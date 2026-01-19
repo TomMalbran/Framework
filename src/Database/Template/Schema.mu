@@ -37,9 +37,8 @@ use Framework\Utils\Arrays;{{/hasID}}
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
 use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
-use Framework\Utils\Errors;
-use Framework\Utils\Color;
-use Framework\Utils\Strings;{{/hasValidation}}
+use Framework\Utils\Errors;{{#validatesColor}}
+use Framework\Utils\Color;{{/validatesColor}}{{/hasValidation}}
 
 /**
  * The {{name}} Schema
@@ -83,7 +82,9 @@ class {{name}}Schema extends Schema {
                 {{#hasExpressions}}
                 expressions:   [
                 {{#expressions}}
-                    Expression::create({{{params}}}),
+                    Expression::create({{#paramList}}
+                        {{{.}}},{{/paramList}}
+                    ),
                 {{/expressions}}
                 ],
                 {{/hasExpressions}}
@@ -167,7 +168,7 @@ class {{name}}Schema extends Schema {
                 $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
             {{/isUnique}}
             {{#maxLength}}
-            } elseif (Strings::length($request->getString("{{fieldName}}")) > {{maxLength}}) {
+            } elseif (!$request->isValidLength("{{fieldName}}", {{maxLength}})) {
                 $errors->add("{{fieldName}}", "{{fieldError}}_LENGTH", {{maxLength}});
             {{/maxLength}}
             }
@@ -821,8 +822,8 @@ class {{name}}Schema extends Schema {
             request: $entityRequest,{{/usesRequest}}
             fields: $entityFields,{{#hasEditParents}}
             orderQuery: self::createParentQuery({{parentsList}})->query,{{/hasEditParents}}{{#hasUsers}}
-            credentialID: $modifiedUser,{{/hasUsers}}
-            {{#hasTimestamps}}skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
+            credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
+            skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
             skipEmpty: $skipEmpty,
             skipUnset: $skipUnset,
         );

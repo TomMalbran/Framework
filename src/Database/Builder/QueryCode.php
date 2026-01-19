@@ -179,6 +179,7 @@ class QueryCode {
      */
     private static function getQueryType(FieldType $type): string {
         return match ($type) {
+            FieldType::None    => "",
             FieldType::Boolean => "BooleanQuery",
             FieldType::Number,
             FieldType::Float   => "NumberQuery",
@@ -186,8 +187,8 @@ class QueryCode {
             FieldType::Text,
             FieldType::LongText,
             FieldType::JSON,
-            FieldType::File    => "StringQuery",
-            default            => "Query",
+            FieldType::File,
+            FieldType::Encrypt => "StringQuery",
         };
     }
 }

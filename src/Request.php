@@ -335,6 +335,17 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns true if the value at the given key is a String with a valid length
+     * @param string $key
+     * @param int    $maxLength
+     * @return bool
+     */
+    public function isValidLength(string $key, int $maxLength): bool {
+        $value = $this->getString($key);
+        return Strings::length($value) <= $maxLength;
+    }
+
+    /**
      * Returns true if the value at the given key is a valid Number
      * @param string $key
      * @return bool
