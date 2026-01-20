@@ -718,7 +718,12 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @param bool   $skipEmpty   Optional.
      * @return int
      */
-    public function toTimeHour(string $dateKey, string $hourKey, bool $useTimezone = true, bool $skipEmpty = false): int {
+    public function toTimeHour(
+        string $dateKey,
+        string $hourKey,
+        bool $useTimezone = true,
+        bool $skipEmpty = false,
+    ): int {
         if ($skipEmpty && (!$this->has($dateKey) || !$this->has($hourKey))) {
             return 0;
         }

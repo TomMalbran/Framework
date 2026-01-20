@@ -23,7 +23,7 @@ class Expression {
      * @param string $expression
      */
     public function __construct(string $expression) {
-        $this->expression = $expression;
+        $this->expression = Strings::replace($expression, "\n", " ");
     }
 
 

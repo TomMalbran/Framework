@@ -198,7 +198,12 @@ class File {
      * @param bool            $createDir Optional.
      * @return bool
      */
-    public static function create(string $path, string $fileName, array|string $content, bool $createDir = false): bool {
+    public static function create(
+        string $path,
+        string $fileName,
+        array|string $content,
+        bool $createDir = false,
+    ): bool {
         $fullPath = self::parsePath($path, $fileName);
         if ($fullPath === "") {
             return false;

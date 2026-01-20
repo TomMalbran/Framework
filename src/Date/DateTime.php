@@ -173,7 +173,14 @@ class DateTime {
      * @param int $second
      * @return int
      */
-    public static function createTime(int $day, int $month, int $year, int $hour = 0, int $minute = 0, int $second = 0): int {
+    public static function createTime(
+        int $day,
+        int $month,
+        int $year,
+        int $hour = 0,
+        int $minute = 0,
+        int $second = 0,
+    ): int {
         $result = mktime($hour, $minute, $second, $month, $day, $year);
         return $result !== false ? $result : 0;
     }
@@ -310,7 +317,12 @@ class DateTime {
      * @param int        $maxHour Optional.
      * @return bool
      */
-    public static function isValidHour(string $string, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
+    public static function isValidHour(
+        string $string,
+        ?array $minutes = null,
+        int $minHour = 0,
+        int $maxHour = 23,
+    ): bool {
         $parts = Strings::split($string, ":");
         return (
             isset($parts[0]) && Numbers::isValid($parts[0], $minHour, $maxHour) &&
@@ -399,7 +411,11 @@ class DateTime {
      * @param bool     $useTimeZone Optional.
      * @return bool
      */
-    public static function isFutureDate(string $dateString, DateType $dateType = DateType::Middle, bool $useTimeZone = true): bool {
+    public static function isFutureDate(
+        string $dateString,
+        DateType $dateType = DateType::Middle,
+        bool $useTimeZone = true,
+    ): bool {
         $timeStamp = self::toDay($dateString, $dateType, $useTimeZone);
         return self::isFutureTime($timeStamp);
     }
@@ -814,7 +830,12 @@ class DateTime {
      * @param bool $useTimeZone Optional.
      * @return int
      */
-    public static function getMonthDayPos(int $timeStamp = 0, int $dayPosition = 0, int $weekDay = 0, bool $useTimeZone = false): int {
+    public static function getMonthDayPos(
+        int $timeStamp = 0,
+        int $dayPosition = 0,
+        int $weekDay = 0,
+        bool $useTimeZone = false,
+    ): int {
         $timeStamp   = self::getMonthStart($timeStamp);
         $thisWeekDay = self::getDayOfWeek($timeStamp);
         $increase    = $thisWeekDay > $weekDay ? 7 : 0;
@@ -831,7 +852,12 @@ class DateTime {
      * @param bool $useTimeZone Optional.
      * @return int
      */
-    public static function addMonths(int $timeStamp = 0, int $monthDiff = 0, int $day = 0, bool $useTimeZone = false): int {
+    public static function addMonths(
+        int $timeStamp = 0,
+        int $monthDiff = 0,
+        int $day = 0,
+        bool $useTimeZone = false,
+    ): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = self::createTime(
             $day > 0 ? $day : self::getDay($timeStamp),
@@ -851,7 +877,8 @@ class DateTime {
      * @return int
      */
     public static function getMonthsDiff(int $timeStamp1, int $timeStamp2): int {
-        return 12 * (self::getYear($timeStamp1) - self::getYear($timeStamp2)) + self::getMonth($timeStamp1) - self::getMonth($timeStamp2);
+        return 12 * (self::getYear($timeStamp1) - self::getYear($timeStamp2)) +
+            self::getMonth($timeStamp1) - self::getMonth($timeStamp2);
     }
 
     /**
@@ -862,8 +889,14 @@ class DateTime {
      * @param string $language    Optional.
      * @return string
      */
-    public static function getMonthYear(int $timeStamp, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
-        return self::getMonthName(self::getMonth($timeStamp), $length, $inUpperCase, $language) . " " . self::getYear($timeStamp);
+    public static function getMonthYear(
+        int $timeStamp,
+        int $length = 0,
+        bool $inUpperCase = false,
+        string $language = "",
+    ): string {
+        return self::getMonthName(self::getMonth($timeStamp), $length, $inUpperCase, $language) . " " .
+            self::getYear($timeStamp);
     }
 
     /**
@@ -874,7 +907,12 @@ class DateTime {
      * @param string $language    Optional.
      * @return string
      */
-    public static function getMonthName(int $month, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+    public static function getMonthName(
+        int $month,
+        int $length = 0,
+        bool $inUpperCase = false,
+        string $language = "",
+    ): string {
         $result = NLS::getIndex("DATE_TIME_MONTHS", $month - 1, $language);
         if ($length > 0) {
             $result = Strings::substring($result, 0, $length);
@@ -927,7 +965,13 @@ class DateTime {
      * @param bool $useTimeZone Optional.
      * @return int
      */
-    public static function addYears(int $timeStamp = 0, int $yearDiff = 0, int $month = 0, int $day = 0, bool $useTimeZone = false): int {
+    public static function addYears(
+        int $timeStamp = 0,
+        int $yearDiff = 0,
+        int $month = 0,
+        int $day = 0,
+        bool $useTimeZone = false,
+    ): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = self::createTime(
             $day   > 0 ? $day   : self::getDay($timeStamp),
@@ -950,7 +994,12 @@ class DateTime {
      * @param bool $useTimeZone Optional.
      * @return int
      */
-    public static function getWeekStart(int $timeStamp = 0, int $dayDiff = 0, bool $startMonday = false, bool $useTimeZone = false): int {
+    public static function getWeekStart(
+        int $timeStamp = 0,
+        int $dayDiff = 0,
+        bool $startMonday = false,
+        bool $useTimeZone = false,
+    ): int {
         $timeStamp = self::getTime($timeStamp);
         $startDay  = self::getDay($timeStamp) - self::getDayOfWeek($timeStamp, $startMonday);
         $month     = self::getMonth($timeStamp);
@@ -1070,7 +1119,12 @@ class DateTime {
      * @param string     $language    Optional.
      * @return string
      */
-    public static function getDayText(int $timeStamp = 0, bool $startMonday = false, ?float $timeZone = null, string $language = ""): string {
+    public static function getDayText(
+        int $timeStamp = 0,
+        bool $startMonday = false,
+        ?float $timeZone = null,
+        string $language = "",
+    ): string {
         $dayOfWeek = self::getDayOfWeek($timeStamp, $startMonday, $timeZone);
         return self::getDayName($dayOfWeek, $startMonday, language: $language);
     }
@@ -1110,7 +1164,13 @@ class DateTime {
      * @param string $language    Optional.
      * @return string
      */
-    public static function getDayName(int $day, bool $startMonday = false, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+    public static function getDayName(
+        int $day,
+        bool $startMonday = false,
+        int $length = 0,
+        bool $inUpperCase = false,
+        string $language = "",
+    ): string {
         $key    = $startMonday ? "DATE_TIME_DAYS_MONDAY" : "DATE_TIME_DAYS";
         $result = NLS::getIndex($key, $day, $language);
 
@@ -1131,7 +1191,12 @@ class DateTime {
      * @param string $language    Optional.
      * @return string
      */
-    public static function getDayMonth(int $timeStamp, int $length = 0, bool $inUpperCase = false, string $language = ""): string {
+    public static function getDayMonth(
+        int $timeStamp,
+        int $length = 0,
+        bool $inUpperCase = false,
+        string $language = "",
+    ): string {
         $day   = self::getDayZero($timeStamp);
         $month = self::getMonth($timeStamp);
         return "$day " . self::getMonthName($month, $length, $inUpperCase, $language);

@@ -101,7 +101,11 @@ class Schema {
      * @param bool             $decrypted   Optional.
      * @return array{}
      */
-    protected static function getSchemaEntity(Query|int|string $query, bool $withDeleted = true, bool $decrypted = false): array {
+    protected static function getSchemaEntity(
+        Query|int|string $query,
+        bool $withDeleted = true,
+        bool $decrypted = false,
+    ): array {
         $query   = self::generateQueryID($query, $withDeleted)->limit(1);
         $request = self::requestSchemaData($query, decrypted: $decrypted);
         return isset($request[0]) ? $request[0] : [];
@@ -391,7 +395,11 @@ class Schema {
      * @param int                 $credentialID Optional.
      * @return int
      */
-    protected static function createSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
+    protected static function createSchemaEntity(
+        ?Request $request = null,
+        array $fields = [],
+        int $credentialID = 0,
+    ): int {
         $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
@@ -406,7 +414,11 @@ class Schema {
      * @param int                 $credentialID Optional.
      * @return int
      */
-    protected static function replaceSchemaEntity(?Request $request = null, array $fields = [], int $credentialID = 0): int {
+    protected static function replaceSchemaEntity(
+        ?Request $request = null,
+        array $fields = [],
+        int $credentialID = 0,
+    ): int {
         $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields);
         $modification->addModification($credentialID);
@@ -477,7 +489,12 @@ class Schema {
      * @param Query|null          $orderQuery   Optional.
      * @return int
      */
-    protected static function createSchemaEntityWithOrder(?Request $request = null, array $fields = [], int $credentialID = 0, ?Query $orderQuery = null): int {
+    protected static function createSchemaEntityWithOrder(
+        ?Request $request = null,
+        array $fields = [],
+        int $credentialID = 0,
+        ?Query $orderQuery = null,
+    ): int {
         $modification = new Modification(static::getModel());
         $modification->addFields($request, $fields);
         $modification->addCreation($credentialID);
@@ -534,7 +551,11 @@ class Schema {
      * @param Query|null       $orderQuery   Optional.
      * @return bool
      */
-    protected static function deleteSchemaEntityWithOrder(Query|int|string $query, int $credentialID = 0, ?Query $orderQuery = null): bool {
+    protected static function deleteSchemaEntityWithOrder(
+        Query|int|string $query,
+        int $credentialID = 0,
+        ?Query $orderQuery = null,
+    ): bool {
         $elem = self::getSchemaEntity($query);
         if (self::deleteSchemaEntity($query, $credentialID)) {
             self::ensureSchemaOrder($elem, null, $orderQuery);

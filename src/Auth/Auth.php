@@ -51,7 +51,12 @@ class Auth {
      * @param int    $timezone
      * @return bool
      */
-    public static function validateCredential(string $accessToken, string $refreshToken, string $langcode, int $timezone): bool {
+    public static function validateCredential(
+        string $accessToken,
+        string $refreshToken,
+        string $langcode,
+        int $timezone,
+    ): bool {
         Reset::deleteOld();
         AuthToken::deleteOld();
 
@@ -102,7 +107,12 @@ class Auth {
      * @param int              $timezone
      * @return bool
      */
-    private static function setLanguageTimezone(CredentialEntity $credential, CredentialEntity $admin, string $langcode, int $timezone): bool {
+    private static function setLanguageTimezone(
+        CredentialEntity $credential,
+        CredentialEntity $admin,
+        string $langcode,
+        int $timezone,
+    ): bool {
         $entity = $credential;
         if ($admin->exists()) {
             $entity = $admin;
@@ -300,7 +310,11 @@ class Auth {
      * @param int                   $userID     Optional.
      * @return bool
      */
-    public static function setCredential(CredentialEntity $credential, ?CredentialEntity $admin = null, int $userID = 0): bool {
+    public static function setCredential(
+        CredentialEntity $credential,
+        ?CredentialEntity $admin = null,
+        int $userID = 0,
+    ): bool {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
         self::$userID       = $userID;

@@ -474,7 +474,12 @@ class Image {
      * @param int         $quality  Optional.
      * @return bool
      */
-    public static function createImage(int $imgType, GdImage $image, ?string $fileName = null, int $quality = 90): bool {
+    public static function createImage(
+        int $imgType,
+        GdImage $image,
+        ?string $fileName = null,
+        int $quality = 90,
+    ): bool {
         $result = match ($imgType) {
             1  => imagegif($image, $fileName),
             2  => imagejpeg($image, $fileName, $quality),

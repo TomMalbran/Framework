@@ -25,7 +25,10 @@ enum {{status}} {
      * @param {{status}} $default Optional.
      * @return {{status}}
      */
-    public static function fromValue({{status}}|string $value, {{status}} $default = self::None): {{status}} {
+    public static function fromValue(
+        {{status}}|string $value,
+        {{status}} $default = self::None,
+    ): {{status}} {
         if ($value instanceof {{status}}) {
             return $value;
         }

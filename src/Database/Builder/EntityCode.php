@@ -80,7 +80,11 @@ class EntityCode {
      * @param FieldType                                                      $fieldType
      * @return bool
      */
-    private static function addAttribute(array &$result, string $fieldKey, FieldType $fieldType): bool {
+    private static function addAttribute(
+        array &$result,
+        string $fieldKey,
+        FieldType $fieldType,
+    ): bool {
         switch ($fieldType) {
         case FieldType::Boolean:
             $result[] = self::getTypeData($fieldKey, "bool");

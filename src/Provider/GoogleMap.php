@@ -93,7 +93,12 @@ class GoogleMap {
      * @param float $longitude2
      * @return float|null
      */
-    public static function calculateDistance(float $latitude1, float $longitude1, float $latitude2, float $longitude2): ?float {
+    public static function calculateDistance(
+        float $latitude1,
+        float $longitude1,
+        float $latitude2,
+        float $longitude2,
+    ): ?float {
         if (!self::isActive()) {
             return null;
         }

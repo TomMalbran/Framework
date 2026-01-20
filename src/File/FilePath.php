@@ -73,7 +73,11 @@ class FilePath implements DiscoveryBuilder {
      * @param bool $forPrivate   Optional.
      * @return string
      */
-    public static function getBasePath(bool $forFramework = false, bool $forBackend = false, bool $forPrivate = false): string {
+    public static function getBasePath(
+        bool $forFramework = false,
+        bool $forBackend = false,
+        bool $forPrivate = false,
+    ): string {
         if ($forFramework) {
             $result = Package::getBasePath();
         } elseif ($forBackend) {

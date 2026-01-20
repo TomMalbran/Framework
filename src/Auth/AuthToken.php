@@ -123,9 +123,12 @@ class AuthToken {
 
         $time  = time();
         $token = [
-            "iat"  => $time,                                   // Issued at: time when the token was generated
-            "nbf"  => $time + 10,                              // Not before: 10 seconds
-            "exp"  => $time + self::getAccessTokenDuration(),  // Expire: In x hour
+            // Issued at: time when the token was generated
+            "iat"  => $time,
+            // Not before: 10 seconds
+            "nbf"  => $time + 10,
+            // Expire: In x hour
+            "exp"  => $time + self::getAccessTokenDuration(),
             "data" => $data,
         ];
         return JWT::encode($token, Config::getAuthKey(), self::Algorithm);

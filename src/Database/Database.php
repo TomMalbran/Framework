@@ -78,7 +78,9 @@ class Database {
     public function connect(): bool {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database, $this->port);
         if ($this->mysqli->connect_error !== null) {
-            trigger_error("Connect Error ({$this->mysqli->connect_errno}) {$this->mysqli->connect_error}", E_USER_ERROR);
+            $errno = $this->mysqli->connect_errno;
+            $error = $this->mysqli->connect_error;
+            trigger_error("Connect Error ($errno) $error", E_USER_ERROR);
         } elseif ($this->database !== "") {
             $this->isConnected = true;
         }
@@ -1136,7 +1138,8 @@ class Database {
             $start  += 250;
 
             if (!Arrays::isEmpty($request) && isset($request[0])) {
-                $result .= "INSERT INTO `$tableName` $crlf\t(`" . Strings::joinKeys($request[0], "`, `") . "`) $crlf VALUES ";
+                $names   = Strings::joinKeys($request[0], "`, `");
+                $result .= "INSERT INTO `$tableName` $crlf\t(`$names`) $crlf VALUES ";
 
                 foreach ($request as $index => $row) {
                     $fieldList = [];

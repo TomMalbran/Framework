@@ -120,7 +120,9 @@ class TimeTable {
                 $errors->add("$fieldKey-$index-to", "GENERAL_ERROR_PERIOD_TO_TIME");
                 $hasError = true;
             }
-            if ($timeTable->from !== "" && $timeTable->to !== "" && !DateTime::isValidHourPeriod($timeTable->from, $timeTable->to, true)) {
+            if ($timeTable->from !== "" && $timeTable->to !== "" &&
+                !DateTime::isValidHourPeriod($timeTable->from, $timeTable->to, true)
+            ) {
                 $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TO");
                 $hasError = true;
             }

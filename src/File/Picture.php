@@ -63,7 +63,15 @@ class Picture {
      * @param bool   $centered Optional.
      * @return bool
      */
-    public function writeText(string $text, int $x, int $y, int $color, string $fontFile, int $fontSize, bool $centered = false): bool {
+    public function writeText(
+        string $text,
+        int $x,
+        int $y,
+        int $color,
+        string $fontFile,
+        int $fontSize,
+        bool $centered = false,
+    ): bool {
         if ($this->image === null) {
             return false;
         }

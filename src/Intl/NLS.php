@@ -221,7 +221,12 @@ class NLS {
      * @param string  $language Optional.
      * @return string
      */
-    public static function pluralize(string $key, int $count, array $args = [], string $language = ""): string {
+    public static function pluralize(
+        string $key,
+        int $count,
+        array $args = [],
+        string $language = "",
+    ): string {
         $suffix = $count === 1 ? "_SINGULAR" : "_PLURAL";
         $args   = array_merge([ $count ], $args);
         return self::format($key . $suffix, $args, $language);
@@ -235,7 +240,12 @@ class NLS {
      * @param string   $language Optional.
      * @return string
      */
-    public static function pluralizeList(string $key, array $strings, bool $useOr = false, string $language = ""): string {
+    public static function pluralizeList(
+        string $key,
+        array $strings,
+        bool $useOr = false,
+        string $language = "",
+    ): string {
         $suffix = count($strings) === 1 ? "_SINGULAR" : "_PLURAL";
         $args   = [ self::join($strings, $useOr, $language) ];
         return self::format($key . $suffix, $args, $language);

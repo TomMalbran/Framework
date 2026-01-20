@@ -233,7 +233,12 @@ class MailChimp {
      * @param string $status    Optional.
      * @return bool
      */
-    public static function editSubscriber(string $email, string $firstName, string $lastName, string $status = "subscribed"): bool {
+    public static function editSubscriber(
+        string $email,
+        string $firstName,
+        string $lastName,
+        string $status = "subscribed",
+    ): bool {
         if (!Config::isMailchimpActive() || !Config::isMailchimpSubscriberActive()) {
             return false;
         }
@@ -296,7 +301,14 @@ class MailChimp {
      * @param int            $folderID   Optional.
      * @return string|null
      */
-    public static function sendCampaign(string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): ?string {
+    public static function sendCampaign(
+        string $subject,
+        int $time,
+        int $templateID,
+        ?array $sections = null,
+        ?array $emails = null,
+        int $folderID = 0,
+    ): ?string {
         if (!Config::isMailchimpActive() || !Config::isMailchimpCreateActive()) {
             return "disabled";
         }
@@ -337,7 +349,15 @@ class MailChimp {
      * @param int            $folderID    Optional.
      * @return bool
      */
-    public static function updateCampaign(string $mailChimpID, string $subject, int $time, int $templateID, ?array $sections = null, ?array $emails = null, int $folderID = 0): bool {
+    public static function updateCampaign(
+        string $mailChimpID,
+        string $subject,
+        int $time,
+        int $templateID,
+        ?array $sections = null,
+        ?array $emails = null,
+        int $folderID = 0,
+    ): bool {
         if (!Config::isMailchimpActive() || !Config::isMailchimpCreateActive()) {
             return false;
         }
@@ -409,7 +429,12 @@ class MailChimp {
      * @param int           $folderID    Optional.
      * @return bool
      */
-    private static function editCampaign(string $mailChimpID, string $subject, ?array $emails = null, int $folderID = 0): bool {
+    private static function editCampaign(
+        string $mailChimpID,
+        string $subject,
+        ?array $emails = null,
+        int $folderID = 0,
+    ): bool {
         $recipients = self::parseRecipients($emails);
         if ($recipients === null || count($recipients) === 0) {
             return false;

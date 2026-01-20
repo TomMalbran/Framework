@@ -54,12 +54,13 @@ class Selection {
             $this->selects[] = "$mainKey.{$this->schemaModel->idDbName} AS id";
         }
         foreach ($this->schemaModel->fields as $field) {
+            $fieldName = "$mainKey.{$field->name}";
             if ($decrypted && $field->type === FieldType::Encrypt) {
-                $this->selects[] = "CAST(AES_DECRYPT($mainKey.$field->name, '$masterKey') AS CHAR(255)) {$field->name}Decrypt";
+                $this->selects[] = "CAST(AES_DECRYPT($fieldName, '$masterKey') AS CHAR(255)) {$field->name}Decrypt";
             } elseif ($field->dbName !== $field->name) {
                 $this->selects[] = "$mainKey.$field->dbName AS $field->name";
             } else {
-                $this->selects[] = "$mainKey.$field->name";
+                $this->selects[] = $fieldName;
             }
         }
         return $this;

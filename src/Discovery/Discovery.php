@@ -161,7 +161,11 @@ class Discovery {
      * @param bool   $withError    Optional.
      * @return array<string,ReflectionClass<object>>
      */
-    public static function getReflectionClasses(string $dir = "", bool $forFramework = false, bool $withError = false): array {
+    public static function getReflectionClasses(
+        string $dir = "",
+        bool $forFramework = false,
+        bool $withError = false,
+    ): array {
         $classes = self::findClasses($dir, $forFramework, $withError);
         $result  = [];
 
@@ -190,7 +194,12 @@ class Discovery {
      * @param bool   $withError    Optional.
      * @return object[]
      */
-    public static function getClassesWithInterface(string $interface, string $dir = "", bool $forFramework = false, bool $withError = false): array {
+    public static function getClassesWithInterface(
+        string $interface,
+        string $dir = "",
+        bool $forFramework = false,
+        bool $withError = false,
+    ): array {
         $reflections = self::getReflectionClasses($dir, $forFramework, $withError);
         $result      = [];
 
@@ -212,7 +221,12 @@ class Discovery {
      * @param bool   $withError    Optional.
      * @return object[]
      */
-    public static function getClassesWithParent(string $parentClass, string $dir = "", bool $forFramework = false, bool $withError = false): array {
+    public static function getClassesWithParent(
+        string $parentClass,
+        string $dir = "",
+        bool $forFramework = false,
+        bool $withError = false,
+    ): array {
         $reflections = self::getReflectionClasses($dir, $forFramework, $withError);
         $result      = [];
 
@@ -265,8 +279,12 @@ class Discovery {
         $result     = [];
         $reflection = new ReflectionClass($class);
 
+        if ($filter === null) {
+            $filter = ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED;
+        }
+
         /** @var list<ReflectionProperty> */
-        $props = $reflection->getProperties($filter ?? ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+        $props = $reflection->getProperties($filter);
 
         foreach ($props as $prop) {
             $type     = $prop->getType();

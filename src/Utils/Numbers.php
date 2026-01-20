@@ -151,7 +151,12 @@ class Numbers {
      * @param string    $default        Optional.
      * @return string
      */
-    public static function formatInt(int|float $number, int $decimals = 0, int $maxForDecimals = 1000, string $default = ""): string {
+    public static function formatInt(
+        int|float $number,
+        int $decimals = 0,
+        int $maxForDecimals = 1000,
+        string $default = "",
+    ): string {
         $float = $decimals > 0 ? self::toFloat($number, $decimals) : $number;
         return self::formatFloat($float, $decimals, $maxForDecimals, $default);
     }
@@ -164,7 +169,12 @@ class Numbers {
      * @param string    $default        Optional.
      * @return string
      */
-    public static function formatFloat(int|float $number, int $decimals, int $maxForDecimals = 1000, string $default = ""): string {
+    public static function formatFloat(
+        int|float $number,
+        int $decimals,
+        int $maxForDecimals = 1000,
+        string $default = "",
+    ): string {
         $float = floatval($number);
         if ($float !== 0.0) {
             $decimals = ($maxForDecimals === 0 || $float < $maxForDecimals) && !is_int($number) ? $decimals : 0;
@@ -206,7 +216,13 @@ class Numbers {
      * @param int|float $toHigh
      * @return int|float
      */
-    public static function map(int|float $number, int|float $fromLow, int|float $fromHigh, int|float $toLow, int|float $toHigh): int|float {
+    public static function map(
+        int|float $number,
+        int|float $fromLow,
+        int|float $fromHigh,
+        int|float $toLow,
+        int|float $toHigh,
+    ): int|float {
         $fromRange = $fromHigh - $fromLow;
         $toRange   = $toHigh - $toLow;
         if ($fromRange === 0) {
@@ -309,7 +325,12 @@ class Numbers {
      * @param int|null  $decimals Optional.
      * @return bool
      */
-    public static function isValidFloat(int|float $number, ?int $min = 1, ?int $max = null, ?int $decimals = null): bool {
+    public static function isValidFloat(
+        int|float $number,
+        ?int $min = 1,
+        ?int $max = null,
+        ?int $decimals = null,
+    ): bool {
         $mult = 1;
         if ($decimals !== null) {
             $numberStr    = (string)$number;
@@ -373,7 +394,12 @@ class Numbers {
      * @param string    $default        Optional.
      * @return string
      */
-    public static function formatPrice(int|float $price, int $decimals = 2, int $maxForDecimals = 1000, string $default = "0"): string {
+    public static function formatPrice(
+        int|float $price,
+        int $decimals = 2,
+        int $maxForDecimals = 1000,
+        string $default = "0",
+    ): string {
         return self::formatFloat($price, $decimals, $maxForDecimals, $default);
     }
 
@@ -448,7 +474,12 @@ class Numbers {
      * @param float $toLongitude
      * @return float
      */
-    public static function coordinatesDistance(float $fromLatitude, float $fromLongitude, float $toLatitude, float $toLongitude): float {
+    public static function coordinatesDistance(
+        float $fromLatitude,
+        float $fromLongitude,
+        float $toLatitude,
+        float $toLongitude,
+    ): float {
         $fromLatitude = deg2rad($fromLatitude);
         $toLatitude   = deg2rad($toLatitude);
         $angle        = deg2rad($fromLongitude - $toLongitude);

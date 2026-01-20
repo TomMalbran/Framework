@@ -22,7 +22,10 @@ class NotificationContent extends NotificationContentSchema implements Discovery
      * @param string           $language         Optional.
      * @return NotificationContentEntity
      */
-    public static function get(NotificationCode $notificationCode, string $language = "root"): NotificationContentEntity {
+    public static function get(
+        NotificationCode $notificationCode,
+        string $language = "root",
+    ): NotificationContentEntity {
         $langCode = Language::getCode($language);
 
         $query = new NotificationContentQuery();
@@ -78,7 +81,12 @@ class NotificationContent extends NotificationContentSchema implements Discovery
      * @param int        $position
      * @return int
      */
-    private static function migrateLanguage(Dictionary $notifications, string $language, string $languageName, int $position): int {
+    private static function migrateLanguage(
+        Dictionary $notifications,
+        string $language,
+        string $languageName,
+        int $position,
+    ): int {
         $total = 0;
 
         foreach ($notifications as $notificationCode => $notification) {

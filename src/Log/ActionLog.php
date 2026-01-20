@@ -56,12 +56,13 @@ class ActionLog extends LogActionSchema {
         $query->sessionID->orderByDesc();
         $query->createdTime->orderByDesc();
 
-        $list      = self::getEntityList($query, $request);
-        $result    = [];
-        $lastIndex = -1;
+        $list          = self::getEntityList($query, $request);
+        $result        = [];
+        $lastSessionID = 0;
+        $lastIndex     = -1;
 
         foreach ($list as $elem) {
-            if ($lastIndex < 0 || (isset($result[$lastIndex]) && isset($result[$lastIndex]["sessionID"]) && $result[$lastIndex]["sessionID"] !== $elem->sessionID)) {
+            if ($lastSessionID !== $elem->sessionID) {
                 $result[] = [
                     "sessionID"      => $elem->sessionID,
                     "credentialID"   => $elem->credentialID,
@@ -72,7 +73,8 @@ class ActionLog extends LogActionSchema {
                     "actions"        => [],
                     "isLast"         => false,
                 ];
-                $lastIndex += 1;
+                $lastSessionID = $elem->sessionID;
+                $lastIndex    += 1;
             }
             $result[$lastIndex]["actions"][] = [
                 "module"      => $elem->module,

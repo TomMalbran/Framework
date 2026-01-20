@@ -461,7 +461,10 @@ class {{name}}Schema extends Schema {
      * @param {{column}} $column
      * @return string|int
      */
-    protected static function getEntityValue({{query}} $query, {{column}} $column): string|int {
+    protected static function getEntityValue(
+        {{query}} $query,
+        {{column}} $column,
+    ): string|int {
         return self::getSchemaValue($query->query, $column->base());
     }
 
@@ -471,7 +474,10 @@ class {{name}}Schema extends Schema {
      * @param {{column}} $column
      * @return array<string|int>
      */
-    protected static function getEntityColumn({{query}} $query, {{column}} $column): array {
+    protected static function getEntityColumn(
+        {{query}} $query,
+        {{column}} $column,
+    ): array {
         return self::getSchemaColumn($query->query, $column->value, $column->key());
     }
 
@@ -989,7 +995,13 @@ class {{name}}Schema extends Schema {
      * @param int $newValue
      * @return bool
      */
-    protected static function ensureUniqueData({{query}} $query, {{column}} $column, int $id, int $oldValue, int $newValue): bool {
+    protected static function ensureUniqueData(
+        {{query}} $query,
+        {{column}} $column,
+        int $id,
+        int $oldValue,
+        int $newValue,
+    ): bool {
         return self::ensureSchemaUniqueData($query->query, $column->base(), $id, $oldValue, $newValue);
     }
 

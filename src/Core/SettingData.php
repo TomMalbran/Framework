@@ -198,7 +198,9 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
                     break;
                 }
 
-                if (Strings::isEqual($elem->section, $section) && Strings::isEqual($elem->variable, $variable)) {
+                if (Strings::isEqual($elem->section, $section) &&
+                    Strings::isEqual($elem->variable, $variable)
+                ) {
                     $renames[] = (object)[
                         "section"  => $elem->section,
                         "variable" => $elem->variable,

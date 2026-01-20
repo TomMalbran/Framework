@@ -25,7 +25,12 @@ class MercadoPago {
      * @param string       $accessToken  Optional.
      * @return Dictionary
      */
-    private static function get(string $route, ?array $request = null, bool $jsonResponse = true, string $accessToken = ""): Dictionary {
+    private static function get(
+        string $route,
+        ?array $request = null,
+        bool $jsonResponse = true,
+        string $accessToken = "",
+    ): Dictionary {
         $accessToken = $accessToken !== "" ? $accessToken : Config::getMpAccessToken();
         $response    = Curl::execute("GET", self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer $accessToken",
@@ -41,7 +46,12 @@ class MercadoPago {
      * @param string               $accessToken Optional.
      * @return Dictionary
      */
-    private static function post(string $route, array $request, array $headers = [], string $accessToken = ""): Dictionary {
+    private static function post(
+        string $route,
+        array $request,
+        array $headers = [],
+        string $accessToken = "",
+    ): Dictionary {
         $accessToken = $accessToken !== "" ? $accessToken : Config::getMpAccessToken();
         $response    =  Curl::execute("POST", self::BaseUrl . $route, $request, Arrays::merge([
             "content-type"  => "application/json",

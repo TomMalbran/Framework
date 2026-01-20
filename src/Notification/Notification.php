@@ -24,7 +24,13 @@ class Notification {
      * @param int    $dataID
      * @return string|null
      */
-    public static function sendToAll(string $title, string $message, string $url, string $dataType, int $dataID): ?string {
+    public static function sendToAll(
+        string $title,
+        string $message,
+        string $url,
+        string $dataType,
+        int $dataID,
+    ): ?string {
         return self::send($title, $message, $url, $dataType, $dataID, [
             "included_segments" => [ "All" ],
         ]);
@@ -40,7 +46,14 @@ class Notification {
      * @param string[] $playerIDs
      * @return string|null
      */
-    public static function sendToSome(string $title, string $message, string $url, string $dataType, int $dataID, array $playerIDs): ?string {
+    public static function sendToSome(
+        string $title,
+        string $message,
+        string $url,
+        string $dataType,
+        int $dataID,
+        array $playerIDs,
+    ): ?string {
         if (count($playerIDs) === 0) {
             return null;
         }
@@ -69,7 +82,14 @@ class Notification {
      * @param array<string,mixed> $params
      * @return string|null
      */
-    private static function send(string $title, string $message, string $url, string $dataType, int $dataID, array $params): ?string {
+    private static function send(
+        string $title,
+        string $message,
+        string $url,
+        string $dataType,
+        int $dataID,
+        array $params,
+    ): ?string {
         if (!Config::isNotificationActive()) {
             return null;
         }

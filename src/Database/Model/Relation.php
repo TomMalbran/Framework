@@ -84,33 +84,46 @@ class Relation {
     // )
 
     // The joins are in the form of:
-    // - relationJoin: Join associated with the Model used as the type of the attribute. It can be in the form of:
+    // - relationJoin: Join associated with the Model used as the type of the
+    // attribute. It can be in the form of:
     //   - `relationFieldName` where only the field name is used
-    //   - `relationModelName.relationFieldName` where there is a Model Name and a field name
-    //   - `relationAliasName.relationFieldName` where the Model Name as an alias and the field name
-    // - ownerJoin: Join associates with the Model that owns a Column referencing the Relation. It can be in the form of:
-    //   - `ownerFieldName` where only the field name is used and the Model is inferred
-    //   - `ownerModelName.ownerFieldName` where there is a Model Name and a field name
-    //   - `ownerModelName.ownerFieldName AND andModelName.andFieldName` where there is a Model Name, a field name and an AND extra condition
-    //   - `ownerModelName.ownerFieldName AND andTableName.isDeleted = 1` where there is a Model Name, a field name and an AND extra condition
-    //   - This last 2 forms can be combines and there can be multiple AND conditions but all using the same Model Name
+    //   - `relationModelName.relationFieldName` where there is a Model Name
+    //     and a field name
+    //   - `relationAliasName.relationFieldName` where the Model Name as an
+    //     alias and the field name
+    // - ownerJoin: Join associates with the Model that owns a Column referencing
+    // the Relation. It can be in the form of:
+    //   - `ownerFieldName` where only the field name is used and the Model
+    //     is inferred
+    //   - `ownerModelName.ownerFieldName` where there is a Model Name and
+    //     a field name
+    //   - `ownerModelName.ownerFieldName AND andModelName.andFieldName` where
+    //     there is a Model Name, a field name and an AND extra condition
+    //   - `ownerModelName.ownerFieldName AND andTableName.isDeleted = 1` where
+    //     there is a Model Name, a field name and an AND extra condition
+    //   - This last 2 forms can be combines and there can be multiple AND
+    //     conditions but all using the same Model Name
 
     // We then extract the data from:
-    // - relationModelName: Name of the Model associated to the type of the attribute.
-    //     This is the Model that has the fields defined.
-    // - relationAliasName: If there are 2 relations with the same Model, an alias name for the Relation Model is required.
-    //     The alias name is set in the `relationJoin` before the dot.
-    // - relationFieldName: Name of the field in the Relation Model used to do the join.
+    // - relationModelName: Name of the Model associated to the type of the
+    //   attribute. This is the Model that has the fields defined.
+    // - relationAliasName: If there are 2 relations with the same Model,
+    //   an alias name for the Relation Model is required. The alias name
+    //   is set in the `relationJoin` before the dot.
+    // - relationFieldName: Name of the field in the Relation Model used to
+    //   do the join.
     //     - It can be inferred as the ID of the Relation Model.
     //     - It can be set in the `relationJoin` after the dot.
     // - ownerModelName: Name of the Model to perform the join with. It can be:
-    //    - The Model where the Relation is defined if there is an attribute as the key of the Relation Model.
+    //    - The Model where the Relation is defined if there is an attribute
+    //      as the key of the Relation Model.
     //    - A Model from another Relation in the Model where the Relation is defined.
     //    - It can come from `ownerJoin` as the Model Name before the dot.
     // - ownerFieldName: Name of the field in the Owner Model used to do the join.
     //     - It can be inferred as the ID of the Relation Model.
     //     - It can be set in the `ownerJoin` after the first dot.
-    // - ownerAndQuery: If the `ownerJoin` contains an AND condition, this fields contains what comes after the AND.
+    // - ownerAndQuery: If the `ownerJoin` contains an AND condition, this
+    //   fields contains what comes after the AND.
 
 
 
@@ -255,7 +268,8 @@ class Relation {
     /**
      * BUILD STEP 4: After creating all the models we can get the Relation Model and the Parent Model
      * @param SchemaModel $relationModel The Relation Model is the one associated to the type of the Attribute.
-     * @param SchemaModel $parentModel   The Parent Model is the Model where the Relation is defined. It might not be the Owner in the JOIN.
+     * @param SchemaModel $parentModel   The Parent Model is the Model where the Relation is defined.
+     *                                   It might not be the Owner in the JOIN.
      * @return Relation
      */
     public function setModels(SchemaModel $relationModel, SchemaModel $parentModel): Relation {
@@ -328,8 +342,10 @@ class Relation {
     /**
      * BUILD STEP 6: Tries to find the Owner Model Name using the Fields and Relations from the Parent Model
      * - If the ownerModelName was set in the previous steps, it does nothing
-     * - If there is a field in the parent with the same ID as the Relation then the ownerModel is the parent Model
-     * - If there is a Relation in the Parent Model with a field that has the same ID as the Relation then the ownerModel is that Relation Model
+     * - If there is a field in the parent with the same ID as the Relation
+     *   then the ownerModel is the parent Model
+     * - If there is a Relation in the Parent Model with a field that has the
+     *   same ID as the Relation then the ownerModel is that Relation Model
      * @return bool
      */
     public function inferOwnerModelName(): bool {
@@ -485,7 +501,9 @@ class Relation {
      */
     public function getExpression(): string {
         $joinTable      = SchemaModel::getDbTableName($this->relationModelName);
-        $asTable        = $this->relationAliasName !== "" ? " AS " . SchemaModel::getDbTableName($this->relationAliasName) : "";
+        $aliasTableName = SchemaModel::getDbTableName($this->relationAliasName);
+
+        $asTable        = $this->relationAliasName !== "" ? " AS $aliasTableName" : "";
         $tableName      = $this->getDbTableName();
 
         $relationColumn = $this->relationFieldDbName;
@@ -493,7 +511,8 @@ class Relation {
         $ownerColumn    = $this->ownerFieldDbName;
         $and            = $this->getAndExpression($tableName);
 
-        return "LEFT JOIN `{$joinTable}`{$asTable} ON ($tableName.$relationColumn = $ownerTableName.$ownerColumn{$and})";
+        return "LEFT JOIN `{$joinTable}`{$asTable} ON (" .
+            "$tableName.$relationColumn = $ownerTableName.$ownerColumn{$and})";
     }
 
     /**
@@ -607,7 +626,9 @@ class Relation {
      * @return array<string,mixed>
      */
     public function toSchemaJSON(string $dbName): array {
-        if ($this->relationModel === null || $this->parentModel === null || $this->ownerModelName !== $this->parentModel->name) {
+        if ($this->relationModel === null || $this->parentModel === null ||
+            $this->ownerModelName !== $this->parentModel->name
+        ) {
             return [];
         }
 

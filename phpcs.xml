@@ -19,13 +19,16 @@
         <exclude name="Generic.WhiteSpace.ScopeIndent"/>
     </rule>
 
+
     <!-- Lines can be 120 chars long, but never show errors -->
     <rule ref="Generic.Files.LineLength">
         <properties>
-            <property name="lineLimit" value="200"/>
+            <property name="lineLimit" value="120"/>
             <property name="absoluteLineLimit" value="300"/>
         </properties>
+        <exclude-pattern>*/Schema/*</exclude-pattern>
     </rule>
+
 
     <!-- Short form of type keywords MUST be used i.e. bool instead of boolean, int instead of integer etc. -->
     <rule ref="PSR12.Keywords.ShortFormTypeKeywords"/>

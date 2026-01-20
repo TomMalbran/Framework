@@ -175,7 +175,9 @@ class Encoding {
                 // looks like 4 bytes UTF8
                 } elseif ($c1 >= "\xf0" && $c1 <= "\xf7") {
                     // yeah, almost sure it's UTF8 already
-                    if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf" && $c4 >= "\x80" && $c4 <= "\xbf") {
+                    if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" &&
+                        $c3 <= "\xbf" && $c4 >= "\x80" && $c4 <= "\xbf"
+                    ) {
                         $buf .= $c1 . $c2 . $c3;
                         $i    = $i + 2;
                     // not valid UTF8.  Convert it.

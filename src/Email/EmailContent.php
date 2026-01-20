@@ -87,7 +87,12 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
      * @param int        $position
      * @return int
      */
-    private static function migrateLanguage(Dictionary $emails, string $language, string $languageName, int $position): int {
+    private static function migrateLanguage(
+        Dictionary $emails,
+        string $language,
+        string $languageName,
+        int $position,
+    ): int {
         $siteName = Config::getName();
         $total    = 0;
 

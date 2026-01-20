@@ -71,7 +71,12 @@ class Strings {
      * @param bool  $trimValues      Optional.
      * @return bool
      */
-    public static function isEqual(mixed $string, mixed $other, bool $caseInsensitive = true, bool $trimValues = true): bool {
+    public static function isEqual(
+        mixed $string,
+        mixed $other,
+        bool $caseInsensitive = true,
+        bool $trimValues = true,
+    ): bool {
         if (!is_string($string) || !is_string($other)) {
             return $string === $other;
         }
@@ -266,7 +271,12 @@ class Strings {
      * @param bool   $caseInsensitive Optional.
      * @return int
      */
-    public static function compare(string $string, string $other, bool $orderAsc = true, bool $caseInsensitive = false): int {
+    public static function compare(
+        string $string,
+        string $other,
+        bool $orderAsc = true,
+        bool $caseInsensitive = false,
+    ): int {
         if ($caseInsensitive) {
             $result = strcasecmp($string, $other);
         } else {
@@ -440,7 +450,12 @@ class Strings {
      * @param int             $limit       Optional.
      * @return string
      */
-    public static function replacePattern(string $string, array|string $pattern, array|string $replacement, int $limit = -1): string {
+    public static function replacePattern(
+        string $string,
+        array|string $pattern,
+        array|string $replacement,
+        int $limit = -1,
+    ): string {
         $result = preg_replace($pattern, $replacement, $string, $limit);
         return $result !== null ? $result : "";
     }
@@ -453,7 +468,12 @@ class Strings {
      * @param int                       $limit    Optional.
      * @return string
      */
-    public static function replaceCallback(string $string, array|string $pattern, callable $callback, int $limit = -1): string {
+    public static function replaceCallback(
+        string $string,
+        array|string $pattern,
+        callable $callback,
+        int $limit = -1,
+    ): string {
         $result = preg_replace_callback($pattern, $callback, $string, $limit);
         return $result !== null ? $result : "";
     }
@@ -636,7 +656,12 @@ class Strings {
      * @param bool            $skipEmpty Optional.
      * @return list<string>
      */
-    public static function split(array|string $string, string $needle, bool $trim = false, bool $skipEmpty = false): array {
+    public static function split(
+        array|string $string,
+        string $needle,
+        bool $trim = false,
+        bool $skipEmpty = false,
+    ): array {
         if (is_array($string)) {
             return array_is_list($string) ? $string : [];
         }
@@ -663,7 +688,8 @@ class Strings {
      * @return string[]
      */
     public static function splitToWords(string $string): array {
-        $result = preg_split('/(\.\.\.\s?|[-.?!,;:(){}\[\]\'"]\s?)|\s/', $string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $option = PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY;
+        $result = preg_split('/(\.\.\.\s?|[-.?!,;:(){}\[\]\'"]\s?)|\s/', $string, -1, $option);
         return $result !== false ? $result : [];
     }
 
@@ -881,9 +907,11 @@ class Strings {
         // This handles cases like "CamelCase" -> "camel_case" and "SomeID" -> "some_id".
         $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', $separator . '$1');
 
-        // Insert an underscore before any sequence of two or more uppercase letters that is preceded by a lowercase letter.
+        // Insert an underscore before any sequence of two or more uppercase letters
+        // that is preceded by a lowercase letter.
         // This handles cases like "someXMLData" -> "some_xml_data".
         $result = self::replacePattern($result, '/(?<=[a-z])([A-Z]{2,})/', $separator . '$1');
+
         // Convert the entire string to lowercase.
         return strtolower($result);
     }

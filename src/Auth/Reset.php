@@ -61,7 +61,11 @@ class Reset extends CredentialResetSchema {
      * @param string $availableSets Optional.
      * @return string
      */
-    public static function create(int $credentialID = 0, string $email = "", string $availableSets = "ud"): string {
+    public static function create(
+        int $credentialID = 0,
+        string $email = "",
+        string $availableSets = "ud",
+    ): string {
         $resetCode = Strings::randomCode(6, $availableSets);
         self::replaceEntity(
             credentialID: $credentialID,

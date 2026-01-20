@@ -377,7 +377,11 @@ class SchemaMigration {
         }
         foreach ($modifies as $modify) {
             if ($modify["toInts"]) {
-                $db->execute("UPDATE `{$schemaModel->tableName}` SET `{$modify["key"]}` = '0' WHERE `{$modify["key"]}` = ''");
+                $db->execute("
+                    UPDATE `{$schemaModel->tableName}`
+                    SET `{$modify["key"]}` = '0'
+                    WHERE `{$modify["key"]}` = ''
+                ");
             }
             $sql = $db->updateColumn($schemaModel->tableName, $modify["key"], $modify["type"], $modify["after"]);
             print("$sql\n");

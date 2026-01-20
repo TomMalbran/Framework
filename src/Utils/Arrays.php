@@ -242,7 +242,13 @@ class Arrays {
      * @param bool            $atLeastOne      Optional.
      * @return bool
      */
-    public static function contains(mixed $array, mixed $needle, int|string|null $key = null, bool $caseInsensitive = true, bool $atLeastOne = false): bool {
+    public static function contains(
+        mixed $array,
+        mixed $needle,
+        int|string|null $key = null,
+        bool $caseInsensitive = true,
+        bool $atLeastOne = false,
+    ): bool {
         $array = self::toArray($array);
 
         if (is_array($needle)) {
@@ -277,7 +283,12 @@ class Arrays {
      * @param bool            $caseInsensitive Optional.
      * @return bool
      */
-    private static function isEqualContains(mixed $row, int|string|null $key, mixed $value, bool $caseInsensitive = true): bool {
+    private static function isEqualContains(
+        mixed $row,
+        int|string|null $key,
+        mixed $value,
+        bool $caseInsensitive = true,
+    ): bool {
         if ($key === null) {
             return Strings::isEqual($row, $value, $caseInsensitive);
         }
@@ -705,7 +716,12 @@ class Arrays {
      * @param bool                 $distinct  Optional.
      * @return mixed[]
      */
-    public static function createArray(array $array, array|string|null $key = null, bool $skipEmpty = false, bool $distinct = false): array {
+    public static function createArray(
+        array $array,
+        array|string|null $key = null,
+        bool $skipEmpty = false,
+        bool $distinct = false,
+    ): array {
         $result = [];
         foreach ($array as $row) {
             $elem = self::getValue($row, $key ?? "");
@@ -935,7 +951,12 @@ class Arrays {
      * @param mixed|null $default  Optional.
      * @return mixed
      */
-    public static function getOneValue(mixed $array, string $key, bool $useEmpty = false, mixed $default = null): mixed {
+    public static function getOneValue(
+        mixed $array,
+        string $key,
+        bool $useEmpty = false,
+        mixed $default = null,
+    ): mixed {
         if (is_object($array) && property_exists($array, $key)) {
             if ($useEmpty || !self::isEmpty($array->$key)) {
                 return $array->$key;

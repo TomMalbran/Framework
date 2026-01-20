@@ -74,7 +74,14 @@ class EmailQueue extends EmailQueueSchema {
      * @param int                $dataID  Optional.
      * @return bool
      */
-    public static function add(EmailContentEntity $content, array|string $sendTo, ?string $message = null, ?string $subject = null, bool $sendNow = false, int $dataID = 0): bool {
+    public static function add(
+        EmailContentEntity $content,
+        array|string $sendTo,
+        ?string $message = null,
+        ?string $subject = null,
+        bool $sendNow = false,
+        int $dataID = 0,
+    ): bool {
         $sendTo    = Arrays::toStrings($sendTo);
         $subject ??= $content->subject;
         $message ??= $content->message;

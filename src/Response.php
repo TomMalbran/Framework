@@ -146,7 +146,11 @@ class Response {
      * @param string                                    $param   Optional.
      * @return Response
      */
-    public static function success(string $success, JsonSerializable|array|null $data = null, string $param = ""): Response {
+    public static function success(
+        string $success,
+        JsonSerializable|array|null $data = null,
+        string $param = "",
+    ): Response {
         return new Response([
             "success" => $success,
             "param"   => $param,
@@ -161,7 +165,11 @@ class Response {
      * @param string                                    $param   Optional.
      * @return Response
      */
-    public static function warning(string $warning, JsonSerializable|array|null $data = null, string $param = ""): Response {
+    public static function warning(
+        string $warning,
+        JsonSerializable|array|null $data = null,
+        string $param = "",
+    ): Response {
         return new Response([
             "warning" => $warning,
             "param"   => $param,

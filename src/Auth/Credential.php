@@ -85,7 +85,10 @@ class Credential extends CredentialSchema {
      * @param bool   $complete    Optional.
      * @return CredentialEntity
      */
-    public static function getByAccessToken(string $accessToken, bool $complete = true): CredentialEntity {
+    public static function getByAccessToken(
+        string $accessToken,
+        bool $complete = true,
+    ): CredentialEntity {
         $query = new CredentialQuery();
         $query->accessToken->equal($accessToken);
         $query->tokenExpiration->greaterThan(time());
@@ -125,7 +128,11 @@ class Credential extends CredentialSchema {
      * @param Access[]|Access|null $accessName Optional.
      * @return bool
      */
-    public static function emailExists(string $email, int $skipID = 0, array|Access|null $accessName = null): bool {
+    public static function emailExists(
+        string $email,
+        int $skipID = 0,
+        array|Access|null $accessName = null,
+    ): bool {
         $query = self::createAccessQuery($accessName);
         $query->email->equal($email);
         $query->credentialID->notEqual($skipID);
@@ -139,7 +146,11 @@ class Credential extends CredentialSchema {
      * @param int              $skipID Optional.
      * @return bool
      */
-    public static function fieldExists(CredentialColumn $column, string|int $value, int $skipID = 0): bool {
+    public static function fieldExists(
+        CredentialColumn $column,
+        string|int $value,
+        int $skipID = 0,
+    ): bool {
         $query = new CredentialQuery();
         $query->add($column, QueryOperator::Equal, $value);
         $query->credentialID->notEqualIf($skipID);
@@ -341,7 +352,10 @@ class Credential extends CredentialSchema {
      * @param bool                 $complete Optional.
      * @return CredentialEntity
      */
-    private static function getCredential(?CredentialQuery $query = null, bool $complete = false): CredentialEntity {
+    private static function getCredential(
+        ?CredentialQuery $query = null,
+        bool $complete = false,
+    ): CredentialEntity {
         $list = self::getCredentials($query, null, $complete);
         if (isset($list[0])) {
             return $list[0];
@@ -488,7 +502,10 @@ class Credential extends CredentialSchema {
      * @param string               $password
      * @return bool
      */
-    public static function isPasswordCorrect(CredentialEntity|int $credential, string $password): bool {
+    public static function isPasswordCorrect(
+        CredentialEntity|int $credential,
+        string $password,
+    ): bool {
         if (!($credential instanceof CredentialEntity)) {
             $credential = self::getByID($credential, true);
         }
@@ -887,7 +904,11 @@ class Credential extends CredentialSchema {
      * @param string|int       $value
      * @return bool
      */
-    public static function setValue(int $credentialID, CredentialColumn $column, string|int $value): bool {
+    public static function setValue(
+        int $credentialID,
+        CredentialColumn $column,
+        string|int $value,
+    ): bool {
         return self::editEntityValue($credentialID, $column, $value);
     }
 
@@ -912,7 +933,11 @@ class Credential extends CredentialSchema {
      * @param string $prefix    Optional.
      * @return string
      */
-    public static function getName(mixed $data, bool $withEmail = false, string $prefix = ""): string {
+    public static function getName(
+        mixed $data,
+        bool $withEmail = false,
+        string $prefix = "",
+    ): string {
         $id        = Strings::toString(Arrays::getValue($data, "credentialID", prefix: $prefix));
         $firstName = Strings::toString(Arrays::getValue($data, "firstName", prefix: $prefix));
         $lastName  = Strings::toString(Arrays::getValue($data, "lastName", prefix: $prefix));
@@ -938,7 +963,11 @@ class Credential extends CredentialSchema {
      * @param bool   $withPlus Optional.
      * @return string
      */
-    public static function getPhone(mixed $data, string $prefix = "", bool $withPlus = false): string {
+    public static function getPhone(
+        mixed $data,
+        string $prefix = "",
+        bool $withPlus = false,
+    ): string {
         $phone     = Strings::toString(Arrays::getValue($data, "phone", prefix: $prefix));
         $cellphone = Strings::toString(Arrays::getValue($data, "cellphone", prefix: $prefix));
         $iddRoot   = Strings::toString(Arrays::getValue($data, "iddRoot", prefix: $prefix));
