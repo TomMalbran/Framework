@@ -4,12 +4,13 @@
         {
             "label": "PHPCS",
             "type": "shell",
-            "command": "${workspaceFolder}/vendor/bin/phpcs",
+            "command": "./vendor/bin/phpcs",
             "args": [
                 "--report=csv",
+                "--runtime-set", "show_progress", "1",
                 "--cache",
-                "-q",
-                "."
+                "-p",
+                "src"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -28,8 +29,18 @@
                 }
             },
             "presentation": {
-                "reveal": "never"
+                "reveal": "never",
+                "clear": true,
+                "panel": "shared",
+                "group": "PHPCS"
             }
-        }
+        },
+
+
+        {
+            "label": "Frame: Build the code",
+            "type": "shell",
+            "command": "./framework build"
+        },
     ]
 }
