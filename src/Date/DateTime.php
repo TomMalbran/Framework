@@ -508,6 +508,19 @@ class DateTime {
     }
 
     /**
+     * Returns the Hour Period as a string
+     * @param int        $fromTime
+     * @param int        $toTime
+     * @param float|null $timeZone Optional.
+     * @return string
+     */
+    public static function toHourPeriodString(int $fromTime, int $toTime, ?float $timeZone = null): string {
+        $fromTimeStr = self::toString($fromTime, DateFormat::Time, $timeZone);
+        $toTimeStr   = self::toString($toTime, DateFormat::Time, $timeZone);
+        return "$fromTimeStr - $toTimeStr";
+    }
+
+    /**
      * Returns the Seconds as a string
      * @param int $seconds
      * @return string
