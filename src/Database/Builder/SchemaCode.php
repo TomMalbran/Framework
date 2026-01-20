@@ -293,7 +293,7 @@ class SchemaCode {
                     "isNumber"      => true,
                     "isRequired"    => $validate->isRequired,
                     "isUnique"      => $validate->isUnique,
-                    "emptySuffix"   => $validate->isUnique || $validate->prefix !== "",
+                    "emptySuffix"   => $validate->isUnique || $validate->isNumeric,
                     "typeOf"        => Strings::substringAfter($validate->typeOf, "\\"),
                     "typeError"     => $validate->getTypeError(),
                     "belongsTo"     => Strings::substringAfter($validate->belongsTo, "\\"),

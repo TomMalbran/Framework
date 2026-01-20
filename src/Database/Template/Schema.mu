@@ -219,7 +219,7 @@ class {{name}}Schema extends Schema {
             {{/belongsTo}}
             {{#isNumeric}}
             {{#isRequired}}} else{{/isRequired}}if (!$request->isNumeric("{{fieldName}}"{{numericParams}})) {
-                $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefx}}_INVALID{{/invalidPrefx}}";
+                $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
             {{/isNumeric}}
             {{#isUnique}}
             } elseif (self::{{fieldName}}Exists($request->getInt("{{fieldName}}"){{parentsSecList}}, $id)) {
