@@ -71,6 +71,9 @@ class NLS {
      */
     public static function getString(string $key, string $language = ""): string {
         $data = self::load($language);
+        if (!$data->hasValue($key)) {
+            return $key;
+        }
         return $data->getString($key);
     }
 
