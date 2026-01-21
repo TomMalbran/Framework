@@ -270,22 +270,28 @@ class Discovery {
 
 
     /**
+     * Returns the Reflection Properties of the given Class
+     * @param object   $class
+     * @param int|null $filter Optional.
+     * @return array<ReflectionProperty>
+     */
+    public static function getReflectionProps(object $class, ?int $filter = null): array {
+        if ($filter === null) {
+            $filter = ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED;
+        }
+        $reflection = new ReflectionClass($class);
+        return $reflection->getProperties($filter);
+    }
+
+    /**
      * Returns the Properties of the given Class
      * @param object   $class
      * @param int|null $filter Optional.
      * @return array<string,string>
      */
     public static function getProperties(object $class, ?int $filter = null): array {
-        $result     = [];
-        $reflection = new ReflectionClass($class);
-
-        if ($filter === null) {
-            $filter = ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED;
-        }
-
-        /** @var list<ReflectionProperty> */
-        $props = $reflection->getProperties($filter);
-
+        $props  = self::getReflectionProps($class, $filter);
+        $result = [];
         foreach ($props as $prop) {
             $type     = $prop->getType();
             $typeName = "mixed";
@@ -293,6 +299,21 @@ class Discovery {
                 $typeName = $type->getName();
             }
             $result[$prop->getName()] = $typeName;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Property Names of the given Class
+     * @param object   $class
+     * @param int|null $filter Optional.
+     * @return array<string>
+     */
+    public static function getPropertyNames(object $class, ?int $filter = null): array {
+        $props  = self::getReflectionProps($class, $filter);
+        $result = [];
+        foreach ($props as $prop) {
+            $result[] = $prop->getName();
         }
         return $result;
     }
