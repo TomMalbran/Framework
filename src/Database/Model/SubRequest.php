@@ -200,10 +200,9 @@ class SubRequest {
             $total      = count($queryParts);
             if ($total % 3 === 0) {
                 for ($i = 0; $i < $total; $i += 3) {
-                    $next = $i + 1;
-                    if (isset($queryParts[$i]) && isset($queryParts[$next])) {
-                        $operator = QueryOperator::fromValue($queryParts[$next]);
-                        $query->add($queryParts[$i], $operator, $queryParts[$next]);
+                    if (isset($queryParts[$i]) && isset($queryParts[$i + 1]) && isset($queryParts[$i + 2])) {
+                        $operator = QueryOperator::fromValue($queryParts[$i + 1]);
+                        $query->add($queryParts[$i], $operator, $queryParts[$i + 2]);
                     }
                 }
             }
