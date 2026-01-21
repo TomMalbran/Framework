@@ -34,12 +34,14 @@ class Mailgun {
 
     /**
      * Sends the Email (used for external calls)
-     * @param string $toEmail
-     * @param string $fromEmail
-     * @param string $fromName
-     * @param string $subject
-     * @param string $body
-     * @param string $replyTo   Optional.
+     * @param string   $toEmail
+     * @param string   $fromEmail
+     * @param string   $fromName
+     * @param string   $subject
+     * @param string   $body
+     * @param string   $replyTo   Optional.
+     * @param string[] $ccEmails  Optional.
+     * @param string[] $ccoEmails Optional.
      * @return string
      */
     public static function send(
@@ -49,6 +51,8 @@ class Mailgun {
         string $subject,
         string $body,
         string $replyTo = "",
+        array $ccEmails = [],
+        array $ccoEmails = [],
     ): string {
         $params = [
             "from"    => "$fromName <{$fromEmail}>",
@@ -62,6 +66,12 @@ class Mailgun {
                 "Email" => $replyTo,
                 "Name"  => $fromName,
             ];
+        }
+        if (count($ccEmails) > 0) {
+            $params["cc"] = Strings::join($ccEmails, ",");
+        }
+        if (count($ccoEmails) > 0) {
+            $params["bcc"] = Strings::join($ccoEmails, ",");
         }
 
         $domain   = Utils::getEmailDomain($fromEmail);
