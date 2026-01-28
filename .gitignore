@@ -10,3 +10,6 @@ src/*/Schema
 
 # misc
 .DS_Store
+
+# tests
+Tester.php
