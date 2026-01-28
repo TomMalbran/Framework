@@ -793,7 +793,7 @@ class Arrays {
      * Returns the index of the given needle
      * @param mixed[] $array
      * @param mixed   $needle
-     * @param bool    $caseInsensitive
+     * @param bool    $caseInsensitive Optional.
      * @return int
      */
     public static function getIndex(array $array, mixed $needle, bool $caseInsensitive = false): int {
