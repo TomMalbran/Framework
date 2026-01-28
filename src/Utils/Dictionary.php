@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Date\Date;
 use Framework\Date\DateTime;
 use Framework\Utils\JSON;
 
@@ -240,6 +241,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
             return DateTime::parseDate($value);
         }
         return $default;
+    }
+
+    /**
+     * Gets the value of the given key as a Date
+     * @param string $key
+     * @return Date
+     */
+    public function getDate(string $key): Date {
+        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
+            return new Date($this->data[$key]);
+        }
+        return new Date();
     }
 
 
