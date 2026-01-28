@@ -11,10 +11,13 @@ use Framework\Database\Type\Entity;
 class {{name}}Entity extends Entity {
 
     protected const ID = "{{id}}";
+{{#categories}}
 
+
+    // {{name}} Fields
 {{#attributes}}{{#subType}}
-
     /** @var {{{subType}}} */
 {{/subType}}    public {{type}} ${{name}} = {{{default}}};
 {{/attributes}}
+{{/categories}}
 }

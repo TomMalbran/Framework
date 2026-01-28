@@ -5,7 +5,6 @@ use Framework\Database\SchemaModel;
 use Framework\Builder\Builder;
 use Framework\Database\Model\FieldType;
 use Framework\Utils\Arrays;
-use Framework\Utils\Strings;
 
 /**
  * The Entity Code
@@ -23,7 +22,7 @@ class EntityCode {
             "name"       => $schemaModel->name,
             "id"         => $schemaModel->idName,
             "subTypes"   => self::getSubTypes($schemaModel),
-            "attributes" => self::getAttributes($schemaModel),
+            "categories" => self::getAttributes($schemaModel),
         ]);
         return $contents;
     }
@@ -31,46 +30,99 @@ class EntityCode {
     /**
      * Returns the Field attributes for the Entity
      * @param SchemaModel $schemaModel
-     * @return array{name:string,type:string,subType:string,default:string}[]
+     * @return array{name:string,attributes:array{name:string,type:string,subType:string,default:string}[]}[]
      */
     private static function getAttributes(SchemaModel $schemaModel): array {
         $result = [];
+        $parsed = [];
+
+        // Main Fields
+        $fields = [];
         if ($schemaModel->hasID) {
             $type     = FieldType::getCodeType($schemaModel->idType);
-            $result[] = self::getTypeData("id", $type);
+            $fields[] = self::getTypeData("id", $type);
         }
-
         foreach ($schemaModel->fields as $field) {
-            self::addAttribute($result, $field->name, $field->type);
+            self::addAttribute($fields, $field->name, $field->type);
         }
+        self::addCategory($result, "Main", $fields, $parsed);
+
+        // Virtual Fields
+        $fields = [];
         foreach ($schemaModel->virtualFields as $field) {
-            self::addAttribute($result, $field->name, $field->type);
+            self::addAttribute($fields, $field->name, $field->type);
         }
+        self::addCategory($result, "Virtual", $fields, $parsed);
+
+        // Status Fields
+        $fields = [];
         if ($schemaModel->hasStatus) {
-            $result[] = self::getTypeData("statusName", "string");
-            $result[] = self::getTypeData("statusColor", "string");
+            $fields[] = self::getTypeData("statusName", "string");
+            $fields[] = self::getTypeData("statusColor", "string");
+        }
+        self::addCategory($result, "Status", $fields, $parsed);
+
+        // Expression Fields
+        $fields = [];
+        foreach ($schemaModel->expressions as $expression) {
+            self::addAttribute($fields, $expression->name, $expression->type);
+        }
+        self::addCategory($result, "Expression", $fields, $parsed);
+
+        // Count Fields
+        $fields = [];
+        foreach ($schemaModel->counts as $count) {
+            self::addAttribute($fields, $count->name, FieldType::Number);
+        }
+        self::addCategory($result, "Count", $fields, $parsed);
+
+        // Relation Fields
+        foreach ($schemaModel->relations as $relation) {
+            $fields = [];
+            foreach ($relation->fields as $field) {
+                self::addAttribute($fields, $field->prefixName, $field->type);
+            }
+            self::addCategory($result, $relation->relationModelName, $fields, $parsed);
         }
 
-        foreach ($schemaModel->expressions as $expression) {
-            self::addAttribute($result, $expression->name, $expression->type);
-        }
-        foreach ($schemaModel->counts as $count) {
-            self::addAttribute($result, $count->name, FieldType::Number);
-        }
-        foreach ($schemaModel->relations as $relation) {
-            foreach ($relation->fields as $field) {
-                self::addAttribute($result, $field->prefixName, $field->type);
-            }
-        }
+        // SubRequest Fields
+        $fields = [];
         foreach ($schemaModel->subRequests as $subRequest) {
             $type = $subRequest->type;
             if ($type === "") {
                 $type = "{$subRequest->modelName}Entity[]";
             }
-            $result[] = self::getTypeData($subRequest->name, "array", $type);
+            $fields[] = self::getTypeData($subRequest->name, "array", $type);
+        }
+        self::addCategory($result, "SubRequest", $fields, $parsed);
+
+        return $result;
+    }
+
+    /**
+     * Adds a Category to the Result
+     * @param array{name:string,attributes:array{name:string,type:string,subType:string,default:string}[]}[] $result
+     * @param string                                                                                         $name
+     * @param array{name:string,type:string,subType:string,default:string}[]                                 $fields
+     * @param array<string,bool>                                                                             $parsed
+     * @return array{name:string,attributes:array{name:string,type:string,subType:string,default:string}[]}[]
+     */
+    private static function addCategory(array &$result, string $name, array $fields, array &$parsed): array {
+        $attributes = [];
+        foreach ($fields as $field) {
+            if (!isset($parsed[$field["name"]])) {
+                $parsed[$field["name"]] = true;
+                $attributes[]           = $field;
+            }
         }
 
-        return self::parseAttributes($result);
+        if (count($attributes) > 0) {
+            $result[] = [
+                "name"       => $name,
+                "attributes" => $attributes,
+            ];
+        }
+        return $result;
     }
 
     /**
@@ -123,37 +175,6 @@ class EntityCode {
             "subType" => $subType,
             "default" => FieldType::getDefault($type),
         ];
-    }
-
-    /**
-     * Parses the Attributes
-     * @param array{name:string,type:string,subType:string,default:string}[] $attributes
-     * @return array{name:string,type:string,subType:string,default:string}[]
-     */
-    private static function parseAttributes(array $attributes): array {
-        $nameLength = 0;
-        $typeLength = 0;
-        $result     = [];
-        $parsed     = [];
-
-        foreach ($attributes as $attribute) {
-            $nameLength = max($nameLength, Strings::length($attribute["name"]));
-            $typeLength = max($typeLength, Strings::length($attribute["type"]));
-        }
-
-        foreach ($attributes as $attribute) {
-            if (isset($parsed[$attribute["name"]])) {
-                continue;
-            }
-            $result[] = [
-                "name"    => Strings::padRight($attribute["name"], $nameLength),
-                "type"    => Strings::padRight($attribute["type"], $typeLength),
-                "subType" => $attribute["subType"],
-                "default" => $attribute["default"],
-            ];
-            $parsed[$attribute["name"]] = true;
-        }
-        return $result;
     }
 
     /**
