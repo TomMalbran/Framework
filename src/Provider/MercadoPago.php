@@ -3,7 +3,7 @@ namespace Framework\Provider;
 
 use Framework\Provider\Curl;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -226,7 +226,7 @@ class MercadoPago {
     public static function cancelPaymentUrl(string $preferenceID, string $accessToken = ""): bool {
         $response = self::put("/checkout/preferences/$preferenceID", [
             "expires"            => true,
-            "expiration_date_to" => DateTime::format(time(), "Y-m-d\TH:i:s-03:00"),
+            "expiration_date_to" => Date::now()->format("Y-m-d\TH:i:s-03:00"),
         ], $accessToken);
         return $response->hasValue("id");
     }

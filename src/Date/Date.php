@@ -6,12 +6,14 @@ use Framework\Date\DateFormat;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
+use JsonSerializable;
+
 /**
  * Date class
  */
-class Date {
+class Date implements JsonSerializable {
 
-    private int $timeStamp = 0;
+    private int $timestamp = 0;
 
 
     /**
@@ -20,19 +22,19 @@ class Date {
      */
     public function __construct(mixed $value = null) {
         if ($value instanceof Date) {
-            $this->timeStamp = $value->getTimeStamp();
+            $this->timestamp = $value->getTime();
         } elseif (Numbers::isValid($value)) {
-            $this->timeStamp = Numbers::toInt($value);
+            $this->timestamp = Numbers::toInt($value);
         } elseif (is_string($value)) {
-            $timeStamp = strtotime($value);
-            if ($timeStamp !== false) {
-                $this->timeStamp = $timeStamp;
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                $this->timestamp = $timestamp;
             }
         }
 
         // If no valid timestamp and value is not null, set to current time
-        if ($value !== null && $this->timeStamp <= 0) {
-            $this->timeStamp = time();
+        if ($value !== null && $this->timestamp <= 0) {
+            $this->timestamp = time();
         }
     }
 
@@ -46,11 +48,20 @@ class Date {
     }
 
     /**
+     * Creates an empty Date instance
+     * @return Date
+     */
+    public static function empty(): Date {
+        return new Date(null);
+    }
+
+    /**
      * Create a Date instance for the current time and adding the given amounts
      * @param int $months  Optional.
      * @param int $days    Optional.
      * @param int $hours   Optional.
      * @param int $minutes Optional.
+     * @param int $seconds Optional.
      * @return Date
      */
     public static function now(
@@ -58,18 +69,24 @@ class Date {
         int $days = 0,
         int $hours = 0,
         int $minutes = 0,
+        int $seconds = 0,
     ): Date {
-        // Start with current time or adjusted month
+        // Start with current time
+        $time = time();
+
+        // Adjust the month if possible
         if ($months !== 0) {
-            $time = mktime(date("H"), month: date("m") + $months);
-        } else {
-            $time = time();
+            $mktime = mktime((int)date("H"), month: date("m") + $months);
+            if ($mktime !== false) {
+                $time = $mktime;
+            }
         }
 
         // Add days, hours and minutes
         $time += $days * 86400;
         $time += $hours * 3600;
         $time += $minutes * 60;
+        $time += $seconds;
         return new Date($time);
     }
 
@@ -292,24 +309,32 @@ class Date {
      * @return bool
      */
     public function isEmpty(): bool {
-        return $this->timeStamp <= 0;
+        return $this->timestamp <= 0;
     }
 
     /**
-     * Returns the Time Stamp
+     * Returns true if the Date is not empty (time stamp is greater than 0)
+     * @return bool
+     */
+    public function isNotEmpty(): bool {
+        return $this->timestamp > 0;
+    }
+
+    /**
+     * Returns the Timestamp
      * @return int
      */
-    public function getTimeStamp(): int {
-        return $this->timeStamp;
+    public function getTime(): int {
+        return $this->timestamp;
     }
 
     /**
-     * Returns the Time Stamp in Server Time
+     * Returns the Timestamp in Server Time
      * @param bool $useTimeZone Optional.
      * @return int
      */
     public function toServerTime(bool $useTimeZone = true): int {
-        return DateTime::toServerTime($this->timeStamp, $useTimeZone);
+        return DateTime::toServerTime($this->timestamp, $useTimeZone);
     }
 
     /**
@@ -339,7 +364,7 @@ class Date {
      * @return int
      */
     public function getYear(): int {
-        return (int)date("Y", $this->timeStamp);
+        return (int)date("Y", $this->timestamp);
     }
 
     /**
@@ -348,7 +373,7 @@ class Date {
      */
     public function getYearDays(): int {
         // NOTE: L returns 1 for leap years and 0 for non-leap years
-        return 365 + (int)date("L", $this->timeStamp);
+        return 365 + (int)date("L", $this->timestamp);
     }
 
 
@@ -358,7 +383,7 @@ class Date {
      * @return int
      */
     public function getMonth(): int {
-        return (int)date("n", $this->timeStamp);
+        return (int)date("n", $this->timestamp);
     }
 
     /**
@@ -366,7 +391,7 @@ class Date {
      * @return string
      */
     public function getMonthZero(): string {
-        return date("m", $this->timeStamp);
+        return date("m", $this->timestamp);
     }
 
     /**
@@ -374,7 +399,7 @@ class Date {
      * @return int
      */
     public function getMonthDays(): int {
-        return (int)date("t", $this->timeStamp);
+        return (int)date("t", $this->timestamp);
     }
 
     /**
@@ -404,7 +429,7 @@ class Date {
      * @return int
      */
     public function getDay(): int {
-        return (int)date("j", $this->timeStamp);
+        return (int)date("j", $this->timestamp);
     }
 
     /**
@@ -412,7 +437,7 @@ class Date {
      * @return string
      */
     public function getDayZero(): string {
-        return date("d", $this->timeStamp);
+        return date("d", $this->timestamp);
     }
 
     /**
@@ -422,9 +447,9 @@ class Date {
      */
     public function getDayOfWeek(bool $startMonday = false): int {
         if ($startMonday) {
-            return (int)date("N", $this->timeStamp) - 1;
+            return (int)date("N", $this->timestamp) - 1;
         }
-        return (int)date("w", $this->timeStamp);
+        return (int)date("w", $this->timestamp);
     }
 
     /**
@@ -457,7 +482,7 @@ class Date {
      * @return int
      */
     public function getHour(): int {
-        return (int)date("G", $this->timeStamp);
+        return (int)date("G", $this->timestamp);
     }
 
     /**
@@ -465,7 +490,7 @@ class Date {
      * @return int
      */
     public function getMinute(): int {
-        return (int)date("i", $this->timeStamp);
+        return (int)date("i", $this->timestamp);
     }
 
     /**
@@ -473,7 +498,7 @@ class Date {
      * @return int
      */
     public function getSecond(): int {
-        return (int)date("s", $this->timeStamp);
+        return (int)date("s", $this->timestamp);
     }
 
 
@@ -496,7 +521,7 @@ class Date {
      * @return bool
      */
     public function isPast(): bool {
-        return $this->timeStamp < time();
+        return $this->timestamp < time();
     }
 
     /**
@@ -504,7 +529,7 @@ class Date {
      * @return bool
      */
     public function isFuture(): bool {
-        return $this->timeStamp > time();
+        return $this->timestamp > time();
     }
 
     /**
@@ -513,7 +538,7 @@ class Date {
      * @return bool
      */
     public function isBefore(Date $date): bool {
-        return $this->timeStamp < $date->getTimeStamp();
+        return $this->timestamp < $date->getTime();
     }
 
     /**
@@ -522,7 +547,7 @@ class Date {
      * @return bool
      */
     public function isAfter(Date $date): bool {
-        return $this->timeStamp > $date->getTimeStamp();
+        return $this->timestamp > $date->getTime();
     }
 
     /**
@@ -532,7 +557,7 @@ class Date {
      * @return bool
      */
     public function isBetween(Date $from, Date $to): bool {
-        return $this->timeStamp >= $from->getTimeStamp() && $this->timeStamp <= $to->getTimeStamp();
+        return $this->timestamp >= $from->getTime() && $this->timestamp <= $to->getTime();
     }
 
     /**
@@ -553,7 +578,7 @@ class Date {
      * @return int
      */
     public function getDaysDiff(Date $date): int {
-        $diffSeconds = abs($this->timeStamp - $date->getTimeStamp());
+        $diffSeconds = abs($this->timestamp - $date->getTime());
         return (int)floor($diffSeconds / 86400);
     }
 
@@ -563,7 +588,7 @@ class Date {
      * @return int
      */
     public function getHoursDiff(Date $date): int {
-        $diffSeconds = abs($this->timeStamp - $date->getTimeStamp());
+        $diffSeconds = abs($this->timestamp - $date->getTime());
         return (int)floor($diffSeconds / 3600);
     }
 
@@ -573,7 +598,7 @@ class Date {
      * @return int
      */
     public function getMinutesDiff(Date $date): int {
-        $diffSeconds = abs($this->timeStamp - $date->getTimeStamp());
+        $diffSeconds = abs($this->timestamp - $date->getTime());
         return (int)floor($diffSeconds / 60);
     }
 
@@ -610,7 +635,7 @@ class Date {
      * @return string
      */
     public function format(string $format): string {
-        return date($format, $this->timeStamp);
+        return date($format, $this->timestamp);
     }
 
     /**
@@ -636,5 +661,16 @@ class Date {
      */
     public function toUTCString(): string {
         return Strings::replace($this->format("c"), "-03:00", "Z");
+    }
+
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->timestamp;
     }
 }

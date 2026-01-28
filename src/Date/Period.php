@@ -108,9 +108,9 @@ class Period {
         $this->period = self::Custom;
 
         if ($fromDate !== "" && $fromHour !== "") {
-            $this->fromTime = Date::fromString($fromDate, $fromHour)->getTimeStamp();
+            $this->fromTime = Date::fromString($fromDate, $fromHour)->getTime();
         } elseif ($fromDate !== "") {
-            $this->fromTime = Date::fromString($fromDate)->getTimeStamp();
+            $this->fromTime = Date::fromString($fromDate)->getTime();
         } elseif ($fromTime !== 0) {
             $this->fromTime = $fromTime;
         } elseif ($period !== "") {
@@ -119,9 +119,9 @@ class Period {
         }
 
         if ($toDate !== "" && $toHour !== "") {
-            $this->toTime = Date::fromString($toDate, $toHour)->getTimeStamp();
+            $this->toTime = Date::fromString($toDate, $toHour)->getTime();
         } elseif ($toDate !== "") {
-            $this->toTime = Date::fromString($toDate)->toDayEnd()->getTimeStamp();
+            $this->toTime = Date::fromString($toDate)->toDayEnd()->getTime();
         } elseif ($toTime !== 0) {
             $this->toTime = $toTime;
         } elseif ($period !== "") {
