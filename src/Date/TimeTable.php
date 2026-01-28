@@ -144,8 +144,9 @@ class TimeTable {
             return false;
         }
 
-        $weekDay    = DateTime::getDayOfWeek($timeStamp, $this->startMonday);
-        $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
+        $date       = new Date($timeStamp);
+        $weekDay    = $date->getDayOfWeek($this->startMonday);
+        $nowMinutes = $date->toMinutes();
 
         foreach ($this->timeTables as $timeTable) {
             if (!Arrays::contains($timeTable->days, $weekDay)) {
@@ -172,9 +173,12 @@ class TimeTable {
             return 0;
         }
 
-        $result     = 0;
-        $weekDay    = DateTime::getDayOfWeek($timeStamp, $this->startMonday);
-        $nowMinutes = DateTime::timeStampToMinutes($timeStamp);
+        $date       = new Date($timeStamp);
+        $dayStart   = $date->toDayStart();
+        $resultDate = new Date();
+
+        $weekDay    = $date->getDayOfWeek($this->startMonday);
+        $nowMinutes = $date->toMinutes();
 
         foreach ($this->timeTables as $timeTable) {
             if (!Arrays::contains($timeTable->days, $weekDay)) {
@@ -184,13 +188,12 @@ class TimeTable {
             $fromMinutes = DateTime::timeToMinutes($timeTable->from);
             $toMinutes   = DateTime::timeToMinutes($timeTable->to);
             if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
-                $result = DateTime::getDayStart($timeStamp);
-                $result = DateTime::addMinutes($result, $toMinutes);
+                $resultDate = $dayStart->moveMinute($toMinutes);
                 break;
             }
         }
 
-        return $result;
+        return $resultDate->getTimeStamp();
     }
 
     /**
@@ -203,11 +206,12 @@ class TimeTable {
             return 0;
         }
 
-        $maxDay    = $this->startMonday ? 8 : 7;
-        $timeStamp = DateTime::getTime($timeStamp);
-        $weekStart = DateTime::getWeekStart($timeStamp, 0, $this->startMonday, false);
-        $weeks     = [ 0, 7 ];
-        $result    = 0;
+        $maxDay     = $this->startMonday ? 8 : 7;
+        $weeks      = [ 0, 7 ];
+
+        $date       = new Date($timeStamp);
+        $weekStart  = $date->toWeekStart($this->startMonday);
+        $resultDate = new Date();
 
         foreach ($weeks as $week) {
             foreach ($this->timeTables as $timeTable) {
@@ -218,17 +222,17 @@ class TimeTable {
                         continue;
                     }
 
-                    $newTime = DateTime::addDays($weekStart, $day + $week);
-                    $newTime = DateTime::addMinutes($newTime, $fromMinutes);
+                    $newDate = $weekStart->moveDay($day + $week);
+                    $newDate = $newDate->moveMinute($fromMinutes);
 
-                    if ($newTime >= $timeStamp && ($result === 0 || $newTime <= $result)) {
-                        $result = $newTime;
+                    if ($newDate->isAfter($date) && ($resultDate->isEmpty() || $newDate->isBefore($resultDate))) {
+                        $resultDate = $newDate;
                     }
                 }
             }
         }
 
-        return $result;
+        return $resultDate->getTimeStamp();
     }
 
 
@@ -264,8 +268,10 @@ class TimeTable {
             foreach ($timeTable->days as $day) {
                 $weekTime = DateTime::getWeekStart(0, $day, $this->startMonday, true);
                 $weekDate = DateTime::toString($weekTime, DateFormat::Dashes);
+
                 $fromTime = DateTime::toTimeHour($weekDate, $timeTable->from);
                 $fromHour = DateTime::toString($fromTime, DateFormat::Time);
+
                 $toTime   = DateTime::toTimeHour($weekDate, $timeTable->to);
                 $toHour   = DateTime::toString($toTime, DateFormat::Time);
                 $id       = "$fromHour-$toHour";
@@ -307,17 +313,18 @@ class TimeTable {
         foreach ($schedules as $id => $elem) {
             sort($schedules[$id]["times"]);
             sort($schedules[$id]["numbers"]);
+
             if (count($elem["times"]) > 0) {
                 foreach ($elem["times"] as $index => $dayTime) {
                     if ($dayTime !== 0) {
                         $schedules[$id]["days"][$index] = DateTime::getDayText(
-                            $dayTime,
+                            timeStamp:   $dayTime,
                             startMonday: $this->startMonday,
                             language:    $isoCode,
                         );
                     } else {
                         $schedules[$id]["days"][$index] = DateTime::getDayName(
-                            $elem["numbers"][$index] ?? 0,
+                            day:         $elem["numbers"][$index] ?? 0,
                             startMonday: $this->startMonday,
                             language:    $isoCode,
                         );
@@ -326,7 +333,7 @@ class TimeTable {
             } else {
                 foreach ($elem["numbers"] as $index => $dayNumber) {
                     $schedules[$id]["days"][$index] = DateTime::getDayName(
-                        $dayNumber,
+                        day:         $dayNumber,
                         startMonday: $this->startMonday,
                         language:    $isoCode,
                     );
