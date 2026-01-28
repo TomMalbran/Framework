@@ -53,6 +53,11 @@ class Framework {
             return false;
         }
 
+        // Try getting the Token from the Header
+        if ($token === "") {
+            $token = Server::getAuthToken();
+        }
+
         // Validate the API
         if ($token !== "") {
             Auth::validateAPI($token);
