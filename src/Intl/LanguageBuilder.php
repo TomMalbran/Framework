@@ -30,7 +30,7 @@ class LanguageBuilder implements DiscoveryBuilder {
         foreach ($files as $file) {
             $code = Strings::stripEnd($file, ".json");
             $data = NLSConfig::loadStrings($code);
-            if (!$data->has("NAME")) {
+            if (!$data->hasValue("NAME")) {
                 continue;
             }
 
