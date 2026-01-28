@@ -10,7 +10,7 @@ use Framework\Notification\Schema\NotificationQueueEntity;
 use Framework\Notification\Schema\NotificationQueueColumn;
 use Framework\Notification\Schema\NotificationQueueQuery;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\JSON;
 
 /**
@@ -41,8 +41,8 @@ class NotificationQueue extends NotificationQueueSchema {
     #[\Override]
     protected static function createListQuery(Request $request): NotificationQueueQuery {
         $search   = $request->getString("search");
-        $fromTime = $request->toDayStartHour("fromDate", "fromHour");
-        $toTime   = $request->toDayEndHour("toDate", "toHour");
+        $fromDate = $request->toDateStartHour("fromDate", "fromHour");
+        $toDate   = $request->toDateEndHour("toDate", "toHour");
         $results  = $request->getStrings("results");
 
         $query = new NotificationQueueQuery();
@@ -53,8 +53,8 @@ class NotificationQueue extends NotificationQueueSchema {
             NotificationQueueColumn::CredentialLastName,
         ], $search);
 
-        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
-        $query->createdTime->lessThan($toTime, $toTime > 0);
+        $query->createdTime->greaterThan($fromDate);
+        $query->createdTime->lessThan($toDate);
         $query->notificationResult->in($results);
         return $query;
     }
@@ -68,7 +68,7 @@ class NotificationQueue extends NotificationQueueSchema {
     public static function getAllUnsent(): array {
         $query = new NotificationQueueQuery();
         $query->notificationResult->equal(NotificationResult::NotProcessed->name);
-        $query->createdTime->greaterThan(DateTime::getLastXHours(1));
+        $query->createdTime->greaterThan(Date::now(hours: -1));
         $query->createdTime->orderByDesc();
         return self::getEntityList($query);
     }
@@ -84,8 +84,8 @@ class NotificationQueue extends NotificationQueueSchema {
         $query = new NotificationQueueQuery();
         $query->credentialID->equal($credentialID);
         $query->currentUser->equal($currentUser);
-        $query->sentTime->equal(0);
-        $query->createdTime->greaterThan($time - 3600);
+        $query->sentTime->isEmpty();
+        $query->createdTime->greaterThan(Date::now(hours: -1));
         $query->createdTime->orderByDesc();
         return self::getEntityList($query);
     }
@@ -102,7 +102,7 @@ class NotificationQueue extends NotificationQueueSchema {
         $query->credentialID->equal($credentialID);
         $query->currentUser->equal($currentUser);
         $query->isDiscarded->isFalse();
-        $query->createdTime->greaterThan(DateTime::getLastXDays(30));
+        $query->createdTime->greaterThan(Date::now(days: -30));
         $query->createdTime->orderByDesc();
         return self::getEntityList($query, $sort);
     }
@@ -119,7 +119,7 @@ class NotificationQueue extends NotificationQueueSchema {
         $query->currentUser->equal($currentUser);
         $query->isRead->isFalse();
         $query->isDiscarded->isFalse();
-        $query->createdTime->greaterThan(DateTime::getLastXDays(30));
+        $query->createdTime->greaterThan(Date::now(days: -30));
         return self::getEntityTotal($query);
     }
 
@@ -174,10 +174,10 @@ class NotificationQueue extends NotificationQueueSchema {
      */
     public static function deleteOld(): bool {
         $days  = Config::getNotificationDeleteDays();
-        $time  = DateTime::getLastXDays($days);
+        $date  = Date::now(days: -$days);
 
         $query = new NotificationQueueQuery();
-        $query->createdTime->lessThan($time);
+        $query->createdTime->lessThan($date);
         return self::removeEntity($query);
     }
 
@@ -243,7 +243,7 @@ class NotificationQueue extends NotificationQueueSchema {
                 notificationResult: $notificationResult->name,
                 externalID:         $externalID,
                 playerIDs:          JSON::encode($playerIDs),
-                sentTime:           time(),
+                sentTime:           Date::now(),
             );
         }
         return $result;

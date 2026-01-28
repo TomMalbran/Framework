@@ -9,7 +9,7 @@ use Framework\Log\Schema\LogActionSchema;
 use Framework\Log\Schema\LogActionColumn;
 use Framework\Log\Schema\LogActionQuery;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
@@ -189,10 +189,10 @@ class ActionLog extends LogActionSchema {
      */
     public static function deleteOld(): bool {
         $days  = Config::getActionLogDeleteDays();
-        $time  = DateTime::getLastXDays($days);
+        $date  = Date::now(days: -$days);
 
         $query = new LogActionQuery();
-        $query->createdTime->lessThan($time);
+        $query->createdTime->lessThan($date);
         self::removeEntity($query);
         return SessionLog::deleteOld();
     }

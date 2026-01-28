@@ -3,6 +3,7 @@ namespace Framework\Auth\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Date\Date;
 
 /**
  * The Credential Reset Model
@@ -20,5 +21,5 @@ class CredentialResetModel {
 
     public string $resetCode = "";
 
-    public int $time = 0;
+    public ?Date $time = null;
 }

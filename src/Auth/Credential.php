@@ -11,6 +11,7 @@ use Framework\Auth\Schema\CredentialQuery;
 use Framework\Intl\NLS;
 use Framework\System\Access;
 use Framework\System\Path;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Search;
@@ -267,13 +268,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the create times for all the Credentials with the given Access
-     * @param int         $fromTime
+     * @param Date        $fromDate
      * @param Access|null $accessName Optional.
-     * @return array<int,int>
+     * @return array<int,Date>
      */
-    public static function getAllCreateTimes(int $fromTime, ?Access $accessName = null): array {
+    public static function getAllCreateTimes(Date $fromDate, ?Access $accessName = null): array {
         $query = self::createAccessQuery($accessName);
-        $query->createdTime->greaterOrEqual($fromTime);
+        $query->createdTime->greaterOrEqual($fromDate);
 
         $list   = self::getEntityList($query);
         $result = [];

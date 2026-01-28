@@ -10,7 +10,7 @@ use Framework\Email\Schema\EmailQueueColumn;
 use Framework\Email\Schema\EmailQueueQuery;
 use Framework\Email\Schema\EmailContentEntity;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 
@@ -27,8 +27,8 @@ class EmailQueue extends EmailQueueSchema {
     #[\Override]
     protected static function createListQuery(Request $request): EmailQueueQuery {
         $search   = $request->getString("search");
-        $fromTime = $request->toDayStartHour("fromDate", "fromHour");
-        $toTime   = $request->toDayEndHour("toDate", "toHour");
+        $fromDate = $request->toDateStartHour("fromDate", "fromHour");
+        $toDate   = $request->toDateEndHour("toDate", "toHour");
         $dataID   = $request->getInt("dataID");
         $results  = $request->getStrings("results");
 
@@ -39,8 +39,8 @@ class EmailQueue extends EmailQueueSchema {
             EmailQueueColumn::Message,
         ], $search);
 
-        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
-        $query->createdTime->lessThan($toTime, $toTime > 0);
+        $query->createdTime->greaterThan($fromDate);
+        $query->createdTime->lessThan($toDate);
         $query->dataID->equalIf($dataID);
         $query->emailResult->in($results);
         return $query;
@@ -52,10 +52,10 @@ class EmailQueue extends EmailQueueSchema {
      */
     public static function getAllUnsent(): array {
         $query = new EmailQueueQuery();
-        $query->sentTime->equal(0);
+        $query->sentTime->isEmpty();
         $query->startOr();
-        $query->createdTime->greaterThan(DateTime::getLastXHours(1));
-        $query->sendTime->greaterThan(DateTime::getLastXHours(1));
+        $query->createdTime->greaterThan(Date::now(hours: -1));
+        $query->sendTime->greaterThan(Date::now(hours: -1));
         $query->endOr();
         $query->createdTime->orderByDesc();
         $query->limit(Config::getEmailLimit());
@@ -95,8 +95,8 @@ class EmailQueue extends EmailQueueSchema {
             subject:     $subject,
             message:     $message,
             emailResult: EmailResult::NotProcessed->name,
-            sendTime:    time(),
-            sentTime:    0,
+            sendTime:    Date::now(),
+            sentTime:    Date::empty(),
             dataID:      $dataID,
         );
 
@@ -157,8 +157,8 @@ class EmailQueue extends EmailQueueSchema {
         return self::editEntity(
             $query,
             emailResult: EmailResult::NotProcessed->name,
-            sendTime:    time(),
-            sentTime:    0,
+            sendTime:    Date::now(),
+            sentTime:    Date::empty(),
         );
     }
 
@@ -172,7 +172,7 @@ class EmailQueue extends EmailQueueSchema {
         return self::editEntity(
             $emailID,
             emailResult: $emailResult->name,
-            sentTime:    time(),
+            sentTime:    Date::now(),
         );
     }
 
@@ -182,10 +182,10 @@ class EmailQueue extends EmailQueueSchema {
      */
     public static function deleteOld(): bool {
         $days  = Config::getEmailDeleteDays();
-        $time  = DateTime::getLastXDays($days);
+        $date  = Date::now(days: -$days);
 
         $query = new EmailQueueQuery();
-        $query->createdTime->lessThan($time);
+        $query->createdTime->lessThan($date);
         return self::removeEntity($query);
     }
 }

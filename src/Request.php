@@ -4,6 +4,7 @@ namespace Framework;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
+use Framework\Date\Date;
 use Framework\Date\DateTime;
 use Framework\Date\DateType;
 use Framework\Utils\Arrays;
@@ -825,6 +826,64 @@ class Request implements IteratorAggregate, JsonSerializable {
     public function getDayEnd(string $key, bool $useTimezone = true): int {
         $value = $this->getInt($key);
         return DateTime::getDayEnd($value, 0, $useTimezone);
+    }
+
+
+
+    /**
+     * Returns the given string as a time at the start of the day
+     * @param string $key
+     * @return Date
+     */
+    public function toDateStart(string $key): Date {
+        if (!$this->has($key)) {
+            return new Date();
+        }
+        return Date::fromString($this->getString($key))->toDayStart();
+    }
+
+    /**
+     * Returns the given string as a Date at the given hour or the start of the day
+     * @param string $dateKey
+     * @param string $hourKey
+     * @return Date
+     */
+    public function toDateStartHour(string $dateKey, string $hourKey): Date {
+        if (!$this->has($dateKey)) {
+            return new Date();
+        }
+        if ($this->has($hourKey)) {
+            return Date::fromString($this->getString($dateKey), $this->getString($hourKey));
+        }
+        return $this->toDateStart($dateKey);
+    }
+
+    /**
+     * Returns the given string as a time at the end of the day
+     * @param string $key
+     * @return Date
+     */
+    public function toDateEnd(string $key): Date {
+        if (!$this->has($key)) {
+            return new Date();
+        }
+        return Date::fromString($this->getString($key))->toDayEnd();
+    }
+
+    /**
+     * Returns the given string as a Date at the given hour or the end of the day
+     * @param string $dateKey
+     * @param string $hourKey
+     * @return Date
+     */
+    public function toDateEndHour(string $dateKey, string $hourKey): Date {
+        if (!$this->has($dateKey)) {
+            return new Date();
+        }
+        if ($this->has($hourKey)) {
+            return Date::fromString($this->getString($dateKey), $this->getString($hourKey));
+        }
+        return $this->toDateEnd($dateKey);
     }
 
 
