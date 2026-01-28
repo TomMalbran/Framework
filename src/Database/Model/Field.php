@@ -8,6 +8,7 @@ use Framework\Database\Type\Assign;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\System\Path;
+use Framework\Date\Date;
 use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -296,16 +297,20 @@ class Field {
         $this->dbName = $name;
 
         switch ($typeName) {
+        case Date::class:
+            $this->type = FieldType::Date;
+            break;
+
+        case "int":
+            $this->type = FieldType::Number;
+            break;
+
         case "bool":
             $this->type = FieldType::Boolean;
             break;
 
         case "float":
             $this->type = FieldType::Float;
-            break;
-
-        case "int":
-            $this->type = FieldType::Number;
             break;
 
         case "string":
@@ -371,6 +376,7 @@ class Field {
         $default    = null;
 
         switch ($this->type) {
+        case FieldType::Date:
         case FieldType::Number:
             $type    = "int";
             $length  = $this->length > 0 ? $this->length : 10;
@@ -456,6 +462,7 @@ class Field {
         }
 
         switch ($this->type) {
+        case FieldType::Date:
         case FieldType::Number:
             if ($this->dateInput !== "" && $this->hourInput !== "") {
                 $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
@@ -500,6 +507,7 @@ class Field {
         $result = [];
 
         switch ($this->type) {
+        case FieldType::Date:
         case FieldType::Number:
             $result[$key] = $number;
             break;
