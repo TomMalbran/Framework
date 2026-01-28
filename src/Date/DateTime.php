@@ -761,13 +761,13 @@ class DateTime {
     }
 
     /**
-     * Returns the Month for the given Time Stamp
+     * Returns the Month for the given Time Stamp with leading zero (01 to 12)
      * @param int $timeStamp Optional.
      * @return string
      */
     public static function getMonthZero(int $timeStamp = 0): string {
-        $month = self::getMonth($timeStamp);
-        return self::parseTime($month);
+        $timeStamp = self::getTime($timeStamp);
+        return date("m", $timeStamp);
     }
 
     /**
@@ -1031,13 +1031,13 @@ class DateTime {
     }
 
     /**
-     * Returns the Day for the given Time Stamp with Padding
+     * Returns the Day for the given Time Stamp with leading 0 (01 to 31)
      * @param int $timeStamp Optional.
      * @return string
      */
     public static function getDayZero(int $timeStamp = 0): string {
-        $day = self::getDay($timeStamp);
-        return self::parseTime($day);
+        $timeStamp = self::getTime($timeStamp);
+        return date("d", $timeStamp);
     }
 
     /**
