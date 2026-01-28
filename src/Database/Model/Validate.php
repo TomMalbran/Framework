@@ -14,6 +14,11 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Validate {
 
+    // A basic condition used to apply the validation.
+    // It can be in the form of "field = value" or "field != value".
+    // Where "field" is a value from the Request.
+    public string $if = "";
+
     // Indicates that the field is required.
     public bool $isRequired = false;
 
@@ -76,6 +81,7 @@ class Validate {
      * @phpstan-param class-string|null $typeOf
      * @phpstan-param class-string|null $belongsTo
      *
+     * @param string      $if          Optional.
      * @param bool        $isRequired  Optional.
      * @param bool        $isEmail     Optional.
      * @param bool        $isUrl       Optional.
@@ -94,6 +100,7 @@ class Validate {
      * @param string      $belongsName Optional.
      */
     public function __construct(
+        string $if = "",
         bool $isRequired = false,
         bool $isEmail = false,
         bool $isUrl = false,
@@ -111,6 +118,7 @@ class Validate {
         string $prefix = "",
         string $belongsName = "",
     ) {
+        $this->if          = $if;
         $this->isRequired  = $isRequired;
         $this->isEmail     = $isEmail;
         $this->isUrl       = $isUrl;
@@ -159,13 +167,12 @@ class Validate {
      * @return Validate
      */
     public function setField(Field $field, string $fantasyName): Validate {
-        $this->name        = $field->name;
-        $this->isUnique    = $field->isUnique;
-        $this->dateInput   = $field->dateInput;
-        $this->hourInput   = $field->hourInput;
-        $this->decimals    = $field->decimals;
-
-        $this->type        = $this->getType($field);
+        $this->name      = $field->name;
+        $this->isUnique  = $field->isUnique;
+        $this->dateInput = $field->dateInput;
+        $this->hourInput = $field->hourInput;
+        $this->decimals  = $field->decimals;
+        $this->type      = $this->getType($field);
 
         if ($this->prefix === "") {
             $this->prefix = Strings::pascalCaseToUpperCase($fantasyName);
@@ -276,5 +283,26 @@ class Validate {
             return "";
         }
         return ", " . Strings::join($result, ", ");
+    }
+
+    /**
+     * Creates the If statement for this Validate
+     * @return string
+     */
+    public function createCondition(): string {
+        $parts = Strings::split($this->if, " ");
+        if (count($parts) !== 3) {
+            return "";
+        }
+
+        $field = $parts[0];
+        $value = trim(Strings::replace($parts[2], [ "'", '"'], ""));
+        $op    = match ($parts[1]) {
+            "=", "==", "==="  => "===",
+            "!=", "!==", "<>" => "!==",
+            default => "=",
+        };
+
+        return "if (\$request->getString(\"{$field}\") {$op} \"{$value}\") {";
     }
 }

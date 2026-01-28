@@ -245,9 +245,10 @@ class SchemaCode {
         $result      = [];
 
         foreach ($schemaModel->validates as $validate) {
+            $validation = [];
             switch ($validate->type) {
             case ValidateType::String:
-                $result[] = [
+                $validation = [
                     "isString"    => true,
                     "isRequired"  => $validate->isRequired,
                     "isUnique"    => $validate->isUnique,
@@ -261,7 +262,7 @@ class SchemaCode {
                 break;
 
             case ValidateType::Email:
-                $result[] = [
+                $validation = [
                     "isEmail"    => true,
                     "isRequired" => $validate->isRequired,
                     "isUnique"   => $validate->isUnique,
@@ -271,7 +272,7 @@ class SchemaCode {
                 break;
 
             case ValidateType::Url:
-                $result[] = [
+                $validation = [
                     "isUrl"      => true,
                     "isRequired" => $validate->isRequired,
                     "fieldName"  => $validate->name,
@@ -280,7 +281,7 @@ class SchemaCode {
                 break;
 
             case ValidateType::Color:
-                $result[] = [
+                $validation = [
                     "isColor"    => true,
                     "isRequired" => $validate->isRequired,
                     "fieldName"  => $validate->name,
@@ -289,7 +290,7 @@ class SchemaCode {
                 break;
 
             case ValidateType::Number:
-                $result[] = [
+                $validation = [
                     "isNumber"      => true,
                     "isRequired"    => $validate->isRequired,
                     "isUnique"      => $validate->isUnique,
@@ -309,7 +310,7 @@ class SchemaCode {
                 break;
 
             case ValidateType::Date:
-                $result[] = [
+                $validation = [
                     "isDate"     => true,
                     "isRequired" => $validate->isRequired,
                     "dateName"   => $validate->dateInput,
@@ -320,8 +321,8 @@ class SchemaCode {
                 if (Strings::startsWith($validate->name, "from")) {
                     $hasFromDate = true;
                 } elseif (Strings::startsWith($validate->name, "to") && $hasFromDate) {
-                    $result[] = [
-                        "isPeriod"     => true,
+                    $validation += [
+                        "hasPeriod"    => true,
                         "fromDateName" => "fromDate",
                         "fromHourName" => "fromHour",
                         "toDateName"   => "toDate",
@@ -332,7 +333,7 @@ class SchemaCode {
                 break;
 
             case ValidateType::Price:
-                $result[] = [
+                $validation = [
                     "isPrice"    => true,
                     "isRequired" => $validate->isRequired,
                     "fieldName"  => $validate->name,
@@ -341,13 +342,19 @@ class SchemaCode {
                 break;
 
             case ValidateType::Status:
-                $result[] = [
+                $validation = [
                     "isStatus" => true,
                 ];
                 break;
 
             default:
             }
+
+            $result[] = $validation + [
+                "hasIf"     => $validate->if !== "",
+                "condition" => $validate->createCondition(),
+                "pads"      => $validate->if !== "" ? "    " : "",
+            ];
         }
         return $result;
     }

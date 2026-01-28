@@ -155,116 +155,114 @@ class {{name}}Schema extends Schema {
         } elseif ($isEdit && !self::exists($id{{parentsSecList}})) {
             $errors->form = "{{errorPrefix}}EXISTS";
         } else {
-        {{#validations}}
-        {{#isString}}
-            if (!$request->isValidString("{{fieldName}}")) {
-                $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
-            {{#typeOf}}
-            } elseif (!{{typeOf}}::{{method}}($request->getString("{{fieldName}}"))) {
-                $errors->{{fieldName}} = "{{fieldError}}_INVALID";
-            {{/typeOf}}
-            {{#isUnique}}
-            } elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
-                $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
-            {{/isUnique}}
-            {{#maxLength}}
-            } elseif (!$request->isValidLength("{{fieldName}}", {{maxLength}})) {
-                $errors->add("{{fieldName}}", "{{fieldError}}_LENGTH", {{maxLength}});
-            {{/maxLength}}
+{{#validations}}
+    {{#hasIf}}
+            {{{condition}}}
+    {{/hasIf}}
+    {{#isString}}
+            {{pads}}if (!$request->isValidString("{{fieldName}}")) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
+        {{#typeOf}}
+            {{pads}}} elseif (!{{typeOf}}::{{method}}($request->getString("{{fieldName}}"))) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_INVALID";
+        {{/typeOf}}
+        {{#isUnique}}
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
+        {{/isUnique}}
+        {{#maxLength}}
+            {{pads}}} elseif (!$request->isValidLength("{{fieldName}}", {{maxLength}})) {
+            {{pads}}    $errors->add("{{fieldName}}", "{{fieldError}}_LENGTH", {{maxLength}});
+        {{/maxLength}}
+            {{pads}}}
+    {{/isString}}
+    {{#isEmail}}
+        {{#isRequired}}
+            {{pads}}if (!$request->isValidString("{{fieldName}}")) {
+            {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_EMPTY";
+        {{/isRequired}}
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidEmail("{{fieldName}}")) {
+            {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_INVALID";
+        {{#isUnique}}
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
+        {{/isUnique}}
+            {{pads}}}
+    {{/isEmail}}
+    {{#isUrl}}
+        {{#isRequired}}
+            {{pads}}if (!$request->isValidString("{{fieldName}}")) {
+            {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_EMPTY";
+        {{/isRequired}}
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidUrl("{{fieldName}}")) {
+            {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_INVALID";
+            {{pads}}}
+    {{/isUrl}}
+    {{#isColor}}
+            {{pads}}if (!Color::isValid($request->getString("{{fieldName}}"))) {
+            {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_COLOR";
+            {{pads}}}
+    {{/isColor}}
+    {{#isNumber}}
+        {{#isRequired}}
+            {{pads}}if (!$request->has("{{fieldName}}")) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
+        {{/isRequired}}
+        {{#typeOf}}
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{typeOf}}::{{method}}($request->getInt("{{fieldName}}"))) {
+            {{pads}}    $errors->{{fieldName}} = "{{typeError}}_ERROR_EXISTS";
+        {{/typeOf}}
+        {{#belongsTo}}
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{belongsTo}}::{{method}}($request->getInt("{{fieldName}}"{{#withParent}}{{parentsSecList}}{{/withParent}}))) {
+            {{pads}}    $errors->{{fieldName}} = "{{belongsError}}";
+        {{/belongsTo}}
+        {{#isNumeric}}
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!$request->isNumeric("{{fieldName}}"{{numericParams}})) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
+        {{/isNumeric}}
+        {{#isUnique}}
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->getInt("{{fieldName}}"){{parentsSecList}}, $id)) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
+        {{/isUnique}}
+            {{pads}}}
+    {{/isNumber}}
+    {{#isDate}}
+            {{pads}}if (!$request->has("{{dateName}}")) {
+            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_EMPTY";
+            {{pads}}} elseif (!$request->isValidDate("{{dateName}}")) {
+            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_INVALID";
+            {{pads}}} elseif (!$request->has("{{hourName}}")) {
+            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_EMPTY";
+            {{pads}}} elseif (!$request->isValidHour("{{hourName}}")) {
+            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_INVALID";
+            {{pads}}}
+        {{#hasPeriod}}
+            {{pads}}if (!$request->isValidFullPeriod("{{fromDateName}}", "{{fromHourName}}", "{{toDateName}}", "{{toHourName}}")) {
+            {{pads}}    $errors->toDate = "GENERAL_ERROR_DATE_PERIOD";
+            {{pads}}}
+        {{/hasPeriod}}
+    {{/isDate}}
+    {{#isPrice}}
+            {{pads}}if (!$request->isValidPrice("{{fieldName}}", 0)) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}";
+            {{pads}}}
+    {{/isPrice}}
+    {{#isStatus}}
+            {{pads}}if (!{{status}}::isValid($request->getString("status"))) {
+            {{pads}}    $errors->status = "GENERAL_ERROR_STATUS";
+            {{pads}}}
+    {{/isStatus}}
+    {{#hasIf}}
             }
+    {{/hasIf}}
 
-        {{/isString}}
-        {{#isEmail}}
-            {{#isRequired}}
-            if (!$request->isValidString("{{fieldName}}")) {
-                $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_EMPTY";
-            {{/isRequired}}
-            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidEmail("{{fieldName}}")) {
-                $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_INVALID";
-            {{#isUnique}}
-            } elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
-                $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
-            {{/isUnique}}
-            }
-
-        {{/isEmail}}
-        {{#isUrl}}
-            {{#isRequired}}
-            if (!$request->isValidString("{{fieldName}}")) {
-                $errors->{{fieldName}} = "GENERAL_ERROR_URL_EMPTY";
-            {{/isRequired}}
-            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidUrl("{{fieldName}}")) {
-                $errors->{{fieldName}} = "GENERAL_ERROR_URL_INVALID";
-            }
-
-        {{/isUrl}}
-        {{#isColor}}
-            if (!Color::isValid($request->getString("{{fieldName}}"))) {
-                $errors->{{fieldName}} = "GENERAL_ERROR_COLOR";
-            }
-
-        {{/isColor}}
-        {{#isNumber}}
-            {{#isRequired}}
-            if (!$request->has("{{fieldName}}")) {
-                $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
-            {{/isRequired}}
-            {{#typeOf}}
-            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{typeOf}}::{{method}}($request->getInt("{{fieldName}}"))) {
-                $errors->{{fieldName}} = "{{typeError}}_ERROR_EXISTS";
-            {{/typeOf}}
-            {{#belongsTo}}
-            {{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{belongsTo}}::{{method}}($request->getInt("{{fieldName}}"{{#withParent}}{{parentsSecList}}{{/withParent}}))) {
-                $errors->{{fieldName}} = "{{belongsError}}";
-            {{/belongsTo}}
-            {{#isNumeric}}
-            {{#isRequired}}} else{{/isRequired}}if (!$request->isNumeric("{{fieldName}}"{{numericParams}})) {
-                $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
-            {{/isNumeric}}
-            {{#isUnique}}
-            } elseif (self::{{fieldName}}Exists($request->getInt("{{fieldName}}"){{parentsSecList}}, $id)) {
-                $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
-            {{/isUnique}}
-            }
-
-        {{/isNumber}}
-        {{#isDate}}
-            if (!$request->has("{{dateName}}")) {
-                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_EMPTY";
-            } elseif (!$request->isValidDate("{{dateName}}")) {
-                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_INVALID";
-            } elseif (!$request->has("{{hourName}}")) {
-                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_EMPTY";
-            } elseif (!$request->isValidHour("{{hourName}}")) {
-                $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_INVALID";
-            }
-
-        {{/isDate}}
-        {{#isPeriod}}
-            if (!$request->isValidFullPeriod("{{fromDateName}}", "{{fromHourName}}", "{{toDateName}}", "{{toHourName}}")) {
-                $errors->toDate = "GENERAL_ERROR_DATE_PERIOD";
-            }
-
-        {{/isPeriod}}
-        {{#isPrice}}
-            if (!$request->isValidPrice("{{fieldName}}", 0)) {
-                $errors->{{fieldName}} = "{{fieldError}}";
-            }
-
-        {{/isPrice}}
-        {{#isStatus}}
-            if (!{{status}}::isValid($request->getString("status"))) {
-                $errors->status = "GENERAL_ERROR_STATUS";
-            }
-
-        {{/isStatus}}
-        {{/validations}}
-        {{#hasPositions}}
+{{/validations}}
+    {{#hasPositions}}
             if (!$request->isValidPosition("position")) {
                 $errors->position = "GENERAL_ERROR_POSITION";
             }
 
-        {{/hasPositions}}
+    {{/hasPositions}}
             $canValidate = true;
         }
 
