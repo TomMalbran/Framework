@@ -14,7 +14,9 @@ class Period {
 
     public const Today         = "today";
     public const Yesterday     = "yesterday";
+    public const PrevYesterday = "prevYesterday";
     public const Tomorrow      = "tomorrow";
+    public const NextTomorrow  = "nextTomorrow";
 
     public const Last7Days     = "last7Days";
     public const Last15Days    = "last15Days";
@@ -32,6 +34,10 @@ class Period {
     public const PastMonth     = "pastMonth";
     public const PastYear      = "pastYear";
 
+    public const NextWeek      = "nextWeek";
+    public const NextMonth     = "nextMonth";
+    public const NextYear      = "nextYear";
+
     public const AllPeriod     = "allPeriod";
     public const Custom        = "custom";
 
@@ -45,7 +51,9 @@ class Period {
     public static array $names = [
         self::Today         => "Hoy",
         self::Yesterday     => "Ayer",
+        self::PrevYesterday => "Anteayer",
         self::Tomorrow      => "Mañana",
+        self::NextTomorrow  => "Pasado mañana",
 
         self::Last7Days     => "Últimos 7 días",
         self::Last15Days    => "Últimos 15 días",
@@ -62,6 +70,10 @@ class Period {
         self::PastWeek      => "La semana pasada",
         self::PastMonth     => "El mes pasado",
         self::PastYear      => "El año pasado",
+
+        self::NextWeek      => "La próxima semana",
+        self::NextMonth     => "El próximo mes",
+        self::NextYear      => "El próximo año",
 
         self::AllPeriod     => "Todo el periodo",
         self::Custom        => "Personalizado",
@@ -172,7 +184,9 @@ class Period {
         $result = match ($this->period) {
             self::Today         => $date,
             self::Yesterday     => $date->moveDay(-1),
+            self::PrevYesterday => $date->moveDay(-2),
             self::Tomorrow      => $date->moveDay(1),
+            self::NextTomorrow  => $date->moveDay(2),
 
             self::Last7Days     => $date->moveDay(-7),
             self::Last15Days    => $date->moveDay(-15),
@@ -189,6 +203,10 @@ class Period {
             self::PastWeek      => $date->moveWeek(-1)->toWeekStart(),
             self::PastMonth     => $date->moveMonth(-1)->toMonthStart(),
             self::PastYear      => $date->moveYear(-1)->toYearStart(),
+
+            self::NextWeek      => $date->moveWeek(1)->toWeekEnd(),
+            self::NextMonth     => $date->moveMonth(1)->toMonthEnd(),
+            self::NextYear      => $date->moveYear(1)->toYearEnd(),
 
             self::AllPeriod     => new Date(),
             self::Custom        => new Date($this->fromTime),
@@ -210,7 +228,9 @@ class Period {
         $result = match ($this->period) {
             self::Today         => $date,
             self::Yesterday     => $date->moveDay(-1),
+            self::PrevYesterday => $date->moveDay(-2),
             self::Tomorrow      => $date->moveDay(1),
+            self::NextTomorrow  => $date->moveDay(2),
 
             self::Last7Days,
             self::Last15Days,
@@ -227,6 +247,10 @@ class Period {
             self::PastWeek      => $date->moveWeek(-1)->toWeekEnd(),
             self::PastMonth     => $date->moveMonth(-1)->toMonthEnd(),
             self::PastYear      => $date->moveYear(-1)->toYearEnd(),
+
+            self::NextWeek      => $date->moveWeek(1)->toWeekEnd(),
+            self::NextMonth     => $date->moveMonth(1)->toMonthEnd(),
+            self::NextYear      => $date->moveYear(1)->toYearEnd(),
 
             self::AllPeriod     => $date,
             self::Custom        => new Date($this->toTime),
@@ -285,7 +309,9 @@ class Period {
         return match ($period) {
             self::Today         => 1,
             self::Yesterday     => 1,
+            self::PrevYesterday => 1,
             self::Tomorrow      => 1,
+            self::NextTomorrow  => 1,
 
             self::Last7Days     => 7,
             self::Last15Days    => 15,
@@ -302,6 +328,10 @@ class Period {
             self::PastWeek      => 7,
             self::PastMonth     => $date->moveMonth(-1)->getMonthDays(),
             self::PastYear      => $date->moveYear(-1)->getYearDays(),
+
+            self::NextWeek      => 7,
+            self::NextMonth     => $date->moveMonth(1)->getMonthDays(),
+            self::NextYear      => $date->moveYear(1)->getYearDays(),
 
             self::AllPeriod     => 0,
             default             => 0,
