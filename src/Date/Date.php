@@ -120,29 +120,29 @@ class Date {
 
     /**
      * Returns a new Date changing the current one with the given values
-     * @param int $day    Optional.
-     * @param int $month  Optional.
-     * @param int $year   Optional.
-     * @param int $hour   Optional.
-     * @param int $minute Optional.
-     * @param int $second Optional.
+     * @param int|null $day    Optional.
+     * @param int|null $month  Optional.
+     * @param int|null $year   Optional.
+     * @param int|null $hour   Optional.
+     * @param int|null $minute Optional.
+     * @param int|null $second Optional.
      * @return Date
      */
     private function changeDate(
-        int $day = 0,
-        int $month = 0,
-        int $year = 0,
-        int $hour = 0,
-        int $minute = 0,
-        int $second = 0,
+        ?int $day = null,
+        ?int $month = null,
+        ?int $year = null,
+        ?int $hour = null,
+        ?int $minute = null,
+        ?int $second = null,
     ): Date {
         $time = mktime(
-            $hour   > 0 ? $hour   : $this->getHour(),
-            $minute > 0 ? $minute : $this->getMinute(),
-            $second > 0 ? $second : $this->getSecond(),
-            $month  > 0 ? $month  : $this->getMonth(),
-            $day    > 0 ? $day    : $this->getDay(),
-            $year   > 0 ? $year   : $this->getYear(),
+            $hour   !== null ? $hour   : $this->getHour(),
+            $minute !== null ? $minute : $this->getMinute(),
+            $second !== null ? $second : $this->getSecond(),
+            $month  !== null ? $month  : $this->getMonth(),
+            $day    !== null ? $day    : $this->getDay(),
+            $year   !== null ? $year   : $this->getYear(),
         );
         return new Date($time);
     }
