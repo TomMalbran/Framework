@@ -193,7 +193,7 @@ class TimeTable {
             }
         }
 
-        return $resultDate->getTime();
+        return $resultDate->toTime();
     }
 
     /**
@@ -232,7 +232,7 @@ class TimeTable {
             }
         }
 
-        return $resultDate->getTime();
+        return $resultDate->toTime();
     }
 
 

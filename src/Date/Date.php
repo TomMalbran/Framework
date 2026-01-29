@@ -22,7 +22,7 @@ class Date implements JsonSerializable {
      */
     public function __construct(mixed $value = null) {
         if ($value instanceof Date) {
-            $this->timestamp = $value->getTime();
+            $this->timestamp = $value->toTime();
         } elseif (Numbers::isValid($value)) {
             $this->timestamp = Numbers::toInt($value);
         } elseif (is_string($value)) {
@@ -153,6 +153,9 @@ class Date implements JsonSerializable {
         int $minute = 0,
         int $second = 0,
     ): Date {
+        if ($this->isEmpty()) {
+            return Date::empty();
+        }
         $time = mktime(
             $hour   > 0 ? $hour   : $this->getHour(),
             $minute > 0 ? $minute : $this->getMinute(),
@@ -324,7 +327,7 @@ class Date implements JsonSerializable {
      * Returns the Timestamp
      * @return int
      */
-    public function getTime(): int {
+    public function toTime(): int {
         return $this->timestamp;
     }
 
@@ -475,6 +478,26 @@ class Date implements JsonSerializable {
         );
     }
 
+    /**
+     * Returns the name of the current Day and Month
+     * @param int    $monthLength Optional.
+     * @param bool   $inUpperCase Optional.
+     * @param string $language    Optional.
+     * @return string
+     */
+    public function getDayMonth(
+        int $monthLength = 0,
+        bool $inUpperCase = false,
+        string $language = "",
+    ): string {
+        return DateTime::getDayMonth(
+            $this->timestamp,
+            length:      $monthLength,
+            inUpperCase: $inUpperCase,
+            language:    $language,
+        );
+    }
+
 
 
     /**
@@ -533,34 +556,6 @@ class Date implements JsonSerializable {
     }
 
     /**
-     * Returns true if the current Date is before another Date
-     * @param Date $date
-     * @return bool
-     */
-    public function isBefore(Date $date): bool {
-        return $this->timestamp < $date->getTime();
-    }
-
-    /**
-     * Returns true if the current Date is after another Date
-     * @param Date $date
-     * @return bool
-     */
-    public function isAfter(Date $date): bool {
-        return $this->timestamp > $date->getTime();
-    }
-
-    /**
-     * Returns true if the current Date is between two other Dates
-     * @param Date $from
-     * @param Date $to
-     * @return bool
-     */
-    public function isBetween(Date $from, Date $to): bool {
-        return $this->timestamp >= $from->getTime() && $this->timestamp <= $to->getTime();
-    }
-
-    /**
      * Returns true if the current Date is in the current Month
      * @return bool
      */
@@ -573,12 +568,58 @@ class Date implements JsonSerializable {
     }
 
     /**
+     * Returns true if the current Date is equal to another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isEqual(Date $date): bool {
+        return $this->timestamp === $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is not equal to another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isNotEqual(Date $date): bool {
+        return $this->timestamp !== $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is before another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isBefore(Date $date): bool {
+        return $this->timestamp < $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is after another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isAfter(Date $date): bool {
+        return $this->timestamp > $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is between two other Dates
+     * @param Date $from
+     * @param Date $to
+     * @return bool
+     */
+    public function isBetween(Date $from, Date $to): bool {
+        return $this->timestamp >= $from->toTime() && $this->timestamp <= $to->toTime();
+    }
+
+    /**
      * Returns the difference in days between the current Date and another Date
      * @param Date $date
      * @return int
      */
     public function getDaysDiff(Date $date): int {
-        $diffSeconds = abs($this->timestamp - $date->getTime());
+        $diffSeconds = abs($this->timestamp - $date->toTime());
         return (int)floor($diffSeconds / 86400);
     }
 
@@ -588,7 +629,7 @@ class Date implements JsonSerializable {
      * @return int
      */
     public function getHoursDiff(Date $date): int {
-        $diffSeconds = abs($this->timestamp - $date->getTime());
+        $diffSeconds = abs($this->timestamp - $date->toTime());
         return (int)floor($diffSeconds / 3600);
     }
 
@@ -598,7 +639,7 @@ class Date implements JsonSerializable {
      * @return int
      */
     public function getMinutesDiff(Date $date): int {
-        $diffSeconds = abs($this->timestamp - $date->getTime());
+        $diffSeconds = abs($this->timestamp - $date->toTime());
         return (int)floor($diffSeconds / 60);
     }
 

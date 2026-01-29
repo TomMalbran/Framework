@@ -686,7 +686,7 @@ class {{name}}Schema extends Schema {
         {{/hasStatus}}
         {{#hasTimestamps}}
         if ($createdTime !== null) {
-            $entityFields["createdTime"] = $createdTime->getTime();
+            $entityFields["createdTime"] = $createdTime->toTime();
         }
         {{/hasTimestamps}}
         {{#hasUsers}}

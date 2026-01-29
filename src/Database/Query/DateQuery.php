@@ -27,7 +27,7 @@ class DateQuery extends BaseQuery {
         return $this->query->add(
             $this->column,
             $operator,
-            $value->getTime(),
+            $value->toTime(),
             condition: $condition,
         );
     }
@@ -43,7 +43,7 @@ class DateQuery extends BaseQuery {
         return $this->query->addIf(
             $this->column,
             $operator,
-            $value->getTime(),
+            $value->toTime(),
             $condition,
         );
     }

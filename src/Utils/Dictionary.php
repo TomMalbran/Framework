@@ -249,7 +249,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return Date
      */
     public function getDate(string $key): Date {
-        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
+        if (isset($this->data[$key]) && !is_array($this->data[$key]) && $this->hasValue($key)) {
             return new Date($this->data[$key]);
         }
         return new Date();

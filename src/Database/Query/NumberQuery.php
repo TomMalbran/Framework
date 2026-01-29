@@ -1,9 +1,11 @@
 <?php
 namespace Framework\Database\Query;
 
+use Framework\Request;
 use Framework\Database\Query\BaseQuery;
 use Framework\Database\Query\Query;
 use Framework\Database\Query\QueryOperator;
+use Framework\Date\Period;
 
 /**
  * The Number Query
@@ -150,5 +152,25 @@ class NumberQuery extends BaseQuery {
             return $this->query;
         }
         return $this->compare(QueryOperator::NotIn, $values, $condition);
+    }
+
+    /**
+     * Uses the Period to add a Between expression
+     * @param Period|Request $period
+     * @param string         $prefix Optional.
+     * @return Query
+     */
+    public function inPeriod(Period|Request $period, string $prefix = ""): Query {
+        if ($period instanceof Request) {
+            $period = new Period($period, $prefix);
+        }
+
+        if ($period->fromTime > 0) {
+            $this->compare(QueryOperator::GreaterOrEqual, $period->fromTime);
+        }
+        if ($period->toTime > 0) {
+            $this->compare(QueryOperator::LessOrEqual, $period->toTime);
+        }
+        return $this->query;
     }
 }

@@ -831,6 +831,18 @@ class Request implements IteratorAggregate, JsonSerializable {
 
 
     /**
+     * Returns the request data at the given key or the default
+     * @param string $key
+     * @return Date
+     */
+    public function toDate(string $key): Date {
+        if (!$this->has($key)) {
+            return new Date();
+        }
+        return new Date($this->getInt($key));
+    }
+
+    /**
      * Returns the given string as a time at the start of the day
      * @param string $key
      * @return Date
@@ -856,6 +868,18 @@ class Request implements IteratorAggregate, JsonSerializable {
             return Date::fromString($this->getString($dateKey), $this->getString($hourKey));
         }
         return $this->toDateStart($dateKey);
+    }
+
+    /**
+     * Returns the given string as a time at the middle of the day
+     * @param string $key
+     * @return Date
+     */
+    public function toDateMiddle(string $key): Date {
+        if (!$this->has($key)) {
+            return new Date();
+        }
+        return Date::fromString($this->getString($key))->toDayMiddle();
     }
 
     /**

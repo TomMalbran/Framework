@@ -219,7 +219,7 @@ class SchemaCode {
             "fieldDocEdit"    => "$assignDoc$type|null $param",
             "fieldParam"      => $param,
             "fieldParamQuery" => $type === "bool" ? "$param === true ? 1 : 0" : $param,
-            "fieldAssign"     => $isDate ? "{$param}->getTime()" : $param,
+            "fieldAssign"     => $isDate ? "{$param}->toTime()" : $param,
             "fieldArg"        => "$type $param",
             "fieldArgNull"    => "?$type $param",
             "fieldArgDefault" => "$type $param = $default",

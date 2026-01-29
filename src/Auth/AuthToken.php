@@ -168,7 +168,7 @@ class AuthToken {
             $result[] = [
                 "refreshToken" => $elem->refreshToken,
                 "platform"     => Server::getPlatform($elem->userAgent),
-                "time"         => $elem->createdTime->getTime(),
+                "time"         => $elem->createdTime->toTime(),
             ];
         }
         return $result;
