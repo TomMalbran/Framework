@@ -3,6 +3,7 @@ namespace Framework\Log\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Date\Date;
 
 /**
  * The Log Query Model
@@ -31,7 +32,7 @@ class LogQueryModel {
 
     public int $totalTime = 0;
 
-    public int $updatedTime = 0;
+    public ?Date $updatedTime = null;
 
     public int $updatedUser = 0;
 }

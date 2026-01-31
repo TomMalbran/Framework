@@ -4,7 +4,7 @@ namespace Framework\Auth;
 use Framework\Auth\Schema\CredentialResetSchema;
 use Framework\Auth\Schema\CredentialResetColumn;
 use Framework\Auth\Schema\CredentialResetQuery;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
@@ -71,7 +71,7 @@ class Reset extends CredentialResetSchema {
             credentialID: $credentialID,
             email:        $email,
             resetCode:    $resetCode,
-            time:         time(),
+            time:         Date::now(),
         );
         return $resetCode;
     }
@@ -94,8 +94,9 @@ class Reset extends CredentialResetSchema {
      * @return bool
      */
     public static function deleteOld(): bool {
+        $time  = Date::now()->subtract(hours: 3);
         $query = new CredentialResetQuery();
-        $query->time->lessThan(DateTime::getLastXHours(3));
+        $query->time->lessThan($time);
         return self::removeEntity($query);
     }
 }

@@ -5,7 +5,7 @@ use Framework\Auth\Auth;
 use Framework\Log\Schema\LogSessionSchema;
 use Framework\Log\Schema\LogSessionQuery;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Server;
 
 /**
@@ -57,7 +57,7 @@ class SessionLog extends LogSessionSchema {
      */
     public static function deleteOld(): bool {
         $days  = Config::getActionLogDeleteDays();
-        $time  = DateTime::getLastXDays($days);
+        $time  = Date::now()->subtract(days: $days);
 
         $query = new LogSessionQuery();
         $query->createdTime->lessThan($time);

@@ -4,6 +4,7 @@ namespace Framework\Email\Model;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Expression;
+use Framework\Date\Date;
 
 /**
  * The Email Queue Model
@@ -30,11 +31,12 @@ class EmailQueueModel {
 
     public string $emailResult = "";
 
-    public int $sendTime = 0;
-
-    public int $sentTime = 0;
-
     public int $dataID = 0;
+
+
+    public ?Date $sendTime = null;
+
+    public ?Date $sentTime = null;
 
 
 
