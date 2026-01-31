@@ -1,76 +1,87 @@
 <?php
 namespace Framework\Date;
 
-use Framework\Date\DateTime;
+use Framework\Date\DateUtils;
+use Framework\Date\DateType;
 use Framework\Date\DateFormat;
+use Framework\Date\TimeZone;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
+
+use JsonSerializable;
 
 /**
  * Date class
  */
-class Date {
+class Date implements JsonSerializable {
 
-    private int $timeStamp = 0;
+    private int $timestamp = 0;
 
 
     /**
      * Creates a new Date instance
-     * @param mixed $value Optional.
+     * @param mixed $date Optional.
+     * @param mixed $hour Optional.
      */
-    public function __construct(mixed $value = null) {
-        if ($value instanceof Date) {
-            $this->timeStamp = $value->getTimeStamp();
-        } elseif (Numbers::isValid($value)) {
-            $this->timeStamp = Numbers::toInt($value);
-        } elseif (is_string($value)) {
-            $timeStamp = strtotime($value);
-            if ($timeStamp !== false) {
-                $this->timeStamp = $timeStamp;
+    private function __construct(mixed $date = null, mixed $hour = null) {
+        if ($date instanceof Date) {
+            $this->timestamp = $date->toTime();
+            return;
+        }
+        if (Numbers::isValid($date)) {
+            $this->timestamp = Numbers::toInt($date);
+            return;
+        }
+        if (is_string($date) && $date !== "") {
+            $dateTime = $date;
+            if (is_string($hour) && $hour !== "") {
+                $dateTime = "$date $hour";
+            }
+            $timestamp = strtotime($dateTime);
+            if ($timestamp !== false) {
+                $this->timestamp = $timestamp;
             }
         }
+    }
 
-        // If no valid timestamp and value is not null, set to current time
-        if ($value !== null && $this->timeStamp <= 0) {
-            $this->timeStamp = time();
-        }
+    /**
+     * Creates an empty Date instance
+     * @return Date
+     */
+    public static function empty(): Date {
+        return new Date();
+    }
+
+    /**
+     * Create a Date instance for the current time
+     * @return Date
+     */
+    public static function now(): Date {
+        return new Date(time());
     }
 
     /**
      * Creates a new Date instance
-     * @param mixed $value Optional.
+     * @param mixed $date Optional.
+     * @param mixed $hour Optional.
      * @return Date
      */
-    public static function create(mixed $value = null): Date {
-        return new Date($value);
+    public static function create(mixed $date = null, mixed $hour = null): Date {
+        return new Date($date, $hour);
     }
 
     /**
-     * Create a Date instance for the current time and adding the given amounts
-     * @param int $months  Optional.
-     * @param int $days    Optional.
-     * @param int $hours   Optional.
-     * @param int $minutes Optional.
+     * Creates a Date instance from the given value or now
+     * @param mixed $date Optional.
+     * @param mixed $hour Optional.
      * @return Date
      */
-    public static function now(
-        int $months = 0,
-        int $days = 0,
-        int $hours = 0,
-        int $minutes = 0,
-    ): Date {
-        // Start with current time or adjusted month
-        if ($months !== 0) {
-            $time = mktime(date("H"), month: date("m") + $months);
-        } else {
-            $time = time();
+    public static function createOrNow(mixed $date = null, mixed $hour = null): Date {
+        $result = new Date($date, $hour);
+        if ($result->isNotEmpty()) {
+            return $result;
         }
-
-        // Add days, hours and minutes
-        $time += $days * 86400;
-        $time += $hours * 3600;
-        $time += $minutes * 60;
-        return new Date($time);
+        return Date::now();
     }
 
     /**
@@ -80,18 +91,8 @@ class Date {
      * @return Date
      */
     public static function parse(string $text, string $language = ""): Date {
-        $dateTime = DateTime::parseDate($text, $language);
+        $dateTime = DateUtils::parseDate($text, $language);
         return new Date($dateTime);
-    }
-
-    /**
-     * Creates a Date instance from the given date string
-     * @param string $dateString
-     * @param string $hourString Optional.
-     * @return Date
-     */
-    public static function fromString(string $dateString, string $hourString = ""): Date {
-        return new Date("$dateString $hourString");
     }
 
     /**
@@ -116,7 +117,35 @@ class Date {
         return new Date($time);
     }
 
+    /**
+     * Returns the maximum Date from the given Dates
+     * @param Date ...$dates
+     * @return Date
+     */
+    public static function max(Date ...$dates): Date {
+        if (count($dates) === 0) {
+            return Date::empty();
+        }
+        $result = array_shift($dates);
+        foreach ($dates as $date) {
+            if ($date->toTime() > $result->toTime()) {
+                $result = $date;
+            }
+        }
+        return $result;
+    }
 
+
+
+    /**
+     * Returns a new Date changing the current one to Server Time
+     * @param bool $useTimeZone Optional.
+     * @return Date
+     */
+    public function toServerTime(bool $useTimeZone = true): Date {
+        $timestamp = TimeZone::toServerTime($this->timestamp, $useTimeZone);
+        return new Date($timestamp);
+    }
 
     /**
      * Returns a new Date changing the current one with the given values
@@ -128,7 +157,7 @@ class Date {
      * @param int|null $second Optional.
      * @return Date
      */
-    private function changeDate(
+    public function set(
         ?int $day = null,
         ?int $month = null,
         ?int $year = null,
@@ -136,6 +165,9 @@ class Date {
         ?int $minute = null,
         ?int $second = null,
     ): Date {
+        if ($this->isEmpty()) {
+            return Date::empty();
+        }
         $time = mktime(
             $hour   !== null ? $hour   : $this->getHour(),
             $minute !== null ? $minute : $this->getMinute(),
@@ -148,72 +180,104 @@ class Date {
     }
 
     /**
-     * Returns a new Date instance moving the day by the given amount
-     * @param int $days
+     * Returns a new Date instance setting the Hour and Minute from the given string
+     * @param string $time
      * @return Date
      */
-    public function moveDay(int $days): Date {
-        $currentDay = $this->getDay();
-        return $this->changeDate(day: $currentDay + $days);
+    public function setHourMinute(string $time): Date {
+        $parts = Strings::split($time, ":");
+        if (count($parts) !== 2) {
+            return new Date($time);
+        }
+        return $this->set(
+            hour:   (int)$parts[0],
+            minute: (int)$parts[1],
+        );
     }
 
     /**
-     * Returns a new Date instance moving the day by the given amount of weeks
-     * @param int $weeks
+     * Returns a new Date instance adding the given amounts
+     * @param int $days    Optional.
+     * @param int $weeks   Optional.
+     * @param int $months  Optional.
+     * @param int $years   Optional.
+     * @param int $hours   Optional.
+     * @param int $minutes Optional.
+     * @param int $seconds Optional.
      * @return Date
      */
-    public function moveWeek(int $weeks): Date {
-        return $this->moveDay($weeks * 7);
+    public function add(
+        int $days = 0,
+        int $weeks = 0,
+        int $months = 0,
+        int $years = 0,
+        int $hours = 0,
+        int $minutes = 0,
+        int $seconds = 0,
+    ): Date {
+        return $this->set(
+            day:    $this->getDay()    + $days + $weeks * 7,
+            month:  $this->getMonth()  + $months,
+            year:   $this->getYear()   + $years,
+            hour:   $this->getHour()   + $hours,
+            minute: $this->getMinute() + $minutes,
+            second: $this->getSecond() + $seconds,
+        );
     }
 
     /**
-     * Returns a new Date instance moving the month by the given amount
-     * @param int $months
+     * Returns a new Date instance subtracting the given amounts
+     * @param int $days    Optional.
+     * @param int $weeks   Optional.
+     * @param int $months  Optional.
+     * @param int $years   Optional.
+     * @param int $hours   Optional.
+     * @param int $minutes Optional.
+     * @param int $seconds Optional.
      * @return Date
      */
-    public function moveMonth(int $months): Date {
-        $currentMonth = $this->getMonth();
-        return $this->changeDate(month: $currentMonth + $months);
+    public function subtract(
+        int $days = 0,
+        int $weeks = 0,
+        int $months = 0,
+        int $years = 0,
+        int $hours = 0,
+        int $minutes = 0,
+        int $seconds = 0,
+    ): Date {
+        return $this->add(
+            days:    -$days,
+            weeks:   -$weeks,
+            months:  -$months,
+            years:   -$years,
+            hours:   -$hours,
+            minutes: -$minutes,
+            seconds: -$seconds,
+        );
     }
+
+
 
     /**
-     * Returns a new Date instance moving the year by the given amount
-     * @param int $years
+     * Returns a Date instance for the given Day Moment
+     * @param DateType $dateType
      * @return Date
      */
-    public function moveYear(int $years): Date {
-        $currentYear = $this->getYear();
-        return $this->changeDate(year: $currentYear + $years);
+    public function toDayMoment(DateType $dateType): Date {
+        return match ($dateType) {
+            DateType::None   => $this,
+            DateType::Start  => $this->toDayStart(),
+            DateType::Middle => $this->toDayMiddle(),
+            DateType::End    => $this->toDayEnd(),
+        };
     }
-
-    /**
-     * Returns a new Date instance moving the hour by the given amount
-     * @param int $hours
-     * @return Date
-     */
-    public function moveHour(int $hours): Date {
-        $currentHour = $this->getHour();
-        return $this->changeDate(hour: $currentHour + $hours);
-    }
-
-    /**
-     * Returns a new Date instance moving the minute by the given amount
-     * @param int $minutes
-     * @return Date
-     */
-    public function moveMinute(int $minutes): Date {
-        $currentMinute = $this->getMinute();
-        return $this->changeDate(minute: $currentMinute + $minutes);
-    }
-
-
 
     /**
      * Returns a Date instance set to the start of the day
      * @return Date
      */
     public function toDayStart(): Date {
-        return $this->changeDate(hour: 0, minute: 0, second: 0);
+        return $this->set(hour: 0, minute: 0, second: 0);
     }
 
     /**
@@ -221,7 +285,7 @@ class Date {
      * @return Date
      */
     public function toDayMiddle(): Date {
-        return $this->changeDate(hour: 12, minute: 0, second: 0);
+        return $this->set(hour: 12, minute: 0, second: 0);
     }
 
     /**
@@ -229,7 +293,7 @@ class Date {
      * @return Date
      */
     public function toDayEnd(): Date {
-        return $this->changeDate(hour: 23, minute: 59, second: 59);
+        return $this->set(hour: 23, minute: 59, second: 59);
     }
 
     /**
@@ -239,7 +303,7 @@ class Date {
      */
     public function toWeekStart(bool $startMonday = false): Date {
         $dayOfWeek = $this->getDayOfWeek($startMonday);
-        return $this->moveDay(-$dayOfWeek);
+        return $this->subtract(days: $dayOfWeek);
     }
 
     /**
@@ -249,7 +313,7 @@ class Date {
      */
     public function toWeekEnd(bool $startMonday = false): Date {
         $dayOfWeek = $this->getDayOfWeek($startMonday);
-        return $this->moveDay(6 - $dayOfWeek);
+        return $this->add(days: 6 - $dayOfWeek);
     }
 
     /**
@@ -257,7 +321,7 @@ class Date {
      * @return Date
      */
     public function toMonthStart(): Date {
-        return $this->changeDate(day: 1);
+        return $this->set(day: 1);
     }
 
     /**
@@ -266,7 +330,7 @@ class Date {
      */
     public function toMonthEnd(): Date {
         $monthDays = $this->getMonthDays();
-        return $this->changeDate(day: $monthDays);
+        return $this->set(day: $monthDays);
     }
 
     /**
@@ -274,7 +338,7 @@ class Date {
      * @return Date
      */
     public function toYearStart(): Date {
-        return $this->changeDate(day: 1, month: 1);
+        return $this->set(day: 1, month: 1);
     }
 
     /**
@@ -282,7 +346,7 @@ class Date {
      * @return Date
      */
     public function toYearEnd(): Date {
-        return $this->changeDate(day: 31, month: 12);
+        return $this->set(day: 31, month: 12);
     }
 
 
@@ -292,24 +356,23 @@ class Date {
      * @return bool
      */
     public function isEmpty(): bool {
-        return $this->timeStamp <= 0;
+        return $this->timestamp <= 0;
     }
 
     /**
-     * Returns the Time Stamp
-     * @return int
+     * Returns true if the Date is not empty (time stamp is greater than 0)
+     * @return bool
      */
-    public function getTimeStamp(): int {
-        return $this->timeStamp;
+    public function isNotEmpty(): bool {
+        return $this->timestamp > 0;
     }
 
     /**
-     * Returns the Time Stamp in Server Time
-     * @param bool $useTimeZone Optional.
+     * Returns the Timestamp
      * @return int
      */
-    public function toServerTime(bool $useTimeZone = true): int {
-        return DateTime::toServerTime($this->timeStamp, $useTimeZone);
+    public function toTime(): int {
+        return $this->timestamp;
     }
 
     /**
@@ -339,7 +402,8 @@ class Date {
      * @return int
      */
     public function getYear(): int {
-        return (int)date("Y", $this->timeStamp);
+        // Y: A full numeric representation of a year, 4 digits
+        return (int)$this->format("Y");
     }
 
     /**
@@ -347,8 +411,11 @@ class Date {
      * @return int
      */
     public function getYearDays(): int {
-        // NOTE: L returns 1 for leap years and 0 for non-leap years
-        return 365 + (int)date("L", $this->timeStamp);
+        if ($this->isEmpty()) {
+            return 0;
+        }
+        // L: Whether it's a leap year (1 if it is a leap year, 0 otherwise)
+        return 365 + (int)$this->format("L");
     }
 
 
@@ -358,7 +425,8 @@ class Date {
      * @return int
      */
     public function getMonth(): int {
-        return (int)date("n", $this->timeStamp);
+        // n: Numeric representation of a month, without leading zeros (1 to 12)
+        return (int)$this->format("n");
     }
 
     /**
@@ -366,7 +434,8 @@ class Date {
      * @return string
      */
     public function getMonthZero(): string {
-        return date("m", $this->timeStamp);
+        // m: Numeric representation of a month, with leading zeros (01 to 12)
+        return $this->format("m");
     }
 
     /**
@@ -374,7 +443,8 @@ class Date {
      * @return int
      */
     public function getMonthDays(): int {
-        return (int)date("t", $this->timeStamp);
+        // t: Number of days in the given month
+        return (int)$this->format("t");
     }
 
     /**
@@ -389,7 +459,7 @@ class Date {
         bool $inUpperCase = false,
         string $language = "",
     ): string {
-        return DateTime::getMonthName(
+        return DateUtils::getMonthName(
             month:       $this->getMonth(),
             length:      $length,
             inUpperCase: $inUpperCase,
@@ -404,7 +474,8 @@ class Date {
      * @return int
      */
     public function getDay(): int {
-        return (int)date("j", $this->timeStamp);
+        // j: Day of the month without leading zeros (1 to 31)
+        return (int)$this->format("j");
     }
 
     /**
@@ -412,7 +483,8 @@ class Date {
      * @return string
      */
     public function getDayZero(): string {
-        return date("d", $this->timeStamp);
+        // d: Day of the month, 2 digits with leading zeros (01 to 31)
+        return $this->format("d");
     }
 
     /**
@@ -421,10 +493,15 @@ class Date {
      * @return int
      */
     public function getDayOfWeek(bool $startMonday = false): int {
-        if ($startMonday) {
-            return (int)date("N", $this->timeStamp) - 1;
+        if ($this->isEmpty()) {
+            return 0;
         }
-        return (int)date("w", $this->timeStamp);
+        if ($startMonday) {
+            // N: ISO-8601 numeric representation of the day of the week (1 for Monday through 7 for Sunday)
+            return (int)$this->format("N") - 1;
+        }
+        // w: Numeric representation of the day of the week (0 for Sunday through 6 for Saturday)
+        return (int)$this->format("w");
     }
 
     /**
@@ -441,13 +518,30 @@ class Date {
         bool $inUpperCase = false,
         string $language = "",
     ): string {
-        return DateTime::getDayName(
-            day:         $this->getDayOfWeek($startMonday),
-            startMonday: $startMonday,
-            length:      $length,
-            inUpperCase: $inUpperCase,
-            language:    $language,
+        return DateUtils::getDayName(
+            day:          $this->getDayOfWeek($startMonday),
+            startMonday:  $startMonday,
+            length:       $length,
+            inUpperCase:  $inUpperCase,
+            language:     $language,
         );
+    }
+
+    /**
+     * Returns the name of the current Day and Month
+     * @param int    $monthLength Optional.
+     * @param bool   $inUpperCase Optional.
+     * @param string $language    Optional.
+     * @return string
+     */
+    public function getDayMonth(
+        int $monthLength = 0,
+        bool $inUpperCase = false,
+        string $language = "",
+    ): string {
+        $day   = $this->getDayZero();
+        $month = $this->getMonthName($monthLength, $inUpperCase, $language);
+        return "$day $month";
     }
 
 
@@ -457,7 +551,8 @@ class Date {
      * @return int
      */
     public function getHour(): int {
-        return (int)date("G", $this->timeStamp);
+        // G: 24-hour format of an hour without leading zeros (0 to 23)
+        return (int)$this->format("G");
     }
 
     /**
@@ -465,7 +560,8 @@ class Date {
      * @return int
      */
     public function getMinute(): int {
-        return (int)date("i", $this->timeStamp);
+        // i: Minutes with leading zeros (00 to 59)
+        return (int)$this->format("i");
     }
 
     /**
@@ -473,7 +569,8 @@ class Date {
      * @return int
      */
     public function getSecond(): int {
-        return (int)date("s", $this->timeStamp);
+        // s: Seconds with leading zeros (00 to 59)
+        return (int)$this->format("s");
     }
 
 
@@ -496,7 +593,10 @@ class Date {
      * @return bool
      */
     public function isPast(): bool {
-        return $this->timeStamp < time();
+        if ($this->isEmpty()) {
+            return false;
+        }
+        return $this->timestamp < time();
     }
 
     /**
@@ -504,35 +604,10 @@ class Date {
      * @return bool
      */
     public function isFuture(): bool {
-        return $this->timeStamp > time();
-    }
-
-    /**
-     * Returns true if the current Date is before another Date
-     * @param Date $date
-     * @return bool
-     */
-    public function isBefore(Date $date): bool {
-        return $this->timeStamp < $date->getTimeStamp();
-    }
-
-    /**
-     * Returns true if the current Date is after another Date
-     * @param Date $date
-     * @return bool
-     */
-    public function isAfter(Date $date): bool {
-        return $this->timeStamp > $date->getTimeStamp();
-    }
-
-    /**
-     * Returns true if the current Date is between two other Dates
-     * @param Date $from
-     * @param Date $to
-     * @return bool
-     */
-    public function isBetween(Date $from, Date $to): bool {
-        return $this->timeStamp >= $from->getTimeStamp() && $this->timeStamp <= $to->getTimeStamp();
+        if ($this->isEmpty()) {
+            return false;
+        }
+        return $this->timestamp > time();
     }
 
     /**
@@ -548,12 +623,67 @@ class Date {
     }
 
     /**
+     * Returns true if the current Date is equal to another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isEqual(Date $date): bool {
+        return $this->timestamp === $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is not equal to another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isNotEqual(Date $date): bool {
+        return $this->timestamp !== $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is before another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isBefore(Date $date): bool {
+        if ($this->isEmpty() || $date->isEmpty()) {
+            return false;
+        }
+        return $this->timestamp < $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is after another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isAfter(Date $date): bool {
+        if ($this->isEmpty() || $date->isEmpty()) {
+            return false;
+        }
+        return $this->timestamp > $date->toTime();
+    }
+
+    /**
+     * Returns true if the current Date is between two other Dates
+     * @param Date $from
+     * @param Date $to
+     * @return bool
+     */
+    public function isBetween(Date $from, Date $to): bool {
+        if ($this->isEmpty() || $from->isEmpty() || $to->isEmpty()) {
+            return false;
+        }
+        return $this->timestamp >= $from->toTime() && $this->timestamp <= $to->toTime();
+    }
+
+    /**
      * Returns the difference in days between the current Date and another Date
      * @param Date $date
      * @return int
      */
     public function getDaysDiff(Date $date): int {
-        $diffSeconds = abs($this->timeStamp - $date->getTimeStamp());
+        $diffSeconds = $this->getSecondsDiff($date);
         return (int)floor($diffSeconds / 86400);
     }
 
@@ -563,7 +693,7 @@ class Date {
      * @return int
      */
     public function getHoursDiff(Date $date): int {
-        $diffSeconds = abs($this->timeStamp - $date->getTimeStamp());
+        $diffSeconds = $this->getSecondsDiff($date);
         return (int)floor($diffSeconds / 3600);
     }
 
@@ -573,8 +703,20 @@ class Date {
      * @return int
      */
     public function getMinutesDiff(Date $date): int {
-        $diffSeconds = abs($this->timeStamp - $date->getTimeStamp());
+        $diffSeconds = $this->getSecondsDiff($date);
         return (int)floor($diffSeconds / 60);
+    }
+
+    /**
+     * Returns the difference in seconds between the current Date and another Date
+     * @param Date $date
+     * @return int
+     */
+    public function getSecondsDiff(Date $date): int {
+        if ($this->isEmpty() || $date->isEmpty()) {
+            return 0;
+        }
+        return abs($this->timestamp - $date->toTime());
     }
 
     /**
@@ -583,6 +725,9 @@ class Date {
      * @return int
      */
     public function getAge(?Date $now = null): int {
+        if ($this->isEmpty()) {
+            return 0;
+        }
         if ($now === null) {
             $now = Date::now();
         }
@@ -610,7 +755,10 @@ class Date {
      * @return string
      */
     public function format(string $format): string {
-        return date($format, $this->timeStamp);
+        if ($this->isEmpty()) {
+            return "";
+        }
+        return date($format, $this->timestamp);
     }
 
     /**
@@ -627,6 +775,7 @@ class Date {
      * @return string
      */
     public function toISOString(): string {
+        // c: ISO 8601 date (e.g. 2004-02-12T15:19:21+00:00)
         return $this->format("c");
     }
 
@@ -635,6 +784,34 @@ class Date {
      * @return string
      */
     public function toUTCString(): string {
-        return Strings::replace($this->format("c"), "-03:00", "Z");
+        // P: Difference to Greenwich time (GMT) with colon between hours and minutes (e.g. +02:00)
+        $timeZone = $this->format("P");
+        return Strings::replace($this->format("c"), $timeZone, "Z");
+    }
+
+    /**
+     * Returns the Hour Period as a string
+     * @param Date $date
+     * @return string
+     */
+    public function toHourPeriodString(Date $date): string {
+        $thisTime  = $this->toString(DateFormat::Time);
+        $otherTime = $date->toString(DateFormat::Time);
+
+        if ($this->isBefore($date)) {
+            return "$thisTime - $otherTime";
+        }
+        return "$otherTime - $thisTime";
+    }
+
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->timestamp;
     }
 }
