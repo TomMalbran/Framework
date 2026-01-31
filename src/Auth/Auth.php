@@ -13,7 +13,7 @@ use Framework\File\FilePath;
 use Framework\Log\ActionLog;
 use Framework\System\Access;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\TimeZone;
 use Framework\Utils\Strings;
 
 /**
@@ -342,7 +342,7 @@ class Auth {
             NLS::setLanguage($language);
         }
         if ($timezone !== 0) {
-            DateTime::setTimeZone($timezone);
+            TimeZone::setTimeZone($timezone);
         }
         return true;
     }

@@ -4,6 +4,7 @@ namespace Framework\Date;
 use Framework\Intl\NLS;
 use Framework\Date\DateTime;
 use Framework\Date\DateFormat;
+use Framework\Date\TimeZone;
 use Framework\Date\TimeTableItem;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Arrays;
@@ -343,7 +344,7 @@ class TimeTable {
 
         $zone = "";
         if ($timeZone !== "") {
-            $zone = DateTime::parseTimeZone((float)$timeZone);
+            $zone = TimeZone::toString((float)$timeZone);
             $zone = " ($zone)";
         }
 
