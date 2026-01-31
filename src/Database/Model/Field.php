@@ -8,6 +8,7 @@ use Framework\Database\Type\Assign;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\System\Path;
+use Framework\Date\Date;
 use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -296,16 +297,20 @@ class Field {
         $this->dbName = $name;
 
         switch ($typeName) {
+        case Date::class:
+            $this->type = FieldType::Date;
+            break;
+
+        case "int":
+            $this->type = FieldType::Number;
+            break;
+
         case "bool":
             $this->type = FieldType::Boolean;
             break;
 
         case "float":
             $this->type = FieldType::Float;
-            break;
-
-        case "int":
-            $this->type = FieldType::Number;
             break;
 
         case "string":
@@ -371,6 +376,12 @@ class Field {
         $default    = null;
 
         switch ($this->type) {
+        case FieldType::Date:
+            $length     = $this->length > 0 ? $this->length : 10;
+            $type       = $length > 10 ? "bigint" : "int";
+            $attributes = "unsigned NOT NULL";
+            $default    = 0;
+            break;
         case FieldType::Number:
             $type    = "int";
             $length  = $this->length > 0 ? $this->length : 10;
@@ -456,15 +467,18 @@ class Field {
         }
 
         switch ($this->type) {
-        case FieldType::Number:
+        case FieldType::Date:
             if ($this->dateInput !== "" && $this->hourInput !== "") {
                 $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
             } elseif ($this->dateInput !== "") {
                 $dateType = $this->dateType !== DateType::None ? $this->dateType : DateType::Start;
-                $result   = $request->toDay($this->dateInput, $dateType, true);
+                $result   = $request->toDayMoment($this->dateInput, $dateType, true);
             } else {
                 $result = $request->getInt($this->name);
             }
+            break;
+        case FieldType::Number:
+            $result = $request->getInt($this->name);
             break;
         case FieldType::Boolean:
             $result = $request->toBinary($this->name);
@@ -500,6 +514,7 @@ class Field {
         $result = [];
 
         switch ($this->type) {
+        case FieldType::Date:
         case FieldType::Number:
             $result[$key] = $number;
             break;

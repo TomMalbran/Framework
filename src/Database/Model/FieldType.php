@@ -10,6 +10,7 @@ enum FieldType {
 
     case None;
 
+    case Date;
     case Number;
     case Boolean;
     case Float;
@@ -63,7 +64,7 @@ enum FieldType {
             FieldType::String,
             FieldType::Text,
             FieldType::LongText => true,
-            default => false,
+            default             => false,
         };
     }
 
@@ -74,8 +75,9 @@ enum FieldType {
      */
     public static function getCodeType(FieldType $type): string {
         return match ($type) {
-            FieldType::Boolean => "bool",
+            FieldType::Date    => "Date",
             FieldType::Number  => "int",
+            FieldType::Boolean => "bool",
             FieldType::Float   => "float",
             default            => "string",
         };
@@ -84,15 +86,16 @@ enum FieldType {
     /**
      * Returns the Default value for the given PHP Type
      * @param string $type
-     * @return string
+     * @return ?string
      */
-    public static function getDefault(string $type): string {
+    public static function getDefault(string $type): string|null {
         return match ($type) {
             "boolean", "bool" => "false",
             "integer", "int"  => "0",
             "float"           => "0",
             "string"          => '""',
             "array"           => '[]',
+            "Date"            => null,
             default           => "null",
         };
     }

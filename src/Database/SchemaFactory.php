@@ -15,6 +15,7 @@ use Framework\Database\Model\SubRequest;
 use Framework\Database\Status\Status;
 use Framework\Database\Status\State;
 use Framework\File\File;
+use Framework\Date\Date;
 use Framework\Utils\Strings;
 
 use ReflectionNamedType;
@@ -128,6 +129,8 @@ class SchemaFactory {
 
                 // Get the Attributes
                 $typeName       = $propType->getName();
+                $isDate         = $typeName === Date::class;
+
                 $propAttributes = $prop->getAttributes();
                 $field          = new Field();
                 $relation       = new Relation();
@@ -180,7 +183,7 @@ class SchemaFactory {
                     }
 
                 // RELATION: If the type is not a Built-in Type.
-                } elseif (!$propType->isBuiltin()) {
+                } elseif (!$isDate && !$propType->isBuiltin()) {
                     $relationModelName = Strings::substringAfter($typeName, "\\");
                     $relationModelName = Strings::stripEnd($relationModelName, "Model");
                     $relation->setDataFromAttribute($relationModelName, $fieldName);

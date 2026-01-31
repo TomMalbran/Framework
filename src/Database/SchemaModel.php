@@ -184,7 +184,7 @@ class SchemaModel {
 
         if ($this->canCreate && $this->hasTimestamps) {
             $this->extraFields[] = Field::create(
-                type: FieldType::Number,
+                type: FieldType::Date,
                 name: "createdTime",
             );
         }
@@ -197,7 +197,7 @@ class SchemaModel {
 
         if ($this->canEdit && $this->hasTimestamps) {
             $this->extraFields[] = Field::create(
-                type: FieldType::Number,
+                type: FieldType::Date,
                 name: "modifiedTime",
             );
         }

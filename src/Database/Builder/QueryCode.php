@@ -180,6 +180,7 @@ class QueryCode {
     private static function getQueryType(FieldType $type): string {
         return match ($type) {
             FieldType::None    => "",
+            FieldType::Date    => "DateQuery",
             FieldType::Boolean => "BooleanQuery",
             FieldType::Number,
             FieldType::Float   => "NumberQuery",
