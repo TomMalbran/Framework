@@ -3,6 +3,7 @@ namespace Framework\Date;
 
 use Framework\Intl\NLS;
 use Framework\Date\DateTime;
+use Framework\Date\DateUtils;
 use Framework\Date\DateFormat;
 use Framework\Date\TimeZone;
 use Framework\Date\TimeTableItem;
@@ -107,22 +108,22 @@ class TimeTable {
                 $hasError = true;
             }
             foreach ($timeTable->days as $day) {
-                if (!DateTime::isValidDay($day, $withHolidays, $this->startMonday)) {
+                if (!DateUtils::isValidDay($day, $withHolidays, $this->startMonday)) {
                     $errors->add("$fieldKey-$index-days", "GENERAL_ERROR_PERIOD_DAYS_INVALID");
                     $hasError = true;
                     break;
                 }
             }
-            if (!DateTime::isValidHour($timeTable->from)) {
+            if (!DateUtils::isValidHour($timeTable->from)) {
                 $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TIME");
                 $hasError = true;
             }
-            if (!DateTime::isValidHour($timeTable->to)) {
+            if (!DateUtils::isValidHour($timeTable->to)) {
                 $errors->add("$fieldKey-$index-to", "GENERAL_ERROR_PERIOD_TO_TIME");
                 $hasError = true;
             }
             if ($timeTable->from !== "" && $timeTable->to !== "" &&
-                !DateTime::isValidHourPeriod($timeTable->from, $timeTable->to, true)
+                !DateUtils::isValidHourPeriod($timeTable->from, $timeTable->to, true)
             ) {
                 $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TO");
                 $hasError = true;
@@ -154,8 +155,8 @@ class TimeTable {
                 continue;
             }
 
-            $fromMinutes = DateTime::timeToMinutes($timeTable->from);
-            $toMinutes   = DateTime::timeToMinutes($timeTable->to) - $minuteGap;
+            $fromMinutes = DateUtils::timeToMinutes($timeTable->from);
+            $toMinutes   = DateUtils::timeToMinutes($timeTable->to) - $minuteGap;
 
             if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
                 return true;
@@ -186,8 +187,8 @@ class TimeTable {
                 continue;
             }
 
-            $fromMinutes = DateTime::timeToMinutes($timeTable->from);
-            $toMinutes   = DateTime::timeToMinutes($timeTable->to);
+            $fromMinutes = DateUtils::timeToMinutes($timeTable->from);
+            $toMinutes   = DateUtils::timeToMinutes($timeTable->to);
             if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
                 $resultDate = $dayStart->moveMinute($toMinutes);
                 break;
@@ -216,7 +217,7 @@ class TimeTable {
 
         foreach ($weeks as $week) {
             foreach ($this->timeTables as $timeTable) {
-                $fromMinutes = DateTime::timeToMinutes($timeTable->from);
+                $fromMinutes = DateUtils::timeToMinutes($timeTable->from);
 
                 foreach ($timeTable->days as $day) {
                     if ($day >= $maxDay) {
@@ -324,7 +325,7 @@ class TimeTable {
                             language:    $isoCode,
                         );
                     } else {
-                        $schedules[$id]["days"][$index] = DateTime::getDayName(
+                        $schedules[$id]["days"][$index] = DateUtils::getDayName(
                             day:         $elem["numbers"][$index] ?? 0,
                             startMonday: $this->startMonday,
                             language:    $isoCode,
@@ -333,7 +334,7 @@ class TimeTable {
                 }
             } else {
                 foreach ($elem["numbers"] as $index => $dayNumber) {
-                    $schedules[$id]["days"][$index] = DateTime::getDayName(
+                    $schedules[$id]["days"][$index] = DateUtils::getDayName(
                         day:         $dayNumber,
                         startMonday: $this->startMonday,
                         language:    $isoCode,

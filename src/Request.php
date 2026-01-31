@@ -5,6 +5,7 @@ use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Date\DateTime;
+use Framework\Date\DateUtils;
 use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
@@ -511,7 +512,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidDate(string $key): bool {
         $value = $this->getString($key);
-        return DateTime::isValidDate($value);
+        return DateUtils::isValidDate($value);
     }
 
     /**
@@ -524,7 +525,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidHour(string $key, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
         $value = $this->getString($key);
-        return DateTime::isValidHour($value, $minutes, $minHour, $maxHour);
+        return DateUtils::isValidHour($value, $minutes, $minHour, $maxHour);
     }
 
     /**
@@ -535,7 +536,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidPeriod(string $fromKey, string $toKey): bool {
         if (!$this->isEmpty([ $fromKey, $toKey ])) {
-            return DateTime::isValidPeriod($this->getString($fromKey), $this->getString($toKey));
+            return DateUtils::isValidPeriod($this->getString($fromKey), $this->getString($toKey));
         }
         return true;
     }
@@ -548,7 +549,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidHourPeriod(string $fromKey, string $toKey): bool {
         if (!$this->isEmpty([ $fromKey, $toKey ])) {
-            return DateTime::isValidHourPeriod($this->getString($fromKey), $this->getString($toKey));
+            return DateUtils::isValidHourPeriod($this->getString($fromKey), $this->getString($toKey));
         }
         return true;
     }
@@ -568,7 +569,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         string $toHourKey,
     ): bool {
         if (!$this->isEmpty([ $fromDateKey, $fromHourKey, $toDateKey, $toHourKey ])) {
-            return DateTime::isValidFullPeriod(
+            return DateUtils::isValidFullPeriod(
                 $this->getString($fromDateKey),
                 $this->getString($fromHourKey),
                 $this->getString($toDateKey),
@@ -586,7 +587,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidWeekDay(string $key, bool $startMonday = false): bool {
         $value = $this->getInt($key);
-        return DateTime::isValidWeekDay($value, $startMonday);
+        return DateUtils::isValidWeekDay($value, $startMonday);
     }
 
     /**
