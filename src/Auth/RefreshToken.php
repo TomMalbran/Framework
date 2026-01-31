@@ -4,6 +4,7 @@ namespace Framework\Auth;
 use Framework\Auth\Schema\CredentialRefreshTokenSchema;
 use Framework\Auth\Schema\CredentialRefreshTokenEntity;
 use Framework\Auth\Schema\CredentialRefreshTokenQuery;
+use Framework\Date\Date;
 use Framework\Utils\Strings;
 use Framework\Utils\Server;
 
@@ -40,16 +41,16 @@ class RefreshToken extends CredentialRefreshTokenSchema {
     /**
      * Creates a Refresh Token
      * @param int $credentialID
-     * @param int $expiration
+     * @param int $tokenDuration
      * @return string
      */
-    public static function create(int $credentialID, int $expiration): string {
+    public static function create(int $credentialID, int $tokenDuration): string {
         $refreshToken = Strings::randomCode(20);
         self::createEntity(
             credentialID:   $credentialID,
             userAgent:      Server::getUserAgent(),
             refreshToken:   $refreshToken,
-            expirationTime: time() + $expiration,
+            expirationTime: Date::now()->add(seconds: $tokenDuration),
         );
         return $refreshToken;
     }
@@ -57,16 +58,16 @@ class RefreshToken extends CredentialRefreshTokenSchema {
     /**
      * Updates the expiration of a Refresh Token
      * @param string $refreshToken
-     * @param int    $expiration
+     * @param int    $tokenDuration
      * @return string
      */
-    public static function update(string $refreshToken, int $expiration): string {
+    public static function update(string $refreshToken, int $tokenDuration): string {
         $query = new CredentialRefreshTokenQuery();
         $query->refreshToken->equal($refreshToken);
 
         self::editEntity(
             $query,
-            expirationTime: time() + $expiration,
+            expirationTime: Date::now()->add(seconds: $tokenDuration),
         );
         return $refreshToken;
     }
@@ -99,7 +100,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
      */
     public static function removeOld(): bool {
         $query = new CredentialRefreshTokenQuery();
-        $query->expirationTime->lessThan(time());
+        $query->expirationTime->lessThan(Date::now());
         return self::removeEntity($query);
     }
 }

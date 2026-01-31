@@ -9,7 +9,7 @@ use Framework\Log\Schema\LogErrorSchema;
 use Framework\Log\Schema\LogErrorColumn;
 use Framework\Log\Schema\LogErrorQuery;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -62,8 +62,8 @@ class ErrorLog extends LogErrorSchema {
             LogErrorColumn::File,
         ], $search);
 
-        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
-        $query->createdTime->lessThan($toTime, $toTime > 0);
+        $query->createdTime->greaterThan($fromTime);
+        $query->createdTime->lessThan($toTime);
 
         if ($isResolved === "yes") {
             $query->isResolved->isTrue();
@@ -101,7 +101,7 @@ class ErrorLog extends LogErrorSchema {
      */
     public static function deleteOld(): bool {
         $days  = Config::getErrorLogDeleteDays();
-        $time  = DateTime::getLastXDays($days);
+        $time  = Date::now()->subtract(days: $days);
 
         $query = new LogErrorQuery();
         $query->createdTime->lessThan($time);
@@ -159,7 +159,7 @@ class ErrorLog extends LogErrorSchema {
                 $query,
                 amount:      Assign::increase(1),
                 isResolved:  false,
-                updatedTime: time(),
+                updatedTime: Date::now(),
             );
         } else {
             self::createEntity(
@@ -173,7 +173,7 @@ class ErrorLog extends LogErrorSchema {
                 backtrace:   $backtrace,
                 amount:      1,
                 isResolved:  false,
-                updatedTime: time(),
+                updatedTime: Date::now(),
             );
 
             $total = self::getEntityTotal();

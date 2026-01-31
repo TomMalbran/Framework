@@ -3,6 +3,7 @@ namespace Framework\Log\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Date\Date;
 
 /**
  * The Log Error Model
@@ -39,5 +40,5 @@ class LogErrorModel {
 
     public bool $isResolved = false;
 
-    public int $updatedTime = 0;
+    public ?Date $updatedTime = null;
 }

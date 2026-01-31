@@ -3,6 +3,7 @@ namespace Framework\Auth\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Date\Date;
 
 /**
  * The Credential Refresh Token Model
@@ -21,5 +22,5 @@ class CredentialRefreshTokenModel {
 
     public string $userAgent = "";
 
-    public int $expirationTime = 0;
+    public ?Date $expirationTime = null;
 }

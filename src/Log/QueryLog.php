@@ -9,7 +9,7 @@ use Framework\System\Config;
 use Framework\Log\Schema\LogQuerySchema;
 use Framework\Log\Schema\LogQueryColumn;
 use Framework\Log\Schema\LogQueryQuery;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -35,8 +35,8 @@ class QueryLog extends LogQuerySchema {
             LogQueryColumn::Expression,
         ], $search);
 
-        $query->createdTime->greaterThan($fromTime, $fromTime > 0);
-        $query->createdTime->lessThan($toTime, $toTime > 0);
+        $query->createdTime->greaterThan($fromTime);
+        $query->createdTime->lessThan($toTime);
 
         if ($isResolved === "yes") {
             $query->isResolved->isTrue();
@@ -74,7 +74,7 @@ class QueryLog extends LogQuerySchema {
                 elapsedTime: Assign::greatest($elapsedTime),
                 totalTime:   Assign::increase($elapsedTime),
                 isResolved:  false,
-                updatedTime: time(),
+                updatedTime: Date::now(),
                 updatedUser: Auth::getID(),
             );
         } else {
@@ -85,7 +85,7 @@ class QueryLog extends LogQuerySchema {
                 totalTime:   $elapsedTime,
                 amount:      1,
                 isResolved:  false,
-                updatedTime: time(),
+                updatedTime: Date::now(),
                 updatedUser: Auth::getID(),
             );
         }
@@ -120,7 +120,7 @@ class QueryLog extends LogQuerySchema {
      */
     public static function deleteOld(): bool {
         $days  = Config::getQueryLogDeleteDays();
-        $time  = DateTime::getLastXDays($days);
+        $time  = Date::now()->subtract(days: $days);
 
         $query = new LogQueryQuery();
         $query->createdTime->lessThan($time);

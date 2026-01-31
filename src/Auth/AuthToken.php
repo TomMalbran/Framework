@@ -4,6 +4,7 @@ namespace Framework\Auth;
 use Framework\Auth\RefreshToken;
 use Framework\Auth\Schema\CredentialRefreshTokenEntity;
 use Framework\System\Config;
+use Framework\Date\Date;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Server;
 
@@ -31,7 +32,7 @@ class AuthToken {
     }
 
     /**
-     * Returns the duration of the Refresh Token
+     * Returns the duration of the Refresh Token in seconds
      * @return int
      */
     private static function getRefreshTokenDuration(): int {
@@ -167,7 +168,7 @@ class AuthToken {
             $result[] = [
                 "refreshToken" => $elem->refreshToken,
                 "platform"     => Server::getPlatform($elem->userAgent),
-                "time"         => $elem->createdTime,
+                "time"         => $elem->createdTime->toTime(),
             ];
         }
         return $result;
@@ -195,7 +196,8 @@ class AuthToken {
         }
 
         $currentToken = self::getOne($refreshToken);
-        if ($currentToken->isEmpty() || $currentToken->modifiedTime > time() - 3600) {
+        $lastHour     = Date::now()->subtract(hours: 1);
+        if ($currentToken->isEmpty() || $currentToken->modifiedTime->isAfter($lastHour)) {
             return "";
         }
 

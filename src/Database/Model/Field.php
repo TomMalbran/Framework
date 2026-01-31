@@ -469,10 +469,10 @@ class Field {
         switch ($this->type) {
         case FieldType::Date:
             if ($this->dateInput !== "" && $this->hourInput !== "") {
-                $result = $request->toTimeHour($this->dateInput, $this->hourInput, true);
+                $result = $request->toTimeHour($this->dateInput, $this->hourInput, true)->toTime();
             } elseif ($this->dateInput !== "") {
                 $dateType = $this->dateType !== DateType::None ? $this->dateType : DateType::Start;
-                $result   = $request->toDayMoment($this->dateInput, $dateType, true);
+                $result   = $request->toDayMoment($this->dateInput, $dateType, true)->toTime();
             } else {
                 $result = $request->getInt($this->name);
             }
