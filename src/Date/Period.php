@@ -42,11 +42,6 @@ class Period {
     public const Custom        = "custom";
 
 
-    public string $period   = "";
-    public int    $fromTime = 0;
-    public int    $toTime   = 0;
-
-
     /** @var array<string,string> All the Period Names */
     public static array $names = [
         self::Today         => "Hoy",
@@ -81,6 +76,12 @@ class Period {
 
 
 
+    // Period Properties
+    public string $period;
+    public Date $fromTime;
+    public Date $toTime;
+
+
     /**
      * Creates a new Period instance
      * @param Request $request
@@ -108,25 +109,29 @@ class Period {
         $this->period = self::Custom;
 
         if ($fromDate !== "" && $fromHour !== "") {
-            $this->fromTime = Date::fromString($fromDate, $fromHour)->getTimeStamp();
+            $this->fromTime = Date::create($fromDate, $fromHour);
         } elseif ($fromDate !== "") {
-            $this->fromTime = Date::fromString($fromDate)->getTimeStamp();
+            $this->fromTime = Date::create($fromDate);
         } elseif ($fromTime !== 0) {
-            $this->fromTime = $fromTime;
+            $this->fromTime = Date::create($fromTime);
         } elseif ($period !== "") {
             $this->period   = $period;
             $this->fromTime = $this->getFromTime();
+        } else {
+            $this->fromTime = Date::empty();
         }
 
         if ($toDate !== "" && $toHour !== "") {
-            $this->toTime = Date::fromString($toDate, $toHour)->getTimeStamp();
+            $this->toTime = Date::create($toDate, $toHour);
         } elseif ($toDate !== "") {
-            $this->toTime = Date::fromString($toDate)->toDayEnd()->getTimeStamp();
+            $this->toTime = Date::create($toDate)->toDayEnd();
         } elseif ($toTime !== 0) {
-            $this->toTime = $toTime;
+            $this->toTime = Date::create($toTime);
         } elseif ($period !== "") {
             $this->period = $period;
             $this->toTime = $this->getToTime();
+        } else {
+            $this->toTime = Date::empty();
         }
     }
 
@@ -161,7 +166,7 @@ class Period {
      * @return bool
      */
     public function isEmpty(): bool {
-        return $this->fromTime === 0 && $this->toTime === 0;
+        return $this->fromTime->isEmpty() && $this->toTime->isEmpty();
     }
 
     /**
@@ -169,48 +174,48 @@ class Period {
      * @return bool
      */
     public function isNotEmpty(): bool {
-        return $this->fromTime !== 0 || $this->toTime !== 0;
+        return $this->fromTime->isNotEmpty() || $this->toTime->isNotEmpty();
     }
 
     /**
      * Returns the From Time depending on the period
      * @param bool $useTimeZone Optional.
-     * @return int
+     * @return Date
      */
-    public function getFromTime(bool $useTimeZone = true): int {
+    public function getFromTime(bool $useTimeZone = true): Date {
         $now    = Date::now();
         $date   = $now->toDayStart();
 
         $result = match ($this->period) {
             self::Today         => $date,
-            self::Yesterday     => $date->moveDay(-1),
-            self::PrevYesterday => $date->moveDay(-2),
-            self::Tomorrow      => $date->moveDay(1),
-            self::NextTomorrow  => $date->moveDay(2),
+            self::Yesterday     => $date->subtract(days: 1),
+            self::PrevYesterday => $date->subtract(days: 2),
+            self::Tomorrow      => $date->add(days: 1),
+            self::NextTomorrow  => $date->add(days: 2),
 
-            self::Last7Days     => $date->moveDay(-7),
-            self::Last15Days    => $date->moveDay(-15),
-            self::Last30Days    => $date->moveDay(-30),
-            self::Last60Days    => $date->moveDay(-60),
-            self::Last90Days    => $date->moveDay(-90),
-            self::Last120Days   => $date->moveDay(-120),
-            self::LastYear      => $date->moveYear(-1),
+            self::Last7Days     => $date->subtract(days: 7),
+            self::Last15Days    => $date->subtract(days: 15),
+            self::Last30Days    => $date->subtract(days: 30),
+            self::Last60Days    => $date->subtract(days: 60),
+            self::Last90Days    => $date->subtract(days: 90),
+            self::Last120Days   => $date->subtract(days: 120),
+            self::LastYear      => $date->subtract(years: 1),
 
             self::ThisWeek      => $date->toWeekStart(),
             self::ThisMonth     => $date->toMonthStart(),
             self::ThisYear      => $date->toYearStart(),
 
-            self::PastWeek      => $date->moveWeek(-1)->toWeekStart(),
-            self::PastMonth     => $date->moveMonth(-1)->toMonthStart(),
-            self::PastYear      => $date->moveYear(-1)->toYearStart(),
+            self::PastWeek      => $date->subtract(weeks: 1)->toWeekStart(),
+            self::PastMonth     => $date->subtract(months: 1)->toMonthStart(),
+            self::PastYear      => $date->subtract(years: 1)->toYearStart(),
 
-            self::NextWeek      => $date->moveWeek(1)->toWeekEnd(),
-            self::NextMonth     => $date->moveMonth(1)->toMonthEnd(),
-            self::NextYear      => $date->moveYear(1)->toYearEnd(),
+            self::NextWeek      => $date->add(weeks: 1)->toWeekEnd(),
+            self::NextMonth     => $date->add(months: 1)->toMonthEnd(),
+            self::NextYear      => $date->add(years: 1)->toYearEnd(),
 
-            self::AllPeriod     => new Date(),
-            self::Custom        => new Date($this->fromTime),
-            default             => new Date(),
+            self::AllPeriod     => Date::empty(),
+            self::Custom        => Date::create($this->fromTime),
+            default             => Date::empty(),
         };
 
         return $result->toServerTime($useTimeZone);
@@ -219,18 +224,18 @@ class Period {
     /**
      * Returns the To Time depending on the period
      * @param bool $useTimeZone Optional.
-     * @return int
+     * @return Date
      */
-    public function getToTime(bool $useTimeZone = true): int {
+    public function getToTime(bool $useTimeZone = true): Date {
         $now    = Date::now();
         $date   = $now->toDayEnd();
 
         $result = match ($this->period) {
             self::Today         => $date,
-            self::Yesterday     => $date->moveDay(-1),
-            self::PrevYesterday => $date->moveDay(-2),
-            self::Tomorrow      => $date->moveDay(1),
-            self::NextTomorrow  => $date->moveDay(2),
+            self::Yesterday     => $date->subtract(days: 1),
+            self::PrevYesterday => $date->subtract(days: 2),
+            self::Tomorrow      => $date->add(days: 1),
+            self::NextTomorrow  => $date->add(days: 2),
 
             self::Last7Days,
             self::Last15Days,
@@ -244,16 +249,16 @@ class Period {
             self::ThisMonth     => $date->toMonthEnd(),
             self::ThisYear      => $date->toYearEnd(),
 
-            self::PastWeek      => $date->moveWeek(-1)->toWeekEnd(),
-            self::PastMonth     => $date->moveMonth(-1)->toMonthEnd(),
-            self::PastYear      => $date->moveYear(-1)->toYearEnd(),
+            self::PastWeek      => $date->subtract(weeks: 1)->toWeekEnd(),
+            self::PastMonth     => $date->subtract(months: 1)->toMonthEnd(),
+            self::PastYear      => $date->subtract(years: 1)->toYearEnd(),
 
-            self::NextWeek      => $date->moveWeek(1)->toWeekEnd(),
-            self::NextMonth     => $date->moveMonth(1)->toMonthEnd(),
-            self::NextYear      => $date->moveYear(1)->toYearEnd(),
+            self::NextWeek      => $date->add(weeks: 1)->toWeekEnd(),
+            self::NextMonth     => $date->add(months: 1)->toMonthEnd(),
+            self::NextYear      => $date->add(years: 1)->toYearEnd(),
 
             self::AllPeriod     => $date,
-            self::Custom        => new Date($this->toTime),
+            self::Custom        => Date::create($this->toTime),
             default             => $date,
         };
 
@@ -326,12 +331,12 @@ class Period {
             self::ThisYear      => $date->getYearDays(),
 
             self::PastWeek      => 7,
-            self::PastMonth     => $date->moveMonth(-1)->getMonthDays(),
-            self::PastYear      => $date->moveYear(-1)->getYearDays(),
+            self::PastMonth     => $date->subtract(months: 1)->getMonthDays(),
+            self::PastYear      => $date->subtract(years: 1)->getYearDays(),
 
             self::NextWeek      => 7,
-            self::NextMonth     => $date->moveMonth(1)->getMonthDays(),
-            self::NextYear      => $date->moveYear(1)->getYearDays(),
+            self::NextMonth     => $date->add(months: 1)->getMonthDays(),
+            self::NextYear      => $date->add(years: 1)->getYearDays(),
 
             self::AllPeriod     => 0,
             default             => 0,

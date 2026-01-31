@@ -4,7 +4,7 @@ namespace Framework;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Date\DateUtils;
 use Framework\Date\DateType;
 use Framework\Utils\Arrays;
@@ -598,7 +598,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isFutureDate(string $key, DateType $dateType = DateType::Middle): bool {
         $value = $this->getString($key);
-        return DateTime::isFutureDate($value, $dateType);
+        return Date::create($value)->toDayMoment($dateType)->isFuture();
     }
 
 
@@ -698,134 +698,108 @@ class Request implements IteratorAggregate, JsonSerializable {
 
 
     /**
-     * Returns the given strings as a time
+     * Returns the request data at the given key or the default
      * @param string $key
-     * @param bool   $useTimezone Optional.
-     * @param bool   $skipEmpty   Optional.
-     * @return int
+     * @return Date
      */
-    public function toTime(string $key, bool $useTimezone = true, bool $skipEmpty = false): int {
-        if ($skipEmpty && !$this->has($key)) {
-            return 0;
-        }
-        return DateTime::toTime($this->get($key), $useTimezone);
+    public function toDate(string $key): Date {
+        return Date::create($this->get($key));
     }
 
     /**
-     * Returns the given strings as a time
+     * Returns the given strings as a Date at the given hour
      * @param string $dateKey
      * @param string $hourKey
-     * @param bool   $useTimezone Optional.
+     * @param bool   $useTimeZone Optional.
      * @param bool   $skipEmpty   Optional.
-     * @return int
+     * @return Date
      */
     public function toTimeHour(
         string $dateKey,
         string $hourKey,
-        bool $useTimezone = true,
+        bool $useTimeZone = true,
         bool $skipEmpty = false,
-    ): int {
+    ): Date {
         if ($skipEmpty && (!$this->has($dateKey) || !$this->has($hourKey))) {
-            return 0;
+            return Date::empty();
         }
-        return DateTime::toTimeHour($this->getString($dateKey), $this->getString($hourKey), $useTimezone);
+        return Date::create(
+            date: $this->getString($dateKey),
+            hour: $this->getString($hourKey)
+        )->toServerTime($useTimeZone);
     }
 
     /**
-     * Returns the given string as a time
+     * Returns the given string as a time at the given moment of the day
      * @param string   $key
      * @param DateType $dateType    Optional.
-     * @param bool     $useTimezone Optional.
-     * @return int
+     * @param bool     $useTimeZone Optional.
+     * @return Date
      */
-    public function toDay(string $key, DateType $dateType = DateType::Start, bool $useTimezone = true): int {
+    public function toDayMoment(string $key, DateType $dateType = DateType::Start, bool $useTimeZone = true): Date {
         $value = $this->getString($key);
-        return DateTime::toDay($value, $dateType, $useTimezone);
+        return Date::create($value)->toServerTime($useTimeZone)->toDayMoment($dateType);
     }
 
     /**
      * Returns the given string as a time at the start of the day
      * @param string $key
-     * @param bool   $useTimezone Optional.
-     * @return int
+     * @param bool   $useTimeZone Optional.
+     * @return Date
      */
-    public function toDayStart(string $key, bool $useTimezone = true): int {
+    public function toDayStart(string $key, bool $useTimeZone = true): Date {
         $value = $this->getString($key);
-        return DateTime::toDayStart($value, $useTimezone);
+        return Date::create($value)->toServerTime($useTimeZone)->toDayStart();
     }
 
     /**
-     * Returns the given string as a time at the given hour or the start of the day
+     * Returns the given string as a Date at the given hour or the start of the day
      * @param string $dateKey
      * @param string $hourKey
-     * @param bool   $useTimezone Optional.
-     * @return int
+     * @param bool   $useTimeZone Optional.
+     * @return Date
      */
-    public function toDayStartHour(string $dateKey, string $hourKey, bool $useTimezone = true): int {
-        $value = $this->getString($dateKey);
+    public function toDayStartHour(string $dateKey, string $hourKey, bool $useTimeZone = true): Date {
         if ($this->has($hourKey)) {
-            return DateTime::toTimeHour($value, $this->getString($hourKey), $useTimezone);
+            return $this->toTimeHour($dateKey, $hourKey, $useTimeZone);
         }
-        return DateTime::toDayStart($value, $useTimezone);
+        return $this->toDayStart($dateKey, $useTimeZone);
     }
 
     /**
      * Returns the given string as a time at the middle of the day
      * @param string $key
-     * @param bool   $useTimezone Optional.
-     * @return int
+     * @param bool   $useTimeZone Optional.
+     * @return Date
      */
-    public function toDayMiddle(string $key, bool $useTimezone = true): int {
+    public function toDayMiddle(string $key, bool $useTimeZone = true): Date {
         $value = $this->getString($key);
-        return DateTime::toDayMiddle($value, $useTimezone);
+        return Date::create($value)->toServerTime($useTimeZone)->toDayMiddle();
     }
 
     /**
      * Returns the given string as a time at the end of the day
      * @param string $key
-     * @param bool   $useTimezone Optional.
-     * @return int
+     * @param bool   $useTimeZone Optional.
+     * @return Date
      */
-    public function toDayEnd(string $key, bool $useTimezone = true): int {
+    public function toDayEnd(string $key, bool $useTimeZone = true): Date {
         $value = $this->getString($key);
-        return DateTime::toDayEnd($value, $useTimezone);
+        return Date::create($value)->toServerTime($useTimeZone)->toDayEnd();
     }
 
     /**
-     * Returns the given string as a time at the given hour or the end of the day
+     * Returns the given string as a Date at the given hour or the end of the day
      * @param string $dateKey
      * @param string $hourKey
-     * @param bool   $useTimezone Optional.
-     * @return int
+     * @param bool   $useTimeZone Optional.
+     * @return Date
      */
-    public function toDayEndHour(string $dateKey, string $hourKey, bool $useTimezone = true): int {
-        $value = $this->getString($dateKey);
+    public function toDayEndHour(string $dateKey, string $hourKey, bool $useTimeZone = true): Date {
         if ($this->has($hourKey)) {
-            return DateTime::toTimeHour($value, $this->getString($hourKey), $useTimezone);
+            return $this->toTimeHour($dateKey, $hourKey, $useTimeZone);
         }
-        return DateTime::toDayEnd($value, $useTimezone);
-    }
-
-    /**
-     * Returns the given integer as a time at the start of the day
-     * @param string $key
-     * @param bool   $useTimezone Optional.
-     * @return int
-     */
-    public function getDayStart(string $key, bool $useTimezone = true): int {
-        $value = $this->getInt($key);
-        return DateTime::getDayStart($value, 0, $useTimezone);
-    }
-
-    /**
-     * Returns the given integer as a time at the end of the day
-     * @param string $key
-     * @param bool   $useTimezone Optional.
-     * @return int
-     */
-    public function getDayEnd(string $key, bool $useTimezone = true): int {
-        $value = $this->getInt($key);
-        return DateTime::getDayEnd($value, 0, $useTimezone);
+        return $this->toDayEnd($dateKey, $useTimeZone);
     }
 
 
