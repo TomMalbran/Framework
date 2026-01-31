@@ -3,6 +3,7 @@ namespace Framework\Database\Type;
 
 use Framework\Request;
 use Framework\Discovery\Discovery;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
@@ -23,25 +24,10 @@ class Entity implements JsonSerializable {
 
 
     /**
-     * Creates a new Entity instance from a Request
-     * @param Request $request
-     * @param string  $key
-     * @return static[]
-     */
-    final public static function createList(Request $request, string $key): array {
-        $data   = $request->getDictionary($key);
-        $result = [];
-        foreach ($data as $item) {
-            $result[] = new static($item);
-        }
-        return $result;
-    }
-
-    /**
      * Creates a new Entity instance
      * @param mixed $data Optional.
      */
-    final public function __construct(mixed $data = null) {
+    public function __construct(mixed $data = null) {
         if ($data === null) {
             return;
         }
@@ -74,6 +60,9 @@ class Entity implements JsonSerializable {
         }
 
         switch ($type) {
+        case Date::class:
+            $this->$property = Date::create($value);
+            break;
         case "int":
             $this->$property = Numbers::toInt($value);
             break;
@@ -110,6 +99,9 @@ class Entity implements JsonSerializable {
         }
 
         switch ($type) {
+        case Date::class:
+            $this->$property = $request->toDate($property);
+            break;
         case "bool":
             $this->$property = $request->has($property);
             break;
@@ -152,6 +144,9 @@ class Entity implements JsonSerializable {
         }
 
         switch ($type) {
+        case Date::class:
+            $this->$property = $data->getDate($property);
+            break;
         case "bool":
             $this->$property = $data->getBool($property);
             break;

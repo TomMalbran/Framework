@@ -13,8 +13,8 @@ class Virtual {
 
 
     // Used internally when parsing the Model
-    public FieldType $type    = FieldType::String;
-    public string    $name    = "";
+    public FieldType $type = FieldType::String;
+    public string    $name = "";
 
 
     /**

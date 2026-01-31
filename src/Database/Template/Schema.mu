@@ -32,7 +32,8 @@ use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
 use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#canEdit}}
 use Framework\Database\Type\Assign;{{/canEdit}}{{#hasValidation}}
 use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
-use Framework\Date\DateType;{{/hasDate}}{{#hasID}}
+use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
+use Framework\Date\DateType;{{/hasDateType}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
@@ -659,7 +660,7 @@ class {{name}}Schema extends Schema {
      * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
      * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{status}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
-     * @param int $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
+     * @param Date|null $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}{{#hasPositions}}
      * @param bool $skipOrder Optional.{{/hasPositions}}
      * @return int
@@ -668,14 +669,14 @@ class {{name}}Schema extends Schema {
         ?Request $entityRequest = null,{{/usesRequest}}{{#fields}}
         {{fieldArgCreate}},{{/fields}}{{#hasStatus}}
         ?{{status}} $status = null,{{/hasStatus}}{{#hasTimestamps}}
-        int $createdTime = 0,{{/hasTimestamps}}{{#hasUsers}}
+        ?Date $createdTime = null,{{/hasTimestamps}}{{#hasUsers}}
         int $createdUser = 0,{{/hasUsers}}{{#hasPositions}}
         bool $skipOrder = false,{{/hasPositions}}
     ): int {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $entityFields["{{fieldKey}}"] = {{fieldParam}};
+            $entityFields["{{fieldKey}}"] = {{{fieldAssign}}};
         }
         {{/fields}}
         {{#hasStatus}}
@@ -684,8 +685,8 @@ class {{name}}Schema extends Schema {
         }
         {{/hasStatus}}
         {{#hasTimestamps}}
-        if ($createdTime > 0) {
-            $entityFields["createdTime"] = $createdTime;
+        if ($createdTime !== null) {
+            $entityFields["createdTime"] = $createdTime->toTime();
         }
         {{/hasTimestamps}}
         {{#hasUsers}}
@@ -737,7 +738,7 @@ class {{name}}Schema extends Schema {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $entityFields["{{fieldKey}}"] = {{fieldParam}};
+            $entityFields["{{fieldKey}}"] = {{{fieldAssign}}};
         }
         {{/fields}}
         {{#hasStatus}}
@@ -790,7 +791,7 @@ class {{name}}Schema extends Schema {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $entityFields["{{fieldKey}}"] = {{fieldParam}};
+            $entityFields["{{fieldKey}}"] = {{{fieldAssign}}};
         }
         {{/fields}}
         {{#hasStatus}}

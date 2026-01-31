@@ -17,12 +17,15 @@ class EntityCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
+        $dates    = self::getDates($schemaModel);
         $contents = Builder::render("Entity", [
             "namespace"  => $schemaModel->namespace,
             "name"       => $schemaModel->name,
             "id"         => $schemaModel->idName,
             "subTypes"   => self::getSubTypes($schemaModel),
             "categories" => self::getAttributes($schemaModel),
+            "hasDates"   => count($dates) > 0,
+            "dates"      => $dates,
         ]);
         return $contents;
     }
@@ -138,6 +141,9 @@ class EntityCode {
         FieldType $fieldType,
     ): bool {
         switch ($fieldType) {
+        case FieldType::Date:
+            $result[] = self::getTypeData($fieldKey, "Date");
+            break;
         case FieldType::Boolean:
             $result[] = self::getTypeData($fieldKey, "bool");
             break;
@@ -169,13 +175,17 @@ class EntityCode {
      * @return array{name:string,type:string,subType:string,default:string}
      */
     private static function getTypeData(string $name, string $type, string $subType = ""): array {
+        $default = FieldType::getDefault($type);
         return [
-            "name"    => $name,
-            "type"    => $type,
-            "subType" => $subType,
-            "default" => FieldType::getDefault($type),
+            "name"       => $name,
+            "type"       => $type,
+            "subType"    => $subType,
+            "hasDefault" => $default !== null,
+            "default"    => $default !== null ? $default : "",
         ];
     }
+
+
 
     /**
      * Returns the Sub Types from the Sub Requests
@@ -198,6 +208,29 @@ class EntityCode {
                     "namespace" => $subRequest->namespace,
                     "type"      => $subRequest->modelName,
                 ];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Date Fields
+     * @param SchemaModel $schemaModel
+     * @return string[]
+     */
+    private static function getDates(SchemaModel $schemaModel): array {
+        $result = [];
+        foreach ($schemaModel->fields as $field) {
+            if ($field->type === FieldType::Date) {
+                $result[] = $field->name;
+            }
+        }
+
+        foreach ($schemaModel->relations as $relation) {
+            foreach ($relation->fields as $field) {
+                if ($field->type === FieldType::Date) {
+                    $result[] = $field->prefixName;
+                }
             }
         }
         return $result;

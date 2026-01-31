@@ -77,6 +77,7 @@ class Expression {
         $result = [];
 
         $result[$key] = match ($this->type) {
+            FieldType::Date,
             FieldType::Number  => $number,
             FieldType::Boolean => !Arrays::isEmpty($data, $key),
             FieldType::Float   => Numbers::toFloat($number, 2),

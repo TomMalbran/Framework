@@ -41,6 +41,7 @@ class SchemaCode {
         $hasUniques  = count($uniques) > 0;
         $hasParents  = count($parents) > 0;
         $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
+        $hasDateType = count(self::getSomeFields($schemaModel, isDateType: true)) > 0;
         $queryName   = "{$schemaModel->name}Query";
 
         $contents    = Builder::render("Schema", [
@@ -108,6 +109,7 @@ class SchemaCode {
             "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
             "editParents"         => $editParents,
             "hasDate"             => $hasDate,
+            "hasDateType"         => $hasDateType,
             "hasQueryOperator"    => $schemaModel->hasID || $hasUniques || $hasParents,
         ]);
         return Strings::replace($contents, "(, ", "(");
@@ -167,6 +169,7 @@ class SchemaCode {
      * @param bool        $isUnique    Optional.
      * @param bool        $isParent    Optional.
      * @param bool        $isDate      Optional.
+     * @param bool        $isDateType  Optional.
      * @return array<string,string>[]
      */
     private static function getSomeFields(
@@ -174,6 +177,7 @@ class SchemaCode {
         bool $isUnique = false,
         bool $isParent = false,
         bool $isDate = false,
+        bool $isDateType = false,
     ): array {
         $result = [];
         foreach ($schemaModel->fields as $field) {
@@ -181,7 +185,12 @@ class SchemaCode {
                 $result[] = self::getField($field);
             } elseif ($isParent && $field->isParent) {
                 $result[] = self::getField($field);
-            } elseif ($isDate && $field->dateType !== DateType::None) {
+            } elseif ($isDateType && $field->dateType !== DateType::None) {
+                $result[] = self::getField($field);
+            } elseif ($isDate && $field->type === FieldType::Date) {
+                if ((!$schemaModel->canCreate && $field->name === "createdTime") || $field->name === "modifiedTime") {
+                    continue;
+                }
                 $result[] = self::getField($field);
             }
         }
@@ -196,7 +205,8 @@ class SchemaCode {
     private static function getField(Field $field): array {
         $type      = FieldType::getCodeType($field->type);
         $default   = FieldType::getDefault($type);
-        $canAssign = !$field->isID && !$field->isParent;
+        $isDate    = $field->type === FieldType::Date;
+        $canAssign = !$field->isID && !$field->isParent && !$isDate;
         $assignDoc = $canAssign ? "Assign|" : "";
         $param     = "\${$field->name}";
 
@@ -209,6 +219,7 @@ class SchemaCode {
             "fieldDocEdit"    => "$assignDoc$type|null $param",
             "fieldParam"      => $param,
             "fieldParamQuery" => $type === "bool" ? "$param === true ? 1 : 0" : $param,
+            "fieldAssign"     => $isDate ? "{$param}->toTime()" : $param,
             "fieldArg"        => "$type $param",
             "fieldArgNull"    => "?$type $param",
             "fieldArgDefault" => "$type $param = $default",
