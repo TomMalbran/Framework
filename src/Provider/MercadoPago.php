@@ -3,7 +3,7 @@ namespace Framework\Provider;
 
 use Framework\Provider\Curl;
 use Framework\System\Config;
-use Framework\Date\DateTime;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -226,7 +226,7 @@ class MercadoPago {
     public static function cancelPaymentUrl(string $preferenceID, string $accessToken = ""): bool {
         $response = self::put("/checkout/preferences/$preferenceID", [
             "expires"            => true,
-            "expiration_date_to" => DateTime::format(time(), "Y-m-d\TH:i:s-03:00"),
+            "expiration_date_to" => Date::now()->format("Y-m-d\TH:i:s-03:00"),
         ], $accessToken);
         return $response->hasValue("id");
     }
@@ -260,10 +260,10 @@ class MercadoPago {
             "refundedID"        => $refund->getString("id"),
             "reference"         => $response->getString("external_reference"),
             "status"            => $response->getString("status"),
-            "createdTime"       => $response->getTime("date_created"),
-            "approvedTime"      => $response->getTime("date_approved"),
-            "refundedTime"      => $refund->getTime("date_created"),
-            "modifiedTime"      => $response->getTime("date_last_updated"),
+            "createdTime"       => $response->getDate("date_created")->toTime(),
+            "approvedTime"      => $response->getDate("date_approved")->toTime(),
+            "refundedTime"      => $refund->getDate("date_created")->toTime(),
+            "modifiedTime"      => $response->getDate("date_last_updated")->toTime(),
             "paymentMethod"     => $response->getString("payment_method_id"),
             "paymentType"       => $response->getString("payment_type_id"),
             "cardInitialNumber" => $response->getString("issuer_id"),

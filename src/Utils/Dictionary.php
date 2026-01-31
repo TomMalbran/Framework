@@ -2,7 +2,6 @@
 namespace Framework\Utils;
 
 use Framework\Date\Date;
-use Framework\Date\DateTime;
 use Framework\Utils\JSON;
 
 use IteratorAggregate;
@@ -217,30 +216,15 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Gets the value of the given key as a Timestamp
+     * Gets the value of the given key as a Date
      * @param string $key
-     * @param int    $default Optional.
-     * @return int
+     * @return Date
      */
-    public function getTime(string $key, int $default = 0): int {
+    public function getDate(string $key): Date {
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
-            return DateTime::toTime($this->data[$key]);
+            return Date::create($this->data[$key]);
         }
-        return $default;
-    }
-
-    /**
-     * Gets the value of the given key as a Timestamp
-     * @param string $key
-     * @param int    $default Optional.
-     * @return int
-     */
-    public function getTimeParsed(string $key, int $default = 0): int {
-        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
-            $value = Strings::toString($this->data[$key]);
-            return DateTime::parseDate($value);
-        }
-        return $default;
+        return Date::empty();
     }
 
     /**
@@ -248,11 +232,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @param string $key
      * @return Date
      */
-    public function getDate(string $key): Date {
-        if (isset($this->data[$key]) && !is_array($this->data[$key])) {
-            return new Date($this->data[$key]);
-        }
-        return new Date();
+    public function getDateParsed(string $key): Date {
+        $date = $this->getString($key);
+        return Date::parse($date);
     }
 
 
