@@ -238,7 +238,7 @@ class Credential extends CredentialSchema {
             return [];
         }
 
-        $query->statusEqual(CredentialStatus::Active);
+        $query->status->equal(CredentialStatus::Active);
         return self::getCredentials($query, $sort, false);
     }
 

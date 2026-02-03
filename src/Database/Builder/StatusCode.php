@@ -28,6 +28,23 @@ class StatusCode {
     }
 
     /**
+     * Returns the Status Query code
+     * @param SchemaModel $schemaModel
+     * @return string
+     */
+    public static function getQueryCode(SchemaModel $schemaModel): string {
+        $contents = Builder::render("StatusQuery", [
+            "namespace" => $schemaModel->namespace,
+            "name"      => $schemaModel->name,
+            "status"    => "{$schemaModel->name}Status",
+            "query"     => "{$schemaModel->name}StatusQuery",
+        ]);
+        return $contents;
+    }
+
+
+
+    /**
      * Generates the Status list
      * @param SchemaModel $schemaModel
      * @return array{name:string,color:string,constant:string}[]

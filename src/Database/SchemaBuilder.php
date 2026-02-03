@@ -70,6 +70,11 @@ class SchemaBuilder implements DiscoveryBuilder {
                 $statusCode = StatusCode::getCode($schemaModel);
                 File::create($schemaModel->path, $statusName, $statusCode);
                 $created += 1;
+
+                $statusQueryName = "{$schemaModel->name}StatusQuery.php";
+                $statusQueryCode = StatusCode::getQueryCode($schemaModel);
+                File::create($schemaModel->path, $statusQueryName, $statusQueryCode);
+                $created += 1;
             }
         }
 

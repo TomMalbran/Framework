@@ -28,7 +28,6 @@ class QueryCode {
             "query"      => "{$schemaModel->name}Query",
             "status"     => "{$schemaModel->name}Status",
             "properties" => $properties,
-            "statuses"   => self::getStatuses($schemaModel),
             "imports"    => self::getImports($schemaModel),
             "queries"    => self::getQueries($properties),
         ]);
@@ -42,89 +41,52 @@ class QueryCode {
      */
     private static function getProperties(SchemaModel $schemaModel): array {
         $nameLength = 0;
-        $typeLength = 0;
         $list       = [];
         $result     = [];
 
         foreach ($schemaModel->fields as $field) {
-            if (!$field->isStatus) {
-                $list[] = [
-                    "type"   => $field->type,
-                    "column" => $field->name,
-                    "name"   => $field->name,
-                    "value"  => "{$schemaModel->tableName}.{$field->dbName}",
-                ];
-            }
+            $list[] = [
+                "fieldType" => $field->type,
+                "status"    => $field->isStatus ? "{$schemaModel->name}Status" : "",
+                "column"    => $field->name,
+                "name"      => $field->name,
+                "value"     => "{$schemaModel->tableName}.{$field->dbName}",
+            ];
         }
 
         foreach ($schemaModel->expressions as $expression) {
             $list[] = [
-                "type"   => $expression->type,
-                "column" => $expression->name,
-                "name"   => $expression->name,
-                "value"  => $expression->name,
+                "fieldType" => $expression->type,
+                "status"    => "",
+                "column"    => $expression->name,
+                "name"      => $expression->name,
+                "value"     => $expression->name,
             ];
         }
 
         foreach ($schemaModel->relations as $relation) {
             $tableName = $relation->getDbTableName();
             foreach ($relation->fields as $field) {
-                if (!$field->isStatus) {
-                    $list[] = [
-                        "type"   => $field->type,
-                        "column" => $field->name,
-                        "name"   => $field->prefixName,
-                        "value"  => "{$tableName}.{$field->dbName}",
-                    ];
-                }
+                $list[] = [
+                    "fieldType" => $field->type,
+                    "status"    => $field->isStatus ? "{$relation->relationModelName}Status" : "",
+                    "column"    => $field->name,
+                    "name"      => $field->prefixName,
+                    "value"     => "{$tableName}.{$field->dbName}",
+                ];
             }
         }
 
         foreach ($list as $property) {
-            $property["queryType"] = self::getQueryType($property["type"]);
-            if ($property["queryType"] !== "") {
+            $property["type"] = self::getQueryType($property["fieldType"], $property["status"]);
+            if ($property["type"] !== "") {
                 $nameLength = max($nameLength, Strings::length($property["name"]));
-                $typeLength = max($typeLength, Strings::length($property["queryType"]));
-
-                $result[] = $property;
+                $result[]   = $property;
             }
         }
 
         foreach ($result as $index => $property) {
-            $result[$index]["propName"]  = Strings::padRight("{$property["name"]};", $nameLength + 1);
-            $result[$index]["propType"]  = Strings::padRight($property["queryType"], $typeLength);
-            $result[$index]["constName"] = Strings::padRight($property["name"], $nameLength);
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the Query Statuses for the Query
-     * @param SchemaModel $schemaModel
-     * @return array{status:string,name:string,value:string}[]
-     */
-    private static function getStatuses(SchemaModel $schemaModel): array {
-        $result = [];
-        foreach ($schemaModel->fields as $field) {
-            if ($field->isStatus) {
-                $result[] = [
-                    "status" => "{$schemaModel->name}Status",
-                    "name"   => $field->name,
-                    "value"  => "{$schemaModel->tableName}.{$field->dbName}",
-                ];
-            }
-        }
-        foreach ($schemaModel->relations as $relation) {
-            $tableName = $relation->getDbTableName();
-            foreach ($relation->fields as $field) {
-                if ($field->isStatus && $relation->relationModel !== null) {
-                    $result[] = [
-                        "status" => "{$relation->relationModelName}Status",
-                        "name"   => $field->prefixName,
-                        "value"  => "{$tableName}.{$field->dbName}",
-                    ];
-                }
-            }
+            $result[$index]["propName"] = Strings::padRight($property["name"], $nameLength);
         }
         return $result;
     }
@@ -138,16 +100,16 @@ class QueryCode {
         $result = [];
         foreach ($schemaModel->fields as $field) {
             if ($field->isStatus) {
-                $name = "{$schemaModel->name}Status";
-                $result["{$schemaModel->namespace}\\$name"] = 1;
+                $queryName = "{$schemaModel->name}StatusQuery";
+                $result["{$schemaModel->namespace}\\$queryName"] = 1;
             }
         }
 
         foreach ($schemaModel->relations as $relation) {
             foreach ($relation->fields as $field) {
                 if ($field->isStatus && $relation->relationModel !== null) {
-                    $name = "{$relation->relationModelName}Status";
-                    $result["{$relation->relationModel->namespace}\\$name"] = 1;
+                    $queryName = "{$relation->relationModelName}StatusQuery";
+                    $result["{$relation->relationModel->namespace}\\$queryName"] = 1;
                 }
             }
         }
@@ -163,9 +125,11 @@ class QueryCode {
     private static function getQueries(array $properties): array {
         $result = [];
         foreach ($properties as $property) {
-            $queryType = Strings::toString($property["queryType"] ?? "");
-            if ($queryType !== "Query" && !Arrays::contains($result, $queryType)) {
-                $result[] = $queryType;
+            $type = Strings::toString($property["type"] ?? "");
+            if ($type !== "Query" && !Strings::endsWith($type, "StatusQuery") &&
+                !Arrays::contains($result, $type)
+            ) {
+                $result[] = $type;
             }
         }
         return $result;
@@ -175,9 +139,13 @@ class QueryCode {
     /**
      * Returns the Query Type for a Field Type
      * @param FieldType $type
+     * @param string    $status
      * @return string
      */
-    private static function getQueryType(FieldType $type): string {
+    private static function getQueryType(FieldType $type, string $status): string {
+        if ($status !== "") {
+            return "{$status}Query";
+        }
         return match ($type) {
             FieldType::None    => "",
             FieldType::Date    => "DateQuery",

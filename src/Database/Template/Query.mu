@@ -19,7 +19,9 @@ class {{query}} extends SchemaQuery {
 
 
 {{#properties}}
-    public {{propType}} ${{propName}} // {{value}}
+
+    // {{value}}
+    public {{type}} ${{name}};
 {{/properties}}
 
 
@@ -32,7 +34,7 @@ class {{query}} extends SchemaQuery {
         parent::__construct($query);
 
         {{#properties}}
-        $this->{{constName}} = new {{queryType}}($this->query, "{{value}}");
+        $this->{{propName}} = new {{type}}($this->query, "{{value}}");
         {{/properties}}
     }
 
@@ -113,29 +115,4 @@ class {{query}} extends SchemaQuery {
         )", ...$subQuery->query->params);
         return $this;
     }
-{{#statuses}}
-
-
-    /**
-     * Adds a {{name}} Equals condition
-     * @param {{status}} ...$statuses
-     * @return {{query}}
-     */
-    public function {{name}}Equal({{status}} ...$statuses): {{query}} {
-        $values = {{status}}::toNames($statuses);
-        $this->query->add("{{value}}", QueryOperator::Equal, $values);
-        return $this;
-    }
-
-    /**
-     * Adds a {{name}} Not Equals condition
-     * @param {{status}} ...$statuses
-     * @return {{query}}
-     */
-    public function {{name}}NotEqual({{status}} ...$statuses): {{query}} {
-        $values = {{status}}::toNames($statuses);
-        $this->query->add("{{value}}", QueryOperator::NotEqual, $values);
-        return $this;
-    }
-{{/statuses}}
 }
