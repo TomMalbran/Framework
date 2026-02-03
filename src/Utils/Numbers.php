@@ -458,10 +458,7 @@ class Numbers {
      * @return string
      */
     public static function zerosPad(int|float $value, int $amount): string {
-        if ($value !== 0 && $value !== 0.0) {
-            return str_pad((string)$value, $amount, "0", STR_PAD_LEFT);
-        }
-        return (string)$value;
+        return str_pad((string)$value, $amount, "0", STR_PAD_LEFT);
     }
 
 
