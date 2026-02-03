@@ -410,15 +410,17 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns the data as an array of Strings
+     * @param bool $withoutEmpty Optional.
      * @return string[]
      */
-    public function toStrings(): array {
+    public function toStrings(bool $withoutEmpty = false): array {
         if (Arrays::isList($this->data)) {
-            return Arrays::toStrings($this->data);
+            return Arrays::toStrings($this->data, withoutEmpty: $withoutEmpty);
         }
+
         $values = array_values($this->data);
         if (Arrays::isList($values)) {
-            return Arrays::toStrings($values);
+            return Arrays::toStrings($values, withoutEmpty: $withoutEmpty);
         }
         return [];
     }
