@@ -6,7 +6,7 @@ use Framework\Utils\Strings;
 /**
  * The {{name}} Column
  */
-enum {{name}}Column : string {
+enum {{columnClass}} : string {
 
     case None = "";
 
@@ -22,9 +22,9 @@ enum {{name}}Column : string {
     /**
      * Creates a {{name}} Column from a String
      * @param string $value
-     * @return {{name}}Column
+     * @return {{columnClass}}
      */
-    public static function fromValue(string $value): {{name}}Column {
+    public static function fromValue(string $value): {{columnClass}} {
         foreach (self::cases() as $case) {
             if ($case->name === $value) {
                 return $case;

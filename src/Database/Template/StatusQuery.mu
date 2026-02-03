@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}};
 
-use {{namespace}}\{{status}};
+use {{namespace}}\{{statusClass}};
 
 use Framework\Database\Query\BaseQuery;
 use Framework\Database\Query\QueryOperator;
@@ -9,26 +9,26 @@ use Framework\Database\Query\QueryOperator;
 /**
  * The {{name}} Status Query
  */
-class {{query}} extends BaseQuery {
+class {{statusQueryClass}} extends BaseQuery {
 
     /**
      * Adds a {{name}} Equals condition
-     * @param {{status}} ...$statuses
-     * @return {{query}}
+     * @param {{statusClass}} ...$statuses
+     * @return {{statusQueryClass}}
      */
-    public function equal({{status}} ...$statuses): {{query}} {
-        $values = {{status}}::toNames($statuses);
+    public function equal({{statusClass}} ...$statuses): {{statusQueryClass}} {
+        $values = {{statusClass}}::toNames($statuses);
         $this->query->add($this->column, QueryOperator::Equal, $values);
         return $this;
     }
 
     /**
      * Adds a {{name}} Not Equals condition
-     * @param {{status}} ...$statuses
-     * @return {{query}}
+     * @param {{statusClass}} ...$statuses
+     * @return {{statusQueryClass}}
      */
-    public function notEqual({{status}} ...$statuses): {{query}} {
-        $values = {{status}}::toNames($statuses);
+    public function notEqual({{statusClass}} ...$statuses): {{statusQueryClass}} {
+        $values = {{statusClass}}::toNames($statuses);
         $this->query->add($this->column, QueryOperator::NotEqual, $values);
         return $this;
     }

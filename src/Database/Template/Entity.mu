@@ -9,7 +9,7 @@ use Framework\Date\Date;{{/hasDates}}
 /**
  * The {{name}} Entity
  */
-class {{name}}Entity extends Entity {
+class {{entityClass}} extends Entity {
 
     protected const ID = "{{id}}";
 {{#categories}}

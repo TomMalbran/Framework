@@ -50,28 +50,28 @@ class SchemaBuilder implements DiscoveryBuilder {
             File::create($schemaModel->path, $schemaName, $schemaCode);
             $created += 1;
 
-            $entityName = "{$schemaModel->name}Entity.php";
+            $entityName = "{$schemaModel->entityClass}.php";
             $entityCode = EntityCode::getCode($schemaModel);
             File::create($schemaModel->path, $entityName, $entityCode);
             $created += 1;
 
-            $columnName = "{$schemaModel->name}Column.php";
+            $columnName = "{$schemaModel->columnClass}.php";
             $columnCode = ColumnCode::getCode($schemaModel);
             File::create($schemaModel->path, $columnName, $columnCode);
             $created += 1;
 
-            $queryName = "{$schemaModel->name}Query.php";
+            $queryName = "{$schemaModel->queryClass}.php";
             $queryCode = QueryCode::getCode($schemaModel);
             File::create($schemaModel->path, $queryName, $queryCode);
             $created += 1;
 
             if ($schemaModel->hasStatus) {
-                $statusName = "{$schemaModel->name}Status.php";
+                $statusName = "{$schemaModel->statusClass}.php";
                 $statusCode = StatusCode::getCode($schemaModel);
                 File::create($schemaModel->path, $statusName, $statusCode);
                 $created += 1;
 
-                $statusQueryName = "{$schemaModel->name}StatusQuery.php";
+                $statusQueryName = "{$schemaModel->statusClass}Query.php";
                 $statusQueryCode = StatusCode::getQueryCode($schemaModel);
                 File::create($schemaModel->path, $statusQueryName, $statusQueryCode);
                 $created += 1;

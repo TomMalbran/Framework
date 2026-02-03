@@ -18,11 +18,11 @@ class StatusCode {
      */
     public static function getCode(SchemaModel $schemaModel): string {
         $contents = Builder::render("Status", [
-            "namespace" => $schemaModel->namespace,
-            "name"      => $schemaModel->name,
-            "status"    => "{$schemaModel->name}Status",
-            "statuses"  => self::getList($schemaModel),
-            "values"    => self::getValues($schemaModel),
+            "namespace"   => $schemaModel->namespace,
+            "name"        => $schemaModel->name,
+            "statusClass" => $schemaModel->statusClass,
+            "statuses"    => self::getList($schemaModel),
+            "values"      => self::getValues($schemaModel),
         ]);
         return $contents;
     }
@@ -34,10 +34,10 @@ class StatusCode {
      */
     public static function getQueryCode(SchemaModel $schemaModel): string {
         $contents = Builder::render("StatusQuery", [
-            "namespace" => $schemaModel->namespace,
-            "name"      => $schemaModel->name,
-            "status"    => "{$schemaModel->name}Status",
-            "query"     => "{$schemaModel->name}StatusQuery",
+            "namespace"        => $schemaModel->namespace,
+            "name"             => $schemaModel->name,
+            "statusClass"      => $schemaModel->statusClass,
+            "statusQueryClass" => "{$schemaModel->statusClass}Query",
         ]);
         return $contents;
     }

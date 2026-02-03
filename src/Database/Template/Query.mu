@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}};
 
-use {{namespace}}\{{column}};{{#imports}}
+use {{namespace}}\{{columnClass}};{{#imports}}
 use {{.}};{{/imports}}
 
 use Framework\Database\Query\Query;
@@ -12,7 +12,7 @@ use Framework\Database\Query\{{.}};{{/queries}}
 /**
  * The {{name}} Query
  */
-class {{query}} extends SchemaQuery {
+class {{queryClass}} extends SchemaQuery {
 
     public string $tableName = "{{tableName}}";
     public string $idDbName  = "{{idDbName}}";
@@ -27,7 +27,7 @@ class {{query}} extends SchemaQuery {
 
 
     /**
-     * Creates a new {{query}} instance
+     * Creates a new {{queryClass}} instance
      * @param Query|null $query Optional.
      */
     public function __construct(?Query $query = null) {
@@ -40,21 +40,21 @@ class {{query}} extends SchemaQuery {
 
     /**
      * Adds an expression
-     * @param {{column}} $column
+     * @param {{columnClass}} $column
      * @param QueryOperator $operator
      * @param mixed[]|int|string $value
      * @param bool $caseSensitive Optional.
      * @param bool|null $condition Optional.
-     * @return {{query}}
+     * @return {{queryClass}}
      */
     public function add(
-        {{column}} $column,
+        {{columnClass}} $column,
         QueryOperator $operator,
         array|int|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
-    ): {{query}} {
-        if ($column !== {{column}}::None) {
+    ): {{queryClass}} {
+        if ($column !== {{columnClass}}::None) {
             $this->query->add($column->value, $operator, $value, $caseSensitive, $condition);
         }
         return $this;
@@ -62,14 +62,14 @@ class {{query}} extends SchemaQuery {
 
     /**
      * Adds a Search expression
-     * @param {{column}}[] $column
+     * @param {{columnClass}}[] $column
      * @param mixed $value
      * @param QueryOperator $operator Optional.
      * @param bool $caseInsensitive Optional.
      * @param bool $splitValue Optional.
      * @param string $splitText Optional.
      * @param bool $matchAny Optional.
-     * @return {{query}}
+     * @return {{queryClass}}
      */
     public function search(
         array $column,
@@ -79,7 +79,7 @@ class {{query}} extends SchemaQuery {
         bool $splitValue = false,
         string $splitText = " ",
         bool $matchAny = false,
-    ): {{query}} {
+    ): {{queryClass}} {
         $columns = [];
         foreach ($column as $col) {
             $columns[] = $col->value;
@@ -91,9 +91,9 @@ class {{query}} extends SchemaQuery {
     /**
      * Adds an Exists expression
      * @param SchemaQuery $subQuery
-     * @return {{query}}
+     * @return {{queryClass}}
      */
-    public function exists(SchemaQuery $subQuery): {{query}} {
+    public function exists(SchemaQuery $subQuery): {{queryClass}} {
         $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
         $this->query->addExp("EXISTS (
             SELECT 1 FROM {$subQuery->tableName}
@@ -105,9 +105,9 @@ class {{query}} extends SchemaQuery {
     /**
      * Adds an Not Exists expression
      * @param SchemaQuery $subQuery
-     * @return {{query}}
+     * @return {{queryClass}}
      */
-    public function notExists(SchemaQuery $subQuery): {{query}} {
+    public function notExists(SchemaQuery $subQuery): {{queryClass}} {
         $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
         $this->query->addExp("NOT EXISTS (
             SELECT 1 FROM {$subQuery->tableName}

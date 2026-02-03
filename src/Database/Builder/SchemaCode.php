@@ -42,16 +42,16 @@ class SchemaCode {
         $hasParents  = count($parents) > 0;
         $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
         $hasDateType = count(self::getSomeFields($schemaModel, isDateType: true)) > 0;
-        $queryName   = "{$schemaModel->name}Query";
+        $queryName   = $schemaModel->queryClass;
 
         $contents    = Builder::render("Schema", [
             "namespace"           => $schemaModel->namespace,
             "name"                => $schemaModel->name,
             "table"               => $schemaModel->tableName,
-            "column"              => "{$schemaModel->name}Column",
-            "entity"              => "{$schemaModel->name}Entity",
-            "status"              => "{$schemaModel->name}Status",
-            "query"               => $queryName,
+            "entityClass"         => $schemaModel->entityClass,
+            "columnClass"         => $schemaModel->columnClass,
+            "statusClass"         => $schemaModel->statusClass,
+            "queryClass"          => $schemaModel->queryClass,
             "hasValidation"       => count($validations) > 0,
             "validations"         => $validations,
             "hasValidateImports"  => count($valImports) > 0,

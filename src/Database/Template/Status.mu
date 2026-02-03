@@ -9,7 +9,7 @@ use Framework\Utils\Strings;
 /**
  * The {{name}} Status
  */
-enum {{status}} {
+enum {{statusClass}} {
 
     case None;
 
@@ -21,15 +21,15 @@ enum {{status}} {
 
     /**
      * Creates a Status from a String
-     * @param {{status}}|string $value
-     * @param {{status}} $default Optional.
-     * @return {{status}}
+     * @param {{statusClass}}|string $value
+     * @param {{statusClass}} $default Optional.
+     * @return {{statusClass}}
      */
     public static function fromValue(
-        {{status}}|string $value,
-        {{status}} $default = self::None,
-    ): {{status}} {
-        if ($value instanceof {{status}}) {
+        {{statusClass}}|string $value,
+        {{statusClass}} $default = self::None,
+    ): {{statusClass}} {
+        if ($value instanceof {{statusClass}}) {
             return $value;
         }
         foreach (self::cases() as $case) {
@@ -43,7 +43,7 @@ enum {{status}} {
     /**
      * Creates a list of Statuses from the given Strings
      * @param string[] $values
-     * @return {{status}}[]
+     * @return {{statusClass}}[]
      */
     public static function fromList(array $values): array {
         $result = [];
@@ -55,7 +55,7 @@ enum {{status}} {
 
     /**
      * Creates a list of Names from the given Statuses
-     * @param {{status}}[] $values
+     * @param {{statusClass}}[] $values
      * @return string[]
      */
     public static function toNames(array $values): array {
@@ -72,21 +72,21 @@ enum {{status}} {
 
     /**
      * Returns the Name of the given Status
-     * @param {{status}}|string $value
+     * @param {{statusClass}}|string $value
      * @param string $isoCode Optional.
      * @return string
      */
-    public static function getName({{status}}|string $value, string $isoCode = ""): string {
-        $value = ($value instanceof {{status}}) ? $value->name : $value;
+    public static function getName({{statusClass}}|string $value, string $isoCode = ""): string {
+        $value = ($value instanceof {{statusClass}}) ? $value->name : $value;
         return NLS::getIndex("SELECT_STATUS", $value, $isoCode);
     }
 
     /**
      * Returns the Color of the given Status
-     * @param {{status}}|string $value
+     * @param {{statusClass}}|string $value
      * @return string
      */
-    public static function getColor({{status}}|string $value): string {
+    public static function getColor({{statusClass}}|string $value): string {
         return match (self::fromValue($value)) {
         {{#statuses}}
             self::{{constant}} => "{{color}}",
@@ -97,10 +97,10 @@ enum {{status}} {
 
     /**
      * Returns true if the given value is valid
-     * @param {{status}}|string $value
+     * @param {{statusClass}}|string $value
      * @return bool
      */
-    public static function isValid({{status}}|string $value): bool {
+    public static function isValid({{statusClass}}|string $value): bool {
         return Arrays::contains([ {{values}} ], self::fromValue($value));
     }
 
@@ -126,10 +126,10 @@ enum {{status}} {
 
     /**
      * Returns true if the given value is the Status {{name}}
-     * @param {{status}}|string $value
+     * @param {{statusClass}}|string $value
      * @return bool
      */
-    public static function is{{name}}({{status}}|string $value): bool {
+    public static function is{{name}}({{statusClass}}|string $value): bool {
         return self::{{name}} === self::fromValue($value);
     }
 {{/statuses}}

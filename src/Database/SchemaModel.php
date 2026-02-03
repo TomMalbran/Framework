@@ -38,6 +38,13 @@ class SchemaModel {
     public bool $usesRequest     = true;
 
 
+    // Subclass Names
+    public string $entityClass   = "";
+    public string $columnClass   = "";
+    public string $queryClass    = "";
+    public string $statusClass   = "";
+
+
     // Main column data
     public bool      $hasID      = false;
     public bool      $hasAutoInc = false;
@@ -149,6 +156,11 @@ class SchemaModel {
         $this->relations     = $relations;
         $this->subRequests   = $subRequests;
         $this->states        = $states;
+
+        $this->entityClass   = "{$this->name}Entity";
+        $this->columnClass   = "{$this->name}Column";
+        $this->queryClass    = "{$this->name}Query";
+        $this->statusClass   = "{$this->name}Status";
 
         $this->setExtraFields();
         $this->setIDField();

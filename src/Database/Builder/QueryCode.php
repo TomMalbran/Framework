@@ -20,16 +20,15 @@ class QueryCode {
     public static function getCode(SchemaModel $schemaModel): string {
         $properties = self::getProperties($schemaModel);
         $contents   = Builder::render("Query", [
-            "namespace"  => $schemaModel->namespace,
-            "name"       => $schemaModel->name,
-            "tableName"  => $schemaModel->tableName,
-            "idDbName"   => $schemaModel->idDbName,
-            "column"     => "{$schemaModel->name}Column",
-            "query"      => "{$schemaModel->name}Query",
-            "status"     => "{$schemaModel->name}Status",
-            "properties" => $properties,
-            "imports"    => self::getImports($schemaModel),
-            "queries"    => self::getQueries($properties),
+            "namespace"   => $schemaModel->namespace,
+            "name"        => $schemaModel->name,
+            "tableName"   => $schemaModel->tableName,
+            "idDbName"    => $schemaModel->idDbName,
+            "columnClass" => $schemaModel->columnClass,
+            "queryClass"  => $schemaModel->queryClass,
+            "properties"  => $properties,
+            "imports"     => self::getImports($schemaModel),
+            "queries"     => self::getQueries($properties),
         ]);
         return $contents;
     }
@@ -47,7 +46,7 @@ class QueryCode {
         foreach ($schemaModel->fields as $field) {
             $list[] = [
                 "fieldType" => $field->type,
-                "status"    => $field->isStatus ? "{$schemaModel->name}Status" : "",
+                "status"    => $field->isStatus ? $schemaModel->statusClass : "",
                 "column"    => $field->name,
                 "name"      => $field->name,
                 "value"     => "{$schemaModel->tableName}.{$field->dbName}",
@@ -100,7 +99,7 @@ class QueryCode {
         $result = [];
         foreach ($schemaModel->fields as $field) {
             if ($field->isStatus) {
-                $queryName = "{$schemaModel->name}StatusQuery";
+                $queryName = "{$schemaModel->statusClass}Query";
                 $result["{$schemaModel->namespace}\\$queryName"] = 1;
             }
         }

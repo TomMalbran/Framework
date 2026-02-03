@@ -27,7 +27,7 @@ class MediaCode implements DiscoveryBuilder {
                     $isReplace = $field->isText || $field->isLongText || $field->isJSON;
                     $fields[]  = [
                         "name"      => $schemaModel->name,
-                        "query"     => Strings::lowerCaseFirst("{$schemaModel->name}Query"),
+                        "query"     => Strings::lowerCaseFirst($schemaModel->queryClass),
                         "tableName" => $schemaModel->tableName,
                         "fieldName" => $field->name,
                         "isReplace" => $isReplace,
