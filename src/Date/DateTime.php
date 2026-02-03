@@ -2,9 +2,9 @@
 namespace Framework\Date;
 
 use Framework\Intl\NLS;
+use Framework\Date\TimeZone;
 use Framework\Date\DateType;
 use Framework\Date\DateFormat;
-use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
@@ -13,104 +13,8 @@ use Framework\Utils\Strings;
  */
 class DateTime {
 
-    /** @var list<float> */
-    public static array $stackZones = [];
-    public static float $serverZone = -3;
-    public static float $timeDiff   = 0;
-
-
-
     /**
-     * Sets the Time Zone in minutes
-     * @param float $timeZone
-     * @return float
-     */
-    public static function setTimeZone(float $timeZone): float {
-        if ($timeZone > 60 || $timeZone < 60) {
-            $timeZone /= 60;
-        }
-        self::$stackZones = [ $timeZone ];
-        self::$timeDiff   = self::$serverZone - $timeZone;
-        return self::$timeDiff;
-    }
-
-    /**
-     * Pushes a Time Zone
-     * @param float $timeZone
-     * @return float
-     */
-    public static function pushTimeZone(float $timeZone): float {
-        if ($timeZone > 60 || $timeZone < 60) {
-            $timeZone /= 60;
-        }
-        self::$stackZones[] = $timeZone;
-        self::$timeDiff     = self::$serverZone - $timeZone;
-        return self::$timeDiff;
-    }
-
-    /**
-     * Pops a Time Zone
-     * @return float
-     */
-    public static function popTimeZone(): float {
-        if (count(self::$stackZones) > 1) {
-            $timeZone = array_pop(self::$stackZones);
-        } elseif (count(self::$stackZones) === 1) {
-            $timeZone = self::$stackZones[0];
-        } else {
-            $timeZone = self::$serverZone;
-        }
-        self::$timeDiff = self::$serverZone - $timeZone;
-        return self::$timeDiff;
-    }
-
-    /**
-     * Returns the given time in the User Time Zone
-     * @param int  $value
-     * @param bool $useTimeZone Optional.
-     * @return int
-     */
-    public static function toUserTime(int $value, bool $useTimeZone = true): int {
-        if ($value !== 0 && $useTimeZone) {
-            return $value - (int)(self::$timeDiff * 3600);
-        }
-        return $value;
-    }
-
-    /**
-     * Returns the given time in the Server Time Zone
-     * @param int  $value
-     * @param bool $useTimeZone Optional.
-     * @return int
-     */
-    public static function toServerTime(int $value, bool $useTimeZone = true): int {
-        if ($value !== 0 && $useTimeZone) {
-            return $value + (int)(self::$timeDiff * 3600);
-        }
-        return $value;
-    }
-
-
-
-    /**
-     * Returns the Server Date
-     * @return string
-     */
-    public static function getServerDate(): string {
-        return date("d-m-Y @ H:i", time());
-    }
-
-    /**
-     * Returns the User Date
-     * @return string
-     */
-    public static function getUserDate(): string {
-        return date("d-m-Y @ H:i", self::toUserTime(time()));
-    }
-
-
-
-    /**
+     * Date::createOrNew($time)
      * Returns the given string as a time
      * @param mixed $time
      * @param bool  $useTimeZone Optional.
@@ -127,10 +31,11 @@ class DateTime {
         if ($timeStamp === 0 || $timeStamp > 4294967295) {
             return 0;
         }
-        return self::toServerTime($timeStamp, $useTimeZone);
+        return TimeZone::toServerTime($timeStamp, $useTimeZone);
     }
 
     /**
+     * Date::create($time)->toServerTime()
      * Returns the given time using the given Time Zone
      * @param mixed      $time
      * @param float|null $timeZone Optional.
@@ -148,13 +53,14 @@ class DateTime {
             return 0;
         }
         if ($timeZone !== null) {
-            $timeDiff = self::$serverZone - $timeZone;
+            $timeDiff = TimeZone::calcTimeDiff($timeZone);
             return $timeStamp - (int)($timeDiff * 3600);
         }
         return $timeStamp;
     }
 
     /**
+     * Date::create($time)->getTime()
      * Returns a Time Stamp
      * @param int $timeStamp
      * @return int
@@ -164,6 +70,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($day, $month, $year, $hour, $minute, $second)
      * Creates a Time Stamp
      * @param int $day
      * @param int $month
@@ -186,6 +93,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($day, $month, $year)->toNumber()
      * Returns the Day, Month and Year as a number
      * @param int $day
      * @param int $month
@@ -199,6 +107,7 @@ class DateTime {
 
 
     /**
+     * Date::create($dateString, $hourString)
      * Returns the given string as a time
      * @param string $dateString
      * @param string $hourString
@@ -210,6 +119,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($dateString)->toDayMoment($dateType)
      * Returns the given string as a time
      * @param string   $string
      * @param DateType $dateType    Optional.
@@ -226,6 +136,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($dateString)->toDayStart()
      * Returns the given string as a time of the start of the day
      * @param string $string
      * @param bool   $useTimeZone Optional.
@@ -240,6 +151,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($dateString)->toDayMiddle()
      * Returns the given string as a time of the middle of the day
      * @param string $string
      * @param bool   $useTimeZone Optional.
@@ -248,12 +160,14 @@ class DateTime {
     public static function toDayMiddle(string $string, bool $useTimeZone = true): int {
         $timeStamp = self::toDayStart($string, $useTimeZone);
         if ($timeStamp !== 0) {
-            return $timeStamp + 12 * 3600 - (int)(self::$timeDiff * 3600);
+            $timeDiff = TimeZone::getCurrentTimeDiff();
+            return $timeStamp + 12 * 3600 - (int)($timeDiff * 3600);
         }
         return 0;
     }
 
     /**
+     * Date::create($dateString)->toDayEnd()
      * Returns the given string as a time of the end of the day
      * @param string $string
      * @param bool   $useTimeZone Optional.
@@ -268,6 +182,7 @@ class DateTime {
     }
 
     /**
+     * Date::create(month: $month, year: $year)
      * Creates a Time, with the given month and year
      * @param int|null $month       Optional.
      * @param int|null $year        Optional.
@@ -288,123 +203,7 @@ class DateTime {
 
 
     /**
-     * Returns true if the given date is Valid
-     * @param string $string
-     * @return bool
-     */
-    public static function isValidDate(string $string): bool {
-        return strtotime($string) !== false;
-    }
-
-    /**
-     * Returns true if the given day is Valid
-     * @param string|int $value
-     * @param bool       $withHolidays Optional.
-     * @param bool       $startMonday  Optional.
-     * @return bool
-     */
-    public static function isValidDay(string|int $value, bool $withHolidays = false, bool $startMonday = false): bool {
-        $minValue = $startMonday ? 1 : 0;
-        $maxValue = ($withHolidays ? 7 : 6) + $minValue;
-        return (int)$value >= $minValue && (int)$value <= $maxValue;
-    }
-
-    /**
-     * Returns true if the given hour is Valid
-     * @param string     $string
-     * @param int[]|null $minutes Optional.
-     * @param int        $minHour Optional.
-     * @param int        $maxHour Optional.
-     * @return bool
-     */
-    public static function isValidHour(
-        string $string,
-        ?array $minutes = null,
-        int $minHour = 0,
-        int $maxHour = 23,
-    ): bool {
-        $parts = Strings::split($string, ":");
-        return (
-            isset($parts[0]) && Numbers::isValid($parts[0], $minHour, $maxHour) &&
-            isset($parts[1]) && Numbers::isValid($parts[1], 0, 59) &&
-            ($minutes === null || Arrays::contains($minutes, $parts[1]))
-        );
-    }
-
-    /**
-     * Returns true if the given dates are a valid period
-     * @param string $fromDate
-     * @param string $toDate
-     * @param bool   $useTimeZone Optional.
-     * @return bool
-     */
-    public static function isValidPeriod(string $fromDate, string $toDate, bool $useTimeZone = true): bool {
-        $fromTime = self::toDayStart($fromDate, $useTimeZone);
-        $toTime   = self::toDayEnd($toDate, $useTimeZone);
-
-        return $fromTime !== 0 && $toTime !== 0 && $fromTime < $toTime;
-    }
-
-    /**
-     * Returns true if the given hours are a valid period
-     * @param string $fromHour
-     * @param string $toHour
-     * @param bool   $allow24
-     * @return bool
-     */
-    public static function isValidHourPeriod(string $fromHour, string $toHour, bool $allow24 = false): bool {
-        $date      = date("d-m-Y");
-        $timeStamp = self::toDayStart($date);
-        $fromTime  = self::toTimeHour($date, $fromHour);
-        $toTime    = self::toTimeHour($date, $toHour);
-
-        if ($allow24 && $fromTime > 0 && $toTime === $timeStamp) {
-            return true;
-        }
-        if ($fromTime !== 0 && $toTime !== 0 && $fromTime < $toTime) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if the given dates with hours are a valid period
-     * @param string $fromDate
-     * @param string $fromHour
-     * @param string $toDate
-     * @param string $toHour
-     * @param bool   $useTimeZone Optional.
-     * @return bool
-     */
-    public static function isValidFullPeriod(
-        string $fromDate,
-        string $fromHour,
-        string $toDate,
-        string $toHour,
-        bool $useTimeZone = true,
-    ): bool {
-        $fromTime = self::toTimeHour($fromDate, $fromHour, $useTimeZone);
-        $toTime   = self::toTimeHour($toDate, $toHour, $useTimeZone);
-
-        return $fromTime !== 0 && $toTime !== 0 && $fromTime < $toTime;
-    }
-
-    /**
-     * Returns true if the given week day is valid
-     * @param int  $weekDay
-     * @param bool $startMonday Optional.
-     * @return bool
-     */
-    public static function isValidWeekDay(int $weekDay, bool $startMonday = false): bool {
-        if ($startMonday) {
-            return Numbers::isValid($weekDay, 1, 7);
-        }
-        return Numbers::isValid($weekDay, 0, 6);
-    }
-
-
-
-    /**
+     * Date::create($dateString)->toDayMoment($dateType)->isFuture()
      * Returns true if the given Date is in the future
      * @param string   $dateString
      * @param DateType $dateType    Optional.
@@ -421,6 +220,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($dateString, $hourString)->isFuture()
      * Returns true if the given Date and Hour is in the future
      * @param string $dateString
      * @param string $hourString
@@ -433,6 +233,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($time)->isFuture()
      * Returns true if the given Time is in the future
      * @param mixed      $time
      * @param float|null $timeZone Optional.
@@ -443,7 +244,8 @@ class DateTime {
         return $timeStamp > time();
     }
 
-     /**
+    /**
+     * Date::create($time)->isToday()
      * Returns true if the given Time is today
      * @param mixed      $time
      * @param float|null $timeZone Optional.
@@ -455,6 +257,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($timeStamp)->isBetween($fromTime, $toTime)
      * Returns true if the given Time is between the from and to Times
      * @param int $timeStamp
      * @param int $fromTime
@@ -466,6 +269,7 @@ class DateTime {
     }
 
     /**
+     * Date::now()->isBetween($fromTime, $toTime)
      * Returns true if the current Time is between the from and to Times
      * @param int $fromTime
      * @param int $toTime
@@ -478,6 +282,7 @@ class DateTime {
 
 
     /**
+     * Date::create($time)->format($format)
      * Formats the Time using the given Time Zone
      * @param mixed      $time
      * @param string     $format
@@ -493,6 +298,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($time)->toString($format)
      * Returns the Time as a string
      * @param mixed      $time
      * @param DateFormat $format
@@ -504,6 +310,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($time)->toISOString()
      * Returns the Time as a ISO date string
      * @param mixed      $time     Optional.
      * @param float|null $timeZone Optional.
@@ -514,6 +321,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($time)->toUTCString()
      * Returns the Time as a UTC date string
      * @param mixed      $time
      * @param float|null $timeZone Optional.
@@ -524,6 +332,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($fromTime)->toHourPeriodString($toTime)
      * Returns the Hour Period as a string
      * @param int        $fromTime
      * @param int        $toTime
@@ -537,6 +346,7 @@ class DateTime {
     }
 
     /**
+     * Date::create($seconds)->toTimeString()
      * Returns the Seconds as a string
      * @param int $seconds
      * @return string
@@ -579,6 +389,7 @@ class DateTime {
     }
 
     /**
+     * DateUtils::getDayString($seconds)
      * Returns the Seconds as a days string
      * @param int $seconds
      * @return string
@@ -611,6 +422,7 @@ class DateTime {
     }
 
     /**
+     * DateUtils::getMinString($minutes, $decimals)
      * Returns the Minutes as a string
      * @param int|float $minutes
      * @param int       $decimals Optional.
@@ -631,6 +443,7 @@ class DateTime {
     }
 
     /**
+     * DateUtils::getSecString($seconds, $decimals)
      * Returns the Seconds as a string
      * @param int $seconds
      * @param int $decimals Optional.
@@ -648,6 +461,8 @@ class DateTime {
 
 
     /**
+     * Date::now()->subtract(months: $months)
+     * Date::create($timeStamp)->subtract(months: $months)
      * Returns the Time Stamp minus x months
      * @param int  $months
      * @param int  $timeStamp   Optional.
@@ -660,10 +475,12 @@ class DateTime {
         $month     = self::getMonth($timeStamp) - $months;
         $year      = self::getYear($timeStamp);
         $result    = self::createTime($day, $month, $year);
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::now()->subtract(days: $days)
+     * Date::create($timeStamp)->subtract(days: $days)
      * Returns the Time Stamp minus x days
      * @param int  $days
      * @param int  $timeStamp   Optional.
@@ -673,10 +490,12 @@ class DateTime {
     public static function getLastXDays(int $days, int $timeStamp = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp - $days * 24 * 3600;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::now()->subtract(hours: $hours)
+     * Date::create($timeStamp)->subtract(hours: $hours)
      * Returns the Time Stamp minus x hours
      * @param int  $hours
      * @param int  $timeStamp   Optional.
@@ -686,10 +505,12 @@ class DateTime {
     public static function getLastXHours(int $hours, int $timeStamp = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp - $hours * 3600;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::now()->subtract(minutes: $minutes)
+     * Date::create($timeStamp)->subtract(minutes: $minutes)
      * Returns the Time Stamp minus x minutes
      * @param int  $minutes
      * @param int  $timeStamp   Optional.
@@ -699,12 +520,14 @@ class DateTime {
     public static function getLastXMinutes(int $minutes, int $timeStamp = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp - $minutes * 60;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
 
 
     /**
+     * Date::now()->add(months: $months)
+     * Date::create($timeStamp)->add(months: $months)
      * Returns the Time Stamp plus x months
      * @param int  $months
      * @param int  $timeStamp   Optional.
@@ -716,6 +539,8 @@ class DateTime {
     }
 
     /**
+     * Date::now()->add(days: $days)
+     * Date::create($timeStamp)->add(days: $days)
      * Returns the Time Stamp plus x days
      * @param int  $days
      * @param int  $timeStamp   Optional.
@@ -727,6 +552,8 @@ class DateTime {
     }
 
     /**
+     * Date::now()->add(hours: $hours)
+     * Date::create($timeStamp)->add(hours: $hours)
      * Returns the Time Stamp plus x hours
      * @param int  $hours
      * @param int  $timeStamp   Optional.
@@ -738,6 +565,8 @@ class DateTime {
     }
 
     /**
+     * Date::now()->add(minutes: $minutes)
+     * Date::create($timeStamp)->add(minutes: $minutes)
      * Returns the Time Stamp plus x minutes
      * @param int  $minutes
      * @param int  $timeStamp   Optional.
@@ -751,6 +580,7 @@ class DateTime {
 
 
     /**
+     * Date::createOrNow($timeStamp)->getMonth()
      * Returns the Month for the given Time Stamp
      * @param int $timeStamp Optional.
      * @return int
@@ -761,6 +591,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->getMonthZero()
      * Returns the Month for the given Time Stamp with leading zero (01 to 12)
      * @param int $timeStamp Optional.
      * @return string
@@ -771,6 +602,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->getMonthDays()
      * Returns the amount of days in the Month for the given Time Stamp
      * @param int $timeStamp Optional.
      * @return int
@@ -781,6 +613,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->isCurrentMonth()
      * Returns true if the given time is the current month
      * @param int        $timeStamp Optional.
      * @param float|null $timeZone  Optional.
@@ -796,6 +629,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->toMonthStart()
      * Returns the Time Stamp of the start of the Month
      * @param int  $timeStamp   Optional.
      * @param int  $monthDiff   Optional.
@@ -807,10 +641,11 @@ class DateTime {
         $month     = self::getMonth($timeStamp) + $monthDiff;
         $year      = self::getYear($timeStamp);
         $result    = self::createTime(1, $month, $year);
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp)->toMonthEnd()
      * Returns the Time Stamp of the end of the Month
      * @param int  $timeStamp   Optional.
      * @param int  $monthDiff   Optional.
@@ -819,7 +654,7 @@ class DateTime {
      */
     public static function getMonthEnd(int $timeStamp = 0, int $monthDiff = 0, bool $useTimeZone = false): int {
         $result = self::getMonthStart($timeStamp, $monthDiff + 1) - 1;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
@@ -841,10 +676,11 @@ class DateTime {
         $increase    = $thisWeekDay > $weekDay ? 7 : 0;
         $days        = $dayPosition * 7 + $weekDay + $increase;
         $result      = self::getWeekStart($timeStamp, $days);
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp)->add(months: $months)
      * Add the given Months to the given Time Stamp
      * @param int  $timeStamp   Optional.
      * @param int  $monthDiff   Optional.
@@ -867,10 +703,11 @@ class DateTime {
             (int)date("i", $timeStamp),
             (int)date("s", $timeStamp),
         );
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp1)->getMonthsDiff($timeStamp2)
      * Returns the difference between 2 Time Stamps in Months
      * @param int $timeStamp1
      * @param int $timeStamp2
@@ -895,32 +732,8 @@ class DateTime {
         bool $inUpperCase = false,
         string $language = "",
     ): string {
-        return self::getMonthName(self::getMonth($timeStamp), $length, $inUpperCase, $language) . " " .
+        return DateUtils::getMonthName(self::getMonth($timeStamp), $length, $inUpperCase, $language) . " " .
             self::getYear($timeStamp);
-    }
-
-    /**
-     * Returns the Month name for the given Month
-     * @param int    $month
-     * @param int    $length      Optional.
-     * @param bool   $inUpperCase Optional.
-     * @param string $language    Optional.
-     * @return string
-     */
-    public static function getMonthName(
-        int $month,
-        int $length = 0,
-        bool $inUpperCase = false,
-        string $language = "",
-    ): string {
-        $result = NLS::getIndex("DATE_TIME_MONTHS", $month - 1, $language);
-        if ($length > 0) {
-            $result = Strings::substring($result, 0, $length);
-        }
-        if ($inUpperCase) {
-            $result = Strings::toUpperCase($result);
-        }
-        return $result;
     }
 
     /**
@@ -930,12 +743,13 @@ class DateTime {
      * @return string
      */
     public static function getShortMonth(int $month, string $language = ""): string {
-        return self::getMonthName($month, 3, true, $language);
+        return DateUtils::getMonthName($month, 3, true, $language);
     }
 
 
 
     /**
+     * Date::createOrNow($timeStamp)->getYear()
      * Returns the Year for the given Time Stamp
      * @param int $timeStamp Optional.
      * @return int
@@ -946,6 +760,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->getYearDays()
      * Returns the amount of days in the Year for the given Time Stamp
      * @param int $timeStamp Optional.
      * @return int
@@ -957,6 +772,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->add(years: $yearDiff)->set(month: $month, day: $day)
      * Add the given Years to the given Time Stamp
      * @param int  $timeStamp   Optional.
      * @param int  $yearDiff    Optional.
@@ -981,12 +797,13 @@ class DateTime {
             (int)date("i", $timeStamp),
             (int)date("s", $timeStamp),
         );
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
 
 
     /**
+     * Date::createOrNow($timeStamp)->toWeekStart()
      * Returns the Time Stamp of the start of the Week
      * @param int  $timeStamp   Optional.
      * @param int  $dayDiff     Optional.
@@ -1005,10 +822,11 @@ class DateTime {
         $month     = self::getMonth($timeStamp);
         $year      = self::getYear($timeStamp);
         $result    = self::createTime($startDay + $dayDiff, $month, $year);
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp)->getWeeksDiff()
      * Returns the difference between 2 Time Stamps in Weeks
      * @param int $timeStamp1
      * @param int $timeStamp2
@@ -1021,6 +839,7 @@ class DateTime {
 
 
     /**
+     * Date::createOrNow($timeStamp)->getDay()
      * Returns the Day for the given Time Stamp
      * @param int $timeStamp Optional.
      * @return int
@@ -1031,6 +850,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->getDayZero()
      * Returns the Day for the given Time Stamp with leading 0 (01 to 31)
      * @param int $timeStamp Optional.
      * @return string
@@ -1041,6 +861,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->getDayOfWeek()
      * Returns the Day of Week of the given Time Stamp
      * @param int        $timeStamp   Optional.
      * @param bool       $startMonday Optional.
@@ -1057,6 +878,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->toDayStart()
      * Returns the Time Stamp of the start of the day
      * @param int  $timeStamp   Optional.
      * @param int  $dayDiff     Optional.
@@ -1069,10 +891,11 @@ class DateTime {
         $month     = self::getMonth($timeStamp);
         $year      = self::getYear($timeStamp);
         $result    = self::createTime($day, $month, $year);
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp)->toDayEnd()
      * Returns the Time Stamp of the end of the day
      * @param int  $timeStamp   Optional.
      * @param int  $dayDiff     Optional.
@@ -1085,10 +908,11 @@ class DateTime {
         $month     = self::getMonth($timeStamp);
         $year      = self::getYear($timeStamp);
         $result    = self::createTime($day, $month, $year, 23, 59, 59);
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp)->add(days: $dayDiff)
      * Add the given Days to the given Time Stamp
      * @param int  $timeStamp   Optional.
      * @param int  $dayDiff     Optional.
@@ -1098,10 +922,11 @@ class DateTime {
     public static function addDays(int $timeStamp = 0, int $dayDiff = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp + $dayDiff * 24 * 3600;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp1)->getDaysDiff($timeStamp2)
      * Returns the difference between 2 Time Stamps in Days
      * @param int $timeStamp1
      * @param int $timeStamp2
@@ -1112,6 +937,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->getDayName()
      * Returns the Day name at the given Time Stamp
      * @param int        $timeStamp   Optional.
      * @param bool       $startMonday Optional.
@@ -1126,7 +952,7 @@ class DateTime {
         string $language = "",
     ): string {
         $dayOfWeek = self::getDayOfWeek($timeStamp, $startMonday, $timeZone);
-        return self::getDayName($dayOfWeek, $startMonday, language: $language);
+        return DateUtils::getDayName($dayOfWeek, $startMonday, language: $language);
     }
 
     /**
@@ -1156,34 +982,7 @@ class DateTime {
     }
 
     /**
-     * Returns the Day name at the given Day
-     * @param int    $day
-     * @param bool   $startMonday Optional.
-     * @param int    $length      Optional.
-     * @param bool   $inUpperCase Optional.
-     * @param string $language    Optional.
-     * @return string
-     */
-    public static function getDayName(
-        int $day,
-        bool $startMonday = false,
-        int $length = 0,
-        bool $inUpperCase = false,
-        string $language = "",
-    ): string {
-        $key    = $startMonday ? "DATE_TIME_DAYS_MONDAY" : "DATE_TIME_DAYS";
-        $result = NLS::getIndex($key, $day, $language);
-
-        if ($length > 0) {
-            $result = Strings::substring($result, 0, $length, true);
-        }
-        if ($inUpperCase) {
-            $result = Strings::toUpperCase($result);
-        }
-        return $result;
-    }
-
-    /**
+     * Date::createOrNow($timeStamp)->getDayMonth()
      * Returns the Day and Month for the given Time Stamp
      * @param int    $timeStamp
      * @param int    $length      Optional.
@@ -1199,12 +998,13 @@ class DateTime {
     ): string {
         $day   = self::getDayZero($timeStamp);
         $month = self::getMonth($timeStamp);
-        return "$day " . self::getMonthName($month, $length, $inUpperCase, $language);
+        return "$day " . DateUtils::getMonthName($month, $length, $inUpperCase, $language);
     }
 
 
 
     /**
+     * Date::createOrNow($timeStamp)->getHour()
      * Returns the Hour of the given Time Stamp
      * @param int $timeStamp Optional.
      * @return int
@@ -1215,6 +1015,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp)->add(hours: $hourDiff)
      * Adds the given Hours to the given Time Stamp
      * @param int  $timeStamp   Optional.
      * @param int  $hourDiff    Optional.
@@ -1224,10 +1025,11 @@ class DateTime {
     public static function addHours(int $timeStamp = 0, int $hourDiff = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp + $hourDiff * 3600;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp1)->getHoursDiff($timeStamp2)
      * Returns the difference between 2 Time Stamps in Hours
      * @param int $timeStamp1
      * @param int $timeStamp2
@@ -1240,6 +1042,7 @@ class DateTime {
 
 
     /**
+     * Date::createOrNow($timeStamp)->add(minutes: $minuteDiff)
      * Adds the given Minutes to the given Time Stamp
      * @param int  $timeStamp   Optional.
      * @param int  $minuteDiff  Optional.
@@ -1249,10 +1052,11 @@ class DateTime {
     public static function addMinutes(int $timeStamp = 0, int $minuteDiff = 0, bool $useTimeZone = false): int {
         $timeStamp = self::getTime($timeStamp);
         $result    = $timeStamp + $minuteDiff * 60;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
+     * Date::createOrNow($timeStamp1)->set($timeDiff)
      * Adds the given Time to the given Time Stamp
      * @param int    $timeStamp   Optional.
      * @param string $timeDiff    Optional.
@@ -1263,7 +1067,7 @@ class DateTime {
         $timeStamp = self::getTime($timeStamp);
         $minutes   = self::timeToMinutes($timeDiff);
         $result    = $timeStamp + $minutes * 60;
-        return self::toServerTime($result, $useTimeZone);
+        return TimeZone::toServerTime($result, $useTimeZone);
     }
 
     /**
@@ -1280,13 +1084,14 @@ class DateTime {
             $result = $hours * 60 + $minutes;
         }
         if ($timeZone !== null) {
-            $timeDiff = self::$serverZone - $timeZone;
+            $timeDiff = TimeZone::calcTimeDiff($timeZone);
             $result  += Numbers::roundInt($timeDiff * 60);
         }
         return $result;
     }
 
     /**
+     * Date::createOrNow($timeStamp)->toMinutes()
      * Converts a Time Stamp to Minutes
      * @param int        $timeStamp
      * @param float|null $timeZone  Optional.
@@ -1300,6 +1105,7 @@ class DateTime {
     }
 
     /**
+     * DateUtils::timeToMinutes($time)
      * Converts a Time to Minutes
      * @param string     $time
      * @param float|null $timeZone Optional.
@@ -1314,6 +1120,7 @@ class DateTime {
     }
 
     /**
+     * DateUtils::minutesToTime($minutes)
      * Converts the Minutes to a Time
      * @param int $minutes
      * @return string
@@ -1325,6 +1132,7 @@ class DateTime {
     }
 
     /**
+     * Date::createOrNow($timeStamp1)->getMinsDiff($timeStamp2)
      * Returns the difference between 2 Time Stamps in Minutes
      * @param int $timeStamp1
      * @param int $timeStamp2
@@ -1337,6 +1145,7 @@ class DateTime {
 
 
     /**
+     * Date::createOrNow($timeStamp)->getAge($nowTimeStamp)
      * Returns the amount of years between given date and today AKA the age
      * @param mixed      $ageTime
      * @param mixed|null $nowTime  Optional.
@@ -1372,172 +1181,5 @@ class DateTime {
      */
     public static function parseTime(int|float $time): string {
         return $time < 10 ? "0{$time}" : (string)$time;
-    }
-
-    /**
-     * Parses the Time Zone
-     * @param float $timeZone
-     * @return string
-     */
-    public static function parseTimeZone(float $timeZone): string {
-        $sign    = $timeZone < 0 ? "-" : "+";
-        $time    = abs($timeZone * 60);
-        $hours   = floor($time / 60);
-        $minutes = $time - $hours * 60;
-
-        return "GMT $sign$hours:" . self::parseTime($minutes);
-    }
-
-
-
-    /**
-     * Parses a text into a Time Stamp
-     * @param string $text
-     * @param string $language Optional.
-     * @return int
-     */
-    public static function parseDate(string $text, string $language = ""): int {
-        $glue = "";
-        if (Strings::contains($text, "/")) {
-            $glue = "/";
-        } elseif (Strings::contains($text, "-")) {
-            $glue = "-";
-        }
-
-        if ($glue !== "") {
-            return self::parseDateGlue($text, $glue);
-        }
-        return self::parseDateLang($text, $language);
-    }
-
-    /**
-     * Parses a text with the given glue into a Time Stamp
-     * @param string $text
-     * @param string $glue
-     * @return int
-     */
-    private static function parseDateGlue(string $text, string $glue): int {
-        $parts  = Strings::split($text, $glue);
-        $amount = count($parts);
-        $part0  = isset($parts[0]) ? (int)$parts[0] : 0;
-        $part1  = isset($parts[1]) ? (int)$parts[1] : 0;
-        $part2  = isset($parts[2]) ? (int)$parts[2] : 0;
-
-        // We need at least 2 parts
-        if ($part0 === 0 || $part1 === 0) {
-            return 0;
-        }
-
-        // Start with the current year and the given month and day
-        $day   = $part0;
-        $month = $part1;
-        $year  = self::getYear();
-
-        // Invert the order
-        if ($amount === 3 && $part0 > 1000) {
-            $day   = $part2;
-            $month = $part1;
-            $year  = $part0;
-        } else {
-            // Handle invalid months
-            if ($month > 12) {
-                $monthStr = (string)$month;
-                switch (Strings::length($monthStr)) {
-                case 3:
-                    $month = (int)Strings::substring($monthStr, 0, 1);
-                    $part2 = Strings::substring($monthStr, 1, 3);
-                    break;
-                case 4:
-                    $month = (int)Strings::substring($monthStr, 0, 2);
-                    $part2 = Strings::substring($monthStr, 2, 4);
-                    break;
-                case 5:
-                    $month = (int)Strings::substring($monthStr, 0, 1);
-                    $year  = (int)Strings::substring($monthStr, 1, 5);
-                    $part2 = 0;
-                    break;
-                case 6:
-                    $month = (int)Strings::substring($monthStr, 0, 2);
-                    $year  = (int)Strings::substring($monthStr, 2, 6);
-                    $part2 = 0;
-                    break;
-                default:
-                }
-            }
-
-            // Handle the Year
-            if ($part2 !== 0 && $part2 !== "") {
-                $yearStr = trim((string)$part2);
-                if (Strings::length($yearStr) === 2) {
-                    if ((int)$yearStr >= 50) {
-                        $year = (int)"19$yearStr";
-                    } else {
-                        $year = (int)"20$yearStr";
-                    }
-                } else {
-                    $year = (int)$yearStr;
-                }
-            }
-        }
-
-        // Something is still wrong
-        if ($month > 12 || $year > 2100) {
-            return 0;
-        }
-
-        // Return the Time Stamp
-        return self::createTime($day, $month, $year);
-    }
-
-    /**
-     * Parses a text with a language into a Time Stamp
-     * @param string $text
-     * @param string $language
-     * @return int
-     */
-    public static function parseDateLang(string $text, string $language): int {
-        $year  = self::getYear();
-        $month = 0;
-        $day   = 0;
-
-        $numbers = Strings::getAllMatches($text, "!\d+!");
-        $numbers = Arrays::toInts($numbers);
-        if (count($numbers) === 0) {
-            return 0;
-        }
-
-        $monthNames = NLS::getList("DATE_TIME_MONTHS", $language);
-        foreach ($monthNames as $index => $monthName) {
-            if (Strings::containsCaseInsensitive($text, $monthName, Strings::substring($monthName, 0, 3))) {
-                $month = (int)$index + 1;
-                break;
-            }
-        }
-        if ($month === 0) {
-            return 0;
-        }
-
-        foreach ($numbers as $number) {
-            if ($number <= 0) {
-                continue;
-            }
-            if ($day === 0 && $number <= 31) {
-                $day = $number;
-            } elseif ($number >= 1000) {
-                $year = $number;
-            } elseif ($number >= 100) {
-                $year = (int)"1$number";
-            } elseif ($number >= 50) {
-                $year = (int)"19$number";
-            } else {
-                $year = (int)"20$number";
-            }
-        }
-
-        if ($day === 0 || $year > 2100) {
-            return 0;
-        }
-
-        return self::createTime($day, $month, $year);
     }
 }
