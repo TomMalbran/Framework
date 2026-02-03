@@ -111,7 +111,7 @@ class NLS {
     public static function getMap(string $key, string $language = ""): array {
         $data = self::load($language);
         $dict = $data->getDict($key);
-        return $dict->toMap();
+        return $dict->toStringsMap();
     }
 
     /**
@@ -123,7 +123,7 @@ class NLS {
     public static function getSelect(string $key, string $language = ""): array {
         $data = self::load($language);
         $dict = $data->getDict($key);
-        $map  = $dict->toMap();
+        $map  = $dict->toStringsMap();
         return Select::createFromMap($map);
     }
 

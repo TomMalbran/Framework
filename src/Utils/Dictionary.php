@@ -393,18 +393,34 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the data as a Map
+     * Returns the data as a Map of string keys and values
      * @return array<string,string>
      */
-    public function toMap(): array {
+    public function toStringsMap(): array {
         return Arrays::toStringsMap($this->data);
     }
 
     /**
-     * Returns the data as a Mixed Map
+     * Returns the data as a Map of int keys and string values
+     * @return array<int,string>
+     */
+    public function toIntStringMap(): array {
+        return Arrays::toIntStringMap($this->data);
+    }
+
+    /**
+     * Returns the data as a Map of string keys and int values
+     * @return array<string,int>
+     */
+    public function toStringIntMap(): array {
+        return Arrays::toStringIntMap($this->data);
+    }
+
+    /**
+     * Returns the data as a Map of string keys and mixed values
      * @return array<string,mixed>
      */
-    public function toMixedMap(): array {
+    public function toStringMixedMap(): array {
         return Arrays::toStringMixedMap($this->data);
     }
 
