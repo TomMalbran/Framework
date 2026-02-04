@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database\Type;
 
-use Framework\Request;
 use Framework\Discovery\Discovery;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
@@ -16,108 +15,21 @@ use JsonSerializable;
  */
 class Entity implements JsonSerializable {
 
-    protected const ID = "";
-
-    private bool $isEmpty = true;
-    private bool $isEdit  = false;
+    protected bool $isEmpty = true;
 
 
 
     /**
      * Creates a new Entity instance
-     * @param mixed $data Optional.
+     * @param Dictionary $data
      */
-    public function __construct(mixed $data = null) {
-        if ($data === null) {
-            return;
-        }
-
+    public function __construct(Dictionary $data) {
         foreach ($this->getPropertiesTypes() as $property => $type) {
-            if ($data instanceof Request) {
-                $added = $this->addFromRequest($data, $property, $type);
-            } elseif ($data instanceof Dictionary) {
-                $added = $this->addFromDictionary($data, $property, $type);
-            } else {
-                $added = $this->addFromObject($data, $property, $type);
-            }
+            $added = $this->setValue($data, $property, $type);
             if ($added) {
                 $this->isEmpty = false;
             }
         }
-    }
-
-    /**
-     * Adds a value from an Object or Array
-     * @param mixed  $data
-     * @param string $property
-     * @param string $type
-     * @return bool
-     */
-    private function addFromObject(mixed $data, string $property, string $type): bool {
-        $value = Arrays::getOneValue($data, $property);
-        if ($value === null) {
-            return false;
-        }
-
-        switch ($type) {
-        case Date::class:
-            $this->$property = Date::create($value);
-            break;
-        case "int":
-            $this->$property = Numbers::toInt($value);
-            break;
-        case "float":
-            $this->$property = Numbers::toFloat($value);
-            break;
-        default:
-            $this->$property = $value;
-        }
-        return true;
-    }
-
-    /**
-     * Adds a value from a Request
-     * @param Request $request
-     * @param string  $property
-     * @param string  $type
-     * @return bool
-     */
-    private function addFromRequest(Request $request, string $property, string $type): bool {
-        if (!$request->exists($property)) {
-            return false;
-        }
-
-        if ($property === static::ID && property_exists($this, "id")) {
-            if (is_numeric($request->get($property))) {
-                $this->{"id"} = $request->getInt($property);
-            } else {
-                $this->{"id"} = $request->getString($property);
-            }
-            if ($this->{"id"} !== "" && $this->{"id"} !== 0) {
-                $this->isEdit = true;
-            }
-        }
-
-        switch ($type) {
-        case Date::class:
-            $this->$property = $request->toDate($property);
-            break;
-        case "bool":
-            $this->$property = $request->has($property);
-            break;
-        case "int":
-            $this->$property = $request->getInt($property);
-            break;
-        case "float":
-            $this->$property = $request->getFloat($property);
-            break;
-        case "string":
-            $this->$property = $request->getString($property);
-            break;
-        default:
-            $this->$property = $request->get($property);
-        }
-        return true;
     }
 
     /**
@@ -127,20 +39,9 @@ class Entity implements JsonSerializable {
      * @param string     $type
      * @return bool
      */
-    private function addFromDictionary(Dictionary $data, string $property, string $type): bool {
+    private function setValue(Dictionary $data, string $property, string $type): bool {
         if (!$data->has($property)) {
             return false;
-        }
-
-        if ($property === static::ID && property_exists($this, "id")) {
-            if (is_numeric($data->getString($property))) {
-                $this->{"id"} = $data->getInt($property);
-            } else {
-                $this->{"id"} = $data->getString($property);
-            }
-            if ($this->{"id"} !== "" && $this->{"id"} !== 0) {
-                $this->isEdit = true;
-            }
         }
 
         switch ($type) {
@@ -160,7 +61,11 @@ class Entity implements JsonSerializable {
             $this->$property = $data->getString($property);
             break;
         default:
-            $this->$property = $data->getArray($property);
+            if (Strings::endsWith($type, "Status")) {
+                $this->$property = $type::fromValue($data->getString($property));
+            } else {
+                $this->$property = $data->getArray($property);
+            }
         }
         return true;
     }
@@ -197,14 +102,6 @@ class Entity implements JsonSerializable {
      */
     final public function isEmpty(): bool {
         return $this->isEmpty;
-    }
-
-    /**
-     * Returns true if the Entity is being Edited
-     * @return bool
-     */
-    final public function isEdit(): bool {
-        return $this->isEdit;
     }
 
     /**
@@ -292,29 +189,28 @@ class Entity implements JsonSerializable {
 
 
     /**
+     * Returns the Data as a Dictionary
+     * @return Dictionary
+     */
+    public function toDictionary(): Dictionary {
+        $result = new Dictionary();
+        foreach ($this->getProperties() as $property) {
+            $result->set($property, $this->$property);
+        }
+        return $result;
+    }
+
+    /**
      * Returns the Data as an Array
      * @param array{} $extraData
      * @return array{}
      */
-    final public function toArray(array $extraData = []): array {
+    public function toArray(array $extraData = []): array {
         $result = [];
         foreach ($this->getProperties() as $property) {
             $result[$property] = $this->$property;
         }
         return $result + $extraData;
-    }
-
-    /**
-     * Returns only the requested Fields
-     * @param string ...$fields
-     * @return array{}
-     */
-    final public function toFields(string ...$fields): array {
-        $result = [];
-        foreach ($fields as $field) {
-            $result[$field] = $this->$field;
-        }
-        return $result;
     }
 
     /**

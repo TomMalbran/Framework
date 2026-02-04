@@ -1,39 +1,86 @@
 <?php
 namespace {{namespace}};
 
-{{#subTypes}}use {{namespace}}\{{type}}Entity;
-{{/subTypes}}
+{{#imports}}use {{.}};
+{{/imports}}{{#hasImports}}
+{{/hasImports}}
 use Framework\Database\Type\Entity;{{#hasDates}}
 use Framework\Date\Date;{{/hasDates}}
+use Framework\Utils\Dictionary;
 
 /**
  * The {{name}} Entity
  */
 class {{entityClass}} extends Entity {
 
-    protected const ID = "{{id}}";
-{{#categories}}
+{{#hasID}}
+    {{#hasIntID}}
+    public int $id = 0;
+    {{/hasIntID}}
+    {{#hasStringID}}
+    public string $id = "";
+    {{/hasStringID}}
 
 
+{{/hasID}}
+{{#properties}}
     // {{name}} Fields
-{{#attributes}}{{#subType}}
+{{#list}}{{#subType}}
     /** @var {{{subType}}} */
 {{/subType}}    public {{type}} ${{name}}{{#hasDefault}} = {{{default}}}{{/hasDefault}};
-{{/attributes}}
-{{/categories}}
-{{#hasDates}}
+{{/list}}
 
 
+{{/properties}}
 
     /**
      * Creates a new {{name}} Entity instance
-     * @param mixed $data Optional.
+     * @param Dictionary|null $data Optional.{{#attributes}}
+     * @param {{{docType}}} ${{name}} Optional.{{/attributes}}{{#dates}}
+     * @param Date|null ${{.}} Optional.{{/dates}}{{#hasStatus}}
+     * @param {{statusClass}} $status Optional.{{/hasStatus}}
      */
-    public function __construct(mixed $data = null) {
+    public function __construct(
+        ?Dictionary $data = null,{{#attributes}}
+        {{type}} ${{name}}{{#hasDefault}} = {{{default}}}{{/hasDefault}},{{/attributes}}{{#dates}}
+        ?Date ${{.}} = null,{{/dates}}{{#hasStatus}}
+        {{statusClass}} $status = {{statusClass}}::None,{{/hasStatus}}
+    ) {
+        // Set the Main Fields
+        {{#attributes}}
+        $this->{{name}} = ${{name}};
+        {{/attributes}}
+
+        {{#hasDates}}
+        // Set the Dates
         {{#dates}}
-        $this->{{.}} = Date::empty();
+        $this->{{.}} = ${{.}} ?? Date::empty();
         {{/dates}}
-        parent::__construct($data);
+        {{/hasDates}}
+
+        // Set all the Fields using the Dictionary
+        if ($data !== null) {
+            parent::__construct($data);
+            {{#subTypes}}
+            foreach ($data->getList("{{name}}") as $index => $subData) {
+                $this->{{name}}[$index] = new {{type}}Entity($subData);
+            }
+            {{/subTypes}}
+        }
+        {{#hasStatus}}
+
+        // Set the Status
+        if ($status !== {{statusClass}}::None) {
+            $this->status = $status;
+        }
+        $this->statusName  = {{statusClass}}::getName($this->status);
+        $this->statusColor = {{statusClass}}::getColor($this->status);
+        {{/hasStatus}}
+        {{#hasID}}
+
+        // Set ID and isEmpty
+        $this->id = $this->{{idName}};
+        $this->isEmpty = $this->id === {{#hasIntID}}0{{/hasIntID}}{{#hasStringID}}""{{/hasStringID}};
+        {{/hasID}}
     }
-{{/hasDates}}
 }

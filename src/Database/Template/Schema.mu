@@ -9,8 +9,6 @@ namespace {{namespace}};
 {{#hasSubRequests}}
 {{#subSchemas}}use {{namespace}}\{{type}}Schema;
 {{/subSchemas}}
-{{#subTypes}}use {{namespace}}\{{type}}Entity;
-{{/subTypes}}
 
 {{/hasSubRequests}}
 use {{namespace}}\{{entityClass}};
@@ -287,24 +285,13 @@ class {{name}}Schema extends Schema {
      * @param Dictionary $data
      * @return {{entityClass}}
      */
-    protected static function constructEntity(array $data): {{entity}} {
+    protected static function constructEntity(Dictionary $data): {{entityClass}} {
         $entity = new {{entityClass}}($data);
-        {{#processEntity}}
+        {{#hasVirtual}}
         if ($entity->exists()) {
-            {{#subTypes}}
-            foreach ($entity->{{name}} as $index => $subEntity) {
-                $entity->{{name}}[$index] = new {{type}}Entity($subEntity);
-            }
-            {{/subTypes}}
-            {{#hasStatus}}
-            $entity->statusName  = {{status}}::getName($entity->status);
-            $entity->statusColor = {{status}}::getColor($entity->status);
-            {{/hasStatus}}
-            {{#hasVirtual}}
             $entity = static::postProcess($entity);
-            {{/hasVirtual}}
         }
-        {{/processEntity}}
+        {{/hasVirtual}}
         return $entity;
     }
 
@@ -313,7 +300,7 @@ class {{name}}Schema extends Schema {
      * @param Dictionary $list
      * @return {{entityClass}}[]
      */
-    private static function constructEntities(Dictionary $list): array {
+    protected static function constructEntities(Dictionary $list): array {
         $result = [];
         foreach ($list as $data) {
             $result[] = self::constructEntity($data);

@@ -7,6 +7,7 @@ use Framework\Core\Schema\SettingsSchema;
 use Framework\Core\Schema\SettingsEntity;
 use Framework\Core\Schema\SettingsColumn;
 use Framework\Core\Schema\SettingsQuery;
+use Framework\Date\Date;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
@@ -217,15 +218,15 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
 
             if (!$found) {
                 $variables[] = "{$section}_{$variable}";
-                $fields      = [
-                    "section"      => $section,
-                    "variable"     => $variable,
-                    "value"        => VariableType::encodeValue($variableType, $value),
-                    "variableType" => $variableType->name,
-                    "modifiedTime" => time(),
-                ];
-                $list[] = new SettingsEntity($fields);
-                $adds[] = $fields;
+                $settings = new SettingsEntity(
+                    section:      $section,
+                    variable:     $variable,
+                    value:        VariableType::encodeValue($variableType, $value),
+                    variableType: $variableType->name,
+                    modifiedTime: Date::now(),
+                );
+                $list[] = $settings;
+                $adds[] = $settings;
             }
         }
 
@@ -255,10 +256,10 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
             print("    " . Strings::join($variables, ", ") . "\n");
             foreach ($adds as $add) {
                 self::replaceEntity(
-                    section:      $add["section"],
-                    variable:     $add["variable"],
-                    value:        $add["value"],
-                    variableType: $add["variableType"],
+                    section:      $add->section,
+                    variable:     $add->variable,
+                    value:        $add->value,
+                    variableType: $add->variableType,
                 );
             }
             $didUpdate = true;

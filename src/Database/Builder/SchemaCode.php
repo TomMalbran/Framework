@@ -27,13 +27,11 @@ class SchemaCode {
         $relations   = $schemaModel->toBuildData("relations");
         $subRequests = $schemaModel->toBuildData("subRequests");
 
-        $idType      = FieldType::getCodeType($schemaModel->idType);
+        $idType      = FieldType::getCodeType($schemaModel->idType, false);
         $fields      = self::getAllFields($schemaModel);
         $uniques     = self::getSomeFields($schemaModel, isUnique: true);
         $parents     = self::getSomeFields($schemaModel, isParent: true);
         $editParents = $schemaModel->hasPositions ? $parents : [];
-        $subSchemas  = self::getSubTypes($schemaModel, forSchemas: true);
-        $subTypes    = self::getSubTypes($schemaModel);
         $validations = self::getValidations($schemaModel);
         $valImports  = self::getValidationImports($schemaModel);
 
@@ -83,9 +81,7 @@ class SchemaCode {
             "canDelete"           => $schemaModel->canDelete,
             "canDeleteValue"      => $schemaModel->canDelete ? "true" : "false",
             "usesRequest"         => $schemaModel->usesRequest,
-            "subSchemas"          => $subSchemas,
-            "subTypes"            => $subTypes,
-            "processEntity"       => count($subTypes) > 0 || $hasVirtual || $schemaModel->hasStatus,
+            "subSchemas"          => self::getSubSchemas($schemaModel),
             "hasVirtual"          => $hasVirtual,
             "mainFields"          => $mainFields,
             "hasExpressions"      => count($expressions) > 0,
@@ -118,10 +114,9 @@ class SchemaCode {
     /**
      * Returns the Sub Types from the Sub Requests
      * @param SchemaModel $schemaModel
-     * @param bool        $forSchemas  Optional.
      * @return array{name:string,type:string,namespace:string}[]
      */
-    private static function getSubTypes(SchemaModel $schemaModel, bool $forSchemas = false): array {
+    private static function getSubSchemas(SchemaModel $schemaModel): array {
         $models = [];
         $result = [];
 
@@ -131,14 +126,12 @@ class SchemaCode {
                 continue;
             }
 
-            if ($forSchemas || $subRequest->type === "") {
-                $models[] = $model;
-                $result[] = [
-                    "name"      => $subRequest->name,
-                    "type"      => $subRequest->modelName,
-                    "namespace" => $subRequest->namespace,
-                ];
-            }
+            $models[] = $model;
+            $result[] = [
+                "name"      => $subRequest->name,
+                "type"      => $subRequest->modelName,
+                "namespace" => $subRequest->namespace,
+            ];
         }
         return $result;
     }
@@ -203,7 +196,7 @@ class SchemaCode {
      * @return array<string,string>
      */
     private static function getField(Field $field): array {
-        $type      = FieldType::getCodeType($field->type);
+        $type      = FieldType::getCodeType($field->type, false);
         $default   = FieldType::getDefault($type);
         $isDate    = $field->type === FieldType::Date;
         $canAssign = !$field->isID && !$field->isParent && !$isDate;

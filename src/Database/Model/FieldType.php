@@ -71,14 +71,16 @@ enum FieldType {
     /**
      * Returns the PHP Type from the given Field Type
      * @param FieldType $type
+     * @param bool      $forEntity
      * @return string
      */
-    public static function getCodeType(FieldType $type): string {
+    public static function getCodeType(FieldType $type, bool $forEntity = false): string {
         return match ($type) {
             FieldType::Date    => "Date",
             FieldType::Number  => "int",
             FieldType::Boolean => "bool",
             FieldType::Float   => "float",
+            FieldType::JSON    => $forEntity ? "mixed" : "string",
             default            => "string",
         };
     }
