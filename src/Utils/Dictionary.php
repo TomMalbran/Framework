@@ -69,19 +69,21 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the key exits in the data
-     * @param string $key
+     * @param string|int $key
      * @return bool
      */
-    public function has(string $key): bool {
+    public function has(string|int $key): bool {
+        $key = (string)$key;
         return isset($this->data[$key]);
     }
 
     /**
      * Returns true if the key exits and has a value in the data
-     * @param string $key
+     * @param string|int $key
      * @return bool
      */
-    public function hasValue(string $key): bool {
+    public function hasValue(string|int $key): bool {
+        $key = (string)$key;
         return !Arrays::isEmpty($this->data, $key);
     }
 
@@ -250,10 +252,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a single Dictionary
-     * @param string $key
+     * @param string|int $key
      * @return Dictionary
      */
-    public function getDict(string $key): Dictionary {
+    public function getDict(string|int $key): Dictionary {
+        $key = (string)$key;
         if (isset($this->data[$key])) {
             return new Dictionary($this->data[$key]);
         }
