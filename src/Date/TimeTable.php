@@ -53,14 +53,15 @@ class TimeTable {
 
         $timeTables = [];
         foreach ($data as $elem) {
-            if (!is_array($elem)) {
+            $days = Arrays::getOneValue($elem, "days");
+            $days = Arrays::sort(Arrays::toInts($days));
+
+            $from = Strings::toString(Arrays::getOneValue($elem, "from"));
+            $to   = Strings::toString(Arrays::getOneValue($elem, "to"));
+
+            if (count($days) === 0 && $from === "" && $to === "") {
                 continue;
             }
-
-            $days = isset($elem["days"]) ? Arrays::sort(Arrays::toInts($elem["days"])) : [];
-            $from = Strings::toString($elem["from"] ?? "");
-            $to   = Strings::toString($elem["to"]   ?? "");
-
             $timeTables[] = new TimeTableItem($days, $from, $to);
         }
         return new TimeTable($timeTables, $startMonday);
