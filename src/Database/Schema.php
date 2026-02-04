@@ -12,6 +12,7 @@ use Framework\Database\Model\SubRequest;
 use Framework\Database\Type\Assign;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
 use Framework\Utils\Search;
 use Framework\Utils\Select;
@@ -99,16 +100,16 @@ class Schema {
      * @param Query|int|string $query
      * @param bool             $withDeleted Optional.
      * @param bool             $decrypted   Optional.
-     * @return array{}
+     * @return Dictionary
      */
     protected static function getSchemaEntity(
         Query|int|string $query,
         bool $withDeleted = true,
         bool $decrypted = false,
-    ): array {
+    ): Dictionary {
         $query   = self::generateQueryID($query, $withDeleted)->limit(1);
         $request = self::requestSchemaData($query, decrypted: $decrypted);
-        return isset($request[0]) ? $request[0] : [];
+        return $request->getFirst();
     }
 
     /**
@@ -242,14 +243,14 @@ class Schema {
 
 
     /**
-     * Returns the Data using a basic Expression and Params
-     * @param string  $expression
-     * @param mixed[] $params     Optional.
-     * @return array<string,string|int>[]
+     * Returns the Data using a basic Expression and a Query
+     * @param Query  $query
+     * @param string $expression
+     * @return Dictionary
      */
-    protected static function getDataWithParams(string $expression, array $params = []): array {
+    protected static function getSchemaData(Query $query, string $expression): Dictionary {
         $expression = self::replaceTable($expression);
-        $request    = Framework::getDatabase()->getData($expression, $params);
+        $request    = Framework::getDatabase()->getDictionary($expression, $query);
         return $request;
     }
 
@@ -257,28 +258,12 @@ class Schema {
      * Returns the Data using a basic Expression and a Query
      * @param Query  $query
      * @param string $expression
-     * @return array<string,string|int>[]
+     * @return Dictionary
      */
-    protected static function getSchemaData(Query $query, string $expression): array {
+    protected static function getSchemaRow(Query $query, string $expression): Dictionary {
         $expression = self::replaceTable($expression);
-        $request    = Framework::getDatabase()->getData($expression, $query);
-        return $request;
-    }
-
-    /**
-     * Returns the Data using a basic Expression and a Query
-     * @param Query  $query
-     * @param string $expression
-     * @return array<string,string|int>
-     */
-    protected static function getSchemaRow(Query $query, string $expression): array {
-        $expression = self::replaceTable($expression);
-        $request    = Framework::getDatabase()->getData($expression, $query);
-
-        if (isset($request[0])) {
-            return $request[0];
-        }
-        return [];
+        $request    = Framework::getDatabase()->getDictionary($expression, $query);
+        return $request->getFirst();
     }
 
     /**
@@ -289,7 +274,7 @@ class Schema {
      * @param string[]     $joins          Optional.
      * @param bool         $decrypted      Optional.
      * @param bool         $skipSubRequest Optional.
-     * @return array{}[]
+     * @return Dictionary
      */
     protected static function getSchemaEntities(
         ?Query $query = null,
@@ -298,7 +283,7 @@ class Schema {
         array $joins = [],
         bool $decrypted = false,
         bool $skipSubRequest = false,
-    ): array {
+    ): Dictionary {
         $query   = self::generateQuerySort($query, $sort);
         $request = self::requestSchemaData($query, $selects, $joins, $decrypted, $skipSubRequest);
         return $request;
@@ -311,7 +296,7 @@ class Schema {
      * @param string[]             $joins          Optional.
      * @param bool                 $decrypted      Optional.
      * @param bool                 $skipSubRequest Optional.
-     * @return array{}[]
+     * @return Dictionary
      */
     private static function requestSchemaData(
         Query $query,
@@ -319,7 +304,7 @@ class Schema {
         array $joins = [],
         bool $decrypted = false,
         bool $skipSubRequest = false,
-    ): array {
+    ): Dictionary {
         $selection = new Selection(static::getModel());
         $selection->addFields($decrypted);
         $selection->addExpressions();
@@ -334,7 +319,7 @@ class Schema {
                 $result = $subRequest->request($result);
             }
         }
-        return $result;
+        return new Dictionary($result);
     }
 
 

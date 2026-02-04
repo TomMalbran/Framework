@@ -35,6 +35,7 @@ use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
 use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
 use Framework\Date\DateType;{{/hasDateType}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
+use Framework\Utils\Dictionary;
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
 use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
@@ -309,10 +310,10 @@ class {{name}}Schema extends Schema {
 
     /**
      * Constructs a list of {{name}} Entities
-     * @param array{}[] $list
+     * @param Dictionary $list
      * @return {{entityClass}}[]
      */
-    private static function constructEntities(array $list): array {
+    private static function constructEntities(Dictionary $list): array {
         $result = [];
         foreach ($list as $data) {
             $result[] = self::constructEntity($data);
@@ -640,9 +641,9 @@ class {{name}}Schema extends Schema {
      * Returns the Data using a basic Expression and a Query
      * @param {{queryClass}} $query
      * @param string $expression
-     * @return array<string,string|int>[]
+     * @return Dictionary
      */
-    protected static function getEntityData({{queryClass}} $query, string $expression): array {
+    protected static function getEntityData({{queryClass}} $query, string $expression): Dictionary {
         return self::getSchemaData($query->query, $expression);
     }
 
@@ -650,9 +651,9 @@ class {{name}}Schema extends Schema {
      * Returns the Data using a basic Expression and a Query
      * @param {{queryClass}} $query
      * @param string $expression
-     * @return array<string,string|int>
+     * @return Dictionary
      */
-    protected static function getEntityRow({{queryClass}} $query, string $expression): array {
+    protected static function getEntityRow({{queryClass}} $query, string $expression): Dictionary {
         return self::getSchemaRow($query->query, $expression);
     }
 
