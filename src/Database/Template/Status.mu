@@ -6,10 +6,12 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
+use JsonSerializable;
+
 /**
  * The {{name}} Status
  */
-enum {{statusClass}} {
+enum {{statusClass}} implements JsonSerializable {
 
     case None;
 
@@ -133,4 +135,14 @@ enum {{statusClass}} {
         return self::{{name}} === self::fromValue($value);
     }
 {{/statuses}}
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->name;
+    }
 }
