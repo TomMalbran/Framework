@@ -124,18 +124,6 @@ enum {{statusClass}} implements JsonSerializable {
     }
 
 
-{{#statuses}}
-
-    /**
-     * Returns true if the given value is the Status {{name}}
-     * @param {{statusClass}}|string $value
-     * @return bool
-     */
-    public static function is{{name}}({{statusClass}}|string $value): bool {
-        return self::{{name}} === self::fromValue($value);
-    }
-{{/statuses}}
-
 
     /**
      * Implements the JSON Serializable Interface
