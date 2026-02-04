@@ -138,16 +138,26 @@ class TimeTable {
 
     /**
      * Returns true if the Time Tables are in the Current time
-     * @param int $timeStamp Optional.
-     * @param int $minuteGap Optional.
+     * @param int  $minuteGap Optional.
+     * @param bool $skipTime  Optional.
      * @return bool
      */
-    public function isCurrent(int $timeStamp = 0, int $minuteGap = 0): bool {
+    public function isCurrent(int $minuteGap = 0, bool $skipTime = false): bool {
+        return $this->containDate(Date::now(), $minuteGap, $skipTime);
+    }
+
+    /**
+     * Returns true if the Time Tables contain the given Date
+     * @param Date $date
+     * @param int  $minuteGap Optional.
+     * @param bool $skipTime  Optional.
+     * @return bool
+     */
+    public function containDate(Date $date, int $minuteGap = 0, bool $skipTime = false): bool {
         if (count($this->timeTables) === 0) {
             return false;
         }
 
-        $date       = Date::createOrNow($timeStamp);
         $weekDay    = $date->getDayOfWeek($this->startMonday);
         $nowMinutes = $date->toMinutes();
 
@@ -159,7 +169,7 @@ class TimeTable {
             $fromMinutes = DateUtils::timeToMinutes($timeTable->from);
             $toMinutes   = DateUtils::timeToMinutes($timeTable->to) - $minuteGap;
 
-            if ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes) {
+            if ($skipTime || ($nowMinutes >= $fromMinutes && $nowMinutes <= $toMinutes)) {
                 return true;
             }
         }
