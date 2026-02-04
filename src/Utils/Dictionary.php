@@ -385,6 +385,24 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
 
     /**
+     * Creates a map from the list using the given key
+     * @param string $key
+     * @return Dictionary
+     */
+    public function createMap(string $key): Dictionary {
+        $result = new Dictionary();
+        if (array_is_list($this->data)) {
+            foreach ($this->data as $elem) {
+                $key = $this->getString($key);
+                if ($key !== "") {
+                    $result->set($key, $elem);
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Returns the data as an Array
      * @return array<string|int,mixed>
      */
