@@ -146,8 +146,8 @@ class QueryCode {
             return "{$status}Query";
         }
         return match ($type) {
-            FieldType::None    => "",
             FieldType::Date    => "DateQuery",
+            FieldType::Enum    => "EnumQuery",
             FieldType::Boolean => "BooleanQuery",
             FieldType::Number,
             FieldType::Float   => "NumberQuery",

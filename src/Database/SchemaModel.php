@@ -19,69 +19,70 @@ use Framework\Utils\Strings;
  */
 class SchemaModel {
 
-    public string $name          = "";
-    public string $tableName     = "";
-    public string $fantasyName   = "";
-    public string $path          = "";
-    public string $namespace     = "";
-    public bool   $fromFramework = false;
+    public string $name           = "";
+    public string $tableName      = "";
+    public string $fantasyName    = "";
+    public string $path           = "";
+    public string $namespace      = "";
+    public bool   $fromFramework  = false;
 
 
     // Special flags
-    public bool $hasUsers        = false;
-    public bool $hasTimestamps   = false;
-    public bool $hasPositions    = false;
-    public bool $hasStatus       = false;
-    public bool $canCreate       = false;
-    public bool $canEdit         = false;
-    public bool $canDelete       = false;
-    public bool $usesRequest     = true;
+    public bool $hasUsers         = false;
+    public bool $hasTimestamps    = false;
+    public bool $hasPositions     = false;
+    public bool $hasStatus        = false;
+    public bool $canCreate        = false;
+    public bool $canEdit          = false;
+    public bool $canDelete        = false;
+    public bool $usesRequest      = true;
 
 
     // Subclass Names
-    public string $entityClass   = "";
-    public string $columnClass   = "";
-    public string $queryClass    = "";
-    public string $statusClass   = "";
+    public string $entityClass    = "";
+    public string $columnClass    = "";
+    public string $queryClass     = "";
+    public string $statusClass    = "";
 
 
     // Main column data
-    public bool      $hasID      = false;
-    public bool      $hasAutoInc = false;
-    public string    $idName     = "";
-    public string    $idDbName   = "";
-    public FieldType $idType     = FieldType::None;
+    public bool      $hasID       = false;
+    public bool      $hasAutoInc  = false;
+    public string    $idName      = "";
+    public string    $idDbName    = "";
+    public FieldType $idType      = FieldType::String;
+    public string    $idEnumClass = "";
 
 
     /** @var Field[] */
-    public array $fields         = [];
+    public array $fields          = [];
 
     /** @var Field[] */
-    public array $mainFields     = [];
+    public array $mainFields      = [];
 
     /** @var Field[] */
-    public array $extraFields    = [];
+    public array $extraFields     = [];
 
     /** @var Validate[] */
-    public array $validates      = [];
+    public array $validates       = [];
 
     /** @var Virtual[] */
-    public array $virtualFields  = [];
+    public array $virtualFields   = [];
 
     /** @var Expression[] */
-    public array $expressions    = [];
+    public array $expressions     = [];
 
     /** @var Count[] */
-    public array $counts         = [];
+    public array $counts          = [];
 
     /** @var Relation[] */
-    public array $relations      = [];
+    public array $relations       = [];
 
     /** @var SubRequest[] */
-    public array $subRequests    = [];
+    public array $subRequests     = [];
 
     /** @var State[] */
-    public array $states         = [];
+    public array $states          = [];
 
 
 
@@ -236,11 +237,12 @@ class SchemaModel {
     public function setIDField(): bool {
         foreach ($this->mainFields as $field) {
             if ($field->isID) {
-                $this->hasID      = true;
-                $this->hasAutoInc = $field->isAutoInc();
-                $this->idName     = $field->name;
-                $this->idDbName   = $field->dbName;
-                $this->idType     = $field->type;
+                $this->hasID       = true;
+                $this->hasAutoInc  = $field->isAutoInc();
+                $this->idName      = $field->name;
+                $this->idDbName    = $field->dbName;
+                $this->idType      = $field->type;
+                $this->idEnumClass = $field->enumClass;
                 return true;
             }
         }

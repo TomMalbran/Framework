@@ -13,8 +13,9 @@ class Virtual {
 
 
     // Used internally when parsing the Model
-    public FieldType $type = FieldType::String;
-    public string    $name = "";
+    public FieldType $type      = FieldType::String;
+    public string    $name      = "";
+    public string    $enumClass = "";
 
 
     /**
@@ -29,12 +30,16 @@ class Virtual {
      * Sets the Data from the Model
      * @param string $name
      * @param string $typeName
+     * @param bool   $isEnum
      * @return Virtual
      */
-    public function setData(string $name, string $typeName): Virtual {
+    public function setData(string $name, string $typeName, bool $isEnum): Virtual {
         $this->name = $name;
 
-        if ($this->isJSON) {
+        if ($isEnum) {
+            $this->type      = FieldType::Enum;
+            $this->enumClass = $typeName;
+        } elseif ($this->isJSON) {
             $this->type = FieldType::JSON;
         } else {
             $this->type = FieldType::fromType($typeName);

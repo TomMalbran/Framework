@@ -20,6 +20,9 @@ class {{entityClass}} extends Entity {
     {{#hasStringID}}
     public string $id = "";
     {{/hasStringID}}
+    {{#hasEnumID}}
+    public {{idEnumName}} $id = {{idEnumName}}::None;
+    {{/hasEnumID}}
 
 
 {{/hasID}}
@@ -50,13 +53,13 @@ class {{entityClass}} extends Entity {
         {{#attributes}}
         $this->{{name}} = ${{name}};
         {{/attributes}}
+    {{#hasDates}}
 
-        {{#hasDates}}
         // Set the Dates
         {{#dates}}
         $this->{{.}} = ${{.}} ?? Date::empty();
         {{/dates}}
-        {{/hasDates}}
+    {{/hasDates}}
 
         // Set all the Fields using the Dictionary
         if ($data !== null) {
@@ -67,7 +70,7 @@ class {{entityClass}} extends Entity {
             }
             {{/subTypes}}
         }
-        {{#hasStatus}}
+    {{#hasStatus}}
 
         // Set the Status
         if ($status !== {{statusClass}}::None) {
@@ -75,12 +78,20 @@ class {{entityClass}} extends Entity {
         }
         $this->statusName  = {{statusClass}}::getName($this->status);
         $this->statusColor = {{statusClass}}::getColor($this->status);
-        {{/hasStatus}}
-        {{#hasID}}
+    {{/hasStatus}}
+    {{#hasID}}
 
         // Set ID and isEmpty
-        $this->id = $this->{{idName}};
-        $this->isEmpty = $this->id === {{#hasIntID}}0{{/hasIntID}}{{#hasStringID}}""{{/hasStringID}};
-        {{/hasID}}
+        $this->id      = $this->{{idName}};
+        {{#hasIntID}}
+        $this->isEmpty = $this->{{idName}} === 0;
+        {{/hasIntID}}
+        {{#hasStringID}}
+        $this->isEmpty = $this->{{idName}} === "";
+        {{/hasStringID}}
+        {{#hasEnumID}}
+        $this->isEmpty = $this->{{idName}} === {{idEnumName}}::None;
+        {{/hasEnumID}}
+    {{/hasID}}
     }
 }

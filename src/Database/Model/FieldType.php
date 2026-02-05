@@ -8,12 +8,13 @@ use Framework\Utils\Strings;
  */
 enum FieldType {
 
-    case None;
-
     case Date;
-    case Number;
+    case Enum;
+
     case Boolean;
+    case Number;
     case Float;
+
     case String;
     case Text;
     case LongText;
@@ -48,7 +49,7 @@ enum FieldType {
             "float"  => FieldType::Float,
             "int"    => FieldType::Number,
             "string" => FieldType::String,
-            default  => FieldType::None,
+            default  => FieldType::String,
         };
     }
 
@@ -71,17 +72,25 @@ enum FieldType {
     /**
      * Returns the PHP Type from the given Field Type
      * @param FieldType $type
+     * @param string    $enumClass
      * @param bool      $forEntity
      * @return string
      */
-    public static function getCodeType(FieldType $type, bool $forEntity = false): string {
+    public static function getCodeType(FieldType $type, string $enumClass, bool $forEntity = false): string {
         return match ($type) {
             FieldType::Date    => "Date",
-            FieldType::Number  => "int",
+            FieldType::Enum    => Strings::substringAfter($enumClass, "\\"),
+
             FieldType::Boolean => "bool",
+            FieldType::Number  => "int",
             FieldType::Float   => "float",
+
+            FieldType::String,
+            FieldType::Text,
+            FieldType::LongText,
+            FieldType::Encrypt,
+            FieldType::File    => "string",
             FieldType::JSON    => $forEntity ? "mixed" : "string",
-            default            => "string",
         };
     }
 

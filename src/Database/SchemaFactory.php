@@ -14,12 +14,15 @@ use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
 use Framework\Database\Status\Status;
 use Framework\Database\Status\State;
+use Framework\Database\Type\Enum;
 use Framework\File\File;
 use Framework\Date\Date;
 use Framework\Utils\Strings;
 
-use ReflectionNamedType;
 use Throwable;
+use JsonSerializable;
+use ReflectionClass;
+use ReflectionNamedType;
 
 /**
  * The Schema Factory
@@ -43,7 +46,7 @@ class SchemaFactory {
      */
     public static function buildData(bool $forFramework = false): array {
         $reflections  = Discovery::getReflectionClasses(forFramework: $forFramework);
-        $errorModels  = [];
+        $errors       = [];
         $schemaModels = [];
         $modelIDs     = [];
         $dbNames      = [];
@@ -95,7 +98,7 @@ class SchemaFactory {
                 /** @var Model */
                 $model = $modelAttr->newInstance();
             } catch (Throwable $e) {
-                $errorModels[] = "$modelName: Model attribute could not be instantiated ($fileName)";
+                $errors[] = "$modelName: Model attribute could not be instantiated ($fileName)";
                 continue;
             }
 
@@ -127,10 +130,22 @@ class SchemaFactory {
                     continue;
                 }
 
-                // Get the Attributes
-                $typeName       = $propType->getName();
-                $isDate         = $typeName === Date::class;
+                // Get the Type
+                $typeName = $propType->getName();
+                $isStatus = $typeName === Status::class;
+                $isDate   = $typeName === Date::class;
+                $isEnum   = false;
+                $isModel  = false;
 
+                if (!$isStatus && !$isDate && !$propType->isBuiltin()) {
+                    [ $isEnum, $isValidEnum ] = self::isPropEnum($typeName, $modelName, $errors);
+                    if ($isEnum && !$isValidEnum) {
+                        continue 2;
+                    }
+                    $isModel = !$isEnum;
+                }
+
+                // Get the Attributes
                 $propAttributes = $prop->getAttributes();
                 $field          = new Field();
                 $relation       = new Relation();
@@ -144,7 +159,7 @@ class SchemaFactory {
                     try {
                         $instance = $propAttribute->newInstance();
                     } catch (Throwable $e) {
-                        $errorModels[] = "$modelName: $fieldName attribute could not be instantiated ($fileName)";
+                        $errors[] = "$modelName: $fieldName attribute could not be instantiated ($fileName)";
                         continue 2;
                     }
 
@@ -165,12 +180,13 @@ class SchemaFactory {
                     }
                 }
 
+
                 // POSITION: If the Name is Position, mark it in the Model.
                 if ($fieldName === "position") {
                     $hasPositions = true;
 
                 // STATUS: If the Type is Status, mark it in the Model.
-                } elseif ($typeName === Status::class) {
+                } elseif ($isStatus) {
                     $hasStatus = true;
                     foreach ($propAttributes as $attribute) {
                         $instance = $attribute->newInstance();
@@ -182,8 +198,8 @@ class SchemaFactory {
                         $validates[] = $validate->setStatus();
                     }
 
-                // RELATION: If the type is not a Built-in Type.
-                } elseif (!$isDate && !$propType->isBuiltin()) {
+                // RELATION: If the type is a class representing a Model.
+                } elseif ($isModel) {
                     $relationModelName = Strings::substringAfter($typeName, "\\");
                     $relationModelName = Strings::stripEnd($relationModelName, "Model");
                     $relation->setDataFromAttribute($relationModelName, $fieldName);
@@ -210,7 +226,7 @@ class SchemaFactory {
 
                 // VIRTUAL: If it has a Virtual attribute.
                 } elseif ($virtual !== null) {
-                    $virtualFields[] = $virtual->setData($fieldName, $typeName);
+                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $isEnum);
 
                 // COUNT: If it has a Count attribute.
                 } elseif ($count !== null) {
@@ -222,7 +238,7 @@ class SchemaFactory {
                     if ($field->fromRequest) {
                         $usesRequest = true;
                     }
-                    $mainField    = $field->setData($fieldName, $typeName);
+                    $mainField    = $field->setData($fieldName, $typeName, $isEnum);
                     $mainFields[] = $mainField;
 
                     if ($validate !== null) {
@@ -264,6 +280,66 @@ class SchemaFactory {
 
 
         // Set the Models in the Relations, Counts and SubRequests
+        self::setModels($schemaModels);
+
+        // Set the BelongsTo and the DB Names of the Main Fields
+        self::parseMainFields($schemaModels, $modelIDs, $dbNames);
+
+        // Do the final parsing in the Relations
+        self::parseRelations($schemaModels, $dbNames);
+
+
+        // Show the Models with Errors
+        if (count($errors) > 0) {
+            print("\nMODELS WITH ERROR:\n");
+            foreach ($errors as $error) {
+                print("- $error\n\n");
+            }
+            print("\n");
+        }
+
+        return $schemaModels;
+    }
+
+
+
+    /**
+     * Returns true if the Enum and if is valid
+     * @param string   $typeName
+     * @param string   $modelName
+     * @param string[] $errors
+     * @return array{bool,bool}
+     */
+    private static function isPropEnum(string $typeName, string $modelName, array &$errors): array {
+        if (!class_exists($typeName)) {
+            return [ false, false ];
+        }
+        $propClass = new ReflectionClass($typeName);
+        if (!$propClass->isEnum()) {
+            return [ false, false ];
+        }
+
+        // Validate the Enum
+        $propFileName  = $propClass->getFileName();
+        $propClassName = Strings::substringAfter($typeName, "\\");
+        $isValid       = true;
+
+        if (!$propClass->implementsInterface(Enum::class)) {
+            $isValid  = false;
+            $errors[] = "$modelName: $propClassName enum must implement the Enum class ($propFileName)";
+        } elseif (!$propClass->implementsInterface(JsonSerializable::class)) {
+            $isValid  = false;
+            $errors[] = "$modelName: $propClassName enum must implement JsonSerializable ($propFileName)";
+        }
+        return [ true, $isValid ];
+    }
+
+    /**
+     * Set the Models in the Relations, Counts and SubRequests
+     * @param array<string,SchemaModel> $schemaModels
+     * @return void
+     */
+    private static function setModels(array $schemaModels): void {
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->relations as $relation) {
                 if (isset($schemaModels[$relation->relationModelName])) {
@@ -281,9 +357,16 @@ class SchemaFactory {
                 }
             }
         }
+    }
 
-
-        // Set the BelongsTo and the DB Names of the Main Fields
+    /**
+     * Set the BelongsTo and the DB Names of the Main Fields
+     * @param array<string,SchemaModel> $schemaModels
+     * @param array<string,string>      $modelIDs
+     * @param array<string,string>      $dbNames
+     * @return void
+     */
+    private static function parseMainFields(array $schemaModels, array $modelIDs, array &$dbNames): void {
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->mainFields as $field) {
                 if (!$field->isID && $field->belongsTo === "") {
@@ -294,9 +377,11 @@ class SchemaFactory {
                 // 1. The main field is an ID of a Model
                 if (isset($modelIDs[$field->name])) {
                     $dbNames[$field->name] = $field->setDbName();
+
                 // 2. The field belongs to a Model and the otherField is an ID of a Model
                 } elseif ($field->belongsTo !== "" && isset($modelIDs[$field->otherField])) {
                     $dbNames[$field->name] = $field->setDbName();
+
                 // 3. There is a Relation where the Field is the Owner
                 } else {
                     foreach ($schemaModel->relations as $relation) {
@@ -310,9 +395,15 @@ class SchemaFactory {
             }
             $schemaModel->setIDField();
         }
+    }
 
-
-        // Do the final parsing in the Relations
+    /**
+     * Final parsing of the Relations
+     * @param array<string,SchemaModel> $schemaModels
+     * @param array<string,string>      $dbNames
+     * @return void
+     */
+    private static function parseRelations(array $schemaModels, array $dbNames): void {
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->relations as $relation) {
                 $relation->generateFields();
@@ -320,17 +411,5 @@ class SchemaFactory {
                 $relation->setDbNames($dbNames);
             }
         }
-
-
-        // Show the Models with Errors
-        if (count($errorModels) > 0) {
-            print("\nMODELS WITH ERROR:\n");
-            foreach ($errorModels as $errorModel) {
-                print("- $errorModel\n\n");
-            }
-            print("\n");
-        }
-
-        return $schemaModels;
     }
 }

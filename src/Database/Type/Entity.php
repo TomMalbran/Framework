@@ -61,7 +61,7 @@ class Entity implements JsonSerializable {
             $this->$property = $data->getString($property);
             break;
         default:
-            if (Strings::endsWith($type, "Status")) {
+            if (method_exists($type, "fromValue")) {
                 $this->$property = $type::fromValue($data->getString($property));
             } else {
                 $this->$property = $data->getArray($property);

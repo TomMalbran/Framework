@@ -27,7 +27,7 @@ class SchemaCode {
         $relations   = $schemaModel->toBuildData("relations");
         $subRequests = $schemaModel->toBuildData("subRequests");
 
-        $idType      = FieldType::getCodeType($schemaModel->idType, false);
+        $imports     = self::getImports($schemaModel);
         $fields      = self::getAllFields($schemaModel);
         $uniques     = self::getSomeFields($schemaModel, isUnique: true);
         $parents     = self::getSomeFields($schemaModel, isParent: true);
@@ -42,6 +42,11 @@ class SchemaCode {
         $hasDateType = count(self::getSomeFields($schemaModel, isDateType: true)) > 0;
         $queryName   = $schemaModel->queryClass;
 
+        $idType      = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, false);
+        $idIsEnum    = $schemaModel->idType === FieldType::Enum;
+        $idSuffix    = $idIsEnum ? "->name" : "";
+        $idConvert   = $idIsEnum ? "string" : $idType;
+
         $contents    = Builder::render("Schema", [
             "namespace"           => $schemaModel->namespace,
             "name"                => $schemaModel->name,
@@ -50,20 +55,29 @@ class SchemaCode {
             "columnClass"         => $schemaModel->columnClass,
             "statusClass"         => $schemaModel->statusClass,
             "queryClass"          => $schemaModel->queryClass,
+
             "hasValidation"       => count($validations) > 0,
             "validations"         => $validations,
             "hasValidateImports"  => count($valImports) > 0,
             "validateImports"     => $valImports,
             "validatesColor"      => self::validatesColor($schemaModel),
             "errorPrefix"         => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
+
             "hasID"               => $schemaModel->hasID,
+            "hasIntID"            => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
+            "hasStringID"         => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
+            "hasEnumID"           => $schemaModel->hasID && $idIsEnum,
             "idName"              => $schemaModel->idName,
             "idDbName"            => $schemaModel->idDbName,
+            "idValue"             => "\${$schemaModel->idName}$idSuffix",
             "idType"              => $idType,
-            "hasIntID"            => $schemaModel->hasID && $idType === "int",
             "idText"              => Strings::upperCaseFirst($schemaModel->idName),
+            "idEnumClass"         => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
+
             "editType"            => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
-            "convertType"         => $schemaModel->hasID ? "Query|$idType" : "Query",
+            "convertType"         => $schemaModel->hasID ? "Query|$idConvert" : "Query",
+            "convertValue"        => "\$value$idSuffix",
+
             "hasPositions"        => $schemaModel->hasPositions,
             "hasPositionsValue"   => $schemaModel->hasPositions ? "true" : "false",
             "hasTimestamps"       => $schemaModel->hasTimestamps,
@@ -81,7 +95,8 @@ class SchemaCode {
             "canDelete"           => $schemaModel->canDelete,
             "canDeleteValue"      => $schemaModel->canDelete ? "true" : "false",
             "usesRequest"         => $schemaModel->usesRequest,
-            "subSchemas"          => self::getSubSchemas($schemaModel),
+            "hasImports"          => count($imports) > 0,
+            "imports"             => $imports,
             "hasVirtual"          => $hasVirtual,
             "mainFields"          => $mainFields,
             "hasExpressions"      => count($expressions) > 0,
@@ -99,9 +114,6 @@ class SchemaCode {
             "parents"             => $parents,
             "parentsList"         => self::joinFields($parents, "fieldParam"),
             "parentsSecList"      => self::joinFields($parents, "fieldParam", ", "),
-            "parentsArgList"      => self::joinFields($parents, "fieldArg"),
-            "parentsNullList"     => self::joinFields($parents, "fieldArgNull", ", "),
-            "parentsDefList"      => self::joinFields($parents, "fieldArgDefault", ", "),
             "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
             "editParents"         => $editParents,
             "hasDate"             => $hasDate,
@@ -112,28 +124,24 @@ class SchemaCode {
     }
 
     /**
-     * Returns the Sub Types from the Sub Requests
+     * Returns used Imports
      * @param SchemaModel $schemaModel
-     * @return array{name:string,type:string,namespace:string}[]
+     * @return string[]
      */
-    private static function getSubSchemas(SchemaModel $schemaModel): array {
-        $models = [];
+    private static function getImports(SchemaModel $schemaModel): array {
         $result = [];
 
-        foreach ($schemaModel->subRequests as $subRequest) {
-            $model = "{$subRequest->namespace}/{$subRequest->modelName}";
-            if (Arrays::contains($models, $model)) {
-                continue;
+        foreach ($schemaModel->fields as $field) {
+            if ($field->type === FieldType::Enum) {
+                $result[$field->enumClass] = 1;
             }
-
-            $models[] = $model;
-            $result[] = [
-                "name"      => $subRequest->name,
-                "type"      => $subRequest->modelName,
-                "namespace" => $subRequest->namespace,
-            ];
         }
-        return $result;
+
+        foreach ($schemaModel->subRequests as $subRequest) {
+            $result["{$subRequest->namespace}\\{$subRequest->modelName}Schema"] = 1;
+        }
+
+        return array_keys($result);
     }
 
     /**
@@ -196,28 +204,49 @@ class SchemaCode {
      * @return array<string,string>
      */
     private static function getField(Field $field): array {
-        $type      = FieldType::getCodeType($field->type, false);
-        $default   = FieldType::getDefault($type);
-        $isDate    = $field->type === FieldType::Date;
-        $canAssign = !$field->isID && !$field->isParent && !$isDate;
-        $assignDoc = $canAssign ? "Assign|" : "";
-        $param     = "\${$field->name}";
+        $type        = FieldType::getCodeType($field->type, $field->enumClass, false);
+        $isDate      = $field->type === FieldType::Date;
+        $isEnum      = $field->type === FieldType::Enum;
+
+        $canAssign   = !$field->isID && !$field->isParent && !$isDate && !$isEnum;
+        $assignDoc   = $canAssign ? "Assign|" : "";
+
+        $default     = FieldType::getDefault($type);
+        $nullDefault = $default === "null";
+        $nullDoc     = $nullDefault ? "|null" : "";
+        $nullPrefix  = $nullDefault ? "?" : "";
+
+        $param       = "\${$field->name}";
+        $dateParam   = "{$param}->toTime()";
+        $enumParam   = "{$param}->name";
+        $value       = $param;
+        $valueNull   = $param;
+
+        if ($isEnum) {
+            $value     = "{$param}->name";
+            $valueNull = "$param !== null ? $value : null";
+        } elseif ($type === "bool") {
+            $value     = "$param === true ? 1 : 0";
+            $valueNull = $value;
+        }
 
         return [
             "fieldKey"        => $field->dbName,
             "fieldName"       => $field->name,
             "fieldText"       => Strings::upperCaseFirst($field->name),
             "fieldDoc"        => "$type $param",
-            "fieldDocNull"    => "$type|null $param",
-            "fieldDocEdit"    => "$assignDoc$type|null $param",
-            "fieldParam"      => $param,
-            "fieldParamQuery" => $type === "bool" ? "$param === true ? 1 : 0" : $param,
-            "fieldAssign"     => $isDate ? "{$param}->toTime()" : $param,
             "fieldArg"        => "$type $param",
+            "fieldDocNull"    => "$type|null $param",
             "fieldArgNull"    => "?$type $param",
-            "fieldArgDefault" => "$type $param = $default",
-            "fieldArgCreate"  => "?$type $param = null",
+            "fieldDocDefault" => "$type$nullDoc $param",
+            "fieldArgDefault" => "$nullPrefix$type $param = $default",
+            "fieldDocEdit"    => "$assignDoc$type|null $param",
             "fieldArgEdit"    => ($canAssign ? "Assign|$type|null" : "?$type") . " $param = null",
+            "fieldArgCreate"  => "?$type $param = null",
+            "fieldParam"      => $param,
+            "fieldValue"      => $value,
+            "fieldValueNull"  => $valueNull,
+            "fieldAssign"     => $isDate ? $dateParam : ($isEnum ? $enumParam : $param),
         ];
     }
 

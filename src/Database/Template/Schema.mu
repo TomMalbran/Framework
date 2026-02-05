@@ -6,11 +6,11 @@ namespace {{namespace}};
 {{/validateImports}}
 
 {{/hasValidateImports}}
-{{#hasSubRequests}}
-{{#subSchemas}}use {{namespace}}\{{type}}Schema;
-{{/subSchemas}}
+{{#hasImports}}
+{{#imports}}use {{.}};
+{{/imports}}
 
-{{/hasSubRequests}}
+{{/hasImports}}
 use {{namespace}}\{{entityClass}};
 use {{namespace}}\{{columnClass}};
 use {{namespace}}\{{queryClass}};{{#hasStatus}}
@@ -134,17 +134,22 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}}{{/parents}}
      * @return bool
      */
-    public static function canEdit({{parentsArgList}}): bool {
+    public static function canEdit({{#parents}}
+        {{{fieldArg}}},{{/parents}}
+    ): bool {
         return true;
     }
 
     /**
      * Validates the {{name}} Request
      * @param Request $request{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}
+     * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @return Result
      */
-    public static function validateRequest(Request $request{{{parentsDefList}}}): Result {
+    public static function validateRequest(
+        Request $request,{{#parents}}
+        {{{fieldArgDefault}}},{{/parents}}
+    ): Result {
         $isEdit      = $request->has("{{idName}}");
         $id          = $request->{{#hasIntID}}getInt{{/hasIntID}}{{^hasIntID}}getString{{/hasIntID}}("{{idName}}");
         $errors      = new Errors();
@@ -323,10 +328,12 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDocNull}}{{/parents}}
      * @return {{queryClass}}
      */
-    protected static function createParentQuery({{parentsNullList}}): {{queryClass}} {
+    protected static function createParentQuery({{#parents}}
+        {{fieldArgNull}},{{/parents}}
+    ): {{queryClass}} {
         $query = new {{queryClass}}();
         {{#parents}}
-        $query->query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}}, {{fieldParam}} !== null);
+        $query->query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}}, {{fieldParam}} !== null);
         {{/parents}}
         return $query;
     }
@@ -349,14 +356,18 @@ class {{name}}Schema extends Schema {
     /**
      * Returns true if there is an {{name}} Entity with the given {{idText}}
      * @param {{idType}} ${{idName}}{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}{{#hasDeleted}}
+     * @param {{fieldDocDefault}} Optional.{{/parents}}{{#hasDeleted}}
      * @param bool $withDeleted Optional.{{/hasDeleted}}
      * @return bool
      */
-    public static function exists({{idType}} ${{idName}}{{{parentsDefList}}}{{#hasDeleted}}, bool $withDeleted = true{{/hasDeleted}}): bool {
-        $query = Query::create("{{idDbName}}", QueryOperator::Equal, ${{idName}});
+    public static function exists(
+        {{idType}} ${{idName}},{{#parents}}
+        {{{fieldArgDefault}}},{{/parents}}{{#hasDeleted}}
+        bool $withDeleted = true,{{/hasDeleted}}
+    ): bool {
+        $query = Query::create("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         return self::getSchemaTotal($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}}) > 0;
     }
@@ -366,14 +377,18 @@ class {{name}}Schema extends Schema {
     /**
      * Returns true if there is a {{name}} Entity with the given {{fieldText}}
      * @param {{fieldDoc}}{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}
+     * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @param int $skipID Optional.
      * @return bool
      */
-    public static function {{fieldName}}Exists({{fieldArg}}{{{parentsDefList}}}, int $skipID = 0): bool {
-        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+    public static function {{fieldName}}Exists(
+        {{fieldArg}},{{#parents}}
+        {{{fieldArgDefault}}},{{/parents}}
+        int $skipID = 0,
+    ): bool {
+        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $query->addIf("{{idDbName}}", QueryOperator::NotEqual, $skipID);
         return self::getSchemaTotal($query) > 0;
@@ -396,15 +411,20 @@ class {{name}}Schema extends Schema {
     /**
      * Returns the {{name}} Entity with the given ID
      * @param {{idType}} ${{idName}}{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}{{#canDelete}}
+     * @param {{fieldDocDefault}} Optional.{{/parents}}{{#canDelete}}
      * @param bool $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
      * @return {{entityClass}}
      */
-    public static function getByID({{idType}} ${{idName}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entityClass}} {
-        $query = Query::create("{{idDbName}}", QueryOperator::Equal, ${{idName}});
+    public static function getByID(
+        {{idType}} ${{idName}},{{#parents}}
+        {{{fieldArgDefault}}},{{/parents}}{{#canDelete}}
+        bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
+        bool $decrypted = false,{{/hasEncrypt}}
+    ): {{entityClass}} {
+        $query = Query::create("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $data  = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -415,15 +435,20 @@ class {{name}}Schema extends Schema {
     /**
      * Returns the {{name}} Entity with the given {{fieldText}}
      * @param {{fieldDoc}}{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}{{#canDelete}}
+     * @param {{fieldDocDefault}} Optional.{{/parents}}{{#canDelete}}
      * @param bool $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
      * @return {{entityClass}}
      */
-    public static function getBy{{fieldText}}({{fieldArg}}{{{parentsDefList}}}{{#canDelete}}, bool $withDeleted = true{{/canDelete}}{{#hasEncrypt}}, bool $decrypted = false{{/hasEncrypt}}): {{entityClass}} {
-        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+    public static function getBy{{fieldText}}(
+        {{fieldArg}},{{#parents}}
+        {{{fieldArgDefault}}},{{/parents}}{{#canDelete}}
+        bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
+        bool $decrypted = false,{{/hasEncrypt}}
+    ): {{entityClass}} {
+        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $data = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -485,9 +510,12 @@ class {{name}}Schema extends Schema {
         {{#hasIntID}}
         return Numbers::toInt($result);
         {{/hasIntID}}
-        {{^hasIntID}}
+        {{#hasStringID}}
         return (string)$result;
-        {{/hasIntID}}
+        {{/hasStringID}}
+        {{#hasEnumID}}
+        return {{idEnumClass}}::fromValue((string)$result);
+        {{/hasEnumID}}
     }
 
     /**
@@ -501,22 +529,28 @@ class {{name}}Schema extends Schema {
         {{#hasIntID}}
         return Arrays::toInts($result);
         {{/hasIntID}}
-        {{^hasIntID}}
+        {{#hasStringID}}
         return Arrays::toStrings($result);
-        {{/hasIntID}}
+        {{/hasStringID}}
+        {{#hasEnumID}}
+        return {{idEnumClass}}::fromList(Arrays::toStrings($result));
+        {{/hasEnumID}}
     }
 
 {{/hasID}}
     /**
      * Returns a list of {{name}} Entities
      * @param Request $request{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}
+     * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @return {{entityClass}}[]
      */
-    public static function getList(Request $request{{{parentsDefList}}}): array {
+    public static function getList(
+        Request $request,{{#parents}}
+        {{{fieldArgDefault}}},{{/parents}}
+    ): array {
         $query = static::createListQuery($request)->query;
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $list  = self::getSchemaEntities($query, sort: $request);
         return self::constructEntities($list);
@@ -548,13 +582,16 @@ class {{name}}Schema extends Schema {
     /**
      * Returns a Total number of {{name}} Entities
      * @param Request $request{{#parents}}
-     * @param {{fieldDoc}} Optional.{{/parents}}
+     * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @return int
      */
-    public static function getTotal(Request $request{{{parentsDefList}}}): int {
+    public static function getTotal(
+        Request $request,{{#parents}}
+        {{{fieldArgDefault}}},{{/parents}}
+    ): int {
         $query = static::createListQuery($request)->query;
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{fieldParamQuery}});
+        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         return self::getSchemaTotal($query);
     }
@@ -1002,15 +1039,15 @@ class {{name}}Schema extends Schema {
 
     /**
      * Converts the {{queryClass}} to a Query
-     * @param {{editType}} $query
+     * @param {{editType}} $value
      * @return {{convertType}}
      */
-    private static function toQuery({{editType}} $query): {{convertType}} {
+    private static function toQuery({{editType}} $value): {{convertType}} {
         {{#hasID}}
-        return $query instanceof {{queryClass}} ? $query->query : $query;
+        return $value instanceof {{queryClass}} ? $value->query : {{{convertValue}}};
         {{/hasID}}
         {{^hasID}}
-        return $query->query;
+        return $value->query;
         {{/hasID}}
     }
 }

@@ -217,6 +217,7 @@ class Field {
     public string    $name       = "";
     public string    $dbName     = "";
     public string    $prefixName = "";
+    public string    $enumClass  = "";
     public bool      $isStatus   = false;
 
 
@@ -290,9 +291,10 @@ class Field {
      * Sets the Data from the Model
      * @param string $name
      * @param string $typeName
+     * @param bool   $isEnum
      * @return Field
      */
-    public function setData(string $name, string $typeName): Field {
+    public function setData(string $name, string $typeName, bool $isEnum): Field {
         $this->name   = $name;
         $this->dbName = $name;
 
@@ -330,7 +332,12 @@ class Field {
             break;
 
         default:
-            $this->type = FieldType::String;
+            if ($isEnum) {
+                $this->type      = FieldType::Enum;
+                $this->enumClass = $typeName;
+            } else {
+                $this->type = FieldType::String;
+            }
             break;
         }
 
@@ -382,6 +389,13 @@ class Field {
             $attributes = "unsigned NOT NULL";
             $default    = 0;
             break;
+
+        case FieldType::Boolean:
+            $type       = "tinyint";
+            $length     = 1;
+            $attributes = "unsigned NOT NULL";
+            $default    = 0;
+            break;
         case FieldType::Number:
             $type    = "int";
             $length  = $this->length > 0 ? $this->length : 10;
@@ -404,18 +418,14 @@ class Field {
                 $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
             }
             break;
-        case FieldType::Boolean:
-            $type       = "tinyint";
-            $length     = 1;
-            $attributes = "unsigned NOT NULL";
-            $default    = 0;
-            break;
         case FieldType::Float:
             $type       = "bigint";
             $length     = 20;
             $attributes = $this->isSigned ? "NOT NULL" : "unsigned NOT NULL";
             $default    = 0;
             break;
+
+        case FieldType::Enum:
         case FieldType::String:
         case FieldType::File:
             $type       = "varchar";
@@ -461,43 +471,41 @@ class Field {
      * @return mixed
      */
     public function getValue(Request $request): mixed {
-        $result = null;
         if ($this->isAutoInc()) {
-            return $result;
+            return null;
         }
 
-        switch ($this->type) {
-        case FieldType::Date:
-            if ($this->dateInput !== "" && $this->hourInput !== "") {
-                $result = $request->toTimeHour($this->dateInput, $this->hourInput, true)->toTime();
-            } elseif ($this->dateInput !== "") {
-                $dateType = $this->dateType !== DateType::None ? $this->dateType : DateType::Start;
-                $result   = $request->toDayMoment($this->dateInput, $dateType, true)->toTime();
-            } else {
-                $result = $request->getInt($this->name);
-            }
-            break;
-        case FieldType::Number:
+        return match ($this->type) {
+            FieldType::Date     => $this->getDateValue($request),
+            FieldType::Enum     => $request->getString($this->name),
+
+            FieldType::Boolean  => $request->toBinary($this->name),
+            FieldType::Number   => $request->getInt($this->name),
+            FieldType::Float    => $request->toInt($this->name, $this->decimals),
+
+            FieldType::String,
+            FieldType::Text,
+            FieldType::LongText => $request->getString($this->name),
+            FieldType::JSON     => $request->toJSON($this->name),
+            FieldType::Encrypt  => Assign::encrypt($request->getString($this->name), Config::getDbKey()),
+            FieldType::File     => $request->getString($this->name),
+        };
+    }
+
+    /**
+     * Returns the Date Field Value from the given Request
+     * @param Request $request
+     * @return int
+     */
+    private function getDateValue(Request $request): int {
+        $result = 0;
+        if ($this->dateInput !== "" && $this->hourInput !== "") {
+            $result = $request->toTimeHour($this->dateInput, $this->hourInput, true)->toTime();
+        } elseif ($this->dateInput !== "") {
+            $dateType = $this->dateType !== DateType::None ? $this->dateType : DateType::Start;
+            $result   = $request->toDayMoment($this->dateInput, $dateType, true)->toTime();
+        } else {
             $result = $request->getInt($this->name);
-            break;
-        case FieldType::Boolean:
-            $result = $request->toBinary($this->name);
-            break;
-        case FieldType::String:
-            $result = $request->getString($this->name);
-            break;
-        case FieldType::Float:
-            $result = $request->toInt($this->name, $this->decimals);
-            break;
-        case FieldType::JSON:
-            $result = $request->toJSON($this->name);
-            break;
-        case FieldType::Encrypt:
-            $value  = $request->getString($this->name);
-            $result = Assign::encrypt($value, Config::getDbKey());
-            break;
-        default:
-            $result = $request->get($this->name);
         }
         return $result;
     }
@@ -509,38 +517,35 @@ class Field {
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;
-        $text   = isset($data[$key]) ? Strings::toString($data[$key]) : "";
+        $string = isset($data[$key]) ? Strings::toString($data[$key]) : "";
         $number = isset($data[$key]) ? Numbers::toInt($data[$key])    : 0;
         $result = [];
 
-        switch ($this->type) {
-        case FieldType::Date:
-        case FieldType::Number:
-            $result[$key] = $number;
-            break;
-        case FieldType::Boolean:
-            $result[$key] = !Arrays::isEmpty($data, $key);
-            break;
-        case FieldType::Float:
-            $result[$key] = Numbers::toFloat($number, $this->decimals);
-            break;
-        case FieldType::JSON:
-            $result[$key] = JSON::decodeAsArray($text);
-            break;
-        case FieldType::Encrypt:
-            $result[$key] = isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "";
-            break;
-        case FieldType::File:
-            $result[$key] = $text;
+        // Set the main value of the field
+        $result[$key] = match ($this->type) {
+            FieldType::Date     => $number,
+            FieldType::Enum     => $string,
+
+            FieldType::Boolean  => !Arrays::isEmpty($data, $key),
+            FieldType::Number   => $number,
+            FieldType::Float    => Numbers::toFloat($number, $this->decimals),
+
+            FieldType::String,
+            FieldType::Text,
+            FieldType::LongText => $string,
+            FieldType::JSON     => JSON::decodeAsArray($string),
+            FieldType::Encrypt  => isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "",
+            FieldType::File     => $string,
+        };
+
+        // Set additional values for the File type
+        if ($this->type === FieldType::File) {
             if ($this->filePath !== "") {
-                $result["{$key}Url"] = $text !== "" ? FilePath::getUrl($this->filePath, $text) : "";
+                $result["{$key}Url"] = $string !== "" ? FilePath::getUrl($this->filePath, $string) : "";
             } else {
-                $result["{$key}Url"]   = $text !== "" ? Path::getSourceUrl("0", $text) : "";
-                $result["{$key}Thumb"] = $text !== "" ? Path::getThumbsUrl("0", $text) : "";
+                $result["{$key}Url"]   = $string !== "" ? Path::getSourceUrl("0", $string) : "";
+                $result["{$key}Thumb"] = $string !== "" ? Path::getThumbsUrl("0", $string) : "";
             }
-            break;
-        default:
-            $result[$key] = $text;
         }
 
         return $result;

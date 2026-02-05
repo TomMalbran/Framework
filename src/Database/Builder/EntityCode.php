@@ -18,19 +18,23 @@ class EntityCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $imports = self::getImports($schemaModel);
-        $dates   = self::getDates($schemaModel);
+        $imports  = self::getImports($schemaModel);
+        $dates    = self::getDates($schemaModel);
 
         $contents = Builder::render("Entity", [
             "namespace"   => $schemaModel->namespace,
             "name"        => $schemaModel->name,
             "entityClass" => $schemaModel->entityClass,
             "statusClass" => $schemaModel->statusClass,
+            "hasStatus"   => $schemaModel->hasStatus,
+
             "hasID"       => $schemaModel->hasID,
             "hasIntID"    => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
-            "hasStringID" => $schemaModel->hasID && $schemaModel->idType !== FieldType::Number,
+            "hasStringID" => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
+            "hasEnumID"   => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
             "idName"      => $schemaModel->idName,
-            "hasStatus"   => $schemaModel->hasStatus,
+            "idEnumName"  => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
+
             "properties"  => self::getProperties($schemaModel),
             "attributes"  => self::getAttributes($schemaModel),
             "subTypes"    => self::getSubTypes($schemaModel),
@@ -57,7 +61,7 @@ class EntityCode {
         $fields = [];
         foreach ($schemaModel->fields as $field) {
             if (!$field->isStatus) {
-                self::addProperty($fields, $field->name, $field->type);
+                self::addProperty($fields, $field->name, $field->type, $field->enumClass);
             }
         }
         self::addCategory($result, "Main", $fields, $parsed);
@@ -75,7 +79,7 @@ class EntityCode {
         // Virtual Fields
         $fields = [];
         foreach ($schemaModel->virtualFields as $field) {
-            self::addProperty($fields, $field->name, $field->type);
+            self::addProperty($fields, $field->name, $field->type, $field->enumClass);
         }
         self::addCategory($result, "Virtual", $fields, $parsed);
 
@@ -104,7 +108,7 @@ class EntityCode {
                         default: "{$relation->relationModelName}Status::None",
                     );
                 } else {
-                    self::addProperty($fields, $field->prefixName, $field->type);
+                    self::addProperty($fields, $field->prefixName, $field->type, $field->enumClass);
                 }
             }
             self::addCategory($result, $relation->relationModelName, $fields, $parsed);
@@ -156,19 +160,24 @@ class EntityCode {
      * @param array<string,string|bool>[] $result
      * @param string                      $fieldKey
      * @param FieldType                   $fieldType
+     * @param string                      $enumClass Optional.
      * @return bool
      */
     private static function addProperty(
         array &$result,
         string $fieldKey,
         FieldType $fieldType,
+        string $enumClass = "",
     ): bool {
-        if ($fieldType === FieldType::File) {
+        if ($fieldType === FieldType::Enum) {
+            $type     = FieldType::getCodeType($fieldType, $enumClass, true);
+            $result[] = self::getTypeData($fieldKey, $type, default: "{$type}::None");
+        } elseif ($fieldType === FieldType::File) {
             $result[] = self::getTypeData($fieldKey, "string");
             $result[] = self::getTypeData("{$fieldKey}Url", "string");
             $result[] = self::getTypeData("{$fieldKey}Thumb", "string");
         } else {
-            $type     = FieldType::getCodeType($fieldType, true);
+            $type     = FieldType::getCodeType($fieldType, $enumClass, true);
             $result[] = self::getTypeData($fieldKey, $type);
         }
         return true;
@@ -211,8 +220,11 @@ class EntityCode {
     private static function getAttributes(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->mainFields as $field) {
-            if ($field->type !== FieldType::Date) {
-                $type     = FieldType::getCodeType($field->type, true);
+            if ($field->type === FieldType::Enum) {
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
+                $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
+            } elseif ($field->type !== FieldType::Date) {
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
                 $result[] = self::getTypeData($field->name, $type);
             }
         }
@@ -278,19 +290,32 @@ class EntityCode {
     }
 
     /**
-     * Returns the Sub Types from the Sub Requests
+     * Returns used Imports
      * @param SchemaModel $schemaModel
      * @return string[]
      */
     private static function getImports(SchemaModel $schemaModel): array {
         $result = [];
-        if ($schemaModel->hasStatus) {
-            $result["{$schemaModel->namespace}\\{$schemaModel->statusClass}"] = 1;
+
+        foreach ($schemaModel->fields as $field) {
+            if ($field->isStatus) {
+                $result["{$schemaModel->namespace}\\{$schemaModel->statusClass}"] = 1;
+            } elseif ($field->type === FieldType::Enum) {
+                $result[$field->enumClass] = 1;
+            }
+        }
+
+        foreach ($schemaModel->virtualFields as $field) {
+            if ($field->type === FieldType::Enum) {
+                $result[$field->enumClass] = 1;
+            }
         }
 
         foreach ($schemaModel->relations as $relation) {
             foreach ($relation->fields as $field) {
-                if ($field->isStatus && $relation->relationModel !== null) {
+                if ($field->type === FieldType::Enum) {
+                    $result[$field->enumClass] = 1;
+                } elseif ($field->isStatus && $relation->relationModel !== null) {
                     $result["{$relation->relationModel->namespace}\\{$relation->relationModelName}Status"] = 1;
                 }
             }
