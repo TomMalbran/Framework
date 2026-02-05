@@ -3,13 +3,18 @@ namespace {{namespace}};
 
 use Framework\Auth\Auth;
 use Framework\Intl\NLS;
+use Framework\Database\Type\Enum;
+use Framework\Database\Type\IsEnum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
+
+use JsonSerializable;
 
 /**
  * The Access
  */
-enum Access {
+enum Access implements Enum, JsonSerializable {
+    use IsEnum;
 
     case None;
 {{#roles}}
@@ -23,62 +28,27 @@ enum Access {
 
 
     /**
-     * Creates an Access from a String
-     * @param Access|string $value
-     * @return Access
-     */
-    public static function fromValue(Access|string $value): Access {
-        if ($value instanceof Access) {
-            return $value;
-        }
-        foreach (self::cases() as $case) {
-            if ($case->name === $value) {
-                return $case;
-            }
-        }
-        return self::None;
-    }
-
-    /**
      * Returns the Name of the given Access
-     * @param Access|string $value
+     * @param Access $value
      * @param string $isoCode Optional.
      * @return string
      */
-    public static function getName(Access|string $value, string $isoCode = ""): string {
-        $value = ($value instanceof Access) ? $value->name : $value;
-        return NLS::getIndex("SELECT_ACCESS", $value, $isoCode);
+    public static function getName(Access $value, string $isoCode = ""): string {
+        return NLS::getIndex("SELECT_ACCESS", $value->name, $isoCode);
     }
 
     /**
      * Returns the Level of the given Access
-     * @param Access|string $value
+     * @param Access $value
      * @return int
      */
-    public static function getLevel(Access|string $value): int {
-        return match (self::fromValue($value)) {
+    public static function getLevel(Access $value): int {
+        return match ($value) {
         {{#roles}}
             self::{{constant}} => {{level}},
         {{/roles}}
             {{default}} => 0,
         };
-    }
-
-    /**
-     * Returns the Accesses as an array of strings
-     * @param Access[]|Access|null $values
-     * @return string[]
-     */
-    public static function toStrings(array|Access|null $values): array {
-        $result = [];
-        if ($values instanceof Access) {
-            $result[] = $values->name;
-        } elseif (is_array($values)) {
-            foreach ($values as $elem) {
-                $result[] = $elem->name;
-            }
-        }
-        return $result;
     }
 
 
@@ -126,11 +96,11 @@ enum Access {
 
     /**
      * Returns true if the given value is one of: {{roles}}
-     * @param Access|string $value
+     * @param Access $value
      * @return bool
      */
-    public static function isValid{{name}}(Access|string $value): bool {
-        return Arrays::contains([ {{values}} ], self::fromValue($value));
+    public static function isValid{{name}}(Access $value): bool {
+        return Arrays::contains([ {{values}} ], $value);
     }
 
     /**

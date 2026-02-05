@@ -2,6 +2,7 @@
 namespace Framework\Notification\Model;
 
 use Framework\Auth\Model\CredentialModel;
+use Framework\Notification\NotificationResult;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
@@ -36,7 +37,7 @@ class NotificationQueueModel {
 
     public int $dataID = 0;
 
-    public string $notificationResult = "";
+    public NotificationResult $notificationResult = NotificationResult::None;
 
     public string $externalID = "";
 

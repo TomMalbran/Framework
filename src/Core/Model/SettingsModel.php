@@ -3,6 +3,7 @@ namespace Framework\Core\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Core\VariableType;
 
 /**
  * The Settings Model
@@ -22,5 +23,5 @@ class SettingsModel {
     #[Field(isText: true)]
     public string $value = "";
 
-    public string $variableType = "";
+    public VariableType $variableType = VariableType::None;
 }

@@ -30,7 +30,7 @@ class EmailQueue extends EmailQueueSchema {
         $fromTime = $request->toDayStartHour("fromDate", "fromHour");
         $toTime   = $request->toDayEndHour("toDate", "toHour");
         $dataID   = $request->getInt("dataID");
-        $results  = $request->getStrings("results");
+        $results  = EmailResult::fromList($request->getStrings("results"));
 
         $query = new EmailQueueQuery();
         $query->search([
@@ -42,7 +42,7 @@ class EmailQueue extends EmailQueueSchema {
         $query->createdTime->greaterThan($fromTime);
         $query->createdTime->lessThan($toTime);
         $query->dataID->equalIf($dataID);
-        $query->emailResult->in($results);
+        $query->emailResult->equal(...$results);
         return $query;
     }
 
@@ -95,7 +95,7 @@ class EmailQueue extends EmailQueueSchema {
             sendTo:      JSON::encode($sendTo),
             subject:     $subject,
             message:     $message,
-            emailResult: EmailResult::NotProcessed->name,
+            emailResult: EmailResult::NotProcessed,
             sendTime:    Date::now(),
             sentTime:    Date::empty(),
             dataID:      $dataID,
@@ -157,7 +157,7 @@ class EmailQueue extends EmailQueueSchema {
 
         return self::editEntity(
             $query,
-            emailResult: EmailResult::NotProcessed->name,
+            emailResult: EmailResult::NotProcessed,
             sendTime:    Date::now(),
             sentTime:    Date::empty(),
         );
@@ -172,7 +172,7 @@ class EmailQueue extends EmailQueueSchema {
     public static function markAsSent(int $emailID, EmailResult $emailResult): bool {
         return self::editEntity(
             $emailID,
-            emailResult: $emailResult->name,
+            emailResult: $emailResult,
             sentTime:    Date::now(),
         );
     }

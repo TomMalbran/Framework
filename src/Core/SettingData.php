@@ -86,7 +86,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
             section:      SettingConfig::Core,
             variable:     $variable,
             value:        (string)$value,
-            variableType: VariableType::Integer->name,
+            variableType: VariableType::Integer,
         );
     }
 
@@ -134,11 +134,10 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
                 continue;
             }
 
-            $variableType = VariableType::fromValue($elem->variableType);
             self::replaceEntity(
                 section:      $elem->section,
                 variable:     $elem->variable,
-                value:        VariableType::encodeValue($variableType, $data[$variable]),
+                value:        VariableType::encodeValue($elem->variableType, $data[$variable]),
                 variableType: $elem->variableType,
             );
         }
@@ -188,11 +187,11 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
 
             foreach ($list as $elem) {
                 if ($elem->section === $section && $elem->variable === $variable) {
-                    if ($elem->variableType !== $variableType->name) {
+                    if ($elem->variableType !== $variableType) {
                         $modifies[] = (object)[
                             "section"      => $elem->section,
                             "variable"     => $elem->variable,
-                            "variableType" => $variableType->name,
+                            "variableType" => $variableType,
                         ];
                     }
                     $found = true;
@@ -208,7 +207,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
                         "fields"   => [
                             "section"      => $section,
                             "variable"     => $variable,
-                            "variableType" => $variableType->name,
+                            "variableType" => $variableType,
                         ],
                     ];
                     $found = true;
@@ -222,7 +221,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
                     section:      $section,
                     variable:     $variable,
                     value:        VariableType::encodeValue($variableType, $value),
-                    variableType: $variableType->name,
+                    variableType: $variableType,
                     modifiedTime: Date::now(),
                 );
                 $list[] = $settings;

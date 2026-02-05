@@ -1,10 +1,18 @@
 <?php
 namespace Framework\Email;
 
+use Framework\Database\Type\Enum;
+use Framework\Database\Type\IsEnum;
+
+use JsonSerializable;
+
 /**
  * The Email Results used by the System
  */
-enum EmailResult {
+enum EmailResult implements Enum, JsonSerializable {
+    use IsEnum;
+
+    case None;
 
     case Sent;
     case NotProcessed;

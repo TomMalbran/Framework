@@ -5,6 +5,7 @@ use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Virtual;
 use Framework\Database\Status\Status;
+use Framework\System\Access;
 
 /**
  * The Credential Model
@@ -60,7 +61,7 @@ class CredentialModel {
 
     public string $appearance = "";
 
-    public string $access = "";
+    public Access $access = Access::None;
 
     public string $password = "";
 
@@ -90,7 +91,7 @@ class CredentialModel {
     public int $adminID = 0;
 
     #[Virtual]
-    public string $userAccess = "";
+    public Access $userAccess = Access::None;
 
     #[Virtual]
     public string $avatarFile = "";

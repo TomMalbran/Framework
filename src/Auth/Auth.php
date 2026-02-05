@@ -220,7 +220,7 @@ class Auth {
         return (
             $credential->exists() &&
             !$credential->isDeleted &&
-            CredentialStatus::isActive($credential->status)
+            $credential->status === CredentialStatus::Active
         );
     }
 
@@ -319,10 +319,10 @@ class Auth {
         self::$credentialID = $credential->id;
         self::$userID       = $userID;
 
-        if ($credential->userAccess !== "") {
-            self::$accessName = Access::fromValue($credential->userAccess);
+        if ($credential->userAccess !== Access::None) {
+            self::$accessName = $credential->userAccess;
         } else {
-            self::$accessName = Access::fromValue($credential->access);
+            self::$accessName = $credential->access;
         }
 
         $language = $credential->language;

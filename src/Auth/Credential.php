@@ -36,13 +36,13 @@ class Credential extends CredentialSchema {
         array|string|null $filter = null,
         string|int $value = 1,
     ): CredentialQuery {
-        $accessNames = Access::toStrings($accessName);
-        if (Arrays::isEmpty($accessNames)) {
+        $accessNames = Access::fromList($accessName);
+        if (count($accessNames) === 0) {
             return new CredentialQuery();
         }
 
         $query = new CredentialQuery();
-        $query->access->in($accessNames);
+        $query->access->equal(...$accessNames);
 
         if (!Arrays::isEmpty($filter)) {
             $filters = Arrays::toStrings($filter);
@@ -547,6 +547,7 @@ class Credential extends CredentialSchema {
      * @param Request|null             $request       Optional.
      * @param array<string,string|int> $fields        Optional.
      * @param Access|null              $accessName    Optional.
+     * @param CredentialStatus|null    $status        Optional.
      * @param bool|null                $reqPassChange Optional.
      * @return int
      */
@@ -554,9 +555,10 @@ class Credential extends CredentialSchema {
         ?Request $request = null,
         array $fields = [],
         ?Access $accessName = null,
+        ?CredentialStatus $status = null,
         ?bool $reqPassChange = null,
     ): int {
-        $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
+        $fields = self::parseFields($request, $fields, $accessName, $status, $reqPassChange);
         $fields["lastLogin"]        = time();
         $fields["currentLogin"]     = time();
         $fields["askNotifications"] = 1;
@@ -569,6 +571,7 @@ class Credential extends CredentialSchema {
      * @param Request|null             $request       Optional.
      * @param array<string,string|int> $fields        Optional.
      * @param Access|null              $accessName    Optional.
+     * @param CredentialStatus|null    $status        Optional.
      * @param bool|null                $reqPassChange Optional.
      * @param bool                     $skipEmpty     Optional.
      * @return bool
@@ -578,10 +581,11 @@ class Credential extends CredentialSchema {
         ?Request $request = null,
         array $fields = [],
         ?Access $accessName = null,
+        ?CredentialStatus $status = null,
         ?bool $reqPassChange = null,
         bool $skipEmpty = false,
     ): bool {
-        $fields = self::parseFields($request, $fields, $accessName, $reqPassChange);
+        $fields = self::parseFields($request, $fields, $accessName, $status, $reqPassChange);
         return self::editSchemaEntity($credentialID, $request, $fields, skipEmpty: $skipEmpty);
     }
 
@@ -642,6 +646,7 @@ class Credential extends CredentialSchema {
      * @param Request|null             $request       Optional.
      * @param array<string,string|int> $fields        Optional.
      * @param Access|null              $accessName    Optional.
+     * @param CredentialStatus|null    $status        Optional.
      * @param bool|null                $reqPassChange Optional.
      * @return array<string,string|int>
      */
@@ -649,6 +654,7 @@ class Credential extends CredentialSchema {
         ?Request $request = null,
         array $fields = [],
         ?Access $accessName = null,
+        ?CredentialStatus $status = null,
         ?bool $reqPassChange = null,
     ): array {
         $result = $fields;
@@ -675,9 +681,12 @@ class Credential extends CredentialSchema {
             $result["salt"]     = $hash["salt"];
         }
 
-        // Parse the Access and Request Password Change
+        // Parse the Access, Status and Request Password Change
         if ($accessName !== null) {
             $result["access"] = $accessName->name;
+        }
+        if ($status !== null) {
+            $result["status"] = $status->name;
         }
         if ($reqPassChange !== null) {
             $result["reqPassChange"] = $reqPassChange ? 1 : 0;
@@ -700,10 +709,10 @@ class Credential extends CredentialSchema {
     /**
      * Sets the Credential Access
      * @param int    $credentialID
-     * @param string $access
+     * @param Access $access
      * @return bool
      */
-    public static function setAccess(int $credentialID, string $access): bool {
+    public static function setAccess(int $credentialID, Access $access): bool {
         return self::editEntity($credentialID, access: $access);
     }
 

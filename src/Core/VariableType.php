@@ -1,14 +1,19 @@
 <?php
 namespace Framework\Core;
 
+use Framework\Database\Type\IsEnum;
+use Framework\Database\Type\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
+use JsonSerializable;
+
 /**
  * The Variable Types used by the System
  */
-enum VariableType {
+enum VariableType implements Enum, JsonSerializable {
+    use IsEnum;
 
     case None;
 
@@ -20,20 +25,6 @@ enum VariableType {
     case String;
 
 
-
-    /**
-     * Creates a Variable Type from a String
-     * @param string $value
-     * @return VariableType
-     */
-    public static function fromValue(string $value): VariableType {
-        foreach (self::cases() as $case) {
-            if ($case->name === $value) {
-                return $case;
-            }
-        }
-        return self::None;
-    }
 
     /**
      * Returns the Setting Type based on the value

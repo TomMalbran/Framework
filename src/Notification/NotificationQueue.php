@@ -43,7 +43,7 @@ class NotificationQueue extends NotificationQueueSchema {
         $search   = $request->getString("search");
         $fromTime = $request->toDayStartHour("fromDate", "fromHour");
         $toTime   = $request->toDayEndHour("toDate", "toHour");
-        $results  = $request->getStrings("results");
+        $results  = NotificationResult::fromList($request->getStrings("results"));
 
         $query = new NotificationQueueQuery();
         $query->search([
@@ -55,7 +55,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
         $query->createdTime->greaterThan($fromTime);
         $query->createdTime->lessThan($toTime);
-        $query->notificationResult->in($results);
+        $query->notificationResult->equal(...$results);
         return $query;
     }
 
@@ -69,7 +69,7 @@ class NotificationQueue extends NotificationQueueSchema {
         $time  = Date::now()->subtract(hours: 1);
 
         $query = new NotificationQueueQuery();
-        $query->notificationResult->equal(NotificationResult::NotProcessed->name);
+        $query->notificationResult->equal(NotificationResult::NotProcessed);
         $query->createdTime->greaterThan($time);
         $query->createdTime->orderByDesc();
         return self::getEntityList($query);
@@ -161,7 +161,7 @@ class NotificationQueue extends NotificationQueueSchema {
             url:                $url,
             dataType:           $dataType,
             dataID:             $dataID,
-            notificationResult: NotificationResult::NotProcessed->name,
+            notificationResult: NotificationResult::NotProcessed,
         );
     }
 
@@ -248,7 +248,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
             self::editEntity(
                 $elem->notificationID,
-                notificationResult: $notificationResult->name,
+                notificationResult: $notificationResult,
                 externalID:         $externalID,
                 playerIDs:          JSON::encode($playerIDs),
                 sentTime:           Date::now(),

@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Email\Model;
 
+use Framework\Email\EmailResult;
+
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Expression;
@@ -29,7 +31,7 @@ class EmailQueueModel {
     #[Field(isText: true)]
     public string $message = "";
 
-    public string $emailResult = "";
+    public EmailResult $emailResult = EmailResult::None;
 
     public int $dataID = 0;
 
