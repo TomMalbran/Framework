@@ -27,25 +27,25 @@ class BaseQuery {
 
     /**
      * Adds an Order By Ascending
-     * @return Query
+     * @return void
      */
-    public function orderByAsc(): Query {
-        return $this->query->orderBy($this->column, true);
+    public function orderByAsc() {
+        $this->query->orderBy($this->column, true);
     }
 
     /**
      * Adds an Order By Descending
-     * @return Query
+     * @return void
      */
-    public function orderByDesc(): Query {
-        return $this->query->orderBy($this->column, false);
+    public function orderByDesc() {
+        $this->query->orderBy($this->column, false);
     }
 
     /**
      * Adds a Group By
-     * @return Query
+     * @return void
      */
-    public function groupBy(): Query {
-        return $this->query->groupBy($this->column);
+    public function groupBy() {
+        $this->query->groupBy($this->column);
     }
 }

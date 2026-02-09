@@ -13,23 +13,21 @@ class EnumQuery extends BaseQuery {
     /**
      * Adds an Enum Equals condition
      * @param Enum ...$values
-     * @return EnumQuery
+     * @return void
      */
-    public function equal(Enum ...$values): EnumQuery {
+    public function equal(Enum ...$values) {
         $names = $this->toNames($values);
         $this->query->add($this->column, QueryOperator::Equal, $names);
-        return $this;
     }
 
     /**
      * Adds an Enum Not Equals condition
      * @param Enum ...$values
-     * @return EnumQuery
+     * @return void
      */
-    public function notEqual(Enum ...$values): EnumQuery {
+    public function notEqual(Enum ...$values) {
         $names = $this->toNames($values);
         $this->query->add($this->column, QueryOperator::NotEqual, $names);
-        return $this;
     }
 
 

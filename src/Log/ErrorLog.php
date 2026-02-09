@@ -154,7 +154,9 @@ class ErrorLog extends LogErrorSchema {
         $query->backtrace->equal($backtrace);
 
         if (self::getEntityTotal($query) > 0) {
-            $query->updatedTime->orderByDesc()->limit(1);
+            $query->updatedTime->orderByDesc();
+            $query->limit(1);
+
             self::editEntity(
                 $query,
                 amount:      Assign::increase(1),
