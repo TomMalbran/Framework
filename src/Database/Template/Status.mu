@@ -2,6 +2,7 @@
 namespace {{namespace}};
 
 use Framework\Intl\NLS;
+use Framework\Database\Type\Enum;
 use Framework\Database\Type\IsEnum;
 use Framework\Utils\Select;
 
@@ -10,7 +11,7 @@ use JsonSerializable;
 /**
  * The {{name}} Status
  */
-enum {{statusClass}} implements JsonSerializable {
+enum {{statusClass}} implements Enum, JsonSerializable {
     use IsEnum;
 
     case None;

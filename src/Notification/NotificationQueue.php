@@ -55,7 +55,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
         $query->createdTime->greaterThan($fromTime);
         $query->createdTime->lessThan($toTime);
-        $query->notificationResult->equal(...$results);
+        $query->notificationResult->in($results);
         return $query;
     }
 

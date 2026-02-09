@@ -42,7 +42,7 @@ class EmailQueue extends EmailQueueSchema {
         $query->createdTime->greaterThan($fromTime);
         $query->createdTime->lessThan($toTime);
         $query->dataID->equalIf($dataID);
-        $query->emailResult->equal(...$results);
+        $query->emailResult->in($results);
         return $query;
     }
 

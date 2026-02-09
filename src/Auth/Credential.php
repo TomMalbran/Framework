@@ -42,7 +42,7 @@ class Credential extends CredentialSchema {
         }
 
         $query = new CredentialQuery();
-        $query->access->equal(...$accessNames);
+        $query->access->in($accessNames);
 
         if (!Arrays::isEmpty($filter)) {
             $filters = Arrays::toStrings($filter);
