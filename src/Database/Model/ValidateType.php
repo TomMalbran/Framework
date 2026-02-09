@@ -19,6 +19,7 @@ enum ValidateType {
     case Price;
     case Date;
 
+    case Enum;
     case Status;
 
 

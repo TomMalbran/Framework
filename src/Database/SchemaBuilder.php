@@ -80,7 +80,7 @@ class SchemaBuilder implements DiscoveryBuilder {
 
         $name   = $forFramework ? "Framework" : "App";
         $models = count($schemaModels);
-        print("- Generated the Schema $name codes -> $models models ($created files)\n");
+        print("- $name Schema codes -> $models models ($created files)\n");
         return $created;
     }
 

@@ -1,11 +1,6 @@
 <?php
 namespace {{namespace}};
 
-{{#hasValidateImports}}
-{{#validateImports}}use {{.}};
-{{/validateImports}}
-
-{{/hasValidateImports}}
 {{#hasImports}}
 {{#imports}}use {{.}};
 {{/imports}}
@@ -134,9 +129,7 @@ class {{name}}Schema extends Schema {
      * @param {{fieldDoc}}{{/parents}}
      * @return bool
      */
-    public static function canEdit({{#parents}}
-        {{{fieldArg}}},{{/parents}}
-    ): bool {
+    public static function canEdit({{parentsArgList}}): bool {
         return true;
     }
 
@@ -151,7 +144,15 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}
     ): Result {
         $isEdit      = $request->has("{{idName}}");
-        $id          = $request->{{#hasIntID}}getInt{{/hasIntID}}{{^hasIntID}}getString{{/hasIntID}}("{{idName}}");
+        {{#hasIntID}}
+        $id          = $request->getInt("{{idName}}");
+        {{/hasIntID}}
+        {{#hasStringID}}
+        $id          = $request->getString("{{idName}}");
+        {{/hasStringID}}
+        {{#hasEnumID}}
+        $id          = {{idEnumClass}}::fromRequest($request, "{{idName}}");
+        {{/hasEnumID}}
         $errors      = new Errors();
         $canValidate = false;
 
@@ -273,8 +274,9 @@ class {{name}}Schema extends Schema {
 
         return new Result(
             isEdit:      $isEdit,{{#hasIntID}}
-            id:          $id,{{/hasIntID}}{{^hasIntID}}
-            code:        $id,{{/hasIntID}}
+            id:          $id,{{/hasIntID}}{{#hasStringID}}
+            code:        $id,{{/hasStringID}}{{#hasEnumID}}
+            code:        $id->name,{{/hasEnumID}}
             name:        $request->getString("name"),
             status:      $request->getString("status"),
             canValidate: $canValidate,

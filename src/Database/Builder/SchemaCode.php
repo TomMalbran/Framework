@@ -33,7 +33,6 @@ class SchemaCode {
         $parents     = self::getSomeFields($schemaModel, isParent: true);
         $editParents = $schemaModel->hasPositions ? $parents : [];
         $validations = self::getValidations($schemaModel);
-        $valImports  = self::getValidationImports($schemaModel);
 
         $hasVirtual  = count($schemaModel->virtualFields) > 0;
         $hasUniques  = count($uniques) > 0;
@@ -58,8 +57,6 @@ class SchemaCode {
 
             "hasValidation"       => count($validations) > 0,
             "validations"         => $validations,
-            "hasValidateImports"  => count($valImports) > 0,
-            "validateImports"     => $valImports,
             "validatesColor"      => self::validatesColor($schemaModel),
             "errorPrefix"         => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
 
@@ -114,6 +111,7 @@ class SchemaCode {
             "parents"             => $parents,
             "parentsList"         => self::joinFields($parents, "fieldParam"),
             "parentsSecList"      => self::joinFields($parents, "fieldParam", ", "),
+            "parentsArgList"      => self::joinFields($parents, "fieldArg", ", "),
             "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
             "editParents"         => $editParents,
             "hasDate"             => $hasDate,
@@ -141,7 +139,17 @@ class SchemaCode {
             $result["{$subRequest->namespace}\\{$subRequest->modelName}Schema"] = 1;
         }
 
-        return array_keys($result);
+        foreach ($schemaModel->validates as $validate) {
+            if ($validate->typeOf !== "") {
+                $result[$validate->typeOf] = 1;
+            } elseif ($validate->belongsTo !== "") {
+                $result[$validate->belongsTo] = 1;
+            }
+        }
+
+        $result = array_keys($result);
+        sort($result);
+        return $result;
     }
 
     /**
@@ -281,6 +289,7 @@ class SchemaCode {
             $validation = [];
             switch ($validate->type) {
             case ValidateType::String:
+            case ValidateType::Enum:
                 $validation = [
                     "isString"    => true,
                     "isRequired"  => $validate->isRequired,
@@ -390,25 +399,6 @@ class SchemaCode {
             ];
         }
         return $result;
-    }
-
-    /**
-     * Returns the Validation Imports for the Schema
-     * @param SchemaModel $schemaModel
-     * @return array<string>
-     */
-    private static function getValidationImports(SchemaModel $schemaModel): array {
-        $uses = [];
-        foreach ($schemaModel->validates as $validate) {
-            if ($validate->typeOf !== "") {
-                $uses[] = $validate->typeOf;
-            } elseif ($validate->belongsTo !== "") {
-                $uses[] = $validate->belongsTo;
-            }
-        }
-
-        sort($uses);
-        return $uses;
     }
 
     /**

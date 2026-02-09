@@ -177,6 +177,11 @@ class Validate {
         if ($this->prefix === "") {
             $this->prefix = Strings::pascalCaseToUpperCase($fantasyName);
         }
+
+        if ($this->type === ValidateType::Enum) {
+            $this->typeOf = $field->enumClass;
+            $this->method = "isValid";
+        }
         return $this;
     }
 
@@ -213,6 +218,9 @@ class Validate {
         }
         if ($this->isNumeric || $field->type === FieldType::Number || $field->type === FieldType::Float) {
             return ValidateType::Number;
+        }
+        if ($field->type === FieldType::Enum) {
+            return ValidateType::Enum;
         }
         if (FieldType::isString($field->type)) {
             return ValidateType::String;
