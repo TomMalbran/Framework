@@ -11,7 +11,7 @@ use Framework\Utils\Strings;
 /**
  * The Template Code
  */
-#[Priority(Priority::High)]
+#[Priority(Priority::Highest)]
 class TemplateCode implements DiscoveryBuilder {
 
     /**

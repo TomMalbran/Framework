@@ -192,9 +192,9 @@ class Discovery {
      * @param string $dir          Optional.
      * @param bool   $forFramework Optional.
      * @param bool   $withError    Optional.
-     * @return object[]
+     * @return array<string,ReflectionClass<object>>
      */
-    public static function getClassesWithInterface(
+    public static function getReflectionsWithInterface(
         string $interface,
         string $dir = "",
         bool $forFramework = false,
@@ -203,12 +203,32 @@ class Discovery {
         $reflections = self::getReflectionClasses($dir, $forFramework, $withError);
         $result      = [];
 
-        foreach ($reflections as $reflection) {
+        foreach ($reflections as $className => $reflection) {
             if ($reflection->implementsInterface($interface)) {
-                $result[] = $reflection;
+                $result[$className] = $reflection;
             }
         }
-        return self::sortClassesByPriority($result);
+        return $result;
+    }
+
+    /**
+     * Returns the Classes that implement the given Interface sorted by their Priority
+     * @phpstan-param class-string $interface
+     *
+     * @param string $interface
+     * @param string $dir          Optional.
+     * @param bool   $forFramework Optional.
+     * @param bool   $withError    Optional.
+     * @return object[]
+     */
+    public static function getClassesWithInterface(
+        string $interface,
+        string $dir = "",
+        bool $forFramework = false,
+        bool $withError = false,
+    ): array {
+        $reflections = self::getReflectionsWithInterface($interface, $dir, $forFramework, $withError);
+        return self::sortClassesByPriority($reflections);
     }
 
     /**
@@ -243,7 +263,7 @@ class Discovery {
      * @param ReflectionClass<object>[] $reflections
      * @return object[]
      */
-    private static function sortClassesByPriority(array $reflections): array {
+    public static function sortClassesByPriority(array $reflections): array {
         $priorities = [];
         $instances  = [];
         $result     = [];

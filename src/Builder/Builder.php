@@ -39,25 +39,19 @@ class Builder {
         File::emptyDir($writePath);
 
 
-        /** @var DiscoveryBuilder[] */
-        $frameBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class, forFramework: true);
-        if (count($frameBuilders) > 0) {
-            print("\nFRAMEWORK CODES\n");
-            foreach ($frameBuilders as $builder) {
-                $created += $builder::generateCode();
-            }
+        // Find all the Builders in the Framework and App
+        $reflections = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class, forFramework: true);
+        if (!Package::isFramework()) {
+            $appBuilders = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class);
+            $reflections = array_merge($reflections, $appBuilders);
         }
 
+        /** @var DiscoveryBuilder[] */
+        $builders = Discovery::sortClassesByPriority($reflections);
 
-        if (!Package::isFramework()) {
-            /** @var DiscoveryBuilder[] */
-            $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
-            if (count($appBuilders) > 0) {
-                print("\nAPP CODES\n");
-                foreach ($appBuilders as $builder) {
-                    $created += $builder::generateCode();
-                }
-            }
+        // Execute each Builder
+        foreach ($builders as $builder) {
+            $created += $builder::generateCode();
         }
 
 
@@ -76,19 +70,19 @@ class Builder {
         $writePath = Package::getBuildPath();
         $deleted   = 0;
 
+        // Find all the Builders in the Framework and App
+        $reflections = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class, forFramework: true);
         if (!Package::isFramework()) {
-            /** @var DiscoveryBuilder[] */
-            $appBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class);
-            $appBuilders = array_reverse($appBuilders);
-            foreach ($appBuilders as $builder) {
-                $deleted += $builder::destroyCode();
-            }
+            $appBuilders = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class);
+            $reflections = array_merge($reflections, $appBuilders);
         }
 
         /** @var DiscoveryBuilder[] */
-        $frameBuilders = Discovery::getClassesWithInterface(DiscoveryBuilder::class, forFramework: true);
-        $frameBuilders = array_reverse($frameBuilders);
-        foreach ($frameBuilders as $builder) {
+        $builders = Discovery::sortClassesByPriority($reflections);
+        $builders = array_reverse($builders);
+
+        // Execute each Destroyer
+        foreach ($builders as $builder) {
             $deleted += $builder::destroyCode();
         }
 
@@ -140,7 +134,7 @@ class Builder {
             $plural = $data["total"] !== 1 ? "s" : "";
             $total  = "-> {$data["total"]} item$plural";
         }
-        print("- Generated the $name code $total\n");
+        print("- $name code $total\n");
         return 1;
     }
 
