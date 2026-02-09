@@ -65,6 +65,19 @@ trait IsEnum {
         return self::fromValue($value) !== self::None;
     }
 
+    /**
+     * Returns all the Enum cases except None
+     * @return self[]
+     */
+    public static function getAll(): array {
+        $result = [];
+        foreach (self::cases() as $case) {
+            if ($case !== self::None) {
+                $result[] = $case;
+            }
+        }
+        return $result;
+    }
 
 
     /**
@@ -80,6 +93,9 @@ trait IsEnum {
      * @return mixed
      */
     public function jsonSerialize(): mixed {
+        if ($this === self::None) {
+            return "";
+        }
         return $this->name;
     }
 }
