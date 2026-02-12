@@ -153,6 +153,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
 
     /**
+     * Gets the value of the given key
+     * @param string|int $key
+     * @return mixed
+     */
+    public function get(string|int $key): mixed {
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
+        }
+        return null;
+    }
+
+    /**
      * Gets the value of the given key as a Boolean
      * @param string $key
      * @return bool
