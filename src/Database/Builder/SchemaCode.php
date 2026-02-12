@@ -43,7 +43,7 @@ class SchemaCode {
 
         $idType      = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, false);
         $idIsEnum    = $schemaModel->idType === FieldType::Enum;
-        $idSuffix    = $idIsEnum ? "->name" : "";
+        $idSuffix    = $idIsEnum ? "->toString()" : "";
         $idConvert   = $idIsEnum ? "string" : $idType;
 
         $contents    = Builder::render("Schema", [
@@ -225,12 +225,12 @@ class SchemaCode {
 
         $param       = "\${$field->name}";
         $dateParam   = "{$param}->toTime()";
-        $enumParam   = "{$param}->name";
+        $enumParam   = "{$param}->toString()";
         $value       = $param;
         $valueNull   = $param;
 
         if ($isEnum) {
-            $value     = "{$param}->name";
+            $value     = "{$param}->toString()";
             $valueNull = "$param !== null ? $value : null";
         } elseif ($type === "bool") {
             $value     = "$param === true ? 1 : 0";
