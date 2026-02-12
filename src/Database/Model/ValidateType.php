@@ -13,7 +13,6 @@ enum ValidateType {
     case String;
     case Email;
     case Url;
-    case Color;
 
     case Number;
     case Price;

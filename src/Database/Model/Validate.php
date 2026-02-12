@@ -4,6 +4,7 @@ namespace Framework\Database\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Utils\Arrays;
+use Framework\Utils\Color;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -27,9 +28,6 @@ class Validate {
 
     // The field should be validated as a URL.
     public bool $isUrl = false;
-
-    // The field should be validated as a Color.
-    public bool $isColor = false;
 
     // The field should be validated as a Number.
     // NOTE: Is only required when the type of the field is a String.
@@ -85,7 +83,6 @@ class Validate {
      * @param bool        $isRequired  Optional.
      * @param bool        $isEmail     Optional.
      * @param bool        $isUrl       Optional.
-     * @param bool        $isColor     Optional.
      * @param bool        $isNumeric   Optional.
      * @param bool        $isSigned    Optional.
      * @param bool        $isPrice     Optional.
@@ -104,7 +101,6 @@ class Validate {
         bool $isRequired = false,
         bool $isEmail = false,
         bool $isUrl = false,
-        bool $isColor = false,
         bool $isNumeric = false,
         bool $isSigned = false,
         bool $isPrice = false,
@@ -122,7 +118,6 @@ class Validate {
         $this->isRequired  = $isRequired;
         $this->isEmail     = $isEmail;
         $this->isUrl       = $isUrl;
-        $this->isColor     = $isColor;
         $this->isNumeric   = $isNumeric;
         $this->isSigned    = $isSigned;
         $this->isPrice     = $isPrice;
@@ -207,9 +202,6 @@ class Validate {
         if ($this->isUrl) {
             return ValidateType::Url;
         }
-        if ($this->isColor) {
-            return ValidateType::Color;
-        }
         if ($this->isPrice) {
             return ValidateType::Price;
         }
@@ -243,12 +235,26 @@ class Validate {
     }
 
     /**
-     * Gets the Type Error string for this Validate
+     * Gets the Type Invalid Error string for this Validate
      * @return string
      */
-    public function getTypeError(): string {
+    public function getTypeInvalidError(): string {
+        if ($this->typeOf === Color::class) {
+            return "GENERAL_ERROR_COLOR";
+        }
+
+        $prefix = $this->getFieldError();
+        return "{$prefix}_INVALID";
+    }
+
+    /**
+     * Gets the Type Exists Error string for this Validate
+     * @return string
+     */
+    public function getTypeExistsError(): string {
         $typeName = Strings::substringAfter($this->typeOf, "\\");
-        return Strings::pascalCaseToUpperCase($typeName);
+        $prefix   = Strings::pascalCaseToUpperCase($typeName);
+        return "{$prefix}_ERROR_EXISTS";
     }
 
     /**

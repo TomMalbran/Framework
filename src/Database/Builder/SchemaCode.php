@@ -57,7 +57,6 @@ class SchemaCode {
 
             "hasValidation"       => count($validations) > 0,
             "validations"         => $validations,
-            "validatesColor"      => self::validatesColor($schemaModel),
             "errorPrefix"         => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
 
             "hasID"               => $schemaModel->hasID,
@@ -291,15 +290,16 @@ class SchemaCode {
             case ValidateType::String:
             case ValidateType::Enum:
                 $validation = [
-                    "isString"    => true,
-                    "isRequired"  => $validate->isRequired,
-                    "isUnique"    => $validate->isUnique,
-                    "typeOf"      => Strings::substringAfter($validate->typeOf, "\\"),
-                    "method"      => $validate->method,
-                    "emptySuffix" => $validate->isUnique || $validate->typeOf !== "" || $validate->maxLength > 0,
-                    "maxLength"   => $validate->maxLength,
-                    "fieldName"   => $validate->name,
-                    "fieldError"  => $validate->getFieldError(),
+                    "isString"     => true,
+                    "isRequired"   => $validate->isRequired,
+                    "isUnique"     => $validate->isUnique,
+                    "typeOf"       => Strings::substringAfter($validate->typeOf, "\\"),
+                    "typeInvError" => $validate->getTypeInvalidError(),
+                    "method"       => $validate->method,
+                    "emptySuffix"  => $validate->isUnique || $validate->typeOf !== "" || $validate->maxLength > 0,
+                    "maxLength"    => $validate->maxLength,
+                    "fieldName"    => $validate->name,
+                    "fieldError"   => $validate->getFieldError(),
                 ];
                 break;
 
@@ -322,32 +322,23 @@ class SchemaCode {
                 ];
                 break;
 
-            case ValidateType::Color:
-                $validation = [
-                    "isColor"    => true,
-                    "isRequired" => $validate->isRequired,
-                    "fieldName"  => $validate->name,
-                    "fieldError" => $validate->getFieldError(),
-                ];
-                break;
-
             case ValidateType::Number:
                 $validation = [
-                    "isNumber"      => true,
-                    "isRequired"    => $validate->isRequired,
-                    "isUnique"      => $validate->isUnique,
-                    "emptySuffix"   => $validate->isUnique || $validate->isNumeric,
-                    "typeOf"        => Strings::substringAfter($validate->typeOf, "\\"),
-                    "typeError"     => $validate->getTypeError(),
-                    "belongsTo"     => Strings::substringAfter($validate->belongsTo, "\\"),
-                    "belongsError"  => $validate->getBelongsToError(),
-                    "method"        => $validate->method,
-                    "withParent"    => $validate->withParent,
-                    "isNumeric"     => $validate->typeOf === "" && $validate->belongsTo === "",
-                    "invalidPrefix" => $validate->isRequired,
-                    "numericParams" => $validate->getNumericParams(),
-                    "fieldName"     => $validate->name,
-                    "fieldError"    => $validate->getFieldError(),
+                    "isNumber"        => true,
+                    "isRequired"      => $validate->isRequired,
+                    "isUnique"        => $validate->isUnique,
+                    "emptySuffix"     => $validate->isUnique || $validate->isNumeric,
+                    "typeOf"          => Strings::substringAfter($validate->typeOf, "\\"),
+                    "typeExistsError" => $validate->getTypeExistsError(),
+                    "belongsTo"       => Strings::substringAfter($validate->belongsTo, "\\"),
+                    "belongsToError"  => $validate->getBelongsToError(),
+                    "method"          => $validate->method,
+                    "withParent"      => $validate->withParent,
+                    "isNumeric"       => $validate->typeOf === "" && $validate->belongsTo === "",
+                    "invalidPrefix"   => $validate->isRequired,
+                    "numericParams"   => $validate->getNumericParams(),
+                    "fieldName"       => $validate->name,
+                    "fieldError"      => $validate->getFieldError(),
                 ];
                 break;
 
@@ -399,19 +390,5 @@ class SchemaCode {
             ];
         }
         return $result;
-    }
-
-    /**
-     * Returns true if there is a Color validation
-     * @param SchemaModel $schemaModel
-     * @return bool
-     */
-    private static function validatesColor(SchemaModel $schemaModel): bool {
-        foreach ($schemaModel->validates as $validate) {
-            if ($validate->type === ValidateType::Color) {
-                return true;
-            }
-        }
-        return false;
     }
 }

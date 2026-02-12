@@ -32,8 +32,7 @@ use Framework\Utils\Dictionary;
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
 use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
-use Framework\Utils\Errors;{{#validatesColor}}
-use Framework\Utils\Color;{{/validatesColor}}{{/hasValidation}}
+use Framework\Utils\Errors;{{/hasValidation}}
 
 /**
  * The {{name}} Schema
@@ -166,11 +165,13 @@ class {{name}}Schema extends Schema {
             {{{condition}}}
     {{/hasIf}}
     {{#isString}}
+        {{#isRequired}}
             {{pads}}if (!$request->isValidString("{{fieldName}}")) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
+        {{/isRequired}}
         {{#typeOf}}
-            {{pads}}} elseif (!{{typeOf}}::{{method}}($request->getString("{{fieldName}}"))) {
-            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_INVALID";
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!{{typeOf}}::{{method}}($request->getString("{{fieldName}}"))) {
+            {{pads}}    $errors->{{fieldName}} = "{{typeInvError}}";
         {{/typeOf}}
         {{#isUnique}}
             {{pads}}} elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
@@ -204,11 +205,6 @@ class {{name}}Schema extends Schema {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_INVALID";
             {{pads}}}
     {{/isUrl}}
-    {{#isColor}}
-            {{pads}}if (!Color::isValid($request->getString("{{fieldName}}"))) {
-            {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_COLOR";
-            {{pads}}}
-    {{/isColor}}
     {{#isNumber}}
         {{#isRequired}}
             {{pads}}if (!$request->has("{{fieldName}}")) {
@@ -216,11 +212,11 @@ class {{name}}Schema extends Schema {
         {{/isRequired}}
         {{#typeOf}}
             {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{typeOf}}::{{method}}($request->getInt("{{fieldName}}"))) {
-            {{pads}}    $errors->{{fieldName}} = "{{typeError}}_ERROR_EXISTS";
+            {{pads}}    $errors->{{fieldName}} = "{{typeExistsError}}";
         {{/typeOf}}
         {{#belongsTo}}
             {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{belongsTo}}::{{method}}($request->getInt("{{fieldName}}"{{#withParent}}{{parentsSecList}}{{/withParent}}))) {
-            {{pads}}    $errors->{{fieldName}} = "{{belongsError}}";
+            {{pads}}    $errors->{{fieldName}} = "{{belongsToError}}";
         {{/belongsTo}}
         {{#isNumeric}}
             {{pads}}{{#isRequired}}} else{{/isRequired}}if (!$request->isNumeric("{{fieldName}}"{{numericParams}})) {
