@@ -266,7 +266,7 @@ class OpenAI {
 
         $text = $choice->getDict("message")->getString("content");
         if ($removeReferences) {
-            $text = Strings::replace($text, '/【.*?†.*?】/', "");
+            $text = Strings::replacePattern($text, '/【.*?†.*?】/', "");
         }
 
         $result->externalID   = $response->getString("id");
@@ -366,7 +366,7 @@ class OpenAI {
             }
         }
         if ($removeReferences) {
-            $text = Strings::replace($text, '/【.*?†.*?】/', "");
+            $text = Strings::replacePattern($text, '/【.*?†.*?】/', "");
         }
 
         if ($text !== "") {
