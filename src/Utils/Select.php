@@ -203,7 +203,7 @@ class Select implements JsonSerializable {
      * @param array<string|int,string> $array
      * @return Select[]
      */
-    public static function createFromMap(array $array): array {
+    public static function createFromArray(array $array): array {
         $result = [];
         foreach ($array as $key => $value) {
             $result[] = new Select((string)$key, $value);

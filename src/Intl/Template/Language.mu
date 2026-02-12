@@ -60,6 +60,6 @@ class Language {
      * @return Select[]
      */
     public static function getSelect(): array {
-        return Select::createFromMap(self::getAll());
+        return Select::createFromArray(self::getAll());
     }
 }

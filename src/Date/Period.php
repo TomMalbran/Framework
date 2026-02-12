@@ -298,7 +298,7 @@ class Period {
      * @return Select[]
      */
     public static function getSelect(): array {
-        return Select::createFromMap(self::$names);
+        return Select::createFromArray(self::$names);
     }
 
 

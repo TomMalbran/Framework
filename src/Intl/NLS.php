@@ -124,7 +124,7 @@ class NLS {
         $data = self::load($language);
         $dict = $data->getDict($key);
         $map  = $dict->toStringsMap();
-        return Select::createFromMap($map);
+        return Select::createFromArray($map);
     }
 
     /**
