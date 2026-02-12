@@ -23,7 +23,7 @@ class EnumQuery extends BaseQuery {
      * @return void
      */
     public function isNotEmpty() {
-        $this->query->add($this->column, QueryOperator::NotEqual, 0);
+        $this->query->add($this->column, QueryOperator::NotEqual, "");
     }
 
     /**
@@ -76,9 +76,9 @@ class EnumQuery extends BaseQuery {
     private function toNames(array $values): array {
         $result = [];
         foreach ($values as $value) {
-            $name = $value->toString();
-            if ($name !== "None") {
-                $result[] = $name;
+            $value = $value->toString();
+            if ($value !== "") {
+                $result[] = $value;
             }
         }
         return $result;
