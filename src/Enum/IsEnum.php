@@ -1,8 +1,10 @@
 <?php
-namespace Framework\Database\Type;
+namespace Framework\Enum;
 
 use Framework\Utils\Strings;
 use Framework\Request;
+
+use BackedEnum;
 
 /**
  * The Enum trait
@@ -20,7 +22,7 @@ trait IsEnum {
             return $value;
         }
         foreach (self::cases() as $case) {
-            if (Strings::isEqual($case->name, $value)) {
+            if (Strings::isEqual($case->toString(), $value)) {
                 return $case;
             }
         }
@@ -65,8 +67,11 @@ trait IsEnum {
         return self::fromValue($value) !== self::None;
     }
 
+
+
     /**
      * Returns all the Enum cases except None
+     * @phpstan-return list<self>
      * @return self[]
      */
     public static function getAll(): array {
@@ -79,13 +84,35 @@ trait IsEnum {
         return $result;
     }
 
+    /**
+     * Checks if the given value is contained in the list of values
+     * @param self[] $values
+     * @param self   $value
+     * @return bool
+     */
+    public static function contains(array $values, self $value): bool {
+        foreach ($values as $item) {
+            if ($item === $value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     /**
      * Converts the Enum into a string
      * @return string
      */
     public function toString(): string {
-        return $this->name;
+        if ($this === self::None) {
+            return "";
+        }
+        if ($this instanceof BackedEnum) {
+            return Strings::toString($this->value);
+        }
+        return Strings::toString($this->name);
     }
 
     /**
@@ -93,9 +120,6 @@ trait IsEnum {
      * @return mixed
      */
     public function jsonSerialize(): mixed {
-        if ($this === self::None) {
-            return "";
-        }
-        return $this->name;
+        return $this->toString();
     }
 }

@@ -14,9 +14,9 @@ use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
 use Framework\Database\Status\Status;
 use Framework\Database\Status\State;
-use Framework\Database\Type\Enum;
 use Framework\File\File;
 use Framework\Date\Date;
+use Framework\Enum\Enum;
 use Framework\Utils\Strings;
 
 use Throwable;

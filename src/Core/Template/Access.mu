@@ -3,8 +3,8 @@ namespace {{namespace}};
 
 use Framework\Auth\Auth;
 use Framework\Intl\NLS;
-use Framework\Database\Type\Enum;
-use Framework\Database\Type\IsEnum;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 

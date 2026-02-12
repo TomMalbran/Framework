@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Database\Type;
+namespace Framework\Enum;
 
 use Framework\Request;
 

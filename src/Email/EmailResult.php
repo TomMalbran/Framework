@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Database\Type\Enum;
-use Framework\Database\Type\IsEnum;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 
 use JsonSerializable;
 

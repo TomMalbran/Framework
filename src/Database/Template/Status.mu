@@ -2,8 +2,8 @@
 namespace {{namespace}};
 
 use Framework\Intl\NLS;
-use Framework\Database\Type\Enum;
-use Framework\Database\Type\IsEnum;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Utils\Select;
 
 use JsonSerializable;

@@ -3,7 +3,7 @@ namespace Framework\Database\Query;
 
 use Framework\Database\Query\BaseQuery;
 use Framework\Database\Query\QueryOperator;
-use Framework\Database\Type\Enum;
+use Framework\Enum\Enum;
 
 /**
  * The Enum Query

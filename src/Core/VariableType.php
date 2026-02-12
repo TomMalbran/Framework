@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Database\Type\IsEnum;
-use Framework\Database\Type\Enum;
+use Framework\Enum\IsEnum;
+use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
