@@ -71,10 +71,7 @@ enum {{statusClass}} implements Enum, JsonSerializable {
      */
     public static function getSelect(string $isoCode = ""): array {
         $result = [];
-        foreach (self::cases() as $status) {
-            if ($status === self::None) {
-                continue;
-            }
+        foreach (self::getAll() as $status) {
             $result[] = new Select(
                 $status->name,
                 self::getName($status, $isoCode),

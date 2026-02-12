@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -129,16 +130,24 @@ class Errors implements JsonSerializable {
 
     /**
      * Adds a new error
-     * @param string      $section
-     * @param string      $error
+     * @param Enum|string $section
+     * @param Enum|string $error
      * @param string      $message
      * @param string|null $value   Optional.
      * @return Errors
      */
-    public function addFor(string $section, string $error, string $message, ?string $value = null): Errors {
+    public function addFor(Enum|string $section, Enum|string $error, string $message, ?string $value = null): Errors {
         if ($message === "") {
             return $this;
         }
+
+        if ($section instanceof Enum) {
+            $section = $section->toString();
+        }
+        if ($error instanceof Enum) {
+            $error = $error->toString();
+        }
+
         if (!isset($this->errors[$section])) {
             $this->errors[$section] = 1;
         } elseif (is_int($this->errors[$section])) {

@@ -1,10 +1,16 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
+
+use JsonSerializable;
+
 /**
  * The Colors
  */
-enum Color : string {
+enum Color: string implements Enum, JsonSerializable {
+    use IsEnum;
 
     case None         = "#f2f2f2";
     case Red          = "#e8384f";

@@ -1,12 +1,17 @@
 <?php
 namespace {{namespace}};
 
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Utils\Strings;
+
+use JsonSerializable;
 
 /**
  * The {{name}} Column
  */
-enum {{columnClass}} : string {
+enum {{columnClass}}: string implements Enum, JsonSerializable {
+    use IsEnum;
 
     case None = "";
 
@@ -18,20 +23,6 @@ enum {{columnClass}} : string {
 {{/columns}}
 
 
-
-    /**
-     * Creates a {{name}} Column from a String
-     * @param string $value
-     * @return {{columnClass}}
-     */
-    public static function fromValue(string $value): {{columnClass}} {
-        foreach (self::cases() as $case) {
-            if ($case->name === $value) {
-                return $case;
-            }
-        }
-        return self::None;
-    }
 
     /**
      * Get the key of the column
