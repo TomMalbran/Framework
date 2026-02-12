@@ -107,6 +107,18 @@ class OpenAI {
 
 
     /**
+     * Returns the allowed File Extensions
+     * @return string[]
+     */
+    public static function getFilExtensions(): array {
+        return [
+            "c", "cs", "cpp", "doc", "docx", "html", "java", "json",
+            "md", "pdf", "php", "pptx", "py", "rb", "tex", "txt",
+            "css", "js", "sh", "ts",
+        ];
+    }
+
+    /**
      * Uploads the given File
      * @param string $fileName
      * @param string $fileContent
