@@ -3,6 +3,7 @@ namespace Framework\Email\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\System\EmailCode;
 
 /**
  * The Email Content Model
@@ -15,7 +16,7 @@ class EmailContentModel {
     #[Field(isID: true)]
     public int $emailContentID = 0;
 
-    public string $emailCode = "";
+    public EmailCode $emailCode = EmailCode::None;
 
     public string $language = "";
 

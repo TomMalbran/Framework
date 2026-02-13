@@ -11,7 +11,7 @@ use Framework\Utils\Strings;
 /**
  * The Language Builder
  */
-#[Priority(Priority::High)]
+#[Priority(Priority::Highest)]
 class LanguageBuilder implements DiscoveryBuilder {
 
     /**

@@ -3,6 +3,7 @@ namespace Framework\Email;
 
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Builder\Builder;
+use Framework\Discovery\Priority;
 use Framework\Intl\NLSConfig;
 use Framework\System\Language;
 use Framework\Utils\Dictionary;
@@ -10,6 +11,7 @@ use Framework\Utils\Dictionary;
 /**
  * The Email Builder
  */
+#[Priority(Priority::High)]
 class EmailBuilder implements DiscoveryBuilder {
 
     /**
@@ -31,6 +33,11 @@ class EmailBuilder implements DiscoveryBuilder {
         $codes = [];
         foreach ($data as $emailCode => $email) {
             $codes[] = $emailCode;
+        }
+
+        // If no codes are found, add a default one
+        if (count($codes) === 0) {
+            $codes[] = "Test";
         }
 
         // Builds the code

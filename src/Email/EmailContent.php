@@ -28,7 +28,7 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
         $langCode = Language::getCode($language);
 
         $query = new EmailContentQuery();
-        $query->emailCode->equal($emailCode->name);
+        $query->emailCode->equal($emailCode);
         $query->language->equal($langCode);
         return self::getEntity($query);
     }
@@ -102,7 +102,7 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
             $total    += 1;
 
             self::createEntity(
-                emailCode:    $emailCode,
+                emailCode:    EmailCode::fromValue($emailCode),
                 language:     $language,
                 languageName: $languageName,
                 description:  $email->getString("description"),
