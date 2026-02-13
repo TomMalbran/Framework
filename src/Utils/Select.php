@@ -1,7 +1,11 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Enum\Enum;
+use Framework\Enum\Map;
 use Framework\Utils\Arrays;
+use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
 
 use JsonSerializable;
 
@@ -24,11 +28,18 @@ class Select implements JsonSerializable {
 
     /**
      * Creates a new Select instance
-     * @param string|int          $key
-     * @param string              $value
+     * @param Enum|string|int     $key
+     * @param Enum|string         $value
      * @param array<string,mixed> $extras Optional.
      */
-    public function __construct(string|int $key, string $value, array $extras = []) {
+    public function __construct(Enum|string|int $key, Enum|string $value, array $extras = []) {
+        if ($key instanceof Enum) {
+            $key = $key->toString();
+        }
+        if ($value instanceof Enum) {
+            $value = $value->toString();
+        }
+
         $this->id     = (int)$key;
         $this->field  = (string)$key;
         $this->key    = $key;
@@ -207,6 +218,22 @@ class Select implements JsonSerializable {
         $result = [];
         foreach ($array as $key => $value) {
             $result[] = new Select((string)$key, $value);
+        }
+        return $result;
+    }
+
+    /**
+     * Creates a select using the given array
+     * @param Map<Enum,mixed> $map
+     * @return Select[]
+     */
+    public static function createFromMap(Map $map): array {
+        $result = [];
+        foreach ($map as $key => $value) {
+            $result[] = new Select(
+                $key,
+                Strings::toString($value),
+            );
         }
         return $result;
     }

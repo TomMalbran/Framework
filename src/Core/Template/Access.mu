@@ -120,7 +120,7 @@ enum Access implements Enum, JsonSerializable {
         $result = [];
         foreach ([ {{values}} ] as $value) {
             $name     = self::getName($value, $isoCode);
-            $result[] = new Select($value->name, $name);
+            $result[] = new Select($value, $name);
         }
         return $result;
     }
