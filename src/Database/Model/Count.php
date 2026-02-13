@@ -29,13 +29,10 @@ class Count {
 
     /**
      * The Count Attribute
-     * @phpstan-param class-string|null $modelName
-     * @phpstan-param class-string|null $otherModelName
-     *
-     * @param string|null $modelName      Optional.
-     * @param string|null $otherModelName Optional.
-     * @param string      $fieldName      Optional.
-     * @param string      $query          Optional.
+     * @param class-string|null $modelName
+     * @param class-string|null $otherModelName
+     * @param string            $fieldName      Optional.
+     * @param string            $query          Optional.
      */
     public function __construct(
         ?string $modelName = null,

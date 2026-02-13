@@ -509,10 +509,8 @@ class Arrays {
     /**
      * Adds the given element to the start of the Array
      * @template TValue
-     * @phpstan-param TValue ...$elem
-     *
      * @param TValue[] $array
-     * @param mixed    ...$elem
+     * @param TValue   ...$elem
      * @return TValue[]
      */
     public static function addFirst(array $array, mixed ...$elem): array {
@@ -523,11 +521,9 @@ class Arrays {
     /**
      * Adds the given element at the given position
      * @template TValue
-     * @phpstan-param TValue ...$elem
-     *
      * @param TValue[] $array
      * @param int      $position
-     * @param mixed    ...$elem
+     * @param TValue   ...$elem
      * @return TValue[]
      */
     public static function addAt(array $array, int $position, mixed ...$elem): array {

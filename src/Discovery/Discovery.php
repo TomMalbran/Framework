@@ -186,12 +186,10 @@ class Discovery {
 
     /**
      * Returns the Reflection Classes that implement the given Interface
-     * @phpstan-param class-string $interface
-     *
-     * @param string $interface
-     * @param string $dir          Optional.
-     * @param bool   $forFramework Optional.
-     * @param bool   $withError    Optional.
+     * @param class-string $interface
+     * @param string       $dir          Optional.
+     * @param bool         $forFramework Optional.
+     * @param bool         $withError    Optional.
      * @return array<string,ReflectionClass<object>>
      */
     public static function getReflectionsWithInterface(
@@ -213,12 +211,10 @@ class Discovery {
 
     /**
      * Returns the Classes that implement the given Interface sorted by their Priority
-     * @phpstan-param class-string $interface
-     *
-     * @param string $interface
-     * @param string $dir          Optional.
-     * @param bool   $forFramework Optional.
-     * @param bool   $withError    Optional.
+     * @param class-string $interface
+     * @param string       $dir          Optional.
+     * @param bool         $forFramework Optional.
+     * @param bool         $withError    Optional.
      * @return object[]
      */
     public static function getClassesWithInterface(
@@ -233,12 +229,10 @@ class Discovery {
 
     /**
      * Returns the Reflection Classes that implement the given Parent
-     * @phpstan-param class-string $parentClass
-     *
-     * @param string $parentClass
-     * @param string $dir          Optional.
-     * @param bool   $forFramework Optional.
-     * @param bool   $withError    Optional.
+     * @param class-string $parentClass
+     * @param string       $dir          Optional.
+     * @param bool         $forFramework Optional.
+     * @param bool         $withError    Optional.
      * @return object[]
      */
     public static function getClassesWithParent(
@@ -340,8 +334,7 @@ class Discovery {
 
     /**
      * Returns the Properties of the given Class, starting from the Base Class
-     * @phpstan-param ReflectionClass<object> $class
-     * @param ReflectionClass $class
+     * @param ReflectionClass<object> $class
      * @return array<ReflectionProperty>
      */
     public static function getPropertiesBaseFirst(ReflectionClass $class): array {

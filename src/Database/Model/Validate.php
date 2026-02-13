@@ -76,25 +76,22 @@ class Validate {
 
     /**
      * The Validate Attribute
-     * @phpstan-param class-string|null $typeOf
-     * @phpstan-param class-string|null $belongsTo
-     *
-     * @param string      $if          Optional.
-     * @param bool        $isRequired  Optional.
-     * @param bool        $isEmail     Optional.
-     * @param bool        $isUrl       Optional.
-     * @param bool        $isNumeric   Optional.
-     * @param bool        $isSigned    Optional.
-     * @param bool        $isPrice     Optional.
-     * @param string|null $typeOf      Optional.
-     * @param string|null $belongsTo   Optional.
-     * @param string      $method      Optional.
-     * @param bool        $withParent  Optional.
-     * @param int         $maxLength   Optional.
-     * @param int         $minValue    Optional.
-     * @param int         $maxValue    Optional.
-     * @param string      $prefix      Optional.
-     * @param string      $belongsName Optional.
+     * @param string            $if          Optional.
+     * @param bool              $isRequired  Optional.
+     * @param bool              $isEmail     Optional.
+     * @param bool              $isUrl       Optional.
+     * @param bool              $isNumeric   Optional.
+     * @param bool              $isSigned    Optional.
+     * @param bool              $isPrice     Optional.
+     * @param class-string|null $typeOf      Optional.
+     * @param class-string|null $belongsTo   Optional.
+     * @param string            $method      Optional.
+     * @param bool              $withParent  Optional.
+     * @param int               $maxLength   Optional.
+     * @param int               $minValue    Optional.
+     * @param int               $maxValue    Optional.
+     * @param string            $prefix      Optional.
+     * @param string            $belongsName Optional.
      */
     public function __construct(
         string $if = "",

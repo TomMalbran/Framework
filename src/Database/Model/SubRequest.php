@@ -25,13 +25,11 @@ class SubRequest {
 
     /**
      * The SubRequest Attribute
-     * @phpstan-param class-string|null $modelName
-     *
-     * @param string|null $modelName Optional.
-     * @param string      $idName    Optional.
-     * @param string      $fieldName Optional.
-     * @param string      $valueName Optional.
-     * @param string      $query     Optional.
+     * @param class-string|null $modelName Optional.
+     * @param string            $idName    Optional.
+     * @param string            $fieldName Optional.
+     * @param string            $valueName Optional.
+     * @param string            $query     Optional.
      */
     public function __construct(
         ?string $modelName = null,

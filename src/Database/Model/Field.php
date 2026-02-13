@@ -116,33 +116,31 @@ class Field {
 
     /**
      * The Field Attribute
-     * @phpstan-param class-string|null $belongsTo
-     *
-     * @param bool        $isID        Optional.
-     * @param bool        $notAutoInc  Optional.
-     * @param bool        $isPrimary   Optional.
-     * @param bool        $isKey       Optional.
-     * @param bool        $isParent    Optional.
-     * @param bool        $isUnique    Optional.
-     * @param bool        $isCode      Optional.
-     * @param string|null $belongsTo   Optional.
-     * @param string      $otherField  Optional.
-     * @param int         $length      Optional.
-     * @param bool        $isSigned    Optional.
-     * @param int         $decimals    Optional.
-     * @param bool        $isText      Optional.
-     * @param bool        $isLongText  Optional.
-     * @param bool        $isEncrypt   Optional.
-     * @param bool        $isJSON      Optional.
-     * @param bool        $isFile      Optional.
-     * @param bool        $hasFile     Optional.
-     * @param string      $filePath    Optional.
-     * @param DateType    $dateType    Optional.
-     * @param string      $dateInput   Optional.
-     * @param string      $hourInput   Optional.
-     * @param bool        $fromRequest Optional.
-     * @param bool        $noEmpty     Optional.
-     * @param bool        $noExists    Optional.
+     * @param bool              $isID        Optional.
+     * @param bool              $notAutoInc  Optional.
+     * @param bool              $isPrimary   Optional.
+     * @param bool              $isKey       Optional.
+     * @param bool              $isParent    Optional.
+     * @param bool              $isUnique    Optional.
+     * @param bool              $isCode      Optional.
+     * @param class-string|null $belongsTo   Optional.
+     * @param string            $otherField  Optional.
+     * @param int               $length      Optional.
+     * @param bool              $isSigned    Optional.
+     * @param int               $decimals    Optional.
+     * @param bool              $isText      Optional.
+     * @param bool              $isLongText  Optional.
+     * @param bool              $isEncrypt   Optional.
+     * @param bool              $isJSON      Optional.
+     * @param bool              $isFile      Optional.
+     * @param bool              $hasFile     Optional.
+     * @param string            $filePath    Optional.
+     * @param DateType          $dateType    Optional.
+     * @param string            $dateInput   Optional.
+     * @param string            $hourInput   Optional.
+     * @param bool              $fromRequest Optional.
+     * @param bool              $noEmpty     Optional.
+     * @param bool              $noExists    Optional.
      */
     public function __construct(
         bool $isID = false,
