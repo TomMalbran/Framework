@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
 
@@ -70,7 +71,7 @@ class Mandrill {
             "async"   => false,
             "send_at" => date("Y-m-d H:i:s"),
         ];
-        $result   = Curl::execute("POST", $url, $params, $headers, jsonBody: true);
+        $result   = Curl::execute(CurlMethod::POST, $url, $params, $headers, jsonBody: true);
 
         $response = new Dictionary($result);
         return $response->getString("status") === "sent";

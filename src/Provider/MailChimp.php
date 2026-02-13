@@ -3,6 +3,7 @@
 namespace Framework\Provider;
 
 use Framework\Email\EmailWhiteList;
+use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Select;
@@ -58,7 +59,7 @@ class MailChimp {
      * @return Dictionary
      */
     private static function get(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute("GET", self::getUrl($route), $request, self::getHeaders());
+        $result = Curl::execute(CurlMethod::GET, self::getUrl($route), $request, self::getHeaders());
         return new Dictionary($result);
     }
 
@@ -69,7 +70,7 @@ class MailChimp {
      * @return Dictionary
      */
     private static function post(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute("POST", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        $result = Curl::execute(CurlMethod::POST, self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
         return new Dictionary($result);
     }
 
@@ -80,7 +81,7 @@ class MailChimp {
      * @return Dictionary
      */
     private static function patch(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute("PATCH", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        $result = Curl::execute(CurlMethod::PATCH, self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
         return new Dictionary($result);
     }
 
@@ -91,7 +92,7 @@ class MailChimp {
      * @return Dictionary
      */
     private static function put(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute("PUT", self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        $result = Curl::execute(CurlMethod::PUT, self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
         return new Dictionary($result);
     }
 
@@ -101,7 +102,7 @@ class MailChimp {
      * @return Dictionary
      */
     private static function delete(string $route): Dictionary {
-        $result = Curl::execute("DELETE", self::getUrl($route), null, self::getHeaders());
+        $result = Curl::execute(CurlMethod::DELETE, self::getUrl($route), null, self::getHeaders());
         return new Dictionary($result);
     }
 

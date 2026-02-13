@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\Utils\Utils;
 
 /**
@@ -22,7 +23,7 @@ class Facebook {
         }
 
         /** @var array<string,string> */
-        $response = Curl::execute("GET", self::BaseUrl . "me", [
+        $response = Curl::execute(CurlMethod::GET, self::BaseUrl . "me", [
             "fields"       => "email,name,first_name,last_name",
             "access_token" => $accessToken,
         ]);

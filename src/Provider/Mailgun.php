@@ -2,6 +2,7 @@
 // spell-checker: ignore  mailgun
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\Provider\Type\DomainData;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
@@ -18,12 +19,12 @@ class Mailgun {
 
     /**
      * Executes a Request
-     * @param string              $method
+     * @param CurlMethod          $method
      * @param string              $route
      * @param array<string,mixed> $params Optional.
      * @return Dictionary
      */
-    private static function execute(string $method, string $route, array $params = []): Dictionary {
+    private static function execute(CurlMethod $method, string $route, array $params = []): Dictionary {
         $url      = self::BaseUrl . $route;
         $userPass = "api:" . Config::getMailgunKey();
         $response = Curl::execute($method, $url, $params, userPass: $userPass);
@@ -75,7 +76,7 @@ class Mailgun {
         }
 
         $domain   = Utils::getEmailDomain($fromEmail);
-        $response = self::execute("POST", "/v3/$domain/messages", $params);
+        $response = self::execute(CurlMethod::POST, "/v3/$domain/messages", $params);
         $uuid     = $response->getString("id");
         $uuid     = Strings::replace($uuid, [ "<", ">" ], "");
         return $uuid;
@@ -111,7 +112,7 @@ class Mailgun {
      * @return DomainData
      */
     public static function getDomain(string $domain): DomainData {
-        $response = self::execute("GET", "/v4/domains/$domain", [
+        $response = self::execute(CurlMethod::GET, "/v4/domains/$domain", [
             "h:extended" => "true",
             "h:with_dns" => "true",
         ]);
@@ -157,7 +158,7 @@ class Mailgun {
         }
 
         // Finally get the DMARC record
-        $response = self::execute("GET", "/v1/dmarc/records/$result->domain");
+        $response = self::execute(CurlMethod::GET, "/v1/dmarc/records/$result->domain");
         if ($response->hasValue("entry")) {
             $result->dmarcType  = "TXT";
             $result->dmarcHost  = "_dmarc.{$result->domain}";
@@ -175,7 +176,7 @@ class Mailgun {
      * @return bool
      */
     public static function createDomain(string $domain): bool {
-        $response = self::execute("POST", "/v4/domains", [
+        $response = self::execute(CurlMethod::POST, "/v4/domains", [
             "name" => $domain,
         ]);
         return $response->hasValue("domain");
@@ -188,14 +189,14 @@ class Mailgun {
      * @return bool
      */
     public static function setDomainTracking(string $domain, bool $tracking): bool {
-        $response = self::execute("PUT", "/v3/domains/$domain/tracking/open", [
+        $response = self::execute(CurlMethod::PUT, "/v3/domains/$domain/tracking/open", [
             "active" => $tracking ? "true" : "false",
         ]);
         if (!$response->hasValue("open")) {
             return false;
         }
 
-        $response = self::execute("PUT", "/v3/domains/$domain/tracking/unsubscribe", [
+        $response = self::execute(CurlMethod::PUT, "/v3/domains/$domain/tracking/unsubscribe", [
             "active" => $tracking ? "true" : "false",
         ]);
         return $response->hasValue("unsubscribe");
@@ -210,7 +211,7 @@ class Mailgun {
     public static function setDomainWebhooks(string $domain, string $url): bool {
         $types = [ "delivered", "opened", "permanent_fail", "unsubscribed" ];
         foreach ($types as $type) {
-            $response = self::execute("POST", "/v3/$domain/webhooks", [
+            $response = self::execute(CurlMethod::POST, "/v3/$domain/webhooks", [
                 "id"  => $type,
                 "url" => $url,
             ]);
@@ -227,7 +228,7 @@ class Mailgun {
      * @return DomainData
      */
     public static function verifyDomain(string $domain): DomainData {
-        $response = self::execute("PUT", "/v4/domains/$domain/verify");
+        $response = self::execute(CurlMethod::PUT, "/v4/domains/$domain/verify");
         return self::generateDomainData($response);
     }
 
@@ -237,7 +238,7 @@ class Mailgun {
      * @return bool
      */
     public static function deleteDomain(string $domain): bool {
-        $response = self::execute("DELETE", "/v3/domains/$domain");
+        $response = self::execute(CurlMethod::DELETE, "/v3/domains/$domain");
         return Strings::contains($response->getString("message"), "deleted");
     }
 }

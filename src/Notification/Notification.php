@@ -3,6 +3,7 @@ namespace Framework\Notification;
 
 use Framework\Application;
 use Framework\Provider\Curl;
+use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -123,7 +124,13 @@ class Notification {
             "Content-Type"  => "application/json; charset=utf-8",
             "Authorization" => "Basic " . Config::getOnesignalRestKey(),
         ];
-        $response = Curl::execute("POST", self::BaseUrl . "/notifications", $data, $headers, jsonBody: true);
+        $response = Curl::execute(
+            CurlMethod::POST,
+            self::BaseUrl . "/notifications",
+            $data,
+            $headers,
+            jsonBody: true,
+        );
 
         if (!is_array($response) || !isset($response["id"]) || Arrays::isEmpty($response["id"])) {
             return null;

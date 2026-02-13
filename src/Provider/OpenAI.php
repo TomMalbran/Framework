@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\Provider\Type\OpenAIOutput;
 use Framework\System\Config;
 use Framework\Date\Timer;
@@ -25,7 +26,7 @@ class OpenAI {
      * @return Dictionary
      */
     private static function get(string $route, ?array $request = null): Dictionary {
-        $response = Curl::execute("GET", self::BaseUrl . $route, $request, [
+        $response = Curl::execute(CurlMethod::GET, self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
         ], jsonResponse: true);
         return new Dictionary($response);
@@ -38,7 +39,7 @@ class OpenAI {
      * @return Dictionary
      */
     private static function post(string $route, ?array $request = null): Dictionary {
-        $response = Curl::execute("POST", self::BaseUrl . $route, $request, [
+        $response = Curl::execute(CurlMethod::POST, self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "application/json",
         ], jsonBody: true, jsonResponse: true);
@@ -52,7 +53,7 @@ class OpenAI {
      * @return Dictionary
      */
     private static function upload(string $route, ?array $request = null): Dictionary {
-        $response = Curl::execute("POST", self::BaseUrl . $route, $request, [
+        $response = Curl::execute(CurlMethod::POST, self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "multipart/form-data",
         ], jsonResponse: true);
@@ -66,7 +67,7 @@ class OpenAI {
      * @return Dictionary
      */
     private static function delete(string $route, ?array $request = null): Dictionary {
-        $response = Curl::execute("DELETE", self::BaseUrl . $route, $request, [
+        $response = Curl::execute(CurlMethod::DELETE, self::BaseUrl . $route, $request, [
             "Authorization" => "Bearer " . Config::getOpenAiKey(),
             "Content-Type"  => "application/json",
         ], jsonResponse: true);

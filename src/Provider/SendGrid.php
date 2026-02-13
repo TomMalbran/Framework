@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 
@@ -55,7 +56,7 @@ class SendGrid {
                 "name"  => $fromName,
             ];
         }
-        $response = Curl::execute("POST", $url, $params, $headers, jsonBody: true);
+        $response = Curl::execute(CurlMethod::POST, $url, $params, $headers, jsonBody: true);
 
         return Arrays::isEmpty($response);
     }

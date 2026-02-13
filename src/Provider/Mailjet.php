@@ -2,6 +2,7 @@
 // spell-checker: ignore  contactslist, managecontact, addforce
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\Provider\Type\DomainData;
 use Framework\System\Config;
 use Framework\Utils\Dictionary;
@@ -16,12 +17,12 @@ class Mailjet {
 
     /**
      * Executes a Request
-     * @param string              $method
+     * @param CurlMethod          $method
      * @param string              $route
      * @param array<string,mixed> $params Optional.
      * @return Dictionary
      */
-    private static function execute(string $method, string $route, array $params = []): Dictionary {
+    private static function execute(CurlMethod $method, string $route, array $params = []): Dictionary {
         $url      = self::BaseUrl . $route;
         $userPass = Config::getMailjetKey() . ":" . Config::getMailjetSecret();
         $headers  = [ "Content-Type" => "application/json" ];
@@ -67,7 +68,7 @@ class Mailjet {
             ];
         }
 
-        $response = self::execute("POST", "/v3.1/send", [
+        $response = self::execute(CurlMethod::POST, "/v3.1/send", [
             "Messages" => [ $message ],
         ]);
         return $response->getFirst("Messages")->getString("Status") === "success";
@@ -85,12 +86,12 @@ class Mailjet {
     public static function createContact(string $firstName, string $lastName, string $email): bool {
         $contactList = Config::getMailjetList();
         if ($contactList === 0) {
-            $response = self::execute("POST", "/v3/REST/contact", [
+            $response = self::execute(CurlMethod::POST, "/v3/REST/contact", [
                 "Name"  => "$firstName $lastName",
                 "Email" => $email,
             ]);
         } else {
-            $response = self::execute("POST", "/v3/REST/contactslist/$contactList/managecontact", [
+            $response = self::execute(CurlMethod::POST, "/v3/REST/contactslist/$contactList/managecontact", [
                 "Action" => "addforce",
                 "Name"   => "$firstName $lastName",
                 "Email"  => $email,
@@ -108,7 +109,7 @@ class Mailjet {
      * @return bool
      */
     public static function editContact(string $firstName, string $lastName, string $oldEmail, string $newEmail): bool {
-        $response = self::execute("PUT", "/v3/REST/contact/$oldEmail", [
+        $response = self::execute(CurlMethod::PUT, "/v3/REST/contact/$oldEmail", [
             "Name"  => "$firstName $lastName",
             "Email" => $newEmail,
         ]);
@@ -127,18 +128,18 @@ class Mailjet {
     public static function deleteContact(string $email): bool {
         $contactList = Config::getMailjetList();
         if ($contactList !== 0) {
-            self::execute("POST", "/v3/REST/contactslist/$contactList/managecontact", [
+            self::execute(CurlMethod::POST, "/v3/REST/contactslist/$contactList/managecontact", [
                 "Action" => "remove",
                 "Email"  => $email,
             ]);
         }
 
-        $response = self::execute("GET", "/v3/REST/contact/$email");
+        $response = self::execute(CurlMethod::GET, "/v3/REST/contact/$email");
         $data     = $response->getFirst("Data");
 
         if ($data->isNotEmpty()) {
             $contactID = $data->getString("ID");
-            self::execute("DELETE", "/v4/contacts/$contactID");
+            self::execute(CurlMethod::DELETE, "/v4/contacts/$contactID");
         }
         return true;
     }
@@ -151,7 +152,7 @@ class Mailjet {
      * @return DomainData
      */
     public static function getDomain(string $domain): DomainData {
-        $response = self::execute("GET", "/v3/REST/sender/*@$domain");
+        $response = self::execute(CurlMethod::GET, "/v3/REST/sender/*@$domain");
         $data     = $response->getFirst("Data");
         $result   = new DomainData();
         if ($data->isEmpty()) {
@@ -159,7 +160,7 @@ class Mailjet {
         }
 
         // Get the DNS data
-        $response = self::execute("GET", "/v3/REST/dns/$domain");
+        $response = self::execute(CurlMethod::GET, "/v3/REST/dns/$domain");
         $dnsData  = $response->getFirst("Data");
 
         // Basic Domain Data
@@ -196,7 +197,7 @@ class Mailjet {
      * @return bool
      */
     public static function createDomain(string $name, string $domain): bool {
-        $response = self::execute("POST", "/v3/REST/sender", [
+        $response = self::execute(CurlMethod::POST, "/v3/REST/sender", [
             "Name"            => $name,
             "Email"           => "*@$domain",
             "EmailType"       => "unknown",
@@ -212,7 +213,7 @@ class Mailjet {
      * @return bool
      */
     public static function editDomain(string $domain, string $name): bool {
-        $response = self::execute("PUT", "/v3/REST/sender/*@$domain", [
+        $response = self::execute(CurlMethod::PUT, "/v3/REST/sender/*@$domain", [
             "Name" => $name,
         ]);
         return !$response->hasValue("ErrorMessage");
@@ -228,10 +229,10 @@ class Mailjet {
         $result = new DomainData();
 
         if ($validateOwner) {
-            $response = self::execute("POST", "/v3/REST/sender/*@$domain/validate");
+            $response = self::execute(CurlMethod::POST, "/v3/REST/sender/*@$domain/validate");
             $result->ownerValid = $response->getString("GlobalError") === "";
         } else {
-            $response = self::execute("POST", "/v3/REST/dns/$domain/check");
+            $response = self::execute(CurlMethod::POST, "/v3/REST/dns/$domain/check");
             $data     = $response->getFirst("Data");
 
             $result->spfValid  = $data->getString("SPFStatus")  === "OK";
@@ -247,7 +248,7 @@ class Mailjet {
      * @return bool
      */
     public static function deleteDomain(string $domain): bool {
-        $response = self::execute("DELETE", "/v3/REST/sender/*@$domain");
+        $response = self::execute(CurlMethod::DELETE, "/v3/REST/sender/*@$domain");
         return !$response->hasValue("ErrorMessage");
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
@@ -62,7 +63,7 @@ class GoogleMap {
         }
 
         $url      = self::BaseUrl . "geocode/json";
-        $result   = Curl::execute("GET", $url, $params);
+        $result   = Curl::execute(CurlMethod::GET, $url, $params);
         $response = new Dictionary($result);
         $address  = $response->getFirst("results");
 
@@ -111,7 +112,7 @@ class GoogleMap {
         ];
 
         $url      = self::BaseUrl . "distancematrix/json";
-        $result   = Curl::execute("GET", $url, $params);
+        $result   = Curl::execute(CurlMethod::GET, $url, $params);
         $response = new Dictionary($result);
 
         $value    = $response->getFirst("rows")->getFirst("elements")->getDict("distance")->getFloat("value");

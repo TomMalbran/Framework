@@ -3,6 +3,7 @@
 // spell-checker: ignore  FOLLOWLOCATION, HTTPGET, USERPWD, HEADERFUNCTION
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
@@ -14,7 +15,7 @@ class Curl {
 
     /**
      * Executes a Request
-     * @param string                    $method
+     * @param CurlMethod                $method
      * @param string                    $url
      * @param array<string,mixed>|null  $params       Optional.
      * @param array<string,string>|null $headers      Optional.
@@ -30,7 +31,7 @@ class Curl {
      * @return mixed
      */
     public static function execute(
-        string $method,
+        CurlMethod $method,
         string $url,
         ?array $params = null,
         ?array $headers = null,
@@ -59,12 +60,12 @@ class Curl {
         }
 
         // GET Requests
-        if (!$isCustom && $method === "GET") {
+        if (!$isCustom && $method === CurlMethod::GET) {
             $options[CURLOPT_URL]      = self::parseUrl($url, $params);
             $options[CURLOPT_ENCODING] = "identity";
 
         // POST Requests
-        } elseif (!$isCustom && $method === "POST") {
+        } elseif (!$isCustom && $method === CurlMethod::POST) {
             $options[CURLOPT_POST] = true;
             $options[CURLOPT_URL]  = $url;
 
@@ -84,7 +85,7 @@ class Curl {
 
         // Custom Requests
         } else {
-            $options[CURLOPT_CUSTOMREQUEST] = $method;
+            $options[CURLOPT_CUSTOMREQUEST] = $method->toString();
             $options[CURLOPT_ENCODING]      = "identity";
 
             if ($jsonBody) {

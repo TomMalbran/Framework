@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\Provider\Type\CurlMethod;
+
 /**
  * The Google Provider
  */
@@ -20,7 +22,7 @@ class Google {
         }
 
         /** @var array<string,string> */
-        $response = Curl::execute("GET", self::BaseUrl . "userinfo", null, [
+        $response = Curl::execute(CurlMethod::GET, self::BaseUrl . "userinfo", null, [
             "Authorization" => "Bearer $accessToken",
         ]);
         if (!isset($response["email"])) {
