@@ -15,7 +15,6 @@ class Result {
     public int    $id          = 0;
     public string $code        = "";
     public string $name        = "";
-    public string $status      = "";
 
     public Errors $errors;
 
@@ -28,7 +27,6 @@ class Result {
      * @param int    $id          Optional.
      * @param string $code        Optional.
      * @param string $name        Optional.
-     * @param string $status      Optional.
      * @param Errors $errors      Optional.
      */
     public function __construct(
@@ -37,7 +35,6 @@ class Result {
         int $id = 0,
         string $code = "",
         string $name = "",
-        string $status = "",
         ?Errors $errors = null,
     ) {
         $this->isCreate    = !$isEdit;
@@ -47,7 +44,6 @@ class Result {
         $this->id          = $id;
         $this->code        = $code;
         $this->name        = $name;
-        $this->status      = $status;
 
         $this->errors      = $errors ?? new Errors();
     }

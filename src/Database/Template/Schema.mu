@@ -274,7 +274,6 @@ class {{name}}Schema extends Schema {
             code:        $id,{{/hasStringID}}{{#hasEnumID}}
             code:        $id->name,{{/hasEnumID}}
             name:        $request->getString("name"),
-            status:      $request->getString("status"),
             canValidate: $canValidate,
             errors:      $errors,
         );
