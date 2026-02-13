@@ -1,8 +1,9 @@
 <?php
 namespace Framework\Enum;
 
-use Framework\Utils\Strings;
 use Framework\Request;
+use Framework\Utils\Arrays;
+use Framework\Utils\Strings;
 
 use BackedEnum;
 
@@ -43,15 +44,25 @@ trait IsEnum {
 
     /**
      * Creates a list of Enums from the given Strings
-     * @param string[]|self[]|self|null $values
+     * @param mixed $value
      * @return self[]
      */
-    public static function fromList(array|self|null $values): array {
+    public static function fromList(mixed $value): array {
+        if ($value === null) {
+            return [];
+        }
+
         $result = [];
-        if ($values instanceof self) {
-            $result[] = $values;
-        } elseif (is_array($values)) {
-            foreach ($values as $value) {
+        if ($value instanceof self) {
+            $result[] = $value;
+        } elseif (is_array($value)) {
+            $values = Arrays::toStrings($value);
+            foreach ($values as $val) {
+                $result[] = self::fromValue($val);
+            }
+        } else {
+            $value = Strings::toString($value);
+            if ($value !== "") {
                 $result[] = self::fromValue($value);
             }
         }
@@ -79,6 +90,21 @@ trait IsEnum {
         foreach (self::cases() as $case) {
             if ($case !== self::None) {
                 $result[] = $case;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns all the Enum cases as Strings
+     * @phpstan-return list<string>
+     * @return string[]
+     */
+    public static function getNames(): array {
+        $result = [];
+        foreach (self::cases() as $case) {
+            if ($case !== self::None) {
+                $result[] = $case->toString();
             }
         }
         return $result;
