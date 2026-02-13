@@ -2,6 +2,7 @@
 // spell-checker: ignore NOQUOTES
 namespace Framework\Utils;
 
+use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 
 /**
@@ -29,6 +30,9 @@ class Strings {
         }
         if (is_int($value) || is_float($value)) {
             return strval($value);
+        }
+        if ($value instanceof Enum) {
+            return $value->toString();
         }
         return "";
     }
