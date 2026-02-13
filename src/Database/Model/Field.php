@@ -8,7 +8,6 @@ use Framework\Database\Type\Assign;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\System\Path;
-use Framework\Date\Date;
 use Framework\Date\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
@@ -77,9 +76,6 @@ class Field {
     // Indicates that the string is encrypted in the database.
     public bool $isEncrypt = false;
 
-    // Indicates that the string is an encoded JSON.
-    public bool $isJSON = false;
-
 
     // Indicates that the string is a relative path to a file.
     // The file path is updated automatically when the file is moved.
@@ -131,7 +127,6 @@ class Field {
      * @param bool              $isText      Optional.
      * @param bool              $isLongText  Optional.
      * @param bool              $isEncrypt   Optional.
-     * @param bool              $isJSON      Optional.
      * @param bool              $isFile      Optional.
      * @param bool              $hasFile     Optional.
      * @param string            $filePath    Optional.
@@ -158,7 +153,6 @@ class Field {
         bool $isText = false,
         bool $isLongText = false,
         bool $isEncrypt = false,
-        bool $isJSON = false,
         bool $isFile = false,
         bool $hasFile = false,
         string $filePath = "",
@@ -190,7 +184,6 @@ class Field {
         $this->isText     = $isText;
         $this->isLongText = $isLongText;
         $this->isEncrypt  = $isEncrypt;
-        $this->isJSON     = $isJSON;
 
         // File types
         $this->isFile   = $isFile;
@@ -296,47 +289,23 @@ class Field {
         $this->name   = $name;
         $this->dbName = $name;
 
-        switch ($typeName) {
-        case Date::class:
-            $this->type = FieldType::Date;
-            break;
-
-        case "int":
-            $this->type = FieldType::Number;
-            break;
-
-        case "bool":
-            $this->type = FieldType::Boolean;
-            break;
-
-        case "float":
-            $this->type = FieldType::Float;
-            break;
-
-        case "string":
+        if ($typeName === "string") {
             if ($this->isText) {
                 $this->type = FieldType::Text;
             } elseif ($this->isLongText) {
                 $this->type = FieldType::LongText;
             } elseif ($this->isEncrypt) {
                 $this->type = FieldType::Encrypt;
-            } elseif ($this->isJSON) {
-                $this->type = FieldType::JSON;
             } elseif ($this->isFile) {
                 $this->type = FieldType::File;
             } else {
                 $this->type = FieldType::String;
             }
-            break;
-
-        default:
-            if ($isEnum) {
-                $this->type      = FieldType::Enum;
-                $this->enumClass = $typeName;
-            } else {
-                $this->type = FieldType::String;
-            }
-            break;
+        } elseif ($isEnum) {
+            $this->type      = FieldType::Enum;
+            $this->enumClass = $typeName;
+        } else {
+            $this->type = FieldType::fromType($typeName);
         }
 
         return $this;

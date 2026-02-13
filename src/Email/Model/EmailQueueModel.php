@@ -8,6 +8,7 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\Expression;
 use Framework\System\EmailCode;
 use Framework\Date\Date;
+use Framework\Utils\JSON;
 
 /**
  * The Email Queue Model
@@ -24,8 +25,7 @@ class EmailQueueModel {
 
     public EmailCode $emailCode = EmailCode::None;
 
-    #[Field(isJSON: true)]
-    public string $sendTo = "";
+    public ?JSON $sendTo = null;
 
     public string $subject = "";
 

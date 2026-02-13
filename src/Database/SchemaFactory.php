@@ -6,6 +6,7 @@ use Framework\Discovery\Package;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\FieldType;
 use Framework\Database\Model\Validate;
 use Framework\Database\Model\Expression;
 use Framework\Database\Model\Virtual;
@@ -15,7 +16,6 @@ use Framework\Database\Model\SubRequest;
 use Framework\Database\Status\Status;
 use Framework\Database\Status\State;
 use Framework\File\File;
-use Framework\Date\Date;
 use Framework\Enum\Enum;
 use Framework\Utils\Strings;
 
@@ -131,13 +131,14 @@ class SchemaFactory {
                 }
 
                 // Get the Type
-                $typeName = $propType->getName();
-                $isStatus = $typeName === Status::class;
-                $isDate   = $typeName === Date::class;
-                $isEnum   = false;
-                $isModel  = false;
+                $typeName     = $propType->getName();
+                $isFieldClass = FieldType::isValidClass($typeName);
+                $isStatus     = $typeName === Status::class;
+                $isArray      = $typeName === "array";
+                $isEnum       = false;
+                $isModel      = false;
 
-                if (!$isStatus && !$isDate && !$propType->isBuiltin()) {
+                if (!$isFieldClass && !$isStatus && !$propType->isBuiltin()) {
                     [ $isEnum, $isValidEnum ] = self::isPropEnum($typeName, $modelName, $errors);
                     if ($isEnum && !$isValidEnum) {
                         continue 2;
@@ -208,7 +209,7 @@ class SchemaFactory {
                     $relations[] = $relation;
 
                 // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
-                } elseif ($typeName === "array") {
+                } elseif ($isArray) {
                     $comment = $prop->getDocComment();
                     if ($comment !== false) {
                         $subType   = trim(Strings::substringBetween($comment, "@var", "*/"));

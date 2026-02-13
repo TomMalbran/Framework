@@ -2,6 +2,8 @@
 namespace Framework\Database\Model;
 
 use Framework\Utils\Strings;
+use Framework\Date\Date;
+use Framework\Utils\JSON;
 
 /**
  * The Field Type
@@ -40,17 +42,33 @@ enum FieldType {
 
     /**
      * Creates an FieldType from a Type
-     * @param string $type
+     * @param string $typeName
      * @return FieldType
      */
-    public static function fromType(string $type): FieldType {
-        return match ($type) {
+    public static function fromType(string $typeName): FieldType {
+        if ($typeName === Date::class) {
+            return self::Date;
+        }
+        if ($typeName === JSON::class) {
+            return self::JSON;
+        }
+
+        return match ($typeName) {
             "bool"   => FieldType::Boolean,
             "float"  => FieldType::Float,
             "int"    => FieldType::Number,
             "string" => FieldType::String,
             default  => FieldType::String,
         };
+    }
+
+    /**
+     * Returns true if the given Type is a valid Class Type for a Field
+     * @param string $typeName
+     * @return bool
+     */
+    public static function isValidClass(string $typeName): bool {
+        return $typeName === Date::class || $typeName === JSON::class;
     }
 
 

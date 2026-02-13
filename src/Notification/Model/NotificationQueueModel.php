@@ -9,6 +9,7 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\Expression;
 use Framework\Database\Model\Relation;
 use Framework\Date\Date;
+use Framework\Utils\JSON;
 
 /**
  * The Notification Queue Model
@@ -41,8 +42,7 @@ class NotificationQueueModel {
 
     public string $externalID = "";
 
-    #[Field(isJSON: true)]
-    public string $playerIDs = "";
+    public ?JSON $playerIDs = null;
 
     public ?Date $sentTime = null;
 

@@ -9,22 +9,11 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Virtual {
 
-    public bool $isJSON = false;
-
-
     // Used internally when parsing the Model
     public FieldType $type      = FieldType::String;
     public string    $name      = "";
     public string    $enumClass = "";
 
-
-    /**
-     * The Virtual Attribute
-     * @param bool $isJSON Optional.
-     */
-    public function __construct(bool $isJSON = false) {
-        $this->isJSON = $isJSON;
-    }
 
     /**
      * Sets the Data from the Model
@@ -39,8 +28,6 @@ class Virtual {
         if ($isEnum) {
             $this->type      = FieldType::Enum;
             $this->enumClass = $typeName;
-        } elseif ($this->isJSON) {
-            $this->type = FieldType::JSON;
         } else {
             $this->type = FieldType::fromType($typeName);
         }

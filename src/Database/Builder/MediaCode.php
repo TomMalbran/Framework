@@ -3,6 +3,7 @@ namespace Framework\Database\Builder;
 
 use Framework\Discovery\DiscoveryBuilder;
 use Framework\Database\SchemaFactory;
+use Framework\Database\Model\FieldType;
 use Framework\Builder\Builder;
 use Framework\Utils\Strings;
 
@@ -24,7 +25,12 @@ class MediaCode implements DiscoveryBuilder {
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->fields as $field) {
                 if ($field->isFile || $field->hasFile) {
-                    $isReplace = $field->isText || $field->isLongText || $field->isJSON;
+                    $isReplace = (
+                        $field->type === FieldType::Text ||
+                        $field->type === FieldType::LongText ||
+                        $field->type === FieldType::JSON
+                    );
+
                     $fields[]  = [
                         "name"      => $schemaModel->name,
                         "query"     => Strings::lowerCaseFirst($schemaModel->queryClass),
