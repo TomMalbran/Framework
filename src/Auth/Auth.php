@@ -397,7 +397,7 @@ class Auth {
 
         // The general data
         $data = [
-            "accessName"       => self::$accessName->name,
+            "accessName"       => self::$accessName->toString(),
             "credentialID"     => self::$credentialID,
             "adminID"          => self::$adminID,
             "userID"           => self::$userID,

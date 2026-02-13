@@ -44,7 +44,9 @@ class RouterCode implements DiscoveryBuilder {
                     continue;
                 }
 
+                /** @var Route */
                 $route      = $attributes[0]->newInstance();
+
                 $fileName   = $reflection->getFileName();
                 $params     = $method->getNumberOfParameters();
                 $response   = $method->getReturnType();
@@ -78,7 +80,7 @@ class RouterCode implements DiscoveryBuilder {
                     "method"     => $methodName,
                     "hasRequest" => $params > 0,
                     "route"      => $route->route,
-                    "access"     => $route->access->name,
+                    "access"     => $route->access->toString(),
                     "addSpace"   => false,
                 ];
                 $usedRoutes[$route->route] = true;

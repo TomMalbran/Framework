@@ -683,10 +683,10 @@ class Credential extends CredentialSchema {
 
         // Parse the Access, Status and Request Password Change
         if ($access !== null) {
-            $result["access"] = $access->name;
+            $result["access"] = $access->toString();
         }
         if ($status !== null) {
-            $result["status"] = $status->name;
+            $result["status"] = $status->toString();
         }
         if ($reqPassChange !== null) {
             $result["reqPassChange"] = $reqPassChange ? 1 : 0;
