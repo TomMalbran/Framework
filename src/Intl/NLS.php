@@ -4,6 +4,7 @@ namespace Framework\Intl;
 use Framework\Intl\NLSConfig;
 use Framework\System\Config;
 use Framework\System\Language;
+use Framework\Enum\Enum;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -79,15 +80,16 @@ class NLS {
 
     /**
      * Returns a string from the data at the given index
-     * @param string     $key
-     * @param int|string $index
-     * @param string     $language Optional.
+     * @param string          $key
+     * @param Enum|int|string $index
+     * @param string          $language Optional.
      * @return string
      */
-    public static function getIndex(string $key, int|string $index, string $language = ""): string {
-        $data = self::load($language);
-        $dict = $data->getDict($key);
-        return $dict->getString((string)$index);
+    public static function getIndex(string $key, Enum|int|string $index, string $language = ""): string {
+        $data  = self::load($language);
+        $dict  = $data->getDict($key);
+        $index = Strings::toString($index);
+        return $dict->getString($index);
     }
 
     /**

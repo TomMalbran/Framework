@@ -34,7 +34,7 @@ enum Access implements Enum, JsonSerializable {
      * @return string
      */
     public static function getName(Access $value, string $isoCode = ""): string {
-        return NLS::getIndex("SELECT_ACCESS", $value->name, $isoCode);
+        return NLS::getIndex("SELECT_ACCESS", $value, $isoCode);
     }
 
     /**
