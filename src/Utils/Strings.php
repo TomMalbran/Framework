@@ -134,7 +134,7 @@ class Strings {
      */
     public static function contains(string $string, string ...$needles): bool {
         foreach ($needles as $needle) {
-            if (strstr($string, $needle) !== false) {
+            if (str_contains($string, $needle)) {
                 return true;
             }
         }
@@ -150,7 +150,7 @@ class Strings {
     public static function containsCaseInsensitive(string $string, string ...$needles): bool {
         $string = strtolower($string);
         foreach ($needles as $needle) {
-            if (strstr($string, strtolower($needle)) !== false) {
+            if (str_contains($string, strtolower($needle))) {
                 return true;
             }
         }
@@ -399,7 +399,7 @@ class Strings {
     }
 
     /**
-     * Replaces in the String the search with the replace
+     * Replaces in the String the search with the replacement
      * @param string               $string
      * @param string[]|string      $search
      * @param string[]|string|null $replace Optional.
@@ -419,7 +419,7 @@ class Strings {
     }
 
     /**
-     * Replaces in the start of the String the search with the replace
+     * Replaces in the start of the String the search with the replacement
      * @param string $string
      * @param string $search
      * @param string $replace
@@ -433,7 +433,7 @@ class Strings {
     }
 
     /**
-     * Replaces in the end of the String the search with the replace
+     * Replaces in the end of the String the search with the replacement
      * @param string $string
      * @param string $search
      * @param string $replace
@@ -1006,7 +1006,7 @@ class Strings {
 
 
     /**
-     * Returns true if the given string is alpha-numeric
+     * Returns true if the given string is Alpha-Numeric
      * @param string   $string
      * @param bool     $withDashes Optional.
      * @param int|null $length     Optional.

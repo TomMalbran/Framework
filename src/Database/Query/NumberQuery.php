@@ -16,7 +16,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null     $condition Optional.
      * @return void
      */
-    public function compare(QueryOperator $operator, array|int $value, ?bool $condition = null) {
+    public function compare(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
         $this->query->add(
             $this->column,
             $operator,
@@ -32,7 +32,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null     $condition Optional.
      * @return void
      */
-    public function compareIf(QueryOperator $operator, array|int $value, ?bool $condition = null) {
+    public function compareIf(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
         $this->query->addIf(
             $this->column,
             $operator,
@@ -48,7 +48,7 @@ class NumberQuery extends BaseQuery {
      * @param int $value
      * @return void
      */
-    public function equal(int $value) {
+    public function equal(int $value): void {
         $this->compare(QueryOperator::Equal, $value);
     }
 
@@ -58,7 +58,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function equalIf(int $value, ?bool $condition = null) {
+    public function equalIf(int $value, ?bool $condition = null): void {
         $this->compareIf(QueryOperator::Equal, $value, $condition);
     }
 
@@ -67,7 +67,7 @@ class NumberQuery extends BaseQuery {
      * @param int $value
      * @return void
      */
-    public function notEqual(int $value) {
+    public function notEqual(int $value): void {
         $this->compare(QueryOperator::NotEqual, $value);
     }
 
@@ -77,7 +77,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function notEqualIf(int $value, ?bool $condition = null) {
+    public function notEqualIf(int $value, ?bool $condition = null): void {
         $this->compareIf(QueryOperator::NotEqual, $value, $condition);
     }
 
@@ -89,7 +89,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function greaterThan(int $value, ?bool $condition = null) {
+    public function greaterThan(int $value, ?bool $condition = null): void {
         $this->compare(QueryOperator::GreaterThan, $value, $condition);
     }
 
@@ -99,7 +99,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function greaterOrEqual(int $value, ?bool $condition = null) {
+    public function greaterOrEqual(int $value, ?bool $condition = null): void {
         $this->compare(QueryOperator::GreaterOrEqual, $value, $condition);
     }
 
@@ -109,7 +109,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function lessThan(int $value, ?bool $condition = null) {
+    public function lessThan(int $value, ?bool $condition = null): void {
         $this->compare(QueryOperator::LessThan, $value, $condition);
     }
 
@@ -119,7 +119,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function lessOrEqual(int $value, ?bool $condition = null) {
+    public function lessOrEqual(int $value, ?bool $condition = null): void {
         $this->compare(QueryOperator::LessOrEqual, $value, $condition);
     }
 
@@ -131,7 +131,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function in(array $values, ?bool $condition = null) {
+    public function in(array $values, ?bool $condition = null): void {
         if (count($values) > 0) {
             $this->compare(QueryOperator::In, $values, $condition);
         }
@@ -143,7 +143,7 @@ class NumberQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function notIn(array $values, ?bool $condition = null) {
+    public function notIn(array $values, ?bool $condition = null): void {
         if (count($values) > 0) {
             $this->compare(QueryOperator::NotIn, $values, $condition);
         }

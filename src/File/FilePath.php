@@ -161,7 +161,7 @@ class FilePath implements DiscoveryBuilder {
     }
 
     /**
-     * Creates an url to the files temp directory
+     * Creates a url to the files temp directory
      * @param int        $credentialID
      * @param string|int ...$pathParts
      * @return string

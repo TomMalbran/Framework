@@ -22,11 +22,11 @@ class Application {
 
     /**
      * Loads the Application Composer Data
-     * @return bool
+     * @return void
      */
-    private static function load(): bool {
+    private static function load(): void {
         if (self::$loaded) {
-            return false;
+            return;
         }
 
         // Determine the Base Path
@@ -48,7 +48,6 @@ class Application {
         self::$namespace = $composer["namespace"];
         self::$baseDir   = $baseDir;
         self::$sourceDir = $composer["sourceDir"];
-        return true;
     }
 
     /**
@@ -124,7 +123,7 @@ class Application {
 
 
     /**
-     * Returns an Url for the given internal path
+     * Returns a Url for the given internal path
      * @param string|int ...$pathParts
      * @return string
      */

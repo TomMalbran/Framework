@@ -105,14 +105,14 @@ class Auth {
      * @param CredentialEntity $admin
      * @param string           $langcode
      * @param int              $timezone
-     * @return bool
+     * @return void
      */
     private static function setLanguageTimezone(
         CredentialEntity $credential,
         CredentialEntity $admin,
         string $langcode,
         int $timezone,
-    ): bool {
+    ): void {
         $entity = $credential;
         if ($admin->exists()) {
             $entity = $admin;
@@ -126,7 +126,6 @@ class Auth {
             Credential::setTimezone($entity->id, $timezone);
             $entity->timezone = $timezone;
         }
-        return true;
     }
 
     /**
@@ -212,7 +211,7 @@ class Auth {
     }
 
     /**
-     * Returns true if the Credential can login
+     * Returns true if the Credential can log in
      * @param CredentialEntity $credential
      * @return bool
      */
@@ -287,7 +286,7 @@ class Auth {
     }
 
     /**
-     * Returns true if the Admin can login as the User
+     * Returns true if the Admin can log in as the User
      * @param CredentialEntity $admin
      * @param CredentialEntity $user
      * @return bool
@@ -499,7 +498,7 @@ class Auth {
     }
 
     /**
-     * Returns true or false if the admin is logged as an user
+     * Returns true or false if the admin is logged in as a user
      * @return bool
      */
     public static function isLoggedAsUser(): bool {

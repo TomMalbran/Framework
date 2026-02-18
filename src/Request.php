@@ -382,7 +382,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the value at the given key is a Alpha-Numeric
+     * Returns true if the value at the given key is an Alpha-Numeric
      * @param string   $key
      * @param bool     $withDashes Optional.
      * @param int|null $length     Optional.

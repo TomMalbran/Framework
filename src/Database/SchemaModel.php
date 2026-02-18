@@ -174,9 +174,9 @@ class SchemaModel {
 
     /**
      * Sets extra fields based on the model attributes
-     * @return SchemaModel
+     * @return void
      */
-    private function setExtraFields(): SchemaModel {
+    private function setExtraFields(): void {
         if ($this->hasPositions) {
             $this->extraFields[] = Field::create(
                 type:        FieldType::Number,
@@ -227,7 +227,6 @@ class SchemaModel {
                 name: "isDeleted",
             );
         }
-        return $this;
     }
 
     /**

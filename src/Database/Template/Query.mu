@@ -103,7 +103,7 @@ class {{queryClass}} extends SchemaQuery {
     }
 
     /**
-     * Adds an Not Exists expression
+     * Adds a Not Exists expression
      * @param SchemaQuery $subQuery
      * @return {{queryClass}}
      */

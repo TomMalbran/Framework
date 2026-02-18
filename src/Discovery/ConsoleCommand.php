@@ -7,6 +7,7 @@ use Framework\Utils\Strings;
 use Attribute;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionException;
 
 /**
  * The Console Command Attribute
@@ -140,7 +141,11 @@ class ConsoleCommand {
             return false;
         }
 
-        $this->handler->invokeArgs(null, $argValues);
+        try {
+            $this->handler->invokeArgs(null, $argValues);
+        } catch (ReflectionException $e) {
+            return false;
+        }
         return true;
     }
 }

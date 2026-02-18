@@ -134,9 +134,9 @@ class EntityCode {
      * @param string                                                $name
      * @param array<string,string|bool>[]                           $fields
      * @param array<string,bool>                                    $parsed
-     * @return array{name:string,list:array<string,string|bool>[]}[]
+     * @return void
      */
-    private static function addCategory(array &$result, string $name, array $fields, array &$parsed): array {
+    private static function addCategory(array &$result, string $name, array $fields, array &$parsed): void {
         $list = [];
         foreach ($fields as $field) {
             $fieldName = Strings::toString($field["name"] ?? "");
@@ -152,7 +152,6 @@ class EntityCode {
                 "list" => $list,
             ];
         }
-        return $result;
     }
 
     /**
@@ -161,14 +160,14 @@ class EntityCode {
      * @param string                      $fieldKey
      * @param FieldType                   $fieldType
      * @param string                      $enumClass Optional.
-     * @return bool
+     * @return void
      */
     private static function addProperty(
         array &$result,
         string $fieldKey,
         FieldType $fieldType,
         string $enumClass = "",
-    ): bool {
+    ): void {
         if ($fieldType === FieldType::Enum) {
             $type     = FieldType::getCodeType($fieldType, $enumClass, true);
             $result[] = self::getTypeData($fieldKey, $type, default: "{$type}::None");
@@ -180,7 +179,6 @@ class EntityCode {
             $type     = FieldType::getCodeType($fieldType, $enumClass, true);
             $result[] = self::getTypeData($fieldKey, $type);
         }
-        return true;
     }
 
     /**

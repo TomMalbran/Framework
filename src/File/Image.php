@@ -260,8 +260,6 @@ class Image {
         case self::Resize:
             $oldWidth  = $imgWidth;
             $oldHeight = $imgHeight;
-            $xCorner   = 0;
-            $yCorner   = 0;
 
             if ($imgWidth > $imgHeight) {
                 $height = Numbers::roundInt($imgHeight * $width / $imgWidth);
@@ -272,9 +270,6 @@ class Image {
 
         // Resize if the image is greater
         case self::Maximum:
-            $xCorner = 0;
-            $yCorner = 0;
-
             if ($imgWidth > $width || $imgHeight > $height) {
                 $oldWidth  = $imgWidth;
                 $oldHeight = $imgHeight;
@@ -301,11 +296,9 @@ class Image {
                 $oldWidth  = Numbers::roundInt($width  * $yScale);
                 $oldHeight = Numbers::roundInt($height * $yScale);
                 $xCorner   = Numbers::roundInt(($imgWidth - $oldWidth) / 2);
-                $yCorner   = 0;
             } else {
                 $oldWidth  = Numbers::roundInt($width  * $xScale);
                 $oldHeight = Numbers::roundInt($height * $xScale);
-                $xCorner   = 0;
                 $yCorner   = Numbers::roundInt(($imgHeight - $oldHeight) / 2);
             }
             break;

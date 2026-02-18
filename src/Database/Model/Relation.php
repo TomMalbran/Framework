@@ -13,35 +13,35 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Relation {
 
-    // By default all fields are returned but this allows to specify a list of field names
+    // By default, all fields are returned but this allows to specify a list of field names
     /** @var string[] */
-    private array $fieldNames = [];
+    private array $fieldNames;
 
     // Allows to specify which fields should be returned without the prefix
     /** @var string[] */
-    private array $withoutPrefix = [];
+    private array $withoutPrefix;
 
 
     // Name of the column to do the join in the relation Model (this)
     // It can have the name of the Model using a dot "ModelName.fieldName"
     // Multiples keys can be specified using "ModelName.fieldName AND ModelName2.fieldName2"
     // By default the primary key of the Related Model is used
-    private string $relationJoin = "";
+    private string $relationJoin;
 
     // Name of the column to do the join in the owner Model (parent)
     // If there are 2 relations with the same Model, use "AsModelName.fieldName" to give the Model a different name
     // By default the primary key of the Related Model is used
-    private string $ownerJoin = "";
+    private string $ownerJoin;
 
 
-    // By default a prefix is added to the field names but it can be disabled
-    private bool $withPrefix = true;
+    // By default, a prefix is added to the field names, but it can be disabled
+    private bool $withPrefix;
 
-    // The prefix to be used for the fields. By default it uses the name of the property
-    private string $prefix = "";
+    // The prefix to be used for the fields. By default, it uses the name of the property
+    private string $prefix;
 
     // Allows to use the 'isDeleted' field of the Model. Is not required when using the fieldNames
-    private bool $withDeleted = false;
+    private bool $withDeleted;
 
 
 
@@ -242,7 +242,7 @@ class Relation {
             return false;
         }
 
-        // Only considere the part before the "AND" if it exists and save the rest
+        // Only consider the part before the "AND" if it exists and save the rest
         $ownerJoin = $this->ownerJoin;
         if (Strings::contains($this->ownerJoin, " AND ")) {
             $ownerJoin           = trim(Strings::substringBefore($this->ownerJoin, " AND "));
@@ -319,7 +319,7 @@ class Relation {
                 }
             }
 
-            // Dont add a prefix in this cases
+            // Don't add a prefix in this cases
             if ($this->withPrefix &&
                 !Arrays::contains($parentFields, $field->name) && (
                     $field->isSchemaID() ||

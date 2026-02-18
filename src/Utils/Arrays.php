@@ -9,7 +9,7 @@ use Framework\Utils\Numbers;
 class Arrays {
 
     /**
-     * Returns true if the given value is an list
+     * Returns true if the given value is a list
      * @param mixed $array
      * @return bool
      */
@@ -276,7 +276,7 @@ class Arrays {
     }
 
     /**
-     * Does the Contains compare
+     * Does the contain compare
      * @param mixed           $row
      * @param int|string|null $key
      * @param mixed           $value
@@ -578,9 +578,9 @@ class Arrays {
      * @param mixed[] $array2
      * @return mixed[]
      */
-    public static function extend(array &$array1, array &$array2): array {
+    public static function extend(array $array1, array $array2): array {
         $result = $array1;
-        foreach ($array2 as $key => &$value) {
+        foreach ($array2 as $key => $value) {
             if (is_array($value) && isset($result[$key]) && is_array($result[$key])) {
                 $result[$key] = self::extend($result[$key], $value);
             } else {
@@ -604,23 +604,6 @@ class Arrays {
             usort($array, $callback);
         } else {
             uasort($array, $callback);
-        }
-        return $array;
-    }
-
-    /**
-     * Sorts the arrays at the given key of the given array using the given callback
-     * @template TValue
-     * @param TValue[]                  $array
-     * @param string                    $field
-     * @param callable(mixed,mixed):int $callback
-     * @return TValue[]
-     */
-    public static function sortArray(array &$array, string $field, callable $callback): array {
-        foreach ($array as $value) {
-            if (is_array($value) && isset($value[$field]) && is_array($value[$field])) {
-                usort($value[$field], $callback);
-            }
         }
         return $array;
     }

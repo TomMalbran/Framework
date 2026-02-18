@@ -163,7 +163,7 @@ class Server {
     }
 
     /**
-     * Returns the Platform from an User Agent
+     * Returns the Platform from a User Agent
      * @param string $userAgent
      * @return string
      */

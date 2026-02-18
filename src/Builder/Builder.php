@@ -96,9 +96,9 @@ class Builder {
 
     /**
      * Loads all the Templates
-     * @return bool
+     * @return void
      */
-    private static function loadTemplates(): bool {
+    private static function loadTemplates(): void {
         $path      = Package::getBasePath();
         $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
 
@@ -108,7 +108,6 @@ class Builder {
                 self::$templates[$fileName] = File::read($filePath);
             }
         }
-        return true;
     }
 
     /**

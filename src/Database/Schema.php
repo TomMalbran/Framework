@@ -614,11 +614,10 @@ class Schema {
 
     /**
      * Gets the Next Position
-     * @param Query|null $query       Optional.
-     * @param bool       $withDeleted Optional.
+     * @param Query|null $query Optional.
      * @return int
      */
-    private static function getNextPosition(?Query $query = null, bool $withDeleted = true): int {
+    private static function getNextPosition(?Query $query = null): int {
         if (!static::$hasPositions) {
             return 0;
         }
@@ -627,7 +626,7 @@ class Schema {
         $selection->addSelects("position", true);
         $selection->addJoins(withSelects: false);
 
-        $query = self::generateQuery($query, $withDeleted);
+        $query = self::generateQuery($query);
         $query->orderBy("position", false);
         $query->limit(1);
 

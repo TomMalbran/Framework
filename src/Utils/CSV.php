@@ -74,7 +74,7 @@ class CSV {
      * @param string[] $fields
      * @return string[]
      */
-    private static function parseLine(array $value, array $fields): mixed {
+    private static function parseLine(array $value, array $fields): array {
         if (count($fields) === 0) {
             return $value;
         }

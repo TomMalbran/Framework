@@ -25,7 +25,7 @@ use Framework\Utils\Utils;
 class Credential extends CredentialSchema {
 
     /**
-     * Creates a Access Query
+     * Creates an Access Query
      * @param Access[]|Access|null $access
      * @param string[]|string|null $filter Optional.
      * @param string|int           $value  Optional.
@@ -99,7 +99,7 @@ class Credential extends CredentialSchema {
 
 
     /**
-     * Returns true if there is an Credential with the given ID and Access(s)
+     * Returns true if there is a Credential with the given ID and Access(s)
      * @param int                  $credentialID
      * @param Access[]|Access      $access
      * @param string[]|string|null $filter       Optional.
@@ -123,7 +123,7 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Returns true if there is an Credential with the given Email
+     * Returns true if there is a Credential with the given Email
      * @param string               $email
      * @param int                  $skipID Optional.
      * @param Access[]|Access|null $access Optional.
@@ -141,7 +141,7 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Returns true if there is an Credential with the given Value for the given Field
+     * Returns true if there is a Credential with the given Value for the given Field
      * @param CredentialColumn $column
      * @param string|int       $value
      * @param int              $skipID Optional.
@@ -267,7 +267,7 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Returns the create times for all the Credentials with the given Access
+     * Returns the created times for all the Credentials with the given Access
      * @param Date        $fromTime
      * @param Access|null $access   Optional.
      * @return array<int,Date>
@@ -786,7 +786,7 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Sets the require password change for the given Credential
+     * Sets the required password change for the given Credential
      * @param int  $credentialID
      * @param bool $reqPassChange
      * @return bool
@@ -825,7 +825,6 @@ class Credential extends CredentialSchema {
         $credential = self::getByID($credentialID, true);
 
         if ($credential->tokenExpiration > 0 && $credential->tokenExpiration < time()) {
-            $accessToken = Strings::randomCode(30, "lud");
             self::editEntity($credentialID, tokenExpiration: $expiration);
             return $credential->accessToken;
         }
@@ -899,9 +898,9 @@ class Credential extends CredentialSchema {
      * Gets a Credential Value
      * @param int              $credentialID
      * @param CredentialColumn $column
-     * @return mixed
+     * @return string|int
      */
-    public static function getValue(int $credentialID, CredentialColumn $column): mixed {
+    public static function getValue(int $credentialID, CredentialColumn $column): string|int {
         $query = new CredentialQuery();
         $query->credentialID->equal($credentialID);
         return self::getEntityValue($query, $column);
@@ -925,7 +924,7 @@ class Credential extends CredentialSchema {
 
 
     /**
-     * Creates a Hash and Salt (if required) for the the given Password
+     * Creates a Hash and Salt (if required) for the given Password
      * @param string $pass
      * @param string $salt Optional.
      * @return array{password:string,salt:string}

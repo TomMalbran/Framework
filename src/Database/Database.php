@@ -396,8 +396,7 @@ class Database {
                         "resource"           => "b",
                         default              => "",
                     };
-
-                    array_push($params, $value);
+                    $params[] = $value;
                 }
 
                 $values = $this->refValues($params);
@@ -1010,15 +1009,14 @@ class Database {
      * Writes the content in a file or prints them in the screen
      * @param resource|null $fp
      * @param string        $content
-     * @return bool
+     * @return void
      */
-    private function write(mixed $fp, string $content): bool {
+    private function write(mixed $fp, string $content): void {
         if ($fp !== null) {
             fwrite($fp, $content);
         } else {
             print($content);
         }
-        return true;
     }
 
     /**

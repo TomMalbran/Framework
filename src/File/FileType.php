@@ -87,7 +87,7 @@ class FileType {
     }
 
     /**
-     * Returns true if the given file is a ICO
+     * Returns true if the given file is an ICO
      * @param string $file
      * @return bool
      */

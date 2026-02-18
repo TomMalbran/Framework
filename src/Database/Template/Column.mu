@@ -49,7 +49,7 @@ enum {{columnClass}}: string implements Enum, JsonSerializable {
         if (is_null($values)) {
             return [];
         }
-        if ($values instanceof static) {
+        if ($values instanceof self) {
             return [ $values->key() ];
         }
         return array_map(fn($value) => $value->key(), $values);

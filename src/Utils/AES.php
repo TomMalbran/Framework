@@ -447,7 +447,6 @@ class AES {
         $tk = self::convertToInt32($key);
 
         // Copy values into round key arrays
-        $index = 0;
         for ($i = 0; $i < $KC; $i += 1) {
             $index              = $i >> 2;
             $Ke[$index][$i % 4] = $tk[$i];

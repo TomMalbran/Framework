@@ -17,7 +17,7 @@ use Framework\Utils\Dictionary;
 class NotificationContent extends NotificationContentSchema implements DiscoveryMigration {
 
     /**
-     * Returns an Notification Content for the Notification Sender
+     * Returns a Notification Content for the Notification Sender
      * @param NotificationCode $notificationCode
      * @param string           $language         Optional.
      * @return NotificationContentEntity

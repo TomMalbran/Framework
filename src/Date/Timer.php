@@ -8,8 +8,8 @@ use Framework\Utils\Numbers;
  */
 class Timer {
 
-    private float $startTime = 0.0;
-    private float $endTime   = 0.0;
+    private float $startTime;
+    private float $endTime;
 
 
     /**
@@ -17,6 +17,7 @@ class Timer {
      */
     public function __construct() {
         $this->startTime = microtime(true);
+        $this->endTime   = 0.0;
     }
 
     /**

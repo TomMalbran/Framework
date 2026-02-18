@@ -169,9 +169,9 @@ class Selection {
     /**
      * Sets the Table Keys to the condition
      * @param Query $query
-     * @return Selection
+     * @return void
      */
-    private function setTableKeys(Query $query): Selection {
+    private function setTableKeys(Query $query): void {
         $columns = $query->getColumns();
         $mainKey = $this->schemaModel->tableName;
 
@@ -221,7 +221,6 @@ class Selection {
                 }
             }
         }
-        return $this;
     }
 
 

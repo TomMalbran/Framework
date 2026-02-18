@@ -290,7 +290,7 @@ class Period {
      * @return string
      */
     public static function getName(string $value): string {
-        return isset(self::$names[$value]) ? self::$names[$value] : "";
+        return self::$names[$value] ?? "";
     }
 
     /**

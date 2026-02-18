@@ -181,7 +181,7 @@ class StringQuery extends BaseQuery {
     }
 
     /**
-     * Generates a Ends With Query
+     * Generates an Ends With Query
      * @param string $value
      * @param bool   $caseSensitive Optional.
      * @return Query

@@ -77,7 +77,7 @@ class ColumnCode {
         }
 
         $nameLength = 0;
-        foreach ($result as $index => $column) {
+        foreach ($result as $column) {
             $nameLength = max($nameLength, Strings::length($column["name"]));
         }
         foreach ($result as $index => $column) {

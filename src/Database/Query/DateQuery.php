@@ -19,7 +19,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null     $condition Optional.
      * @return void
      */
-    public function compare(QueryOperator $operator, Date $date, ?bool $condition = null) {
+    public function compare(QueryOperator $operator, Date $date, ?bool $condition = null): void {
         if (!$date->isEmpty()) {
             $this->query->add(
                 $this->column,
@@ -37,7 +37,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null     $condition Optional.
      * @return void
      */
-    public function compareIf(QueryOperator $operator, Date $date, ?bool $condition = null) {
+    public function compareIf(QueryOperator $operator, Date $date, ?bool $condition = null): void {
         $this->query->addIf(
             $this->column,
             $operator,
@@ -52,7 +52,7 @@ class DateQuery extends BaseQuery {
      * Generates an Is Empty Query
      * @return void
      */
-    public function isEmpty() {
+    public function isEmpty(): void {
         $this->query->add($this->column, QueryOperator::Equal, 0);
     }
 
@@ -60,7 +60,7 @@ class DateQuery extends BaseQuery {
      * Generates an Is Not Empty Query
      * @return void
      */
-    public function isNotEmpty() {
+    public function isNotEmpty(): void {
         $this->query->add($this->column, QueryOperator::NotEqual, 0);
     }
 
@@ -69,7 +69,7 @@ class DateQuery extends BaseQuery {
      * @param Date $date
      * @return void
      */
-    public function equal(Date $date) {
+    public function equal(Date $date): void {
         $this->compare(QueryOperator::Equal, $date);
     }
 
@@ -79,7 +79,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function equalIf(Date $date, ?bool $condition = null) {
+    public function equalIf(Date $date, ?bool $condition = null): void {
         $this->compareIf(QueryOperator::Equal, $date, $condition);
     }
 
@@ -88,7 +88,7 @@ class DateQuery extends BaseQuery {
      * @param Date $date
      * @return void
      */
-    public function notEqual(Date $date) {
+    public function notEqual(Date $date): void {
         $this->compare(QueryOperator::NotEqual, $date);
     }
 
@@ -98,7 +98,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function notEqualIf(Date $date, ?bool $condition = null) {
+    public function notEqualIf(Date $date, ?bool $condition = null): void {
         $this->compareIf(QueryOperator::NotEqual, $date, $condition);
     }
 
@@ -110,7 +110,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function greaterThan(Date $date, ?bool $condition = null) {
+    public function greaterThan(Date $date, ?bool $condition = null): void {
         $this->compare(QueryOperator::GreaterThan, $date, $condition);
     }
 
@@ -120,7 +120,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function greaterOrEqual(Date $date, ?bool $condition = null) {
+    public function greaterOrEqual(Date $date, ?bool $condition = null): void {
         $this->compare(QueryOperator::GreaterOrEqual, $date, $condition);
     }
 
@@ -130,7 +130,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function lessThan(Date $date, ?bool $condition = null) {
+    public function lessThan(Date $date, ?bool $condition = null): void {
         $this->compare(QueryOperator::LessThan, $date, $condition);
     }
 
@@ -140,7 +140,7 @@ class DateQuery extends BaseQuery {
      * @param bool|null $condition Optional.
      * @return void
      */
-    public function lessOrEqual(Date $date, ?bool $condition = null) {
+    public function lessOrEqual(Date $date, ?bool $condition = null): void {
         $this->compare(QueryOperator::LessOrEqual, $date, $condition);
     }
 
@@ -152,7 +152,7 @@ class DateQuery extends BaseQuery {
      * @param string         $prefix Optional.
      * @return void
      */
-    public function inPeriod(Period|Request $period, string $prefix = "") {
+    public function inPeriod(Period|Request $period, string $prefix = ""): void {
         if ($period instanceof Request) {
             $period = new Period($period, $prefix);
         }

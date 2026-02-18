@@ -41,6 +41,6 @@
             "label": "Frame: Build the code",
             "type": "shell",
             "command": "./framework build"
-        },
+        }
     ]
 }

@@ -148,7 +148,7 @@ class NLS {
 
 
     /**
-     * Creates an url from the given arguments
+     * Creates a url from the given arguments
      * @param mixed[] $args
      * @param string  $language Optional.
      * @return string
@@ -166,7 +166,7 @@ class NLS {
     }
 
     /**
-     * Creates an url from the given arguments
+     * Creates a url from the given arguments
      * @param string  $urlKey
      * @param mixed[] $args
      * @param string  $language Optional.

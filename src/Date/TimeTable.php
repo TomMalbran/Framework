@@ -19,8 +19,8 @@ use Framework\Utils\Strings;
 class TimeTable {
 
     /** @var TimeTableItem[] */
-    private array $timeTables  = [];
-    private bool  $startMonday = false;
+    private array $timeTables;
+    private bool  $startMonday;
 
 
     /**

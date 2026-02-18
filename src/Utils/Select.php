@@ -23,7 +23,7 @@ class Select implements JsonSerializable {
     public string     $description = "";
 
     /** @var array<string,mixed> */
-    private array $extras = [];
+    private array $extras;
 
 
     /**

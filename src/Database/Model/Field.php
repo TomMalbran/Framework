@@ -25,7 +25,7 @@ class Field {
     // Makes the field a primary key and auto-increment
     public bool $isID = false;
 
-    // By default when using isID on a number field, it will be auto-incremented
+    // By default, when using isID on a number field, it will be auto-incremented
     // Using this property will prevent the auto-increment
     public bool $notAutoInc = false;
 

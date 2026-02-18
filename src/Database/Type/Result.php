@@ -22,12 +22,12 @@ class Result {
 
     /**
      * Creates a new Result
-     * @param bool   $isEdit      Optional.
-     * @param bool   $canValidate Optional.
-     * @param int    $id          Optional.
-     * @param string $code        Optional.
-     * @param string $name        Optional.
-     * @param Errors $errors      Optional.
+     * @param bool        $isEdit      Optional.
+     * @param bool        $canValidate Optional.
+     * @param int         $id          Optional.
+     * @param string      $code        Optional.
+     * @param string      $name        Optional.
+     * @param Errors|null $errors      Optional.
      */
     public function __construct(
         bool $isEdit = false,

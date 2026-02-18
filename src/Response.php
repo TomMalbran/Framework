@@ -15,7 +15,7 @@ class Response {
     /** @var array<string,mixed> */
     private array $data;
 
-    private bool $withTokens = true;
+    private bool $withTokens;
 
 
 

@@ -54,7 +54,7 @@ class RouterCode implements DiscoveryBuilder {
                 $startLine  = $method->getStartLine();
 
                 // Check the Response
-                if ($response === null || !$response instanceof ReflectionNamedType) {
+                if (!$response instanceof ReflectionNamedType) {
                     $errorRoutes[] = "Required Response for $methodName: $fileName:$startLine";
                     continue;
                 }

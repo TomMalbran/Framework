@@ -29,11 +29,11 @@ class Package {
 
     /**
      * Loads the Framework Composer Data
-     * @return bool
+     * @return void
      */
-    private static function load(): bool {
+    private static function load(): void {
         if (self::$loaded) {
-            return false;
+            return;
         }
 
         // Read the Composer File
@@ -44,7 +44,6 @@ class Package {
         self::$loaded    = true;
         self::$version   = $composer["version"];
         self::$sourceDir = $composer["sourceDir"];
-        return true;
     }
 
     /**

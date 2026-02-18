@@ -12,6 +12,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 use ReflectionNamedType;
+use ReflectionException;
 use Throwable;
 
 /**
@@ -267,7 +268,11 @@ class Discovery {
             if (!isset($instances[$priority])) {
                 $priorities[] = $priority;
             }
-            $instances[$priority][] = $reflection->newInstance();
+            try {
+                $instances[$priority][] = $reflection->newInstance();
+            } catch (ReflectionException $e) {
+                continue;
+            }
         }
 
         sort($priorities);
@@ -309,7 +314,7 @@ class Discovery {
         foreach ($props as $prop) {
             $type     = $prop->getType();
             $typeName = "mixed";
-            if ($type !== null && $type instanceof ReflectionNamedType) {
+            if ($type instanceof ReflectionNamedType) {
                 $typeName = $type->getName();
             }
             $result[$prop->getName()] = $typeName;

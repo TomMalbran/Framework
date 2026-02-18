@@ -339,7 +339,7 @@ class Query {
 
 
     /**
-     * Adds a Open Parenthesis
+     * Adds an Open Parenthesis
      * @return Query
      */
     public function startParen(): Query {
@@ -458,10 +458,10 @@ class Query {
     /**
      * Adds an Order By
      * @param string $column
-     * @param bool   $isASC  Optional.
+     * @param bool   $isASC
      * @return Query
      */
-    public function orderBy(string $column, bool $isASC = true): Query {
+    public function orderBy(string $column, bool $isASC): Query {
         $prefix         = $this->orderBy !== "" ? "," : "";
         $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
         $this->orders[] = $column;
@@ -469,7 +469,7 @@ class Query {
     }
 
     /**
-     * Adds an Limit
+     * Adds a Limit
      * @param int      $from
      * @param int|null $to   Optional.
      * @return Query
@@ -537,7 +537,7 @@ class Query {
     }
 
     /**
-     * Returns true if there is an Group By
+     * Returns true if there is a Group By
      * @param string|null $group Optional.
      * @return bool
      */

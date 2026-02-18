@@ -65,12 +65,11 @@ class Utils {
         $nameParts = Strings::split(trim($fullName), " ");
         if (count($nameParts) > 1) {
             if ($lastNameFirst) {
-                $lastName  = array_shift($nameParts);
-                $firstName = Strings::join($nameParts, " ");
+                $lastName = array_shift($nameParts);
             } else {
-                $lastName  = array_pop($nameParts);
-                $firstName = Strings::join($nameParts, " ");
+                $lastName = array_pop($nameParts);
             }
+            $firstName = Strings::join($nameParts, " ");
         } else {
             $firstName = $fullName;
             $lastName  = "";

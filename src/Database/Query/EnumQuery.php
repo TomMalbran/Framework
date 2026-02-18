@@ -14,7 +14,7 @@ class EnumQuery extends BaseQuery {
      * Adds an Enum Is Empty condition
      * @return void
      */
-    public function isEmpty() {
+    public function isEmpty(): void {
         $this->query->add($this->column, QueryOperator::NotEqual, "");
     }
 
@@ -22,7 +22,7 @@ class EnumQuery extends BaseQuery {
      * Generates an Is Not Empty Query
      * @return void
      */
-    public function isNotEmpty() {
+    public function isNotEmpty(): void {
         $this->query->add($this->column, QueryOperator::NotEqual, "");
     }
 
@@ -31,7 +31,7 @@ class EnumQuery extends BaseQuery {
      * @param Enum ...$values
      * @return void
      */
-    public function equal(Enum ...$values) {
+    public function equal(Enum ...$values): void {
         $names = $this->toNames($values);
         $this->query->add($this->column, QueryOperator::Equal, $names);
     }
@@ -41,7 +41,7 @@ class EnumQuery extends BaseQuery {
      * @param Enum ...$values
      * @return void
      */
-    public function notEqual(Enum ...$values) {
+    public function notEqual(Enum ...$values): void {
         $names = $this->toNames($values);
         $this->query->add($this->column, QueryOperator::NotEqual, $names);
     }
@@ -51,7 +51,7 @@ class EnumQuery extends BaseQuery {
      * @param Enum[] $values
      * @return void
      */
-    public function in(array $values) {
+    public function in(array $values): void {
         $names = $this->toNames($values);
         $this->query->add($this->column, QueryOperator::In, $names);
     }
@@ -61,7 +61,7 @@ class EnumQuery extends BaseQuery {
      * @param Enum[] $values
      * @return void
      */
-    public function notIn(array $values) {
+    public function notIn(array $values): void {
         $names = $this->toNames($values);
         $this->query->add($this->column, QueryOperator::NotIn, $names);
     }

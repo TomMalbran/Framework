@@ -126,7 +126,7 @@ class SchemaFactory {
             foreach ($props as $prop) {
                 $propType  = $prop->getType();
                 $fieldName = $prop->getName();
-                if ($propType === null || !$propType instanceof ReflectionNamedType) {
+                if (!$propType instanceof ReflectionNamedType) {
                     continue;
                 }
 

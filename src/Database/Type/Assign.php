@@ -58,7 +58,7 @@ class Assign {
     }
 
     /**
-     * Generates an Decrease Assign of a column
+     * Generates a Decrease Assign of a column
      * @param int $amount Optional.
      * @return Assign
      */
@@ -67,7 +67,7 @@ class Assign {
     }
 
     /**
-     * Method generates an UUID function call
+     * Method generates a UUID function call
      * @return Assign
      */
     public static function uuid(): Assign {

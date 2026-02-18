@@ -40,9 +40,9 @@ class CSVWriter implements ExporterWriter {
 
     /**
      * Starts the Writer
-     * @return bool
+     * @return void
      */
-    private function start(): bool {
+    private function start(): void {
         if (ob_get_level() > 0) {
             ob_end_clean();
         }
@@ -52,7 +52,6 @@ class CSVWriter implements ExporterWriter {
         header("Pragma: no-cache");
         header("Expires: 0");
         flush();
-        return true;
     }
 
 

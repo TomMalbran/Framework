@@ -19,9 +19,9 @@ class SchemaMigration {
      * @param array{from:string,to:string}[]              $tableRenames
      * @param array{table:string,from:string,to:string}[] $columnRenames
      * @param bool                                        $canDelete     Optional.
-     * @return bool
+     * @return void
      */
-    public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): bool {
+    public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): void {
         $db            = Framework::getDatabase();
         $schemaModels  = SchemaFactory::getData();
         $startMovement = SettingData::getCore("movement");
@@ -41,7 +41,6 @@ class SchemaMigration {
 
         // Migrate the Tables
         self::migrateTables($db, $schemaModels, $canDelete);
-        return true;
     }
 
     /**
@@ -131,40 +130,34 @@ class SchemaMigration {
      * @param Database      $db
      * @param SchemaModel[] $schemaModels
      * @param bool          $canDelete    Optional.
-     * @return bool
+     * @return void
      */
-    private static function migrateTables(Database $db, array $schemaModels, bool $canDelete = false): bool {
+    private static function migrateTables(Database $db, array $schemaModels, bool $canDelete = false): void {
         $tableNames = $db->getTables();
         $modelNames = [];
-        $didMigrate = false;
 
         // Create or update the Tables
         foreach ($schemaModels as $schemaModel) {
-            $didUpdate    = false;
             $modelNames[] = $schemaModel->tableName;
 
             if (!Arrays::contains($tableNames, $schemaModel->tableName)) {
-                $didUpdate = self::createTable($db, $schemaModel);
+                self::createTable($db, $schemaModel);
             } else {
-                $didUpdate = self::updateTable($db, $schemaModel, $canDelete);
-            }
-            if ($didUpdate) {
-                $didMigrate = true;
+                self::updateTable($db, $schemaModel, $canDelete);
             }
         }
 
         // Delete the Tables or show which to delete
-        $didDelete = self::deleteTables($db, $tableNames, $modelNames, $canDelete);
-        return $didMigrate || $didDelete;
+        self::deleteTables($db, $tableNames, $modelNames, $canDelete);
     }
 
     /**
      * Creates a New Table
      * @param Database    $db
      * @param SchemaModel $schemaModel
-     * @return bool
+     * @return void
      */
-    private static function createTable(Database $db, SchemaModel $schemaModel): bool {
+    private static function createTable(Database $db, SchemaModel $schemaModel): void {
         $fields  = [];
         $primary = [];
         $keys    = [];
@@ -182,7 +175,6 @@ class SchemaMigration {
         $sql = $db->createTable($schemaModel->tableName, $fields, $primary, $keys);
         print("\n- Created table {$schemaModel->tableName} ... \n");
         print("$sql\n\n");
-        return true;
     }
 
     /**
@@ -191,10 +183,9 @@ class SchemaMigration {
      * @param string[] $tableNames
      * @param string[] $modelNames
      * @param bool     $canDelete
-     * @return bool
+     * @return void
      */
-    private static function deleteTables(Database $db, array $tableNames, array $modelNames, bool $canDelete): bool {
-        $deleted  = 0;
+    private static function deleteTables(Database $db, array $tableNames, array $modelNames, bool $canDelete): void {
         $preBreak = "\n";
         foreach ($tableNames as $tableName) {
             if (!Arrays::contains($modelNames, $tableName)) {
@@ -204,11 +195,9 @@ class SchemaMigration {
                 } else {
                     print("{$preBreak}- Delete table $tableName (manually)\n");
                 }
-                $deleted += 1;
                 $preBreak = "";
             }
         }
-        return $deleted > 0;
     }
 
     /**
@@ -216,9 +205,9 @@ class SchemaMigration {
      * @param Database    $db
      * @param SchemaModel $schemaModel
      * @param bool        $canDelete
-     * @return bool
+     * @return void
      */
-    private static function updateTable(Database $db, SchemaModel $schemaModel, bool $canDelete): bool {
+    private static function updateTable(Database $db, SchemaModel $schemaModel, bool $canDelete): void {
         $autoKey     = $db->getAutoIncrement($schemaModel->tableName);
         $primaryKeys = $db->getPrimaryKeys($schemaModel->tableName);
         $tableKeys   = $db->getTableKeys($schemaModel->tableName);
@@ -358,7 +347,7 @@ class SchemaMigration {
         // Nothing to change
         if (!$update) {
             print("- No changes for {$schemaModel->tableName}\n");
-            return false;
+            return;
         }
 
         // Update the Table
@@ -399,6 +388,5 @@ class SchemaMigration {
             print("$sql\n");
         }
         print("\n");
-        return true;
     }
 }

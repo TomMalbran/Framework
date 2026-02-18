@@ -29,7 +29,7 @@ class BaseQuery {
      * Adds an Order By Ascending
      * @return void
      */
-    public function orderByAsc() {
+    public function orderByAsc(): void {
         $this->query->orderBy($this->column, true);
     }
 
@@ -37,7 +37,7 @@ class BaseQuery {
      * Adds an Order By Descending
      * @return void
      */
-    public function orderByDesc() {
+    public function orderByDesc(): void {
         $this->query->orderBy($this->column, false);
     }
 
@@ -45,7 +45,7 @@ class BaseQuery {
      * Adds a Group By
      * @return void
      */
-    public function groupBy() {
+    public function groupBy(): void {
         $this->query->groupBy($this->column);
     }
 }

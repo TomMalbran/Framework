@@ -101,7 +101,7 @@ class Framework {
      * @return Response
      */
     private static function request(string $route, Request $request): Response {
-        // The Route doesn't exists
+        // The Route doesn't exist
         if (!Router::has($route)) {
             return Response::error("GENERAL_ERROR_PATH");
         }

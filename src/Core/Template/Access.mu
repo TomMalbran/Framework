@@ -55,7 +55,7 @@ enum Access implements Enum, JsonSerializable {
 
 {{#roles}}
     /**
-     * Returns true if the current user is an {{name}}
+     * Returns true if the current user is {{name}}
      * @return bool
      */
     public static function is{{name}}(): bool {
@@ -63,7 +63,7 @@ enum Access implements Enum, JsonSerializable {
     }
 
     /**
-     * Returns true if the current user is an {{name}} or Lower
+     * Returns true if the current user is {{name}} or Lower
      * @return bool
      */
     public static function is{{name}}OrLower(): bool {
@@ -71,7 +71,7 @@ enum Access implements Enum, JsonSerializable {
     }
 
     /**
-     * Returns true if the current user is an {{name}} or Higher
+     * Returns true if the current user is {{name}} or Higher
      * @return bool
      */
     public static function is{{name}}OrHigher(): bool {
