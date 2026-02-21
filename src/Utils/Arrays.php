@@ -174,6 +174,24 @@ class Arrays {
     }
 
     /**
+     * Converts an array into a Map of string keys and float values
+     * @param mixed $array
+     * @param int   $decimals Optional.
+     * @return array<string,float>
+     */
+    public static function toStringFloatMap(mixed $array, int $decimals = 0): array {
+        if (!is_array($array)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $key => $value) {
+            $result[Strings::toString($key)] = Numbers::toFloat($value, $decimals);
+        }
+        return $result;
+    }
+
+    /**
      * Converts an array into a Map of string keys and mixed values
      * @param mixed $array
      * @return array<string,mixed>
