@@ -408,9 +408,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         $result = new Dictionary();
         if (array_is_list($this->data)) {
             foreach ($this->data as $elem) {
-                $key = $this->getString($key);
-                if ($key !== "") {
-                    $result->set($key, $elem);
+                if (is_array($elem)) {
+                    $keyVal = Strings::toString($elem[$key] ?? "");
+                    if ($keyVal !== "") {
+                        $result->set($keyVal, $elem);
+                    }
                 }
             }
         }
