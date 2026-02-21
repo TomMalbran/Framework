@@ -518,7 +518,7 @@ class Numbers {
         $expression = Strings::replacePattern($expression, "/([0-9]{1})(%)/", ".0\$1");
         $expression = Strings::replacePattern($expression, "/([0-9]+)(%)/", ".\$1");
 
-        // Fix some errors
+        // Fixes some errors
         $expression = Strings::replacePattern($expression, "/,/", ".");
         $expression = Strings::replacePattern($expression, "/\.+/", ".");
         $expression = Strings::replacePattern($expression, "/\(\)/", "");
