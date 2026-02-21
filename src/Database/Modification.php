@@ -6,6 +6,7 @@ use Framework\Request;
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Query;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 
 /**
  * The Schema Modification
@@ -30,10 +31,10 @@ class Modification {
 
     /**
      * Returns the Fields
-     * @return array<string,mixed>
+     * @return Dictionary
      */
-    public function getFields(): array {
-        return $this->fields;
+    public function getFields(): Dictionary {
+        return new Dictionary($this->fields);
     }
 
     /**

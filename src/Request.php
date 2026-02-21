@@ -927,6 +927,14 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns the Request data as a Dictionary
+     * @return Dictionary
+     */
+    public function toDictionary(): Dictionary {
+        return new Dictionary($this->request);
+    }
+
+    /**
      * Return the Data for var_dump
      * @return array<string,mixed>
      */

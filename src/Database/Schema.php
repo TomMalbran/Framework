@@ -519,7 +519,7 @@ class Schema {
         }
 
         $fields = $modification->getFields();
-        if (isset($fields["position"])) {
+        if ($fields->has("position")) {
             $elem         = self::getSchemaEntity($query);
             $savePosition = self::ensureSchemaOrder($elem, $fields, $orderQuery);
             $modification->setField("position", $savePosition);
@@ -566,18 +566,22 @@ class Schema {
 
     /**
      * Ensures that the Order of the Schema is correct
-     * @param mixed      $oldFields
-     * @param mixed      $newFields
-     * @param Query|null $query     Optional.
+     * @param Dictionary|null $oldFields
+     * @param Dictionary|null $newFields
+     * @param Query|null      $query     Optional.
      * @return int
      */
-    protected static function ensureSchemaOrder(mixed $oldFields, mixed $newFields, ?Query $query = null): int {
+    protected static function ensureSchemaOrder(
+        ?Dictionary $oldFields,
+        ?Dictionary $newFields,
+        ?Query $query = null,
+    ): int {
         $isCreate     = Arrays::isEmpty($oldFields)  && !Arrays::isEmpty($newFields);
         $isEdit       = !Arrays::isEmpty($oldFields) && !Arrays::isEmpty($newFields);
         $isDelete     = !Arrays::isEmpty($oldFields) && Arrays::isEmpty($newFields);
 
-        $oldPosition  = Numbers::toInt(Arrays::getOneValue($oldFields, "position", default: 0));
-        $newPosition  = Numbers::toInt(Arrays::getOneValue($newFields, "position", default: 0));
+        $oldPosition  = $oldFields !== null ? $oldFields->getInt("position") : 0;
+        $newPosition  = $newFields !== null ? $newFields->getInt("position") : 0;
         $nextPosition = self::getNextPosition($query);
 
         $oldPosition  = $isCreate ? $nextPosition : $oldPosition;

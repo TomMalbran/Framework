@@ -996,19 +996,23 @@ class {{name}}Schema extends Schema {
     /**
      * Ensures that the order of the Elements is correct
      * @param {{entityClass}}|null $entity
-     * @param Request|array{}|null $fields{{#parents}}
+     * @param Request|null $fields{{#parents}}
      * @param {{fieldDoc}}{{/parents}}
      * @return int
      */
     protected static function ensureEntityOrder(
         ?{{entityClass}} $entity,
-        Request|array|null $fields,{{#editParents}}
+        Request|null $fields,{{#editParents}}
         {{fieldArg}},{{/editParents}}
     ): int {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::ensureSchemaOrder($entity, $fields{{#hasEditParents}}, $orderQuery->query{{/hasEditParents}});
+        return self::ensureSchemaOrder(
+            $entity?->toDictionary(),
+            $fields?->toDictionary(),{{#hasEditParents}}
+            $orderQuery->query,{{/hasEditParents}}
+        );
     }
 {{/hasPositions}}
 
