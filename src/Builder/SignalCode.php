@@ -100,7 +100,6 @@ class SignalCode implements DiscoveryBuilder {
     private static function getParams(ReflectionMethod $method, array &$uses): array {
         $parameters = $method->getParameters();
         $params     = [];
-        $typeLength = 0;
 
         foreach ($parameters as $parameter) {
             $paramName = $parameter->getName();
@@ -135,21 +134,14 @@ class SignalCode implements DiscoveryBuilder {
                 $docTypes[]  = $docType;
             }
 
-            $typeName   = Strings::join($typeNames, "|");
-            $docType    = Strings::join($docTypes, "|");
-            $typeLength = max($typeLength, Strings::length($docType));
-
             $params[] = [
                 "isFirst" => false,
                 "name"    => $parameter->getName(),
-                "type"    => $typeName,
-                "docType" => $docType,
+                "type"    => Strings::join($typeNames, "|"),
+                "docType" => Strings::join($docTypes, "|"),
             ];
         }
 
-        foreach ($params as $index => $param) {
-            $params[$index]["docType"] = Strings::padRight($param["docType"], $typeLength);
-        }
         if (isset($params[0])) {
             $params[0]["isFirst"] = true;
         }
