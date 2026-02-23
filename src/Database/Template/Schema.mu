@@ -32,7 +32,10 @@ use Framework\Utils\Dictionary;
 use Framework\Utils\Search;
 use Framework\Utils\Select;{{#hasIntID}}
 use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
-use Framework\Utils\Errors;{{/hasValidation}}
+use Framework\Utils\Errors;{{/hasValidation}}{{#hasJsonType}}
+use Framework\Utils\JSON;
+
+use JsonSerializable;{{/hasJsonType}}
 
 /**
  * The {{name}} Schema
@@ -681,7 +684,7 @@ class {{name}}Schema extends Schema {
     /**
      * Creates a new {{name}} Entity{{#usesRequest}}
      * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
-     * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
+     * @param {{{fieldDocNull}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
      * @param Date|null $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}{{#hasPositions}}
@@ -747,7 +750,7 @@ class {{name}}Schema extends Schema {
     /**
      * Replaces the {{name}} Entity{{#usesRequest}}
      * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
-     * @param {{fieldDocNull}} Optional.{{/fields}}{{#hasStatus}}
+     * @param {{{fieldDocNull}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}
      * @return bool
@@ -789,7 +792,7 @@ class {{name}}Schema extends Schema {
      * Edits a {{name}} Entity
      * @param {{editType}} $query{{#usesRequest}}
      * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
-     * @param {{fieldDocEdit}} Optional.{{/fields}}{{#hasStatus}}
+     * @param {{{fieldDocEdit}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
      * @param bool|null $isDeleted Optional.{{/canDelete}}{{#hasPositions}}
@@ -814,7 +817,7 @@ class {{name}}Schema extends Schema {
         $entityFields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $entityFields["{{fieldKey}}"] = {{{fieldAssign}}};
+            $entityFields["{{fieldKey}}"] = {{{fieldAssignEdit}}};
         }
         {{/fields}}
         {{#hasStatus}}

@@ -48,6 +48,9 @@ class Entity implements JsonSerializable {
         case Date::class:
             $this->$property = $data->getDate($property);
             break;
+        case Dictionary::class:
+            $this->$property = $data->getDict($property);
+            break;
         case "bool":
             $this->$property = $data->getBool($property);
             break;

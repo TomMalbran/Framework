@@ -12,6 +12,8 @@ enum FieldType {
 
     case Date;
     case Enum;
+    case JSON;
+    case Array;
 
     case Boolean;
     case Number;
@@ -20,7 +22,6 @@ enum FieldType {
     case String;
     case Text;
     case LongText;
-    case JSON;
     case Encrypt;
     case File;
 
@@ -54,6 +55,7 @@ enum FieldType {
         }
 
         return match ($typeName) {
+            "array"  => FieldType::Array,
             "bool"   => FieldType::Boolean,
             "float"  => FieldType::Float,
             "int"    => FieldType::Number,
@@ -98,6 +100,8 @@ enum FieldType {
         return match ($type) {
             FieldType::Date    => "Date",
             FieldType::Enum    => Strings::substringAfter($enumClass, "\\"),
+            FieldType::JSON    => $forEntity ? "Dictionary" : "JsonSerializable|array",
+            FieldType::Array   => "array",
 
             FieldType::Boolean => "bool",
             FieldType::Number  => "int",
@@ -108,7 +112,6 @@ enum FieldType {
             FieldType::LongText,
             FieldType::Encrypt,
             FieldType::File    => "string",
-            FieldType::JSON    => $forEntity ? "mixed" : "string",
         };
     }
 
@@ -125,6 +128,7 @@ enum FieldType {
             "string"          => '""',
             "array"           => '[]',
             "Date"            => null,
+            "Dictionary"      => null,
             default           => "null",
         };
     }

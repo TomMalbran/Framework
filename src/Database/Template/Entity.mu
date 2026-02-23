@@ -31,28 +31,37 @@ class {{entityClass}} extends Entity {
 {{#list}}{{#subType}}
     /** @var {{{subType}}} */
 {{/subType}}    public {{type}} ${{name}}{{#hasDefault}} = {{{default}}}{{/hasDefault}};
-{{/list}}
 
+{{/list}}
 
 {{/properties}}
 
     /**
      * Creates a new {{name}} Entity instance
-     * @param Dictionary|null $data Optional.{{#attributes}}
-     * @param {{{docType}}} ${{name}} Optional.{{/attributes}}{{#dates}}
+     * @param Dictionary|null $data Optional.{{#mainFields}}
+     * @param {{{docType}}} ${{name}} Optional.{{/mainFields}}{{#dictionaries}}
+     * @param Dictionary|null ${{.}} Optional.{{/dictionaries}}{{#dates}}
      * @param Date|null ${{.}} Optional.{{/dates}}{{#hasStatus}}
      * @param {{statusClass}} $status Optional.{{/hasStatus}}
      */
     public function __construct(
-        ?Dictionary $data = null,{{#attributes}}
-        {{type}} ${{name}}{{#hasDefault}} = {{{default}}}{{/hasDefault}},{{/attributes}}{{#dates}}
+        ?Dictionary $data = null,{{#mainFields}}
+        {{type}} ${{name}}{{#hasDefault}} = {{{default}}}{{/hasDefault}},{{/mainFields}}{{#dictionaries}}
+        ?Dictionary ${{.}} = null,{{/dictionaries}}{{#dates}}
         ?Date ${{.}} = null,{{/dates}}{{#hasStatus}}
         {{statusClass}} $status = {{statusClass}}::None,{{/hasStatus}}
     ) {
         // Set the Main Fields
-        {{#attributes}}
+        {{#mainFields}}
         $this->{{name}} = ${{name}};
-        {{/attributes}}
+        {{/mainFields}}
+    {{#hasDictionaries}}
+
+        // Set the Dictionaries
+        {{#dictionaries}}
+        $this->{{.}} = new Dictionary(${{.}});
+        {{/dictionaries}}
+    {{/hasDictionaries}}
     {{#hasDates}}
 
         // Set the Dates

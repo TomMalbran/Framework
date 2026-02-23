@@ -148,13 +148,17 @@ class QueryCode {
         return match ($type) {
             FieldType::Date    => "DateQuery",
             FieldType::Enum    => "EnumQuery",
+            FieldType::JSON,
+            FieldType::Array   => "StringQuery",
+
             FieldType::Boolean => "BooleanQuery",
+
             FieldType::Number,
             FieldType::Float   => "NumberQuery",
+
             FieldType::String,
             FieldType::Text,
             FieldType::LongText,
-            FieldType::JSON,
             FieldType::File,
             FieldType::Encrypt => "StringQuery",
         };

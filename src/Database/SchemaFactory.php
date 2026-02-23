@@ -22,6 +22,7 @@ use Framework\Utils\Strings;
 use Throwable;
 use JsonSerializable;
 use ReflectionClass;
+use ReflectionProperty;
 use ReflectionNamedType;
 
 /**
@@ -208,26 +209,24 @@ class SchemaFactory {
                     $relation->parseOwnerJoin();
                     $relations[] = $relation;
 
+                // VIRTUAL: If it has a Virtual attribute. It can be an array.
+                } elseif ($virtual !== null) {
+                    $subType = "";
+                    if ($isArray) {
+                        [ $subType, $subSchema ] = self::getArrayType($prop);
+                    }
+                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $subType, $isEnum);
+
                 // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
                 } elseif ($isArray) {
-                    $comment = $prop->getDocComment();
-                    if ($comment !== false) {
-                        $subType   = trim(Strings::substringBetween($comment, "@var", "*/"));
-                        $subSchema = "";
-                        if (Strings::endsWith($subType, "Model[]")) {
-                            $subSchema = Strings::stripEnd($subType, "Model[]");
-                            $subType   = "";
-                        }
+                    [ $subType, $subSchema ] = self::getArrayType($prop);
+                    if ($subType !== "" || $subSchema !== "") {
                         $subRequests[] = $subRequest->setData($fieldName, $subType, $subSchema);
                     }
 
                 // EXPRESSION: If it has an Expression attribute.
                 } elseif ($expression !== null) {
                     $expressions[] = $expression->setData($fieldName, $typeName);
-
-                // VIRTUAL: If it has a Virtual attribute.
-                } elseif ($virtual !== null) {
-                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $isEnum);
 
                 // COUNT: If it has a Count attribute.
                 } elseif ($count !== null) {
@@ -334,6 +333,28 @@ class SchemaFactory {
         }
         return [ true, $isValid ];
     }
+
+    /**
+     * Returns the Field Type from the given Type Name
+     * @param ReflectionProperty $prop
+     * @return array{string,string}
+     */
+    public static function getArrayType(ReflectionProperty $prop): array {
+        $comment = $prop->getDocComment();
+        if ($comment === false) {
+            return [ "", "" ];
+        }
+
+        $subType   = trim(Strings::substringBetween($comment, "@var", "*/"));
+        $subSchema = "";
+        if (Strings::endsWith($subType, "Model[]")) {
+            $subSchema = Strings::stripEnd($subType, "Model[]");
+            $subType   = "";
+        }
+        return [ $subType, $subSchema ];
+    }
+
+
 
     /**
      * Set the Models in the Relations, Counts and SubRequests

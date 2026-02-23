@@ -18,30 +18,33 @@ class EntityCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $imports  = self::getImports($schemaModel);
-        $dates    = self::getDates($schemaModel);
+        $dictionaries = self::getFieldsByType($schemaModel, FieldType::JSON);
+        $dates        = self::getFieldsByType($schemaModel, FieldType::Date);
+        $imports      = self::getImports($schemaModel);
 
         $contents = Builder::render("Entity", [
-            "namespace"   => $schemaModel->namespace,
-            "name"        => $schemaModel->name,
-            "entityClass" => $schemaModel->entityClass,
-            "statusClass" => $schemaModel->statusClass,
-            "hasStatus"   => $schemaModel->hasStatus,
+            "namespace"       => $schemaModel->namespace,
+            "name"            => $schemaModel->name,
+            "entityClass"     => $schemaModel->entityClass,
+            "statusClass"     => $schemaModel->statusClass,
+            "hasStatus"       => $schemaModel->hasStatus,
 
-            "hasID"       => $schemaModel->hasID,
-            "hasIntID"    => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
-            "hasStringID" => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
-            "hasEnumID"   => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
-            "idName"      => $schemaModel->idName,
-            "idEnumName"  => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
+            "hasID"           => $schemaModel->hasID,
+            "hasIntID"        => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
+            "hasStringID"     => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
+            "hasEnumID"       => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
+            "idName"          => $schemaModel->idName,
+            "idEnumName"      => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
 
-            "properties"  => self::getProperties($schemaModel),
-            "attributes"  => self::getAttributes($schemaModel),
-            "subTypes"    => self::getSubTypes($schemaModel),
-            "hasDates"    => count($dates) > 0,
-            "dates"       => $dates,
-            "imports"     => $imports,
-            "hasImports"  => count($imports) > 0,
+            "properties"      => self::getProperties($schemaModel),
+            "subTypes"        => self::getSubTypes($schemaModel),
+            "mainFields"      => self::getMainFields($schemaModel),
+            "hasDictionaries" => count($dictionaries) > 0,
+            "dictionaries"    => $dictionaries,
+            "hasDates"        => count($dates) > 0,
+            "dates"           => $dates,
+            "imports"         => $imports,
+            "hasImports"      => count($imports) > 0,
         ]);
         return $contents;
     }
@@ -61,7 +64,7 @@ class EntityCode {
         $fields = [];
         foreach ($schemaModel->fields as $field) {
             if (!$field->isStatus) {
-                self::addProperty($fields, $field->name, $field->type, $field->enumClass);
+                self::addProperty($fields, $field->name, $field->type, "", $field->enumClass);
             }
         }
         self::addCategory($result, "Main", $fields, $parsed);
@@ -79,7 +82,7 @@ class EntityCode {
         // Virtual Fields
         $fields = [];
         foreach ($schemaModel->virtualFields as $field) {
-            self::addProperty($fields, $field->name, $field->type, $field->enumClass);
+            self::addProperty($fields, $field->name, $field->type, $field->subType, $field->enumClass);
         }
         self::addCategory($result, "Virtual", $fields, $parsed);
 
@@ -108,7 +111,7 @@ class EntityCode {
                         default: "{$relation->relationModelName}Status::None",
                     );
                 } else {
-                    self::addProperty($fields, $field->prefixName, $field->type, $field->enumClass);
+                    self::addProperty($fields, $field->prefixName, $field->type, "", $field->enumClass);
                 }
             }
             self::addCategory($result, $relation->relationModelName, $fields, $parsed);
@@ -159,6 +162,7 @@ class EntityCode {
      * @param array<string,string|bool>[] $result
      * @param string                      $fieldKey
      * @param FieldType                   $fieldType
+     * @param string                      $subType   Optional.
      * @param string                      $enumClass Optional.
      * @return void
      */
@@ -166,6 +170,7 @@ class EntityCode {
         array &$result,
         string $fieldKey,
         FieldType $fieldType,
+        string $subType = "",
         string $enumClass = "",
     ): void {
         if ($fieldType === FieldType::Enum) {
@@ -177,7 +182,7 @@ class EntityCode {
             $result[] = self::getTypeData("{$fieldKey}Thumb", "string");
         } else {
             $type     = FieldType::getCodeType($fieldType, $enumClass, true);
-            $result[] = self::getTypeData($fieldKey, $type);
+            $result[] = self::getTypeData($fieldKey, $type, $subType);
         }
     }
 
@@ -211,17 +216,17 @@ class EntityCode {
 
 
     /**
-     * Returns the Attributes of the Entity
+     * Returns the Main Fields of the Entity
      * @param SchemaModel $schemaModel
      * @return array<string,string|bool>[]
      */
-    private static function getAttributes(SchemaModel $schemaModel): array {
+    private static function getMainFields(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->mainFields as $field) {
             if ($field->type === FieldType::Enum) {
                 $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
                 $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
-            } elseif ($field->type !== FieldType::Date) {
+            } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
                 $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
                 $result[] = self::getTypeData($field->name, $type);
             }
@@ -236,23 +241,30 @@ class EntityCode {
     }
 
     /**
-     * Returns the Date Fields
+     * Returns the Fields by Type
      * @param SchemaModel $schemaModel
+     * @param FieldType   $type
      * @return string[]
      */
-    private static function getDates(SchemaModel $schemaModel): array {
+    private static function getFieldsByType(SchemaModel $schemaModel, FieldType $type): array {
         $result = [];
         foreach ($schemaModel->fields as $field) {
-            if ($field->type === FieldType::Date) {
+            if ($field->type === $type) {
                 $result[] = $field->name;
             }
         }
 
         foreach ($schemaModel->relations as $relation) {
             foreach ($relation->fields as $field) {
-                if ($field->type === FieldType::Date) {
+                if ($field->type === $type) {
                     $result[] = $field->prefixName;
                 }
+            }
+        }
+
+        foreach ($schemaModel->virtualFields as $field) {
+            if ($field->type === $type) {
+                $result[] = $field->name;
             }
         }
         return $result;

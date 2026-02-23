@@ -39,6 +39,7 @@ class SchemaCode {
         $hasParents  = count($parents) > 0;
         $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
         $hasDateType = count(self::getSomeFields($schemaModel, isDateType: true)) > 0;
+        $hasJsonType = count(self::getSomeFields($schemaModel, isJsonType: true)) > 0;
         $queryName   = $schemaModel->queryClass;
 
         $idType      = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, false);
@@ -115,6 +116,7 @@ class SchemaCode {
             "editParents"         => $editParents,
             "hasDate"             => $hasDate,
             "hasDateType"         => $hasDateType,
+            "hasJsonType"         => $hasJsonType,
             "hasQueryOperator"    => $schemaModel->hasID || $hasUniques || $hasParents,
         ]);
         return Strings::replace($contents, "(, ", "(");
@@ -178,6 +180,7 @@ class SchemaCode {
      * @param bool        $isParent    Optional.
      * @param bool        $isDate      Optional.
      * @param bool        $isDateType  Optional.
+     * @param bool        $isJsonType  Optional.
      * @return array<string,string>[]
      */
     private static function getSomeFields(
@@ -186,6 +189,7 @@ class SchemaCode {
         bool $isParent = false,
         bool $isDate = false,
         bool $isDateType = false,
+        bool $isJsonType = false,
     ): array {
         $result = [];
         foreach ($schemaModel->fields as $field) {
@@ -193,12 +197,14 @@ class SchemaCode {
                 $result[] = self::getField($field);
             } elseif ($isParent && $field->isParent) {
                 $result[] = self::getField($field);
-            } elseif ($isDateType && $field->dateType !== DateType::None) {
-                $result[] = self::getField($field);
             } elseif ($isDate && $field->type === FieldType::Date) {
                 if ((!$schemaModel->canCreate && $field->name === "createdTime") || $field->name === "modifiedTime") {
                     continue;
                 }
+                $result[] = self::getField($field);
+            } elseif ($isDateType && $field->dateType !== DateType::None) {
+                $result[] = self::getField($field);
+            } elseif ($isJsonType && $field->type === FieldType::JSON) {
                 $result[] = self::getField($field);
             }
         }
@@ -214,27 +220,40 @@ class SchemaCode {
         $type        = FieldType::getCodeType($field->type, $field->enumClass, false);
         $isDate      = $field->type === FieldType::Date;
         $isEnum      = $field->type === FieldType::Enum;
+        $isJSON      = $field->type === FieldType::JSON;
 
+        $typeDoc     = $type;
+        $typeNull    = "?$type";
         $canAssign   = !$field->isID && !$field->isParent && !$isDate && !$isEnum;
         $assignDoc   = $canAssign ? "Assign|" : "";
 
         $default     = FieldType::getDefault($type);
-        $nullDefault = $default === "null";
-        $nullDoc     = $nullDefault ? "|null" : "";
-        $nullPrefix  = $nullDefault ? "?" : "";
+        $defaultNull = $default === "null";
+        $docNull     = $defaultNull ? "|null" : "";
+        $prefixNull  = $defaultNull ? "?" : "";
 
         $param       = "\${$field->name}";
-        $dateParam   = "{$param}->toTime()";
-        $enumParam   = "{$param}->toString()";
         $value       = $param;
         $valueNull   = $param;
+        $assign      = $param;
+        $assignEdit  = $param;
 
         if ($isEnum) {
-            $value     = "{$param}->toString()";
-            $valueNull = "$param !== null ? $value : null";
+            $value      = "{$param}->toString()";
+            $valueNull  = "$param !== null ? $value : null";
+            $assign     = $value;
+            $assignEdit = $assign;
+        } elseif ($isDate) {
+            $assign     = "{$param}->toTime()";
+            $assignEdit = $assign;
+        } elseif ($isJSON) {
+            $typeNull   = "$type|null";
+            $typeDoc    = Strings::replace($type, "array", "array<string|int,mixed>");
+            $assign     = "JSON::encode($param)";
+            $assignEdit = "$param instanceof Assign ? $param : $assign";
         } elseif ($type === "bool") {
-            $value     = "$param === true ? 1 : 0";
-            $valueNull = $value;
+            $value      = "$param === true ? 1 : 0";
+            $valueNull  = $value;
         }
 
         return [
@@ -243,17 +262,18 @@ class SchemaCode {
             "fieldText"       => Strings::upperCaseFirst($field->name),
             "fieldDoc"        => "$type $param",
             "fieldArg"        => "$type $param",
-            "fieldDocNull"    => "$type|null $param",
-            "fieldArgNull"    => "?$type $param",
-            "fieldDocDefault" => "$type$nullDoc $param",
-            "fieldArgDefault" => "$nullPrefix$type $param = $default",
-            "fieldDocEdit"    => "$assignDoc$type|null $param",
-            "fieldArgEdit"    => ($canAssign ? "Assign|$type|null" : "?$type") . " $param = null",
-            "fieldArgCreate"  => "?$type $param = null",
+            "fieldDocNull"    => "$typeDoc|null $param",
+            "fieldArgNull"    => "$typeNull $param",
+            "fieldDocDefault" => "$type$docNull $param",
+            "fieldArgDefault" => "$prefixNull$type $param = $default",
+            "fieldDocEdit"    => "$assignDoc$typeDoc|null $param",
+            "fieldArgEdit"    => ($canAssign ? "Assign|$type|null" : $typeNull) . " $param = null",
+            "fieldArgCreate"  => "$typeNull $param = null",
             "fieldParam"      => $param,
             "fieldValue"      => $value,
             "fieldValueNull"  => $valueNull,
-            "fieldAssign"     => $isDate ? $dateParam : ($isEnum ? $enumParam : $param),
+            "fieldAssign"     => $assign,
+            "fieldAssignEdit" => $assignEdit,
         ];
     }
 

@@ -356,6 +356,11 @@ class Field {
             $attributes = "unsigned NOT NULL";
             $default    = 0;
             break;
+        case FieldType::JSON:
+        case FieldType::Array:
+            $type       = "mediumtext";
+            $attributes = "NULL";
+            break;
 
         case FieldType::Boolean:
             $type       = "tinyint";
@@ -408,10 +413,6 @@ class Field {
             $type       = "longtext";
             $attributes = "NULL";
             break;
-        case FieldType::JSON:
-            $type       = "mediumtext";
-            $attributes = "NULL";
-            break;
         case FieldType::Encrypt:
             $type       = "varbinary";
             $length     = $this->length > 0 ? $this->length : 255;
@@ -445,6 +446,8 @@ class Field {
         return match ($this->type) {
             FieldType::Date     => $this->getDateValue($request),
             FieldType::Enum     => $request->getString($this->name),
+            FieldType::JSON,
+            FieldType::Array    => $request->toJSON($this->name),
 
             FieldType::Boolean  => $request->toBinary($this->name),
             FieldType::Number   => $request->getInt($this->name),
@@ -453,7 +456,6 @@ class Field {
             FieldType::String,
             FieldType::Text,
             FieldType::LongText => $request->getString($this->name),
-            FieldType::JSON     => $request->toJSON($this->name),
             FieldType::Encrypt  => Assign::encrypt($request->getString($this->name), Config::getDbKey()),
             FieldType::File     => $request->getString($this->name),
         };
@@ -492,6 +494,8 @@ class Field {
         $result[$key] = match ($this->type) {
             FieldType::Date     => $number,
             FieldType::Enum     => $string,
+            FieldType::JSON,
+            FieldType::Array    => JSON::decodeAsArray($string),
 
             FieldType::Boolean  => !Arrays::isEmpty($data, $key),
             FieldType::Number   => $number,
@@ -500,7 +504,6 @@ class Field {
             FieldType::String,
             FieldType::Text,
             FieldType::LongText => $string,
-            FieldType::JSON     => JSON::decodeAsArray($string),
             FieldType::Encrypt  => isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "",
             FieldType::File     => $string,
         };
