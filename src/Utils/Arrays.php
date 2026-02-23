@@ -97,7 +97,7 @@ class Arrays {
      * @param mixed  $array
      * @param string $key          Optional.
      * @param bool   $withoutEmpty Optional.
-     * @return string[]
+     * @return list<string>
      */
     public static function toStrings(mixed $array, string $key = "", bool $withoutEmpty = false): array {
         if (is_string($array)) {
@@ -374,6 +374,16 @@ class Arrays {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns true if the arrays are Equal using JSON encoding
+     * @param mixed $array
+     * @param mixed $other
+     * @return bool
+     */
+    public static function isEqualJSON(mixed $array, mixed $other): bool {
+        return JSON::encode($array) === JSON::encode($other);
     }
 
     /**
