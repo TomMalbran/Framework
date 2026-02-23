@@ -11,7 +11,6 @@ use Framework\Notification\Schema\NotificationQueueColumn;
 use Framework\Notification\Schema\NotificationQueueQuery;
 use Framework\System\Config;
 use Framework\Date\Date;
-use Framework\Utils\JSON;
 
 /**
  * The Notification Queue
@@ -250,7 +249,7 @@ class NotificationQueue extends NotificationQueueSchema {
                 $elem->notificationID,
                 notificationResult: $notificationResult,
                 externalID:         $externalID,
-                playerIDs:          JSON::encode($playerIDs),
+                playerIDs:          $playerIDs,
                 sentTime:           Date::now(),
             );
         }

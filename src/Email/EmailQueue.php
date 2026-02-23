@@ -12,7 +12,6 @@ use Framework\Email\Schema\EmailContentEntity;
 use Framework\System\Config;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
-use Framework\Utils\JSON;
 
 /**
  * The Email Queue
@@ -83,16 +82,16 @@ class EmailQueue extends EmailQueueSchema {
         bool $sendNow = false,
         int $dataID = 0,
     ): bool {
-        $sendTo    = Arrays::toStrings($sendTo);
+        $sendTos   = Arrays::toStrings($sendTo);
         $subject ??= $content->subject;
         $message ??= $content->message;
 
-        if (count($sendTo) === 0) {
+        if (count($sendTos) === 0) {
             return false;
         }
         $emailID = self::createEntity(
             emailCode:   $content->emailCode,
-            sendTo:      JSON::encode($sendTo),
+            sendTo:      $sendTos,
             subject:     $subject,
             message:     $message,
             emailResult: EmailResult::NotProcessed,
@@ -133,7 +132,7 @@ class EmailQueue extends EmailQueueSchema {
      */
     public static function send(EmailQueueEntity $email, bool $sendAlways): bool {
         $emailResult = EmailResult::NoEmails;
-        $sendTos     = Arrays::toStrings($email->sendTo, withoutEmpty: true);
+        $sendTos     = $email->sendTo->toStrings(withoutEmpty: true);
 
         foreach ($sendTos as $sendTo) {
             $emailResult = Email::send(

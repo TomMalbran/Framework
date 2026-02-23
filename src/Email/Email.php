@@ -103,13 +103,13 @@ class Email {
         ?string $subject = null,
         bool $sendAlways = false,
     ): EmailResult {
-        $sendTo    = Arrays::toStrings($sendTo);
+        $sendTos   = Arrays::toStrings($sendTo);
         $subject ??= $content->subject;
         $message ??= $content->message;
         $result    = EmailResult::NoEmails;
 
-        foreach ($sendTo as $email) {
-            $result = self::send($email, $subject, $message, $sendAlways);
+        foreach ($sendTos as $toEmail) {
+            $result = self::send($toEmail, $subject, $message, $sendAlways);
         }
         return $result;
     }
