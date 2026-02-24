@@ -54,61 +54,61 @@ class SchemaModel {
     public string    $idEnumClass = "";
 
 
-    /** @var Field[] */
+    /** @var list<Field> */
     public array $fields          = [];
 
-    /** @var Field[] */
+    /** @var list<Field> */
     public array $mainFields      = [];
 
-    /** @var Field[] */
+    /** @var list<Field> */
     public array $extraFields     = [];
 
-    /** @var Validate[] */
+    /** @var list<Validate> */
     public array $validates       = [];
 
-    /** @var Virtual[] */
+    /** @var list<Virtual> */
     public array $virtualFields   = [];
 
-    /** @var Expression[] */
+    /** @var list<Expression> */
     public array $expressions     = [];
 
-    /** @var Count[] */
+    /** @var list<Count> */
     public array $counts          = [];
 
-    /** @var Relation[] */
+    /** @var list<Relation> */
     public array $relations       = [];
 
-    /** @var SubRequest[] */
+    /** @var list<SubRequest> */
     public array $subRequests     = [];
 
-    /** @var State[] */
+    /** @var list<State> */
     public array $states          = [];
 
 
 
     /**
      * The Schema Model
-     * @param string       $name          Optional.
-     * @param string       $fantasyName   Optional.
-     * @param string       $path          Optional.
-     * @param string       $namespace     Optional.
-     * @param bool         $fromFramework Optional.
-     * @param bool         $hasUsers      Optional.
-     * @param bool         $hasTimestamps Optional.
-     * @param bool         $hasPositions  Optional.
-     * @param bool         $hasStatus     Optional.
-     * @param bool         $canCreate     Optional.
-     * @param bool         $canEdit       Optional.
-     * @param bool         $canDelete     Optional.
-     * @param bool         $usesRequest   Optional.
-     * @param Field[]      $mainFields    Optional.
-     * @param Validate[]   $validates     Optional.
-     * @param Virtual[]    $virtualFields Optional.
-     * @param Expression[] $expressions   Optional.
-     * @param Count[]      $counts        Optional.
-     * @param Relation[]   $relations     Optional.
-     * @param SubRequest[] $subRequests   Optional.
-     * @param State[]      $states        Optional.
+     * @param string           $name          Optional.
+     * @param string           $fantasyName   Optional.
+     * @param string           $path          Optional.
+     * @param string           $namespace     Optional.
+     * @param bool             $fromFramework Optional.
+     * @param bool             $hasUsers      Optional.
+     * @param bool             $hasTimestamps Optional.
+     * @param bool             $hasPositions  Optional.
+     * @param bool             $hasStatus     Optional.
+     * @param bool             $canCreate     Optional.
+     * @param bool             $canEdit       Optional.
+     * @param bool             $canDelete     Optional.
+     * @param bool             $usesRequest   Optional.
+     * @param list<Field>      $mainFields    Optional.
+     * @param list<Validate>   $validates     Optional.
+     * @param list<Virtual>    $virtualFields Optional.
+     * @param list<Expression> $expressions   Optional.
+     * @param list<Count>      $counts        Optional.
+     * @param list<Relation>   $relations     Optional.
+     * @param list<SubRequest> $subRequests   Optional.
+     * @param list<State>      $states        Optional.
      */
     public function __construct(
         string $name = "",
@@ -254,7 +254,7 @@ class SchemaModel {
      * Returns the Fields of the Model
      * @param bool $withTimestamps
      * @param bool $withDeleted
-     * @return Field[]
+     * @return list<Field>
      */
     public function getFields(bool $withTimestamps, bool $withDeleted): array {
         $result = [];
@@ -277,7 +277,7 @@ class SchemaModel {
 
     /**
      * Returns all the Field Names of the Model
-     * @return string[]
+     * @return list<string>
      */
     public function getFieldNames(): array {
         $result = [];

@@ -27,7 +27,7 @@ class Configs implements DiscoveryBuilder {
     /** @var array<string,mixed> */
     private static array $data         = [];
 
-    /** @var string[] */
+    /** @var list<string> */
     private static array $environments = [];
 
 
@@ -163,7 +163,7 @@ class Configs implements DiscoveryBuilder {
 
     /**
      * Returns the Config Environments
-     * @return string[]
+     * @return list<string>
      */
     public static function getEnvironments(): array {
         self::load();
@@ -242,7 +242,7 @@ class Configs implements DiscoveryBuilder {
     /**
      * Returns a Config Property as a List
      * @param string $property
-     * @return string[]
+     * @return list<string>
      */
     public static function getList(string $property): array {
         $value = self::get($property);

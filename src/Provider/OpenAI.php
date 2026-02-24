@@ -78,7 +78,7 @@ class OpenAI {
 
     /**
      * Returns a Select of Models
-     * @return Select[]
+     * @return list<Select>
      */
     public static function getModelSelect(): array {
         $response = self::get("/models");

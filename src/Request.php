@@ -121,14 +121,14 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns the request data at the given key as an array and removing the empty entries
      * @param string $key
-     * @return mixed[]
+     * @return list<mixed>
      */
     public function getArray(string $key): array {
         $value = $this->get($key, []);
         if (!is_array($value)) {
             return [];
         }
-        return Arrays::removeEmpty($value);
+        return Arrays::removeEmpty(Arrays::getValues($value));
     }
 
     /**
@@ -153,7 +153,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns the request data at the given key as an array of integers
      * @param string $key
      * @param bool   $withoutEmpty Optional.
-     * @return int[]
+     * @return list<int>
      */
     public function getInts(string $key, bool $withoutEmpty = true): array {
         $value  = $this->get($key, "");
@@ -171,7 +171,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns the request data at the given key as an array of Strings
      * @param string $key
-     * @return string[]
+     * @return list<string>
      */
     public function getStrings(string $key): array {
         $value  = $this->get($key, "");

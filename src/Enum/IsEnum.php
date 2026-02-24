@@ -45,7 +45,7 @@ trait IsEnum {
     /**
      * Creates a list of Enums from the given Strings
      * @param mixed $value
-     * @return self[]
+     * @return list<self>
      */
     public static function fromList(mixed $value): array {
         if ($value === null) {
@@ -82,8 +82,7 @@ trait IsEnum {
 
     /**
      * Returns all the Enum cases except None
-     * @phpstan-return list<self>
-     * @return self[]
+     * @return list<self>
      */
     public static function getAll(): array {
         $result = [];
@@ -97,8 +96,7 @@ trait IsEnum {
 
     /**
      * Returns all the Enum cases as Strings
-     * @phpstan-return list<string>
-     * @return string[]
+     * @return list<string>
      */
     public static function getNames(): array {
         $result = [];

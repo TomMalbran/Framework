@@ -5,6 +5,7 @@ use Framework\Intl\NLSConfig;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\Enum\Enum;
+use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -96,7 +97,7 @@ class NLS {
      * Returns a List from the data
      * @param string $key
      * @param string $language Optional.
-     * @return string[]
+     * @return list<string>
      */
     public static function getList(string $key, string $language = ""): array {
         $data = self::load($language);
@@ -120,7 +121,7 @@ class NLS {
      * Returns a string from the data
      * @param string $key
      * @param string $language Optional.
-     * @return Select[]
+     * @return list<Select>
      */
     public static function getSelect(string $key, string $language = ""): array {
         $data = self::load($language);
@@ -133,7 +134,7 @@ class NLS {
      * Returns all the strings from the data
      * @param string[] $keys
      * @param string   $language Optional.
-     * @return string[]
+     * @return list<string>
      */
     public static function getAll(array $keys, string $language = ""): array {
         $result = [];
@@ -264,7 +265,7 @@ class NLS {
      * @return string
      */
     public static function join(array $strings, bool $useOr = false, string $language = ""): string {
-        $strings = array_values($strings);
+        $strings = Arrays::getValues($strings);
         if (count($strings) === 0) {
             return "";
         }

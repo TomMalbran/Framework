@@ -51,6 +51,21 @@ class Arrays {
     }
 
     /**
+     * Converts a single value or an array into an array list
+     * @param mixed $array
+     * @return list<mixed>
+     */
+    public static function toList(mixed $array): array {
+        if (!is_array($array)) {
+            return [ $array ];
+        }
+        if (!array_is_list($array)) {
+            return array_values($array);
+        }
+        return $array;
+    }
+
+    /**
      * Converts an array into an object or returns the array
      * @param mixed[]|null $array Optional.
      * @return mixed
@@ -64,7 +79,7 @@ class Arrays {
      * @param mixed  $array
      * @param string $key          Optional.
      * @param bool   $withoutEmpty Optional.
-     * @return int[]
+     * @return list<int>
      */
     public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
         if (is_int($array)) {
@@ -206,6 +221,16 @@ class Arrays {
             $result[Strings::toString($key)] = $value;
         }
         return $result;
+    }
+
+    /**
+     * Returns the values of the given array
+     * @template TValue
+     * @param array<string|int,TValue> $array
+     * @return list<TValue>
+     */
+    public static function getValues(array $array): array {
+        return array_values($array);
     }
 
 
@@ -425,8 +450,6 @@ class Arrays {
         return $result;
     }
 
-
-
     /**
      * Returns a random value from the array
      * @template TValue
@@ -441,11 +464,38 @@ class Arrays {
         return null;
     }
 
+
+
+    /**
+     * Adds the given element to the start of the Array
+     * @template TValue
+     * @param list<TValue> $array
+     * @param TValue       ...$elem
+     * @return list<TValue>
+     */
+    public static function addFirst(array $array, mixed ...$elem): array {
+        array_unshift($array, ...$elem);
+        return $array;
+    }
+
+    /**
+     * Adds the given element at the given position
+     * @template TValue
+     * @param list<TValue> $array
+     * @param int          $position
+     * @param TValue       ...$elem
+     * @return list<TValue>
+     */
+    public static function addAt(array $array, int $position, mixed ...$elem): array {
+        array_splice($array, $position, 0, $elem);
+        return $array;
+    }
+
     /**
      * Removes the First value from the array
      * @template TValue
-     * @param TValue[] $array
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @return list<TValue>
      */
     public static function removeFirst(array $array): array {
         array_shift($array);
@@ -455,8 +505,8 @@ class Arrays {
     /**
      * Removes the Last value from the array
      * @template TValue
-     * @param TValue[] $array
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @return list<TValue>
      */
     public static function removeLast(array $array): array {
         array_pop($array);
@@ -464,12 +514,24 @@ class Arrays {
     }
 
     /**
+     * Removes the value at the given position from the array
+     * @template TValue
+     * @param list<TValue> $array
+     * @param int          $position
+     * @return list<TValue>
+     */
+    public static function removeAt(array $array, int $position): array {
+        array_splice($array, $position, 1);
+        return $array;
+    }
+
+    /**
      * Removes the given value from the array
      * @template TValue
-     * @param TValue[]   $array
-     * @param string|int $key
-     * @param string|int $idKey Optional.
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @param string|int   $key
+     * @param string|int   $idKey Optional.
+     * @return list<TValue>
      */
     public static function removeValue(array $array, string|int $key, string|int $idKey = ""): array {
         $result = [];
@@ -492,8 +554,8 @@ class Arrays {
     /**
      * Removes the empty entries from the given array
      * @template TValue
-     * @param TValue[] $array
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @return list<TValue>
      */
     public static function removeEmpty(array $array): array {
         $result = [];
@@ -508,8 +570,8 @@ class Arrays {
     /**
      * Removes the duplicate entries from the given array
      * @template TValue
-     * @param TValue[] $array
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @return list<TValue>
      */
     public static function removeDuplicates(array $array): array {
         $result = [];
@@ -535,37 +597,22 @@ class Arrays {
     }
 
     /**
-     * Adds the given element to the start of the Array
+     * Merges the given Array Lists
      * @template TValue
-     * @param TValue[] $array
-     * @param TValue   ...$elem
-     * @return TValue[]
+     * @param list<TValue> ...$arrays
+     * @return list<TValue>
      */
-    public static function addFirst(array $array, mixed ...$elem): array {
-        array_unshift($array, ...$elem);
-        return $array;
-    }
-
-    /**
-     * Adds the given element at the given position
-     * @template TValue
-     * @param TValue[] $array
-     * @param int      $position
-     * @param TValue   ...$elem
-     * @return TValue[]
-     */
-    public static function addAt(array $array, int $position, mixed ...$elem): array {
-        array_splice($array, $position, 0, $elem);
-        return $array;
+    public static function mergeLists(array ...$arrays): array {
+        return array_merge(...$arrays);
     }
 
     /**
      * Slices an Array from the index the amount of items
      * @template TValue
-     * @param TValue[] $array
-     * @param int      $from
-     * @param int|null $amount Optional.
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @param int          $from
+     * @param int|null     $amount Optional.
+     * @return list<TValue>
      */
     public static function slice(array $array, int $from, ?int $amount = null): array {
         return array_slice($array, $from, $amount);
@@ -574,10 +621,10 @@ class Arrays {
     /**
      * Paginates an Array from the page to the amount of items
      * @template TValue
-     * @param TValue[] $array
-     * @param int      $page
-     * @param int      $amount
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @param int          $page
+     * @param int          $amount
+     * @return list<TValue>
      */
     public static function paginate(array $array, int $page, int $amount): array {
         $from = $page * $amount;
@@ -637,10 +684,26 @@ class Arrays {
     }
 
     /**
+     * Sorts a list using the given callback
+     * @template TValue
+     * @param list<TValue>                     $array
+     * @param callable(TValue,TValue):int|null $callback Optional.
+     * @return list<TValue>
+     */
+    public static function sortList(array $array, ?callable $callback = null): array {
+        if ($callback === null) {
+            sort($array);
+        } else {
+            usort($array, $callback);
+        }
+        return $array;
+    }
+
+    /**
      * Returns the given array reversed
      * @template TValue
-     * @param TValue[] $array
-     * @return TValue[]
+     * @param list<TValue> $array
+     * @return list<TValue>
      */
     public static function reverse(array $array): array {
         return array_reverse($array);

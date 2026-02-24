@@ -24,7 +24,7 @@ enum CurlMethod implements Enum, JsonSerializable {
 
     /**
      * Creates a Select for the Fetch Methods
-     * @return Select[]
+     * @return list<Select>
      */
     public static function getSelect(): array {
         $result = [];

@@ -27,7 +27,7 @@ class RefreshToken extends CredentialRefreshTokenSchema {
     /**
      * Returns all the Refresh Tokens for the given Credential
      * @param int $credentialID
-     * @return CredentialRefreshTokenEntity[]
+     * @return list<CredentialRefreshTokenEntity>
      */
     public static function getAllForCredential(int $credentialID): array {
         $query = new CredentialRefreshTokenQuery();

@@ -27,7 +27,7 @@ interface ImporterReader extends Iterator {
 
     /**
      * Returns the Header
-     * @return Select[]
+     * @return list<Select>
      */
     public function getHeader(): array;
 }

@@ -57,7 +57,7 @@ class Language {
 
     /**
      * Creates a Select of Languages
-     * @return Select[]
+     * @return list<Select>
      */
     public static function getSelect(): array {
         return Select::createFromArray(self::getAll());

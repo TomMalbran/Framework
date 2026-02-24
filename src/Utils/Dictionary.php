@@ -316,7 +316,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as a list of Dictionary
      * @param string $key
-     * @return Dictionary[]
+     * @return list<Dictionary>
      */
     public function getList(string $key): array {
         $result = [];
@@ -363,7 +363,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as a list of Integers
      * @param string $key
-     * @return int[]
+     * @return list<int>
      */
     public function getInts(string $key): array {
         if (isset($this->data[$key])) {
@@ -376,7 +376,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * Gets the value of the given key as a list of Strings
      * @param string $key
      * @param bool   $withoutEmpty Optional.
-     * @return string[]
+     * @return list<string>
      */
     public function getStrings(string $key, bool $withoutEmpty = false): array {
         if (isset($this->data[$key])) {
@@ -426,7 +426,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Gets the value of the given key as a list of Strings decoded from JSON
      * @param string $key
-     * @return string[]
+     * @return list<string>
      */
     public function decodeAsStrings(string $key): array {
         if (isset($this->data[$key]) && is_string($this->data[$key])) {
@@ -463,6 +463,14 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      */
     public function toArray(): array {
         return $this->data;
+    }
+
+    /**
+     * Returns the data as a List
+     * @return list<mixed>
+     */
+    public function toList(): array {
+        return Arrays::getValues($this->data);
     }
 
     /**
@@ -507,28 +515,22 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
             return Arrays::toStrings($this->data, withoutEmpty: $withoutEmpty);
         }
 
-        $values = array_values($this->data);
-        if (Arrays::isList($values)) {
-            return Arrays::toStrings($values, withoutEmpty: $withoutEmpty);
-        }
-        return [];
+        $values = Arrays::getValues($this->data);
+        return Arrays::toStrings($values, withoutEmpty: $withoutEmpty);
     }
 
     /**
      * Returns the data as an array of Ints
      * @param bool $withoutEmpty Optional.
-     * @return int[]
+     * @return list<int>
      */
     public function toInts(bool $withoutEmpty = false): array {
         if (Arrays::isList($this->data)) {
             return Arrays::toInts($this->data, withoutEmpty: $withoutEmpty);
         }
 
-        $values = array_values($this->data);
-        if (Arrays::isList($values)) {
-            return Arrays::toInts($values, withoutEmpty: $withoutEmpty);
-        }
-        return [];
+        $values = Arrays::getValues($this->data);
+        return Arrays::toInts($values, withoutEmpty: $withoutEmpty);
     }
 
     /**

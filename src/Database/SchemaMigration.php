@@ -127,9 +127,9 @@ class SchemaMigration {
 
     /**
      * Migrates the Tables
-     * @param Database      $db
-     * @param SchemaModel[] $schemaModels
-     * @param bool          $canDelete    Optional.
+     * @param Database          $db
+     * @param list<SchemaModel> $schemaModels
+     * @param bool              $canDelete    Optional.
      * @return void
      */
     private static function migrateTables(Database $db, array $schemaModels, bool $canDelete = false): void {
@@ -179,10 +179,10 @@ class SchemaMigration {
 
     /**
      * Delete the Tables or show which to delete
-     * @param Database $db
-     * @param string[] $tableNames
-     * @param string[] $modelNames
-     * @param bool     $canDelete
+     * @param Database     $db
+     * @param list<string> $tableNames
+     * @param list<string> $modelNames
+     * @param bool         $canDelete
      * @return void
      */
     private static function deleteTables(Database $db, array $tableNames, array $modelNames, bool $canDelete): void {

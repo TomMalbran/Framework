@@ -17,6 +17,7 @@ use Framework\Database\Status\Status;
 use Framework\Database\Status\State;
 use Framework\File\File;
 use Framework\Enum\Enum;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use Throwable;
@@ -32,18 +33,18 @@ class SchemaFactory {
 
     /**
      * Returns all the Schema Models
-     * @return SchemaModel[]
+     * @return list<SchemaModel>
      */
     public static function getData(): array {
         $frameModels = self::buildData(forFramework: true);
         $appModels   = self::buildData(forFramework: false);
-        return array_merge($frameModels, $appModels);
+        return Arrays::mergeLists($frameModels, $appModels);
     }
 
     /**
      * Builds the Schema Models for the Framework or the Application
      * @param bool $forFramework Optional.
-     * @return SchemaModel[]
+     * @return list<SchemaModel>
      */
     public static function buildData(bool $forFramework = false): array {
         $reflections  = Discovery::getReflectionClasses(forFramework: $forFramework);
@@ -298,16 +299,16 @@ class SchemaFactory {
             print("\n");
         }
 
-        return $schemaModels;
+        return Arrays::getValues($schemaModels);
     }
 
 
 
     /**
      * Returns true if the Enum and if is valid
-     * @param string   $typeName
-     * @param string   $modelName
-     * @param string[] $errors
+     * @param string       $typeName
+     * @param string       $modelName
+     * @param list<string> $errors
      * @return array{bool,bool}
      */
     private static function isPropEnum(string $typeName, string $modelName, array &$errors): array {

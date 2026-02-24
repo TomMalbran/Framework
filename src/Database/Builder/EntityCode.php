@@ -239,7 +239,7 @@ class EntityCode {
      * Returns the Fields by Type
      * @param SchemaModel $schemaModel
      * @param FieldType   $type
-     * @return string[]
+     * @return list<string>
      */
     private static function getFieldsByType(SchemaModel $schemaModel, FieldType $type): array {
         $result = [];
@@ -301,7 +301,7 @@ class EntityCode {
     /**
      * Returns used Imports
      * @param SchemaModel $schemaModel
-     * @return string[]
+     * @return list<string>
      */
     private static function getImports(SchemaModel $schemaModel): array {
         $result = [];

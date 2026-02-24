@@ -3,6 +3,7 @@ namespace Framework\IO;
 
 use Framework\Intl\NLS;
 use Framework\IO\ExporterWriter;
+use Framework\Utils\Arrays;
 
 use OpenSpout\Writer\XLSX\Writer;
 use OpenSpout\Writer\XLSX\Options;
@@ -60,8 +61,8 @@ class XLSXWriter implements ExporterWriter {
     public function writeHeader(array $headers): XLSXWriter {
         $this->headers = $headers;
 
-        $values = NLS::getAll(array_values($headers), $this->lang);
-        $row    = Row::fromValues(array_values($values));
+        $values = NLS::getAll(Arrays::getValues($headers), $this->lang);
+        $row    = Row::fromValues($values);
         $this->writer->addRow($row);
         return $this;
     }

@@ -35,7 +35,7 @@ class InvalidReader implements ImporterReader {
 
     /**
      * Returns the Header
-     * @return Select[]
+     * @return list<Select>
      */
     #[\Override]
     public function getHeader(): array {

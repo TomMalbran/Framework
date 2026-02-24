@@ -277,7 +277,7 @@ class MailChimp {
 
     /**
      * Returns a list of Templates
-     * @return Select[]
+     * @return list<Select>
      */
     public static function getTemplates(): array {
         if (!Config::isMailchimpActive()) {

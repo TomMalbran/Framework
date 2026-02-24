@@ -12,8 +12,8 @@ class CSV {
 
     /**
      * Converts an array or string to a CSV string
-     * @param string[]|string $value
-     * @param string          $separator Optional.
+     * @param list<string>|string $value
+     * @param string              $separator Optional.
      * @return string
      */
     public static function encode(array|string $value, string $separator = ","): string {
@@ -29,9 +29,9 @@ class CSV {
 
     /**
      * Converts an array or string to a CSV array
-     * @param string[]|string $value
-     * @param string          $separator Optional.
-     * @param string[]        $fields    Optional.
+     * @param list<string>|string $value
+     * @param string              $separator Optional.
+     * @param string[]            $fields    Optional.
      * @return string[]|string[][]
      */
     public static function decode(array|string $value, string $separator = ",", array $fields = []): array {

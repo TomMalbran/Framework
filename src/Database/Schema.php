@@ -49,7 +49,7 @@ class Schema {
 
     /**
      * Returns a list of SubRequests
-     * @return SubRequest[]
+     * @return list<SubRequest>
      */
     public static function getSubRequests(): array {
         return [];
@@ -183,7 +183,7 @@ class Schema {
      * @param string[]|string|null $extraColumn    Optional.
      * @param string|null          $distinctColumn Optional.
      * @param bool                 $useEmpty       Optional.
-     * @return Select[]
+     * @return list<Select>
      */
     protected static function getSchemaSelect(
         Query $query,
@@ -223,7 +223,7 @@ class Schema {
      * @param string[]|string $nameColumn
      * @param string|null     $idColumn   Optional.
      * @param int             $limit      Optional.
-     * @return Search[]
+     * @return list<Search>
      */
     protected static function getSchemaSearch(
         Query $query,

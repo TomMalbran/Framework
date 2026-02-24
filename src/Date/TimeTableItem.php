@@ -6,7 +6,7 @@ namespace Framework\Date;
  */
 class TimeTableItem {
 
-    /** @var int[] */
+    /** @var list<int> */
     public array $days;
     public string $from;
     public string $to;
@@ -14,9 +14,9 @@ class TimeTableItem {
 
     /**
      * Constructor
-     * @param int[]  $days
-     * @param string $from
-     * @param string $to
+     * @param list<int> $days
+     * @param string    $from
+     * @param string    $to
      */
     public function __construct(
         array $days,

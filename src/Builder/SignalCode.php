@@ -62,7 +62,7 @@ class SignalCode implements DiscoveryBuilder {
             }
         }
 
-        $signals = array_values($signals);
+        $signals = Arrays::getValues($signals);
         $signals = Arrays::sort($signals, function (array $a, array $b) {
             return $a["event"] <=> $b["event"];
         });
@@ -127,7 +127,7 @@ class SignalCode implements DiscoveryBuilder {
 
                 $docType = $name;
                 if (Strings::endsWith($paramName, "IDs")) {
-                    $docType = "int[]";
+                    $docType = "list<int>";
                 }
 
                 $typeNames[] = $name;

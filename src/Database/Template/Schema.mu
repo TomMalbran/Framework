@@ -111,7 +111,7 @@ class {{name}}Schema extends Schema {
 {{#hasSubRequests}}
     /**
      * Returns a list of SubRequests
-     * @return SubRequest[]
+     * @return list<SubRequest>
      */
     #[\Override]
     public static function getSubRequests(): array {
@@ -303,7 +303,7 @@ class {{name}}Schema extends Schema {
     /**
      * Constructs a list of {{name}} Entities
      * @param Dictionary $list
-     * @return {{entityClass}}[]
+     * @return list<{{entityClass}}>
      */
     protected static function constructEntities(Dictionary $list): array {
         $result = [];
@@ -521,7 +521,7 @@ class {{name}}Schema extends Schema {
     /**
      * Returns an array with all the {{idText}}s
      * @param {{queryClass}}|null $query Optional.
-     * @return {{idType}}[]
+     * @return list<{{idType}}>
      */
     public static function get{{idText}}s(?{{queryClass}} $query = null): array {
         $result = self::getSchemaColumn($query?->query, "{{idDbName}}", "{{idName}}");
@@ -541,7 +541,7 @@ class {{name}}Schema extends Schema {
      * Returns a list of {{name}} Entities
      * @param Request $request{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}
-     * @return {{entityClass}}[]
+     * @return list<{{entityClass}}>
      */
     public static function getList(
         Request $request,{{#parents}}
@@ -563,7 +563,7 @@ class {{name}}Schema extends Schema {
      * @param string[] $joins Optional.{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
      * @param bool $skipSubRequest Optional.
-     * @return {{entityClass}}[]
+     * @return list<{{entityClass}}>
      */
     protected static function getEntityList(
         ?{{queryClass}} $query = null,
@@ -614,7 +614,7 @@ class {{name}}Schema extends Schema {
      * @param {{columnClass}}[]|{{columnClass}}|null $extraColumn Optional.
      * @param {{columnClass}}|null $distinctColumn Optional.
      * @param bool $useEmpty Optional.
-     * @return Select[]
+     * @return list<Select>
      */
     protected static function getEntitySelect(
         {{queryClass}} $query,
@@ -642,7 +642,7 @@ class {{name}}Schema extends Schema {
      * @param {{columnClass}}[]|{{columnClass}} $nameColumn
      * @param {{columnClass}}|null $idColumn Optional.
      * @param int $limit Optional.
-     * @return Search[]
+     * @return list<Search>
      */
     public static function getEntitySearch(
         {{queryClass}} $query,

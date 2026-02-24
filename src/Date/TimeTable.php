@@ -303,7 +303,7 @@ class TimeTable {
                 $days[$day] = 1;
             }
         }
-        $schedules = array_values($schedules);
+        $schedules = Arrays::getValues($schedules);
 
         if ($allDays && count($days) < $maxDay) {
             $numbers = [];

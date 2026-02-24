@@ -108,7 +108,7 @@ class Response {
 
     /**
      * Creates a Search Response
-     * @param Search[] $data Optional.
+     * @param list<Search> $data Optional.
      * @return Response
      */
     public static function search(array $data = []): Response {

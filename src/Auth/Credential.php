@@ -26,9 +26,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Creates an Access Query
-     * @param Access[]|Access|null $access
-     * @param string[]|string|null $filter Optional.
-     * @param string|int           $value  Optional.
+     * @param list<Access>|Access|null $access
+     * @param list<string>|string|null $filter Optional.
+     * @param string|int               $value  Optional.
      * @return CredentialQuery
      */
     private static function createAccessQuery(
@@ -100,10 +100,10 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is a Credential with the given ID and Access(s)
-     * @param int                  $credentialID
-     * @param Access[]|Access      $access
-     * @param string[]|string|null $filter       Optional.
-     * @param string|int           $value        Optional.
+     * @param int                      $credentialID
+     * @param list<Access>|Access      $access
+     * @param list<string>|string|null $filter       Optional.
+     * @param string|int               $value        Optional.
      * @return bool
      */
     public static function existsWithAccess(
@@ -124,9 +124,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is a Credential with the given Email
-     * @param string               $email
-     * @param int                  $skipID Optional.
-     * @param Access[]|Access|null $access Optional.
+     * @param string                   $email
+     * @param int                      $skipID Optional.
+     * @param list<Access>|Access|null $access Optional.
      * @return bool
      */
     public static function emailExists(
@@ -164,7 +164,7 @@ class Credential extends CredentialSchema {
      * Returns all the Credentials
      * @param Request|null         $sort  Optional.
      * @param CredentialQuery|null $query Optional.
-     * @return CredentialEntity[]
+     * @return list<CredentialEntity>
      */
     public static function getAll(?Request $sort = null, ?CredentialQuery $query = null): array {
         return self::getCredentials($query, $sort, false);
@@ -172,9 +172,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials for the given Access(s)
-     * @param Access[]|Access $access
-     * @param Request|null    $sort   Optional.
-     * @return CredentialEntity[]
+     * @param list<Access>|Access $access
+     * @param Request|null        $sort   Optional.
+     * @return list<CredentialEntity>
      */
     public static function getAllForAccess(array|Access $access, ?Request $sort = null): array {
         $query = self::createAccessQuery($access);
@@ -187,9 +187,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials for the given IDs
-     * @param int[]        $credentialIDs
+     * @param list<int>    $credentialIDs
      * @param Request|null $sort          Optional.
-     * @return CredentialEntity[]
+     * @return list<CredentialEntity>
      */
     public static function getAllWithIDs(array $credentialIDs, ?Request $sort = null): array {
         if (count($credentialIDs) === 0) {
@@ -203,11 +203,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials for the given Access(s) and filter
-     * @param Access[]|Access $access
-     * @param string          $filter
-     * @param string|int      $value  Optional.
-     * @param Request|null    $sort   Optional.
-     * @return CredentialEntity[]
+     * @param list<Access>|Access $access
+     * @param string              $filter
+     * @param string|int          $value  Optional.
+     * @param Request|null        $sort   Optional.
+     * @return list<CredentialEntity>
      */
     public static function getAllWithFilter(
         array|Access $access,
@@ -225,9 +225,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials for the given Access(s)
-     * @param Access[]|Access $access
-     * @param Request|null    $sort   Optional.
-     * @return CredentialEntity[]
+     * @param list<Access>|Access $access
+     * @param Request|null        $sort   Optional.
+     * @return list<CredentialEntity>
      */
     public static function getActiveForAccess(
         array|Access $access,
@@ -244,11 +244,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the latest Credentials for the given Access(s)
-     * @param Access[]|Access $access
-     * @param int             $amount
-     * @param string|null     $filter Optional.
-     * @param string|int      $value  Optional.
-     * @return CredentialEntity[]
+     * @param list<Access>|Access $access
+     * @param int                 $amount
+     * @param string|null         $filter Optional.
+     * @param string|int          $value  Optional.
+     * @return list<CredentialEntity>
      */
     public static function getLatestForAccess(
         array|Access $access,
@@ -296,9 +296,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the total amount of Credentials for the given Access(s)
-     * @param Access[]|Access $access
-     * @param string|null     $filter Optional.
-     * @param string|int      $value  Optional.
+     * @param list<Access>|Access $access
+     * @param string|null         $filter Optional.
+     * @param string|int          $value  Optional.
      * @return int
      */
     public static function getTotalForAccess(
@@ -319,7 +319,7 @@ class Credential extends CredentialSchema {
      * @param CredentialQuery|null $query    Optional.
      * @param Request|null         $sort     Optional.
      * @param bool                 $complete Optional.
-     * @return CredentialEntity[]
+     * @return list<CredentialEntity>
      */
     private static function getCredentials(
         ?CredentialQuery $query = null,
@@ -368,7 +368,7 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a select of all the Credentials
-     * @return Select[]
+     * @return list<Select>
      */
     public static function getSelect(): array {
         return self::requestSelect();
@@ -376,10 +376,10 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a select of Credentials for the given Access(s)
-     * @param Access[]|Access      $access
-     * @param string[]|string|null $filter Optional.
-     * @param string|int           $value  Optional.
-     * @return Select[]
+     * @param list<Access>|Access      $access
+     * @param list<string>|string|null $filter Optional.
+     * @param string|int               $value  Optional.
+     * @return list<Select>
      */
     public static function getSelectForAccess(
         array|Access $access,
@@ -397,8 +397,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a select of Credentials with the given IDs
-     * @param int[] $credentialIDs
-     * @return Select[]
+     * @param list<int> $credentialIDs
+     * @return list<Select>
      */
     public static function getSelectForIDs(array $credentialIDs): array {
         if (count($credentialIDs) === 0) {
@@ -413,13 +413,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credentials that contains the text and the given Accesses
-     * @param string               $text
-     * @param int                  $amount       Optional.
-     * @param Access[]|Access|null $access       Optional.
-     * @param int[]|int|null       $credentialID Optional.
-     * @param bool                 $withEmail    Optional.
-     * @param bool                 $splitValue   Optional.
-     * @return Search[]
+     * @param string                   $text
+     * @param int                      $amount       Optional.
+     * @param list<Access>|Access|null $access       Optional.
+     * @param list<int>|int|null       $credentialID Optional.
+     * @param bool                     $withEmail    Optional.
+     * @param bool                     $splitValue   Optional.
+     * @return list<Search>
      */
     public static function search(
         string $text,
@@ -455,7 +455,7 @@ class Credential extends CredentialSchema {
     /**
      * Returns a select of Credentials under the given conditions
      * @param CredentialQuery|null $query Optional.
-     * @return Select[]
+     * @return list<Select>
      */
     private static function requestSelect(?CredentialQuery $query = null): array {
         $list   = self::getEntityList($query);
@@ -472,9 +472,9 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns a list of emails of the Credentials with the given Accesses
-     * @param Access[]|Access      $access
-     * @param string[]|string|null $filter Optional.
-     * @param string|int           $value  Optional.
+     * @param list<Access>|Access      $access
+     * @param list<string>|string|null $filter Optional.
+     * @param string|int               $value  Optional.
      * @return array<string,string>
      */
     public static function getEmailsForAccess(

@@ -89,7 +89,7 @@ class ImporterRow {
     /**
      * Returns the Field Value for the given Key as a List of Strings
      * @param string $key
-     * @return string[]
+     * @return list<string>
      */
     public function getList(string $key): array {
         $value = $this->getValue($key, splitResult: true);

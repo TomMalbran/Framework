@@ -295,7 +295,7 @@ class Period {
 
     /**
      * Returns a select of Periods
-     * @return Select[]
+     * @return list<Select>
      */
     public static function getSelect(): array {
         return Select::createFromArray(self::$names);

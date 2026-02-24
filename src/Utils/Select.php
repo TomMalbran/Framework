@@ -154,7 +154,7 @@ class Select implements JsonSerializable {
      * @param string[]|string|null $extraKey Optional.
      * @param bool                 $useEmpty Optional.
      * @param bool                 $distinct Optional.
-     * @return Select[]
+     * @return list<Select>
      */
     public static function create(
         array $array,
@@ -199,7 +199,7 @@ class Select implements JsonSerializable {
     /**
      * Creates a select using the given array
      * @param string[] $array
-     * @return Select[]
+     * @return list<Select>
      */
     public static function createFromList(array $array): array {
         $result = [];
@@ -212,7 +212,7 @@ class Select implements JsonSerializable {
     /**
      * Creates a select using the given array
      * @param array<string|int,string> $array
-     * @return Select[]
+     * @return list<Select>
      */
     public static function createFromArray(array $array): array {
         $result = [];
@@ -225,7 +225,7 @@ class Select implements JsonSerializable {
     /**
      * Creates a select using the given array
      * @param Map<Enum,mixed> $map
-     * @return Select[]
+     * @return list<Select>
      */
     public static function createFromMap(Map $map): array {
         $result = [];

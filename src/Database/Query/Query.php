@@ -18,19 +18,19 @@ class Query {
     public string $groupBy   = "";
     public string $orderBy   = "";
 
-    /** @var string[] */
+    /** @var list<string> */
     public array  $prefixes  = [];
 
-    /** @var mixed[] */
+    /** @var list<mixed> */
     public array  $params    = [];
 
-    /** @var string[] */
+    /** @var list<string> */
     public array  $columns   = [];
 
-    /** @var string[] */
+    /** @var list<string> */
     public array  $groups    = [];
 
-    /** @var string[] */
+    /** @var list<string> */
     public array  $orders    = [];
 
 
@@ -208,7 +208,7 @@ class Query {
         }
 
         $this->where    .= "$prefix $column $compare $suffix $binds ";
-        $this->params    = array_merge($this->params, Arrays::toArray($param));
+        $this->params    = Arrays::mergeLists($this->params, Arrays::toList($param));
         $this->columns[] = $column;
         return $this;
     }
@@ -246,7 +246,7 @@ class Query {
     public function addExp(string $expression, mixed ...$values): Query {
         $prefix       = $this->getPrefix();
         $this->where .= "{$prefix}{$expression} ";
-        $this->params = array_merge($this->params, $values);
+        $this->params = Arrays::mergeLists($this->params, Arrays::toList($values));
         return $this;
     }
 

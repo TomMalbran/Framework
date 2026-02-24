@@ -125,7 +125,7 @@ class SchemaCode {
     /**
      * Returns used Imports
      * @param SchemaModel $schemaModel
-     * @return string[]
+     * @return list<string>
      */
     private static function getImports(SchemaModel $schemaModel): array {
         $result = [];

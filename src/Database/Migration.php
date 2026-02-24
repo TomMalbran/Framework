@@ -85,7 +85,7 @@ class Migration {
 
 
         // Apply other Migrations from the Framework
-        /** @var DiscoveryMigration[] */
+        /** @var list<DiscoveryMigration> */
         $frameMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class, forFramework: true);
         if (count($frameMigrations) > 0) {
             print("\nFRAMEWORK MIGRATIONS\n");
@@ -96,7 +96,7 @@ class Migration {
 
 
         // Apply the Migrations from the App
-        /** @var DiscoveryMigration[] */
+        /** @var list<DiscoveryMigration> */
         $appMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class);
         if (count($appMigrations) > 0) {
             print("\nAPP MIGRATIONS\n");

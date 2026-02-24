@@ -14,7 +14,7 @@ class AccessRole implements DiscoveryBuilder {
 
     private static int $level = -1;
 
-    /** @var array<string,string[]> */
+    /** @var array<string,list<string>> */
     private static array $groups = [];
 
     /** @var array<string,int> */

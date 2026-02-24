@@ -93,7 +93,7 @@ class QueryCode {
     /**
      * Returns the Query Imports for the Query
      * @param SchemaModel $schemaModel
-     * @return string[]
+     * @return list<string>
      */
     private static function getImports(SchemaModel $schemaModel): array {
         $result = [];
@@ -118,8 +118,8 @@ class QueryCode {
 
     /**
      * Returns the Queries used in the Query
-     * @param array<string,mixed>[] $properties
-     * @return string[]
+     * @param list<array<string,mixed>> $properties
+     * @return list<string>
      */
     private static function getQueries(array $properties): array {
         $result = [];

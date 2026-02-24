@@ -72,7 +72,7 @@ class JSON {
      * Decodes a String as a list of Strings
      * @param mixed $value
      * @param bool  $withoutEmpty Optional.
-     * @return string[]
+     * @return list<string>
      */
     public static function decodeAsStrings(mixed $value, bool $withoutEmpty = false): array {
         $result = self::decodeAsArray($value);

@@ -48,7 +48,7 @@ class EnumQuery extends BaseQuery {
 
     /**
      * Adds an Enum In condition
-     * @param Enum[] $values
+     * @param list<Enum> $values
      * @return void
      */
     public function in(array $values): void {
@@ -58,7 +58,7 @@ class EnumQuery extends BaseQuery {
 
     /**
      * Adds an Enum Not In condition
-     * @param Enum[] $values
+     * @param list<Enum> $values
      * @return void
      */
     public function notIn(array $values): void {
@@ -71,7 +71,7 @@ class EnumQuery extends BaseQuery {
     /**
      * Creates a list of Names from the given Enums
      * @param Enum[] $values
-     * @return string[]
+     * @return list<string>
      */
     private function toNames(array $values): array {
         $result = [];

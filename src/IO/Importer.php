@@ -54,7 +54,7 @@ class Importer implements Iterator {
 
     /**
      * Returns the Header
-     * @return Select[]
+     * @return list<Select>
      */
     public function getHeader(): array {
         return $this->reader->getHeader();

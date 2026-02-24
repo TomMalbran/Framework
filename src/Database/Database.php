@@ -632,8 +632,8 @@ class Database {
 
     /**
      * Returns an array with all the tables
-     * @param string[]|null $filter Optional.
-     * @return string[]
+     * @param list<string>|null $filter Optional.
+     * @return list<string>
      */
     public function getTables(?array $filter = null): array {
         $request   = $this->queryData("SHOW TABLES FROM `{$this->database}`");
@@ -950,7 +950,7 @@ class Database {
 
     /**
      * Dumps the entire database
-     * @param string[]      $filter Optional.
+     * @param list<string>  $filter Optional.
      * @param resource|null $fp     Optional.
      * @return bool
      */

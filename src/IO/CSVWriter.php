@@ -3,6 +3,7 @@ namespace Framework\IO;
 
 use Framework\Intl\NLS;
 use Framework\IO\ExporterWriter;
+use Framework\Utils\Arrays;
 
 /**
  * The CSV Writer
@@ -65,7 +66,7 @@ class CSVWriter implements ExporterWriter {
     public function writeHeader(array $headers): CSVWriter {
         if ($this->file !== null) {
             $this->headers = $headers;
-            $values = NLS::getAll(array_values($headers), $this->lang);
+            $values = NLS::getAll(Arrays::getValues($headers), $this->lang);
             fputcsv($this->file, $values);
         }
         return $this;

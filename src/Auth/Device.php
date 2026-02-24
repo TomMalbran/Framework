@@ -25,8 +25,8 @@ class Device extends CredentialDeviceSchema {
 
     /**
      * Returns all the Devices for the given Credential
-     * @param int[]|int $credentialID
-     * @return string[]
+     * @param list<int>|int $credentialID
+     * @return list<string>
      */
     public static function getAllForCredential(array|int $credentialID): array {
         if (Arrays::isEmpty($credentialID)) {

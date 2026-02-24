@@ -91,7 +91,7 @@ class Console {
 
     /**
      * Returns all the Console Commands
-     * @return ConsoleCommand[]
+     * @return list<ConsoleCommand>
      */
     private static function getCommands(): array {
         $frameReflections = Discovery::getReflectionClasses(forFramework: true);

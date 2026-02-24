@@ -105,7 +105,7 @@ enum Access implements Enum, JsonSerializable {
 
     /**
      * Returns an array with the values of: {{roles}}
-     * @return Access[]
+     * @return list<Access>
      */
     public static function get{{name}}s(): array {
         return [ {{values}} ];
@@ -114,7 +114,7 @@ enum Access implements Enum, JsonSerializable {
     /**
      * Returns a Select for the values: {{roles}}
      * @param string $isoCode Optional.
-     * @return Select[]
+     * @return list<Select>
      */
     public static function get{{name}}Select(string $isoCode = ""): array {
         $result = [];

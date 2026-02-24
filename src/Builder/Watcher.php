@@ -71,7 +71,7 @@ class Watcher {
     /**
      * Parses the .gitignore file and returns an array of ignore patterns.
      * @param string $basePath
-     * @return string[]
+     * @return list<string>
      */
     private static function parseGitignore(string $basePath): array {
         if (!File::exists($basePath, ".gitignore")) {
@@ -117,9 +117,9 @@ class Watcher {
 
     /**
      * Scans a directory for files and their modification times.
-     * @param string   $path
-     * @param string   $basePath
-     * @param string[] $ignorePatterns
+     * @param string       $path
+     * @param string       $basePath
+     * @param list<string> $ignorePatterns
      * @return array<string,int>
      */
     private static function scanDirectory(
@@ -139,9 +139,9 @@ class Watcher {
 
     /**
      * Checks if a file path matches any of the .gitignore regex patterns.
-     * @param string   $filePath
-     * @param string   $basePath
-     * @param string[] $ignorePatterns
+     * @param string       $filePath
+     * @param string       $basePath
+     * @param list<string> $ignorePatterns
      * @return bool
      */
     private static function isIgnored(

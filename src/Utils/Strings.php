@@ -408,7 +408,7 @@ class Strings {
     public static function replace(string $string, array|string $search, array|string|null $replace = null): string {
         if ($replace === null && is_array($search)) {
             $keys   = Arrays::toStrings(array_keys($search));
-            $values = array_values($search);
+            $values = Arrays::getValues($search);
             return str_replace($keys, $values, $string);
         }
 

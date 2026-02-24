@@ -14,11 +14,11 @@ use Attribute;
 class Relation {
 
     // By default, all fields are returned but this allows to specify a list of field names
-    /** @var string[] */
+    /** @var list<string> */
     private array $fieldNames;
 
     // Allows to specify which fields should be returned without the prefix
-    /** @var string[] */
+    /** @var list<string> */
     private array $withoutPrefix;
 
 
@@ -47,13 +47,13 @@ class Relation {
 
     /**
      * The Relation Attribute
-     * @param string[] $fieldNames    Optional.
-     * @param string[] $withoutPrefix Optional.
-     * @param string   $relationJoin  Optional.
-     * @param string   $ownerJoin     Optional.
-     * @param bool     $withPrefix    Optional.
-     * @param string   $prefix        Optional.
-     * @param bool     $withDeleted   Optional.
+     * @param list<string> $fieldNames    Optional.
+     * @param list<string> $withoutPrefix Optional.
+     * @param string       $relationJoin  Optional.
+     * @param string       $ownerJoin     Optional.
+     * @param bool         $withPrefix    Optional.
+     * @param string       $prefix        Optional.
+     * @param bool         $withDeleted   Optional.
      */
     public function __construct(
         array $fieldNames = [],

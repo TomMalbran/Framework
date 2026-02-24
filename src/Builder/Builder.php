@@ -46,7 +46,7 @@ class Builder {
             $reflections = array_merge($reflections, $appBuilders);
         }
 
-        /** @var DiscoveryBuilder[] */
+        /** @var list<DiscoveryBuilder> */
         $builders = Discovery::sortClassesByPriority($reflections);
 
         // Execute each Builder
@@ -77,7 +77,7 @@ class Builder {
             $reflections = array_merge($reflections, $appBuilders);
         }
 
-        /** @var DiscoveryBuilder[] */
+        /** @var list<DiscoveryBuilder> */
         $builders = Discovery::sortClassesByPriority($reflections);
         $builders = array_reverse($builders);
 
@@ -184,8 +184,8 @@ class Builder {
 
     /**
      * Returns the longest Param and Type of the current Doc comment
-     * @param string[] $lines
-     * @param int      $index
+     * @param list<string> $lines
+     * @param int          $index
      * @return array{int,int}
      */
     private static function getLongestParam(array $lines, int $index): array {
