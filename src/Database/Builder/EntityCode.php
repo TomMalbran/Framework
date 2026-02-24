@@ -120,11 +120,7 @@ class EntityCode {
         // SubRequest Fields
         $fields = [];
         foreach ($schemaModel->subRequests as $subRequest) {
-            $type = $subRequest->type;
-            if ($type === "") {
-                $type = "{$subRequest->modelName}Entity[]";
-            }
-            $fields[] = self::getTypeData($subRequest->name, "array", $type);
+            $fields[] = self::getTypeData($subRequest->name, "array", $subRequest->getDocType());
         }
         self::addCategory($result, "SubRequest", $fields, $parsed);
 
@@ -232,9 +228,8 @@ class EntityCode {
             }
         }
         foreach ($schemaModel->subRequests as $subRequest) {
-            $type = $subRequest->type;
-            if ($type !== "") {
-                $result[] = self::getTypeData($subRequest->name, "array", $type);
+            if ($subRequest->modelName === "") {
+                $result[] = self::getTypeData($subRequest->name, "array", $subRequest->getDocType());
             }
         }
         return $result;
@@ -275,26 +270,30 @@ class EntityCode {
     /**
      * Returns the Sub Types from the Sub Requests
      * @param SchemaModel $schemaModel
-     * @return array{name:string,type:string,namespace:string}[]
+     * @return array{name:string,type:string,namespace:string,useIndex:bool,keyType:string}[]
      */
     private static function getSubTypes(SchemaModel $schemaModel): array {
         $models = [];
         $result = [];
 
         foreach ($schemaModel->subRequests as $subRequest) {
+            if ($subRequest->type !== "" || $subRequest->modelName === "") {
+                continue;
+            }
+
             $model = "{$subRequest->namespace}/{$subRequest->modelName}";
             if (Arrays::contains($models, $model)) {
                 continue;
             }
 
-            if ($subRequest->type === "") {
-                $models[] = $model;
-                $result[] = [
-                    "name"      => $subRequest->name,
-                    "type"      => $subRequest->modelName,
-                    "namespace" => $subRequest->namespace,
-                ];
-            }
+            $models[] = $model;
+            $result[] = [
+                "name"      => $subRequest->name,
+                "type"      => $subRequest->modelName,
+                "namespace" => $subRequest->namespace,
+                "useIndex"  => $subRequest->keyType !== "",
+                "keyType"   => $subRequest->keyType !== "string" ? "($subRequest->keyType)" : "",
+            ];
         }
         return $result;
     }
@@ -332,7 +331,7 @@ class EntityCode {
         }
 
         foreach ($schemaModel->subRequests as $subRequest) {
-            if ($subRequest->type === "") {
+            if ($subRequest->type === "" && $subRequest->modelName !== "") {
                 $result["{$subRequest->namespace}\\{$subRequest->modelName}Entity"] = 1;
             }
         }

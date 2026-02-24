@@ -211,17 +211,17 @@ class SchemaFactory {
 
                 // VIRTUAL: If it has a Virtual attribute. It can be an array.
                 } elseif ($virtual !== null) {
-                    $subType = "";
+                    $arrayType = "";
                     if ($isArray) {
-                        [ $subType, $subSchema ] = self::getArrayType($prop);
+                        [ $arrayType ] = self::getArrayType($prop);
                     }
-                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $subType, $isEnum);
+                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $arrayType, $isEnum);
 
                 // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
                 } elseif ($isArray) {
-                    [ $subType, $subSchema ] = self::getArrayType($prop);
-                    if ($subType !== "" || $subSchema !== "") {
-                        $subRequests[] = $subRequest->setData($fieldName, $subType, $subSchema);
+                    [ $arrayType, $subModelName ] = self::getArrayType($prop);
+                    if ($arrayType !== "" || $subModelName !== "") {
+                        $subRequests[] = $subRequest->setData($fieldName, $subModelName, $arrayType);
                     }
 
                 // EXPRESSION: If it has an Expression attribute.
@@ -345,13 +345,20 @@ class SchemaFactory {
             return [ "", "" ];
         }
 
-        $subType   = trim(Strings::substringBetween($comment, "@var", "*/"));
-        $subSchema = "";
-        if (Strings::endsWith($subType, "Model[]")) {
-            $subSchema = Strings::stripEnd($subType, "Model[]");
-            $subType   = "";
+        $type      = trim(Strings::substringBetween($comment, "@var", "*/"));
+        $modelName = "";
+
+        if (Strings::endsWith($type, "Model[]", "Model>")) {
+            $modelName = Strings::stripEnd($type, "Model[]", "Model>");
+            if (Strings::startsWith($type, "array<")) {
+                $modelName = Strings::substringAfter($modelName, ",");
+                $type      = Strings::substringBetween($type, "array<", ",");
+            } else {
+                $type      = "";
+                $modelName = Strings::stripStart($modelName, "list<");
+            }
         }
-        return [ $subType, $subSchema ];
+        return [ $type, $modelName ];
     }
 
 

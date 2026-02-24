@@ -53,6 +53,7 @@ class SubRequest {
     public string $name      = "";
     public string $idDbName  = "";
     public string $type      = "";
+    public string $keyType   = "";
     public string $namespace = "";
     public string $className = "";
 
@@ -87,18 +88,18 @@ class SubRequest {
     /**
      * Sets the Data from the Model
      * @param string $name
-     * @param string $type
      * @param string $modelName
+     * @param string $type
      * @return SubRequest
      */
-    public function setData(string $name, string $type, string $modelName): SubRequest {
+    public function setData(string $name, string $modelName, string $type): SubRequest {
         $this->name = $name;
 
-        if ($type !== "") {
-            $this->type = $type;
-        }
         if ($modelName !== "") {
             $this->modelName = $modelName;
+            $this->keyType   = $type;
+        } elseif ($type !== "") {
+            $this->type = $type;
         }
         return $this;
     }
@@ -115,6 +116,23 @@ class SubRequest {
         $this->namespace   = $schemaModel->namespace;
         $this->className   = "{$schemaModel->name}Schema";
         return $this;
+    }
+
+    /**
+     * Returns the Type of the SubRequest for the Docs
+     * @return string
+     */
+    public function getDocType(): string {
+        if ($this->type !== "") {
+            return $this->type;
+        }
+        if ($this->modelName !== "" && $this->keyType !== "") {
+            return "array<{$this->keyType},{$this->modelName}Entity>";
+        }
+        if ($this->modelName !== "") {
+            return "list<{$this->modelName}Entity>";
+        }
+        return "";
     }
 
     /**
