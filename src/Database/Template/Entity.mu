@@ -74,6 +74,8 @@ class {{entityClass}} extends Entity {
         if ($data !== null) {
             parent::__construct($data);
             {{#subTypes}}
+
+            $this->{{name}} = [];
             foreach ($data->getDict("{{name}}") as {{#useIndex}}$index => {{/useIndex}}$subData) {
                 $this->{{name}}[{{#useIndex}}{{keyType}}$index{{/useIndex}}] = new {{type}}Entity($subData);
             }
