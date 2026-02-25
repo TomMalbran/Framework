@@ -279,7 +279,7 @@ class TimeTable {
             }
 
             foreach ($timeTable->days as $day) {
-                $weekTime = Date::now()->add(days: $day)->toWeekStart($this->startMonday)->toServerTime();
+                $weekTime = Date::now()->toWeekStart($this->startMonday)->add(days: $day)->toServerTime();
                 $weekDate = $weekTime->toString(DateFormat::Dashes);
 
                 $fromTime = Date::create($weekDate, $timeTable->from);

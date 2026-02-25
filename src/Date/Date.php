@@ -498,7 +498,7 @@ class Date implements JsonSerializable {
         }
         if ($startMonday) {
             // N: ISO-8601 numeric representation of the day of the week (1 for Monday through 7 for Sunday)
-            return (int)$this->format("N") - 1;
+            return (int)$this->format("N");
         }
         // w: Numeric representation of the day of the week (0 for Sunday through 6 for Saturday)
         return (int)$this->format("w");
@@ -519,11 +519,11 @@ class Date implements JsonSerializable {
         string $language = "",
     ): string {
         return DateUtils::getDayName(
-            day:          $this->getDayOfWeek($startMonday),
-            startMonday:  $startMonday,
-            length:       $length,
-            inUpperCase:  $inUpperCase,
-            language:     $language,
+            day:         $this->getDayOfWeek($startMonday),
+            startMonday: $startMonday,
+            length:      $length,
+            inUpperCase: $inUpperCase,
+            language:    $language,
         );
     }
 

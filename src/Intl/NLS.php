@@ -195,9 +195,9 @@ class NLS {
     public static function format(string $key, array $args, string $language = ""): string {
         $subject = self::getString($key, $language);
         return Strings::replaceCallback(
-            $subject,
-            "/\{(\d+)\}/",
-            function (array $match) use ($args): string {
+            string:   $subject,
+            pattern:  "/\{(\d+)\}/",
+            callback: function (array $match) use ($args): string {
                 if (!isset($match[1])) {
                     return "";
                 }
