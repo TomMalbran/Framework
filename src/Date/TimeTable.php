@@ -54,7 +54,7 @@ class TimeTable {
         $timeTables = [];
         foreach ($data as $elem) {
             $days = Arrays::getOneValue($elem, "days");
-            $days = Arrays::sort(Arrays::toInts($days));
+            $days = Arrays::sortList(Arrays::toInts($days));
 
             $from = Strings::toString(Arrays::getOneValue($elem, "from"));
             $to   = Strings::toString(Arrays::getOneValue($elem, "to"));
@@ -256,7 +256,7 @@ class TimeTable {
      * @param string $closedText Optional.
      * @param string $timeZone   Optional.
      * @param string $isoCode    Optional.
-     * @return array{days:int[],fromHour:string,toHour:string,daysText:string,timeText:string,zone:string}[]
+     * @return list<TimeTableData>
      */
     public function getList(
         bool $allDays = false,
@@ -290,16 +290,13 @@ class TimeTable {
                 $id       = "$fromHour-$toHour";
 
                 if (!isset($schedules[$id])) {
-                    $schedules[$id] = [
-                        "fromHour" => $fromHour,
-                        "toHour"   => $toHour,
-                        "numbers"  => [],
-                        "times"    => [],
-                        "days"     => [],
-                    ];
+                    $schedules[$id] = new TimeTableData(
+                        fromHour: $fromHour,
+                        toHour:   $toHour,
+                    );
                 }
-                $schedules[$id]["numbers"][] = $day;
-                $schedules[$id]["times"][]   = $day < $maxDay ? $fromTime : Date::empty();
+                $schedules[$id]->dayNumbers[] = $day;
+                $schedules[$id]->dates[]      = $day < $maxDay ? $fromTime : Date::empty();
                 $days[$day] = 1;
             }
         }
@@ -313,38 +310,34 @@ class TimeTable {
                 }
             }
             if (count($numbers) > 0) {
-                $schedules[] = [
-                    "fromHour" => "",
-                    "toHour"   => "",
-                    "numbers"  => $numbers,
-                    "times"    => [],
-                    "days"     => [],
-                ];
+                $schedules[] = new TimeTableData();
             }
         }
 
         foreach ($schedules as $id => $elem) {
-            sort($schedules[$id]["times"]);
-            sort($schedules[$id]["numbers"]);
+            Arrays::sortList($schedules[$id]->dayNumbers);
+            Arrays::sortList($schedules[$id]->dates, function (Date $a, Date $b) {
+                return $a->toTime() - $b->toTime();
+            });
 
-            if (count($elem["times"]) > 0) {
-                foreach ($elem["times"] as $index => $dayTime) {
+            if (count($elem->dates) > 0) {
+                foreach ($elem->dates as $index => $dayTime) {
                     if ($dayTime->isNotEmpty()) {
-                        $schedules[$id]["days"][$index] = $dayTime->getDayName(
+                        $schedules[$id]->days[] = $dayTime->getDayName(
                             startMonday: $this->startMonday,
                             language:    $isoCode,
                         );
                     } else {
-                        $schedules[$id]["days"][$index] = DateUtils::getDayName(
-                            day:         $elem["numbers"][$index] ?? 0,
+                        $schedules[$id]->days[] = DateUtils::getDayName(
+                            day:         $elem->dayNumbers[$index] ?? 0,
                             startMonday: $this->startMonday,
                             language:    $isoCode,
                         );
                     }
                 }
             } else {
-                foreach ($elem["numbers"] as $index => $dayNumber) {
-                    $schedules[$id]["days"][$index] = DateUtils::getDayName(
+                foreach ($elem->dayNumbers as $index => $dayNumber) {
+                    $schedules[$id]->days[] = DateUtils::getDayName(
                         day:         $dayNumber,
                         startMonday: $this->startMonday,
                         language:    $isoCode,
@@ -361,16 +354,17 @@ class TimeTable {
 
         $result = [];
         foreach ($schedules as $elem) {
+            $amount   = count($elem->days);
             $daysText = "";
-            $amount   = count($elem["days"]);
+
             if ($amount > 7) {
                 $daysText = NLS::getString("TIME_TABLE_ALL_HOLIDAYS", $isoCode);
             } elseif ($amount === 7) {
                 $daysText = NLS::getString("TIME_TABLE_ALL_DAYS", $isoCode);
             } elseif ($amount === 2) {
-                $daysText = NLS::join($elem["days"], false, $isoCode);
+                $daysText = NLS::join($elem->days, false, $isoCode);
             } elseif ($amount === 1) {
-                $daysText = $elem["days"][0] ?? "";
+                $daysText = $elem->days[0] ?? "";
             } else {
                 $parts = [];
                 $count = 0;
@@ -378,23 +372,23 @@ class TimeTable {
                     $first = $count;
                     $last  = $count;
                     for ($i = $count + 1; $i < $amount; $i += 1) {
-                        $number = $elem["numbers"][$i] ?? 0;
+                        $number = $elem->dayNumbers[$i] ?? 0;
                         if ($number === $maxDay) {
                             break;
                         }
-                        if ($number - 1 !== ($elem["numbers"][$last] ?? 0)) {
+                        if ($number - 1 !== ($elem->dayNumbers[$last] ?? 0)) {
                             break;
                         }
                         $last = $i;
                     }
                     if ($last - $first > 1) {
                         $parts[] = NLS::format("TIME_TABLE_SOME_DAYS", [
-                            $elem["days"][$first] ?? "",
-                            $elem["days"][$last]  ?? "",
+                            $elem->days[$first] ?? "",
+                            $elem->days[$last]  ?? "",
                         ], $isoCode);
                         $count = $last + 1;
                     } else {
-                        $parts[] = $elem["days"][$first] ?? "";
+                        $parts[] = $elem->days[$first] ?? "";
                         $count  += 1;
                     }
                     $daysText = NLS::join($parts, false, $isoCode);
@@ -402,25 +396,25 @@ class TimeTable {
             }
 
             $timeText = "";
-            $toHour   = $elem["toHour"];
+            $toHour   = $elem->toHour;
             if ($toHour === "00:00") {
                 $toHour = "24:00";
             }
 
-            if ($elem["fromHour"] === "") {
+            if ($elem->fromHour === "") {
                 $timeText = NLS::getString($closedText, $isoCode);
             } else {
-                $timeText = NLS::format("TIME_TABLE_HOURS", [ $elem["fromHour"], $toHour ], $isoCode);
+                $timeText = NLS::format("TIME_TABLE_HOURS", [ $elem->fromHour, $toHour ], $isoCode);
             }
 
-            $result[] = [
-                "days"     => $elem["numbers"],
-                "fromHour" => $elem["fromHour"],
-                "toHour"   => $toHour,
-                "daysText" => $daysText,
-                "timeText" => $timeText,
-                "zone"     => $zone,
-            ];
+            $result[] = new TimeTableData(
+                days:     $elem->days,
+                fromHour: $elem->fromHour,
+                toHour:   $toHour,
+                daysText: $daysText,
+                timeText: $timeText,
+                zone:     $zone,
+            );
         }
 
         return $result;
@@ -441,9 +435,9 @@ class TimeTable {
         $result = [];
         foreach ($list as $elem) {
             $result[] = NLS::format("TIME_TABLE_SCHEDULE", [
-                $elem["daysText"],
-                $elem["timeText"],
-                $elem["zone"],
+                $elem->daysText,
+                $elem->timeText,
+                $elem->zone,
             ], $isoCode);
         }
 
