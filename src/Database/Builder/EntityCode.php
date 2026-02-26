@@ -227,8 +227,21 @@ class EntityCode {
                 $result[] = self::getTypeData($field->name, $type);
             }
         }
+
+        foreach ($schemaModel->virtualFields as $field) {
+            if ($field->type === FieldType::Array) {
+                $result[] = self::getTypeData($field->name, "array", $field->subType);
+            } elseif ($field->type === FieldType::Enum) {
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
+                $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
+            } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
+                $result[] = self::getTypeData($field->name, $type);
+            }
+        }
+
         foreach ($schemaModel->subRequests as $subRequest) {
-            if ($subRequest->modelName === "") {
+            if ($subRequest->type !== "") {
                 $result[] = self::getTypeData($subRequest->name, "array", $subRequest->getDocType());
             }
         }
