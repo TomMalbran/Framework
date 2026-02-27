@@ -1,0 +1,14 @@
+rules:
+    - Framework\Analysis\General\PreferListTypeRule
+    - Framework\Analysis\General\RequireNamedBoolArgRule
+    - Framework\Analysis\Model\ModelIdFieldRule
+    - Framework\Analysis\Model\ModelEnumRule
+    - Framework\Analysis\Route\RouteMethodNameRule
+    - Framework\Analysis\Route\RouteReturnTypeRule
+    - Framework\Analysis\Route\RouteDuplicateRule
+
+services:
+    -
+        class: Framework\Analysis\Route\RoutePathCollector
+        tags:
+            - phpstan.collector

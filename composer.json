@@ -38,6 +38,13 @@
     "bin": [
         "framework"
     ],
+    "extras": {
+        "phpstan": {
+            "includes": [
+                "phpstan-rules.neon"
+            ]
+        }
+    },
     "autoload": {
         "psr-4": {
             "Framework\\": "src"

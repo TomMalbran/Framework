@@ -1,5 +1,6 @@
 includes:
     - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - phpstan-rules.neon
 
 parameters:
     phpVersion: 80300
