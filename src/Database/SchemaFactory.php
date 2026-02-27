@@ -141,7 +141,7 @@ class SchemaFactory {
                 $isModel      = false;
 
                 if (!$isFieldClass && !$isStatus && !$propType->isBuiltin()) {
-                    [ $isEnum, $isValidEnum ] = self::isPropEnum($typeName, $modelName, $errors);
+                    [ $isEnum, $isValidEnum ] = self::isPropEnum($typeName);
                     if ($isEnum && !$isValidEnum) {
                         continue 2;
                     }
@@ -306,12 +306,10 @@ class SchemaFactory {
 
     /**
      * Returns true if the Enum and if is valid
-     * @param string       $typeName
-     * @param string       $modelName
-     * @param list<string> $errors
+     * @param string $typeName
      * @return array{bool,bool}
      */
-    private static function isPropEnum(string $typeName, string $modelName, array &$errors): array {
+    private static function isPropEnum(string $typeName): array {
         if (!class_exists($typeName)) {
             return [ false, false ];
         }
@@ -321,16 +319,12 @@ class SchemaFactory {
         }
 
         // Validate the Enum
-        $propFileName  = $propClass->getFileName();
-        $propClassName = Strings::substringAfter($typeName, "\\");
-        $isValid       = true;
+        $isValid = true;
 
         if (!$propClass->implementsInterface(Enum::class)) {
-            $isValid  = false;
-            $errors[] = "$modelName: $propClassName enum must implement the Enum class ($propFileName)";
+            $isValid = false;
         } elseif (!$propClass->implementsInterface(JsonSerializable::class)) {
-            $isValid  = false;
-            $errors[] = "$modelName: $propClassName enum must implement JsonSerializable ($propFileName)";
+            $isValid = false;
         }
         return [ true, $isValid ];
     }

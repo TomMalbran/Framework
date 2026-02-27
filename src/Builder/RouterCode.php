@@ -8,8 +8,6 @@ use Framework\Discovery\Route;
 use Framework\Builder\Builder;
 use Framework\Utils\Strings;
 
-use ReflectionNamedType;
-
 /**
  * The Router Code
  */
@@ -24,9 +22,6 @@ class RouterCode implements DiscoveryBuilder {
     public static function generateCode(): int {
         $reflections = Discovery::getReflectionClasses();
         $routes      = [];
-        $usedRoutes  = [];
-        $errorRoutes = [];
-
 
         foreach ($reflections as $className => $reflection) {
             // Get the Methods
@@ -46,33 +41,8 @@ class RouterCode implements DiscoveryBuilder {
 
                 /** @var Route */
                 $route      = $attributes[0]->newInstance();
-
-                $fileName   = $reflection->getFileName();
                 $params     = $method->getNumberOfParameters();
-                $response   = $method->getReturnType();
                 $methodName = $method->getName();
-                $startLine  = $method->getStartLine();
-
-                // Check the Response
-                if (!$response instanceof ReflectionNamedType) {
-                    $errorRoutes[] = "Required Response for $methodName: $fileName:$startLine";
-                    continue;
-                }
-                $responseName = $response->getName();
-
-                // Check the Route
-                if (isset($usedRoutes[$route->route])) {
-                    $errorRoutes[] = "Route already used for $methodName: $fileName:$startLine";
-                    continue;
-                }
-                if ($responseName !== "never" && $responseName !== "Framework\\Response") {
-                    $errorRoutes[] = "Wrong Response for $methodName: $fileName:$startLine";
-                    continue;
-                }
-                if (!Strings::endsWith($route->route, "/$methodName")) {
-                    $errorRoutes[] = "Route must end with $methodName: $fileName:$startLine";
-                    continue;
-                }
 
                 // Add the Route
                 $routes[] = [
@@ -83,7 +53,6 @@ class RouterCode implements DiscoveryBuilder {
                     "access"     => $route->access->toString(),
                     "addSpace"   => false,
                 ];
-                $usedRoutes[$route->route] = true;
             }
         }
 
@@ -96,14 +65,6 @@ class RouterCode implements DiscoveryBuilder {
             $routes[$index]["route"] = Strings::padRight("\"{$route["route"]}\"", $length);
         }
 
-        // Show the Error Routes
-        if (count($errorRoutes) > 0) {
-            print("\nROUTES WITH ERROR:\n");
-            foreach ($errorRoutes as $errorRoute) {
-                print("- $errorRoute\n\n");
-            }
-            print("\n");
-        }
 
         // Builds the code
         $total = count($routes);
