@@ -73,7 +73,7 @@ class Auth {
 
         // Retrieve the Token data
         [ $credentialID, $adminID ] = AuthToken::getCredentials($accessToken, $refreshToken);
-        $credential = Credential::getByID($credentialID, true);
+        $credential = Credential::getByID($credentialID, complete: true);
         if ($credential->isEmpty() || $credential->isDeleted) {
             return false;
         }
@@ -81,7 +81,7 @@ class Auth {
         // Retrieve the Admin
         $admin = new CredentialEntity();
         if ($adminID !== 0) {
-            $admin = Credential::getByID($adminID, true);
+            $admin = Credential::getByID($adminID, complete: true);
         }
 
         // Update the Refresh Token
@@ -179,9 +179,9 @@ class Auth {
         self::setCredential($credential, null, $credential->currentUser);
 
         Credential::updateLoginTime($credential->id);
-        ActionLog::startSession(true);
+        ActionLog::startSession(destroy: true);
 
-        $path = FilePath::getTempPath($credential->id, false);
+        $path = FilePath::getTempPath($credential->id, create: false);
         File::emptyDir($path);
         Reset::delete($credential->id);
 
@@ -236,7 +236,7 @@ class Auth {
         }
 
         $admin = self::$credential;
-        $user  = Credential::getByID($credentialID, true);
+        $user  = Credential::getByID($credentialID, complete: true);
 
         if (self::canLoginAs($admin, $user)) {
             self::setCredential($user, $admin, $user->currentUser);
@@ -271,8 +271,8 @@ class Auth {
         $user  = null;
 
         if (isset($parts[0]) && isset($parts[1])) {
-            $admin = Credential::getByEmail($parts[0], true);
-            $user  = Credential::getByEmail($parts[1], true);
+            $admin = Credential::getByEmail($parts[0], complete: true);
+            $user  = Credential::getByEmail($parts[1], complete: true);
 
             if (self::canLoginAs($admin, $user)) {
                 $user->password = $admin->password;
@@ -280,7 +280,7 @@ class Auth {
                 $user->adminID  = $admin->id;
             }
         } else {
-            $user = Credential::getByEmail($email, true);
+            $user = Credential::getByEmail($email, complete: true);
         }
         return $user;
     }
@@ -352,7 +352,7 @@ class Auth {
      */
     public static function updateCredential(): bool {
         if (self::$credentialID !== 0) {
-            $credential = Credential::getByID(self::$credentialID, true);
+            $credential = Credential::getByID(self::$credentialID, complete: true);
             if ($credential->exists()) {
                 self::$credential = $credential;
                 return true;
@@ -372,7 +372,7 @@ class Auth {
         self::$accessName = Access::fromValue($accessName);
 
         ActionLog::endSession();
-        ActionLog::startSession(true);
+        ActionLog::startSession(destroy: true);
         return true;
     }
 

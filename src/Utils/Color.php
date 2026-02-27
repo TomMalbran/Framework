@@ -47,7 +47,7 @@ enum Color: string implements Enum, JsonSerializable {
 
     /**
      * Returns a list of Colors
-     * @return string[]
+     * @return list<string>
      */
     public static function getValues(): array {
         $list = [];

@@ -143,7 +143,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns the request data at the given key from a JSON Array
      * @param string $key
-     * @return array<string|int,mixed>
+     * @return array<int|string,mixed>
      */
     public function getJSONArray(string $key): array {
         return JSON::decodeAsArray($this->get($key, "[]"));
@@ -235,8 +235,8 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the given key exists in the request data
-     * @param string[]|string|null $key   Optional.
-     * @param int|null             $index Optional.
+     * @param list<string>|string|null $key   Optional.
+     * @param int|null                 $index Optional.
      * @return bool
      */
     public function has(array|string|null $key = null, ?int $index = null): bool {
@@ -263,7 +263,7 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the given key is set in the request data
-     * @param string[]|string $key
+     * @param list<string>|string $key
      * @return bool
      */
     public function exists(array|string $key): bool {
@@ -295,8 +295,8 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Checks if all the given keys are not empty or set
-     * @param string[] $emptyKeys
-     * @param string[] $setKeys   Optional.
+     * @param list<string> $emptyKeys
+     * @param list<string> $setKeys   Optional.
      * @return bool
      */
     public function isEmpty(array $emptyKeys, array $setKeys = []): bool {
@@ -517,10 +517,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the value at the given key is a valid Hour
-     * @param string     $key
-     * @param int[]|null $minutes Optional.
-     * @param int        $minHour Optional.
-     * @param int        $maxHour Optional.
+     * @param string         $key
+     * @param list<int>|null $minutes Optional.
+     * @param int            $minHour Optional.
+     * @param int            $maxHour Optional.
      * @return bool
      */
     public function isValidHour(string $key, ?array $minutes = null, int $minHour = 0, int $maxHour = 23): bool {
@@ -892,8 +892,8 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the file at the given key has the given extension
-     * @param string          $key
-     * @param string[]|string $extensions
+     * @param string              $key
+     * @param list<string>|string $extensions
      * @return bool
      */
     public function hasExtension(string $key, array|string $extensions): bool {

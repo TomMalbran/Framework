@@ -121,7 +121,7 @@ class XLSXReader implements ImporterReader {
 
         foreach ($headerRow as $key => $value) {
             if ($value !== "") {
-                $columns[] = new Select((int)$key + 1, $value);
+                $columns[] = new Select($key + 1, $value);
             }
         }
         return $columns;
@@ -130,7 +130,7 @@ class XLSXReader implements ImporterReader {
     /**
      * Returns the Content of the Row
      * @param Row $row
-     * @return string[]
+     * @return list<string>
      */
     private function parseRow(Row $row): array {
         $cells  = $row->getCells();
@@ -164,7 +164,7 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns the current Row
-     * @return string[]
+     * @return list<string>
      */
     #[\Override]
     public function current(): array {

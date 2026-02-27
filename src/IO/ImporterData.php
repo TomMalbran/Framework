@@ -8,7 +8,7 @@ use Framework\Utils\Select;
  */
 class ImporterData {
 
-    /** @var Select[] */
+    /** @var list<Select> */
     public array  $columns = [];
     public int    $amount  = 0;
     public string $first   = "";
@@ -18,10 +18,10 @@ class ImporterData {
 
     /**
      * Creates a new ImporterData instance
-     * @param Select[] $columns Optional.
-     * @param int      $amount  Optional.
-     * @param string   $first   Optional.
-     * @param string   $last    Optional.
+     * @param list<Select> $columns Optional.
+     * @param int          $amount  Optional.
+     * @param string       $first   Optional.
+     * @param string       $last    Optional.
      */
     public function __construct(
         array $columns = [],

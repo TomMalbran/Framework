@@ -25,14 +25,11 @@ class Schema {
 
     protected static ?SchemaModel $model = null;
 
-    protected static string $modelName      = "";
-    protected static string $tableName      = "";
-    protected static string $idName         = "";
-    protected static string $idDbName       = "";
-
-    protected static bool   $hasPositions   = false;
-    protected static bool   $canDelete      = false;
-    protected static bool   $hasSubRequests = false;
+    protected static string $modelName = "";
+    protected static string $tableName = "";
+    protected static string $idName    = "";
+    protected static string $idDbName  = "";
+    protected static bool   $canDelete = false;
 
 
 
@@ -116,9 +113,9 @@ class Schema {
      * Selects the given column from a single table and returns a single value
      * @param Query  $query
      * @param string $column
-     * @return string|int
+     * @return int|string
      */
-    protected static function getSchemaValue(Query $query, string $column): string|int {
+    protected static function getSchemaValue(Query $query, string $column): int|string {
         return Framework::getDatabase()->getValue(static::$tableName, $column, $query);
     }
 
@@ -127,13 +124,13 @@ class Schema {
      * @param Query|null $query
      * @param string     $column
      * @param string     $columnKey Optional.
-     * @return array<string|int>
+     * @return array<int|string>
      */
     protected static function getSchemaColumn(?Query $query, string $column, string $columnKey = ""): array {
         $query     = self::generateQuery($query);
         $selection = new Selection(static::getModel());
         $selection->addFields();
-        $selection->addSelects($column, true);
+        $selection->addSelects($column, addMainKey: true);
         $selection->addJoins();
 
         $selection->request($query);
@@ -176,13 +173,13 @@ class Schema {
 
     /**
      * Returns a Select array
-     * @param Query                $query
-     * @param string[]|string      $nameColumn
-     * @param string|null          $idColumn       Optional.
-     * @param string|null          $descColumn     Optional.
-     * @param string[]|string|null $extraColumn    Optional.
-     * @param string|null          $distinctColumn Optional.
-     * @param bool                 $useEmpty       Optional.
+     * @param Query                    $query
+     * @param list<string>|string      $nameColumn
+     * @param string|null              $idColumn       Optional.
+     * @param string|null              $descColumn     Optional.
+     * @param list<string>|string|null $extraColumn    Optional.
+     * @param string|null              $distinctColumn Optional.
+     * @param bool                     $useEmpty       Optional.
      * @return list<Select>
      */
     protected static function getSchemaSelect(
@@ -219,10 +216,10 @@ class Schema {
 
     /**
      * Returns the Search results
-     * @param Query           $query
-     * @param string[]|string $nameColumn
-     * @param string|null     $idColumn   Optional.
-     * @param int             $limit      Optional.
+     * @param Query               $query
+     * @param list<string>|string $nameColumn
+     * @param string|null         $idColumn   Optional.
+     * @param int                 $limit      Optional.
      * @return list<Search>
      */
     protected static function getSchemaSearch(
@@ -271,7 +268,7 @@ class Schema {
      * @param Query|null   $query          Optional.
      * @param Request|null $sort           Optional.
      * @param array{}      $selects        Optional.
-     * @param string[]     $joins          Optional.
+     * @param list<string> $joins          Optional.
      * @param bool         $decrypted      Optional.
      * @param bool         $skipSubRequest Optional.
      * @return Dictionary
@@ -293,7 +290,7 @@ class Schema {
      * Requests data to the database
      * @param Query                $query
      * @param array<string,string> $selects        Optional.
-     * @param string[]             $joins          Optional.
+     * @param list<string>         $joins          Optional.
      * @param bool                 $decrypted      Optional.
      * @param bool                 $skipSubRequest Optional.
      * @return Dictionary
@@ -308,13 +305,13 @@ class Schema {
         $selection = new Selection(static::getModel());
         $selection->addFields($decrypted);
         $selection->addExpressions();
-        $selection->addSelects(array_values($selects));
+        $selection->addSelects(Arrays::getValues($selects));
         $selection->addJoins($joins);
         $selection->addCounts();
         $selection->request($query);
 
         $result = $selection->resolve(array_keys($selects));
-        if (!$skipSubRequest && static::$hasSubRequests) {
+        if (!$skipSubRequest) {
             foreach (static::getSubRequests() as $subRequest) {
                 $result = $subRequest->request($result);
             }
@@ -329,7 +326,7 @@ class Schema {
      * @param Query|null           $query     Optional.
      * @param Request|null         $sort      Optional.
      * @param array<string,string> $selects   Optional.
-     * @param string[]             $joins     Optional.
+     * @param list<string>         $joins     Optional.
      * @param bool                 $decrypted Optional.
      * @return string
      */
@@ -344,7 +341,7 @@ class Schema {
         $selection = new Selection(static::getModel());
         $selection->addFields($decrypted);
         $selection->addExpressions();
-        $selection->addSelects(array_values($selects));
+        $selection->addSelects(Arrays::getValues($selects));
         $selection->addJoins($joins);
         $selection->addCounts();
 
@@ -436,7 +433,7 @@ class Schema {
             $modification->addModification($credentialID);
         }
 
-        $query = self::generateQueryID($query, false);
+        $query = self::generateQueryID($query, withDeleted: false);
         return $modification->update($query);
     }
 
@@ -447,7 +444,7 @@ class Schema {
      * @return bool
      */
     protected static function deleteSchemaEntity(Query|int|string $query, int $credentialID = 0): bool {
-        $query = self::generateQueryID($query, false);
+        $query = self::generateQueryID($query, withDeleted: false);
         if (static::$canDelete) {
             return self::editSchemaEntity($query, null, [ "isDeleted" => 1 ], $credentialID);
         }
@@ -460,7 +457,7 @@ class Schema {
      * @return bool
      */
     protected static function removeSchemaEntity(Query|int|string $query): bool {
-        $query = self::generateQueryID($query, false);
+        $query = self::generateQueryID($query, withDeleted: false);
         return Framework::getDatabase()->delete(static::$tableName, $query);
     }
 
@@ -525,7 +522,7 @@ class Schema {
             $modification->setField("position", $savePosition);
         }
 
-        $query = self::generateQueryID($query, false);
+        $query = self::generateQueryID($query, withDeleted: false);
         return $modification->update($query);
     }
 
@@ -568,13 +565,15 @@ class Schema {
      * Ensures that the Order of the Schema is correct
      * @param Dictionary|null $oldFields
      * @param Dictionary|null $newFields
-     * @param Query|null      $query     Optional.
+     * @param Query|null      $query       Optional.
+     * @param int             $minPosition Optional.
      * @return int
      */
     protected static function ensureSchemaOrder(
         ?Dictionary $oldFields,
         ?Dictionary $newFields,
         ?Query $query = null,
+        int $minPosition = 0,
     ): int {
         $isCreate     = Arrays::isEmpty($oldFields)  && !Arrays::isEmpty($newFields);
         $isEdit       = !Arrays::isEmpty($oldFields) && !Arrays::isEmpty($newFields);
@@ -588,13 +587,22 @@ class Schema {
         $newPosition  = $newPosition > 0 ? $newPosition : $nextPosition - ($isEdit ? 1 : 0);
         $savePosition = $newPosition;
 
+        // In a create if the position is the last one, we just set the element to the last position
         if ($isCreate && ($newPosition === 0 || $newPosition >= $nextPosition)) {
             return $nextPosition;
         }
+
+        // If this is an edit and the position didn't change, we don't need to do anything
         if (!$isDelete && $oldPosition === $newPosition) {
             return $newPosition;
         }
 
+        // Apply the minimum position
+        if ($newPosition < $minPosition) {
+            $newPosition = $minPosition;
+        }
+
+        // On an edit if the position is the last one, set it to 1 lower
         if ($isEdit && $newPosition > $nextPosition) {
             $savePosition = $nextPosition - 1;
         }
@@ -622,16 +630,12 @@ class Schema {
      * @return int
      */
     private static function getNextPosition(?Query $query = null): int {
-        if (!static::$hasPositions) {
-            return 0;
-        }
-
         $selection = new Selection(static::getModel());
-        $selection->addSelects("position", true);
+        $selection->addSelects("position", addMainKey: true);
         $selection->addJoins(withSelects: false);
 
         $query = self::generateQuery($query);
-        $query->orderBy("position", false);
+        $query->orderBy("position", isASC: false);
         $query->limit(1);
 
         $request = $selection->request($query);
@@ -666,7 +670,7 @@ class Schema {
             $updated = true;
         }
         if ($newValue === 0 && $oldValue !== 0) {
-            $newQuery = self::generateQuery($query, true);
+            $newQuery = self::generateQuery($query, withDeleted: true);
             $newQuery->limit(1);
             self::editSchemaEntity($newQuery, null, [ $column => 1 ]);
             $updated = true;
@@ -706,7 +710,7 @@ class Schema {
                 $query->paginate($sort->getInt("page"), $sort->getInt("amount"));
             }
         } elseif (!$query->hasOrder() && static::$idDbName !== "") {
-            $query->orderBy(static::$idDbName, true);
+            $query->orderBy(static::$idDbName, isASC: true);
         }
         return $query;
     }

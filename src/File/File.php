@@ -24,10 +24,10 @@ class File {
 
     /**
      * Returns the path used to store the files
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function parsePath(string|int ...$pathParts): string {
+    public static function parsePath(int|string ...$pathParts): string {
         $result = Strings::join($pathParts, "/");
 
         // Windows path
@@ -52,10 +52,10 @@ class File {
 
     /**
      * Returns the path used to store the files
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function parseUrl(string|int ...$pathParts): string {
+    public static function parseUrl(int|string ...$pathParts): string {
         $protocols = [ "http://", "https://" ];
         foreach ($protocols as $protocol) {
             if (isset($pathParts[0]) && is_string($pathParts[0]) && Strings::startsWith($pathParts[0], $protocol)) {
@@ -112,20 +112,20 @@ class File {
 
     /**
      * Returns true if given file exists
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return bool
      */
-    public static function exists(string|int ...$pathParts): bool {
+    public static function exists(int|string ...$pathParts): bool {
         $fullPath = self::parsePath(...$pathParts);
         return $fullPath !== "" && file_exists($fullPath);
     }
 
     /**
      * Returns the modified time of a file
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return int
      */
-    public static function getModifiedTime(string|int ...$pathParts): int {
+    public static function getModifiedTime(int|string ...$pathParts): int {
         $fullPath = self::parsePath(...$pathParts);
         if ($fullPath === "" || !file_exists($fullPath)) {
             return 0;
@@ -138,10 +138,10 @@ class File {
 
     /**
      * Reads the contents of a file
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function read(string|int ...$pathParts): string {
+    public static function read(int|string ...$pathParts): string {
         $fullPath = self::parsePath(...$pathParts);
         if ($fullPath === "" || !file_exists($fullPath)) {
             return "";
@@ -192,10 +192,10 @@ class File {
 
     /**
      * Creates a file with the given content
-     * @param string          $path
-     * @param string          $fileName
-     * @param string[]|string $content
-     * @param bool            $createDir Optional.
+     * @param string              $path
+     * @param string              $fileName
+     * @param list<string>|string $content
+     * @param bool                $createDir Optional.
      * @return bool
      */
     public static function create(
@@ -315,8 +315,8 @@ class File {
 
     /**
      * Returns true if the file has the given extension
-     * @param string          $name
-     * @param string[]|string $extensions
+     * @param string              $name
+     * @param list<string>|string $extensions
      * @return bool
      */
     public static function hasExtension(string $name, array|string $extensions): bool {
@@ -346,7 +346,7 @@ class File {
     /**
      * Returns the files inside the given path
      * @param string $path
-     * @return string[]
+     * @return list<string>
      */
     private static function scanPath(string $path): array {
         if (!file_exists($path) || !is_dir($path)) {
@@ -359,7 +359,7 @@ class File {
     /**
      * Returns all the Files and Directories inside the given path
      * @param string $path
-     * @return string[]
+     * @return list<string>
      */
     public static function getAllInDir(string $path): array {
         $files  = self::scanPath($path);
@@ -375,11 +375,12 @@ class File {
     /**
      * Returns all the Directories inside the given path
      * @param string $path
-     * @return string[]
+     * @return list<string>
      */
     public static function getDirectoriesInDir(string $path): array {
         $result = self::getAllInDir($path);
         $result = array_filter($result, fn($file) => is_dir($file));
+        $result = array_values($result);
         return $result;
     }
 
@@ -388,7 +389,7 @@ class File {
      * @param string $path
      * @param bool   $recursive  Optional.
      * @param bool   $skipVendor Optional.
-     * @return string[]
+     * @return list<string>
      */
     public static function getFilesInDir(string $path, bool $recursive = false, bool $skipVendor = false): array {
         $result = [];
@@ -405,7 +406,7 @@ class File {
                     continue;
                 }
                 if ($recursive) {
-                    $response = self::getFilesInDir("$path/$file", true, $skipVendor);
+                    $response = self::getFilesInDir("$path/$file", recursive: true, skipVendor: $skipVendor);
                     $result   = array_merge($result, $response);
                 } else {
                     $result[] = $file;
@@ -437,7 +438,7 @@ class File {
      */
     public static function createDir(string $path): bool {
         if (!self::exists($path)) {
-            mkdir($path, 0777, true);
+            mkdir($path, 0777, recursive: true);
             return true;
         }
         return false;
@@ -446,10 +447,10 @@ class File {
     /**
      * Ensures that all the directories are created
      * @param string     $basePath
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function ensureDir(string $basePath, string|int ...$pathParts): string {
+    public static function ensureDir(string $basePath, int|string ...$pathParts): string {
         $path        = trim(self::parsePath(...$pathParts));
         $pathParts   = Strings::split($path, "/");
         $totalParts  = count($pathParts);
@@ -513,15 +514,15 @@ class File {
 
     /**
      * Creates a new zip archive and adds the given files/directories
-     * @param string          $name
-     * @param string[]|string $files
+     * @param string              $name
+     * @param list<string>|string $files
      * @return ZipArchive|null
      */
     public static function createZip(string $name, array|string $files): ?ZipArchive {
         $zip   = new ZipArchive();
         $files = Arrays::toStrings($files);
 
-        if ($zip->open($name, ZIPARCHIVE::CREATE) === true) {
+        if ($zip->open($name, ZipArchive::CREATE) === true) {
             foreach ($files as $file) {
                 self::addDirToZip($zip, $file, pathinfo($file, PATHINFO_BASENAME));
             }

@@ -71,8 +71,8 @@ enum VariableType implements Enum, JsonSerializable {
      */
     public static function getDocType(VariableType $type): string {
         return match ($type) {
-            self::Array   => "array<string|integer,mixed>",
-            self::List    => "string[]",
+            self::Array   => "array<int|stringeger,mixed>",
+            self::List    => "list<string>",
             self::Boolean => "bool",
             self::Integer => "int",
             self::Float   => "float",

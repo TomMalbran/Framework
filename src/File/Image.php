@@ -21,10 +21,10 @@ class Image {
     public const Thumb   = "thumb";
 
 
-    /** @var int[] The image types */
+    /** @var list<int> The image types */
     private static array $imageTypes = [ 1, 2, 3, 15, 16 ];
 
-    /** @var int[] The transparent image type */
+    /** @var list<int> The transparent image type */
     private static array $transTypes = [ 1, 3 ];
 
 
@@ -71,10 +71,10 @@ class Image {
 
     /**
      * Returns the Size of the Image as [ width, height, type ]
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return array{int,int,int}
      */
-    public static function getSize(string|int ...$pathParts): array {
+    public static function getSize(int|string ...$pathParts): array {
         $filePath = File::parsePath(...$pathParts);
         if (!File::exists($filePath) || !FileType::isImage($filePath)) {
             return [ 0, 0, 0 ];
@@ -103,10 +103,10 @@ class Image {
 
     /**
      * Returns the Orientation for the given Image
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return int
      */
-    public static function getOrientation(string|int ...$pathParts): int {
+    public static function getOrientation(int|string ...$pathParts): int {
         if (!File::exists(...$pathParts)) {
             return 0;
         }
@@ -121,10 +121,10 @@ class Image {
 
     /**
      * Returns true if the Image has Transparency
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return bool
      */
-    public static function hasTransparency(string|int ...$pathParts): bool {
+    public static function hasTransparency(int|string ...$pathParts): bool {
         $filePath = File::parsePath(...$pathParts);
         if (!File::exists($filePath) || !FileType::isPNG($filePath)) {
             return false;
@@ -143,7 +143,7 @@ class Image {
             if ($thumb === false) {
                 return false;
             }
-            imagealphablending($thumb, false);
+            imagealphablending($thumb, enable: false);
             imagecopyresized($thumb, $imgData, 0, 0, 0, 0, 10, 10, $width, $height);
 
             $imgData = $thumb;
@@ -210,7 +210,7 @@ class Image {
         }
         imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $imgWidth, $imgHeight, $imgWidth, $imgHeight);
 
-        // Fix Orientation
+        // Update the Orientation
         $dstImage = match ($orientation) {
             3 => imagerotate($dstImage, 180, 0),
             6 => imagerotate($dstImage, -90, 0),
@@ -449,8 +449,8 @@ class Image {
         }
 
         if (Arrays::contains(self::$transTypes, $imgType)) {
-            imagealphablending($result, false);
-            imagesavealpha($result, true);
+            imagealphablending($result, enable: false);
+            imagesavealpha($result, enable: true);
             $transparent = imagecolorallocatealpha($result, 255, 255, 255, 127);
             if ($transparent !== false) {
                 imagefilledrectangle($result, 0, 0, $width, $height, $transparent);

@@ -31,8 +31,8 @@ class CSV {
      * Converts an array or string to a CSV array
      * @param list<string>|string $value
      * @param string              $separator Optional.
-     * @param string[]            $fields    Optional.
-     * @return string[]|string[][]
+     * @param list<string>        $fields    Optional.
+     * @return array<int|string,string>|list<array<int|string,string>>
      */
     public static function decode(array|string $value, string $separator = ",", array $fields = []): array {
         if (is_array($value)) {
@@ -50,10 +50,10 @@ class CSV {
 
     /**
      * Decodes a CSV File
-     * @param string   $value
-     * @param string   $separator Optional.
-     * @param string[] $fields    Optional.
-     * @return string[][]
+     * @param string       $value
+     * @param string       $separator Optional.
+     * @param list<string> $fields    Optional.
+     * @return list<array<int|string,string>>
      */
     public static function decodeFile(string $value, string $separator = ",", array $fields = []): array {
         $lines  = Strings::split($value, "\n");
@@ -70,9 +70,9 @@ class CSV {
 
     /**
      * Parses a CSV Line
-     * @param string[] $value
-     * @param string[] $fields
-     * @return string[]
+     * @param array<int,string> $value
+     * @param list<string>      $fields
+     * @return array<int|string,string>
      */
     private static function parseLine(array $value, array $fields): array {
         if (count($fields) === 0) {
@@ -93,7 +93,7 @@ class CSV {
      * @param string $path
      * @param string $separator  Optional.
      * @param bool   $skipHeader Optional.
-     * @return mixed[]
+     * @return list<array<int|string,string>|list<array<int|string,string>>>
      */
     public static function readFile(string $path, string $separator = ",", bool $skipHeader = false): array {
         $content = File::read($path);
@@ -113,9 +113,9 @@ class CSV {
 
     /**
      * Writes a CSV File
-     * @param string   $path
-     * @param string[] $contents
-     * @param string   $separator Optional.
+     * @param string       $path
+     * @param list<string> $contents
+     * @param string       $separator Optional.
      * @return bool
      */
     public static function writeFile(string $path, array $contents, string $separator = ","): bool {

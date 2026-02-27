@@ -16,7 +16,7 @@ class Timer {
      * Starts the Timer
      */
     public function __construct() {
-        $this->startTime = microtime(true);
+        $this->startTime = microtime(as_float: true);
         $this->endTime   = 0.0;
     }
 
@@ -26,7 +26,7 @@ class Timer {
      */
     public function end(): Timer {
         if ($this->endTime === 0.0) {
-            $this->endTime = microtime(true);
+            $this->endTime = microtime(as_float: true);
         }
         return $this;
     }

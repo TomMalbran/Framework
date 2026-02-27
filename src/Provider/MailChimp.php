@@ -204,7 +204,7 @@ class MailChimp {
 
     /**
      * Adds a Subscriber Batch
-     * @param array<string,string>[] $subscribers
+     * @param list<array<string,string>> $subscribers
      * @return bool
      */
     public static function addSubscriberBatch(array $subscribers): bool {
@@ -286,7 +286,7 @@ class MailChimp {
 
         $response = self::get("templates");
         if ($response->hasValue("templates")) {
-            $templates = $response->getArray("templates");
+            $templates = $response->getList("templates");
             return Select::create($templates, "id", "name");
         }
         return [];
@@ -294,12 +294,12 @@ class MailChimp {
 
     /**
      * Sends a Campaign
-     * @param string         $subject
-     * @param int            $time
-     * @param int            $templateID
-     * @param array{}[]|null $sections   Optional.
-     * @param string[]|null  $emails     Optional.
-     * @param int            $folderID   Optional.
+     * @param string                          $subject
+     * @param int                             $time
+     * @param int                             $templateID
+     * @param list<array<string,string>>|null $sections   Optional.
+     * @param list<string>|null               $emails     Optional.
+     * @param int                             $folderID   Optional.
      * @return string|null
      */
     public static function sendCampaign(
@@ -341,13 +341,13 @@ class MailChimp {
 
     /**
      * Updates a Campaign
-     * @param string         $mailChimpID
-     * @param string         $subject
-     * @param int            $time
-     * @param int            $templateID
-     * @param array{}[]|null $sections    Optional.
-     * @param string[]|null  $emails      Optional.
-     * @param int            $folderID    Optional.
+     * @param string                          $mailChimpID
+     * @param string                          $subject
+     * @param int                             $time
+     * @param int                             $templateID
+     * @param list<array<string,string>>|null $sections    Optional.
+     * @param list<string>|null               $emails      Optional.
+     * @param int                             $folderID    Optional.
      * @return bool
      */
     public static function updateCampaign(
@@ -389,9 +389,9 @@ class MailChimp {
 
     /**
      * Creates a Campaign
-     * @param string        $subject
-     * @param string[]|null $emails   Optional.
-     * @param int           $folderID Optional.
+     * @param string            $subject
+     * @param list<string>|null $emails   Optional.
+     * @param int               $folderID Optional.
      * @return string
      */
     private static function createCampaign(string $subject, ?array $emails = null, int $folderID = 0): string {
@@ -424,10 +424,10 @@ class MailChimp {
 
     /**
      * Edits a Campaign
-     * @param string        $mailChimpID
-     * @param string        $subject
-     * @param string[]|null $emails      Optional.
-     * @param int           $folderID    Optional.
+     * @param string            $mailChimpID
+     * @param string            $subject
+     * @param list<string>|null $emails      Optional.
+     * @param int               $folderID    Optional.
      * @return bool
      */
     private static function editCampaign(
@@ -458,7 +458,7 @@ class MailChimp {
 
     /**
      * Parses the recipients of a Campaign
-     * @param string[]|null $emails Optional.
+     * @param list<string>|null $emails Optional.
      * @return array<string,mixed>|null
      */
     private static function parseRecipients(?array $emails = null): ?array {
@@ -492,9 +492,9 @@ class MailChimp {
 
     /**
      * Puts the content into the given MailChimp campaign
-     * @param string         $mailChimpID
-     * @param int            $templateID
-     * @param array{}[]|null $sections    Optional.
+     * @param string             $mailChimpID
+     * @param int                $templateID
+     * @param list<array{}>|null $sections    Optional.
      * @return bool
      */
     private static function placeContent(string $mailChimpID, int $templateID, ?array $sections = null): bool {
@@ -610,7 +610,7 @@ class MailChimp {
     /**
      * Returns the Send Details Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return string[]
+     * @return list<string>
      */
     public static function getSendDetails(string $mailChimpID): array {
         $result = [];
@@ -631,7 +631,7 @@ class MailChimp {
     /**
      * Returns the Open Details Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return string[]
+     * @return list<string>
      */
     public static function getOpenDetails(string $mailChimpID): array {
         $result = [];
@@ -652,7 +652,7 @@ class MailChimp {
     /**
      * Returns the Click Details Report for the given MailChimp campaign
      * @param string $mailChimpID
-     * @return string[]
+     * @return list<string>
      */
     public static function getClickDetails(string $mailChimpID): array {
         $result = [];

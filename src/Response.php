@@ -61,7 +61,7 @@ class Response {
      */
     public function printData(): Response {
         if (isset($this->data["data"])) {
-            print(JSON::encode($this->data["data"], true));
+            print(JSON::encode($this->data["data"], asPretty: true));
         }
         return $this;
     }
@@ -181,7 +181,7 @@ class Response {
      * Creates an Error Response
      * @param Errors|string                             $error
      * @param JsonSerializable|array<string,mixed>|null $data  Optional.
-     * @param string[]|string                           $param Optional.
+     * @param list<string>|string                       $param Optional.
      * @return Response
      */
     public static function error(

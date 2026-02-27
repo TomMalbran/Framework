@@ -42,82 +42,81 @@ class SchemaCode {
         $hasJsonType = count(self::getSomeFields($schemaModel, isJsonType: true)) > 0;
         $queryName   = $schemaModel->queryClass;
 
-        $idType      = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, false);
+        $idType      = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, forEntity: false);
         $idIsEnum    = $schemaModel->idType === FieldType::Enum;
         $idSuffix    = $idIsEnum ? "->toString()" : "";
         $idConvert   = $idIsEnum ? "string" : $idType;
 
         $contents    = Builder::render("Schema", [
-            "namespace"           => $schemaModel->namespace,
-            "name"                => $schemaModel->name,
-            "table"               => $schemaModel->tableName,
-            "entityClass"         => $schemaModel->entityClass,
-            "columnClass"         => $schemaModel->columnClass,
-            "statusClass"         => $schemaModel->statusClass,
-            "queryClass"          => $schemaModel->queryClass,
+            "namespace"          => $schemaModel->namespace,
+            "name"               => $schemaModel->name,
+            "table"              => $schemaModel->tableName,
+            "entityClass"        => $schemaModel->entityClass,
+            "columnClass"        => $schemaModel->columnClass,
+            "statusClass"        => $schemaModel->statusClass,
+            "queryClass"         => $schemaModel->queryClass,
 
-            "hasValidation"       => count($validations) > 0,
-            "validations"         => $validations,
-            "errorPrefix"         => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
+            "hasValidation"      => count($validations) > 0,
+            "validations"        => $validations,
+            "errorPrefix"        => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
 
-            "hasID"               => $schemaModel->hasID,
-            "hasIntID"            => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
-            "hasStringID"         => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
-            "hasEnumID"           => $schemaModel->hasID && $idIsEnum,
-            "idName"              => $schemaModel->idName,
-            "idDbName"            => $schemaModel->idDbName,
-            "idValue"             => "\${$schemaModel->idName}$idSuffix",
-            "idType"              => $idType,
-            "idText"              => Strings::upperCaseFirst($schemaModel->idName),
-            "idEnumClass"         => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
+            "hasID"              => $schemaModel->hasID,
+            "hasIntID"           => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
+            "hasStringID"        => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
+            "hasEnumID"          => $schemaModel->hasID && $idIsEnum,
+            "idName"             => $schemaModel->idName,
+            "idDbName"           => $schemaModel->idDbName,
+            "idValue"            => "\${$schemaModel->idName}$idSuffix",
+            "idType"             => $idType,
+            "idText"             => Strings::upperCaseFirst($schemaModel->idName),
+            "idEnumClass"        => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
 
-            "editType"            => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
-            "convertType"         => $schemaModel->hasID ? "Query|$idConvert" : "Query",
-            "convertValue"        => "\$value$idSuffix",
+            "editType"           => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
+            "convertType"        => $schemaModel->hasID ? "Query|$idConvert" : "Query",
+            "convertValue"       => "\$value$idSuffix",
 
-            "hasPositions"        => $schemaModel->hasPositions,
-            "hasPositionsValue"   => $schemaModel->hasPositions ? "true" : "false",
-            "hasTimestamps"       => $schemaModel->hasTimestamps,
-            "hasTimestampsValue"  => $schemaModel->hasTimestamps ? "true" : "false",
-            "hasStatus"           => $schemaModel->hasStatus,
-            "hasStatusValue"      => $schemaModel->hasStatus ? "true" : "false",
-            "hasUsers"            => $schemaModel->hasUsers,
-            "hasUsersValue"       => $schemaModel->hasUsers ? "true" : "false",
-            "hasEncrypt"          => $schemaModel->hasEncrypt(),
-            "canCreate"           => $schemaModel->canCreate,
-            "canCreateValue"      => $schemaModel->canCreate ? "true" : "false",
-            "canEdit"             => $schemaModel->canEdit,
-            "canEditValue"        => $schemaModel->canEdit ? "true" : "false",
-            "canReplace"          => $schemaModel->canEdit && !$schemaModel->hasAutoInc,
-            "canDelete"           => $schemaModel->canDelete,
-            "canDeleteValue"      => $schemaModel->canDelete ? "true" : "false",
-            "usesRequest"         => $schemaModel->usesRequest,
-            "hasImports"          => count($imports) > 0,
-            "imports"             => $imports,
-            "hasVirtual"          => $hasVirtual,
-            "mainFields"          => $mainFields,
-            "hasExpressions"      => count($expressions) > 0,
-            "expressions"         => $expressions,
-            "hasCounts"           => count($counts) > 0,
-            "counts"              => $counts,
-            "hasRelations"        => count($relations) > 0,
-            "relations"           => $relations,
-            "hasSubRequests"      => count($subRequests) > 0,
-            "hasSubRequestsValue" => count($subRequests) > 0 ? "true" : "false",
-            "subRequests"         => $subRequests,
-            "fields"              => $fields,
-            "uniques"             => $uniques,
-            "hasParents"          => $hasParents,
-            "parents"             => $parents,
-            "parentsList"         => self::joinFields($parents, "fieldParam"),
-            "parentsSecList"      => self::joinFields($parents, "fieldParam", ", "),
-            "parentsArgList"      => self::joinFields($parents, "fieldArg", ", "),
-            "hasEditParents"      => $schemaModel->hasPositions && $hasParents,
-            "editParents"         => $editParents,
-            "hasDate"             => $hasDate,
-            "hasDateType"         => $hasDateType,
-            "hasJsonType"         => $hasJsonType,
-            "hasQueryOperator"    => $schemaModel->hasID || $hasUniques || $hasParents,
+            "hasPositions"       => $schemaModel->hasPositions,
+            "hasPositionsValue"  => $schemaModel->hasPositions ? "true" : "false",
+            "hasTimestamps"      => $schemaModel->hasTimestamps,
+            "hasTimestampsValue" => $schemaModel->hasTimestamps ? "true" : "false",
+            "hasStatus"          => $schemaModel->hasStatus,
+            "hasStatusValue"     => $schemaModel->hasStatus ? "true" : "false",
+            "hasUsers"           => $schemaModel->hasUsers,
+            "hasUsersValue"      => $schemaModel->hasUsers ? "true" : "false",
+            "hasEncrypt"         => $schemaModel->hasEncrypt(),
+            "canCreate"          => $schemaModel->canCreate,
+            "canCreateValue"     => $schemaModel->canCreate ? "true" : "false",
+            "canEdit"            => $schemaModel->canEdit,
+            "canEditValue"       => $schemaModel->canEdit ? "true" : "false",
+            "canReplace"         => $schemaModel->canEdit && !$schemaModel->hasAutoInc,
+            "canDelete"          => $schemaModel->canDelete,
+            "canDeleteValue"     => $schemaModel->canDelete ? "true" : "false",
+            "usesRequest"        => $schemaModel->usesRequest,
+            "hasImports"         => count($imports) > 0,
+            "imports"            => $imports,
+            "hasVirtual"         => $hasVirtual,
+            "mainFields"         => $mainFields,
+            "hasExpressions"     => count($expressions) > 0,
+            "expressions"        => $expressions,
+            "hasCounts"          => count($counts) > 0,
+            "counts"             => $counts,
+            "hasRelations"       => count($relations) > 0,
+            "relations"          => $relations,
+            "hasSubRequests"     => count($subRequests) > 0,
+            "subRequests"        => $subRequests,
+            "fields"             => $fields,
+            "uniques"            => $uniques,
+            "hasParents"         => $hasParents,
+            "parents"            => $parents,
+            "parentsList"        => self::joinFields($parents, "fieldParam"),
+            "parentsSecList"     => self::joinFields($parents, "fieldParam", ", "),
+            "parentsArgList"     => self::joinFields($parents, "fieldArg", ", "),
+            "hasEditParents"     => $schemaModel->hasPositions && $hasParents,
+            "editParents"        => $editParents,
+            "hasDate"            => $hasDate,
+            "hasDateType"        => $hasDateType,
+            "hasJsonType"        => $hasJsonType,
+            "hasQueryOperator"   => $schemaModel->hasID || $hasUniques || $hasParents,
         ]);
         return Strings::replace($contents, "(, ", "(");
     }
@@ -156,7 +155,7 @@ class SchemaCode {
     /**
      * Returns a list of all the Fields to set
      * @param SchemaModel $schemaModel
-     * @return array<string,string>[]
+     * @return list<array<string,string>>
      */
     private static function getAllFields(SchemaModel $schemaModel): array {
         $result = [];
@@ -181,7 +180,7 @@ class SchemaCode {
      * @param bool        $isDate      Optional.
      * @param bool        $isDateType  Optional.
      * @param bool        $isJsonType  Optional.
-     * @return array<string,string>[]
+     * @return list<array<string,string>>
      */
     private static function getSomeFields(
         SchemaModel $schemaModel,
@@ -217,7 +216,7 @@ class SchemaCode {
      * @return array<string,string>
      */
     private static function getField(Field $field): array {
-        $type        = FieldType::getCodeType($field->type, $field->enumClass, false);
+        $type        = FieldType::getCodeType($field->type, $field->enumClass, forEntity: false);
         $isDate      = $field->type === FieldType::Date;
         $isEnum      = $field->type === FieldType::Enum;
         $isJSON      = $field->type === FieldType::JSON;
@@ -248,7 +247,7 @@ class SchemaCode {
             $assignEdit = $assign;
         } elseif ($isJSON) {
             $typeNull   = "$type|null";
-            $typeDoc    = Strings::replace($type, "array", "array<string|int,mixed>");
+            $typeDoc    = Strings::replace($type, "array", "array<int|string,mixed>");
             $assign     = "JSON::encode($param)";
             $assignEdit = "$param instanceof Assign ? $param : $assign";
         } elseif ($type === "bool") {
@@ -279,9 +278,9 @@ class SchemaCode {
 
     /**
      * Summary of joinFields
-     * @param array{}[] $fields
-     * @param string    $key
-     * @param string    $prefix Optional.
+     * @param list<array<string,mixed>> $fields
+     * @param string                    $key
+     * @param string                    $prefix Optional.
      * @return string
      */
     private static function joinFields(array $fields, string $key, string $prefix = ""): string {
@@ -298,7 +297,7 @@ class SchemaCode {
     /**
      * Returns the Validations for the Schema
      * @param SchemaModel $schemaModel
-     * @return array{}[]
+     * @return list<array<string,mixed>>
      */
     private static function getValidations(SchemaModel $schemaModel): array {
         $hasFromDate = false;

@@ -50,9 +50,9 @@ class QueryLog extends LogQuerySchema {
 
     /**
      * Creates or edits a Query
-     * @param float   $time
-     * @param string  $expression
-     * @param mixed[] $params
+     * @param float       $time
+     * @param string      $expression
+     * @param list<mixed> $params
      * @return bool
      */
     public static function createOrEdit(float $time, string $expression, array $params): bool {
@@ -96,7 +96,7 @@ class QueryLog extends LogQuerySchema {
 
     /**
      * Marks the given Query(s) as Resolved
-     * @param int[]|int $logID
+     * @param list<int>|int $logID
      * @return bool
      */
     public static function markResolved(array|int $logID): bool {
@@ -107,7 +107,7 @@ class QueryLog extends LogQuerySchema {
 
     /**
      * Deletes the given Query(s)
-     * @param int[]|int $logID
+     * @param list<int>|int $logID
      * @return bool
      */
     public static function delete(array|int $logID): bool {

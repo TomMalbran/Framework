@@ -132,8 +132,8 @@ class NLS {
 
     /**
      * Returns all the strings from the data
-     * @param string[] $keys
-     * @param string   $language Optional.
+     * @param list<string> $keys
+     * @param string       $language Optional.
      * @return list<string>
      */
     public static function getAll(array $keys, string $language = ""): array {
@@ -150,8 +150,8 @@ class NLS {
 
     /**
      * Creates a url from the given arguments
-     * @param mixed[] $args
-     * @param string  $language Optional.
+     * @param list<mixed> $args
+     * @param string      $language Optional.
      * @return string
      */
     public static function url(array $args, string $language = ""): string {
@@ -168,9 +168,9 @@ class NLS {
 
     /**
      * Creates a url from the given arguments
-     * @param string  $urlKey
-     * @param mixed[] $args
-     * @param string  $language Optional.
+     * @param string      $urlKey
+     * @param list<mixed> $args
+     * @param string      $language Optional.
      * @return string
      */
     public static function urlPath(string $urlKey, array $args, string $language = ""): string {
@@ -187,9 +187,9 @@ class NLS {
 
     /**
      * Returns a formatted string
-     * @param string  $key
-     * @param mixed[] $args
-     * @param string  $language Optional.
+     * @param string      $key
+     * @param list<mixed> $args
+     * @param string      $language Optional.
      * @return string
      */
     public static function format(string $key, array $args, string $language = ""): string {
@@ -201,17 +201,17 @@ class NLS {
                 if (!isset($match[1])) {
                     return "";
                 }
-                return Strings::toString($args[$match[1]] ?? "");
+                return Strings::toString($args[(int)$match[1]] ?? "");
             },
         );
     }
 
     /**
      * Format and Joins the given strings to form a sentence
-     * @param string   $key
-     * @param string[] $strings
-     * @param bool     $useOr    Optional.
-     * @param string   $language Optional.
+     * @param string       $key
+     * @param list<string> $strings
+     * @param bool         $useOr    Optional.
+     * @param string       $language Optional.
      * @return string
      */
     public static function formatJoin(string $key, array $strings, bool $useOr = false, string $language = ""): string {
@@ -221,10 +221,10 @@ class NLS {
 
     /**
      * Returns a formatted string using the correct plural string
-     * @param string  $key
-     * @param int     $count
-     * @param mixed[] $args     Optional.
-     * @param string  $language Optional.
+     * @param string      $key
+     * @param int         $count
+     * @param list<mixed> $args     Optional.
+     * @param string      $language Optional.
      * @return string
      */
     public static function pluralize(
@@ -240,10 +240,10 @@ class NLS {
 
     /**
      * Returns a formatted string using the correct plural string
-     * @param string   $key
-     * @param string[] $strings
-     * @param bool     $useOr    Optional.
-     * @param string   $language Optional.
+     * @param string       $key
+     * @param list<string> $strings
+     * @param bool         $useOr    Optional.
+     * @param string       $language Optional.
      * @return string
      */
     public static function pluralizeList(
@@ -259,9 +259,9 @@ class NLS {
 
     /**
      * Joins the given strings to form a sentence
-     * @param string[] $strings
-     * @param bool     $useOr    Optional.
-     * @param string   $language Optional.
+     * @param list<string> $strings
+     * @param bool         $useOr    Optional.
+     * @param string       $language Optional.
      * @return string
      */
     public static function join(array $strings, bool $useOr = false, string $language = ""): string {
@@ -282,6 +282,26 @@ class NLS {
             $result .= ($i < $count - 1 ? ", " : " $glue ") . $string;
         }
         return $result;
+    }
+
+    /**
+     * Joins the given strings to form a sentence with "and"
+     * @param list<string> $strings
+     * @param string       $language Optional.
+     * @return string
+     */
+    public static function joinWithAnd(array $strings, string $language = ""): string {
+        return self::join($strings, useOr: false, language: $language);
+    }
+
+    /**
+     * Joins the given strings to form a sentence with "or"
+     * @param list<string> $strings
+     * @param string       $language Optional.
+     * @return string
+     */
+    public static function joinWithOr(array $strings, string $language = ""): string {
+        return self::join($strings, useOr: true, language: $language);
     }
 
     /**

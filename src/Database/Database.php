@@ -129,9 +129,9 @@ class Database {
 
     /**
      * Process the given expression
-     * @param string        $expression
-     * @param Query|mixed[] $params     Optional.
-     * @return array<string,string|int|null>[]
+     * @param string            $expression
+     * @param Query|list<mixed> $params     Optional.
+     * @return list<array<string,int|string|null>>
      */
     public function queryData(string $expression, Query|array $params = []): array {
         $timer     = new Timer();
@@ -144,14 +144,14 @@ class Database {
 
     /**
      * Process the given expression using a Query
-     * @param string        $expression
-     * @param Query|mixed[] $query      Optional.
-     * @return array<string,string|int>[]
+     * @param string            $expression
+     * @param Query|list<mixed> $query      Optional.
+     * @return list<array<string,int|string>>
      */
     public function getData(string $expression, Query|array $query = []): array {
         $params = [];
         if ($query instanceof Query) {
-            $expression .= $query->get(true);
+            $expression .= $query->get(addWhere: true);
             $params      = $query->params;
         } else {
             $params = $query;
@@ -169,7 +169,7 @@ class Database {
                 }
             }
         }
-        return $result;
+        return array_values($result);
     }
 
     /**
@@ -185,10 +185,10 @@ class Database {
 
     /**
      * Selects the given columns from a single table and returns the result as an array
-     * @param string          $table
-     * @param string[]|string $columns Optional.
-     * @param Query|null      $query   Optional.
-     * @return array<string,string|int>[]
+     * @param string              $table
+     * @param list<string>|string $columns Optional.
+     * @param Query|null          $query   Optional.
+     * @return list<array<string,int|string>>
      */
     public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
         $selection  = Strings::join($columns, ", ");
@@ -201,9 +201,9 @@ class Database {
      * @param string $table
      * @param string $column
      * @param Query  $query
-     * @return string|int
+     * @return int|string
      */
-    public function getValue(string $table, string $column, Query $query): string|int {
+    public function getValue(string $table, string $column, Query $query): int|string {
         $request = $this->getAll($table, $column, $query->limit(1));
 
         if (isset($request[0][$column])) {
@@ -253,7 +253,7 @@ class Database {
         $bindParams  = [];
         $expression  = "$method INTO `$table` ";
         $expression .= $this->buildInsertHeader($fields);
-        $expression .= $this->buildTableData($fields, $bindParams, true);
+        $expression .= $this->buildTableData($fields, $bindParams, isInsert: true);
         $statement   = $this->processQuery($expression, $bindParams);
 
         if ($statement === null) {
@@ -276,9 +276,9 @@ class Database {
 
     /**
      * Replaces or Inserts multiple rows
-     * @param string    $table
-     * @param array{}[] $fields
-     * @param string    $method Optional.
+     * @param string                    $table
+     * @param list<array<string,mixed>> $fields
+     * @param string                    $method Optional.
      * @return bool
      */
     public function batch(string $table, array $fields, string $method = "REPLACE"): bool {
@@ -292,7 +292,7 @@ class Database {
 
         $rows = [];
         foreach ($fields as $tableData) {
-            $rows[] = $this->buildTableData($tableData, $bindParams, true);
+            $rows[] = $this->buildTableData($tableData, $bindParams, isInsert: true);
         }
 
         $expression .= Strings::join($rows, ", ");
@@ -310,8 +310,8 @@ class Database {
     public function update(string $table, array $fields, Query $query): bool {
         $bindParams  = [];
         $expression  = "UPDATE `$table` SET ";
-        $expression .= $this->buildTableData($fields, $bindParams, false);
-        $expression .= " " . $query->get();
+        $expression .= $this->buildTableData($fields, $bindParams, isInsert: false);
+        $expression .= " " . $query->get(addWhere: true);
         $bindParams  = array_merge($bindParams, $query->params);
         $statement   = $this->processQuery($expression, $bindParams);
         return $this->closeQuery($statement);
@@ -364,8 +364,8 @@ class Database {
 
     /**
      * Process a mysqli query
-     * @param string  $expression
-     * @param mixed[] $bindParams Optional.
+     * @param string      $expression
+     * @param list<mixed> $bindParams Optional.
      * @return mysqli_stmt|null
      */
     private function processQuery(string $expression, array $bindParams = []): ?mysqli_stmt {
@@ -399,7 +399,12 @@ class Database {
                     $params[] = $value;
                 }
 
-                $values = $this->refValues($params);
+                $total  = count($params);
+                $values = [];
+                for ($i = 0; $i < $total; $i += 1) {
+                    $values[$i] = & $params[$i];
+                }
+
                 if (!$statement->bind_param($types, ...$values)) {
                     return null;
                 }
@@ -444,14 +449,14 @@ class Database {
      * Replaces any parameter placeholders in a query with the value of that
      * parameter. Useful for debugging. Assumes anonymous parameters from
      * $params are are in the same order as specified in $query
-     * @param string        $expression
-     * @param Query|mixed[] $query
+     * @param string            $expression
+     * @param Query|list<mixed> $query
      * @return string
      */
     public function interpolateQuery(string $expression, Query|array $query): string {
         $expression = Strings::replace(trim($expression), "\n", "");
         if ($query instanceof Query) {
-            $expression .= $query->get(true);
+            $expression .= $query->get(addWhere: true);
             $params      = $query->params;
         } else {
             $params = $query;
@@ -461,11 +466,8 @@ class Database {
         $values = [];
 
         foreach ($params as $key => $value) {
-            if (is_string($key)) {
-                $keys[] = '/:' . $key . '/';
-            } else {
-                $keys[] = '/[?]/';
-            }
+            $keys[] = '/:' . $key . '/';
+
             if (is_string($value)) {
                 $values[] = "'$value'";
             } else {
@@ -476,23 +478,9 @@ class Database {
     }
 
     /**
-     * Creates a reference of each value
-     * @param mixed[] $array
-     * @return mixed[]
-     */
-    private function refValues(array $array): array {
-        $total = count($array);
-        $refs  = [];
-        for ($i = 0; $i < $total; $i += 1) {
-            $refs[$i] = & $array[$i];
-        }
-        return $refs;
-    }
-
-    /**
      * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
-     * @return array<string,string|int|null>[]
+     * @return list<array<string,int|string|null>>
      */
     private function dynamicBindResults(?mysqli_stmt $statement): array {
         if ($statement === null) {
@@ -548,7 +536,7 @@ class Database {
     /**
      * Process the table data for building the query for inserting or updating
      * @param array<string,mixed> $fields
-     * @param mixed[]             $bindParams
+     * @param list<mixed>         $bindParams
      * @param bool                $isInsert
      * @return string
      */
@@ -610,9 +598,9 @@ class Database {
 
     /**
      * Process a elapsed time and saves it if it last more than 5 seconds
-     * @param Timer   $timer
-     * @param string  $expression
-     * @param mixed[] $params
+     * @param Timer       $timer
+     * @param string      $expression
+     * @param list<mixed> $params
      * @return bool
      */
     protected function processTime(Timer $timer, string $expression, array $params): bool {
@@ -664,7 +652,7 @@ class Database {
     /**
      * Returns the Table Primary Keys
      * @param string $tableName
-     * @return string[]
+     * @return list<string>
      */
     public function getPrimaryKeys(string $tableName): array {
         $request = $this->getDictionary("SHOW KEYS FROM `$tableName`");
@@ -700,7 +688,7 @@ class Database {
     /**
      * Returns the Table Keys
      * @param string $tableName
-     * @return array<string,mixed>[]
+     * @return list<array<string,mixed>>
      */
     public function getTableKeys(string $tableName): array {
         return $this->queryData("SHOW INDEXES IN `$tableName`");
@@ -753,8 +741,8 @@ class Database {
      * Creates a Table
      * @param string               $tableName
      * @param array<string,string> $fields
-     * @param string[]             $primary
-     * @param string[]             $keys
+     * @param list<string>         $primary
+     * @param list<string>         $keys
      * @return string
      */
     public function createTable(string $tableName, array $fields, array $primary, array $keys): string {
@@ -912,8 +900,8 @@ class Database {
 
     /**
      * Updates the Primary Keys on the Table
-     * @param string   $tableName
-     * @param string[] $primary
+     * @param string       $tableName
+     * @param list<string> $primary
      * @return string
      */
     public function updatePrimary(string $tableName, array $primary): string {

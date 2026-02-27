@@ -300,7 +300,7 @@ class Configs implements DiscoveryBuilder {
     /**
      * Returns the Config Properties for the generator
      * @param array<string,mixed> $data
-     * @return array{array<string,mixed>[],array<string,mixed>[]}
+     * @return array{list<array<string,mixed>>,list<array<string,mixed>>}
      */
     private static function getProperties(array $data): array {
         $urls       = [];
@@ -320,7 +320,7 @@ class Configs implements DiscoveryBuilder {
                 continue;
             }
 
-            $variableType = VariableType::get($value, true);
+            $variableType = VariableType::get($value, useLists: true);
             $properties[] = [
                 "property"  => $property,
                 "name"      => $name,

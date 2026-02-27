@@ -75,7 +75,7 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Marks the given Error(s) as Resolved
-     * @param int[]|int $logID
+     * @param list<int>|int $logID
      * @return bool
      */
     public static function markResolved(array|int $logID): bool {
@@ -86,7 +86,7 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Deletes the given Error(s)
-     * @param int[]|int $logID
+     * @param list<int>|int $logID
      * @return bool
      */
     public static function delete(array|int $logID): bool {
@@ -276,7 +276,7 @@ class ErrorLog extends LogErrorSchema {
             $index     = 1;
             foreach ($trace as $item) {
                 if (Strings::startsWith($item, "#") && !Strings::contains($item, "{main}")) {
-                    $backtrace .= "#{$index}- " . Strings::substringAfter($item, " ", true) . "\n";
+                    $backtrace .= "#{$index}- " . Strings::substringAfter($item, " ", useFirst: true) . "\n";
                     $index     += 1;
                 }
             }

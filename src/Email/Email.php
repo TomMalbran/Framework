@@ -89,11 +89,11 @@ class Email {
 
     /**
      * Sends the given Email Content
-     * @param EmailContentEntity $content
-     * @param string[]|string    $sendTo
-     * @param string|null        $message    Optional.
-     * @param string|null        $subject    Optional.
-     * @param bool               $sendAlways Optional.
+     * @param EmailContentEntity  $content
+     * @param list<string>|string $sendTo
+     * @param string|null         $message    Optional.
+     * @param string|null         $subject    Optional.
+     * @param bool                $sendAlways Optional.
      * @return EmailResult
      */
     public static function sendContent(

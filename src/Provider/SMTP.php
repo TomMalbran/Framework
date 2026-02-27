@@ -33,7 +33,7 @@ class SMTP {
         $email = new PHPMailer();
 
         $email->isSMTP();
-        $email->isHTML(true);
+        $email->isHTML(isHtml: true);
         $email->clearAllRecipients();
         $email->clearReplyTos();
 

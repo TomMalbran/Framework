@@ -338,34 +338,34 @@ class SchemaModel {
     /**
      * Returns the Build Data for the Schema Builder
      * @param string $name
-     * @return array{params:string,fields:array{}}[]
+     * @return list<array{params:string,fields:array{}}>
      */
     public function toBuildData(string $name): array {
         $result = [];
         switch ($name) {
         case "mainFields":
             foreach ($this->mainFields as $field) {
-                $result[] = $this->generateBuildData($field->toBuildData(), true);
+                $result[] = $this->generateBuildData($field->toBuildData(), withKey: true);
             }
             break;
         case "expressions":
             foreach ($this->expressions as $expression) {
-                $result[] = $this->generateBuildData($expression->toBuildData(), false);
+                $result[] = $this->generateBuildData($expression->toBuildData(), withKey: false);
             }
             break;
         case "counts":
             foreach ($this->counts as $count) {
-                $result[] = $this->generateBuildData($count->toBuildData(), false);
+                $result[] = $this->generateBuildData($count->toBuildData(), withKey: false);
             }
             break;
         case "relations":
             foreach ($this->relations as $relation) {
-                $result[] = $this->generateBuildData($relation->toBuildData(), false);
+                $result[] = $this->generateBuildData($relation->toBuildData(), withKey: false);
             }
             break;
         case "subRequests":
             foreach ($this->subRequests as $subRequest) {
-                $result[] = $this->generateBuildData($subRequest->toBuildData(), false);
+                $result[] = $this->generateBuildData($subRequest->toBuildData(), withKey: false);
             }
             break;
         default:
@@ -407,7 +407,7 @@ class SchemaModel {
         if (isset($data["fields"]) && is_array($data["fields"])) {
             foreach ($data["fields"] as $value) {
                 $value    = Arrays::toStringMixedMap($value);
-                $fields[] = self::generateBuildData($value, true);
+                $fields[] = self::generateBuildData($value, withKey: true);
             }
         }
 

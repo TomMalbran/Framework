@@ -5,7 +5,6 @@ use Framework\Database\SchemaModel;
 use Framework\Database\Selection;
 use Framework\Database\Query\Query;
 use Framework\Database\Query\QueryOperator;
-use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -147,8 +146,8 @@ class SubRequest {
 
     /**
      * Does the Request with a Sub Request
-     * @param array<string,mixed>[] $result
-     * @return array<string,mixed>[]
+     * @param list<array<string,mixed>> $result
+     * @return list<array<string,mixed>>
      */
     public function request(array $result): array {
         $query = $this->createQuery($result);
@@ -199,11 +198,18 @@ class SubRequest {
 
     /**
      * Does the Request with a Sub Request
-     * @param mixed[] $result
+     * @param list<array<string,mixed>> $result
      * @return Query|null
      */
     private function createQuery(array $result): ?Query {
-        $ids = Arrays::createArray($result, $this->idName);
+        $ids = [];
+        foreach ($result as $row) {
+            if (isset($row[$this->idName]) &&
+                (is_string($row[$this->idName]) || is_int($row[$this->idName]))
+            ) {
+                $ids[] = $row[$this->idName];
+            }
+        }
         if (count($ids) === 0) {
             return null;
         }
@@ -230,7 +236,7 @@ class SubRequest {
                 $query->add($isDeleted, QueryOperator::Equal, 0);
             }
             if ($this->schemaModel->hasPositions) {
-                $query->orderBy($this->schemaModel->getKey("position"), true);
+                $query->orderBy($this->schemaModel->getKey("position"), isASC: true);
             }
         }
         return $query;

@@ -97,7 +97,7 @@ class Application {
         $path = File::getDirectory(__FILE__, 2);
         if (Strings::contains($path, "vendor")) {
             $path = Strings::substringBefore($path, "/vendor");
-            $path = Strings::substringBefore($path, "/", false);
+            $path = Strings::substringBefore($path, "/", useFirst: false);
         }
         return File::parsePath($path, ...$pathParts);
     }
@@ -124,10 +124,10 @@ class Application {
 
     /**
      * Returns a Url for the given internal path
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getUrl(string|int ...$pathParts): string {
+    public static function getUrl(int|string ...$pathParts): string {
         return Config::getUrl(self::getBaseDir(), ...$pathParts);
     }
 

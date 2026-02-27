@@ -41,10 +41,10 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Compare Query
-     * @param QueryOperator   $operator
-     * @param string[]|string $value
-     * @param bool            $caseSensitive Optional.
-     * @param bool|null       $condition     Optional.
+     * @param QueryOperator       $operator
+     * @param list<string>|string $value
+     * @param bool                $caseSensitive Optional.
+     * @param bool|null           $condition     Optional.
      * @return Query
      */
     public function compare(
@@ -64,10 +64,10 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates a Compare If Query
-     * @param QueryOperator   $operator
-     * @param string[]|string $value
-     * @param bool|null       $condition     Optional.
-     * @param bool            $caseSensitive Optional.
+     * @param QueryOperator       $operator
+     * @param list<string>|string $value
+     * @param bool|null           $condition     Optional.
+     * @param bool                $caseSensitive Optional.
      * @return Query
      */
     public function compareIf(
@@ -194,27 +194,29 @@ class StringQuery extends BaseQuery {
 
     /**
      * Generates an In Query
-     * @param string[]  $values
-     * @param bool|null $condition Optional.
+     * @param list<string> $values
+     * @param bool|null    $condition     Optional.
+     * @param bool         $caseSensitive Optional.
      * @return Query
      */
-    public function in(array $values, ?bool $condition = null): Query {
+    public function in(array $values, ?bool $condition = null, bool $caseSensitive = false): Query {
         if (count($values) === 0) {
             return $this->query;
         }
-        return $this->compare(QueryOperator::In, $values, false, $condition);
+        return $this->compare(QueryOperator::In, $values, $caseSensitive, $condition);
     }
 
     /**
      * Generates a Not In Query
-     * @param string[]  $values
-     * @param bool|null $condition Optional.
+     * @param list<string> $values
+     * @param bool|null    $condition     Optional.
+     * @param bool         $caseSensitive Optional.
      * @return Query
      */
-    public function notIn(array $values, ?bool $condition = null): Query {
+    public function notIn(array $values, ?bool $condition = null, bool $caseSensitive = false): Query {
         if (count($values) === 0) {
             return $this->query;
         }
-        return $this->compare(QueryOperator::NotIn, $values, false, $condition);
+        return $this->compare(QueryOperator::NotIn, $values, $caseSensitive, $condition);
     }
 }

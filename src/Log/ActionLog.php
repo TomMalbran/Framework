@@ -48,7 +48,7 @@ class ActionLog extends LogActionSchema {
      * Returns all the Actions Log items
      * @param Request              $request
      * @param array<string,string> $mappings Optional.
-     * @return array<string,mixed>[]
+     * @return list<array<string,mixed>>
      */
     public static function getAll(Request $request, array $mappings = []): array {
         $query = self::createQuery($request, $mappings);
@@ -87,7 +87,7 @@ class ActionLog extends LogActionSchema {
         if ($lastIndex >= 0) {
             $result[$lastIndex]["isLast"] = true;
         }
-        return $result;
+        return array_values($result);
     }
 
     /**

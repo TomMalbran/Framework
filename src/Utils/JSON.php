@@ -49,13 +49,13 @@ class JSON {
     /**
      * Decodes a String if it is not already decoded
      * @param mixed $value
-     * @return array<string|int,mixed>
+     * @return array<int|string,mixed>
      */
     public static function decodeAsArray(mixed $value): array {
         if (!is_string($value) || !self::isValid($value)) {
             return is_array($value) ? $value : [];
         }
-        return (array)json_decode($value, true);
+        return (array)json_decode($value, associative: true);
     }
 
     /**
@@ -85,7 +85,7 @@ class JSON {
      * @return string
      */
     public static function fromCSV(string $value): string {
-        $content = Strings::split($value, ",", true, true);
+        $content = Strings::split($value, ",", trim: true, skipEmpty: true);
         return self::encode($content);
     }
 
@@ -93,10 +93,10 @@ class JSON {
 
     /**
      * Reads a JSON file
-     * @param string|int ...$pathParts
-     * @return array<string|int,mixed>
+     * @param int|string ...$pathParts
+     * @return array<int|string,mixed>
      */
-    public static function readFile(string|int ...$pathParts): array {
+    public static function readFile(int|string ...$pathParts): array {
         $response = File::read(...$pathParts);
         if ($response === "") {
             return [];
@@ -107,7 +107,7 @@ class JSON {
     /**
      * Reads a JSON url
      * @param string $url
-     * @return array<string|int,mixed>
+     * @return array<int|string,mixed>
      */
     public static function readUrl(string $url): array {
         $response = File::readUrl($url);
@@ -120,8 +120,8 @@ class JSON {
     /**
      * Posts to a JSON url
      * @param string                  $url
-     * @param array<string|int,mixed> $data
-     * @return array<string|int,mixed>
+     * @param array<int|string,mixed> $data
+     * @return array<int|string,mixed>
      */
     public static function postUrl(string $url, array $data): array {
         $options = [
@@ -132,7 +132,7 @@ class JSON {
             ],
         ];
         $context  = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
+        $response = file_get_contents($url, context: $context);
         if ($response === false || $response === "") {
             return [];
         }
@@ -147,6 +147,6 @@ class JSON {
      */
     public static function writeFile(string $path, mixed $contents): bool {
         $value = Arrays::toArray($contents);
-        return File::write($path, self::encode($value, true));
+        return File::write($path, self::encode($value, asPretty: true));
     }
 }

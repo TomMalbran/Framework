@@ -11,28 +11,28 @@ class Path {
 
     /**
      * Returns the Dir for the {{title}} files
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function get{{title}}Dir(string|int ...$pathParts): string {
+    public static function get{{title}}Dir(int|string ...$pathParts): string {
         return FilePath::getDir("{{name}}", ...$pathParts);
     }
 
     /**
      * Returns the Path for the {{title}} files
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function get{{title}}Path(string|int ...$pathParts): string {
+    public static function get{{title}}Path(int|string ...$pathParts): string {
         return FilePath::getPath("{{name}}", ...$pathParts);
     }
 
     /**
      * Returns the Url for the {{title}} files
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function get{{title}}Url(string|int ...$pathParts): string {
+    public static function get{{title}}Url(int|string ...$pathParts): string {
         return FilePath::getUrl("{{name}}", ...$pathParts);
     }
 {{/paths}}

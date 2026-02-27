@@ -24,7 +24,7 @@ enum {{statusClass}} implements Enum, JsonSerializable {
 
     /**
      * Creates a list of Names from the given Statuses
-     * @param {{statusClass}}[] $values
+     * @param list<{{statusClass}}> $values
      * @return list<string>
      */
     public static function toNames(array $values): array {

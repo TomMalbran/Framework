@@ -57,10 +57,10 @@ class Query {
 
     /**
      * Creates a new Query with the given values
-     * @param string                  $column        Optional.
-     * @param QueryOperator|string    $operator      Optional.
-     * @param mixed[]|int|string|null $value         Optional.
-     * @param bool                    $caseSensitive Optional.
+     * @param string                           $column        Optional.
+     * @param QueryOperator|string             $operator      Optional.
+     * @param list<int|string>|int|string|null $value         Optional.
+     * @param bool                             $caseSensitive Optional.
      * @return Query
      */
     public static function create(
@@ -92,11 +92,11 @@ class Query {
 
     /**
      * Adds an expression as an and
-     * @param string               $column
-     * @param QueryOperator|string $operator
-     * @param mixed[]|string|int   $value
-     * @param bool                 $caseSensitive Optional.
-     * @param bool|null            $condition     Optional.
+     * @param string                      $column
+     * @param QueryOperator|string        $operator
+     * @param list<int|string>|int|string $value
+     * @param bool                        $caseSensitive Optional.
+     * @param bool|null                   $condition     Optional.
      * @return Query
      */
     public function add(
@@ -215,11 +215,11 @@ class Query {
 
     /**
      * Adds an expression as an and if the value is not empty
-     * @param string                  $column
-     * @param QueryOperator|string    $operator
-     * @param mixed[]|int|string|null $value
-     * @param bool|null               $condition     Optional.
-     * @param bool                    $caseSensitive Optional.
+     * @param string                           $column
+     * @param QueryOperator|string             $operator
+     * @param list<int|string>|int|string|null $value
+     * @param bool|null                        $condition     Optional.
+     * @param bool                             $caseSensitive Optional.
      * @return Query
      */
     public function addIf(
@@ -252,7 +252,7 @@ class Query {
 
     /**
      * Adds a Search expression
-     * @param string[]|string      $column
+     * @param list<string>|string  $column
      * @param mixed                $value
      * @param QueryOperator|string $operator        Optional.
      * @param bool                 $caseInsensitive Optional.
@@ -328,10 +328,10 @@ class Query {
 
     /**
      * Adds a param to the Query
-     * @param string|int $param
+     * @param int|string $param
      * @return Query
      */
-    public function addParam(string|int $param): Query {
+    public function addParam(int|string $param): Query {
         $this->params[] = $param;
         return $this;
     }
@@ -575,11 +575,12 @@ class Query {
 
     /**
      * Returns the Columns
-     * @return string[]
+     * @return list<string>
      */
     public function getColumns(): array {
         $result = array_merge($this->columns, $this->groups, $this->orders);
-        return array_unique($result);
+        $result = array_unique($result);
+        return array_values($result);
     }
 
     /**
@@ -597,7 +598,7 @@ class Query {
 
     /**
      * Creates a list of question marks for the given array
-     * @param mixed[] $array
+     * @param list<int|string> $array
      * @return string
      */
     public function createBinds(array $array): string {

@@ -10,7 +10,7 @@ use Framework\Utils\Strings;
  */
 class ImporterRow {
 
-    /** @var string[] */
+    /** @var list<string> */
     private array $fields;
 
     /** @var array<string,int> */
@@ -20,7 +20,7 @@ class ImporterRow {
 
     /**
      * Creates a new ImporterRow instance
-     * @param string[]          $fields
+     * @param list<string>      $fields
      * @param array<string,int> $columns
      */
     public function __construct(array $fields, array $columns) {
@@ -30,7 +30,7 @@ class ImporterRow {
 
     /**
      * Returns all the Fields
-     * @return array{}
+     * @return list<string>
      */
     public function toArray(): array {
         return $this->fields;
@@ -42,7 +42,7 @@ class ImporterRow {
      * Returns the Field Value for the given Key
      * @param string $key
      * @param bool   $splitResult Optional.
-     * @return string[]|string
+     * @return list<string>|string
      */
     private function getValue(string $key, bool $splitResult = false): array|string {
         $index  = isset($this->columns[$key]) ? $this->columns[$key] - 1 : -1;

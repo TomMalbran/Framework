@@ -31,10 +31,10 @@ class Config {
     /**
      * Returns the url for the given key and adding the url parts at the end
      * @param string $urlKey
-     * @param string|int ...$urlParts
+     * @param int|string ...$urlParts
      * @return string
      */
-    public static function getUrlWithKey(string $urlKey, string|int ...$urlParts): string {
+    public static function getUrlWithKey(string $urlKey, int|string ...$urlParts): string {
         $url = Configs::getString($urlKey);
         if ($url === "") {
             $url = Configs::getString("url");
@@ -48,10 +48,10 @@ class Config {
 
     /**
      * Returns the "{{title}}" using the adding the url parts at the end
-     * @param string|int ...$urlParts
+     * @param int|string ...$urlParts
      * @return string
      */
-    public static function get{{name}}(string|int ...$urlParts): string {
+    public static function get{{name}}(int|string ...$urlParts): string {
         return self::getUrlWithKey("{{property}}", ...$urlParts);
     }
 {{/urls}}

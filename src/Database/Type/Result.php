@@ -61,10 +61,10 @@ class Result {
      * Adds a new Error
      * @param string          $field
      * @param string          $message
-     * @param string|int|null $value   Optional.
+     * @param int|string|null $value   Optional.
      * @return Result
      */
-    public function addError(string $field, string $message, string|int|null $value = null): Result {
+    public function addError(string $field, string $message, int|string|null $value = null): Result {
         $this->errors->add($field, $message, $value);
         return $this;
     }

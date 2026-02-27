@@ -131,7 +131,7 @@ class EntityCode {
      * Adds a Category to the Properties
      * @param array{name:string,list:array<string,string|bool>[]}[] $result
      * @param string                                                $name
-     * @param array<string,string|bool>[]                           $fields
+     * @param list<array<string,string|bool>>                       $fields
      * @param array<string,bool>                                    $parsed
      * @return void
      */
@@ -155,11 +155,11 @@ class EntityCode {
 
     /**
      * Adds the Property to the Entity
-     * @param array<string,string|bool>[] $result
-     * @param string                      $fieldKey
-     * @param FieldType                   $fieldType
-     * @param string                      $subType   Optional.
-     * @param string                      $enumClass Optional.
+     * @param list<array<string,string|bool>> $result
+     * @param string                          $fieldKey
+     * @param FieldType                       $fieldType
+     * @param string                          $subType   Optional.
+     * @param string                          $enumClass Optional.
      * @return void
      */
     private static function addProperty(
@@ -170,14 +170,14 @@ class EntityCode {
         string $enumClass = "",
     ): void {
         if ($fieldType === FieldType::Enum) {
-            $type     = FieldType::getCodeType($fieldType, $enumClass, true);
+            $type     = FieldType::getCodeType($fieldType, $enumClass, forEntity: true);
             $result[] = self::getTypeData($fieldKey, $type, default: "{$type}::None");
         } elseif ($fieldType === FieldType::File) {
             $result[] = self::getTypeData($fieldKey, "string");
             $result[] = self::getTypeData("{$fieldKey}Url", "string");
             $result[] = self::getTypeData("{$fieldKey}Thumb", "string");
         } else {
-            $type     = FieldType::getCodeType($fieldType, $enumClass, true);
+            $type     = FieldType::getCodeType($fieldType, $enumClass, forEntity: true);
             $result[] = self::getTypeData($fieldKey, $type, $subType);
         }
     }
@@ -214,16 +214,16 @@ class EntityCode {
     /**
      * Returns the Main Fields of the Entity
      * @param SchemaModel $schemaModel
-     * @return array<string,string|bool>[]
+     * @return list<array<string,string|bool>>
      */
     private static function getMainFields(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->mainFields as $field) {
             if ($field->type === FieldType::Enum) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
             } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type);
             }
         }
@@ -232,10 +232,10 @@ class EntityCode {
             if ($field->type === FieldType::Array) {
                 $result[] = self::getTypeData($field->name, "array", $field->subType);
             } elseif ($field->type === FieldType::Enum) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
             } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, true);
+                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type);
             }
         }

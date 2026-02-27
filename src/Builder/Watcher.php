@@ -79,7 +79,7 @@ class Watcher {
         }
 
         $content  = File::read($basePath, ".gitignore");
-        $patterns = Strings::split($content, "\n", true, true);
+        $patterns = Strings::split($content, "\n", trim: true, skipEmpty: true);
         $regexes  = [];
 
         foreach ($patterns as $pattern) {
@@ -127,7 +127,7 @@ class Watcher {
         string $basePath,
         array $ignorePatterns,
     ): array {
-        $files  = File::getFilesInDir($path, true);
+        $files  = File::getFilesInDir($path, recursive: true);
         $result = [];
         foreach ($files as $file) {
             if (!self::isIgnored($file, $basePath, $ignorePatterns)) {

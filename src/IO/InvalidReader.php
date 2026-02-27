@@ -55,7 +55,7 @@ class InvalidReader implements ImporterReader {
 
     /**
      * Returns the current Row
-     * @return string[]
+     * @return list<string>
      */
     #[\Override]
     public function current(): array {

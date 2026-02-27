@@ -42,7 +42,7 @@ class {{queryClass}} extends SchemaQuery {
      * Adds an expression
      * @param {{columnClass}} $column
      * @param QueryOperator $operator
-     * @param mixed[]|int|string $value
+     * @param list<int|string>|int|string $value
      * @param bool $caseSensitive Optional.
      * @param bool|null $condition Optional.
      * @return {{queryClass}}
@@ -62,7 +62,7 @@ class {{queryClass}} extends SchemaQuery {
 
     /**
      * Adds a Search expression
-     * @param {{columnClass}}[] $column
+     * @param list<{{columnClass}}> $column
      * @param mixed $value
      * @param QueryOperator $operator Optional.
      * @param bool $caseInsensitive Optional.

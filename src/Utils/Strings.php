@@ -119,7 +119,7 @@ class Strings {
      */
     public static function equalsCaseInsensitive(string $string, string ...$needles): bool {
         foreach ($needles as $needle) {
-            if (self::isEqual($string, $needle, true)) {
+            if (self::isEqual($string, $needle, caseInsensitive: true)) {
                 return true;
             }
         }
@@ -238,7 +238,7 @@ class Strings {
      * Returns all the matches for the Pattern in the given String as an array
      * @param string $string
      * @param string $pattern
-     * @return mixed[]
+     * @return list<mixed>
      */
     public static function getAllMatches(string $string, string $pattern): array {
         preg_match_all($pattern, $string, $matches);
@@ -248,7 +248,7 @@ class Strings {
         if (count($matches) === 1 && isset($matches[0])) {
             return $matches[0];
         }
-        return $matches;
+        return Arrays::toList($matches);
     }
 
     /**
@@ -400,9 +400,9 @@ class Strings {
 
     /**
      * Replaces in the String the search with the replacement
-     * @param string               $string
-     * @param string[]|string      $search
-     * @param string[]|string|null $replace Optional.
+     * @param string                                   $string
+     * @param list<string>|array<string,string>|string $search
+     * @param list<string>|string|null                 $replace Optional.
      * @return string
      */
     public static function replace(string $string, array|string $search, array|string|null $replace = null): string {
@@ -448,10 +448,10 @@ class Strings {
 
     /**
      * Replaces in the String the pattern with the replacement
-     * @param string          $string
-     * @param string[]|string $pattern
-     * @param string[]|string $replacement
-     * @param int             $limit       Optional.
+     * @param string              $string
+     * @param list<string>|string $pattern
+     * @param list<string>|string $replacement
+     * @param int                 $limit       Optional.
      * @return string
      */
     public static function replacePattern(
@@ -467,7 +467,7 @@ class Strings {
     /**
      * Replaces in the String the pattern using the callback
      * @param string                    $string
-     * @param string[]|string           $pattern
+     * @param list<string>|string       $pattern
      * @param callable(string[]):string $callback
      * @param int                       $limit    Optional.
      * @return string
@@ -654,10 +654,10 @@ class Strings {
 
     /**
      * Splits the given String at the given Needle
-     * @param string[]|string $string
-     * @param string          $needle
-     * @param bool            $trim      Optional.
-     * @param bool            $skipEmpty Optional.
+     * @param list<string>|string $string
+     * @param string              $needle
+     * @param bool                $trim      Optional.
+     * @param bool                $skipEmpty Optional.
      * @return list<string>
      */
     public static function split(
@@ -667,7 +667,7 @@ class Strings {
         bool $skipEmpty = false,
     ): array {
         if (is_array($string)) {
-            return array_is_list($string) ? $string : [];
+            return $string;
         }
         if ($string === "" || $needle === "") {
             return [];
@@ -689,7 +689,7 @@ class Strings {
     /**
      * Split the String into Words
      * @param string $string
-     * @return string[]
+     * @return list<string>
      */
     public static function splitToWords(string $string): array {
         $option = PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY;
@@ -1037,7 +1037,7 @@ class Strings {
      * @return string
      */
     public static function toSlug(string $string): string {
-        $result = self::sanitize($string, true, true);
+        $result = self::sanitize($string, lowercase: true, anal: true);
         $result = str_replace("---", "-", $result);
         $result = str_replace("--", "-", $result);
         return $result;
@@ -1170,7 +1170,7 @@ class Strings {
     public static function convertEncoding(string $string): string {
         return mb_encode_numericentity(
             htmlspecialchars_decode(
-                htmlentities($string, ENT_NOQUOTES, "UTF-8", false),
+                htmlentities($string, ENT_NOQUOTES, "UTF-8", double_encode: false),
                 ENT_NOQUOTES
             ),
             [ 0x80, 0x10FFFF, 0, ~0 ],
@@ -1184,7 +1184,7 @@ class Strings {
      * @return string
      */
     public static function base64Decode(string $string): string {
-        $result = base64_decode($string, true);
+        $result = base64_decode($string, strict: true);
         return $result !== false ? $result : "";
     }
 }

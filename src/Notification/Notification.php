@@ -39,12 +39,12 @@ class Notification {
 
     /**
      * Send to Some
-     * @param string   $title
-     * @param string   $message
-     * @param string   $url
-     * @param string   $dataType
-     * @param int      $dataID
-     * @param string[] $playerIDs
+     * @param string       $title
+     * @param string       $message
+     * @param string       $url
+     * @param string       $dataType
+     * @param int          $dataID
+     * @param list<string> $playerIDs
      * @return string|null
      */
     public static function sendToSome(

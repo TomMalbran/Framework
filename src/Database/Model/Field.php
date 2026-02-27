@@ -469,10 +469,10 @@ class Field {
     private function getDateValue(Request $request): int {
         $result = 0;
         if ($this->dateInput !== "" && $this->hourInput !== "") {
-            $result = $request->toTimeHour($this->dateInput, $this->hourInput, true)->toTime();
+            $result = $request->toTimeHour($this->dateInput, $this->hourInput, useTimeZone: true)->toTime();
         } elseif ($this->dateInput !== "") {
             $dateType = $this->dateType !== DateType::None ? $this->dateType : DateType::Start;
-            $result   = $request->toDayMoment($this->dateInput, $dateType, true)->toTime();
+            $result   = $request->toDayMoment($this->dateInput, $dateType, useTimeZone: true)->toTime();
         } else {
             $result = $request->getInt($this->name);
         }
@@ -482,7 +482,7 @@ class Field {
     /**
      * Returns the Field Values from the given Data
      * @param array<string,mixed> $data
-     * @return array<string,string|int|float|bool|array<string|int,mixed>>
+     * @return array<string,int|string|float|bool|array<int|string,mixed>>
      */
     public function toValues(array $data): array {
         $key    = $this->prefixName;

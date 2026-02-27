@@ -42,8 +42,8 @@ enum {{columnClass}}: string implements Enum, JsonSerializable {
 
     /**
      * Get the name of the column without the table
-     * @param self[]|self|null $values
-     * @return string[]
+     * @param list<self>|self|null $values
+     * @return list<string>
      */
     public static function toKeys(array|self|null $values): array {
         if (is_null($values)) {

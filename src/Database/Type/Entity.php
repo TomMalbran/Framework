@@ -83,7 +83,7 @@ class Entity implements JsonSerializable {
 
     /**
      * Returns a list of Properties
-     * @return string[]
+     * @return list<string>
      */
     public function getProperties(): array {
         return array_keys($this->getPropertiesTypes());

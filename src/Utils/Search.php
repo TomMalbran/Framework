@@ -73,9 +73,9 @@ class Search implements JsonSerializable {
 
     /**
      * Creates a select using the given array
-     * @param Dictionary      $data
-     * @param string          $idKey
-     * @param string[]|string $nameKey
+     * @param Dictionary          $data
+     * @param string              $idKey
+     * @param list<string>|string $nameKey
      * @return list<Search>
      */
     public static function create(Dictionary $data, string $idKey, array|string $nameKey): array {

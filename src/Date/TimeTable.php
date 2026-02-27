@@ -18,15 +18,15 @@ use Framework\Utils\Strings;
  */
 class TimeTable {
 
-    /** @var TimeTableItem[] */
+    /** @var list<TimeTableItem> */
     private array $timeTables;
     private bool  $startMonday;
 
 
     /**
      * Creates a new Time Table instance
-     * @param TimeTableItem[] $timeTables  Optional.
-     * @param bool            $startMonday Optional.
+     * @param list<TimeTableItem> $timeTables  Optional.
+     * @param bool                $startMonday Optional.
      */
     private function __construct(array $timeTables = [], bool $startMonday = false) {
         $this->timeTables  = $timeTables;
@@ -124,7 +124,7 @@ class TimeTable {
                 $hasError = true;
             }
             if ($timeTable->from !== "" && $timeTable->to !== "" &&
-                !DateUtils::isValidHourPeriod($timeTable->from, $timeTable->to, true)
+                !DateUtils::isValidHourPeriod($timeTable->from, $timeTable->to, allow24: true)
             ) {
                 $errors->add("$fieldKey-$index-from", "GENERAL_ERROR_PERIOD_FROM_TO");
                 $hasError = true;
@@ -252,17 +252,17 @@ class TimeTable {
 
     /**
      * Returns the Time Table as list
-     * @param bool   $allDays    Optional.
      * @param string $closedText Optional.
      * @param string $timeZone   Optional.
      * @param string $isoCode    Optional.
+     * @param bool   $allDays    Optional.
      * @return list<TimeTableData>
      */
     public function getList(
-        bool $allDays = false,
         string $closedText = "TIME_TABLE_NO_HOURS",
         string $timeZone = "",
         string $isoCode = "",
+        bool $allDays = false,
     ): array {
         if (count($this->timeTables) === 0 && !$allDays) {
             return [];
@@ -362,7 +362,7 @@ class TimeTable {
             } elseif ($amount === 7) {
                 $daysText = NLS::getString("TIME_TABLE_ALL_DAYS", $isoCode);
             } elseif ($amount === 2) {
-                $daysText = NLS::join($elem->days, false, $isoCode);
+                $daysText = NLS::joinWithAnd($elem->days, $isoCode);
             } elseif ($amount === 1) {
                 $daysText = $elem->days[0] ?? "";
             } else {
@@ -391,7 +391,7 @@ class TimeTable {
                         $parts[] = $elem->days[$first] ?? "";
                         $count  += 1;
                     }
-                    $daysText = NLS::join($parts, false, $isoCode);
+                    $daysText = NLS::joinWithAnd($parts, $isoCode);
                 }
             }
 
@@ -427,7 +427,7 @@ class TimeTable {
      * @return string
      */
     public function getText(string $timeZone = "", string $isoCode = ""): string {
-        $list = $this->getList(false, $timeZone, $isoCode);
+        $list = $this->getList($timeZone, $isoCode, allDays: true);
         if (count($list) === 0) {
             return "";
         }
@@ -441,6 +441,6 @@ class TimeTable {
             ], $isoCode);
         }
 
-        return NLS::join($result, false, $isoCode);
+        return NLS::joinWithAnd($result, $isoCode);
     }
 }

@@ -58,12 +58,12 @@ class DateUtils {
 
     /**
      * Returns true if the given day is Valid
-     * @param string|int $value
+     * @param int|string $value
      * @param bool       $withHolidays Optional.
      * @param bool       $startMonday  Optional.
      * @return bool
      */
-    public static function isValidDay(string|int $value, bool $withHolidays = false, bool $startMonday = false): bool {
+    public static function isValidDay(int|string $value, bool $withHolidays = false, bool $startMonday = false): bool {
         $minValue = $startMonday ? 1 : 0;
         $maxValue = ($withHolidays ? 7 : 6) + $minValue;
         return (int)$value >= $minValue && (int)$value <= $maxValue;
@@ -71,10 +71,10 @@ class DateUtils {
 
     /**
      * Returns true if the given hour is Valid
-     * @param string     $string
-     * @param int[]|null $minutes Optional.
-     * @param int        $minHour Optional.
-     * @param int        $maxHour Optional.
+     * @param string         $string
+     * @param list<int>|null $minutes Optional.
+     * @param int            $minHour Optional.
+     * @param int            $maxHour Optional.
      * @return bool
      */
     public static function isValidHour(
@@ -185,7 +185,7 @@ class DateUtils {
         $result = NLS::getIndex($key, $day, $language);
 
         if ($length > 0) {
-            $result = Strings::substring($result, 0, $length, true);
+            $result = Strings::substring($result, 0, $length, asUtf8: true);
         }
         if ($inUpperCase) {
             $result = Strings::toUpperCase($result);

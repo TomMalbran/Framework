@@ -74,7 +74,7 @@ class Exporter {
 
     /**
      * Removes multiple Headers
-     * @param string[] $headers
+     * @param list<string> $headers
      * @return Exporter
      */
     public function removeHeaders(array $headers): Exporter {
@@ -120,7 +120,7 @@ class Exporter {
 
     /**
      * Writes a Line
-     * @param array<string,string|int|float> $line
+     * @param array<string,int|string|float> $line
      * @return Exporter
      */
     public function writeLine(array $line): Exporter {

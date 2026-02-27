@@ -109,7 +109,7 @@ class OpenAI {
 
     /**
      * Returns the allowed File Extensions
-     * @return string[]
+     * @return list<string>
      */
     public static function getFilExtensions(): array {
         return [

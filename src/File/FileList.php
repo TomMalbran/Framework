@@ -9,7 +9,7 @@ use Framework\Utils\Arrays;
  */
 class FileList {
 
-    /** @var FileItem[] */
+    /** @var list<FileItem> */
     private array $list = [];
 
 
@@ -59,7 +59,7 @@ class FileList {
 
     /**
      * Returns the List
-     * @return FileItem[]
+     * @return list<FileItem>
      */
     public function get(): array {
         return $this->list;
@@ -67,10 +67,10 @@ class FileList {
 
     /**
      * Sorts and returns the List
-     * @return FileItem[]
+     * @return list<FileItem>
      */
     public function getSorted(): array {
-        return Arrays::sort($this->list, function (FileItem $a, FileItem $b) {
+        return Arrays::sortList($this->list, function (FileItem $a, FileItem $b) {
             // Back goes first
             if ($a->isBack && !$b->isBack) {
                 return -1;

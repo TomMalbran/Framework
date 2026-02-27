@@ -47,7 +47,7 @@ class EmailQueue extends EmailQueueSchema {
 
     /**
      * Returns all the not sent Queued Emails in the last hour
-     * @return EmailQueueEntity[]
+     * @return list<EmailQueueEntity>
      */
     public static function getAllUnsent(): array {
         $time  = Date::now()->subtract(hours: 1);
@@ -66,12 +66,12 @@ class EmailQueue extends EmailQueueSchema {
 
     /**
      * Adds the given Email to the Queue
-     * @param EmailContentEntity $content
-     * @param string[]|string    $sendTo
-     * @param string|null        $message Optional.
-     * @param string|null        $subject Optional.
-     * @param bool               $sendNow Optional.
-     * @param int                $dataID  Optional.
+     * @param EmailContentEntity  $content
+     * @param list<string>|string $sendTo
+     * @param string|null         $message Optional.
+     * @param string|null         $subject Optional.
+     * @param bool                $sendNow Optional.
+     * @param int                 $dataID  Optional.
      * @return bool
      */
     public static function add(
@@ -117,7 +117,7 @@ class EmailQueue extends EmailQueueSchema {
         $emails = self::getAllUnsent();
         $result = true;
         foreach ($emails as $email) {
-            if (!self::send($email, false)) {
+            if (!self::send($email, sendAlways: false)) {
                 $result = false;
             }
         }
@@ -147,7 +147,7 @@ class EmailQueue extends EmailQueueSchema {
 
     /**
      * Marks the given Email(s) as Not Sent
-     * @param int[]|int $emailID
+     * @param list<int>|int $emailID
      * @return bool
      */
     public static function markAsNotSent(array|int $emailID): bool {

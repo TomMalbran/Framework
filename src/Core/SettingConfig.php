@@ -103,7 +103,7 @@ class SettingConfig implements DiscoveryBuilder {
 
     /**
      * Returns the Settings Variables for the generator
-     * @return array{array<string,mixed>[],bool}
+     * @return array{list<array<string,mixed>>,bool}
      */
     private static function getVariables(): array {
         $result  = [];

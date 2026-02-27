@@ -17,7 +17,7 @@ class Select implements JsonSerializable {
     public int        $id;
     public string     $field;
 
-    public string|int $key;
+    public int|string $key;
     public string     $value;
 
     public string     $description = "";
@@ -28,11 +28,11 @@ class Select implements JsonSerializable {
 
     /**
      * Creates a new Select instance
-     * @param Enum|string|int     $key
+     * @param Enum|int|string     $key
      * @param Enum|string         $value
      * @param array<string,mixed> $extras Optional.
      */
-    public function __construct(Enum|string|int $key, Enum|string $value, array $extras = []) {
+    public function __construct(Enum|int|string $key, Enum|string $value, array $extras = []) {
         if ($key instanceof Enum) {
             $key = $key->toString();
         }
@@ -147,13 +147,13 @@ class Select implements JsonSerializable {
 
     /**
      * Creates a select using the given array
-     * @param mixed[]              $array
-     * @param string               $keyName
-     * @param string[]|string      $valName
-     * @param string|null          $descName Optional.
-     * @param string[]|string|null $extraKey Optional.
-     * @param bool                 $useEmpty Optional.
-     * @param bool                 $distinct Optional.
+     * @param list<mixed>              $array
+     * @param string                   $keyName
+     * @param list<string>|string      $valName
+     * @param string|null              $descName Optional.
+     * @param list<string>|string|null $extraKey Optional.
+     * @param bool                     $useEmpty Optional.
+     * @param bool                     $distinct Optional.
      * @return list<Select>
      */
     public static function create(
@@ -198,7 +198,7 @@ class Select implements JsonSerializable {
 
     /**
      * Creates a select using the given array
-     * @param string[] $array
+     * @param list<string> $array
      * @return list<Select>
      */
     public static function createFromList(array $array): array {
@@ -211,7 +211,7 @@ class Select implements JsonSerializable {
 
     /**
      * Creates a select using the given array
-     * @param array<string|int,string> $array
+     * @param array<int|string,string> $array
      * @return list<Select>
      */
     public static function createFromArray(array $array): array {

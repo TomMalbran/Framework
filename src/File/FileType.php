@@ -12,40 +12,40 @@ use Framework\Utils\Strings;
  */
 class FileType {
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $imageExts        = [ "jpg", "jpeg", "gif", "png", "ico", "avif", "webp" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $pngExts          = [ "png" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $icoExts          = [ "ico" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $videoExts        = [ "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $audioExts        = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $codeExts         = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $textExts         = [ "txt", "csv", "log", "rtf", "json" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $documentExts     = [ "doc", "docx", "odt", "ott" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $spreadsheetExts  = [ "xls", "xlsx", "ods" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $presentationExts = [ "ppt", "pptx" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $pdfExts          = [ "pdf" ];
 
-    /** @var string[] */
+    /** @var list<string> */
     public static array $zipExts          = [ "zip", "rar", "gz", "tar", "iso", "7zip" ];
 
 

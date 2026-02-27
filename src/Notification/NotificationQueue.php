@@ -62,7 +62,7 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Returns the Unset Notifications in the last hour
-     * @return NotificationQueueEntity[]
+     * @return list<NotificationQueueEntity>
      */
     public static function getAllUnsent(): array {
         $time  = Date::now()->subtract(hours: 1);
@@ -79,7 +79,7 @@ class NotificationQueue extends NotificationQueueSchema {
      * @param int  $credentialID
      * @param int  $currentUser
      * @param Date $time
-     * @return NotificationQueueEntity[]
+     * @return list<NotificationQueueEntity>
      */
     public static function getUnsentForCredential(int $credentialID, int $currentUser, Date $time): array {
         $time  = $time->subtract(hours: 1);
@@ -98,7 +98,7 @@ class NotificationQueue extends NotificationQueueSchema {
      * @param int     $credentialID
      * @param int     $currentUser
      * @param Request $sort
-     * @return NotificationQueueEntity[]
+     * @return list<NotificationQueueEntity>
      */
     public static function getAllForCredential(int $credentialID, int $currentUser, Request $sort): array {
         $time  = Date::now()->subtract(days: 30);

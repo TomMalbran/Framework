@@ -41,7 +41,7 @@ class SchemaQuery {
 
     /**
      * Creates a list of question marks for the given array
-     * @param string[]|int[] $array
+     * @param list<string>|list<int> $array
      * @return string
      */
     public function createBinds(array $array): string {
@@ -52,20 +52,20 @@ class SchemaQuery {
 
     /**
      * Adds a param to the Query
-     * @param string|int $param
+     * @param int|string $param
      * @return Query
      */
-    public function addParam(string|int $param): Query {
+    public function addParam(int|string $param): Query {
         return $this->query->addParam($param);
     }
 
     /**
      * Adds an Expression to the Query
      * @param string     $expression
-     * @param string|int ...$values
+     * @param int|string ...$values
      * @return Query
      */
-    public function addExp(string $expression, string|int ...$values): Query {
+    public function addExp(string $expression, int|string ...$values): Query {
         return $this->query->addExp($expression, ...$values);
     }
 

@@ -110,8 +110,8 @@ trait IsEnum {
 
     /**
      * Checks if the given value is contained in the list of values
-     * @param self[] $values
-     * @param self   $value
+     * @param list<self> $values
+     * @param self       $value
      * @return bool
      */
     public static function contains(array $values, self $value): bool {

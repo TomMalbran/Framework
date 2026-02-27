@@ -68,7 +68,7 @@ class Expression {
     /**
      * Returns the Field Values from the given Data
      * @param array<string,mixed> $data
-     * @return array<string,string|int|float|bool|array<string|int,mixed>>
+     * @return array<string,int|string|float|bool|array<int|string,mixed>>
      */
     public function toValues(array $data): array {
         $key    = $this->name;

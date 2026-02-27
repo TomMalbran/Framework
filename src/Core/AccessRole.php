@@ -106,7 +106,7 @@ class AccessRole implements DiscoveryBuilder {
     /**
      * Returns the Access Groups for the generator
      * @param array<string,array<string>> $groups
-     * @return array<string,string>[]
+     * @return list<array<string,string>>
      */
     private static function getGroups(array $groups): array {
         $result = [];

@@ -30,7 +30,7 @@ class BaseQuery {
      * @return void
      */
     public function orderByAsc(): void {
-        $this->query->orderBy($this->column, true);
+        $this->query->orderBy($this->column, isASC: true);
     }
 
     /**
@@ -38,7 +38,7 @@ class BaseQuery {
      * @return void
      */
     public function orderByDesc(): void {
-        $this->query->orderBy($this->column, false);
+        $this->query->orderBy($this->column, isASC: false);
     }
 
     /**

@@ -169,8 +169,8 @@ class Builder {
                 [ $typeLength, $varLength ] = self::getLongestParam($lines, $index);
             } elseif (Strings::contains($line, "@param")) {
                 $docType    = Strings::substringBetween($line, "@param ", " ");
-                $docTypePad = Strings::padRight($docType, $typeLength);
-                $line       = Strings::replace($line, $docType, $docTypePad);
+                $docTypePad = Strings::padRight(" $docType", $typeLength + 1);
+                $line       = Strings::replace($line, " $docType", $docTypePad);
                 if (Strings::contains($line, "Optional.")) {
                     $varName    = Strings::substringBetween($line, "$docTypePad ", " Optional.");
                     $varNamePad = Strings::padRight($varName, $varLength);

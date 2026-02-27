@@ -18,16 +18,16 @@ class Selection {
 
     private int $index   = 66;
 
-    /** @var string[] */
+    /** @var array<string,string> */
     private array $keys    = [];
 
-    /** @var string[] */
+    /** @var list<string> */
     private array $selects = [];
 
-    /** @var string[] */
+    /** @var list<string> */
     private array $joins   = [];
 
-    /** @var array<string,mixed>[] */
+    /** @var list<array<string,mixed>> */
     private array $request = [];
 
 
@@ -79,8 +79,8 @@ class Selection {
 
     /**
      * Adds extra Selects
-     * @param string[]|string $selects
-     * @param bool            $addMainKey Optional.
+     * @param list<string>|string $selects
+     * @param bool                $addMainKey Optional.
      * @return Selection
      */
     public function addSelects(array|string $selects, bool $addMainKey = false): Selection {
@@ -97,8 +97,8 @@ class Selection {
 
     /**
      * Adds the Joins
-     * @param string[] $extraJoins  Optional.
-     * @param bool     $withSelects Optional.
+     * @param list<string> $extraJoins  Optional.
+     * @param bool         $withSelects Optional.
      * @return Selection
      */
     public function addJoins(array $extraJoins = [], bool $withSelects = true): Selection {
@@ -158,7 +158,7 @@ class Selection {
     /**
      * Does a Request to the Query
      * @param Query $query
-     * @return array<string,string|int|null>[]
+     * @return list<array<string,int|string|null>>
      */
     public function request(Query $query): array {
         $expression    = $this->getExpression($query);
@@ -227,8 +227,8 @@ class Selection {
 
     /**
      * Generates the Result from the Request
-     * @param string[]|string|null $extras Optional.
-     * @return array<string,mixed>[]
+     * @param list<string>|string|null $extras Optional.
+     * @return list<array<string,mixed>>
      */
     public function resolve(array|string|null $extras = null): array {
         $result = [];

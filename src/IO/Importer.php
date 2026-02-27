@@ -102,6 +102,7 @@ class Importer implements Iterator {
     #[\Override]
     public function current(): ImporterRow {
         $data = $this->reader->current();
+        // @phpstan-ignore argument.type
         return new ImporterRow($data, $this->columns);
     }
 

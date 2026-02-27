@@ -7,7 +7,7 @@ namespace Framework\Utils;
  */
 class AES {
 
-    /** @var int[] */
+    /** @var list<int> */
     private static array $T1 = [
         0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d, 0xfff2f20d,
         0xd66b6bbd, 0xde6f6fb1, 0x91c5c554, 0x60303050, 0x02010103,
@@ -63,7 +63,7 @@ class AES {
         0x2c16163a,
     ];
 
-    /** @var int[] */
+    /** @var list<int> */
     private static array $T2 = [
         0xa5c66363, 0x84f87c7c, 0x99ee7777, 0x8df67b7b, 0x0dfff2f2,
         0xbdd66b6b, 0xb1de6f6f, 0x5491c5c5, 0x50603030, 0x03020101,
@@ -119,7 +119,7 @@ class AES {
         0x3a2c1616,
     ];
 
-    /** @var int[] */
+    /** @var list<int> */
     private static array $T3 = [
         0x63a5c663, 0x7c84f87c, 0x7799ee77, 0x7b8df67b, 0xf20dfff2,
         0x6bbdd66b, 0x6fb1de6f, 0xc55491c5, 0x30506030, 0x01030201,
@@ -175,7 +175,7 @@ class AES {
         0x163a2c16,
     ];
 
-    /** @var int[] */
+    /** @var list<int> */
     private static array $T4 = [
         0x6363a5c6, 0x7c7c84f8, 0x777799ee, 0x7b7b8df6, 0xf2f20dff,
         0x6b6bbdd6, 0x6f6fb1de, 0xc5c55491, 0x30305060, 0x01010302,
@@ -231,7 +231,7 @@ class AES {
         0x16163a2c,
     ];
 
-    /** @var int[] */
+    /** @var list<int> */
     private static array $S = [
         0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01,
         0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76, 0xca, 0x82, 0xc9, 0x7d,
@@ -261,7 +261,7 @@ class AES {
         0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
     ];
 
-    /** @var int[] */
+    /** @var list<int> */
     private static array $rCon = [
         0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36,
         0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6,
@@ -273,7 +273,7 @@ class AES {
     /**
      * Converts the String to UTF8 Bytes
      * @param string $value
-     * @return int[]
+     * @return list<int>
      */
     public static function toUtf8Bytes(string $value): array {
         $text   = rawurlencode($value);
@@ -295,7 +295,7 @@ class AES {
     /**
      * Converts the String to Hex Bytes
      * @param string $value
-     * @return int[]
+     * @return list<int>
      */
     public static function toHexBytes(string $value): array {
         $count  = strlen($value);
@@ -308,7 +308,7 @@ class AES {
 
     /**
      * Converts the Bytes to a String
-     * @param int[] $bytes
+     * @param list<int> $bytes
      * @return string
      */
     public static function fromBytes(array $bytes): string {
@@ -341,9 +341,9 @@ class AES {
 
     /**
      * Encrypts the given Value using the given Key
-     * @param int[] $value
-     * @param int[] $key
-     * @return int[]
+     * @param list<int> $value
+     * @param list<int> $key
+     * @return array<int,int>
      */
     public static function encrypt(array $value, array $key): array {
         $counterIndex = 16;
@@ -381,9 +381,9 @@ class AES {
 
     /**
      * Does the Encryption for the CTR algorithm
-     * @param int[] $counter
-     * @param int[] $key
-     * @return int[]
+     * @param array<int,int> $counter
+     * @param list<int>      $key
+     * @return array<int,int>
      */
     private static function ctrEncrypt(array $counter, array $key): array {
         $Ke = self::prepareEncrypt($key);
@@ -427,8 +427,8 @@ class AES {
 
     /**
      * Prepares the Encryption
-     * @param int[] $key
-     * @return int[][]
+     * @param list<int> $key
+     * @return array<int,array<int,int>>
      */
     private static function prepareEncrypt(array $key): array {
         $rounds = 10;
@@ -510,8 +510,8 @@ class AES {
 
     /**
      * Converts the Bytes to 32-bit Integers
-     * @param int[] $bytes
-     * @return int[]
+     * @param array<int,int> $bytes
+     * @return array<int,int>
      */
     private static function convertToInt32(array $bytes): array {
         $count  = count($bytes);

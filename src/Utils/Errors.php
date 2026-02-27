@@ -14,7 +14,7 @@ use AllowDynamicProperties;
 #[AllowDynamicProperties]
 class Errors implements JsonSerializable {
 
-    /** @var array<string,string|int|array<string|int>> */
+    /** @var array<string,int|string|array<int|string>> */
     private array $errors = [];
 
     /** @var array<string,int> */
@@ -99,10 +99,10 @@ class Errors implements JsonSerializable {
      * Adds a new error
      * @param string          $error
      * @param string          $message
-     * @param string|int|null $value   Optional.
+     * @param int|string|null $value   Optional.
      * @return Errors
      */
-    public function add(string $error, string $message, string|int|null $value = null): Errors {
+    public function add(string $error, string $message, int|string|null $value = null): Errors {
         if ($message === "") {
             return $this;
         }
@@ -196,7 +196,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns true if there are errors or if the given error exists
-     * @param string[]|string|null $error Optional.
+     * @param list<string>|string|null $error Optional.
      * @return bool
      */
     public function has(array|string|null $error = null): bool {
@@ -221,7 +221,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns the errors as an Object
-     * @return array<string,string|int|array<string|int>>
+     * @return array<string,int|string|array<int|string>>
      */
     public function get(): array {
         return $this->errors + $this->counts;
@@ -229,7 +229,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns the error keys
-     * @return string[]
+     * @return list<string>
      */
     public function keys(): array {
         return array_keys($this->errors);

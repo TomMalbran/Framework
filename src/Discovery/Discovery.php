@@ -42,7 +42,7 @@ class Discovery {
      * Loads a JSON File
      * @param string $dir
      * @param string $fileName
-     * @return array<string|int,mixed>
+     * @return array<int|string,mixed>
      */
     public static function loadJSON(string $dir, string $fileName): array {
         $file = Strings::addSuffix($fileName, ".json");
@@ -82,7 +82,7 @@ class Discovery {
             $sourcePath = Application::getSourcePath();
         }
 
-        $filePaths  = File::getFilesInDir($sourcePath, true);
+        $filePaths  = File::getFilesInDir($sourcePath, recursive: true);
         $classPaths = [];
         $result     = [];
 
@@ -93,7 +93,7 @@ class Discovery {
             }
 
             $className = Strings::replace($filePath, [ $sourcePath, ".php" ], "");
-            $className = Strings::substringAfter($className, "/", true);
+            $className = Strings::substringAfter($className, "/", useFirst: true);
             $className = Strings::replace($className, "/", "\\");
             $className = "{$namespace}{$className}";
 
@@ -216,7 +216,7 @@ class Discovery {
      * @param string       $dir          Optional.
      * @param bool         $forFramework Optional.
      * @param bool         $withError    Optional.
-     * @return object[]
+     * @return list<object>
      */
     public static function getClassesWithInterface(
         string $interface,
@@ -234,7 +234,7 @@ class Discovery {
      * @param string       $dir          Optional.
      * @param bool         $forFramework Optional.
      * @param bool         $withError    Optional.
-     * @return object[]
+     * @return list<object>
      */
     public static function getClassesWithParent(
         string $parentClass,
@@ -255,8 +255,8 @@ class Discovery {
 
     /**
      * Sorts the given Classes by their Priority
-     * @param ReflectionClass<object>[] $reflections
-     * @return object[]
+     * @param array<int|string,ReflectionClass<object>> $reflections
+     * @return list<object>
      */
     public static function sortClassesByPriority(array $reflections): array {
         $priorities = [];

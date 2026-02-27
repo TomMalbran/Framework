@@ -48,10 +48,7 @@ class {{name}}Schema extends Schema {
     protected static string $tableName = "{{table}}";
     protected static string $idName    = "{{idName}}";
     protected static string $idDbName  = "{{idDbName}}";
-
-    protected static bool $hasPositions   = {{hasPositionsValue}};
-    protected static bool $canDelete      = {{canDeleteValue}};
-    protected static bool $hasSubRequests = {{hasSubRequestsValue}};
+    protected static bool   $canDelete = {{canDeleteValue}};
 
 
 
@@ -475,12 +472,12 @@ class {{name}}Schema extends Schema {
      * Selects the given column from a single table and returns a single value
      * @param {{queryClass}} $query
      * @param {{columnClass}} $column
-     * @return string|int
+     * @return int|string
      */
     protected static function getEntityValue(
         {{queryClass}} $query,
         {{columnClass}} $column,
-    ): string|int {
+    ): int|string {
         return self::getSchemaValue($query->query, $column->base());
     }
 
@@ -488,7 +485,7 @@ class {{name}}Schema extends Schema {
      * Selects the given column from a single table and returns the entire column
      * @param {{queryClass}} $query
      * @param {{columnClass}} $column
-     * @return array<string|int>
+     * @return array<int|string>
      */
     protected static function getEntityColumn(
         {{queryClass}} $query,
@@ -560,7 +557,7 @@ class {{name}}Schema extends Schema {
      * @param {{queryClass}}|null $query Optional.
      * @param Request|null $sort Optional.
      * @param array<string,string> $selects Optional.
-     * @param string[] $joins Optional.{{#hasEncrypt}}
+     * @param list<string> $joins Optional.{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
      * @param bool $skipSubRequest Optional.
      * @return list<{{entityClass}}>
@@ -608,10 +605,10 @@ class {{name}}Schema extends Schema {
     /**
      * Returns a Select of {{name}} Entities
      * @param {{queryClass}} $query
-     * @param {{columnClass}}[]|{{columnClass}} $nameColumn
+     * @param list<{{columnClass}}>|{{columnClass}} $nameColumn
      * @param {{columnClass}}|null $idColumn Optional.
      * @param {{columnClass}}|null $descColumn Optional.
-     * @param {{columnClass}}[]|{{columnClass}}|null $extraColumn Optional.
+     * @param list<{{columnClass}}>|{{columnClass}}|null $extraColumn Optional.
      * @param {{columnClass}}|null $distinctColumn Optional.
      * @param bool $useEmpty Optional.
      * @return list<Select>
@@ -639,7 +636,7 @@ class {{name}}Schema extends Schema {
     /**
      * Returns the Search results for the {{name}} Entities
      * @param {{queryClass}} $query
-     * @param {{columnClass}}[]|{{columnClass}} $nameColumn
+     * @param list<{{columnClass}}>|{{columnClass}} $nameColumn
      * @param {{columnClass}}|null $idColumn Optional.
      * @param int $limit Optional.
      * @return list<Search>
@@ -876,14 +873,14 @@ class {{name}}Schema extends Schema {
      * Edits a value in a {{name}} Entity
      * @param {{editType}} $query
      * @param {{columnClass}} $column
-     * @param string|int $value{{#hasUsers}}
+     * @param int|string $value{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}
      * @return bool
      */
     protected static function editEntityValue(
         {{editType}} $query,
         {{columnClass}} $column,
-        string|int $value,{{#hasUsers}}
+        int|string $value,{{#hasUsers}}
         int $modifiedUser = 0,{{/hasUsers}}
     ): bool {
         {{#hasUsers}}
@@ -1012,9 +1009,9 @@ class {{name}}Schema extends Schema {
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
         return self::ensureSchemaOrder(
-            $entity?->toDictionary(),
-            $fields?->toDictionary(),{{#hasEditParents}}
-            $orderQuery->query,{{/hasEditParents}}
+            oldFields: $entity?->toDictionary(),
+            newFields: $fields?->toDictionary(),{{#hasEditParents}}
+            query:     $orderQuery->query,{{/hasEditParents}}
         );
     }
 {{/hasPositions}}

@@ -35,14 +35,14 @@ class Mailgun {
 
     /**
      * Sends the Email (used for external calls)
-     * @param string   $toEmail
-     * @param string   $fromEmail
-     * @param string   $fromName
-     * @param string   $subject
-     * @param string   $body
-     * @param string   $replyTo   Optional.
-     * @param string[] $ccEmails  Optional.
-     * @param string[] $ccoEmails Optional.
+     * @param string       $toEmail
+     * @param string       $fromEmail
+     * @param string       $fromName
+     * @param string       $subject
+     * @param string       $body
+     * @param string       $replyTo   Optional.
+     * @param list<string> $ccEmails  Optional.
+     * @param list<string> $ccoEmails Optional.
      * @return string
      */
     public static function send(

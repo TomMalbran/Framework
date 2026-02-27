@@ -12,15 +12,15 @@ class NumberQuery extends BaseQuery {
     /**
      * Generates a Compare Query
      * @param QueryOperator $operator
-     * @param int[]|int     $value
+     * @param list<int>|int $value
      * @param bool|null     $condition Optional.
      * @return void
      */
     public function compare(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
         $this->query->add(
-            $this->column,
-            $operator,
-            $value,
+            column:    $this->column,
+            operator:  $operator,
+            value:     $value,
             condition: $condition,
         );
     }
@@ -28,16 +28,16 @@ class NumberQuery extends BaseQuery {
     /**
      * Generates a Compare If Query
      * @param QueryOperator $operator
-     * @param int[]|int     $value
+     * @param list<int>|int $value
      * @param bool|null     $condition Optional.
      * @return void
      */
     public function compareIf(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
         $this->query->addIf(
-            $this->column,
-            $operator,
-            $value,
-            $condition,
+            column:    $this->column,
+            operator:  $operator,
+            value:     $value,
+            condition: $condition,
         );
     }
 
@@ -127,7 +127,7 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates an In Query
-     * @param int[]     $values
+     * @param list<int> $values
      * @param bool|null $condition Optional.
      * @return void
      */
@@ -139,7 +139,7 @@ class NumberQuery extends BaseQuery {
 
     /**
      * Generates a Not In Query
-     * @param int[]     $values
+     * @param list<int> $values
      * @param bool|null $condition Optional.
      * @return void
      */

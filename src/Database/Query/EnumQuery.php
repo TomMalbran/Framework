@@ -32,7 +32,7 @@ class EnumQuery extends BaseQuery {
      * @return void
      */
     public function equal(Enum ...$values): void {
-        $names = $this->toNames($values);
+        $names = $this->toNames(array_values($values));
         $this->query->add($this->column, QueryOperator::Equal, $names);
     }
 
@@ -42,7 +42,7 @@ class EnumQuery extends BaseQuery {
      * @return void
      */
     public function notEqual(Enum ...$values): void {
-        $names = $this->toNames($values);
+        $names = $this->toNames(array_values($values));
         $this->query->add($this->column, QueryOperator::NotEqual, $names);
     }
 
@@ -70,7 +70,7 @@ class EnumQuery extends BaseQuery {
 
     /**
      * Creates a list of Names from the given Enums
-     * @param Enum[] $values
+     * @param list<Enum> $values
      * @return list<string>
      */
     private function toNames(array $values): array {

@@ -9,16 +9,16 @@ class Assign {
     public string $type;
     public string $column;
 
-    /** @var mixed[] */
+    /** @var list<int|string> */
     public array  $params;
 
 
 
     /**
      * Creates a new Assign instance
-     * @param string  $type
-     * @param string  $column Optional.
-     * @param mixed[] $params Optional.
+     * @param string           $type
+     * @param string           $column Optional.
+     * @param list<int|string> $params Optional.
      */
     private function __construct(
         string $type,

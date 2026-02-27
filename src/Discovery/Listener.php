@@ -9,7 +9,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD)]
 class Listener {
 
-    /** @var string[] */
+    /** @var list<string> */
     public array $triggers = [];
 
 
@@ -19,6 +19,6 @@ class Listener {
      * @param string ...$trigger
      */
     public function __construct(string ...$trigger) {
-        $this->triggers = $trigger;
+        $this->triggers = array_values($trigger);
     }
 }

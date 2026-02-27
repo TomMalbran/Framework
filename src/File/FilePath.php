@@ -23,10 +23,10 @@ class FilePath implements DiscoveryBuilder {
     private const Avatars = "avatars";
 
 
-    /** @var string[] */
+    /** @var list<string> */
     private static array $paths       = [];
 
-    /** @var string[] */
+    /** @var list<string> */
     private static array $directories = [];
 
 
@@ -58,10 +58,10 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the Files Path with the given path parts
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getPath(string|int ...$pathParts): string {
+    public static function getPath(int|string ...$pathParts): string {
         $basePath = self::getBasePath();
         return File::parsePath($basePath, Config::getFileDir(), ...$pathParts);
     }
@@ -94,20 +94,20 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the Private Path
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getPrivatePath(string|int ...$pathParts): string {
+    public static function getPrivatePath(int|string ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
         return File::parsePath($basePath, ...$pathParts);
     }
 
     /**
      * Returns the FTP Path
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getFTPPath(string|int ...$pathParts): string {
+    public static function getFTPPath(int|string ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
         return File::parsePath($basePath, Config::getFileFtp(), ...$pathParts);
     }
@@ -116,28 +116,28 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Returns the directory used to store the files
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getDir(string|int ...$pathParts): string {
+    public static function getDir(int|string ...$pathParts): string {
         return File::parsePath(Config::getFileDir(), ...$pathParts);
     }
 
     /**
      * Returns the directory used for the internal files
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getInternalDir(string|int ...$pathParts): string {
+    public static function getInternalDir(int|string ...$pathParts): string {
         return File::parsePath(Application::getBaseDir(), Config::getFileDir(), ...$pathParts);
     }
 
     /**
      * Returns the url for the given path
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getUrl(string|int ...$pathParts): string {
+    public static function getUrl(int|string ...$pathParts): string {
         return Config::getFileUrl(Config::getFileDir(), ...$pathParts);
     }
 
@@ -163,10 +163,10 @@ class FilePath implements DiscoveryBuilder {
     /**
      * Creates a url to the files temp directory
      * @param int        $credentialID
-     * @param string|int ...$pathParts
+     * @param int|string ...$pathParts
      * @return string
      */
-    public static function getTempUrl(int $credentialID, string|int ...$pathParts): string {
+    public static function getTempUrl(int $credentialID, int|string ...$pathParts): string {
         return Config::getFileUrl(self::Temp, $credentialID, ...$pathParts);
     }
 
@@ -248,7 +248,7 @@ class FilePath implements DiscoveryBuilder {
     /**
      * Creates the Directories for the given ID
      * @param int $id Optional.
-     * @return string[]
+     * @return list<string>
      */
     public static function createDirs(int $id = 0): array {
         DiscoveryConfig::load();

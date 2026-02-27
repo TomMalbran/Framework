@@ -92,7 +92,7 @@ class ConsoleCommand {
 
     /**
      * Invokes the command handler
-     * @param string[] $arguments
+     * @param list<string> $arguments
      * @return bool
      */
     public function invoke(array $arguments): bool {

@@ -302,7 +302,7 @@ class Curl {
         if (!is_string($output)) {
             return [];
         }
-        $response = json_decode($output, true);
+        $response = json_decode($output, associative: true);
         return $response;
     }
 }

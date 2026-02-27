@@ -28,7 +28,7 @@ enum Status {
 
     /**
      * Returns the default groups used in the Code generation
-     * @return array<string,string[]>
+     * @return array<string,list<string>>
      */
     public static function getGroups(): array {
         return [

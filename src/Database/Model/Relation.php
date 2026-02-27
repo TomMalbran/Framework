@@ -144,20 +144,20 @@ class Relation {
     // Model where the Relation attribute is defined
     public ?SchemaModel $parentModel   = null;
 
-    /** @var Field[] */
+    /** @var list<Field> */
     public array $fields = [];
 
 
 
     /**
      * Creates a Relation
-     * @param string  $relationModelName
-     * @param string  $relationAliasName
-     * @param string  $relationFieldDbName
-     * @param string  $ownerModelName
-     * @param string  $ownerFieldDbName
-     * @param string  $ownerAndQuery
-     * @param Field[] $fields
+     * @param string      $relationModelName
+     * @param string      $relationAliasName
+     * @param string      $relationFieldDbName
+     * @param string      $ownerModelName
+     * @param string      $ownerFieldDbName
+     * @param string      $ownerAndQuery
+     * @param list<Field> $fields
      * @return Relation
      */
     public static function create(
@@ -411,7 +411,7 @@ class Relation {
 
     /**
      * Returns the fields from the Model
-     * @return Field[]
+     * @return list<Field>
      */
     public function getFields(): array {
         if ($this->relationModel === null) {
@@ -461,7 +461,7 @@ class Relation {
 
     /**
      * Returns the Names of the And Fields
-     * @return string[]
+     * @return list<string>
      */
     public function getAndFieldNames(): array {
         $andParts = Strings::split($this->ownerAndQuery, " AND ");
@@ -599,7 +599,7 @@ class Relation {
 
     /**
      * Returns the Name of the Relation
-     * @param string[] $otherRelationNames List of the names of the Relations in the Parent Model.
+     * @param list<string> $otherRelationNames List of the names of the Relations in the Parent Model.
      * @return string
      */
     public function getName(array $otherRelationNames): string {

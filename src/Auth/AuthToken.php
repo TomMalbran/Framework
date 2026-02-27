@@ -154,7 +154,7 @@ class AuthToken {
     /**
      * Returns all the Refresh Tokens for the given Credential
      * @param int $credentialID
-     * @return array<string,string|int>[]
+     * @return list<array<string,int|string>>
      */
     public static function getAllForCredential(int $credentialID): array {
         if ($credentialID === 0) {
