@@ -302,4 +302,34 @@ class Curl {
         $response = JSON::decode($output);
         return $response;
     }
+
+
+
+    /**
+     * Prints the Curl Options in a Readable Format for Debugging
+     * @param array<int,string> $options
+     * @return void
+     */
+    public static function printOptions(array $options): void {
+        $constants = get_defined_constants(categorize: true);
+        if (!isset($constants["curl"])) {
+            return;
+        }
+
+        $constants = $constants["curl"];
+        $constMap  = [];
+        foreach ($constants as $name => $value) {
+            if (strpos($name, "CURLOPT_") === 0 && is_int($value)) {
+                $constMap[$value] = $name;
+            }
+        }
+
+        $readableOptions = [];
+        foreach ($options as $key => $value) {
+            $name = $constMap[$key] ?? "UNKNOWN_OPTION_{$key}";
+            $readableOptions[$name] = $value;
+        }
+
+        print_r($readableOptions);
+    }
 }
