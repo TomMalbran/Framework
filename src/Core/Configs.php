@@ -35,20 +35,19 @@ class Configs implements DiscoveryBuilder {
     /**
      * Sets the Config File Name
      * @param string $fileName
-     * @return bool
+     * @return void
      */
-    public static function setFileName(string $fileName): bool {
+    public static function setFileName(string $fileName): void {
         self::$fileName = $fileName;
-        return true;
     }
 
     /**
      * Loads the Config Data
-     * @return bool
+     * @return void
      */
-    public static function load(): bool {
+    public static function load(): void {
         if (self::$loaded) {
-            return false;
+            return;
         }
 
         $framePath   = Package::getBasePath();
@@ -102,7 +101,6 @@ class Configs implements DiscoveryBuilder {
 
         self::$loaded = true;
         self::$data   = Arrays::merge($frameData, $appData, $replace);
-        return true;
     }
 
     /**

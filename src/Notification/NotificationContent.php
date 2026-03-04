@@ -48,10 +48,10 @@ class NotificationContent extends NotificationContentSchema implements Discovery
 
     /**
      * Migrates the Notification Contents data
-     * @return bool
+     * @return void
      */
     #[\Override]
-    public static function migrateData(): bool {
+    public static function migrateData(): void {
         self::truncateData();
 
         $languages = Language::getAll();
@@ -68,9 +68,7 @@ class NotificationContent extends NotificationContentSchema implements Discovery
 
         if (!$didUpdate) {
             print("- No notifications updated\n");
-            return false;
         }
-        return true;
     }
 
     /**

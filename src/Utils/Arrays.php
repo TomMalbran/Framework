@@ -915,12 +915,12 @@ class Arrays {
     /**
      * Returns the Value at the given id with the given key
      * @template TValue
-     * @param list<TValue> $array
-     * @param string       $idKey
-     * @param mixed        $idValue
+     * @param array<int|string,TValue> $array
+     * @param string                   $idKey
+     * @param mixed                    $idValue
      * @return TValue|null
      */
-    public static function findValue(array $array, string $idKey, mixed $idValue) {
+    public static function findValue(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $elem) {
             if (is_object($elem)) {
                 if (isset($elem->$idKey) && $elem->$idKey === $idValue) {

@@ -32,11 +32,10 @@ class NLS {
     /**
      * Sets the Language
      * @param string $language
-     * @return bool
+     * @return void
      */
-    public static function setLanguage(string $language): bool {
+    public static function setLanguage(string $language): void {
         self::$language = $language;
-        return true;
     }
 
 

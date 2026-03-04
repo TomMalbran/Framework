@@ -492,9 +492,9 @@ class MailChimp {
 
     /**
      * Puts the content into the given MailChimp campaign
-     * @param string             $mailChimpID
-     * @param int                $templateID
-     * @param list<array{}>|null $sections    Optional.
+     * @param string                          $mailChimpID
+     * @param int                             $templateID
+     * @param list<array<string,string>>|null $sections    Optional.
      * @return bool
      */
     private static function placeContent(string $mailChimpID, int $templateID, ?array $sections = null): bool {
@@ -562,7 +562,7 @@ class MailChimp {
     /**
      * Returns the Content of the given MailChimp campaign
      * @param string $mailChimpID
-     * @return array{}
+     * @return array<int|string,mixed>
      */
     public static function getContent(string $mailChimpID): array {
         if (!Config::isMailchimpActive()) {

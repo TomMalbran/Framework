@@ -93,7 +93,7 @@ enum FieldType {
      * Returns the PHP Type from the given Field Type
      * @param FieldType $type
      * @param string    $enumClass
-     * @param bool      $forEntity
+     * @param bool      $forEntity Optional.
      * @return string
      */
     public static function getCodeType(FieldType $type, string $enumClass, bool $forEntity = false): string {

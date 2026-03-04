@@ -55,7 +55,7 @@ class {{queryClass}} extends SchemaQuery {
         ?bool $condition = null,
     ): {{queryClass}} {
         if ($column !== {{columnClass}}::None) {
-            $this->query->add($column->value, $operator, $value, $caseSensitive, $condition);
+            $this->query->add($column->name(), $operator, $value, $caseSensitive, $condition);
         }
         return $this;
     }
@@ -82,7 +82,7 @@ class {{queryClass}} extends SchemaQuery {
     ): {{queryClass}} {
         $columns = [];
         foreach ($column as $col) {
-            $columns[] = $col->value;
+            $columns[] = $col->name();
         }
         $this->query->search($columns, $value, $operator, $caseInsensitive, $splitValue, $splitText, $matchAny);
         return $this;

@@ -74,7 +74,7 @@ class CSVWriter implements ExporterWriter {
 
     /**
      * Writes a Line
-     * @param array<string,string> $line
+     * @param array<string,float|int|string> $line
      * @return CSVWriter
      */
     #[\Override]

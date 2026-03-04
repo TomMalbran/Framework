@@ -23,7 +23,7 @@ class Errors implements JsonSerializable {
 
     /**
      * Creates a new Errors instance
-     * @param array<string,string>|null $errors
+     * @param array<string,string>|null $errors Optional.
      */
     public function __construct(?array $errors = null) {
         if ($errors !== null) {
@@ -62,7 +62,7 @@ class Errors implements JsonSerializable {
     /**
      * Increases the Errors amount
      * @param string $section
-     * @param int    $amount
+     * @param int    $amount  Optional.
      * @return Errors
      */
     public function incCount(string $section, int $amount = 1): Errors {

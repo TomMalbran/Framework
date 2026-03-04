@@ -186,16 +186,15 @@ class Relation {
      * BUILD STEP 1: When parsing the attributes of a Model, set the name of the Relation Model and prefix
      * @param string $relationModelName The Relation Model Name comes from the type of the attribute.
      * @param string $fieldName         The name of the attribute used as the prefix.
-     * @return bool
+     * @return void
      */
-    public function setDataFromAttribute(string $relationModelName, string $fieldName): bool {
+    public function setDataFromAttribute(string $relationModelName, string $fieldName): void {
         $this->relationModelName = $relationModelName;
         $this->fieldName         = $fieldName;
 
         if ($this->prefix === "") {
             $this->prefix = $fieldName;
         }
-        return true;
     }
 
     /**
@@ -390,9 +389,9 @@ class Relation {
     /**
      * BUILD STEP 7: Sets the relationFieldDbName and ownerFieldDbName using the modelIDs
      * @param array<string,string> $dbNames A list with all the Database Field Names.
-     * @return bool
+     * @return void
      */
-    public function setDbNames(array $dbNames): bool {
+    public function setDbNames(array $dbNames): void {
         if (isset($dbNames[$this->relationFieldName])) {
             $this->relationFieldDbName = $dbNames[$this->relationFieldName];
         } else {
@@ -404,7 +403,6 @@ class Relation {
         } else {
             $this->ownerFieldDbName = $this->ownerFieldName;
         }
-        return true;
     }
 
 

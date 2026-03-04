@@ -20,11 +20,10 @@ class MediaFile {
     /**
      * Sets the Current ID
      * @param int $id
-     * @return bool
+     * @return void
      */
-    public static function setID(int $id): bool {
+    public static function setID(int $id): void {
         self::$id = $id;
-        return true;
     }
 
 
@@ -82,7 +81,7 @@ class MediaFile {
      * @param string $mediaType Optional.
      * @param string $path      Optional.
      * @param string $basePath  Optional.
-     * @return array{list:FileItem[],path:string}
+     * @return array{list:list<FileItem>,path:string}
      */
     public static function getList(string $mediaType = "", string $path = "", string $basePath = ""): array {
         $path   = $path !== "" && self::exists($basePath, $path) ? $path : "";
@@ -163,7 +162,9 @@ class MediaFile {
         if (!File::deleteDir($source) || !File::deleteDir($thumbs)) {
             return false;
         }
-        return MediaSchema::updatePaths($relPath, "");
+
+        MediaSchema::updatePaths($relPath, "");
+        return true;
     }
 
 
@@ -219,6 +220,7 @@ class MediaFile {
             }
         }
 
-        return MediaSchema::updatePaths($oldRelPath, $newRelPath);
+        MediaSchema::updatePaths($oldRelPath, $newRelPath);
+        return true;
     }
 }

@@ -123,9 +123,9 @@ class Mailjet {
     /**
      * Deletes a Contact
      * @param string $email
-     * @return bool
+     * @return void
      */
-    public static function deleteContact(string $email): bool {
+    public static function deleteContact(string $email): void {
         $contactList = Config::getMailjetList();
         if ($contactList !== 0) {
             self::execute(CurlMethod::POST, "/v3/REST/contactslist/$contactList/managecontact", [
@@ -141,7 +141,6 @@ class Mailjet {
             $contactID = $data->getString("ID");
             self::execute(CurlMethod::DELETE, "/v4/contacts/$contactID");
         }
-        return true;
     }
 
 

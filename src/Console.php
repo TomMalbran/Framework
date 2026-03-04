@@ -49,23 +49,22 @@ class Console {
 
     /**
      * Displays the version information
-     * @return bool
+     * @return void
      */
     #[ConsoleCommand("version", "-v")]
     #[Priority(Priority::Highest)]
-    public static function version(): bool {
+    public static function version(): void {
         $version = Application::getVersion();
         print("Version: $version\n");
-        return true;
     }
 
     /**
      * Installs the Framework
-     * @return bool
+     * @return void
      */
     #[ConsoleCommand("install")]
     #[Priority(Priority::High)]
-    public static function install(): bool {
+    public static function install(): void {
         print("Installing the Framework...\n\n");
         $framePath = dirname(__DIR__);
         $appPath   = getcwd();
@@ -84,7 +83,6 @@ class Console {
         }
 
         print("\nInstallation completed.\n");
-        return true;
     }
 
 

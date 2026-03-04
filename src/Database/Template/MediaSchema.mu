@@ -16,9 +16,9 @@ class MediaSchema {
      * Updates the Paths in the Database
      * @param string $oldPath
      * @param string $newPath
-     * @return bool
+     * @return void
      */
-    public static function updatePaths(string $oldPath, string $newPath): bool {
+    public static function updatePaths(string $oldPath, string $newPath): void {
         $db    = Framework::getDatabase();
         $files = [
             [
@@ -51,7 +51,5 @@ class MediaSchema {
             {{/isReplace}}
         {{/fields}}
         }
-
-        return true;
     }
 }

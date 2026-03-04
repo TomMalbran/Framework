@@ -20,7 +20,7 @@ class InvalidReader implements ImporterReader {
 
     /**
      * Returns some data
-     * @param int $amount
+     * @param int $amount Optional.
      * @return ImporterData
      */
     #[\Override]

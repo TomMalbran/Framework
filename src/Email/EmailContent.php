@@ -54,10 +54,10 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
 
     /**
      * Migrates the Email Contents data
-     * @return bool
+     * @return void
      */
     #[\Override]
-    public static function migrateData(): bool {
+    public static function migrateData(): void {
         self::truncateData();
 
         $languages = Language::getAll();
@@ -74,9 +74,7 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
 
         if (!$didUpdate) {
             print("- No emails updated\n");
-            return false;
         }
-        return true;
     }
 
     /**

@@ -146,7 +146,7 @@ class Numbers {
     /**
      * Returns a number using the right format
      * @param int|float $number
-     * @param int       $decimals
+     * @param int       $decimals       Optional.
      * @param int       $maxForDecimals Optional.
      * @param string    $default        Optional.
      * @return string

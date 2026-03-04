@@ -113,11 +113,14 @@ class Query {
         $prefix   = $this->getPrefix();
         $suffix   = $caseSensitive ? "BINARY" : "";
         $operator = QueryOperator::fromValue($operator);
-        $compare  = $operator->value;
+        $compare  = $operator->toString();
         $param    = null;
         $binds    = "?";
 
         switch ($operator) {
+        case QueryOperator::None:
+            return $this;
+
         case QueryOperator::Equal:
             if (!is_array($value)) {
                 $param   = $value;
@@ -176,6 +179,13 @@ class Query {
             }
             break;
 
+        case QueryOperator::GreaterThan:
+        case QueryOperator::LessThan:
+        case QueryOperator::GreaterOrEqual:
+        case QueryOperator::LessOrEqual:
+            $param = $value;
+            break;
+
         case QueryOperator::Like:
         case QueryOperator::NotLike:
             if (!is_array($value)) {
@@ -187,7 +197,7 @@ class Query {
         case QueryOperator::NotStartsWith:
             if (!is_array($value)) {
                 $param   = Strings::addSuffix(trim(strtolower((string)$value)), "%");
-                $compare = Strings::replace($operator->value, "STARTS", "LIKE");
+                $compare = Strings::replace($operator->toString(), "STARTS", "LIKE");
             }
             break;
 
@@ -195,12 +205,9 @@ class Query {
         case QueryOperator::NotEndsWith:
             if (!is_array($value)) {
                 $param   = Strings::addPrefix(trim(strtolower((string)$value)), "%");
-                $compare = Strings::replace($operator->value, "ENDS", "LIKE");
+                $compare = Strings::replace($operator->toString(), "ENDS", "LIKE");
             }
             break;
-
-        default:
-            $param = $value;
         }
 
         if ($param === null) {

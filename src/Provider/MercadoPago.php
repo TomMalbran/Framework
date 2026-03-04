@@ -20,10 +20,10 @@ class MercadoPago {
 
     /**
      * Does a GET Request
-     * @param string       $route
-     * @param array{}|null $request      Optional.
-     * @param bool         $jsonResponse Optional.
-     * @param string       $accessToken  Optional.
+     * @param string                   $route
+     * @param array<string,mixed>|null $request      Optional.
+     * @param bool                     $jsonResponse Optional.
+     * @param string                   $accessToken  Optional.
      * @return Dictionary
      */
     private static function get(
@@ -81,7 +81,7 @@ class MercadoPago {
 
     /**
      * Returns the Redirect url
-     * @param string $redirectUrl
+     * @param string $redirectUrl Optional.
      * @return string
      */
     public static function getRedirectUrl(string $redirectUrl = ""): string {

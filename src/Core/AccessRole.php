@@ -26,9 +26,9 @@ class AccessRole implements DiscoveryBuilder {
      * @param string $roleName
      * @param string $groupName
      * @param int    $level     Optional.
-     * @return bool
+     * @return void
      */
-    public static function register(string $roleName, string $groupName, int $level = -1): bool {
+    public static function register(string $roleName, string $groupName, int $level = -1): void {
         if ($level >= 0) {
             self::$level = $level;
         } else {
@@ -43,7 +43,6 @@ class AccessRole implements DiscoveryBuilder {
         if (!Arrays::contains(self::$groups[$groupName], $roleName)) {
             self::$groups[$groupName][] = $roleName;
         }
-        return true;
     }
 
 
@@ -83,7 +82,7 @@ class AccessRole implements DiscoveryBuilder {
      * Returns the Access Roles for the generator
      * @param array<string,array<string>> $groups
      * @param array<string,int>           $roles
-     * @return array{addSpace:bool,group:string,name:string,constant:string,level:int}[]
+     * @return list<array{addSpace:bool,group:string,name:string,constant:string,level:int}>
      */
     private static function getAccesses(array $groups, array $roles): array {
         $result = [];
@@ -122,7 +121,7 @@ class AccessRole implements DiscoveryBuilder {
 
     /**
      * Aligns the List Names
-     * @param array{addSpace:bool,group:string,name:string,constant:string,level:int}[] $list
+     * @param list<array{addSpace:bool,group:string,name:string,constant:string,level:int}> $list
      * @return int
      */
     private static function alignNames(array &$list): int {

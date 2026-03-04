@@ -16,7 +16,7 @@ interface Enum {
     public static function fromValue(string $value): self;
 
     /**
-     * Creates an Enum from a String
+     * Creates an Enum from a Request
      * @param Request $request
      * @param string  $key
      * @return self
@@ -24,9 +24,8 @@ interface Enum {
     public static function fromRequest(Request $request, string $key): self;
 
 
-
     /**
-     * Converts the Enumerable into a string
+     * Converts the Enum into a string
      * @return string
      */
     public function toString(): string;

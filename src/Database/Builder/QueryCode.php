@@ -36,7 +36,7 @@ class QueryCode {
     /**
      * Returns the Field properties for the Query
      * @param SchemaModel $schemaModel
-     * @return array{}
+     * @return list<array{fieldType:FieldType,status:string,column:string,name:string,value:string}>
      */
     private static function getProperties(SchemaModel $schemaModel): array {
         $nameLength = 0;

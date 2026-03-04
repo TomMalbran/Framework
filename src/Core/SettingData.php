@@ -96,7 +96,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
      * Returns all the Settings
      * @param string|null $section  Optional.
      * @param bool        $asObject Optional.
-     * @return array{}|object
+     * @return array<string,array<string,string>|string>|object
      */
     public static function getAll(?string $section = null, bool $asObject = false): array|object {
         $query = new SettingsQuery();
@@ -123,9 +123,9 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
     /**
      * Saves all the Settings
      * @param array<string,string> $data
-     * @return bool
+     * @return void
      */
-    public static function saveAll(array $data): bool {
+    public static function saveAll(array $data): void {
         $list = self::getEntityList();
 
         foreach ($list as $elem) {
@@ -141,21 +141,20 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
                 variableType: $elem->variableType,
             );
         }
-        return true;
     }
 
     /**
      * Saves the Settings from the given Section
      * @param string               $section
      * @param array<string,string> $data
-     * @return bool
+     * @return void
      */
-    public static function saveSection(string $section, array $data): bool {
+    public static function saveSection(string $section, array $data): void {
         $fields = [];
         foreach ($data as $key => $value) {
             $fields["$section-$key"] = $value;
         }
-        return self::saveAll($fields);
+        self::saveAll($fields);
     }
 
 
@@ -163,10 +162,10 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
 
     /**
      * Migrates the Settings data
-     * @return bool
+     * @return void
      */
     #[\Override]
-    public static function migrateData(): bool {
+    public static function migrateData(): void {
         $query = new SettingsQuery();
         $query->section->notEqual(SettingConfig::Core);
         $list = self::getEntityList($query);
@@ -303,8 +302,6 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
 
         if (!$didUpdate) {
             print("- No settings updated\n");
-            return false;
         }
-        return true;
     }
 }

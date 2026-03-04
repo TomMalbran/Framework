@@ -51,6 +51,7 @@ class SchemaCode {
             "namespace"          => $schemaModel->namespace,
             "name"               => $schemaModel->name,
             "table"              => $schemaModel->tableName,
+            "entityName"         => Strings::lowerCaseFirst($schemaModel->name),
             "entityClass"        => $schemaModel->entityClass,
             "columnClass"        => $schemaModel->columnClass,
             "statusClass"        => $schemaModel->statusClass,
@@ -306,6 +307,9 @@ class SchemaCode {
         foreach ($schemaModel->validates as $validate) {
             $validation = [];
             switch ($validate->type) {
+            case ValidateType::None:
+                break;
+
             case ValidateType::String:
             case ValidateType::Enum:
                 $validation = [
@@ -398,8 +402,6 @@ class SchemaCode {
                     "isStatus" => true,
                 ];
                 break;
-
-            default:
             }
 
             $result[] = $validation + [

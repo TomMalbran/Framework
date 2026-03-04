@@ -73,9 +73,9 @@ class Database {
 
     /**
      * Connects with the database
-     * @return bool
+     * @return void
      */
-    public function connect(): bool {
+    public function connect(): void {
         $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database, $this->port);
         if ($this->mysqli->connect_error !== null) {
             $errno = $this->mysqli->connect_errno;
@@ -88,7 +88,6 @@ class Database {
         if ($this->charset !== "") {
             $this->mysqli->set_charset($this->charset);
         }
-        return true;
     }
 
     /**
@@ -601,19 +600,18 @@ class Database {
      * @param Timer       $timer
      * @param string      $expression
      * @param list<mixed> $params
-     * @return bool
+     * @return void
      */
-    protected function processTime(Timer $timer, string $expression, array $params): bool {
+    protected function processTime(Timer $timer, string $expression, array $params): void {
         $logTime = Config::getDbLogTime();
         $time    = $timer->getElapsedSeconds();
         if ($logTime === 0 || $time < $logTime || $this->skipLog) {
-            return false;
+            return;
         }
 
         $this->skipLog = true;
-        $result = QueryLog::createOrEdit($time, $expression, $params);
+        QueryLog::createOrEdit($time, $expression, $params);
         $this->skipLog = false;
-        return $result;
     }
 
 
@@ -940,9 +938,9 @@ class Database {
      * Dumps the entire database
      * @param list<string>  $filter Optional.
      * @param resource|null $fp     Optional.
-     * @return bool
+     * @return void
      */
-    public function dump(array $filter = [], mixed $fp = null): bool {
+    public function dump(array $filter = [], mixed $fp = null): void {
         $crlf = "\r\n";
 
         // SQL Dump Header
@@ -990,7 +988,6 @@ class Database {
             }
         }
         $this->write($fp, "$crlf # Done $crlf");
-        return true;
     }
 
     /**

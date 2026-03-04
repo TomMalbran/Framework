@@ -95,7 +95,7 @@ class SignalCode implements DiscoveryBuilder {
      * Generates the Params of the Method
      * @param ReflectionMethod  $method
      * @param array<string,int> $uses
-     * @return array{isFirst:bool,name:string,type:string,docType:string}[]
+     * @return list<array{isFirst:bool,name:string,type:string,docType:string}>
      */
     private static function getParams(ReflectionMethod $method, array &$uses): array {
         $parameters = $method->getParameters();

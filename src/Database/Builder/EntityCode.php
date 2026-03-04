@@ -54,7 +54,7 @@ class EntityCode {
     /**
      * Returns the Properties of the Entity
      * @param SchemaModel $schemaModel
-     * @return array{name:string,list:array<string,string|bool>[]}[]
+     * @return list<array{name:string,list:list<array<string,string|bool>>}>
      */
     private static function getProperties(SchemaModel $schemaModel): array {
         $result = [];
@@ -129,10 +129,10 @@ class EntityCode {
 
     /**
      * Adds a Category to the Properties
-     * @param array{name:string,list:array<string,string|bool>[]}[] $result
-     * @param string                                                $name
-     * @param list<array<string,string|bool>>                       $fields
-     * @param array<string,bool>                                    $parsed
+     * @param list<array{name:string,list:list<array<string,string|bool>>}> $result
+     * @param string                                                        $name
+     * @param list<array<string,string|bool>>                               $fields
+     * @param array<string,bool>                                            $parsed
      * @return void
      */
     private static function addCategory(array &$result, string $name, array $fields, array &$parsed): void {
@@ -186,7 +186,7 @@ class EntityCode {
      * Returns the Type and Default
      * @param string      $name
      * @param string      $type
-     * @param string      $subType
+     * @param string      $subType Optional.
      * @param string|null $default Optional.
      * @return array<string,string|bool>
      */
@@ -283,7 +283,7 @@ class EntityCode {
     /**
      * Returns the Sub Types from the Sub Requests
      * @param SchemaModel $schemaModel
-     * @return array{name:string,type:string,namespace:string,useIndex:bool,keyType:string}[]
+     * @return list<array{name:string,type:string,namespace:string,useIndex:bool,keyType:string}>
      */
     private static function getSubTypes(SchemaModel $schemaModel): array {
         $models = [];

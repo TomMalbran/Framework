@@ -73,7 +73,7 @@ class Server {
 
     /**
      * Returns true if running on Localhost
-     * @param list<string> $whitelist
+     * @param list<string> $whitelist Optional.
      * @return bool
      */
     public static function isLocalHost(array $whitelist = [ "127.0.0.1", "::1" ]): bool {
@@ -94,7 +94,7 @@ class Server {
 
     /**
      * Returns the Origin Url
-     * @param bool $useForwarded
+     * @param bool $useForwarded Optional.
      * @return string
      */
     public static function getUrl(bool $useForwarded = false): string {
@@ -126,7 +126,7 @@ class Server {
 
     /**
      * Returns the Full Url
-     * @param bool $useForwarded
+     * @param bool $useForwarded Optional.
      * @return string
      */
     public static function getFullUrl(bool $useForwarded = false): string {

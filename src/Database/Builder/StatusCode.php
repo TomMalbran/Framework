@@ -47,7 +47,7 @@ class StatusCode {
     /**
      * Generates the Status list
      * @param SchemaModel $schemaModel
-     * @return array{name:string,color:string,constant:string}[]
+     * @return list<array{name:string,color:string,constant:string}>
      */
     private static function getList(SchemaModel $schemaModel): array {
         $result    = [];

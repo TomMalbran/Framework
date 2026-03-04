@@ -11,7 +11,7 @@ class Setting {
 
     /**
      * Returns all the Settings
-     * @return array{}
+     * @return array<string,array<string,string>|string>|object
      */
     public static function getAll(): array {
         return SettingData::getAll();
@@ -19,7 +19,7 @@ class Setting {
 
     /**
      * Saves all the Settings
-     * @param array{} $data
+     * @param array<string,string> $data
      * @return bool
      */
     public static function saveAll(array $data): bool {
@@ -31,8 +31,8 @@ class Setting {
 {{#sections}}
     /**
      * Returns all the Settings for {{name}}
-     * @param bool    $asObject Optional.
-     * @return array{}|object
+     * @param bool $asObject Optional.
+     * @return array<string,string>|object
      */
     public static function getAll{{name}}(bool $asObject = false): array|object {
         return SettingData::getAll("{{section}}", $asObject);
@@ -40,7 +40,7 @@ class Setting {
 
     /**
      * Saves all the Settings for {{name}}
-     * @param array{} $data
+     * @param array<string,string> $data
      * @return bool
      */
     public static function save{{name}}(array $data): bool {

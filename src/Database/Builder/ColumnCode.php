@@ -30,7 +30,7 @@ class ColumnCode {
     /**
      * Returns the Field columns for the Column
      * @param SchemaModel $schemaModel
-     * @return array{}
+     * @return list<array{name:string,value:string,addSpace:bool}>
      */
     private static function getColumns(SchemaModel $schemaModel): array {
         $addSpace = true;

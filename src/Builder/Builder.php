@@ -23,10 +23,10 @@ class Builder {
 
     /**
      * Builds all the Code
-     * @return bool
+     * @return void
      */
     #[ConsoleCommand("build")]
-    public static function build(): bool {
+    public static function build(): void {
         $timer = new Timer();
         print("Building the Code...\n");
 
@@ -58,15 +58,14 @@ class Builder {
         // Calculate and show the time taken
         $time = $timer->getElapsedText();
         print("\nGenerated $created files in $time\n");
-        return true;
     }
 
     /**
      * Destroys all the Code
-     * @return bool
+     * @return void
      */
     #[ConsoleCommand("destroy")]
-    public static function destroy(): bool {
+    public static function destroy(): void {
         $writePath = Package::getBuildPath();
         $deleted   = 0;
 
@@ -89,7 +88,6 @@ class Builder {
         File::deleteDir($writePath, $deleted);
 
         print("\nDestroyed $deleted generated files\n\n");
-        return true;
     }
 
 

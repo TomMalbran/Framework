@@ -272,7 +272,7 @@ class {{name}}Schema extends Schema {
             isEdit:      $isEdit,{{#hasIntID}}
             id:          $id,{{/hasIntID}}{{#hasStringID}}
             code:        $id,{{/hasStringID}}{{#hasEnumID}}
-            code:        $id->name,{{/hasEnumID}}
+            code:        $id->toString(),{{/hasEnumID}}
             name:        $request->getString("name"),
             canValidate: $canValidate,
             errors:      $errors,
@@ -339,11 +339,11 @@ class {{name}}Schema extends Schema {
 {{#hasVirtual}}
     /**
      * Post Process the Result
-     * @param {{entityClass}} $entity
+     * @param {{entityClass}} ${{entityName}}
      * @return {{entityClass}}
      */
-    protected static function postProcess({{entityClass}} $entity): {{entityClass}} {
-        return $entity;
+    protected static function postProcess({{entityClass}} ${{entityName}}): {{entityClass}} {
+        return ${{entityName}};
     }
 
 {{/hasVirtual}}
@@ -491,7 +491,7 @@ class {{name}}Schema extends Schema {
         {{queryClass}} $query,
         {{columnClass}} $column,
     ): array {
-        return self::getSchemaColumn($query->query, $column->value, $column->key());
+        return self::getSchemaColumn($query->query, $column->name(), $column->key());
     }
 
 
@@ -628,7 +628,7 @@ class {{name}}Schema extends Schema {
             idColumn:       $idColumn?->key(),
             descColumn:     $descColumn?->key(),
             extraColumn:    {{columnClass}}::toKeys($extraColumn),
-            distinctColumn: $distinctColumn?->value,
+            distinctColumn: $distinctColumn?->name(),
             useEmpty:       $useEmpty,
         );
     }
@@ -704,7 +704,7 @@ class {{name}}Schema extends Schema {
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
-            $entityFields["status"] = $status->name;
+            $entityFields["status"] = $status->toString();
         }
         {{/hasStatus}}
         {{#hasTimestamps}}
@@ -766,7 +766,7 @@ class {{name}}Schema extends Schema {
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
-            $entityFields["status"] = $status->name;
+            $entityFields["status"] = $status->toString();
         }
         {{/hasStatus}}
         {{#hasUsers}}
@@ -819,7 +819,7 @@ class {{name}}Schema extends Schema {
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
-            $entityFields["status"] = $status->name;
+            $entityFields["status"] = $status->toString();
         }
         {{/hasStatus}}
         {{#canDelete}}

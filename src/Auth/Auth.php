@@ -152,11 +152,10 @@ class Auth {
 
     /**
      * Validates and Sets the auth as API Internal
-     * @return bool
+     * @return void
      */
-    public static function validateInternal(): bool {
+    public static function validateInternal(): void {
         self::$accessName = Access::API;
-        return true;
     }
 
 
@@ -172,9 +171,9 @@ class Auth {
     /**
      * Logins the given Credential
      * @param CredentialEntity $credential
-     * @return bool
+     * @return void
      */
-    public static function login(CredentialEntity $credential): bool {
+    public static function login(CredentialEntity $credential): void {
         $isNew = self::$credentialID !== $credential->id;
         self::setCredential($credential, null, $credential->currentUser);
 
@@ -189,14 +188,13 @@ class Auth {
             self::$refreshToken = AuthToken::createRefreshToken($credential->id);
             self::$sendRefresh  = true;
         }
-        return true;
     }
 
     /**
      * Logouts the Current Credential
-     * @return bool
+     * @return void
      */
-    public static function logout(): bool {
+    public static function logout(): void {
         AuthToken::deleteRefreshToken(self::$refreshToken);
         ActionLog::endSession();
 
@@ -207,7 +205,6 @@ class Auth {
         self::$credentialID = 0;
         self::$adminID      = 0;
         self::$userID       = 0;
-        return true;
     }
 
     /**
@@ -255,8 +252,9 @@ class Auth {
         }
 
         if (self::canLoginAs(self::$admin, self::$credential)) {
+            $credentialID = self::$credential->id;
             self::setCredential(self::$admin);
-            return self::$credential->id;
+            return $credentialID;
         }
         return 0;
     }
@@ -307,13 +305,13 @@ class Auth {
      * @param CredentialEntity      $credential
      * @param CredentialEntity|null $admin      Optional.
      * @param int                   $userID     Optional.
-     * @return bool
+     * @return void
      */
     public static function setCredential(
         CredentialEntity $credential,
         ?CredentialEntity $admin = null,
         int $userID = 0,
-    ): bool {
+    ): void {
         self::$credential   = $credential;
         self::$credentialID = $credential->id;
         self::$userID       = $userID;
@@ -343,7 +341,6 @@ class Auth {
         if ($timezone !== 0) {
             TimeZone::setTimeZone($timezone);
         }
-        return true;
     }
 
     /**
@@ -365,15 +362,14 @@ class Auth {
      * Sets the Current User
      * @param int           $userID
      * @param Access|string $accessName
-     * @return bool
+     * @return void
      */
-    public static function setCurrentUser(int $userID, Access|string $accessName): bool {
+    public static function setCurrentUser(int $userID, Access|string $accessName): void {
         self::$userID     = $userID;
         self::$accessName = Access::fromValue($accessName);
 
         ActionLog::endSession();
         ActionLog::startSession(destroy: true);
-        return true;
     }
 
     /**

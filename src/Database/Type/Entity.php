@@ -205,8 +205,8 @@ class Entity implements JsonSerializable {
 
     /**
      * Returns the Data as an Array
-     * @param array{} $extraData
-     * @return array{}
+     * @param array<string,mixed> $extraData Optional.
+     * @return array<string,mixed>
      */
     public function toArray(array $extraData = []): array {
         $result = [];

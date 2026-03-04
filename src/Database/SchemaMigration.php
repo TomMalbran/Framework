@@ -16,9 +16,9 @@ class SchemaMigration {
 
     /**
      * Migrates the Tables
-     * @param array{from:string,to:string}[]              $tableRenames
-     * @param array{table:string,from:string,to:string}[] $columnRenames
-     * @param bool                                        $canDelete     Optional.
+     * @param list<array{from:string,to:string}>              $tableRenames
+     * @param list<array{table:string,from:string,to:string}> $columnRenames
+     * @param bool                                            $canDelete     Optional.
      * @return void
      */
     public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): void {
@@ -45,9 +45,9 @@ class SchemaMigration {
 
     /**
      * Renames the Tables
-     * @param Database                       $db
-     * @param int                            $startRename
-     * @param array{from:string,to:string}[] $tableRenames
+     * @param Database                           $db
+     * @param int                                $startRename
+     * @param list<array{from:string,to:string}> $tableRenames
      * @return int
      */
     private static function renameTables(Database $db, int $startRename, array $tableRenames): int {
@@ -80,9 +80,9 @@ class SchemaMigration {
 
     /**
      * Renames the Table Columns
-     * @param Database                                    $db
-     * @param int                                         $startRename
-     * @param array{table:string,from:string,to:string}[] $columnRenames
+     * @param Database                                        $db
+     * @param int                                             $startRename
+     * @param list<array{table:string,from:string,to:string}> $columnRenames
      * @return int
      */
     private static function renameColumns(Database $db, int $startRename, array $columnRenames): int {

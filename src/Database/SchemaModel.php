@@ -338,7 +338,7 @@ class SchemaModel {
     /**
      * Returns the Build Data for the Schema Builder
      * @param string $name
-     * @return list<array{params:string,fields:array{}}>
+     * @return list<array{params:string,fields:list<array<string,mixed>>}>
      */
     public function toBuildData(string $name): array {
         $result = [];
@@ -377,7 +377,7 @@ class SchemaModel {
      * Returns the Build Data for the Schema Builder
      * @param array<string,mixed> $data
      * @param bool                $withKey
-     * @return array{params:string,fields:array{}}
+     * @return array{params:string,fields:list<array<string,mixed>>}
      */
     private function generateBuildData(array $data, bool $withKey): array {
         $params = [];
@@ -386,7 +386,8 @@ class SchemaModel {
                 continue;
             }
 
-            $text = "";
+            $text   = "";
+            $addKey = $withKey;
             if ($value instanceof FieldType) {
                 $text = "FieldType::{$value->name}";
             } elseif ($value instanceof DateType) {
@@ -396,11 +397,12 @@ class SchemaModel {
             } elseif (is_string($value)) {
                 $text = "\"$value\"";
             } elseif (is_bool($value)) {
-                $text = $value ? "true" : "false";
+                $text   = $value ? "true" : "false";
+                $addKey = true;
             } elseif (is_numeric($value)) {
                 $text = $value;
             }
-            $params[] = $withKey ? "$key: $text" : $text;
+            $params[] = $addKey ? "$key: $text" : $text;
         }
 
         $fields = [];

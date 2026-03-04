@@ -17,7 +17,7 @@ class SettingConfig implements DiscoveryBuilder {
     public const General = "General";
 
 
-    /** @var array{variable:string,section:string,variableType:VariableType,value:mixed}[] */
+    /** @var list<array{variable:string,section:string,variableType:VariableType,value:mixed}> */
     private static array $settings = [];
 
 
@@ -27,26 +27,25 @@ class SettingConfig implements DiscoveryBuilder {
      * @param string       $section
      * @param VariableType $variableType
      * @param mixed        $value        Optional.
-     * @return bool
+     * @return void
      */
     public static function register(
         string $variable,
         string $section,
         VariableType $variableType,
         mixed $value = "",
-    ): bool {
+    ): void {
         self::$settings[] = [
             "variable"     => $variable,
             "section"      => $section,
             "variableType" => $variableType,
             "value"        => $value,
         ];
-        return true;
     }
 
     /**
      * Returns the registered Settings
-     * @return array{variable:string,section:string,variableType:VariableType,value:mixed}[]
+     * @return list<array{variable:string,section:string,variableType:VariableType,value:mixed}>
      */
     public static function getSettings(): array {
         return self::$settings;
@@ -84,7 +83,7 @@ class SettingConfig implements DiscoveryBuilder {
 
     /**
      * Returns the Settings Sections for the generator
-     * @return array{section:string,name:string}[]
+     * @return list<array{section:string,name:string}>
      */
     private static function getSections(): array {
         $result = [];

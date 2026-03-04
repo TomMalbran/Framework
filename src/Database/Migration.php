@@ -22,10 +22,10 @@ use ReflectionClass;
  */
 class Migration {
 
-    /** @var array{from:string,to:string}[] */
+    /** @var list<array{from:string,to:string}> */
     private static array $tableRenames  = [];
 
-    /** @var array{table:string,from:string,to:string}[] */
+    /** @var list<array{table:string,from:string,to:string}> */
     private static array $columnRenames = [];
 
 
@@ -33,14 +33,13 @@ class Migration {
      * Renames a Table
      * @param string $from
      * @param string $to
-     * @return bool
+     * @return void
      */
-    public static function renameTable(string $from, string $to): bool {
+    public static function renameTable(string $from, string $to): void {
         self::$tableRenames[] = [
             "from" => $from,
             "to"   => $to,
         ];
-        return true;
     }
 
     /**
@@ -48,15 +47,14 @@ class Migration {
      * @param string $table
      * @param string $from
      * @param string $to
-     * @return bool
+     * @return void
      */
-    public static function renameColumn(string $table, string $from, string $to): bool {
+    public static function renameColumn(string $table, string $from, string $to): void {
         self::$columnRenames[] = [
             "table" => $table,
             "from"  => $from,
             "to"    => $to,
         ];
-        return true;
     }
 
 
@@ -65,10 +63,10 @@ class Migration {
      * Migrates the Data
      * @param string $envFile Optional.
      * @param bool   $delete  Optional.
-     * @return bool
+     * @return void
      */
     #[ConsoleCommand("migrate")]
-    public static function migrate(string $envFile = "", bool $delete = false): bool {
+    public static function migrate(string $envFile = "", bool $delete = false): void {
         $timer = new Timer();
         print("Migrating data...\n");
 
@@ -114,7 +112,6 @@ class Migration {
         // Calculate and show the time taken
         $time = $timer->getElapsedText();
         print("\nMigrations completed in $time\n");
-        return true;
     }
 
     /**

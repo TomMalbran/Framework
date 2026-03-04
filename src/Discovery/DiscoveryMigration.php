@@ -8,7 +8,7 @@ interface DiscoveryMigration {
 
     /**
      * Migrates the Data
-     * @return bool If the migration was successful.
+     * @return void
      */
-    public static function migrateData(): bool;
+    public static function migrateData(): void;
 }

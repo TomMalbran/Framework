@@ -53,9 +53,9 @@ class QueryLog extends LogQuerySchema {
      * @param float       $time
      * @param string      $expression
      * @param list<mixed> $params
-     * @return bool
+     * @return void
      */
-    public static function createOrEdit(float $time, string $expression, array $params): bool {
+    public static function createOrEdit(float $time, string $expression, array $params): void {
         $elapsedTime = (int)floor($time);
         $expression  = Strings::replacePattern($expression, "/ +/", " ");
         foreach ($params as $param) {
@@ -91,41 +91,40 @@ class QueryLog extends LogQuerySchema {
                 updatedUser: Auth::getID(),
             );
         }
-        return true;
     }
 
     /**
      * Marks the given Query(s) as Resolved
      * @param list<int>|int $logID
-     * @return bool
+     * @return void
      */
-    public static function markResolved(array|int $logID): bool {
+    public static function markResolved(array|int $logID): void {
         $query = new LogQueryQuery();
         $query->logID->in(Arrays::toInts($logID));
-        return self::editEntity($query, isResolved: true);
+        self::editEntity($query, isResolved: true);
     }
 
     /**
      * Deletes the given Query(s)
      * @param list<int>|int $logID
-     * @return bool
+     * @return void
      */
-    public static function delete(array|int $logID): bool {
+    public static function delete(array|int $logID): void {
         $query = new LogQueryQuery();
         $query->logID->in(Arrays::toInts($logID));
-        return self::removeEntity($query);
+        self::removeEntity($query);
     }
 
     /**
      * Deletes the items older than some days
-     * @return bool
+     * @return void
      */
-    public static function deleteOld(): bool {
+    public static function deleteOld(): void {
         $days  = Config::getQueryLogDeleteDays();
         $time  = Date::now()->subtract(days: $days);
 
         $query = new LogQueryQuery();
         $query->createdTime->lessThan($time);
-        return self::removeEntity($query);
+        self::removeEntity($query);
     }
 }

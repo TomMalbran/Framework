@@ -29,8 +29,8 @@ class Count {
 
     /**
      * The Count Attribute
-     * @param class-string|null $modelName
-     * @param class-string|null $otherModelName
+     * @param class-string|null $modelName      Optional.
+     * @param class-string|null $otherModelName Optional.
      * @param string            $fieldName      Optional.
      * @param string            $query          Optional.
      */

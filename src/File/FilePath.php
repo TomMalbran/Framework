@@ -33,25 +33,21 @@ class FilePath implements DiscoveryBuilder {
     /**
      * Registers a Path
      * @param string $name
-     * @return bool
+     * @return void
      */
-    public static function register(string $name): bool {
+    public static function register(string $name): void {
         self::$paths[] = $name;
-        return true;
     }
 
     /**
      * Registers a Directory
      * @param string $name
-     * @return bool
+     * @return void
      */
-    public static function registerDirectory(string $name): bool {
-        if ($name === "" || $name === "example") {
-            return false;
+    public static function registerDirectory(string $name): void {
+        if ($name !== "" && $name !== "example") {
+            self::$directories[] = $name;
         }
-
-        self::$directories[] = $name;
-        return true;
     }
 
 
@@ -209,10 +205,10 @@ class FilePath implements DiscoveryBuilder {
 
     /**
      * Ensures that the Paths are created
-     * @return bool
+     * @return void
      */
     #[ConsoleCommand("ensurePaths")]
-    public static function ensurePaths(): bool {
+    public static function ensurePaths(): void {
         print("\nENSURE PATHS\n");
 
         DiscoveryConfig::load();
@@ -242,7 +238,6 @@ class FilePath implements DiscoveryBuilder {
         if (count($paths) === 0 && count($directories) === 0) {
             print("- No paths added\n");
         }
-        return true;
     }
 
     /**

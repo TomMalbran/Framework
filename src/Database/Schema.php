@@ -265,12 +265,12 @@ class Schema {
 
     /**
      * Returns an array of Entities Data
-     * @param Query|null   $query          Optional.
-     * @param Request|null $sort           Optional.
-     * @param array{}      $selects        Optional.
-     * @param list<string> $joins          Optional.
-     * @param bool         $decrypted      Optional.
-     * @param bool         $skipSubRequest Optional.
+     * @param Query|null           $query          Optional.
+     * @param Request|null         $sort           Optional.
+     * @param array<string,string> $selects        Optional.
+     * @param list<string>         $joins          Optional.
+     * @param bool                 $decrypted      Optional.
+     * @param bool                 $skipSubRequest Optional.
      * @return Dictionary
      */
     protected static function getSchemaEntities(

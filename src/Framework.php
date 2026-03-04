@@ -172,11 +172,10 @@ class Framework {
     /**
      * Stores a Response
      * @param Response|null $response Optional.
-     * @return bool
+     * @return void
      */
-    public static function setResponse(?Response $response = null): bool {
+    public static function setResponse(?Response $response = null): void {
         self::$response = $response;
-        return true;
     }
 
     /**

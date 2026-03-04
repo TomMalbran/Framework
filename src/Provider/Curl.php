@@ -124,7 +124,6 @@ class Curl {
         if ($curl !== false) {
             curl_setopt_array($curl, $options);
             $result = curl_exec($curl);
-            curl_close($curl);
         }
 
 
@@ -165,7 +164,7 @@ class Curl {
     /**
      * Parses the Url adding the Params
      * @param string                   $url
-     * @param array<string,mixed>|null $params
+     * @param array<string,mixed>|null $params Optional.
      * @return string
      */
     private static function parseUrl(string $url, ?array $params = null): string {
@@ -179,7 +178,7 @@ class Curl {
 
     /**
      * Parses the Params
-     * @param array<string,mixed>|null $params
+     * @param array<string,mixed>|null $params Optional.
      * @return string
      */
     private static function parseParams(?array $params = null): string {
@@ -252,7 +251,6 @@ class Curl {
 
         curl_setopt_array($curl, $options);
         curl_exec($curl);
-        curl_close($curl);
         fclose($file);
 
         $error = curl_error($curl);
@@ -296,13 +294,12 @@ class Curl {
         curl_setopt_array($curl, $options);
         curl_exec($curl);
         $output = curl_exec($curl);
-        curl_close($curl);
 
         // Return the Response
         if (!is_string($output)) {
             return [];
         }
-        $response = json_decode($output, associative: true);
+        $response = JSON::decode($output);
         return $response;
     }
 }

@@ -308,7 +308,7 @@ class AES {
 
     /**
      * Converts the Bytes to a String
-     * @param list<int> $bytes
+     * @param array<int,int> $bytes
      * @return string
      */
     public static function fromBytes(array $bytes): string {

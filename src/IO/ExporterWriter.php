@@ -15,7 +15,7 @@ interface ExporterWriter {
 
     /**
      * Writes a Line
-     * @param array{} $line
+     * @param array<string,float|int|string> $line
      * @return ExporterWriter
      */
     public function writeLine(array $line): ExporterWriter;

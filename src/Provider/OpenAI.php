@@ -62,8 +62,8 @@ class OpenAI {
 
     /**
      * Does a DELETE Request
-     * @param string       $route
-     * @param array{}|null $request Optional.
+     * @param string                   $route
+     * @param array<string,mixed>|null $request Optional.
      * @return Dictionary
      */
     private static function delete(string $route, ?array $request = null): Dictionary {
@@ -217,11 +217,11 @@ class OpenAI {
 
     /**
      * Creates a Completion and returns the Result
-     * @param string                              $model
-     * @param string                              $prompt
-     * @param array{role:string,content:string}[] $context          Optional.
-     * @param Dictionary|null                     $schema           Optional.
-     * @param bool                                $removeReferences Optional.
+     * @param string                                  $model
+     * @param string                                  $prompt
+     * @param list<array{role:string,content:string}> $context          Optional.
+     * @param Dictionary|null                         $schema           Optional.
+     * @param bool                                    $removeReferences Optional.
      * @return OpenAIOutput
      */
     public static function createCompletion(
@@ -280,14 +280,14 @@ class OpenAI {
 
     /**
      * Creates a Response and returns the Result
-     * @param string                              $model
-     * @param string                              $prompt
-     * @param array{role:string,content:string}[] $context          Optional.
-     * @param Dictionary|null                     $schema           Optional.
-     * @param string                              $vectorStoreID    Optional.
-     * @param bool                                $allowWebSearch   Optional.
-     * @param string                              $allowedDomain    Optional.
-     * @param bool                                $removeReferences Optional.
+     * @param string                                  $model
+     * @param string                                  $prompt
+     * @param list<array{role:string,content:string}> $context          Optional.
+     * @param Dictionary|null                         $schema           Optional.
+     * @param string                                  $vectorStoreID    Optional.
+     * @param bool                                    $allowWebSearch   Optional.
+     * @param string                                  $allowedDomain    Optional.
+     * @param bool                                    $removeReferences Optional.
      * @return OpenAIOutput
      */
     public static function createResponse(

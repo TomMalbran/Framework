@@ -25,6 +25,14 @@ enum {{columnClass}}: string implements Enum, JsonSerializable {
 
 
     /**
+     * Get the name of the column
+     * @return string
+     */
+    public function name(): string {
+        return $this->value;
+    }
+
+    /**
      * Get the key of the column
      * @return string
      */
