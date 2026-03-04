@@ -66,7 +66,7 @@ class SchemaQuery {
      * @return Query
      */
     public function addExp(string $expression, int|string ...$values): Query {
-        return $this->query->addExp($expression, ...$values);
+        return $this->query->whereExp($expression, ...$values);
     }
 
 

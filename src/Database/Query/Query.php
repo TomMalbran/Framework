@@ -71,7 +71,7 @@ class Query {
     ): Query {
         $query = new Query();
         if ($column !== "" && $value !== null) {
-            $query->add($column, $operator, $value, $caseSensitive);
+            $query->where($column, $operator, $value, $caseSensitive);
         }
         return $query;
     }
@@ -82,7 +82,7 @@ class Query {
      * Returns the Prefix
      * @return string
      */
-    public function getPrefix(): string {
+    private function getWherePrefix(): string {
         $prefix = $this->addPrefix ? "{$this->prefix} " : "";
         if (!$this->addPrefix) {
             $this->addPrefix = true;
@@ -91,7 +91,7 @@ class Query {
     }
 
     /**
-     * Adds an expression as an and
+     * Adds a Where expression
      * @param string                      $column
      * @param QueryOperator|string        $operator
      * @param list<int|string>|int|string $value
@@ -99,7 +99,7 @@ class Query {
      * @param bool|null                   $condition     Optional.
      * @return Query
      */
-    public function add(
+    public function where(
         string $column,
         QueryOperator|string $operator,
         array|int|string $value,
@@ -110,7 +110,7 @@ class Query {
             return $this;
         }
 
-        $prefix   = $this->getPrefix();
+        $prefix   = $this->getWherePrefix();
         $suffix   = $caseSensitive ? "BINARY" : "";
         $operator = QueryOperator::fromValue($operator);
         $compare  = $operator->toString();
@@ -221,7 +221,7 @@ class Query {
     }
 
     /**
-     * Adds an expression as an and if the value is not empty
+     * Adds a Where expression if the value is not empty
      * @param string                           $column
      * @param QueryOperator|string             $operator
      * @param list<int|string>|int|string|null $value
@@ -229,7 +229,7 @@ class Query {
      * @param bool                             $caseSensitive Optional.
      * @return Query
      */
-    public function addIf(
+    public function whereIf(
         string $column,
         QueryOperator|string $operator,
         array|int|string|null $value,
@@ -237,21 +237,21 @@ class Query {
         bool $caseSensitive = false,
     ): Query {
         if ($condition === true && $value !== null) {
-            $this->add($column, $operator, $value, $caseSensitive);
+            $this->where($column, $operator, $value, $caseSensitive);
         } elseif ($condition === null && $value !== null && !Arrays::isEmpty($value)) {
-            $this->add($column, $operator, $value, $caseSensitive);
+            $this->where($column, $operator, $value, $caseSensitive);
         }
         return $this;
     }
 
     /**
-     * Adds an expression with a value
+     * Adds a Where expression with a value
      * @param string $expression
      * @param mixed  ...$values
      * @return Query
      */
-    public function addExp(string $expression, mixed ...$values): Query {
-        $prefix       = $this->getPrefix();
+    public function whereExp(string $expression, mixed ...$values): Query {
+        $prefix       = $this->getWherePrefix();
         $this->where .= "{$prefix}{$expression} ";
         $this->params = Arrays::mergeLists($this->params, Arrays::toList($values));
         return $this;
@@ -320,7 +320,7 @@ class Query {
                 $this->startOr();
             }
             foreach ($columns as $columnSearch) {
-                $this->add($columnSearch, $operator, $valuePart);
+                $this->where($columnSearch, $operator, $valuePart);
             }
             if ($multiCols) {
                 $this->endOr();
@@ -350,7 +350,7 @@ class Query {
      * @return Query
      */
     public function startParen(): Query {
-        $prefix          = $this->getPrefix();
+        $prefix          = $this->getWherePrefix();
         $this->where    .= "{$prefix}(";
         $this->addPrefix = false;
         return $this;
@@ -381,7 +381,7 @@ class Query {
      * @return Query
      */
     public function startAnd(): Query {
-        $prefix           = $this->getPrefix();
+        $prefix           = $this->getWherePrefix();
         $this->where     .= "{$prefix}(";
         $this->prefixes[] = $this->prefix;
         $this->prefix     = "AND";
@@ -412,7 +412,7 @@ class Query {
      * @return Query
      */
     public function startOr(): Query {
-        $prefix           = $this->getPrefix();
+        $prefix           = $this->getWherePrefix();
         $this->where     .= "{$prefix}(";
         $this->prefixes[] = $this->prefix;
         $this->prefix     = "OR";

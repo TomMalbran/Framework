@@ -18,7 +18,7 @@ class {{statusQueryClass}} extends BaseQuery {
      */
     public function equal({{statusClass}} ...$statuses): {{statusQueryClass}} {
         $values = {{statusClass}}::toNames(array_values($statuses));
-        $this->query->add($this->column, QueryOperator::Equal, $values);
+        $this->query->where($this->column, QueryOperator::Equal, $values);
         return $this;
     }
 
@@ -29,7 +29,7 @@ class {{statusQueryClass}} extends BaseQuery {
      */
     public function notEqual({{statusClass}} ...$statuses): {{statusQueryClass}} {
         $values = {{statusClass}}::toNames(array_values($statuses));
-        $this->query->add($this->column, QueryOperator::NotEqual, $values);
+        $this->query->where($this->column, QueryOperator::NotEqual, $values);
         return $this;
     }
 
@@ -40,7 +40,7 @@ class {{statusQueryClass}} extends BaseQuery {
      */
     public function in(array $statuses): {{statusQueryClass}} {
         $values = {{statusClass}}::toNames($statuses);
-        $this->query->add($this->column, QueryOperator::In, $values);
+        $this->query->where($this->column, QueryOperator::In, $values);
         return $this;
     }
 
@@ -51,7 +51,7 @@ class {{statusQueryClass}} extends BaseQuery {
      */
     public function notIn(array $statuses): {{statusQueryClass}} {
         $values = {{statusClass}}::toNames($statuses);
-        $this->query->add($this->column, QueryOperator::NotIn, $values);
+        $this->query->where($this->column, QueryOperator::NotIn, $values);
         return $this;
     }
 }

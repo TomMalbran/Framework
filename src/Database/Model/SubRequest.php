@@ -215,7 +215,7 @@ class SubRequest {
         }
 
         $query = new Query();
-        $query->add($this->idDbName, QueryOperator::In, $ids);
+        $query->where($this->idDbName, QueryOperator::In, $ids);
 
         if ($this->query !== "") {
             $queryParts = Strings::split($this->query, " ");
@@ -224,7 +224,7 @@ class SubRequest {
                 for ($i = 0; $i < $total; $i += 3) {
                     if (isset($queryParts[$i]) && isset($queryParts[$i + 1]) && isset($queryParts[$i + 2])) {
                         $operator = QueryOperator::fromValue($queryParts[$i + 1]);
-                        $query->add($queryParts[$i], $operator, $queryParts[$i + 2]);
+                        $query->where($queryParts[$i], $operator, $queryParts[$i + 2]);
                     }
                 }
             }
@@ -233,7 +233,7 @@ class SubRequest {
         if ($this->schemaModel !== null) {
             if ($this->schemaModel->canDelete) {
                 $isDeleted = $this->schemaModel->getKey("isDeleted");
-                $query->add($isDeleted, QueryOperator::Equal, 0);
+                $query->where($isDeleted, QueryOperator::Equal, 0);
             }
             if ($this->schemaModel->hasPositions) {
                 $query->orderBy($this->schemaModel->getKey("position"), isASC: true);

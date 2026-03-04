@@ -609,12 +609,12 @@ class Schema {
 
         $newQuery = self::generateQuery($query);
         if ($newPosition > $oldPosition) {
-            $newQuery->add("position", QueryOperator::GreaterThan, $oldPosition);
-            $newQuery->add("position", QueryOperator::LessOrEqual, $newPosition);
+            $newQuery->where("position", QueryOperator::GreaterThan, $oldPosition);
+            $newQuery->where("position", QueryOperator::LessOrEqual, $newPosition);
             $assign = Assign::decrease(1);
         } else {
-            $newQuery->add("position", QueryOperator::GreaterOrEqual, $newPosition);
-            $newQuery->add("position", QueryOperator::LessThan, $oldPosition);
+            $newQuery->where("position", QueryOperator::GreaterOrEqual, $newPosition);
+            $newQuery->where("position", QueryOperator::LessThan, $oldPosition);
             $assign = Assign::increase(1);
         }
 
@@ -664,8 +664,8 @@ class Schema {
         $updated = false;
         if ($newValue !== 0 && $oldValue === 0) {
             $newQuery = new Query($query);
-            $newQuery->add(static::$idDbName, QueryOperator::NotEqual, $id);
-            $newQuery->add($column, QueryOperator::Equal, 1);
+            $newQuery->where(static::$idDbName, QueryOperator::NotEqual, $id);
+            $newQuery->where($column, QueryOperator::Equal, 1);
             self::editSchemaEntity($newQuery, null, [ $column => 0 ]);
             $updated = true;
         }
@@ -726,7 +726,7 @@ class Schema {
         $isDeleted = static::getModel()->getKey("isDeleted");
 
         if ($withDeleted && static::$canDelete && !$query->hasColumn($isDeleted) && !$query->hasColumn("isDeleted")) {
-            $query->add($isDeleted, QueryOperator::Equal, 0);
+            $query->where($isDeleted, QueryOperator::Equal, 0);
         }
         return $query;
     }

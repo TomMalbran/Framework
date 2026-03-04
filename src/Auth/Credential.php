@@ -47,7 +47,7 @@ class Credential extends CredentialSchema {
         if (!Arrays::isEmpty($filter)) {
             $filters = Arrays::toStrings($filter);
             foreach ($filters as $key) {
-                $query->query->add($key, QueryOperator::Equal, $value);
+                $query->query->where($key, QueryOperator::Equal, $value);
             }
         }
         return $query;

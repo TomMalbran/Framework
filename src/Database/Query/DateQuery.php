@@ -21,7 +21,7 @@ class DateQuery extends BaseQuery {
      */
     public function compare(QueryOperator $operator, Date $date, ?bool $condition = null): void {
         if (!$date->isEmpty()) {
-            $this->query->add(
+            $this->query->where(
                 $this->column,
                 $operator,
                 $date->toTime(),
@@ -38,7 +38,7 @@ class DateQuery extends BaseQuery {
      * @return void
      */
     public function compareIf(QueryOperator $operator, Date $date, ?bool $condition = null): void {
-        $this->query->addIf(
+        $this->query->whereIf(
             $this->column,
             $operator,
             $date->toTime(),
@@ -53,7 +53,7 @@ class DateQuery extends BaseQuery {
      * @return void
      */
     public function isEmpty(): void {
-        $this->query->add($this->column, QueryOperator::Equal, 0);
+        $this->query->where($this->column, QueryOperator::Equal, 0);
     }
 
     /**
@@ -61,7 +61,7 @@ class DateQuery extends BaseQuery {
      * @return void
      */
     public function isNotEmpty(): void {
-        $this->query->add($this->column, QueryOperator::NotEqual, 0);
+        $this->query->where($this->column, QueryOperator::NotEqual, 0);
     }
 
     /**

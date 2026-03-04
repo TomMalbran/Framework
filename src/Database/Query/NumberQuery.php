@@ -17,7 +17,7 @@ class NumberQuery extends BaseQuery {
      * @return void
      */
     public function compare(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
-        $this->query->add(
+        $this->query->where(
             column:    $this->column,
             operator:  $operator,
             value:     $value,
@@ -33,7 +33,7 @@ class NumberQuery extends BaseQuery {
      * @return void
      */
     public function compareIf(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
-        $this->query->addIf(
+        $this->query->whereIf(
             column:    $this->column,
             operator:  $operator,
             value:     $value,

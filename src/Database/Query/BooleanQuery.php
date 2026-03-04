@@ -16,7 +16,7 @@ class BooleanQuery extends BaseQuery {
      * @return void
      */
     public function equal(bool $value, ?bool $condition = null): void {
-        $this->query->add(
+        $this->query->where(
             $this->column,
             QueryOperator::Equal,
             (int)$value,
@@ -31,7 +31,7 @@ class BooleanQuery extends BaseQuery {
      * @return void
      */
     public function isAny(): void {
-        $this->query->add($this->column, QueryOperator::GreaterOrEqual, 0);
+        $this->query->where($this->column, QueryOperator::GreaterOrEqual, 0);
     }
 
     /**

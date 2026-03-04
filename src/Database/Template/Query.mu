@@ -55,7 +55,7 @@ class {{queryClass}} extends SchemaQuery {
         ?bool $condition = null,
     ): {{queryClass}} {
         if ($column !== {{columnClass}}::None) {
-            $this->query->add($column->name(), $operator, $value, $caseSensitive, $condition);
+            $this->query->where($column->name(), $operator, $value, $caseSensitive, $condition);
         }
         return $this;
     }
@@ -95,7 +95,7 @@ class {{queryClass}} extends SchemaQuery {
      */
     public function exists(SchemaQuery $subQuery): {{queryClass}} {
         $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
-        $this->query->addExp("EXISTS (
+        $this->query->whereExp("EXISTS (
             SELECT 1 FROM {$subQuery->tableName}
             " . $subQuery->query->get() . "
         )", ...$subQuery->query->params);
@@ -109,7 +109,7 @@ class {{queryClass}} extends SchemaQuery {
      */
     public function notExists(SchemaQuery $subQuery): {{queryClass}} {
         $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
-        $this->query->addExp("NOT EXISTS (
+        $this->query->whereExp("NOT EXISTS (
             SELECT 1 FROM {$subQuery->tableName}
             " . $subQuery->query->get() . "
         )", ...$subQuery->query->params);

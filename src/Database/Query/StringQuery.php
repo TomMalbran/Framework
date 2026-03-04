@@ -53,7 +53,7 @@ class StringQuery extends BaseQuery {
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): Query {
-        return $this->query->add(
+        return $this->query->where(
             $this->column,
             $operator,
             $value,
@@ -76,7 +76,7 @@ class StringQuery extends BaseQuery {
         ?bool $condition = null,
         bool $caseSensitive = false,
     ): Query {
-        return $this->query->addIf(
+        return $this->query->whereIf(
             $this->column,
             $operator,
             $value,
