@@ -966,6 +966,15 @@ class Strings {
     }
 
     /**
+     * Decodes the HTML entities in the given string
+     * @param string $string
+     * @return string
+     */
+    public static function decodeHtml(string $string): string {
+        return html_entity_decode($string, ENT_QUOTES | ENT_HTML5);
+    }
+
+    /**
      * Returns a short version of the given string
      * @param string $string
      * @param int    $length Optional.
