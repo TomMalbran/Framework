@@ -12,13 +12,13 @@ use PhpParser\Node\Stmt\Function_;
 use PhpParser\Node\Stmt\Property;
 
 /**
- * The Prefer List Type Rule
+ * The Disallow Empty Array Rule
  * @implements Rule<Node>
  */
-class PreferListTypeRule implements Rule {
+class DisallowEmptyArrayRule implements Rule {
 
     /**
-     * Creates a new Prefer List Type Rule
+     * Create a new Disallow Empty Array Rule
      * @param bool $enabled Optional.
      */
     public function __construct(
@@ -63,28 +63,20 @@ class PreferListTypeRule implements Rule {
         $startLine = $docComment->getStartLine();
         $errors    = [];
 
-        // Matches @var, @param, or @return followed by Type[]
-        $regExp = '/(@(?:var|param|return)\s+)([a-zA-Z0-9_\|\\\{}<>,:]+)\[\]/';
-        $match  = preg_match_all($regExp, $text, $matches, PREG_OFFSET_CAPTURE);
-        if ($match === false || $match === 0) {
-            return [];
-        }
+        // Match all occurrences of 'array{}' in the doc comment
+        preg_match_all("/array\{\}/m", $text, $matches, PREG_OFFSET_CAPTURE);
 
-        // Iterate over matches and create errors
-        foreach ($matches[0] as $index => $fullMatch) {
-            if (!isset($matches[2][$index])) {
-                continue;
-            }
-            $type   = $matches[2][$index][0];
-            $offset = $fullMatch[1];
-
-            // Calculate the specific line within the docblock
+        foreach ($matches[0] as $match) {
+            $offset           = $match[1];
             $linesBeforeMatch = substr_count(substr($text, 0, $offset), "\n");
             $errorLine        = $startLine + $linesBeforeMatch;
 
-            $errors[] = RuleErrorBuilder::message("Use 'list<{$type}>' instead of '{$type}[]'.")
+            $errors[] = RuleErrorBuilder::message(
+                "Empty array shapes 'array{}' are disallowed." .
+                "Use a specific type like 'array<mixed, mixed>' instead."
+            )
                 ->line($errorLine)
-                ->identifier("framework.preferListType")
+                ->identifier("framework.disallowEmptyArray")
                 ->build();
         }
 

@@ -20,6 +20,15 @@ use PhpParser\Node\Expr\ConstFetch;
 class RequireNamedBoolArgRule implements Rule {
 
     /**
+     * Creates a new Require Named Bool Arg Rule
+     * @param bool $enabled Optional.
+     */
+    public function __construct(
+        private bool $enabled = false,
+    ) {
+    }
+
+    /**
      * Returns the type of node this rule is interested in
      * @return class-string<CallLike>
      */
@@ -36,6 +45,10 @@ class RequireNamedBoolArgRule implements Rule {
      */
     #[\Override]
     public function processNode(Node $node, Scope $scope): array {
+        if (!$this->enabled) {
+            return [];
+        }
+
         // Only process method, static, or function calls
         if (!$node instanceof MethodCall &&
             !$node instanceof StaticCall &&
@@ -69,7 +82,7 @@ class RequireNamedBoolArgRule implements Rule {
                 "(e.g., paramName: $constName).",
             )
                 ->line($arg->getLine())
-                ->identifier("framework.boolarg.named")
+                ->identifier("framework.requireNamedBool")
                 ->build();
         }
 

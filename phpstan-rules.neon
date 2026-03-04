@@ -1,14 +1,101 @@
 rules:
-    - Framework\Analysis\General\PreferListTypeRule
-    - Framework\Analysis\General\RequireNamedBoolArgRule
     - Framework\Analysis\Model\ModelIdFieldRule
     - Framework\Analysis\Model\ModelEnumRule
     - Framework\Analysis\Route\RouteMethodNameRule
     - Framework\Analysis\Route\RouteReturnTypeRule
     - Framework\Analysis\Route\RouteDuplicateRule
+    - Framework\Analysis\Signal\ListenerReturnVoidRule
 
 services:
     -
         class: Framework\Analysis\Route\RoutePathCollector
         tags:
             - phpstan.collector
+    -
+        class: Framework\Analysis\General\DisallowEmptyArrayRule
+        arguments:
+            enabled: %framework.disallowEmptyArray%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\DisallowEnumNameValueRule
+        arguments:
+            enabled: %framework.disallowEnumNameValue%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\EnumSwitchExhaustiveRule
+        arguments:
+            enabled: %framework.enumSwitchExhaustive%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\MethodReturnNotNeededRule
+        arguments:
+            enabled: %framework.methodReturnNotNeeded%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\PreferListTypeRule
+        arguments:
+            enabled: %framework.preferListType%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\PreferMatchOverSwitchRule
+        arguments:
+            enabled: %framework.preferMatchOverSwitch%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\PrivateMethodReturnUnusedRule
+        arguments:
+            enabled: %framework.privateMethodReturnUnused%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\RequireNamedBoolArgRule
+        arguments:
+            enabled: %framework.requireNamedBoolArg%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\RequireOptionalCommentRule
+        arguments:
+            enabled: %framework.requireOptionalComment%
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Framework\Analysis\General\RequireReturnTypeRule
+        arguments:
+            enabled: %framework.requireReturnType%
+        tags:
+            - phpstan.rules.rule
+
+
+parameters:
+    framework:
+        disallowEmptyArray: false
+        disallowEnumNameValue: false
+        enumSwitchExhaustive: false
+        methodReturnNotNeeded: false
+        preferListType: false
+        preferMatchOverSwitch: false
+        privateMethodReturnUnused: false
+        requireNamedBoolArg: false
+        requireOptionalComment: false
+        requireReturnType: false
+
+parametersSchema:
+    framework: structure([
+        disallowEnumNameValue: bool()
+        disallowEmptyArray: bool()
+        enumSwitchExhaustive: bool()
+        methodReturnNotNeeded: bool()
+        preferListType: bool()
+        preferMatchOverSwitch: bool()
+        privateMethodReturnUnused: bool()
+        requireNamedBoolArg: bool()
+        requireOptionalComment: bool()
+        requireReturnType: bool()
+    ])

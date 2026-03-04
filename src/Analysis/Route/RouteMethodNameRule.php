@@ -1,6 +1,9 @@
 <?php
 namespace Framework\Analysis\Route;
 
+use Framework\Discovery\Route;
+use Framework\Utils\Strings;
+
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -8,8 +11,6 @@ use PHPStan\Rules\IdentifierRuleError;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
-use Framework\Discovery\Route;
-use Framework\Utils\Strings;
 
 /**
  * The Route Method Name Rule
@@ -77,7 +78,7 @@ class RouteMethodNameRule implements Rule {
         return [
             RuleErrorBuilder::message("Method {$method} must match the route '{$routeMethod}'.")
                 ->line($node->getStartLine())
-                ->identifier("framework.route.name")
+                ->identifier("framework.routeName")
                 ->build()
         ];
     }

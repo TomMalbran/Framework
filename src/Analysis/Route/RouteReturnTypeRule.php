@@ -75,7 +75,7 @@ class RouteReturnTypeRule implements Rule {
             return [
                 RuleErrorBuilder::message("Method {$method} must return a Response since is a Route.")
                     ->line($node->getStartLine())
-                    ->identifier("framework.route.return")
+                    ->identifier("framework.routeReturn")
                     ->build()
             ];
         }

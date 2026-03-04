@@ -47,7 +47,7 @@ class RouteDuplicateRule implements Rule {
                     $errors[] = RuleErrorBuilder::message($message)
                         ->file($file)
                         ->line($line)
-                        ->identifier("framework.route.duplicate")
+                        ->identifier("framework.routeDuplicate")
                         ->build();
                 }
                 $paths[$path] = $method;

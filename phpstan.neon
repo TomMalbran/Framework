@@ -44,6 +44,20 @@ parameters:
         strictArrayFilter: true
         illegalConstructorMethodCall: true
 
+    # Framework Rules
+    framework:
+        disallowEmptyArray: true
+        disallowEnumNameValue: true
+        enumSwitchExhaustive: true
+        methodReturnNotNeeded: true
+        preferListType: true
+        preferMatchOverSwitch: true
+        privateMethodReturnUnused: true
+        requireNamedBoolArg: true
+        requireOptionalComment: true
+        requireReturnType: true
+
+    # Ignore Errors
     ignoreErrors:
         -
             identifier: offsetAccess.notFound
