@@ -47,6 +47,15 @@ class JSON {
     }
 
     /**
+     * Decodes a String without checks
+     * @param string $value
+     * @return mixed
+     */
+    public static function decode(string $value): mixed {
+        return json_decode($value, associative: true);
+    }
+
+    /**
      * Decodes a String if it is not already decoded
      * @param mixed $value
      * @return array<int|string,mixed>
@@ -55,7 +64,7 @@ class JSON {
         if (!is_string($value) || !self::isValid($value)) {
             return is_array($value) ? $value : [];
         }
-        return (array)json_decode($value, associative: true);
+        return (array)self::decode($value);
     }
 
     /**
