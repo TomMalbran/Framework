@@ -128,33 +128,35 @@ class Strings {
 
     /**
      * Returns true if the given String contains any of the given Needles
-     * @param string $string
-     * @param string ...$needles
+     * @param string              $string
+     * @param list<string>|string $needle
+     * @param bool                $caseInsensitive Optional.
+     * @param bool                $atLeastOne      Optional.
      * @return bool
      */
-    public static function contains(string $string, string ...$needles): bool {
-        foreach ($needles as $needle) {
-            if (str_contains($string, $needle)) {
-                return true;
-            }
+    public static function contains(
+        string $string,
+        array|string $needle,
+        bool $caseInsensitive = false,
+        bool $atLeastOne = true,
+    ): bool {
+        $needles = is_array($needle) ? $needle : [ $needle ];
+        if ($caseInsensitive) {
+            $string  = strtolower($string);
+            $needles = array_map("strtolower", $needles);
         }
-        return false;
-    }
 
-    /**
-     * Returns true if the given String contains any of the given Needles as Case Insensitive
-     * @param string $string
-     * @param string ...$needles
-     * @return bool
-     */
-    public static function containsCaseInsensitive(string $string, string ...$needles): bool {
-        $string = strtolower($string);
-        foreach ($needles as $needle) {
-            if (str_contains($string, strtolower($needle))) {
-                return true;
+        $count = 0;
+        foreach ($needles as $value) {
+            if (str_contains($string, $value)) {
+                $count += 1;
             }
         }
-        return false;
+
+        if ($atLeastOne) {
+            return $count > 0;
+        }
+        return $count === count($needles);
     }
 
     /**

@@ -111,7 +111,7 @@ class DateUtils {
      * Returns true if the given hours are a valid period
      * @param string $fromHour
      * @param string $toHour
-     * @param bool   $allow24
+     * @param bool   $allow24  Optional.
      * @return bool
      */
     public static function isValidHourPeriod(string $fromHour, string $toHour, bool $allow24 = false): bool {
@@ -387,7 +387,8 @@ class DateUtils {
 
         $monthNames = NLS::getList("DATE_TIME_MONTHS", $language);
         foreach ($monthNames as $index => $monthName) {
-            if (Strings::containsCaseInsensitive($text, $monthName, Strings::substring($monthName, 0, 3))) {
+            $needles = [ $monthName, Strings::substring($monthName, 0, 3) ];
+            if (Strings::contains($text, $needles, caseInsensitive: true, atLeastOne: true)) {
                 $month = $index + 1;
                 break;
             }

@@ -103,7 +103,7 @@ class Discovery {
         // Filter the Classes that have all their dependencies available
         foreach ($classPaths as $className => $filePath) {
             // Skip some ignored directories
-            if (Strings::contains($filePath, "/Schema/", "/System/")) {
+            if (Strings::contains($filePath, [ "/Schema/", "/System/" ])) {
                 continue;
             }
 
