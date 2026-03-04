@@ -39,7 +39,16 @@ class BooleanQuery extends BaseQuery {
      * @return void
      */
     public function isTrue(): void {
-        $this->query->add($this->column, QueryOperator::Equal, 1);
+        $this->equal(value: true);
+    }
+
+    /**
+     * Generates a True Query
+     * @param bool|null $condition Optional.
+     * @return void
+     */
+    public function equalTrueIf(?bool $condition = null): void {
+        $this->equal(value: true, condition: $condition);
     }
 
     /**
@@ -47,6 +56,15 @@ class BooleanQuery extends BaseQuery {
      * @return void
      */
     public function isFalse(): void {
-        $this->query->add($this->column, QueryOperator::Equal, 0);
+        $this->equal(value: false);
+    }
+
+    /**
+     * Generates a False If Query
+     * @param bool|null $condition Optional.
+     * @return void
+     */
+    public function equalFalseIf(?bool $condition = null): void {
+        $this->equal(value: false, condition: $condition);
     }
 }
