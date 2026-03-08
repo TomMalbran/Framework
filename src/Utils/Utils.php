@@ -59,10 +59,15 @@ class Utils {
      * Parses a Full Name into a First and Last Name
      * @param string $fullName
      * @param bool   $lastNameFirst Optional.
+     * @param string $separator     Optional.
      * @return array{string,string}
      */
-    public static function parseName(string $fullName, bool $lastNameFirst = false): array {
-        $nameParts = Strings::split(trim($fullName), " ");
+    public static function parseName(
+        string $fullName,
+        bool $lastNameFirst = false,
+        string $separator = " ",
+    ): array {
+        $nameParts = Strings::split($fullName, $separator, trim: true);
         if (count($nameParts) > 1) {
             if ($lastNameFirst) {
                 $lastName = array_shift($nameParts);
@@ -370,7 +375,7 @@ class Utils {
 
 
     /**
-     * Returns true if is a valid Url
+     * Returns true if is a valid URL
      * @param string $url
      * @return bool
      */
@@ -379,7 +384,7 @@ class Utils {
     }
 
     /**
-     * Encodes the given Url
+     * Encodes the given URL
      * @param string $url
      * @return string
      */
@@ -391,7 +396,44 @@ class Utils {
     }
 
     /**
-     * Returns an Avatar url
+     * Adds Params to a URL
+     * @param string                   $url
+     * @param array<string,mixed>|null $params Optional.
+     * @return string
+     */
+    public static function addParamsToUrl(string $url, ?array $params = null): string {
+        $parsedParams = self::parseUrlParams($params);
+        if ($parsedParams !== "") {
+            $prefix = Strings::contains($url, "?") ? "&" : "?";
+            $url   .= $prefix . $parsedParams;
+        }
+        return $url;
+    }
+
+    /**
+     * Parses the URL Params
+     * @param array<string,mixed>|null $params Optional.
+     * @return string
+     */
+    public static function parseUrlParams(?array $params = null): string {
+        if ($params === null || count($params) === 0) {
+            return "";
+        }
+
+        $content = [];
+        foreach ($params as $key => $value) {
+            if (is_array($value)) {
+                $content[] = "$key=" . urlencode(JSON::encode($value));
+            } elseif ($value !== null) {
+                $content[] = "$key=" . urlencode(Strings::toString($value));
+            }
+        }
+
+        return Strings::join($content, "&");
+    }
+
+    /**
+     * Returns an Avatar URL
      * @param string $url
      * @param string $email
      * @return string
@@ -405,7 +447,7 @@ class Utils {
     }
 
     /**
-     * Returns a WhatsApp url
+     * Returns a WhatsApp URL
      * @param string $whatsApp
      * @return string
      */

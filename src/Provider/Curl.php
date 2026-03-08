@@ -7,6 +7,7 @@ use Framework\Provider\Type\CurlMethod;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
+use Framework\Utils\Utils;
 
 /**
  * The Curl Utils
@@ -61,7 +62,7 @@ class Curl {
 
         // GET Requests
         if (!$isCustom && $method === CurlMethod::GET) {
-            $options[CURLOPT_URL]      = self::parseUrl($url, $params);
+            $options[CURLOPT_URL]      = Utils::addParamsToUrl($url, $params);
             $options[CURLOPT_ENCODING] = "identity";
 
         // POST Requests
@@ -73,7 +74,7 @@ class Curl {
             if ($jsonBody) {
                 $body = JSON::encode($params);
             } elseif ($urlBody) {
-                $body = self::parseParams($params);
+                $body = Utils::parseUrlParams($params);
             }
 
             if (!Arrays::isEmpty($body)) {
@@ -92,7 +93,7 @@ class Curl {
                 $options[CURLOPT_URL]        = $url;
                 $options[CURLOPT_POSTFIELDS] = JSON::encode($params);
             } else {
-                $options[CURLOPT_URL] = self::parseUrl($url, $params);
+                $options[CURLOPT_URL] = Utils::addParamsToUrl($url, $params);
             }
         }
 
@@ -159,43 +160,6 @@ class Curl {
             return [ "response" => $response, "headers" => $headers ];
         }
         return $response;
-    }
-
-    /**
-     * Parses the Url adding the Params
-     * @param string                   $url
-     * @param array<string,mixed>|null $params Optional.
-     * @return string
-     */
-    private static function parseUrl(string $url, ?array $params = null): string {
-        $content = self::parseParams($params);
-        $prefix  = Strings::contains($url, "?") ? "&" : "?";
-        if ($content !== "") {
-            $url .= $prefix . $content;
-        }
-        return $url;
-    }
-
-    /**
-     * Parses the Params
-     * @param array<string,mixed>|null $params Optional.
-     * @return string
-     */
-    private static function parseParams(?array $params = null): string {
-        if ($params === null || count($params) === 0) {
-            return "";
-        }
-
-        $content = [];
-        foreach ($params as $key => $value) {
-            if (is_array($value)) {
-                $content[] = "$key=" . urlencode(JSON::encode($value));
-            } elseif ($value !== null) {
-                $content[] = "$key=" . urlencode(Strings::toString($value));
-            }
-        }
-
-        return Strings::join($content, "&");
     }
 
     /**
