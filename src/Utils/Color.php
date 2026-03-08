@@ -12,7 +12,9 @@ use JsonSerializable;
 enum Color: string implements Enum, JsonSerializable {
     use IsEnum;
 
-    case None         = "#f2f2f2";
+    case None         = "";
+
+    case White        = "#f2f2f2";
     case Red          = "#e8384f";
     case Orange       = "#fd612c";
     case YellowOrange = "#fd9a00";
@@ -37,6 +39,9 @@ enum Color: string implements Enum, JsonSerializable {
      * @return bool
      */
     public static function isValid(string $value): bool {
+        if ($value === "") {
+            return false;
+        }
         foreach (self::cases() as $case) {
             if ($case->value === $value) {
                 return true;
@@ -51,7 +56,7 @@ enum Color: string implements Enum, JsonSerializable {
      */
     public static function getValues(): array {
         $list = [];
-        foreach (self::cases() as $case) {
+        foreach (self::getAll() as $case) {
             $list[] = $case->value;
         }
         return $list;
