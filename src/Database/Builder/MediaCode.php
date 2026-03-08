@@ -18,7 +18,7 @@ class MediaCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $schemaModels = SchemaFactory::buildData(forFramework: true);
+        $schemaModels = SchemaFactory::getData();
 
         $fields     = [];
         $hasReplace = false;

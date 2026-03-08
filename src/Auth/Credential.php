@@ -2,7 +2,7 @@
 namespace Framework\Auth;
 
 use Framework\Request;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Operator;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialColumn;
@@ -47,7 +47,7 @@ class Credential extends CredentialSchema {
         if (!Arrays::isEmpty($filter)) {
             $filters = Arrays::toStrings($filter);
             foreach ($filters as $key) {
-                $query->query->where($key, QueryOperator::Equal, $value);
+                $query->query->where($key, Operator::Equal, $value);
             }
         }
         return $query;
@@ -153,7 +153,7 @@ class Credential extends CredentialSchema {
         int $skipID = 0,
     ): bool {
         $query = new CredentialQuery();
-        $query->add($column, QueryOperator::Equal, $value);
+        $query->where($column, Operator::Equal, $value);
         $query->credentialID->notEqualIf($skipID);
         return self::entityExists($query);
     }
