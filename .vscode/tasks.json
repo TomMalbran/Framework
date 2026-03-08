@@ -41,6 +41,11 @@
             "label": "Frame: Build the code",
             "type": "shell",
             "command": "./framework build"
+        },
+        {
+            "label": "Frame: Test the code",
+            "type": "shell",
+            "command": "./framework test"
         }
     ]
 }
