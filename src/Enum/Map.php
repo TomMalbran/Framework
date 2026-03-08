@@ -135,6 +135,10 @@ class Map implements Countable, IteratorAggregate, JsonSerializable {
      */
     #[\Override]
     public function jsonSerialize(): mixed {
-        return $this->data;
+        $result = [];
+        foreach ($this->data as $enumKey) {
+            $result[$enumKey->toString()] = $this->data->offsetGet($enumKey);
+        }
+        return $result;
     }
 }
