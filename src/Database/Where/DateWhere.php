@@ -1,25 +1,25 @@
 <?php
-namespace Framework\Database\Query;
+namespace Framework\Database\Where;
 
 use Framework\Request;
-use Framework\Database\Query\BaseQuery;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Operator;
+use Framework\Database\Where\BaseWhere;
 use Framework\Date\Date;
 use Framework\Date\Period;
 
 /**
- * The Date Query
+ * The Date Where
  */
-class DateQuery extends BaseQuery {
+class DateWhere extends BaseWhere {
 
     /**
-     * Generates a Compare Query
-     * @param QueryOperator $operator
-     * @param Date          $date
-     * @param bool|null     $condition Optional.
+     * Adds a Compare condition
+     * @param Operator  $operator
+     * @param Date      $date
+     * @param bool|null $condition Optional.
      * @return void
      */
-    public function compare(QueryOperator $operator, Date $date, ?bool $condition = null): void {
+    public function compare(Operator $operator, Date $date, ?bool $condition = null): void {
         if (!$date->isEmpty()) {
             $this->query->where(
                 $this->column,
@@ -31,13 +31,13 @@ class DateQuery extends BaseQuery {
     }
 
     /**
-     * Generates a Compare If Query
-     * @param QueryOperator $operator
-     * @param Date          $date
-     * @param bool|null     $condition Optional.
+     * Adds a Compare If condition
+     * @param Operator  $operator
+     * @param Date      $date
+     * @param bool|null $condition Optional.
      * @return void
      */
-    public function compareIf(QueryOperator $operator, Date $date, ?bool $condition = null): void {
+    public function compareIf(Operator $operator, Date $date, ?bool $condition = null): void {
         $this->query->whereIf(
             $this->column,
             $operator,
@@ -49,105 +49,105 @@ class DateQuery extends BaseQuery {
 
 
     /**
-     * Generates an Is Empty Query
+     * Adds an Is Empty condition
      * @return void
      */
     public function isEmpty(): void {
-        $this->query->where($this->column, QueryOperator::Equal, 0);
+        $this->query->where($this->column, Operator::Equal, 0);
     }
 
     /**
-     * Generates an Is Not Empty Query
+     * Adds an Is Not Empty condition
      * @return void
      */
     public function isNotEmpty(): void {
-        $this->query->where($this->column, QueryOperator::NotEqual, 0);
+        $this->query->where($this->column, Operator::NotEqual, 0);
     }
 
     /**
-     * Generates an Equal Query
+     * Adds an Equal condition
      * @param Date $date
      * @return void
      */
     public function equal(Date $date): void {
-        $this->compare(QueryOperator::Equal, $date);
+        $this->compare(Operator::Equal, $date);
     }
 
     /**
-     * Generates an Equal If Query
+     * Adds an Equal If condition
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function equalIf(Date $date, ?bool $condition = null): void {
-        $this->compareIf(QueryOperator::Equal, $date, $condition);
+        $this->compareIf(Operator::Equal, $date, $condition);
     }
 
     /**
-     * Generates a Not Equal Query
+     * Adds a Not Equal condition
      * @param Date $date
      * @return void
      */
     public function notEqual(Date $date): void {
-        $this->compare(QueryOperator::NotEqual, $date);
+        $this->compare(Operator::NotEqual, $date);
     }
 
     /**
-     * Generates a Not Equal If Query
+     * Adds a Not Equal If condition
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function notEqualIf(Date $date, ?bool $condition = null): void {
-        $this->compareIf(QueryOperator::NotEqual, $date, $condition);
+        $this->compareIf(Operator::NotEqual, $date, $condition);
     }
 
 
 
     /**
-     * Generates a Greater Than Query
+     * Adds a Greater Than condition
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function greaterThan(Date $date, ?bool $condition = null): void {
-        $this->compare(QueryOperator::GreaterThan, $date, $condition);
+        $this->compare(Operator::GreaterThan, $date, $condition);
     }
 
     /**
-     * Generates a Greater or Equal Query
+     * Adds a Greater or Equal condition
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function greaterOrEqual(Date $date, ?bool $condition = null): void {
-        $this->compare(QueryOperator::GreaterOrEqual, $date, $condition);
+        $this->compare(Operator::GreaterOrEqual, $date, $condition);
     }
 
     /**
-     * Generates a Less Than Query
+     * Adds a Less Than condition
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function lessThan(Date $date, ?bool $condition = null): void {
-        $this->compare(QueryOperator::LessThan, $date, $condition);
+        $this->compare(Operator::LessThan, $date, $condition);
     }
 
     /**
-     * Generates a Less or Equal Query
+     * Adds a Less or Equal condition
      * @param Date      $date
      * @param bool|null $condition Optional.
      * @return void
      */
     public function lessOrEqual(Date $date, ?bool $condition = null): void {
-        $this->compare(QueryOperator::LessOrEqual, $date, $condition);
+        $this->compare(Operator::LessOrEqual, $date, $condition);
     }
 
 
 
     /**
-     * Uses the Period to add a Between expression
+     * Uses the Period to add a Between condition
      * @param Period|Request $period
      * @param string         $prefix Optional.
      * @return void

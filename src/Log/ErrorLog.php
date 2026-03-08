@@ -4,7 +4,7 @@ namespace Framework\Log;
 use Framework\Application;
 use Framework\Request;
 use Framework\Discovery\Package;
-use Framework\Database\Type\Assign;
+use Framework\Database\Query\Assign;
 use Framework\Log\Schema\LogErrorSchema;
 use Framework\Log\Schema\LogErrorColumn;
 use Framework\Log\Schema\LogErrorQuery;

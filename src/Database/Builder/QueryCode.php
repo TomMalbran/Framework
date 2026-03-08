@@ -77,7 +77,7 @@ class QueryCode {
         }
 
         foreach ($list as $property) {
-            $property["type"] = self::getQueryType($property["fieldType"], $property["status"]);
+            $property["type"] = self::getWhereType($property["fieldType"], $property["status"]);
             if ($property["type"] !== "") {
                 $nameLength = max($nameLength, Strings::length($property["name"]));
                 $result[]   = $property;
@@ -99,7 +99,7 @@ class QueryCode {
         $result = [];
         foreach ($schemaModel->fields as $field) {
             if ($field->isStatus) {
-                $queryName = "{$schemaModel->statusClass}Query";
+                $queryName = "{$schemaModel->statusClass}Where";
                 $result["{$schemaModel->namespace}\\$queryName"] = 1;
             }
         }
@@ -107,7 +107,7 @@ class QueryCode {
         foreach ($schemaModel->relations as $relation) {
             foreach ($relation->fields as $field) {
                 if ($field->isStatus && $relation->relationModel !== null) {
-                    $queryName = "{$relation->relationModelName}StatusQuery";
+                    $queryName = "{$relation->relationModelName}StatusWhere";
                     $result["{$relation->relationModel->namespace}\\$queryName"] = 1;
                 }
             }
@@ -125,7 +125,7 @@ class QueryCode {
         $result = [];
         foreach ($properties as $property) {
             $type = Strings::toString($property["type"] ?? "");
-            if ($type !== "Query" && !Strings::endsWith($type, "StatusQuery") &&
+            if ($type !== "Query" && !Strings::endsWith($type, "StatusWhere") &&
                 !Arrays::contains($result, $type)
             ) {
                 $result[] = $type;
@@ -136,31 +136,31 @@ class QueryCode {
 
 
     /**
-     * Returns the Query Type for a Field Type
+     * Returns the Where Type for a Field Type
      * @param FieldType $type
      * @param string    $status
      * @return string
      */
-    private static function getQueryType(FieldType $type, string $status): string {
+    private static function getWhereType(FieldType $type, string $status): string {
         if ($status !== "") {
-            return "{$status}Query";
+            return "{$status}Where";
         }
         return match ($type) {
-            FieldType::Date    => "DateQuery",
-            FieldType::Enum    => "EnumQuery",
+            FieldType::Date    => "DateWhere",
+            FieldType::Enum    => "EnumWhere",
             FieldType::JSON,
-            FieldType::Array   => "StringQuery",
+            FieldType::Array   => "StringWhere",
 
-            FieldType::Boolean => "BooleanQuery",
+            FieldType::Boolean => "BooleanWhere",
 
             FieldType::Number,
-            FieldType::Float   => "NumberQuery",
+            FieldType::Float   => "NumberWhere",
 
             FieldType::String,
             FieldType::Text,
             FieldType::LongText,
             FieldType::File,
-            FieldType::Encrypt => "StringQuery",
+            FieldType::Encrypt => "StringWhere",
         };
     }
 }

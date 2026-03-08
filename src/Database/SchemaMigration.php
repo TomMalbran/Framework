@@ -356,14 +356,17 @@ class SchemaMigration {
             $sql = $db->dropPrimary($schemaModel->tableName);
             print("$sql\n");
         }
+
         foreach ($renames as $rename) {
             $sql = $db->renameColumn($schemaModel->tableName, $rename["key"], $rename["new"], $rename["type"]);
             print("$sql\n");
         }
+
         foreach ($adds as $add) {
             $sql = $db->addColumn($schemaModel->tableName, $add["key"], $add["type"], $add["after"]);
             print("$sql\n");
         }
+
         foreach ($modifies as $modify) {
             if ($modify["toInts"]) {
                 $db->execute("
@@ -375,14 +378,17 @@ class SchemaMigration {
             $sql = $db->updateColumn($schemaModel->tableName, $modify["key"], $modify["type"], $modify["after"]);
             print("$sql\n");
         }
+
         foreach ($drops as $drop) {
             $sql = $db->deleteColumn($schemaModel->tableName, $drop, $canDelete);
             print("$sql" . (!$canDelete ? " (manually)" : "") . "\n");
         }
+
         foreach ($keys as $key) {
             $sql = $db->createIndex($schemaModel->tableName, $key);
             print("$sql\n");
         }
+
         if ($addPrimary) {
             $sql = $db->updatePrimary($schemaModel->tableName, $primary);
             print("$sql\n");

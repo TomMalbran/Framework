@@ -17,10 +17,9 @@ class SchemaQuery {
 
     /**
      * Creates a new SchemaQuery instance
-     * @param Query|null $query Optional.
      */
-    protected function __construct(?Query $query = null) {
-        $this->query = new Query($query);
+    protected function __construct() {
+        $this->query = Query::select($this->tableName);
     }
 
     /**
@@ -39,100 +38,101 @@ class SchemaQuery {
         return $this->query->isNotEmpty();
     }
 
-    /**
-     * Creates a list of question marks for the given array
-     * @param list<string>|list<int> $array
-     * @return string
-     */
-    public function createBinds(array $array): string {
-        return $this->query->createBinds($array);
-    }
-
 
 
     /**
      * Adds a param to the Query
      * @param int|string $param
-     * @return Query
+     * @return SchemaQuery
      */
-    public function addParam(int|string $param): Query {
-        return $this->query->addParam($param);
+    public function addParam(int|string $param): SchemaQuery {
+        $this->query->addParam($param);
+        return $this;
     }
 
     /**
      * Adds an Expression to the Query
      * @param string     $expression
      * @param int|string ...$values
-     * @return Query
+     * @return SchemaQuery
      */
-    public function addExp(string $expression, int|string ...$values): Query {
-        return $this->query->whereExp($expression, ...$values);
+    public function whereExp(string $expression, int|string ...$values): SchemaQuery {
+        $this->query->whereExp($expression, ...$values);
+        return $this;
     }
 
 
 
     /**
      * Adds an Open Parenthesis
-     * @return Query
+     * @return SchemaQuery
      */
-    public function startParen(): Query {
-        return $this->query->startParen();
+    public function startParen(): SchemaQuery {
+        $this->query->startParen();
+        return $this;
     }
 
     /**
      * Adds a Close Parenthesis
-     * @return Query
+     * @return SchemaQuery
      */
-    public function endParen(): Query {
-        return $this->query->endParen();
+    public function endParen(): SchemaQuery {
+        $this->query->endParen();
+        return $this;
     }
 
     /**
      * Adds an And
-     * @return Query
+     * @return SchemaQuery
      */
-    public function and(): Query {
-        return $this->query->and();
+    public function and(): SchemaQuery {
+        $this->query->and();
+        return $this;
     }
 
     /**
      * Starts an And expression
-     * @return Query
+     * @return SchemaQuery
      */
-    public function startAnd(): Query {
-        return $this->query->startAnd();
+    public function startAnd(): SchemaQuery {
+        $this->query->startAnd();
+        return $this;
     }
 
     /**
      * Ends an And expression
-     * @return Query
+     * @return SchemaQuery
      */
-    public function endAnd(): Query {
-        return $this->query->endAnd();
+    public function endAnd(): SchemaQuery {
+        $this->query->endAnd();
+        return $this;
     }
 
     /**
      * Adds an Or
-     * @return Query
+     * @return SchemaQuery
      */
-    public function or(): Query {
-        return $this->query->or();
+    public function or(): SchemaQuery {
+        $this->query->or();
+        return $this;
     }
 
     /**
      * Starts an Or expression
-     * @return Query
+     * @return SchemaQuery
      */
-    public function startOr(): Query {
-        return $this->query->startOr();
+    public function startOr(): SchemaQuery {
+        $this->query->startOr();
+        return $this;
     }
 
     /**
      * Ends an Or expression
-     * @return Query
+     * @return SchemaQuery
      */
-    public function endOr(): Query {
-        return $this->query->endOr();
+    public function endOr(): SchemaQuery {
+        $this->query->endOr();
+        return $this;
     }
 
 
@@ -141,22 +141,21 @@ class SchemaQuery {
      * Adds a Limit
      * @param int      $from
      * @param int|null $to   Optional.
-     * @return Query
+     * @return SchemaQuery
      */
-    public function limit(int $from, ?int $to = null): Query {
-        if ($from !== 0 || ($to !== null && $to !== 0)) {
-            return $this->query->limit($from, $to);
-        }
-        return $this->query;
+    public function limit(int $from, ?int $to = null): SchemaQuery {
+        $this->query->limit($from, $to);
+        return $this;
     }
 
     /**
      * Adds a limit using pagination
      * @param int $page   Optional.
      * @param int $amount Optional.
-     * @return Query
+     * @return SchemaQuery
      */
-    public function paginate(int $page = 0, int $amount = 100): Query {
-        return $this->query->paginate($page, $amount);
+    public function paginate(int $page = 0, int $amount = 100): SchemaQuery {
+        $this->query->paginate($page, $amount);
+        return $this;
     }
 }

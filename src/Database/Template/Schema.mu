@@ -15,15 +15,15 @@ use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
 use Framework\Database\SchemaModel;
-use Framework\Database\Query\Query;{{#hasQueryOperator}}
-use Framework\Database\Query\QueryOperator;{{/hasQueryOperator}}
+use Framework\Database\Query\Query;{{#canEdit}}
+use Framework\Database\Query\Assign;{{/canEdit}}{{#hasOperator}}
+use Framework\Database\Query\Operator as QueryOperator;{{/hasOperator}}
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
 use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
 use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
-use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#canEdit}}
-use Framework\Database\Type\Assign;{{/canEdit}}{{#hasValidation}}
+use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasValidation}}
 use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
 use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
 use Framework\Date\DateType;{{/hasDateType}}{{#hasID}}
@@ -330,7 +330,7 @@ class {{name}}Schema extends Schema {
     ): {{queryClass}} {
         $query = new {{queryClass}}();
         {{#parents}}
-        $query->query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}}, {{fieldParam}} !== null);
+        $query->query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}}, {{fieldParam}} !== null);
         {{/parents}}
         return $query;
     }
@@ -362,9 +362,10 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}{{#hasDeleted}}
         bool $withDeleted = true,{{/hasDeleted}}
     ): bool {
-        $query = Query::create("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
+        $query = new Query();
+        $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         return self::getSchemaTotal($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}}) > 0;
     }
@@ -383,11 +384,12 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}
         int $skipID = 0,
     ): bool {
-        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
+        $query = new Query();
+        $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
-        $query->addIf("{{idDbName}}", QueryOperator::NotEqual, $skipID);
+        $query->whereIf("{{idDbName}}", QueryOperator::NotEqual, $skipID);
         return self::getSchemaTotal($query) > 0;
     }
 
@@ -419,9 +421,10 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
-        $query = Query::create("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
+        $query = new Query();
+        $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $data  = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -443,9 +446,10 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
-        $query = Query::create("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
+        $query = new Query();
+        $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $data = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
@@ -546,7 +550,7 @@ class {{name}}Schema extends Schema {
     ): array {
         $query = static::createListQuery($request)->query;
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         $list  = self::getSchemaEntities($query, sort: $request);
         return self::constructEntities($list);
@@ -586,7 +590,7 @@ class {{name}}Schema extends Schema {
     ): int {
         $query = static::createListQuery($request)->query;
         {{#parents}}
-        $query->addIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
+        $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
         return self::getSchemaTotal($query);
     }

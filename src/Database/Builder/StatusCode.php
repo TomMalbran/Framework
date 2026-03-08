@@ -28,16 +28,16 @@ class StatusCode {
     }
 
     /**
-     * Returns the Status Query code
+     * Returns the Status Where code
      * @param SchemaModel $schemaModel
      * @return string
      */
-    public static function getQueryCode(SchemaModel $schemaModel): string {
-        $contents = Builder::render("StatusQuery", [
+    public static function getWhereCode(SchemaModel $schemaModel): string {
+        $contents = Builder::render("StatusWhere", [
             "namespace"        => $schemaModel->namespace,
             "name"             => $schemaModel->name,
             "statusClass"      => $schemaModel->statusClass,
-            "statusQueryClass" => "{$schemaModel->statusClass}Query",
+            "statusWhereClass" => "{$schemaModel->statusClass}Where",
         ]);
         return $contents;
     }

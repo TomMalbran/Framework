@@ -1,22 +1,22 @@
 <?php
-namespace Framework\Database\Query;
+namespace Framework\Database\Where;
 
-use Framework\Database\Query\BaseQuery;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Operator;
+use Framework\Database\Where\BaseWhere;
 
 /**
- * The Number Query
+ * The Number Where
  */
-class NumberQuery extends BaseQuery {
+class NumberWhere extends BaseWhere {
 
     /**
-     * Generates a Compare Query
-     * @param QueryOperator $operator
+     * Adds a Compare condition
+     * @param Operator      $operator
      * @param list<int>|int $value
      * @param bool|null     $condition Optional.
      * @return void
      */
-    public function compare(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
+    public function compare(Operator $operator, array|int $value, ?bool $condition = null): void {
         $this->query->where(
             column:    $this->column,
             operator:  $operator,
@@ -26,13 +26,13 @@ class NumberQuery extends BaseQuery {
     }
 
     /**
-     * Generates a Compare If Query
-     * @param QueryOperator $operator
+     * Adds a Compare If condition
+     * @param Operator      $operator
      * @param list<int>|int $value
      * @param bool|null     $condition Optional.
      * @return void
      */
-    public function compareIf(QueryOperator $operator, array|int $value, ?bool $condition = null): void {
+    public function compareIf(Operator $operator, array|int $value, ?bool $condition = null): void {
         $this->query->whereIf(
             column:    $this->column,
             operator:  $operator,
@@ -44,108 +44,108 @@ class NumberQuery extends BaseQuery {
 
 
     /**
-     * Generates an Equal Query
+     * Adds an Equal condition
      * @param int $value
      * @return void
      */
     public function equal(int $value): void {
-        $this->compare(QueryOperator::Equal, $value);
+        $this->compare(Operator::Equal, $value);
     }
 
     /**
-     * Generates an Equal If Query
+     * Adds an Equal If condition
      * @param int       $value
      * @param bool|null $condition Optional.
      * @return void
      */
     public function equalIf(int $value, ?bool $condition = null): void {
-        $this->compareIf(QueryOperator::Equal, $value, $condition);
+        $this->compareIf(Operator::Equal, $value, $condition);
     }
 
     /**
-     * Generates a Not Equal Query
+     * Adds a Not Equal condition
      * @param int $value
      * @return void
      */
     public function notEqual(int $value): void {
-        $this->compare(QueryOperator::NotEqual, $value);
+        $this->compare(Operator::NotEqual, $value);
     }
 
     /**
-     * Generates a Not Equal If Query
+     * Adds a Not Equal If condition
      * @param int       $value
      * @param bool|null $condition Optional.
      * @return void
      */
     public function notEqualIf(int $value, ?bool $condition = null): void {
-        $this->compareIf(QueryOperator::NotEqual, $value, $condition);
+        $this->compareIf(Operator::NotEqual, $value, $condition);
     }
 
 
 
     /**
-     * Generates a Greater Than Query
+     * Adds a Greater Than condition
      * @param int       $value
      * @param bool|null $condition Optional.
      * @return void
      */
     public function greaterThan(int $value, ?bool $condition = null): void {
-        $this->compare(QueryOperator::GreaterThan, $value, $condition);
+        $this->compare(Operator::GreaterThan, $value, $condition);
     }
 
     /**
-     * Generates a Greater or Equal Query
+     * Adds a Greater or Equal condition
      * @param int       $value
      * @param bool|null $condition Optional.
      * @return void
      */
     public function greaterOrEqual(int $value, ?bool $condition = null): void {
-        $this->compare(QueryOperator::GreaterOrEqual, $value, $condition);
+        $this->compare(Operator::GreaterOrEqual, $value, $condition);
     }
 
     /**
-     * Generates a Less Than Query
+     * Adds a Less Than condition
      * @param int       $value
      * @param bool|null $condition Optional.
      * @return void
      */
     public function lessThan(int $value, ?bool $condition = null): void {
-        $this->compare(QueryOperator::LessThan, $value, $condition);
+        $this->compare(Operator::LessThan, $value, $condition);
     }
 
     /**
-     * Generates a Less or Equal Query
+     * Adds a Less or Equal condition
      * @param int       $value
      * @param bool|null $condition Optional.
      * @return void
      */
     public function lessOrEqual(int $value, ?bool $condition = null): void {
-        $this->compare(QueryOperator::LessOrEqual, $value, $condition);
+        $this->compare(Operator::LessOrEqual, $value, $condition);
     }
 
 
 
     /**
-     * Generates an In Query
+     * Adds an In condition
      * @param list<int> $values
      * @param bool|null $condition Optional.
      * @return void
      */
     public function in(array $values, ?bool $condition = null): void {
         if (count($values) > 0) {
-            $this->compare(QueryOperator::In, $values, $condition);
+            $this->compare(Operator::In, $values, $condition);
         }
     }
 
     /**
-     * Generates a Not In Query
+     * Adds a Not In condition
      * @param list<int> $values
      * @param bool|null $condition Optional.
      * @return void
      */
     public function notIn(array $values, ?bool $condition = null): void {
         if (count($values) > 0) {
-            $this->compare(QueryOperator::NotIn, $values, $condition);
+            $this->compare(Operator::NotIn, $values, $condition);
         }
     }
 }

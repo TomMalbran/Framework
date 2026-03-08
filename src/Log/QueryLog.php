@@ -3,7 +3,7 @@ namespace Framework\Log;
 
 use Framework\Application;
 use Framework\Request;
-use Framework\Database\Type\Assign;
+use Framework\Database\Query\Assign;
 use Framework\Auth\Auth;
 use Framework\System\Config;
 use Framework\Log\Schema\LogQuerySchema;

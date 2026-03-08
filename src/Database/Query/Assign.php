@@ -1,0 +1,142 @@
+<?php
+namespace Framework\Database\Query;
+
+use Framework\Utils\Strings;
+
+/**
+ * The Query Assign
+ */
+class Assign {
+
+    private string $sql;
+
+    /** @var list<float|int|string> */
+    private array $params;
+
+
+
+    /**
+     * Creates a new Assign instance
+     * @param string                 $sql    Optional.
+     * @param list<float|int|string> $params Optional.
+     */
+    private function __construct(
+        string $sql = "",
+        array $params = [],
+    ) {
+        $this->sql    = $sql;
+        $this->params = $params;
+    }
+
+    /**
+     * Assigns an custom SQL Expression
+     * @param string                 $sql
+     * @param list<float|int|string> $params Optional.
+     * @return Assign
+     */
+    public static function exp(string $sql, array $params = []): Assign {
+        $sql = Strings::replace($sql, "\n", " ");
+        $sql = Strings::replacePattern($sql, "!\s+!", " ");
+        return new Assign($sql, $params);
+    }
+
+    /**
+     * Assigns the value of another Column
+     * @param string $column
+     * @return Assign
+     */
+    public static function equal(string $column): Assign {
+        return new Assign("`{$column}`");
+    }
+
+    /**
+     * Assigns the Opposite of the value of another Column
+     * @param string $column Optional.
+     * @return Assign
+     */
+    public static function not(string $column): Assign {
+        return new Assign("!`{$column}`");
+    }
+
+    /**
+     * Assigns the Field value incremented by a certain Amount
+     * @param int $amount Optional.
+     * @return Assign
+     */
+    public static function increase(int $amount = 1): Assign {
+        return new Assign("`__FIELD__` + ?", [ $amount ]);
+    }
+
+    /**
+     * Assigns the Field value decremented by a certain Amount
+     * @param int $amount Optional.
+     * @return Assign
+     */
+    public static function decrease(int $amount = 1): Assign {
+        return new Assign("`__FIELD__` - ?", [ $amount ]);
+    }
+
+    /**
+     * Assigns a UUID value
+     * @return Assign
+     */
+    public static function uuid(): Assign {
+        return new Assign("UUID()");
+    }
+
+    /**
+     * Assigns an AES Encrypt of the value with a certain key
+     * @param string $value
+     * @param string $key
+     * @return Assign
+     */
+    public static function encrypt(string $value, string $key): Assign {
+        return new Assign("AES_ENCRYPT(?, ?)", [ $value, $key ]);
+    }
+
+    /**
+     * Assigns the Column replacing one value with another
+     * @param string $value
+     * @param string $replace
+     * @return Assign
+     */
+    public static function replace(string $value, string $replace): Assign {
+        return new Assign("REPLACE(`__FIELD__`, ?, ?)", [ $value, $replace ]);
+    }
+
+    /**
+     * Assigns the Greatest between the Field value and another value
+     * @param int $value
+     * @return Assign
+     */
+    public static function greatest(int $value): Assign {
+        return new Assign("GREATEST(`__FIELD__`, ?)", [ $value ]);
+    }
+
+    /**
+     * Assigns the Field value with the first letter in Upper Case
+     * @return Assign
+     */
+    public static function upperCaseFirst(): Assign {
+        return new Assign("CONCAT(UCASE(LEFT(`__FIELD__`, 1)), SUBSTRING(`__FIELD__`, 2))");
+    }
+
+
+
+    /**
+     * Returns the parameters for the Assign
+     * @return list<float|int|string>
+     */
+    public function getParams(): array {
+        return $this->params;
+    }
+
+    /**
+     * Converts the Assign to an SQL expression
+     * @param string $field
+     * @return string
+     */
+    public function toSQL(string $field): string {
+        return Strings::replace($this->sql, "__FIELD__", $field);
+    }
+}

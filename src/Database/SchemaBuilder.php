@@ -71,8 +71,8 @@ class SchemaBuilder implements DiscoveryBuilder {
                 File::create($schemaModel->path, $statusName, $statusCode);
                 $created += 1;
 
-                $statusQueryName = "{$schemaModel->statusClass}Query.php";
-                $statusQueryCode = StatusCode::getQueryCode($schemaModel);
+                $statusQueryName = "{$schemaModel->statusClass}Where.php";
+                $statusQueryCode = StatusCode::getWhereCode($schemaModel);
                 File::create($schemaModel->path, $statusQueryName, $statusQueryCode);
                 $created += 1;
             }

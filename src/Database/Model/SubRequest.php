@@ -2,9 +2,9 @@
 namespace Framework\Database\Model;
 
 use Framework\Database\SchemaModel;
-use Framework\Database\Selection;
 use Framework\Database\Query\Query;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Operator;
+use Framework\Database\Query\SelectionBuilder;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -155,15 +155,15 @@ class SubRequest {
             return [];
         }
 
-        $selection = new Selection($this->schemaModel);
-        $selection->addFields();
-        $selection->addExpressions();
-        $selection->addJoins();
-        $selection->addCounts();
-        $selection->request($query);
-        $request   = $selection->resolve();
-        $subResult = [];
+        $request = SelectionBuilder::create($this->schemaModel)
+            ->addFields()
+            ->addExpressions()
+            ->addJoins()
+            ->addCounts()
+            ->request($query)
+            ->resolve();
 
+        $subResult = [];
         foreach ($request as $row) {
             if (!isset($row[$this->idName])) {
                 continue;
@@ -215,7 +215,7 @@ class SubRequest {
         }
 
         $query = new Query();
-        $query->where($this->idDbName, QueryOperator::In, $ids);
+        $query->where($this->idDbName, Operator::In, $ids);
 
         if ($this->query !== "") {
             $queryParts = Strings::split($this->query, " ");
@@ -223,7 +223,7 @@ class SubRequest {
             if ($total % 3 === 0) {
                 for ($i = 0; $i < $total; $i += 3) {
                     if (isset($queryParts[$i]) && isset($queryParts[$i + 1]) && isset($queryParts[$i + 2])) {
-                        $operator = QueryOperator::fromValue($queryParts[$i + 1]);
+                        $operator = Operator::fromValue($queryParts[$i + 1]);
                         $query->where($queryParts[$i], $operator, $queryParts[$i + 2]);
                     }
                 }
@@ -233,7 +233,7 @@ class SubRequest {
         if ($this->schemaModel !== null) {
             if ($this->schemaModel->canDelete) {
                 $isDeleted = $this->schemaModel->getKey("isDeleted");
-                $query->where($isDeleted, QueryOperator::Equal, 0);
+                $query->where($isDeleted, Operator::Equal, 0);
             }
             if ($this->schemaModel->hasPositions) {
                 $query->orderBy($this->schemaModel->getKey("position"), isASC: true);

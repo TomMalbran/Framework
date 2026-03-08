@@ -4,12 +4,12 @@ namespace Framework\Database;
 use Framework\Framework;
 use Framework\Request;
 use Framework\Database\SchemaModel;
-use Framework\Database\Selection;
-use Framework\Database\Modification;
 use Framework\Database\Query\Query;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Assign;
+use Framework\Database\Query\Operator;
+use Framework\Database\Query\SelectionBuilder;
+use Framework\Database\Query\ModificationBuilder;
 use Framework\Database\Model\SubRequest;
-use Framework\Database\Type\Assign;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
@@ -127,16 +127,14 @@ class Schema {
      * @return array<int|string>
      */
     protected static function getSchemaColumn(?Query $query, string $column, string $columnKey = ""): array {
-        $query     = self::generateQuery($query);
-        $selection = new Selection(static::getModel());
-        $selection->addFields();
-        $selection->addSelects($column, addMainKey: true);
-        $selection->addJoins();
+        $request = SelectionBuilder::create(static::getModel())
+            ->addFields()
+            ->addSelects($column, addMainKey: true)
+            ->addJoins()
+            ->request(self::generateQuery($query))
+            ->resolve();
 
-        $selection->request($query);
-        $request = $selection->resolve();
-        $result  = [];
-
+        $result    = [];
         $columnKey = $columnKey !== "" ? $columnKey : Strings::substringAfter($column, ".");
         foreach ($request as $row) {
             if (!isset($row[$columnKey])) {
@@ -159,12 +157,12 @@ class Schema {
      * @return int
      */
     protected static function getSchemaTotal(?Query $query = null, bool $withDeleted = true): int {
-        $query     = self::generateQuery($query, $withDeleted);
-        $selection = new Selection(static::getModel());
-        $selection->addSelects("COUNT(*) AS cnt");
-        $selection->addJoins(withSelects: false);
+        $request = SelectionBuilder::create(static::getModel())
+            ->addSelects("COUNT(*) AS cnt")
+            ->addJoins(withSelects: false)
+            ->request(self::generateQuery($query, $withDeleted))
+            ->getResult();
 
-        $request = $selection->request($query);
         if (isset($request[0]["cnt"])) {
             return Numbers::toInt($request[0]["cnt"]);
         }
@@ -191,17 +189,13 @@ class Schema {
         ?string $distinctColumn = null,
         bool $useEmpty = false,
     ): array {
-        $query     = self::generateQuery($query);
-        $selection = new Selection(static::getModel());
-        if ($distinctColumn !== null) {
-            $selection->addSelects("DISTINCT($distinctColumn)");
-        }
-
-        $selection->addFields();
-        $selection->addExpressions();
-        $selection->addJoins();
-        $selection->request($query);
-        $request = $selection->resolve();
+        $request = SelectionBuilder::create(static::getModel())
+            ->addSelects($distinctColumn !== null ? "DISTINCT($distinctColumn)" : "")
+            ->addFields()
+            ->addExpressions()
+            ->addJoins()
+            ->request(self::generateQuery($query))
+            ->resolve();
 
         return Select::create(
             $request,
@@ -302,21 +296,21 @@ class Schema {
         bool $decrypted = false,
         bool $skipSubRequest = false,
     ): Dictionary {
-        $selection = new Selection(static::getModel());
-        $selection->addFields($decrypted);
-        $selection->addExpressions();
-        $selection->addSelects(Arrays::getValues($selects));
-        $selection->addJoins($joins);
-        $selection->addCounts();
-        $selection->request($query);
+        $request = SelectionBuilder::create(static::getModel())
+            ->addFields($decrypted)
+            ->addExpressions()
+            ->addSelects(Arrays::getValues($selects))
+            ->addJoins($joins)
+            ->addCounts()
+            ->request($query)
+            ->resolve(array_keys($selects));
 
-        $result = $selection->resolve(array_keys($selects));
         if (!$skipSubRequest) {
             foreach (static::getSubRequests() as $subRequest) {
-                $result = $subRequest->request($result);
+                $request = $subRequest->request($request);
             }
         }
-        return new Dictionary($result);
+        return new Dictionary($request);
     }
 
 
@@ -337,16 +331,16 @@ class Schema {
         array $joins = [],
         bool $decrypted = false,
     ): string {
-        $query     = self::generateQuerySort($query, $sort);
-        $selection = new Selection(static::getModel());
-        $selection->addFields($decrypted);
-        $selection->addExpressions();
-        $selection->addSelects(Arrays::getValues($selects));
-        $selection->addJoins($joins);
-        $selection->addCounts();
+        $query      = self::generateQuerySort($query, $sort);
+        $expression = SelectionBuilder::create(static::getModel())
+            ->addFields($decrypted)
+            ->addExpressions()
+            ->addSelects(Arrays::getValues($selects))
+            ->addJoins($joins)
+            ->addCounts()
+            ->toSQL($query);
 
-        $expression = $selection->getExpression($query);
-        return Framework::getDatabase()->interpolateQuery($expression, $query->params);
+        return Framework::getDatabase()->interpolateQuery($expression, $query->getParams());
     }
 
     /**
@@ -367,7 +361,7 @@ class Schema {
      * @return bool
      */
     protected static function truncateData(): bool {
-        return Framework::getDatabase()->truncate(static::$tableName);
+        return Query::truncate(static::$tableName)->execute() > 0;
     }
 
     /**
@@ -382,11 +376,11 @@ class Schema {
         array $fields = [],
         int $credentialID = 0,
     ): int {
-        $modification = new Modification(static::getModel());
-        $modification->addFields($request, $fields);
-        $modification->addCreation($credentialID);
-        $modification->addModification();
-        return $modification->insert();
+        return ModificationBuilder::insert(static::getModel())
+            ->addFields($request, $fields)
+            ->addCreation($credentialID)
+            ->addModification()
+            ->execute();
     }
 
     /**
@@ -401,10 +395,10 @@ class Schema {
         array $fields = [],
         int $credentialID = 0,
     ): int {
-        $modification = new Modification(static::getModel());
-        $modification->addFields($request, $fields);
-        $modification->addModification($credentialID);
-        return $modification->replace();
+        return ModificationBuilder::replace(static::getModel())
+            ->addFields($request, $fields)
+            ->addModification($credentialID)
+            ->execute();
     }
 
     /**
@@ -427,14 +421,11 @@ class Schema {
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
-        $modification = new Modification(static::getModel());
-        $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
-        if (!$skipTimestamps) {
-            $modification->addModification($credentialID);
-        }
-
         $query = self::generateQueryID($query, withDeleted: false);
-        return $modification->update($query);
+        return ModificationBuilder::update(static::getModel(), $query)
+            ->addFields($request, $fields, $skipEmpty, $skipUnset)
+            ->addModification($credentialID, $skipTimestamps)
+            ->execute() > 0;
     }
 
     /**
@@ -458,7 +449,7 @@ class Schema {
      */
     protected static function removeSchemaEntity(Query|int|string $query): bool {
         $query = self::generateQueryID($query, withDeleted: false);
-        return Framework::getDatabase()->delete(static::$tableName, $query);
+        return Query::delete(static::$tableName)->query($query)->execute() > 0;
     }
 
 
@@ -477,14 +468,14 @@ class Schema {
         int $credentialID = 0,
         ?Query $orderQuery = null,
     ): int {
-        $modification = new Modification(static::getModel());
-        $modification->addFields($request, $fields);
-        $modification->addCreation($credentialID);
-        $modification->addModification();
+        $modification = ModificationBuilder::insert(static::getModel())
+            ->addFields($request, $fields)
+            ->addCreation($credentialID)
+            ->addModification();
 
         $newPosition = self::ensureSchemaOrder(null, $modification->getFields(), $orderQuery);
         $modification->setField("position", $newPosition);
-        return $modification->insert();
+        return $modification->execute();
     }
 
     /**
@@ -509,11 +500,10 @@ class Schema {
         bool $skipEmpty = false,
         bool $skipUnset = false,
     ): bool {
-        $modification = new Modification(static::getModel());
-        $modification->addFields($request, $fields, $skipEmpty, $skipUnset);
-        if (!$skipTimestamps) {
-            $modification->addModification($credentialID);
-        }
+        $modifyQuery  = self::generateQueryID($query, withDeleted: false);
+        $modification = ModificationBuilder::update(static::getModel(), $modifyQuery)
+            ->addFields($request, $fields, $skipEmpty, $skipUnset)
+            ->addModification($credentialID, $skipTimestamps);
 
         $fields = $modification->getFields();
         if ($fields->has("position")) {
@@ -522,8 +512,7 @@ class Schema {
             $modification->setField("position", $savePosition);
         }
 
-        $query = self::generateQueryID($query, withDeleted: false);
-        return $modification->update($query);
+        return $modification->execute() > 0;
     }
 
     /**
@@ -607,20 +596,20 @@ class Schema {
             $savePosition = $nextPosition - 1;
         }
 
-        $newQuery = self::generateQuery($query);
+        $builder = Query::update(static::$tableName)
+            ->query(self::generateQuery($query));
+
         if ($newPosition > $oldPosition) {
-            $newQuery->where("position", QueryOperator::GreaterThan, $oldPosition);
-            $newQuery->where("position", QueryOperator::LessOrEqual, $newPosition);
-            $assign = Assign::decrease(1);
+            $builder->set("position", Assign::decrease(1));
+            $builder->where("position", Operator::GreaterThan, $oldPosition);
+            $builder->where("position", Operator::LessOrEqual, $newPosition);
         } else {
-            $newQuery->where("position", QueryOperator::GreaterOrEqual, $newPosition);
-            $newQuery->where("position", QueryOperator::LessThan, $oldPosition);
-            $assign = Assign::increase(1);
+            $builder->set("position", Assign::increase(1));
+            $builder->where("position", Operator::GreaterOrEqual, $newPosition);
+            $builder->where("position", Operator::LessThan, $oldPosition);
         }
 
-        Framework::getDatabase()->update(static::$tableName, [
-            "position" => $assign,
-        ], $newQuery);
+        $builder->execute();
         return $savePosition;
     }
 
@@ -630,15 +619,16 @@ class Schema {
      * @return int
      */
     private static function getNextPosition(?Query $query = null): int {
-        $selection = new Selection(static::getModel());
-        $selection->addSelects("position", addMainKey: true);
-        $selection->addJoins(withSelects: false);
-
         $query = self::generateQuery($query);
         $query->orderBy("position", isASC: false);
         $query->limit(1);
 
-        $request = $selection->request($query);
+        $request = SelectionBuilder::create(static::getModel())
+            ->addSelects("position", addMainKey: true)
+            ->addJoins(withSelects: false)
+            ->request($query)
+            ->getResult();
+
         if (isset($request[0]) && isset($request[0]["position"])) {
             return Numbers::toInt($request[0]["position"]) + 1;
         }
@@ -661,34 +651,35 @@ class Schema {
         int $oldValue,
         int $newValue,
     ): bool {
-        $updated = false;
         if ($newValue !== 0 && $oldValue === 0) {
-            $newQuery = new Query($query);
-            $newQuery->where(static::$idDbName, QueryOperator::NotEqual, $id);
-            $newQuery->where($column, QueryOperator::Equal, 1);
-            self::editSchemaEntity($newQuery, null, [ $column => 0 ]);
-            $updated = true;
+            $query->where(static::$idDbName, Operator::NotEqual, $id);
+            $query->where($column, Operator::Equal, 1);
+            self::editSchemaEntity($query, null, [ $column => 0 ]);
+            return true;
         }
         if ($newValue === 0 && $oldValue !== 0) {
-            $newQuery = self::generateQuery($query, withDeleted: true);
-            $newQuery->limit(1);
-            self::editSchemaEntity($newQuery, null, [ $column => 1 ]);
-            $updated = true;
+            $query = self::generateQuery($query, withDeleted: true);
+            $query->limit(1);
+            self::editSchemaEntity($query, null, [ $column => 1 ]);
+            return true;
         }
-        return $updated;
+        return false;
     }
 
 
 
     /**
      * Generates a Query with the ID or returns the Query
-     * @param Query|int|string $query
+     * @param Query|int|string $queryOrID
      * @param bool             $withDeleted Optional.
      * @return Query
      */
-    private static function generateQueryID(Query|int|string $query, bool $withDeleted = true): Query {
-        if (!($query instanceof Query)) {
-            $query = Query::create(static::$idDbName, QueryOperator::Equal, $query);
+    private static function generateQueryID(Query|int|string $queryOrID, bool $withDeleted = true): Query {
+        if ($queryOrID instanceof Query) {
+            $query = $queryOrID;
+        } else {
+            $query = new Query();
+            $query->where(static::$idDbName, Operator::Equal, $queryOrID);
         }
         return self::generateQuery($query, $withDeleted);
     }
@@ -722,11 +713,14 @@ class Schema {
      * @return Query
      */
     private static function generateQuery(?Query $query = null, bool $withDeleted = true): Query {
-        $query     = new Query($query);
+        $query     = (new Query())->query($query);
         $isDeleted = static::getModel()->getKey("isDeleted");
 
-        if ($withDeleted && static::$canDelete && !$query->hasColumn($isDeleted) && !$query->hasColumn("isDeleted")) {
-            $query->where($isDeleted, QueryOperator::Equal, 0);
+        if ($withDeleted && static::$canDelete &&
+            !$query->hasWhereColumn($isDeleted) &&
+            !$query->hasWhereColumn("isDeleted")
+        ) {
+            $query->where($isDeleted, Operator::Equal, 0);
         }
         return $query;
     }

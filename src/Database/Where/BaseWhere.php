@@ -1,12 +1,12 @@
 <?php
-namespace Framework\Database\Query;
+namespace Framework\Database\Where;
 
 use Framework\Database\Query\Query;
 
 /**
- * The Base Query
+ * The Base Where
  */
-class BaseQuery {
+class BaseWhere {
 
     protected Query  $query;
     protected string $column;
@@ -14,7 +14,7 @@ class BaseQuery {
 
 
     /**
-     * Creates a new BooleanQuery instance
+     * Creates a new BaseWhere instance
      * @param Query  $query
      * @param string $column
      */

@@ -1,8 +1,14 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Database\Query\QueryOperator;
+use Framework\Framework;
+use Framework\Database\Database;
+use Framework\Database\Query\QueryMode;
+use Framework\Database\Query\Operator;
+use Framework\Database\Query\QueryBuilder;
+use Framework\Database\Query\WhereBuilder;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
 /**
@@ -10,90 +16,154 @@ use Framework\Utils\Strings;
  */
 class Query {
 
-    public string $where     = "";
-    public string $prefix    = "AND";
-    public bool   $addPrefix = false;
+    private QueryBuilder $queryBuilder;
+    private WhereBuilder $whereBuilder;
 
-    public string $limit     = "";
-    public string $groupBy   = "";
-    public string $orderBy   = "";
-
-    /** @var list<string> */
-    public array  $prefixes  = [];
-
-    /** @var list<mixed> */
-    public array  $params    = [];
-
-    /** @var list<string> */
-    public array  $columns   = [];
-
-    /** @var list<string> */
-    public array  $groups    = [];
-
-    /** @var list<string> */
-    public array  $orders    = [];
+    private QueryMode $mode = QueryMode::Select;
 
 
     /**
      * Creates a new Query instance
-     * @param Query|null $query Optional.
+     * @param QueryMode $mode      Optional.
+     * @param string    $tableName Optional.
      */
-    public function __construct(?Query $query = null) {
-        if ($query !== null) {
-            $this->where     = $query->where;
-            $this->params    = $query->params;
-            $this->prefix    = $query->prefix;
-            $this->addPrefix = $query->addPrefix;
+    public function __construct(QueryMode $mode = QueryMode::Select, string $tableName = "") {
+        $this->whereBuilder = new WhereBuilder();
+        $this->queryBuilder = new QueryBuilder($mode, $tableName, $this->whereBuilder);
 
-            $this->limit     = $query->limit;
-            $this->orderBy   = $query->orderBy;
-            $this->groupBy   = $query->groupBy;
-
-            $this->columns   = $query->columns;
-            $this->groups    = $query->groups;
-            $this->orders    = $query->orders;
-        }
+        $this->mode = $mode;
     }
 
     /**
-     * Creates a new Query with the given values
-     * @param string                           $column        Optional.
-     * @param QueryOperator|string             $operator      Optional.
-     * @param list<int|string>|int|string|null $value         Optional.
-     * @param bool                             $caseSensitive Optional.
+     * Creates a new SELECT Query for the given table
+     * @param string $tableName
      * @return Query
      */
-    public static function create(
-        string $column = "",
-        QueryOperator|string $operator = QueryOperator::Equal,
-        array|int|string|null $value = null,
-        bool $caseSensitive = false,
-    ): Query {
-        $query = new Query();
-        if ($column !== "" && $value !== null) {
-            $query->where($column, $operator, $value, $caseSensitive);
-        }
-        return $query;
+    public static function select(string $tableName): Query {
+        return new Query(QueryMode::Select, $tableName);
+    }
+
+    /**
+     * Creates a new INSERT Query for the given table
+     * @param string $tableName
+     * @return Query
+     */
+    public static function insert(string $tableName): Query {
+        return new Query(QueryMode::Insert, $tableName);
+    }
+
+    /**
+     * Creates a new REPLACE Query for the given table
+     * @param string $tableName
+     * @return Query
+     */
+    public static function replace(string $tableName): Query {
+        return new Query(QueryMode::Replace, $tableName);
+    }
+
+    /**
+     * Creates a new UPDATE Query for the given table
+     * @param string $tableName
+     * @return Query
+     */
+    public static function update(string $tableName): Query {
+        return new Query(QueryMode::Update, $tableName);
+    }
+
+    /**
+     * Creates a new DELETE Query for the given table
+     * @param string $tableName
+     * @return Query
+     */
+    public static function delete(string $tableName): Query {
+        return new Query(QueryMode::Delete, $tableName);
+    }
+
+    /**
+     * Creates a new TRUNCATE Query for the given table
+     * @param string $tableName
+     * @return Query
+     */
+    public static function truncate(string $tableName): Query {
+        return new Query(QueryMode::Truncate, $tableName);
     }
 
 
 
     /**
-     * Returns the Prefix
-     * @return string
+     * Adds a Join to the Query
+     * @param string $table
+     * @param string $condition
+     * @param string $type      Optional.
+     * @return Query
      */
-    private function getWherePrefix(): string {
-        $prefix = $this->addPrefix ? "{$this->prefix} " : "";
-        if (!$this->addPrefix) {
-            $this->addPrefix = true;
+    public function join(string $table, string $condition, string $type = "LEFT"): Query {
+        $this->queryBuilder->addJoin($table, $condition, $type);
+        return $this;
+    }
+
+    /**
+     * Sets the Columns used in a SELECT query
+     * @param string ...$selects
+     * @return Query
+     */
+    public function columns(string ...$selects): Query {
+        foreach ($selects as $select) {
+            $this->queryBuilder->addSelect($select);
         }
-        return $prefix;
+        return $this;
+    }
+
+    /**
+     * Sets a field to be Inserted or Updated
+     * @param string $field
+     * @param mixed  $value
+     * @return Query
+     */
+    public function set(string $field, mixed $value): Query {
+        $this->queryBuilder->setField($field, $value);
+        return $this;
+    }
+
+    /**
+     * Sets a field to be Inserted or Updated using a raw SQL expression
+     * @param string $field
+     * @param string $sql
+     * @return Query
+     */
+    public function setExp(string $field, string $sql): Query {
+        $this->queryBuilder->setField($field, Assign::exp($sql));
+        return $this;
+    }
+
+    /**
+     * Sets multiple fields to be Inserted or Updated
+     * @param array<string,mixed> $fields
+     * @return Query
+     */
+    public function fields(array $fields): Query {
+        $this->queryBuilder->setFields($fields);
+        return $this;
+    }
+
+
+
+    /**
+     * Copies the Where clause from another Query instance
+     * @param Query|null $query Optional.
+     * @return Query
+     */
+    public function query(?Query $query = null): Query {
+        if ($query !== null) {
+            $this->whereBuilder->copy($query->whereBuilder);
+        }
+        return $this;
     }
 
     /**
      * Adds a Where expression
      * @param string                      $column
-     * @param QueryOperator|string        $operator
+     * @param Operator|string             $operator
      * @param list<int|string>|int|string $value
      * @param bool                        $caseSensitive Optional.
      * @param bool|null                   $condition     Optional.
@@ -101,7 +171,7 @@ class Query {
      */
     public function where(
         string $column,
-        QueryOperator|string $operator,
+        Operator|string $operator,
         array|int|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -109,121 +179,37 @@ class Query {
         if ($condition !== null && !$condition) {
             return $this;
         }
+        $this->whereBuilder->where($column, $operator, $value, $caseSensitive);
+        return $this;
+    }
 
-        $prefix   = $this->getWherePrefix();
-        $suffix   = $caseSensitive ? "BINARY" : "";
-        $operator = QueryOperator::fromValue($operator);
-        $compare  = $operator->toString();
-        $param    = null;
-        $binds    = "?";
-
-        switch ($operator) {
-        case QueryOperator::None:
-            return $this;
-
-        case QueryOperator::Equal:
-            if (!is_array($value)) {
-                $param   = $value;
-            } elseif (array_is_list($value)) {
-                if (count($value) === 1) {
-                    $param   = $value[0];
-                } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $compare = "IN";
-                    $binds   = $this->createBinds($value);
-                }
-            }
-            break;
-
-        case QueryOperator::NotEqual:
-            if (!is_array($value)) {
-                $param   = $value;
-            } elseif (array_is_list($value)) {
-                if (count($value) === 1) {
-                    $param   = $value[0];
-                } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $compare = "NOT IN";
-                    $binds   = $this->createBinds($value);
-                }
-            }
-            break;
-
-        case QueryOperator::In:
-            if (!is_array($value)) {
-                $param   = $value;
-                $compare = "=";
-            } elseif (array_is_list($value)) {
-                if (count($value) === 1) {
-                    $param   = $value[0];
-                    $compare = "=";
-                } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $binds   = $this->createBinds($value);
-                }
-            }
-            break;
-
-        case QueryOperator::NotIn:
-            if (!is_array($value)) {
-                $param   = $value;
-                $compare = "<>";
-            } elseif (array_is_list($value)) {
-                if (count($value) === 1) {
-                    $param   = $value[0];
-                    $compare = "<>";
-                } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $binds   = $this->createBinds($value);
-                }
-            }
-            break;
-
-        case QueryOperator::GreaterThan:
-        case QueryOperator::LessThan:
-        case QueryOperator::GreaterOrEqual:
-        case QueryOperator::LessOrEqual:
-            $param = $value;
-            break;
-
-        case QueryOperator::Like:
-        case QueryOperator::NotLike:
-            if (!is_array($value)) {
-                $param = Strings::addPrefixSuffix(trim(strtolower((string)$value)), "%", "%");
-            }
-            break;
-
-        case QueryOperator::StartsWith:
-        case QueryOperator::NotStartsWith:
-            if (!is_array($value)) {
-                $param   = Strings::addSuffix(trim(strtolower((string)$value)), "%");
-                $compare = Strings::replace($operator->toString(), "STARTS", "LIKE");
-            }
-            break;
-
-        case QueryOperator::EndsWith:
-        case QueryOperator::NotEndsWith:
-            if (!is_array($value)) {
-                $param   = Strings::addPrefix(trim(strtolower((string)$value)), "%");
-                $compare = Strings::replace($operator->toString(), "ENDS", "LIKE");
-            }
-            break;
-        }
-
-        if ($param === null) {
+    /**
+     * Adds an OR Where expression
+     * @param string                      $column
+     * @param Operator|string             $operator
+     * @param list<int|string>|int|string $value
+     * @param bool                        $caseSensitive Optional.
+     * @param bool|null                   $condition     Optional.
+     * @return Query
+     */
+    public function orWhere(
+        string $column,
+        Operator|string $operator,
+        array|int|string $value,
+        bool $caseSensitive = false,
+        ?bool $condition = null,
+    ): Query {
+        if ($condition !== null && !$condition) {
             return $this;
         }
-
-        $this->where    .= "$prefix $column $compare $suffix $binds ";
-        $this->params    = Arrays::mergeLists($this->params, Arrays::toList($param));
-        $this->columns[] = $column;
+        $this->whereBuilder->orWhere($column, $operator, $value, $caseSensitive);
         return $this;
     }
 
     /**
      * Adds a Where expression if the value is not empty
      * @param string                           $column
-     * @param QueryOperator|string             $operator
+     * @param Operator|string                  $operator
      * @param list<int|string>|int|string|null $value
      * @param bool|null                        $condition     Optional.
      * @param bool                             $caseSensitive Optional.
@@ -231,7 +217,7 @@ class Query {
      */
     public function whereIf(
         string $column,
-        QueryOperator|string $operator,
+        Operator|string $operator,
         array|int|string|null $value,
         ?bool $condition = null,
         bool $caseSensitive = false,
@@ -246,32 +232,30 @@ class Query {
 
     /**
      * Adds a Where expression with a value
-     * @param string $expression
-     * @param mixed  ...$values
+     * @param string           $expression
+     * @param float|int|string ...$values
      * @return Query
      */
-    public function whereExp(string $expression, mixed ...$values): Query {
-        $prefix       = $this->getWherePrefix();
-        $this->where .= "{$prefix}{$expression} ";
-        $this->params = Arrays::mergeLists($this->params, Arrays::toList($values));
+    public function whereExp(string $expression, float|int|string ...$values): Query {
+        $this->whereBuilder->whereExp($expression, ...$values);
         return $this;
     }
 
     /**
      * Adds a Search expression
-     * @param list<string>|string  $column
-     * @param mixed                $value
-     * @param QueryOperator|string $operator        Optional.
-     * @param bool                 $caseInsensitive Optional.
-     * @param bool                 $splitValue      Optional.
-     * @param string               $splitText       Optional.
-     * @param bool                 $matchAny        Optional.
+     * @param list<string>|string $column
+     * @param mixed               $value
+     * @param Operator|string     $operator        Optional.
+     * @param bool                $caseInsensitive Optional.
+     * @param bool                $splitValue      Optional.
+     * @param string              $splitText       Optional.
+     * @param bool                $matchAny        Optional.
      * @return Query
      */
     public function search(
         array|string $column,
         mixed $value,
-        QueryOperator|string $operator = QueryOperator::Like,
+        Operator|string $operator = Operator::Like,
         bool $caseInsensitive = true,
         bool $splitValue = false,
         string $splitText = " ",
@@ -281,55 +265,7 @@ class Query {
             return $this;
         }
 
-        // Prepare the columns
-        $columns   = is_array($column) ? $column : [ $column ];
-        $multiCols = Arrays::length($columns) > 1;
-
-        // Prepare the values
-        $valueParts = [];
-        if (is_array($value)) {
-            $valueParts = Arrays::toStrings($value, withoutEmpty: true);
-        } elseif (is_string($value)) {
-            $valueParts = $splitValue ? Strings::split($value, $splitText) : [ $value ];
-            $valueParts = Arrays::removeEmpty($valueParts);
-        } else {
-            $valueParts = [ Strings::toString($value) ];
-        }
-
-        if ($caseInsensitive) {
-            foreach ($valueParts as $index => $valuePart) {
-                $valueParts[$index] = Strings::toLowerCase($valuePart);
-            }
-        }
-        $multiParts = Arrays::length($valueParts) > 1;
-
-        // Handle the search
-        $isFirst = true;
-        if ($multiParts) {
-            $this->startParen();
-        }
-        foreach ($valueParts as $valuePart) {
-            if ($multiParts && !$isFirst) {
-                if ($matchAny) {
-                    $this->or();
-                } else {
-                    $this->and();
-                }
-            }
-            if ($multiCols) {
-                $this->startOr();
-            }
-            foreach ($columns as $columnSearch) {
-                $this->where($columnSearch, $operator, $valuePart);
-            }
-            if ($multiCols) {
-                $this->endOr();
-            }
-            $isFirst = false;
-        }
-        if ($multiParts) {
-            $this->endParen();
-        }
+        $this->whereBuilder->search($column, $value, $operator, $caseInsensitive, $splitValue, $splitText, $matchAny);
         return $this;
     }
 
@@ -339,10 +275,9 @@ class Query {
      * @return Query
      */
     public function addParam(int|string $param): Query {
-        $this->params[] = $param;
+        $this->whereBuilder->addParam($param);
         return $this;
     }
-
 
 
     /**
@@ -350,9 +285,7 @@ class Query {
      * @return Query
      */
     public function startParen(): Query {
-        $prefix          = $this->getWherePrefix();
-        $this->where    .= "{$prefix}(";
-        $this->addPrefix = false;
+        $this->whereBuilder->startParen();
         return $this;
     }
 
@@ -361,8 +294,7 @@ class Query {
      * @return Query
      */
     public function endParen(): Query {
-        $this->where    .= ") ";
-        $this->addPrefix = true;
+        $this->whereBuilder->endParen();
         return $this;
     }
 
@@ -371,8 +303,7 @@ class Query {
      * @return Query
      */
     public function and(): Query {
-        $this->where    .= " AND ";
-        $this->addPrefix = false;
+        $this->whereBuilder->and();
         return $this;
     }
 
@@ -381,11 +312,7 @@ class Query {
      * @return Query
      */
     public function startAnd(): Query {
-        $prefix           = $this->getWherePrefix();
-        $this->where     .= "{$prefix}(";
-        $this->prefixes[] = $this->prefix;
-        $this->prefix     = "AND";
-        $this->addPrefix  = false;
+        $this->whereBuilder->startAnd();
         return $this;
     }
 
@@ -394,7 +321,8 @@ class Query {
      * @return Query
      */
     public function endAnd(): Query {
-        return $this->endAndOr();
+        $this->whereBuilder->endAnd();
+        return $this;
     }
 
     /**
@@ -402,8 +330,7 @@ class Query {
      * @return Query
      */
     public function or(): Query {
-        $this->where    .= " OR ";
-        $this->addPrefix = false;
+        $this->whereBuilder->or();
         return $this;
     }
 
@@ -412,11 +339,7 @@ class Query {
      * @return Query
      */
     public function startOr(): Query {
-        $prefix           = $this->getWherePrefix();
-        $this->where     .= "{$prefix}(";
-        $this->prefixes[] = $this->prefix;
-        $this->prefix     = "OR";
-        $this->addPrefix  = false;
+        $this->whereBuilder->startOr();
         return $this;
     }
 
@@ -425,40 +348,18 @@ class Query {
      * @return Query
      */
     public function endOr(): Query {
-        return $this->endAndOr();
-    }
-
-    /**
-     * Ends an And o Or expression
-     * @return Query
-     */
-    private function endAndOr(): Query {
-        if (Strings::endsWith($this->where, "AND (")) {
-            $this->where = Strings::stripEnd($this->where, "AND (");
-        } elseif (Strings::endsWith($this->where, "OR (")) {
-            $this->where = Strings::stripEnd($this->where, "OR (");
-        } elseif (Strings::endsWith($this->where, "(")) {
-            $this->where = Strings::stripEnd($this->where, "(");
-        } else {
-            $this->where .= ") ";
-        }
-
-        $this->prefix    = array_pop($this->prefixes) ?? "AND";
-        $this->addPrefix = true;
+        $this->whereBuilder->endOr();
         return $this;
     }
 
 
-
     /**
      * Adds a Group By
-     * @param string $column
+     * @param string ...$columns
      * @return Query
      */
-    public function groupBy(string $column): Query {
-        $prefix         = $this->groupBy !== "" ? "," : "";
-        $this->groupBy .= "$prefix $column ";
-        $this->groups[] = $column;
+    public function groupBy(string ...$columns): Query {
+        $this->whereBuilder->groupBy(...$columns);
         return $this;
     }
 
@@ -469,9 +370,7 @@ class Query {
      * @return Query
      */
     public function orderBy(string $column, bool $isASC): Query {
-        $prefix         = $this->orderBy !== "" ? "," : "";
-        $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
-        $this->orders[] = $column;
+        $this->whereBuilder->orderBy($column, $isASC);
         return $this;
     }
 
@@ -482,13 +381,7 @@ class Query {
      * @return Query
      */
     public function limit(int $from, ?int $to = null): Query {
-        if ($from !== 0 || ($to !== null && $to !== 0)) {
-            if ($to !== null) {
-                $this->limit = max($from, 0) . ", " . max($to - $from + 1, 1);
-            } else {
-                $this->limit = (string)$from;
-            }
-        }
+        $this->whereBuilder->limit($from, $to);
         return $this;
     }
 
@@ -504,14 +397,41 @@ class Query {
         return $this->limit($from, $to);
     }
 
+    /**
+     * Adds an If Null expression
+     * @param int|string $value
+     * @return Query
+     */
+    public function ifNull(int|string $value): Query {
+        $this->queryBuilder->setIfNull($value);
+        return $this;
+    }
 
+
+
+    /**
+     * Returns true if the Field exists
+     * @param string $field
+     * @return bool
+     */
+    public function hasField(string $field): bool {
+        return $this->queryBuilder->hasField($field);
+    }
+
+    /**
+     * Returns the Fields
+     * @return Dictionary
+     */
+    public function getFields(): Dictionary {
+        return $this->queryBuilder->getFields();
+    }
 
     /**
      * Returns true if the Query is empty
      * @return bool
      */
     public function isEmpty(): bool {
-        return $this->where === "";
+        return $this->whereBuilder->isEmpty();
     }
 
     /**
@@ -519,7 +439,7 @@ class Query {
      * @return bool
      */
     public function isNotEmpty(): bool {
-        return $this->where !== "";
+        return !$this->isEmpty();
     }
 
     /**
@@ -527,8 +447,8 @@ class Query {
      * @param string $column
      * @return bool
      */
-    public function hasColumn(string $column): bool {
-        return Arrays::contains($this->columns, $column);
+    public function hasWhereColumn(string $column): bool {
+        return $this->whereBuilder->hasColumn($column);
     }
 
     /**
@@ -537,10 +457,7 @@ class Query {
      * @return bool
      */
     public function hasOrder(?string $order = null): bool {
-        if ($order !== null && $order !== "") {
-            return Arrays::contains($this->orders, $order);
-        }
-        return $this->orderBy !== "";
+        return $this->whereBuilder->hasOrder($order);
     }
 
     /**
@@ -549,10 +466,26 @@ class Query {
      * @return bool
      */
     public function hasGroup(?string $group = null): bool {
-        if ($group !== null && $group !== "") {
-            return Arrays::contains($this->groups, $group);
-        }
-        return $this->groupBy !== "";
+        return $this->whereBuilder->hasGroup($group);
+    }
+
+    /**
+     * Returns the Columns
+     * @return list<string>
+     */
+    public function getWhereColumns(): array {
+        return $this->whereBuilder->getColumns();
+    }
+
+    /**
+     * Updates a Column
+     * @param string $oldColumn
+     * @param string $newColumn
+     * @return Query
+     */
+    public function updateWhereColumn(string $oldColumn, string $newColumn): Query {
+        $this->whereBuilder->updateColumn($oldColumn, $newColumn);
+        return $this;
     }
 
 
@@ -563,57 +496,117 @@ class Query {
      * @return string
      */
     public function get(bool $addWhere = true): string {
-        $result = "";
-        if ($this->where !== "") {
-            $where   = Strings::stripStart($this->where, "AND ");
-            $result .= ($addWhere ? "WHERE " : "AND ") . $where;
-        }
-        if ($this->groupBy !== "") {
-            $result .= " GROUP BY {$this->groupBy}";
-        }
-        if ($this->orderBy !== "") {
-            $result .= " ORDER BY {$this->orderBy}";
-        }
-        if ($this->limit !== "") {
-            $result .= " LIMIT {$this->limit}";
-        }
-        return Strings::replacePattern($result, "!\s+!", " ");
+        return $this->whereBuilder->toSQL($addWhere);
     }
 
     /**
-     * Returns the Columns
-     * @return list<string>
+     * Returns the Params
+     * @return list<float|int|string>
      */
-    public function getColumns(): array {
-        $result = array_merge($this->columns, $this->groups, $this->orders);
-        $result = array_unique($result);
-        return array_values($result);
+    public function getParams(): array {
+        return $this->whereBuilder->getParams();
     }
 
+
+
     /**
-     * Updates a Column
-     * @param string $oldColumn
-     * @param string $newColumn
-     * @return Query
+     * Executes a SELECT query returning all the values in a Dictionary
+     * @param Database|null $db Optional.
+     * @return Dictionary
      */
-    public function updateColumn(string $oldColumn, string $newColumn): Query {
-        $this->where   = Strings::replace($this->where, " $oldColumn ", " $newColumn ");
-        $this->orderBy = Strings::replace($this->orderBy, " $oldColumn ", " $newColumn ");
-        $this->groupBy = Strings::replace($this->groupBy, " $oldColumn ", " $newColumn ");
-        return $this;
+    public function getAll(?Database $db = null): Dictionary {
+        if ($this->mode !== QueryMode::Select) {
+            return new Dictionary();
+        }
+
+        $db         = $db ?? Framework::getDatabase();
+        $expression = $this->queryBuilder->toSelectSQL();
+        $bindings   = $this->queryBuilder->getBindings();
+        $data       = $db->getData($expression, $bindings);
+        return new Dictionary($data);
     }
 
     /**
-     * Creates a list of question marks for the given array
-     * @param list<int|string> $array
+     * Executes a SELECT query returning the first value in a Dictionary
+     * @param Database|null $db Optional.
+     * @return Dictionary
+     */
+    public function getOne(?Database $db = null): Dictionary {
+        return $this->limit(1)->getAll($db)->getFirst();
+    }
+
+    /**
+     * Executes a SELECT query returning the first value of a Column
+     * @param string        $column
+     * @param Database|null $db     Optional.
+     * @return int
+     */
+    public function getInt(string $column, ?Database $db = null): int {
+        return $this->getOne($db)->getInt($column);
+    }
+
+    /**
+     * Executes a SELECT query returning the first value of a Column
+     * @param string        $column
+     * @param Database|null $db     Optional.
      * @return string
      */
-    public function createBinds(array $array): string {
-        $count = count($array);
-        $bind  = [];
-        for ($i = 0; $i < $count; $i += 1) {
-            $bind[] = "?";
+    public function getString(string $column, ?Database $db = null): string {
+        return $this->getOne($db)->getString($column);
+    }
+
+    /**
+     * Executes an INSERT, REPLACE or UPDATE query
+     * @param Database|null $db Optional.
+     * @return int
+     */
+    public function execute(?Database $db = null): int {
+        if ($this->mode === QueryMode::Select) {
+            return 0;
         }
-        return "(" . Strings::join($bind, ",") . ")";
+        $db = $db ?? Framework::getDatabase();
+
+        $expression = $this->queryBuilder->toSQL();
+        $bindings   = $this->queryBuilder->getBindings();
+        $result     = $db->execute($expression, $bindings);
+
+        if ($this->mode === QueryMode::Insert) {
+            return $result ? $db->getInsertID() : 0;
+        }
+        return $result ? 1 : 0;
+    }
+
+    /**
+     * Returns the SQL to add it as an assignment
+     * @return Assign
+     */
+    public function toAssign(): Assign {
+        return $this->queryBuilder->toAssign();
+    }
+
+    /**
+     * Returns the complete SQL expression of the Query
+     * @return string
+     */
+    public function toSQL(): string {
+        $expression = $this->queryBuilder->toSQL(forDebug: true);
+        $bindings   = $this->queryBuilder->getBindings();
+
+        // Interpolate the expression with the bindings
+        foreach ($bindings as $value) {
+            if (is_string($value)) {
+                $value = "'$value'";
+            } else {
+                $value = Strings::toString($value);
+            }
+            $expression = Strings::replacePattern($expression, '/\?/', $value, 1);
+        }
+
+        // Add new lines for better readability
+        foreach ([ "FROM", "LEFT JOIN", "VALUES", "SET", "WHERE", "ORDER BY", "GROUP BY", "LIMIT" ] as $key) {
+            $expression = Strings::replace($expression, "$key ", "\n$key ");
+        }
+
+        return $expression;
     }
 }

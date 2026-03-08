@@ -1,16 +1,16 @@
 <?php
-namespace Framework\Database\Query;
+namespace Framework\Database\Where;
 
-use Framework\Database\Query\BaseQuery;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Operator;
+use Framework\Database\Where\BaseWhere;
 
 /**
- * The Boolean Query
+ * The Boolean Where
  */
-class BooleanQuery extends BaseQuery {
+class BooleanWhere extends BaseWhere {
 
     /**
-     * Generates an Equal Query
+     * Adds an Equal condition
      * @param bool      $value
      * @param bool|null $condition Optional.
      * @return void
@@ -18,7 +18,7 @@ class BooleanQuery extends BaseQuery {
     public function equal(bool $value, ?bool $condition = null): void {
         $this->query->where(
             $this->column,
-            QueryOperator::Equal,
+            Operator::Equal,
             (int)$value,
             condition: $condition,
         );
@@ -27,15 +27,15 @@ class BooleanQuery extends BaseQuery {
 
 
     /**
-     * Generates an Any Query
+     * Adds an Any condition
      * @return void
      */
     public function isAny(): void {
-        $this->query->where($this->column, QueryOperator::GreaterOrEqual, 0);
+        $this->query->where($this->column, Operator::GreaterOrEqual, 0);
     }
 
     /**
-     * Generates a True Query
+     * Adds a True condition
      * @return void
      */
     public function isTrue(): void {
@@ -43,7 +43,7 @@ class BooleanQuery extends BaseQuery {
     }
 
     /**
-     * Generates a True Query
+     * Adds a True If condition
      * @param bool|null $condition Optional.
      * @return void
      */
@@ -52,7 +52,7 @@ class BooleanQuery extends BaseQuery {
     }
 
     /**
-     * Generates a False Query
+     * Adds a False condition
      * @return void
      */
     public function isFalse(): void {
@@ -60,7 +60,7 @@ class BooleanQuery extends BaseQuery {
     }
 
     /**
-     * Generates a False If Query
+     * Adds a False If condition
      * @param bool|null $condition Optional.
      * @return void
      */

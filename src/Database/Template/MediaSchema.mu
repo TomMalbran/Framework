@@ -3,8 +3,8 @@ namespace {{namespace}};
 
 use Framework\Framework;{{#hasFields}}
 use Framework\Database\Query\Query;
-use Framework\Database\Query\QueryOperator;{{/hasFields}}{{#hasReplace}}
-use Framework\Database\Type\Assign;{{/hasReplace}}
+use Framework\Database\Query\Operator;{{/hasFields}}{{#hasReplace}}
+use Framework\Database\Query\Assign;{{/hasReplace}}
 use Framework\File\File;
 
 /**
@@ -38,16 +38,16 @@ class MediaSchema {
 
             // Replace the File Path in {{name}}.{{fieldName}}
             {{#isReplace}}
-            ${{query}} = Query::create("{{fieldName}}", QueryOperator::Like, "\"$old\"");
-            $db->update("{{tableName}}", [
-                "{{fieldName}}" => Assign::replace($old, $new),
-            ], ${{query}});
+            Query::update("{{tableName}}")
+                ->set("{{fieldName}}", Assign::replace($old, $new))
+                ->where("{{fieldName}}", Operator::Like, "\"$old\"")
+                ->execute($db);
             {{/isReplace}}
             {{^isReplace}}
-            ${{query}} = Query::create("{{fieldName}}", QueryOperator::Equal, $old);
-            $db->update("{{tableName}}", [
-                "{{fieldName}}" => $new,
-            ], ${{query}});
+            Query::update("{{tableName}}")
+                ->set("{{fieldName}}", $new)
+                ->where("{{fieldName}}", Operator::Equal, $old)
+                ->execute($db);
             {{/isReplace}}
         {{/fields}}
         }

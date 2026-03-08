@@ -117,7 +117,7 @@ class SchemaCode {
             "hasDate"            => $hasDate,
             "hasDateType"        => $hasDateType,
             "hasJsonType"        => $hasJsonType,
-            "hasQueryOperator"   => $schemaModel->hasID || $hasUniques || $hasParents,
+            "hasOperator"        => $schemaModel->hasID || $hasUniques || $hasParents,
         ]);
         return Strings::replace($contents, "(, ", "(");
     }

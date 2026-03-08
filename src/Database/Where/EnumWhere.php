@@ -1,69 +1,69 @@
 <?php
-namespace Framework\Database\Query;
+namespace Framework\Database\Where;
 
-use Framework\Database\Query\BaseQuery;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Operator;
+use Framework\Database\Where\BaseWhere;
 use Framework\Enum\Enum;
 
 /**
- * The Enum Query
+ * The Enum Where
  */
-class EnumQuery extends BaseQuery {
+class EnumWhere extends BaseWhere {
 
     /**
-     * Adds an Enum Is Empty condition
+     * Adds a Is Empty condition
      * @return void
      */
     public function isEmpty(): void {
-        $this->query->where($this->column, QueryOperator::NotEqual, "");
+        $this->query->where($this->column, Operator::NotEqual, "");
     }
 
     /**
-     * Generates an Is Not Empty Query
+     * Adds a Is Not Empty condition
      * @return void
      */
     public function isNotEmpty(): void {
-        $this->query->where($this->column, QueryOperator::NotEqual, "");
+        $this->query->where($this->column, Operator::NotEqual, "");
     }
 
     /**
-     * Adds an Enum Equals condition
+     * Adds an Equals condition
      * @param Enum ...$values
      * @return void
      */
     public function equal(Enum ...$values): void {
         $names = $this->toNames(array_values($values));
-        $this->query->where($this->column, QueryOperator::Equal, $names);
+        $this->query->where($this->column, Operator::Equal, $names);
     }
 
     /**
-     * Adds an Enum Not Equals condition
+     * Adds a Not Equals condition
      * @param Enum ...$values
      * @return void
      */
     public function notEqual(Enum ...$values): void {
         $names = $this->toNames(array_values($values));
-        $this->query->where($this->column, QueryOperator::NotEqual, $names);
+        $this->query->where($this->column, Operator::NotEqual, $names);
     }
 
     /**
-     * Adds an Enum In condition
+     * Adds an In condition
      * @param list<Enum> $values
      * @return void
      */
     public function in(array $values): void {
         $names = $this->toNames($values);
-        $this->query->where($this->column, QueryOperator::In, $names);
+        $this->query->where($this->column, Operator::In, $names);
     }
 
     /**
-     * Adds an Enum Not In condition
+     * Adds a Not In condition
      * @param list<Enum> $values
      * @return void
      */
     public function notIn(array $values): void {
         $names = $this->toNames($values);
-        $this->query->where($this->column, QueryOperator::NotIn, $names);
+        $this->query->where($this->column, Operator::NotIn, $names);
     }
 
 

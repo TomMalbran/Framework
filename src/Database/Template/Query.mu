@@ -4,10 +4,9 @@ namespace {{namespace}};
 use {{namespace}}\{{columnClass}};{{#imports}}
 use {{.}};{{/imports}}
 
-use Framework\Database\Query\Query;
-use Framework\Database\Query\QueryOperator;
+use Framework\Database\Query\Operator;
 use Framework\Database\Query\SchemaQuery;{{#queries}}
-use Framework\Database\Query\{{.}};{{/queries}}
+use Framework\Database\Where\{{.}};{{/queries}}
 
 /**
  * The {{name}} Query
@@ -28,10 +27,9 @@ class {{queryClass}} extends SchemaQuery {
 
     /**
      * Creates a new {{queryClass}} instance
-     * @param Query|null $query Optional.
      */
-    public function __construct(?Query $query = null) {
-        parent::__construct($query);
+    public function __construct() {
+        parent::__construct();
 
         {{#properties}}
         $this->{{propName}} = new {{type}}($this->query, "{{value}}");
@@ -39,17 +37,17 @@ class {{queryClass}} extends SchemaQuery {
     }
 
     /**
-     * Adds an expression
+     * Adds a where expression
      * @param {{columnClass}} $column
-     * @param QueryOperator $operator
+     * @param Operator $operator
      * @param list<int|string>|int|string $value
      * @param bool $caseSensitive Optional.
      * @param bool|null $condition Optional.
      * @return {{queryClass}}
      */
-    public function add(
+    public function where(
         {{columnClass}} $column,
-        QueryOperator $operator,
+        Operator $operator,
         array|int|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
@@ -64,7 +62,7 @@ class {{queryClass}} extends SchemaQuery {
      * Adds a Search expression
      * @param list<{{columnClass}}> $column
      * @param mixed $value
-     * @param QueryOperator $operator Optional.
+     * @param Operator $operator Optional.
      * @param bool $caseInsensitive Optional.
      * @param bool $splitValue Optional.
      * @param string $splitText Optional.
@@ -74,7 +72,7 @@ class {{queryClass}} extends SchemaQuery {
     public function search(
         array $column,
         mixed $value,
-        QueryOperator $operator = QueryOperator::Like,
+        Operator $operator = Operator::Like,
         bool $caseInsensitive = true,
         bool $splitValue = false,
         string $splitText = " ",
@@ -94,11 +92,11 @@ class {{queryClass}} extends SchemaQuery {
      * @return {{queryClass}}
      */
     public function exists(SchemaQuery $subQuery): {{queryClass}} {
-        $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $subQuery->whereExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
         $this->query->whereExp("EXISTS (
             SELECT 1 FROM {$subQuery->tableName}
             " . $subQuery->query->get() . "
-        )", ...$subQuery->query->params);
+        )", ...$subQuery->query->getParams());
         return $this;
     }
 
@@ -108,11 +106,11 @@ class {{queryClass}} extends SchemaQuery {
      * @return {{queryClass}}
      */
     public function notExists(SchemaQuery $subQuery): {{queryClass}} {
-        $subQuery->addExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $subQuery->whereExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
         $this->query->whereExp("NOT EXISTS (
             SELECT 1 FROM {$subQuery->tableName}
             " . $subQuery->query->get() . "
-        )", ...$subQuery->query->params);
+        )", ...$subQuery->query->getParams());
         return $this;
     }
 }

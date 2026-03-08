@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Database;
+namespace Framework\Database\Query;
 
 use Framework\Framework;
 use Framework\Database\SchemaModel;
@@ -10,22 +10,22 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Schema Selection
+ * The Selection Builder
  */
-class Selection {
+class SelectionBuilder {
 
     private SchemaModel $schemaModel;
 
-    private int $index   = 66;
+    private int $index = 66;
 
     /** @var array<string,string> */
-    private array $keys    = [];
+    private array $keys = [];
 
     /** @var list<string> */
     private array $selects = [];
 
     /** @var list<string> */
-    private array $joins   = [];
+    private array $joins = [];
 
     /** @var list<array<string,mixed>> */
     private array $request = [];
@@ -35,8 +35,17 @@ class Selection {
      * Creates a new Selection instance
      * @param SchemaModel $schemaModel
      */
-    public function __construct(SchemaModel $schemaModel) {
+    private function __construct(SchemaModel $schemaModel) {
         $this->schemaModel = $schemaModel;
+    }
+
+    /**
+     * Creates a new Selection instance
+     * @param SchemaModel $schemaModel
+     * @return SelectionBuilder
+     */
+    public static function create(SchemaModel $schemaModel): SelectionBuilder {
+        return new SelectionBuilder($schemaModel);
     }
 
 
@@ -44,9 +53,9 @@ class Selection {
     /**
      * Adds the Fields to the Selects
      * @param bool $decrypted Optional.
-     * @return Selection
+     * @return SelectionBuilder
      */
-    public function addFields(bool $decrypted = false): Selection {
+    public function addFields(bool $decrypted = false): SelectionBuilder {
         $masterKey = Config::getDbKey();
         $mainKey   = $this->schemaModel->tableName;
 
@@ -68,9 +77,9 @@ class Selection {
 
     /**
      * Adds the Expressions to the Selects
-     * @return Selection
+     * @return SelectionBuilder
      */
-    public function addExpressions(): Selection {
+    public function addExpressions(): SelectionBuilder {
         foreach ($this->schemaModel->expressions as $expression) {
             $this->selects[] = "({$expression->expression}) AS {$expression->name}";
         }
@@ -81,10 +90,14 @@ class Selection {
      * Adds extra Selects
      * @param list<string>|string $selects
      * @param bool                $addMainKey Optional.
-     * @return Selection
+     * @return SelectionBuilder
      */
-    public function addSelects(array|string $selects, bool $addMainKey = false): Selection {
-        $selects = Arrays::toStrings($selects);
+    public function addSelects(array|string $selects, bool $addMainKey = false): SelectionBuilder {
+        $selects = Arrays::toStrings($selects, withoutEmpty: true);
+        if (Arrays::isEmpty($selects)) {
+            return $this;
+        }
+
         foreach ($selects as $select) {
             if ($addMainKey) {
                 $this->selects[] = $this->schemaModel->getKey($select);
@@ -99,9 +112,9 @@ class Selection {
      * Adds the Joins
      * @param list<string> $extraJoins  Optional.
      * @param bool         $withSelects Optional.
-     * @return Selection
+     * @return SelectionBuilder
      */
-    public function addJoins(array $extraJoins = [], bool $withSelects = true): Selection {
+    public function addJoins(array $extraJoins = [], bool $withSelects = true): SelectionBuilder {
         foreach ($this->schemaModel->relations as $relation) {
             $this->joins[] = $relation->getExpression();
 
@@ -120,9 +133,9 @@ class Selection {
 
     /**
      * Adds the Counts
-     * @return Selection
+     * @return SelectionBuilder
      */
-    public function addCounts(): Selection {
+    public function addCounts(): SelectionBuilder {
         foreach ($this->schemaModel->counts as $count) {
             $asTable                  = chr($this->index);
             $this->joins[]            = $count->getExpression($asTable, $this->schemaModel->tableName);
@@ -136,11 +149,11 @@ class Selection {
 
 
     /**
-     * Creates a Request Expression
+     * Returns the Selection as an SQL Expression
      * @param Query $query
      * @return string
      */
-    public function getExpression(Query $query): string {
+    public function toSQL(Query $query): string {
         $this->setTableKeys($query);
 
         $mainKey    = $this->schemaModel->tableName;
@@ -156,30 +169,19 @@ class Selection {
     }
 
     /**
-     * Does a Request to the Query
-     * @param Query $query
-     * @return list<array<string,int|string|null>>
-     */
-    public function request(Query $query): array {
-        $expression    = $this->getExpression($query);
-        $this->request = Framework::getDatabase()->queryData($expression, $query);
-        return $this->request;
-    }
-
-    /**
      * Sets the Table Keys to the condition
      * @param Query $query
      * @return void
      */
     private function setTableKeys(Query $query): void {
-        $columns = $query->getColumns();
+        $columns = $query->getWhereColumns();
         $mainKey = $this->schemaModel->tableName;
 
         foreach ($columns as $column) {
             $found = false;
             foreach ($this->schemaModel->fields as $field) {
                 if ($column === $field->dbName) {
-                    $query->updateColumn($column, "$mainKey.{$field->dbName}");
+                    $query->updateWhereColumn($column, "$mainKey.{$field->dbName}");
                     $found = true;
                     break;
                 }
@@ -190,7 +192,7 @@ class Selection {
                     foreach ($relation->fields as $field) {
                         if ($column === $field->dbName) {
                             $tableName = $relation->getDbTableName();
-                            $query->updateColumn($column, "$tableName.{$field->dbName}");
+                            $query->updateWhereColumn($column, "$tableName.{$field->dbName}");
                             $found = true;
                             break;
                         }
@@ -203,7 +205,7 @@ class Selection {
                     if (isset($this->keys[$count->name]) && $this->keys[$count->name] !== "") {
                         $joinKey = $this->keys[$count->name];
                         if ($column === $count->name) {
-                            $query->updateColumn($column, $count->getSelect($joinKey));
+                            $query->updateWhereColumn($column, $count->getSelect($joinKey));
                             $found = true;
                             break;
                         }
@@ -214,7 +216,7 @@ class Selection {
             if (!$found) {
                 foreach ($this->schemaModel->expressions as $expression) {
                     if ($column === $expression->name) {
-                        $query->updateColumn($column, "({$expression->expression})");
+                        $query->updateWhereColumn($column, "({$expression->expression})");
                         $found = true;
                         break;
                     }
@@ -224,6 +226,25 @@ class Selection {
     }
 
 
+
+    /**
+     * Does a Request to the Query
+     * @param Query $query
+     * @return SelectionBuilder
+     */
+    public function request(Query $query): SelectionBuilder {
+        $expression    = $this->toSQL($query);
+        $this->request = Framework::getDatabase()->queryData($expression, $query);
+        return $this;
+    }
+
+    /**
+     * Returns the Request Result
+     * @return list<array<string,mixed>>
+     */
+    public function getResult(): array {
+        return $this->request;
+    }
 
     /**
      * Generates the Result from the Request
