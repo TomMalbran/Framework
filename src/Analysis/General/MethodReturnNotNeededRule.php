@@ -9,8 +9,10 @@ use PHPStan\Node\InClassMethodNode;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt;
-use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Stmt\Return_;
+use PhpParser\Node\Stmt\Switch_;
+use PhpParser\Node\Stmt\TryCatch;
 
 /**
  * The Method Return Not Needed Rule
@@ -66,9 +68,13 @@ class MethodReturnNotNeededRule implements Rule {
             return [];
         }
 
-        $returns = $this->findReturns($statements);
+        // Allow methods that only contain a single statement
+        if (count($statements) === 1) {
+            return [];
+        }
 
         // If no return statements are found, nothing to validate
+        $returns = $this->findReturns($statements);
         if (count($returns) === 0) {
             return [];
         }
@@ -115,8 +121,27 @@ class MethodReturnNotNeededRule implements Rule {
     private function findReturns(array $nodes): array {
         $found = [];
         foreach ($nodes as $node) {
+            // Standard return
             if ($node instanceof Return_ && $node->expr !== null) {
                 $found[] = $node->expr;
+            }
+
+            // Handle Switch cases
+            if ($node instanceof Switch_) {
+                foreach ($node->cases as $case) {
+                    $found = array_merge($found, $this->findReturns($case->stmts));
+                }
+            }
+
+            // Handle Try/Catch/Finally
+            if ($node instanceof TryCatch) {
+                $found = array_merge($found, $this->findReturns($node->stmts));
+                foreach ($node->catches as $catch) {
+                    $found = array_merge($found, $this->findReturns($catch->stmts));
+                }
+                if ($node->finally !== null) {
+                    $found = array_merge($found, $this->findReturns($node->finally->stmts));
+                }
             }
 
             if ($node instanceof Stmt) {
