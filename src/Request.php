@@ -286,7 +286,8 @@ class Request implements IteratorAggregate, JsonSerializable {
     public function isActive(string $key): bool {
         if (isset($this->request[$key])) {
             $value = $this->request[$key];
-            return $value === "true" || $value === 1;
+            return $value === "true" || $value === true ||
+                $value === "1" || $value === 1;
         }
         return false;
     }
