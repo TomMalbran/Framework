@@ -115,6 +115,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         return $this->has($key);
     }
 
+    /**
+     * Returns true if the key exits in the data or in the list as an Integer
+     * @param int $key
+     * @return bool
+     */
+    public function containsInt(int $key): bool {
+        if ($this->isList()) {
+            return Arrays::contains($this->toInts(), $key);
+        }
+        return $this->has($key);
+    }
+
 
 
     /**
