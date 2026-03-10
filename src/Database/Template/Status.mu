@@ -46,7 +46,6 @@ enum {{statusClass}} implements Enum, JsonSerializable {
      * @return string
      */
     public static function getName({{statusClass}}|string $value, string $isoCode = ""): string {
-        $value = ($value instanceof {{statusClass}}) ? $value->name : $value;
         return NLS::getIndex("SELECT_STATUS", $value, $isoCode);
     }
 
