@@ -137,23 +137,47 @@ class TimeTable {
 
 
     /**
+     * Returns true if the Time Tables contain Holiday
+     * @return bool
+     */
+    public function hasHoliday(): bool {
+        foreach ($this->timeTables as $timeTable) {
+            if ($timeTable->hasHoliday) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns true if the Time Tables are in the Current time
      * @param int  $minuteGap Optional.
+     * @param bool $isHoliday Optional.
      * @param bool $skipTime  Optional.
      * @return bool
      */
-    public function isCurrent(int $minuteGap = 0, bool $skipTime = false): bool {
-        return $this->containDate(Date::now(), $minuteGap, $skipTime);
+    public function isCurrent(
+        int $minuteGap = 0,
+        bool $isHoliday = false,
+        bool $skipTime = false,
+    ): bool {
+        return $this->containsDate(Date::now(), $minuteGap, $skipTime, $isHoliday);
     }
 
     /**
      * Returns true if the Time Tables contain the given Date
      * @param Date $date
      * @param int  $minuteGap Optional.
+     * @param bool $isHoliday Optional.
      * @param bool $skipTime  Optional.
      * @return bool
      */
-    public function containDate(Date $date, int $minuteGap = 0, bool $skipTime = false): bool {
+    public function containsDate(
+        Date $date,
+        int $minuteGap = 0,
+        bool $isHoliday = false,
+        bool $skipTime = false,
+    ): bool {
         if (count($this->timeTables) === 0) {
             return false;
         }
@@ -162,7 +186,10 @@ class TimeTable {
         $nowMinutes = $date->toMinutes();
 
         foreach ($this->timeTables as $timeTable) {
-            if (!Arrays::contains($timeTable->days, $weekDay)) {
+            if ($isHoliday && !$timeTable->hasHoliday) {
+                continue;
+            }
+            if (!$isHoliday && !Arrays::contains($timeTable->days, $weekDay)) {
                 continue;
             }
 

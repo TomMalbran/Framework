@@ -1,15 +1,20 @@
 <?php
 namespace Framework\Date;
 
+use Framework\Utils\Arrays;
+
 /**
  * The Time Table Item class
  */
 class TimeTableItem {
 
+    public const HolidayIndex = 8;
+
     /** @var list<int> */
     public array $days;
     public string $from;
     public string $to;
+    public bool $hasHoliday;
 
 
     /**
@@ -26,5 +31,7 @@ class TimeTableItem {
         $this->days = $days;
         $this->from = $from;
         $this->to   = $to;
+
+        $this->hasHoliday = Arrays::contains($days, self::HolidayIndex);
     }
 }
