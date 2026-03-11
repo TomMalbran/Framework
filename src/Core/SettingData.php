@@ -26,9 +26,7 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
         $query = new SettingsQuery();
         $query->section->equal($section);
         $query->variable->equal($variable);
-
-        $result = self::getEntityValue($query, SettingsColumn::Value);
-        return Strings::toString($result);
+        return self::getEntityValue($query, SettingsColumn::Value);
     }
 
     /**

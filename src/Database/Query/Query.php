@@ -1,116 +1,193 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Framework;
 use Framework\Database\Database;
+use Framework\Database\Query\QueryLike;
 use Framework\Database\Query\QueryMode;
-use Framework\Database\Query\Operator;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\WhereBuilder;
+use Framework\Database\Query\Operator;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
-use Framework\Utils\Strings;
 
 /**
  * The Database Query
  */
-class Query {
+class Query implements QueryLike {
 
+    private QueryMode $mode;
     private QueryBuilder $queryBuilder;
     private WhereBuilder $whereBuilder;
-
-    private QueryMode $mode = QueryMode::Select;
 
 
     /**
      * Creates a new Query instance
-     * @param QueryMode $mode      Optional.
-     * @param string    $tableName Optional.
+     * @param QueryMode        $mode
+     * @param QueryLike|string $queryOrTable
+     * @param string           $asTable      Optional.
      */
-    public function __construct(QueryMode $mode = QueryMode::Select, string $tableName = "") {
-        $this->whereBuilder = new WhereBuilder();
-        $this->queryBuilder = new QueryBuilder($mode, $tableName, $this->whereBuilder);
+    private function __construct(
+        QueryMode $mode,
+        QueryLike|string $queryOrTable,
+        string $asTable = "",
+    ) {
+        if ($queryOrTable instanceof QueryLike) {
+            $tableName = $queryOrTable->getTableName();
+        } else {
+            $tableName = $queryOrTable;
+        }
 
-        $this->mode = $mode;
+        $this->mode         = $mode;
+        $this->whereBuilder = new WhereBuilder();
+        $this->queryBuilder = new QueryBuilder($mode, $tableName, $asTable, $this->whereBuilder);
+
+        if ($queryOrTable instanceof QueryLike) {
+            $this->whereBuilder->copy($queryOrTable->getQuery()->whereBuilder);
+        }
     }
 
     /**
      * Creates a new SELECT Query for the given table
-     * @param string $tableName
+     * @param QueryLike|string $queryOrTable
+     * @param string           $as           Optional.
      * @return Query
      */
-    public static function select(string $tableName): Query {
-        return new Query(QueryMode::Select, $tableName);
+    public static function select(QueryLike|string $queryOrTable, string $as = ""): Query {
+        return new Query(QueryMode::Select, $queryOrTable, $as);
     }
 
     /**
      * Creates a new INSERT Query for the given table
-     * @param string $tableName
+     * @param QueryLike|string $queryOrTable
      * @return Query
      */
-    public static function insert(string $tableName): Query {
-        return new Query(QueryMode::Insert, $tableName);
+    public static function insert(QueryLike|string $queryOrTable): Query {
+        return new Query(QueryMode::Insert, $queryOrTable);
     }
 
     /**
      * Creates a new REPLACE Query for the given table
-     * @param string $tableName
+     * @param QueryLike|string $queryOrTable
      * @return Query
      */
-    public static function replace(string $tableName): Query {
-        return new Query(QueryMode::Replace, $tableName);
+    public static function replace(QueryLike|string $queryOrTable): Query {
+        return new Query(QueryMode::Replace, $queryOrTable);
     }
 
     /**
      * Creates a new UPDATE Query for the given table
-     * @param string $tableName
+     * @param QueryLike|string $queryOrTable
+     * @param string           $as           Optional.
      * @return Query
      */
-    public static function update(string $tableName): Query {
-        return new Query(QueryMode::Update, $tableName);
+    public static function update(QueryLike|string $queryOrTable, string $as = ""): Query {
+        return new Query(QueryMode::Update, $queryOrTable, $as);
     }
 
     /**
      * Creates a new DELETE Query for the given table
-     * @param string $tableName
+     * @param QueryLike|string $queryOrTable
      * @return Query
      */
-    public static function delete(string $tableName): Query {
-        return new Query(QueryMode::Delete, $tableName);
+    public static function delete(QueryLike|string $queryOrTable): Query {
+        return new Query(QueryMode::Delete, $queryOrTable);
     }
 
     /**
      * Creates a new TRUNCATE Query for the given table
-     * @param string $tableName
+     * @param QueryLike|string $queryOrTable
      * @return Query
      */
-    public static function truncate(string $tableName): Query {
-        return new Query(QueryMode::Truncate, $tableName);
+    public static function truncate(QueryLike|string $queryOrTable): Query {
+        return new Query(QueryMode::Truncate, $queryOrTable);
     }
 
 
 
     /**
      * Adds a Join to the Query
-     * @param string $table
-     * @param string $condition
-     * @param string $type      Optional.
+     * @param SchemaQuery|string $queryOrTable
+     * @param string             $as           Optional.
+     * @param string             $on           Optional.
+     * @param string             $type         Optional.
      * @return Query
      */
-    public function join(string $table, string $condition, string $type = "LEFT"): Query {
-        $this->queryBuilder->addJoin($table, $condition, $type);
+    public function join(
+        SchemaQuery|string $queryOrTable,
+        string $as = "",
+        string $on = "",
+        string $type = "LEFT",
+    ): Query {
+        // Do a Join using the table name
+        if (is_string($queryOrTable)) {
+            $expression = "$type JOIN $queryOrTable";
+            if ($as !== "") {
+                $expression .= " AS $as";
+            }
+            if ($on !== "") {
+                $expression .= " ON ($on)";
+            }
+            $this->queryBuilder->addJoin($expression);
+            return $this;
+        }
+
+        // Do a Join using the Query
+        $thisTable = $this->getTableName();
+        $tableName = $queryOrTable->getTableName();
+        $idDbName  = $queryOrTable->getIDDbName();
+        if ($on === "" && $idDbName !== "") {
+            $on = "{$tableName}.{$idDbName} = {$thisTable}.{$idDbName}";
+        }
+
+        // The ON is required for the Join
+        if ($idDbName === "") {
+            return $this;
+        }
+
+        // Add the Join
+        $this->queryBuilder->addJoin("$type JOIN $tableName ON ($on)");
+        $this->whereBuilder->join($queryOrTable->getQuery()->whereBuilder);
+        return $this;
+    }
+
+    /**
+     * Adds a raw Join to the Query
+     * @param string $join
+     * @return Query
+     */
+    public function addJoin(string $join): Query {
+        $this->queryBuilder->addJoin($join);
         return $this;
     }
 
     /**
      * Sets the Columns used in a SELECT query
-     * @param string ...$selects
+     * @param array<string,string>|string $columns
+     * @param string                      ...$selects
      * @return Query
      */
-    public function columns(string ...$selects): Query {
+    public function columns(array|string $columns, string ...$selects): Query {
+        if (is_array($columns)) {
+            foreach ($columns as $alias => $column) {
+                $this->queryBuilder->addSelect("$column AS $alias");
+            }
+        } else {
+            $this->queryBuilder->addSelect($columns);
+        }
+
         foreach ($selects as $select) {
             $this->queryBuilder->addSelect($select);
         }
+        return $this;
+    }
+
+    /**
+     * Adds a new Select clause
+     * @param string $select
+     * @return Query
+     */
+    public function addSelect(string $select): Query {
+        $this->queryBuilder->addSelect($select);
         return $this;
     }
 
@@ -147,18 +224,6 @@ class Query {
     }
 
 
-
-    /**
-     * Copies the Where clause from another Query instance
-     * @param Query|null $query Optional.
-     * @return Query
-     */
-    public function query(?Query $query = null): Query {
-        if ($query !== null) {
-            $this->whereBuilder->copy($query->whereBuilder);
-        }
-        return $this;
-    }
 
     /**
      * Adds a Where expression
@@ -238,6 +303,26 @@ class Query {
      */
     public function whereExp(string $expression, float|int|string ...$values): Query {
         $this->whereBuilder->whereExp($expression, ...$values);
+        return $this;
+    }
+
+    /**
+     * Adds a Where Exists expression
+     * @param QueryLike $subQuery
+     * @return Query
+     */
+    public function whereExists(QueryLike $subQuery): Query {
+        $this->whereBuilder->whereExists($subQuery->getQuery());
+        return $this;
+    }
+
+    /**
+     * Adds a Where Not Exists expression
+     * @param QueryLike $subQuery
+     * @return Query
+     */
+    public function whereNotExists(QueryLike $subQuery): Query {
+        $this->whereBuilder->whereExists($subQuery->getQuery(), notExists: true);
         return $this;
     }
 
@@ -443,6 +528,32 @@ class Query {
     }
 
     /**
+     * Returns true if the Query is a SELECT query
+     * @return bool
+     */
+    public function isSelect(): bool {
+        return $this->mode === QueryMode::Select;
+    }
+
+    /**
+     * Returns the Query
+     * @return Query
+     */
+    #[\Override]
+    public function getQuery(): Query {
+        return $this;
+    }
+
+    /**
+     * Returns the Table Name
+     * @return string
+     */
+    #[\Override]
+    public function getTableName(): string {
+        return $this->queryBuilder->getTableName();
+    }
+
+    /**
      * Returns true if the given Column is in the Query
      * @param string $column
      * @return bool
@@ -491,25 +602,6 @@ class Query {
 
 
     /**
-     * Returns the complete Query to use with the Database
-     * @param bool $addWhere Optional.
-     * @return string
-     */
-    public function get(bool $addWhere = true): string {
-        return $this->whereBuilder->toSQL($addWhere);
-    }
-
-    /**
-     * Returns the Params
-     * @return list<float|int|string>
-     */
-    public function getParams(): array {
-        return $this->whereBuilder->getParams();
-    }
-
-
-
-    /**
      * Executes a SELECT query returning all the values in a Dictionary
      * @param Database|null $db Optional.
      * @return Dictionary
@@ -519,8 +611,8 @@ class Query {
             return new Dictionary();
         }
 
-        $db         = $db ?? Framework::getDatabase();
-        $expression = $this->queryBuilder->toSelectSQL();
+        $db         = Database::getInstance($db);
+        $expression = $this->queryBuilder->toSQL();
         $bindings   = $this->queryBuilder->getBindings();
         $data       = $db->getData($expression, $bindings);
         return new Dictionary($data);
@@ -564,8 +656,8 @@ class Query {
         if ($this->mode === QueryMode::Select) {
             return 0;
         }
-        $db = $db ?? Framework::getDatabase();
 
+        $db         = Database::getInstance($db);
         $expression = $this->queryBuilder->toSQL();
         $bindings   = $this->queryBuilder->getBindings();
         $result     = $db->execute($expression, $bindings);
@@ -585,28 +677,29 @@ class Query {
     }
 
     /**
-     * Returns the complete SQL expression of the Query
+     * Returns the SQL expression of the Query
      * @return string
      */
     public function toSQL(): string {
+        return $this->queryBuilder->toSQL();
+    }
+
+    /**
+     * Returns the SQL expression of the Query for Debugging
+     * @return string
+     */
+    public function toDebugSQL(): string {
         $expression = $this->queryBuilder->toSQL(forDebug: true);
         $bindings   = $this->queryBuilder->getBindings();
 
-        // Interpolate the expression with the bindings
-        foreach ($bindings as $value) {
-            if (is_string($value)) {
-                $value = "'$value'";
-            } else {
-                $value = Strings::toString($value);
-            }
-            $expression = Strings::replacePattern($expression, '/\?/', $value, 1);
-        }
+        return $this->queryBuilder->interpolateParams($expression, $bindings);
+    }
 
-        // Add new lines for better readability
-        foreach ([ "FROM", "LEFT JOIN", "VALUES", "SET", "WHERE", "ORDER BY", "GROUP BY", "LIMIT" ] as $key) {
-            $expression = Strings::replace($expression, "$key ", "\n$key ");
-        }
-
-        return $expression;
+    /**
+     * Returns the Bindings
+     * @return list<float|int|string>
+     */
+    public function getBindings(): array {
+        return $this->queryBuilder->getBindings();
     }
 }

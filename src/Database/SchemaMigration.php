@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Framework;
 use Framework\Database\Database;
 use Framework\Database\SchemaFactory;
 use Framework\Database\SchemaModel;
@@ -22,7 +21,7 @@ class SchemaMigration {
      * @return void
      */
     public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): void {
-        $db            = Framework::getDatabase();
+        $db            = Database::getInstance();
         $schemaModels  = SchemaFactory::getData();
         $startMovement = SettingData::getCore("movement");
         $startRename   = SettingData::getCore("rename");

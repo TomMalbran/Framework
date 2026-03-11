@@ -47,7 +47,8 @@ class Credential extends CredentialSchema {
         if (!Arrays::isEmpty($filter)) {
             $filters = Arrays::toStrings($filter);
             foreach ($filters as $key) {
-                $query->query->where($key, Operator::Equal, $value);
+                $column = CredentialColumn::fromValue($key);
+                $query->where($column, Operator::Equal, $value);
             }
         }
         return $query;
@@ -537,7 +538,7 @@ class Credential extends CredentialSchema {
         $query->credentialID->equalIf($credentialID);
         $query->email->equalIf($email);
         $query->endOr();
-        return self::getEntityValue($query, CredentialColumn::ReqPassChange) === 1;
+        return self::getEntityValue($query, CredentialColumn::ReqPassChange) === "1";
     }
 
 

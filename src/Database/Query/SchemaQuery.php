@@ -2,25 +2,66 @@
 namespace Framework\Database\Query;
 
 use Framework\Database\Query\Query;
+use Framework\Database\Query\QueryLike;
 
 /**
  * The Schema Query
  */
-class SchemaQuery {
+class SchemaQuery implements QueryLike {
 
-    public Query $query;
+    protected Query $query;
 
-    public string $tableName = "";
-    public string $idDbName  = "";
+    protected string $tableName;
+    protected string $idDbName;
 
 
 
     /**
      * Creates a new SchemaQuery instance
+     * @param string $tableName
+     * @param string $idDbName  Optional.
      */
-    protected function __construct() {
-        $this->query = Query::select($this->tableName);
+    protected function __construct(string $tableName, string $idDbName = "") {
+        $this->query     = Query::select($tableName);
+        $this->tableName = $tableName;
+        $this->idDbName  = $idDbName;
     }
+
+    /**
+     * Returns the Query
+     * @return Query
+     */
+    #[\Override]
+    public function getQuery(): Query {
+        return $this->query;
+    }
+
+    /**
+     * Returns the Table Name
+     * @return string
+     */
+    #[\Override]
+    public function getTableName(): string {
+        return $this->tableName;
+    }
+
+    /**
+     * Returns the ID DB Name
+     * @return string
+     */
+    public function getIDDbName(): string {
+        return $this->idDbName;
+    }
+
+    /**
+     * Returns the Debug SQL
+     * @return string
+     */
+    public function toDebugSQL(): string {
+        return $this->query->toDebugSQL();
+    }
+
+
 
     /**
      * Returns true if the Query is empty
@@ -61,78 +102,90 @@ class SchemaQuery {
         return $this;
     }
 
+    /**
+     * Adds an Exists expression
+     * @param QueryLike $subQuery
+     * @return SchemaQuery
+     */
+    public function whereExists(QueryLike $subQuery): SchemaQuery {
+        $this->query->whereExists($subQuery);
+        return $this;
+    }
+
+    /**
+     * Adds a Not Exists expression
+     * @param QueryLike $subQuery
+     * @return SchemaQuery
+     */
+    public function whereNotExists(QueryLike $subQuery): SchemaQuery {
+        $this->query->whereNotExists($subQuery);
+        return $this;
+    }
+
 
 
     /**
      * Adds an Open Parenthesis
-     * @return SchemaQuery
+     * @return void
      */
-    public function startParen(): SchemaQuery {
+    public function startParen(): void {
         $this->query->startParen();
-        return $this;
     }
 
     /**
      * Adds a Close Parenthesis
-     * @return SchemaQuery
+     * @return void
      */
-    public function endParen(): SchemaQuery {
+    public function endParen(): void {
         $this->query->endParen();
-        return $this;
     }
 
     /**
      * Adds an And
-     * @return SchemaQuery
+     * @return void
      */
-    public function and(): SchemaQuery {
+    public function and(): void {
         $this->query->and();
-        return $this;
     }
 
     /**
      * Starts an And expression
-     * @return SchemaQuery
+     * @return void
      */
-    public function startAnd(): SchemaQuery {
+    public function startAnd(): void {
         $this->query->startAnd();
-        return $this;
     }
 
     /**
      * Ends an And expression
-     * @return SchemaQuery
+     * @return void
      */
-    public function endAnd(): SchemaQuery {
+    public function endAnd(): void {
         $this->query->endAnd();
-        return $this;
     }
 
     /**
      * Adds an Or
-     * @return SchemaQuery
+     * @return void
      */
-    public function or(): SchemaQuery {
+    public function or(): void {
         $this->query->or();
-        return $this;
     }
 
     /**
      * Starts an Or expression
-     * @return SchemaQuery
+     * @return void
      */
-    public function startOr(): SchemaQuery {
+    public function startOr(): void {
         $this->query->startOr();
-        return $this;
     }
 
     /**
      * Ends an Or expression
-     * @return SchemaQuery
+     * @return void
      */
-    public function endOr(): SchemaQuery {
+    public function endOr(): void {
         $this->query->endOr();
-        return $this;
     }
 
 
@@ -141,21 +194,19 @@ class SchemaQuery {
      * Adds a Limit
      * @param int      $from
      * @param int|null $to   Optional.
-     * @return SchemaQuery
+     * @return void
      */
-    public function limit(int $from, ?int $to = null): SchemaQuery {
+    public function limit(int $from, ?int $to = null): void {
         $this->query->limit($from, $to);
-        return $this;
     }
 
     /**
      * Adds a limit using pagination
      * @param int $page   Optional.
      * @param int $amount Optional.
-     * @return SchemaQuery
+     * @return void
      */
-    public function paginate(int $page = 0, int $amount = 100): SchemaQuery {
+    public function paginate(int $page = 0, int $amount = 100): void {
         $this->query->paginate($page, $amount);
-        return $this;
     }
 }

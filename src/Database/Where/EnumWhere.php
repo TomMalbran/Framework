@@ -11,11 +11,36 @@ use Framework\Enum\Enum;
 class EnumWhere extends BaseWhere {
 
     /**
+     * Adds a Compare condition
+     * @param Operator            $operator
+     * @param list<string>|string $value
+     * @param bool                $caseSensitive Optional.
+     * @param bool|null           $condition     Optional.
+     * @return void
+     */
+    public function compare(
+        Operator $operator,
+        array|string $value,
+        bool $caseSensitive = false,
+        ?bool $condition = null,
+    ): void {
+        $this->query->where(
+            $this->column,
+            $operator,
+            $value,
+            $caseSensitive,
+            $condition,
+        );
+    }
+
+
+
+    /**
      * Adds a Is Empty condition
      * @return void
      */
     public function isEmpty(): void {
-        $this->query->where($this->column, Operator::NotEqual, "");
+        $this->compare(Operator::NotEqual, "");
     }
 
     /**
@@ -23,7 +48,7 @@ class EnumWhere extends BaseWhere {
      * @return void
      */
     public function isNotEmpty(): void {
-        $this->query->where($this->column, Operator::NotEqual, "");
+        $this->compare(Operator::NotEqual, "");
     }
 
     /**
@@ -33,7 +58,7 @@ class EnumWhere extends BaseWhere {
      */
     public function equal(Enum ...$values): void {
         $names = $this->toNames(array_values($values));
-        $this->query->where($this->column, Operator::Equal, $names);
+        $this->compare(Operator::Equal, $names);
     }
 
     /**
@@ -43,8 +68,52 @@ class EnumWhere extends BaseWhere {
      */
     public function notEqual(Enum ...$values): void {
         $names = $this->toNames(array_values($values));
-        $this->query->where($this->column, Operator::NotEqual, $names);
+        $this->compare(Operator::NotEqual, $names);
     }
+
+
+
+    /**
+     * Adds an Equals condition with the Name of the Enum
+     * @param string $name
+     * @param bool   $caseSensitive Optional.
+     * @return void
+     */
+    public function equalName(string $name, bool $caseSensitive = false): void {
+        $this->compare(Operator::Equal, $name, $caseSensitive);
+    }
+
+    /**
+     * Adds a Not Equals condition with the Name of the Enum
+     * @param string $name
+     * @param bool   $caseSensitive Optional.
+     * @return void
+     */
+    public function notEqualName(string $name, bool $caseSensitive = false): void {
+        $this->compare(Operator::NotEqual, $name, $caseSensitive);
+    }
+
+    /**
+     * Adds a Like condition
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
+     * @return void
+     */
+    public function like(string $value, bool $caseSensitive = false): void {
+        $this->compare(Operator::Like, $value, $caseSensitive);
+    }
+
+    /**
+     * Adds a Not Like condition
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
+     * @return void
+     */
+    public function notLike(string $value, bool $caseSensitive = false): void {
+        $this->compare(Operator::NotLike, $value, $caseSensitive);
+    }
+
+
 
     /**
      * Adds an In condition
@@ -53,7 +122,7 @@ class EnumWhere extends BaseWhere {
      */
     public function in(array $values): void {
         $names = $this->toNames($values);
-        $this->query->where($this->column, Operator::In, $names);
+        $this->compare(Operator::In, $names);
     }
 
     /**
@@ -63,7 +132,7 @@ class EnumWhere extends BaseWhere {
      */
     public function notIn(array $values): void {
         $names = $this->toNames($values);
-        $this->query->where($this->column, Operator::NotIn, $names);
+        $this->compare(Operator::NotIn, $names);
     }
 
 

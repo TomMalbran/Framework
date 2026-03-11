@@ -1,12 +1,12 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Framework;
 use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\DiscoveryMigration;
 use Framework\Discovery\ConsoleCommand;
+use Framework\Database\Database;
 use Framework\Database\SchemaMigration;
 use Framework\Database\DataMigration;
 use Framework\Core\Configs;
@@ -157,7 +157,7 @@ class Migration {
         // Run the Migrations
         print("Running migrations $firstMigration -> $lastMigration\n");
 
-        $db    = Framework::getDatabase();
+        $db    = Database::getInstance();
         $index = 0;
         foreach ($migrations as $className => $filePath) {
             $index += 1;

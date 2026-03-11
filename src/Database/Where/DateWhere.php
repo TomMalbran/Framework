@@ -20,7 +20,7 @@ class DateWhere extends BaseWhere {
      * @return void
      */
     public function compare(Operator $operator, Date $date, ?bool $condition = null): void {
-        if (!$date->isEmpty()) {
+        if ($date->isNotEmpty()) {
             $this->query->where(
                 $this->column,
                 $operator,

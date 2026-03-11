@@ -21,6 +21,8 @@ class QueryBuilder {
 
     private string $tableName;
 
+    private string $asTable;
+
     /** @var list<string> */
     private array $joins = [];
 
@@ -38,24 +40,24 @@ class QueryBuilder {
      * Creates a new Query Builder instance
      * @param QueryMode    $mode
      * @param string       $tableName
+     * @param string       $asTable
      * @param WhereBuilder $whereBuilder
      */
-    public function __construct(QueryMode $mode, string $tableName, WhereBuilder $whereBuilder) {
+    public function __construct(QueryMode $mode, string $tableName, string $asTable, WhereBuilder $whereBuilder) {
         $this->mode         = $mode;
         $this->tableName    = $tableName;
+        $this->asTable      = $asTable;
         $this->whereBuilder = $whereBuilder;
     }
 
 
     /**
      * Adds a join to the Query Builder
-     * @param string $table
-     * @param string $condition
-     * @param string $type      Optional.
+     * @param string $join
      * @return void
      */
-    public function addJoin(string $table, string $condition, string $type = "LEFT"): void {
-        $this->joins[] = "$type JOIN $table ON ($condition)";
+    public function addJoin(string $join): void {
+        $this->joins[] = $join;
     }
 
     /**
@@ -127,6 +129,14 @@ class QueryBuilder {
 
 
     /**
+     * Returns the Table Name
+     * @return string
+     */
+    public function getTableName(): string {
+        return $this->tableName;
+    }
+
+    /**
      * Returns true if the Field exists
      * @param string $field
      * @return bool
@@ -151,7 +161,7 @@ class QueryBuilder {
      * @return string
      */
     public function toSQL(bool $forDebug = false): string {
-        return match ($this->mode) {
+        $result = match ($this->mode) {
             QueryMode::Select   => $this->toSelectSQL($forDebug),
             QueryMode::Insert   => $this->toInsertSQL(),
             QueryMode::Replace  => $this->toReplaceSQL(),
@@ -159,6 +169,10 @@ class QueryBuilder {
             QueryMode::Delete   => $this->toDeleteSQL(),
             QueryMode::Truncate => $this->toTruncateSQL(),
         };
+
+        $result = Strings::replace($result, "\n", " ");
+        $result = Strings::replacePattern($result, "!\s+!", " ");
+        return $result;
     }
 
     /**
@@ -181,23 +195,26 @@ class QueryBuilder {
      * @param bool $forDebug Optional.
      * @return string
      */
-    public function toSelectSQL(bool $forDebug = false): string {
+    private function toSelectSQL(bool $forDebug = false): string {
         $glue = $forDebug ? ",\n    " : ", ";
 
-        $expression = "SELECT ";
+        $expression = [ "SELECT" ];
         if (count($this->selects) === 0) {
-            $expression .= "*";
+            $expression[] = "*";
         } else {
-            $expression .= Strings::join($this->selects, $glue);
+            $expression[] = Strings::join($this->selects, $glue);
         }
 
-        $expression .= " FROM {$this->tableName} ";
+        $expression[] = "FROM `{$this->tableName}`";
+        if ($this->asTable !== "") {
+            $expression[] = "AS {$this->asTable}";
+        }
         foreach ($this->joins as $join) {
-            $expression .= " $join ";
+            $expression[] = $join;
         }
 
-        $expression .= $this->whereBuilder->toSQL(addWhere: true);
-        return $expression;
+        $expression[] = $this->whereBuilder->toSQL(addWhere: true);
+        return Strings::join($expression, " ");
     }
 
     /**
@@ -249,7 +266,10 @@ class QueryBuilder {
         }
 
         $expression   = [];
-        $expression[] = "UPDATE {$this->tableName}";
+        $expression[] = "UPDATE `{$this->tableName}`";
+        if ($this->asTable !== "") {
+            $expression[] = "AS {$this->asTable}";
+        }
         foreach ($this->joins as $join) {
             $expression[] = $join;
         }
@@ -265,18 +285,18 @@ class QueryBuilder {
      * @return string
      */
     private function toDeleteSQL(): string {
-        $expression = "DELETE ";
+        $expression = [ "DELETE" ];
         if (count($this->joins) > 0) {
-            $expression .= "`{$this->tableName}` ";
+            $expression[] = "`{$this->tableName}`";
         }
 
-        $expression .= "FROM `{$this->tableName}`";
+        $expression[] = "FROM `{$this->tableName}`";
         foreach ($this->joins as $join) {
-            $expression .= " $join ";
+            $expression[] = $join;
         }
 
-        $expression .= " " . $this->whereBuilder->toSQL(addWhere: true);
-        return $expression;
+        $expression[] = $this->whereBuilder->toSQL(addWhere: true);
+        return Strings::join($expression, " ");
     }
 
     /**
@@ -307,5 +327,29 @@ class QueryBuilder {
 
         $bindings = Arrays::mergeLists($bindings, $this->whereBuilder->getParams());
         return $bindings;
+    }
+
+    /**
+     * Interpolates the Params in the given SQL expression
+     * @param string                 $expression
+     * @param list<float|int|string> $bindings   Optional.
+     * @return string
+     */
+    public function interpolateParams(string $expression, array $bindings): string {
+        foreach ($bindings as $value) {
+            if (is_string($value)) {
+                $value = "'$value'";
+            } else {
+                $value = Strings::toString($value);
+            }
+            $expression = Strings::replacePattern($expression, '/\?/', $value, 1);
+        }
+
+        // Add new lines for better readability
+        foreach ([ "FROM", "LEFT JOIN", "VALUES", "SET", "WHERE", "ORDER BY", "GROUP BY", "LIMIT" ] as $key) {
+            $expression = Strings::replace($expression, "$key ", "\n$key ");
+        }
+
+        return $expression;
     }
 }

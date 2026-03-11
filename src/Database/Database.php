@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Database\Query\Query;
 use Framework\Log\QueryLog;
 use Framework\System\Config;
 use Framework\Date\Timer;
@@ -19,6 +18,9 @@ use mysqli_sql_exception;
  * The mysqli Database Wrapper
  */
 class Database {
+
+    private static ?Database $db = null;
+
 
     private mysqli $mysqli;
 
@@ -69,6 +71,28 @@ class Database {
         $this->mysqli->close();
     }
 
+    /**
+     * Returns the Database instance
+     * @param Database|null $instance Optional.
+     * @return Database
+     */
+    public static function getInstance(?Database $instance = null): Database {
+        if ($instance !== null) {
+            return $instance;
+        }
+        if (self::$db === null) {
+            self::$db = new Database(
+                Config::getDbHost(),
+                Config::getDbDatabase(),
+                Config::getDbUsername(),
+                Config::getDbPassword(),
+                Config::getDbCharset(),
+                Config::getDbPort(),
+            );
+        }
+        return self::$db;
+    }
+
 
 
     /**
@@ -117,47 +141,38 @@ class Database {
     /**
      * Executes the given expression
      * @param string                 $expression
-     * @param list<float|int|string> $bindParams Optional.
+     * @param list<float|int|string> $bindings   Optional.
      * @return bool
      */
-    public function execute(string $expression, array $bindParams = []): bool {
+    public function execute(string $expression, array $bindings = []): bool {
         $timer     = new Timer();
-        $statement = $this->processQuery($expression, $bindParams);
-        $this->processTime($timer, $expression, $bindParams);
+        $statement = $this->processQuery($expression, $bindings);
+        $this->processTime($timer, $expression, $bindings);
         return $this->closeQuery($statement);
     }
 
     /**
-     * Process the given expression
-     * @param string            $expression
-     * @param Query|list<mixed> $params     Optional.
+     * Executes the given expression and returns the result as an array
+     * @param string                 $expression
+     * @param list<float|int|string> $bindings   Optional.
      * @return list<array<string,int|string|null>>
      */
-    public function queryData(string $expression, Query|array $params = []): array {
+    private function queryData(string $expression, array $bindings = []): array {
         $timer     = new Timer();
-        $binds     = $params instanceof Query ? $params->getParams() : $params;
-        $statement = $this->processQuery($expression, $binds);
+        $statement = $this->processQuery($expression, $bindings);
         $result    = $this->dynamicBindResults($statement);
-        $this->processTime($timer, $expression, $binds);
+        $this->processTime($timer, $expression, $bindings);
         return $result;
     }
 
     /**
-     * Process the given expression using a Query
-     * @param string            $expression
-     * @param Query|list<mixed> $query      Optional.
-     * @return list<array<string,int|string>>
+     * Executes the given expression and returns the result as a Dictionary
+     * @param string                 $expression
+     * @param list<float|int|string> $bindings   Optional.
+     * @return Dictionary
      */
-    public function getData(string $expression, Query|array $query = []): array {
-        $params = [];
-        if ($query instanceof Query) {
-            $expression .= $query->get(addWhere: true);
-            $params      = $query->getParams();
-        } else {
-            $params = $query;
-        }
-
-        $request = $this->queryData($expression, $params);
+    public function getData(string $expression, array $bindings = []): Dictionary {
+        $request = $this->queryData($expression, $bindings);
         $result  = [];
 
         foreach ($request as $index => $row) {
@@ -169,47 +184,8 @@ class Database {
                 }
             }
         }
-        return array_values($result);
-    }
 
-    /**
-     * Process the given expression using a Query and returns a Dictionary
-     * @param string     $expression
-     * @param Query|null $query      Optional.
-     * @return Dictionary
-     */
-    public function getDictionary(string $expression, ?Query $query = null): Dictionary {
-        $request = $this->getData($expression, $query ?? []);
-        return new Dictionary($request);
-    }
-
-    /**
-     * Selects the given columns from a single table and returns the result as an array
-     * @param string              $table
-     * @param list<string>|string $columns Optional.
-     * @param Query|null          $query   Optional.
-     * @return list<array<string,int|string>>
-     */
-    public function getAll(string $table, array|string $columns = "*", ?Query $query = null): array {
-        $selection  = Strings::join($columns, ", ");
-        $expression = "SELECT $selection FROM `$table` ";
-        return $this->getData($expression, $query ?? []);
-    }
-
-    /**
-     * Selects the given column from a single table and returns a single value
-     * @param string $table
-     * @param string $column
-     * @param Query  $query
-     * @return int|string
-     */
-    public function getValue(string $table, string $column, Query $query): int|string {
-        $request = $this->getAll($table, $column, $query->limit(1));
-
-        if (isset($request[0][$column])) {
-            return $request[0][$column];
-        }
-        return "";
+        return new Dictionary($result);
     }
 
 
@@ -234,10 +210,10 @@ class Database {
     /**
      * Process a mysqli query
      * @param string      $expression
-     * @param list<mixed> $bindParams Optional.
+     * @param list<mixed> $bindings   Optional.
      * @return mysqli_stmt|null
      */
-    private function processQuery(string $expression, array $bindParams = []): ?mysqli_stmt {
+    private function processQuery(string $expression, array $bindings = []): ?mysqli_stmt {
         if (!$this->isConnected) {
             return null;
         }
@@ -249,10 +225,10 @@ class Database {
                 return null;
             }
 
-            if (count($bindParams) > 0) {
+            if (count($bindings) > 0) {
                 $types  = "";
                 $params = [];
-                foreach ($bindParams as $value) {
+                foreach ($bindings as $value) {
                     // NOTE: For bind_params the first parameter is a string with the types of the following parameters:
                     //       i | corresponding variable has type `int`
                     //       d | corresponding variable has type `float`
@@ -288,7 +264,7 @@ class Database {
         // Catch any MySQL Error and throw it to the Error Log
         } catch (mysqli_sql_exception $e) {
             $message = $e->getMessage();
-            $params  = JSON::encode($bindParams);
+            $params  = JSON::encode($bindings);
             $error   = "MySQL Error: $message.\n\n$query\n\n$params";
             if (Server::isLocalHost()) {
                 die($error);
@@ -317,38 +293,6 @@ class Database {
 
         $statement->close();
         return $this->isLastSuccess;
-    }
-
-    /**
-     * Replaces any parameter placeholders in a query with the value of that
-     * parameter. Useful for debugging. Assumes anonymous parameters from
-     * $params are are in the same order as specified in $query
-     * @param string            $expression
-     * @param Query|list<mixed> $query
-     * @return string
-     */
-    public function interpolateQuery(string $expression, Query|array $query): string {
-        $expression = Strings::replace(trim($expression), "\n", "");
-        if ($query instanceof Query) {
-            $expression .= $query->get(addWhere: true);
-            $params      = $query->getParams();
-        } else {
-            $params = $query;
-        }
-
-        $keys   = [];
-        $values = [];
-
-        foreach ($params as $key => $value) {
-            $keys[] = '/:' . $key . '/';
-
-            if (is_string($value)) {
-                $values[] = "'$value'";
-            } else {
-                $values[] = Strings::toString($value);
-            }
-        }
-        return Strings::replacePattern($expression, $keys, $values, 1);
     }
 
     /**
@@ -441,22 +385,12 @@ class Database {
     }
 
     /**
-     * Returns an array with all the tables
-     * @param string $tableName
-     * @return bool
-     */
-    public function hasTable(string $tableName): bool {
-        $request = $this->queryData("SHOW TABLES LIKE '$tableName'");
-        return !Arrays::isEmpty($request);
-    }
-
-    /**
      * Returns the Table Primary Keys
      * @param string $tableName
      * @return list<string>
      */
     public function getPrimaryKeys(string $tableName): array {
-        $request = $this->getDictionary("SHOW KEYS FROM `$tableName`");
+        $request = $this->getData("SHOW KEYS FROM `$tableName`");
         $result  = [];
 
         foreach ($request as $row) {
@@ -473,7 +407,7 @@ class Database {
      * @return string
      */
     public function getAutoIncrement(string $tableName): string {
-        $request = $this->getDictionary("
+        $request = $this->getData("
             SELECT *
             FROM INFORMATION_SCHEMA.COLUMNS
             WHERE TABLE_NAME = '$tableName'
@@ -521,7 +455,7 @@ class Database {
         if ($tableName === "") {
             return false;
         }
-        $request = $this->getDictionary("SHOW TABLES LIKE '$tableName'");
+        $request = $this->getData("SHOW TABLES LIKE '$tableName'");
         return $request->isNotEmpty();
     }
 
@@ -531,7 +465,7 @@ class Database {
      * @return bool
      */
     public function tableIsEmpty(string $tableName): bool {
-        $request = $this->getDictionary("
+        $request = $this->getData("
             SELECT COUNT(*) AS count
             FROM `$tableName`
         ")->getFirst();
@@ -733,222 +667,5 @@ class Database {
         $sql = "CREATE INDEX `$key` ON `$tableName`(`$key`)";
         $this->execute($sql);
         return $sql;
-    }
-
-
-
-    /**
-     * Dumps the entire database
-     * @param list<string>  $filter Optional.
-     * @param resource|null $fp     Optional.
-     * @return void
-     */
-    public function dump(array $filter = [], mixed $fp = null): void {
-        $crlf = "\r\n";
-
-        // SQL Dump Header
-        $this->write(
-            $fp,
-            "# ========================================================= $crlf" .
-            "# $crlf" .
-            "# Database dump of tables in `{$this->database}` $crlf" .
-            "# " . date("d M Y, H:i:s") . $crlf .
-            "# $crlf" .
-            "# ========================================================= $crlf" .
-            $crlf
-        );
-
-        // Get all tables in the database
-        $tables = $this->getTables($filter);
-
-        // Dump each table
-        foreach ($tables as $table) {
-            $this->write(
-                $fp,
-                $crlf .
-                "#$crlf" .
-                "# Table structure for table `$table` $crlf" .
-                "#$crlf" .
-                $crlf .
-                "DROP TABLE IF EXISTS `$table`; $crlf" .
-                $crlf .
-                $this->getTableSQLData($table) . "; $crlf"
-            );
-
-            // Are there any rows in this table?
-            $rows = $this->getTableContent($table);
-            if ($rows !== "") {
-                $this->write(
-                    $fp,
-                    $crlf .
-                    "# $crlf" .
-                    "# Dumping data in `$table` $crlf" .
-                    "# $crlf" .
-                    $crlf .
-                    $rows .
-                    "# -------------------------------------------------------- $crlf"
-                );
-            }
-        }
-        $this->write($fp, "$crlf # Done $crlf");
-    }
-
-    /**
-     * Writes the content in a file or prints them in the screen
-     * @param resource|null $fp
-     * @param string        $content
-     * @return void
-     */
-    private function write(mixed $fp, string $content): void {
-        if ($fp !== null) {
-            fwrite($fp, $content);
-        } else {
-            print($content);
-        }
-    }
-
-    /**
-     * Returns the table's SQL data
-     * @param string $tableName
-     * @return string
-     */
-    private function getTableSQLData(string $tableName): string {
-        $crlf    = "\r\n";
-        $result  = "CREATE TABLE `$tableName` ($crlf";
-        $request = $this->queryData("SHOW FIELDS FROM `$tableName`");
-
-        foreach ($request as $row) {
-            $data    = new Dictionary($row);
-            $field   = $data->getString("Field");
-            $type    = $data->getString("Type");
-            $null    = $data->getString("Null");
-            $default = $data->getString("Default");
-            $extra   = $data->getString("Extra");
-
-            // Make the CREATE for this column.
-            $result .= "  $field $type" . ($null !== "YES" ? " NOT NULL" : "");
-
-            // Add a default...?
-            if ($default !== "") {
-                // Make a special case of auto-timestamp.
-                if ($default === "CURRENT_TIMESTAMP") {
-                    $result .= " /*!40102 NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP */";
-                } elseif (is_numeric($default)) {
-                    $result .= " default $default";
-                } else {
-                    $result .= " default '" . $this->escape($default) . "'";
-                }
-            }
-
-            // And now any extra information. (such as auto_increment.)
-            if ($extra !== "") {
-                $result .= " $extra";
-            }
-            $result .= ",$crlf";
-        }
-
-        // Take off the last comma.
-        $result = substr($result, 0, -strlen($crlf) - 1);
-
-        // Find the keys.
-        $request = $this->queryData("SHOW KEYS FROM `$tableName`");
-        $indexes = [];
-
-        foreach ($request as $row) {
-            $data       = new Dictionary($row);
-            $keyName    = $data->getString("Key_name");
-            $columnName = $data->getString("Column_name");
-            $subPart    = $data->getString("Sub_part");
-            $seqIndex   = $data->getString("Seq_in_index");
-
-            // IS this a primary key, unique index, or regular index?
-            if ($keyName === "PRIMARY") {
-                $row["Key_name"] = "PRIMARY KEY";
-            } elseif (!isset($row["Non_unique"])) {
-                $row["Key_name"] = "UNIQUE $keyName";
-            } elseif ($data->getString("Comment") === "FULLTEXT" || $data->getString("Index_type") === "FULLTEXT") {
-                $row["Key_name"] = "FULLTEXT $keyName";
-            } else {
-                $row["Key_name"] = "KEY $keyName";
-            }
-
-            // Is this the first column in the index?
-            if (!isset($indexes[$keyName])) {
-                $indexes[$keyName] = [];
-            }
-
-            // A sub part, like only indexing 15 characters of a varchar.
-            if ($subPart !== "") {
-                $indexes[$keyName][$seqIndex] = "$columnName($subPart)";
-            } else {
-                $indexes[$keyName][$seqIndex] = $columnName;
-            }
-        }
-
-        // Build the CREATEs for the keys.
-        foreach ($indexes as $keyName => $columns) {
-            ksort($columns);
-            $result .= ",$crlf $keyName (" . Strings::join($columns, ", ") . ")";
-        }
-
-        // Now just get the comment and type...
-        $request = $this->queryData("
-            SHOW TABLE STATUS
-            LIKE '" . strtr($tableName, [ '_' => '\\_', '%' => '\\%' ]) . "'
-        ");
-        if (isset($request[0])) {
-            $data    = new Dictionary($request[0]);
-            $type    = $data->getString("Type");
-            $engine  = $data->getString("Engine");
-            $comment = $data->getString("Comment");
-
-            $result .= $crlf . ") ENGINE=" . ($type !== "" ? $type : $engine);
-            $result .= $comment !== "" ? " COMMENT='$comment'" : "";
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns the table content
-     * @param string $tableName
-     * @return string
-     */
-    private function getTableContent(string $tableName): string {
-        $crlf   = "\r\n";
-        $result = "";
-        $start  = 0;
-
-        do {
-            $request = $this->queryData("SELECT /*!40001 SQL_NO_CACHE */ * FROM `$tableName` LIMIT $start, 250");
-            $start  += 250;
-
-            if (!Arrays::isEmpty($request) && isset($request[0])) {
-                $names   = Strings::joinKeys($request[0], "`, `");
-                $result .= "INSERT INTO `$tableName` $crlf\t(`$names`) $crlf VALUES ";
-
-                foreach ($request as $index => $row) {
-                    $fieldList = [];
-                    foreach ($row as $value) {
-                        // Try to figure out the type of each field. (NULL, number, or 'string'.)
-                        if (is_int($value)) {
-                            $fieldList[] = $value;
-                        } elseif (is_string($value)) {
-                            $fieldList[] = "'" . $this->escape($value) . "'";
-                        } else {
-                            $fieldList[] = "NULL";
-                        }
-                    }
-                    $result .= "(" . Strings::join($fieldList, ", ") . ")";
-
-                    if ($index < count($request) - 1) {
-                        $result .= ",$crlf\t";
-                    }
-                }
-                $result .= ";$crlf";
-            }
-        } while (!Arrays::isEmpty($request));
-
-        return $result;
     }
 }

@@ -34,9 +34,7 @@ class Reset extends CredentialResetSchema {
     public static function getEmail(string $resetCode): string {
         $query = new CredentialResetQuery();
         $query->resetCode->equal($resetCode);
-
-        $result = self::getEntityValue($query, CredentialResetColumn::Email);
-        return Strings::toString($result);
+        return self::getEntityValue($query, CredentialResetColumn::Email);
     }
 
     /**

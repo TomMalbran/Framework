@@ -14,8 +14,8 @@ use {{namespace}}\{{statusClass}};{{/hasStatus}}
 use Framework\Request;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
-use Framework\Database\SchemaModel;
-use Framework\Database\Query\Query;{{#canEdit}}
+use Framework\Database\SchemaModel;{{#hasQuery}}
+use Framework\Database\Query\Query;{{/hasQuery}}{{#canEdit}}
 use Framework\Database\Query\Assign;{{/canEdit}}{{#hasOperator}}
 use Framework\Database\Query\Operator as QueryOperator;{{/hasOperator}}
 use Framework\Database\Model\Field;
@@ -330,7 +330,7 @@ class {{name}}Schema extends Schema {
     ): {{queryClass}} {
         $query = new {{queryClass}}();
         {{#parents}}
-        $query->query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}}, {{fieldParam}} !== null);
+        $query->getQuery()->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}}, {{fieldParam}} !== null);
         {{/parents}}
         return $query;
     }
@@ -362,7 +362,7 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}{{#hasDeleted}}
         bool $withDeleted = true,{{/hasDeleted}}
     ): bool {
-        $query = new Query();
+        $query = Query::select("{{table}}");
         $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
@@ -384,7 +384,7 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}
         int $skipID = 0,
     ): bool {
-        $query = new Query();
+        $query = Query::select("{{table}}");
         $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
@@ -401,7 +401,7 @@ class {{name}}Schema extends Schema {
      * @return bool
      */
     public static function entityExists({{queryClass}} $query{{#hasDeleted}}, bool $withDeleted = true{{/hasDeleted}}): bool {
-        return self::getSchemaTotal($query->query{{#hasDeleted}}, $withDeleted{{/hasDeleted}}) > 0;
+        return self::getSchemaTotal($query{{#hasDeleted}}, $withDeleted{{/hasDeleted}}) > 0;
     }
 
 
@@ -421,7 +421,7 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
-        $query = new Query();
+        $query = Query::select("{{table}}");
         $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
@@ -446,7 +446,7 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
-        $query = new Query();
+        $query = Query::select("{{table}}");
         $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
@@ -468,7 +468,7 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
-        $data = self::getSchemaEntity($query->query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
+        $data = self::getSchemaEntity($query{{#canDelete}}, $withDeleted{{/canDelete}}{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}});
         return self::constructEntity($data);
     }
 
@@ -476,13 +476,13 @@ class {{name}}Schema extends Schema {
      * Selects the given column from a single table and returns a single value
      * @param {{queryClass}} $query
      * @param {{columnClass}} $column
-     * @return int|string
+     * @return string
      */
     protected static function getEntityValue(
         {{queryClass}} $query,
         {{columnClass}} $column,
-    ): int|string {
-        return self::getSchemaValue($query->query, $column->base());
+    ): string {
+        return self::getSchemaValue($query, $column->base());
     }
 
     /**
@@ -495,7 +495,7 @@ class {{name}}Schema extends Schema {
         {{queryClass}} $query,
         {{columnClass}} $column,
     ): array {
-        return self::getSchemaColumn($query->query, $column->name(), $column->key());
+        return self::getSchemaColumn($query, $column->name(), $column->key());
     }
 
 
@@ -507,13 +507,13 @@ class {{name}}Schema extends Schema {
      * @return {{idType}}
      */
     public static function get{{idText}}({{queryClass}} $query): {{idType}} {
-        $result = self::getSchemaValue($query->query, "{{idDbName}}");
+        $result = self::getSchemaValue($query, "{{idDbName}}");
+        {{#hasStringID}}
+        return $result;
+        {{/hasStringID}}
         {{#hasIntID}}
         return Numbers::toInt($result);
         {{/hasIntID}}
-        {{#hasStringID}}
-        return (string)$result;
-        {{/hasStringID}}
         {{#hasEnumID}}
         return {{idEnumClass}}::fromValue((string)$result);
         {{/hasEnumID}}
@@ -525,7 +525,7 @@ class {{name}}Schema extends Schema {
      * @return list<{{idType}}>
      */
     public static function get{{idText}}s(?{{queryClass}} $query = null): array {
-        $result = self::getSchemaColumn($query?->query, "{{idDbName}}", "{{idName}}");
+        $result = self::getSchemaColumn($query, "{{idDbName}}", "{{idName}}");
         {{#hasIntID}}
         return Arrays::toInts($result);
         {{/hasIntID}}
@@ -548,7 +548,7 @@ class {{name}}Schema extends Schema {
         Request $request,{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}
     ): array {
-        $query = static::createListQuery($request)->query;
+        $query = static::createListQuery($request)->getQuery();
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
@@ -574,7 +574,7 @@ class {{name}}Schema extends Schema {
         bool $decrypted = false,{{/hasEncrypt}}
         bool $skipSubRequest = false,
     ): array {
-        $list = self::getSchemaEntities($query?->query, $sort, $selects, $joins{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}}, skipSubRequest: $skipSubRequest);
+        $list = self::getSchemaEntities($query, $sort, $selects, $joins{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}}, skipSubRequest: $skipSubRequest);
         return self::constructEntities($list);
     }
 
@@ -588,7 +588,7 @@ class {{name}}Schema extends Schema {
         Request $request,{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}
     ): int {
-        $query = static::createListQuery($request)->query;
+        $query = static::createListQuery($request)->getQuery();
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
@@ -601,7 +601,7 @@ class {{name}}Schema extends Schema {
      * @return int
      */
     public static function getEntityTotal(?{{queryClass}} $query = null): int {
-        return self::getSchemaTotal($query?->query);
+        return self::getSchemaTotal($query);
     }
 
 
@@ -627,7 +627,7 @@ class {{name}}Schema extends Schema {
         bool $useEmpty = false,
     ): array {
         return self::getSchemaSelect(
-            $query->query,
+            $query,
             nameColumn:     {{columnClass}}::toKeys($nameColumn),
             idColumn:       $idColumn?->key(),
             descColumn:     $descColumn?->key(),
@@ -652,31 +652,11 @@ class {{name}}Schema extends Schema {
         int $limit = 0,
     ): array {
         return self::getSchemaSearch(
-            $query->query,
+            $query,
             nameColumn: {{columnClass}}::toKeys($nameColumn),
             idColumn:   $idColumn?->key(),
             limit:      $limit,
         );
-    }
-
-    /**
-     * Returns the Data using a basic Expression and a Query
-     * @param {{queryClass}} $query
-     * @param string $expression
-     * @return Dictionary
-     */
-    protected static function getEntityData({{queryClass}} $query, string $expression): Dictionary {
-        return self::getSchemaData($query->query, $expression);
-    }
-
-    /**
-     * Returns the Data using a basic Expression and a Query
-     * @param {{queryClass}} $query
-     * @param string $expression
-     * @return Dictionary
-     */
-    protected static function getEntityRow({{queryClass}} $query, string $expression): Dictionary {
-        return self::getSchemaRow($query->query, $expression);
     }
 
 
@@ -733,7 +713,7 @@ class {{name}}Schema extends Schema {
         return self::createSchemaEntityWithOrder({{#usesRequest}}
             request: $entityRequest,{{/usesRequest}}
             fields: $entityFields,{{#hasEditParents}}
-            orderQuery: self::createParentQuery({{parentsList}})->query,{{/hasEditParents}}{{#hasUsers}}
+            orderQuery: self::createParentQuery({{parentsList}}),{{/hasEditParents}}{{#hasUsers}}
             credentialID: $createdUser,{{/hasUsers}}
         );
         {{/hasPositions}}
@@ -840,7 +820,7 @@ class {{name}}Schema extends Schema {
         {{#hasPositions}}
         if ($skipOrder) {
             return self::editSchemaEntity(
-                query: self::toQuery($query),{{#usesRequest}}
+                query: $query,{{#usesRequest}}
                 request: $entityRequest,{{/usesRequest}}
                 fields: $entityFields,{{#hasUsers}}
                 credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
@@ -850,10 +830,10 @@ class {{name}}Schema extends Schema {
             );
         }
         return self::editSchemaEntityWithOrder(
-            query: self::toQuery($query),{{#usesRequest}}
+            query: $query,{{#usesRequest}}
             request: $entityRequest,{{/usesRequest}}
             fields: $entityFields,{{#hasEditParents}}
-            orderQuery: self::createParentQuery({{parentsList}})->query,{{/hasEditParents}}{{#hasUsers}}
+            orderQuery: self::createParentQuery({{parentsList}}),{{/hasEditParents}}{{#hasUsers}}
             credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
             skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
             skipEmpty: $skipEmpty,
@@ -862,7 +842,7 @@ class {{name}}Schema extends Schema {
         {{/hasPositions}}
         {{^hasPositions}}
         return self::editSchemaEntity(
-            query: self::toQuery($query),{{#usesRequest}}
+            query: $query,{{#usesRequest}}
             request: $entityRequest,{{/usesRequest}}
             fields: $entityFields,{{#hasUsers}}
             credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
@@ -893,7 +873,7 @@ class {{name}}Schema extends Schema {
         }
 
         {{/hasUsers}}
-        return self::editSchemaEntity(self::toQuery($query), fields: [
+        return self::editSchemaEntity($query, fields: [
             $column->base() => $value,
         ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
     }
@@ -918,7 +898,7 @@ class {{name}}Schema extends Schema {
         }
 
         {{/hasUsers}}
-        return self::editSchemaEntity(self::toQuery($query), fields: [
+        return self::editSchemaEntity($query, fields: [
             $column->base() => Assign::increase($amount),
         ]{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
     }
@@ -947,19 +927,19 @@ class {{name}}Schema extends Schema {
         {{/hasUsers}}
         {{#hasPositions}}
         if ($skipOrder) {
-            return self::deleteSchemaEntity(self::toQuery($query){{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+            return self::deleteSchemaEntity($query{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         }
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
         return self::deleteSchemaEntityWithOrder(
-            self::toQuery($query),{{#hasEditParents}}
-            orderQuery: $orderQuery->query,{{/hasEditParents}}{{#hasUsers}}
+            $query,{{#hasEditParents}}
+            orderQuery: $orderQuery,{{/hasEditParents}}{{#hasUsers}}
             credentialID: $modifiedUser,{{/hasUsers}}
         );
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::deleteSchemaEntity(self::toQuery($query){{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
+        return self::deleteSchemaEntity($query{{#hasUsers}}, credentialID: $modifiedUser{{/hasUsers}});
         {{/hasPositions}}
     }
 {{/canDelete}}
@@ -978,10 +958,10 @@ class {{name}}Schema extends Schema {
         {{#hasEditParents}}
         $orderQuery = self::createParentQuery({{parentsList}});
         {{/hasEditParents}}
-        return self::removeSchemaEntityWithOrder(self::toQuery($query){{#hasEditParents}}, $orderQuery->query{{/hasEditParents}});
+        return self::removeSchemaEntityWithOrder($query{{#hasEditParents}}, $orderQuery{{/hasEditParents}});
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::removeSchemaEntity(self::toQuery($query));
+        return self::removeSchemaEntity($query);
         {{/hasPositions}}
     }
 {{#hasPositions}}
@@ -992,7 +972,7 @@ class {{name}}Schema extends Schema {
      * @return bool
      */
     protected static function removeAllEntities({{editType}} $query): bool {
-        return self::removeSchemaEntity(self::toQuery($query));
+        return self::removeSchemaEntity($query);
     }
 {{/hasPositions}}
 {{#hasPositions}}
@@ -1015,7 +995,7 @@ class {{name}}Schema extends Schema {
         return self::ensureSchemaOrder(
             oldFields: $entity?->toDictionary(),
             newFields: $fields?->toDictionary(),{{#hasEditParents}}
-            query:     $orderQuery->query,{{/hasEditParents}}
+            query:     $orderQuery,{{/hasEditParents}}
         );
     }
 {{/hasPositions}}
@@ -1036,20 +1016,6 @@ class {{name}}Schema extends Schema {
         int $oldValue,
         int $newValue,
     ): bool {
-        return self::ensureSchemaUniqueData($query->query, $column->base(), $id, $oldValue, $newValue);
-    }
-
-    /**
-     * Converts the {{queryClass}} to a Query
-     * @param {{editType}} $value
-     * @return {{convertType}}
-     */
-    private static function toQuery({{editType}} $value): {{convertType}} {
-        {{#hasID}}
-        return $value instanceof {{queryClass}} ? $value->query : {{{convertValue}}};
-        {{/hasID}}
-        {{^hasID}}
-        return $value->query;
-        {{/hasID}}
+        return self::ensureSchemaUniqueData($query, $column->base(), $id, $oldValue, $newValue);
     }
 }

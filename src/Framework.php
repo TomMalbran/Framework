@@ -4,9 +4,7 @@ namespace Framework;
 use Framework\Response;
 use Framework\Auth\Auth;
 use Framework\Log\ErrorLog;
-use Framework\Database\Database;
 use Framework\System\Router;
-use Framework\System\Config;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Server;
@@ -18,7 +16,6 @@ use Exception;
  */
 class Framework {
 
-    private static ?Database $db       = null;
     private static ?Request  $request  = null;
     private static ?Response $response = null;
 
@@ -139,24 +136,6 @@ class Framework {
     }
 
 
-
-    /**
-     * Returns the Framework Database
-     * @return Database
-     */
-    public static function getDatabase(): Database {
-        if (self::$db === null) {
-            self::$db = new Database(
-                Config::getDbHost(),
-                Config::getDbDatabase(),
-                Config::getDbUsername(),
-                Config::getDbPassword(),
-                Config::getDbCharset(),
-                Config::getDbPort(),
-            );
-        }
-        return self::$db;
-    }
 
     /**
      * Returns the current Request

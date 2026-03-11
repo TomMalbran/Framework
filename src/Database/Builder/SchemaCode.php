@@ -45,7 +45,6 @@ class SchemaCode {
         $idType      = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, forEntity: false);
         $idIsEnum    = $schemaModel->idType === FieldType::Enum;
         $idSuffix    = $idIsEnum ? "->toString()" : "";
-        $idConvert   = $idIsEnum ? "string" : $idType;
 
         $contents    = Builder::render("Schema", [
             "namespace"          => $schemaModel->namespace,
@@ -71,10 +70,8 @@ class SchemaCode {
             "idType"             => $idType,
             "idText"             => Strings::upperCaseFirst($schemaModel->idName),
             "idEnumClass"        => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
-
             "editType"           => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
-            "convertType"        => $schemaModel->hasID ? "Query|$idConvert" : "Query",
-            "convertValue"       => "\$value$idSuffix",
+            "hasQuery"           => $schemaModel->hasID || count($uniques) > 0,
 
             "hasPositions"       => $schemaModel->hasPositions,
             "hasPositionsValue"  => $schemaModel->hasPositions ? "true" : "false",

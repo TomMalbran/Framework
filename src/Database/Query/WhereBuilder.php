@@ -18,8 +18,8 @@ class WhereBuilder {
     private array  $usedOperators = [];
 
     private string $limit         = "";
-    private string $groupBy       = "";
     private string $orderBy       = "";
+    private string $groupBy       = "";
 
     /** @var list<float|int|string> */
     private array  $params        = [];
@@ -38,11 +38,10 @@ class WhereBuilder {
     /**
      * Copies the Data from another WhereBuilder instance
      * @param WhereBuilder $builder
-     * @return void
+     * @return WhereBuilder
      */
-    public function copy(WhereBuilder $builder): void {
+    public function copy(WhereBuilder $builder): WhereBuilder {
         $this->where         = $builder->where;
-        $this->params        = $builder->params;
         $this->addOperator   = $builder->addOperator;
         $this->nextOperator  = $builder->nextOperator;
         $this->usedOperators = $builder->usedOperators;
@@ -51,9 +50,33 @@ class WhereBuilder {
         $this->orderBy       = $builder->orderBy;
         $this->groupBy       = $builder->groupBy;
 
+        $this->params        = $builder->params;
         $this->columns       = $builder->columns;
         $this->groups        = $builder->groups;
         $this->orders        = $builder->orders;
+        return $this;
+    }
+
+    /**
+     * Joins the data from another Where Builder
+     * @param WhereBuilder $builder
+     * @return WhereBuilder
+     */
+    public function join(WhereBuilder $builder): WhereBuilder {
+        $this->where         = Strings::join([ $this->where, $builder->where ], " AND ", withoutEmpty: true);
+        $this->addOperator   = $builder->addOperator;
+        $this->nextOperator  = $builder->nextOperator;
+        $this->usedOperators = Arrays::mergeLists($this->usedOperators, $builder->usedOperators);
+
+        $this->limit         = $builder->limit;
+        $this->orderBy       = Strings::join([ $this->orderBy, $builder->orderBy ], ", ", withoutEmpty: true);
+        $this->groupBy       = Strings::join([ $this->groupBy, $builder->groupBy ], ", ", withoutEmpty: true);
+
+        $this->params        = Arrays::mergeLists($this->params, $builder->params);
+        $this->columns       = Arrays::mergeLists($this->columns, $builder->columns);
+        $this->groups        = Arrays::mergeLists($this->groups, $builder->groups);
+        $this->orders        = Arrays::mergeLists($this->orders, $builder->orders);
+        return $this;
     }
 
 
@@ -182,9 +205,9 @@ class WhereBuilder {
         $this->columns[] = $column;
 
         if (is_array($param)) {
-            $this->params = Arrays::mergeLists($this->params, $param);
+            $this->addParam(...$param);
         } else {
-            $this->params[] = $param;
+            $this->addParam($param);
         }
     }
 
@@ -218,7 +241,26 @@ class WhereBuilder {
     public function whereExp(string $expression, float|int|string ...$values): void {
         $operator     = $this->getWhereOperator();
         $this->where .= "$operator $expression ";
-        $this->params = Arrays::mergeLists($this->params, array_values($values));
+        $this->addParam(...$values);
+    }
+
+    /**
+     * Adds a Where Exists expression
+     * @param Query $subQuery
+     * @param bool  $notExists Optional.
+     * @return void
+     */
+    public function whereExists(Query $subQuery, bool $notExists = false): void {
+        if ($subQuery->isEmpty() || !$subQuery->isSelect()) {
+            return;
+        }
+
+        $operator = $this->getWhereOperator();
+        $not      = $notExists ? "NOT " : "";
+        $sql      = $subQuery->columns("1")->toSQL();
+
+        $this->where .= "$operator {$not}EXISTS ($sql) ";
+        $this->addParam(...$subQuery->getBindings());
     }
 
     /**
@@ -326,11 +368,13 @@ class WhereBuilder {
 
     /**
      * Adds a param to the Query
-     * @param int|string $param
+     * @param float|int|string ...$params
      * @return void
      */
-    public function addParam(int|string $param): void {
-        $this->params[] = $param;
+    public function addParam(float|int|string ...$params): void {
+        foreach ($params as $param) {
+            $this->params[] = $param;
+        }
     }
 
 
@@ -369,7 +413,7 @@ class WhereBuilder {
     public function startAnd(): void {
         $operator              = $this->getWhereOperator();
         $this->where          .= "$operator (";
-        $this->usedOperators[] = $operator;
+        $this->usedOperators[] = $this->nextOperator;
         $this->nextOperator    = "AND";
         $this->addOperator     = false;
     }
@@ -398,7 +442,7 @@ class WhereBuilder {
     public function startOr(): void {
         $operator              = $this->getWhereOperator();
         $this->where          .= "$operator (";
-        $this->usedOperators[] = $operator;
+        $this->usedOperators[] = $this->nextOperator;
         $this->nextOperator    = "OR";
         $this->addOperator     = false;
     }
@@ -452,9 +496,11 @@ class WhereBuilder {
      * @return void
      */
     public function orderBy(string $column, bool $isASC): void {
-        $prefix         = $this->orderBy !== "" ? "," : "";
-        $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
-        $this->orders[] = $column;
+        if ($column !== "") {
+            $prefix         = $this->orderBy !== "" ? "," : "";
+            $this->orderBy .= "$prefix $column " . ($isASC ? "ASC" : "DESC");
+            $this->orders[] = $column;
+        }
     }
 
     /**

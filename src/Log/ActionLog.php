@@ -30,9 +30,12 @@ class ActionLog extends LogActionSchema {
         $search       = $request->getString("search");
 
         $query = new LogActionQuery();
-        foreach ($mappings as $key => $value) {
-            $query->query->whereIf($value, Operator::Equal, $request->getString($key));
+        foreach ($mappings as $key => $columnName) {
+            $column = LogActionColumn::fromValue($columnName);
+            $value  = $request->getString($key);
+            $query->where($column, Operator::Equal, $value, condition: $value !== "");
         }
+
         $query->search([
             LogActionColumn::CredentialName,
             LogActionColumn::Module,

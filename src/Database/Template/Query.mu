@@ -4,19 +4,15 @@ namespace {{namespace}};
 use {{namespace}}\{{columnClass}};{{#imports}}
 use {{.}};{{/imports}}
 
-use Framework\Database\Query\Operator;
-use Framework\Database\Query\SchemaQuery;{{#queries}}
+use Framework\Database\Query\SchemaQuery;{{#idDbName}}
+use Framework\Database\Query\QueryLike;{{/idDbName}}
+use Framework\Database\Query\Operator;{{#queries}}
 use Framework\Database\Where\{{.}};{{/queries}}
 
 /**
  * The {{name}} Query
  */
 class {{queryClass}} extends SchemaQuery {
-
-    public string $tableName = "{{tableName}}";
-    public string $idDbName  = "{{idDbName}}";
-
-
 {{#properties}}
 
     // {{value}}
@@ -29,7 +25,7 @@ class {{queryClass}} extends SchemaQuery {
      * Creates a new {{queryClass}} instance
      */
     public function __construct() {
-        parent::__construct();
+        parent::__construct("{{tableName}}", "{{idDbName}}");
 
         {{#properties}}
         $this->{{propName}} = new {{type}}($this->query, "{{value}}");
@@ -85,32 +81,30 @@ class {{queryClass}} extends SchemaQuery {
         $this->query->search($columns, $value, $operator, $caseInsensitive, $splitValue, $splitText, $matchAny);
         return $this;
     }
+{{#idDbName}}
 
     /**
      * Adds an Exists expression
-     * @param SchemaQuery $subQuery
+     * @param QueryLike $subQuery
      * @return {{queryClass}}
      */
-    public function exists(SchemaQuery $subQuery): {{queryClass}} {
-        $subQuery->whereExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
-        $this->query->whereExp("EXISTS (
-            SELECT 1 FROM {$subQuery->tableName}
-            " . $subQuery->query->get() . "
-        )", ...$subQuery->query->getParams());
+    public function exists(QueryLike $subQuery): {{queryClass}} {
+        $tableName = $subQuery->getTableName();
+        $subQuery->getQuery()->whereExp("{$tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $this->query->whereExists($subQuery);
         return $this;
     }
 
     /**
      * Adds a Not Exists expression
-     * @param SchemaQuery $subQuery
+     * @param QueryLike $subQuery
      * @return {{queryClass}}
      */
-    public function notExists(SchemaQuery $subQuery): {{queryClass}} {
-        $subQuery->whereExp("{$subQuery->tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
-        $this->query->whereExp("NOT EXISTS (
-            SELECT 1 FROM {$subQuery->tableName}
-            " . $subQuery->query->get() . "
-        )", ...$subQuery->query->getParams());
+    public function notExists(QueryLike $subQuery): {{queryClass}} {
+        $tableName = $subQuery->getTableName();
+        $subQuery->getQuery()->whereExp("{$tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $this->query->whereNotExists($subQuery);
         return $this;
     }
+{{/idDbName}}
 }

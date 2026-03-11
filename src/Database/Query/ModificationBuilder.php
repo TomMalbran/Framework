@@ -52,7 +52,7 @@ class ModificationBuilder {
      * @return ModificationBuilder
      */
     public static function update(SchemaModel $schemaModel, Query $query): ModificationBuilder {
-        $builder = Query::update($schemaModel->tableName)->query($query);
+        $builder = Query::update($query);
         return new ModificationBuilder($builder, $schemaModel);
     }
 

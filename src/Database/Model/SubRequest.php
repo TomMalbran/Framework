@@ -150,17 +150,21 @@ class SubRequest {
      * @return list<array<string,mixed>>
      */
     public function request(array $result): array {
-        $query = $this->createQuery($result);
-        if ($query === null || $this->schemaModel === null) {
+        if ($this->schemaModel === null) {
             return [];
         }
 
-        $request = SelectionBuilder::create($this->schemaModel)
+        $query = $this->createQuery($result, $this->schemaModel->tableName);
+        if ($query === null) {
+            return [];
+        }
+
+        $request = SelectionBuilder::create($this->schemaModel, $query)
             ->addFields()
             ->addExpressions()
             ->addJoins()
             ->addCounts()
-            ->request($query)
+            ->request()
             ->resolve();
 
         $subResult = [];
@@ -199,9 +203,10 @@ class SubRequest {
     /**
      * Does the Request with a Sub Request
      * @param list<array<string,mixed>> $result
+     * @param string                    $tableName
      * @return Query|null
      */
-    private function createQuery(array $result): ?Query {
+    private function createQuery(array $result, string $tableName): ?Query {
         $ids = [];
         foreach ($result as $row) {
             if (isset($row[$this->idName]) &&
@@ -214,7 +219,7 @@ class SubRequest {
             return null;
         }
 
-        $query = new Query();
+        $query = Query::select($tableName);
         $query->where($this->idDbName, Operator::In, $ids);
 
         if ($this->query !== "") {

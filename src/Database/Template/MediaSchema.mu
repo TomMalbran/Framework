@@ -1,11 +1,10 @@
 <?php
 namespace {{namespace}};
 
-use Framework\Framework;{{#hasFields}}
+use Framework\File\File;{{#hasFields}}
 use Framework\Database\Query\Query;
 use Framework\Database\Query\Operator;{{/hasFields}}{{#hasReplace}}
 use Framework\Database\Query\Assign;{{/hasReplace}}
-use Framework\File\File;
 
 /**
  * The Media Schema
@@ -19,7 +18,6 @@ class MediaSchema {
      * @return void
      */
     public static function updatePaths(string $oldPath, string $newPath): void {
-        $db    = Framework::getDatabase();
         $files = [
             [
                 "old" => $oldPath,
@@ -41,13 +39,13 @@ class MediaSchema {
             Query::update("{{tableName}}")
                 ->set("{{fieldName}}", Assign::replace($old, $new))
                 ->where("{{fieldName}}", Operator::Like, "\"$old\"")
-                ->execute($db);
+                ->execute();
             {{/isReplace}}
             {{^isReplace}}
             Query::update("{{tableName}}")
                 ->set("{{fieldName}}", $new)
                 ->where("{{fieldName}}", Operator::Equal, $old)
-                ->execute($db);
+                ->execute();
             {{/isReplace}}
         {{/fields}}
         }
