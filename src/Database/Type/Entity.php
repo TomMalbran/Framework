@@ -67,7 +67,7 @@ class Entity implements JsonSerializable {
             if (method_exists($type, "fromValue")) {
                 $this->$property = $type::fromValue($data->getString($property));
             } else {
-                $this->$property = $data->getArray($property);
+                $this->$property = $data->getDict($property)->toArray();
             }
         }
         return true;
