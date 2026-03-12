@@ -1,4 +1,5 @@
 rules:
+    - Framework\Analysis\Enum\EnumHasNoneCaseRule
     - Framework\Analysis\Model\ModelIdFieldRule
     - Framework\Analysis\Model\ModelEnumRule
     - Framework\Analysis\Route\RouteMethodNameRule
