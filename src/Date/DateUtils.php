@@ -306,7 +306,7 @@ class DateUtils {
         // Start with the current year and the given month and day
         $day   = $part0;
         $month = $part1;
-        $year  = (int)date("Y");
+        $year  = Date::now()->getYear();
 
         // Invert the order
         if ($amount === 3 && $part0 > 1000) {
@@ -375,7 +375,7 @@ class DateUtils {
      * @return int
      */
     private static function parseDateLang(string $text, string $language): int {
-        $year  = (int)date("Y");
+        $year  = Date::now()->getYear();
         $month = 0;
         $day   = 0;
 

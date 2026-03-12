@@ -2,6 +2,7 @@
 namespace Framework\Provider;
 
 use Framework\System\Config;
+use Framework\Date\Date;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Utils;
 
@@ -40,7 +41,7 @@ class Microsoft {
         if ($payloadData->getString("aud") !== Config::getMicrosoftClient()) {
             return null;
         }
-        if ($payloadData->getInt("exp") < time()) {
+        if ($payloadData->getInt("exp") < Date::now()->toTime()) {
             return null;
         }
         if (!$payloadData->hasValue("email") || !$payloadData->hasValue("name")) {

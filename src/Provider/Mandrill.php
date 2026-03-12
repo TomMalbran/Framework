@@ -3,6 +3,8 @@ namespace Framework\Provider;
 
 use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
+use Framework\Date\Date;
+use Framework\Date\DateFormat;
 use Framework\Utils\Dictionary;
 
 /**
@@ -69,7 +71,7 @@ class Mandrill {
             "key"     => Config::getMandrillKey(),
             "message" => $message,
             "async"   => false,
-            "send_at" => date("Y-m-d H:i:s"),
+            "send_at" => Date::now()->toString(DateFormat::ReverseSeconds),
         ];
         $result   = Curl::execute(CurlMethod::POST, $url, $params, $headers, jsonBody: true);
 

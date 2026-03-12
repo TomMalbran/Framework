@@ -13,7 +13,6 @@ use Framework\System\Access;
 use Framework\System\Path;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
-use Framework\Utils\Numbers;
 use Framework\Utils\Search;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -93,7 +92,7 @@ class Credential extends CredentialSchema {
     ): CredentialEntity {
         $query = new CredentialQuery();
         $query->accessToken->equal($accessToken);
-        $query->tokenExpiration->greaterThan(time());
+        $query->tokenExpiration->greaterThan(Date::now());
         return self::getCredential($query, $complete);
     }
 
@@ -341,7 +340,7 @@ class Credential extends CredentialSchema {
                 $elem->password        = "";
                 $elem->salt            = "";
                 $elem->accessToken     = "";
-                $elem->tokenExpiration = 0;
+                $elem->tokenExpiration = Date::empty();
             }
             $result[] = $elem;
         }
@@ -515,7 +514,7 @@ class Credential extends CredentialSchema {
             return false;
         }
 
-        if ($credential->passExpiration > 0 && $credential->passExpiration < time()) {
+        if ($credential->passExpiration->isPast()) {
             return false;
         }
         $hash = self::createHash($password, $credential->salt);
@@ -560,8 +559,8 @@ class Credential extends CredentialSchema {
         ?bool $reqPassChange = null,
     ): int {
         $fields = self::parseFields($request, $fields, $access, $status, $reqPassChange);
-        $fields["lastLogin"]        = time();
-        $fields["currentLogin"]     = time();
+        $fields["lastLogin"]        = Date::now();
+        $fields["currentLogin"]     = Date::now();
         $fields["askNotifications"] = 1;
         return self::createSchemaEntity($request, $fields);
     }
@@ -627,15 +626,15 @@ class Credential extends CredentialSchema {
             password:         "",
             salt:             "",
             reqPassChange:    false,
-            passExpiration:   0,
+            passExpiration:   Date::empty(),
             accessToken:      "",
-            tokenExpiration:  0,
+            tokenExpiration:  Date::empty(),
             observations:     "",
             sendEmails:       false,
             sendEmailNotis:   false,
             timezone:         0,
-            currentLogin:     0,
-            lastLogin:        0,
+            currentLogin:     Date::empty(),
+            lastLogin:        Date::empty(),
             askNotifications: false,
             status:           CredentialStatus::Inactive,
             isDeleted:        true,
@@ -780,7 +779,7 @@ class Credential extends CredentialSchema {
             $credentialID,
             password:       $hash["password"],
             salt:           $hash["salt"],
-            passExpiration: 0,
+            passExpiration: Date::empty(),
             reqPassChange:  false,
         );
         return $hash;
@@ -809,7 +808,7 @@ class Credential extends CredentialSchema {
             $credentialID,
             password:       $hash["password"],
             salt:           $hash["salt"],
-            passExpiration: time() + $hours * 3600,
+            passExpiration: Date::now()->add(hours: $hours),
             reqPassChange:  true,
         );
         return $password;
@@ -822,10 +821,10 @@ class Credential extends CredentialSchema {
      * @return string
      */
     public static function setAccessToken(int $credentialID, int $hours = 4): string {
-        $expiration = $hours > 0 ? time() + $hours * 3600 : 0;
+        $expiration = $hours > 0 ? Date::now()->add(hours: $hours) : Date::empty();
         $credential = self::getByID($credentialID, complete: true);
 
-        if ($credential->tokenExpiration > 0 && $credential->tokenExpiration < time()) {
+        if ($credential->tokenExpiration->isPast()) {
             self::editEntity($credentialID, tokenExpiration: $expiration);
             return $credential->accessToken;
         }
@@ -848,7 +847,7 @@ class Credential extends CredentialSchema {
         return self::editEntity(
             $credentialID,
             accessToken:     "",
-            tokenExpiration: 0,
+            tokenExpiration: Date::empty(),
         );
     }
 
@@ -870,8 +869,8 @@ class Credential extends CredentialSchema {
         $currentLogin = self::getValue($credentialID, CredentialColumn::CurrentLogin);
         return self::editEntity(
             $credentialID,
-            lastLogin:    Numbers::toInt($currentLogin),
-            currentLogin: time(),
+            lastLogin:    Date::create($currentLogin),
+            currentLogin: Date::now(),
         );
     }
 

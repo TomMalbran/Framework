@@ -122,7 +122,7 @@ class AuthToken {
     public static function createAccessToken(array $data): string {
         JWT::$leeway = 1000;
 
-        $time  = time();
+        $time  = Date::now()->toTime();
         $token = [
             // Issued at: time when the token was generated
             "iat"  => $time,

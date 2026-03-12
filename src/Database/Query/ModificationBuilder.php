@@ -3,6 +3,7 @@ namespace Framework\Database\Query;
 
 use Framework\Request;
 use Framework\Database\SchemaModel;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
@@ -148,7 +149,7 @@ class ModificationBuilder {
 
         if ($this->schemaModel->canCreate) {
             if ($this->schemaModel->hasTimestamps && !$this->builder->hasField("createdTime")) {
-                $this->builder->set("createdTime", time());
+                $this->builder->set("createdTime", Date::now());
             }
             if ($this->schemaModel->hasUsers && $credentialID !== 0) {
                 $this->builder->set("createdUser", $credentialID);
@@ -169,7 +170,7 @@ class ModificationBuilder {
         }
 
         if ($this->schemaModel->hasTimestamps && !$this->builder->hasField("modifiedTime")) {
-            $this->builder->set("modifiedTime", time());
+            $this->builder->set("modifiedTime", Date::now());
         }
         if ($this->schemaModel->hasUsers && $credentialID !== 0) {
             $this->builder->set("modifiedUser", $credentialID);

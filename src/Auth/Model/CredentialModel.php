@@ -6,6 +6,7 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\Virtual;
 use Framework\Database\Status\Status;
 use Framework\System\Access;
+use Framework\Date\Date;
 
 /**
  * The Credential Model
@@ -69,15 +70,15 @@ class CredentialModel {
 
     public bool $reqPassChange = false;
 
-    public int $passExpiration = 0;
+    public ?Date $passExpiration = null;
 
     public string $accessToken = "";
 
-    public int $tokenExpiration = 0;
+    public ?Date $tokenExpiration = null;
 
-    public int $currentLogin = 0;
+    public ?Date $currentLogin = null;
 
-    public int $lastLogin = 0;
+    public ?Date $lastLogin = null;
 
     public bool $askNotifications = true;
 

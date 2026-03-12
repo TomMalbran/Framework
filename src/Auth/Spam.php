@@ -3,6 +3,7 @@ namespace Framework\Auth;
 
 use Framework\Auth\Schema\CredentialSpamSchema;
 use Framework\Auth\Schema\CredentialSpamQuery;
+use Framework\Date\Date;
 use Framework\Utils\Server;
 
 /**
@@ -19,12 +20,12 @@ class Spam extends CredentialSpamSchema {
 
         // Delete old entries
         $query = new CredentialSpamQuery();
-        $query->time->lessThan(time() - 1);
+        $query->time->lessThan(Date::now()->subtract(seconds: 1));
         $query->ip->equal($ip);
         self::removeEntity($query);
 
         $query = new CredentialSpamQuery();
-        $query->time->lessThan(time() - 3);
+        $query->time->lessThan(Date::now()->subtract(seconds: 3));
         self::removeEntity($query);
 
         // Check if there is still an entry for the given ip
@@ -35,7 +36,7 @@ class Spam extends CredentialSpamSchema {
         // Add a new entry
         self::replaceEntity(
             ip:   $ip,
-            time: time(),
+            time: Date::now(),
         );
         return false;
     }

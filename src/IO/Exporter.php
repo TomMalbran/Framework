@@ -6,6 +6,8 @@ use Framework\Intl\NLS;
 use Framework\IO\ExporterWriter;
 use Framework\IO\XLSXWriter;
 use Framework\IO\CSVWriter;
+use Framework\Date\Date;
+use Framework\Date\DateFormat;
 
 /**
  * The Exporter Wrapper
@@ -33,7 +35,9 @@ class Exporter {
      * @param string $lang     Optional.
      */
     public function __construct(int $total, string $title, string $fileName, string $lang = "root") {
-        $this->fileName = NLS::getString($fileName, $lang) . "_" . date("Y-m-d");
+        $this->fileName  = NLS::getString($fileName, $lang);
+        $this->fileName .= "_" . Date::now()->toString(DateFormat::Reverse);
+
         $this->total    = $total;
         $this->headers  = [];
 

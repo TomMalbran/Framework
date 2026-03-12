@@ -128,7 +128,7 @@ class MercadoPago {
             "userID"         => $response->getString("user_id"),
             "accessToken"    => $response->getString("access_token"),
             "refreshToken"   => $response->getString("refresh_token"),
-            "expirationTime" => time() + $response->getInt("expires_in"),
+            "expirationTime" => Date::now()->add(seconds: $response->getInt("expires_in"))->toTime(),
         ];
     }
 
@@ -152,7 +152,7 @@ class MercadoPago {
             "userID"         => $response->getString("user_id"),
             "accessToken"    => $response->getString("access_token"),
             "refreshToken"   => $response->getString("refresh_token"),
-            "expirationTime" => time() + $response->getInt("expires_in"),
+            "expirationTime" => Date::now()->add(seconds: $response->getInt("expires_in"))->toTime(),
         ];
     }
 

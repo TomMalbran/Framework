@@ -5,6 +5,8 @@ namespace Framework\Provider;
 use Framework\Email\EmailWhiteList;
 use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
+use Framework\Date\Date;
+use Framework\Date\DateFormat;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
@@ -295,7 +297,7 @@ class MailChimp {
     /**
      * Sends a Campaign
      * @param string                          $subject
-     * @param int                             $time
+     * @param Date                            $time
      * @param int                             $templateID
      * @param list<array<string,string>>|null $sections   Optional.
      * @param list<string>|null               $emails     Optional.
@@ -304,7 +306,7 @@ class MailChimp {
      */
     public static function sendCampaign(
         string $subject,
-        int $time,
+        Date $time,
         int $templateID,
         ?array $sections = null,
         ?array $emails = null,
@@ -331,7 +333,7 @@ class MailChimp {
         }
 
         // Send/Schedule the Campaign
-        if ($time === 0 || self::mailCampaign($mailChimpID, $time)) {
+        if (self::mailCampaign($mailChimpID, $time)) {
             return $mailChimpID;
         }
 
@@ -343,7 +345,7 @@ class MailChimp {
      * Updates a Campaign
      * @param string                          $mailChimpID
      * @param string                          $subject
-     * @param int                             $time
+     * @param Date                            $time
      * @param int                             $templateID
      * @param list<array<string,string>>|null $sections    Optional.
      * @param list<string>|null               $emails      Optional.
@@ -353,7 +355,7 @@ class MailChimp {
     public static function updateCampaign(
         string $mailChimpID,
         string $subject,
-        int $time,
+        Date $time,
         int $templateID,
         ?array $sections = null,
         ?array $emails = null,
@@ -379,7 +381,7 @@ class MailChimp {
         }
 
         // Send/Schedule the Campaign
-        if ($time !== 0 && !self::mailCampaign($mailChimpID, $time)) {
+        if (!self::mailCampaign($mailChimpID, $time)) {
             return false;
         }
 
@@ -510,19 +512,19 @@ class MailChimp {
     /**
      * Schedules the given MailChimp campaign
      * @param string $mailChimpID
-     * @param int    $time
+     * @param Date   $time
      * @return bool
      */
-    private static function mailCampaign(string $mailChimpID, int $time): bool {
-        if ($time === 0) {
+    private static function mailCampaign(string $mailChimpID, Date $time): bool {
+        if ($time->isEmpty()) {
             return false;
         }
 
-        if ($time <= time()) {
+        if ($time->isPast()) {
             $response = self::post("campaigns/{$mailChimpID}/actions/send");
         } else {
             $response = self::post("campaigns/{$mailChimpID}/actions/schedule", [
-                "schedule_time" => gmdate("Y-m-d H:i:s", $time),
+                "schedule_time" => $time->toString(DateFormat::ReverseSeconds),
                 "timewarp"      => false,
             ]);
         }
