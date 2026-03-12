@@ -8,11 +8,11 @@ use Framework\Date\Date;
  */
 class TimeTableData {
 
-    /** @var list<string> */
+    /** @var list<int> */
     public array $days;
 
-    /** @var list<int> */
-    public array $dayNumbers;
+    /** @var list<string> */
+    public array $dayNames;
 
     /** @var list<Date> */
     public array $dates;
@@ -26,18 +26,18 @@ class TimeTableData {
 
     /**
      * Constructor
-     * @param list<string> $days       Optional.
-     * @param list<int>    $dayNumbers Optional.
-     * @param list<Date>   $dates      Optional.
-     * @param string       $fromHour   Optional.
-     * @param string       $toHour     Optional.
-     * @param string       $daysText   Optional.
-     * @param string       $timeText   Optional.
-     * @param string       $zone       Optional.
+     * @param list<int>    $days     Optional.
+     * @param list<string> $dayNames Optional.
+     * @param list<Date>   $dates    Optional.
+     * @param string       $fromHour Optional.
+     * @param string       $toHour   Optional.
+     * @param string       $daysText Optional.
+     * @param string       $timeText Optional.
+     * @param string       $zone     Optional.
      */
     public function __construct(
         array $days = [],
-        array $dayNumbers = [],
+        array $dayNames = [],
         array $dates = [],
         string $fromHour = "",
         string $toHour = "",
@@ -45,14 +45,14 @@ class TimeTableData {
         string $timeText = "",
         string $zone = "",
     ) {
-        $this->days       = $days;
-        $this->dayNumbers = $dayNumbers;
-        $this->dates      = $dates;
+        $this->days     = $days;
+        $this->dayNames = $dayNames;
+        $this->dates    = $dates;
 
-        $this->fromHour   = $fromHour;
-        $this->toHour     = $toHour;
-        $this->daysText   = $daysText;
-        $this->timeText   = $timeText;
-        $this->zone       = $zone;
+        $this->fromHour = $fromHour;
+        $this->toHour   = $toHour;
+        $this->daysText = $daysText;
+        $this->timeText = $timeText;
+        $this->zone     = $zone;
     }
 }
