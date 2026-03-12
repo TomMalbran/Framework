@@ -7,6 +7,7 @@ use Framework\Database\Query\QueryMode;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\WhereBuilder;
 use Framework\Database\Query\Operator;
+use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
@@ -227,17 +228,17 @@ class Query implements QueryLike {
 
     /**
      * Adds a Where expression
-     * @param string                      $column
-     * @param Operator|string             $operator
-     * @param list<int|string>|int|string $value
-     * @param bool                        $caseSensitive Optional.
-     * @param bool|null                   $condition     Optional.
+     * @param string                           $column
+     * @param Operator|string                  $operator
+     * @param Date|list<int|string>|int|string $value
+     * @param bool                             $caseSensitive Optional.
+     * @param bool|null                        $condition     Optional.
      * @return Query
      */
     public function where(
         string $column,
         Operator|string $operator,
-        array|int|string $value,
+        Date|array|int|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): Query {
