@@ -33,6 +33,12 @@ services:
         tags:
             - phpstan.rules.rule
     -
+        class: Framework\Analysis\General\DisallowNativeDateRule
+        arguments:
+            enabled: %framework.disallowNativeDate%
+        tags:
+            - phpstan.rules.rule
+    -
         class: Framework\Analysis\General\EnumSwitchExhaustiveRule
         arguments:
             enabled: %framework.enumSwitchExhaustive%
@@ -87,6 +93,7 @@ parameters:
         disallowClassCompare: false
         disallowEmptyArray: false
         disallowEnumNameValue: false
+        disallowNativeDate: false
         enumSwitchExhaustive: false
         methodReturnNotNeeded: false
         preferListType: false
@@ -101,6 +108,7 @@ parametersSchema:
         disallowClassCompare: bool()
         disallowEnumNameValue: bool()
         disallowEmptyArray: bool()
+        disallowNativeDate: bool()
         enumSwitchExhaustive: bool()
         methodReturnNotNeeded: bool()
         preferListType: bool()

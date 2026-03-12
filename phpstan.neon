@@ -49,6 +49,7 @@ parameters:
         disallowClassCompare: true
         disallowEmptyArray: true
         disallowEnumNameValue: true
+        disallowNativeDate: true
         enumSwitchExhaustive: true
         methodReturnNotNeeded: true
         preferListType: true
