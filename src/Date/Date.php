@@ -15,7 +15,8 @@ use JsonSerializable;
  */
 class Date implements JsonSerializable {
 
-    private int $timestamp = 0;
+    private bool $hasDate;
+    private int  $timestamp;
 
 
     /**
@@ -24,14 +25,24 @@ class Date implements JsonSerializable {
      * @param mixed $hour Optional.
      */
     private function __construct(mixed $date = null, mixed $hour = null) {
+        // Use the Date from the other Date
         if ($date instanceof Date) {
+            $this->hasDate   = true;
             $this->timestamp = $date->toTime();
             return;
         }
-        if (Numbers::isValid($date)) {
-            $this->timestamp = Numbers::toInt($date);
-            return;
+
+        // Use the Timestamp from the number that can be negative or positive
+        if (Numbers::isValid($date, null)) {
+            $number = Numbers::toInt($date);
+            if ($number !== 0) {
+                $this->hasDate   = true;
+                $this->timestamp = $number;
+                return;
+            }
         }
+
+        // Try to parse the Date from the string
         if (is_string($date) && $date !== "") {
             $dateTime = $date;
             if (is_string($hour) && $hour !== "") {
@@ -39,9 +50,15 @@ class Date implements JsonSerializable {
             }
             $timestamp = strtotime($dateTime);
             if ($timestamp !== false) {
+                $this->hasDate   = true;
                 $this->timestamp = $timestamp;
+                return;
             }
         }
+
+        // If the Date is not valid, create an empty Date
+        $this->hasDate   = false;
+        $this->timestamp = 0;
     }
 
     /**
@@ -356,7 +373,7 @@ class Date implements JsonSerializable {
      * @return bool
      */
     public function isEmpty(): bool {
-        return $this->timestamp <= 0;
+        return !$this->hasDate;
     }
 
     /**
@@ -364,7 +381,7 @@ class Date implements JsonSerializable {
      * @return bool
      */
     public function isNotEmpty(): bool {
-        return $this->timestamp > 0;
+        return $this->hasDate;
     }
 
     /**
