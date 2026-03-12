@@ -32,4 +32,23 @@ enum Operator: string implements Enum, JsonSerializable {
     case NotStartsWith  = "NOT STARTS";
     case EndsWith       = "ENDS";
     case NotEndsWith    = "NOT ENDS";
+
+
+
+    /**
+     * Converts the Operator to SQL
+     * @return string
+     */
+    public function toSQL(): string {
+        return match ($this) {
+            self::None          => "",
+            self::Like          => "LIKE",
+            self::NotLike       => "NOT LIKE",
+            self::StartsWith    => "LIKE",
+            self::NotStartsWith => "NOT LIKE",
+            self::EndsWith      => "LIKE",
+            self::NotEndsWith   => "NOT LIKE",
+            default             => $this->value,
+        };
+    }
 }

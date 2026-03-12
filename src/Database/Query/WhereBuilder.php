@@ -96,7 +96,6 @@ class WhereBuilder {
         bool $caseSensitive,
     ): void {
         $operator = Operator::fromValue($operator);
-        $compare  = $operator->toString();
         $param    = null;
         $binds    = "?";
 
@@ -109,11 +108,11 @@ class WhereBuilder {
                 $param = $value;
             } elseif (array_is_list($value)) {
                 if (count($value) === 1) {
-                    $param   = $value[0];
+                    $param = $value[0];
                 } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $compare = "IN";
-                    $binds   = $this->createBinds($value);
+                    $param    = $value;
+                    $operator = Operator::In;
+                    $binds    = $this->createBinds($value);
                 }
             }
             break;
@@ -123,41 +122,41 @@ class WhereBuilder {
                 $param = $value;
             } elseif (array_is_list($value)) {
                 if (count($value) === 1) {
-                    $param   = $value[0];
+                    $param = $value[0];
                 } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $compare = "NOT IN";
-                    $binds   = $this->createBinds($value);
+                    $param    = $value;
+                    $operator = Operator::NotIn;
+                    $binds    = $this->createBinds($value);
                 }
             }
             break;
 
         case Operator::In:
             if (!is_array($value)) {
-                $param   = $value;
-                $compare = "=";
+                $param    = $value;
+                $operator = Operator::Equal;
             } elseif (array_is_list($value)) {
                 if (count($value) === 1) {
-                    $param   = $value[0];
-                    $compare = "=";
+                    $param    = $value[0];
+                    $operator = Operator::Equal;
                 } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $binds   = $this->createBinds($value);
+                    $param = $value;
+                    $binds = $this->createBinds($value);
                 }
             }
             break;
 
         case Operator::NotIn:
             if (!is_array($value)) {
-                $param   = $value;
-                $compare = "<>";
+                $param    = $value;
+                $operator = Operator::NotEqual;
             } elseif (array_is_list($value)) {
                 if (count($value) === 1) {
-                    $param   = $value[0];
-                    $compare = "<>";
+                    $param    = $value[0];
+                    $operator = Operator::NotEqual;
                 } elseif (count($value) > 1) {
-                    $param   = $value;
-                    $binds   = $this->createBinds($value);
+                    $param = $value;
+                    $binds = $this->createBinds($value);
                 }
             }
             break;
@@ -179,16 +178,14 @@ class WhereBuilder {
         case Operator::StartsWith:
         case Operator::NotStartsWith:
             if (!is_array($value)) {
-                $param   = Strings::addSuffix(trim(strtolower((string)$value)), "%");
-                $compare = Strings::replace($operator->toString(), "STARTS", "LIKE");
+                $param = Strings::addSuffix(trim(strtolower((string)$value)), "%");
             }
             break;
 
         case Operator::EndsWith:
         case Operator::NotEndsWith:
             if (!is_array($value)) {
-                $param   = Strings::addPrefix(trim(strtolower((string)$value)), "%");
-                $compare = Strings::replace($operator->toString(), "ENDS", "LIKE");
+                $param = Strings::addPrefix(trim(strtolower((string)$value)), "%");
             }
             break;
         }
@@ -198,8 +195,9 @@ class WhereBuilder {
         }
 
 
-        $prefix = $this->getWhereOperator();
-        $suffix = $caseSensitive ? "BINARY" : "";
+        $prefix  = $this->getWhereOperator();
+        $suffix  = $caseSensitive ? "BINARY" : "";
+        $compare = $operator->toSQL();
 
         $this->where    .= "$prefix $column $compare $suffix $binds ";
         $this->columns[] = $column;
