@@ -13,6 +13,12 @@ services:
         tags:
             - phpstan.collector
     -
+        class: Framework\Analysis\General\DisallowClassCompareRule
+        arguments:
+            enabled: %framework.disallowClassCompare%
+        tags:
+            - phpstan.rules.rule
+    -
         class: Framework\Analysis\General\DisallowEmptyArrayRule
         arguments:
             enabled: %framework.disallowEmptyArray%
@@ -76,6 +82,7 @@ services:
 
 parameters:
     framework:
+        disallowClassCompare: false
         disallowEmptyArray: false
         disallowEnumNameValue: false
         enumSwitchExhaustive: false
@@ -89,6 +96,7 @@ parameters:
 
 parametersSchema:
     framework: structure([
+        disallowClassCompare: bool()
         disallowEnumNameValue: bool()
         disallowEmptyArray: bool()
         enumSwitchExhaustive: bool()

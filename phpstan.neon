@@ -46,6 +46,7 @@ parameters:
 
     # Framework Rules
     framework:
+        disallowClassCompare: true
         disallowEmptyArray: true
         disallowEnumNameValue: true
         enumSwitchExhaustive: true
