@@ -47,6 +47,7 @@ parameters:
     # Framework Rules
     framework:
         disallowClassCompare: true
+        disallowDebugPrint: true
         disallowEmptyArray: true
         disallowEnumNameValue: true
         disallowNativeDate: true

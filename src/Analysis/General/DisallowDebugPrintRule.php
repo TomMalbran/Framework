@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Analysis\General;
 
-use Framework\Date\Date;
 use Framework\Utils\Arrays;
 
 use PHPStan\Analyser\Scope;
@@ -14,13 +13,13 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
 
 /**
- * The Disallow Native Date Rule
+ * The Disallow Debug Print Rule
  * @implements Rule<FuncCall>
  */
-class DisallowNativeDateRule implements Rule {
+class DisallowDebugPrintRule implements Rule {
 
     /**
-     * Creates a new Disallow Native Date Rule
+     * Creates a new Disallow Debug Print Rule
      * @param bool $enabled Optional.
      */
     public function __construct(
@@ -49,28 +48,28 @@ class DisallowNativeDateRule implements Rule {
             return [];
         }
 
-        // Only check if the function name is a literal string (Name node)
+        // Only check if the function name is a literal string
         if (!$node->name instanceof Name) {
             return [];
         }
 
-        // Check if the function being called is time or date
+        // Check if the function being called is var_dump or print_r
         $functionName = $scope->resolveName($node->name);
-        if (!Arrays::contains([ "time", "date" ], $functionName)) {
+        if (!Arrays::contains([ "var_dump", "print_r" ], $functionName)) {
             return [];
         }
 
-        // Check if the current context is the Date class
-        $classReflection = $scope->getClassReflection();
-        if ($classReflection !== null && $classReflection->getName() === Date::class) {
+        // Check if the current file is Tester.php
+        $filePath = $scope->getFile();
+        if (basename($filePath) === "Tester.php") {
             return [];
         }
 
         // Build and return the error message
         return [
-            RuleErrorBuilder::message("Usage of {$functionName}() is disallowed. Use the Date class instead.")
+            RuleErrorBuilder::message("Usage of {$functionName}() is disallowed. Remove debug calls.")
             ->line($node->getLine())
-            ->identifier("framework.disallowNativeDate")
+            ->identifier("framework.disallowDebugPrint")
             ->build(),
         ];
     }

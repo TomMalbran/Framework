@@ -21,6 +21,12 @@ services:
         tags:
             - phpstan.rules.rule
     -
+        class: Framework\Analysis\General\DisallowDebugPrintRule
+        arguments:
+            enabled: %framework.disallowDebugPrint%
+        tags:
+            - phpstan.rules.rule
+    -
         class: Framework\Analysis\General\DisallowEmptyArrayRule
         arguments:
             enabled: %framework.disallowEmptyArray%
@@ -91,6 +97,7 @@ services:
 parameters:
     framework:
         disallowClassCompare: false
+        disallowDebugPrint: false
         disallowEmptyArray: false
         disallowEnumNameValue: false
         disallowNativeDate: false
@@ -106,6 +113,7 @@ parameters:
 parametersSchema:
     framework: structure([
         disallowClassCompare: bool()
+        disallowDebugPrint: bool()
         disallowEnumNameValue: bool()
         disallowEmptyArray: bool()
         disallowNativeDate: bool()
