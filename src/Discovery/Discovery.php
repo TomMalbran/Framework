@@ -149,7 +149,7 @@ class Discovery {
                 $classKey = Strings::substringAfter($className, "\\");
                 $result["\\$className"] = $classKey;
             } elseif ($withError) {
-                var_dump("Skipping class $className due to missing dependencies.");
+                print("Skipping class $className due to missing dependencies.");
             }
         }
         return $result;
@@ -177,7 +177,7 @@ class Discovery {
                 }
             } catch (Throwable $e) {
                 if ($withError) {
-                    var_dump("Error loading class: $className: " . $e->getMessage());
+                    print("Error loading class: $className: " . $e->getMessage());
                 }
                 continue;
             }

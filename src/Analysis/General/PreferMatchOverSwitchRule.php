@@ -63,10 +63,6 @@ class PreferMatchOverSwitchRule implements Rule {
                 return !($stmt instanceof Break_);
             });
 
-            if (count($statements) === 0) {
-                var_dump($case->cond);
-            }
-
             // Each case must contain exactly one meaningful statement
             // If a case is empty (fall-through), it is allowed as match handles multiple keys
             if (count($statements) === 0 && $case->cond !== null) {

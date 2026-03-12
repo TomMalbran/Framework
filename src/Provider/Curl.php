@@ -270,14 +270,14 @@ class Curl {
 
 
     /**
-     * Prints the Curl Options in a Readable Format for Debugging
+     * Parses the Curl Options in a Readable Format for Debugging
      * @param array<int,string> $options
-     * @return void
+     * @return array<string,mixed>
      */
-    public static function printOptions(array $options): void {
+    public static function parseOptions(array $options): array {
         $constants = get_defined_constants(categorize: true);
         if (!isset($constants["curl"])) {
-            return;
+            return [];
         }
 
         $constants = $constants["curl"];
@@ -294,6 +294,6 @@ class Curl {
             $readableOptions[$name] = $value;
         }
 
-        print_r($readableOptions);
+        return $readableOptions;
     }
 }
