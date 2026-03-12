@@ -1,7 +1,7 @@
 rules:
+    - Framework\Analysis\Database\ModelIdFieldRule
+    - Framework\Analysis\Database\ModelEnumRule
     - Framework\Analysis\Enum\EnumHasNoneCaseRule
-    - Framework\Analysis\Model\ModelIdFieldRule
-    - Framework\Analysis\Model\ModelEnumRule
     - Framework\Analysis\Route\RouteMethodNameRule
     - Framework\Analysis\Route\RouteReturnTypeRule
     - Framework\Analysis\Route\RouteDuplicateRule

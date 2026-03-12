@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Analysis\Model;
+namespace Framework\Analysis\Database;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Status\Status;
