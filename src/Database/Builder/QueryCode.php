@@ -146,6 +146,8 @@ class QueryCode {
             return "{$status}Where";
         }
         return match ($type) {
+            FieldType::None    => "",
+
             FieldType::Date    => "DateWhere",
             FieldType::Enum    => "EnumWhere",
             FieldType::JSON,

@@ -350,6 +350,9 @@ class Field {
         $default    = null;
 
         switch ($this->type) {
+        case FieldType::None:
+            break;
+
         case FieldType::Date:
             $length     = $this->length > 0 ? $this->length : 10;
             $type       = $length > 10 ? "bigint" : "int";
@@ -444,6 +447,8 @@ class Field {
         }
 
         return match ($this->type) {
+            FieldType::None     => "",
+
             FieldType::Date     => $this->getDateValue($request),
             FieldType::Enum     => $request->getString($this->name),
             FieldType::JSON,
@@ -492,6 +497,8 @@ class Field {
 
         // Set the main value of the field
         $result[$key] = match ($this->type) {
+            FieldType::None     => "",
+
             FieldType::Date     => $number,
             FieldType::Enum     => $string,
             FieldType::JSON,

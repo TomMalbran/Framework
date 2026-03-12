@@ -1,12 +1,16 @@
 <?php
 namespace Framework\Database\Model;
 
-use Framework\Utils\Strings;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
+
+use JsonSerializable;
 
 /**
  * The Validate Type
  */
-enum ValidateType {
+enum ValidateType implements Enum, JsonSerializable {
+    use IsEnum;
 
     case None;
 
@@ -20,20 +24,4 @@ enum ValidateType {
 
     case Enum;
     case Status;
-
-
-
-    /**
-     * Creates a Validate Type from a String
-     * @param string $value
-     * @return ValidateType
-     */
-    public static function fromValue(string $value): ValidateType {
-        foreach (self::cases() as $case) {
-            if (Strings::isEqual($case->name, $value)) {
-                return $case;
-            }
-        }
-        return self::String;
-    }
 }

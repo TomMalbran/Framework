@@ -1,14 +1,22 @@
 <?php
 namespace Framework\Database\Model;
 
-use Framework\Utils\Strings;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Date\Date;
 use Framework\Utils\JSON;
+use Framework\Utils\Strings;
+
+use JsonSerializable;
 
 /**
  * The Field Type
  */
-enum FieldType {
+enum FieldType implements Enum, JsonSerializable {
+    use IsEnum;
+
+
+    case None;
 
     case Date;
     case Enum;
@@ -26,20 +34,6 @@ enum FieldType {
     case File;
 
 
-
-    /**
-     * Creates a Field Type from a String
-     * @param string $value
-     * @return FieldType
-     */
-    public static function fromValue(string $value): FieldType {
-        foreach (self::cases() as $case) {
-            if (Strings::isEqual($case->name, $value)) {
-                return $case;
-            }
-        }
-        return self::String;
-    }
 
     /**
      * Creates an FieldType from a Type
@@ -98,6 +92,8 @@ enum FieldType {
      */
     public static function getCodeType(FieldType $type, string $enumClass, bool $forEntity = false): string {
         return match ($type) {
+            FieldType::None    => "",
+
             FieldType::Date    => "Date",
             FieldType::Enum    => Strings::substringAfter($enumClass, "\\"),
             FieldType::JSON    => $forEntity ? "Dictionary" : "JsonSerializable|array",

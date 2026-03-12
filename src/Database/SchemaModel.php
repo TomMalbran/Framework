@@ -389,9 +389,9 @@ class SchemaModel {
             $text   = "";
             $addKey = $withKey;
             if ($value instanceof FieldType) {
-                $text = "FieldType::{$value->name}";
+                $text = "FieldType::{$value->toString()}";
             } elseif ($value instanceof DateType) {
-                $text = "DateType::{$value->name}";
+                $text = "DateType::{$value->toString()}";
             } elseif (is_string($value) && Strings::endsWith($value, "Schema")) {
                 $text = "{$value}::getModel()";
             } elseif (is_string($value)) {

@@ -39,26 +39,11 @@ enum Color: string implements Enum, JsonSerializable {
      * @return bool
      */
     public static function isValid(string $value): bool {
-        if ($value === "") {
-            return false;
-        }
-        foreach (self::cases() as $case) {
+        foreach (self::getAll() as $case) {
             if ($case->value === $value) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * Returns a list of Colors
-     * @return list<string>
-     */
-    public static function getValues(): array {
-        $list = [];
-        foreach (self::getAll() as $case) {
-            $list[] = $case->value;
-        }
-        return $list;
     }
 }
