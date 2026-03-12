@@ -78,12 +78,11 @@ class ModelIdFieldRule implements Rule {
         }
 
         // Build the error message
-        $fields  = Strings::join($idFields, ", ");
-        $message = "A model can only have 1 Field marked as isID. Found: $fields";
+        $fields = Strings::join($idFields, ", ");
         return [
-            RuleErrorBuilder::message($message)
+            RuleErrorBuilder::message("A model can only have 1 field marked as isID. Found: $fields")
                 ->line($lineNumber)
-                ->identifier("framework.model.id")
+                ->identifier("framework.modelIsID")
                 ->build(),
         ];
     }
