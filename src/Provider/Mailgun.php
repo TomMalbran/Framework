@@ -211,7 +211,7 @@ class Mailgun {
     public static function setDomainWebhooks(string $domain, string $url): bool {
         $types = [ "delivered", "opened", "permanent_fail", "unsubscribed" ];
         foreach ($types as $type) {
-            $response = self::execute(CurlMethod::POST, "/v3/$domain/webhooks", [
+            $response = self::execute(CurlMethod::POST, "/v3/domains/$domain/webhooks", [
                 "id"  => $type,
                 "url" => $url,
             ]);
