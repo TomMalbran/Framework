@@ -72,7 +72,7 @@ class Select implements JsonSerializable {
     }
 
     /**
-     * Returns the value as a string
+     * Returns the value as a String
      * @param string $key
      * @return string
      */
@@ -87,7 +87,7 @@ class Select implements JsonSerializable {
     }
 
     /**
-     * Returns the value as an integer
+     * Returns the value as an Integer
      * @param string $key
      * @return int
      */
@@ -99,6 +99,18 @@ class Select implements JsonSerializable {
             return Numbers::toInt($this->extras[$key]);
         }
         return 0;
+    }
+
+    /**
+     * Returns the value as a Dictionary
+     * @param string $key
+     * @return Dictionary
+     */
+    public function getDictionary(string $key): Dictionary {
+        if (isset($this->extras[$key])) {
+            return new Dictionary($this->extras[$key]);
+        }
+        return new Dictionary();
     }
 
     /**
