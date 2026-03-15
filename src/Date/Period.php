@@ -214,7 +214,7 @@ class Period {
             self::NextYear      => $date->add(years: 1)->toYearEnd(),
 
             self::AllPeriod     => Date::empty(),
-            self::Custom        => Date::create($this->fromTime),
+            self::Custom        => $date,
             default             => Date::empty(),
         };
 
@@ -258,7 +258,7 @@ class Period {
             self::NextYear      => $date->add(years: 1)->toYearEnd(),
 
             self::AllPeriod     => $date,
-            self::Custom        => Date::create($this->toTime),
+            self::Custom        => $date,
             default             => $date,
         };
 
