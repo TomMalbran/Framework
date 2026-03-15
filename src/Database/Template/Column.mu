@@ -1,17 +1,19 @@
 <?php
 namespace {{namespace}};
 
+use Framework\Database\Type\Column;
+use Framework\Database\Type\IsColumn;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
-use Framework\Utils\Strings;
 
 use JsonSerializable;
 
 /**
  * The {{name}} Column
  */
-enum {{columnClass}}: string implements Enum, JsonSerializable {
+enum {{columnClass}}: string implements Column, Enum, JsonSerializable {
     use IsEnum;
+    use IsColumn;
 
     case None = "";
 
@@ -23,43 +25,14 @@ enum {{columnClass}}: string implements Enum, JsonSerializable {
 {{/columns}}
 
 
-
     /**
-     * Get the name of the column
+     * Converts the column into a string
      * @return string
      */
-    public function name(): string {
-        return $this->value;
-    }
-
-    /**
-     * Get the key of the column
-     * @return string
-     */
-    public function key(): string {
-        return Strings::lowerCaseFirst($this->name);
-    }
-
-    /**
-     * Get the name of the column without the table
-     * @return string
-     */
-    public function base(): string {
-        return Strings::substringAfter($this->value, ".");
-    }
-
-    /**
-     * Get the name of the column without the table
-     * @param list<self>|self|null $values
-     * @return list<string>
-     */
-    public static function toKeys(array|self|null $values): array {
-        if (is_null($values)) {
-            return [];
+    public function toString(): string {
+        if ($this === self::None) {
+            return "";
         }
-        if ($values instanceof self) {
-            return [ $values->key() ];
-        }
-        return array_map(fn($value) => $value->key(), $values);
+        return $this->name;
     }
 }

@@ -8,6 +8,7 @@ use Framework\Database\Query\SchemaQuery;{{#idDbName}}
 use Framework\Database\Query\QueryLike;{{/idDbName}}
 use Framework\Database\Query\Operator;{{#queries}}
 use Framework\Database\Where\{{.}};{{/queries}}
+use Framework\Utils\Strings;
 
 /**
  * The {{name}} Query
@@ -89,8 +90,12 @@ class {{queryClass}} extends SchemaQuery {
      * @return {{queryClass}}
      */
     public function exists(QueryLike $subQuery): {{queryClass}} {
+        $query     = $subQuery->getQuery();
         $tableName = $subQuery->getTableName();
-        $subQuery->getQuery()->whereExp("{$tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $joinWith  = "{$this->tableName}.{$this->idDbName}";
+        if (!Strings::contains($query->toSQL(), $joinWith)) {
+            $query->whereExp("{$tableName}.{$this->idDbName} = $joinWith");
+        }
         $this->query->whereExists($subQuery);
         return $this;
     }
@@ -101,8 +106,12 @@ class {{queryClass}} extends SchemaQuery {
      * @return {{queryClass}}
      */
     public function notExists(QueryLike $subQuery): {{queryClass}} {
+        $query     = $subQuery->getQuery();
         $tableName = $subQuery->getTableName();
-        $subQuery->getQuery()->whereExp("{$tableName}.{$this->idDbName} = {$this->tableName}.{$this->idDbName}");
+        $joinWith  = "{$this->tableName}.{$this->idDbName}";
+        if (!Strings::contains($query->toSQL(), $joinWith)) {
+            $query->whereExp("{$tableName}.{$this->idDbName} = $joinWith");
+        }
         $this->query->whereNotExists($subQuery);
         return $this;
     }

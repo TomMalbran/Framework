@@ -2,6 +2,7 @@
 namespace Framework\Database\Where;
 
 use Framework\Database\Query\Query;
+use Framework\Database\Type\Column;
 
 /**
  * The Base Where
@@ -24,6 +25,15 @@ class BaseWhere {
     }
 
 
+
+    /**
+     * Adds an Equal Column condition
+     * @param Column $column
+     * @return void
+     */
+    public function equalColumn(Column $column): void {
+        $this->query->whereExp("{$this->column} = {$column->name()}");
+    }
 
     /**
      * Adds an Order By Ascending
