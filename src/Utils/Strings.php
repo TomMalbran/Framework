@@ -81,8 +81,11 @@ class Strings {
         bool $caseInsensitive = true,
         bool $trimValues = true,
     ): bool {
-        if (!is_string($string) || !is_string($other)) {
-            return $string === $other;
+        if (!is_string($string)) {
+            $string = self::toString($string);
+        }
+        if (!is_string($other)) {
+            $other = self::toString($other);
         }
 
         if ($caseInsensitive) {
