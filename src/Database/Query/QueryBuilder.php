@@ -3,6 +3,7 @@ namespace Framework\Database\Query;
 
 use Framework\Database\Query\QueryMode;
 use Framework\Database\Query\Assign;
+use Framework\Database\Type\Column;
 use Framework\Date\Date;
 use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
@@ -62,10 +63,15 @@ class QueryBuilder {
 
     /**
      * Adds a select to the Select Builder
-     * @param string $select
+     * @param Column|string $column
+     * @param string        $alias  Optional.
      * @return void
      */
-    public function addSelect(string $select): void {
+    public function addSelect(Column|string $column, string $alias = ""): void {
+        $select = $column instanceof Column ? $column->name() : $column;
+        if ($alias !== "") {
+            $select .= " AS $alias";
+        }
         $this->selects[] = $select;
     }
 

@@ -7,6 +7,7 @@ use Framework\Database\Query\QueryMode;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\WhereBuilder;
 use Framework\Database\Query\Operator;
+use Framework\Database\Type\Column;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
@@ -163,14 +164,14 @@ class Query implements QueryLike {
 
     /**
      * Sets the Columns used in a SELECT query
-     * @param array<string,string>|string $columns
-     * @param string                      ...$selects
+     * @param array<string,Column|string>|Column|string $columns
+     * @param Column|string                             ...$selects
      * @return Query
      */
-    public function columns(array|string $columns, string ...$selects): Query {
+    public function columns(array|Column|string $columns, Column|string ...$selects): Query {
         if (is_array($columns)) {
             foreach ($columns as $alias => $column) {
-                $this->queryBuilder->addSelect("$column AS $alias");
+                $this->queryBuilder->addSelect($column, $alias);
             }
         } else {
             $this->queryBuilder->addSelect($columns);
