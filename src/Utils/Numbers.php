@@ -177,8 +177,10 @@ class Numbers {
      * Returns a number using the right format
      * @param int|float $number
      * @param int       $decimals
-     * @param int       $maxForDecimals Optional.
-     * @param string    $default        Optional.
+     * @param int       $maxForDecimals     Optional.
+     * @param string    $default            Optional.
+     * @param string    $decimalSeparator   Optional.
+     * @param string    $thousandsSeparator Optional.
      * @return string
      */
     public static function formatFloat(
@@ -186,11 +188,13 @@ class Numbers {
         int $decimals,
         int $maxForDecimals = 1000,
         string $default = "",
+        string $decimalSeparator = ",",
+        string $thousandsSeparator = ".",
     ): string {
         $float = floatval($number);
         if ($float !== 0.0) {
             $decimals = ($maxForDecimals === 0 || $float < $maxForDecimals) && !is_int($number) ? $decimals : 0;
-            return number_format($float, $decimals, ",", ".");
+            return number_format($float, $decimals, $decimalSeparator, $thousandsSeparator);
         }
         return $default;
     }
