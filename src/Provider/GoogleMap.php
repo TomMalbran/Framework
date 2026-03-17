@@ -1,10 +1,12 @@
 <?php
+// spell-checker: ignore  staticmap
 namespace Framework\Provider;
 
 use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
+use Framework\Utils\Utils;
 
 /**
  * The Google Map Provider
@@ -84,6 +86,38 @@ class GoogleMap {
             "latitude"  => $location->getFloat("lat"),
             "longitude" => $location->getFloat("lng"),
         ];
+    }
+
+    /**
+     * Returns an Image Url with a Map at the given Latitude and Longitude
+     * @param float $latitude
+     * @param float $longitude
+     * @param int   $zoom      Optional.
+     * @param int   $width     Optional.
+     * @param int   $height    Optional.
+     * @return string
+     */
+    public static function getImageUrl(
+        float $latitude,
+        float $longitude,
+        int $zoom = 16,
+        int $width = 400,
+        int $height = 400,
+    ): string {
+        if (!self::isActive()) {
+            return "";
+        }
+
+        $params = [
+            "key"     => Config::getGoogleMapApiKey(),
+            "center"  => "$latitude,$longitude",
+            "zoom"    => $zoom,
+            "size"    => "{$width}x{$height}",
+            "markers" => "color:red|$latitude,$longitude",
+        ];
+
+        $url = self::BaseUrl . "staticmap";
+        return Utils::addParamsToUrl($url, $params);
     }
 
     /**
