@@ -11,15 +11,6 @@ use Throwable;
 class Numbers {
 
     /**
-     * Returns the length og the given Number
-     * @param int $number
-     * @return int
-     */
-    public static function length(int $number): int {
-        return strlen((string)$number);
-    }
-
-    /**
      * Returns true if the given value is a number and greater and/or equal to cero
      * @param mixed    $number
      * @param int|null $min    Optional.
@@ -37,6 +28,68 @@ class Numbers {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the given number as an integer using the given decimals
+     * @param mixed $value
+     * @param int   $decimals Optional.
+     * @return int
+     */
+    public static function toInt(mixed $value, int $decimals = 0): int {
+        if (is_numeric($value)) {
+            $padding = pow(10, $decimals);
+            return self::roundInt($value * $padding);
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the given number as a float using the given decimals
+     * @param mixed $number
+     * @param int   $decimals Optional.
+     * @return float
+     */
+    public static function toFloat(mixed $number, int $decimals = 0): float {
+        if (is_int($number)) {
+            $padding = pow(10, $decimals);
+            return $number / $padding;
+        }
+        if (is_float($number)) {
+            return $number;
+        }
+        if (is_numeric($number)) {
+            return floatval($number);
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the given number as an integer or a float
+     * @param mixed $number
+     * @return int|float
+     */
+    public static function toIntOrFloat(mixed $number): int|float {
+        if (is_int($number)) {
+            return $number;
+        }
+        if (is_float($number)) {
+            return $number;
+        }
+        if (is_numeric($number)) {
+            return floatval($number);
+        }
+        return 0;
+    }
+
+
+    /**
+     * Returns the length og the given Number
+     * @param int $number
+     * @return int
+     */
+    public static function length(int $number): int {
+        return strlen((string)$number);
     }
 
     /**
@@ -91,57 +144,7 @@ class Numbers {
         return rand($min, $max);
     }
 
-    /**
-     * Returns the given number as an integer using the given decimals
-     * @param mixed $value
-     * @param int   $decimals Optional.
-     * @return int
-     */
-    public static function toInt(mixed $value, int $decimals = 0): int {
-        if (is_numeric($value)) {
-            $padding = pow(10, $decimals);
-            return self::roundInt($value * $padding);
-        }
-        return 0;
-    }
 
-    /**
-     * Returns the given number as a float using the given decimals
-     * @param mixed $number
-     * @param int   $decimals Optional.
-     * @return float
-     */
-    public static function toFloat(mixed $number, int $decimals = 0): float {
-        if (is_int($number)) {
-            $padding = pow(10, $decimals);
-            return $number / $padding;
-        }
-        if (is_float($number)) {
-            return $number;
-        }
-        if (is_numeric($number)) {
-            return floatval($number);
-        }
-        return 0;
-    }
-
-    /**
-     * Returns the given number as an integer or a float
-     * @param mixed $number
-     * @return int|float
-     */
-    public static function toIntOrFloat(mixed $number): int|float {
-        if (is_int($number)) {
-            return $number;
-        }
-        if (is_float($number)) {
-            return $number;
-        }
-        if (is_numeric($number)) {
-            return floatval($number);
-        }
-        return 0;
-    }
 
     /**
      * Returns a number using the right format
