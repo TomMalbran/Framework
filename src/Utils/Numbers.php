@@ -84,6 +84,15 @@ class Numbers {
 
 
     /**
+     * Returns true if the given number has decimals
+     * @param int $number
+     * @return bool
+     */
+    public static function hasDecimals(int|float $number): bool {
+        return is_float($number) && floor($number) !== $number;
+    }
+
+    /**
      * Returns the length og the given Number
      * @param int $number
      * @return int
