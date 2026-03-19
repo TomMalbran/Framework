@@ -29,6 +29,7 @@ enum {{columnClass}}: string implements Column, Enum, JsonSerializable {
      * Converts the column into a string
      * @return string
      */
+    #[\Override]
     public function toString(): string {
         if ($this === self::None) {
             return "";

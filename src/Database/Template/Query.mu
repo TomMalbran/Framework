@@ -7,8 +7,8 @@ use {{.}};{{/imports}}
 use Framework\Database\Query\SchemaQuery;{{#idDbName}}
 use Framework\Database\Query\QueryLike;{{/idDbName}}
 use Framework\Database\Query\Operator;{{#queries}}
-use Framework\Database\Where\{{.}};{{/queries}}
-use Framework\Utils\Strings;
+use Framework\Database\Where\{{.}};{{/queries}}{{#idDbName}}
+use Framework\Utils\Strings;{{/idDbName}}
 
 /**
  * The {{name}} Query
