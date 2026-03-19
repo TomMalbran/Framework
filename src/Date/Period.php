@@ -7,10 +7,14 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Select;
 
+use IteratorAggregate;
+use Generator;
+
 /**
  * The Period Types used by the System
+ * @implements IteratorAggregate<Date>
  */
-class Period {
+class Period implements IteratorAggregate {
 
     public const Today         = "today";
     public const Yesterday     = "yesterday";
@@ -182,7 +186,7 @@ class Period {
      * @param bool $useTimeZone Optional.
      * @return Date
      */
-    public function getFromTime(bool $useTimeZone = true): Date {
+    private function getFromTime(bool $useTimeZone = true): Date {
         $now    = Date::now();
         $date   = $now->toDayStart();
 
@@ -226,7 +230,7 @@ class Period {
      * @param bool $useTimeZone Optional.
      * @return Date
      */
-    public function getToTime(bool $useTimeZone = true): Date {
+    private function getToTime(bool $useTimeZone = true): Date {
         $now    = Date::now();
         $date   = $now->toDayEnd();
 
@@ -341,5 +345,26 @@ class Period {
             self::AllPeriod     => 0,
             default             => 0,
         };
+    }
+
+
+
+    /**
+     * Returns an iterator for the Period
+     * @return Generator<Date>
+     */
+    #[\Override]
+    public function getIterator(): Generator {
+        $time   = $this->fromTime;
+        $toTime = $this->toTime;
+
+        if ($time->isAfter($toTime) || $time->isEmpty() || $toTime->isEmpty()) {
+            return;  // phpcs:ignore
+        }
+
+        while ($time->isBeforeOrEqual($toTime)) {
+            yield Date::create($time);
+            $time = $time->add(days: 1);
+        }
     }
 }
