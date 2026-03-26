@@ -189,6 +189,7 @@ class Mailgun {
      * @return bool
      */
     public static function setDomainTracking(string $domain, bool $tracking): bool {
+        // Activate the open tracking
         $response = self::execute(CurlMethod::PUT, "/v3/domains/$domain/tracking/open", [
             "active" => $tracking ? "true" : "false",
         ]);
@@ -196,10 +197,21 @@ class Mailgun {
             return false;
         }
 
+        // Activate the unsubscribe tracking
         $response = self::execute(CurlMethod::PUT, "/v3/domains/$domain/tracking/unsubscribe", [
             "active" => $tracking ? "true" : "false",
         ]);
-        return $response->hasValue("unsubscribe");
+        if (!$response->hasValue("unsubscribe")) {
+            return false;
+        }
+
+        // Generate a certificate
+        $response = self::execute(CurlMethod::POST, "/v2/x509/email.$domain");
+        if (!$response->hasValue("message")) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
