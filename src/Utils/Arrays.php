@@ -18,6 +18,18 @@ class Arrays {
     }
 
     /**
+     * Returns true if the given value is a list of arrays or objects
+     * @param mixed $array
+     * @return bool
+     */
+    public static function isArrayList(mixed $array): bool {
+        if (!is_array($array) || !array_is_list($array)) {
+            return false;
+        }
+        return isset($array[0]) && (is_array($array[0]) || is_object($array[0]));
+    }
+
+    /**
      * Returns true if the given value is a dictionary
      * @param mixed $array
      * @return bool

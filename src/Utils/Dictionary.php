@@ -86,6 +86,18 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns true if the data is a list of arrays or objects
+     * @param string $key Optional.
+     * @return bool
+     */
+    public function isArrayList(string $key = ""): bool {
+        if ($key !== "") {
+            return isset($this->data[$key]) && Arrays::isArrayList($this->data[$key]);
+        }
+        return Arrays::isArrayList($this->data);
+    }
+
+    /**
      * Returns true if the key exits in the data
      * @param int|string $key
      * @return bool
