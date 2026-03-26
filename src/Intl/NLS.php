@@ -7,6 +7,7 @@ use Framework\System\Language;
 use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
+use Framework\Utils\Numbers;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
@@ -315,5 +316,28 @@ class NLS {
      */
     public static function toYesNo(bool $value, string $language = ""): string {
         return self::getIndex("SELECT_YES_NO", $value ? 1 : 0, $language);
+    }
+
+    /**
+     * Returns a formatted number
+     * @param int|float $number
+     * @param int       $decimals       Optional.
+     * @param int       $maxForDecimals Optional.
+     * @param string    $language       Optional.
+     * @return string
+     */
+    public static function formatNumber(
+        int|float $number,
+        int $decimals = 2,
+        int $maxForDecimals = 1000,
+        string $language = "",
+    ): string {
+        return Numbers::formatFloat(
+            number:             $number,
+            decimals:           $decimals,
+            maxForDecimals:     $maxForDecimals,
+            decimalSeparator:   self::getString("NUMBER_DECIMAL_SEPARATOR", $language),
+            thousandsSeparator: self::getString("NUMBER_THOUSANDS_SEPARATOR", $language),
+        );
     }
 }
