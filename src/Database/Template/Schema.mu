@@ -515,7 +515,7 @@ class {{name}}Schema extends Schema {
         return Numbers::toInt($result);
         {{/hasIntID}}
         {{#hasEnumID}}
-        return {{idEnumClass}}::fromValue((string)$result);
+        return {{idEnumClass}}::fromValue($result);
         {{/hasEnumID}}
     }
 
