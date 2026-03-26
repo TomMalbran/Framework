@@ -89,7 +89,7 @@ class EmailQueue extends EmailQueueSchema {
         if (count($sendTos) === 0) {
             return false;
         }
-        $emailID = self::createEntity(
+        $emailQueueID = self::createEntity(
             emailCode:   $content->emailCode,
             sendTo:      $sendTos,
             subject:     $subject,
@@ -103,7 +103,7 @@ class EmailQueue extends EmailQueueSchema {
         if (!$sendNow) {
             return true;
         }
-        $email = self::getByID($emailID);
+        $email = self::getByID($emailQueueID);
         return self::send($email, $sendNow);
     }
 
@@ -142,17 +142,17 @@ class EmailQueue extends EmailQueueSchema {
                 $sendAlways,
             );
         }
-        return self::markAsSent($email->emailID, $emailResult);
+        return self::markAsSent($email->id, $emailResult);
     }
 
     /**
      * Marks the given Email(s) as Not Sent
-     * @param list<int>|int $emailID
+     * @param list<int>|int $emailQueueID
      * @return bool
      */
-    public static function markAsNotSent(array|int $emailID): bool {
+    public static function markAsNotSent(array|int $emailQueueID): bool {
         $query = new EmailQueueQuery();
-        $query->emailID->in(Arrays::toInts($emailID));
+        $query->emailQueueID->in(Arrays::toInts($emailQueueID));
 
         return self::editEntity(
             $query,
@@ -164,13 +164,13 @@ class EmailQueue extends EmailQueueSchema {
 
     /**
      * Marks the given Email as Sent
-     * @param int         $emailID
+     * @param int         $emailQueueID
      * @param EmailResult $emailResult
      * @return bool
      */
-    public static function markAsSent(int $emailID, EmailResult $emailResult): bool {
+    public static function markAsSent(int $emailQueueID, EmailResult $emailResult): bool {
         return self::editEntity(
-            $emailID,
+            $emailQueueID,
             emailResult: $emailResult,
             sentTime:    Date::now(),
         );

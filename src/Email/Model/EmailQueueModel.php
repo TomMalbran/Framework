@@ -21,7 +21,7 @@ use Framework\Utils\JSON;
 class EmailQueueModel {
 
     #[Field(isID: true)]
-    public int $emailID = 0;
+    public int $emailQueueID = 0;
 
     public EmailCode $emailCode = EmailCode::None;
 
