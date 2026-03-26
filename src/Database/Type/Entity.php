@@ -2,6 +2,7 @@
 namespace Framework\Database\Type;
 
 use Framework\Discovery\Discovery;
+use Framework\Enum\Enum;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
@@ -135,6 +136,12 @@ class Entity implements JsonSerializable {
      */
     final public function getType(string $key): string {
         if ($this->has($key)) {
+            if ($this->$key instanceof Enum) {
+                return get_class($this->$key);
+            }
+            if ($this->$key instanceof Date) {
+                return Date::class;
+            }
             return gettype($this->$key);
         }
         return "";
