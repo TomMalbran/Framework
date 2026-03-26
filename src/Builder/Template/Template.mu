@@ -56,4 +56,16 @@ enum Template {
         $code = File::read($path);
         return Mustache::render($code, $data);
     }
+
+    /**
+     * Deletes the File of the Template
+     * @param string $path
+     * @param int $deleted Optional.
+     * @return bool
+     */
+    public function delete(string $path, int &$deleted = 0): bool {
+        $result   = File::delete($path, $this->getFileName());
+        $deleted += $result ? 1 : 0;
+        return $result;
+    }
 }
