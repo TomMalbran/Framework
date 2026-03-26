@@ -19,13 +19,13 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Returns true if there is a Notification with the given ID for the given Credential
-     * @param int $notificationID
+     * @param int $notificationQueueID
      * @param int $credentialID
      * @return bool
      */
-    public static function existsForCredential(int $notificationID, int $credentialID): bool {
+    public static function existsForCredential(int $notificationQueueID, int $credentialID): bool {
         $query = new NotificationQueueQuery();
-        $query->notificationID->equal($notificationID);
+        $query->notificationQueueID->equal($notificationQueueID);
         $query->credentialID->equal($credentialID);
         return self::entityExists($query);
     }
@@ -166,12 +166,12 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Deletes the given Notification
-     * @param int $notificationID
+     * @param int $notificationQueueID
      * @return bool
      */
-    public static function delete(int $notificationID): bool {
+    public static function delete(int $notificationQueueID): bool {
         $query = new NotificationQueueQuery();
-        $query->notificationID->equal($notificationID);
+        $query->notificationQueueID->equal($notificationQueueID);
         return self::removeEntity($query);
     }
 
@@ -192,23 +192,23 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Marks the given Notification as read for the given Credential
-     * @param int $notificationID
+     * @param int $notificationQueueID
      * @return bool
      */
-    public static function markAsRead(int $notificationID): bool {
+    public static function markAsRead(int $notificationQueueID): bool {
         $query = new NotificationQueueQuery();
-        $query->notificationID->equal($notificationID);
+        $query->notificationQueueID->equal($notificationQueueID);
         return self::editEntity($query, isRead: true);
     }
 
     /**
      * Discards the given Notification for the given Credential
-     * @param int $notificationID
+     * @param int $notificationQueueID
      * @return bool
      */
-    public static function discard(int $notificationID): bool {
+    public static function discard(int $notificationQueueID): bool {
         $query = new NotificationQueueQuery();
-        $query->notificationID->equal($notificationID);
+        $query->notificationQueueID->equal($notificationQueueID);
         return self::editEntity($query, isDiscarded: true);
     }
 
@@ -246,7 +246,7 @@ class NotificationQueue extends NotificationQueueSchema {
             }
 
             self::editEntity(
-                $elem->notificationID,
+                $elem->notificationQueueID,
                 notificationResult: $notificationResult,
                 externalID:         $externalID,
                 playerIDs:          $playerIDs,

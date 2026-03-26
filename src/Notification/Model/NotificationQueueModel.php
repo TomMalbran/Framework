@@ -22,7 +22,7 @@ use Framework\Utils\JSON;
 class NotificationQueueModel {
 
     #[Field(isID: true)]
-    public int $notificationID = 0;
+    public int $notificationQueueID = 0;
 
     public int $credentialID = 0;
 
