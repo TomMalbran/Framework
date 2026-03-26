@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Date\Date;
 use Framework\Utils\Strings;
 
 use Throwable;
@@ -40,6 +41,9 @@ class Numbers {
         if (is_numeric($value)) {
             $padding = pow(10, $decimals);
             return self::roundInt($value * $padding);
+        }
+        if ($value instanceof Date) {
+            return $value->toTime();
         }
         return 0;
     }
