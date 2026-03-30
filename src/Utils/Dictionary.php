@@ -56,6 +56,16 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns the total number of elements in the data
+     * @return int
+     */
+    public function getTotal(): int {
+        return count($this->data);
+    }
+
+
+
+    /**
      * Returns true if the data is equal to another Dictionary
      * @param Dictionary $dict
      * @return bool
