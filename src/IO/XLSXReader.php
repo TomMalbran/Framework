@@ -80,24 +80,22 @@ class XLSXReader implements ImporterReader {
             return $data;
         }
 
+        $lastRow = null;
         foreach ($this->sheet->getRowIterator() as $index => $row) {
             if ($index < 2) {
                 continue;
             }
 
-            $values = $this->parseRow($row);
-            $fields = [];
-            for ($i = 0; $i < $amount; $i += 1) {
-                if (isset($values[$i]) && !Arrays::isEmpty($values, $i)) {
-                    $fields[] = $values[$i];
-                }
-            }
-
             if ($index === 2) {
-                $data->first = Strings::join($fields, " - ");
+                $data->first = $this->getRowAsString($row, $amount);
+                $data->last  = $data->first;
             }
-            $data->last    = Strings::join($fields, " - ");
             $data->amount += 1;
+
+            $lastRow = $row;
+        }
+        if ($lastRow !== null) {
+            $data->last = $this->getRowAsString($lastRow, $amount);
         }
 
         $this->reader->close();
@@ -130,19 +128,44 @@ class XLSXReader implements ImporterReader {
     /**
      * Returns the Content of the Row
      * @param Row $row
+     * @param int $amount Optional.
      * @return list<string>
      */
-    private function parseRow(Row $row): array {
+    private function parseRow(Row $row, int $amount = 0): array {
         $cells  = $row->getCells();
+        $index  = 0;
         $result = [];
+
         foreach ($cells as $cell) {
             if ($cell instanceof FormulaCell) {
-                $result[] = $cell->getComputedValue();
+                $result[] = Strings::toString($cell->getComputedValue());
             } else {
-                $result[] = $cell->getValue();
+                $result[] = Strings::toString($cell->getValue());
+            }
+
+            if ($amount > 0 && $index >= $amount - 1) {
+                break;
+            }
+            $index += 1;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns the Row as String
+     * @param Row $row
+     * @param int $amount Optional.
+     * @return string
+     */
+    private function getRowAsString(Row $row, int $amount = 0): string {
+        $values = $this->parseRow($row, $amount);
+        $fields = [];
+        for ($i = 0; $i < $amount; $i += 1) {
+            if (isset($values[$i]) && !Arrays::isEmpty($values, $i)) {
+                $fields[] = $values[$i];
             }
         }
-        return Arrays::toStrings($result);
+        return Strings::join($fields, " - ");
     }
 
 
