@@ -544,7 +544,6 @@ class Numbers {
         $expression = Strings::replacePattern($expression, "/\(\)/", "");
         $expression = Strings::replacePattern($expression, "/\+\-/", "-");
         $expression = Strings::replacePattern($expression, "/--/", "+");
-        $expression = Strings::replacePattern($expression, "/([+\-*\/])[+\-*\/]+/", "$1");
 
         // There is no expression
         if ($expression === "") {
