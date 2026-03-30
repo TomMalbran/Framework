@@ -163,6 +163,17 @@ class Query implements QueryLike {
     }
 
     /**
+     * Adds a new Column to the Query
+     * @param Column|string $column
+     * @param string        $as     Optional.
+     * @return Query
+     */
+    public function column(Column|string $column, string $as = ""): Query {
+        $this->queryBuilder->addSelect($column, $as);
+        return $this;
+    }
+
+    /**
      * Sets the Columns used in a SELECT query
      * @param array<string,Column|string>|Column|string $columns
      * @param Column|string                             ...$selects
