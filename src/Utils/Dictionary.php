@@ -379,6 +379,22 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Gets the last element of the list at the given key
+     * @param string $key Optional.
+     * @return Dictionary
+     */
+    public function getLast(string $key = ""): Dictionary {
+        if ($key === "") {
+            $last = Arrays::getLast($this->data);
+            return new Dictionary($last);
+        }
+
+        $list = $this->getList($key);
+        $last = $list[count($list) - 1] ?? null;
+        return $last ?? new Dictionary();
+    }
+
+    /**
      * Finds an element in the list at the given key
      * @param string $key
      * @param string $value
