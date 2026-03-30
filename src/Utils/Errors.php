@@ -97,17 +97,17 @@ class Errors implements JsonSerializable {
 
     /**
      * Adds a new error
-     * @param string          $error
-     * @param string          $message
-     * @param int|string|null $value   Optional.
+     * @param string     $error
+     * @param string     $message
+     * @param int|string ...$value
      * @return Errors
      */
-    public function add(string $error, string $message, int|string|null $value = null): Errors {
+    public function add(string $error, string $message, int|string ...$value): Errors {
         if ($message === "") {
             return $this;
         }
-        if ($value !== null) {
-            $this->errors[$error] = [ $message, $value ];
+        if (count($value) > 0) {
+            $this->errors[$error] = [ $message, ...$value ];
         } else {
             $this->errors[$error] = $message;
         }
@@ -133,10 +133,10 @@ class Errors implements JsonSerializable {
      * @param Enum|string $section
      * @param Enum|string $error
      * @param string      $message
-     * @param string|null $value   Optional.
+     * @param int|string  ...$value
      * @return Errors
      */
-    public function addFor(Enum|string $section, Enum|string $error, string $message, ?string $value = null): Errors {
+    public function addFor(Enum|string $section, Enum|string $error, string $message, int|string ...$value): Errors {
         if ($message === "") {
             return $this;
         }
@@ -153,7 +153,7 @@ class Errors implements JsonSerializable {
         } elseif (is_int($this->errors[$section])) {
             $this->errors[$section] += 1;
         }
-        return $this->add($error, $message, $value);
+        return $this->add($error, $message, ...$value);
     }
 
     /**

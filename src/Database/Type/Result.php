@@ -59,13 +59,13 @@ class Result {
 
     /**
      * Adds a new Error
-     * @param string          $field
-     * @param string          $message
-     * @param int|string|null $value   Optional.
+     * @param string     $field
+     * @param string     $message
+     * @param int|string ...$value
      * @return Result
      */
-    public function addError(string $field, string $message, int|string|null $value = null): Result {
-        $this->errors->add($field, $message, $value);
+    public function addError(string $field, string $message, int|string ...$value): Result {
+        $this->errors->add($field, $message, ...$value);
         return $this;
     }
 }
