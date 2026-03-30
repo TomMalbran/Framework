@@ -147,11 +147,11 @@ class OpenAI {
 
     /**
      * Lists all the Vector Store
-     * @return array<int|string,mixed>
+     * @return Dictionary
      */
-    public static function getAllVectorStores(): array {
+    public static function getAllVectorStores(): Dictionary {
         $response = self::get("/vector_stores");
-        return $response->getArray("data");
+        return $response->getDict("data");
     }
 
     /**
@@ -187,6 +187,18 @@ class OpenAI {
     public static function deleteVectorStore(string $vectorStoreID): string {
         $response = self::delete("/vector_stores/$vectorStoreID");
         return $response->getString("id");
+    }
+
+    /**
+     * Lists all the Files of a Vector Store
+     * @param string $vectorStoreID
+     * @return Dictionary
+     */
+    public static function getVectorStoreFiles(string $vectorStoreID): Dictionary {
+        $response = self::get("/vector_stores/$vectorStoreID/files", [
+            "limit" => 100,
+        ]);
+        return $response->getDict("data");
     }
 
     /**
