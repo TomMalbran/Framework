@@ -47,34 +47,24 @@ class StatusCode {
     /**
      * Generates the Status list
      * @param SchemaModel $schemaModel
-     * @return list<array{name:string,color:string,constant:string}>
+     * @return list<array{name:string,color:string}>
      */
     private static function getList(SchemaModel $schemaModel): array {
-        $result    = [];
-        $maxLength = 0;
-
+        $result = [];
         if (count($schemaModel->states) > 0) {
             foreach ($schemaModel->states as $state) {
                 $result[] = [
-                    "name"     => $state->name,
-                    "color"    => $state->color->getColor(),
-                    "constant" => "",
+                    "name"  => $state->name,
+                    "color" => $state->color->getColor(),
                 ];
-                $maxLength = max($maxLength, Strings::length($state->name));
             }
         } else {
             foreach (Status::getValues() as $statusName => $statusColor) {
                 $result[] = [
-                    "name"     => $statusName,
-                    "color"    => $statusColor,
-                    "constant" => "",
+                    "name"  => $statusName,
+                    "color" => $statusColor,
                 ];
-                $maxLength = max($maxLength, Strings::length($statusName));
             }
-        }
-
-        foreach ($result as $index => $elem) {
-            $result[$index]["constant"] = Strings::padRight($elem["name"], $maxLength);
         }
         return $result;
     }

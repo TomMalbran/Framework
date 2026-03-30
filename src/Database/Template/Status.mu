@@ -57,10 +57,19 @@ enum {{statusClass}} implements Enum, JsonSerializable {
     public static function getColor({{statusClass}}|string $value): string {
         return match (self::fromValue($value)) {
         {{#statuses}}
-            self::{{constant}} => "{{color}}",
+            self::{{name}} => "{{color}}",
         {{/statuses}}
             default => "gray",
         };
+    }
+
+    /**
+     * Returns true if the given value is valid
+     * @param {{statusClass}}|string $value
+     * @return bool
+     */
+    public static function isValid({{statusClass}}|string $value): bool {
+        return self::contains([ {{values}} ], self::fromValue($value));
     }
 
     /**
@@ -69,6 +78,23 @@ enum {{statusClass}} implements Enum, JsonSerializable {
      * @return list<Select>
      */
     public static function getSelect(string $isoCode = ""): array {
+        $result = [];
+        foreach ([ {{values}} ] as $status) {
+            $result[] = new Select(
+                $status->name,
+                self::getName($status, $isoCode),
+                [ "color" => self::getColor($status) ]
+            );
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a Select of Statuses including hidden ones
+     * @param string $isoCode Optional.
+     * @return list<Select>
+     */
+    public static function getFullSelect(string $isoCode = ""): array {
         $result = [];
         foreach (self::getAll() as $status) {
             $result[] = new Select(
