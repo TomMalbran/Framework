@@ -35,6 +35,36 @@
                 "group": "PHPCS"
             }
         },
+        {
+            "label": "PHPUnit",
+            "type": "shell",
+            "command": "./vendor/bin/phpunit",
+            "args": [
+                "--colors=never",
+                "--teamcity"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": {
+                "owner": "phpunit",
+                "fileLocation": [ "absolute" ],
+                "pattern": {
+                    "regexp": "^##teamcity\\[testFailed .*name='([^']+)'.*message='([^']*)'.*details='([^:']+):(\\d+)\\|n'.*\\]$",
+                    "file": 3,
+                    "line": 4,
+                    "message": 1,
+                    "code": 2,
+                    "column": 5
+                }
+            },
+            "presentation": {
+                "reveal": "never",
+                "clear": true,
+                "panel": "shared",
+                "group": "PHPUNIT"
+            }
+        },
 
 
         {
