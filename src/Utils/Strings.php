@@ -309,11 +309,16 @@ class Strings {
 
     /**
      * Returns a char from an index
-     * @param int $index
+     * @param int  $index
+     * @param bool $upperCase Optional.
      * @return string
      */
-    public static function getLetter(int $index): string {
-        return chr($index + 65);
+    public static function getLetter(int $index, bool $upperCase = true): string {
+        if ($index < 0 || $index > 25) {
+            return "";
+        }
+        $start = $upperCase ? 65 : 97;
+        return chr($index + $start);
     }
 
     /**
