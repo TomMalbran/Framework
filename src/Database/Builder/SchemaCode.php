@@ -58,7 +58,7 @@ class SchemaCode {
 
             "hasValidation"      => count($validations) > 0,
             "validations"        => $validations,
-            "errorPrefix"        => Strings::pascalCaseToUpperCase($schemaModel->fantasyName) . "_ERROR_",
+            "errorPrefix"        => Strings::toConstantCase($schemaModel->fantasyName) . "_ERROR_",
 
             "hasID"              => $schemaModel->hasID,
             "hasIntID"           => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,

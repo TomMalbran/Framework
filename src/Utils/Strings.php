@@ -328,7 +328,7 @@ class Strings {
      */
     public static function getNumber(string $text): int {
         $letter = strtoupper(trim($text));
-        if (preg_match('/^[A-Z]$/', $letter) > 0) {
+        if (self::match($letter, "/^[A-Z]$/")) {
             return ord($letter) - 64;
         }
         return 0;
@@ -783,24 +783,6 @@ class Strings {
 
 
     /**
-     * Transforms the first Character to LowerCase
-     * @param string $string
-     * @return string
-     */
-    public static function lowerCaseFirst(string $string): string {
-        return lcfirst($string);
-    }
-
-    /**
-     * Transforms the first Character to UpperCase
-     * @param string $string
-     * @return string
-     */
-    public static function upperCaseFirst(string $string): string {
-        return ucfirst($string);
-    }
-
-    /**
      * Transforms a String to lowercase
      * @param string $string
      * @return string
@@ -810,12 +792,12 @@ class Strings {
     }
 
     /**
-     * Returns true if a String is UPPERCASE
+     * Transforms the first Character to LowerCase
      * @param string $string
-     * @return bool
+     * @return string
      */
-    public static function isUpperCase(string $string): bool {
-        return preg_match('/^[A-Z_]+$/', $string) === 1;
+    public static function lowerCaseFirst(string $string): string {
+        return lcfirst($string);
     }
 
     /**
@@ -828,12 +810,164 @@ class Strings {
     }
 
     /**
+     * Transforms the first Character to UpperCase
+     * @param string $string
+     * @return string
+     */
+    public static function upperCaseFirst(string $string): string {
+        return ucfirst($string);
+    }
+
+
+
+    /**
+     * Returns true if a String is CONSTANT_CASE
+     * @param string $string
+     * @return bool
+     */
+    public static function isConstantCase(string $string): bool {
+        return self::match($string, "/^[A-Z_]+$/");
+    }
+
+    /**
+     * Transforms a String to CONSTANT_CASE
+     * @param string $string
+     * @return string
+     */
+    public static function toConstantCase(string $string): string {
+        if (self::isConstantCase($string)) {
+            return $string;
+        }
+
+        if (self::isPascalCase($string) || self::isCamelCase($string)) {
+            $parts = preg_split('/(?=[A-Z])/', $string);
+            if ($parts === false) {
+                return strtoupper($string);
+            }
+
+            $result = implode("_", $parts);
+            $result = strtoupper($result);
+            $result = self::stripStart($result, "_");
+            return $result;
+        }
+
+        $result = self::replacePattern($string, "/[\.:;\-_ ]+/", "_");
+        $result = strtoupper($result);
+        return $result;
+    }
+
+    /**
+     * Returns true if a String is snake_case
+     * @param string $string
+     * @return bool
+     */
+    public static function isSnakeCase(string $string): bool {
+        return self::match($string, "/^[a-z0-9]+(_[a-z0-9]+)*$/");
+    }
+
+    /**
+     * Transforms a String to snake_case
+     * @param string $string
+     * @return string
+     */
+    public static function toSnakeCase(string $string): string {
+        if (self::isSnakeCase($string)) {
+            return $string;
+        }
+
+        if (self::isPascalCase($string) || self::isCamelCase($string)) {
+            // Insert an underscore before any uppercase letter that is not followed by another uppercase letter,
+            // or before an uppercase letter that is followed by a lowercase letter.
+            // This handles cases like "CamelCase" -> "camel_case" and "SomeID" -> "some_id".
+            $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', "_" . '$1');
+
+            // Insert an underscore before any sequence of two or more uppercase letters
+            // that is preceded by a lowercase letter.
+            // This handles cases like "someXMLData" -> "some_xml_data".
+            $result = self::replacePattern($result, '/(?<=[a-z])([A-Z]{2,})/', "_" . '$1');
+
+            return strtolower($result);
+        }
+
+        $result = self::replacePattern($string, "/[\.:;\- ]+/", "_");
+        $result = strtolower($result);
+        return $result;
+    }
+
+    /**
+     * Returns true if a String is kebab-case
+     * @param string $string
+     * @return bool
+     */
+    public static function isKebabCase(string $string): bool {
+        return self::match($string, "/^[a-z0-9]+(-[a-z0-9]+)*$/");
+    }
+
+    /**
+     * Transforms a String to kebab-case
+     * @param string $string
+     * @return string
+     */
+    public static function toKebabCase(string $string): string {
+        if (self::isKebabCase($string)) {
+            return $string;
+        }
+
+        if (self::isPascalCase($string) || self::isCamelCase($string)) {
+            // Insert a hyphen before any uppercase letter that is not followed by another uppercase letter,
+            // or before an uppercase letter that is followed by a lowercase letter.
+            // This handles cases like "CamelCase" -> "camel-case" and "SomeID" -> "some-id".
+            $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', "-" . '$1');
+
+            // Insert a hyphen before any sequence of two or more uppercase letters
+            // that is preceded by a lowercase letter.
+            // This handles cases like "someXMLData" -> "some-xml-data".
+            $result = self::replacePattern($result, '/(?<=[a-z])([A-Z]{2,})/', "-" . '$1');
+
+            return strtolower($result);
+        }
+
+        $result = self::replacePattern($string, "/[\.:;\_ ]+/", "-");
+        $result = strtolower($result);
+        return $result;
+    }
+
+    /**
+     * Returns true if a String is PascalCase
+     * @param string $string
+     * @return bool
+     */
+    public static function isPascalCase(string $string): bool {
+        return self::match($string, "/^[A-Z][a-zA-Z0-9]*$/");
+    }
+
+    /**
      * Transforms a String to PascalCase
      * @param string $string
      * @return string
      */
     public static function toPascalCase(string $string): string {
-        return ucfirst(strtolower($string));
+        if (self::isPascalCase($string)) {
+            return $string;
+        }
+        if (self::isCamelCase($string)) {
+            return self::upperCaseFirst($string);
+        }
+
+        $result = self::replacePattern($string, "/[\.:;\-_]+/", " ");
+        $result = strtolower($result);
+        $result = ucwords($result);
+        $result = str_replace(" ", "", $result);
+        return $result;
+    }
+
+    /**
+     * Returns true if a String is camelCase
+     * @param string $string
+     * @return bool
+     */
+    public static function isCamelCase(string $string): bool {
+        return self::match($string, "/^[a-z][a-zA-Z0-9]*$/");
     }
 
     /**
@@ -842,113 +976,19 @@ class Strings {
      * @return string
      */
     public static function toCamelCase(string $string): string {
+        if (self::isCamelCase($string)) {
+            return $string;
+        }
+        if (self::isPascalCase($string)) {
+            return self::lowerCaseFirst($string);
+        }
+
         $result = self::replacePattern($string, "/[\.:;\-_]+/", " ");
         $result = strtolower($result);
         $result = ucwords($result);
         $result = str_replace(" ", "", $result);
         $result = lcfirst($result);
         return $result;
-    }
-
-    /**
-     * Transforms an UPPER_CASE string to PascalCase
-     * @param string $string
-     * @return string
-     */
-    public static function upperCaseToPascalCase(string $string): string {
-        $result = ucwords(strtolower($string), "_");
-        $result = str_replace("_", " ", $result);
-        return $result;
-    }
-
-    /**
-     * Transforms an UPPER_CASE string to camelCase
-     * @param string $string
-     * @param bool   $capitalizeFirst Optional.
-     * @return string
-     */
-    public static function upperCaseToCamelCase(string $string, bool $capitalizeFirst = false): string {
-        if (!self::isUpperCase($string)) {
-            return $string;
-        }
-
-        $result = ucwords(strtolower($string), "_");
-        $result = str_replace("_", "", $result);
-        if (!$capitalizeFirst) {
-            $result = lcfirst($result);
-        }
-        return $result;
-    }
-
-    /**
-     * Transforms a camelCase string to UPPER_CASE
-     * @param string $string
-     * @return string
-     */
-    public static function camelCaseToUpperCase(string $string): string {
-        if (self::isUpperCase($string)) {
-            return $string;
-        }
-
-        $parts = preg_split('/(?=[A-Z])/', $string);
-        if ($parts === false) {
-            return strtoupper($string);
-        }
-
-        $result = implode("_", $parts);
-        $result = strtoupper($result);
-        return $result;
-    }
-
-    /**
-     * Transforms a camelCase string to PascalCase
-     * @param string $string
-     * @return string
-     */
-    public static function camelCaseToPascalCase(string $string): string {
-        $parts = preg_split('/(?=[A-Z])/', $string);
-        if ($parts === false) {
-            return ucfirst($string);
-        }
-
-        $result = implode(" ", $parts);
-        $result = ucfirst($result);
-        return $result;
-    }
-
-    /**
-     * Transforms a PascalCase string to snake_case
-     * @param string $string
-     * @param string $separator Optional.
-     * @return string
-     */
-    public static function pascalCaseToSnakeCase(string $string, string $separator = "_"): string {
-        if (self::contains($string, $separator)) {
-            return strtolower($string);
-        }
-
-        // Insert an underscore before any uppercase letter that is not followed by another uppercase letter,
-        // or before an uppercase letter that is followed by a lowercase letter.
-        // This handles cases like "CamelCase" -> "camel_case" and "SomeID" -> "some_id".
-        $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', $separator . '$1');
-
-        // Insert an underscore before any sequence of two or more uppercase letters
-        // that is preceded by a lowercase letter.
-        // This handles cases like "someXMLData" -> "some_xml_data".
-        $result = self::replacePattern($result, '/(?<=[a-z])([A-Z]{2,})/', $separator . '$1');
-
-        // Convert the entire string to lowercase.
-        return strtolower($result);
-    }
-
-    /**
-     * Transforms a PascalCase string to UPPER_CASE
-     * @param string $string
-     * @return string
-     */
-    public static function pascalCaseToUpperCase(string $string): string {
-        $result = self::pascalCaseToSnakeCase($string);
-        return strtoupper($result);
     }
 
 

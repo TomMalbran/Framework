@@ -184,7 +184,7 @@ class Configs implements DiscoveryBuilder {
      */
     private static function get(string $property): mixed {
         self::load();
-        $upperKey = Strings::camelCaseToUpperCase($property);
+        $upperKey = Strings::toConstantCase($property);
         return self::$data[$upperKey] ?? null;
     }
 
@@ -305,8 +305,8 @@ class Configs implements DiscoveryBuilder {
         $properties = [];
 
         foreach ($data as $envKey => $value) {
-            $property = Strings::upperCaseToCamelCase($envKey);
-            $title    = Strings::upperCaseToPascalCase($envKey);
+            $property = Strings::toCamelCase($envKey);
+            $title    = Strings::toPascalCase($envKey);
             $name     = Strings::upperCaseFirst($property);
 
             if (Strings::endsWith($envKey, "URL")) {

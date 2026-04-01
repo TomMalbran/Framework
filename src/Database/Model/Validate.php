@@ -128,8 +128,8 @@ class Validate {
         $this->minValue    = $minValue;
         $this->maxValue    = $maxValue;
 
-        $this->prefix      = Strings::toUpperCase($prefix);
-        $this->belongsName = Strings::toUpperCase($belongsName);
+        $this->prefix      = Strings::toConstantCase($prefix);
+        $this->belongsName = Strings::toConstantCase($belongsName);
 
         if ($this->method === "") {
             if (!Arrays::isEmpty($this->typeOf)) {
@@ -167,7 +167,7 @@ class Validate {
         $this->type      = $this->getType($field);
 
         if ($this->prefix === "") {
-            $this->prefix = Strings::pascalCaseToUpperCase($fantasyName);
+            $this->prefix = Strings::toConstantCase($fantasyName);
         }
 
         if ($this->type === ValidateType::Enum) {
@@ -226,7 +226,7 @@ class Validate {
     public function getFieldError(): string {
         $fieldName = trim(ucfirst($this->name));
         $fieldName = Strings::stripEnd($fieldName, "ID");
-        $fieldName = Strings::pascalCaseToUpperCase($fieldName);
+        $fieldName = Strings::toConstantCase($fieldName);
 
         return "{$this->prefix}_ERROR_{$fieldName}";
     }
@@ -250,7 +250,7 @@ class Validate {
      */
     public function getTypeExistsError(): string {
         $typeName = Strings::substringAfter($this->typeOf, "\\");
-        $prefix   = Strings::pascalCaseToUpperCase($typeName);
+        $prefix   = Strings::toConstantCase($typeName);
         return "{$prefix}_ERROR_EXISTS";
     }
 
@@ -262,7 +262,7 @@ class Validate {
         $prefix = $this->belongsName;
         if ($prefix === "") {
             $belongsName = Strings::substringAfter($this->belongsTo, "\\");
-            $prefix      = Strings::pascalCaseToUpperCase($belongsName);
+            $prefix      = Strings::toConstantCase($belongsName);
         }
         return "{$prefix}_ERROR_EXISTS";
     }

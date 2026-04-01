@@ -116,7 +116,7 @@ class SettingConfig implements DiscoveryBuilder {
 
             $isGeneral    = Strings::isEqual($section, self::General);
             $prefix       = !$isGeneral ? Strings::upperCaseFirst($section) : "";
-            $title        = Strings::camelCaseToPascalCase($variable);
+            $title        = Strings::toPascalCase($variable);
 
             $result[] = [
                 "isFirst"   => $isFirst,

@@ -488,7 +488,7 @@ class SchemaModel {
      * @return string
      */
     public static function getDbTableName(string $modelName): string {
-        return Strings::pascalCaseToSnakeCase($modelName);
+        return Strings::toSnakeCase($modelName);
     }
 
     /**
@@ -497,9 +497,9 @@ class SchemaModel {
      * @return string
      */
     public static function getDbFieldName(string $name): string {
-        if (Strings::endsWith($name, "ID") && !Strings::isUpperCase($name)) {
+        if (Strings::endsWith($name, "ID") && !Strings::isConstantCase($name)) {
             $name = Strings::replace($name, "ID", "Id");
-            $name = Strings::camelCaseToUpperCase($name);
+            $name = Strings::toConstantCase($name);
         }
         return $name;
     }
