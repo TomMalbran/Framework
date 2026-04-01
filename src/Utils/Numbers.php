@@ -301,7 +301,8 @@ class Numbers {
         if ($percent === 0 || $percent === 0.0) {
             return $number;
         }
-        $discount = (100 - min(100, $percent)) / 100;
+        $percent  = max(0, min(100, $percent));
+        $discount = (100 - $percent) / 100;
         return $number * $discount;
     }
 
@@ -322,11 +323,11 @@ class Numbers {
 
     /**
      * Returns the Greatest Common Divisor
-     * @param int|float $a
-     * @param int|float $b
-     * @return int|float
+     * @param int $a
+     * @param int $b
+     * @return int
      */
-    public static function getCommonDivisor(int|float $a, int|float $b): int|float {
+    public static function getCommonDivisor(int $a, int $b): int {
         while ($b !== 0) {
             $m = $a % $b;
             $a = $b;
@@ -530,13 +531,11 @@ class Numbers {
         }
 
         // Sanitize the input
-        $expression = Strings::replacePattern($expression, "/[^0-9.,+\-*\/()%]/", "");
+        $expression = Strings::replacePattern($expression, "/[^0-9.,+\-\*\/\^%()]/", "");
 
         // Convert percentages to decimal
-        $expression = Strings::replacePattern($expression, "/([+-])([0-9]{1})(%)/", "*(1\$1.0\$2)");
-        $expression = Strings::replacePattern($expression, "/([+-])([0-9]+)(%)/", "*(1\$1.\$2)");
-        $expression = Strings::replacePattern($expression, "/([0-9]{1})(%)/", ".0\$1");
-        $expression = Strings::replacePattern($expression, "/([0-9]+)(%)/", ".\$1");
+        $expression = Strings::replacePattern($expression, "/([+-])([0-9]+)(%)/", "(\$1\$2/100)");
+        $expression = Strings::replacePattern($expression, "/([0-9]+)(%)/", "(\$1/100)");
 
         // Fixes some errors
         $expression = Strings::replacePattern($expression, "/,/", ".");
