@@ -270,6 +270,10 @@ class Strings {
      * @return bool
      */
     public static function onlyOneCharacter(string $string, string $needle): bool {
+        if ($string === "") {
+            return false;
+        }
+
         $chars = str_split($string);
         foreach ($chars as $char) {
             if ($char !== $needle) {
