@@ -248,17 +248,19 @@ class Strings {
      * Returns all the matches for the Pattern in the given String as an array
      * @param string $string
      * @param string $pattern
-     * @return list<mixed>
+     * @return list<string>
      */
     public static function getAllMatches(string $string, string $pattern): array {
-        preg_match_all($pattern, $string, $matches);
-        if (Arrays::isEmpty($matches)) {
+        $result = preg_match_all($pattern, $string, $matches);
+        if ($result === false || $result === 0) {
             return [];
         }
-        if (count($matches) === 1 && isset($matches[0])) {
-            return $matches[0];
+
+        $list = [];
+        foreach ($matches as $match) {
+            $list = array_merge($list, $match);
         }
-        return Arrays::toList($matches);
+        return $list;
     }
 
     /**
