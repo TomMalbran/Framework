@@ -1,7 +1,7 @@
 <?php
-namespace Framework\IO;
+namespace Framework\ImpExp;
 
-use Framework\IO\ImporterReader;
+use Framework\ImpExp\ImporterReader;
 use Framework\Utils\Select;
 
 /**

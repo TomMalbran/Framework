@@ -1,8 +1,8 @@
 <?php
-namespace Framework\IO;
+namespace Framework\ImpExp;
 
 use Framework\Intl\NLS;
-use Framework\IO\ExporterWriter;
+use Framework\ImpExp\ExporterWriter;
 use Framework\Utils\Arrays;
 
 /**

@@ -1,8 +1,8 @@
 <?php
-namespace Framework\IO;
+namespace Framework\ImpExp;
 
-use Framework\IO\ImporterReader;
-use Framework\IO\ImporterData;
+use Framework\ImpExp\ImporterReader;
+use Framework\ImpExp\ImporterData;
 use Framework\Utils\Arrays;
 use Framework\Utils\Select;
 use Framework\Utils\Strings;

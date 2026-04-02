@@ -1,5 +1,5 @@
 <?php
-namespace Framework\IO;
+namespace Framework\ImpExp;
 
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;

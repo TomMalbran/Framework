@@ -1,5 +1,5 @@
 <?php
-namespace Framework\IO;
+namespace Framework\ImpExp;
 
 /**
  * The Exporter Writer
