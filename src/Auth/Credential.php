@@ -1,7 +1,9 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\Request;
+use Framework\IO\Request;
+use Framework\IO\Search;
+use Framework\IO\Select;
 use Framework\Database\Query\Operator;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialEntity;
@@ -13,8 +15,6 @@ use Framework\System\Access;
 use Framework\System\Path;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
-use Framework\Utils\Search;
-use Framework\Utils\Select;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
 

@@ -2,13 +2,13 @@
 // spell-checker: ignore  apikey
 namespace Framework\Provider;
 
+use Framework\IO\Select;
 use Framework\Email\EmailWhiteList;
 use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Date\Date;
 use Framework\Date\DateFormat;
 use Framework\Utils\Dictionary;
-use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 /**

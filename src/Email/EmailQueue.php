@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Email\Email;
 use Framework\Email\EmailResult;
 use Framework\Email\Schema\EmailQueueSchema;

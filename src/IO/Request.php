@@ -1,5 +1,5 @@
 <?php
-namespace Framework;
+namespace Framework\IO;
 
 use Framework\File\File;
 use Framework\File\FileType;

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Date;
 
+use Framework\IO\Errors;
 use Framework\Intl\NLS;
 use Framework\Date\Date;
 use Framework\Date\DateUtils;
@@ -9,7 +10,6 @@ use Framework\Date\TimeZone;
 use Framework\Date\TimeTableItem;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Arrays;
-use Framework\Utils\Errors;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 

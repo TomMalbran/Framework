@@ -1,7 +1,7 @@
 <?php
 namespace Framework\File;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\FileItem;

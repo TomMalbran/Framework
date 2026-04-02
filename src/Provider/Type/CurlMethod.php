@@ -1,9 +1,9 @@
 <?php
 namespace Framework\Provider\Type;
 
+use Framework\IO\Select;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
-use Framework\Utils\Select;
 
 use JsonSerializable;
 

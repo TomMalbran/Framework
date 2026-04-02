@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Where;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Database\Query\Operator;
 use Framework\Database\Where\BaseWhere;
 use Framework\Date\Date;

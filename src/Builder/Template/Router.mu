@@ -1,8 +1,8 @@
 <?php
 namespace {{namespace}};
 
-use Framework\Request;
-use Framework\Response;
+use Framework\IO\Request;
+use Framework\IO\Response;
 use Framework\System\Access;
 
 /**

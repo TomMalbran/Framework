@@ -1,12 +1,12 @@
 <?php
 namespace Framework\Provider;
 
+use Framework\IO\Select;
 use Framework\Provider\Type\CurlMethod;
 use Framework\Provider\Type\OpenAIOutput;
 use Framework\System\Config;
 use Framework\Date\Timer;
 use Framework\Utils\Dictionary;
-use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 use CURLStringFile;

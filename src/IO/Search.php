@@ -1,7 +1,10 @@
 <?php
-namespace Framework\Utils;
+namespace Framework\IO;
 
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
+use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
 
 use JsonSerializable;
 

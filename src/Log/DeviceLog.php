@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Log;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Log\Schema\LogDeviceSchema;
 use Framework\Log\Schema\LogDeviceColumn;
 use Framework\Log\Schema\LogDeviceQuery;

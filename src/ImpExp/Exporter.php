@@ -1,7 +1,7 @@
 <?php
 namespace Framework\ImpExp;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Intl\NLS;
 use Framework\ImpExp\ExporterWriter;
 use Framework\ImpExp\XLSXWriter;

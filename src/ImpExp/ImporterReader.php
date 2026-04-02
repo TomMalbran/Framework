@@ -1,8 +1,8 @@
 <?php
 namespace Framework\ImpExp;
 
+use Framework\IO\Select;
 use Framework\ImpExp\ImporterData;
-use Framework\Utils\Select;
 
 use Iterator;
 

@@ -1,7 +1,9 @@
 <?php
 namespace Framework\Database;
 
-use Framework\Request;
+use Framework\IO\Request;
+use Framework\IO\Search;
+use Framework\IO\Select;
 use Framework\Database\Database;
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Query;
@@ -15,8 +17,6 @@ use Framework\System\Config;
 use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
-use Framework\Utils\Search;
-use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 /**

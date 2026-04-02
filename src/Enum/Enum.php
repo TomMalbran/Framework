@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Enum;
 
-use Framework\Request;
+use Framework\IO\Request;
 
 /**
  * The Enum interface

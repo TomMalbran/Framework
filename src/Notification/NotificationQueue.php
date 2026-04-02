@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Notification;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Auth\Device;
 use Framework\Notification\Notification;
 use Framework\Notification\NotificationResult;

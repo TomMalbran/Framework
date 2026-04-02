@@ -11,7 +11,9 @@ use {{namespace}}\{{columnClass}};
 use {{namespace}}\{{queryClass}};{{#hasStatus}}
 use {{namespace}}\{{statusClass}};{{/hasStatus}}
 
-use Framework\Request;{{#hasUsers}}
+use Framework\IO\Request;
+use Framework\IO\Search;
+use Framework\IO\Select;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
 use Framework\Database\SchemaModel;{{#hasQuery}}
@@ -28,9 +30,7 @@ use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
 use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
 use Framework\Date\DateType;{{/hasDateType}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
-use Framework\Utils\Dictionary;
-use Framework\Utils\Search;
-use Framework\Utils\Select;{{#hasIntID}}
+use Framework\Utils\Dictionary;{{#hasIntID}}
 use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
 use Framework\Utils\Errors;{{/hasValidation}}{{#hasJsonType}}
 use Framework\Utils\JSON;

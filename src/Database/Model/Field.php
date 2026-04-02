@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Model;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Assign;
 use Framework\Database\Model\FieldType;

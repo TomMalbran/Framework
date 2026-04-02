@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Intl;
 
+use Framework\IO\Select;
 use Framework\Intl\NLSConfig;
 use Framework\System\Config;
 use Framework\System\Language;
@@ -8,7 +9,6 @@ use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
-use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 /**

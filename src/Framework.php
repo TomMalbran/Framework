@@ -1,7 +1,8 @@
 <?php
 namespace Framework;
 
-use Framework\Response;
+use Framework\IO\Request;
+use Framework\IO\Response;
 use Framework\Auth\Auth;
 use Framework\Log\ErrorLog;
 use Framework\System\Router;

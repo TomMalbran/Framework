@@ -1,9 +1,10 @@
 <?php
-namespace Framework\Utils;
+namespace Framework\IO;
 
 use Framework\Enum\Enum;
 use Framework\Enum\Map;
 use Framework\Utils\Arrays;
+use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 

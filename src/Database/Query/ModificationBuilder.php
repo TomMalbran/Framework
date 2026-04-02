@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Database\SchemaModel;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;

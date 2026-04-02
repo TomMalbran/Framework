@@ -1,8 +1,8 @@
 <?php
-namespace Framework;
+namespace Framework\IO;
 
-use Framework\Utils\Errors;
-use Framework\Utils\Search;
+use Framework\IO\Errors;
+use Framework\IO\Search;
 use Framework\Utils\JSON;
 
 use JsonSerializable;

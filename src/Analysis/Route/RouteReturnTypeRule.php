@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Analysis\Route;
 
-use Framework\Response;
+use Framework\IO\Response;
 use Framework\Discovery\Route;
 
 use PHPStan\Analyser\Scope;

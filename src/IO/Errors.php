@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Utils;
+namespace Framework\IO;
 
 use Framework\Enum\Enum;
 use Framework\Utils\Arrays;

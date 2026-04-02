@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Log;
 
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Auth\Auth;
 use Framework\Database\Query\Operator;
 use Framework\Log\SessionLog;

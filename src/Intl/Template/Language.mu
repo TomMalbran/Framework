@@ -1,8 +1,8 @@
 <?php
 namespace {{namespace}};
 
+use Framework\IO\Select;
 use Framework\Utils\Arrays;
-use Framework\Utils\Select;
 use Framework\Utils\Strings;
 
 /**

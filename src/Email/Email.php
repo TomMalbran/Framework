@@ -2,7 +2,7 @@
 namespace Framework\Email;
 
 use Framework\Application;
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Discovery\Discovery;
 use Framework\Email\EmailWhiteList;
 use Framework\Email\EmailProvider;

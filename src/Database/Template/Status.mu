@@ -1,10 +1,10 @@
 <?php
 namespace {{namespace}};
 
+use Framework\IO\Select;
 use Framework\Intl\NLS;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
-use Framework\Utils\Select;
 
 use JsonSerializable;
 

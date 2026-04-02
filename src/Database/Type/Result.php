@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Type;
 
-use Framework\Utils\Errors;
+use Framework\IO\Errors;
 
 /**
  * The Database Result

@@ -2,7 +2,7 @@
 namespace Framework\Log;
 
 use Framework\Application;
-use Framework\Request;
+use Framework\IO\Request;
 use Framework\Discovery\Package;
 use Framework\Database\Query\Assign;
 use Framework\Log\Schema\LogErrorSchema;
