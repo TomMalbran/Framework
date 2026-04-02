@@ -341,6 +341,9 @@ class Strings {
      * @return string
      */
     public static function repeat(string $string, int $times): string {
+        if ($times <= 0) {
+            return "";
+        }
         return str_repeat($string, $times);
     }
 
@@ -360,6 +363,9 @@ class Strings {
      * @return string
      */
     public static function randomChar(string $string): string {
+        if ($string === "") {
+            return "";
+        }
         $parts = str_split($string);
         $index = array_rand($parts);
         return $string[$index];
@@ -1019,7 +1025,7 @@ class Strings {
             return $result;
         }
 
-        $styles = substr($result, $start, $end + strlen("</style>"));
+        $styles = substr($result, $start, $end + strlen("</style>") - $start);
         $result = str_replace($styles, "", $result);
         return $result;
     }
@@ -1040,7 +1046,11 @@ class Strings {
      * @param bool   $asUtf8 Optional.
      * @return string
      */
-    public static function makeShort(string $string, int $length = 30, bool $asUtf8 = true): string {
+    public static function makeShort(
+        string $string,
+        int $length = 30,
+        bool $asUtf8 = true,
+    ): string {
         if ($length === 0) {
             return $string;
         }
@@ -1069,7 +1079,11 @@ class Strings {
      * @param bool   $asUtf8 Optional.
      * @return bool
      */
-    public static function isShort(string $string, int $length = 30, bool $asUtf8 = true): bool {
+    public static function isShort(
+        string $string,
+        int $length = 30,
+        bool $asUtf8 = true,
+    ): bool {
         return self::makeShort($string, $length, $asUtf8) !== $string;
     }
 

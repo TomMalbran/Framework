@@ -469,6 +469,10 @@ class Arrays {
      * @return TValue|null
      */
     public static function random(array $array): mixed {
+        if (self::isEmpty($array)) {
+            return null;
+        }
+
         $index = array_rand($array);
         if (isset($array[$index])) {
             return $array[$index];
