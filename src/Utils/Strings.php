@@ -366,6 +366,7 @@ class Strings {
         if ($string === "") {
             return "";
         }
+
         $parts = str_split($string);
         $index = array_rand($parts);
         return $string[$index];
@@ -735,6 +736,7 @@ class Strings {
         if (is_string($value)) {
             return $value;
         }
+
         $list = Arrays::toStrings($value, withoutEmpty: $withoutEmpty);
         return implode($glue, $list);
     }
@@ -763,6 +765,7 @@ class Strings {
         if (!is_array($value)) {
             return is_string($value) ? $value : "";
         }
+
         $values = Arrays::toStrings($value, $key);
         return implode($glue, $values);
     }
@@ -956,6 +959,7 @@ class Strings {
         if (self::isPascalCase($string)) {
             return $string;
         }
+
         if (self::isCamelCase($string)) {
             return self::upperCaseFirst($string);
         }
@@ -985,6 +989,7 @@ class Strings {
         if (self::isCamelCase($string)) {
             return $string;
         }
+
         if (self::isPascalCase($string)) {
             return self::lowerCaseFirst($string);
         }
@@ -1104,54 +1109,6 @@ class Strings {
             $string = str_replace([ "-", "_" ], "", $string);
         }
         return ctype_alnum($string);
-    }
-
-    /**
-     * Returns true if the given string is a valid slug
-     * @param string $string
-     * @return bool
-     */
-    public static function isValidSlug(string $string): bool {
-        return self::match($string, '/^[a-z0-9\-]+$/');
-    }
-
-    /**
-     * Returns a Slug from the given string
-     * @param string $string
-     * @return string
-     */
-    public static function toSlug(string $string): string {
-        $result = self::sanitize($string, lowercase: true, anal: true);
-        $result = str_replace("---", "-", $result);
-        $result = str_replace("--", "-", $result);
-        return $result;
-    }
-
-    /**
-     * Encodes the url
-     * @param string $url
-     * @return string
-     */
-    public static function encodeUrl(string $url): string {
-        return str_replace(" ", "%20", $url);
-    }
-
-    /**
-     * Replaces the URLs in an HTML String
-     * @param string $string
-     * @param string $url
-     * @return string
-     */
-    public static function replaceUrls(string $string, string $url): string {
-        $regex = '/<(img|audio|video)([^>]*?)src=["\']((?!https?:\/\/|\/\/|data:)[^"\']+)["\']([^>]*?)>/i';
-        return self::replaceCallback($string, $regex, function (array $matches) use ($url) {
-            $tag          = self::toString($matches[1] ?? "");
-            $beforeSrc    = self::toString($matches[2] ?? "");
-            $relativePath = self::toString($matches[3] ?? "");
-            $afterSrc     = self::toString($matches[4] ?? "");
-            $absolutePath = "$url/{$relativePath}";
-            return "<$tag{$beforeSrc}src=\"$absolutePath\"{$afterSrc}>";
-        });
     }
 
     /**

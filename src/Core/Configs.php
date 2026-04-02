@@ -12,7 +12,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
+use Framework\Utils\URL;
 
 /**
  * The Configs
@@ -57,7 +57,7 @@ class Configs implements DiscoveryBuilder {
         $appData     = self::loadENV($appPath, ".env");
 
         $currentUrl  = Server::getUrl();
-        $currentHost = Utils::getHost($currentUrl);
+        $currentHost = URL::getHost($currentUrl);
         $replace     = [];
 
         // Read using the getenv function or the saved file name
@@ -88,7 +88,7 @@ class Configs implements DiscoveryBuilder {
                 foreach ($values as $key => $value) {
                     if (Strings::endsWith($key, "URL")) {
                         $host = Strings::toString($value);
-                        if (Utils::getHost($host) === $currentHost) {
+                        if (URL::getHost($host) === $currentHost) {
                             self::$environment = $environment;
                             $replace = $values;
                             break;

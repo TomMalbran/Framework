@@ -13,6 +13,7 @@ use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 use Framework\Utils\Utils;
+use Framework\Utils\URL;
 
 use ArrayIterator;
 use IteratorAggregate;
@@ -395,16 +396,6 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the value at the given key is a valid Slug
-     * @param string $key
-     * @return bool
-     */
-    public function isValidSlug(string $key): bool {
-        $value = $this->getString($key);
-        return Strings::isValidSlug($value);
-    }
-
-    /**
      * Returns true if the value at the given key is a valid Email
      * @param string $key
      * @return bool
@@ -424,15 +415,6 @@ class Request implements IteratorAggregate, JsonSerializable {
     public function isValidPassword(string $key, string $checkSets = "ad", int $minLength = 6): bool {
         $value = $this->getString($key);
         return Utils::isValidPassword($value, $checkSets, $minLength);
-    }
-
-    /**
-     * Returns true if the value at the given key is a valid Domain
-     * @param string $key
-     * @return bool
-     */
-    public function isValidDomain(string $key): bool {
-        return Utils::isValidDomain($this->toDomain($key));
     }
 
     /**
@@ -492,7 +474,26 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function isValidUrl(string $key): bool {
         $value = $this->getString($key);
-        return Utils::isValidUrl($value);
+        return URL::isValid($value);
+    }
+
+    /**
+     * Returns true if the value at the given key is a valid Domain
+     * @param string $key
+     * @return bool
+     */
+    public function isValidDomain(string $key): bool {
+        return URL::isValidDomain($this->toDomain($key));
+    }
+
+    /**
+     * Returns true if the value at the given key is a valid Slug
+     * @param string $key
+     * @return bool
+     */
+    public function isValidSlug(string $key): bool {
+        $value = $this->getString($key);
+        return URL::isValidSlug($value);
     }
 
     /**
@@ -693,7 +694,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function toDomain(string $key): string {
         $value = $this->getString($key);
-        return Utils::parseDomain($value);
+        return URL::getDomain($value);
     }
 
 

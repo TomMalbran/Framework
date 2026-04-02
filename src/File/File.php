@@ -3,6 +3,7 @@ namespace Framework\File;
 
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
+use Framework\Utils\URL;
 
 use ZipArchive;
 
@@ -160,7 +161,7 @@ class File {
             return "";
         }
 
-        $fileUrl = Strings::encodeUrl($fileUrl);
+        $fileUrl = URL::encodeSpaces($fileUrl);
         $result  = file_get_contents($fileUrl);
         return $result !== false ? $result : "";
     }

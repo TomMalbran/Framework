@@ -122,6 +122,20 @@ class UtilsTest extends TestCase {
         $this->assertFalse(Utils::isValidEmail(""));
     }
 
+    public function testGetEmailDomain() {
+        $this->assertEquals("example.com", Utils::getEmailDomain("user@Example.COM"));
+        $this->assertEquals("sub.example.co.uk", Utils::getEmailDomain("user@Sub.Example.Co.UK"));
+        $this->assertEquals("example.com", Utils::getEmailDomain("user+tag@EXAMPLE.COM"));
+        $this->assertEquals("sub-example.com", Utils::getEmailDomain("User.Name+tag@Sub-Example.COM"));
+        $this->assertEquals("123domain.com", Utils::getEmailDomain("user@123domain.com"));
+
+        // invalid emails return empty string
+        $this->assertEquals("", Utils::getEmailDomain(" user@Example.COM "));
+        $this->assertEquals("", Utils::getEmailDomain("user@localhost"));
+        $this->assertEquals("", Utils::getEmailDomain("not-an-email"));
+        $this->assertEquals("", Utils::getEmailDomain(""));
+    }
+
     public function testExtractEmail() {
         $this->assertEquals("foo@bar.com", Utils::extractEmail("contact: foo@bar.com here"));
         $this->assertEquals("john.smith@sub.example.com", Utils::extractEmail("Contact: <john.smith@sub.example.com> is listed"));
@@ -268,161 +282,6 @@ class UtilsTest extends TestCase {
         // invalid inputs return empty string
         $this->assertEquals("", Utils::dniToNumber("abc"));
         $this->assertEquals("", Utils::dniToNumber(""));
-    }
-
-    public function testIsValidDomain() {
-        $this->assertTrue(Utils::isValidDomain("example.com"));
-        $this->assertTrue(Utils::isValidDomain("sub.example.co.uk"));
-        $this->assertTrue(Utils::isValidDomain("ex-ample.com"));
-
-        // invalid domains
-        $this->assertFalse(Utils::isValidDomain("not valid"));
-        $this->assertFalse(Utils::isValidDomain("example..com"));
-        $this->assertFalse(Utils::isValidDomain("-example.com"));
-        $this->assertFalse(Utils::isValidDomain("example.com-"));
-        $this->assertFalse(Utils::isValidDomain(""));
-    }
-
-    public function testGetEmailDomain() {
-        $this->assertEquals("example.com", Utils::getEmailDomain("user@Example.COM"));
-        $this->assertEquals("sub.example.co.uk", Utils::getEmailDomain("user@Sub.Example.Co.UK"));
-        $this->assertEquals("example.com", Utils::getEmailDomain("user+tag@EXAMPLE.COM"));
-        $this->assertEquals("sub-example.com", Utils::getEmailDomain("User.Name+tag@Sub-Example.COM"));
-        $this->assertEquals("123domain.com", Utils::getEmailDomain("user@123domain.com"));
-
-        // invalid emails return empty string
-        $this->assertEquals("", Utils::getEmailDomain(" user@Example.COM "));
-        $this->assertEquals("", Utils::getEmailDomain("user@localhost"));
-        $this->assertEquals("", Utils::getEmailDomain("not-an-email"));
-        $this->assertEquals("", Utils::getEmailDomain(""));
-    }
-
-    public function testGetDomainExtension() {
-        $this->assertEquals("com", Utils::getDomainExtension("example.com"));
-        $this->assertEquals("uk", Utils::getDomainExtension("sub.example.co.uk"));
-        $this->assertEquals("localhost", Utils::getDomainExtension("localhost"));
-        $this->assertEquals("", Utils::getDomainExtension(""));
-    }
-
-    public function testParseDomain() {
-        $this->assertEquals("example.com", Utils::parseDomain("Example.Com"));
-        $this->assertEquals("example.com", Utils::parseDomain("www.example.com"));
-        $this->assertEquals("example.org", Utils::parseDomain("WWW.EXAMPLE.ORG"));
-        $this->assertEquals("example.com", Utils::parseDomain("http://www.Example.Com"));
-        $this->assertEquals("example.com", Utils::parseDomain("https://WWW.EXAMPLE.COM"));
-        $this->assertEquals("example.com", Utils::parseDomain("https://WWW.EXAMPLE.COM/path?query=string"));
-
-        // subdomains preserved but www. removed
-        $this->assertEquals("sub.example.co.uk", Utils::parseDomain("Sub.Example.Co.UK"));
-        $this->assertEquals("sub.example.co.uk", Utils::parseDomain("www.Sub.Example.Co.UK"));
-        $this->assertEquals("sub.example.co.uk", Utils::parseDomain("http://www.Sub.Example.Co.UK"));
-
-        // invalid input returns as-is
-        $this->assertEquals("not a domain", Utils::parseDomain("not a domain"));
-        $this->assertEquals("", Utils::parseDomain(""));
-    }
-
-    public function testGetHost() {
-        $this->assertEquals("example.com", Utils::getHost("http://example.com/path"));
-        $this->assertEquals("www.example.co.uk", Utils::getHost("https://www.example.co.uk/some/page"));
-
-        // invalid URLs return empty string
-        $this->assertEquals("", Utils::getHost(""));
-        $this->assertEquals("", Utils::getHost("not a url"));
-        $this->assertEquals("", Utils::getHost("example.com/path"));
-        $this->assertEquals("", Utils::getHost("www.example.com/path"));
-    }
-
-    public function testIsDelegated() {
-        $hostIp = gethostbyname("localhost");
-        $this->assertTrue(Utils::isDelegated("localhost"));
-
-        // when providing the correct server IP it still reports delegated
-        $this->assertTrue(Utils::isDelegated("localhost", $hostIp));
-
-        // wrong server IP yields false
-        $this->assertFalse(Utils::isDelegated("localhost", '1.2.3.4'));
-
-        // unknown domain not delegated
-        $this->assertFalse(Utils::isDelegated("no-such-host-example.invalid"));
-    }
-
-    public function testVerifyDelegation() {
-        // localhost normally resolves to an IP
-        $hostIp = gethostbyname("localhost");
-        $this->assertTrue(Utils::verifyDelegation("localhost"));
-        $this->assertTrue(Utils::verifyDelegation("localhost", $hostIp));
-
-        // mismatching server IP should return false
-        $this->assertFalse(Utils::verifyDelegation("localhost", "1.2.3.4"));
-
-        // non-resolvable domain returns false
-        $this->assertFalse(Utils::verifyDelegation("no-such-host-example.invalid"));
-
-        // empty input returns false
-        $this->assertFalse(Utils::verifyDelegation(""));
-    }
-
-    public function testIsValidUrl() {
-        $this->assertTrue(Utils::isValidUrl("http://example.com"));
-        $this->assertTrue(Utils::isValidUrl("https://example.com"));
-        $this->assertTrue(Utils::isValidUrl("https://sub.example.co.uk/path?query=1#frag"));
-        $this->assertTrue(Utils::isValidUrl("https://example.com:8080"));
-        $this->assertTrue(Utils::isValidUrl("https://127.0.0.1"));
-
-        // schemes other than http/https are considered invalid by Utils
-        $this->assertFalse(Utils::isValidUrl("ftp://example.com"));
-
-        // missing scheme or plain text is invalid
-        $this->assertFalse(Utils::isValidUrl("www.example.com"));
-        $this->assertFalse(Utils::isValidUrl(""));
-        $this->assertFalse(Utils::isValidUrl("not a url"));
-    }
-
-    public function testEncodeUrl() {
-        // spaces are encoded
-        $this->assertStringNotContainsString(" ", Utils::encodeUrl("a b"));
-        $this->assertStringContainsString("%20", Utils::encodeUrl("a b"));
-
-        // complex strings should not contain raw spaces after encoding
-        $this->assertStringNotContainsString(" ", Utils::encodeUrl("a b/c?d=e&f=g"));
-
-        // non-ASCII characters are percent-encoded (UTF-8)
-        $this->assertStringContainsString("%C3%B1", Utils::encodeUrl("mañana"));
-
-        // already-encoded input retains encoding for encoded parts
-        $encoded = Utils::encodeUrl("a%20b");
-        $this->assertStringContainsString("%20", $encoded);
-    }
-
-    public function testAddParamsToUrl() {
-        $this->assertEquals("/path?a=1&b=2", Utils::addParamsToUrl("/path", [ "a" => 1, "b" => 2 ]));
-        $this->assertEquals("/path?existing=1&a=2", Utils::addParamsToUrl("/path?existing=1", [ "a" => 2 ]));
-
-        // values requiring encoding are encoded in the resulting URL
-        $result = Utils::addParamsToUrl("/path", [ "q" => "a b" ]);
-        $this->assertStringNotContainsString(" ", $result);
-        $this->assertStringContainsString("q=", $result);
-        $this->assertStringContainsString("+", $result);
-
-        // boolean and numeric values are represented in query string
-        $this->assertStringContainsString("flag=true", Utils::addParamsToUrl("/path", [ "flag" => true ]));
-        $this->assertStringContainsString("num=0", Utils::addParamsToUrl("/path", [ "num" => 0 ]));
-    }
-
-    public function testParseUrlParams() {
-        // arrays/objects are JSON-encoded and urlencoded (contains %7B for '{')
-        $this->assertStringContainsString("a=%7B", Utils::parseUrlParams(["a"=>["k"=>"v"]]));
-
-        // special characters are encoded
-        $this->assertStringContainsString("+", Utils::parseUrlParams(["q"=>"a b"]));
-
-        // empty input yields empty string
-        $this->assertEquals("", Utils::parseUrlParams([]));
-
-        // numeric and boolean values serialized as strings
-        $this->assertStringContainsString("n=123", Utils::parseUrlParams(["n"=>123]));
-        $this->assertStringContainsString("t=true", Utils::parseUrlParams(["t"=>true]));
     }
 
     public function testGetAvatarUrl() {

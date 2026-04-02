@@ -1036,67 +1036,6 @@ class StringsTest extends TestCase {
         $this->assertFalse(Strings::isAlphaNum(""));
     }
 
-    public function testIsValidSlug() {
-        // basic valid slug
-        $this->assertTrue(Strings::isValidSlug("a-slug-1"));
-        $this->assertTrue(Strings::isValidSlug("a"));
-
-        // invalid cases
-        $this->assertFalse(Strings::isValidSlug(""));
-        $this->assertFalse(Strings::isValidSlug("a_aslug"));
-        $this->assertFalse(Strings::isValidSlug("Invalid Slug!"));
-    }
-
-    public function testToSlug() {
-        $this->assertEquals("a-slug", Strings::toSlug("A-Slug"));
-        $this->assertEquals("a-slug", Strings::toSlug("A Slug!!"));
-        $this->assertEquals("a-slug", Strings::toSlug("A  Slug !!"));
-        $this->assertEquals("simple", Strings::toSlug("Simple"));
-        $this->assertEquals("", Strings::toSlug(""));
-    }
-
-    public function testEncodeUrl() {
-        $this->assertEquals("a%20b", Strings::encodeUrl("a b"));
-        $this->assertEquals("a%20%20b", Strings::encodeUrl("a  b"));
-
-        // only spaces are encoded
-        $this->assertEquals("a", Strings::encodeUrl("a"));
-        $this->assertEquals("a/b", Strings::encodeUrl("a/b"));
-        $this->assertEquals("a+b", Strings::encodeUrl("a+b"));
-    }
-
-    public function testReplaceUrls() {
-        // images
-        $html = "<img src=\"img/pic.jpg\">";
-        $out = Strings::replaceUrls($html, "http://cdn");
-        $this->assertStringContainsString("http://cdn/", $out);
-
-        // audio tag with src attribute
-        $html = "<audio src=\"audio/song.mp3\"></audio>";
-        $out = Strings::replaceUrls($html, "http://cdn");
-        $this->assertStringContainsString("http://cdn/audio/song.mp3", $out);
-
-        // video tag with src attribute
-        $html = "<video src=\"video/clip.mp4\"></video>";
-        $out = Strings::replaceUrls($html, "http://cdn");
-        $this->assertStringContainsString("http://cdn/video/clip.mp4", $out);
-
-        // do not replace already absolute http/https URLs
-        $html = "<img src=\"http://example.com/img.jpg\">";
-        $out = Strings::replaceUrls($html, "http://cdn");
-        $this->assertStringContainsString("http://example.com/img.jpg", $out);
-
-        $html = "<video src=\"https://videos.example.org/clip.mp4\"></video>";
-        $out = Strings::replaceUrls($html, "http://cdn");
-        $this->assertStringContainsString("https://videos.example.org/clip.mp4", $out);
-
-        // do not replace data URIs
-        $data = "data:image/png;base64,iVBORw0KGgo=";
-        $html = "<img src=\"" . $data . "\">";
-        $out = Strings::replaceUrls($html, "http://cdn");
-        $this->assertStringContainsString($data, $out);
-    }
-
     public function testSanitize() {
         // basic lowercase sanitization (punctuation removed)
         $this->assertEquals("hello", Strings::sanitize("Hello!!", lowercase: true, anal: false));

@@ -5,6 +5,7 @@ use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
+use Framework\Utils\URL;
 
 use GdImage;
 use Imagick;
@@ -64,7 +65,7 @@ class Image {
      * @return string
      */
     public static function getMimeType(string $fileUrl): string {
-        $fileUrl   = Strings::encodeUrl($fileUrl);
+        $fileUrl   = URL::encodeSpaces($fileUrl);
         $imageType = self::getType($fileUrl);
         return image_type_to_mime_type($imageType);
     }
@@ -93,7 +94,7 @@ class Image {
      * @return array{int,int,int}
      */
     public static function getSizeFromUrl(string $fileUrl): array {
-        $fileUrl = Strings::encodeUrl($fileUrl);
+        $fileUrl = URL::encodeSpaces($fileUrl);
         $size    = getimagesize($fileUrl);
         if ($size === false) {
             return [ 0, 0, 0 ];

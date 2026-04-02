@@ -6,7 +6,7 @@ use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
-use Framework\Utils\Utils;
+use Framework\Utils\URL;
 
 /**
  * The Google Map Provider
@@ -117,7 +117,7 @@ class GoogleMap {
         ];
 
         $url = self::BaseUrl . "staticmap";
-        return Utils::addParamsToUrl($url, $params);
+        return URL::addParams($url, $params);
     }
 
     /**

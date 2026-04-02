@@ -7,7 +7,7 @@ use Framework\Provider\Type\CurlMethod;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
+use Framework\Utils\URL;
 
 /**
  * The Curl Utils
@@ -62,7 +62,7 @@ class Curl {
 
         // GET Requests
         if (!$isCustom && $method === CurlMethod::GET) {
-            $options[CURLOPT_URL]      = Utils::addParamsToUrl($url, $params);
+            $options[CURLOPT_URL]      = URL::addParams($url, $params);
             $options[CURLOPT_ENCODING] = "identity";
 
         // POST Requests
@@ -74,7 +74,7 @@ class Curl {
             if ($jsonBody) {
                 $body = JSON::encode($params);
             } elseif ($urlBody) {
-                $body = Utils::parseUrlParams($params);
+                $body = URL::parseParams($params);
             }
 
             if (!Arrays::isEmpty($body)) {
@@ -93,7 +93,7 @@ class Curl {
                 $options[CURLOPT_URL]        = $url;
                 $options[CURLOPT_POSTFIELDS] = JSON::encode($params);
             } else {
-                $options[CURLOPT_URL] = Utils::addParamsToUrl($url, $params);
+                $options[CURLOPT_URL] = URL::addParams($url, $params);
             }
         }
 

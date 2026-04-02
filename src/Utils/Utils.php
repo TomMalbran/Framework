@@ -128,6 +128,21 @@ class Utils {
     }
 
     /**
+     * Extracts the Domain from the given email
+     * @param string $email
+     * @return string
+     */
+    public static function getEmailDomain(string $email): string {
+        if (!self::isValidEmail($email)) {
+            return "";
+        }
+
+        $result = Strings::substringAfter($email, "@");
+        $result = Strings::toLowerCase($result);
+        return $result;
+    }
+
+    /**
      * Extracts the first Email from the given text
      * @param string $text
      * @return string
@@ -284,159 +299,6 @@ class Utils {
     }
 
 
-
-    /**
-     * Returns true if the given Domain is valid
-     * @param string $domain
-     * @return bool
-     */
-    public static function isValidDomain(string $domain): bool {
-        return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
-    }
-
-    /**
-     * Extracts the Domain from the given email
-     * @param string $email
-     * @return string
-     */
-    public static function getEmailDomain(string $email): string {
-        if (!self::isValidEmail($email)) {
-            return "";
-        }
-
-        $result = Strings::substringAfter($email, "@");
-        $result = Strings::toLowerCase($result);
-        return $result;
-    }
-
-    /**
-     * Returns the extension of the given domain (without the dot)
-     * @param string $domain
-     * @return string
-     */
-    public static function getDomainExtension(string $domain): string {
-        return Strings::substringAfter($domain, ".");
-    }
-
-    /**
-     * Parses a Domain to try and return something like "domain.com"
-     * @param string $domain
-     * @return string
-     */
-    public static function parseDomain(string $domain): string {
-        $domain = Strings::toLowerCase($domain);
-        if (!Strings::startsWith($domain, "http://", "https://")) {
-            $domain = "http://$domain";
-        }
-        $host = self::getHost($domain);
-
-        if ($host !== "") {
-            return Strings::replace($host, "www.", "");
-        }
-        return "";
-    }
-
-    /**
-     * Returns the host of the given Url
-     * @param string $url
-     * @return string
-     */
-    public static function getHost(string $url): string {
-        if ($url === "") {
-            return "";
-        }
-        $result = parse_url($url, PHP_URL_HOST);
-        return Strings::toString($result);
-    }
-
-    /**
-     * Returns true if the given domain or www.domain is delegated
-     * @param string $domain
-     * @param string $serverIP Optional.
-     * @return bool
-     */
-    public static function isDelegated(string $domain, string $serverIP = ""): bool {
-        if (self::verifyDelegation($domain, $serverIP)) {
-            return true;
-        }
-        return self::verifyDelegation("www.$domain", $serverIP);
-    }
-
-    /**
-     * Returns true if the given domain is delegated
-     * @param string $domain
-     * @param string $serverIP Optional.
-     * @return bool
-     */
-    public static function verifyDelegation(string $domain, string $serverIP = ""): bool {
-        $host = gethostbyname($domain);
-        if ($serverIP !== "") {
-            return $host !== "" && $host === $serverIP;
-        }
-        return $host !== "" && $host !== $domain;
-    }
-
-
-
-    /**
-     * Returns true if is a valid URL
-     * @param string $url
-     * @return bool
-     */
-    public static function isValidUrl(string $url): bool {
-        return Strings::startsWith($url, "http://", "https://");
-    }
-
-    /**
-     * Encodes the given URL
-     * @param string $url
-     * @return string
-     */
-    public static function encodeUrl(string $url): string {
-        return Strings::replaceCallback($url, "/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function (array $match) {
-            $value = Strings::toString($match[0] ?? "");
-            return rawurlencode($value);
-        });
-    }
-
-    /**
-     * Adds Params to a URL
-     * @param string                   $url
-     * @param array<string,mixed>|null $params Optional.
-     * @return string
-     */
-    public static function addParamsToUrl(string $url, ?array $params = null): string {
-        $parsedParams = self::parseUrlParams($params);
-        if ($parsedParams !== "") {
-            $prefix = Strings::contains($url, "?") ? "&" : "?";
-            $url   .= $prefix . $parsedParams;
-        }
-        return $url;
-    }
-
-    /**
-     * Parses the URL Params
-     * @param array<string,mixed>|null $params Optional.
-     * @return string
-     */
-    public static function parseUrlParams(?array $params = null): string {
-        if ($params === null || count($params) === 0) {
-            return "";
-        }
-
-        $content = [];
-        foreach ($params as $key => $value) {
-            if (is_array($value)) {
-                $content[] = "$key=" . urlencode(JSON::encode($value));
-            } elseif (is_bool($value)) {
-                $content[] = "$key=" . ($value ? "true" : "false");
-            } elseif ($value !== null) {
-                $content[] = "$key=" . urlencode(Strings::toString($value));
-            }
-        }
-
-        return Strings::join($content, "&");
-    }
 
     /**
      * Returns an Avatar URL
