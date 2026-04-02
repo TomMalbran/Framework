@@ -1,36 +1,25 @@
 <?php
+namespace Tests\Utils;
+
 use Framework\Utils\Server;
 
 use PHPUnit\Framework\TestCase;
-
-// Provide a simple getallheaders shim for CLI PHPUnit runs when missing
-if (!function_exists("getallheaders")) {
-    function getallheaders() {
-        global $test_getallheaders;
-        return $test_getallheaders ?? [];
-    }
-}
-
-// Provide a simple file_get_contents shim for CLI PHPUnit runs to return JSON for php://input
-if (!function_exists("file_get_contents")) {
-    function file_get_contents($filename) {
-        if ($filename === "php://input") {
-            return '{"x":"y","num":123}';
-        }
-        return \file_get_contents($filename);
-    }
-}
-
 
 class ServerTest extends TestCase {
 
     protected function tearDown(): void {
         // clear any globals we modified
         $_SERVER = [];
+        $_REQUEST = [];
+
         if (isset($GLOBALS["test_getallheaders"])) {
             unset($GLOBALS["test_getallheaders"]);
         }
+        if (isset($GLOBALS["test_file_get_contents"])) {
+            unset($GLOBALS["test_file_get_contents"]);
+        }
     }
+
 
     public function testHas() {
         $_SERVER["SOME_KEY"] = "value";
@@ -76,9 +65,13 @@ class ServerTest extends TestCase {
         $this->assertEquals("2", $payload->getString("b"));
         $this->assertEquals(2, $payload->getInt("b"));
 
-        // clear $_REQUEST so JSON path is chosen
+        // clear $_REQUEST and set php://input so it is chosen
         $_REQUEST = [];
-        $payload  = Server::getPayload();
+        global $test_file_get_contents;
+        $test_file_get_contents = '{"x":"y","num":123}';
+
+        $payload = Server::getPayload();
+        $this->assertEquals($test_file_get_contents, $payload->toJSON());
         $this->assertEquals("y", $payload->getString("x"));
         $this->assertEquals(123, $payload->getInt("num"));
     }

@@ -1,4 +1,6 @@
 <?php
+namespace Tests\Utils;
+
 use Framework\Utils\URL;
 
 use PHPUnit\Framework\TestCase;

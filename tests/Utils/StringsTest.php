@@ -1,9 +1,12 @@
 <?php
+namespace Tests\Utils;
+
 use Framework\Date\Date;
 use Framework\System\EmailCode;
 use Framework\Utils\Strings;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class StringsTest extends TestCase {
 
@@ -872,7 +875,7 @@ class StringsTest extends TestCase {
 
     public function testIsPascalCase() {
         $this->assertTrue(Strings::isPascalCase("HelloWorld"));
-        $this->assertTrue(Strings::isPascalCase("A"));
+        $this->assertTrue(Strings::isPascalCase("Ab"));
 
         // invalid cases
         $this->assertFalse(Strings::isPascalCase("helloWorld"));

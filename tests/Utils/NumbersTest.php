@@ -1,8 +1,11 @@
 <?php
+namespace Tests\Utils;
+
 use Framework\Date\Date;
 use Framework\Utils\Numbers;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class NumbersTest extends TestCase {
 
