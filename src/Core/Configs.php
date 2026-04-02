@@ -72,13 +72,15 @@ class Configs implements DiscoveryBuilder {
                 self::$environment = $environment;
             }
 
-        // Read all the .env files in the App Path
+        // Read all the .env.* files in the App Path
         } else {
             $files = File::getFilesInDir($appPath);
             foreach ($files as $file) {
-                if (!Strings::startsWith($file, ".env.")) {
+                // Skip the example and main env files
+                if ($file === ".env.example" || $file === ".env") {
                     continue;
                 }
+
                 $environment = Strings::replace($file, ".env.", "");
                 if (Arrays::contains(self::$environments, $environment)) {
                     continue;
@@ -306,14 +308,12 @@ class Configs implements DiscoveryBuilder {
 
         foreach ($data as $envKey => $value) {
             $property = Strings::toCamelCase($envKey);
-            $title    = Strings::toPascalCase($envKey);
-            $name     = Strings::upperCaseFirst($property);
+            $name     = Strings::toPascalCase($envKey);
 
             if (Strings::endsWith($envKey, "URL")) {
                 $urls[] = [
                     "property" => $property,
                     "name"     => $name,
-                    "title"    => $title,
                 ];
                 continue;
             }
@@ -322,7 +322,6 @@ class Configs implements DiscoveryBuilder {
             $properties[] = [
                 "property"  => $property,
                 "name"      => $name,
-                "title"     => $title,
                 "type"      => VariableType::getType($variableType),
                 "docType"   => VariableType::getDocType($variableType),
                 "getter"    => $variableType === VariableType::Boolean ? "is" : "get",

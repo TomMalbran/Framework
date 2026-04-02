@@ -47,7 +47,7 @@ class Config {
 {{#urls}}
 
     /**
-     * Returns the "{{title}}" using the adding the url parts at the end
+     * Returns the "{{name}}" using the adding the url parts at the end
      * @param int|string ...$urlParts
      * @return string
      */
@@ -60,7 +60,7 @@ class Config {
 {{#properties}}
 
     /**
-     * Returns the value of the "{{title}}"
+     * Returns the value of the "{{name}}"
      * @return {{{docType}}}
      */
     public static function {{getter}}{{name}}(): {{type}} {
