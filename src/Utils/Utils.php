@@ -15,7 +15,11 @@ class Utils {
      * @param int    $minLength Optional.
      * @return bool
      */
-    public static function isValidPassword(string $password, string $checkSets = "ad", int $minLength = 6): bool {
+    public static function isValidPassword(
+        string $password,
+        string $checkSets = "ad",
+        int $minLength = 6,
+    ): bool {
         if (Strings::length($password) < $minLength) {
             return false;
         }
@@ -321,7 +325,7 @@ class Utils {
      */
     public static function parseDomain(string $domain): string {
         $domain = Strings::toLowerCase($domain);
-        if (!Strings::startsWith($domain, "http://")) {
+        if (!Strings::startsWith($domain, "http://", "https://")) {
             $domain = "http://$domain";
         }
         $host = self::getHost($domain);
@@ -424,6 +428,8 @@ class Utils {
         foreach ($params as $key => $value) {
             if (is_array($value)) {
                 $content[] = "$key=" . urlencode(JSON::encode($value));
+            } elseif (is_bool($value)) {
+                $content[] = "$key=" . ($value ? "true" : "false");
             } elseif ($value !== null) {
                 $content[] = "$key=" . urlencode(Strings::toString($value));
             }
