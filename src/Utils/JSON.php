@@ -34,16 +34,15 @@ class JSON {
         if (is_null($value)) {
             return "";
         }
-        if (is_string($value) && self::isValid($value)) {
+        if (is_string($value)) {
             return $value;
         }
 
         $result = json_encode($value, $asPretty ? JSON_PRETTY_PRINT : 0);
-        if ($result !== false) {
+        if (is_string($result)) {
             return $result;
         }
-
-        return is_string($value) ? $value : "";
+        return "";
     }
 
     /**
