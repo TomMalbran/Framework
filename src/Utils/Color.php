@@ -30,20 +30,4 @@ enum Color: string implements Enum, JsonSerializable {
     case HotPink      = "#ea4e9d";
     case Pink         = "#fc91ad";
     case Gray         = "#8da3a6";
-
-
-
-    /**
-     * Returns true if the Color is valid
-     * @param string $value
-     * @return bool
-     */
-    public static function isValid(string $value): bool {
-        foreach (self::getAll() as $case) {
-            if ($case->value === $value) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
