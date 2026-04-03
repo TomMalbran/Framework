@@ -89,6 +89,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return bool
      */
     public function isList(string $key = ""): bool {
+        if ($this->isEmpty()) {
+            return false;
+        }
         if ($key !== "") {
             return isset($this->data[$key]) && Arrays::isList($this->data[$key]);
         }
@@ -101,6 +104,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @return bool
      */
     public function isArrayList(string $key = ""): bool {
+        if ($this->isEmpty()) {
+            return false;
+        }
         if ($key !== "") {
             return isset($this->data[$key]) && Arrays::isArrayList($this->data[$key]);
         }
@@ -127,15 +133,15 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the key exits in the data or in the list
-     * @param int|string $needle
-     * @param int|string $key    Optional.
+     * @param int|string      $needle
+     * @param int|string|null $key    Optional.
      * @return bool
      */
-    public function contains(int|string $needle, int|string $key = ""): bool {
+    public function contains(int|string $needle, int|string|null $key = null): bool {
         if ($this->isList()) {
             return Arrays::contains($this->data, $needle, $key);
         }
-        return $this->has($key);
+        return $this->has($needle);
     }
 
     /**
@@ -163,7 +169,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Adds an array to the data
+     * Adds an array to the data if the data is a list
      * @param mixed $value
      * @return Dictionary
      */
@@ -180,43 +186,43 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Sets the value of the given key
-     * @param string $key
-     * @param mixed  $value
+     * @param int|string $key
+     * @param mixed      $value
      * @return Dictionary
      */
-    public function set(string $key, mixed $value): Dictionary {
+    public function set(int|string $key, mixed $value): Dictionary {
         $this->data[$key] = $value;
         return $this;
     }
 
     /**
      * Sets a string value of the given key
-     * @param string $key
-     * @param string $value
+     * @param int|string $key
+     * @param string     $value
      * @return Dictionary
      */
-    public function setString(string $key, string $value): Dictionary {
+    public function setString(int|string $key, string $value): Dictionary {
         $this->data[$key] = $value;
         return $this;
     }
 
     /**
      * Sets an int value of the given key
-     * @param string $key
-     * @param int    $value
+     * @param int|string $key
+     * @param int        $value
      * @return Dictionary
      */
-    public function setInt(string $key, int $value): Dictionary {
+    public function setInt(int|string $key, int $value): Dictionary {
         $this->data[$key] = $value;
         return $this;
     }
 
     /**
      * Removes the value at the given key
-     * @param string $key
+     * @param int|string $key
      * @return Dictionary
      */
-    public function remove(string $key): Dictionary {
+    public function remove(int|string $key): Dictionary {
         if (isset($this->data[$key])) {
             unset($this->data[$key]);
         }
@@ -349,6 +355,23 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Finds an element in the list at the given key
+     * @param string $key
+     * @param string $value
+     * @return Dictionary
+     */
+    public function findDict(string $key, string $value): Dictionary {
+        if (array_is_list($this->data)) {
+            foreach ($this->data as $elem) {
+                if (is_array($elem) && isset($elem[$key]) && $elem[$key] === $value) {
+                    return new Dictionary($elem);
+                }
+            }
+        }
+        return new Dictionary();
+    }
+
+    /**
      * Gets the value of the given key as a list of Dictionary
      * @param string $key
      * @return list<Dictionary>
@@ -392,23 +415,6 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         $list = $this->getList($key);
         $last = $list[count($list) - 1] ?? null;
         return $last ?? new Dictionary();
-    }
-
-    /**
-     * Finds an element in the list at the given key
-     * @param string $key
-     * @param string $value
-     * @return Dictionary
-     */
-    public function findDict(string $key, string $value): Dictionary {
-        if (array_is_list($this->data)) {
-            foreach ($this->data as $elem) {
-                if (is_array($elem) && isset($elem[$key]) && $elem[$key] === $value) {
-                    return new Dictionary($elem);
-                }
-            }
-        }
-        return new Dictionary();
     }
 
     /**
