@@ -22,6 +22,9 @@ class CSV {
             return Strings::join($parts, $separator);
         }
 
+        if ($separator === "") {
+            return $value;
+        }
         $parts = Strings::split($value, $separator);
         $parts = Arrays::removeEmpty($parts);
         return Strings::join($parts, $separator);
@@ -34,17 +37,29 @@ class CSV {
      * @param list<string>        $fields    Optional.
      * @return array<int|string,string>|list<array<int|string,string>>
      */
-    public static function decode(array|string $value, string $separator = ",", array $fields = []): array {
+    public static function decode(
+        array|string $value,
+        string $separator = ",",
+        array $fields = [],
+    ): array {
+        // If is already an array just prase it in case is associative
         if (is_array($value)) {
             return self::parseLine($value, $fields);
         }
 
+        // If the value is a single line, convert it to a list of strings
         if (!Strings::contains($value, "\n")) {
+            // The separator must be a single character to decode
+            if ($separator === "" || Strings::length($separator) > 1) {
+                return [ $value ];
+            }
+
             $csv = str_getcsv($value, $separator);
             $csv = Arrays::toStrings($csv);
             return self::parseLine($csv, $fields);
         }
 
+        // If the value contains multiple lines, decode it as a file
         return self::decodeFile($value, $separator, $fields);
     }
 
@@ -55,7 +70,11 @@ class CSV {
      * @param list<string> $fields    Optional.
      * @return list<array<int|string,string>>
      */
-    public static function decodeFile(string $value, string $separator = ",", array $fields = []): array {
+    public static function decodeFile(
+        string $value,
+        string $separator = ",",
+        array $fields = [],
+    ): array {
         $lines  = Strings::split($value, "\n");
         $result = [];
         foreach ($lines as $line) {
@@ -95,7 +114,11 @@ class CSV {
      * @param bool   $skipHeader Optional.
      * @return list<array<int|string,string>|list<array<int|string,string>>>
      */
-    public static function readFile(string $path, string $separator = ",", bool $skipHeader = false): array {
+    public static function readFile(
+        string $path,
+        string $separator = ",",
+        bool $skipHeader = false,
+    ): array {
         $content = File::read($path);
         if ($content === "") {
             return [];
@@ -118,7 +141,11 @@ class CSV {
      * @param string       $separator Optional.
      * @return bool
      */
-    public static function writeFile(string $path, array $contents, string $separator = ","): bool {
+    public static function writeFile(
+        string $path,
+        array $contents,
+        string $separator = ",",
+    ): bool {
         if (!File::exists($path)) {
             return false;
         }
