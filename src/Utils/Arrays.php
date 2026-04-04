@@ -59,7 +59,16 @@ class Arrays {
      * @return array<int|string,mixed>
      */
     public static function toArray(mixed $array): array {
-        return is_array($array) ? $array : [ $array ];
+        if (is_null($array)) {
+            return [];
+        }
+        if (is_array($array)) {
+            return $array;
+        }
+        if (is_object($array)) {
+            return get_object_vars($array);
+        }
+        return [ $array ];
     }
 
     /**
@@ -68,6 +77,12 @@ class Arrays {
      * @return list<mixed>
      */
     public static function toList(mixed $array): array {
+        if (is_null($array)) {
+            return [];
+        }
+        if (is_object($array)) {
+            return array_values(get_object_vars($array));
+        }
         if (!is_array($array)) {
             return [ $array ];
         }
@@ -93,7 +108,11 @@ class Arrays {
      * @param bool   $withoutEmpty Optional.
      * @return list<int>
      */
-    public static function toInts(mixed $array, string $key = "", bool $withoutEmpty = false): array {
+    public static function toInts(
+        mixed $array,
+        string $key = "",
+        bool $withoutEmpty = false,
+    ): array {
         if (is_int($array)) {
             if ($withoutEmpty && $array === 0) {
                 return [];
@@ -107,7 +126,7 @@ class Arrays {
 
         $result = [];
         foreach ($array as $row) {
-            $value = self::getValue($row, $key);
+            $value = self::getValue($row, $key, useEmpty: true);
             if (!Numbers::isValid($value, null)) {
                 continue;
             }
@@ -126,7 +145,11 @@ class Arrays {
      * @param bool   $withoutEmpty Optional.
      * @return list<string>
      */
-    public static function toStrings(mixed $array, string $key = "", bool $withoutEmpty = false): array {
+    public static function toStrings(
+        mixed $array,
+        string $key = "",
+        bool $withoutEmpty = false,
+    ): array {
         if (is_string($array)) {
             if ($withoutEmpty && $array === "") {
                 return [];
@@ -140,7 +163,7 @@ class Arrays {
 
         $result = [];
         foreach ($array as $row) {
-            $value = self::getValue($row, $key);
+            $value = self::getValue($row, $key, useEmpty: true);
             if ($withoutEmpty && self::isEmpty($value)) {
                 continue;
             }
@@ -272,23 +295,6 @@ class Arrays {
     }
 
     /**
-     * Returns the max value of the given array
-     * @param mixed $array
-     * @return int
-     */
-    public static function max(mixed $array): int {
-        if (self::isEmpty($array) || !is_array($array)) {
-            return 0;
-        }
-
-        $length = self::length($array);
-        if ($length > 1) {
-            return Numbers::toInt(max(...$array));
-        }
-        return Numbers::toInt($array[0] ?? 0);
-    }
-
-    /**
      * Returns true if the array contains the needle
      * @param mixed           $array
      * @param mixed           $needle
@@ -371,7 +377,8 @@ class Arrays {
      * @return bool
      */
     public static function containsKey(array $array, mixed $needle): bool {
-        return in_array($needle, array_keys($array), strict: true);
+        $keys = array_keys($array);
+        return in_array($needle, $keys, strict: true);
     }
 
     /**
@@ -385,12 +392,13 @@ class Arrays {
         if (self::length($array) !== self::length($other)) {
             return false;
         }
+
         foreach ($array as $index => $value) {
             if (is_array($value) && $key !== "") {
                 if (!isset($value[$key]) || !self::contains($other, $value[$key], $key)) {
                     return false;
                 }
-            } elseif (isset($other[$index]) && $value !== $other[$index]) {
+            } elseif (!isset($other[$index]) || $value !== $other[$index]) {
                 return false;
             }
         }
@@ -448,7 +456,12 @@ class Arrays {
      * @param string|null             $getKey   Optional.
      * @return array<int|string,mixed>
      */
-    public static function getDiff(array $array, array $other, string $checkKey, ?string $getKey = null): array {
+    public static function getDiff(
+        array $array,
+        array $other,
+        string $checkKey,
+        ?string $getKey = null,
+    ): array {
         $result = [];
         foreach ($array as $row) {
             if (is_array($row) && (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey))) {
@@ -460,24 +473,6 @@ class Arrays {
             }
         }
         return $result;
-    }
-
-    /**
-     * Returns a random value from the array
-     * @template TValue
-     * @param array<int|string,TValue> $array
-     * @return TValue|null
-     */
-    public static function random(array $array): mixed {
-        if (self::isEmpty($array)) {
-            return null;
-        }
-
-        $index = array_rand($array);
-        if (isset($array[$index])) {
-            return $array[$index];
-        }
-        return null;
     }
 
 
@@ -549,7 +544,11 @@ class Arrays {
      * @param int|string   $idKey Optional.
      * @return list<TValue>
      */
-    public static function removeValue(array $array, int|string $key, int|string $idKey = ""): array {
+    public static function removeValue(
+        array $array,
+        int|string $key,
+        int|string $idKey = "",
+    ): array {
         $result = [];
         foreach ($array as $elem) {
             $shouldAdd = false;
@@ -644,7 +643,7 @@ class Arrays {
      */
     public static function paginate(array $array, int $page, int $amount): array {
         $from = $page * $amount;
-        return array_slice($array, $from, $amount - 1);
+        return array_slice($array, $from, $amount);
     }
 
     /**
@@ -736,6 +735,43 @@ class Arrays {
     }
 
 
+
+    /**
+     * Returns a random value from the array
+     * @template TValue
+     * @param array<int|string,TValue> $array
+     * @return TValue|null
+     */
+    public static function random(array $array): mixed {
+        if (self::isEmpty($array)) {
+            return null;
+        }
+
+        $index = array_rand($array);
+        if (isset($array[$index])) {
+            return $array[$index];
+        }
+        return null;
+    }
+
+    /**
+     * Returns the max value of the given array
+     * @param mixed $array
+     * @return int
+     */
+    public static function max(mixed $array): int {
+        if (self::isEmpty($array) || !is_array($array)) {
+            return 0;
+        }
+
+        if (!self::isList($array)) {
+            $array = array_values($array);
+        }
+        if (count($array) > 1) {
+            return Numbers::toInt(max(...$array));
+        }
+        return Numbers::toInt($array[0] ?? 0);
+    }
 
     /**
      * Returns the sum of the elements of the given array
@@ -896,17 +932,6 @@ class Arrays {
     }
 
     /**
-     * Returns true if there is an item with the given id key with the given is value
-     * @param array<int|string,mixed> $array
-     * @param string                  $idKey
-     * @param mixed                   $idValue
-     * @return bool
-     */
-    public static function hasValue(array $array, string $idKey, mixed $idValue): bool {
-        return self::findIndex($array, $idKey, $idValue) !== -1;
-    }
-
-    /**
      * Returns the index at the given id key with the given is value
      * @param array<int|string,mixed> $array
      * @param string                  $idKey
@@ -926,6 +951,17 @@ class Arrays {
             }
         }
         return -1;
+    }
+
+    /**
+     * Returns true if there is an item with the given id key with the given is value
+     * @param array<int|string,mixed> $array
+     * @param string                  $idKey
+     * @param mixed                   $idValue
+     * @return bool
+     */
+    public static function hasValue(array $array, string $idKey, mixed $idValue): bool {
+        return self::findIndex($array, $idKey, $idValue) !== -1;
     }
 
     /**
