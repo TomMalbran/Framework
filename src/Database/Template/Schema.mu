@@ -11,7 +11,8 @@ use {{namespace}}\{{columnClass}};
 use {{namespace}}\{{queryClass}};{{#hasStatus}}
 use {{namespace}}\{{statusClass}};{{/hasStatus}}
 
-use Framework\IO\Request;
+use Framework\IO\Request;{{#hasValidation}}
+use Framework\IO\Errors;{{/hasValidation}}
 use Framework\IO\Search;
 use Framework\IO\Select;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
@@ -31,8 +32,7 @@ use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
 use Framework\Date\DateType;{{/hasDateType}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
 use Framework\Utils\Dictionary;{{#hasIntID}}
-use Framework\Utils\Numbers;{{/hasIntID}}{{#hasValidation}}
-use Framework\Utils\Errors;{{/hasValidation}}{{#hasJsonType}}
+use Framework\Utils\Numbers;{{/hasIntID}}{{#hasJsonType}}
 use Framework\Utils\JSON;
 
 use JsonSerializable;{{/hasJsonType}}
