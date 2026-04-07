@@ -102,7 +102,11 @@ class Errors implements JsonSerializable {
      * @param int|string ...$value
      * @return Errors
      */
-    public function add(string $error, string $message, int|string ...$value): Errors {
+    public function add(
+        string $error,
+        string $message,
+        int|string ...$value,
+    ): Errors {
         if ($message === "") {
             return $this;
         }
@@ -121,7 +125,11 @@ class Errors implements JsonSerializable {
      * @param string $message
      * @return Errors
      */
-    public function addIf(bool $condition, string $error, string $message): Errors {
+    public function addIf(
+        bool $condition,
+        string $error,
+        string $message,
+    ): Errors {
         if ($condition) {
             $this->add($error, $message);
         }
@@ -136,7 +144,12 @@ class Errors implements JsonSerializable {
      * @param int|string  ...$value
      * @return Errors
      */
-    public function addFor(Enum|string $section, Enum|string $error, string $message, int|string ...$value): Errors {
+    public function addFor(
+        Enum|string $section,
+        Enum|string $error,
+        string $message,
+        int|string ...$value,
+    ): Errors {
         if ($message === "") {
             return $this;
         }
@@ -163,9 +176,13 @@ class Errors implements JsonSerializable {
      * @param string $suffix Optional.
      * @return Errors
      */
-    public function merge(Errors $errors, string $prefix = "", string $suffix = ""): Errors {
+    public function merge(
+        Errors $errors,
+        string $prefix = "",
+        string $suffix = "",
+    ): Errors {
         if ($prefix === "" && $suffix === "") {
-            $this->errors += $errors->get();
+            $this->errors = array_merge($this->errors, $errors->get());
             return $this;
         }
 
@@ -184,7 +201,12 @@ class Errors implements JsonSerializable {
      * @param string $suffix  Optional.
      * @return Errors
      */
-    public function mergeFor(string $section, Errors $errors, string $prefix = "", string $suffix = ""): Errors {
+    public function mergeFor(
+        string $section,
+        Errors $errors,
+        string $prefix = "",
+        string $suffix = "",
+    ): Errors {
         if (!$errors->has()) {
             return $this;
         }
