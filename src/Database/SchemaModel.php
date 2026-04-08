@@ -10,7 +10,7 @@ use Framework\Database\Model\Count;
 use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
 use Framework\Database\Status\State;
-use Framework\Date\DateType;
+use Framework\Date\Type\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 

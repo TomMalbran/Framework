@@ -2,8 +2,8 @@
 namespace Tests\IO;
 
 use Framework\IO\Request;
-use Framework\Date\DateType;
-use Framework\Date\DateFormat;
+use Framework\Date\Type\DateType;
+use Framework\Date\Type\DateFormat;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 

@@ -8,7 +8,7 @@ use Framework\Database\Model\FieldType;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Framework\System\Path;
-use Framework\Date\DateType;
+use Framework\Date\Type\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;

@@ -3,7 +3,7 @@
 namespace Framework\Utils;
 
 use Framework\Date\Date;
-use Framework\Date\DateFormat;
+use Framework\Date\Type\DateFormat;
 use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 

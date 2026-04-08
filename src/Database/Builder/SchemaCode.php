@@ -6,7 +6,7 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Database\Model\ValidateType;
 use Framework\Builder\Builder;
-use Framework\Date\DateType;
+use Framework\Date\Type\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 

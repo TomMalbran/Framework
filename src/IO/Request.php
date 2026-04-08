@@ -6,7 +6,7 @@ use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Date\Date;
 use Framework\Date\DateUtils;
-use Framework\Date\DateType;
+use Framework\Date\Type\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;

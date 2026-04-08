@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Date;
+namespace Framework\Date\Type;
 
 /**
  * The Date Formats used by the System

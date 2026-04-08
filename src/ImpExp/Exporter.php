@@ -7,7 +7,7 @@ use Framework\ImpExp\ExporterWriter;
 use Framework\ImpExp\XLSXWriter;
 use Framework\ImpExp\CSVWriter;
 use Framework\Date\Date;
-use Framework\Date\DateFormat;
+use Framework\Date\Type\DateFormat;
 
 /**
  * The Exporter Wrapper

@@ -29,7 +29,7 @@ use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
 use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasValidation}}
 use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
 use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
-use Framework\Date\DateType;{{/hasDateType}}{{#hasID}}
+use Framework\Date\Type\DateType;{{/hasDateType}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
 use Framework\Utils\Dictionary;{{#hasIntID}}
 use Framework\Utils\Numbers;{{/hasIntID}}{{#hasJsonType}}

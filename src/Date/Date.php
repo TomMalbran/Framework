@@ -2,8 +2,8 @@
 namespace Framework\Date;
 
 use Framework\Date\DateUtils;
-use Framework\Date\DateType;
-use Framework\Date\DateFormat;
+use Framework\Date\Type\DateType;
+use Framework\Date\Type\DateFormat;
 use Framework\Date\TimeZone;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;

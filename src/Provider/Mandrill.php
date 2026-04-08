@@ -4,7 +4,7 @@ namespace Framework\Provider;
 use Framework\Provider\Type\CurlMethod;
 use Framework\System\Config;
 use Framework\Date\Date;
-use Framework\Date\DateFormat;
+use Framework\Date\Type\DateFormat;
 use Framework\Utils\Dictionary;
 
 /**

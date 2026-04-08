@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Date;
+namespace Framework\Date\Type;
 
 use Framework\Utils\Arrays;
 
