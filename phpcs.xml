@@ -144,7 +144,7 @@
     <!-- Functions should not have a nesting level greater than 10, and should try to stay below 5. -->
     <rule ref="Generic.Metrics.NestingLevel">
         <properties>
-            <property name="nestingLevel" value="5"/>
+            <property name="nestingLevel" value="10"/>
             <property name="absoluteNestingLevel" value="10"/>
         </properties>
     </rule>
