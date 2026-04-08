@@ -15,13 +15,13 @@ use JsonSerializable;
  */
 class Select implements JsonSerializable {
 
-    public int        $id;
-    public string     $field;
+    public int $id;
+    public string $field;
 
     public int|string $key;
-    public string     $value;
+    public string $value;
 
-    public string     $description = "";
+    public string $description = "";
 
     /** @var array<string,mixed> */
     private array $extras;
@@ -33,7 +33,11 @@ class Select implements JsonSerializable {
      * @param Enum|string         $value
      * @param array<string,mixed> $extras Optional.
      */
-    public function __construct(Enum|int|string $key, Enum|string $value, array $extras = []) {
+    public function __construct(
+        Enum|int|string $key,
+        Enum|string $value,
+        array $extras = [],
+    ) {
         if ($key instanceof Enum) {
             $key = $key->toString();
         }
