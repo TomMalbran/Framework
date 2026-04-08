@@ -46,13 +46,29 @@ class SignalCode implements DiscoveryBuilder {
                     if (!isset($signals[$trigger])) {
                         $signals[$trigger] = [
                             "event"    => $trigger,
-                            "params"   => $params,
+                            "params"   => [],
                             "triggers" => [],
                         ];
-                    } elseif (count($params) > count($signals[$trigger]["params"])) {
-                        $signals[$trigger]["params"] = $params;
                     }
 
+                    // Adds the Params
+                    foreach ($params as $param) {
+                        $hasParam = false;
+                        foreach ($signals[$trigger]["params"] as $existingParam) {
+                            if ($existingParam["name"] === $param["name"]) {
+                                $hasParam = true;
+                                break;
+                            }
+                        }
+                        if (!$hasParam) {
+                            if (count($signals[$trigger]["params"]) > 0) {
+                                $param["isFirst"] = false;
+                            }
+                            $signals[$trigger]["params"][] = $param;
+                        }
+                    }
+
+                    // Adds the Triggers
                     $triggerClass = "{$className}::{$method->getName()}";
                     $signals[$trigger]["triggers"][] = [
                         "name"   => $triggerClass,
@@ -132,6 +148,11 @@ class SignalCode implements DiscoveryBuilder {
 
                 $typeNames[] = $name;
                 $docTypes[]  = $docType;
+            }
+
+            if ($parameter->allowsNull()) {
+                $typeNames[] = "null";
+                $docTypes[]  = "null";
             }
 
             $params[] = [
