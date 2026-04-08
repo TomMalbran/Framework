@@ -118,13 +118,27 @@ class DateUtils {
         $fromMinutes = self::timeToMinutes($fromHour);
         $toMinutes   = self::timeToMinutes($toHour);
 
+        // Allow 24:00 as a special case for end time
         if ($allow24 && $fromMinutes > 0 && $toMinutes === 1440) {
             return true;
         }
-        if ($fromMinutes !== 0 && $toMinutes !== 0 && $fromMinutes < $toMinutes) {
-            return true;
+
+        // Both hours should be valid and not empty
+        if ($fromMinutes === 0 || $toMinutes === 0) {
+            return false;
         }
-        return false;
+
+        // Dont allow hours greater than 24 (1440 minutes)
+        if ($fromMinutes > 1440 || $toMinutes > 1440) {
+            return false;
+        }
+
+        // From Hour should be before to To Hour
+        if ($fromMinutes >= $toMinutes) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
