@@ -537,10 +537,10 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return bool
      */
     public function isValidPeriod(string $fromKey, string $toKey): bool {
-        if (!$this->isEmpty([ $fromKey, $toKey ])) {
-            return DateUtils::isValidPeriod($this->getString($fromKey), $this->getString($toKey));
+        if ($this->isEmpty([ $fromKey, $toKey ])) {
+            return false;
         }
-        return true;
+        return DateUtils::isValidPeriod($this->getString($fromKey), $this->getString($toKey));
     }
 
     /**
@@ -550,10 +550,10 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return bool
      */
     public function isValidHourPeriod(string $fromKey, string $toKey): bool {
-        if (!$this->isEmpty([ $fromKey, $toKey ])) {
-            return DateUtils::isValidHourPeriod($this->getString($fromKey), $this->getString($toKey));
+        if ($this->isEmpty([ $fromKey, $toKey ])) {
+            return false;
         }
-        return true;
+        return DateUtils::isValidHourPeriod($this->getString($fromKey), $this->getString($toKey));
     }
 
     /**
@@ -570,15 +570,15 @@ class Request implements IteratorAggregate, JsonSerializable {
         string $toDateKey,
         string $toHourKey,
     ): bool {
-        if (!$this->isEmpty([ $fromDateKey, $fromHourKey, $toDateKey, $toHourKey ])) {
-            return DateUtils::isValidFullPeriod(
-                $this->getString($fromDateKey),
-                $this->getString($fromHourKey),
-                $this->getString($toDateKey),
-                $this->getString($toHourKey)
-            );
+        if ($this->isEmpty([ $fromDateKey, $fromHourKey, $toDateKey, $toHourKey ])) {
+            return false;
         }
-        return true;
+        return DateUtils::isValidFullPeriod(
+            $this->getString($fromDateKey),
+            $this->getString($fromHourKey),
+            $this->getString($toDateKey),
+            $this->getString($toHourKey)
+        );
     }
 
     /**
@@ -934,14 +934,6 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function toDictionary(): Dictionary {
         return new Dictionary($this->request);
-    }
-
-    /**
-     * Return the Data for var_dump
-     * @return array<string,mixed>
-     */
-    public function __debugInfo(): array {
-        return $this->request;
     }
 
     /**
