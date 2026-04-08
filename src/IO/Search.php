@@ -13,8 +13,9 @@ use JsonSerializable;
  */
 class Search implements JsonSerializable {
 
-    public int        $id;
-    public string     $title;
+    public int $id;
+    public string $title;
+
     public Dictionary $data;
 
 
@@ -24,7 +25,11 @@ class Search implements JsonSerializable {
      * @param string          $title
      * @param Dictionary|null $data  Optional.
      */
-    public function __construct(int|string $id, string $title, ?Dictionary $data = null) {
+    public function __construct(
+        int|string $id,
+        string $title,
+        ?Dictionary $data = null,
+    ) {
         $this->id    = (int)$id;
         $this->title = $title;
 
@@ -81,7 +86,11 @@ class Search implements JsonSerializable {
      * @param list<string>|string $nameKey
      * @return list<Search>
      */
-    public static function create(Dictionary $data, string $idKey, array|string $nameKey): array {
+    public static function create(
+        Dictionary $data,
+        string $idKey,
+        array|string $nameKey,
+    ): array {
         $result = [];
         $ids    = [];
 
