@@ -2,9 +2,9 @@
 namespace Framework;
 
 use Framework\Discovery\Discovery;
-use Framework\Discovery\ConsoleCommand;
-use Framework\Discovery\Priority;
 use Framework\Discovery\Package;
+use Framework\Discovery\Attr\Priority;
+use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;

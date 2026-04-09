@@ -4,6 +4,7 @@ namespace Framework\Discovery;
 use Framework\Application;
 use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryClass;
+use Framework\Discovery\Attr\Priority;
 use Framework\File\File;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;

@@ -2,8 +2,8 @@
 namespace Framework\Email;
 
 use Framework\Discovery\Type\DiscoveryBuilder;
+use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
-use Framework\Discovery\Priority;
 use Framework\Intl\NLSConfig;
 use Framework\System\Language;
 use Framework\Utils\Dictionary;

@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Discovery\Priority;
 use Framework\Discovery\Type\DiscoveryBuilder;
+use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
 use Framework\Core\VariableType;
 use Framework\Utils\Strings;

@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Discovery\Type;
 
-use Framework\Discovery\Priority;
+use Framework\Discovery\Attr\Priority;
 use Framework\Utils\Strings;
 
 use ReflectionClass;

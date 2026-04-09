@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Discovery;
+namespace Framework\Discovery\Attr;
 
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;

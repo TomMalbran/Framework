@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Analysis\Route;
 
-use Framework\Discovery\Route;
+use Framework\Discovery\Attr\Route;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Collectors\Collector;

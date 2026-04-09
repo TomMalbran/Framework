@@ -2,7 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Application;
-use Framework\Discovery\ConsoleCommand;
+use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\File\File;
 use Framework\Date\Timer;
 use Framework\Utils\Strings;

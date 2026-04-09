@@ -2,7 +2,7 @@
 namespace Framework\Builder;
 
 use Framework\Application;
-use Framework\Discovery\Priority;
+use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
 use Framework\File\File;

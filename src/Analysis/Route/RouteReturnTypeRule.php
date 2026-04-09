@@ -2,7 +2,7 @@
 namespace Framework\Analysis\Route;
 
 use Framework\IO\Response;
-use Framework\Discovery\Route;
+use Framework\Discovery\Attr\Route;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;

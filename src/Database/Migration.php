@@ -5,7 +5,7 @@ use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\Type\DiscoveryMigration;
-use Framework\Discovery\ConsoleCommand;
+use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\Database\Database;
 use Framework\Database\SchemaMigration;
 use Framework\Database\DataMigration;

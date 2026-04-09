@@ -3,9 +3,9 @@ namespace Framework\File;
 
 use Framework\Application;
 use Framework\Discovery\DiscoveryConfig;
-use Framework\Discovery\ConsoleCommand;
 use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryBuilder;
+use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\Builder\Builder;
 use Framework\File\File;
 use Framework\System\Config;

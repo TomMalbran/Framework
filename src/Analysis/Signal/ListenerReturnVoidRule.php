@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Analysis\Signal;
 
-use Framework\Discovery\Listener;
+use Framework\Discovery\Attr\Listener;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
