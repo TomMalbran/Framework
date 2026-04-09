@@ -25,21 +25,19 @@ class SignalCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $reflections = Discovery::getReflectionClasses();
-        $signals     = [];
-        $uses        = [];
+        $classes = Discovery::findClasses();
+        $signals = [];
+        $uses    = [];
 
-        foreach ($reflections as $className => $reflection) {
-            $methods = $reflection->getMethods();
+        foreach ($classes as $class) {
+            $methods = $class->getMethods();
             foreach ($methods as $method) {
                 $attributes = $method->getAttributes(Listener::class);
                 if (!isset($attributes[0])) {
                     continue;
                 }
 
-                $attribute = $attributes[0];
-                $listener  = $attribute->newInstance();
-
+                $listener = $attributes[0]->newInstance();
                 foreach ($listener->triggers as $trigger) {
                     $params = self::getParams($method, $uses);
 
@@ -69,7 +67,7 @@ class SignalCode implements DiscoveryBuilder {
                     }
 
                     // Adds the Triggers
-                    $triggerClass = "{$className}::{$method->getName()}";
+                    $triggerClass = "\\{$class->getName()}::{$method->getName()}";
                     $signals[$trigger]["triggers"][] = [
                         "name"   => $triggerClass,
                         "params" => $params,

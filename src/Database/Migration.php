@@ -83,23 +83,27 @@ class Migration {
 
 
         // Apply other Migrations from the Framework
-        /** @var list<DiscoveryMigration> */
-        $frameMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class, forFramework: true);
-        if (count($frameMigrations) > 0) {
+        $frameClasses = Discovery::findClasses(interface: DiscoveryMigration::class, forFramework: true);
+        if (count($frameClasses) > 0) {
             print("\nFRAMEWORK MIGRATIONS\n");
-            foreach ($frameMigrations as $migration) {
-                $migration::migrateData();
+            foreach ($frameClasses as $class) {
+                $instance = $class->newInstance();
+                if ($instance instanceof DiscoveryMigration) {
+                    $instance::migrateData();
+                }
             }
         }
 
 
         // Apply the Migrations from the App
-        /** @var list<DiscoveryMigration> */
-        $appMigrations = Discovery::getClassesWithInterface(DiscoveryMigration::class);
+        $appMigrations = Discovery::findClasses(interface: DiscoveryMigration::class, forFramework: false);
         if (count($appMigrations) > 0) {
             print("\nAPP MIGRATIONS\n");
-            foreach ($appMigrations as $migration) {
-                $migration::migrateData();
+            foreach ($appMigrations as $class) {
+                $instance = $class->newInstance();
+                if ($instance instanceof DiscoveryMigration) {
+                    $instance::migrateData();
+                }
             }
         }
 

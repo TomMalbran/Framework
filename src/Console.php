@@ -92,15 +92,13 @@ class Console {
      * @return list<ConsoleCommand>
      */
     private static function getCommands(): array {
-        $frameReflections = Discovery::getReflectionClasses(forFramework: true);
-        $appReflections   = Discovery::getReflectionClasses(forFramework: false);
-        $reflections      = array_merge($frameReflections, $appReflections);
-        $priorities       = [];
-        $instances        = [];
-        $result           = [];
+        $classes    = Discovery::findClasses(forAll: true);
+        $priorities = [];
+        $instances  = [];
+        $result     = [];
 
-        foreach ($reflections as $reflection) {
-            $methods = $reflection->getMethods();
+        foreach ($classes as $class) {
+            $methods = $class->getMethods();
             foreach ($methods as $method) {
                 $attributes = $method->getAttributes(ConsoleCommand::class);
                 if (!$method->isPublic() || !isset($attributes[0])) {

@@ -20,12 +20,12 @@ class RouterCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $reflections = Discovery::getReflectionClasses();
-        $routes      = [];
+        $classes = Discovery::findClasses();
+        $routes  = [];
 
-        foreach ($reflections as $className => $reflection) {
+        foreach ($classes as $class) {
             // Get the Methods
-            $methods = $reflection->getMethods();
+            $methods = $class->getMethods();
 
             // Add a space between the classes
             $total = count($routes);
@@ -46,7 +46,7 @@ class RouterCode implements DiscoveryBuilder {
 
                 // Add the Route
                 $routes[] = [
-                    "className"  => $className,
+                    "className"  => $class->getName(),
                     "method"     => $methodName,
                     "hasRequest" => $params > 0,
                     "route"      => $route->route,

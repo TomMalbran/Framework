@@ -3,6 +3,7 @@ namespace Framework\Discovery;
 
 use Framework\Application;
 use Framework\Discovery\Package;
+use Framework\Discovery\Type\DiscoveryClass;
 use Framework\File\File;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
@@ -12,7 +13,6 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 use ReflectionNamedType;
-use ReflectionException;
 use Throwable;
 
 /**
@@ -67,13 +67,89 @@ class Discovery {
 
 
     /**
-     * Finds the Classes in the given Directory
-     * @param string $dir          Optional.
-     * @param bool   $forFramework Optional.
-     * @param bool   $withError    Optional.
+     * Finds the Classes with the given params
+     * @param class-string|null $parentClass  Optional.
+     * @param class-string|null $interface    Optional.
+     * @param bool              $forAll       Optional.
+     * @param bool              $forFramework Optional.
+     * @param bool              $withError    Optional.
+     * @return list<DiscoveryClass>
+     */
+    public static function findClasses(
+        ?string $parentClass = null,
+        ?string $interface = null,
+        bool $forAll = false,
+        bool $forFramework = false,
+        bool $withError = false,
+    ): array {
+        if ($forAll) {
+            $frameFiles = self::getAllFiles(forFramework: true);
+            $appFiles   = self::getAllFiles(forFramework: false);
+            $classPaths = array_merge($frameFiles, $appFiles);
+        } else {
+            $classPaths = self::getAllFiles($forFramework);
+        }
+
+        $result = [];
+        foreach ($classPaths as $className => $filePath) {
+            if (Strings::contains($filePath, [ "/Schema/", "/System/" ])) {
+                continue;
+            }
+
+            $file        = File::read($filePath);
+            $usedClasses = self::getUsedClasses($file);
+
+            // Skip the Class if any of its used Classes is not found
+            if (!self::isValidClass($file, $usedClasses, $classPaths)) {
+                if ($withError) {
+                    print("Skipping class $className due to missing dependencies.\n");
+                }
+                continue;
+            }
+
+            // Get the Class Reflection and skip if it fails
+            $reflection = null;
+            $className  = "\\$className";
+            try {
+                if (class_exists($className)) {
+                    $reflection = new ReflectionClass($className);
+                }
+            } catch (Throwable $e) {
+                if ($withError) {
+                    print("Error loading class: $className: " . $e->getMessage() . "\n");
+                }
+                continue;
+            }
+
+            // Skip if the Reflection is not found
+            if ($reflection === null) {
+                continue;
+            }
+
+            // Check the Parent Class if given
+            if ($parentClass !== null && !$reflection->isSubclassOf($parentClass)) {
+                continue;
+            }
+
+            // Check the Interface if given
+            if ($interface !== null && !$reflection->implementsInterface($interface)) {
+                continue;
+            }
+
+            // Add the Class to the result
+            $result[] = new DiscoveryClass($reflection, array_values($usedClasses));
+        }
+
+        $result = self::sortClassesByPriority($result);
+        return $result;
+    }
+
+    /**
+     * Returns all the php files in the given Directory
+     * @param bool $forFramework
      * @return array<string,string>
      */
-    public static function findClasses(string $dir = "", bool $forFramework = false, bool $withError = false): array {
+    private static function getAllFiles(bool $forFramework): array {
         if ($forFramework) {
             $namespace  = Package::Namespace;
             $sourcePath = Package::getSourcePath();
@@ -82,11 +158,9 @@ class Discovery {
             $sourcePath = Application::getSourcePath();
         }
 
-        $filePaths  = File::getFilesInDir($sourcePath, recursive: true);
-        $classPaths = [];
-        $result     = [];
+        $filePaths = File::getFilesInDir($sourcePath, recursive: true);
+        $result    = [];
 
-        // Find all the Classes
         foreach ($filePaths as $filePath) {
             if (!Strings::endsWith($filePath, ".php")) {
                 continue;
@@ -97,182 +171,88 @@ class Discovery {
             $className = Strings::replace($className, "/", "\\");
             $className = "{$namespace}{$className}";
 
-            $classPaths[$className] = $filePath;
+            $result[$className] = $filePath;
         }
+        return $result;
+    }
 
-        // Filter the Classes that have all their dependencies available
-        foreach ($classPaths as $className => $filePath) {
-            // Skip some ignored directories
-            if (Strings::contains($filePath, [ "/Schema/", "/System/" ])) {
-                continue;
-            }
+    /**
+     * Returns the used Classes in the given File
+     * @param string $file
+     * @return array<string,string>
+     */
+    private static function getUsedClasses(string $file): array {
+        $lines  = Strings::split($file, "\n", trim: true, skipEmpty: true);
+        $result = [];
 
-            // Skip using the given Directory
-            if ($dir !== "" && !Strings::contains($filePath, "/$dir/")) {
-                continue;
-            }
-
-            $file        = File::read($filePath);
-            $lines       = Strings::split($file, "\n", trim: true, skipEmpty: true);
-            $usedClasses = [];
-            $isValid     = true;
-
-            foreach ($lines as $line) {
-                if (Strings::startsWith($line, "use ")) {
-                    $usedClass     = Strings::substringBetween($line, "use ", ";");
-                    $usedClassName = Strings::substringAfter($usedClass, "\\");
-                    $usedClasses[$usedClassName] = $usedClass;
-                    continue;
-                }
-
-                // Only Validate the Classes for the current Namespace
-                $namespace = Package::Namespace;
-                if (!$forFramework) {
-                    $namespace = Application::getNamespace();
-                }
-
-                // Check that the used Class exists
-                if (Strings::startsWith($line, "class") && Strings::contains($line, "extends")) {
-                    $parentExtends = Strings::substringBetween($line, "extends ", " ");
-                    $parentClasses = Strings::split($parentExtends, ",", trim: true);
-                    foreach ($parentClasses as $parentClass) {
-                        $fullClassName = $usedClasses[$parentClass] ?? "";
-                        if (Strings::startsWith($fullClassName, $namespace) && !isset($classPaths[$fullClassName])) {
-                            $isValid = false;
-                            break 2;
-                        }
-                    }
-                }
-            }
-
-            if ($isValid) {
-                $classKey = Strings::substringAfter($className, "\\");
-                $result["\\$className"] = $classKey;
-            } elseif ($withError) {
-                print("Skipping class $className due to missing dependencies.");
+        foreach ($lines as $line) {
+            if (Strings::startsWith($line, "use ")) {
+                $usedClass     = Strings::substringBetween($line, "use ", ";");
+                $usedClassName = Strings::substringAfter($usedClass, "\\");
+                $result[$usedClassName] = $usedClass;
             }
         }
         return $result;
     }
 
     /**
-     * Returns the Reflection Classes in the given Directory
-     * @param string $dir          Optional.
-     * @param bool   $forFramework Optional.
-     * @param bool   $withError    Optional.
-     * @return array<string,ReflectionClass<object>>
-     */
-    public static function getReflectionClasses(
-        string $dir = "",
-        bool $forFramework = false,
-        bool $withError = false,
-    ): array {
-        $classes = self::findClasses($dir, $forFramework, $withError);
-        $result  = [];
-
-        foreach ($classes as $className => $classKey) {
-            try {
-                if (class_exists($className)) {
-                    $result[$className] = new ReflectionClass($className);
-                }
-            } catch (Throwable $e) {
-                if ($withError) {
-                    print("Error loading class: $className: " . $e->getMessage());
-                }
-                continue;
-            }
+     * Checks if the given Class is valid by checking that all its used Classes are found
+      * @param string               $fileContent
+      * @param array<string,string> $usedClasses
+      * @param array<string,string> $classPaths
+      * @return bool
+      */
+    private static function isValidClass(
+        string $fileContent,
+        array $usedClasses,
+        array $classPaths,
+    ): bool {
+        // Extract the namespace from the file with Regexp
+        $namespacePattern = '/^namespace\s+([A-Za-z0-9]+).*$/m';
+        $matches          = Strings::getAllMatches($fileContent, $namespacePattern);
+        $namespace        = $matches[1] ?? "";
+        if ($namespace === "") {
+            return false;
         }
-        return $result;
-    }
 
-    /**
-     * Returns the Reflection Classes that implement the given Interface
-     * @param class-string $interface
-     * @param string       $dir          Optional.
-     * @param bool         $forFramework Optional.
-     * @param bool         $withError    Optional.
-     * @return array<string,ReflectionClass<object>>
-     */
-    public static function getReflectionsWithInterface(
-        string $interface,
-        string $dir = "",
-        bool $forFramework = false,
-        bool $withError = false,
-    ): array {
-        $reflections = self::getReflectionClasses($dir, $forFramework, $withError);
-        $result      = [];
+        // Extract the class name and extends from the file with Regexp
+        $classPattern    = '/^class\s+(\w+)\s*(?:extends\s+([^\s;]+))?.*$/m';
+        $matches         = Strings::getAllMatches($fileContent, $classPattern);
+        $baseClassName   = $matches[1] ?? "";
+        $parentClassName = $matches[2] ?? "";
 
-        foreach ($reflections as $className => $reflection) {
-            if ($reflection->implementsInterface($interface)) {
-                $result[$className] = $reflection;
-            }
+        if ($baseClassName === "") {
+            return false;
         }
-        return $result;
-    }
-
-    /**
-     * Returns the Classes that implement the given Interface sorted by their Priority
-     * @param class-string $interface
-     * @param string       $dir          Optional.
-     * @param bool         $forFramework Optional.
-     * @param bool         $withError    Optional.
-     * @return list<object>
-     */
-    public static function getClassesWithInterface(
-        string $interface,
-        string $dir = "",
-        bool $forFramework = false,
-        bool $withError = false,
-    ): array {
-        $reflections = self::getReflectionsWithInterface($interface, $dir, $forFramework, $withError);
-        return self::sortClassesByPriority($reflections);
-    }
-
-    /**
-     * Returns the Reflection Classes that implement the given Parent
-     * @param class-string $parentClass
-     * @param string       $dir          Optional.
-     * @param bool         $forFramework Optional.
-     * @param bool         $withError    Optional.
-     * @return list<object>
-     */
-    public static function getClassesWithParent(
-        string $parentClass,
-        string $dir = "",
-        bool $forFramework = false,
-        bool $withError = false,
-    ): array {
-        $reflections = self::getReflectionClasses($dir, $forFramework, $withError);
-        $result      = [];
-
-        foreach ($reflections as $reflection) {
-            if ($reflection->isSubclassOf($parentClass)) {
-                $result[] = $reflection;
-            }
+        if ($parentClassName === "") {
+            return true;
         }
-        return self::sortClassesByPriority($result);
+
+        // Check that the used Class exists
+        $fullClassName = $usedClasses[$parentClassName] ?? "";
+        if (Strings::startsWith($fullClassName, $namespace) && !isset($classPaths[$fullClassName])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Sorts the given Classes by their Priority
-     * @param array<int|string,ReflectionClass<object>> $reflections
-     * @return list<object>
+     * @param list<DiscoveryClass> $classes
+     * @return list<DiscoveryClass>
      */
-    public static function sortClassesByPriority(array $reflections): array {
+    private static function sortClassesByPriority(array $classes): array {
         $priorities = [];
         $instances  = [];
         $result     = [];
 
-        foreach ($reflections as $reflection) {
-            $priority = self::getPriority($reflection);
+        foreach ($classes as $class) {
+            $priority = $class->getPriority();
             if (!isset($instances[$priority])) {
                 $priorities[] = $priority;
             }
-            try {
-                $instances[$priority][] = $reflection->newInstance();
-            } catch (ReflectionException $e) {
-                continue;
-            }
+            $instances[$priority][] = $class;
         }
 
         sort($priorities);
@@ -334,26 +314,6 @@ class Discovery {
         foreach ($props as $prop) {
             $result[] = $prop->getName();
         }
-        return $result;
-    }
-
-    /**
-     * Returns the Properties of the given Class, starting from the Base Class
-     * @param ReflectionClass<object> $class
-     * @return array<ReflectionProperty>
-     */
-    public static function getPropertiesBaseFirst(ReflectionClass $class): array {
-        $result = [];
-        do {
-            $properties = [];
-            foreach ($class->getProperties() as $property) {
-                if ($property->getDeclaringClass()->getName() === $class->getName()) {
-                    $properties[] = $property;
-                }
-            }
-            $result = array_merge($properties, $result);
-            $class  = $class->getParentClass();
-        } while ($class !== false);
         return $result;
     }
 

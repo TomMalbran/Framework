@@ -40,18 +40,18 @@ class Builder {
 
 
         // Find all the Builders in the Framework and App
-        $reflections = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class, forFramework: true);
-        if (!Package::isFramework()) {
-            $appBuilders = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class);
-            $reflections = array_merge($reflections, $appBuilders);
-        }
-
-        /** @var list<DiscoveryBuilder> */
-        $builders = Discovery::sortClassesByPriority($reflections);
+        $classes = Discovery::findClasses(
+            interface:    DiscoveryBuilder::class,
+            forAll:       !Package::isFramework(),
+            forFramework: true,
+        );
 
         // Execute each Builder
-        foreach ($builders as $builder) {
-            $created += $builder::generateCode();
+        foreach ($classes as $class) {
+            $instance = $class->newInstance();
+            if ($instance instanceof DiscoveryBuilder) {
+                $created += $instance::generateCode();
+            }
         }
 
 
@@ -70,19 +70,19 @@ class Builder {
         $deleted   = 0;
 
         // Find all the Builders in the Framework and App
-        $reflections = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class, forFramework: true);
-        if (!Package::isFramework()) {
-            $appBuilders = Discovery::getReflectionsWithInterface(DiscoveryBuilder::class);
-            $reflections = array_merge($reflections, $appBuilders);
-        }
-
-        /** @var list<DiscoveryBuilder> */
-        $builders = Discovery::sortClassesByPriority($reflections);
-        $builders = array_reverse($builders);
+        $classes = Discovery::findClasses(
+            interface:    DiscoveryBuilder::class,
+            forAll:       !Package::isFramework(),
+            forFramework: true,
+        );
+        $classes = array_reverse($classes);
 
         // Execute each Destroyer
-        foreach ($builders as $builder) {
-            $deleted += $builder::destroyCode();
+        foreach ($classes as $class) {
+            $instance = $class->newInstance();
+            if ($instance instanceof DiscoveryBuilder) {
+                $deleted += $instance::destroyCode();
+            }
         }
 
         File::deleteDir($writePath, $deleted);

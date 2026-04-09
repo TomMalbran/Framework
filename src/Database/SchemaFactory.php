@@ -47,36 +47,35 @@ class SchemaFactory {
      * @return list<SchemaModel>
      */
     public static function buildData(bool $forFramework = false): array {
-        $reflections  = Discovery::getReflectionClasses(forFramework: $forFramework);
+        $classes      = Discovery::findClasses(forFramework: $forFramework);
         $errors       = [];
         $schemaModels = [];
         $modelIDs     = [];
         $dbNames      = [];
 
         // Parse the Reflections
-        foreach ($reflections as $className => $reflection) {
-            $parent        = $reflection->getParentClass();
+        foreach ($classes as $class) {
+            $className     = $class->getName();
+            $parent        = $class->getParentClass();
             $fileName      = "";
             $namespace     = "";
             $fromFramework = false;
             $modelAttr     = null;
 
-            // Get the Data from the Class
-            if ($parent === false) {
-                $fileName   = $reflection->getFileName();
-                $namespace  = $reflection->getNamespaceName();
-                $attributes = $reflection->getAttributes(Model::class);
-                $modelAttr  = $attributes[0] ?? null;
-
-            // Get some data from the Parent Class
-            } else {
+            // Get the Data from the Parent Class
+            if ($parent->isNotEmpty()) {
                 $fileName      = $parent->getFileName();
                 $namespace     = $parent->getNamespaceName();
-                $parentAttrs   = $parent->getAttributes(Model::class);
-                $modelAttr     = $parentAttrs[0] ?? null;
+                $modelAttr     = $parent->getAttribute(Model::class);
                 $fromFramework = true;
+
+            // Get some data from the Base Class
+            } else {
+                $fileName  = $class->getFileName();
+                $namespace = $class->getNamespaceName();
+                $modelAttr = $class->getAttribute(Model::class);
             }
-            if ($fileName === false || $modelAttr === null) {
+            if ($fileName === "" || $modelAttr === null) {
                 continue;
             }
 
@@ -124,7 +123,7 @@ class SchemaFactory {
             $states        = [];
 
             // Parse the Properties
-            $props = Discovery::getPropertiesBaseFirst($reflection);
+            $props = $class->getPropertiesBaseFirst();
             foreach ($props as $prop) {
                 $propType  = $prop->getType();
                 $fieldName = $prop->getName();
