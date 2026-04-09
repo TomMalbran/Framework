@@ -46,7 +46,7 @@ class RouterCode implements DiscoveryBuilder {
 
                 // Add the Route
                 $routes[] = [
-                    "className"  => $class->getName(),
+                    "className"  => $class->getFullyQualifiedName(),
                     "method"     => $methodName,
                     "hasRequest" => $params > 0,
                     "route"      => $route->route,

@@ -76,6 +76,18 @@ class DiscoveryClass {
     }
 
     /**
+     * Returns the fully qualified name of the class, including the namespace
+     * @return string
+     */
+    public function getFullyQualifiedName(): string {
+        $result = $this->getName();
+        if ($result !== "") {
+            return "\\{$result}";
+        }
+        return "";
+    }
+
+    /**
      * Returns the parent class of the class
      * @return DiscoveryClass
      */

@@ -67,7 +67,7 @@ class SignalCode implements DiscoveryBuilder {
                     }
 
                     // Adds the Triggers
-                    $triggerClass = "\\{$class->getName()}::{$method->getName()}";
+                    $triggerClass = "{$class->getFullyQualifiedName()}::{$method->getName()}";
                     $signals[$trigger]["triggers"][] = [
                         "name"   => $triggerClass,
                         "params" => $params,
