@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Discovery;
+namespace Framework\Discovery\Type;
 
 /**
  * The Discovery Builder

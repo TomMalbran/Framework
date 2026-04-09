@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
 use Framework\Discovery\Priority;
 use Framework\Intl\NLSConfig;

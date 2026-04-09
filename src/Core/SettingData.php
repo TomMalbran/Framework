@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Core;
 
-use Framework\Discovery\DiscoveryMigration;
+use Framework\Discovery\Type\DiscoveryMigration;
 use Framework\Core\SettingConfig;
 use Framework\Core\Schema\SettingsSchema;
 use Framework\Core\Schema\SettingsEntity;

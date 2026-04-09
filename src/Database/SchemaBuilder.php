@@ -2,7 +2,7 @@
 namespace Framework\Database;
 
 use Framework\Database\SchemaFactory;
-use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Database\Builder\SchemaCode;
 use Framework\Database\Builder\EntityCode;
 use Framework\Database\Builder\ColumnCode;

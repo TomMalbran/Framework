@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Notification;
 
-use Framework\Discovery\DiscoveryMigration;
+use Framework\Discovery\Type\DiscoveryMigration;
 use Framework\Notification\Schema\NotificationContentSchema;
 use Framework\Notification\Schema\NotificationContentEntity;
 use Framework\Notification\Schema\NotificationContentQuery;

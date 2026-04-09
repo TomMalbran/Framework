@@ -2,7 +2,7 @@
 namespace Framework\Database\Builder;
 
 use Framework\Application;
-use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Database\SchemaFactory;
 use Framework\System\Config;
 use Framework\Utils\Strings;

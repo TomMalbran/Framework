@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Email;
 
-use Framework\Discovery\DiscoveryMigration;
+use Framework\Discovery\Type\DiscoveryMigration;
 use Framework\Email\Schema\EmailContentSchema;
 use Framework\Email\Schema\EmailContentEntity;
 use Framework\Email\Schema\EmailContentQuery;

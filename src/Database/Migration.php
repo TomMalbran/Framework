@@ -4,7 +4,7 @@ namespace Framework\Database;
 use Framework\Application;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
-use Framework\Discovery\DiscoveryMigration;
+use Framework\Discovery\Type\DiscoveryMigration;
 use Framework\Discovery\ConsoleCommand;
 use Framework\Database\Database;
 use Framework\Database\SchemaMigration;

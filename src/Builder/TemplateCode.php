@@ -2,8 +2,8 @@
 namespace Framework\Builder;
 
 use Framework\Application;
-use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\Priority;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
 use Framework\File\File;
 use Framework\Utils\Strings;

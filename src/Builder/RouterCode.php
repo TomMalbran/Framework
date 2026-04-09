@@ -2,9 +2,9 @@
 namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
-use Framework\Discovery\DiscoveryBuilder;
 use Framework\Discovery\Priority;
 use Framework\Discovery\Route;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
 use Framework\Utils\Strings;
 

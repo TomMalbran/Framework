@@ -2,7 +2,7 @@
 namespace Framework\Core;
 
 use Framework\Discovery\DiscoveryConfig;
-use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;

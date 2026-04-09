@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Builder;
 
-use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Database\SchemaFactory;
 use Framework\Database\Model\FieldType;
 use Framework\Builder\Builder;

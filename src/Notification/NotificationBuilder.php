@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Notification;
 
-use Framework\Discovery\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
 use Framework\Intl\NLSConfig;
 use Framework\System\Language;
