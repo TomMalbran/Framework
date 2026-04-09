@@ -330,6 +330,8 @@ class EntityCode {
         foreach ($schemaModel->virtualFields as $field) {
             if ($field->type === FieldType::Enum) {
                 $result[$field->enumClass] = 1;
+            } elseif ($field->subClass !== "") {
+                $result[$field->subClass] = 1;
             }
         }
 

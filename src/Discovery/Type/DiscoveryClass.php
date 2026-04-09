@@ -64,7 +64,7 @@ class DiscoveryClass {
                 return $use;
             }
         }
-        return $name;
+        return "";
     }
 
     /**

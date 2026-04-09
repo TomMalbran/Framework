@@ -3,6 +3,7 @@ namespace Framework\Database;
 
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
+use Framework\Discovery\Type\DiscoveryClass;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
@@ -211,15 +212,16 @@ class SchemaFactory {
 
                 // VIRTUAL: If it has a Virtual attribute. It can be an array.
                 } elseif ($virtual !== null) {
-                    $arrayType = "";
+                    $arrayType  = "";
+                    $arrayClass = "";
                     if ($isArray) {
-                        [ $arrayType ] = self::getArrayType($prop);
+                        [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType($class, $prop);
                     }
-                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $arrayType, $isEnum);
+                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $arrayType, $arrayClass, $isEnum);
 
                 // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
                 } elseif ($isArray) {
-                    [ $arrayType, $subModelName ] = self::getArrayType($prop);
+                    [ $arrayType, $subModelName ] = self::getArrayType($class, $prop);
                     if ($arrayType !== "" || $subModelName !== "") {
                         $subRequests[] = $subRequest->setData($fieldName, $subModelName, $arrayType);
                     }
@@ -330,29 +332,34 @@ class SchemaFactory {
 
     /**
      * Returns the Field Type from the given Type Name
+     * @param DiscoveryClass     $class
      * @param ReflectionProperty $prop
-     * @return array{string,string}
+     * @return array{string,string,string}
      */
-    public static function getArrayType(ReflectionProperty $prop): array {
+    public static function getArrayType(DiscoveryClass $class, ReflectionProperty $prop): array {
         $comment = $prop->getDocComment();
         if ($comment === false) {
-            return [ "", "" ];
+            return [ "", "" , "" ];
         }
 
         $type      = trim(Strings::substringBetween($comment, "@var", "*/"));
         $modelName = "";
+        $typeClass = "";
 
         if (Strings::endsWith($type, "Model[]", "Model>")) {
             $modelName = Strings::stripEnd($type, "Model[]", "Model>");
             if (Strings::startsWith($type, "array<")) {
-                $modelName = Strings::substringAfter($modelName, ",");
                 $type      = Strings::substringBetween($type, "array<", ",");
+                $modelName = Strings::substringAfter($modelName, ",");
             } else {
                 $type      = "";
                 $modelName = Strings::stripStart($modelName, "list<");
             }
+        } else {
+            $typeName  = Strings::substringBetween($type, "list<", ">");
+            $typeClass = $class->getUseClassName($typeName);
         }
-        return [ $type, $modelName ];
+        return [ $type, $modelName, $typeClass ];
     }
 
 

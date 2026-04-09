@@ -13,6 +13,7 @@ class Virtual {
     public string    $name      = "";
     public FieldType $type      = FieldType::String;
     public string    $subType   = "";
+    public string    $subClass  = "";
     public string    $enumClass = "";
 
 
@@ -21,18 +22,26 @@ class Virtual {
      * @param string $name
      * @param string $typeName
      * @param string $subType
+     * @param string $subClass
      * @param bool   $isEnum
      * @return Virtual
      */
-    public function setData(string $name, string $typeName, string $subType, bool $isEnum): Virtual {
+    public function setData(
+        string $name,
+        string $typeName,
+        string $subType,
+        string $subClass,
+        bool $isEnum,
+    ): Virtual {
         $this->name = $name;
 
         if ($isEnum) {
             $this->type      = FieldType::Enum;
             $this->enumClass = $typeName;
         } else {
-            $this->type    = FieldType::fromType($typeName);
-            $this->subType = $subType;
+            $this->type     = FieldType::fromType($typeName);
+            $this->subType  = $subType;
+            $this->subClass = $subClass;
         }
         return $this;
     }
