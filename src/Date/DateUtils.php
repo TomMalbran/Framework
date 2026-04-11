@@ -83,6 +83,10 @@ class DateUtils {
         int $minHour = 0,
         int $maxHour = 23,
     ): bool {
+        if ($string === "") {
+            return false;
+        }
+
         $parts = Strings::split($string, ":");
         return (
             isset($parts[0]) && Numbers::isValid($parts[0], $minHour, $maxHour) &&
