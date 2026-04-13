@@ -397,10 +397,7 @@ class DateUtils {
 
         // Return the Time Stamp
         $result = mktime(0, 0, 0, $month, $day, $year);
-        if ($result === false) {
-            return 0;
-        }
-        return $result;
+        return $result === false ? 0 : $result;
     }
 
     /**
@@ -433,9 +430,6 @@ class DateUtils {
         }
 
         foreach ($numbers as $number) {
-            if ($number <= 0) {
-                continue;
-            }
             if ($day === 0 && $number <= 31) {
                 $day = $number;
             } elseif ($number >= 1000) {
@@ -454,9 +448,6 @@ class DateUtils {
         }
 
         $result = mktime(0, 0, 0, $month, $day, $year);
-        if ($result === false) {
-            return 0;
-        }
-        return $result;
+        return $result === false ? 0 : $result;
     }
 }

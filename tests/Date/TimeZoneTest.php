@@ -42,6 +42,9 @@ class TimeZoneTest extends TestCase {
         // set initial stack
         $this->setPrivateStaticProperty(TimeZone::class, "stackZones", $initialStack);
 
+        $extraPop = TimeZone::popTimeZone();
+        $this->assertSame(0.0, $extraPop);
+
         $afterPush = TimeZone::pushTimeZone($pushValue);
         $this->assertSame($expectedAfterPush, $afterPush);
 
