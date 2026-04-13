@@ -10,42 +10,58 @@ use Framework\Utils\Dictionary;
  */
 class NLSConfig {
 
+    private static string $defaultLanguage  = "en";
     private static string $stringsDir       = "nls/strings";
     private static string $emailsDir        = "nls/emails";
     private static string $notificationsDir = "nls/notifications";
 
 
+
+    /**
+     * Sets the Default Language
+     * @param string $lang
+     * @return void
+     */
+    public static function setDefaultLanguage(string $lang): void {
+        self::$defaultLanguage = $lang;
+    }
+
     /**
      * Sets the Strings Directory
      * @param string $dir
-     * @return string
+     * @return void
      */
-    public static function setStringsDir(string $dir): string {
+    public static function setStringsDir(string $dir): void {
         self::$stringsDir = $dir;
-        return self::$stringsDir;
     }
 
     /**
      * Sets the Emails Directory
      * @param string $dir
-     * @return string
+     * @return void
      */
-    public static function setEmailsDir(string $dir): string {
+    public static function setEmailsDir(string $dir): void {
         self::$emailsDir = $dir;
-        return self::$emailsDir;
     }
 
     /**
      * Sets the Notifications Directory
      * @param string $dir
-     * @return string
+     * @return void
      */
-    public static function setNotificationsDir(string $dir): string {
+    public static function setNotificationsDir(string $dir): void {
         self::$notificationsDir = $dir;
-        return self::$notificationsDir;
     }
 
 
+
+    /**
+     * Returns the Default Language
+     * @return string
+     */
+    public static function getDefaultLanguage(): string {
+        return self::$defaultLanguage;
+    }
 
     /**
      * Returns the path to the Strings Directory

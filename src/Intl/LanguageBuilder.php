@@ -22,7 +22,7 @@ class LanguageBuilder implements DiscoveryBuilder {
     public static function generateCode(): int {
         $path      = NLSConfig::getStringsPath();
         $files     = File::getFilesInDir($path);
-        $rootCode  = "es";
+        $rootCode  = NLSConfig::getDefaultLanguage();
         $rootFound = false;
         $languages = [];
 
@@ -46,8 +46,8 @@ class LanguageBuilder implements DiscoveryBuilder {
         // If no languages are found, add a default one
         if (count($languages) === 0) {
             $languages[] = [
-                "code" => "es",
-                "name" => "Español",
+                "code" => "en",
+                "name" => "English",
             ];
         }
 
