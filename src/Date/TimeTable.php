@@ -350,7 +350,7 @@ class TimeTable {
                 }
             }
             if (count($numbers) > 0) {
-                $schedules[] = new TimeTableData();
+                $schedules[] = new TimeTableData(days: $numbers);
             }
         }
 
@@ -472,11 +472,7 @@ class TimeTable {
             return "";
         }
 
-        $list = $this->getList($timeZone, $isoCode, allDays: true);
-        if (count($list) === 0) {
-            return "";
-        }
-
+        $list   = $this->getList($timeZone, $isoCode, allDays: true);
         $result = [];
         foreach ($list as $elem) {
             $result[] = NLS::format("{0} {1} {2}", [
