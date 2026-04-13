@@ -7,8 +7,17 @@
     cacheDirectory=".phpunit.cache"
 >
     <testsuites>
-        <testsuite name="Framework Test Suite">
-            <directory>tests</directory>
+        <testsuite name="Date Tests">
+            <directory>tests/Date</directory>
+        </testsuite>
+        <testsuite name="Enum Tests">
+            <directory>tests/Enum</directory>
+        </testsuite>
+        <testsuite name="IO Tests">
+            <directory>tests/IO</directory>
+        </testsuite>
+        <testsuite name="Utils Tests">
+            <directory>tests/Utils</directory>
         </testsuite>
     </testsuites>
     <php>
