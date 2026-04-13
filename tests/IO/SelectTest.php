@@ -205,6 +205,10 @@ class SelectTest extends TestCase {
             }
         }
         $this->assertTrue($found, "combined name not found for id=2");
+
+        // test with invalid keys/values, should be skipped
+        $invalid = Select::create([ [] ], "", "name");
+        $this->assertCount(0, $invalid);
     }
 
     public function testCreateFromList() {

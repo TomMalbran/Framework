@@ -2,8 +2,18 @@
 namespace Tests\IO;
 
 use Framework\IO\Errors;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 
 use PHPUnit\Framework\TestCase;
+
+enum TestErrorEnum implements Enum {
+    use IsEnum;
+
+    case None;
+    case Section;
+    case Error;
+}
 
 class ErrorsTest extends TestCase {
 
@@ -114,6 +124,10 @@ class ErrorsTest extends TestCase {
         $e->add("k", "third", 5);
         $this->assertIsArray($e->get()["k"]);
         $this->assertEquals([ "third", 5 ], $e->get()["k"]);
+
+        // should skip empty messages
+        $e->add("empty", "", 1);
+        $this->assertFalse($e->has("empty"));
     }
 
     public function testAddIf() {
@@ -142,17 +156,27 @@ class ErrorsTest extends TestCase {
         $this->assertEquals(3, $e->getTotal());
 
         // addFor with values should store an array [message, ...values]
-        $e4 = new Errors();
-        $e4->addFor("section4", "err4", "m4", 7, "more");
-        $this->assertTrue($e4->has("err4"));
-        $this->assertIsArray($e4->get()["err4"]);
-        $this->assertEquals([ "m4", 7, "more" ], $e4->get()["err4"]);
-        $this->assertEquals(1, $e4->get()["section4"]);
+        $e->addFor("section4", "err4", "m4", 7, "more");
+        $this->assertTrue($e->has("err4"));
+        $this->assertIsArray($e->get()["err4"]);
+        $this->assertEquals([ "m4", 7, "more" ], $e->get()["err4"]);
+        $this->assertEquals(1, $e->get()["section4"]);
 
         // overwriting the same key with values replaces previous value and increments section count
-        $e4->addFor("section4", "err4", "newMsg", 2);
-        $this->assertEquals([ "newMsg", 2 ], $e4->get()["err4"]);
-        $this->assertEquals(2, $e4->get()["section4"]);
+        $e->addFor("section4", "err4", "newMsg", 2);
+        $this->assertEquals([ "newMsg", 2 ], $e->get()["err4"]);
+        $this->assertEquals(2, $e->get()["section4"]);
+
+        // should skip empty messages
+        $e->addFor("section4", "empty", "", 1);
+        $this->assertFalse($e->has("empty"));
+
+        // should work with an Enum section and error
+        $e->addFor(TestErrorEnum::Section, TestErrorEnum::Error, "enum message", 3);
+        $this->assertTrue($e->has("Section"));
+        $this->assertTrue($e->has("Error"));
+        $this->assertEquals([ "enum message", 3 ], $e->get()["Error"]);
+        $this->assertEquals(1, $e->get()["Section"]);
     }
 
     public function testMerge() {

@@ -72,9 +72,22 @@ class RequestTest extends TestCase {
         }
 
         // clear any globals we modified
+        $_REQUEST = [];
         $_FILES = [];
     }
 
+
+    public function testConstruct() {
+        // test with $_REQUEST
+        $_REQUEST = [
+            "a" => 1,
+            "b" => "x",
+        ];
+        $r = new Request(withRequest: true);
+
+        $this->assertSame(1, $r->get("a"));
+        $this->assertSame("x", $r->get("b"));
+    }
 
     public function testGet() {
         $r = new Request([
@@ -395,6 +408,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isEmpty([ "a" ], [ "b" ]));
         $this->assertTrue($r->isEmpty([ "missing" ]));
         $this->assertTrue($r->isEmpty([ "c" ]));
+        $this->assertTrue($r->isEmpty([ "a" ], [ "missing" ]));
 
         $this->assertTrue($r->isEmpty([ "c" ]));
         $this->assertTrue($r->isEmpty([ "d" ]));
