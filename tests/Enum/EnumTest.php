@@ -62,17 +62,24 @@ class EnumTest extends TestCase {
         $list2 = TestBackedEnum::fromList([ "red", "green" ]);
         $this->assertSame([ TestBackedEnum::Red, TestBackedEnum::Green ], $list2);
 
-        // invalid values are converted to None
-        $list3 = TestPlainEnum::fromList([ "Apple", "Unknown", "Banana" ]);
+        // with Enum instances in the list, they should be returned as-is
+        $list3 = TestPlainEnum::fromList([ TestPlainEnum::Apple, "Unknown", TestPlainEnum::Banana ]);
         $this->assertSame([ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ], $list3);
 
+        // invalid values are converted to None
+        $list4 = TestPlainEnum::fromList([ "Apple", "Unknown", "Banana" ]);
+        $this->assertSame([ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ], $list4);
+
         // it works with non-array input by treating it as a single value
-        $single = TestPlainEnum::fromList("Apple");
-        $this->assertSame([ TestPlainEnum::Apple ], $single);
+        $list5 = TestPlainEnum::fromList("Apple");
+        $this->assertSame([ TestPlainEnum::Apple ], $list5);
+
+        // with a single enum
+        $list6 = TestPlainEnum::fromList(TestPlainEnum::Banana);
+        $this->assertSame([ TestPlainEnum::Banana ], $list6);
 
         // empty string should return empty list
-        $empty = TestPlainEnum::fromList("");
-        $this->assertSame([], $empty);
+        $this->assertSame([], TestPlainEnum::fromList(""));
 
         // null should return empty list
         $this->assertSame([], TestPlainEnum::fromList(null));
