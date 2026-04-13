@@ -19,7 +19,7 @@ class DateUtils {
      */
     public static function timeToMinutes(string $time, ?float $timeZone = null): int {
         $parts = Strings::split($time, ":");
-        if (count($parts) !== 2) {
+        if (count($parts) !== 2 && count($parts) !== 3) {
             return 0;
         }
 
@@ -40,9 +40,15 @@ class DateUtils {
      * @return string
      */
     public static function minutesToTime(int $minutes): string {
-        $hours = floor($minutes / 60);
-        $mins  = $minutes - $hours * 60;
-        return Numbers::zerosPad($hours, 2) . ":" . Numbers::zerosPad($mins, 2);
+        $value  = abs($minutes);
+        $hours  = floor($value / 60);
+        $mins   = $value - $hours * 60;
+        $result = Numbers::zerosPad($hours, 2) . ":" . Numbers::zerosPad($mins, 2);
+
+        if ($minutes < 0) {
+            $result = "-$result";
+        }
+        return $result;
     }
 
 
@@ -63,10 +69,14 @@ class DateUtils {
      * @param bool       $startMonday  Optional.
      * @return bool
      */
-    public static function isValidDay(int|string $value, bool $withHolidays = false, bool $startMonday = false): bool {
+    public static function isValidDay(
+        int|string $value,
+        bool $withHolidays = false,
+        bool $startMonday = false,
+    ): bool {
         $minValue = $startMonday ? 1 : 0;
         $maxValue = ($withHolidays ? 7 : 6) + $minValue;
-        return (int)$value >= $minValue && (int)$value <= $maxValue;
+        return Numbers::isValid($value, $minValue, $maxValue);
     }
 
     /**
@@ -118,7 +128,11 @@ class DateUtils {
      * @param bool   $allow24  Optional.
      * @return bool
      */
-    public static function isValidHourPeriod(string $fromHour, string $toHour, bool $allow24 = false): bool {
+    public static function isValidHourPeriod(
+        string $fromHour,
+        string $toHour,
+        bool $allow24 = false,
+    ): bool {
         $fromMinutes = self::timeToMinutes($fromHour);
         $toMinutes   = self::timeToMinutes($toHour);
 
@@ -253,17 +267,20 @@ class DateUtils {
      * @return string
      */
     public static function getMinString(int|float $minutes, int $decimals = 0): string {
-        if ($minutes < 120) {
-            return "{$minutes}m";
+        $sign = $minutes < 0 ? "-" : "";
+        $mins = abs($minutes);
+
+        if ($mins < 120) {
+            return "{$sign}{$mins}m";
         }
 
-        $hours = Numbers::divide($minutes, 60, $decimals);
+        $hours = Numbers::divide($mins, 60, $decimals);
         if ($hours < 72) {
-            return "{$hours}h";
+            return "{$sign}{$hours}h";
         }
 
-        $days = Numbers::divide($minutes, 60 * 24, $decimals);
-        return "{$days}d";
+        $days = Numbers::divide($mins, 60 * 24, $decimals);
+        return "{$sign}{$days}d";
     }
 
     /**
@@ -273,7 +290,7 @@ class DateUtils {
      * @return string
      */
     public static function getSecString(int $seconds, int $decimals = 0): string {
-        if ($seconds < 120) {
+        if (abs($seconds) < 120) {
             return "{$seconds}s";
         }
 
