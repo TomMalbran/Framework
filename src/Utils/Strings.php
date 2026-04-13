@@ -947,7 +947,7 @@ class Strings {
      * @return bool
      */
     public static function isPascalCase(string $string): bool {
-        return self::match($string, "/^[A-Z][a-z][a-zA-Z0-9]*$/");
+        return self::match($string, "/^[A-Z]+[a-z][a-zA-Z0-9]*$/");
     }
 
     /**

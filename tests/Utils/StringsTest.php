@@ -820,6 +820,7 @@ class StringsTest extends TestCase {
         // converts PascalCase to snake_case
         $this->assertEquals("some_hey", Strings::toSnakeCase("SomeHey"));
         $this->assertEquals("some_hey_data", Strings::toSnakeCase("SomeHEYData"));
+        $this->assertEquals("hey_some_data", Strings::toSnakeCase("HEYSomeData"));
 
         // converts various delimiters to snake_case
         $this->assertEquals("hello_world", Strings::toSnakeCase("Hello world"));
@@ -861,6 +862,7 @@ class StringsTest extends TestCase {
         // converts PascalCase to kebab-case
         $this->assertEquals("some-hey", Strings::toKebabCase("SomeHey"));
         $this->assertEquals("some-hey-data", Strings::toKebabCase("SomeHEYData"));
+        $this->assertEquals("hey-some-data", Strings::toKebabCase("HEYSomeData"));
 
         // converts various delimiters to kebab-case
         $this->assertEquals("hello-world", Strings::toKebabCase("Hello world"));
@@ -876,10 +878,13 @@ class StringsTest extends TestCase {
     public function testIsPascalCase() {
         $this->assertTrue(Strings::isPascalCase("HelloWorld"));
         $this->assertTrue(Strings::isPascalCase("Ab"));
+        $this->assertTrue(Strings::isPascalCase("SomeHEYData"));
+        $this->assertTrue(Strings::isPascalCase("HEYSomeData"));
 
         // invalid cases
         $this->assertFalse(Strings::isPascalCase("helloWorld"));
         $this->assertFalse(Strings::isPascalCase("Hello World"));
+        $this->assertFalse(Strings::isPascalCase("Hello-World"));
         $this->assertFalse(Strings::isPascalCase("Hello-World"));
         $this->assertFalse(Strings::isPascalCase(""));
     }
@@ -899,6 +904,7 @@ class StringsTest extends TestCase {
 
         // converts camelCase to PascalCase
         $this->assertEquals("SomeHey", Strings::toPascalCase("someHey"));
+        $this->assertEquals("SomeHEYData", Strings::toPascalCase("someHEYData"));
 
         // converts various delimiters to PascalCase
         $this->assertEquals("Hello", Strings::toPascalCase("hello"));
