@@ -28,9 +28,7 @@ class TimerTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider elapsedSecondsProvider
-     */
+    /** @dataProvider elapsedSecondsProvider */
     public function testGetElapsedSeconds(float $start, float $end, float $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);
@@ -48,9 +46,7 @@ class TimerTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider elapsedSecondsIntProvider
-     */
+    /** @dataProvider elapsedSecondsIntProvider */
     public function testGetElapsedSecondsInt(float $start, float $end, int $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);
@@ -68,9 +64,7 @@ class TimerTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider elapsedMinutesProvider
-     */
+    /** @dataProvider elapsedMinutesProvider */
     public function testGetElapsedMinutes(float $start, float $end, float $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);
@@ -88,9 +82,7 @@ class TimerTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider elapsedTextProvider
-     */
+    /** @dataProvider elapsedTextProvider */
     public function testGetElapsedText(float $start, float $end, string $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);

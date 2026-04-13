@@ -11,9 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class TimeTableTest extends TestCase {
 
-    /**
-     * @dataProvider createProvider
-     */
+    /** @dataProvider createProvider */
     public function testCreate(mixed $input, int $expectedCount): void {
         $tt   = TimeTable::create($input);
         $list = $tt->getList();
@@ -73,9 +71,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider isValidProvider
-     */
+    /** @dataProvider isValidProvider */
     public function testIsValid(array $input, bool $withHolidays, bool $isRequired, bool $expectedHasErrors, string $expectedKey = ""): void {
         $tt     = TimeTable::create($input, allowEmpty: true);
         $errors = new Errors();
@@ -101,9 +97,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider hasHolidayProvider
-     */
+    /** @dataProvider hasHolidayProvider */
     public function testHasHoliday(array $input, bool $expected): void {
         $tt = TimeTable::create($input);
         $this->assertSame($expected, $tt->hasHoliday());
@@ -117,9 +111,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider isCurrentProvider
-     */
+    /** @dataProvider isCurrentProvider */
     public function testIsCurrent(array $input, int $minuteGap, bool $isHoliday, bool $skipTime, bool $expected): void {
         $tt = TimeTable::create($input);
         $this->assertSame($expected, $tt->isCurrent($minuteGap, $isHoliday, $skipTime));
@@ -134,9 +126,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider containsDateProvider
-     */
+    /** @dataProvider containsDateProvider */
     public function testContainsDate(array $input, string $date, string $time, int $minuteGap, bool $isHoliday, bool $skipTime, bool $expected): void {
         $tt = TimeTable::create($input);
         $d = Date::create($date, $time);
@@ -158,9 +148,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider currentEndProvider
-     */
+    /** @dataProvider currentEndProvider */
     public function testGetCurrentEndTime(array $input, string $date, string $time, bool $isEmpty): void {
         $tt = TimeTable::create($input);
         $d  = Date::create($date, $time);
@@ -187,9 +175,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider nextStartProvider
-     */
+    /** @dataProvider nextStartProvider */
     public function testGetNextStartTime(array $input, string $date, string $time, bool $isEmpty): void {
         $tt = TimeTable::create($input);
         $d  = Date::create($date, $time);
@@ -234,9 +220,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider listProvider
-     */
+    /** @dataProvider listProvider */
     public function testGetList(array $input, string $closedText, string $timeZone, string $isoCode, bool $allDays, bool $isEmpty): void {
         $tt = TimeTable::create($input);
         $list = $tt->getList($closedText, $timeZone, $isoCode, $allDays);
@@ -278,9 +262,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider getTextProvider
-     */
+    /** @dataProvider getTextProvider */
     public function testGetText(array $input, string $timeZone, string $isoCode, bool $expectEmpty, bool $expectZone): void {
         $tt = TimeTable::create($input);
         $text = $tt->getText($timeZone, $isoCode);
@@ -309,9 +291,7 @@ class TimeTableTest extends TestCase {
     }
 
 
-    /**
-     * @dataProvider encodeProvider
-     */
+    /** @dataProvider encodeProvider */
     public function testEncode(array $input, bool $expectNonEmpty): void {
         $tt = TimeTable::create($input);
         $encoded = $tt->encode();
