@@ -359,6 +359,9 @@ class StringsTest extends TestCase {
 
         // array search with array replacement
         $this->assertEquals("xyc", Strings::replace("abc", [ "a", "b" ], [ "x", "y" ]));
+
+        // null replace
+        $this->assertEquals("", Strings::replace("abc", "a", null));
     }
 
     public function testReplaceStart() {
@@ -971,6 +974,9 @@ class StringsTest extends TestCase {
 
         // style tag at start should be removed entirely
         $this->assertEquals("abc", Strings::removeHtml("<style>body{}</style>abc"));
+
+        // without end style tag
+        $this->assertEquals("<style>body{}abc", Strings::removeHtml("<style>body{}abc"));
 
         // style tag in the middle should be removed and surrounding text preserved
         $this->assertEquals("preabc", Strings::removeHtml("pre<style>body{}</style>abc"));

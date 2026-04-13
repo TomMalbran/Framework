@@ -124,6 +124,20 @@ class ServerTest extends TestCase {
         // fallback to REMOTE_ADDR
         $_SERVER = [ "REMOTE_ADDR" => "192.0.2.5" ];
         $this->assertEquals("192.0.2.5", Server::getIP());
+
+        // when $_SERVER is empty, getenv fallbacks should be used
+        $_SERVER = [];
+        putenv("HTTP_X_FORWARDED_FOR=10.1.1.2");
+        $this->assertEquals("10.1.1.2", Server::getIP());
+        putenv("HTTP_X_FORWARDED_FOR");
+
+        putenv("HTTP_CLIENT_IP=192.0.2.9");
+        $this->assertEquals("192.0.2.9", Server::getIP());
+        putenv("HTTP_CLIENT_IP");
+
+        putenv("REMOTE_ADDR=192.0.2.10");
+        $this->assertEquals("192.0.2.10", Server::getIP());
+        putenv("REMOTE_ADDR");
     }
 
     public function testGetUserAgent() {
@@ -155,6 +169,10 @@ class ServerTest extends TestCase {
         // test Android with Fluid
         $ua = "Mozilla/5.0 (Android 10; Mobile; rv:88.0) Gecko/88.0 Fluid/88.0";
         $this->assertEquals("Android Fluid", Server::getPlatform($ua));
+
+        // test AIR with Chrome
+        $ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 AIR/33.0";
+        $this->assertEquals("Windows Air", Server::getPlatform($ua));
 
         // test unknown platform
         $ua = "SomeUnknownAgent/1.0";

@@ -218,9 +218,13 @@ class UtilsTest extends TestCase {
     public function testIsValidCUIT() {
         // valid raw digits
         $this->assertTrue(Utils::isValidCUIT("20123456786"));
+        $this->assertTrue(Utils::isValidCUIT("20123456840"));
+        $this->assertTrue(Utils::isValidCUIT("23123456849"));
 
         // valid when passed formatted with dashes
         $this->assertTrue(Utils::isValidCUIT("20-12345678-6"));
+        $this->assertTrue(Utils::isValidCUIT("20-12345684-0"));
+        $this->assertTrue(Utils::isValidCUIT("23-12345684-9"));
 
         // invalid when last digit changed (hardcoded)
         $this->assertFalse(Utils::isValidCUIT("20123456780"));
@@ -230,10 +234,13 @@ class UtilsTest extends TestCase {
     }
 
     public function testParseCUIT() {
+        $this->assertEquals("20-12345678-6", Utils::parseCUIT("20-12345678-6"));
         $this->assertEquals("20-12345678-6", Utils::parseCUIT("20123456786"));
+        $this->assertEquals("20-12345684-0", Utils::parseCUIT("20123456840"));
+        $this->assertEquals("23-12345684-9", Utils::parseCUIT("23123456849"));
 
         // non-11 input is returned as-is
-        $this->assertEquals("20-12345678-6", Utils::parseCUIT("20-12345678-6"));
+        $this->assertEquals("20-123456789-6", Utils::parseCUIT("20-123456789-6"));
         $this->assertEquals("123", Utils::parseCUIT("123"));
         $this->assertEquals("", Utils::parseCUIT(""));
 

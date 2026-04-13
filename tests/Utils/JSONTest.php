@@ -17,6 +17,7 @@ class JSONTest extends TestCase {
         }
     }
 
+
     public function testIsValid() {
         $this->assertTrue(JSON::isValid('{"a":1}'));
         $this->assertTrue(JSON::isValid('["x","y"]'));
@@ -38,6 +39,11 @@ class JSONTest extends TestCase {
         $this->assertEquals("", JSON::encode(""));
         $this->assertEquals("{}", JSON::encode(new stdClass()));
         $this->assertEquals("123", JSON::encode("123"));
+
+        // json_encode can fail (e.g. when encoding resources) -> should return empty string
+        $res = fopen("php://memory", "r");
+        $this->assertEquals("", JSON::encode($res));
+        fclose($res);
 
         // encode a normal array
         $arr = [ "x" => "y", "n" => 2 ];
@@ -127,6 +133,9 @@ class JSONTest extends TestCase {
         $read = JSON::readFile($this->tmpFile);
         $this->assertIsArray($read);
         $this->assertEquals("q", $read["p"]);
+
+        // invalid file should return empty array
+        $this->assertEquals([], JSON::readFile("nonexistent_file.json"));
     }
 
     public function testReadUrl() {
@@ -136,6 +145,9 @@ class JSONTest extends TestCase {
         $fromUrl = JSON::readUrl($url);
         $this->assertIsArray($fromUrl);
         $this->assertEquals("v", $fromUrl["u"]);
+
+        // invalid URL should return empty array
+        $this->assertEquals([], JSON::readUrl("invalid://url"));
     }
 
     public function testPostUrl() {
@@ -159,5 +171,8 @@ class JSONTest extends TestCase {
         // posted body should be urlencoded form data
         $this->assertStringContainsString("a=b", $opts["http"]["content"]);
         $this->assertStringContainsString("n=3", $opts["http"]["content"]);
+
+        // invalid URL should return empty array
+        $this->assertEquals([], JSON::postUrl("invalid://url", $data));
     }
 }

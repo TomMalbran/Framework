@@ -101,6 +101,9 @@ class CSVTest extends TestCase {
         $this->assertIsArray($read);
         $this->assertCount(2, $read);
         $this->assertEquals([ "p", "q" ], $read[0]);
+
+        // invalid file should return empty array
+        $this->assertEquals([], CSV::readFile("nonexistent_file.csv"));
     }
 
     public function testReadFileSkipHeader() {

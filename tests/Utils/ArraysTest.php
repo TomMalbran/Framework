@@ -83,6 +83,9 @@ class ArraysTest extends TestCase {
     }
 
     public function testToList() {
+        // valid lists should be returned as-is
+        $this->assertSame([ 1, 2 ], Arrays::toList([ 1, 2 ]));
+
         // arrays with numeric keys starting from 0 should be returned as-is
         $this->assertSame([ 1 ], Arrays::toList(1));
 
@@ -377,6 +380,16 @@ class ArraysTest extends TestCase {
         $this->assertFalse(Arrays::contains([
             [ "id" => 1 ]
         ], [ 2, 3 ], "id", true, true));
+
+        // with invalid key, should return false
+        $this->assertFalse(Arrays::contains([[ "id" => 1 ]], 1, "nonexistent_key"));
+
+        // with invalid key in an array of objects, should return false
+        $rowsObj = [(object)[ "id" => 1 ]];
+        $this->assertFalse(Arrays::contains($rowsObj, 1, "nonexistent_key"));
+
+        // with null values in the array, should not cause errors and should return false if looking for a non-null value
+        $this->assertFalse(Arrays::contains([ null ], 1, "id"));
     }
 
     public function testContainsKey() {
