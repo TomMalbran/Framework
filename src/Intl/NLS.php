@@ -2,7 +2,7 @@
 namespace Framework\Intl;
 
 use Framework\IO\Select;
-use Framework\Intl\NLSConfig;
+use Framework\Intl\IntlConfig;
 use Framework\System\Config;
 use Framework\System\Language;
 use Framework\Enum\Enum;
@@ -56,7 +56,7 @@ class NLS {
             return self::$data[$langCode];
         }
 
-        $data = NLSConfig::loadStrings($langCode);
+        $data = IntlConfig::loadStrings($langCode);
         if ($data->isNotEmpty()) {
             self::$data[$langCode] = $data;
             return $data;

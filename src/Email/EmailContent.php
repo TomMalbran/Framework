@@ -5,7 +5,7 @@ use Framework\Discovery\Type\DiscoveryMigration;
 use Framework\Email\Schema\EmailContentSchema;
 use Framework\Email\Schema\EmailContentEntity;
 use Framework\Email\Schema\EmailContentQuery;
-use Framework\Intl\NLSConfig;
+use Framework\Intl\IntlConfig;
 use Framework\Provider\Mustache;
 use Framework\System\Config;
 use Framework\System\Language;
@@ -65,7 +65,7 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
         $didUpdate = false;
 
         foreach ($languages as $language => $languageName) {
-            $emails = NLSConfig::loadEmails($language);
+            $emails = IntlConfig::loadEmails($language);
             if ($emails->isNotEmpty()) {
                 $position  = self::migrateLanguage($emails, $language, $languageName, $position);
                 $didUpdate = true;

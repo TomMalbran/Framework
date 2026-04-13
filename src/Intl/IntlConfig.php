@@ -8,7 +8,7 @@ use Framework\Utils\Dictionary;
 /**
  * The Internalization Strings Configuration
  */
-class NLSConfig {
+class IntlConfig {
 
     private static string $defaultLanguage  = "en";
     private static string $stringsDir       = "nls/strings";

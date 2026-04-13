@@ -4,7 +4,7 @@ namespace Framework\Email;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
-use Framework\Intl\NLSConfig;
+use Framework\Intl\IntlConfig;
 use Framework\System\Language;
 use Framework\Utils\Dictionary;
 
@@ -24,7 +24,7 @@ class EmailBuilder implements DiscoveryBuilder {
         $data      = new Dictionary();
 
         foreach ($languages as $language => $languageName) {
-            $data = NLSConfig::loadEmails($language);
+            $data = IntlConfig::loadEmails($language);
             if ($data->isNotEmpty()) {
                 break;
             }

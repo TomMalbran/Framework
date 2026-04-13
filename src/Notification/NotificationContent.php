@@ -6,7 +6,7 @@ use Framework\Notification\Schema\NotificationContentSchema;
 use Framework\Notification\Schema\NotificationContentEntity;
 use Framework\Notification\Schema\NotificationContentQuery;
 use Framework\Provider\Mustache;
-use Framework\Intl\NLSConfig;
+use Framework\Intl\IntlConfig;
 use Framework\System\Language;
 use Framework\System\NotificationCode;
 use Framework\Utils\Dictionary;
@@ -59,7 +59,7 @@ class NotificationContent extends NotificationContentSchema implements Discovery
         $didUpdate = false;
 
         foreach ($languages as $language => $languageName) {
-            $notifications = NLSConfig::loadNotifications($language);
+            $notifications = IntlConfig::loadNotifications($language);
             if ($notifications->isNotEmpty()) {
                 $position  = self::migrateLanguage($notifications, $language, $languageName, $position);
                 $didUpdate = true;

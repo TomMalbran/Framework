@@ -3,7 +3,7 @@ namespace Framework\Notification;
 
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
-use Framework\Intl\NLSConfig;
+use Framework\Intl\IntlConfig;
 use Framework\System\Language;
 use Framework\Utils\Dictionary;
 
@@ -22,7 +22,7 @@ class NotificationBuilder implements DiscoveryBuilder {
         $data      = new Dictionary();
 
         foreach ($languages as $language => $languageName) {
-            $data = NLSConfig::loadNotifications($language);
+            $data = IntlConfig::loadNotifications($language);
             if ($data->isNotEmpty()) {
                 break;
             }

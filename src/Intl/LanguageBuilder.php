@@ -4,7 +4,7 @@ namespace Framework\Intl;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
-use Framework\Intl\NLSConfig;
+use Framework\Intl\IntlConfig;
 use Framework\File\File;
 use Framework\Utils\Strings;
 
@@ -20,16 +20,16 @@ class LanguageBuilder implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $path      = NLSConfig::getStringsPath();
+        $path      = IntlConfig::getStringsPath();
         $files     = File::getFilesInDir($path);
-        $rootCode  = NLSConfig::getDefaultLanguage();
+        $rootCode  = IntlConfig::getDefaultLanguage();
         $rootFound = false;
         $languages = [];
 
         // Load all the languages
         foreach ($files as $file) {
             $code = Strings::stripEnd($file, ".json");
-            $data = NLSConfig::loadStrings($code);
+            $data = IntlConfig::loadStrings($code);
             if (!$data->hasValue("NAME")) {
                 continue;
             }
