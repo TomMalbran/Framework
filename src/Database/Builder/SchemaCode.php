@@ -49,7 +49,7 @@ class SchemaCode {
         $contents    = Builder::render("Schema", [
             "namespace"          => $schemaModel->namespace,
             "name"               => $schemaModel->name,
-            "table"              => $schemaModel->tableName,
+            "tableName"          => $schemaModel->tableName,
             "entityName"         => Strings::lowerCaseFirst($schemaModel->name),
             "entityClass"        => $schemaModel->entityClass,
             "columnClass"        => $schemaModel->columnClass,

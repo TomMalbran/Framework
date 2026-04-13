@@ -45,7 +45,7 @@ class {{name}}Schema extends Schema {
     protected static ?SchemaModel $model = null;
 
     protected static string $modelName = "{{name}}";
-    protected static string $tableName = "{{table}}";
+    protected static string $tableName = "{{tableName}}";
     protected static string $idName    = "{{idName}}";
     protected static string $idDbName  = "{{idDbName}}";
     protected static bool   $canDelete = {{canDeleteValue}};
@@ -362,7 +362,7 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}{{#hasDeleted}}
         bool $withDeleted = true,{{/hasDeleted}}
     ): bool {
-        $query = Query::select("{{table}}");
+        $query = Query::select(self::$tableName);
         $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
@@ -384,7 +384,7 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}
         int $skipID = 0,
     ): bool {
-        $query = Query::select("{{table}}");
+        $query = Query::select(self::$tableName);
         $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
@@ -421,7 +421,7 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
-        $query = Query::select("{{table}}");
+        $query = Query::select(self::$tableName);
         $query->where("{{idDbName}}", QueryOperator::Equal, {{{idValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
@@ -446,7 +446,7 @@ class {{name}}Schema extends Schema {
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
     ): {{entityClass}} {
-        $query = Query::select("{{table}}");
+        $query = Query::select(self::$tableName);
         $query->where("{{fieldKey}}", QueryOperator::Equal, {{{fieldValue}}});
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
