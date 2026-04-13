@@ -743,15 +743,12 @@ class Arrays {
      * @return TValue|null
      */
     public static function random(array $array): mixed {
-        if (self::isEmpty($array)) {
+        if (count($array) === 0) {
             return null;
         }
 
         $index = array_rand($array);
-        if (isset($array[$index])) {
-            return $array[$index];
-        }
-        return null;
+        return $array[$index];
     }
 
     /**
@@ -867,16 +864,12 @@ class Arrays {
      * @return TValue|null
      */
     public static function getFirst(array $array, string $key = ""): mixed {
-        if (self::isEmpty($array)) {
+        if (count($array) === 0) {
             return null;
         }
 
         $firstKey = array_key_first($array);
-        if (!isset($array[$firstKey])) {
-            return null;
-        }
-
-        $value = $array[$firstKey];
+        $value    = $array[$firstKey];
         return self::getValue($value, $key);
     }
 
@@ -900,16 +893,12 @@ class Arrays {
      * @return mixed
      */
     public static function getLast(array $array, string $key = ""): mixed {
-        if (self::isEmpty($array)) {
+        if (count($array) === 0) {
             return null;
         }
 
         $lastKey = array_key_last($array);
-        if (!isset($array[$lastKey])) {
-            return null;
-        }
-
-        $value = $array[$lastKey];
+        $value   = $array[$lastKey];
         return self::getValue($value, $key);
     }
 
