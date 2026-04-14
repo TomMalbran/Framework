@@ -9,180 +9,189 @@ use stdClass;
 
 class NumbersTest extends TestCase {
 
-    public function testIsValid() {
-        // valid numbers
-        $this->assertTrue(Numbers::isValid(NAN));
-        $this->assertTrue(Numbers::isValid(0, 0));
-        $this->assertTrue(Numbers::isValid(5));
-        $this->assertTrue(Numbers::isValid(5.5));
-        $this->assertTrue(Numbers::isValid("5"));
-        $this->assertTrue(Numbers::isValid("5.5"));
-
-        // invalid types
-        $this->assertFalse(Numbers::isValid("a"));
-        $this->assertFalse(Numbers::isValid(null));
-        $this->assertFalse(Numbers::isValid([]));
-        $this->assertFalse(Numbers::isValid(new stdClass()));
-        $this->assertFalse(Numbers::isValid(true));
-        $this->assertFalse(Numbers::isValid(false));
-        $this->assertFalse(Numbers::isValid(""));
-        $this->assertFalse(Numbers::isValid(" "));
-
-        // min / max checks
-        $this->assertFalse(Numbers::isValid(0, 1));
-        $this->assertTrue(Numbers::isValid(5, 1, 10));
-        $this->assertFalse(Numbers::isValid(0, 1, 10));
-        $this->assertFalse(Numbers::isValid(11, 1, 10));
-        $this->assertTrue(Numbers::isValid("10", 1, 10));
+    /** @dataProvider providerIsValid */
+    public function testIsValid(mixed $value, $min = null, $max = null, $expected) {
+        $this->assertSame($expected, Numbers::isValid($value, $min, $max));
     }
 
-    public function testToInt() {
-        // integers
-        $this->assertEquals(123, Numbers::toInt(123));
+    public static function providerIsValid(): array {
+        return [
+            "valid_nan"         => [ NAN, null, null, true ],
+            "valid_zero_min"    => [ 0, 0, null, true ],
+            "valid_int"         => [ 5, null, null, true ],
+            "valid_float"       => [ 5.5, null, null, true ],
+            "valid_str_int"     => [ "5", null, null, true ],
+            "valid_str_float"   => [ "5.5", null, null, true ],
 
-        // floats -> int with different decimals
-        $this->assertEquals(12, Numbers::toInt(12.345));
-        $this->assertEquals(123, Numbers::toInt(12.345, 1));
-        $this->assertEquals(1235, Numbers::toInt(12.345, 2));
-        $this->assertEquals(12345, Numbers::toInt(12.345, 3));
+            "invalid_alpha"     => [ "a", null, null, false ],
+            "invalid_null"      => [ null, null, null, false ],
+            "invalid_array"     => [ [], null, null, false ],
+            "invalid_object"    => [ new stdClass(), null, null, false ],
+            "invalid_true"      => [ true, null, null, false ],
+            "invalid_false"     => [ false, null, null, false ],
+            "invalid_empty"     => [ "", null, null, false ],
+            "invalid_space"     => [ " ", null, null, false ],
 
-        // numeric strings
-        $this->assertEquals(123, Numbers::toInt("123"));
-        $this->assertEquals(12345, Numbers::toInt("123.45", 2));
-
-        // Date instance
-        $d = Date::create(1600000000);
-        $this->assertEquals(1600000000, Numbers::toInt($d));
-
-        // invalid or non-numeric
-        $this->assertEquals(0, Numbers::toInt(null));
-        $this->assertEquals(0, Numbers::toInt([]));
-        $this->assertEquals(0, Numbers::toInt(new stdClass()));
-
-        // strings containing numbers but not purely numeric
-        $this->assertEquals(123, Numbers::toInt(" 123 "));
-        $this->assertEquals(0, Numbers::toInt("123abc"));
+            "min_check_fail"    => [ 0, 1, null, false ],
+            "min_max_ok"        => [ 5, 1, 10, true ],
+            "min_max_fail_low"  => [ 0, 1, 10, false ],
+            "min_max_fail_high" => [ 11, 1, 10, false ],
+            "min_max_str"       => [ "10", 1, 10, true ],
+        ];
     }
 
-    public function testToFloat() {
-        // from integer with decimals
-        $this->assertEquals(123.45, Numbers::toFloat(12345, 2));
-        $this->assertEquals(12345, Numbers::toFloat(12345, 0));
 
-        // from integers and floats
-        $this->assertEquals(123.0, Numbers::toFloat(123));
-        $this->assertEquals(12.345, Numbers::toFloat(12.345));
-
-        // numeric strings
-        $this->assertEquals(123.0, Numbers::toFloat("123"));
-        $this->assertEquals(123.45, Numbers::toFloat("123.45"));
-        $this->assertEquals(12345.0, Numbers::toFloat("12345", 2));
-        $this->assertEquals(123.45, Numbers::toFloat(" 123.45 "));
-
-        // invalid or non-numeric
-        $this->assertEquals(0, Numbers::toFloat(null));
-        $this->assertEquals(0, Numbers::toFloat([]));
-        $this->assertEquals(0, Numbers::toFloat(new stdClass()));
+    /** @dataProvider providerToInt */
+    public function testToInt(mixed $value, int $decimals = 0, int $expected) {
+        $this->assertEquals($expected, Numbers::toInt($value, $decimals));
     }
 
-    public function testToIntOrFloat() {
-        // integer input returns int
-        $val = Numbers::toIntOrFloat(123);
-        $this->assertIsInt($val);
-        $this->assertSame(123, $val);
-
-        // float input returns float
-        $val = Numbers::toIntOrFloat(12.345);
-        $this->assertIsFloat($val);
-        $this->assertEquals(12.345, $val);
-
-        // numeric strings return floats
-        $val = Numbers::toIntOrFloat("123");
-        $this->assertIsFloat($val);
-        $this->assertEquals(123.0, $val);
-
-        $val = Numbers::toIntOrFloat("123.45");
-        $this->assertIsFloat($val);
-        $this->assertEquals(123.45, $val);
-
-        // invalid values return 0 (int)
-        $this->assertIsInt(Numbers::toIntOrFloat(null));
-        $this->assertSame(0, Numbers::toIntOrFloat(null));
-        $this->assertSame(0, Numbers::toIntOrFloat([]));
-        $this->assertSame(0, Numbers::toIntOrFloat(new stdClass()));
+    public static function providerToInt(): array {
+        return [
+            "integer"              => [ 123, 0, 123 ],
+            "float_no_decimals"    => [ 12.345, 0, 12 ],
+            "float_1_decimal"      => [ 12.345, 1, 123 ],
+            "float_2_decimals"     => [ 12.345, 2, 1235 ],
+            "float_3_decimals"     => [ 12.345, 3, 12345 ],
+            "numeric_string"       => [ "123", 0, 123 ],
+            "numeric_string_2_dec" => [ "123.45", 2, 12345 ],
+            "date_instance"        => [ Date::create(1600000000), 0, 1600000000 ],
+            "null"                 => [ null, 0, 0 ],
+            "array"                => [ [], 0, 0 ],
+            "object"               => [ new stdClass(), 0, 0 ],
+            "trimmed_string"       => [ " 123 ", 0, 123 ],
+            "non_numeric_string"   => [ "123abc", 0, 0 ],
+        ];
     }
 
-    public function testHasDecimals() {
-        $this->assertTrue(Numbers::hasDecimals(1.5));
-        $this->assertFalse(Numbers::hasDecimals(2.0));
 
-        // integer inputs should not have decimals
-        $this->assertFalse(Numbers::hasDecimals(1));
-        $this->assertFalse(Numbers::hasDecimals(0));
+    /** @dataProvider providerToFloat */
+    public function testToFloat(mixed $value, $decimals = 0, $expected) {
+        $this->assertEquals($expected, Numbers::toFloat($value, $decimals));
     }
 
-    public function testLength() {
-        $this->assertEquals(1, Numbers::length(0));
-        $this->assertEquals(3, Numbers::length(123));
-        $this->assertEquals(3, Numbers::length(-12));
-        $this->assertEquals(4, Numbers::length(1000));
+    public static function providerToFloat(): array {
+        return [
+            "int_w_decimals"  => [ 12345, 2, 123.45 ],
+            "int_no_decimals" => [ 12345, 0, 12345 ],
+            "from_int"        => [ 123, 0, 123.0 ],
+            "from_float"      => [ 12.345, 0, 12.345 ],
+            "num_str"         => [ "123", 0, 123.0 ],
+            "num_str_float"   => [ "123.45", 0, 123.45 ],
+            "str_w_decimals"  => [ "12345", 2, 12345.0 ],
+            "trimmed_str"     => [ " 123.45 ", 0, 123.45 ],
+            "null_input"      => [ null, 0, 0 ],
+            "array_input"     => [ [], 0, 0 ],
+            "obj_input"       => [ new stdClass(), 0, 0 ],
+        ];
     }
 
-    public function testCompare() {
-        // integers ascending
-        $this->assertEquals(2, Numbers::compare(5, 3));
-        $this->assertEquals(-2, Numbers::compare(3, 5));
 
-        // floats ascending
-        $this->assertEquals(2.3, Numbers::compare(5.5, 3.2));
-        $this->assertEquals(-2.3, Numbers::compare(3.2, 5.5));
-
-        // mixed integer/float
-        $this->assertEquals(1.5, Numbers::compare(5, 3.5));
-        $this->assertEquals(-1.5, Numbers::compare(3.5, 5));
-
-        // descending (orderAsc = false) flips sign
-        $this->assertEquals(-2, Numbers::compare(5, 3, false));
-        $this->assertEquals(2, Numbers::compare(3, 5, false));
-        $this->assertEquals(-2.3, Numbers::compare(5.5, 3.2, false));
-        $this->assertEquals(2.3, Numbers::compare(3.2, 5.5, false));
+    /** @dataProvider providerToIntOrFloat */
+    public function testToIntOrFloat(mixed $value, int|float $expected, string $expectedType) {
+        $result = Numbers::toIntOrFloat($value);
+        $this->assertEquals($expected, $result);
+        $this->assertSame($expectedType, gettype($result));
     }
 
-    public function testRound() {
-        // integer input returns same integer
-        $this->assertSame(5, Numbers::round(5, 2));
-
-        // rounding down
-        $this->assertEquals(1.23, Numbers::round(1.234, 2));
-
-        // rounding up
-        $this->assertEquals(1.24, Numbers::round(1.235, 2));
-
-        // different amount of decimals
-        $this->assertEquals(1.235, Numbers::round(1.2345, 3));
-
-        // zero decimals -> nearest integer (down/up)
-        $this->assertEquals(1, Numbers::round(1.4, 0));
-        $this->assertEquals(2, Numbers::round(1.6, 0));
+    public static function providerToIntOrFloat(): array {
+        return [
+            "integer_input"        => [ 123, 123, "integer" ],
+            "float_input"          => [ 12.345, 12.345, "double" ],
+            "numeric_string_int"   => [ "123", 123.0, "double" ],
+            "numeric_string_float" => [ "123.45", 123.45, "double" ],
+            "null_input"           => [ null, 0, "integer" ],
+            "array_input"          => [ [], 0, "integer" ],
+            "object_input"         => [ new stdClass(), 0, "integer" ],
+        ];
     }
 
-    public function testRoundInt() {
-        // integer input returns the same integer
-        $this->assertIsInt(Numbers::roundInt(5));
-        $this->assertSame(5, Numbers::roundInt(5));
 
-        // normal rounding behavior
-        $this->assertSame(1, Numbers::roundInt(1.4));
-        $this->assertSame(2, Numbers::roundInt(1.6));
-
-        // negative numbers rounding
-        $this->assertSame(-1, Numbers::roundInt(-1.4));
-        $this->assertSame(-2, Numbers::roundInt(-1.6));
-
-        // floor behavior when $useFloor = true
-        $this->assertSame(1, Numbers::roundInt(1.9, true));
-        $this->assertSame(-2, Numbers::roundInt(-1.1, true));
+    /** @dataProvider providerHasDecimals */
+    public function testHasDecimals(mixed $value, bool $expected) {
+        $this->assertSame($expected, Numbers::hasDecimals($value));
     }
+
+    public static function providerHasDecimals(): array {
+        return [
+            "float_with_decimals" => [ 1.5, true ],
+            "float_no_decimals"   => [ 2.0, false ],
+            "integer"             => [ 1, false ],
+            "zero"                => [ 0, false ],
+        ];
+    }
+
+
+    /** @dataProvider providerLength */
+    public function testLength(int $value, int $expected) {
+        $this->assertEquals($expected, Numbers::length($value));
+    }
+
+    public static function providerLength(): array {
+        return [
+            "zero"         => [ 0, 1 ],
+            "positive_int" => [ 123, 3 ],
+            "negative_int" => [ -12, 3 ],
+            "four_digits"  => [ 1000, 4 ],
+        ];
+    }
+
+
+    /** @dataProvider providerCompare */
+    public function testCompare(mixed $a, mixed $b, bool $orderAsc = true, int|float $expected) {
+        $this->assertEquals($expected, Numbers::compare($a, $b, $orderAsc));
+    }
+
+    public static function providerCompare(): array {
+        return [
+            "integers_ascending"  => [ 5, 3, true, 2 ],
+            "integers_descending" => [ 3, 5, true, -2 ],
+            "floats_ascending"    => [ 5.5, 3.2, true, 2.3 ],
+            "floats_descending"   => [ 3.2, 5.5, true, -2.3 ],
+            "mixed_ascending"     => [ 5, 3.5, true, 1.5 ],
+            "mixed_descending"    => [ 3.5, 5, true, -1.5 ],
+            "desc_order_5_3"      => [ 5, 3, false, -2 ],
+            "desc_order_3_5"      => [ 3, 5, false, 2 ],
+            "desc_order_5.5_3.2"  => [ 5.5, 3.2, false, -2.3 ],
+            "desc_order_3.2_5.5"  => [ 3.2, 5.5, false, 2.3 ],
+        ];
+    }
+
+
+    /** @dataProvider providerRound */
+    public function testRound(mixed $value, int $decimals, float|int $expected) {
+        $this->assertEquals($expected, Numbers::round($value, $decimals));
+    }
+
+    public static function providerRound(): array {
+        return [
+            "integer_input"      => [ 5, 2, 5 ],
+            "rounding_down"      => [ 1.234, 2, 1.23 ],
+            "rounding_up"        => [ 1.235, 2, 1.24 ],
+            "three_decimals"     => [ 1.2345, 3, 1.235 ],
+            "zero_decimals_down" => [ 1.4, 0, 1 ],
+            "zero_decimals_up"   => [ 1.6, 0, 2 ],
+        ];
+    }
+
+
+    /** @dataProvider providerRoundInt */
+    public function testRoundInt(mixed $value, bool $useFloor = false, int $expected) {
+        $this->assertSame($expected, Numbers::roundInt($value, $useFloor));
+    }
+
+    public static function providerRoundInt(): array {
+        return [
+            "integer_input"          => [ 5, false, 5 ],
+            "rounding_down"          => [ 1.4, false, 1 ],
+            "rounding_up"            => [ 1.6, false, 2 ],
+            "negative_rounding_down" => [ -1.4, false, -1 ],
+            "negative_rounding_up"   => [ -1.6, false, -2 ],
+            "floor_positive"         => [ 1.9, true, 1 ],
+            "floor_negative"         => [ -1.1, true, -2 ],
+        ];
+    }
+
 
     public function testRandom() {
         // default length (8)
@@ -200,587 +209,492 @@ class NumbersTest extends TestCase {
         }
     }
 
-    public function testFormatInt() {
-        // simple decimals from integer
-        $this->assertEquals("123,45", Numbers::formatInt(12345, 2));
 
-        // zero value returns default when provided
-        $this->assertEquals("-", Numbers::formatInt(0, 2, 1000, "-"));
-
-        // thousands separator and decimals
-        $this->assertEquals("12.346", Numbers::formatInt(1234567, 2));
-
-        // no decimals
-        $this->assertEquals("123", Numbers::formatInt(123, 0));
-
-        // more decimals
-        $this->assertEquals("12,345", Numbers::formatInt(12345, 3));
-
-        // floats as input
-        $this->assertEquals("123,45", Numbers::formatInt(123.45, 2));
-        $this->assertEquals("1.235", Numbers::formatInt(1234.5, 2));
-        $this->assertEquals("124", Numbers::formatInt(123.99, 0));
-        $this->assertEquals("12.346", Numbers::formatInt(12345.6, 0));
-
-        // maxForDecimals behavior: large numbers drop decimals when >= maxForDecimals
-        $this->assertEquals("12.345", Numbers::formatInt(1234500, 2));
-
-        // forcing maxForDecimals=0 keeps decimals even for large numbers
-        $this->assertEquals("12.345,00", Numbers::formatInt(1234500, 2, 0));
-
-        // explicit maxForDecimals variations
-        $this->assertEquals("12.345", Numbers::formatInt(1234500, 2, 1000));
-        $this->assertEquals("12.345,00", Numbers::formatInt(1234500, 2, 100000));
-
-        // when float equals maxForDecimals decimals are dropped
-        $this->assertEquals("12.345", Numbers::formatInt(1234500, 2, 12345));
-        $this->assertEquals("12.345,00", Numbers::formatInt(1234500, 2, 12346));
-
-        // smaller large number (123450 -> 1234.5) variations
-        $this->assertEquals("1.235", Numbers::formatInt(123450, 2, 1000));
-        $this->assertEquals("1.234,50", Numbers::formatInt(123450, 2, 10000));
-        $this->assertEquals("1.235", Numbers::formatInt(123450, 2, 1234));
-        $this->assertEquals("1.234,50", Numbers::formatInt(123450, 2, 1235));
+    /** @dataProvider providerFormatInt */
+    public function testFormatInt(mixed $value, int $decimals, int $maxForDecimals, string $default, string $expected) {
+        $this->assertEquals($expected, Numbers::formatInt($value, $decimals, $maxForDecimals, $default));
     }
 
-    public function testFormatFloat() {
-        // normal float preserves decimals when below maxForDecimals
-        $this->assertEquals("12,35", Numbers::formatFloat(12.345, 2));
-
-        // float exceeds maxForDecimals -> decimals become 0
-        $this->assertEquals("1.235", Numbers::formatFloat(1234.56, 2, 1000));
-
-        // maxForDecimals = 0 forces decimals to be allowed
-        $this->assertEquals("1.234,56", Numbers::formatFloat(1234.56, 2, 0));
-
-        // integer input => no decimals
-        $this->assertEquals("123", Numbers::formatFloat(123, 2));
-
-        // different decimals
-        $this->assertEquals("12,346", Numbers::formatFloat(12.3456, 3));
-
-        // maxForDecimals variations: below max keeps decimals
-        $this->assertEquals("999,99", Numbers::formatFloat(999.99, 2, 1000));
-        // equal to max -> decimals dropped
-        $this->assertEquals("1.000", Numbers::formatFloat(1000.0, 2, 1000));
-        // well above max -> decimals dropped
-        $this->assertEquals("1.235", Numbers::formatFloat(1234.56, 2, 1000));
-        // very large max keeps decimals
-        $this->assertEquals("1.234,56", Numbers::formatFloat(1234.56, 2, 10000));
-
-        // default when number is zero
-        $this->assertEquals("-", Numbers::formatFloat(0, 2, 1000, "-"));
-
-        // custom separators (decimal separator '.' and thousands ',')
-        $this->assertEquals("1,234.56", Numbers::formatFloat(1234.56, 2, 0, "", ".", ","));
-
-        // large integer with thousands separator
-        $this->assertEquals("1.234.567", Numbers::formatFloat(1234567, 0));
+    public static function providerFormatInt(): array {
+        return [
+            "simple_decimals"        => [ 12345, 2, 1000, "", "123,45" ],
+            "zero_returns_default"   => [ 0, 2, 1000, "-", "-" ],
+            "thousands_sep_decimals" => [ 1234567, 2, 1000, "", "12.346" ],
+            "no_decimals"            => [ 123, 0, 1000, "", "123" ],
+            "more_decimals"          => [ 12345, 3, 1000, "", "12,345" ],
+            "float_basic"            => [ 123.45, 2, 1000, "", "123,45" ],
+            "float_large"            => [ 1234.5, 2, 1000, "", "1.235" ],
+            "float_rounding"         => [ 123.99, 0, 1000, "", "124" ],
+            "float_large_no_dec"     => [ 12345.6, 0, 1000, "", "12.346" ],
+            "large_drops_decimals"   => [ 1234500, 2, 1000, "", "12.345" ],
+            "max_zero_keeps_dec"     => [ 1234500, 2, 0, "", "12.345,00" ],
+            "max_1000"               => [ 1234500, 2, 1000, "", "12.345" ],
+            "max_100k"               => [ 1234500, 2, 100000, "", "12.345,00" ],
+            "max_equals_val"         => [ 1234500, 2, 12345, "", "12.345" ],
+            "max_greater_val"        => [ 1234500, 2, 12346, "", "12.345,00" ],
+            "small_max_1k"           => [ 123450, 2, 1000, "", "1.235" ],
+            "small_max_10k"          => [ 123450, 2, 10000, "", "1.234,50" ],
+            "small_max_1234"         => [ 123450, 2, 1234, "", "1.235" ],
+            "small_max_1235"         => [ 123450, 2, 1235, "", "1.234,50" ],
+        ];
     }
 
-    public function testClampInt() {
-        // below min -> returns min
-        $this->assertEquals(1, Numbers::clampInt(0, 1, 5));
 
-        // above max -> returns max
-        $this->assertEquals(5, Numbers::clampInt(10, 1, 5));
-
-        // within range -> returns the same value
-        $this->assertEquals(3, Numbers::clampInt(3, 1, 5));
-
-        // equal to bounds
-        $this->assertEquals(1, Numbers::clampInt(1, 1, 5));
-        $this->assertEquals(5, Numbers::clampInt(5, 1, 5));
-
-        // negative ranges
-        $this->assertEquals(-2, Numbers::clampInt(-3, -2, 2));
-        $this->assertEquals(2, Numbers::clampInt(3, -2, 2));
+    /** @dataProvider providerFormatFloat */
+    public function testFormatFloat(mixed $value, int $decimals, int $maxForDecimals, string $default, string $decimalSeparator, string $thousandsSeparator, string $expected) {
+        $this->assertEquals($expected, Numbers::formatFloat($value, $decimals, $maxForDecimals, $default, $decimalSeparator, $thousandsSeparator));
     }
 
-    public function testClampFloat() {
-        // below min -> returns min
-        $this->assertEquals(1.0, Numbers::clampFloat(0.5, 1.0, 3.0));
-
-        // above max -> returns max
-        $this->assertEquals(3.0, Numbers::clampFloat(4.2, 1.0, 3.0));
-
-        // within range -> returns the same value
-        $this->assertEquals(2.5, Numbers::clampFloat(2.5, 1.0, 3.0));
-
-        // equal to bounds
-        $this->assertEquals(1.0, Numbers::clampFloat(1.0, 1.0, 3.0));
-        $this->assertEquals(3.0, Numbers::clampFloat(3.0, 1.0, 3.0));
-
-        // negative ranges
-        $this->assertEquals(-2.0, Numbers::clampFloat(-3.0, -2.0, 2.0));
-        $this->assertEquals(2.0, Numbers::clampFloat(3.5, -2.0, 2.0));
-
-        // decimals within range
-        $this->assertEquals(1.25, Numbers::clampFloat(1.25, 1.0, 2.0));
+    public static function providerFormatFloat(): array {
+        return [
+            "normal_preserves_dec" => [ 12.345, 2, 1000, "", ",", ".", "12,35" ],
+            "exceeds_max"          => [ 1234.56, 2, 1000, "", ",", ".", "1.235" ],
+            "max_zero_keeps_dec"   => [ 1234.56, 2, 0, "", ",", ".", "1.234,56" ],
+            "int_no_dec"           => [ 123, 2, 1000, "", ",", ".", "123" ],
+            "diff_decimals"        => [ 12.3456, 3, 1000, "", ",", ".", "12,346" ],
+            "below_max_keeps_dec"  => [ 999.99, 2, 1000, "", ",", ".", "999,99" ],
+            "at_max_drops_dec"     => [ 1000.0, 2, 1000, "", ",", ".", "1.000" ],
+            "above_max_drops_dec"  => [ 1234.56, 2, 1000, "", ",", ".", "1.235" ],
+            "large_max_keeps_dec"  => [ 1234.56, 2, 10000, "", ",", ".", "1.234,56" ],
+            "zero_default"         => [ 0, 2, 1000, "-", ",", ".", "-" ],
+            "custom_seps"          => [ 1234.56, 2, 0, "", ".", ",", "1,234.56" ],
+            "large_int_thousands"  => [ 1234567, 0, 1000, "", ",", ".", "1.234.567" ],
+        ];
     }
 
-    public function testMap() {
-        // simple mapping
-        $this->assertEquals(50, Numbers::map(5, 0, 10, 0, 100));
 
-        // different output range
-        $this->assertEquals(150, Numbers::map(5, 0, 10, 100, 200));
-
-        // fractional inputs and outputs
-        $this->assertEquals(5, Numbers::map(2.5, 0, 5, 0, 10));
-
-        // negative ranges
-        $this->assertEquals(50, Numbers::map(-5, -10, 0, 0, 100));
-
-        // reversed output range
-        $this->assertEquals(0.5, Numbers::map(15, 10, 20, 1, 0));
-
-        // value at bounds
-        $this->assertEquals(0, Numbers::map(10, 10, 20, 0, 1));
-        $this->assertEquals(1, Numbers::map(20, 10, 20, 0, 1));
-
-        // from range zero -> returns toLow (implementation guard)
-        $this->assertEquals(10, Numbers::map(0, 0, 0, 10, 20));
+    /** @dataProvider providerClampInt */
+    public function testClampInt(mixed $value, int $min, int $max, int $expected) {
+        $this->assertEquals($expected, Numbers::clampInt($value, $min, $max));
     }
 
-    public function testPercent() {
-        // basic percent
-        $this->assertEquals(40, Numbers::percent(2, 5));
-
-        // zero total -> returns 0
-        $this->assertEquals(0, Numbers::percent(5, 0));
-
-        // simple fractions
-        $this->assertEquals(25, Numbers::percent(1, 4));
-
-        // decimals and rounding
-        $this->assertEquals(33.33, Numbers::percent(1, 3, 2));
-        $this->assertEquals(66.67, Numbers::percent(2, 3, 2));
-        $this->assertEquals(33.333, Numbers::percent(1, 3, 3));
-
-        // negative numbers
-        $this->assertEquals(-25, Numbers::percent(-1, 4));
-        $this->assertEquals(-33.33, Numbers::percent(-1, 3, 2));
-
-        // zero numerator -> zero percent
-        $this->assertEquals(0, Numbers::percent(0, 100));
-        $this->assertEquals(0, Numbers::percent(0.0, 100.0));
-        $this->assertEquals(0, Numbers::percent(0, 0));
-
-        // mixed integer/float inputs should behave the same
-        $this->assertEquals(40, Numbers::percent(2.0, 5));
-        $this->assertEquals(40, Numbers::percent(2, 5.0));
-        $this->assertEquals(40, Numbers::percent(2.0, 5.0));
+    public static function providerClampInt(): array {
+        return [
+            "below_min"      => [ 0, 1, 5, 1 ],
+            "above_max"      => [ 10, 1, 5, 5 ],
+            "within_range"   => [ 3, 1, 5, 3 ],
+            "equal_to_min"   => [ 1, 1, 5, 1 ],
+            "equal_to_max"   => [ 5, 1, 5, 5 ],
+            "negative_below" => [ -3, -2, 2, -2 ],
+            "negative_above" => [ 3, -2, 2, 2 ],
+        ];
     }
 
-    public function testDivide() {
-        // integer division with decimals
-        $this->assertEquals(2.5, Numbers::divide(5, 2, 2));
-        $this->assertEquals(2, Numbers::divide(4, 2));
 
-        // floats input
-        $this->assertEquals(2.5, Numbers::divide(5.0, 2.0, 1));
-        $this->assertEquals(2.33, Numbers::divide(7.0, 3.0, 2));
-
-        // rounding behavior
-        $this->assertEquals(2.33, Numbers::divide(7, 3, 2));
-        $this->assertEquals(2.333, Numbers::divide(7, 3, 3));
-
-        // zero numerator
-        $this->assertEquals(0, Numbers::divide(0, 5));
-
-        // zero divisor -> returns 0 (guard)
-        $this->assertEquals(0, Numbers::divide(5, 0));
-
-        // negative numbers
-        $this->assertEquals(-2.5, Numbers::divide(-5, 2, 1));
-        $this->assertEquals(-2.33, Numbers::divide(-7, 3, 2));
+    /** @dataProvider providerClampFloat */
+    public function testClampFloat(mixed $value, float $min, float $max, float $expected) {
+        $this->assertEquals($expected, Numbers::clampFloat($value, $min, $max));
     }
 
-    public function testDivideInt() {
-        // rounding behavior: 5 / 2 = 2.5 -> rounded to 3
-        $this->assertEquals(3, Numbers::divideInt(5, 2));
-        // floor behavior: 5 / 2 = 2.5 -> floored to 2
-        $this->assertEquals(2, Numbers::divideInt(5, 2, true));
-
-        // exact divisions remain exact
-        $this->assertEquals(5, Numbers::divideInt(10, 2));
-        $this->assertEquals(5, Numbers::divideInt(10, 2, true));
-
-        // non-integer results with different rounding
-        $this->assertEquals(3, Numbers::divideInt(10, 3)); // 3.333 -> 3
-        $this->assertEquals(3, Numbers::divideInt(10, 3, true));
-        $this->assertEquals(2, Numbers::divideInt(9, 4)); // 2.25 -> 2
-        $this->assertEquals(2, Numbers::divideInt(9, 4, true));
-        $this->assertEquals(3, Numbers::divideInt(11, 4)); // 2.75 -> 3
-        $this->assertEquals(1, Numbers::divideInt(7, 4, true));
-        $this->assertEquals(2, Numbers::divideInt(7, 4));
-
-        // zero numerator
-        $this->assertEquals(0, Numbers::divideInt(0, 5));
-
-        // zero divisor -> guarded to 0
-        $this->assertEquals(0, Numbers::divideInt(5, 0));
-        $this->assertEquals(0, Numbers::divideInt(0, 0));
-
-        // negative numbers and divisors
-        $this->assertEquals(-3, Numbers::divideInt(-5, 2));
-        $this->assertEquals(-3, Numbers::divideInt(-5, 2, true));
-        $this->assertEquals(-3, Numbers::divideInt(5, -2));
-        $this->assertEquals(-3, Numbers::divideInt(5, -2, true));
+    public static function providerClampFloat(): array {
+        return [
+            "below_min"         => [ 0.5, 1.0, 3.0, 1.0 ],
+            "above_max"         => [ 4.2, 1.0, 3.0, 3.0 ],
+            "within_range"      => [ 2.5, 1.0, 3.0, 2.5 ],
+            "equal_to_min"      => [ 1.0, 1.0, 3.0, 1.0 ],
+            "equal_to_max"      => [ 3.0, 1.0, 3.0, 3.0 ],
+            "negative_below"    => [ -3.0, -2.0, 2.0, -2.0 ],
+            "negative_above"    => [ 3.5, -2.0, 2.0, 2.0 ],
+            "decimals_in_range" => [ 1.25, 1.0, 2.0, 1.25 ],
+        ];
     }
 
-    public function testApplyDiscount() {
-        // simple percent discount
-        $this->assertEquals(90, Numbers::applyDiscount(100, 10));
 
-        // zero percent -> same value
-        $this->assertEquals(100, Numbers::applyDiscount(100, 0));
-        $this->assertEquals(100, Numbers::applyDiscount(100, 0.0));
-
-        // full discount or higher than 100 -> zero
-        $this->assertEquals(0, Numbers::applyDiscount(100, 100));
-        $this->assertEquals(0, Numbers::applyDiscount(100, 150));
-
-        // decimal percent (101 * (1 - 0.055) = 95.445)
-        $this->assertEquals(95.445, Numbers::applyDiscount(101, 5.5));
-
-        // negative discount is clamped to zero -> no change
-        $this->assertEquals(100, Numbers::applyDiscount(100, -10));
-
-        // zero price remains zero regardless of discount
-        $this->assertEquals(0, Numbers::applyDiscount(0, 50));
-        $this->assertEquals(0.0, Numbers::applyDiscount(0.0, 50));
+    /** @dataProvider providerMap */
+    public function testMap(mixed $value, int|float $fromLow, int|float $fromHigh, int|float $toLow, int|float $toHigh, int|float $expected) {
+        $this->assertEquals($expected, Numbers::map($value, $fromLow, $fromHigh, $toLow, $toHigh));
     }
 
-    public function testApplyIncrement() {
-        // zero percent -> same value
-        $this->assertEquals(100, Numbers::applyIncrement(100, 0));
-
-        // negative percent treated as 0 -> same value
-        $this->assertEquals(100, Numbers::applyIncrement(100, -10));
-
-        // existing rounding check (9% -> ~109.89 -> rounded 110)
-        $this->assertEquals(110, round(Numbers::applyIncrement(100, 9)));
-
-        // 10% -> 100 + 100*(10/90) = 111.111...
-        $this->assertEqualsWithDelta(111.1111111111, Numbers::applyIncrement(100, 10), 0.0001);
-
-        // decimal percent on larger number
-        $this->assertEqualsWithDelta(205.1282051282, Numbers::applyIncrement(200, 2.5), 0.0001);
-
-        // zero price remains zero
-        $this->assertEquals(0, Numbers::applyIncrement(0, 50));
-
-        // mixed integer/float inputs
-        $this->assertEqualsWithDelta(20, Numbers::applyIncrement(10, 50), 0.0001);
+    public static function providerMap(): array {
+        return [
+            "simple_mapping"         => [ 5, 0, 10, 0, 100, 50 ],
+            "different_output_range" => [ 5, 0, 10, 100, 200, 150 ],
+            "fractional_inputs"      => [ 2.5, 0, 5, 0, 10, 5 ],
+            "negative_ranges"        => [ -5, -10, 0, 0, 100, 50 ],
+            "reversed_output_range"  => [ 15, 10, 20, 1, 0, 0.5 ],
+            "value_at_low_bound"     => [ 10, 10, 20, 0, 1, 0 ],
+            "value_at_high_bound"    => [ 20, 10, 20, 0, 1, 1 ],
+            "from_range_zero"        => [ 0, 0, 0, 10, 20, 10 ],
+        ];
     }
 
-    public function testGetCommonDivisor() {
-        // integers
-        $this->assertEquals(6, Numbers::getCommonDivisor(48, 18));
-        $this->assertEquals(1, Numbers::getCommonDivisor(17, 13));
-        $this->assertEquals(12, Numbers::getCommonDivisor(60, 48));
 
-        // zero cases
-        $this->assertEquals(5, Numbers::getCommonDivisor(0, 5));
-        $this->assertEquals(5, Numbers::getCommonDivisor(5, 0));
-        $this->assertEquals(0, Numbers::getCommonDivisor(0, 0));
+    /** @dataProvider providerPercent */
+    public function testPercent(mixed $numerator, mixed $total, int $decimals = 0, int|float $expected) {
+        $this->assertEquals($expected, Numbers::percent($numerator, $total, $decimals));
     }
 
-    public function testIsValidFloat() {
-        $this->assertTrue(Numbers::isValidFloat(1.23, 1, null, 2));
-        $this->assertFalse(Numbers::isValidFloat(1.234, 1, null, 2));
-
-        // integers with decimals=0
-        $this->assertTrue(Numbers::isValidFloat(5, 1, 10, 0));
-        $this->assertFalse(Numbers::isValidFloat(0, 1, 10, 0));
-
-        // floats within min/max and allowed decimals
-        $this->assertTrue(Numbers::isValidFloat(1.2, 1, 2, 1));
-        $this->assertFalse(Numbers::isValidFloat(0.5, 1, null, 1));
-
-        // decimals limit enforcement
-        $this->assertFalse(Numbers::isValidFloat(1.2345, 1, null, 3));
-
-        // min/max bounds with floats and ints
-        $this->assertTrue(Numbers::isValidFloat(100.00, 1, 200, 2));
-        $this->assertFalse(Numbers::isValidFloat(201.0, 1, 200, 1));
-
-        // when min == max boundaries
-        $this->assertTrue(Numbers::isValidFloat(5, 5, 5, 0));
-        $this->assertFalse(Numbers::isValidFloat(5.1, 5, 5, 1));
+    public static function providerPercent(): array {
+        return [
+            "basic_percent"           => [ 2, 5, 0, 40 ],
+            "zero_total"              => [ 5, 0, 0, 0 ],
+            "simple_fraction_quarter" => [ 1, 4, 0, 25 ],
+            "decimals_2_one_third"    => [ 1, 3, 2, 33.33 ],
+            "decimals_2_two_thirds"   => [ 2, 3, 2, 66.67 ],
+            "decimals_3_one_third"    => [ 1, 3, 3, 33.333 ],
+            "negative_numerator"      => [ -1, 4, 0, -25 ],
+            "negative_with_decimals"  => [ -1, 3, 2, -33.33 ],
+            "zero_numerator"          => [ 0, 100, 0, 0 ],
+            "zero_numerator_float"    => [ 0.0, 100.0, 0, 0 ],
+            "zero_both"               => [ 0, 0, 0, 0 ],
+            "mixed_float_int_1"       => [ 2.0, 5, 0, 40 ],
+            "mixed_int_float_1"       => [ 2, 5.0, 0, 40 ],
+            "mixed_both_float"        => [ 2.0, 5.0, 0, 40 ],
+        ];
     }
 
-    public function testIsValidPrice() {
-        // must allow two decimals and respect default min=1
-        $this->assertTrue(Numbers::isValidPrice(1.23));
-        $this->assertFalse(Numbers::isValidPrice(0.99));
 
-        // rejects more than two decimals
-        $this->assertFalse(Numbers::isValidPrice(1.234));
-
-        // min/max bounds
-        $this->assertTrue(Numbers::isValidPrice(100.00, 1, 200));
-        $this->assertFalse(Numbers::isValidPrice(201.00, 1, 200));
-
-        // integer price allowed
-        $this->assertTrue(Numbers::isValidPrice(5, 1, 5));
-        $this->assertFalse(Numbers::isValidPrice(5.01, 1, 5));
-
-        // allow zero when min is set to 0
-        $this->assertTrue(Numbers::isValidPrice(0, 0, 100));
-        $this->assertFalse(Numbers::isValidPrice(0.01, 1, 100));
+    /** @dataProvider providerDivide */
+    public function testDivide(mixed $numerator, mixed $divisor, int $decimals = 0, int|float $expected) {
+        $this->assertEquals($expected, Numbers::divide($numerator, $divisor, $decimals));
     }
 
-    public function testRoundCents() {
-        // basic rounding down
-        $this->assertEquals(1.23, Numbers::roundCents(1.234));
-
-        // rounding up at 5
-        $this->assertEquals(1.24, Numbers::roundCents(1.235));
-
-        // small values round to zero
-        $this->assertEquals(0, Numbers::roundCents(0.004));
-
-        // negative values
-        $this->assertEquals(-1.23, Numbers::roundCents(-1.234));
-        $this->assertEquals(-1.24, Numbers::roundCents(-1.235));
-
-        // integer input remains same (as float)
-        $this->assertEquals(123.0, Numbers::roundCents(123));
-
-        // values that cross integer boundary
-        $this->assertEquals(2.0, Numbers::roundCents(1.999));
-
-        // preserve one-decimal inputs
-        $this->assertEquals(1.2, Numbers::roundCents(1.2));
+    public static function providerDivide(): array {
+        return [
+            "int_div_decimals" => [ 5, 2, 2, 2.5 ],
+            "exact_div"        => [ 4, 2, 0, 2 ],
+            "float_1_dec"      => [ 5.0, 2.0, 1, 2.5 ],
+            "float_2_dec"      => [ 7.0, 3.0, 2, 2.33 ],
+            "round_2_dec"      => [ 7, 3, 2, 2.33 ],
+            "round_3_dec"      => [ 7, 3, 3, 2.333 ],
+            "zero_num"         => [ 0, 5, 0, 0 ],
+            "zero_div"         => [ 5, 0, 0, 0 ],
+            "neg_num_1_dec"    => [ -5, 2, 1, -2.5 ],
+            "neg_num_2_dec"    => [ -7, 3, 2, -2.33 ],
+        ];
     }
 
-    public function testToCents() {
-        // basic float
-        $this->assertEquals(1234, Numbers::toCents(12.34));
 
-        // rounding of extra decimals
-        $this->assertEquals(1235, Numbers::toCents(12.345));
-
-        // integer input -> cents
-        $this->assertEquals(1200, Numbers::toCents(12));
-
-        // negative values
-        $this->assertEquals(-123, Numbers::toCents(-1.23));
-        $this->assertEquals(-124, Numbers::toCents(-1.235));
-
-        // numeric strings
-        $this->assertEquals(1234, Numbers::toCents("12.34"));
-        $this->assertEquals(1234, Numbers::toCents(" 12.34 "));
-        $this->assertEquals(1200, Numbers::toCents("12"));
-
-        // invalid or non-numeric values -> 0
-        $this->assertEquals(0, Numbers::toCents(null));
-        $this->assertEquals(0, Numbers::toCents([]));
-        $this->assertEquals(0, Numbers::toCents(new stdClass()));
-        $this->assertEquals(0, Numbers::toCents("abc"));
+    /** @dataProvider providerDivideInt */
+    public function testDivideInt(mixed $numerator, mixed $divisor, bool $useFloor = false, int $expected) {
+        $this->assertEquals($expected, Numbers::divideInt($numerator, $divisor, $useFloor));
     }
 
-    public function testFromCents() {
-        // integer cents -> dollars
-        $this->assertEquals(12.34, Numbers::fromCents(1234));
-
-        // integer float input
-        $this->assertEquals(1234.0, Numbers::fromCents(1234.0));
-
-        // numeric string with decimal
-        $this->assertEquals(12.34, Numbers::fromCents("12.34"));
-
-        // numeric string without decimal: implementation returns floatval("1234")
-        $this->assertEquals(1234.0, Numbers::fromCents("1234"));
-
-        // trimmed string
-        $this->assertEquals(12.34, Numbers::fromCents(" 12.34 "));
-
-        // negative values
-        $this->assertEquals(-12.34, Numbers::fromCents(-1234));
-        $this->assertEquals(-1234.0, Numbers::fromCents("-1234"));
-
-        // invalid or non-numeric values -> 0.0
-        $this->assertEquals(0.0, Numbers::fromCents(null));
-        $this->assertEquals(0.0, Numbers::fromCents([]));
-        $this->assertEquals(0.0, Numbers::fromCents(new stdClass()));
-        $this->assertEquals(0.0, Numbers::fromCents("abc"));
+    public static function providerDivideInt(): array {
+        return [
+            "round_5_2"        => [ 5, 2, false, 3 ],
+            "floor_5_2"        => [ 5, 2, true, 2 ],
+            "exact_10_2"       => [ 10, 2, false, 5 ],
+            "exact_10_2_floor" => [ 10, 2, true, 5 ],
+            "round_10_3"       => [ 10, 3, false, 3 ],
+            "floor_10_3"       => [ 10, 3, true, 3 ],
+            "round_9_4"        => [ 9, 4, false, 2 ],
+            "floor_9_4"        => [ 9, 4, true, 2 ],
+            "round_11_4"       => [ 11, 4, false, 3 ],
+            "floor_7_4"        => [ 7, 4, true, 1 ],
+            "round_7_4"        => [ 7, 4, false, 2 ],
+            "zero_num"         => [ 0, 5, false, 0 ],
+            "zero_div"         => [ 5, 0, false, 0 ],
+            "zero_both"        => [ 0, 0, false, 0 ],
+            "neg_num"          => [ -5, 2, false, -3 ],
+            "neg_num_floor"    => [ -5, 2, true, -3 ],
+            "neg_div"          => [ 5, -2, false, -3 ],
+            "neg_div_floor"    => [ 5, -2, true, -3 ],
+        ];
     }
 
-    public function testFormatPrice() {
-        // normal price with two decimals
-        $this->assertEquals("123,50", Numbers::formatPrice(123.5));
 
-        // zero price returns default '0'
-        $this->assertEquals("0", Numbers::formatPrice(0));
-        // custom default for zero
-        $this->assertEquals("-", Numbers::formatPrice(0, 2, 1000, "-"));
-
-        // large numbers drop decimals when >= maxForDecimals (default 1000)
-        $this->assertEquals("1.234.568", Numbers::formatPrice(1234567.891));
-
-        // negative values
-        $this->assertEquals("-12,35", Numbers::formatPrice(-12.345));
-
-        // different decimals
-        $this->assertEquals("12,346", Numbers::formatPrice(12.3456, 3));
-
-        // integer input -> no decimals
-        $this->assertEquals("123", Numbers::formatPrice(123));
-
-        // maxForDecimals boundaries
-        $this->assertEquals("999,99", Numbers::formatPrice(999.99, 2, 1000));
-        $this->assertEquals("1.000", Numbers::formatPrice(1000.0, 2, 1000));
+    /** @dataProvider providerApplyDiscount */
+    public function testApplyDiscount(mixed $value, int|float $percent, int|float $expected) {
+        $this->assertEquals($expected, Numbers::applyDiscount($value, $percent));
     }
 
-    public function testFormatCents() {
-        // basic cents -> price
-        $this->assertEquals("12,34", Numbers::formatCents(1234));
-
-        // small cents -> 1.00
-        $this->assertEquals("1,00", Numbers::formatCents(100));
-
-        // zero cents -> empty string (formatFloat default)
-        $this->assertEquals("", Numbers::formatCents(0));
-
-        // negative cents
-        $this->assertEquals("-12,34", Numbers::formatCents(-1234));
-
-        // thousands separator
-        $this->assertEquals("1.235", Numbers::formatCents(123456));
-
-        // different decimals
-        $this->assertEquals("12,3", Numbers::formatCents(1234, 1));
-        $this->assertEquals("1.235", Numbers::formatCents(123456, 3));
-
-        // numeric string input accepted by PHP casting (loose types)
-        $this->assertEquals("12,34", Numbers::formatCents("1234"));
+    public static function providerApplyDiscount(): array {
+        return [
+            "simple_discount"      => [ 100, 10, 90 ],
+            "zero_pct"             => [ 100, 0, 100 ],
+            "zero_pct_float"       => [ 100, 0.0, 100 ],
+            "full_discount"        => [ 100, 100, 0 ],
+            "discount_over_100"    => [ 100, 150, 0 ],
+            "decimal_pct"          => [ 101, 5.5, 95.445 ],
+            "neg_discount_clamped" => [ 100, -10, 100 ],
+            "zero_val_discount"    => [ 0, 50, 0 ],
+            "zero_val_float_disc"  => [ 0.0, 50, 0.0 ],
+        ];
     }
 
-    public function testToPriceString() {
-        // small values -> exact dollar amount
-        $this->assertEquals("$123", Numbers::toPriceString(123));
-        $this->assertEquals("$123", Numbers::toPriceString(123.4));
 
-        // threshold behaviour: 10000 -> kilos rounded to 10 -> not greater than 10
-        $this->assertEquals("$10000", Numbers::toPriceString(10000));
-
-        // kilos > 10 -> return in 'k'
-        $this->assertEquals("$11k", Numbers::toPriceString(10500));
-        $this->assertEquals("$12k", Numbers::toPriceString(12000));
-
-        // millions > 10 -> return in 'm'
-        $this->assertEquals("$12m", Numbers::toPriceString(12345678));
+    /** @dataProvider providerApplyIncrement */
+    public function testApplyIncrement(mixed $value, int|float $percent, int|float $expected, float $delta = 0.0001) {
+        if ($delta > 0) {
+            $this->assertEqualsWithDelta($expected, Numbers::applyIncrement($value, $percent), $delta);
+        } else {
+            $this->assertEquals($expected, Numbers::applyIncrement($value, $percent));
+        }
     }
 
-    public function testToBytesString() {
-        // bytes less than 1024 -> MB
-        $this->assertEquals("512 MB", Numbers::toBytesString(512));
-
-        // exactly 1024 -> 1 GB
-        $this->assertEquals("1 GB", Numbers::toBytesString(1024));
-
-        // multiple gigabytes
-        $this->assertEquals("2 GB", Numbers::toBytesString(2048));
-
-        // terabyte threshold (1024 * 1024 bytes -> 1 TB)
-        $this->assertEquals("1 TB", Numbers::toBytesString(1024 * 1024));
-
-        // inGigas = true treats input as gigas -> 1 -> 1 GB
-        $this->assertEquals("1 GB", Numbers::toBytesString(1, true));
-
-        // inGigas true large value -> should produce TB
-        $this->assertEquals("2 TB", Numbers::toBytesString(2048, true));
-
-        // inGigas true non-edge value -> returns GB
-        $this->assertEquals("500 GB", Numbers::toBytesString(500, true));
+    public static function providerApplyIncrement(): array {
+        return [
+            "zero_percent"     => [ 100, 0, 100, 0 ],
+            "negative_percent" => [ 100, -10, 100, 0 ],
+            "nine_percent"     => [ 100, 9, 109.8901098901, 0.0001 ],
+            "ten_percent"      => [ 100, 10, 111.1111111111, 0.0001 ],
+            "decimal_percent"  => [ 200, 2.5, 205.1282051282, 0.0001 ],
+            "zero_price"       => [ 0, 50, 0, 0 ],
+            "mixed_int_float"  => [ 10, 50, 20, 0.0001 ],
+        ];
     }
 
-    public function testZerosPad() {
-        // pad integers
-        $this->assertEquals("005", Numbers::zerosPad(5, 3));
 
-        // pad floats (string representation preserved)
-        $this->assertEquals("012.34", Numbers::zerosPad(12.34, 6));
-
-        // negative number: string "-5" padded on the left
-        $this->assertEquals("0-5", Numbers::zerosPad(-5, 3));
-
-        // amount smaller than value length returns original string
-        $this->assertEquals("1234", Numbers::zerosPad(1234, 3));
-
-        // pad zero
-        $this->assertEquals("0000", Numbers::zerosPad(0, 4));
+    /** @dataProvider providerGetCommonDivisor */
+    public function testGetCommonDivisor(int $a, int $b, int $expected) {
+        $this->assertEquals($expected, Numbers::getCommonDivisor($a, $b));
     }
 
-    public function testCoordinatesDistance() {
-        // same point -> zero distance
-        $this->assertEquals(0, Numbers::coordinatesDistance(0, 0, 0, 0));
-
-        // one degree longitude at equator ~111.32 km
-        $this->assertEqualsWithDelta(111.32, Numbers::coordinatesDistance(0, 0, 0, 1), 1);
-
-        // Paris -> London ~343 km (approx)
-        $parisLat = 48.8566;
-        $parisLon = 2.3522;
-        $londonLat = 51.5074;
-        $londonLon = -0.1278;
-        $this->assertEqualsWithDelta(343, Numbers::coordinatesDistance($parisLat, $parisLon, $londonLat, $londonLon), 10);
-
-        // New York -> London ~5570 km (approx)
-        $nyLat = 40.7128;
-        $nyLon = -74.0060;
-        $this->assertEqualsWithDelta(5570, Numbers::coordinatesDistance($nyLat, $nyLon, $londonLat, $londonLon), 50);
-
-        // symmetry: distance(a,b) == distance(b,a)
-        $d1 = Numbers::coordinatesDistance($nyLat, $nyLon, $londonLat, $londonLon);
-        $d2 = Numbers::coordinatesDistance($londonLat, $londonLon, $nyLat, $nyLon);
-        $this->assertEqualsWithDelta($d1, $d2, 0.01);
+    public static function providerGetCommonDivisor(): array {
+        return [
+            "integers_48_18" => [ 48, 18, 6 ],
+            "integers_17_13" => [ 17, 13, 1 ],
+            "integers_60_48" => [ 60, 48, 12 ],
+            "zero_a"         => [ 0, 5, 5 ],
+            "zero_b"         => [ 5, 0, 5 ],
+            "zero_both"      => [ 0, 0, 0 ],
+        ];
     }
 
-    public function testCalcExpression() {
-        // basic arithmetic
-        $this->assertEquals(14, Numbers::calcExpression("2+3*4"));
 
-        // text mixed with numbers should be stripped
-        $this->assertEquals(14, Numbers::calcExpression("a2+3b*4c"));
-        $this->assertEquals(14, Numbers::calcExpression(" 2 + abc3*4 "));
+    /** @dataProvider providerIsValidFloat */
+    public function testIsValidFloat(mixed $value, int $min, ?int $max, int $decimals, bool $expected) {
+        $this->assertSame($expected, Numbers::isValidFloat($value, $min, $max, $decimals));
+    }
 
-        // functions: floor, ceil, round (both with and without parentheses)
-        $this->assertEquals(2, Numbers::calcExpression("floor(2.7)"));
-        $this->assertEquals(2, Numbers::calcExpression("floor2.7"));
-        $this->assertEquals(2, Numbers::calcExpression("floor 2.7"));
-        $this->assertEquals(3, Numbers::calcExpression("ceil(2.1)"));
-        $this->assertEquals(2, Numbers::calcExpression("round(1.6)"));
+    public static function providerIsValidFloat(): array {
+        return [
+            "valid_1_23_dec_2"        => [ 1.23, 1, null, 2, true ],
+            "invalid_1_234_dec_2"     => [ 1.234, 1, null, 2, false ],
+            "valid_int_dec_0"         => [ 5, 1, 10, 0, true ],
+            "invalid_int_below_min"   => [ 0, 1, 10, 0, false ],
+            "valid_1_2_dec_1"         => [ 1.2, 1, 2, 1, true ],
+            "invalid_0_5_below_min"   => [ 0.5, 1, null, 1, false ],
+            "invalid_1_2345_dec_3"    => [ 1.2345, 1, null, 3, false ],
+            "valid_100_00_in_range"   => [ 100.00, 1, 200, 2, true ],
+            "invalid_201_0_above_max" => [ 201.0, 1, 200, 1, false ],
+            "valid_eq_min_max"        => [ 5, 5, 5, 0, true ],
+            "invalid_5_1_not_eq"      => [ 5.1, 5, 5, 1, false ],
+        ];
+    }
 
-        // function names mixed with text should still work when at start
-        $this->assertEquals(2, Numbers::calcExpression("floorabc2.9"));
 
-        // percents: 5% -> 0.05 so 100*5% == 5
-        $this->assertEquals(5, Numbers::calcExpression("100*5%"));
-        $this->assertEquals(20, Numbers::calcExpression("200*10%"));
-        // negative percent
-        $this->assertEquals(-5, Numbers::calcExpression("100*-5%"));
-        $this->assertEquals(-20, Numbers::calcExpression("200*-10%"));
+    /** @dataProvider providerIsValidPrice */
+    public function testIsValidPrice(mixed $value, int $min, ?int $max, bool $expected) {
+        $this->assertSame($expected, Numbers::isValidPrice($value, $min, $max));
+    }
 
-        // commas as decimal separators
-        $this->assertEquals(4, Numbers::calcExpression("1,5+2,5"));
+    public static function providerIsValidPrice(): array {
+        return [
+            "valid_1_23"             => [ 1.23, 1, null, true ],
+            "invalid_0_99"           => [ 0.99, 1, null, false ],
+            "invalid_1_234"          => [ 1.234, 1, null, false ],
+            "valid_100_in_range"     => [ 100.00, 1, 200, true ],
+            "invalid_201_above_max"  => [ 201.00, 1, 200, false ],
+            "valid_int_at_max"       => [ 5, 1, 5, true ],
+            "invalid_5_01_above_max" => [ 5.01, 1, 5, false ],
+            "valid_zero_allowed"     => [ 0, 0, 100, true ],
+            "invalid_0_01_above_min" => [ 0.01, 1, 100, false ],
+        ];
+    }
 
-        // +- becomes - | -- becomes +
-        $this->assertEquals(5, Numbers::calcExpression("10+-5"));
-        $this->assertEquals(15, Numbers::calcExpression("10--5"));
-        $this->assertEquals(100_000, Numbers::calcExpression("10**5"));
 
-        // backslash is removed by sanitization -> "2\+3" => "2+3"
-        $this->assertEquals(5, Numbers::calcExpression("2\\+3"));
+    /** @dataProvider providerRoundCents */
+    public function testRoundCents(mixed $value, float|int $expected) {
+        $this->assertEquals($expected, Numbers::roundCents($value));
+    }
 
-        // invalid or empty expressions return 0
-        $this->assertEquals(0, Numbers::calcExpression(""));
-        $this->assertEquals(0, Numbers::calcExpression("abc"));
-        $this->assertEquals(0, Numbers::calcExpression("2+*3"));
-        $this->assertEquals(0, Numbers::calcExpression("round(abc)"));
+    public static function providerRoundCents(): array {
+        return [
+            "rounding_down"        => [ 1.234, 1.23 ],
+            "rounding_up_at_5"     => [ 1.235, 1.24 ],
+            "small_values_to_zero" => [ 0.004, 0 ],
+            "negative_rounding_down" => [ -1.234, -1.23 ],
+            "negative_rounding_up" => [ -1.235, -1.24 ],
+            "integer_input"        => [ 123, 123.0 ],
+            "cross_integer_boundary" => [ 1.999, 2.0 ],
+            "preserve_one_decimal" => [ 1.2, 1.2 ],
+        ];
+    }
+
+
+    /** @dataProvider providerToCents */
+    public function testToCents(mixed $value, int $expected) {
+        $this->assertEquals($expected, Numbers::toCents($value));
+    }
+
+    public static function providerToCents(): array {
+        return [
+            "basic_float"         => [ 12.34, 1234 ],
+            "rounding_extra_decs" => [ 12.345, 1235 ],
+            "integer_input"       => [ 12, 1200 ],
+            "negative_float"      => [ -1.23, -123 ],
+            "negative_rounding"   => [ -1.235, -124 ],
+            "numeric_string"      => [ "12.34", 1234 ],
+            "trimmed_string"      => [ " 12.34 ", 1234 ],
+            "numeric_string_int"  => [ "12", 1200 ],
+            "null_input"          => [ null, 0 ],
+            "array_input"         => [ [], 0 ],
+            "object_input"        => [ new stdClass(), 0 ],
+            "non_numeric_string"  => [ "abc", 0 ],
+        ];
+    }
+
+
+    /** @dataProvider providerFromCents */
+    public function testFromCents(mixed $value, float $expected) {
+        $this->assertEquals($expected, Numbers::fromCents($value));
+    }
+
+    public static function providerFromCents(): array {
+        return [
+            "integer_cents"          => [ 1234, 12.34 ],
+            "float_input"            => [ 1234.0, 1234.0 ],
+            "numeric_string_decimal" => [ "12.34", 12.34 ],
+            "numeric_string_no_dec"  => [ "1234", 1234.0 ],
+            "trimmed_string"         => [ " 12.34 ", 12.34 ],
+            "negative_int"           => [ -1234, -12.34 ],
+            "negative_string"        => [ "-1234", -1234.0 ],
+            "null_input"             => [ null, 0.0 ],
+            "array_input"            => [ [], 0.0 ],
+            "object_input"           => [ new stdClass(), 0.0 ],
+            "non_numeric_string"     => [ "abc", 0.0 ],
+        ];
+    }
+
+
+    /** @dataProvider providerFormatPrice */
+    public function testFormatPrice(mixed $value, int $decimals, int $maxForDecimals, string $default, string $expected) {
+        $this->assertEquals($expected, Numbers::formatPrice($value, $decimals, $maxForDecimals, $default));
+    }
+
+    public static function providerFormatPrice(): array {
+        return [
+            "norm_2dec"           => [ 123.5, 2, 1000, "0", "123,50" ],
+            "zero_default"        => [ 0, 2, 1000, "0", "0" ],
+            "zero_custom_default" => [ 0, 2, 1000, "-", "-" ],
+            "large_drop_dec"      => [ 1234567.891, 2, 1000, "0", "1.234.568" ],
+            "neg_values"          => [ -12.345, 2, 1000, "0", "-12,35" ],
+            "diff_dec"            => [ 12.3456, 3, 1000, "0", "12,346" ],
+            "int_no_dec"          => [ 123, 2, 1000, "0", "123" ],
+            "max_below"           => [ 999.99, 2, 1000, "0", "999,99" ],
+            "max_at_threshold"    => [ 1000.0, 2, 1000, "0", "1.000" ],
+        ];
+    }
+
+
+    /** @dataProvider providerFormatCents */
+    public function testFormatCents(mixed $value, int $decimals, string $expected) {
+        $this->assertEquals($expected, Numbers::formatCents($value, $decimals));
+    }
+
+    public static function providerFormatCents(): array {
+        return [
+            "basic_cents"          => [ 1234, 2, "12,34" ],
+            "small_cents"          => [ 100, 2, "1,00" ],
+            "zero_cents"           => [ 0, 2, "" ],
+            "negative_cents"       => [ -1234, 2, "-12,34" ],
+            "thousands_separator"  => [ 123456, 2, "1.235" ],
+            "one_decimal"          => [ 1234, 1, "12,3" ],
+            "three_decimals"       => [ 123456, 3, "1.235" ],
+            "numeric_string_input" => [ "1234", 2, "12,34" ],
+        ];
+    }
+
+
+    /** @dataProvider providerToPriceString */
+    public function testToPriceString(mixed $value, string $expected) {
+        $this->assertEquals($expected, Numbers::toPriceString($value));
+    }
+
+    public static function providerToPriceString(): array {
+        return [
+            "small_int"          => [ 123, "$123" ],
+            "small_float"        => [ 123.4, "$123" ],
+            "threshold_at_10000" => [ 10000, "$10000" ],
+            "kilos_above_10"     => [ 10500, "$11k" ],
+            "kilos_exact_12000"  => [ 12000, "$12k" ],
+            "millions_above_10"  => [ 12345678, "$12m" ],
+        ];
+    }
+
+
+    /** @dataProvider providerToBytesString */
+    public function testToBytesString(mixed $value, bool $inGigas = false, string $expected) {
+        $this->assertEquals($expected, Numbers::toBytesString($value, $inGigas));
+    }
+
+    public static function providerToBytesString(): array {
+        return [
+            "bytes_512_mb"     => [ 512, false, "512 MB" ],
+            "bytes_1024_gb"    => [ 1024, false, "1 GB" ],
+            "bytes_2048_gb"    => [ 2048, false, "2 GB" ],
+            "bytes_1048576_tb" => [ 1024 * 1024, false, "1 TB" ],
+            "gigas_1_gb"       => [ 1, true, "1 GB" ],
+            "gigas_2048_tb"    => [ 2048, true, "2 TB" ],
+            "gigas_500_gb"     => [ 500, true, "500 GB" ],
+        ];
+    }
+
+
+    /** @dataProvider providerZerosPad */
+    public function testZerosPad(mixed $value, int $length, string $expected) {
+        $this->assertEquals($expected, Numbers::zerosPad($value, $length));
+    }
+
+    public static function providerZerosPad(): array {
+        return [
+            "pad_integers"               => [ 5, 3, "005" ],
+            "pad_floats"                 => [ 12.34, 6, "012.34" ],
+            "negative_number"            => [ -5, 3, "0-5" ],
+            "amount_smaller_than_length" => [ 1234, 3, "1234" ],
+            "pad_zero"                   => [ 0, 4, "0000" ],
+        ];
+    }
+
+
+    /** @dataProvider providerCoordinatesDistance */
+    public function testCoordinatesDistance(float $lat1, float $lon1, float $lat2, float $lon2, float $expected, float $delta) {
+        $this->assertEqualsWithDelta($expected, Numbers::coordinatesDistance($lat1, $lon1, $lat2, $lon2), $delta);
+    }
+
+    public static function providerCoordinatesDistance(): array {
+        return [
+            "same_point"           => [ 0, 0, 0, 0, 0, 0 ],
+            "one_degree_longitude" => [ 0, 0, 0, 1, 111.32, 1 ],
+            "paris_london"         => [ 48.8566, 2.3522, 51.5074, -0.1278, 343, 10 ],
+            "new_york_london"      => [ 40.7128, -74.0060, 51.5074, -0.1278, 5570, 50 ],
+            "symmetry_ab"          => [ 40.7128, -74.0060, 51.5074, -0.1278, 5570, 50 ],
+            "symmetry_ba"          => [ 51.5074, -0.1278, 40.7128, -74.0060, 5570, 50 ],
+        ];
+    }
+
+
+    /** @dataProvider providerCalcExpression */
+    public function testCalcExpression(string $expression, int|float $expected) {
+        $this->assertEquals($expected, Numbers::calcExpression($expression));
+    }
+
+    public static function providerCalcExpression(): array {
+        return [
+            "basic_arithmetic"          => [ "2+3*4", 14 ],
+            "text_mixed_with_numbers"   => [ "a2+3b*4c", 14 ],
+            "text_mixed_with_spaces"    => [ " 2 + abc3*4 ", 14 ],
+            "floor_with_parentheses"    => [ "floor(2.7)", 2 ],
+            "floor_without_parentheses" => [ "floor2.7", 2 ],
+            "floor_with_space"          => [ "floor 2.7", 2 ],
+            "ceil_with_parentheses"     => [ "ceil(2.1)", 3 ],
+            "round_with_parentheses"    => [ "round(1.6)", 2 ],
+            "function_name_with_text"   => [ "floor abc2.9", 2 ],
+            "percent_basic"             => [ "100*5%", 5 ],
+            "percent_200"               => [ "200*10%", 20 ],
+            "percent_negative_1"        => [ "100*-5%", -5 ],
+            "percent_negative_2"        => [ "200*-10%", -20 ],
+            "comma_decimal_separator"   => [ "1,5+2,5", 4 ],
+            "plus_minus_becomes_minus"  => [ "10+-5", 5 ],
+            "minus_minus_becomes_plus"  => [ "10--5", 15 ],
+            "power_operator"            => [ "10**5", 100_000 ],
+            "backslash_removed"         => [ "2\\+3", 5 ],
+            "empty_expression"          => [ "", 0 ],
+            "invalid_abc"               => [ "abc", 0 ],
+            "invalid_operator_sequence" => [ "2+*3", 0 ],
+            "invalid_function_argument" => [ "round(abc)", 0 ],
+        ];
     }
 }
