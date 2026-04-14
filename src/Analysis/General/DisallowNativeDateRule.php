@@ -54,6 +54,12 @@ class DisallowNativeDateRule implements Rule {
             return [];
         }
 
+        // Allow if the current file is Tester.php
+        $filePath = $scope->getFile();
+        if (basename($filePath) === "Tester.php") {
+            return [];
+        }
+
         // Check if the function being called is time or date
         $functionName = $scope->resolveName($node->name);
         if (!Arrays::contains([ "time", "date" ], $functionName)) {

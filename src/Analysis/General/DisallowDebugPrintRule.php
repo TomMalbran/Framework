@@ -53,15 +53,15 @@ class DisallowDebugPrintRule implements Rule {
             return [];
         }
 
-        // Check if the function being called is var_dump or print_r
-        $functionName = $scope->resolveName($node->name);
-        if (!Arrays::contains([ "var_dump", "print_r" ], $functionName)) {
+        // Allow if the current file is Tester.php
+        $filePath = $scope->getFile();
+        if (basename($filePath) === "Tester.php") {
             return [];
         }
 
-        // Check if the current file is Tester.php
-        $filePath = $scope->getFile();
-        if (basename($filePath) === "Tester.php") {
+        // Check if the function being called is var_dump or print_r
+        $functionName = $scope->resolveName($node->name);
+        if (!Arrays::contains([ "var_dump", "print_r" ], $functionName)) {
             return [];
         }
 
