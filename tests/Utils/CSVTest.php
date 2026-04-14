@@ -15,105 +15,105 @@ class CSVTest extends TestCase {
         }
     }
 
-    public function testEncode() {
-        $arr = [ "a", "b", "c" ];
-        $this->assertEquals("a,b,c", CSV::encode($arr));
-
-        // arrays remove empty values
-        $this->assertEquals("a,b", CSV::encode([ "a", "", "b" ]));
-
-        // empty string becomes empty
-        $this->assertEquals("", CSV::encode(""));
-
-        // custom separator
-        $this->assertEquals("x;y", CSV::encode([ "x","y" ], ";"));
-
-        // encode a string with separator should remove empty parts
-        $this->assertEquals("a,b", CSV::encode("a,,b"));
-        $this->assertEquals("a;b", CSV::encode("a;;b", ";"));
-
-        // encode with an invalid separator
-        $this->assertEquals("a,b", CSV::encode("a,b", ";"));
-
-        // encode with empty separator is fine with arrays
-        $this->assertEquals("ab", CSV::encode([ "a", "b" ], ""));
-
-        // encode with empty separator should return original string
-        $this->assertEquals("a,b", CSV::encode("a,b", ""));
-        $this->assertEquals("abc", CSV::encode("abc", ""));
+    /** @dataProvider providerEncode */
+    public function testEncode(mixed $input, string $separator, string $expected) {
+        $this->assertEquals($expected, CSV::encode($input, $separator));
     }
 
-    public function testDecode() {
-        $decoded = CSV::decode("a,b,c");
-        $this->assertIsArray($decoded);
-        $this->assertEquals(["a", "b", "c"], array_values($decoded));
-
-        // numeric values remain strings
-        $this->assertEquals([ "1", "2", "3" ], CSV::decode("1,2,3"));
-
-        // array input is returned as-is
-        $this->assertEquals([ "x", "y" ], CSV::decode([ "x", "y" ]));
-
-        // custom separator for decode
-        $this->assertEquals([ "a","b" ], CSV::decode("a;b", ";"));
-
-        // decode an array with fields should return associative array
-        $res = CSV::decode([ "1", "2" ], ",", [ "x", "y" ]);
-        $this->assertIsArray($res);
-        $this->assertArrayHasKey("x", $res);
-        $this->assertEquals("1", $res["x"]);
-        $this->assertEquals("2", $res["y"]);
-
-        // decode with empty separator returns original string in an array
-        $this->assertEquals([ "a,b" ], CSV::decode("a,b", ""));
-        $this->assertEquals([ "a;b" ], CSV::decode("a;b", ""));
-
-        // decode with separator with more than 1 character should return original string in array
-        $this->assertEquals([ "abc<>abs" ], CSV::decode("abc<>abs", "<>"));
+    public static function providerEncode() {
+        return [
+            "array_basic"            => [ ["a", "b", "c"], ",", "a,b,c" ],
+            "array_skip_empty"       => [ ["a", "", "b"], ",", "a,b" ],
+            "empty_string"           => [ "", ",", "" ],
+            "array_semicolon"        => [ ["x", "y"], ";", "x;y" ],
+            "string_skip_commas"     => [ "a,,b", ",", "a,b" ],
+            "string_skip_semicolons" => [ "a;;b", ";", "a;b" ],
+            "string_diff_separator"  => [ "a,b", ";", "a,b" ],
+            "array_empty_separator"  => [ ["a", "b"], "", "ab" ],
+            "string_empty_separator" => [ "a,b", "", "a,b" ],
+            "simple_string"          => [ "abc", "", "abc" ],
+        ];
     }
 
-    public function testDecodeFile() {
-        $input = "a,b\nc,d";
+
+    /** @dataProvider providerDecode */
+    public function testDecode(mixed $input, string $separator, array $fields, mixed $expected) {
+        $this->assertEquals($expected, CSV::decode($input, $separator, $fields));
+    }
+
+    public static function providerDecode() {
+        return [
+            "string_basic"          => [ "a,b,c", ",", [], ["a", "b", "c"] ],
+            "numeric_strings"       => [ "1,2,3", ",", [], ["1", "2", "3"] ],
+            "array_passthrough"     => [ ["x", "y"], ",", [], ["x", "y"] ],
+            "custom_separator"      => [ "a;b", ";", [], ["a", "b"] ],
+            "array_with_fields"     => [ ["1", "2"], ",", ["x", "y"], ["x" => "1", "y" => "2"] ],
+            "empty_separator"       => [ "a,b", "", [], ["a,b"] ],
+            "empty_separator_semi"  => [ "a;b", "", [], ["a;b"] ],
+            "multi_char_separator"  => [ "abc<>abs", "<>", [], ["abc<>abs"] ],
+        ];
+    }
+
+
+    /** @dataProvider providerDecodeFile */
+    public function testDecodeFile(string $input, array $expected) {
         $res = CSV::decode($input);
         $this->assertIsArray($res);
-        $this->assertCount(2, $res);
-        $this->assertEquals([ "a", "b" ], $res[0]);
-        $this->assertEquals([ "c", "d" ], $res[1]);
+        $this->assertCount(count($expected), $res);
+        foreach ($expected as $index => $row) {
+            $this->assertEquals($row, $res[$index]);
+        }
     }
 
-    public function testReadFileAndWriteFile() {
+    public static function providerDecodeFile() {
+        return [
+            "basic_multiline"  => [ "a,b\nc,d", [["a", "b"], ["c", "d"]] ],
+            "trailing_newline" => [ "a,b\nc,d\n", [["a", "b"], ["c", "d"]] ],
+            "empty_lines"      => [ "a,b\n\nc,d\n\n", [["a", "b"], ["c", "d"]] ],
+            "quoted_fields"    => [ "\"a,b\",c\n\"d,e\",f", [["a,b", "c"], ["d,e", "f"]] ],
+        ];
+    }
+
+
+    /** @dataProvider providerReadFileAndWriteFile */
+    public function testReadFileAndWriteFile(bool $validFile, array $data, array $expected) {
         $this->tmpFile = sys_get_temp_dir() . "/csv_utils_test_" . uniqid() . ".csv";
+        if ($validFile) {
+            touch($this->tmpFile);
+        }
 
-        // writeFile should fail if file doesn't exist
-        $this->assertFalse(CSV::writeFile($this->tmpFile, [[ "x", "y" ]]));
-
-        // create the file and write
-        touch($this->tmpFile);
-        $ok = CSV::writeFile($this->tmpFile, [[ "p", "q" ], [ "r", "s" ]]);
-        $this->assertTrue($ok);
-        $this->assertFileExists($this->tmpFile);
-
-        $content = file_get_contents($this->tmpFile);
-        $this->assertStringContainsString("p,q", $content);
-        $this->assertStringContainsString("r,s", $content);
+        $ok = CSV::writeFile($this->tmpFile, $data);
+        $this->assertSame($validFile, $ok);
 
         $read = CSV::readFile($this->tmpFile);
-        $this->assertIsArray($read);
-        $this->assertCount(2, $read);
-        $this->assertEquals([ "p", "q" ], $read[0]);
-
-        // invalid file should return empty array
-        $this->assertEquals([], CSV::readFile("nonexistent_file.csv"));
+        $this->assertEquals($expected, $read);
     }
 
-    public function testReadFileSkipHeader() {
+    public static function providerReadFileAndWriteFile() {
+        return [
+            "basic_write_read" => [ true, [["p", "q"], ["r", "s"]], [["p", "q"], ["r", "s"]] ],
+            "empty_fields"     => [ true, [["a", ""], ["", "b"]], [["a"], ["b"]] ],
+            "invalid_file"     => [ false, [["x", "y"]], [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerReadFileSkipHeader */
+    public function testReadFileSkipHeader(string $data, array $expected) {
         $this->tmpFile = sys_get_temp_dir() . "/csv_utils_test_" . uniqid() . ".csv";
-        $data = "h1,h2\nv1,v2\nv3,v4\n";
         file_put_contents($this->tmpFile, $data);
 
         $res = CSV::readFile($this->tmpFile, ",", true);
         $this->assertIsArray($res);
-        $this->assertCount(2, $res);
-        $this->assertEquals([ "v1", "v2" ], $res[0]);
+        $this->assertCount(count($expected), $res);
+        $this->assertEquals($expected, $res);
+    }
+
+    public static function providerReadFileSkipHeader() {
+        return [
+            "basic_skip_header" => [ "h1,h2\nv1,v2\nv3,v4\n", [["v1", "v2"], ["v3", "v4"]] ],
+            "only_header"       => [ "h1,h2\n", [] ],
+            "empty_lines"       => [ "h1,h2\n\nv1,v2\n\nv3,v4\n\n", [["v1", "v2"], ["v3", "v4"]] ],
+        ];
     }
 }
