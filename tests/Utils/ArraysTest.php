@@ -7,1273 +7,1079 @@ use PHPUnit\Framework\TestCase;
 
 class ArraysTest extends TestCase {
 
-    public function testIsList() {
-        // only numeric keys starting from 0 are considered lists
-        $this->assertTrue(Arrays::isList([ 1, 2, 3 ]));
-
-        // non-numeric keys or numeric keys that don't start from 0 are not lists
-        $this->assertFalse(Arrays::isList([ "a" => 1, "b" => 2 ]));
-
-        // null or non-arrays are not lists
-        $this->assertFalse(Arrays::isList(null));
-
-        // empty array is considered a list
-        $this->assertTrue(Arrays::isList([]));
+    /** @dataProvider providerIsList */
+    public function testIsList(mixed $input, bool $expected) {
+        $this->assertSame($expected, Arrays::isList($input));
     }
 
-    public function testIsArrayList() {
-        // only arrays of arrays with numeric keys are considered array lists
-        $this->assertTrue(Arrays::isArrayList([[ 1 ], [ 2 ]]));
-
-        // non-array values or non-numeric keys are not array lists
-        $this->assertFalse(Arrays::isArrayList([ "a" => [ "x" ]]));
-
-        // null or non-arrays are not array lists
-        $this->assertFalse(Arrays::isArrayList(null));
-        $this->assertFalse(Arrays::isArrayList([]));
-
-        // list of non-arrays is not an array list
-        $this->assertFalse(Arrays::isArrayList([ 1, 2 ]));
+    public static function providerIsList() {
+        return [
+            "list"    => [ [ 1, 2, 3 ], true ],
+            "assoc"   => [ [ "a" => 1 ], false ],
+            "null"    => [ null, false ],
+            "empty"   => [ [], true ],
+            "invalid" => [ "not-an-array", false ],
+        ];
     }
 
-    public function testIsDict() {
-        // only arrays with string keys are considered dicts
-        $this->assertTrue(Arrays::isDict([ "a" => 1 ]));
 
-        // arrays with numeric keys are not dicts
-        $this->assertFalse(Arrays::isDict([ 1, 2, 3 ]));
-
-        // null or non-arrays are not dicts
-        $this->assertFalse(Arrays::isDict(null));
-
-        // empty array is not considered a dict
-        $this->assertFalse(Arrays::isDict([]));
+    /** @dataProvider providerIsArrayList */
+    public function testIsArrayList(mixed $input, bool $expected) {
+        $this->assertSame($expected, Arrays::isArrayList($input));
     }
 
-    public function testIsMap() {
-        // only arrays with string keys and array values are considered maps
-        $this->assertTrue(Arrays::isMap([ "a" => [ "x" => 1 ] ]));
-
-        // arrays with non-array values or numeric keys are not maps
-        $this->assertFalse(Arrays::isMap([ "a" => 1 ]));
-
-        // null or non-arrays are not maps
-        $this->assertFalse(Arrays::isMap(null));
-
-        // empty array is not considered a map
-        $this->assertFalse(Arrays::isMap([]));
+    public static function providerIsArrayList() {
+        return [
+            "array_list" => [ [[ 1 ], [ 2 ]], true ],
+            "assoc"      => [ [ "a" => [ "x" ]], false ],
+            "list"       => [ [ 1, 2 ], false ],
+            "null"       => [ null, false ],
+            "empty"      => [ [], false ],
+            "invalid"    => [ "not-an-array", false ],
+        ];
     }
 
-    public function testToArray() {
-        // arrays should be returned as-is
-        $this->assertSame([ 1, 2 ], Arrays::toArray([ 1, 2 ]));
 
-        // non-arrays should be wrapped in an array
-        $this->assertSame([ "x" ], Arrays::toArray("x"));
-
-        // null should return empty array
-        $this->assertSame([], Arrays::toArray(null));
-
-        // objects should be converted to arrays
-        $obj = (object)[ "a" => 1 ];
-        $this->assertSame([ "a" => 1 ], Arrays::toArray($obj));
-
-        // arrays with non-numeric keys should be returned as-is
-        $this->assertSame([ "a" => 1 ], Arrays::toArray([ "a" => 1 ]));
+    /** @dataProvider providerIsDict */
+    public function testIsDict(mixed $input, bool $expected) {
+        $this->assertSame($expected, Arrays::isDict($input));
     }
 
-    public function testToList() {
-        // valid lists should be returned as-is
-        $this->assertSame([ 1, 2 ], Arrays::toList([ 1, 2 ]));
-
-        // arrays with numeric keys starting from 0 should be returned as-is
-        $this->assertSame([ 1 ], Arrays::toList(1));
-
-        // arrays with non-numeric keys should return their values as a list
-        $this->assertSame([ 1, 2 ], Arrays::toList([ "a" => 1, "b" => 2 ]));
-
-        // null should return empty list
-        $this->assertSame([], Arrays::toList(null));
-
-        // non-arrays should be wrapped in a list
-        $this->assertSame([ "x" ], Arrays::toList("x"));
-
-        // objects should be converted to lists of their values
-        $obj = (object)[ "a" => 1, "b" => 2 ];
-        $this->assertSame([ 1, 2 ], Arrays::toList($obj));
+    public static function providerIsDict() {
+        return [
+            "dict"    => [ [ "a" => 1 ], true ],
+            "list"    => [ [ 1, 2 ], false ],
+            "null"    => [ null, false ],
+            "empty"   => [ [], false ],
+            "invalid" => [ "not-an-array", false ],
+        ];
     }
 
-    public function testToObject() {
-        // arrays should be returned as-is
-        $this->assertSame([ "a" => 1 ], Arrays::toObject([ "a" => 1 ]));
 
-        // null should return empty object
-        $this->assertEquals((object)[], Arrays::toObject(null));
-
-        // empty array should return empty object
-        $this->assertEquals((object)[], Arrays::toObject([]));
+    /** @dataProvider providerIsMap */
+    public function testIsMap(mixed $input, bool $expected) {
+        $this->assertSame($expected, Arrays::isMap($input));
     }
 
-    public function testToInts() {
-        // scalar int returns a single-element list
-        $this->assertSame([ 1 ], Arrays::toInts(1));
-
-        // scalar zero with withoutEmpty true should be filtered out
-        $this->assertSame([], Arrays::toInts(0, "", true));
-
-        // non-array, non-int returns empty list
-        $this->assertSame([], Arrays::toInts("notarray"));
-
-        // numeric strings and ints in an array are converted to ints
-        $this->assertSame([ 1, 2 ], Arrays::toInts([ "1", 2 ]));
-
-        // mixed values: non-numeric are skipped
-        $this->assertSame([ 1 ], Arrays::toInts([ "1", "x" ]));
-
-        // when using a key, the function extracts values from sub-rows
-        $rows = [[ "v" => "3" ], [ "v" => "4" ], [ "v" => "" ], [ "v" => 0 ]];
-        $this->assertSame([ 3, 4, 0 ], Arrays::toInts($rows, "v"));
-
-        // withoutEmpty true should remove empty values (including 0)
-        $this->assertSame([ 3, 4 ], Arrays::toInts($rows, "v", true));
-
-        // works with objects too
-        $rowsObj = [(object)[ "v" => "5" ], (object)[ "v" => "6" ]];
-        $this->assertSame([ 5, 6 ], Arrays::toInts($rowsObj, "v"));
+    public static function providerIsMap() {
+        return [
+            "map"     => [ [ "a" => [ "x" => 1 ] ], true ],
+            "assoc"   => [ [ "a" => 1 ], false ],
+            "list"    => [ [ 1, 2 ], false ],
+            "null"    => [ null, false ],
+            "empty"   => [ [], false ],
+            "invalid" => [ "not-an-array", false ],
+        ];
     }
 
-    public function testToStrings() {
-        // simple list of strings is preserved
-        $this->assertSame([ "a", "b" ], Arrays::toStrings([ "a", "b" ]));
 
-        // non-array non-string returns empty list
-        $this->assertSame([], Arrays::toStrings(123));
-
-        // scalar string returns single-element list
-        $this->assertSame([ "s" ], Arrays::toStrings("s"));
-
-        // empty scalar with withoutEmpty filters out
-        $this->assertSame([], Arrays::toStrings("", "", true));
-
-        // numeric values are converted to strings
-        $this->assertSame([ "0" ], Arrays::toStrings([ 0 ]));
-
-        // withoutEmpty removes values considered empty (0, "", null)
-        $this->assertSame([], Arrays::toStrings([ 0 ], "", true));
-
-        // works with key extraction from rows (arrays)
-        $rows = [[ "v" => "x" ], [ "v" => "" ], [ "v" => null ], [ "v" => 5 ]];
-        $this->assertSame([ "x", "", "", "5" ], Arrays::toStrings($rows, "v"));
-        $this->assertSame([ "x", "5" ], Arrays::toStrings($rows, "v", true));
-
-        // works with objects as rows and respects withoutEmpty
-        $rowsObj = [(object)[ "v" => "a" ], (object)[ "v" => 0 ]];
-        $this->assertSame([ "a", "0" ], Arrays::toStrings($rowsObj, "v"));
-        $this->assertSame([ "a" ], Arrays::toStrings($rowsObj, "v", true));
-
-        // passing a single object (not an array) returns empty list
-        $this->assertSame([], Arrays::toStrings((object)[ "v" => "a" ]));
+    /** @dataProvider providerToArray */
+    public function testToArray(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::toArray($input));
     }
 
-    public function testToStringsMap() {
-        // simple key/value conversion
-        $this->assertSame([ "a" => "1" ], Arrays::toStringsMap([ "a" => 1 ]));
-
-        // numeric keys become string keys
-        $this->assertSame([ "1" => "v" ], Arrays::toStringsMap([ 1 => "v" ]));
-
-        // string numeric keys are preserved
-        $this->assertSame([ "1.23" => "x" ], Arrays::toStringsMap([ "1.23" => "x" ]));
-
-        // null and non-arrays return empty map
-        $this->assertSame([], Arrays::toStringsMap("x"));
-        $this->assertSame([], Arrays::toStringsMap(null));
-
-        // null values convert to empty string
-        $this->assertSame([ "a" => "" ], Arrays::toStringsMap([ "a" => null ]));
-
-        // object values convert via Strings::toString (typically empty)
-        $this->assertSame([ "k" => "" ], Arrays::toStringsMap([ "k" => (object)[] ]));
+    public static function providerToArray() {
+        return [
+            "array"  => [ [ 1, 2 ], [ 1, 2 ] ],
+            "string" => [ "x", [ "x" ] ],
+            "null"   => [ null, [] ],
+            "object" => [ (object)[ "a" => 1 ], [ "a" => 1 ] ],
+            "asoc"   => [ [ "a" => 1 ], [ "a" => 1 ] ],
+        ];
     }
 
-    public function testToIntStringMap() {
-        // numeric string keys become int keys
-        $this->assertSame([ 1 => "v" ], Arrays::toIntStringMap([ "1" => "v" ]));
 
-        // integer keys are preserved
-        $this->assertSame([ 2 => "x" ], Arrays::toIntStringMap([ 2 => "x" ]));
-
-        // float-like numeric keys are converted to int (rounded)
-        $this->assertSame([ 1 => "x" ], Arrays::toIntStringMap([ "1.23" => "x" ]));
-
-        // non-numeric keys convert to 0
-        $this->assertSame([ 0 => "a" ], Arrays::toIntStringMap([ "a" => "a" ]));
-
-        // collisions: later value wins for the same int key
-        $this->assertSame([ 1 => "b" ], Arrays::toIntStringMap([ "1" => "a", "1.0" => "b" ]));
-
-        // values are converted to strings (including null -> empty string)
-        $this->assertSame([ 1 => "2" ], Arrays::toIntStringMap([ "1" => 2 ]));
-        $this->assertSame([ 1 => "" ], Arrays::toIntStringMap([ "1" => null ]));
-
-        // object values become empty strings
-        $this->assertSame([ 1 => "" ], Arrays::toIntStringMap([ "1" => (object)[] ]));
-
-        // non-array input returns empty map
-        $this->assertSame([], Arrays::toIntStringMap("x"));
+    /** @dataProvider providerToList */
+    public function testToList(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::toList($input));
     }
 
-    public function testToStringIntMap() {
-        // simple string numeric value converted to int
-        $this->assertSame([ "k" => 1 ], Arrays::toStringIntMap([ "k" => "1" ]));
-
-        // integer values preserved
-        $this->assertSame([ "k" => 2 ], Arrays::toStringIntMap([ "k" => 2 ]));
-
-        // float-like strings converted to int (rounded)
-        $this->assertSame([ "k" => 1 ], Arrays::toStringIntMap([ "k" => "1.23" ]));
-
-        // null and non-numeric convert to 0
-        $this->assertSame([ "k" => 0 ], Arrays::toStringIntMap([ "k" => null ]));
-        $this->assertSame([ "k" => 0 ], Arrays::toStringIntMap([ "k" => "x" ]));
-
-        // object values convert to 0
-        $this->assertSame([ "k" => 0 ], Arrays::toStringIntMap([ "k" => (object)[] ]));
-
-        // non-array input returns empty map
-        $this->assertSame([], Arrays::toStringIntMap("x"));
+    public static function providerToList() {
+        return [
+            "array"  => [ [ 1, 2 ], [ 1, 2 ] ],
+            "number" => [ 1, [ 1 ] ],
+            "string" => [ "x", [ "x" ] ],
+            "null"   => [ null, [] ],
+            "object" => [ (object)[ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
+            "asoc"   => [ [ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
+        ];
     }
 
-    public function testToStringFloatMap() {
-        // string numeric with decimals returns float
-        $this->assertSame([ "k" => 1.23 ], Arrays::toStringFloatMap([ "k" => "1.23" ], 2));
 
-        // integer interpreted with decimals is divided by padding
-        $this->assertSame([ "k" => 1.23 ], Arrays::toStringFloatMap([ "k" => 123 ], 2));
-
-        // float values are preserved
-        $this->assertSame([ "k" => 1.23 ], Arrays::toStringFloatMap([ "k" => 1.23 ], 2));
-
-        // numeric string without decimals becomes float of whole number
-        $this->assertSame([ "k" => 123.0 ], Arrays::toStringFloatMap([ "k" => "123" ], 2));
-
-        // null converts to zero
-        $this->assertSame([ "k" => 0.0 ], Arrays::toStringFloatMap([ "k" => null ], 2));
-
-        // non-array input returns empty map
-        $this->assertSame([], Arrays::toStringFloatMap("x", 2));
+    /** @dataProvider providerToObject */
+    public function testToObject(mixed $input, mixed $expected) {
+        $this->assertEquals($expected, Arrays::toObject($input));
     }
 
-    public function testToStringMixedMap() {
-        // nested array values are preserved
-        $this->assertSame([ "k" => [ "x" => 1 ] ], Arrays::toStringMixedMap([ "k" => [ "x" => 1 ] ]));
+    public static function providerToObject() {
+        return [
+            "array" => [ [ "a" => 1 ], [ "a" => 1 ] ],
+            "null"  => [ null, (object)[] ],
+            "empty" => [ [], (object)[] ],
+        ];
+    }
 
-        // scalar and string values are preserved
-        $this->assertSame([ "k" => 1 ], Arrays::toStringMixedMap([ "k" => 1 ]));
-        $this->assertSame([ "k" => "v" ], Arrays::toStringMixedMap([ "k" => "v" ]));
 
-        // object values are preserved (same instance)
+    /** @dataProvider providerToInts */
+    public function testToInts(mixed $input, string $key, bool $withoutEmpty, array $expected) {
+        $this->assertSame($expected, Arrays::toInts($input, $key, $withoutEmpty));
+    }
+
+    public static function providerToInts() {
+        return [
+            "zero_no_empty"      => [ 0, "", true, [] ],
+            "single_int"         => [ 5, "", false, [ 5 ] ],
+            "non_array_int"      => [ "not-array", "", false, [] ],
+            "num_str_ints"       => [ [ "1", 2 ], "", false, [ 1, 2 ] ],
+            "mixed_skip_non_num" => [ [ "1", "x" ], "", false, [ 1 ] ],
+            "key_extract"        => [ [[ "v" => "3" ], [ "v" => "4" ], [ "v" => "" ], [ "v" => 0 ]], "v", false, [ 3, 4, 0 ] ],
+            "key_no_empty"       => [ [[ "v" => "3" ], [ "v" => "4" ], [ "v" => "" ], [ "v" => 0 ]], "v", true, [ 3, 4 ] ],
+            "objs_key_extract"   => [ [(object)[ "v" => "5" ], (object)[ "v" => "6" ]], "v", false, [ 5, 6 ] ],
+        ];
+    }
+
+
+    /** @dataProvider providerToStrings */
+    public function testToStrings(mixed $input, string $key, bool $withoutEmpty, array $expected) {
+        $this->assertSame($expected, Arrays::toStrings($input, $key, $withoutEmpty));
+    }
+
+    public static function providerToStrings() {
+        return [
+            "simple_list"           => [ [ "a", "b" ], "", false, [ "a", "b" ] ],
+            "non_array_non_string"  => [ 123, "", false, [] ],
+            "scalar_string"         => [ "s", "", false, [ "s" ] ],
+            "empty_scalar"          => [ "", "", true, [] ],
+            "numeric_values"        => [ [ 0 ], "", false, [ "0" ] ],
+            "without_empty"         => [ [ 0 ], "", true, [] ],
+            "key_extraction"        => [ [[ "v" => "x" ], [ "v" => "" ], [ "v" => null ], [ "v" => 5 ]], "v", false, [ "x", "", "", "5" ] ],
+            "key_without_empty"     => [ [[ "v" => "x" ], [ "v" => "" ], [ "v" => null ], [ "v" => 5 ]], "v", true, [ "x", "5" ] ],
+            "objects_as_rows"       => [ [(object)[ "v" => "a" ], (object)[ "v" => 0 ]], "v", false, [ "a", "0" ] ],
+            "objects_without_empty" => [ [(object)[ "v" => "a" ], (object)[ "v" => 0 ]], "v", true, [ "a" ] ],
+            "single_object"         => [ (object)[ "v" => "a" ], "", false, [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerToStringsMap */
+    public function testToStringsMap(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::toStringsMap($input));
+    }
+
+    public static function providerToStringsMap() {
+        return [
+            "simple_conversion"   => [ [ "a" => 1 ], [ "a" => "1" ] ],
+            "numeric_keys"        => [ [ 1 => "v" ], [ "1" => "v" ] ],
+            "string_numeric_keys" => [ [ "1.23" => "x" ], [ "1.23" => "x" ] ],
+            "non_array_string"    => [ "x", [] ],
+            "null_input"          => [ null, [] ],
+            "null_values"         => [ [ "a" => null ], [ "a" => "" ] ],
+            "object_values"       => [ [ "k" => (object)[] ], [ "k" => "" ] ],
+        ];
+    }
+
+
+    /** @dataProvider providerToIntStringMap */
+    public function testToIntStringMap(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::toIntStringMap($input));
+    }
+
+    public static function providerToIntStringMap() {
+        return [
+            "numeric_string_keys" => [ [ "1" => "v" ], [ 1 => "v" ] ],
+            "integer_keys"        => [ [ 2 => "x" ], [ 2 => "x" ] ],
+            "float_like_keys"     => [ [ "1.23" => "x" ], [ 1 => "x" ] ],
+            "non_numeric_keys"    => [ [ "a" => "a" ], [ 0 => "a" ] ],
+            "key_collisions"      => [ [ "1" => "a", "1.0" => "b" ], [ 1 => "b" ] ],
+            "values_to_strings"   => [ [ "1" => 2 ], [ 1 => "2" ] ],
+            "null_to_empty"       => [ [ "1" => null ], [ 1 => "" ] ],
+            "object_to_empty"     => [ [ "1" => (object)[] ], [ 1 => "" ] ],
+            "non_array_input"     => [ "x", [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerToStringIntMap */
+    public function testToStringIntMap(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::toStringIntMap($input));
+    }
+
+    public static function providerToStringIntMap() {
+        return [
+            "string_numeric"    => [ [ "k" => "1" ], [ "k" => 1 ] ],
+            "integer"           => [ [ "k" => 2 ], [ "k" => 2 ] ],
+            "float_like_string" => [ [ "k" => "1.23" ], [ "k" => 1 ] ],
+            "null_value"        => [ [ "k" => null ], [ "k" => 0 ] ],
+            "non_numeric"       => [ [ "k" => "x" ], [ "k" => 0 ] ],
+            "object_value"      => [ [ "k" => (object)[] ], [ "k" => 0 ] ],
+            "non_array_input"   => [ "x", [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerToStringFloatMap */
+    public function testToStringFloatMap(mixed $input, int $decimals, array $expected) {
+        $this->assertSame($expected, Arrays::toStringFloatMap($input, $decimals));
+    }
+
+    public static function providerToStringFloatMap() {
+        return [
+            "string_numeric_with_decimals" => [ [ "k" => "1.23" ], 2, [ "k" => 1.23 ] ],
+            "integer_with_decimals"        => [ [ "k" => 123 ], 2, [ "k" => 1.23 ] ],
+            "float_preserved"              => [ [ "k" => 1.23 ], 2, [ "k" => 1.23 ] ],
+            "numeric_string_no_decimals"   => [ [ "k" => "123" ], 2, [ "k" => 123.0 ] ],
+            "null_to_zero"                 => [ [ "k" => null ], 2, [ "k" => 0.0 ] ],
+            "non_array_input"              => [ "x", 2, [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerToStringMixedMap */
+    public function testToStringMixedMap(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::toStringMixedMap($input));
+    }
+
+    public static function providerToStringMixedMap() {
         $obj = (object)[ "x" => 1 ];
-        $this->assertSame([ "k" => $obj ], Arrays::toStringMixedMap([ "k" => $obj ]));
-
-        // non-array input returns empty map
-        $this->assertSame([], Arrays::toStringMixedMap("x"));
+        return [
+            "nested_array_preserved"   => [ [ "k" => [ "x" => 1 ] ], [ "k" => [ "x" => 1 ] ] ],
+            "scalar_value_preserved"   => [ [ "k" => 1 ], [ "k" => 1 ] ],
+            "string_value_preserved"   => [ [ "k" => "v" ], [ "k" => "v" ] ],
+            "object_value_preserved"   => [ [ "k" => $obj ], [ "k" => $obj ] ],
+            "non_array_input"          => [ "x", [] ],
+        ];
     }
 
-    public function testGetValues() {
-        // associative arrays return their values in order
-        $this->assertSame([ 1, 2 ], Arrays::getValues([ "a" => 1, "b" => 2 ]));
 
-        // lists are returned unchanged
-        $this->assertSame([ 1, 2, 3 ], Arrays::getValues([ 1, 2, 3 ]));
+    /** @dataProvider providerGetValues */
+    public function testGetValues(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::getValues($input));
+    }
 
-        // non-sequential numeric keys are reindexed
-        $this->assertSame([ 10, 30 ], Arrays::getValues([ 0 => 10, 2 => 30 ]));
-
-        // empty array returns empty list
-        $this->assertSame([], Arrays::getValues([]));
-
-        // object values are preserved (same instance)
+    public static function providerGetValues() {
         $obj = (object)[ "x" => 1 ];
-        $this->assertSame([ $obj ], Arrays::getValues([ "a" => $obj ]));
+        return [
+            "assoc"          => [ [ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
+            "list"           => [ [ 1, 2, 3 ], [ 1, 2, 3 ] ],
+            "non_sequential" => [ [ 0 => 10, 2 => 30 ], [ 10, 30 ] ],
+            "empty"          => [ [], [] ],
+            "object_values"  => [ [ "a" => $obj ], [ $obj ] ],
+        ];
     }
 
-    public function testIsEmpty() {
-        // empty array is empty
-        $this->assertTrue(Arrays::isEmpty([]));
 
-        // array with non-empty value is not empty
-        $this->assertFalse(Arrays::isEmpty([ 1 ]));
-
-        // array with empty string value is empty when checking that key
-        $this->assertTrue(Arrays::isEmpty([ "a" => "" ], "a"));
-
-        // null is empty
-        $this->assertTrue(Arrays::isEmpty(null));
-
-        // non-empty scalar is not empty
-        $this->assertFalse(Arrays::isEmpty("x"));
-
-        // empty string is empty
-        $this->assertTrue(Arrays::isEmpty(""));
-
-        // 0 is empty
-        $this->assertTrue(Arrays::isEmpty(0));
-
-        // false is empty
-        $this->assertTrue(Arrays::isEmpty(false));
-
-        // key lookup treats 0, false and missing keys as empty
-        $this->assertTrue(Arrays::isEmpty([ "a" => 0 ], "a"));
-        $this->assertTrue(Arrays::isEmpty([ "a" => false ], "a"));
-        $this->assertTrue(Arrays::isEmpty([], "missing"));
-
-        // array containing empty values is not considered empty as a whole
-        $this->assertFalse(Arrays::isEmpty([ "a" => "" ]));
+    /** @dataProvider providerIsEmpty */
+    public function testIsEmpty(mixed $input, ?string $key, bool $expected) {
+        $this->assertSame($expected, Arrays::isEmpty($input, $key));
     }
 
-    public function testLength() {
-        $this->assertSame(3, Arrays::length([ 1, 2, 3 ]));
-
-        // associative arrays count their keys
-        $this->assertSame(2, Arrays::length([ "a" => 1, "b" => 2 ]));
-
-        // empty array is zero length
-        $this->assertSame(0, Arrays::length([]));
-
-        // null is treated as empty
-        $this->assertSame(0, Arrays::length(null));
-
-        // nested arrays count only top-level entries
-        $this->assertSame(2, Arrays::length([[ 1 ], [ 2 ]]));
+    public static function providerIsEmpty() {
+        return [
+            "empty_array"           => [ [], null, true ],
+            "array_with_value"      => [ [ 1 ], null, false ],
+            "empty_string_by_key"   => [ [ "a" => "" ], "a", true ],
+            "null_input"            => [ null, null, true ],
+            "non_empty_scalar"      => [ "x", null, false ],
+            "empty_string"          => [ "", null, true ],
+            "zero"                  => [ 0, null, true ],
+            "false"                 => [ false, null, true ],
+            "zero_by_key"           => [ [ "a" => 0 ], "a", true ],
+            "false_by_key"          => [ [ "a" => false ], "a", true ],
+            "missing_key"           => [ [], "missing", true ],
+            "array_with_empty_vals" => [ [ "a" => "" ], null, false ],
+        ];
     }
 
-    public function testContains() {
-        // simple values
-        $this->assertTrue(Arrays::contains([[ "id" => 1 ], [ "id" => 2 ]], 2, "id"));
-        $this->assertFalse(Arrays::contains([ 1, 2, 3 ], 4));
-        $this->assertTrue(Arrays::contains([ "a", "b" ], [ "a", "b" ]));
 
-        // works with single non-array values (toArray wraps them)
-        $this->assertTrue(Arrays::contains("x", "x"));
-
-        // works with objects as rows when checking a property
-        $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
-        $this->assertTrue(Arrays::contains($rowsObj, 2, "id"));
-
-        // when needle is an array and atLeastOne is true, any match suffices
-        $this->assertTrue(Arrays::contains([[ "id" => 1 ], [ "id" => 2 ]], [ 2, 3 ], "id", true, true));
-
-        // when needle is an array and atLeastOne is false, all values must be present
-        $this->assertFalse(Arrays::contains([[ "id" => 1 ]], [ 1, 2 ], "id"));
-
-        // case sensitivity behavior
-        $this->assertTrue(Arrays::contains([ "A" ], "a"));
-        $this->assertFalse(Arrays::contains([ "A" ], "a", null, false));
-
-        // when needle is an array and all values are present (atLeastOne=false) -> true
-        $this->assertTrue(Arrays::contains([
-            [ "id" => 1 ], [ "id" => 2 ], [ "id" => 3 ]
-        ], [ 2, 3 ], "id"));
-
-        // when atLeastOne is true and none match -> false
-        $this->assertFalse(Arrays::contains([
-            [ "id" => 1 ]
-        ], [ 2, 3 ], "id", true, true));
-
-        // with invalid key, should return false
-        $this->assertFalse(Arrays::contains([[ "id" => 1 ]], 1, "nonexistent_key"));
-
-        // with invalid key in an array of objects, should return false
-        $rowsObj = [(object)[ "id" => 1 ]];
-        $this->assertFalse(Arrays::contains($rowsObj, 1, "nonexistent_key"));
-
-        // with null values in the array, should not cause errors and should return false if looking for a non-null value
-        $this->assertFalse(Arrays::contains([ null ], 1, "id"));
+    /** @dataProvider providerLength */
+    public function testLength(mixed $input, int $expected) {
+        $this->assertSame($expected, Arrays::length($input));
     }
 
-    public function testContainsKey() {
-        $this->assertTrue(Arrays::containsKey([ "a" => 1 ], "a"));
-        $this->assertFalse(Arrays::containsKey([ "a" => 1 ], "b"));
-
-        // numeric-string keys vs int keys
-        $this->assertTrue(Arrays::containsKey([ "1" => "v" ], 1));
-        $this->assertFalse(Arrays::containsKey([ 1 => "v" ], "1"));
-        $this->assertTrue(Arrays::containsKey([ 1 => "v" ], 1));
-
-        // empty array
-        $this->assertFalse(Arrays::containsKey([], "x"));
-
-        // float-like string key preserved
-        $this->assertTrue(Arrays::containsKey([ "1.23" => "x" ], "1.23"));
+    public static function providerLength() {
+        return [
+            "list"   => [ [ 1, 2, 3 ], 3 ],
+            "assoc"  => [ [ "a" => 1, "b" => 2 ], 2 ],
+            "empty"  => [ [], 0 ],
+            "null"   => [ null, 0 ],
+            "nested" => [ [[ 1 ], [ 2 ]], 2 ],
+        ];
     }
 
-    public function testIsEqual() {
-        $this->assertTrue(Arrays::isEqual([ 1, 2 ], [ 1, 2 ]));
-        $this->assertFalse(Arrays::isEqual([ 1 ], [ 1, 2 ]));
 
-        // different order matters when not using a key
-        $this->assertFalse(Arrays::isEqual([ 1, 2 ], [ 2, 1 ]));
-
-        // strict comparison (types) is used
-        $this->assertFalse(Arrays::isEqual([ 1 ], [ "1" ]));
-
-        // associative arrays with different keys are not equal even if values match
-        $this->assertFalse(Arrays::isEqual([ "x" => 1 ], [ "y" => 1 ]));
-
-        // nested arrays compared by a key: order-independent presence check
-        $a = [[ "id" => 1 ], [ "id" => 2 ]];
-        $b = [[ "id" => 2 ], [ "id" => 1 ]];
-        $this->assertTrue(Arrays::isEqual($a, $b, "id"));
-
-        // nested arrays missing the key cause inequality
-        $this->assertFalse(Arrays::isEqual([[ "id" => 1 ], [ "no" => 2 ]], [[ "id" => 1 ], [ "id" => 2 ]], "id"));
+    /** @dataProvider providerContains */
+    public function testContains(mixed $input, mixed $needle, ?string $key, bool $caseInsensitive, bool $atLeastOne, bool $expected) {
+        $this->assertSame($expected, Arrays::contains($input, $needle, $key, $caseInsensitive, $atLeastOne));
     }
 
-    public function testIsEqualWithKeys() {
-        $a = [ "x" => 1, "y" => 2 ];
-        $b = [ "x" => 1, "y" => 3 ];
-        $this->assertTrue(Arrays::isEqualWithKeys($a, $a, [ "x", "y" ]));
-        $this->assertFalse(Arrays::isEqualWithKeys($a, $b, [ "x", "y" ]));
+    public static function providerContains() {
+        $rowsObj       = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
+        $rowsObjSingle = [(object)[ "id" => 1 ]];
 
-        // order of keys doesn't matter for associative arrays
-        $d = [ "y" => 2, "x" => 1 ];
-        $this->assertTrue(Arrays::isEqualWithKeys($a, $d, [ "x", "y" ]));
-
-        // missing keys cause inequality
-        $e = [ "x" => 1 ];
-        $this->assertFalse(Arrays::isEqualWithKeys($a, $e, [ "x", "y" ]));
-
-        // extra keys are ignored when comparing selected keys
-        $f = [ "x" => 1, "y" => 2, "z" => 3 ];
-        $this->assertTrue(Arrays::isEqualWithKeys($a, $f, [ "x", "y" ]));
-
-        // type differences are significant (strict)
-        $c = [ "x" => 1, "y" => "2" ];
-        $this->assertFalse(Arrays::isEqualWithKeys($a, $c, [ "x", "y" ]));
+        return [
+            "simple_values"             => [ [[ "id" => 1 ], [ "id" => 2 ]], 2, "id", true, false, true ],
+            "not_found"                 => [ [ 1, 2, 3 ], 4, null, true, false, false ],
+            "array_exact_match"         => [ [ "a", "b" ], [ "a", "b" ], null, true, false, true ],
+            "single_scalar_value"       => [ "x", "x", null, true, false, true ],
+            "objects_by_property"       => [ $rowsObj, 2, "id", true, false, true ],
+            "array_needle_at_least_one" => [ [[ "id" => 1 ], [ "id" => 2 ]], [ 2, 3 ], "id", true, true, true ],
+            "array_needle_all_required" => [ [[ "id" => 1 ]], [ 1, 2 ], "id", true, false, false ],
+            "case_insensitive"          => [ [ "A" ], "a", null, true, false, true ],
+            "case_sensitive"            => [ [ "A" ], "a", null, false, false, false ],
+            "multiple_values_all_match" => [ [[ "id" => 1 ], [ "id" => 2 ], [ "id" => 3 ]], [ 2, 3 ], "id", true, false, true ],
+            "at_least_one_no_match"     => [ [[ "id" => 1 ]], [ 2, 3 ], "id", true, true, false ],
+            "invalid_key"               => [ [[ "id" => 1 ]], 1, "nonexistent_key", true, false, false ],
+            "invalid_key_objects"       => [ $rowsObjSingle, 1, "nonexistent_key", true, false, false ],
+            "null_values_in_array"      => [ [ null ], 1, "id", true, false, false ],
+        ];
     }
 
-    public function testIsEqualJSON() {
-        $this->assertTrue(Arrays::isEqualJSON([ "a" => 1 ], (object)[ "a" => 1 ]));
 
-        // array vs JSON string
-        $this->assertTrue(Arrays::isEqualJSON([ "a" => 1 ], '{"a":1}'));
-
-        // order matters for lists
-        $this->assertFalse(Arrays::isEqualJSON([ 1, 2 ], [ 2, 1 ]));
-
-        // different keys
-        $this->assertFalse(Arrays::isEqualJSON([ "a" => 1 ], [ "b" => 1 ]));
-
-        // null encodes to empty string in JSON::encode
-        $this->assertTrue(Arrays::isEqualJSON(null, null));
-
-        // nested structures and object vs string
-        $this->assertTrue(Arrays::isEqualJSON((object)[ "x" => (object)[ "y" => 2 ] ], '{"x":{"y":2}}'));
-
-        // invalid JSON string compared to array -> not equal
-        $this->assertFalse(Arrays::isEqualJSON([ "a" => 1 ], '{invalid}'));
+    /** @dataProvider providerContainsKey */
+    public function testContainsKey(mixed $input, mixed $key, bool $expected) {
+        $this->assertSame($expected, Arrays::containsKey($input, $key));
     }
 
-    public function testIntersects() {
-        // simple overlap
-        $this->assertTrue(Arrays::intersects([ 1, 2 ], [ 2, 3 ]));
+    public static function providerContainsKey() {
+        return [
+            "simple_key"            => [ [ "a" => 1 ], "a", true ],
+            "missing_key"           => [ [ "a" => 1 ], "b", false ],
+            "numeric_string_to_int" => [ [ "1" => "v" ], 1, true ],
+            "int_to_string"         => [ [ 1 => "v" ], "1", false ],
+            "numeric_int_key"       => [ [ 1 => "v" ], 1, true ],
+            "empty_array"           => [ [], "x", false ],
+            "float_like_string_key" => [ [ "1.23" => "x" ], "1.23", true ],
+        ];
+    }
 
-        // no overlap
-        $this->assertFalse(Arrays::intersects([ 1 ], [ 2 ]));
 
-        // empty arrays
-        $this->assertFalse(Arrays::intersects([], []));
-        $this->assertFalse(Arrays::intersects([], [ 1 ]));
+    /** @dataProvider providerIsEqual */
+    public function testIsEqual(mixed $a, mixed $b, string $key, bool $expected) {
+        $this->assertSame($expected, Arrays::isEqual($a, $b, $key));
+    }
 
-        // identical arrays -> intersects
-        $this->assertTrue(Arrays::intersects([ 1, 2 ], [ 1, 2 ]));
+    public static function providerIsEqual() {
+        return [
+            "simple_equal"            => [ [ 1, 2 ], [ 1, 2 ], "", true ],
+            "different_length"        => [ [ 1 ], [ 1, 2 ], "", false ],
+            "different_order"         => [ [ 1, 2 ], [ 2, 1 ], "", false ],
+            "type_mismatch"           => [ [ 1 ], [ "1" ], "", false ],
+            "different_assoc_keys"    => [ [ "x" => 1 ], [ "y" => 1 ], "", false ],
+            "nested_by_key_reordered" => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ], [ "id" => 1 ]], "id", true ],
+            "nested_missing_key"      => [ [[ "id" => 1 ], [ "no" => 2 ]], [[ "id" => 1 ], [ "id" => 2 ]], "id", false ],
+        ];
+    }
 
-        // strict type comparison (1 !== "1")
-        $this->assertFalse(Arrays::intersects([ 1 ], [ "1" ]));
 
-        // nested arrays compared by value
-        $this->assertTrue(Arrays::intersects([[ "a" => 1 ]], [[ "a" => 1 ]]));
+    /** @dataProvider providerIsEqualWithKeys */
+    public function testIsEqualWithKeys(mixed $a, mixed $b, array $keys, bool $expected) {
+        $this->assertSame($expected, Arrays::isEqualWithKeys($a, $b, $keys));
+    }
 
-        // objects require the same instance for ===
+    public static function providerIsEqualWithKeys() {
+        return [
+            "equal_arrays"       => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 2 ], [ "x", "y" ], true ],
+            "unequal_values"     => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 3 ], [ "x", "y" ], false ],
+            "different_order"    => [ [ "x" => 1, "y" => 2 ], [ "y" => 2, "x" => 1 ], [ "x", "y" ], true ],
+            "missing_keys"       => [ [ "x" => 1, "y" => 2 ], [ "x" => 1 ], [ "x", "y" ], false ],
+            "extra_keys_ignored" => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 2, "z" => 3 ], [ "x", "y" ], true ],
+            "type_difference"    => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => "2" ], [ "x", "y" ], false ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsEqualJSON */
+    public function testIsEqualJSON(mixed $a, mixed $b, bool $expected) {
+        $this->assertSame($expected, Arrays::isEqualJSON($a, $b));
+    }
+
+    public static function providerIsEqualJSON() {
+        return [
+            "array_vs_object"         => [ [ "a" => 1 ], (object)[ "a" => 1 ], true ],
+            "array_vs_json_string"    => [ [ "a" => 1 ], '{"a":1}', true ],
+            "list_order_matters"      => [ [ 1, 2 ], [ 2, 1 ], false ],
+            "different_keys"          => [ [ "a" => 1 ], [ "b" => 1 ], false ],
+            "null_values"             => [ null, null, true ],
+            "nested_object_vs_string" => [ (object)[ "x" => (object)[ "y" => 2 ] ], '{"x":{"y":2}}', true ],
+            "invalid_json_string"     => [ [ "a" => 1 ], '{invalid}', false ],
+        ];
+    }
+
+
+    /** @dataProvider providerIntersects */
+    public function testIntersects(mixed $a, mixed $b, bool $expected) {
+        $this->assertSame($expected, Arrays::intersects($a, $b));
+    }
+
+    public static function providerIntersects() {
         $obj = (object)[ "x" => 1 ];
-        $this->assertTrue(Arrays::intersects([ $obj ], [ $obj ]));
-        $this->assertFalse(Arrays::intersects([ $obj ], [ (object)[ "x" => 1 ] ]));
+        return [
+            "simple_overlap"            => [ [ 1, 2 ], [ 2, 3 ], true ],
+            "no_overlap"                => [ [ 1 ], [ 2 ], false ],
+            "empty_arrays"              => [ [], [], false ],
+            "empty_with_values"         => [ [], [ 1 ], false ],
+            "identical_arrays"          => [ [ 1, 2 ], [ 1, 2 ], true ],
+            "strict_type_comparison"    => [ [ 1 ], [ "1" ], false ],
+            "nested_arrays_by_value"    => [ [[ "a" => 1 ]], [[ "a" => 1 ]], true ],
+            "same_object_instance"      => [ [ $obj ], [ $obj ], true ],
+            "different_object_instance" => [ [ $obj ], [ (object)[ "x" => 1 ] ], false ],
+        ];
     }
 
-    public function testGetDiff() {
-        $a = [[ "id" => 1 ], [ "id" => 2 ]];
-        $b = [[ "id" => 2 ]];
-        $this->assertSame([[ "id" => 1 ]], Arrays::getDiff($a, $b, "id"));
-        $this->assertSame([ 1 ], Arrays::getDiff($a, $b, "id", "id"));
 
-        // identical arrays -> empty diff
-        $this->assertSame([], Arrays::getDiff($a, $a, "id"));
-
-        // other empty -> all elements returned
-        $this->assertSame($a, Arrays::getDiff($a, [], "id"));
-        $this->assertSame([ 1, 2 ], Arrays::getDiff($a, [], "id", "id"));
-
-        // rows that are not arrays are ignored
-        $mixed = [ [ "id" => 1 ], 5, "x" ];
-        $this->assertSame([[ "id" => 1 ]], Arrays::getDiff($mixed, [], "id"));
-
-        // missing checkKey in a row causes it to be included
-        $withMissing = [[ "id" => 1 ], [ "no" => 3 ]];
-        $this->assertSame([[ "no" => 3 ]], Arrays::getDiff($withMissing, [[ "id" => 1 ]], "id"));
+    /** @dataProvider providerGetDiff */
+    public function testGetDiff(mixed $a, mixed $b, string $key, ?string $returnKey, array $expected) {
+        $this->assertSame($expected, Arrays::getDiff($a, $b, $key, $returnKey));
     }
 
-    public function testAddFirst() {
-        // add a single element to the start
-        $this->assertSame([ 0, 1, 2 ], Arrays::addFirst([ 1, 2 ], 0));
+    public static function providerGetDiff() {
+        return [
+            "basic_diff"          => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", null, [[ "id" => 1 ]] ],
+            "extract_id_key"      => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", "id", [ 1 ] ],
+            "identical_arrays"    => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 1 ], [ "id" => 2 ]], "id", null, [] ],
+            "empty_other"         => [ [[ "id" => 1 ], [ "id" => 2 ]], [], "id", null, [[ "id" => 1 ], [ "id" => 2 ]] ],
+            "empty_other_extract" => [ [[ "id" => 1 ], [ "id" => 2 ]], [], "id", "id", [ 1, 2 ] ],
+            "mixed_non_arrays"    => [ [ [ "id" => 1 ], 5, "x" ], [], "id", null, [[ "id" => 1 ]] ],
+            "missing_check_key"   => [ [[ "id" => 1 ], [ "no" => 3 ]], [[ "id" => 1 ]], "id", null, [[ "no" => 3 ]] ],
+        ];
+    }
 
-        // add multiple elements using variadic args
-        $this->assertSame([ 1, 2, 3 ], Arrays::addFirst([ 3 ], 1, 2));
 
-        // add to an empty array
-        $this->assertSame([ "a" ], Arrays::addFirst([], "a"));
+    /** @dataProvider providerAddFirst */
+    public function testAddFirst(mixed $input, array $elements, array $expected) {
+        $this->assertSame($expected, Arrays::addFirst($input, ...$elements));
+    }
 
-        // objects are preserved (same instance returned)
+    public static function providerAddFirst() {
         $o = (object)[ "x" => 1 ];
-        $this->assertSame([ $o ], Arrays::addFirst([], $o));
+        return [
+            "single_element"    => [ [ 1, 2 ], [ 0 ], [ 0, 1, 2 ] ],
+            "multiple_elements" => [ [ 3 ], [ 1, 2 ], [ 1, 2, 3 ] ],
+            "add_to_empty"      => [ [], [ "a" ], [ "a" ] ],
+            "object_preserved"  => [ [], [ $o ], [ $o ] ],
+        ];
     }
 
-    public function testAddAt() {
-        // insert single element in the middle
-        $this->assertSame([ 1, 99, 2 ], Arrays::addAt([ 1, 2 ], 1, 99));
 
-        // insert at the start
-        $this->assertSame([ 0, 1, 2 ], Arrays::addAt([ 1, 2 ], 0, 0));
+    /** @dataProvider providerAddAt */
+    public function testAddAt(mixed $input, int $index, array $elements, array $expected) {
+        $this->assertSame($expected, Arrays::addAt($input, $index, ...$elements));
+    }
 
-        // insert multiple elements (variadic)
-        $this->assertSame([ 1, 2, 3, 4 ], Arrays::addAt([ 1, 4 ], 1, 2, 3));
-
-        // insert with negative index (before last)
-        $this->assertSame([ 1, 2, 9, 3 ], Arrays::addAt([ 1, 2, 3 ], -1, 9));
-
-        // insert beyond end appends
-        $this->assertSame([ 1, 2 ], Arrays::addAt([ 1 ], 10, 2));
-
-        // objects are preserved (same instance)
+    public static function providerAddAt() {
         $o = (object)[ "x" => 1 ];
-        $this->assertSame([ $o ], Arrays::addAt([], 0, $o));
+        return [
+            "insert_middle"         => [ [ 1, 2 ], 1, [ 99 ], [ 1, 99, 2 ] ],
+            "insert_start"          => [ [ 1, 2 ], 0, [ 0 ], [ 0, 1, 2 ] ],
+            "insert_multiple"       => [ [ 1, 4 ], 1, [ 2, 3 ], [ 1, 2, 3, 4 ] ],
+            "insert_negative_index" => [ [ 1, 2, 3 ], -1, [ 9 ], [ 1, 2, 9, 3 ] ],
+            "insert_beyond_end"     => [ [ 1 ], 10, [ 2 ], [ 1, 2 ] ],
+            "object_preserved"      => [ [], 0, [ $o ], [ $o ] ],
+        ];
     }
 
-    public function testRemoveFirst() {
-        // simple removal
-        $this->assertSame([ 2, 3 ], Arrays::removeFirst([ 1, 2, 3 ]));
 
-        // single-element becomes empty
-        $this->assertSame([], Arrays::removeFirst([ 1 ]));
-
-        // removing from an empty array returns empty array
-        $this->assertSame([], Arrays::removeFirst([]));
-
-        // objects preserved and first removed
-        $o1 = (object)[ 'x' => 1 ];
-        $o2 = (object)[ 'x' => 2 ];
-        $this->assertSame([ $o2 ], Arrays::removeFirst([ $o1, $o2 ]));
+    /** @dataProvider providerRemoveFirst */
+    public function testRemoveFirst(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::removeFirst($input));
     }
 
-    public function testRemoveLast() {
-        // remove last from a simple list
-        $this->assertSame([ 1, 2 ], Arrays::removeLast([ 1, 2, 3 ]));
-
-        // single-element becomes empty
-        $this->assertSame([], Arrays::removeLast([ 1 ]));
-
-        // removing from an empty array returns empty array
-        $this->assertSame([], Arrays::removeLast([]));
-
-        // objects preserved and last removed
+    public static function providerRemoveFirst() {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
-        $this->assertSame([ $o1 ], Arrays::removeLast([ $o1, $o2 ]));
-
-        // associative arrays keep remaining keys
-        $this->assertSame([ "a" => 1 ], Arrays::removeLast([ "a" => 1, "b" => 2 ]));
+        return [
+            "simple_removal"    => [ [ 1, 2, 3 ], [ 2, 3 ] ],
+            "single_element"    => [ [ 1 ], [] ],
+            "empty_array"       => [ [], [] ],
+            "objects_preserved" => [ [ $o1, $o2 ], [ $o2 ] ],
+        ];
     }
 
-    public function testRemoveAt() {
-        // remove middle element
-        $this->assertSame([ 1, 3 ], Arrays::removeAt([ 1, 2, 3 ], 1));
 
-        // remove at start
-        $this->assertSame([ 2, 3 ], Arrays::removeAt([ 1, 2, 3 ], 0));
+    /** @dataProvider providerRemoveLast */
+    public function testRemoveLast(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::removeLast($input));
+    }
 
-        // remove at end using negative index
-        $this->assertSame([ 1, 2 ], Arrays::removeAt([ 1, 2, 3 ], -1));
-
-        // single-element becomes empty
-        $this->assertSame([], Arrays::removeAt([ 1 ], 0));
-
-        // position beyond end does nothing
-        $this->assertSame([ 1 ], Arrays::removeAt([ 1 ], 10));
-
-        // objects preserved and element removed
+    public static function providerRemoveLast() {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
-        $this->assertSame([ $o1 ], Arrays::removeAt([ $o1, $o2 ], 1));
+        return [
+            "simple_list"       => [ [ 1, 2, 3 ], [ 1, 2 ] ],
+            "single_element"    => [ [ 1 ], [] ],
+            "empty_array"       => [ [], [] ],
+            "objects_preserved" => [ [ $o1, $o2 ], [ $o1 ] ],
+            "assoc_array"       => [ [ "a" => 1, "b" => 2 ], [ "a" => 1 ] ],
+        ];
     }
 
-    public function testRemoveValue() {
-        // remove by key from nested rows
-        $this->assertSame([[ "id" => 2 ]], Arrays::removeValue([[ "id" => 1 ], [ "id" => 2 ]], 1, "id"));
 
-        // remove primitive values from a simple list
-        $this->assertSame([ 2, 3 ], Arrays::removeValue([ 1, 2, 3 ], 1));
+    /** @dataProvider providerRemoveAt */
+    public function testRemoveAt(mixed $input, int $index, array $expected) {
+        $this->assertSame($expected, Arrays::removeAt($input, $index));
+    }
 
-        // removing non-existing value leaves array unchanged
-        $this->assertSame([ 1, 2 ], Arrays::removeValue([ 1, 2 ], 3));
+    public static function providerRemoveAt() {
+        $o1 = (object)[ "x" => 1 ];
+        $o2 = (object)[ "x" => 2 ];
+        return [
+            "remove_middle"       => [ [ 1, 2, 3 ], 1, [ 1, 3 ] ],
+            "remove_at_start"     => [ [ 1, 2, 3 ], 0, [ 2, 3 ] ],
+            "remove_at_end"       => [ [ 1, 2, 3 ], -1, [ 1, 2 ] ],
+            "single_element"      => [ [ 1 ], 0, [] ],
+            "position_beyond_end" => [ [ 1 ], 10, [ 1 ] ],
+            "objects_preserved"   => [ [ $o1, $o2 ], 1, [ $o1 ] ],
+        ];
+    }
 
-        // removes all occurrences of the value
-        $this->assertSame([ 2 ], Arrays::removeValue([ 1, 2, 1 ], 1));
 
-        // works with objects (same instance preserved)
+    /** @dataProvider providerRemoveValue */
+    public function testRemoveValue(mixed $input, mixed $value, string $key, array $expected) {
+        $this->assertSame($expected, Arrays::removeValue($input, $value, $key));
+    }
+
+    public static function providerRemoveValue() {
         $o1 = (object)[ "id" => 1 ];
         $o2 = (object)[ "id" => 2 ];
-        $this->assertSame([ $o2 ], Arrays::removeValue([ $o1, $o2 ], 1, "id"));
-
-        // rows missing the idKey are not kept
-        $withMissing = [[ "id" => 1 ], [ "no" => 3 ]];
-        $this->assertSame([], Arrays::removeValue($withMissing, 1, "id"));
-
-        // strict type comparison: string "1" is not equal to int 1
-        $this->assertSame([ "1", "2" ], Arrays::removeValue([ "1", "2" ], 1));
+        return [
+            "remove_by_key_from_rows"    => [ [[ "id" => 1 ], [ "id" => 2 ]], 1, "id", [[ "id" => 2 ]] ],
+            "remove_primitive_from_list" => [ [ 1, 2, 3 ], 1, "", [ 2, 3 ] ],
+            "non_existing_value"         => [ [ 1, 2 ], 3, "", [ 1, 2 ] ],
+            "remove_all_occurrences"     => [ [ 1, 2, 1 ], 1, "", [ 2 ] ],
+            "objects_preserved"          => [ [ $o1, $o2 ], 1, "id", [ $o2 ] ],
+            "rows_missing_key"           => [ [[ "id" => 1 ], [ "no" => 3 ]], 1, "id", [] ],
+            "strict_type_comparison"     => [ [ "1", "2" ], 1, "", [ "1", "2" ] ],
+        ];
     }
 
-    public function testRemoveEmpty() {
-        // basic removal of empty values
-        $this->assertSame([ 1, "a" ], Arrays::removeEmpty([ 1, "", null, "a" ]));
 
-        // empty input stays empty
-        $this->assertSame([], Arrays::removeEmpty([]));
+    /** @dataProvider providerRemoveEmpty */
+    public function testRemoveEmpty(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::removeEmpty($input));
+    }
 
-        // removes 0, false, empty string and null (empty() semantics)
-        $this->assertSame([ 1, "a" ], Arrays::removeEmpty([ 0, 1, "", null, false, "a", "0" ]));
-
-        // removes empty nested arrays but preserves non-empty arrays and objects
+    public static function providerRemoveEmpty() {
         $o1 = (object)[];
         $o2 = (object)[ "x" => 1 ];
-        $this->assertSame([[ 1 ], $o1, $o2], Arrays::removeEmpty([ [], [ 1 ], $o1, $o2 ]));
+        return [
+            "basic_removal"         => [ [ 1, "", null, "a" ], [ 1, "a" ] ],
+            "empty_input"           => [ [], [] ],
+            "removes_falsy_values"  => [ [ 0, 1, "", null, false, "a", "0" ], [ 1, "a" ] ],
+            "nested_arrays_objects" => [ [ [], [ 1 ], $o1, $o2 ], [ [ 1 ], $o1, $o2 ] ],
+        ];
     }
 
-    public function testRemoveDuplicates() {
-        // basic numeric duplicates
-        $this->assertSame([ 1, 2 ], Arrays::removeDuplicates([ 1, 2, 1, 2 ]));
 
-        // string duplicates
-        $this->assertSame([ "a", "b" ], Arrays::removeDuplicates([ "a", "b", "a" ]));
-
-        // strict types: int and string are not distinct
-        $this->assertSame([ 1 ], Arrays::removeDuplicates([ 1, "1", 1 ]));
-
-        // empty input remains empty
-        $this->assertSame([], Arrays::removeDuplicates([]));
+    /** @dataProvider providerRemoveDuplicates */
+    public function testRemoveDuplicates(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::removeDuplicates($input));
     }
 
-    public function testMerge() {
-        // simple associative merge
-        $this->assertSame([ "a" => 1, "b" => 2 ], Arrays::merge([ "a" => 1 ], [ "b" => 2 ]));
+    public static function providerRemoveDuplicates() {
+        return [
+            "basic_numeric"     => [ [ 1, 2, 1, 2 ], [ 1, 2 ] ],
+            "string_duplicates" => [ [ "a", "b", "a" ], [ "a", "b" ] ],
+            "strict_types"      => [ [ 1, "1", 1 ], [ 1 ] ],
+            "empty_input"       => [ [], [] ],
+        ];
+    }
 
-        // key conflict: later array wins
-        $this->assertSame([ "a" => 2 ], Arrays::merge([ "a" => 1 ], [ "a" => 2 ]));
 
-        // numeric keys are reindexed (list merge)
-        $this->assertSame([ 1, 2, 3 ], Arrays::merge([ 1, 2 ], [ 3 ]));
+    /** @dataProvider providerMerge */
+    public function testMerge(mixed $a, mixed $b, array $expected) {
+        $this->assertSame($expected, Arrays::merge($a, $b));
+    }
 
-        // nested arrays are replaced, not deep-merged
-        $this->assertSame([ "x" => [ "z" => 2 ] ], Arrays::merge([ "x" => [ "y" => 1 ] ], [ "x" => [ "z" => 2 ] ]));
-
-        // object values preserved (same instance)
+    public static function providerMerge() {
         $o = (object)[ "k" => "v" ];
-        $this->assertSame([ "k" => $o ], Arrays::merge([ "k" => $o ], []));
-
-        // merging with empty arrays returns the other
-        $this->assertSame([ "a" => 1 ], Arrays::merge([], [ "a" => 1 ]));
+        return [
+            "simple_associative_merge" => [ [ "a" => 1 ], [ "b" => 2 ], [ "a" => 1, "b" => 2 ] ],
+            "key_conflict_later_wins"  => [ [ "a" => 1 ], [ "a" => 2 ], [ "a" => 2 ] ],
+            "numeric_keys_reindexed"   => [ [ 1, 2 ], [ 3 ], [ 1, 2, 3 ] ],
+            "nested_arrays_replaced"   => [ [ "x" => [ "y" => 1 ] ], [ "x" => [ "z" => 2 ] ], [ "x" => [ "z" => 2 ] ] ],
+            "object_preserved"         => [ [ "k" => $o ], [], [ "k" => $o ] ],
+            "merge_with_empty"         => [ [], [ "a" => 1 ], [ "a" => 1 ] ],
+        ];
     }
 
-    public function testMergeLists() {
-        // simple concatenation
-        $this->assertSame([ 1, 2, 3 ], Arrays::mergeLists([ 1, 2 ], [ 3 ]));
 
-        // merging with empty list returns other list
-        $this->assertSame([ 1 ], Arrays::mergeLists([], [ 1 ]));
+    /** @dataProvider providerMergeLists */
+    public function testMergeLists(mixed $a, mixed $b, array $expected) {
+        $this->assertSame($expected, Arrays::mergeLists($a, $b));
+    }
 
-        // duplicates are preserved and reindexed
-        $this->assertSame([ 1, 2, 2, 3 ], Arrays::mergeLists([ 1, 2 ], [ 2, 3 ]));
-
-        // variadic merging of multiple lists
-        $this->assertSame([ 1, 2, 3 ], Arrays::mergeLists([ 1 ], [ 2 ], [ 3 ]));
-
-        // object elements preserve identity
+    public static function providerMergeLists() {
         $o = (object)[ "x" => 1 ];
-        $this->assertSame([ $o ], Arrays::mergeLists([], [ $o ]));
+        return [
+            "simple_concatenation"      => [ [ 1, 2 ], [ 3 ], [ 1, 2, 3 ] ],
+            "merge_with_empty"          => [ [], [ 1 ], [ 1 ] ],
+            "duplicates_preserved"      => [ [ 1, 2 ], [ 2, 3 ], [ 1, 2, 2, 3 ] ],
+            "variadic_multiple_lists"   => [ [ 1 ], [ 2 ], [ 1, 2 ] ],
+            "object_elements_preserved" => [ [], [ $o ], [ $o ] ],
+        ];
     }
 
-    public function testSlice() {
-        // basic slice with explicit amount
-        $this->assertSame([ 2, 3 ], Arrays::slice([ 1, 2, 3 ], 1, 2));
 
-        // slice from index to end when amount omitted
-        $this->assertSame([ 3 ], Arrays::slice([ 1, 2, 3 ], 2));
+    /** @dataProvider providerSlice */
+    public function testSlice(mixed $input, int $from, ?int $amount, array $expected) {
+        $this->assertSame($expected, Arrays::slice($input, $from, $amount));
+    }
 
-        // amount larger than remaining returns remaining elements
-        $this->assertSame([ 2, 3 ], Arrays::slice([ 1, 2, 3 ], 1, 10));
-
-        // negative from counts from the end
-        $this->assertSame([ 2 ], Arrays::slice([ 1, 2, 3 ], -2, 1));
-
-        // empty input returns empty
-        $this->assertSame([], Arrays::slice([], 0, 2));
-
-        // objects preserved (same instance)
+    public static function providerSlice() {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
-        $this->assertSame([ $o2 ], Arrays::slice([ $o1, $o2 ], 1, 1));
+        return [
+            "basic_slice_with_amount"  => [ [ 1, 2, 3 ], 1, 2, [ 2, 3 ] ],
+            "slice_to_end_omit_amount" => [ [ 1, 2, 3 ], 2, null, [ 3 ] ],
+            "amount_larger_remaining"  => [ [ 1, 2, 3 ], 1, 10, [ 2, 3 ] ],
+            "negative_from_index"      => [ [ 1, 2, 3 ], -2, 1, [ 2 ] ],
+            "empty_input"              => [ [], 0, 2, [] ],
+            "objects_preserved"        => [ [ $o1, $o2 ], 1, 1, [ $o2 ] ],
+        ];
     }
 
-    public function testPaginate() {
-        $this->assertSame([ 1, 2 ], Arrays::paginate([ 1, 2, 3 ], 0, 2));
-        $this->assertSame([ 3, 4 ], Arrays::paginate([ 1, 2, 3, 4 ], 1, 2));
 
-        // page beyond available items returns empty list
-        $this->assertSame([], Arrays::paginate([ 1, 2, 3 ], 2, 2));
+    /** @dataProvider providerPaginate */
+    public function testPaginate(mixed $input, int $page, int $amount, array $expected) {
+        $this->assertSame($expected, Arrays::paginate($input, $page, $amount));
+    }
 
-        // amount larger than remaining returns an empty array
-        $this->assertSame([], Arrays::paginate([ 1, 2, 3 ], 1, 5));
-
-        // empty input always returns empty
-        $this->assertSame([], Arrays::paginate([], 0, 3));
-
-        // object identity preserved when paginating
+    public static function providerPaginate() {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
-        $this->assertSame([ $o2 ], Arrays::paginate([ $o1, $o2 ], 1, 1));
+        return [
+            "basic_pagination"          => [ [ 1, 2, 3 ], 0, 2, [ 1, 2 ] ],
+            "second_page"               => [ [ 1, 2, 3, 4 ], 1, 2, [ 3, 4 ] ],
+            "page_beyond_available"     => [ [ 1, 2, 3 ], 2, 2, [] ],
+            "amount_larger_remaining"   => [ [ 1, 2, 3 ], 1, 5, [] ],
+            "empty_input"               => [ [], 0, 3, [] ],
+            "object_identity_preserved" => [ [ $o1, $o2 ], 1, 1, [ $o2 ] ],
+        ];
     }
 
-    public function testSubArray() {
-        // basic intersection by value
-        $this->assertSame([ 2 ], Arrays::subArray([ 1, 2, 3 ], [ 2, 4 ]));
 
-        // no matches -> empty
-        $this->assertSame([], Arrays::subArray([ 1, 2, 3 ], [ 4, 5 ]));
+    /** @dataProvider providerSubArray */
+    public function testSubArray(mixed $input, mixed $selector, array $expected) {
+        $this->assertSame($expected, Arrays::subArray($input, $selector));
+    }
 
-        // it does not preserve duplicates present in the source
-        $this->assertSame([ 2 ], Arrays::subArray([ 1, 2, 2, 3 ], [ 2 ]));
-
-        // empty source returns empty
-        $this->assertSame([], Arrays::subArray([], [ 1, 2 ]));
-
-        // empty selector returns empty
-        $this->assertSame([], Arrays::subArray([ 1, 2 ], []));
-
-        // object identity preserved
+    public static function providerSubArray() {
         $o1 = (object)[ "id" => 1 ];
         $o2 = (object)[ "id" => 2 ];
-        $this->assertSame([ $o2 ], Arrays::subArray([ $o1, $o2 ], [ $o2 ]));
+        return [
+            "basic_intersection"        => [ [ 1, 2, 3 ], [ 2, 4 ], [ 2 ] ],
+            "no_matches"                => [ [ 1, 2, 3 ], [ 4, 5 ], [] ],
+            "no_duplicates"             => [ [ 1, 2, 2, 3 ], [ 2 ], [ 2 ] ],
+            "empty_source"              => [ [], [ 1, 2 ], [] ],
+            "empty_selector"            => [ [ 1, 2 ], [], [] ],
+            "object_identity_preserved" => [ [ $o1, $o2 ], [ $o2 ], [ $o2 ] ],
+        ];
     }
 
-    public function testExtend() {
-        $a = [ "x" => [ "y" => 1 ] ];
-        $b = [ "x" => [ "z" => 2 ] ];
-        $this->assertSame([ "x" => [ "y" => 1, "z" => 2 ] ], Arrays::extend($a, $b));
 
-        // adds new top-level keys
-        $a2 = [ "a" => 1 ];
-        $b2 = [ "b" => 2 ];
-        $this->assertSame([ "a" => 1, "b" => 2 ], Arrays::extend($a2, $b2));
+    /** @dataProvider providerExtend */
+    public function testExtend(mixed $a, mixed $b, array $expected) {
+        $this->assertSame($expected, Arrays::extend($a, $b));
+    }
 
-        // scalar keys are overridden by the second array
-        $a3 = [ "k" => 1 ];
-        $b3 = [ "k" => 2 ];
-        $this->assertSame([ "k" => 2 ], Arrays::extend($a3, $b3));
-
-        // extending with an empty array returns the first
-        $this->assertSame($a2, Arrays::extend($a2, []));
-
-        // object values preserve identity
+    public static function providerExtend() {
         $obj = (object)[ "x" => 1 ];
-        $res = Arrays::extend([ "o" => $obj ], []);
-        $this->assertSame([ "o" => $obj ], $res);
+        return [
+            "nested_merge"              => [ [ "x" => [ "y" => 1 ] ], [ "x" => [ "z" => 2 ] ], [ "x" => [ "y" => 1, "z" => 2 ] ] ],
+            "adds_new_top_level_keys"   => [ [ "a" => 1 ], [ "b" => 2 ], [ "a" => 1, "b" => 2 ] ],
+            "scalar_keys_overridden"    => [ [ "k" => 1 ], [ "k" => 2 ], [ "k" => 2 ] ],
+            "extend_empty_array"        => [ [ "a" => 1 ], [], [ "a" => 1 ] ],
+            "object_identity_preserved" => [ [ "o" => $obj ], [], [ "o" => $obj ] ],
+        ];
     }
 
-    public function testSort() {
-        // simple ascending
-        $this->assertSame([ 1, 2, 3 ], Arrays::sort([ 3, 1, 2 ]));
 
-        // descending using comparator
-        $this->assertSame([ 3, 2, 1 ], Arrays::sort([ 1, 2, 3 ], fn($a, $b) => $b <=> $a));
+    /** @dataProvider providerSort */
+    public function testSort(mixed $input, ?callable $comparator, array $expected) {
+        $this->assertSame($expected, Arrays::sort($input, $comparator));
+    }
 
-        // associative arrays with callback preserve keys
-        $assoc = [ "c" => 3, "a" => 1, "b" => 2 ];
-        $sortedAssoc = Arrays::sort($assoc, fn($x, $y) => $x <=> $y);
-        $this->assertSame([ "a" => 1, "b" => 2, "c" => 3 ], $sortedAssoc);
-
-        // sorting list of objects by property (same instances preserved)
+    public static function providerSort() {
         $o1 = (object)[ "v" => 2 ];
         $o2 = (object)[ "v" => 1 ];
-        $sorted = Arrays::sort([ $o1, $o2 ], fn($x, $y) => $x->v <=> $y->v);
-        $this->assertSame([ $o2, $o1 ], $sorted);
+        return [
+            "simple_ascending"      => [ [ 3, 1, 2 ], null, [ 1, 2, 3 ] ],
+            "descending_comparator" => [ [ 1, 2, 3 ], fn($a, $b) => $b <=> $a, [ 3, 2, 1 ] ],
+            "assoc_preserve_keys"   => [ [ "c" => 3, "a" => 1, "b" => 2 ], fn($x, $y) => $x <=> $y, [ "a" => 1, "b" => 2, "c" => 3 ] ],
+            "objects_by_property"   => [ [ $o1, $o2 ], fn($x, $y) => $x->v <=> $y->v, [ $o2, $o1 ] ],
+        ];
     }
 
-    public function testSortList() {
-        $this->assertSame([ 1, 2 ], Arrays::sortList([ 2, 1 ]));
 
-        // empty list remains empty
-        $this->assertSame([], Arrays::sortList([]));
+    /** @dataProvider providerSortList */
+    public function testSortList(mixed $input, ?callable $comparator, array $expected) {
+        $this->assertSame($expected, Arrays::sortList($input, $comparator));
+    }
 
-        // duplicates preserved and reindexed
-        $this->assertSame([ 1, 2, 2, 3 ], Arrays::sortList([ 2, 3, 1, 2 ]));
-
-        // custom comparator (descending)
-        $this->assertSame([ 3, 2, 1 ], Arrays::sortList([ 1, 2, 3 ], fn($a, $b) => $b <=> $a));
-
-        // sorting objects by property preserves instances
+    public static function providerSortList() {
         $o1 = (object)[ "v" => 2 ];
         $o2 = (object)[ "v" => 1 ];
-        $sorted = Arrays::sortList([ $o1, $o2 ], fn($x, $y) => $x->v <=> $y->v);
-        $this->assertSame([ $o2, $o1 ], $sorted);
+        return [
+            "simple_sort"          => [ [ 2, 1 ], null, [ 1, 2 ] ],
+            "empty_list"           => [ [], null, [] ],
+            "duplicates_preserved" => [ [ 2, 3, 1, 2 ], null, [ 1, 2, 2, 3 ] ],
+            "custom_descending"    => [ [ 1, 2, 3 ], fn($a, $b) => $b <=> $a, [ 3, 2, 1 ] ],
+            "objects_by_property"  => [ [ $o1, $o2 ], fn($x, $y) => $x->v <=> $y->v, [ $o2, $o1 ] ],
+        ];
     }
 
-    public function testReverse() {
-        $this->assertSame([ 3, 2, 1 ], Arrays::reverse([ 1, 2, 3 ]));
 
-        // empty list remains empty
-        $this->assertSame([], Arrays::reverse([]));
+    /** @dataProvider providerReverse */
+    public function testReverse(mixed $input, array $expected) {
+        $this->assertSame($expected, Arrays::reverse($input));
+    }
 
-        // single-element unchanged
-        $this->assertSame([ 1 ], Arrays::reverse([ 1 ]));
-
-        // object instances preserved and order reversed
+    public static function providerReverse() {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
-        $this->assertSame([ $o2, $o1 ], Arrays::reverse([ $o1, $o2 ]));
+        return [
+            "simple_reverse"    => [ [ 1, 2, 3 ], [ 3, 2, 1 ] ],
+            "empty_list"        => [ [], [] ],
+            "single_element"    => [ [ 1 ], [ 1 ] ],
+            "objects_preserved" => [ [ $o1, $o2 ], [ $o2, $o1 ] ],
+        ];
     }
 
-    public function testMap() {
-        $this->assertSame([ 2, 4 ], Arrays::map([ 1, 2 ], fn($v) => $v * 2));
 
-        // empty input returns empty
-        $this->assertSame([], Arrays::map([], fn($v) => $v * 2));
+    /** @dataProvider providerMap */
+    public function testMap(mixed $input, callable $callback, array $expected) {
+        $this->assertSame($expected, Arrays::map($input, $callback));
+    }
 
-        // associative arrays preserve keys
-        $this->assertSame([ "a" => 2, "b" => 4 ], Arrays::map([ "a" => 1, "b" => 2 ], fn($v) => $v * 2));
-
-        // mapping can return different types
-        $this->assertSame([ "1", "2" ], Arrays::map([ 1, 2 ], fn($v) => (string)$v));
-
-        // object instances preserved when callback returns the same instance
+    public static function providerMap() {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
-        $this->assertSame([ $o1, $o2 ], Arrays::map([ $o1, $o2 ], fn($v) => $v));
+        return [
+            "simple_mapping"             => [ [ 1, 2 ], fn($v) => $v * 2, [ 2, 4 ] ],
+            "empty_input"                => [ [], fn($v) => $v * 2, [] ],
+            "assoc_preserve_keys"        => [ [ "a" => 1, "b" => 2 ], fn($v) => $v * 2, [ "a" => 2, "b" => 4 ] ],
+            "different_return_type"      => [ [ 1, 2 ], fn($v) => (string)$v, [ "1", "2" ] ],
+            "object_instances_preserved" => [ [ $o1, $o2 ], fn($v) => $v, [ $o1, $o2 ] ],
+        ];
     }
 
-    public function testRandom() {
-        // random from a simple list
-        $val = Arrays::random([ 10, 20, 30 ]);
-        $this->assertContains($val, [ 10, 20, 30 ]);
 
-        // random from an associative array returns one of the values
-        $assoc = [ "a" => 100, "b" => 200 ];
-        $this->assertContains(Arrays::random($assoc), [ 100, 200 ]);
+    /** @dataProvider providerRandom */
+    public function testRandom(mixed $input, array $expected) {
+        $this->assertContains(Arrays::random($input), $expected);
+    }
 
-        // single-element array returns that element
-        $this->assertSame(42, Arrays::random([ 42 ]));
-
-        // empty array returns null
-        $this->assertNull(Arrays::random([]));
-
-        // non-consecutive numeric keys
-        $mixed = [ 5 => "x", 999 => "y" ];
-        $this->assertContains(Arrays::random($mixed), [ "x", "y" ]);
-
-        // objects are returned as-is (same instance)
+    public static function providerRandom() {
         $o1 = (object)[ "a" => 1 ];
         $o2 = (object)[ "b" => 2 ];
-        $this->assertContains(Arrays::random([ $o1, $o2 ]), [ $o1, $o2 ]);
+        return [
+            "simple_list"          => [ [ 10, 20, 30 ], [ 10, 20, 30 ] ],
+            "assoc_array"          => [ [ "a" => 100, "b" => 200 ], [ 100, 200 ] ],
+            "single_element"       => [ [ 42 ], [ 42 ] ],
+            "empty_array"          => [ [], [ null ] ],
+            "non_consecutive_keys" => [ [ 5 => "x", 999 => "y" ], [ "x", "y" ] ],
+            "objects_preserved"    => [ [ $o1, $o2 ], [ $o1, $o2 ] ],
+        ];
     }
 
-    public function testMax() {
-        $this->assertSame(5, Arrays::max([ 1, 5, 3 ]));
 
-        // empty arrays return 0
-        $this->assertSame(0, Arrays::max([]));
-
-        // works with negative numbers
-        $this->assertSame(-1, Arrays::max([ -3, -1, -2 ]));
-
-        // associative arrays consider values
-        $this->assertSame(7, Arrays::max([ "a" => 7, "b" => 2 ]));
-
-        // single-element arrays return that element
-        $this->assertSame(4, Arrays::max([ 4 ]));
-
-        // null treated as empty
-        $this->assertSame(0, Arrays::max(null));
+    /** @dataProvider providerMax */
+    public function testMax(mixed $input, int|float $expected) {
+        $this->assertSame($expected, Arrays::max($input));
     }
 
-    public function testSum() {
-        $this->assertSame(6, Arrays::sum([ 1, 2, 3 ]));
-        $this->assertSame(3, Arrays::sum([[ "v" => 1 ], [ "v" => 2 ]], "v"));
-
-        // empty input -> zero
-        $this->assertSame(0, Arrays::sum([]));
-
-        // negative values
-        $this->assertSame(1, Arrays::sum([ -1, 2 ]));
-
-        // floats preserved
-        $this->assertSame(3.75, Arrays::sum([ 1.5, 2.25 ]));
-
-        // numeric strings converted
-        $this->assertSame(3.0, Arrays::sum([ "1", "2" ]));
-
-        // when summing by key, missing keys are ignored
-        $this->assertSame(1, Arrays::sum([[ "v" => 1 ], [ "x" => 2 ]], "v"));
+    public static function providerMax() {
+        return [
+            "simple_values"    => [ [ 1, 5, 3 ], 5 ],
+            "empty_array"      => [ [], 0 ],
+            "negative_numbers" => [ [ -3, -1, -2 ], -1 ],
+            "assoc_array"      => [ [ "a" => 7, "b" => 2 ], 7 ],
+            "single_element"   => [ [ 4 ], 4 ],
+            "null_input"       => [ null, 0 ],
+        ];
     }
 
-    public function testAverage() {
-        $this->assertSame(2.0, Arrays::average([ 1, 2, 3 ]));
-        $this->assertSame(4.0, Arrays::average([ 4 ]));
 
-        // negative numbers
-        $this->assertSame(0.0, Arrays::average([ -1, 1 ]));
-
-        // empty input -> zero
-        $this->assertSame(0.0, Arrays::average([]));
-
-        // numeric strings are converted
-        $this->assertSame(2.0, Arrays::average([ "1", "2", "3" ]));
-
-        // decimals parameter rounds the result
-        $this->assertSame(1.5, Arrays::average([ 1.2, 1.8 ], 1));
-
-        // associative arrays count keys
-        $this->assertSame(2.0, Arrays::average([ "a" => 1, "b" => 3 ]));
-
-        // averaging by key divides by total length (missing keys reduce average)
-        $this->assertSame(0.5, Arrays::average([[ "v" => 1 ], [ "x" => 2 ]], 1, "v"));
-
-        // average by key with all present
-        $this->assertSame(1.5, Arrays::average([[ "v" => 1 ], [ "v" => 2 ] ], 1, "v"));
+    /** @dataProvider providerSum */
+    public function testSum(mixed $input, ?string $key, int|float $expected) {
+        $this->assertSame($expected, Arrays::sum($input, $key));
     }
 
-    public function testCreateMap() {
-        $rows = [[ "id" => 1, "v" => "a" ], [ "id" => 2, "v" => "b" ]];
-        $map = Arrays::createMap($rows, "id");
-        $this->assertArrayHasKey(1, $map);
-        $this->assertArrayHasKey(2, $map);
-        $this->assertSame($rows[0], $map[1]);
+    public static function providerSum() {
+        return [
+            "simple_sum"           => [ [ 1, 2, 3 ], null, 6 ],
+            "sum_by_key"           => [ [[ "v" => 1 ], [ "v" => 2 ]], "v", 3 ],
+            "empty_input"          => [ [], null, 0 ],
+            "negative_values"      => [ [ -1, 2 ], null, 1 ],
+            "floats_preserved"     => [ [ 1.5, 2.25 ], null, 3.75 ],
+            "numeric_strings"      => [ [ "1", "2" ], null, 3.0 ],
+            "missing_keys_ignored" => [ [[ "v" => 1 ], [ "x" => 2 ]], "v", 1 ],
+        ];
+    }
 
-        // later rows override earlier rows with the same key
-        $dup = [ [ "id" => 1, "v" => "a" ], [ "id" => 1, "v" => "c" ] ];
-        $mapDup = Arrays::createMap($dup, "id");
-        $this->assertSame("c", $mapDup[1]["v"]);
 
-        // rows missing the key are ignored
-        $mixed = [[ "no" => 1 ], [ "id" => 2, "v" => "b" ]];
-        $mapMixed = Arrays::createMap($mixed, "id");
-        $this->assertArrayHasKey(2, $mapMixed);
-        $this->assertCount(1, $mapMixed);
+    /** @dataProvider providerAverage */
+    public function testAverage(mixed $input, int $decimals, ?string $key, float $expected) {
+        $this->assertSame($expected, Arrays::average($input, $decimals, $key));
+    }
 
-        // works with objects (preserves same instance)
+    public static function providerAverage() {
+        return [
+            "simple_average"        => [ [ 1, 2, 3 ], 0, null, 2.0 ],
+            "single_element"        => [ [ 4 ], 0, null, 4.0 ],
+            "negative_numbers"      => [ [ -1, 1 ], 0, null, 0.0 ],
+            "empty_input"           => [ [], 0, null, 0.0 ],
+            "numeric_strings"       => [ [ "1", "2", "3" ], 0, null, 2.0 ],
+            "with_decimals"         => [ [ 1.2, 1.8 ], 1, null, 1.5 ],
+            "assoc_arrays"          => [ [ "a" => 1, "b" => 3 ], 0, null, 2.0 ],
+            "by_key_missing_values" => [ [[ "v" => 1 ], [ "x" => 2 ]], 1, "v", 0.5 ],
+            "by_key_all_present"    => [ [[ "v" => 1 ], [ "v" => 2 ]], 1, "v", 1.5 ],
+        ];
+    }
+
+
+    /** @dataProvider providerCreateMap */
+    public function testCreateMap(mixed $input, string $key, array $expected) {
+        $this->assertSame($expected, Arrays::createMap($input, $key));
+    }
+
+    public static function providerCreateMap() {
         $o1 = (object)[ "id" => 1, "v" => "a" ];
         $o2 = (object)[ "id" => 2, "v" => "b" ];
-        $mapObj = Arrays::createMap([ $o1, $o2 ], "id");
-        $this->assertSame($o1, $mapObj[1]);
+        return [
+            "basic_map"           => [ [[ "id" => 1, "v" => "a" ], [ "id" => 2, "v" => "b" ]], "id", [ 1 => [ "id" => 1, "v" => "a" ], 2 => [ "id" => 2, "v" => "b" ] ] ],
+            "duplicates_override" => [ [[ "id" => 1, "v" => "a" ], [ "id" => 1, "v" => "c" ]], "id", [ 1 => [ "id" => 1, "v" => "c" ] ] ],
+            "missing_key_ignored" => [ [[ "no" => 1 ], [ "id" => 2, "v" => "b" ]], "id", [ 2 => [ "id" => 2, "v" => "b" ] ] ],
+            "objects_preserved"   => [ [ $o1, $o2 ], "id", [ 1 => $o1, 2 => $o2 ] ],
+        ];
     }
 
-    public function testCreateArray() {
-        $rows = [[ "id" => 1, "v" => "a" ], [ "id" => 2, "v" => "b" ]];
-        $this->assertSame([ 1, 2 ], Arrays::createArray($rows, "id"));
 
-        // duplicates preserved by default
-        $dup = [[ "id" => 1 ], [ "id" => 1 ]];
-        $this->assertSame([ 1, 1 ], Arrays::createArray($dup, "id"));
+    /** @dataProvider providerCreateArray */
+    public function testCreateArray(mixed $input, mixed $key, bool $distinct, array $expected) {
+        $this->assertSame($expected, Arrays::createArray($input, $key, false, $distinct));
+    }
 
-        // distinct removes duplicates
-        $this->assertSame([ 1 ], Arrays::createArray($dup, "id", false, true));
-
-        // multiple-key extraction returns concatenated values
-        $multi = [[ "a" => 1, "b" => 2 ], [ "a" => 3, "b" => 4 ]];
-        $this->assertSame([ "1 - 2", "3 - 4" ], Arrays::createArray($multi, [ "a", "b" ]));
-
-        // works with object rows
+    public static function providerCreateArray() {
         $o1 = (object)[ "id" => 1 ];
         $o2 = (object)[ "id" => 2 ];
-        $this->assertSame([ 1, 2 ], Arrays::createArray([ $o1, $o2 ], "id"));
-
-        // empty input returns empty
-        $this->assertSame([], Arrays::createArray([], "id"));
-
-        // null key returns the rows themselves
-        $rows2 = [[ "id" => 5 ], [ "id" => 6 ]];
-        $this->assertSame($rows2, Arrays::createArray($rows2, null));
+        return [
+            "simple_extraction"       => [ [[ "id" => 1, "v" => "a" ], [ "id" => 2, "v" => "b" ]], "id", false, [ 1, 2 ] ],
+            "duplicates_preserved"    => [ [[ "id" => 1 ], [ "id" => 1 ]], "id", false, [ 1, 1 ] ],
+            "distinct_removes_dupes"  => [ [[ "id" => 1 ], [ "id" => 1 ]], "id", true, [ 1 ] ],
+            "multiple_key_extraction" => [ [[ "a" => 1, "b" => 2 ], [ "a" => 3, "b" => 4 ]], [ "a", "b" ], false, [ "1 - 2", "3 - 4" ] ],
+            "objects_preserved"       => [ [ $o1, $o2 ], "id", false, [ 1, 2 ] ],
+            "empty_input"             => [ [], "id", false, [] ],
+            "null_key_returns_rows"   => [ [[ "id" => 5 ], [ "id" => 6 ]], null, false, [[ "id" => 5 ], [ "id" => 6 ]] ],
+        ];
     }
 
-    public function testGetFirst() {
-        $this->assertSame(1, Arrays::getFirst([ 1, 2, 3 ]));
-        $this->assertSame("a", Arrays::getFirst([ [ "x" => "a" ] ], "x"));
 
-        // empty input returns null
-        $this->assertNull(Arrays::getFirst([]));
+    /** @dataProvider providerGetFirst */
+    public function testGetFirst(mixed $input, string $key, mixed $expected) {
+        $this->assertSame($expected, Arrays::getFirst($input, $key));
+    }
 
-        // associative arrays return the first value
-        $this->assertSame(1, Arrays::getFirst([ "a" => 1, "b" => 2 ]));
-
-        // object rows preserved when no key provided
+    public static function providerGetFirst() {
         $obj = (object)[ "v" => "z" ];
-        $this->assertSame($obj, Arrays::getFirst([ $obj ]));
-
-        // missing key on the first row returns empty string (getValue default)
-        $this->assertSame("", Arrays::getFirst([[ "a" => 1 ]], "missing"));
+        return [
+            "simple_list"      => [ [ 1, 2, 3 ], "", 1 ],
+            "extract_by_key"   => [ [ [ "x" => "a" ] ], "x", "a" ],
+            "empty_input"      => [ [], "", null ],
+            "assoc_array"      => [ [ "a" => 1, "b" => 2 ], "", 1 ],
+            "object_preserved" => [ [ $obj ], "", $obj ],
+            "missing_key"      => [ [[ "a" => 1 ]], "missing", "" ],
+        ];
     }
 
-    public function testGetFirstKey() {
-        // associative arrays return the first key (string preserved)
-        $this->assertSame("a", Arrays::getFirstKey([ "a" => 1, "b" => 2 ]));
 
-        // empty array returns null
-        $this->assertNull(Arrays::getFirstKey([]));
-
-        // numeric list returns numeric 0 as first key
-        $this->assertSame(0, Arrays::getFirstKey([ 10, 20 ]));
-
-        // non-consecutive numeric keys preserved
-        $this->assertSame(5, Arrays::getFirstKey([ 5 => "x", 10 => "y" ]));
-
-        // numeric-string key is converted to int by PHP array keys, so "1" becomes 1
-        $this->assertSame(1, Arrays::getFirstKey([ "1" => "v" ]));
+    /** @dataProvider providerGetFirstKey */
+    public function testGetFirstKey(mixed $input, mixed $expected) {
+        $this->assertSame($expected, Arrays::getFirstKey($input));
     }
 
-    public function testGetLast() {
-        $this->assertSame(3, Arrays::getLast([ 1, 2, 3 ]));
-
-        // associative arrays return the last value
-        $this->assertSame(2, Arrays::getLast([ "a" => 1, "b" => 2 ]));
-
-        // empty array returns null
-        $this->assertNull(Arrays::getLast([]));
-
-        // non-consecutive numeric keys preserved
-        $this->assertSame("y", Arrays::getLast([ 5 => "x", 10 => "y" ]));
-
-        // works with rows and key extraction
-        $rows = [[ "x" => "a" ], [ "x" => "b" ]];
-        $this->assertSame("b", Arrays::getLast($rows, "x"));
-
-        // missing key on last row returns empty string
-        $this->assertSame("", Arrays::getLast([[ "a" => 1 ], [ "b" => 2 ] ], "missing"));
+    public static function providerGetFirstKey() {
+        return [
+            "assoc_array"          => [ [ "a" => 1, "b" => 2 ], "a" ],
+            "empty_array"          => [ [], null ],
+            "numeric_list"         => [ [ 10, 20 ], 0 ],
+            "non_consecutive_keys" => [ [ 5 => "x", 10 => "y" ], 5 ],
+            "numeric_string_key"   => [ [ "1" => "v" ], 1 ],
+        ];
     }
 
-    public function testGetIndex() {
-        // simple value found
-        $this->assertSame(1, Arrays::getIndex([ 1, 2, 3 ], 2));
 
-        // not found returns -1
-        $this->assertSame(-1, Arrays::getIndex([ 1 ], 5));
-
-        // duplicates -> first index returned
-        $this->assertSame(1, Arrays::getIndex([ 1, 2, 2 ], 2));
-
-        // empty array -> -1
-        $this->assertSame(-1, Arrays::getIndex([], "x"));
-
-        // case sensitive by default (no match)
-        $this->assertSame(-1, Arrays::getIndex([ "A" ], "a"));
-
-        // case-insensitive search when flag enabled
-        $this->assertSame(0, Arrays::getIndex([ "A" ], "a", true));
+    /** @dataProvider providerGetLast */
+    public function testGetLast(mixed $input, string $key, mixed $expected) {
+        $this->assertSame($expected, Arrays::getLast($input, $key));
     }
 
-    public function testFindIndex() {
-        // simple found at first index
-        $this->assertSame(0, Arrays::findIndex([ [ "id" => 1 ] ], "id", 1));
+    public static function providerGetLast() {
+        return [
+            "simple_list"          => [ [ 1, 2, 3 ], "", 3 ],
+            "assoc_array"          => [ [ "a" => 1, "b" => 2 ], "", 2 ],
+            "empty_array"          => [ [], "", null ],
+            "non_consecutive_keys" => [ [ 5 => "x", 10 => "y" ], "", "y" ],
+            "rows_with_key"        => [ [[ "x" => "a" ], [ "x" => "b" ]], "x", "b" ],
+            "missing_key_on_last"  => [ [[ "a" => 1 ], [ "b" => 2 ]], "missing", "" ],
+        ];
+    }
 
-        // not found on empty input
-        $this->assertSame(-1, Arrays::findIndex([ ], "id", 1));
 
-        // found at second position
-        $rows = [[ "id" => 9 ], [ "id" => 10 ]];
-        $this->assertSame(1, Arrays::findIndex($rows, "id", 10));
+    /** @dataProvider providerGetIndex */
+    public function testGetIndex(mixed $input, mixed $needle, bool $caseInsensitive, int $expected) {
+        $this->assertSame($expected, Arrays::getIndex($input, $needle, $caseInsensitive));
+    }
 
-        // works with object rows
+    public static function providerGetIndex() {
+        return [
+            "simple_value_found"      => [ [ 1, 2, 3 ], 2, false, 1 ],
+            "not_found"               => [ [ 1 ], 5, false, -1 ],
+            "duplicates_first_index"  => [ [ 1, 2, 2 ], 2, false, 1 ],
+            "empty_array"             => [ [], "x", false, -1 ],
+            "case_sensitive_no_match" => [ [ "A" ], "a", false, -1 ],
+            "case_insensitive_match"  => [ [ "A" ], "a", true, 0 ],
+        ];
+    }
+
+
+    /** @dataProvider providerFindIndex */
+    public function testFindIndex(mixed $input, string $key, mixed $value, mixed $expected) {
+        $this->assertSame($expected, Arrays::findIndex($input, $key, $value));
+    }
+
+    public static function providerFindIndex() {
         $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
-        $this->assertSame(1, Arrays::findIndex($rowsObj, "id", 2));
-
-        // missing key returns -1
-        $this->assertSame(-1, Arrays::findIndex([[ "no" => 1 ]], "id", 1));
-
-        // strict comparison: string vs int does not match
-        $this->assertSame(-1, Arrays::findIndex([[ "id" => "1" ]], "id", 1));
-
-        // associative array returns the original key
-        $assoc = [ "a" => [ "id" => 1 ], "b" => [ "id" => 2 ] ];
-        $this->assertSame("b", Arrays::findIndex($assoc, "id", 2));
+        $assoc   = [ "a" => [ "id" => 1 ], "b" => [ "id" => 2 ] ];
+        return [
+            "simple_found_at_first"         => [ [[ "id" => 1 ]], "id", 1, 0 ],
+            "not_found_empty_input"         => [ [], "id", 1, -1 ],
+            "found_at_second_position"      => [ [[ "id" => 9 ], [ "id" => 10 ]], "id", 10, 1 ],
+            "works_with_object_rows"        => [ $rowsObj, "id", 2, 1 ],
+            "missing_key_returns_minus_one" => [ [[ "no" => 1 ]], "id", 1, -1 ],
+            "strict_comparison_no_match"    => [ [[ "id" => "1" ]], "id", 1, -1 ],
+            "assoc_array_returns_key"       => [ $assoc, "id", 2, "b" ],
+        ];
     }
 
-    public function testHasValue() {
-        // simple present
-        $this->assertTrue(Arrays::hasValue([[ "id" => 1 ]], "id", 1));
 
-        // empty input -> false
-        $this->assertFalse(Arrays::hasValue([], "id", 1));
+    /** @dataProvider providerHasValue */
+    public function testHasValue(mixed $input, string $key, mixed $value, bool $expected) {
+        $this->assertSame($expected, Arrays::hasValue($input, $key, $value));
+    }
 
-        // works with object rows
+    public static function providerHasValue() {
         $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
-        $this->assertTrue(Arrays::hasValue($rowsObj, "id", 2));
-
-        // missing key -> false
-        $this->assertFalse(Arrays::hasValue([[ "no" => 1 ]], "id", 1));
-
-        // strict comparison: string vs int does not match
-        $this->assertFalse(Arrays::hasValue([[ "id" => "1" ]], "id", 1));
-
-        // duplicates handled (presence detected)
-        $this->assertTrue(Arrays::hasValue([[ "id" => 2 ], [ "id" => 2 ]], "id", 2));
+        return [
+            "simple_present"         => [ [[ "id" => 1 ]], "id", 1, true ],
+            "empty_input"            => [ [], "id", 1, false ],
+            "works_with_object_rows" => [ $rowsObj, "id", 2, true ],
+            "missing_key"            => [ [[ "no" => 1 ]], "id", 1, false ],
+            "strict_comparison"      => [ [[ "id" => "1" ]], "id", 1, false ],
+            "duplicates_handled"     => [ [[ "id" => 2 ], [ "id" => 2 ]], "id", 2, true ],
+        ];
     }
 
-    public function testFindValue() {
-        $rows = [[ "id" => 1, "x" => 9 ], [ "id" => 2, "x" => 8 ]];
-        $this->assertSame($rows[0], Arrays::findValue($rows, "id", 1));
 
-        // works with object rows
+    /** @dataProvider providerFindValue */
+    public function testFindValue(mixed $input, string $key, mixed $value, mixed $expected) {
+        $this->assertSame($expected, Arrays::findValue($input, $key, $value));
+    }
+
+    public static function providerFindValue() {
         $rowsObj = [(object)[ "id" => 1, "x" => 9 ], (object)[ "id" => 2, "x" => 8 ]];
-        $this->assertSame($rowsObj[1], Arrays::findValue($rowsObj, "id", 2));
-
-        // empty or missing key -> null
-        $this->assertNull(Arrays::findValue([], "id", 1));
-        $this->assertNull(Arrays::findValue([[ "no" => 1 ]], "id", 1));
-
-        // strict comparison: string vs int does not match
-        $this->assertNull(Arrays::findValue([[ "id" => "1" ]], "id", 1));
-
-        // multiple matches -> first row returned
-        $many = [[ "id" => 2, "x" => 1 ], [ "id" => 2, "x" => 2 ]];
-        $this->assertSame($many[0], Arrays::findValue($many, "id", 2));
-
-        // associative arrays: returns the matching value (row)
-        $assoc = [ "a" => [ "id" => 1, "x" => 9 ], "b" => [ "id" => 2, "x" => 8 ] ];
-        $this->assertSame($assoc["b"], Arrays::findValue($assoc, "id", 2));
+        $assoc   = [ "a" => [ "id" => 1, "x" => 9 ], "b" => [ "id" => 2, "x" => 8 ] ];
+        return [
+            "simple_found_at_first"  => [ [[ "id" => 1, "x" => 9 ], [ "id" => 2, "x" => 8 ]], "id", 1, [ "id" => 1, "x" => 9 ] ],
+            "works_with_object_rows" => [ $rowsObj, "id", 2, $rowsObj[1] ],
+            "empty_input"            => [ [], "id", 1, null ],
+            "missing_key"            => [ [[ "no" => 1 ]], "id", 1, null ],
+            "strict_comparison"      => [ [[ "id" => "1" ]], "id", 1, null ],
+            "multiple_matches"       => [ [[ "id" => 2, "x" => 1 ], [ "id" => 2, "x" => 2 ]], "id", 2, [ "id" => 2, "x" => 1 ] ],
+            "assoc_array"            => [ $assoc, "id", 2, $assoc["b"] ],
+        ];
     }
 
-    public function testFindValues() {
-        $rows = [[ "id" => 1 ], [ "id" => 1 ], [ "id" => 2 ]];
-        $this->assertCount(2, Arrays::findValues($rows, "id", 1));
 
-        // works with object rows and preserves instances
+    /** @dataProvider providerFindValues */
+    public function testFindValues(mixed $input, string $key, mixed $value, array $expected) {
+        $this->assertSame($expected, Arrays::findValues($input, $key, $value));
+    }
+
+    public static function providerFindValues() {
         $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ], (object)[ "id" => 1 ]];
-        $resObj = Arrays::findValues($rowsObj, "id", 1);
-        $this->assertCount(2, $resObj);
-        $this->assertSame($rowsObj[0], $resObj[0]);
-        $this->assertSame($rowsObj[2], $resObj[1]);
-
-        // empty input -> empty array
-        $this->assertSame([], Arrays::findValues([], "id", 1));
-
-        // rows missing the key are ignored
-        $withMissing = [[ "no" => 1 ], [ "id" => 1 ]];
-        $resMissing = Arrays::findValues($withMissing, "id", 1);
-        $this->assertCount(1, $resMissing);
-        $this->assertSame([ [ "id" => 1 ] ], $resMissing);
-
-        // strict comparison: string vs int does not match
-        $this->assertCount(0, Arrays::findValues([[ "id" => "1" ]], "id", 1));
-
-        // associative input returns matching values as a simple list
-        $assoc = [ "a" => [ "id" => 1 ], "b" => [ "id" => 1 ] ];
-        $resAssoc = Arrays::findValues($assoc, "id", 1);
-        $this->assertCount(2, $resAssoc);
-        $this->assertSame($assoc["a"], $resAssoc[0]);
-        $this->assertSame($assoc["b"], $resAssoc[1]);
+        $assoc   = [ "a" => [ "id" => 1 ], "b" => [ "id" => 1 ] ];
+        return [
+            "simple_multiple_matches"    => [ [[ "id" => 1 ], [ "id" => 1 ], [ "id" => 2 ]], "id", 1, [[ "id" => 1 ], [ "id" => 1 ]] ],
+            "objects_preserved"          => [ $rowsObj, "id", 1, [ $rowsObj[0], $rowsObj[2] ] ],
+            "empty_input"                => [ [], "id", 1, [] ],
+            "rows_missing_key"           => [ [[ "no" => 1 ], [ "id" => 1 ]], "id", 1, [[ "id" => 1 ]] ],
+            "strict_comparison_no_match" => [ [[ "id" => "1" ]], "id", 1, [] ],
+            "assoc_array"                => [ $assoc, "id", 1, [ $assoc["a"], $assoc["b"] ] ],
+        ];
     }
 
-    public function testGetKey() {
-        $this->assertSame("name", Arrays::getKey("name"));
-        $this->assertSame("PrefName", Arrays::getKey("name", "Pref"));
 
-        // preserves case of provided key's first letter when already uppercase
-        $this->assertSame("PreName", Arrays::getKey("Name", "Pre"));
-
-        // lowercase prefix concatenated with ucfirst(key)
-        $this->assertSame("preX", Arrays::getKey("x", "pre"));
-
-        // empty prefix returns the key unchanged
-        $this->assertSame("k", Arrays::getKey("k", ""));
+    /** @dataProvider providerGetKey */
+    public function testGetKey(string $key, string $prefix, string $expected) {
+        $this->assertSame($expected, Arrays::getKey($key, $prefix));
     }
 
-    public function testGetValue() {
-        // when key is empty, return the array/scalar unchanged
-        $row = [ "a" => [ "b" => "c" ]];
-        $this->assertSame($row, Arrays::getValue($row, ""));
-        $this->assertSame("scalar", Arrays::getValue("scalar", ""));
+    public static function providerGetKey() {
+        return [
+            "no_prefix"                => [ "name", "", "name" ],
+            "with_prefix"              => [ "name", "Pref", "PrefName" ],
+            "preserve_uppercase_first" => [ "Name", "Pre", "PreName" ],
+            "lowercase_prefix"         => [ "x", "pre", "preX" ],
+            "empty_prefix"             => [ "k", "", "k" ],
+        ];
+    }
 
-        // single key lookup: arrays and objects
-        $this->assertSame("v", Arrays::getValue([ "k" => "v" ], "k"));
+
+    /** @dataProvider providerGetValue */
+    public function testGetValue(mixed $input, mixed $key, string $glue, string $prefix, bool $useEmpty, mixed $default, mixed $expected) {
+        $this->assertSame($expected, Arrays::getValue($input, $key, $glue, $prefix, $useEmpty, $default));
+    }
+
+    public static function providerGetValue() {
+        $obj     = (object)[ "k" => "v" ];
+        $objMult = (object)[ "name" => "n", "age" => 10 ];
+        return [
+            "empty_key_ret_arr"       => [ [ "a" => [ "b" => "c" ]], "", " - ", "", false, null, [ "a" => [ "b" => "c" ] ] ],
+            "empty_key_ret_scal"      => [ "scalar", "", " - ", "", false, null, "scalar" ],
+            "single_key_arr"          => [ [ "k" => "v" ], "k", " - ", "", false, null, "v" ],
+            "single_key_obj"          => [ $obj, "k", " - ", "", false, null, "v" ],
+            "miss_key_ret_def"        => [ [ "a" => 1 ], "x", " - ", "", false, "D", "D" ],
+            "empty_val_miss"          => [ [ "k" => "" ], "k", " - ", "", false, "X", "X" ],
+            "empty_val_use_true"      => [ [ "k" => "" ], "k", " - ", "", true, "X", "" ],
+            "num_zero_key"            => [ [ 0 => "zero" ], "0", " - ", "", false, null, [ 0 => "zero" ] ],
+            "multi_key_def_glue"      => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], " - ", "", false, null, "1 - 2" ],
+            "multi_key_cust_glue"     => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], ", ", "", false, null, "1, 2" ],
+            "pfx_single_key"          => [ [ "preName" => "pv" ], "name", " - ", "pre", false, null, "pv" ],
+            "pfx_multi_key_cust_glue" => [ [ "preA" => 1, "preB" => 2 ], [ "a", "b" ], " + ", "pre", false, null, "1 + 2" ],
+            "multi_key_none_exist"    => [ [ "a" => 1 ], [ "x", "y" ], " - ", "", false, "D", "" ],
+            "obj_multi_key"           => [ $objMult, [ "name", "age" ], " - ", "", false, null, "n - 10" ],
+        ];
+    }
+
+
+    /** @dataProvider providerGetOneValue */
+    public function testGetOneValue(mixed $input, mixed $key, bool $useEmpty, mixed $default, mixed $expected) {
+        $this->assertSame($expected, Arrays::getOneValue($input, $key, $useEmpty, $default));
+    }
+
+    public static function providerGetOneValue() {
         $obj = (object)[ "k" => "v" ];
-        $this->assertSame("v", Arrays::getValue($obj, "k"));
-
-        // missing single key returns provided default
-        $this->assertSame("D", Arrays::getValue([ "a" => 1 ], "x", " - ", "", false, "D"));
-
-        // empty value is treated as missing unless useEmpty is true
-        $emptyRow = [ "k" => "" ];
-        $this->assertSame("X", Arrays::getValue($emptyRow, "k", " - ", "", false, "X"));
-        $this->assertSame("", Arrays::getValue($emptyRow, "k", " - ", "", true, "X"));
-
-        // numeric-string key is considered empty by empty() semantics, so a "0" key
-        // causes getValue to treat the key as empty and return the original array
-        $this->assertSame([ 0 => "zero" ], Arrays::getValue([ 0 => "zero" ], "0"));
-
-        // multiple keys: concatenation with default glue
-        $this->assertSame("1 - 2", Arrays::getValue([ "a" => 1, "b" => 2 ], [ "a", "b" ]));
-
-        // custom glue
-        $this->assertSame("1, 2", Arrays::getValue([ "a" => 1, "b" => 2 ], [ "a", "b" ], ", "));
-
-        // prefix is prepended using ucfirst on the key
-        $prefixed = [ "preName" => "pv" ];
-        $this->assertSame("pv", Arrays::getValue($prefixed, "name", " - ", "pre"));
-
-        // prefix with multiple keys and custom glue
-        $multiPref = [ "preA" => 1, "preB" => 2 ];
-        $this->assertSame("1 + 2", Arrays::getValue($multiPref, [ "a", "b" ], " + ", "pre"));
-
-        // array-of-keys where none exist -> empty string (default not applied for arrays)
-        $this->assertSame("", Arrays::getValue([ "a" => 1 ], [ "x", "y" ], " - ", "", false, "D"));
-
-        // object with multiple keys
-        $objMulti = (object)[ "name" => "n", "age" => 10 ];
-        $this->assertSame("n - 10", Arrays::getValue($objMulti, [ "name", "age" ]));
-    }
-
-    public function testGetOneValue() {
-        // simple array key
-        $this->assertSame("v", Arrays::getOneValue([ "k" => "v" ], "k"));
-
-        // object property
-        $obj = (object)[ "k" => "v" ];
-        $this->assertSame("v", Arrays::getOneValue($obj, "k"));
-
-        // missing key returns default null
-        $this->assertNull(Arrays::getOneValue([ ], "x"));
-
-        // empty string treated as empty unless useEmpty=true
-        $empty = [ "k" => "" ];
-        $this->assertNull(Arrays::getOneValue($empty, "k"));
-        $this->assertSame("", Arrays::getOneValue($empty, "k", true));
-
-        // numeric 0 value is empty by default but preserved when useEmpty=true
-        $zeroVal = [ "k" => 0 ];
-        $this->assertNull(Arrays::getOneValue($zeroVal, "k"));
-        $this->assertSame(0, Arrays::getOneValue($zeroVal, "k", true));
-
-        // default parameter is returned when key missing
-        $this->assertSame("D", Arrays::getOneValue([ ], "x", false, "D"));
-
-        // numeric-string key accesses numeric keys correctly
-        $num = [ 0 => "zero" ];
-        $this->assertSame("zero", Arrays::getOneValue($num, "0"));
+        return [
+            "simple_array_key"            => [ [ "k" => "v" ], "k", false, null, "v" ],
+            "object_property"             => [ $obj, "k", false, null, "v" ],
+            "missing_key_returns_null"    => [ [], "x", false, null, null ],
+            "empty_string_treated_empty"  => [ [ "k" => "" ], "k", false, null, null ],
+            "empty_string_use_empty"      => [ [ "k" => "" ], "k", true, null, "" ],
+            "zero_value_treated_empty"    => [ [ "k" => 0 ], "k", false, null, null ],
+            "zero_value_use_empty"        => [ [ "k" => 0 ], "k", true, null, 0 ],
+            "missing_key_returns_default" => [ [], "x", false, "D", "D" ],
+            "numeric_string_key"          => [ [ 0 => "zero" ], "0", false, null, "zero" ],
+        ];
     }
 }
