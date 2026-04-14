@@ -39,10 +39,7 @@ class JSON {
         }
 
         $result = json_encode($value, $asPretty ? JSON_PRETTY_PRINT : 0);
-        if (is_string($result)) {
-            return $result;
-        }
-        return "";
+        return is_string($result) ? $result : "";
     }
 
     /**

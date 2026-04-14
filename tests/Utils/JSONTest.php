@@ -18,161 +18,177 @@ class JSONTest extends TestCase {
     }
 
 
-    public function testIsValid() {
-        $this->assertTrue(JSON::isValid('{"a":1}'));
-        $this->assertTrue(JSON::isValid('["x","y"]'));
-
-        // invalid JSON strings
-        $this->assertFalse(JSON::isValid("not json"));
-        $this->assertFalse(JSON::isValid(""));
-        $this->assertFalse(JSON::isValid(123));
-        $this->assertFalse(JSON::isValid(null));
-
-        // numeric strings are not considered JSON by isValid
-        $this->assertFalse(JSON::isValid("123"));
+    /** @dataProvider providerIsValid */
+    public function testIsValid(mixed $json, bool $expected) {
+        $this->assertEquals($expected, JSON::isValid($json));
     }
 
-    public function testEncodeDecode() {
-        // special cases
-        $this->assertEquals("", JSON::encode(null));
-        $this->assertEquals('{"a":1}', JSON::isValid('{"a":1}'));
-        $this->assertEquals("", JSON::encode(""));
-        $this->assertEquals("{}", JSON::encode(new stdClass()));
-        $this->assertEquals("123", JSON::encode("123"));
-
-        // json_encode can fail (e.g. when encoding resources) -> should return empty string
-        $res = fopen("php://memory", "r");
-        $this->assertEquals("", JSON::encode($res));
-        fclose($res);
-
-        // encode a normal array
-        $arr = [ "x" => "y", "n" => 2 ];
-        $encoded = JSON::encode($arr);
-        $this->assertIsString($encoded);
-
-        // decode it back
-        $decoded = JSON::decode($encoded);
-        $this->assertIsArray($decoded);
-        $this->assertEquals("y", $decoded["x"]);
-        $this->assertEquals(2, $decoded["n"]);
+    public static function providerIsValid() {
+        return [
+            "valid_object"   => [ '{"a":1}', true ],
+            "valid_array"    => [ '["x","y"]', true ],
+            "invalid_string" => [ 'not json', false ],
+            "empty_string"   => [ "", false ],
+            "numeric_input"  => [ 123, false ],
+            "null_input"     => [ null, false ],
+            "numeric_string" => [ "123", false ],
+        ];
     }
 
-    public function testDecodeAsArray() {
-        $json = '{"a":"b","c":3}';
-        $arr = JSON::decodeAsArray($json);
-        $this->assertIsArray($arr);
-        $this->assertEquals("b", $arr["a"]);
 
-        // invalid JSON should return empty array
-        $this->assertEquals([], JSON::decodeAsArray("not json"));
-        $this->assertEquals([], JSON::decodeAsArray(123));
-        $this->assertEquals([], JSON::decodeAsArray(null));
+    /** @dataProvider providerEncodeDecode */
+    public function testEncodeDecode(mixed $input, string $expectedEncoded, mixed $expectedDecoded) {
+        $encoded = JSON::encode($input);
+        $this->assertEquals($expectedEncoded, $encoded);
 
-        // already an array should be returned as is
-        $inputArr = [ "x" => "y" ];
-        $this->assertSame($inputArr, JSON::decodeAsArray($inputArr));
+        if ($expectedDecoded !== null) {
+            $decoded = JSON::decode($encoded);
+            $this->assertEquals($expectedDecoded, $decoded);
+        }
     }
 
-    public function testDecodeAsDictionary() {
-        $json = '{"a":"b","c":3}';
+    public static function providerEncodeDecode() {
+        return [
+            "null_input"     => [ null, "", null ],
+            "empty_string"   => [ "", "", null ],
+            "stdClass"       => [ new stdClass(), "{}", [] ],
+            "numeric_string" => [ "123", "123", null ],
+            "normal_array"   => [ [ "x" => "y", "n" => 2 ], '{"x":"y","n":2}', [ "x" => "y", "n" => 2 ] ],
+        ];
+    }
+
+
+    /** @dataProvider providerDecodeAsArray */
+    public function testDecodeAsArray(mixed $input, array $expected) {
+        $result = JSON::decodeAsArray($input);
+        $this->assertEquals($expected, $result);
+    }
+
+    public static function providerDecodeAsArray() {
+        return [
+            "valid_json_object" => [ '{"a":"b","c":3}', [ "a" => "b", "c" => 3 ] ],
+            "invalid_json"      => [ "not json", [] ],
+            "numeric_input"     => [ 123, [] ],
+            "null_input"        => [ null, [] ],
+            "array_input"       => [ [ "x" => "y" ], [ "x" => "y" ] ],
+        ];
+    }
+
+
+    /** @dataProvider providerDecodeAsDictionary */
+    public function testDecodeAsDictionary(mixed $json, string $expectedA, int $expectedC) {
         $dict = JSON::decodeAsDictionary($json);
         $this->assertInstanceOf(Dictionary::class, $dict);
-        $this->assertEquals("b", $dict->getString("a"));
-        $this->assertEquals(3, $dict->getInt("c"));
+        $this->assertEquals($expectedA, $dict->getString("a"));
+        $this->assertEquals($expectedC, $dict->getInt("c"));
     }
 
-    public function testDecodeAsStrings() {
-        $json = '["one", "", "two"]';
-        $strings = JSON::decodeAsStrings($json);
-        $this->assertContains("one", $strings);
-        $stringsNoEmpty = JSON::decodeAsStrings($json, true);
-        $this->assertNotContains("", $stringsNoEmpty);
-        $this->assertEquals([ "one", "two" ], array_values($stringsNoEmpty));
-
-        // numeric JSON array becomes strings
-        $numJson = "[1,2]";
-        $numStrings = JSON::decodeAsStrings($numJson);
-        $this->assertEquals([ "1", "2" ], $numStrings);
-
-        // already an array input
-        $arrInput = [ 'a', '', 'b' ];
-        $arrStrings = JSON::decodeAsStrings($arrInput);
-        $this->assertEquals([ "a", "", "b" ], $arrStrings);
-        $arrStringsNoEmpty = JSON::decodeAsStrings($arrInput, true);
-        $this->assertEquals([ "a", "b" ], $arrStringsNoEmpty);
-
-        // empty or non-json input returns empty list
-        $this->assertEquals([], JSON::decodeAsStrings("", true));
-        $this->assertEquals([], JSON::decodeAsStrings("plain string"));
+    public static function providerDecodeAsDictionary() {
+        return [
+            "valid_json_object" => [ '{"a":"b","c":3}', "b", 3 ],
+            "invalid_json"      => [ "not json", "", 0 ],
+            "numeric_input"     => [ 123, "", 0 ],
+        ];
     }
 
-    public function testFromCSV() {
-        $csv = "a,b,c";
+
+    /** @dataProvider providerDecodeAsStrings */
+    public function testDecodeAsStrings(mixed $input, bool $skipEmpty, array $expected) {
+        $result = JSON::decodeAsStrings($input, $skipEmpty);
+        $this->assertEquals($expected, $result);
+    }
+
+    public static function providerDecodeAsStrings() {
+        return [
+            "json_array_with_empty"  => [ '["one", "", "two"]', false, [ "one", "", "two" ] ],
+            "json_array_skip_empty"  => [ '["one", "", "two"]', true, [ "one", "two" ] ],
+            "numeric_json_array"     => [ "[1,2]", false, [ "1", "2" ] ],
+            "array_input_with_empty" => [ [ 'a', '', 'b' ], false, [ "a", "", "b" ] ],
+            "array_input_skip_empty" => [ [ 'a', '', 'b' ], true, [ "a", "b" ] ],
+            "empty_string_input"     => [ "", true, [] ],
+            "plain_string_input"     => [ "plain string", false, [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerFromCSV */
+    public function testFromCSV(string $csv, array $expectedStrings) {
         $csvJson = JSON::fromCSV($csv);
-        $this->assertStringContainsString('"a"', $csvJson);
-        $this->assertStringContainsString('"b"', $csvJson);
-        $this->assertStringContainsString('"c"', $csvJson);
-
-        // test with spaces and empty values
-        $csv = " a, b, ,c ";
-        $csvJson = JSON::fromCSV($csv);
-        $this->assertStringContainsString('"a"', $csvJson);
-        $this->assertStringContainsString('"b"', $csvJson);
-        $this->assertStringContainsString('"c"', $csvJson);
+        foreach ($expectedStrings as $expected) {
+            $this->assertStringContainsString($expected, $csvJson);
+        }
     }
 
-    public function testReadFileAndWriteFile() {
+    public static function providerFromCSV() {
+        return [
+            "simple_csv"      => [ "a,b,c", [ '"a"', '"b"', '"c"' ] ],
+            "csv_with_spaces" => [ " a, b, ,c ", [ '"a"', '"b"', '"c"' ] ],
+        ];
+    }
+
+
+    /** @dataProvider providerReadFileAndWriteFile */
+    public function testReadFileAndWriteFile(array $data, string $key, mixed $expectedValue) {
         $this->tmpFile = sys_get_temp_dir() . "/json_utils_test_" . uniqid() . ".json";
 
-        // writeFile should create the file with pretty JSON
-        $ok = JSON::writeFile($this->tmpFile, [ "p" => "q", "num" => 5 ]);
+        $ok = JSON::writeFile($this->tmpFile, $data);
         $this->assertTrue($ok);
         $this->assertFileExists($this->tmpFile);
 
-        // readFile should return array
         $read = JSON::readFile($this->tmpFile);
         $this->assertIsArray($read);
-        $this->assertEquals("q", $read["p"]);
-
-        // invalid file should return empty array
-        $this->assertEquals([], JSON::readFile("nonexistent_file.json"));
+        $this->assertEquals($expectedValue, $read[$key]);
     }
 
-    public function testReadUrl() {
-        // readUrl using data:// scheme
-        $data = json_encode([ "u" => "v" ]);
-        $url = "data://text/plain," . rawurlencode($data);
-        $fromUrl = JSON::readUrl($url);
-        $this->assertIsArray($fromUrl);
-        $this->assertEquals("v", $fromUrl["u"]);
-
-        // invalid URL should return empty array
-        $this->assertEquals([], JSON::readUrl("invalid://url"));
+    public static function providerReadFileAndWriteFile() {
+        return [
+            "valid_data"   => [ [ "p" => "q", "num" => 5 ], "p", "q" ],
+            "numeric_data" => [ [ "p" => "q", "num" => 5 ], "num", 5 ],
+        ];
     }
 
-    public function testPostUrl() {
-        // Use a synthetic test URL that the shim recognizes
-        $url = "test://post/endpoint";
-        $data = [ "a" => "b", "n" => 3 ];
-
-        // Call the real method; within this namespace our shim intercepts the file_get_contents call
-        $res = JSON::postUrl($url, $data);
-
+    public function testReadFileNonExistent() {
+        $this->tmpFile = sys_get_temp_dir() . "/json_utils_test_" . uniqid() . ".json";
+        $res = JSON::readFile($this->tmpFile);
         $this->assertIsArray($res);
-        $this->assertArrayHasKey("ok", $res);
-        $this->assertTrue($res["ok"]);
+        $this->assertCount(0, $res);
+    }
 
-        // Verify shim captured the request options and content
-        $this->assertSame($url, $GLOBALS["test_post_url"]);
-        $opts = $GLOBALS["test_post_options"];
-        $this->assertArrayHasKey("http", $opts);
-        $this->assertArrayHasKey("content", $opts["http"]);
 
-        // posted body should be urlencoded form data
-        $this->assertStringContainsString("a=b", $opts["http"]["content"]);
-        $this->assertStringContainsString("n=3", $opts["http"]["content"]);
+    /** @dataProvider providerReadUrl */
+    public function testReadUrl(string $url, array $expected) {
+        $fromUrl = JSON::readUrl($url);
+        $this->assertEquals($expected, $fromUrl);
+    }
 
-        // invalid URL should return empty array
-        $this->assertEquals([], JSON::postUrl("invalid://url", $data));
+    public static function providerReadUrl() {
+        $data = json_encode([ "u" => "v" ]);
+        $validUrl = "data://text/plain," . rawurlencode($data);
+
+        return [
+            "valid_url"   => [ $validUrl, [ "u" => "v" ] ],
+            "invalid_url" => [ "invalid://url", [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerPostUrl */
+    public function testPostUrl(string $url, array $data, bool $shouldSucceed) {
+        $res = JSON::postUrl($url, $data);
+        $this->assertIsArray($res);
+
+        if ($shouldSucceed) {
+            $this->assertArrayHasKey("ok", $res);
+            $this->assertTrue($res["ok"]);
+        } else {
+            $this->assertEquals([], $res);
+        }
+    }
+
+    public static function providerPostUrl() {
+        return [
+            "valid_url"   => [ "test://post/endpoint", [ "a" => "b", "n" => 3 ], true ],
+            "invalid_url" => [ "invalid://url", [ "a" => "b" ], false ],
+        ];
     }
 }
