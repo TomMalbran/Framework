@@ -50,7 +50,7 @@
                 "owner": "phpunit",
                 "fileLocation": [ "absolute" ],
                 "pattern": {
-                    "regexp": "^##teamcity\\[testFailed .*name='([^']+)'.*message='([^']*)'.*details='([^:']+):(\\d+)\\|n'.*\\]$",
+                    "regexp": "^##teamcity\\[testFailed .*name='([^']+)'.*message='([^']*)'.*details='([^:']+):([^']*)\\|n'.*\\]$",
                     "file": 3,
                     "line": 4,
                     "message": 1,
