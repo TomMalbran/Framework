@@ -16,7 +16,7 @@ use JsonSerializable;
 class Date implements JsonSerializable {
 
     private bool $hasDate;
-    private int  $timestamp;
+    private int $timestamp;
 
 
     /**
@@ -155,14 +155,22 @@ class Date implements JsonSerializable {
 
 
     /**
-     * Returns a new Date changing the current one to Server Time
-     * @param bool $useTimeZone Optional.
-     * @return Date
+     * Returns true if the Date is empty (time stamp is 0 or less)
+     * @return bool
      */
-    public function toServerTime(bool $useTimeZone = true): Date {
-        $timestamp = TimeZone::toServerTime($this->timestamp, $useTimeZone);
-        return new Date($timestamp);
+    public function isEmpty(): bool {
+        return !$this->hasDate;
     }
+
+    /**
+     * Returns true if the Date is not empty (time stamp is greater than 0)
+     * @return bool
+     */
+    public function isNotEmpty(): bool {
+        return $this->hasDate;
+    }
+
+
 
     /**
      * Returns a new Date changing the current one with the given values
@@ -203,9 +211,10 @@ class Date implements JsonSerializable {
      */
     public function setHourMinute(string $time): Date {
         $parts = Strings::split($time, ":");
-        if (count($parts) !== 2) {
-            return new Date($time);
+        if (!DateUtils::isValidHour($time) || count($parts) !== 2) {
+            return Date::empty();
         }
+
         return $this->set(
             hour:   (int)$parts[0],
             minute: (int)$parts[1],
@@ -274,6 +283,44 @@ class Date implements JsonSerializable {
     }
 
 
+
+    /**
+     * Returns the Timestamp
+     * @return int
+     */
+    public function toTime(): int {
+        return $this->timestamp;
+    }
+
+    /**
+     * Returns the Day, Month and Year as a number
+     * @return int
+     */
+    public function toNumber(): int {
+        return (
+            $this->getYear() * 10000 +
+            $this->getMonth() * 100 +
+            $this->getDay()
+        );
+    }
+
+    /**
+     * Returns the Hours and Minutes as total Minutes
+     * @return int
+     */
+    public function toMinutes(): int {
+        return $this->getHour() * 60 + $this->getMinute();
+    }
+
+    /**
+     * Returns a new Date changing the current one to Server Time
+     * @param bool $useTimeZone Optional.
+     * @return Date
+     */
+    public function toServerTime(bool $useTimeZone = true): Date {
+        $timestamp = TimeZone::toServerTime($this->timestamp, $useTimeZone);
+        return new Date($timestamp);
+    }
 
     /**
      * Returns a Date instance for the given Day Moment
@@ -364,52 +411,6 @@ class Date implements JsonSerializable {
      */
     public function toYearEnd(): Date {
         return $this->set(day: 31, month: 12);
-    }
-
-
-
-    /**
-     * Returns true if the Date is empty (time stamp is 0 or less)
-     * @return bool
-     */
-    public function isEmpty(): bool {
-        return !$this->hasDate;
-    }
-
-    /**
-     * Returns true if the Date is not empty (time stamp is greater than 0)
-     * @return bool
-     */
-    public function isNotEmpty(): bool {
-        return $this->hasDate;
-    }
-
-    /**
-     * Returns the Timestamp
-     * @return int
-     */
-    public function toTime(): int {
-        return $this->timestamp;
-    }
-
-    /**
-     * Returns the Day, Month and Year as a number
-     * @return int
-     */
-    public function toNumber(): int {
-        return (
-            $this->getYear() * 10000 +
-            $this->getMonth() * 100 +
-            $this->getDay()
-        );
-    }
-
-    /**
-     * Returns the Hours and Minutes as total Minutes
-     * @return int
-     */
-    public function toMinutes(): int {
-        return $this->getHour() * 60 + $this->getMinute();
     }
 
 
@@ -556,6 +557,9 @@ class Date implements JsonSerializable {
         bool $inUpperCase = false,
         string $language = "",
     ): string {
+        if ($this->isEmpty()) {
+            return "";
+        }
         $day   = $this->getDayZero();
         $month = $this->getMonthName($monthLength, $inUpperCase, $language);
         return "$day $month";
@@ -712,6 +716,8 @@ class Date implements JsonSerializable {
         return $this->timestamp >= $from->toTime() && $this->timestamp <= $to->toTime();
     }
 
+
+
     /**
      * Returns the difference in days between the current Date and another Date
      * @param Date $date
@@ -773,7 +779,7 @@ class Date implements JsonSerializable {
         if ($this->isEmpty()) {
             return 0;
         }
-        if ($now === null) {
+        if ($now === null || $now->isEmpty()) {
             $now = Date::now();
         }
 
@@ -843,6 +849,9 @@ class Date implements JsonSerializable {
         $thisTime  = $this->toString(DateFormat::Time);
         $otherTime = $date->toString(DateFormat::Time);
 
+        if ($this->isEmpty() || $date->isEmpty()) {
+            return "";
+        }
         if ($this->isBefore($date)) {
             return "$thisTime - $otherTime";
         }
