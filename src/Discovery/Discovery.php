@@ -183,7 +183,7 @@ class Discovery {
      * @return array<string,string>
      */
     private static function getUsedClasses(string $file): array {
-        $lines  = Strings::split($file, "\n", trim: true, skipEmpty: true);
+        $lines  = Strings::split($file, "\n", trim: false, skipEmpty: true);
         $result = [];
 
         foreach ($lines as $line) {
@@ -231,6 +231,15 @@ class Discovery {
 
         // Check that the used Class exists
         $fullClassName = $usedClasses[$parentClassName] ?? "";
+        if (Strings::startsWith($fullClassName, $namespace) && !isset($classPaths[$fullClassName])) {
+            return false;
+        }
+
+        // Extract the trait use
+        $traitPattern  = '/^    use\s+([A-Za-z0-9\\\\]+);/m';
+        $matches       = Strings::getAllMatches($fileContent, $traitPattern);
+        $traitClass    = $matches[1] ?? "";
+        $fullClassName = $usedClasses[$traitClass] ?? "";
         if (Strings::startsWith($fullClassName, $namespace) && !isset($classPaths[$fullClassName])) {
             return false;
         }
