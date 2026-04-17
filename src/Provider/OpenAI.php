@@ -254,7 +254,7 @@ class OpenAI {
             ]),
         ];
 
-        if ($schema !== null) {
+        if ($schema !== null && $schema->isNotEmpty()) {
             $params["response_format"] = [
                 "type"        => "json_schema",
                 "json_schema" => [
@@ -324,7 +324,7 @@ class OpenAI {
         ];
 
         // Set the Schema
-        if ($schema !== null) {
+        if ($schema !== null && $schema->isNotEmpty()) {
             $params["text"] = [
                 "format" => [
                     "type"   => "json_schema",
