@@ -13,40 +13,40 @@ use Framework\Utils\Strings;
 class FileType {
 
     /** @var list<string> */
-    public static array $imageExts        = [ "jpg", "jpeg", "gif", "png", "ico", "avif", "webp" ];
+    private static array $imageExts = [ "jpg", "jpeg", "gif", "png", "ico", "avif", "webp" ];
 
     /** @var list<string> */
-    public static array $pngExts          = [ "png" ];
+    private static array $pngExts = [ "png" ];
 
     /** @var list<string> */
-    public static array $icoExts          = [ "ico" ];
+    private static array $icoExts = [ "ico" ];
 
     /** @var list<string> */
-    public static array $videoExts        = [ "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm" ];
+    private static array $videoExts = [ "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm" ];
 
     /** @var list<string> */
-    public static array $audioExts        = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];
+    private static array $audioExts = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];
 
     /** @var list<string> */
-    public static array $codeExts         = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
+    private static array $codeExts = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
 
     /** @var list<string> */
-    public static array $textExts         = [ "txt", "csv", "log", "rtf", "json" ];
+    private static array $textExts = [ "txt", "md", "csv", "log", "rtf", "json" ];
 
     /** @var list<string> */
-    public static array $documentExts     = [ "doc", "docx", "odt", "ott" ];
+    private static array $documentExts = [ "doc", "docx", "odt", "ott" ];
 
     /** @var list<string> */
-    public static array $spreadsheetExts  = [ "xls", "xlsx", "ods" ];
+    private static array $spreadsheetExts = [ "xls", "xlsx", "ods", "ots" ];
 
     /** @var list<string> */
-    public static array $presentationExts = [ "ppt", "pptx" ];
+    private static array $presentationExts = [ "ppt", "pptx", "odp" ];
 
     /** @var list<string> */
-    public static array $pdfExts          = [ "pdf" ];
+    private static array $pdfExts = [ "pdf" ];
 
     /** @var list<string> */
-    public static array $zipExts          = [ "zip", "rar", "gz", "tar", "iso", "7zip" ];
+    private static array $zipExts = [ "zip", "rar", "gz", "tar", "iso", "7zip" ];
 
 
 
@@ -183,6 +183,7 @@ class FileType {
      */
     public static function isFile(string $file): bool {
         return (
+            $file !== "" &&
             !self::isDir($file) &&
             !self::isImage($file) &&
             !self::isVideo($file)
@@ -240,16 +241,16 @@ class FileType {
             "video/3gpp2"                                                               => "3g2",
             "video/3gp"                                                                 => "3gp",
             "video/3gpp"                                                                => "3gp",
-            "application/x-compressed"                                                  => "7zip",
             "audio/x-acc"                                                               => "aac",
             "audio/ac3"                                                                 => "ac3",
-            "application/postscript"                                                    => "ai",
             "audio/x-aiff"                                                              => "aif",
             "audio/aiff"                                                                => "aif",
             "audio/x-au"                                                                => "au",
             "video/x-msvideo"                                                           => "avi",
             "video/msvideo"                                                             => "avi",
             "video/avi"                                                                 => "avi",
+            "application/x-compressed"                                                  => "7zip",
+            "application/postscript"                                                    => "ai",
             "application/x-troff-msvideo"                                               => "avi",
             "application/macbinary"                                                     => "bin",
             "application/mac-binary"                                                    => "bin",
