@@ -21,32 +21,34 @@ class SchemaCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $mainFields  = $schemaModel->toBuildData("mainFields");
-        $expressions = $schemaModel->toBuildData("expressions");
-        $counts      = $schemaModel->toBuildData("counts");
-        $relations   = $schemaModel->toBuildData("relations");
-        $subRequests = $schemaModel->toBuildData("subRequests");
+        $mainFields   = $schemaModel->toBuildData("mainFields");
+        $expressions  = $schemaModel->toBuildData("expressions");
+        $counts       = $schemaModel->toBuildData("counts");
+        $relations    = $schemaModel->toBuildData("relations");
+        $subRequests  = $schemaModel->toBuildData("subRequests");
 
-        $imports     = self::getImports($schemaModel);
-        $fields      = self::getAllFields($schemaModel);
-        $uniques     = self::getSomeFields($schemaModel, isUnique: true);
-        $parents     = self::getSomeFields($schemaModel, isParent: true);
-        $editParents = $schemaModel->hasPositions ? $parents : [];
-        $validations = self::getValidations($schemaModel);
+        $imports      = self::getImports($schemaModel);
+        $fields       = self::getAllFields($schemaModel);
+        $uniques      = self::getSomeFields($schemaModel, isUnique: true);
+        $parents      = self::getSomeFields($schemaModel, isParent: true);
+        $editParents  = $schemaModel->hasPositions ? $parents : [];
+        $validations  = self::getValidations($schemaModel);
 
-        $hasVirtual  = count($schemaModel->virtualFields) > 0;
-        $hasUniques  = count($uniques) > 0;
-        $hasParents  = count($parents) > 0;
-        $hasDate     = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
-        $hasDateType = count(self::getSomeFields($schemaModel, isDateType: true)) > 0;
-        $hasJsonType = count(self::getSomeFields($schemaModel, isJsonType: true)) > 0;
-        $queryName   = $schemaModel->queryClass;
+        $hasVirtual   = count($schemaModel->virtualFields) > 0;
+        $hasUniques   = count($uniques) > 0;
+        $hasParents   = count($parents) > 0;
+        $hasDate      = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
+        $hasDateType  = count(self::getSomeFields($schemaModel, isDateType: true)) > 0;
+        $hasJsonType  = count(self::getSomeFields($schemaModel, isJsonType: true)) > 0;
+        $hasFloatType = count(self::getSomeFields($schemaModel, isFloatType: true)) > 0;
+        $queryName    = $schemaModel->queryClass;
 
-        $idType      = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, forEntity: false);
-        $idIsEnum    = $schemaModel->idType === FieldType::Enum;
-        $idSuffix    = $idIsEnum ? "->toString()" : "";
+        $idType       = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, forEntity: false);
+        $idIsEnum     = $schemaModel->idType === FieldType::Enum;
+        $idSuffix     = $idIsEnum ? "->toString()" : "";
+        $hasIntID     = $schemaModel->hasID && $schemaModel->idType === FieldType::Number;
 
-        $contents    = Builder::render("Schema", [
+        $contents     = Builder::render("Schema", [
             "namespace"          => $schemaModel->namespace,
             "name"               => $schemaModel->name,
             "tableName"          => $schemaModel->tableName,
@@ -61,7 +63,7 @@ class SchemaCode {
             "errorPrefix"        => Strings::toConstantCase($schemaModel->fantasyName) . "_ERROR_",
 
             "hasID"              => $schemaModel->hasID,
-            "hasIntID"           => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
+            "hasIntID"           => $hasIntID,
             "hasStringID"        => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
             "hasEnumID"          => $schemaModel->hasID && $idIsEnum,
             "idName"             => $schemaModel->idName,
@@ -111,9 +113,11 @@ class SchemaCode {
             "parentsArgList"     => self::joinFields($parents, "fieldArg", ", "),
             "hasEditParents"     => $schemaModel->hasPositions && $hasParents,
             "editParents"        => $editParents,
+
             "hasDate"            => $hasDate,
             "hasDateType"        => $hasDateType,
             "hasJsonType"        => $hasJsonType,
+            "usesNumbers"        => $hasFloatType || $hasIntID,
             "hasOperator"        => $schemaModel->hasID || $hasUniques || $hasParents,
         ]);
         return Strings::replace($contents, "(, ", "(");
@@ -178,6 +182,7 @@ class SchemaCode {
      * @param bool        $isDate      Optional.
      * @param bool        $isDateType  Optional.
      * @param bool        $isJsonType  Optional.
+     * @param bool        $isFloatType Optional.
      * @return list<array<string,string>>
      */
     private static function getSomeFields(
@@ -187,6 +192,7 @@ class SchemaCode {
         bool $isDate = false,
         bool $isDateType = false,
         bool $isJsonType = false,
+        bool $isFloatType = false,
     ): array {
         $result = [];
         foreach ($schemaModel->fields as $field) {
@@ -202,6 +208,8 @@ class SchemaCode {
             } elseif ($isDateType && $field->dateType !== DateType::None) {
                 $result[] = self::getField($field);
             } elseif ($isJsonType && $field->type === FieldType::JSON) {
+                $result[] = self::getField($field);
+            } elseif ($isFloatType && $field->type === FieldType::Float) {
                 $result[] = self::getField($field);
             }
         }
@@ -247,6 +255,9 @@ class SchemaCode {
             $typeNull   = "$type|null";
             $typeDoc    = Strings::replace($type, "array", "array<int|string,mixed>");
             $assign     = "JSON::encode($param)";
+            $assignEdit = "$param instanceof Assign ? $param : $assign";
+        } elseif ($type === "float") {
+            $assign     = "Numbers::toInt($param, {$field->decimals})";
             $assignEdit = "$param instanceof Assign ? $param : $assign";
         } elseif ($type === "bool") {
             $value      = "$param === true ? 1 : 0";

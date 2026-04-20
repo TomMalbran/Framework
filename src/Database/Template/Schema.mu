@@ -31,8 +31,8 @@ use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
 use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
 use Framework\Date\Type\DateType;{{/hasDateType}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
-use Framework\Utils\Dictionary;{{#hasIntID}}
-use Framework\Utils\Numbers;{{/hasIntID}}{{#hasJsonType}}
+use Framework\Utils\Dictionary;{{#usesNumbers}}
+use Framework\Utils\Numbers;{{/usesNumbers}}{{#hasJsonType}}
 use Framework\Utils\JSON;
 
 use JsonSerializable;{{/hasJsonType}}
