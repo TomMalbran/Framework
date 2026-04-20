@@ -144,6 +144,7 @@ class Validate {
 
     // Data that comes from the Field attribute
     public ValidateType $type = ValidateType::None;
+    public FieldType $fieldType = FieldType::None;
 
     public string $name      = "";
     public bool   $isUnique  = false;
@@ -164,7 +165,9 @@ class Validate {
         $this->dateInput = $field->dateInput;
         $this->hourInput = $field->hourInput;
         $this->decimals  = $field->decimals;
+
         $this->type      = $this->getType($field);
+        $this->fieldType = $field->type;
 
         if ($this->prefix === "") {
             $this->prefix = Strings::toConstantCase($fantasyName);
@@ -283,7 +286,7 @@ class Validate {
             $result[] = $this->maxValue;
         }
 
-        if ($this->decimals !== 0) {
+        if ($this->fieldType === FieldType::Float && $this->decimals !== 0) {
             for ($i = count($result); $i < 2; $i += 1) {
                 $result[] = "null";
             }
