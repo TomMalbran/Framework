@@ -30,7 +30,7 @@ class GoogleMap {
      * @return array{address:string,latitude:float,longitude:float}|null
      */
     public static function getFromAddress(string $address): array|null {
-        return self::getAddress($address, 0, 0);
+        return self::getAddress($address, 0.0, 0.0);
     }
 
     /**

@@ -339,7 +339,7 @@ class Auth {
             NLS::setLanguage($language);
         }
         if ($timezone !== 0) {
-            TimeZone::setTimeZone($timezone);
+            TimeZone::setTimeZone((float)$timezone);
         }
     }
 
