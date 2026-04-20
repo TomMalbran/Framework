@@ -50,6 +50,7 @@ parameters:
         disallowDebugPrint: true
         disallowEmptyArray: true
         disallowEnumNameValue: true
+        disallowIntFloatWidening: true
         disallowNativeDate: true
         enumSwitchExhaustive: true
         methodReturnNotNeeded: true

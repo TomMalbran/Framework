@@ -39,6 +39,12 @@ services:
         tags:
             - phpstan.rules.rule
     -
+        class: Framework\Analysis\General\DisallowIntFloatWideningRule
+        arguments:
+            enabled: %framework.disallowIntFloatWidening%
+        tags:
+            - phpstan.rules.rule
+    -
         class: Framework\Analysis\General\DisallowNativeDateRule
         arguments:
             enabled: %framework.disallowNativeDate%
@@ -100,6 +106,7 @@ parameters:
         disallowDebugPrint: false
         disallowEmptyArray: false
         disallowEnumNameValue: false
+        disallowIntFloatWidening: false
         disallowNativeDate: false
         enumSwitchExhaustive: false
         methodReturnNotNeeded: false
@@ -116,6 +123,7 @@ parametersSchema:
         disallowDebugPrint: bool()
         disallowEnumNameValue: bool()
         disallowEmptyArray: bool()
+        disallowIntFloatWidening: bool()
         disallowNativeDate: bool()
         enumSwitchExhaustive: bool()
         methodReturnNotNeeded: bool()
