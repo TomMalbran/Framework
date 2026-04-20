@@ -1,7 +1,7 @@
 <?php
 namespace Framework\File;
 
-use Framework\File\FileItem;
+use Framework\File\Type\FileItem;
 use Framework\Utils\Arrays;
 
 /**
