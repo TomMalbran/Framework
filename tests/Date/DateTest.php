@@ -995,6 +995,24 @@ class DateTest extends TestCase {
     }
 
 
+    /** @dataProvider providerIsAtDayStart */
+    public function testIsAtDayStart(mixed $input, bool $expected) {
+        $d = Date::create($input);
+        $this->assertSame($expected, $d->isAtDayStart());
+    }
+
+    public static function providerIsAtDayStart(): array {
+        return [
+            "null"     => [ null, false ],
+            "empty"    => [ "", false ],
+            "invalid"  => [ "not-a-date", false ],
+            "day"      => [ "2020-02-03", true ],
+            "day_time" => [ "2020-02-03 12:34:56", false ],
+            "date"     => [ Date::createTime(3, 2, 2020, 0, 0, 0), true ],
+        ];
+    }
+
+
     /** @dataProvider providerGetDaysDiff */
     public function testGetDaysDiff(mixed $input1, mixed $input2, int $expected) {
         $d1 = Date::create($input1);

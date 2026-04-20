@@ -716,6 +716,17 @@ class Date implements JsonSerializable {
         return $this->timestamp >= $from->toTime() && $this->timestamp <= $to->toTime();
     }
 
+    /**
+     * Returns true if the current Date is at the start of the day (00:00:00)
+     * @return bool
+     */
+    public function isAtDayStart(): bool {
+        if ($this->isEmpty()) {
+            return false;
+        }
+        return $this->getHour() === 0 && $this->getMinute() === 0 && $this->getSecond() === 0;
+    }
+
 
 
     /**
