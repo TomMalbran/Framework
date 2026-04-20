@@ -13,6 +13,9 @@
         <testsuite name="Enum Tests">
             <directory>tests/Enum</directory>
         </testsuite>
+        <testsuite name="File Tests">
+            <directory>tests/File</directory>
+        </testsuite>
         <testsuite name="IO Tests">
             <directory>tests/IO</directory>
         </testsuite>
