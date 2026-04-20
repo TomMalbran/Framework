@@ -159,18 +159,18 @@ class NumbersTest extends TestCase {
 
 
     /** @dataProvider providerRound */
-    public function testRound(mixed $value, int $decimals, float|int $expected) {
+    public function testRound(mixed $value, int $decimals, float $expected) {
         $this->assertEquals($expected, Numbers::round($value, $decimals));
     }
 
     public static function providerRound(): array {
         return [
-            "integer_input"      => [ 5, 2, 5 ],
+            "integer_input"      => [ 5, 2, 5.0 ],
             "rounding_down"      => [ 1.234, 2, 1.23 ],
             "rounding_up"        => [ 1.235, 2, 1.24 ],
             "three_decimals"     => [ 1.2345, 3, 1.235 ],
-            "zero_decimals_down" => [ 1.4, 0, 1 ],
-            "zero_decimals_up"   => [ 1.6, 0, 2 ],
+            "zero_decimals_down" => [ 1.4, 0, 1.0 ],
+            "zero_decimals_up"   => [ 1.6, 0, 2.0 ],
         ];
     }
 

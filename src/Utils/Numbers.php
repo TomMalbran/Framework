@@ -120,11 +120,11 @@ class Numbers {
      * Rounds the given number to the given decimals
      * @param int|float $number
      * @param int       $decimals
-     * @return int|float
+     * @return float
      */
-    public static function round(int|float $number, int $decimals): int|float {
+    public static function round(int|float $number, int $decimals): float {
         if (is_int($number)) {
-            return $number;
+            return (float)$number;
         }
         $padding = pow(10, $decimals);
         return round($number * $padding) / $padding;
