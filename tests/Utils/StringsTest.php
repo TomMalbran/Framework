@@ -1,287 +1,385 @@
 <?php
+// spell-checker: ignore abbab bcdef preabc tést xyxyxy
 namespace Tests\Utils;
 
 use Framework\Date\Date;
-use Framework\System\EmailCode;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Utils\Strings;
 
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+enum TestStringEnum implements Enum {
+    use IsEnum;
+
+    case None;
+    case String;
+    case Number;
+}
+
 class StringsTest extends TestCase {
 
-    public function testIsString() {
-        // valid strings
-        $this->assertTrue(Strings::isString(""));
-        $this->assertTrue(Strings::isString("x"));
-        $this->assertTrue(Strings::isString("123"));
-
-        // invalid strings
-        $this->assertFalse(Strings::isString(1));
-        $this->assertFalse(Strings::isString(null));
-        $this->assertFalse(Strings::isString(false));
-        $this->assertFalse(Strings::isString(new stdClass()));
+    /** @dataProvider providerIsString */
+    public function testIsString(mixed $value, bool $expected) {
+        $this->assertEquals($expected, Strings::isString($value));
     }
 
-    public function testToString() {
-        $this->assertEquals("x", Strings::toString("x"));
-        $this->assertEquals("123", Strings::toString(123));
-        $this->assertEquals("12.3", Strings::toString(12.3));
-        $this->assertEquals("", Strings::toString(new stdClass()));
-
-        // Date conversion uses ReverseSeconds format
-        $d = Date::createTime(1, 1, 2020, 12, 34, 56);
-        $this->assertEquals("2020-01-01 12:34:56", Strings::toString($d));
-
-        // Enum conversion returns its string name/value
-        $this->assertEquals("Test", Strings::toString(EmailCode::Test));
+    public static function providerIsString() {
+        return [
+            "empty"   => [ "", true ],
+            "char"    => [ "x", true],
+            "numeric" => [ "123", true ],
+            "integer" => [ 1, false ],
+            "null"    => [ null, false ],
+            "boolean" => [ false, false ],
+            "object"  => [ new stdClass(), false ],
+        ];
     }
 
-    public function testTrim() {
-        $this->assertEquals("a", Strings::trim(" a "));
-        $this->assertEquals("a", Strings::trim(" a"));
-        $this->assertEquals("1", Strings::trim(1));
-        $this->assertEquals("1.2", Strings::trim(1.2));
-        $this->assertEquals("", Strings::trim(null));
+
+    /** @dataProvider providerToString */
+    public function testToString(mixed $value, string $expected) {
+        $this->assertEquals($expected, Strings::toString($value));
     }
 
-    public function testNormalized() {
-        $this->assertEquals("x\nline", Strings::normalized(" x\r\nline "));
-        $this->assertEquals("a", Strings::normalized("a"));
-        $this->assertEquals("", Strings::normalized(null));
+    public static function providerToString() {
+        return [
+            "string"  => [ "x", "x" ],
+            "integer" => [ 123, "123" ],
+            "float"   => [ 12.3, "12.3" ],
+            "object"  => [ new stdClass(), "" ],
+            "date"    => [ Date::createTime(1, 1, 2020, 12, 34, 56), "2020-01-01 12:34:56" ],
+            "enum"    => [ TestStringEnum::String, "String" ],
+        ];
     }
 
-    public function testLength() {
-        $this->assertEquals(4, Strings::length("tést"));
-        $this->assertEquals(1, Strings::length("😄"));
-        $this->assertEquals(7, Strings::length("hello 😄"));
-        $this->assertEquals(0, Strings::length(""));
+
+    /** @dataProvider providerTrim */
+    public function testTrim(mixed $value, string $expected) {
+        $this->assertEquals($expected, Strings::trim($value));
     }
 
-    public function testIsEqual() {
-        // default behavior: case-insensitive, trim values
-        $this->assertTrue(Strings::isEqual(" A ", "a"));
-
-        // case-sensitive (no ignore case) -> should be false
-        $this->assertFalse(Strings::isEqual(" A ", "a", false));
-
-        // no trim -> spaces are significant
-        $this->assertFalse(Strings::isEqual(" A ", "a", true, false));
-
-        // case-sensitive and no trim
-        $this->assertFalse(Strings::isEqual("A ", "A", false, false));
-
-        // numeric conversions
-        $this->assertTrue(Strings::isEqual(123, " 123 "));
-
-        // Date and Enum conversions
-        $d = Date::createTime(1, 1, 2020, 12, 34, 56);
-        $this->assertTrue(Strings::isEqual($d, "2020-01-01 12:34:56"));
-        $this->assertTrue(Strings::isEqual(EmailCode::Test, "Test"));
-
-        // null and booleans convert to empty string
-        $this->assertTrue(Strings::isEqual(null, ""));
-        $this->assertTrue(Strings::isEqual(false, ""));
-
-        // different strings still false
-        $this->assertFalse(Strings::isEqual("A", "B", false));
+    public static function providerTrim() {
+        return [
+            "space_both" => [ " a ", "a" ],
+            "space_left" => [ " a", "a" ],
+            "integer"    => [ 1, "1" ],
+            "float"      => [ 1.2, "1.2" ],
+            "null"       => [ null, "" ],
+        ];
     }
 
-    public function testEquals() {
-        // valid cases
-        $this->assertTrue(Strings::equals("", ""));
-        $this->assertTrue(Strings::equals("one", "one"));
-        $this->assertTrue(Strings::equals("one", "two", "one"));
-        $this->assertTrue(Strings::equals("one", "one", "two"));
 
-        // invalid cases
-        $this->assertFalse(Strings::equals("", "-"));
-        $this->assertFalse(Strings::equals("", "two", "three"));
-        $this->assertFalse(Strings::equals("one", "two", "three"));
+    /** @dataProvider providerNormalized */
+    public function testNormalized(mixed $value, string $expected) {
+        $this->assertEquals($expected, Strings::normalized($value));
     }
 
-    public function testEqualsCaseInsensitive() {
-        // valid cases
-        $this->assertTrue(Strings::equalsCaseInsensitive("", ""));
-        $this->assertTrue(Strings::equalsCaseInsensitive("One", "oNe"));
-        $this->assertTrue(Strings::equalsCaseInsensitive("one", "one", "two"));
-        $this->assertTrue(Strings::equalsCaseInsensitive("One", "oNe", "two"));
-
-        // invalid cases
-        $this->assertFalse(Strings::equalsCaseInsensitive("", "-"));
-        $this->assertFalse(Strings::equalsCaseInsensitive("", "two", "three"));
-        $this->assertFalse(Strings::equalsCaseInsensitive("One", "Two"));
-        $this->assertFalse(Strings::equalsCaseInsensitive("One", "Two", "Three"));
+    public static function providerNormalized() {
+        return [
+            "with_whitespace" => [ " x\r\nline ", "x\nline" ],
+            "single_char"     => [ "a", "a" ],
+            "null"            => [ null, "" ],
+        ];
     }
 
-    public function testContains() {
-        // case-insensitive single needle
-        $this->assertTrue(Strings::contains("Hello World", "world", true));
-        // case-sensitive single needle -> not found
-        $this->assertFalse(Strings::contains("Hello World", "world", false));
 
-        // array of needles, atLeastOne = true (default) -> any match
-        $this->assertTrue(Strings::contains("abc", [ "x", "b" ], false, true));
-        $this->assertFalse(Strings::contains("abc", [ "x", "y" ], false, true));
-
-        // array of needles, atLeastOne = false -> requires all needles present
-        $this->assertTrue(Strings::contains("abc", [ "a", "b" ], false, false));
-        $this->assertFalse(Strings::contains("abc", [ "a", "x" ], false, false));
-
-        // case-insensitive with multiple needles
-        $this->assertTrue(Strings::contains("AbCd", [ "a", "C" ], true, false));
-
-        // single-element array behaves like single needle
-        $this->assertTrue(Strings::contains("abc", [ "b" ], false, true));
+    /** @dataProvider providerLength */
+    public function testLength(mixed $value, int $expected) {
+        $this->assertEquals($expected, Strings::length($value));
     }
 
-    public function testStartsWith() {
-        $this->assertTrue(Strings::startsWith("prefix_value", "prefix"));
-        $this->assertFalse(Strings::startsWith("nope", "pre"));
-
-        // multiple needles: any match should return true
-        $this->assertTrue(Strings::startsWith("prefix_value", "no", "prefix"));
-        // when none match, return false
-        $this->assertFalse(Strings::startsWith("nope", "pre", "xx"));
+    public static function providerLength() {
+        return [
+            "utf8_char" => [ "oración", 7 ],
+            "emoji"     => [ "😄", 1 ],
+            "mixed"     => [ "hello 😄", 7 ],
+            "empty"     => [ "", 0 ],
+        ];
     }
 
-    public function testStartsWithCaseInsensitive() {
-        $this->assertTrue(Strings::startsWithCaseInsensitive("AbC", "a"));
 
-        // multiple needles case-insensitive
-        $this->assertTrue(Strings::startsWithCaseInsensitive("AbC", "x", "A"));
-        $this->assertFalse(Strings::startsWithCaseInsensitive("AbC", "x", "y"));
+    /** @dataProvider providerIsEqual */
+    public function testIsEqual(mixed $value, mixed $compare, bool $ignoreCase, bool $trim, bool $expected) {
+        $this->assertEquals($expected, Strings::isEqual($value, $compare, $ignoreCase, $trim));
     }
 
-    public function testEndsWith() {
-        $this->assertTrue(Strings::endsWith("file.php", ".php"));
-        $this->assertFalse(Strings::endsWith("file.txt", ".php"));
-
-        // multiple needles - any matching needle should return true
-        $this->assertTrue(Strings::endsWith("index.html", ".php", ".html"));
-
-        // case-sensitive: uppercase extension won't match lowercase needle
-        $this->assertFalse(Strings::endsWith("readme.MD", ".md", ".txt"));
-        $this->assertTrue(Strings::endsWith("readme.md", ".md", ".txt"));
-        $this->assertFalse(Strings::endsWith("noext", ".php", ".html"));
+    public static function providerIsEqual() {
+        return [
+            "default_insensitive_trim" => [ " A ", "a", true, true, true ],
+            "case_sensitive"           => [ " A ", "a", false, true, false ],
+            "no_trim"                  => [ " A ", "a", true, false, false ],
+            "case_sensitive_no_trim"   => [ "A ", "A", false, false, false ],
+            "numeric_conversion"       => [ 123, " 123 ", true, true, true ],
+            "date_conversion"          => [ Date::createTime(1, 1, 2020, 12, 34, 56), "2020-01-01 12:34:56", true, true, true ],
+            "enum_conversion"          => [ TestStringEnum::String, "String", true, true, true ],
+            "null_empty_string"        => [ null, "", true, true, true ],
+            "false_empty_string"       => [ false, "", true, true, true ],
+            "different_strings"        => [ "A", "B", false, true, false ],
+        ];
     }
 
-    public function testEndsWithCaseInsensitive() {
-        $this->assertTrue(Strings::endsWithCaseInsensitive("AbC", "c"));
 
-        // multiple needles case-insensitive
-        $this->assertTrue(Strings::endsWithCaseInsensitive("readme.MD", ".md", ".txt"));
-        $this->assertTrue(Strings::endsWithCaseInsensitive("index.HTML", ".php", ".html"));
-        $this->assertFalse(Strings::endsWithCaseInsensitive("file", ".php", ".txt"));
+    /** @dataProvider providerEquals */
+    public function testEquals(mixed $value, array $compare, bool $expected) {
+        $this->assertEquals($expected, Strings::equals($value, ...$compare));
     }
 
-    public function testMatch() {
-        // anchored numeric match
-        $this->assertTrue(Strings::match("123", "/^[0-9]+$/"));
-        $this->assertFalse(Strings::match("a1", "/^[0-9]+$/"));
+    public static function providerEquals() {
+        return [
+            "empty_equals_empty"       => [ "", [ "" ], true ],
+            "one_equals_one"           => [ "one", [ "one" ], true ],
+            "one_equals_in_list"       => [ "one", [ "two", "one" ], true ],
+            "one_equals_first_in_list" => [ "one", [ "one", "two" ], true ],
 
-        // unanchored digit search
-        $this->assertTrue(Strings::match("abc123", "/\\d+/"));
-
-        // case-insensitive flag
-        $this->assertTrue(Strings::match("HELLO", "/hello/i"));
-
-        // pattern that matches nothing -> false
-        $this->assertFalse(Strings::match("b", "/^a$/"));
-
-        // invalid regexp should result in false; suppress PHP warnings during the call
-        $this->assertFalse(Strings::match("anything", "invalid"));
-        $this->assertFalse(Strings::match("anything", "/]invalid/"));
+            "empty_not_dash"           => [ "", [ "-" ], false ],
+            "empty_not_in_list"        => [ "", [ "two", "three" ], false ],
+            "one_not_in_list"          => [ "one", [ "two", "three" ], false ],
+        ];
     }
 
-    public function testGetAllMatches() {
-        // simple digit matches
-        $this->assertEquals([ "1", "22" ], Strings::getAllMatches("a1b22", "/\\d+/"));
-        $this->assertEquals([], Strings::getAllMatches("abc", "/\\d+/"));
 
-        // pattern with groups: returned list merges full matches then each group's matches
-        $this->assertEquals([
-            "abb", "ab", // full matches
-            "a", "a",    // group 1 matches
-            "bb", "b"    // group 2 matches
-        ], Strings::getAllMatches("abbab", "/(a)(b+)/"));
-
-        // single capturing group duplicates entries when merged
-        $this->assertEquals([
-            "1", "22",    // full matches
-            "1", "22"     // group matches
-        ], Strings::getAllMatches("a1b22", "/(\\d+)/"));
-
-        // invalid regexp should return empty array (function guards against false)
-        $this->assertEquals([], Strings::getAllMatches("anything", "/]invalid/"));
+    /** @dataProvider providerEqualsCaseInsensitive */
+    public function testEqualsCaseInsensitive(mixed $value, array $compare, bool $expected) {
+        $this->assertEquals($expected, Strings::equalsCaseInsensitive($value, ...$compare));
     }
 
-    public function testOnlyOneCharacter() {
-        // valid cases
-        $this->assertTrue(Strings::onlyOneCharacter("aaa", "a"));
+    public static function providerEqualsCaseInsensitive() {
+        return [
+            "empty_equals_empty"      => [ "", [ "" ], true ],
+            "one_equals_case_variant" => [ "One", [ "oNe" ], true ],
+            "one_equals_in_list"      => [ "one", [ "one", "two" ], true ],
+            "one_equals_case_in_list" => [ "One", [ "oNe", "two" ], true ],
 
-        // invalid cases
-        $this->assertFalse(Strings::onlyOneCharacter("", "a"));
-        $this->assertFalse(Strings::onlyOneCharacter("aaa", "aa"));
-        $this->assertFalse(Strings::onlyOneCharacter("aba", "a"));
-        $this->assertFalse(Strings::onlyOneCharacter("a b a", "a"));
+            "empty_not_dash"          => [ "", [ "-" ], false ],
+            "empty_not_in_list"       => [ "", [ "two", "three" ], false ],
+            "one_not_two"             => [ "One", [ "Two" ], false ],
+            "one_not_in_three_list"   => [ "One", [ "Two", "Three" ], false ],
+        ];
     }
 
-    public function testCompare() {
-        // basic ordering
-        $this->assertGreaterThan(0, Strings::compare("b", "a"));
-        $this->assertLessThan(0, Strings::compare("a", "b"));
 
-        // equal strings -> zero
-        $this->assertEquals(0, Strings::compare("same", "same"));
-
-        // reverse ordering when orderAsc = false
-        $this->assertLessThan(0, Strings::compare("b", "a", false));
-        $this->assertGreaterThan(0, Strings::compare("a", "b", false));
-
-        // case-insensitive comparisons
-        $this->assertLessThan(0, Strings::compare("a", "B", true, true));
-        $this->assertGreaterThan(0, Strings::compare("B", "a", true, true));
-
-        // combination: orderAsc = false with case-insensitive
-        $this->assertGreaterThan(0, Strings::compare("a", "B", false, true));
-        $this->assertLessThan(0, Strings::compare("B", "a", false, true));
+    /** @dataProvider providerContains */
+    public function testContains(string $value, string|array $needle, bool $ignoreCase, bool $atLeastOne, bool $expected) {
+        $this->assertEquals($expected, Strings::contains($value, $needle, $ignoreCase, $atLeastOne));
     }
 
-    public function testGetLetter() {
-        // valid indices in uppercase
-        $this->assertEquals("A", Strings::getLetter(0));
-        $this->assertEquals("C", Strings::getLetter(2));
+    public static function providerContains() {
+        return [
+            "one_ci_ok"     => [ "Hello World", "world", true, true, true ],
+            "one_cs_no"     => [ "Hello World", "world", false, true, false ],
 
-        // valid indices in lowercase
-        $this->assertEquals("a", Strings::getLetter(0, false));
-        $this->assertEquals("c", Strings::getLetter(2, false));
+            "arr_any_ok"    => [ "abc", [ "x", "b" ], false, true, true ],
+            "arr_any_no"    => [ "abc", [ "x", "y" ], false, true, false ],
 
-        // invalid indices should return empty string
-        $this->assertEquals("", Strings::getLetter(200));
-        $this->assertEquals("", Strings::getLetter(-1));
+            "arr_all_ok"    => [ "abc", [ "a", "b" ], false, false, true ],
+            "arr_all_no"    => [ "abc", [ "a", "x" ], false, false, false ],
+
+            "arr_ci_all_ok" => [ "AbCd", [ "a", "C" ], true, false, true ],
+            "arr_one_ok"    => [ "abc", [ "b" ], false, true, true ],
+        ];
     }
 
-    public function testGetNumber() {
-        // valid letters
-        $this->assertEquals(1, Strings::getNumber("A"));
-        $this->assertEquals(3, Strings::getNumber("c"));
 
-        // invalid letters should return 0
-        $this->assertEquals(0, Strings::getNumber("-"));
-        $this->assertEquals(0, Strings::getNumber("AA"));
-        $this->assertEquals(0, Strings::getNumber("cc"));
+    /** @dataProvider providerStartsWith */
+    public function testStartsWith(string $value, array $needles, bool $expected) {
+        $this->assertEquals($expected, Strings::startsWith($value, ...$needles));
     }
 
-    public function testRepeat() {
-        // valid cases
-        $this->assertEquals("xxx", Strings::repeat("x", 3));
-        $this->assertEquals("xyxyxy", Strings::repeat("xy", 3));
-
-        // zero or negative counts should return empty string
-        $this->assertEquals("", Strings::repeat("x", 0));
-        $this->assertEquals("", Strings::repeat("x", -1));
+    public static function providerStartsWith() {
+        return [
+            "single_match"        => [ "prefix_value", [ "prefix" ], true ],
+            "single_no_match"     => [ "nope", [ "pre" ], false ],
+            "multiple_any_match"  => [ "prefix_value", [ "no", "prefix" ], true ],
+            "multiple_none_match" => [ "nope", [ "pre", "xx" ], false ],
+        ];
     }
+
+
+    /** @dataProvider providerStartsWithCaseInsensitive */
+    public function testStartsWithCaseInsensitive(string $value, array $needles, bool $expected) {
+        $this->assertEquals($expected, Strings::startsWithCaseInsensitive($value, ...$needles));
+    }
+
+    public static function providerStartsWithCaseInsensitive() {
+        return [
+            "single_match"       => [ "AbC", [ "a" ], true ],
+            "multiple_any_match" => [ "AbC", [ "x", "A" ], true ],
+            "multiple_none"      => [ "AbC", [ "x", "y" ], false ],
+        ];
+    }
+
+
+    /** @dataProvider providerEndsWith */
+    public function testEndsWith(string $value, array $needles, bool $expected) {
+        $this->assertEquals($expected, Strings::endsWith($value, ...$needles));
+    }
+
+    public static function providerEndsWith() {
+        return [
+            "single_match"        => [ "file.php", [ ".php" ], true ],
+            "single_no_match"     => [ "file.txt", [ ".php" ], false ],
+            "multiple_any_match"  => [ "index.html", [ ".php", ".html" ], true ],
+            "case_sensitive_no"   => [ "readme.MD", [ ".md", ".txt" ], false ],
+            "case_sensitive_yes"  => [ "readme.md", [ ".md", ".txt" ], true ],
+            "multiple_none_match" => [ "file", [ ".php", ".html" ], false ],
+        ];
+    }
+
+
+    /** @dataProvider providerEndsWithCaseInsensitive */
+    public function testEndsWithCaseInsensitive(string $value, array $needles, bool $expected) {
+        $this->assertEquals($expected, Strings::endsWithCaseInsensitive($value, ...$needles));
+    }
+
+    public static function providerEndsWithCaseInsensitive() {
+        return [
+            "single_match"        => [ "AbC", [ "c" ], true ],
+            "multiple_any_match"  => [ "readme.MD", [ ".md", ".txt" ], true ],
+            "multiple_html_match" => [ "index.HTML", [ ".php", ".html" ], true ],
+            "multiple_none_match" => [ "file", [ ".php", ".txt" ], false ],
+        ];
+    }
+
+
+    /** @dataProvider providerMatch */
+    public function testMatch(string $value, string $pattern, bool $expected) {
+        $this->assertEquals($expected, Strings::match($value, $pattern));
+    }
+
+    public static function providerMatch() {
+        return [
+            "anchored_numeric_match"   => [ "123", "/^[0-9]+$/", true ],
+            "anchored_numeric_no"      => [ "a1", "/^[0-9]+$/", false ],
+            "unanchored_digit_search"  => [ "abc123", "/\\d+/", true ],
+            "case_insensitive_match"   => [ "HELLO", "/hello/i", true ],
+            "pattern_matches_nothing"  => [ "b", "/^a$/", false ],
+            "invalid_regexp_plain"     => [ "anything", "invalid", false ],
+            "invalid_regexp_delimited" => [ "anything", "/]invalid/", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerGetAllMatches */
+    public function testGetAllMatches(string $value, string $pattern, array $expected) {
+        $this->assertEquals($expected, Strings::getAllMatches($value, $pattern));
+    }
+
+    public static function providerGetAllMatches() {
+        return [
+            "simple_digit_matches" => [ "a1b22", "/\\d+/", [ "1", "22" ] ],
+            "no_matches"           => [ "abc", "/\\d+/", [] ],
+
+            "with_groups"          => [ "abbab", "/(a)(b+)/", [
+                "abb", "ab", // full matches
+                "a", "a",    // group 1 matches
+                "bb", "b"    // group 2 matches
+            ] ],
+
+            "single_group"         => [ "a1b22", "/(\\d+)/", [
+                "1", "22", // full matches
+                "1", "22"  // group matches
+            ] ],
+
+            "invalid_regexp"       => [ "anything", "/]invalid/", [] ],
+        ];
+    }
+
+
+    /** @dataProvider providerOnlyOneCharacter */
+    public function testOnlyOneCharacter(string $value, string $character, bool $expected) {
+        $this->assertEquals($expected, Strings::onlyOneCharacter($value, $character));
+    }
+
+    public static function providerOnlyOneCharacter() {
+        return [
+            "valid_repeated_char"      => [ "aaa", "a", true ],
+            "empty_string"             => [ "", "a", false ],
+            "multi_char_target"        => [ "aaa", "aa", false ],
+            "contains_other_character" => [ "aba", "a", false ],
+            "contains_spaces"          => [ "a b a", "a", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerCompare */
+    public function testCompare(string $value, string $compare, bool $orderAsc, bool $ignoreCase, int $expectedSign) {
+        $actual = Strings::compare($value, $compare, $orderAsc, $ignoreCase);
+        $this->assertSame($expectedSign, $actual <=> 0);
+    }
+
+    public static function providerCompare() {
+        return [
+            // basic ordering
+            "b_gt_a_asc" => [ "b", "a", true, false, 1 ],
+            "a_lt_b_asc" => [ "a", "b", true, false, -1 ],
+
+            // equal strings -> zero
+            "same_eq_same" => [ "same", "same", true, false, 0 ],
+
+            // reverse ordering when orderAsc = false
+            "b_lt_a_desc" => [ "b", "a", false, false, -1 ],
+            "a_gt_b_desc" => [ "a", "b", false, false, 1 ],
+
+            // case-insensitive comparisons
+            "a_lt_B_ci" => [ "a", "B", true, true, -1 ],
+            "B_gt_a_ci" => [ "B", "a", true, true, 1 ],
+
+            // combination: orderAsc = false with case-insensitive
+            "a_gt_B_desc_ci" => [ "a", "B", false, true, 1 ],
+            "B_lt_a_desc_ci" => [ "B", "a", false, true, -1 ],
+        ];
+    }
+
+
+    /** @dataProvider providerGetLetter */
+    public function testGetLetter(int $index, bool $uppercase, string $expected) {
+        $this->assertEquals($expected, Strings::getLetter($index, $uppercase));
+    }
+
+    public static function providerGetLetter() {
+        return [
+            "upper_a"          => [ 0, true, "A" ],
+            "upper_c"          => [ 2, true, "C" ],
+            "lower_a"          => [ 0, false, "a" ],
+            "lower_c"          => [ 2, false, "c" ],
+            "invalid_high"     => [ 200, true, "" ],
+            "invalid_negative" => [ -1, true, "" ],
+        ];
+    }
+
+
+    /** @dataProvider providerGetNumber */
+    public function testGetNumber(string $value, int $expected) {
+        $this->assertEquals($expected, Strings::getNumber($value));
+    }
+
+    public static function providerGetNumber() {
+        return [
+            "upper_a"        => [ "A", 1 ],
+            "lower_c"        => [ "c", 3 ],
+            "invalid_dash"   => [ "-", 0 ],
+            "invalid_double" => [ "AA", 0 ],
+            "invalid_cc"     => [ "cc", 0 ],
+        ];
+    }
+
+
+    /** @dataProvider providerRepeat */
+    public function testRepeat(string $value, int $count, string $expected) {
+        $this->assertEquals($expected, Strings::repeat($value, $count));
+    }
+
+    public static function providerRepeat() {
+        return [
+            "single_char_x3" => [ "x", 3, "xxx" ],
+            "multi_char_x3"  => [ "xy", 3, "xyxyxy" ],
+            "zero_count"     => [ "x", 0, "" ],
+            "negative_count" => [ "x", -1, "" ],
+        ];
+    }
+
 
     public function testRandom() {
         $r = Strings::random(5);
@@ -289,858 +387,1077 @@ class StringsTest extends TestCase {
         $this->assertEquals(5, strlen($r));
     }
 
-    public function testRandomChar() {
-        $this->assertEquals("", Strings::randomChar(""));
-        $this->assertEquals("a", Strings::randomChar("a"));
-        $this->assertContains(Strings::randomChar("abc"), str_split("abc"));
+
+    /** @dataProvider providerRandomChar */
+    public function testRandomChar(string $chars, string|array $expected) {
+        $actual = Strings::randomChar($chars);
+        if (is_array($expected)) {
+            $this->assertContains($actual, $expected);
+        } else {
+            $this->assertEquals($expected, $actual);
+        }
     }
 
-    public function testRandomCode() {
-        $code = Strings::randomCode(6, "ld");
+    public static function providerRandomChar() {
+        return [
+            "empty"  => [ "", "" ],
+            "single" => [ "a", "a" ],
+            "many"   => [ "abc", [ "a", "b", "c" ] ],
+        ];
+    }
+
+
+    /** @dataProvider providerRandomCode */
+    public function testRandomCode(?int $length, ?string $set, int $expectedLength, ?string $expectedPattern, ?string $expectedValue = null) {
+        if ($length === null && $set === null) {
+            $code = Strings::randomCode();
+        } elseif ($set === null) {
+            $code = Strings::randomCode($length);
+        } else {
+            $code = Strings::randomCode($length, $set);
+        }
+
         $this->assertIsString($code);
-        $this->assertEquals(6, strlen($code));
+        $this->assertEquals($expectedLength, strlen($code));
 
-        // test using default values
-        $c = Strings::randomCode();
-        $this->assertIsString($c);
-        $this->assertEquals(8, strlen($c));
-        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9]+$/', $c);
+        if ($expectedValue !== null) {
+            $this->assertEquals($expectedValue, $code);
+        }
 
-        // 'a' -> both lower and upper letters
-        $c = Strings::randomCode(10, "a");
-        $this->assertMatchesRegularExpression('/^[a-zA-Z]+$/', $c);
-
-        // 'l' -> lowercase only
-        $c = Strings::randomCode(8, "l");
-        $this->assertMatchesRegularExpression('/^[a-z]+$/', $c);
-
-        // 'u' -> uppercase only
-        $c = Strings::randomCode(8, "u");
-        $this->assertMatchesRegularExpression('/^[A-Z]+$/', $c);
-
-        // 'd' -> digits only
-        $c = Strings::randomCode(8, "d");
-        $this->assertMatchesRegularExpression('/^[0-9]+$/', $c);
-
-        // 's' -> symbols set !@#$%&*?
-        $c = Strings::randomCode(8, "s");
-        $this->assertMatchesRegularExpression('/^[!@#\$%&\*\?]+$/', $c);
-
-        // combinations (ensure allowed chars are subset)
-        $c = Strings::randomCode(12, "ld");
-        $this->assertMatchesRegularExpression('/^[a-z0-9]+$/i', $c);
-
-        // test empty set -> should return empty string
-        $c = Strings::randomCode(8, "");
-        $this->assertEquals("", $c);
-
-        // test invalid set -> should return empty string
-        $c = Strings::randomCode(8, "x");
-        $this->assertEquals("", $c);
+        if ($expectedPattern !== null && $code !== "") {
+            $this->assertMatchesRegularExpression($expectedPattern, $code);
+        }
     }
 
-    public function testToNumber() {
-        $this->assertEquals("12", Strings::toNumber("a1b2"));
-        $this->assertEquals("", Strings::toNumber("abc"));
+    public static function providerRandomCode() {
+        return [
+            "default_values"     => [ null, null, 8, '/^[a-zA-Z0-9]+$/', null ],
+            "letters_and_digits" => [ 6, "ld", 6, '/^[a-z0-9]+$/', null ],
+            "letters_any_case"   => [ 10, "a", 10, '/^[a-zA-Z]+$/', null ],
+            "lowercase_only"     => [ 8, "l", 8, '/^[a-z]+$/', null ],
+            "uppercase_only"     => [ 8, "u", 8, '/^[A-Z]+$/', null ],
+            "digits_only"        => [ 8, "d", 8, '/^[0-9]+$/', null ],
+            "symbols_only"       => [ 8, "s", 8, '/^[!@#\$%&\*\?]+$/', null ],
+            "empty_set"          => [ 8, "", 0, null, "" ],
+            "invalid_set"        => [ 8, "x", 0, null, "" ],
+        ];
     }
 
-    public function testReplace() {
-        // simple scalar replacement
-        $this->assertEquals("bar", Strings::replace("foo", "foo", "bar"));
-        $this->assertEquals("bar bar", Strings::replace("foo foo", "foo", "bar"));
 
-        // mapping replacement: keys replaced by their values
-        $this->assertEquals("one:two", Strings::replace("a:b", [ "a" => "one", "b" => "two" ]));
-        // mapping with no matches should return original
-        $this->assertEquals("abc", Strings::replace("abc", [ "x" => "y" ]));
-
-        // array search with single replacement string -> all occurrences replaced by same value
-        $this->assertEquals("XXc", Strings::replace("abc", [ "a", "b" ], "X"));
-
-        // array search with array replacement
-        $this->assertEquals("xyc", Strings::replace("abc", [ "a", "b" ], [ "x", "y" ]));
-
-        // null replace
-        $this->assertEquals("", Strings::replace("abc", "a", null));
+    /** @dataProvider providerToNumber */
+    public function testToNumber(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toNumber($value));
     }
 
-    public function testReplaceStart() {
-        // basic prefix replacement
-        $this->assertEquals("barBAR", Strings::replaceStart("fooBAR", "foo", "bar"));
-
-        // no-op when prefix not present
-        $this->assertEquals("fooBAR", Strings::replaceStart("fooBAR", "no", "x"));
-
-        // full-string prefix replacement
-        $this->assertEquals("bar", Strings::replaceStart("foo", "foo", "bar"));
-
-        // empty input remains empty
-        $this->assertEquals("", Strings::replaceStart("", "foo", "bar"));
-
-        // case-sensitive behavior: only exact match replaced
-        $this->assertEquals("barBAR", Strings::replaceStart("FooBAR", "Foo", "bar"));
-        $this->assertEquals("fooBAR", Strings::replaceStart("fooBAR", "Foo", "bar"));
+    public static function providerToNumber() {
+        return [
+            "mixed_alnum" => [ "a1b2", "12" ],
+            "no_digits"   => [ "abc", "" ],
+        ];
     }
 
-    public function testReplaceEnd() {
-        // basic suffix replacement
-        $this->assertEquals("fooBAZ", Strings::replaceEnd("fooBAR", "BAR", "BAZ"));
 
-        // no-op when suffix not present
-        $this->assertEquals("fooBAR", Strings::replaceEnd("fooBAR", "no", "x"));
-
-        // full-string suffix replacement
-        $this->assertEquals("baz", Strings::replaceEnd("bar", "bar", "baz"));
-
-        // empty input remains empty
-        $this->assertEquals("", Strings::replaceEnd("", "x", "y"));
-
-        // case-sensitive behavior: only exact match replaced
-        $this->assertEquals("fooBAZ", Strings::replaceEnd("fooBar", "Bar", "BAZ"));
-        $this->assertEquals("fooBAR", Strings::replaceEnd("fooBAR", "Bar", "BAZ"));
+    /** @dataProvider providerReplace */
+    public function testReplace(string $value, string|array $search, string|array|null $replace, string $expected) {
+        if (is_array($search) && $replace === null) {
+            $this->assertEquals($expected, Strings::replace($value, $search));
+        } else {
+            $this->assertEquals($expected, Strings::replace($value, $search, $replace));
+        }
     }
 
-    public function testReplacePattern() {
-        // simple vowel replacements
-        $this->assertEquals("h_ll_", Strings::replacePattern("hello", "/[eo]/", "_"));
+    public static function providerReplace() {
+        return [
+            // simple scalar replacement
+            "scalar_single" => [ "foo", "foo", "bar", "bar" ],
+            "scalar_multi"  => [ "foo foo", "foo", "bar", "bar bar" ],
 
-        // replace digit groups with a single marker
-        $this->assertEquals("aNbN", Strings::replacePattern("a1b22", "/\\d+/", "N"));
+            // mapping replacement: keys replaced by their values
+            "mapping_match"    => [ "a:b", [ "a" => "one", "b" => "two" ], null, "one:two" ],
+            "mapping_no_match" => [ "abc", [ "x" => "y" ], null, "abc" ],
 
-        // limit parameter: only first match replaced
-        $this->assertEquals("aNb22", Strings::replacePattern("a1b22", "/\\d+/", "N", 1));
+            // array search with single replacement string
+            "array_search_single_replace" => [ "abc", [ "a", "b" ], "X", "XXc" ],
 
-        // capturing group replacement using $1 backreference
-        $this->assertEquals("a[1]b[2]", Strings::replacePattern("a1b2", "/(\\d)/", "[$1]"));
+            // array search with array replacement
+            "array_search_array_replace" => [ "abc", [ "a", "b" ], [ "x", "y" ], "xyc" ],
 
-        // case-insensitive replacement
-        $this->assertEquals("Jello", Strings::replacePattern("hello", "/h/i", "J"));
-
-        // array of patterns with array of replacements
-        $this->assertEquals("h_ll_N", Strings::replacePattern("hello123", [ "/[eo]/", "/\\d+/" ], [ "_", "N" ]));
+            // empty replace
+            "empty_replace" => [ "abc", "a", "", "bc" ],
+        ];
     }
 
-    public function testReplaceCallback() {
-        // basic callback wrapping matches
-        $cb = Strings::replaceCallback("a1b2", "/(\\d+)/", function($m) { return "[" . $m[0] . "]"; });
-        $this->assertEquals("a[1]b[2]", $cb);
 
-        // limit parameter: only the first match replaced
-        $cb = Strings::replaceCallback("a1b22", "/(\\d+)/", function($m) { return "[" . $m[0] . "]"; }, 1);
-        $this->assertEquals("a[1]b22", $cb);
-
-        // callback can transform the match (double numeric values)
-        $cb = Strings::replaceCallback("a2b3", "/(\\d+)/", function($m) { return (string)((int)$m[0] * 2); });
-        $this->assertEquals("a4b6", $cb);
-
-        // array of patterns: callback is invoked for each pattern's matches
-        $cb = Strings::replaceCallback("a1e2", ["/[ae]/", "/(\\d)/"], function($m) {
-            if (ctype_digit($m[0])) {
-                return "{" . $m[0] . "}";
-            }
-            return strtoupper($m[0]);
-        });
-        $this->assertEquals("A{1}E{2}", $cb);
+    /** @dataProvider providerReplaceStart */
+    public function testReplaceStart(string $value, string $search, string $replace, string $expected) {
+        $this->assertEquals($expected, Strings::replaceStart($value, $search, $replace));
     }
 
-    public function testStripStart() {
-        // basic start removal
-        $this->assertEquals("value", Strings::stripStart("pre_value", "pre_"));
-
-        // multiple needles: first matching needle is removed
-        $this->assertEquals("value", Strings::stripStart("prefix_value", "prefix_", "pre"));
-
-        // when none of the needles match, original returned
-        $this->assertEquals("prefix_value", Strings::stripStart("prefix_value", "x", "y"));
-
-        // empty input stays empty
-        $this->assertEquals("", Strings::stripStart("", "pre"));
-
-        // ordering matters: earlier needle can remove a smaller piece
-        $this->assertEquals("fix_value", Strings::stripStart("prefix_value", "pre", "prefix_"));
+    public static function providerReplaceStart() {
+        return [
+            "basic_ok"      => [ "fooBAR", "foo", "bar", "barBAR" ],
+            "no_prefix"     => [ "fooBAR", "no", "x", "fooBAR" ],
+            "full_match"    => [ "foo", "foo", "bar", "bar" ],
+            "empty_in"      => [ "", "foo", "bar", "" ],
+            "case_ok"       => [ "FooBAR", "Foo", "bar", "barBAR" ],
+            "case_no_match" => [ "fooBAR", "Foo", "bar", "fooBAR" ],
+        ];
     }
 
-    public function testStripEnd() {
-        // basic end removal
-        $this->assertEquals("pre", Strings::stripEnd("pre_suf", "_suf"));
 
-        // multiple needles: any matching suffix removed
-        $this->assertEquals("file", Strings::stripEnd("file.php", ".php", ".txt"));
-
-        // when none match, original returned
-        $this->assertEquals("file.php", Strings::stripEnd("file.php", ".x", ".y"));
-
-        // empty input stays empty
-        $this->assertEquals("", Strings::stripEnd("", "x"));
-
-        // ordering: shorter suffix first will remove only that suffix when it matches
-        $this->assertEquals("file.tx", Strings::stripEnd("file.txt", "t", ".txt"));
+    /** @dataProvider providerReplaceEnd */
+    public function testReplaceEnd(string $value, string $search, string $replace, string $expected) {
+        $this->assertEquals($expected, Strings::replaceEnd($value, $search, $replace));
     }
 
-    public function testStripStartEnd() {
-        // basic start+end removal
-        $this->assertEquals("mid", Strings::stripStartEnd("[mid]", "[", "]"));
-
-        // longer delimiters
-        $this->assertEquals("text", Strings::stripStartEnd("<<text>>", "<<", ">>"));
-
-        // empty input stays empty
-        $this->assertEquals("", Strings::stripStartEnd("", "[", "]"));
-
-        // only start matches -> end unchanged
-        $this->assertEquals("foo", Strings::stripStartEnd("pre_foo", "pre_", "]"));
-
-        // only end matches -> start unchanged
-        $this->assertEquals("bar", Strings::stripStartEnd("bar_suf", "[", "_suf"));
+    public static function providerReplaceEnd() {
+        return [
+            "basic_suffix_replacement" => [ "fooBAR", "BAR", "BAZ", "fooBAZ" ],
+            "no_suffix_noop"           => [ "fooBAR", "no", "x", "fooBAR" ],
+            "full_string_replacement"  => [ "bar", "bar", "baz", "baz" ],
+            "empty_input"              => [ "", "x", "y", "" ],
+            "case_sensitive_match"     => [ "fooBar", "Bar", "BAZ", "fooBAZ" ],
+            "case_sensitive_no_match"  => [ "fooBAR", "Bar", "BAZ", "fooBAR" ],
+        ];
     }
 
-    public function testPadLeft() {
-        // basic numeric padding on the left
-        $this->assertEquals("001", Strings::padLeft("1", 3, "0"));
 
-        // when length is less or equal to string length, original returned
-        $this->assertEquals("abcd", Strings::padLeft("abcd", 3, "0"));
-        $this->assertEquals("abcd", Strings::padLeft("abcd", 4, "0"));
-
-        // multi-character needle is repeated as needed
-        $this->assertEquals("abab1", Strings::padLeft("1", 5, "ab"));
-
-        // padding with spaces (default)
-        $this->assertEquals("  x", Strings::padLeft("x", 3));
+    /** @dataProvider providerReplacePattern */
+    public function testReplacePattern(string $value, string|array $pattern, string|array $replace, ?int $limit, string $expected) {
+        if ($limit === null) {
+            $actual = Strings::replacePattern($value, $pattern, $replace);
+        } else {
+            $actual = Strings::replacePattern($value, $pattern, $replace, $limit);
+        }
+        $this->assertEquals($expected, $actual);
     }
 
-    public function testPadRight() {
-        // basic padding on the right
-        $this->assertEquals("1  ", Strings::padRight("1", 3, " "));
-
-        // when length is less or equal to string length, original returned
-        $this->assertEquals("hello", Strings::padRight("hello", 3, " "));
-        $this->assertEquals("hello", Strings::padRight("hello", 5, " "));
-
-        // multi-character needle is repeated and truncated as needed
-        $this->assertEquals("1xyx", Strings::padRight("1", 4, "xy"));
-
-        // default needle (space)
-        $this->assertEquals("x  ", Strings::padRight("x", 3));
+    public static function providerReplacePattern() {
+        return [
+            "vowel_rep"      => [ "hello", "/[eo]/", "_", null, "h_ll_" ],
+            "digit_rep"      => [ "a1b22", "/\\d+/", "N", null, "aNbN" ],
+            "limit_first"    => [ "a1b22", "/\\d+/", "N", 1, "aNb22" ],
+            "group_back_ref" => [ "a1b2", "/(\\d)/", "[$1]", null, "a[1]b[2]" ],
+            "ci_rep"         => [ "hello", "/h/i", "J", null, "Jello" ],
+            "arr_pat_arr_rep"=> [ "hello123", [ "/[eo]/", "/\\d+/" ], [ "_", "N" ], null, "h_ll_N" ],
+        ];
     }
 
-    public function testAddPrefix() {
-        // adds missing prefix
-        $this->assertEquals("pre_x", Strings::addPrefix("x", "pre_"));
 
-        // does not duplicate when prefix already present
-        $this->assertEquals("pre_x", Strings::addPrefix("pre_x", "pre_"));
-
-        // multi-character prefix
-        $this->assertEquals("Mr x", Strings::addPrefix("x", "Mr "));
+    /** @dataProvider providerReplaceCallback */
+    public function testReplaceCallback(string $value, string|array $pattern, callable $callback, ?int $limit, string $expected) {
+        if ($limit === null) {
+            $actual = Strings::replaceCallback($value, $pattern, $callback);
+        } else {
+            $actual = Strings::replaceCallback($value, $pattern, $callback, $limit);
+        }
+        $this->assertEquals($expected, $actual);
     }
 
-    public function testAddSuffix() {
-        // adds missing suffix
-        $this->assertEquals("x_suf", Strings::addSuffix("x", "_suf"));
-
-        // does not duplicate when suffix already present
-        $this->assertEquals("x_suf", Strings::addSuffix("x_suf", "_suf"));
-
-        // multi-character suffix
-        $this->assertEquals("x Jr.", Strings::addSuffix("x", " Jr."));
+    public static function providerReplaceCallback() {
+        return [
+            "basic_wrap_matches" => [
+                "a1b2",
+                "/(\\d+)/",
+                function($m) { return "[" . $m[0] . "]"; },
+                null,
+                "a[1]b[2]"
+            ],
+            "limit_first_only" => [
+                "a1b22",
+                "/(\\d+)/",
+                function($m) { return "[" . $m[0] . "]"; },
+                1,
+                "a[1]b22"
+            ],
+            "double_numeric_values" => [
+                "a2b3",
+                "/(\\d+)/",
+                function($m) { return (string)((int)$m[0] * 2); },
+                null,
+                "a4b6"
+            ],
+            "array_patterns" => [
+                "a1e2",
+                ["/[ae]/", "/(\\d)/"],
+                function($m) {
+                    if (ctype_digit($m[0])) {
+                        return "{" . $m[0] . "}";
+                    }
+                    return strtoupper($m[0]);
+                },
+                null,
+                "A{1}E{2}"
+            ],
+        ];
     }
 
-    public function testAddPrefixSuffix() {
-        // adds both prefix and suffix when missing
-        $this->assertEquals("pre_x_suf", Strings::addPrefixSuffix("x", "pre_", "_suf"));
 
-        // when prefix present but suffix missing
-        $this->assertEquals("pre_x_suf", Strings::addPrefixSuffix("pre_x", "pre_", "_suf"));
-
-        // when suffix present but prefix missing
-        $this->assertEquals("pre_x_suf", Strings::addPrefixSuffix("x_suf", "pre_", "_suf"));
-
-        // when both present -> unchanged
-        $this->assertEquals("pre_x_suf", Strings::addPrefixSuffix("pre_x_suf", "pre_", "_suf"));
+    /** @dataProvider providerStripStart */
+    public function testStripStart(string $value, array $needles, string $expected) {
+        $this->assertEquals($expected, Strings::stripStart($value, ...$needles));
     }
 
-    public function testSubstring() {
-        // basic substring with length
-        $this->assertEquals("bcd", Strings::substring("abcdef", 1, 3));
-
-        // substring without length returns rest of string
-        $this->assertEquals("bcdef", Strings::substring("abcdef", 1));
-
-        // negative start counts from end
-        $this->assertEquals("def", Strings::substring("abcdef", -3));
-
-        // utf8-aware substring
-        $this->assertEquals("és", Strings::substring("tést", 1, 2, true));
+    public static function providerStripStart() {
+        return [
+            "basic_start"       => [ "pre_value", [ "pre_" ], "value" ],
+            "multi_first_match" => [ "prefix_value", [ "prefix_", "pre" ], "value" ],
+            "no_match"          => [ "prefix_value", [ "x", "y" ], "prefix_value" ],
+            "empty_input"       => [ "", [ "pre" ], "" ],
+            "order_short_first" => [ "prefix_value", [ "pre", "prefix_" ], "fix_value" ],
+        ];
     }
 
-    public function testSubstringAfter() {
-        // substringAfter uses last occurrence by default
-        $this->assertEquals("c", Strings::substringAfter("a.b.c", "."));
 
-        // when useFirst = true, returns after first occurrence
-        $this->assertEquals("b.c", Strings::substringAfter("a.b.c", ".", true));
-
-        // needle at end returns empty string
-        $this->assertEquals("", Strings::substringAfter("a.", "."));
-
-        // needle not found -> returns original
-        $this->assertEquals("abc", Strings::substringAfter("abc", "."));
-
-        // empty needle behaves as position 0 -> returns original
-        $this->assertEquals("abc", Strings::substringAfter("abc", "", true));
+    /** @dataProvider providerStripEnd */
+    public function testStripEnd(string $value, array $needles, string $expected) {
+        $this->assertEquals($expected, Strings::stripEnd($value, ...$needles));
     }
 
-    public function testSubstringBefore() {
-        // substringBefore uses first occurrence by default
-        $this->assertEquals("a", Strings::substringBefore("a.b.c", "."));
-
-        // when useFirst = false, returns before last occurrence
-        $this->assertEquals("a.b", Strings::substringBefore("a.b.c", ".", false));
-
-        // needle not found -> returns original
-        $this->assertEquals("abc", Strings::substringBefore("abc", "."));
-
-        // needle at start (position 0) returns original
-        $this->assertEquals(".a", Strings::substringBefore(".a", "."));
-
-        // empty needle behaves like not-found for substringBefore -> original
-        $this->assertEquals("abc", Strings::substringBefore("abc", "", true));
+    public static function providerStripEnd() {
+        return [
+            "basic_end"   => [ "pre_suf", [ "_suf" ], "pre" ],
+            "multi_any"   => [ "file.php", [ ".php", ".txt" ], "file" ],
+            "none_match"  => [ "file.php", [ ".x", ".y" ], "file.php" ],
+            "empty_input" => [ "", [ "x" ], "" ],
+            "short_first" => [ "file.txt", [ "t", ".txt" ], "file.tx" ],
+        ];
     }
 
-    public function testSubstringBetween() {
-        // basic between
-        $this->assertEquals("mid", Strings::substringBetween("x[start]mid[end]y", "[start]", "[end]"));
 
-        // longer delimiters
-        $this->assertEquals("text", Strings::substringBetween("<<text>>", "<<", ">>"));
-
-        // missing delimiters -> original returned
-        $this->assertEquals("nope", Strings::substringBetween("nope", "[", "]"));
-
-        // empty string handled
-        $this->assertEquals("", Strings::substringBetween("", "[", "]"));
+    /** @dataProvider providerStripStartEnd */
+    public function testStripStartEnd(string $value, string $start, string $end, string $expected) {
+        $this->assertEquals($expected, Strings::stripStartEnd($value, $start, $end));
     }
 
-    public function testSplit() {
-        // basic split with trim and skipEmpty
-        $this->assertEquals([ "a", "b" ], Strings::split("a,,b", ",", trim: true, skipEmpty: true));
-
-        // empty string returns empty array
-        $this->assertEquals([], Strings::split("", ","));
-
-        // empty needle returns empty array
-        $this->assertEquals([], Strings::split("abc", ""));
-
-        // passing an array returns it unchanged
-        $this->assertEquals([ "x", "y" ], Strings::split([ "x", "y" ], ","));
-
-        // when needle not present, original returned as single element
-        $this->assertEquals([ "abc" ], Strings::split("abc", "|"));
-
-        // trim and skipEmpty interactions
-        $raw = " a , , b ";
-        // no trim, no skipEmpty -> keeps empty and whitespace
-        $this->assertEquals([ " a ", " ", " b " ], Strings::split($raw, ",", trim: false, skipEmpty: false));
-        // trim, no skipEmpty -> keeps empty but trims entries
-        $this->assertEquals([ "a", "", "b" ], Strings::split($raw, ",", trim: true, skipEmpty: false));
-        // no trim, skipEmpty -> removes empty but keeps whitespace
-        $this->assertEquals([ " a ", "b " ], Strings::split($raw, ", ", trim: false, skipEmpty: true));
-        // trim and skipEmpty -> trims and removes empty
-        $this->assertEquals([ "a", "b" ], Strings::split($raw, ",", trim: true, skipEmpty: true));
-
-        // multi-character needle
-        $this->assertEquals([ "a", "b", "c" ], Strings::split("a--b--c", "--"));
-
-        // trailing separators: last empty element behavior
-        $this->assertEquals([ "a", "b", "" ], Strings::split("a,b,", ",", trim: false, skipEmpty: false));
-        $this->assertEquals([ "a", "b" ], Strings::split("a,b,", ",", trim: false, skipEmpty: true));
-
-        // needle equals full string -> two empty parts
-        $this->assertEquals([ "", "" ], Strings::split(",", ",", trim: false, skipEmpty: false));
-        $this->assertEquals([], Strings::split(",", ",", trim: false, skipEmpty: true));
+    public static function providerStripStartEnd() {
+        return [
+            "basic_start_end_removal" => [ "[mid]", "[", "]", "mid" ],
+            "longer_delimiters"       => [ "<<text>>", "<<", ">>", "text" ],
+            "empty_input"             => [ "", "[", "]", "" ],
+            "only_start_matches"      => [ "pre_foo", "pre_", "]", "foo" ],
+            "only_end_matches"        => [ "bar_suf", "[", "_suf", "bar" ],
+        ];
     }
 
-    public function testSplitToWords() {
-        $words = Strings::splitToWords("Hello, world!");
-        $this->assertContains("Hello", $words);
-        $this->assertContains("world", $words);
 
-        // preserves words separated by punctuation
-        $words = Strings::splitToWords("Wait... what?");
-        $this->assertContains("Wait", $words);
-        $this->assertContains("what", $words);
-
-        // non-word characters only -> empty array
-        $this->assertEquals([], Strings::splitToWords(""));
+    /** @dataProvider providerPadLeft */
+    public function testPadLeft(string $value, int $length, string $needle, string $expected) {
+        $this->assertEquals($expected, Strings::padLeft($value, $length, $needle));
     }
 
-    public function testJoin() {
-        $this->assertEquals("a, b", Strings::join([ "a", "b" ], ", "));
-
-        // join without glue
-        $this->assertEquals("ab", Strings::join([ "a", "b" ]));
-
-        // join with withoutEmpty flag removes empty entries
-        $this->assertEquals("a,b", Strings::join([ "a", "", "b" ], ",", withoutEmpty: true));
-
-        // numeric array is joined as strings
-        $this->assertEquals("1, 2", Strings::join([ 1, 2 ], ", "));
-        $this->assertEquals("1, 2", Strings::join([ 1, 0, 2 ], ", ", withoutEmpty: true));
-        $this->assertEquals("1.2, 2.3", Strings::join([ 1.2, 2.3 ], ", "));
-
-        // non-array input returns string or empty
-        $this->assertEquals("x", Strings::join("x"));
-        $this->assertEquals("", Strings::join(123));
+    public static function providerPadLeft() {
+        return [
+            "basic_numeric_padding"  => [ "1", 3, "0", "001" ],
+            "length_less_than_value" => [ "abcd", 3, "0", "abcd" ],
+            "length_equal_value"     => [ "abcd", 4, "0", "abcd" ],
+            "multi_character_needle" => [ "1", 5, "ab", "abab1" ],
+            "default_space_padding"  => [ "x", 3, " ", "  x" ],
+        ];
     }
 
-    public function testJoinKeys() {
-        $this->assertEquals("ab", Strings::joinKeys([ "a" => 1, "b" => 2 ]));
 
-        // array as list joins numeric keys
-        $this->assertEquals("01", Strings::joinKeys([ 1, 2 ]));
-
-        // non-array input returns string or empty
-        $this->assertEquals("x", Strings::joinKeys("x"));
-        $this->assertEquals("", Strings::joinKeys(123));
+    /** @dataProvider providerPadRight */
+    public function testPadRight(string $value, int $length, ?string $needle, string $expected) {
+        if ($needle === null) {
+            $this->assertEquals($expected, Strings::padRight($value, $length));
+        } else {
+            $this->assertEquals($expected, Strings::padRight($value, $length, $needle));
+        }
     }
 
-    public function testJoinValues() {
-        $this->assertEquals("1, 2", Strings::joinValues([[ "n" => 1 ], [ "n" => 2 ]], "n", ", "));
-
-        // missing key returns empty string for that entry
-        $this->assertEquals("1, ", Strings::joinValues([[ "n" => 1 ], []], "n", ", "));
-
-        // non-array input returns string when provided
-        $this->assertEquals("x", Strings::joinValues("x", "n", ", "));
-        $this->assertEquals("", Strings::joinValues(123, "n", ", "));
+    public static function providerPadRight() {
+        return [
+            "basic_right_padding"    => [ "1", 3, " ", "1  " ],
+            "length_less_than_value" => [ "hello", 3, " ", "hello" ],
+            "length_equal_value"     => [ "hello", 5, " ", "hello" ],
+            "multi_character_needle" => [ "1", 4, "xy", "1xyx" ],
+            "default_space_padding"  => [ "x", 3, null, "x  " ],
+        ];
     }
 
-    public function testMerge() {
-        $this->assertEquals("A B", Strings::merge("A", "B", " "));
 
-        // when first empty
-        $this->assertEquals("B", Strings::merge("", "B", " "));
-
-        // when second empty
-        $this->assertEquals("A", Strings::merge("A", "", " "));
-
-        // when both empty
-        $this->assertEquals("", Strings::merge("", "", " "));
+    /** @dataProvider providerAddPrefix */
+    public function testAddPrefix(string $value, string $prefix, string $expected) {
+        $this->assertEquals($expected, Strings::addPrefix($value, $prefix));
     }
 
-    public function testToLowerCase() {
-        $this->assertEquals("hello world", Strings::toLowerCase("Hello World"));
-        $this->assertEquals("mixed case", Strings::toLowerCase("Mixed CASE"));
-        $this->assertEquals("", Strings::toLowerCase(""));
-        $this->assertEquals("a", Strings::toLowerCase("A"));
+    public static function providerAddPrefix() {
+        return [
+            "adds_missing_prefix"       => [ "x", "pre_", "pre_x" ],
+            "does_not_duplicate_prefix" => [ "pre_x", "pre_", "pre_x" ],
+            "multi_character_prefix"    => [ "x", "Mr ", "Mr x" ],
+        ];
     }
 
-    public function testLowerCaseFirst() {
-        $this->assertEquals("hello", Strings::lowerCaseFirst("Hello"));
-        $this->assertEquals("", Strings::lowerCaseFirst(""));
-        $this->assertEquals("h", Strings::lowerCaseFirst("H"));
+
+    /** @dataProvider providerAddSuffix */
+    public function testAddSuffix(string $value, string $suffix, string $expected) {
+        $this->assertEquals($expected, Strings::addSuffix($value, $suffix));
     }
 
-    public function testToUpperCase() {
-        $this->assertEquals("HELLO WORLD", Strings::toUpperCase("hello world"));
-        $this->assertEquals("MIXED CASE", Strings::toUpperCase("Mixed case"));
-
-        // edge cases
-        $this->assertEquals("", Strings::toUpperCase(""));
-        $this->assertEquals("A", Strings::toUpperCase("a"));
+    public static function providerAddSuffix() {
+        return [
+            "adds_missing_suffix"       => [ "x", "_suf", "x_suf" ],
+            "does_not_duplicate_suffix" => [ "x_suf", "_suf", "x_suf" ],
+            "multi_character_suffix"    => [ "x", " Jr.", "x Jr." ],
+        ];
     }
 
-    public function testUpperCaseFirst() {
-        $this->assertEquals("Hello", Strings::upperCaseFirst("hello"));
-        $this->assertEquals("", Strings::upperCaseFirst(""));
-        $this->assertEquals("H", Strings::upperCaseFirst("h"));
+
+    /** @dataProvider providerAddPrefixSuffix */
+    public function testAddPrefixSuffix(string $value, string $prefix, string $suffix, string $expected) {
+        $this->assertEquals($expected, Strings::addPrefixSuffix($value, $prefix, $suffix));
     }
 
-    public function testIsConstantCase() {
-        $this->assertTrue(Strings::isConstantCase("ABCDEF"));
-        $this->assertTrue(Strings::isConstantCase("ABC_DEF"));
-
-        // invalid cases
-        $this->assertFalse(Strings::isConstantCase("AbC_DEF"));
-        $this->assertFalse(Strings::isConstantCase("ABC-def"));
-        $this->assertFalse(Strings::isConstantCase(""));
-        $this->assertFalse(Strings::isConstantCase("123"));
+    public static function providerAddPrefixSuffix() {
+        return [
+            "add_both" => [ "x", "pre_", "_suf", "pre_x_suf" ],
+            "has_pre"  => [ "pre_x", "pre_", "_suf", "pre_x_suf" ],
+            "has_suf"  => [ "x_suf", "pre_", "_suf", "pre_x_suf" ],
+            "has_both" => [ "pre_x_suf", "pre_", "_suf", "pre_x_suf" ],
+        ];
     }
 
-    public function testToConstantCase() {
-        // already in constant case -> should remain unchanged
-        $this->assertEquals("SOME_CONSTANT", Strings::toConstantCase("SOME_CONSTANT"));
 
-        // converts snake_case to CONSTANT_CASE
-        $this->assertEquals("SOME_CONSTANT", Strings::toConstantCase("some_constant"));
-
-        // converts kebab-case to CONSTANT_CASE
-        $this->assertEquals("SOME_CONSTANT", Strings::toConstantCase("some-constant"));
-
-        // converts camelCase to CONSTANT_CASE
-        $this->assertEquals("SOME_CONSTANT", Strings::toConstantCase("someConstant"));
-
-        // converts PascalCase to CONSTANT_CASE
-        $this->assertEquals("SOME_CONSTANT", Strings::toConstantCase("SomeConstant"));
-
-        // converts various delimiters to CONSTANT_CASE
-        $this->assertEquals("HELLO_WORLD", Strings::toConstantCase("Hello world"));
-        $this->assertEquals("HELLO_WORLD", Strings::toConstantCase("hello.world"));
-        $this->assertEquals("HELLO_WORLD", Strings::toConstantCase("hello:world"));
-        $this->assertEquals("HELLO_WORLD", Strings::toConstantCase("hello;world"));
-
-        // edge cases
-        $this->assertEquals("A", Strings::toConstantCase("A"));
-        $this->assertEquals("", Strings::toConstantCase(""));
+    /** @dataProvider providerSubstring */
+    public function testSubstring(string $value, int $start, ?int $length, bool $asUtf8, string $expected) {
+        if ($length === null) {
+            $actual = Strings::substring($value, $start, asUtf8: $asUtf8);
+        } else {
+            $actual = Strings::substring($value, $start, $length, $asUtf8);
+        }
+        $this->assertEquals($expected, $actual);
     }
 
-    public function testIsSnakeCase() {
-        $this->assertTrue(Strings::isSnakeCase("hello_world"));
-        $this->assertTrue(Strings::isSnakeCase("a"));
-
-        // invalid cases
-        $this->assertFalse(Strings::isSnakeCase("Hello_world"));
-        $this->assertFalse(Strings::isSnakeCase("helloWorld"));
-        $this->assertFalse(Strings::isSnakeCase("hello world"));
-        $this->assertFalse(Strings::isSnakeCase("hello-world"));
-        $this->assertFalse(Strings::isSnakeCase(""));
+    public static function providerSubstring() {
+        return [
+            "basic_with_length"    => [ "abcdef", 1, 3, false, "bcd" ],
+            "without_length"       => [ "abcdef", 1, null, false, "bcdef" ],
+            "negative_start"       => [ "abcdef", -3, null, false, "def" ],
+            "utf8_aware_substring" => [ "tést", 1, 2, true, "és" ],
+        ];
     }
 
-    public function testToSnakeCase() {
-        // already in snake_case -> should remain unchanged
-        $this->assertEquals("some_hey", Strings::toSnakeCase("some_hey"));
 
-        // converts CONSTANT_CASE to snake_case
-        $this->assertEquals("some_hey", Strings::toSnakeCase("SOME_HEY"));
-
-        // converts kebab-case to snake_case
-        $this->assertEquals("some_hey", Strings::toSnakeCase("some-hey"));
-
-        // converts camelCase to snake_case
-        $this->assertEquals("some_hey", Strings::toSnakeCase("someHey"));
-
-        // converts PascalCase to snake_case
-        $this->assertEquals("some_hey", Strings::toSnakeCase("SomeHey"));
-        $this->assertEquals("some_hey_data", Strings::toSnakeCase("SomeHEYData"));
-        $this->assertEquals("hey_some_data", Strings::toSnakeCase("HEYSomeData"));
-
-        // converts various delimiters to snake_case
-        $this->assertEquals("hello_world", Strings::toSnakeCase("Hello world"));
-        $this->assertEquals("hello_world", Strings::toSnakeCase("hello-world"));
-        $this->assertEquals("hello_world", Strings::toSnakeCase("hello.world"));
-        $this->assertEquals("hello_world", Strings::toSnakeCase("hello:world"));
-        $this->assertEquals("hello_world", Strings::toSnakeCase("hello;world"));
-
-        // edge cases
-        $this->assertEquals("a", Strings::toSnakeCase("A"));
-        $this->assertEquals("", Strings::toSnakeCase(""));
+    /** @dataProvider providerSubstringAfter */
+    public function testSubstringAfter(string $value, string $needle, bool $useFirst, string $expected) {
+        $this->assertEquals($expected, Strings::substringAfter($value, $needle, $useFirst));
     }
 
-    public function testIsKebabCase() {
-        $this->assertTrue(Strings::isKebabCase("hello-world"));
-        $this->assertTrue(Strings::isKebabCase("a"));
-
-        // invalid cases
-        $this->assertFalse(Strings::isKebabCase("Hello-world"));
-        $this->assertFalse(Strings::isKebabCase("helloWorld"));
-        $this->assertFalse(Strings::isKebabCase("hello world"));
-        $this->assertFalse(Strings::isKebabCase("hello_world"));
-        $this->assertFalse(Strings::isKebabCase(""));
+    public static function providerSubstringAfter() {
+        return [
+            "default_uses_last"      => [ "a.b.c", ".", false, "c" ],
+            "use_first_occurrence"   => [ "a.b.c", ".", true, "b.c" ],
+            "needle_at_end"          => [ "a.", ".", false, "" ],
+            "needle_not_found"       => [ "abc", ".", false, "abc" ],
+            "empty_needle_use_first" => [ "abc", "", true, "abc" ],
+        ];
     }
 
-    public function testToKebabCase() {
-        // already in kebab-case -> should remain unchanged
-        $this->assertEquals("some-hey", Strings::toKebabCase("some-hey"));
 
-        // converts CONSTANT_CASE to kebab-case
-        $this->assertEquals("some-hey", Strings::toKebabCase("SOME_HEY"));
-
-        // converts snake_case to kebab-case
-        $this->assertEquals("some-hey", Strings::toKebabCase("some_hey"));
-
-        // converts camelCase to kebab-case
-        $this->assertEquals("some-hey", Strings::toKebabCase("someHey"));
-
-        // converts PascalCase to kebab-case
-        $this->assertEquals("some-hey", Strings::toKebabCase("SomeHey"));
-        $this->assertEquals("some-hey-data", Strings::toKebabCase("SomeHEYData"));
-        $this->assertEquals("hey-some-data", Strings::toKebabCase("HEYSomeData"));
-
-        // converts various delimiters to kebab-case
-        $this->assertEquals("hello-world", Strings::toKebabCase("Hello world"));
-        $this->assertEquals("hello-world", Strings::toKebabCase("hello.world"));
-        $this->assertEquals("hello-world", Strings::toKebabCase("hello:world"));
-        $this->assertEquals("hello-world", Strings::toKebabCase("hello;world"));
-
-        // edge cases
-        $this->assertEquals("a", Strings::toKebabCase("A"));
-        $this->assertEquals("", Strings::toKebabCase(""));
+    /** @dataProvider providerSubstringBefore */
+    public function testSubstringBefore(string $value, string $needle, ?bool $useFirst, string $expected) {
+        if ($useFirst === null) {
+            $actual = Strings::substringBefore($value, $needle);
+        } else {
+            $actual = Strings::substringBefore($value, $needle, $useFirst);
+        }
+        $this->assertEquals($expected, $actual);
     }
 
-    public function testIsPascalCase() {
-        $this->assertTrue(Strings::isPascalCase("HelloWorld"));
-        $this->assertTrue(Strings::isPascalCase("Ab"));
-        $this->assertTrue(Strings::isPascalCase("SomeHEYData"));
-        $this->assertTrue(Strings::isPascalCase("HEYSomeData"));
-
-        // invalid cases
-        $this->assertFalse(Strings::isPascalCase("helloWorld"));
-        $this->assertFalse(Strings::isPascalCase("Hello World"));
-        $this->assertFalse(Strings::isPascalCase("Hello-World"));
-        $this->assertFalse(Strings::isPascalCase("Hello-World"));
-        $this->assertFalse(Strings::isPascalCase(""));
+    public static function providerSubstringBefore() {
+        return [
+            "default_uses_first" => [ "a.b.c", ".", null, "a" ],
+            "use_last"           => [ "a.b.c", ".", false, "a.b" ],
+            "needle_not_found"   => [ "abc", ".", true, "abc" ],
+            "needle_at_start"    => [ ".a", ".", true, ".a" ],
+            "empty_needle"       => [ "abc", "", true, "abc" ],
+        ];
     }
 
-    public function testToPascalCase() {
-        // already in PascalCase -> should remain unchanged
-        $this->assertEquals("HelloWorld", Strings::toPascalCase("HelloWorld"));
 
-        // converts CONSTANT_CASE to PascalCase
-        $this->assertEquals("SomeHey", Strings::toPascalCase("SOME_HEY"));
-
-        // converts snake_case to PascalCase
-        $this->assertEquals("SomeHey", Strings::toPascalCase("some_hey"));
-
-        // converts kebab-case to PascalCase
-        $this->assertEquals("SomeHey", Strings::toPascalCase("some-hey"));
-
-        // converts camelCase to PascalCase
-        $this->assertEquals("SomeHey", Strings::toPascalCase("someHey"));
-        $this->assertEquals("SomeHEYData", Strings::toPascalCase("someHEYData"));
-
-        // converts various delimiters to PascalCase
-        $this->assertEquals("Hello", Strings::toPascalCase("hello"));
-        $this->assertEquals("HelloWorld", Strings::toPascalCase("Hello world"));
-        $this->assertEquals("HelloWorld", Strings::toPascalCase("hello.world"));
-        $this->assertEquals("HelloWorld", Strings::toPascalCase("hello:world"));
-        $this->assertEquals("HelloWorld", Strings::toPascalCase("hello;world"));
-
-        // edge cases
-        $this->assertEquals("A", Strings::toPascalCase("a"));
-        $this->assertEquals("", Strings::toPascalCase(""));
+    /** @dataProvider providerSubstringBetween */
+    public function testSubstringBetween(string $value, string $start, string $end, string $expected) {
+        $this->assertEquals($expected, Strings::substringBetween($value, $start, $end));
     }
 
-    public function testIsCamelCase() {
-        $this->assertTrue(Strings::isCamelCase("helloWorld"));
-        $this->assertTrue(Strings::isCamelCase("a"));
-
-        // invalid cases
-        $this->assertFalse(Strings::isCamelCase("HelloWorld"));
-        $this->assertFalse(Strings::isCamelCase("hello world"));
-        $this->assertFalse(Strings::isCamelCase("hello-world"));
-        $this->assertFalse(Strings::isCamelCase(""));
+    public static function providerSubstringBetween() {
+        return [
+            "basic_between"      => [ "x[start]mid[end]y", "[start]", "[end]", "mid" ],
+            "longer_delimiters"  => [ "<<text>>", "<<", ">>", "text" ],
+            "missing_delimiters" => [ "nope", "[", "]", "nope" ],
+            "empty_string"       => [ "", "[", "]", "" ],
+        ];
     }
 
-    public function testToCamelCase() {
-        // already in camelCase -> should remain unchanged
-        $this->assertEquals("helloWorld", Strings::toCamelCase("helloWorld"));
 
-        // converts CONSTANT_CASE to camelCase
-        $this->assertEquals("someHey", Strings::toCamelCase("SOME_HEY"));
-
-        // converts snake_case to camelCase
-        $this->assertEquals("someHey", Strings::toCamelCase("some_hey"));
-
-        // converts kebab-case to camelCase
-        $this->assertEquals("someHey", Strings::toCamelCase("some-hey"));
-
-        // converts PascalCase to camelCase
-        $this->assertEquals("someHey", Strings::toCamelCase("SomeHey"));
-
-        // converts various delimiters to camelCase
-        $this->assertEquals("hello", Strings::toCamelCase("Hello"));
-        $this->assertEquals("helloWorld", Strings::toCamelCase("Hello world"));
-        $this->assertEquals("helloWorld", Strings::toCamelCase("hello-world"));
-        $this->assertEquals("helloWorld", Strings::toCamelCase("hello.world"));
-        $this->assertEquals("helloWorld", Strings::toCamelCase("hello:world"));
-        $this->assertEquals("helloWorld", Strings::toCamelCase("hello;world"));
-
-        // edge cases
-        $this->assertEquals("a", Strings::toCamelCase("A"));
-        $this->assertEquals("", Strings::toCamelCase(""));
+    /** @dataProvider providerSplit */
+    public function testSplit(mixed $value, string $needle, bool $trim, bool $skipEmpty, array $expected) {
+        $this->assertEquals($expected, Strings::split($value, $needle, trim: $trim, skipEmpty: $skipEmpty));
     }
 
-    public function testToHtml() {
-        $this->assertEquals("a<br>b", Strings::toHtml("a\nb"));
-        $this->assertEquals("<br>", Strings::toHtml("\n"));
-        $this->assertEquals("ab", Strings::toHtml("ab"));
-        $this->assertEquals("", Strings::toHtml(""));
+    public static function providerSplit() {
+        return [
+            "basic_split_trim_skip_empty" => [ "a,,b", ",", true, true, [ "a", "b" ] ],
+            "empty_string"                => [ "", ",", true, true, [] ],
+            "empty_needle"                => [ "abc", "", true, true, [] ],
+            "array_input_unchanged"       => [ [ "x", "y" ], ",", true, true, [ "x", "y" ] ],
+            "needle_not_present"          => [ "abc", "|", true, true, [ "abc" ] ],
+
+            "raw_no_trim_no_skip"         => [ " a , , b ", ",", false, false, [ " a ", " ", " b " ] ],
+            "raw_trim_no_skip"            => [ " a , , b ", ",", true, false, [ "a", "", "b" ] ],
+            "raw_no_trim_skip"            => [ " a , , b ", ", ", false, true, [ " a ", "b " ] ],
+            "raw_trim_skip"               => [ " a , , b ", ",", true, true, [ "a", "b" ] ],
+
+            "multi_character_needle"      => [ "a--b--c", "--", true, true, [ "a", "b", "c" ] ],
+
+            "trailing_sep_keep_empty"     => [ "a,b,", ",", false, false, [ "a", "b", "" ] ],
+            "trailing_sep_skip_empty"     => [ "a,b,", ",", false, true, [ "a", "b" ] ],
+
+            "needle_equals_full_keep"     => [ ",", ",", false, false, [ "", "" ] ],
+            "needle_equals_full_skip"     => [ ",", ",", false, true, [] ],
+        ];
     }
 
-    public function testRemoveHtml() {
-        $this->assertEquals("abc", Strings::removeHtml("<b>abc</b>"));
-        $this->assertEquals("", Strings::removeHtml(""));
 
-        // style tag at start should be removed entirely
-        $this->assertEquals("abc", Strings::removeHtml("<style>body{}</style>abc"));
-
-        // without end style tag
-        $this->assertEquals("<style>body{}abc", Strings::removeHtml("<style>body{}abc"));
-
-        // style tag in the middle should be removed and surrounding text preserved
-        $this->assertEquals("preabc", Strings::removeHtml("pre<style>body{}</style>abc"));
+    /** @dataProvider providerSplitToWords */
+    public function testSplitToWords(string $value, array $expectedContains, ?array $expectedExact = null) {
+        $words = Strings::splitToWords($value);
+        foreach ($expectedContains as $expectedWord) {
+            $this->assertContains($expectedWord, $words);
+        }
+        if ($expectedExact !== null) {
+            $this->assertEquals($expectedExact, $words);
+        }
     }
 
-    public function testDecodeHtml() {
-        $this->assertEquals("&", Strings::decodeHtml("&amp;"));
-        $this->assertEquals("<", Strings::decodeHtml("&lt;"));
-
-        // numeric entities
-        $this->assertEquals("A", Strings::decodeHtml("&#65;"));
-        $this->assertEquals("é", Strings::decodeHtml("&#233;"));
-
-        // hexadecimal entities
-        $this->assertEquals("A", Strings::decodeHtml("&#x41;"));
-        $this->assertEquals("é", Strings::decodeHtml("&#xE9;"));
+    public static function providerSplitToWords() {
+        return [
+            "hello_world" => [ "Hello, world!", [ "Hello", "world" ], null ],
+            "punctuation" => [ "Wait... what?", [ "Wait", "what" ], null ],
+            "empty"       => [ "", [], [] ],
+        ];
     }
 
-    public function testMakeShort() {
-        // when length is zero, original returned
-        $this->assertEquals("anything", Strings::makeShort("anything", 0));
 
-        // short string shorter than length -> unchanged (first line)
-        $this->assertEquals("short", Strings::makeShort("short", 10));
-
-        // truncation with utf8 enabled: length 5 -> 2 chars + '...'
-        $this->assertEquals("ab...", Strings::makeShort("abcdef", 5));
-
-        // newline handling: only first line considered
-        $this->assertEquals("first", Strings::makeShort("first\nsecond", 10));
-
-        // utf8 multi-byte handling: preserves characters correctly
-        $this->assertEquals("tést", Strings::makeShort("tést", 4));
-        $this->assertEquals("tés...", Strings::makeShort("tést", 2));
-
-        // asUtf8 = false uses byte-length loop trimming
-        $this->assertEquals("abcde", Strings::makeShort("abcdefgh", 5, false));
+    /** @dataProvider providerJoin */
+    public function testJoin(mixed $value, ?string $glue, ?bool $withoutEmpty, string $expected) {
+        if ($glue === null && $withoutEmpty === null) {
+            $actual = Strings::join($value);
+        } elseif ($glue === null) {
+            $actual = Strings::join($value, withoutEmpty: $withoutEmpty);
+        } elseif ($withoutEmpty === null) {
+            $actual = Strings::join($value, $glue);
+        } else {
+            $actual = Strings::join($value, $glue, withoutEmpty: $withoutEmpty);
+        }
+        $this->assertEquals($expected, $actual);
     }
 
-    public function testIsShort() {
-        $long = str_repeat("x", 50);
-        $this->assertTrue(Strings::isShort($long, 10));
-        $this->assertTrue(Strings::isShort("abcdefgh", 3));
+    public static function providerJoin() {
+        return [
+            "basic_with_glue"      => [ [ "a", "b" ], ", ", null, "a, b" ],
+            "without_glue"         => [ [ "a", "b" ], null, null, "ab" ],
+            "without_empty"        => [ [ "a", "", "b" ], ",", true, "a,b" ],
+
+            "numeric_array"        => [ [ 1, 2 ], ", ", null, "1, 2" ],
+            "numeric_with_zero"    => [ [ 1, 0, 2 ], ", ", true, "1, 2" ],
+            "float_array"          => [ [ 1.2, 2.3 ], ", ", null, "1.2, 2.3" ],
+
+            "non_array_string"     => [ "x", null, null, "x" ],
+            "non_array_non_string" => [ 123, null, null, "" ],
+        ];
     }
 
-    public function testIsAlphaNum() {
-        // basic alphanumeric
-        $this->assertTrue(Strings::isAlphaNum("abc123"));
-        $this->assertFalse(Strings::isAlphaNum("abc 123"));
 
-        // pure letters and numbers
-        $this->assertTrue(Strings::isAlphaNum("ABC"));
-        $this->assertTrue(Strings::isAlphaNum("123"));
-
-        // dashes and underscores disallowed by default
-        $this->assertFalse(Strings::isAlphaNum("abc-123"));
-        $this->assertFalse(Strings::isAlphaNum("abc_123"));
-
-        // allow dashes/underscores when requested
-        $this->assertTrue(Strings::isAlphaNum("abc-123", true));
-        $this->assertTrue(Strings::isAlphaNum("abc_123", true));
-        $this->assertTrue(Strings::isAlphaNum("a-b_c", true));
-
-        // length parameter is checked before dash/underscore removal
-        $this->assertTrue(Strings::isAlphaNum("abcd", false, 4));
-        $this->assertFalse(Strings::isAlphaNum("abcd", false, 3));
-        // original length includes dashes/underscores
-        $this->assertTrue(Strings::isAlphaNum("a-b_c", true, 5));
-        $this->assertFalse(Strings::isAlphaNum("a-b_c", false, 5));
-
-        // empty string
-        $this->assertFalse(Strings::isAlphaNum(""));
+    /** @dataProvider providerJoinKeys */
+    public function testJoinKeys(mixed $value, string $expected) {
+        $this->assertEquals($expected, Strings::joinKeys($value));
     }
 
-    public function testSanitize() {
-        // basic lowercase sanitization (punctuation removed)
-        $this->assertEquals("hello", Strings::sanitize("Hello!!", lowercase: true, anal: false));
-
-        // anal mode: accents removed and non-alnum chars dropped, spaces -> hyphen
-        $this->assertEquals("hello-world", Strings::sanitize("Hello World!!", lowercase: true, anal: true));
-
-        // preserve case when lowercase = false
-        $this->assertEquals("Hello", Strings::sanitize("Hello!!", lowercase: false, anal: false));
-
-        // accents preserved when anal = false, lowercased when requested
-        $this->assertEquals("áéí", Strings::sanitize("ÁÉÍ", lowercase: true, anal: false));
-
-        // anal mode converts accents to ASCII equivalents
-        $this->assertEquals("ole-nino", Strings::sanitize("Olé Niño", lowercase: true, anal: true));
-
-        // underscores and slashes removed before whitespace->hyphen conversion
-        $this->assertEquals("ab-c", Strings::sanitize("a_b c", lowercase: true, anal: false));
-        $this->assertEquals("ab-c", Strings::sanitize("a/b c", lowercase: true, anal: false));
-
-        // multiple whitespace collapsed to single hyphen
-        $this->assertEquals("many-spaces-here", Strings::sanitize("Many   Spaces   Here", lowercase: true, anal: false));
+    public static function providerJoinKeys() {
+        return [
+            "assoc_keys"        => [ [ "a" => 1, "b" => 2 ], "ab" ],
+            "list_numeric_keys" => [ [ 1, 2 ], "01" ],
+            "string_input"      => [ "x", "x" ],
+            "non_array_input"   => [ 123, "" ],
+        ];
     }
 
-    public function testHasEmoji() {
-        // basic emoji presence
-        $this->assertTrue(Strings::hasEmoji("hello 😄"));
-        $this->assertTrue(Strings::hasEmoji("😄"));
-        $this->assertTrue(Strings::hasEmoji("Flags 🇺🇸 are cool"));
-        $this->assertTrue(Strings::hasEmoji("Family: 👨‍👩‍👧‍👦"));
-        $this->assertTrue(Strings::hasEmoji("Skin tone 👍🏽"));
-        $this->assertTrue(Strings::hasEmoji("👍🏽"));
-        $this->assertTrue(Strings::hasEmoji("👩‍❤️‍👩"));
 
-        // invalid cases: no emoji present
-        $this->assertFalse(Strings::hasEmoji("no emoji here"));
-        $this->assertFalse(Strings::hasEmoji(""));
+    /** @dataProvider providerJoinValues */
+    public function testJoinValues(mixed $value, string $key, string $glue, string $expected) {
+        $this->assertEquals($expected, Strings::joinValues($value, $key, $glue));
     }
 
-    public function testIsOnlyEmojis() {
-        // valid emoji-only strings
-        $this->assertTrue(Strings::isOnlyEmojis("😄😄"));
-        $this->assertTrue(Strings::isOnlyEmojis("😄"));
-        $this->assertTrue(Strings::isOnlyEmojis("👍🏽"));
-
-        // invalid cases: any non-emoji character disqualifies
-        $this->assertFalse(Strings::isOnlyEmojis("hi 😄"));
-        $this->assertFalse(Strings::isOnlyEmojis("😄 😄"));
-        $this->assertFalse(Strings::isOnlyEmojis("😄a"));
-        $this->assertFalse(Strings::isOnlyEmojis(""));
+    public static function providerJoinValues() {
+        return [
+            "basic_join"           => [ [[ "n" => 1 ], [ "n" => 2 ]], "n", ", ", "1, 2" ],
+            "missing_key_entry"    => [ [[ "n" => 1 ], []], "n", ", ", "1, " ],
+            "string_input"         => [ "x", "n", ", ", "x" ],
+            "non_array_non_string" => [ 123, "n", ", ", "" ],
+        ];
     }
 
-    public function testConvertEncoding() {
-        // basic return type
-        $this->assertIsString(Strings::convertEncoding("&eacute;"));
 
-        // raw accented character should be converted to an HTML entity
-        $this->assertEquals("&eacute;", Strings::convertEncoding("é"));
-
-        // existing named entity preserved
-        $this->assertEquals("&eacute;", Strings::convertEncoding("&eacute;"));
-
-        // multi-character string with accents
-        $this->assertEquals("Ol&eacute;", Strings::convertEncoding("Olé"));
-
-        // ASCII-only input unchanged
-        $this->assertEquals("A", Strings::convertEncoding("A"));
-
-        // numeric entity preserved when provided
-        $this->assertEquals("&#233;", Strings::convertEncoding("&#233;"));
+    /** @dataProvider providerMerge */
+    public function testMerge(string $first, string $second, string $glue, string $expected) {
+        $this->assertEquals($expected, Strings::merge($first, $second, $glue));
     }
 
-    public function testBase64Decode() {
-        // simple ascii
-        $this->assertEquals("hi", Strings::base64Decode(base64_encode("hi")));
+    public static function providerMerge() {
+        return [
+            "both_values"  => [ "A", "B", " ", "A B" ],
+            "first_empty"  => [ "", "B", " ", "B" ],
+            "second_empty" => [ "A", "", " ", "A" ],
+            "both_empty"   => [ "", "", " ", "" ],
+        ];
+    }
 
-        // empty input returns empty string
-        $this->assertEquals("", Strings::base64Decode(""));
 
-        // invalid base64 returns empty string (strict mode)
-        $this->assertEquals("", Strings::base64Decode("not-base64!!"));
+    /** @dataProvider providerToLowerCase */
+    public function testToLowerCase(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toLowerCase($value));
+    }
 
-        // newlines / stray chars make it invalid in strict mode
-        $this->assertEquals("x", Strings::base64Decode(base64_encode("x") . "\n"));
+    public static function providerToLowerCase() {
+        return [
+            "hello_world" => [ "Hello World", "hello world" ],
+            "mixed_case"  => [ "Mixed CASE", "mixed case" ],
+            "empty"       => [ "", "" ],
+            "single_char" => [ "A", "a" ],
+        ];
+    }
 
-        // UTF-8 content round-trips
-        $this->assertEquals("tést", Strings::base64Decode(base64_encode("tést")));
 
-        // binary content round-trips
-        $bin = "\x00\x01\xFF";
-        $this->assertEquals($bin, Strings::base64Decode(base64_encode($bin)));
+    /** @dataProvider providerLowerCaseFirst */
+    public function testLowerCaseFirst(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::lowerCaseFirst($value));
+    }
+
+    public static function providerLowerCaseFirst() {
+        return [
+            "basic"       => [ "Hello", "hello" ],
+            "empty"       => [ "", "" ],
+            "single_char" => [ "H", "h" ],
+        ];
+    }
+
+
+    /** @dataProvider providerToUpperCase */
+    public function testToUpperCase(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toUpperCase($value));
+    }
+
+    public static function providerToUpperCase() {
+        return [
+            "hello_world" => [ "hello world", "HELLO WORLD" ],
+            "mixed_case"  => [ "Mixed case", "MIXED CASE" ],
+            "empty"       => [ "", "" ],
+            "single_char" => [ "a", "A" ],
+        ];
+    }
+
+
+    /** @dataProvider providerUpperCaseFirst */
+    public function testUpperCaseFirst(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::upperCaseFirst($value));
+    }
+
+    public static function providerUpperCaseFirst() {
+        return [
+            "basic"       => [ "hello", "Hello" ],
+            "empty"       => [ "", "" ],
+            "single_char" => [ "h", "H" ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsConstantCase */
+    public function testIsConstantCase(string $value, bool $expected) {
+        $this->assertEquals($expected, Strings::isConstantCase($value));
+    }
+
+    public static function providerIsConstantCase() {
+        return [
+            "upper_only"      => [ "ABCDEF", true ],
+            "with_underscore" => [ "ABC_DEF", true ],
+
+            "mixed_case"      => [ "AbC_DEF", false ],
+            "with_dash"       => [ "ABC-def", false ],
+            "empty"           => [ "", false ],
+            "numeric_only"    => [ "123", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerToConstantCase */
+    public function testToConstantCase(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toConstantCase($value));
+    }
+
+    public static function providerToConstantCase() {
+        return [
+            // already in constant case -> should remain unchanged
+            "already_constant" => [ "SOME_CONSTANT", "SOME_CONSTANT" ],
+
+            // converts snake_case to CONSTANT_CASE
+            "snake_case" => [ "some_constant", "SOME_CONSTANT" ],
+
+            // converts kebab-case to CONSTANT_CASE
+            "kebab_case" => [ "some-constant", "SOME_CONSTANT" ],
+
+            // converts camelCase to CONSTANT_CASE
+            "camelCase" => [ "someConstant", "SOME_CONSTANT" ],
+
+            // converts PascalCase to CONSTANT_CASE
+            "pascalCase" => [ "SomeConstant", "SOME_CONSTANT" ],
+
+            // converts various delimiters to CONSTANT_CASE
+            "space_delimiter" => [ "Hello world", "HELLO_WORLD" ],
+            "dot_delimiter"   => [ "hello.world", "HELLO_WORLD" ],
+            "colon_delimiter" => [ "hello:world", "HELLO_WORLD" ],
+            "semi_delimiter"  => [ "hello;world", "HELLO_WORLD" ],
+
+            // edge cases
+            "single_letter" => [ "A", "A" ],
+            "empty"         => [ "", "" ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsSnakeCase */
+    public function testIsSnakeCase(string $value, bool $expected) {
+        $this->assertEquals($expected, Strings::isSnakeCase($value));
+    }
+
+    public static function providerIsSnakeCase() {
+        return [
+            "valid_hello_world"  => [ "hello_world", true ],
+            "valid_single_char"  => [ "a", true ],
+
+            "invalid_uppercase"  => [ "Hello_world", false ],
+            "invalid_camel_case" => [ "helloWorld", false ],
+            "invalid_space"      => [ "hello world", false ],
+            "invalid_dash"       => [ "hello-world", false ],
+            "invalid_empty"      => [ "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerToSnakeCase */
+    public function testToSnakeCase(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toSnakeCase($value));
+    }
+
+    public static function providerToSnakeCase() {
+        return [
+            // already in snake_case -> should remain unchanged
+            "already_snake" => [ "some_hey", "some_hey" ],
+
+            // converts CONSTANT_CASE to snake_case
+            "constant_case" => [ "SOME_HEY", "some_hey" ],
+
+            // converts kebab-case to snake_case
+            "kebab_case" => [ "some-hey", "some_hey" ],
+
+            // converts camelCase to snake_case
+            "camel_case" => [ "someHey", "some_hey" ],
+
+            // converts PascalCase to snake_case
+            "pascal_case" => [ "SomeHey", "some_hey" ],
+            "pascal_with_acronym_mid" => [ "SomeHEYData", "some_hey_data" ],
+            "pascal_with_acronym_start" => [ "HEYSomeData", "hey_some_data" ],
+
+            // converts various delimiters to snake_case
+            "space_delimiter" => [ "Hello world", "hello_world" ],
+            "dash_delimiter" => [ "hello-world", "hello_world" ],
+            "dot_delimiter" => [ "hello.world", "hello_world" ],
+            "colon_delimiter" => [ "hello:world", "hello_world" ],
+            "semi_delimiter" => [ "hello;world", "hello_world" ],
+
+            // edge cases
+            "single_letter" => [ "A", "a" ],
+            "empty" => [ "", "" ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsKebabCase */
+    public function testIsKebabCase(string $value, bool $expected) {
+        $this->assertEquals($expected, Strings::isKebabCase($value));
+    }
+
+    public static function providerIsKebabCase() {
+        return [
+            "valid_hello_world"  => [ "hello-world", true ],
+            "valid_single_char"  => [ "a", true ],
+
+            "invalid_uppercase"  => [ "Hello-world", false ],
+            "invalid_camel_case" => [ "helloWorld", false ],
+            "invalid_space"      => [ "hello world", false ],
+            "invalid_snake_case" => [ "hello_world", false ],
+            "invalid_empty"      => [ "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerToKebabCase */
+    public function testToKebabCase(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toKebabCase($value));
+    }
+
+    public static function providerToKebabCase() {
+        return [
+            // already in kebab-case -> should remain unchanged
+            "already_kebab" => [ "some-hey", "some-hey" ],
+
+            // converts CONSTANT_CASE to kebab-case
+            "constant_case" => [ "SOME_HEY", "some-hey" ],
+
+            // converts snake_case to kebab-case
+            "snake_case" => [ "some_hey", "some-hey" ],
+
+            // converts camelCase to kebab-case
+            "camel_case" => [ "someHey", "some-hey" ],
+
+            // converts PascalCase to kebab-case
+            "pascal_case" => [ "SomeHey", "some-hey" ],
+            "pascal_with_acronym_mid" => [ "SomeHEYData", "some-hey-data" ],
+            "pascal_with_acronym_start" => [ "HEYSomeData", "hey-some-data" ],
+
+            // converts various delimiters to kebab-case
+            "space_delimiter" => [ "Hello world", "hello-world" ],
+            "dot_delimiter" => [ "hello.world", "hello-world" ],
+            "colon_delimiter" => [ "hello:world", "hello-world" ],
+            "semi_delimiter" => [ "hello;world", "hello-world" ],
+
+            // edge cases
+            "single_letter" => [ "A", "a" ],
+            "empty" => [ "", "" ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsPascalCase */
+    public function testIsPascalCase(string $value, bool $expected) {
+        $this->assertEquals($expected, Strings::isPascalCase($value));
+    }
+
+    public static function providerIsPascalCase() {
+        return [
+            "hello_world"         => [ "HelloWorld", true ],
+            "ab"                  => [ "Ab", true ],
+            "pascal_with_acronym" => [ "SomeHEYData", true ],
+            "acronym_prefix"      => [ "HEYSomeData", true ],
+
+            "camel_case_invalid"  => [ "helloWorld", false ],
+            "space_invalid"       => [ "Hello World", false ],
+            "dash_invalid"        => [ "Hello-World", false ],
+            "empty_invalid"       => [ "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerToPascalCase */
+    public function testToPascalCase(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toPascalCase($value));
+    }
+
+    public static function providerToPascalCase() {
+        return [
+            // already in PascalCase -> should remain unchanged
+            "already_pascal" => [ "HelloWorld", "HelloWorld" ],
+
+            // converts CONSTANT_CASE to PascalCase
+            "constant_case" => [ "SOME_HEY", "SomeHey" ],
+
+            // converts snake_case to PascalCase
+            "snake_case" => [ "some_hey", "SomeHey" ],
+
+            // converts kebab-case to PascalCase
+            "kebab_case" => [ "some-hey", "SomeHey" ],
+
+            // converts camelCase to PascalCase
+            "camel_case" => [ "someHey", "SomeHey" ],
+            "camel_with_acronym" => [ "someHEYData", "SomeHEYData" ],
+
+            // converts various delimiters to PascalCase
+            "single_word" => [ "hello", "Hello" ],
+            "space_delimiter" => [ "Hello world", "HelloWorld" ],
+            "dot_delimiter" => [ "hello.world", "HelloWorld" ],
+            "colon_delimiter" => [ "hello:world", "HelloWorld" ],
+            "semi_delimiter" => [ "hello;world", "HelloWorld" ],
+
+            // edge cases
+            "single_letter" => [ "a", "A" ],
+            "empty" => [ "", "" ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsCamelCase */
+    public function testIsCamelCase(string $value, bool $expected) {
+        $this->assertEquals($expected, Strings::isCamelCase($value));
+    }
+
+    public static function providerIsCamelCase() {
+        return [
+            "valid_camel"       => [ "helloWorld", true ],
+            "valid_single_char" => [ "a", true ],
+
+            "invalid_pascal"    => [ "HelloWorld", false ],
+            "invalid_space"     => [ "hello world", false ],
+            "invalid_kebab"     => [ "hello-world", false ],
+            "invalid_empty"     => [ "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerToCamelCase */
+    public function testToCamelCase(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toCamelCase($value));
+    }
+
+    public static function providerToCamelCase() {
+        return [
+            // already in camelCase -> should remain unchanged
+            "already_camel" => [ "helloWorld", "helloWorld" ],
+
+            // converts CONSTANT_CASE to camelCase
+            "constant_case" => [ "SOME_HEY", "someHey" ],
+
+            // converts snake_case to camelCase
+            "snake_case" => [ "some_hey", "someHey" ],
+
+            // converts kebab-case to camelCase
+            "kebab_case" => [ "some-hey", "someHey" ],
+
+            // converts PascalCase to camelCase
+            "pascal_case" => [ "SomeHey", "someHey" ],
+
+            // converts various delimiters to camelCase
+            "single_word" => [ "Hello", "hello" ],
+            "space_delimiter" => [ "Hello world", "helloWorld" ],
+            "dash_delimiter" => [ "hello-world", "helloWorld" ],
+            "dot_delimiter" => [ "hello.world", "helloWorld" ],
+            "colon_delimiter" => [ "hello:world", "helloWorld" ],
+            "semi_delimiter" => [ "hello;world", "helloWorld" ],
+
+            // edge cases
+            "single_letter" => [ "A", "a" ],
+            "empty" => [ "", "" ],
+        ];
+    }
+
+
+    /** @dataProvider providerToHtml */
+    public function testToHtml(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::toHtml($value));
+    }
+
+    public static function providerToHtml() {
+        return [
+            "line_break"   => [ "a\nb", "a<br>b" ],
+            "single_break" => [ "\n", "<br>" ],
+            "plain_text"   => [ "ab", "ab" ],
+            "empty"        => [ "", "" ],
+        ];
+    }
+
+
+    /** @dataProvider providerRemoveHtml */
+    public function testRemoveHtml(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::removeHtml($value));
+    }
+
+    public static function providerRemoveHtml() {
+        return [
+            "basic"               => [ "<b>abc</b>", "abc" ],
+            "empty"               => [ "", "" ],
+            "style_at_start"      => [ "<style>body{}</style>abc", "abc" ],
+            "style_without_end"   => [ "<style>body{}abc", "<style>body{}abc" ],
+            "style_in_the_middle" => [ "pre<style>body{}</style>abc", "preabc" ],
+        ];
+    }
+
+
+    /** @dataProvider providerDecodeHtml */
+    public function testDecodeHtml(string $value, string $expected) {
+        $this->assertEquals($expected, Strings::decodeHtml($value));
+    }
+
+    public static function providerDecodeHtml() {
+        return [
+            "ampersand_entity"     => [ "&amp;", "&" ],
+            "less_than_entity"     => [ "&lt;", "<" ],
+            "numeric_A"            => [ "&#65;", "A" ],
+            "numeric_e_acute"      => [ "&#233;", "é" ],
+            "hex_A"                => [ "&#x41;", "A" ],
+            "hex_e_acute_upperhex" => [ "&#xE9;", "é" ],
+        ];
+    }
+
+
+    /** @dataProvider providerMakeShort */
+    public function testMakeShort(string $value, int $length, string $expected, ?bool $asUtf8 = null) {
+        if ($asUtf8 === null) {
+            $actual = Strings::makeShort($value, $length);
+        } else {
+            $actual = Strings::makeShort($value, $length, $asUtf8);
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public static function providerMakeShort() {
+        return [
+            "len0_original"   => [ "anything", 0, "anything", null ],
+            "short_unchanged" => [ "short", 10, "short", null ],
+            "trunc_utf8_def"  => [ "abcdef", 5, "ab...", null ],
+            "nl_first_line"   => [ "first\nsecond", 10, "first", null ],
+            "utf8_exact"      => [ "tést", 4, "tést", null ],
+            "utf8_trunc"      => [ "tést", 2, "tés...", null ],
+            "non_utf8_trunc"  => [ "abcdefgh", 5, "abcde", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsShort */
+    public function testIsShort(string $value, int $length, bool $expected) {
+        $this->assertEquals($expected, Strings::isShort($value, $length));
+    }
+
+    public static function providerIsShort() {
+        return [
+            "long_string"  => [ str_repeat("x", 50), 10, true ],
+            "short_string" => [ "abcdefgh", 3, true ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsAlphaNum */
+    public function testIsAlphaNum(string $value, bool $allowDashUnderscore, ?int $length, bool $expected) {
+        if ($length === null) {
+            $actual = Strings::isAlphaNum($value, $allowDashUnderscore);
+        } else {
+            $actual = Strings::isAlphaNum($value, $allowDashUnderscore, $length);
+        }
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function providerIsAlphaNum(): array {
+        return [
+            "basic"      => [ "abc123", false, null, true ],
+            "space"      => [ "abc 123", false, null, false ],
+            "letters"    => [ "ABC", false, null, true ],
+            "numbers"    => [ "123", false, null, true ],
+            "dash_no"    => [ "abc-123", false, null, false ],
+            "under_no"   => [ "abc_123", false, null, false ],
+            "dash_yes"   => [ "abc-123", true, null, true ],
+            "under_yes"  => [ "abc_123", true, null, true ],
+            "mixed_ok"   => [ "a-b_c", true, null, true ],
+            "len_ok"     => [ "abcd", false, 4, true ],
+            "len_no"     => [ "abcd", false, 3, false ],
+            "sep_len_ok" => [ "a-b_c", true, 5, true ],
+            "sep_len_no" => [ "a-b_c", false, 5, false ],
+            "empty"      => [ "", false, null, false ],
+        ];
+    }
+
+
+    /** @dataProvider providerSanitize */
+    public function testSanitize(string $value, bool $lowercase, bool $anal, string $expected) {
+        $this->assertEquals($expected, Strings::sanitize($value, lowercase: $lowercase, anal: $anal));
+    }
+
+    public static function providerSanitize(): array {
+        return [
+            "basic_lowercase"    => [ "Hello!!", true, false, "hello" ],
+            "anal_mode"          => [ "Hello World!!", true, true, "hello-world" ],
+            "preserve_case"      => [ "Hello!!", false, false, "Hello" ],
+            "accents_preserved"  => [ "ÁÉÍ", true, false, "áéí" ],
+            "anal_accents_ascii" => [ "Olé Niño", true, true, "ole-nino" ],
+            "underscore_removed" => [ "a_b c", true, false, "ab-c" ],
+            "slash_removed"      => [ "a/b c", true, false, "ab-c" ],
+            "collapse_spaces"    => [ "Many   Spaces   Here", true, false, "many-spaces-here" ],
+        ];
+    }
+
+
+    /** @dataProvider providerHasEmoji */
+    public function testHasEmoji(string $value, bool $expected) {
+        $this->assertSame($expected, Strings::hasEmoji($value));
+    }
+
+    public static function providerHasEmoji(): array {
+        return [
+            "emoji_in_text"    => [ "hello 😄", true ],
+            "single_emoji"     => [ "😄", true ],
+            "flag_emoji"       => [ "Flags 🇺🇸 are cool", true ],
+            "family_emoji"     => [ "Family: 👨‍👩‍👧‍👦", true ],
+            "skin_tone_emoji"  => [ "Skin tone 👍🏽", true ],
+            "single_skin_tone" => [ "👍🏽", true ],
+            "zwj_emoji"        => [ "👩‍❤️‍👩", true ],
+            "no_emoji"         => [ "no emoji here", false ],
+            "empty"            => [ "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerIsOnlyEmojis */
+    public function testIsOnlyEmojis(string $value, bool $expected) {
+        $this->assertSame($expected, Strings::isOnlyEmojis($value));
+    }
+
+    public static function providerIsOnlyEmojis(): array {
+        return [
+            // valid emoji-only strings
+            "double_emoji"     => [ "😄😄", true ],
+            "single_emoji"     => [ "😄", true ],
+            "emoji_skin_tone"  => [ "👍🏽", true ],
+
+            // invalid cases
+            "text_with_emoji"  => [ "hi 😄", false ],
+            "emoji_with_space" => [ "😄 😄", false ],
+            "emoji_with_text"  => [ "😄a", false ],
+            "empty"            => [ "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerConvertEncoding */
+    public function testConvertEncoding(string $value, string $expected) {
+        $actual = Strings::convertEncoding($value);
+
+        $this->assertIsString($actual);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public static function providerConvertEncoding(): array {
+        return [
+            "raw_accented_character" => [ "é", "&eacute;" ],
+            "named_entity"           => [ "&eacute;", "&eacute;" ],
+            "multi_character"        => [ "Olé", "Ol&eacute;" ],
+            "ascii_only"             => [ "A", "A" ],
+            "numeric_entity"         => [ "&#233;", "&#233;" ],
+        ];
+    }
+
+
+    /** @dataProvider providerBase64Decode */
+    public function testBase64Decode(string $input, string $expected) {
+        $this->assertEquals($expected, Strings::base64Decode($input));
+    }
+
+    public static function providerBase64Decode(): array {
+        return [
+            "simple_ascii"      => [ base64_encode("hi"), "hi" ],
+            "empty_input"       => [ "", "" ],
+            "invalid_base64"    => [ "not-base64!!", "" ],
+            "newline_invalid"   => [ base64_encode("x") . "\n", "x" ],
+            "utf8_round_trip"   => [ base64_encode("tést"), "tést" ],
+            "binary_round_trip" => [ base64_encode("\x00\x01\xFF"), "\x00\x01\xFF" ],
+        ];
     }
 }
