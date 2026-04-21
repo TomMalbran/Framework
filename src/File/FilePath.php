@@ -36,7 +36,9 @@ class FilePath implements DiscoveryBuilder {
      * @return void
      */
     public static function register(string $name): void {
-        self::$paths[] = $name;
+        if ($name !== "" && $name !== "example") {
+            self::$paths[] = $name;
+        }
     }
 
     /**
@@ -51,16 +53,6 @@ class FilePath implements DiscoveryBuilder {
     }
 
 
-
-    /**
-     * Returns the Files Path with the given path parts
-     * @param int|string ...$pathParts
-     * @return string
-     */
-    public static function getPath(int|string ...$pathParts): string {
-        $basePath = self::getBasePath();
-        return File::parsePath($basePath, Config::getFileDir(), ...$pathParts);
-    }
 
     /**
      * Returns the base path used to store the files
@@ -86,6 +78,16 @@ class FilePath implements DiscoveryBuilder {
             return File::getDirectory($result);
         }
         return $result;
+    }
+
+    /**
+     * Returns the Files Path with the given path parts
+     * @param int|string ...$pathParts
+     * @return string
+     */
+    public static function getPath(int|string ...$pathParts): string {
+        $basePath = self::getBasePath();
+        return File::parsePath($basePath, Config::getFileDir(), ...$pathParts);
     }
 
     /**
@@ -146,6 +148,10 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getTempPath(int $credentialID, bool $create = true): string {
+        if ($credentialID <= 0) {
+            return "";
+        }
+
         $path   = self::getPath(self::Temp, $credentialID);
         $exists = File::exists($path);
 
@@ -163,6 +169,9 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getTempUrl(int $credentialID, int|string ...$pathParts): string {
+        if ($credentialID <= 0) {
+            return "";
+        }
         return Config::getFileUrl(self::Temp, $credentialID, ...$pathParts);
     }
 
@@ -190,7 +199,7 @@ class FilePath implements DiscoveryBuilder {
         // Builds the code
         return Builder::generateCode("Path", [
             "paths" => $paths,
-            "total" => count(self::$paths),
+            "total" => count($paths),
         ]);
     }
 
