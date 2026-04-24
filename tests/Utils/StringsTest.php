@@ -684,9 +684,11 @@ class StringsTest extends TestCase {
 
     public static function providerAddPrefix() {
         return [
-            "adds_missing_prefix"       => [ "x", "pre_", "pre_x" ],
-            "does_not_duplicate_prefix" => [ "pre_x", "pre_", "pre_x" ],
-            "multi_character_prefix"    => [ "x", "Mr ", "Mr x" ],
+            "empty_string"           => [ "", "pre_", "" ],
+            "empty_prefix"           => [ "x", "", "x" ],
+            "missing_prefix"         => [ "x", "pre_", "pre_x" ],
+            "no_duplicate_prefix"    => [ "pre_x", "pre_", "pre_x" ],
+            "multi_character_prefix" => [ "x", "Mr ", "Mr x" ],
         ];
     }
 
@@ -698,9 +700,11 @@ class StringsTest extends TestCase {
 
     public static function providerAddSuffix() {
         return [
-            "adds_missing_suffix"       => [ "x", "_suf", "x_suf" ],
-            "does_not_duplicate_suffix" => [ "x_suf", "_suf", "x_suf" ],
-            "multi_character_suffix"    => [ "x", " Jr.", "x Jr." ],
+            "empty_string"           => [ "", "_suf", "" ],
+            "empty_suffix"           => [ "x", "", "x" ],
+            "missing_suffix"         => [ "x", "_suf", "x_suf" ],
+            "no_duplicate_suffix"    => [ "x_suf", "_suf", "x_suf" ],
+            "multi_character_suffix" => [ "x", " Jr.", "x Jr." ],
         ];
     }
 
@@ -712,6 +716,7 @@ class StringsTest extends TestCase {
 
     public static function providerAddPrefixSuffix() {
         return [
+            "empty"    => [ "", "pre_", "_suf", "" ],
             "add_both" => [ "x", "pre_", "_suf", "pre_x_suf" ],
             "has_pre"  => [ "pre_x", "pre_", "_suf", "pre_x_suf" ],
             "has_suf"  => [ "x_suf", "pre_", "_suf", "pre_x_suf" ],

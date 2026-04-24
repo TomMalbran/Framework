@@ -586,6 +586,9 @@ class Strings {
      * @return string
      */
     public static function addPrefix(string $string, string $prefix): string {
+        if ($string === "") {
+            return "";
+        }
         if (!self::startsWith($string, $prefix)) {
             return $prefix . $string;
         }
@@ -599,6 +602,9 @@ class Strings {
      * @return string
      */
     public static function addSuffix(string $string, string $suffix): string {
+        if ($string === "") {
+            return "";
+        }
         if (!self::endsWith($string, $suffix)) {
             return $string . $suffix;
         }
