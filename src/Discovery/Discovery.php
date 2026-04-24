@@ -71,6 +71,7 @@ class Discovery {
      * Finds the Classes with the given params
      * @param class-string|null $parentClass  Optional.
      * @param class-string|null $interface    Optional.
+     * @param string            $path         Optional.
      * @param bool              $forAll       Optional.
      * @param bool              $forFramework Optional.
      * @param bool              $withError    Optional.
@@ -79,6 +80,7 @@ class Discovery {
     public static function findClasses(
         ?string $parentClass = null,
         ?string $interface = null,
+        string $path = "",
         bool $forAll = false,
         bool $forFramework = false,
         bool $withError = false,
@@ -124,6 +126,12 @@ class Discovery {
 
             // Skip if the Reflection is not found
             if ($reflection === null) {
+                continue;
+            }
+
+            // Check the path
+            $path = File::addLastSlash($path);
+            if ($path !== "" && !Strings::startsWith($filePath, $path)) {
                 continue;
             }
 
