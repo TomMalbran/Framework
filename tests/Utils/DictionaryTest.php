@@ -1,11 +1,21 @@
 <?php
 namespace Tests\Utils;
 
-use Framework\Utils\Dictionary;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Date\Date;
+use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
 use stdClass;
+
+enum TestDictionaryEnum implements Enum {
+    use IsEnum;
+
+    case None;
+    case Key;
+    case Value;
+}
 
 class DictionaryTest extends TestCase {
 
@@ -26,7 +36,7 @@ class DictionaryTest extends TestCase {
         $obj->x = 10;
         $obj->y = "z";
 
-        $json = json_encode(["m" => 5, "n" => "v"]);
+        $json = json_encode([ "m" => 5, "n" => "v" ]);
         $dict = new Dictionary([ "k" => "val" ]);
 
         return [
@@ -150,7 +160,7 @@ class DictionaryTest extends TestCase {
 
 
     /** @dataProvider providerHas */
-    public function testHas(mixed $input, int|string $key, bool $expected) {
+    public function testHas(mixed $input, Enum|int|string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->has($key));
     }
@@ -161,6 +171,8 @@ class DictionaryTest extends TestCase {
             "associative_key_missing" => [ [ "a" => 1 ], "missing", false ],
             "numeric_key_exists"      => [ [ "x", "y" ], 0, true ],
             "numeric_key_missing"     => [ [ "x", "y" ], 2, false ],
+            "enum_key_exists"         => [ [ "Key" => "value" ], TestDictionaryEnum::Key, true ],
+            "enum_key_missing"        => [ [ "Key" => "value" ], TestDictionaryEnum::Value, false ],
             "zero_value"              => [ [ "k" => 0 ], "k", true ],
             "empty_string_value"      => [ [ "k2" => "" ], "k2", true ],
             "invalid_input"           => [ "not json", "any", false ],
@@ -169,7 +181,7 @@ class DictionaryTest extends TestCase {
 
 
     /** @dataProvider providerHasValue */
-    public function testHasValue(mixed $input, int|string $key, bool $expected) {
+    public function testHasValue(mixed $input, Enum|int|string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->hasValue($key));
     }
@@ -179,7 +191,11 @@ class DictionaryTest extends TestCase {
             "assoc_empty_string"    => [ [ "a" => "" ], "a", false ],
             "assoc_non_empty"       => [ [ "b" => "x" ], "b", true ],
             "assoc_zero"            => [ [ "c" => 0 ], "c", false ],
-            "missing_key"           => [ [ "a" => "x" ], "missing", false ],
+            "assoc_key_missing"     => [ [ "a" => "x" ], "missing", false ],
+            "numeric_key_empty"     => [ [ "", "y" ], 0, false ],
+            "numeric_key_non_empty" => [ [ "", "y" ], 1, true ],
+            "enum_key_empty"        => [ [ "Key" => "" ], TestDictionaryEnum::Key, false ],
+            "enum_key_non_empty"    => [ [ "Key" => "value" ], TestDictionaryEnum::Key, true ],
 
             "list_first_empty"      => [ [ "", "y", 0 ], 0, false ],
             "list_second_non_empty" => [ [ "", "y", 0 ], 1, true ],
@@ -272,52 +288,71 @@ class DictionaryTest extends TestCase {
 
 
     /** @dataProvider providerSet */
-    public function testSet(mixed $input, int|string $key, mixed $value, mixed $expectedValue) {
+    public function testSet(mixed $input, Enum|int|string $key, mixed $value) {
         $d = new Dictionary($input);
         $d->set($key, $value);
-        $this->assertEquals($expectedValue, $d->get($key));
+        $this->assertEquals($value, $d->get($key));
     }
 
     public static function providerSet() {
         return [
-            "string_value" => [ [], "k", "v", "v" ],
-            "numeric_key"  => [ [], 0, "zero", "zero" ],
+            "string_value" => [ [], "k", "v" ],
+            "numeric_key"  => [ [], 0, "zero" ],
+            "enum_key"     => [ [], TestDictionaryEnum::Key, "value" ],
         ];
     }
 
 
     /** @dataProvider providerSetString */
-    public function testSetString(int|string $key, string $value, string $expected) {
+    public function testSetString(Enum|int|string $key, string $value) {
         $d = new Dictionary();
         $d->setString($key, $value);
-        $this->assertEquals($expected, $d->getString($key));
+        $this->assertEquals($value, $d->getString($key));
     }
 
     public static function providerSetString() {
         return [
-            "string_key"  => [ "s", "str", "str" ],
-            "numeric_key" => [ 0, "zero", "zero" ],
+            "string_key"  => [ "s", "str" ],
+            "numeric_key" => [ 0, "zero" ],
+            "enum_key"    => [ TestDictionaryEnum::Key, "value" ],
         ];
     }
 
 
     /** @dataProvider providerSetInt */
-    public function testSetInt(int|string $key, int $value, int $expected) {
+    public function testSetInt(Enum|int|string $key, int $value) {
         $d = new Dictionary();
         $d->setInt($key, $value);
-        $this->assertEquals($expected, $d->getInt($key));
+        $this->assertEquals($value, $d->getInt($key));
     }
 
     public static function providerSetInt() {
         return [
-            "string_key"  => [ "n", 5, 5 ],
-            "numeric_key" => [ 0, 100, 100 ],
+            "string_key"  => [ "n", 5 ],
+            "numeric_key" => [ 0, 100 ],
+            "enum_key"    => [ TestDictionaryEnum::Key, 10 ],
+        ];
+    }
+
+
+    /** @dataProvider providerSetEnum */
+    public function testSetEnum(Enum|int|string $key, Enum $value) {
+        $d = new Dictionary();
+        $d->setEnum($key, $value);
+        $this->assertEquals($value->toString(), $d->getString($key));
+    }
+
+    public static function providerSetEnum() {
+        return [
+            "string_key"  => [ "e", TestDictionaryEnum::Value ],
+            "numeric_key" => [ 0, TestDictionaryEnum::Value ],
+            "enum_key"    => [ TestDictionaryEnum::Key, TestDictionaryEnum::Value ],
         ];
     }
 
 
     /** @dataProvider providerRemove */
-    public function testRemove(mixed $input, int|string $key, bool $shouldExist, int $expectedTotal) {
+    public function testRemove(mixed $input, Enum|int|string $key, bool $shouldExist, int $expectedTotal) {
         $d = new Dictionary($input);
         $d->remove($key);
         $this->assertEquals($shouldExist, $d->has($key));
@@ -329,12 +364,13 @@ class DictionaryTest extends TestCase {
             "associative_key"  => [ [ "a" => 1 ], "a", false, 0 ],
             "missing_key"      => [ [ "a" => 1 ], "missing", false, 1 ],
             "numeric_key_list" => [ [ "first", "second", "third" ], 1, false, 2 ],
+            "enum_key"         => [ [ TestDictionaryEnum::Key => "value" ], TestDictionaryEnum::Key, true, 1 ],
         ];
     }
 
 
     /** @dataProvider providerGet */
-    public function testGet(mixed $input, int|string $key, mixed $expected) {
+    public function testGet(mixed $input, Enum|int|string $key, mixed $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->get($key));
     }
@@ -344,6 +380,7 @@ class DictionaryTest extends TestCase {
             "string_value"  => [ [ "x" => "y" ], "x", "y" ],
             "missing_key"   => [ [ "x" => "y" ], "none", null ],
             "numeric_key"   => [ [ "first", "second" ], 0, "first" ],
+            "enum_key"      => [ [ "Key" => "value" ], TestDictionaryEnum::Key, "value" ],
             "array_value"   => [ [ "arr" => [ "a" => 1 ]], "arr", [ "a" => 1 ] ],
             "set_then_get"  => [ [], "new", null ],
             "invalid_input" => [ "not json", "any", null ],
@@ -352,7 +389,7 @@ class DictionaryTest extends TestCase {
 
 
     /** @dataProvider providerGetBool */
-    public function testGetBool(mixed $input, int|string $key, bool $expected) {
+    public function testGetBool(mixed $input, Enum|int|string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getBool($key));
     }
@@ -368,13 +405,14 @@ class DictionaryTest extends TestCase {
             "true_string"    => [ [ "g" => "true" ], "g", true ],
             "false_string"   => [ [ "h" => "false" ], "h", true ],
             "array_value"    => [ [ "arr" => [ 1 ] ], "arr", false ],
+            "enum_key"       => [ [ "Key" => true ], TestDictionaryEnum::Key, true ],
             "missing_key"    => [ [], "missing", false ],
         ];
     }
 
 
     /** @dataProvider providerGetInt */
-    public function testGetInt(mixed $input, int|string $key, int $decimals, int $default, int $expected) {
+    public function testGetInt(mixed $input, Enum|int|string $key, int $decimals, int $default, int $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getInt($key, $decimals, $default));
     }
@@ -389,12 +427,13 @@ class DictionaryTest extends TestCase {
             "missing_key_default" => [ [], "missing", 0, 0, 0 ],
             "missing_key_custom"  => [ [], "missing", 0, 7, 7 ],
             "non_scalar_default"  => [ [ "bad" => [ 1 ] ], "bad", 0, 5, 5 ],
+            "enum_key"            => [ [ "Key" => "3.2" ], TestDictionaryEnum::Key, 0, 0, 3 ],
         ];
     }
 
 
     /** @dataProvider providerGetFloat */
-    public function testGetFloat(mixed $input, int|string $key, float $default, float $expected) {
+    public function testGetFloat(mixed $input, Enum|int|string $key, float $default, float $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getFloat($key, $default));
     }
@@ -407,12 +446,13 @@ class DictionaryTest extends TestCase {
             "missing_key"        => [ [], "missing", 0.0, 0.0 ],
             "missing_key_custom" => [ [], "missing", 1.23, 1.23 ],
             "non_scalar_default" => [ [ "arr" => [ 1 ] ], "arr", 9.9, 9.9 ],
+            "enum_key"           => [ [ "Key" => "3.2" ], TestDictionaryEnum::Key, 0.0, 3.2 ],
         ];
     }
 
 
     /** @dataProvider providerGetPrice */
-    public function testGetPrice(mixed $input, int|string $key, float $default, float $expected) {
+    public function testGetPrice(mixed $input, Enum|int|string $key, float $default, float $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getPrice($key, $default));
     }
@@ -426,12 +466,13 @@ class DictionaryTest extends TestCase {
             "missing_key_default" => [ [], "missing", 0.0, 0.0 ],
             "missing_key_custom"  => [ [], "missing", 9.99, 9.99 ],
             "non_scalar_default"  => [ [ "arr" => [ 1 ] ], "arr", 5.50, 5.50 ],
+            "enum_key"            => [ [ "Key" => 250 ], TestDictionaryEnum::Key, 0.0, 2.50 ],
         ];
     }
 
 
     /** @dataProvider providerGetString */
-    public function testGetString(mixed $input, int|string $key, string $default, string $expected) {
+    public function testGetString(mixed $input, Enum|int|string $key, string $default, string $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getString($key, $default));
     }
@@ -444,12 +485,13 @@ class DictionaryTest extends TestCase {
             "null_returns_default"       => [ [ "null" => null ], "null", "", "" ],
             "missing_key_custom_default" => [ [ "s" => 5 ], "missing", "def", "def" ],
             "non_scalar_value_fallback"  => [ [ "arr" => [ "x" ] ], "arr", "fallback", "fallback" ],
+            "enum_key"                   => [ [ "Key" => "value" ], TestDictionaryEnum::Key, "", "value" ],
         ];
     }
 
 
     /** @dataProvider providerGetDate */
-    public function testGetDate(mixed $input, int|string $key, bool $shouldBeEmpty, int|null $expectedNumber) {
+    public function testGetDate(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, int|null $expectedNumber) {
         $d = new Dictionary($input);
         $date = $d->getDate($key);
         $this->assertInstanceOf(Date::class, $date);
@@ -473,12 +515,14 @@ class DictionaryTest extends TestCase {
             "date_instance"    => [ [ "d" => $orig ], "d", false, null ],
             "missing_key"      => [ [], "no", true, null ],
             "non_scalar_value" => [ [ "arr" => [ 1 ] ], "arr", true, null ],
+            "invalid_date"     => [ [ "date" => "not a date" ], "date", true, null ],
+            "enum_key"         => [ [ "Key" => "2020-01-02" ], TestDictionaryEnum::Key, false, 20200102 ],
         ];
     }
 
 
     /** @dataProvider providerGetDateParsed */
-    public function testGetDateParsed(mixed $input, int|string $key, bool $shouldBeEmpty, int|null $expectedNumber) {
+    public function testGetDateParsed(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, int|null $expectedNumber) {
         $d = new Dictionary($input);
         $date = $d->getDateParsed($key);
         $this->assertInstanceOf(Date::class, $date);
@@ -498,6 +542,7 @@ class DictionaryTest extends TestCase {
             "common_textual_date" => [ [ "date" => "2/1/2020" ], "date", false, 20200102 ],
             "missing_key"         => [ [], "no", true, null ],
             "invalid_text"        => [ [ "bad" => "not a date" ], "bad", true, null ],
+            "enum_key"            => [ [ "Key" => "2/1/2020" ], TestDictionaryEnum::Key, false, 20200102 ],
         ];
     }
 
@@ -531,7 +576,7 @@ class DictionaryTest extends TestCase {
 
 
     /** @dataProvider providerGetDict */
-    public function testGetDict(mixed $input, int|string $key, bool $shouldBeEmpty, mixed $expectedValue) {
+    public function testGetDict(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $result = $d->getDict($key);
         $this->assertInstanceOf(Dictionary::class, $result);
@@ -552,12 +597,13 @@ class DictionaryTest extends TestCase {
             "scalar_value"       => [ [ "s" => "string" ], "s", true, null ],
             "list_element_valid" => [ [[ "id" => "x" ]], 0, false, "x" ],
             "list_element_oob"   => [ [[ "id" => "x" ]], 1, true, null ],
+            "enum_key"           => [ [ "Key" => [ "x" => 1 ]], TestDictionaryEnum::Key, false, 1 ],
         ];
     }
 
 
     /** @dataProvider providerFindDict */
-    public function testFindDict(mixed $input, string $key, mixed $searchValue, bool $shouldBeEmpty, mixed $expectedValue) {
+    public function testFindDict(mixed $input, Enum|int|string $key, mixed $searchValue, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $found = $d->findDict($key, $searchValue);
         $this->assertInstanceOf(Dictionary::class, $found);
@@ -575,12 +621,13 @@ class DictionaryTest extends TestCase {
             "missing_value"    => [ [[ "id" => "a", "val" => 1 ], [ "id" => "b", "val" => 2 ]], "id", "z", true, null ],
             "top_level_map"    => [ [ "a" => [ "id" => "x", "val" => 10 ]], "id", "x", true, null ],
             "multiple_matches" => [ [[ "id" => "d", "val" => 4 ], [ "id" => "d", "val" => 5 ]], "id", "d", false, 4 ],
+            "enum_key"         => [ [[ "Key" => "a", "val" => 1 ], [ "Key" => "b", "val" => 2 ]], TestDictionaryEnum::Key, "b", false, 2 ],
         ];
     }
 
 
     /** @dataProvider providerGetList */
-    public function testGetList(mixed $input, string $key, array $expectedList, bool $shouldBeEmpty, mixed $expectedId) {
+    public function testGetList(mixed $input, Enum|int|string $key, array $expectedList, bool $shouldBeEmpty, mixed $expectedId) {
         $d = new Dictionary($input);
         $list = $d->getList($key);
         $this->assertIsArray($list);
@@ -610,12 +657,13 @@ class DictionaryTest extends TestCase {
             "empty_nested_list"     => [ [ "empty" => [] ], "empty", [], true, null ],
             "objects_in_list"       => [ [ "objs" => [ $obj ] ], "objs", [ $obj ], false, null ],
             "nested_arrays_in_list" => [ [ "items" => [[ "sub" => [ "a", "b" ], "vals" => [ 1, 2 ] ]]], "items", [[ "sub" => [ "a", "b" ], "vals" => [ 1, 2 ] ]], false, null ],
+            "enum_key"              => [ [ "Key" => [[ "id" => "a" ], [ "id" => "b" ]] ], TestDictionaryEnum::Key, [[ "id" => "a" ], [ "id" => "b" ]], false, "a" ],
         ];
     }
 
 
     /** @dataProvider providerGetFirst */
-    public function testGetFirst(mixed $input, string $key, bool $shouldBeEmpty, mixed $expectedValue) {
+    public function testGetFirst(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $result = $d->getFirst($key);
         $this->assertInstanceOf(Dictionary::class, $result);
@@ -632,12 +680,13 @@ class DictionaryTest extends TestCase {
             "top_level_list"   => [ [[ "id" => "a" ], [ "id" => "b" ]], "", false, "a" ],
             "nested_list"      => [ [ "group" => [[ "n" => 1 ], [ "n" => 2 ]]], "group", false, 1 ],
             "empty_dictionary" => [ [], "", true, null ],
+            "enum_key"         => [ [ "Key" => [[ "n" => 1 ], [ "n" => 2 ]] ], TestDictionaryEnum::Key, false, 1 ],
         ];
     }
 
 
     /** @dataProvider providerGetLast */
-    public function testGetLast(mixed $input, string $key, bool $shouldBeEmpty, mixed $expectedValue) {
+    public function testGetLast(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $result = $d->getLast($key);
         $this->assertInstanceOf(Dictionary::class, $result);
@@ -654,12 +703,13 @@ class DictionaryTest extends TestCase {
             "top_level_list"   => [ [[ "id" => "a" ], [ "id" => "b" ]], "", false, "b" ],
             "nested_list"      => [ [ "group" => [[ "n" => 1 ], [ "n" => 2 ]]], "group", false, 2 ],
             "empty_dictionary" => [ [], "", true, null ],
+            "enum_key"         => [ [ "Key" => [[ "n" => 1 ], [ "n" => 2 ]] ], TestDictionaryEnum::Key, false, 2 ],
         ];
     }
 
 
     /** @dataProvider providerGetInts */
-    public function testGetInts(mixed $input, string $key, array $expected) {
+    public function testGetInts(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getInts($key));
     }
@@ -670,12 +720,14 @@ class DictionaryTest extends TestCase {
             "missing_key"      => [ [], "no", [] ],
             "non_list_value"   => [ [ "ints" => "not an array" ], "ints", [] ],
             "decimals_rounded" => [ [ "ints" => [ "2.5", "-1.2" ]], "ints", [ 3, -1 ] ],
+            "enum_key"         => [ [ "Key" => [ "1", 2 ]], TestDictionaryEnum::Key, [ 1, 2 ] ],
+            "integer_key"      => [ [[ "1", 2 ]], 0, [ 1, 2 ] ],
         ];
     }
 
 
     /** @dataProvider providerGetStrings */
-    public function testGetStrings(mixed $input, string $key, bool $skipEmpty, array $expected) {
+    public function testGetStrings(mixed $input, Enum|int|string $key, bool $skipEmpty, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getStrings($key, $skipEmpty));
     }
@@ -687,12 +739,14 @@ class DictionaryTest extends TestCase {
             "missing_key"        => [ [], "no", false, [] ],
             "non_list_value"     => [ [ "strings" => "not an array" ], "strings", false, [ "not an array" ] ],
             "numeric_to_strings" => [ [ "strings" => [ 1, 2 ]], "strings", false, [ "1", "2" ] ],
+            "enum_key"           => [ [ "Key" => [ "1", 2 ]], TestDictionaryEnum::Key, false, [ "1", "2" ] ],
+            "integer_key"        => [ [[ "a", "b" ]], 0, false, [ "a", "b" ] ],
         ];
     }
 
 
     /** @dataProvider providerGetArray */
-    public function testGetArray(mixed $input, string $key, array $expected) {
+    public function testGetArray(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getArray($key));
     }
@@ -703,28 +757,32 @@ class DictionaryTest extends TestCase {
             "missing_key"        => [ [], "no", [] ],
             "non_array_value"    => [ [ "arr" => "str" ], "arr", [] ],
             "array_mixed_values" => [ [ "arr" => [ 1, "x" ]], "arr", [ 1, "x" ] ],
+            "enum_key"           => [ [ "Key" => [ "x" ]], TestDictionaryEnum::Key, [ "x" ] ],
+            "integer_key"        => [ [[ "x" ], [ "y" ]], 1, [ "y" ] ],
         ];
     }
 
 
     /** @dataProvider providerGetJSON */
-    public function testGetJSON(mixed $input, int|string $key, string $expected) {
+    public function testGetJSON(mixed $input, Enum|int|string $key, string $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getJSON($key));
     }
 
     public static function providerGetJSON() {
         return [
-            "basic_json"          => [ [ "json" => [ "k" => "v" ]], "json", '{"k":"v"}' ],
-            "missing_key"         => [ [], "no", "[]" ],
-            "non_array_value"     => [ [ "json" => "not an array" ], "json", "[]" ],
-            "invalid_input"       => [ "not json", "any", "[]" ],
+            "basic_json"      => [ [ "json" => [ "k" => "v" ]], "json", '{"k":"v"}' ],
+            "missing_key"     => [ [], "no", "[]" ],
+            "non_array_value" => [ [ "json" => "not an array" ], "json", "[]" ],
+            "invalid_input"   => [ "not json", "any", "[]" ],
+            "enum_key"        => [ [ "Key" => [ "k" => "v" ]], TestDictionaryEnum::Key, '{"k":"v"}' ],
+            "integer_key"     => [ [[ "k" => "v" ]], 0, '{"k":"v"}' ],
         ];
     }
 
 
     /** @dataProvider providerDecodeAsArray */
-    public function testDecodeAsArray(mixed $input, string $key, array $expected) {
+    public function testDecodeAsArray(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->decodeAsArray($key));
     }
@@ -735,12 +793,14 @@ class DictionaryTest extends TestCase {
             "json_array"   => [ [ "jsonArr" => '["x", 2]' ], "jsonArr", [ "x", 2 ] ],
             "invalid_json" => [ [ "bad" => "not json" ], "bad", [] ],
             "missing_key"  => [ [], "missing", [] ],
+            "enum_key"     => [ [ "Key" => '{"k":"v"}' ], TestDictionaryEnum::Key, [ "k" => "v" ] ],
+            "integer_key"  => [ [ '{"k":"v"}' ], 0, [ "k" => "v" ] ],
         ];
     }
 
 
     /** @dataProvider providerDecodeAsStrings */
-    public function testDecodeAsStrings(mixed $input, string $key, array $expected) {
+    public function testDecodeAsStrings(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->decodeAsStrings($key));
     }
@@ -751,13 +811,15 @@ class DictionaryTest extends TestCase {
             "json_numerics" => [ [ "jsonNum" => '[1,2]' ], "jsonNum", [ "1", "2" ] ],
             "json_empty"    => [ [ "jsonEmpty" => '[]' ], "jsonEmpty", [] ],
             "invalid_json"  => [ [ "bad" => "not json" ], "bad", [] ],
+            "enum_key"      => [ [ "Key" => '["a","b"]' ], TestDictionaryEnum::Key, [ "a", "b" ] ],
+            "integer_key"   => [ [ '["a","b"]' ], 0, [ "a", "b" ] ],
             "missing_key"   => [ [], "missing", [] ],
         ];
     }
 
 
     /** @dataProvider providerCreateMap */
-    public function testCreateMap(mixed $input, string $key, array $expectedKeys, array $unexpectedKeys) {
+    public function testCreateMap(mixed $input, Enum|int|string $key, array $expectedKeys, array $unexpectedKeys) {
         $d = new Dictionary($input);
         $map = $d->createMap($key);
         $this->assertInstanceOf(Dictionary::class, $map);
@@ -776,6 +838,7 @@ class DictionaryTest extends TestCase {
             "basic_map"                => [ [[ "id" => "x", "v" => 1 ], [ "id" => "y", "v" => 2 ]], "id", [ "x", "y" ], [] ],
             "missing_key_skipped"      => [ [[ "id" => "x", "v" => 1 ], [ "v" => 2 ]], "id", [ "x" ], [ "y" ] ],
             "numeric_keys_stringified" => [ [[ "id" => 1, "v" => "a" ], [ "id" => 2, "v" => "b" ]], "id", [ "1", "2" ], [] ],
+            "enum_key"                 => [ [[ "Key" => "x", "v" => 1 ], [ "Key" => "y", "v" => 2 ]], TestDictionaryEnum::Key, [ "x", "y" ], [] ],
         ];
     }
 

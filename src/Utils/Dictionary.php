@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Enum\Enum;
 use Framework\Date\Date;
 use Framework\Utils\JSON;
 
@@ -115,19 +116,21 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the key exits in the data
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return bool
      */
-    public function has(int|string $key): bool {
+    public function has(Enum|int|string $key): bool {
+        $key = Strings::toString($key);
         return isset($this->data[$key]);
     }
 
     /**
      * Returns true if the key exits and has a value in the data
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return bool
      */
-    public function hasValue(int|string $key): bool {
+    public function hasValue(Enum|int|string $key): bool {
+        $key = Strings::toString($key);
         return !Arrays::isEmpty($this->data, $key);
     }
 
@@ -186,43 +189,63 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Sets the value of the given key
-     * @param int|string $key
-     * @param mixed      $value
+     * @param Enum|int|string $key
+     * @param mixed           $value
      * @return Dictionary
      */
-    public function set(int|string $key, mixed $value): Dictionary {
+    public function set(Enum|int|string $key, mixed $value): Dictionary {
+        $key = Strings::toString($key);
+        if ($value instanceof Enum) {
+            $value = $value->toString();
+        }
+
         $this->data[$key] = $value;
         return $this;
     }
 
     /**
-     * Sets a string value of the given key
-     * @param int|string $key
-     * @param string     $value
+     * Sets a string value to the given key
+     * @param Enum|int|string $key
+     * @param string          $value
      * @return Dictionary
      */
-    public function setString(int|string $key, string $value): Dictionary {
+    public function setString(Enum|int|string $key, string $value): Dictionary {
+        $key = Strings::toString($key);
         $this->data[$key] = $value;
         return $this;
     }
 
     /**
-     * Sets an int value of the given key
-     * @param int|string $key
-     * @param int        $value
+     * Sets an int value to the given key
+     * @param Enum|int|string $key
+     * @param int             $value
      * @return Dictionary
      */
-    public function setInt(int|string $key, int $value): Dictionary {
+    public function setInt(Enum|int|string $key, int $value): Dictionary {
+        $key = Strings::toString($key);
         $this->data[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * Sets an Enum value to the given key
+     * @param Enum|int|string $key
+     * @param Enum            $value
+     * @return Dictionary
+     */
+    public function setEnum(Enum|int|string $key, Enum $value): Dictionary {
+        $key = Strings::toString($key);
+        $this->data[$key] = $value->toString();
         return $this;
     }
 
     /**
      * Removes the value at the given key
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return Dictionary
      */
-    public function remove(int|string $key): Dictionary {
+    public function remove(Enum|int|string $key): Dictionary {
+        $key = Strings::toString($key);
         if (isset($this->data[$key])) {
             unset($this->data[$key]);
         }
@@ -233,10 +256,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return mixed
      */
-    public function get(int|string $key): mixed {
+    public function get(Enum|int|string $key): mixed {
+        $key = Strings::toString($key);
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }
@@ -245,10 +269,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Boolean
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return bool
      */
-    public function getBool(int|string $key): bool {
+    public function getBool(Enum|int|string $key): bool {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return $this->hasValue($key);
         }
@@ -257,12 +282,13 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as an Integer
-     * @param int|string $key
-     * @param int        $decimals Optional.
-     * @param int        $default  Optional.
+     * @param Enum|int|string $key
+     * @param int             $decimals Optional.
+     * @param int             $default  Optional.
      * @return int
      */
-    public function getInt(int|string $key, int $decimals = 0, int $default = 0): int {
+    public function getInt(Enum|int|string $key, int $decimals = 0, int $default = 0): int {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Numbers::toInt($this->data[$key], $decimals);
         }
@@ -271,11 +297,12 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Float
-     * @param int|string $key
-     * @param float      $default Optional.
+     * @param Enum|int|string $key
+     * @param float           $default Optional.
      * @return float
      */
-    public function getFloat(int|string $key, float $default = 0.0): float {
+    public function getFloat(Enum|int|string $key, float $default = 0.0): float {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Numbers::toFloat($this->data[$key]);
         }
@@ -284,11 +311,12 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Price
-     * @param int|string $key
-     * @param float      $default Optional.
+     * @param Enum|int|string $key
+     * @param float           $default Optional.
      * @return float
      */
-    public function getPrice(int|string $key, float $default = 0.0): float {
+    public function getPrice(Enum|int|string $key, float $default = 0.0): float {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Numbers::fromCents($this->data[$key]);
         }
@@ -297,11 +325,12 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a String
-     * @param int|string $key
-     * @param string     $default Optional.
+     * @param Enum|int|string $key
+     * @param string          $default Optional.
      * @return string
      */
-    public function getString(int|string $key, string $default = ""): string {
+    public function getString(Enum|int|string $key, string $default = ""): string {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Strings::toString($this->data[$key]);
         }
@@ -310,10 +339,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Date
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return Date
      */
-    public function getDate(int|string $key): Date {
+    public function getDate(Enum|int|string $key): Date {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Date::create($this->data[$key]);
         }
@@ -322,10 +352,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a Date
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return Date
      */
-    public function getDateParsed(int|string $key): Date {
+    public function getDateParsed(Enum|int|string $key): Date {
+        $key  = Strings::toString($key);
         $date = $this->getString($key);
         return Date::parse($date);
     }
@@ -343,11 +374,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a single Dictionary
-     * @param int|string $key
+     * @param Enum|int|string $key
      * @return Dictionary
      */
-    public function getDict(int|string $key): Dictionary {
-        $key = (string)$key;
+    public function getDict(Enum|int|string $key): Dictionary {
+        $key = Strings::toString($key);
         if (isset($this->data[$key])) {
             return new Dictionary($this->data[$key]);
         }
@@ -356,11 +387,12 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Finds an element in the list at the given key
-     * @param string $key
-     * @param string $value
+     * @param Enum|int|string $key
+     * @param string          $value
      * @return Dictionary
      */
-    public function findDict(string $key, string $value): Dictionary {
+    public function findDict(Enum|int|string $key, string $value): Dictionary {
+        $key = Strings::toString($key);
         if (array_is_list($this->data)) {
             foreach ($this->data as $elem) {
                 if (is_array($elem) && isset($elem[$key]) && $elem[$key] === $value) {
@@ -373,10 +405,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a list of Dictionary
-     * @param string $key
+     * @param Enum|int|string $key
      * @return list<Dictionary>
      */
-    public function getList(string $key): array {
+    public function getList(Enum|int|string $key): array {
+        $key    = Strings::toString($key);
         $result = [];
         if (isset($this->data[$key]) && is_array($this->data[$key])) {
             foreach ($this->data[$key] as $item) {
@@ -388,10 +421,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the first element of the list at the given key
-     * @param string $key Optional.
+     * @param Enum|int|string $key Optional.
      * @return Dictionary
      */
-    public function getFirst(string $key = ""): Dictionary {
+    public function getFirst(Enum|int|string $key = ""): Dictionary {
+        $key = Strings::toString($key);
         if ($key === "") {
             $first = Arrays::getFirst($this->data);
             return new Dictionary($first);
@@ -403,10 +437,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the last element of the list at the given key
-     * @param string $key Optional.
+     * @param Enum|int|string $key Optional.
      * @return Dictionary
      */
-    public function getLast(string $key = ""): Dictionary {
+    public function getLast(Enum|int|string $key = ""): Dictionary {
+        $key = Strings::toString($key);
         if ($key === "") {
             $last = Arrays::getLast($this->data);
             return new Dictionary($last);
@@ -419,10 +454,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a list of Integers
-     * @param string $key
+     * @param Enum|int|string $key
      * @return list<int>
      */
-    public function getInts(string $key): array {
+    public function getInts(Enum|int|string $key): array {
+        $key = Strings::toString($key);
         if (isset($this->data[$key])) {
             return Arrays::toInts($this->data[$key]);
         }
@@ -431,11 +467,12 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a list of Strings
-     * @param string $key
-     * @param bool   $withoutEmpty Optional.
+     * @param Enum|int|string $key
+     * @param bool            $withoutEmpty Optional.
      * @return list<string>
      */
-    public function getStrings(string $key, bool $withoutEmpty = false): array {
+    public function getStrings(Enum|int|string $key, bool $withoutEmpty = false): array {
+        $key = Strings::toString($key);
         if (isset($this->data[$key])) {
             return Arrays::toStrings($this->data[$key], withoutEmpty: $withoutEmpty);
         }
@@ -444,10 +481,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as an Array
-     * @param string $key
+     * @param Enum|int|string $key
      * @return array<int|string,mixed>
      */
-    public function getArray(string $key): array {
+    public function getArray(Enum|int|string $key): array {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && is_array($this->data[$key])) {
             return $this->data[$key];
         }
@@ -456,10 +494,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a JSON
-     * @param string $key
+     * @param Enum|int|string $key
      * @return string
      */
-    public function getJSON(string $key): string {
+    public function getJSON(Enum|int|string $key): string {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && is_array($this->data[$key])) {
             return JSON::encode($this->data[$key]);
         }
@@ -470,10 +509,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as an Array decoded from JSON
-     * @param string $key
+     * @param Enum|int|string $key
      * @return array<int|string,mixed>
      */
-    public function decodeAsArray(string $key): array {
+    public function decodeAsArray(Enum|int|string $key): array {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && is_string($this->data[$key])) {
             return JSON::decodeAsArray($this->data[$key]);
         }
@@ -482,10 +522,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Gets the value of the given key as a list of Strings decoded from JSON
-     * @param string $key
+     * @param Enum|int|string $key
      * @return list<string>
      */
-    public function decodeAsStrings(string $key): array {
+    public function decodeAsStrings(Enum|int|string $key): array {
+        $key = Strings::toString($key);
         if (isset($this->data[$key]) && is_string($this->data[$key])) {
             return JSON::decodeAsStrings($this->data[$key]);
         }
@@ -496,10 +537,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Creates a map from the list using the given key
-     * @param string $key
+     * @param Enum|int|string $key
      * @return Dictionary
      */
-    public function createMap(string $key): Dictionary {
+    public function createMap(Enum|int|string $key): Dictionary {
+        $key    = Strings::toString($key);
         $result = new Dictionary();
         if (array_is_list($this->data)) {
             foreach ($this->data as $elem) {
