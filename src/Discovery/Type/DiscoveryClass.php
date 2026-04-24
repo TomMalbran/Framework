@@ -148,6 +148,14 @@ class DiscoveryClass {
     }
 
     /**
+     * Returns the properties of the class
+     * @return list<ReflectionProperty>
+     */
+    public function getProperties(): array {
+        return $this->reflection?->getProperties() ?? [];
+    }
+
+    /**
      * Returns the properties of the class, starting from the base class
      * @return list<ReflectionProperty>
       */
