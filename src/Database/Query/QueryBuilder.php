@@ -63,14 +63,18 @@ class QueryBuilder {
 
     /**
      * Adds a select to the Select Builder
-     * @param Column|string $column
-     * @param string        $alias  Optional.
+     * @param Query|Column|string $select
+     * @param string              $as     Optional.
      * @return void
      */
-    public function addSelect(Column|string $column, string $alias = ""): void {
-        $select = $column instanceof Column ? $column->name() : $column;
-        if ($alias !== "") {
-            $select .= " AS $alias";
+    public function addSelect(Query|Column|string $select, string $as = ""): void {
+        if ($select instanceof Query) {
+            $select = "({$select->toSQL()})";
+        } elseif ($select instanceof Column) {
+            $select = $select->name();
+        }
+        if ($as !== "") {
+            $select .= " AS $as";
         }
         $this->selects[] = $select;
     }

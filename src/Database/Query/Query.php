@@ -196,11 +196,12 @@ class Query implements QueryLike {
 
     /**
      * Adds a new Select clause
-     * @param string $select
+     * @param Query|Column|string $select
+     * @param string              $as     Optional.
      * @return Query
      */
-    public function addSelect(string $select): Query {
-        $this->queryBuilder->addSelect($select);
+    public function addSelect(Query|Column|string $select, string $as = ""): Query {
+        $this->queryBuilder->addSelect($select, $as);
         return $this;
     }
 

@@ -58,7 +58,7 @@ class SelectionBuilder {
         $mainKey   = $this->schemaModel->tableName;
 
         if ($this->schemaModel->hasID) {
-            $this->builder->addSelect("$mainKey.{$this->schemaModel->idDbName} AS id");
+            $this->builder->addSelect("$mainKey.{$this->schemaModel->idDbName}", as: "id");
         }
         foreach ($this->schemaModel->fields as $field) {
             $fieldName = "$mainKey.{$field->name}";
@@ -67,7 +67,7 @@ class SelectionBuilder {
                     "CAST(AES_DECRYPT($fieldName, '$masterKey') AS CHAR(255)) {$field->name}Decrypt"
                 );
             } elseif ($field->dbName !== $field->name) {
-                $this->builder->addSelect("$mainKey.$field->dbName AS $field->name");
+                $this->builder->addSelect("$mainKey.$field->dbName", as: $field->name);
             } else {
                 $this->builder->addSelect($fieldName);
             }
@@ -81,7 +81,7 @@ class SelectionBuilder {
      */
     public function addExpressions(): SelectionBuilder {
         foreach ($this->schemaModel->expressions as $expression) {
-            $this->builder->addSelect("({$expression->expression}) AS {$expression->name}");
+            $this->builder->addSelect("({$expression->expression})", as: $expression->name);
         }
         return $this;
     }
@@ -121,7 +121,7 @@ class SelectionBuilder {
             if ($withSelects) {
                 $tableName = $relation->getDbTableName();
                 foreach ($relation->fields as $field) {
-                    $this->builder->addSelect("$tableName.{$field->dbName} AS {$field->prefixName}");
+                    $this->builder->addSelect("$tableName.{$field->dbName}", as: $field->prefixName);
                 }
             }
         }
