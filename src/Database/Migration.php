@@ -159,10 +159,12 @@ class Migration {
         }
 
         // Run the Migrations
+        $firstMigration += 1;
+        $lastMigration  += 1;
         print("Running migrations $firstMigration -> $lastMigration\n");
 
         $db    = Database::getInstance();
-        $index = 0;
+        $index = 1;
         foreach ($migrations as $className => $filePath) {
             $index += 1;
             if ($index < $firstMigration) {
