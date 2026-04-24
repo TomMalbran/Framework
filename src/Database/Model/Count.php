@@ -2,7 +2,8 @@
 namespace Framework\Database\Model;
 
 use Framework\Database\SchemaModel;
-use Framework\Utils\Strings;
+use Framework\Database\Query\Query;
+use Framework\Database\Query\Operator;
 
 use Attribute;
 
@@ -110,51 +111,28 @@ class Count {
 
     /**
      * Returns the Expression for the Query
-     * @param string $asTable
      * @param string $mainKey
-     * @return string
+     * @return Query
      */
-    public function getExpression(string $asTable, string $mainKey): string {
-        $name       = $this->name;
-        $what       = "COUNT(*)";
-        $table      = SchemaModel::getDbTableName($this->modelName);
-        $onTable    = $this->otherModelName !== "" ? SchemaModel::getDbTableName($this->otherModelName) : $mainKey;
-        $leftKey    = SchemaModel::getDbFieldName($this->fieldName);
-        $rightKey   = SchemaModel::getDbFieldName($this->fieldName);
-        $groupKey   = "$table.$rightKey";
-        $where      = $this->getWhere();
+    public function getExpression(string $mainKey): Query {
+        $table    = SchemaModel::getDbTableName($this->modelName);
+        $onTable  = $this->otherModelName !== "" ? SchemaModel::getDbTableName($this->otherModelName) : $mainKey;
+        $leftKey  = SchemaModel::getDbFieldName($this->fieldName);
+        $rightKey = SchemaModel::getDbFieldName($this->fieldName);
 
-        $select     = "SELECT $groupKey, $what AS $name FROM $table $where GROUP BY $groupKey";
-        $expression = "LEFT JOIN ($select) AS $asTable ON ($asTable.$leftKey = $onTable.$rightKey)";
-        return $expression;
-    }
+        $query = Query::select($table)
+            ->column("COUNT(*)")
+            ->whereExp("$table.$leftKey = $onTable.$rightKey");
 
-    /**
-     * Returns the Count Where
-     * @return string
-     */
-    private function getWhere(): string {
-        $query = [];
         if ($this->query !== "") {
-            $query[] = $this->query;
+            $query->whereExp($this->query);
         }
+
         if ($this->hasDeleted) {
-            $query[] = "isDeleted = 0";
+            $query->where("isDeleted", Operator::Equal, 0);
         }
 
-        if (count($query) === 0) {
-            return "";
-        }
-        return "WHERE " . Strings::join($query, " AND ");
-    }
-
-    /**
-     * Returns the Count select name
-     * @param string $joinKey
-     * @return string
-     */
-    public function getSelect(string $joinKey): string {
-        return "$joinKey.{$this->name}";
+        return $query;
     }
 
     /**

@@ -18,11 +18,6 @@ class SelectionBuilder {
     private SchemaModel $schemaModel;
     private Dictionary $request;
 
-    private int $index = 66;
-
-    /** @var array<string,string> */
-    private array $keys = [];
-
 
 
     /**
@@ -137,12 +132,8 @@ class SelectionBuilder {
      */
     public function addCounts(): SelectionBuilder {
         foreach ($this->schemaModel->counts as $count) {
-            $asTable = chr($this->index);
-            $this->builder->addJoin($count->getExpression($asTable, $this->schemaModel->tableName));
-            $this->builder->addSelect($count->getSelect($asTable));
-
-            $this->keys[$count->name] = $asTable;
-            $this->index             += 1;
+            $expression = $count->getExpression($this->schemaModel->tableName);
+            $this->builder->addSelect($expression, as: $count->name);
         }
         return $this;
     }
@@ -173,19 +164,6 @@ class SelectionBuilder {
                         if ($column === $field->dbName) {
                             $tableName = $relation->getDbTableName();
                             $this->builder->updateWhereColumn($column, "$tableName.{$field->dbName}");
-                            $found = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (!$found) {
-                foreach ($this->schemaModel->counts as $count) {
-                    if (isset($this->keys[$count->name]) && $this->keys[$count->name] !== "") {
-                        $joinKey = $this->keys[$count->name];
-                        if ($column === $count->name) {
-                            $this->builder->updateWhereColumn($column, $count->getSelect($joinKey));
                             $found = true;
                             break;
                         }
