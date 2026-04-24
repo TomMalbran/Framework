@@ -73,10 +73,7 @@ class File {
      * @return string
      */
     public static function addLastSlash(string $path): string {
-        if (!Strings::endsWith($path, "/")) {
-            return "$path/";
-        }
-        return $path;
+        return Strings::addSuffix($path, "/");
     }
 
     /**
@@ -85,10 +82,7 @@ class File {
      * @return string
      */
     public static function addFirstSlash(string $path): string {
-        if (!Strings::startsWith($path, "/")) {
-            return "/$path";
-        }
-        return $path;
+        return Strings::addPrefix($path, "/");
     }
 
     /**
