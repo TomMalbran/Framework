@@ -6,6 +6,7 @@ use Framework\Enum\Map;
 use Framework\Enum\IsEnum;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 enum TestMapPlainEnum implements Enum {
     use IsEnum;
@@ -25,155 +26,292 @@ enum TestMapBackedEnum: string implements Enum {
 
 class MapTest extends TestCase {
 
-    public function testIsEmpty(): void {
-        $map = new Map();
-        $this->assertTrue($map->isEmpty());
-
-        $map->set(TestMapPlainEnum::Apple, 1);
-        $this->assertFalse($map->isEmpty());
+    #[DataProvider("providerIsEmpty")]
+    public function testIsEmpty(array $operations, bool $expected): void {
+        $map = $this->createMap($operations);
+        $this->assertSame($expected, $map->isEmpty());
     }
 
-    public function testIsNotEmpty(): void {
-        $map = new Map();
-        $this->assertFalse($map->isNotEmpty());
-
-        $map->set(TestMapPlainEnum::Apple, 1);
-        $this->assertTrue($map->isNotEmpty());
+    public static function providerIsEmpty(): array {
+        return [
+            "empty"  => [ [], true ],
+            "filled" => [ [[ TestMapPlainEnum::Apple, 1 ]], false ],
+        ];
     }
 
-    public function testSet(): void {
-        $map = new Map();
-        $map->set(TestMapPlainEnum::Apple, "value");
 
-        // set should register the key (we check via has)
-        $this->assertTrue($map->has(TestMapPlainEnum::Apple));
-
-        // set should overwrite existing value
-        $map->set(TestMapPlainEnum::Apple, "new value");
-        $this->assertSame("new value", $map->get(TestMapPlainEnum::Apple));
-
-        // set should allow different keys
-        $map->set(TestMapPlainEnum::Banana, "banana value");
-        $this->assertSame("banana value", $map->get(TestMapPlainEnum::Banana));
-
-        // set should allow different enum types
-        $map->set(TestMapBackedEnum::Red, "red value");
-        $this->assertSame("red value", $map->get(TestMapBackedEnum::Red));
-
-        // set should allow null values
-        $map->set(TestMapPlainEnum::None, null);
-        $this->assertTrue($map->has(TestMapPlainEnum::None));
-        $this->assertNull($map->get(TestMapPlainEnum::None));
+    #[DataProvider("providerIsNotEmpty")]
+    public function testIsNotEmpty(array $operations, bool $expected): void {
+        $map = $this->createMap($operations);
+        $this->assertSame($expected, $map->isNotEmpty());
     }
 
-    public function testHas(): void {
-        $map = new Map();
-        $this->assertFalse($map->has(TestMapPlainEnum::Apple));
-
-        $map->set(TestMapPlainEnum::Apple, 123);
-        $this->assertTrue($map->has(TestMapPlainEnum::Apple));
-        $this->assertFalse($map->has(TestMapPlainEnum::Banana));
-
-        // has should work for different enum types
-        $this->assertFalse($map->has(TestMapBackedEnum::Red));
-        $map->set(TestMapBackedEnum::Red, "red");
-        $this->assertTrue($map->has(TestMapBackedEnum::Red));
+    public static function providerIsNotEmpty(): array {
+        return [
+            "empty"  => [ [], false ],
+            "filled" => [ [[ TestMapPlainEnum::Apple, 1 ]], true ],
+        ];
     }
 
-    public function testGet(): void {
-        $map = new Map();
-        $this->assertNull($map->get(TestMapPlainEnum::Apple));
 
-        $map->set(TestMapPlainEnum::Apple, "x");
-        $this->assertSame("x", $map->get(TestMapPlainEnum::Apple));
+    #[DataProvider("providerSet")]
+    public function testSet(array $operations, array $hasChecks, array $getChecks): void {
+        $map = $this->createMap($operations);
 
-        // get should work for different enum types
-        $this->assertNull($map->get(TestMapBackedEnum::Red));
-        $map->set(TestMapBackedEnum::Red, "red");
-        $this->assertSame("red", $map->get(TestMapBackedEnum::Red));
+        foreach ($hasChecks as [ $key, $expected ]) {
+            $this->assertSame($expected, $map->has($key));
+        }
+        foreach ($getChecks as [ $key, $expected ]) {
+            $this->assertSame($expected, $map->get($key));
+        }
     }
 
-    public function testGetInt(): void {
-        $map = new Map();
-        $this->assertSame(0, $map->getInt(TestMapPlainEnum::Apple));
-
-        // getInt should return the integer value if it's already an integer
-        $map->set(TestMapPlainEnum::Apple, 42);
-        $this->assertSame(42, $map->getInt(TestMapPlainEnum::Apple));
-
-        // getInt should convert numeric strings to integers
-        $map->set(TestMapPlainEnum::Apple, "42");
-        $this->assertSame(42, $map->getInt(TestMapPlainEnum::Apple));
-
-        // getInt should truncate floats to integers
-        $map->set(TestMapPlainEnum::Banana, 7.9);
-        $this->assertSame(8, $map->getInt(TestMapPlainEnum::Banana));
-
-        // getInt should work for different enum types
-        $this->assertSame(0, $map->getInt(TestMapBackedEnum::Red));
-        $map->set(TestMapBackedEnum::Red, "100");
-        $this->assertSame(100, $map->getInt(TestMapBackedEnum::Red));
-
-        // getInt should return 0 for non-numeric values
-        $map->set(TestMapPlainEnum::None, "not a number");
-        $this->assertSame(0, $map->getInt(TestMapPlainEnum::None));
+    public static function providerSet(): array {
+        return [
+            "set_and_overwrite" => [
+                [
+                    [ TestMapPlainEnum::Apple, "value" ],
+                    [ TestMapPlainEnum::Apple, "new value" ],
+                    [ TestMapPlainEnum::Banana, "banana value" ],
+                    [ TestMapBackedEnum::Red, "red value" ],
+                    [ TestMapPlainEnum::None, null ],
+                ],
+                [
+                    [ TestMapPlainEnum::Apple, true ],
+                    [ TestMapPlainEnum::None, true ],
+                ],
+                [
+                    [ TestMapPlainEnum::Apple, "new value" ],
+                    [ TestMapPlainEnum::Banana, "banana value" ],
+                    [ TestMapBackedEnum::Red, "red value" ],
+                    [ TestMapPlainEnum::None, null ],
+                ],
+            ],
+        ];
     }
 
-    public function testGetString(): void {
-        $map = new Map();
-        $this->assertSame("", $map->getString(TestMapPlainEnum::Apple));
 
-        // getString should return the string value if it's already a string
-        $map->set(TestMapPlainEnum::Apple, "hello");
-        $this->assertSame("hello", $map->getString(TestMapPlainEnum::Apple));
-
-        // getString should convert other types to strings
-        $map->set(TestMapPlainEnum::Apple, 55);
-        $this->assertSame("55", $map->getString(TestMapPlainEnum::Apple));
-
-        // getString should work for different enum types
-        $this->assertSame("", $map->getString(TestMapBackedEnum::Red));
-        $map->set(TestMapBackedEnum::Red, "red value");
-        $this->assertSame("red value", $map->getString(TestMapBackedEnum::Red));
-
-        // getString should return empty string for null values
-        $map->set(TestMapPlainEnum::None, null);
-        $this->assertSame("", $map->getString(TestMapPlainEnum::None));
+    #[DataProvider("providerHas")]
+    public function testHas(array $operations, Enum $key, bool $expected): void {
+        $map = $this->createMap($operations);
+        $this->assertSame($expected, $map->has($key));
     }
 
-    public function testCount(): void {
-        $map = new Map();
-        $this->assertSame(0, $map->count());
-
-        $map->set(TestMapPlainEnum::Apple, 1);
-        $map->set(TestMapPlainEnum::Banana, 2);
-        $this->assertSame(2, $map->count());
+    public static function providerHas(): array {
+        return [
+            "missing_plain"  => [ [], TestMapPlainEnum::Apple, false ],
+            "existing_plain" => [
+                [[ TestMapPlainEnum::Apple, 123 ]],
+                TestMapPlainEnum::Apple,
+                true,
+            ],
+            "other_plain_missing" => [
+                [[ TestMapPlainEnum::Apple, 123 ]],
+                TestMapPlainEnum::Banana,
+                false,
+            ],
+            "missing_backed" => [
+                [[ TestMapPlainEnum::Apple, 123 ]],
+                TestMapBackedEnum::Red,
+                false,
+            ],
+            "existing_backed" => [
+                [
+                    [ TestMapPlainEnum::Apple, 123 ],
+                    [ TestMapBackedEnum::Red, "red" ],
+                ],
+                TestMapBackedEnum::Red,
+                true,
+            ],
+        ];
     }
 
-    public function testGetIterator(): void {
-        $map = new Map();
-        $map->set(TestMapPlainEnum::Apple, "a");
-        $map->set(TestMapPlainEnum::Banana, "b");
+
+    #[DataProvider("providerGet")]
+    public function testGet(array $operations, Enum $key, mixed $expected): void {
+        $map = $this->createMap($operations);
+        $this->assertSame($expected, $map->get($key));
+    }
+
+    public static function providerGet(): array {
+        return [
+            "missing_plain"  => [ [], TestMapPlainEnum::Apple, null ],
+            "existing_plain" => [
+                [[ TestMapPlainEnum::Apple, "x" ]],
+                TestMapPlainEnum::Apple,
+                "x",
+            ],
+            "missing_backed" => [
+                [[ TestMapPlainEnum::Apple, "x" ]],
+                TestMapBackedEnum::Red,
+                null,
+            ],
+            "existing_backed" => [
+                [
+                    [ TestMapPlainEnum::Apple, "x" ],
+                    [ TestMapBackedEnum::Red, "red" ],
+                ],
+                TestMapBackedEnum::Red,
+                "red",
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetInt")]
+    public function testGetInt(array $operations, Enum $key, int $expected): void {
+        $map = $this->createMap($operations);
+        $this->assertSame($expected, $map->getInt($key));
+    }
+
+    public static function providerGetInt(): array {
+        return [
+            "missing_plain" => [ [], TestMapPlainEnum::Apple, 0 ],
+            "plain_int"     => [
+                [[ TestMapPlainEnum::Apple, 42 ]],
+                TestMapPlainEnum::Apple,
+                42,
+            ],
+            "plain_string" => [
+                [[ TestMapPlainEnum::Apple, "42" ]],
+                TestMapPlainEnum::Apple,
+                42,
+            ],
+            "plain_float" => [
+                [[ TestMapPlainEnum::Banana, 7.9 ]],
+                TestMapPlainEnum::Banana,
+                8,
+            ],
+            "missing_backed" => [ [], TestMapBackedEnum::Red, 0 ],
+            "backed_string"  => [
+                [[ TestMapBackedEnum::Red, "100" ]],
+                TestMapBackedEnum::Red,
+                100,
+            ],
+            "plain_invalid" => [
+                [[ TestMapPlainEnum::None, "not a number" ]],
+                TestMapPlainEnum::None,
+                0,
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetString")]
+    public function testGetString(array $operations, Enum $key, string $expected): void {
+        $map = $this->createMap($operations);
+        $this->assertSame($expected, $map->getString($key));
+    }
+
+    public static function providerGetString(): array {
+        return [
+            "missing_plain" => [ [], TestMapPlainEnum::Apple, "" ],
+            "plain_string"  => [
+                [[ TestMapPlainEnum::Apple, "hello" ]],
+                TestMapPlainEnum::Apple,
+                "hello",
+            ],
+            "plain_int" => [
+                [[ TestMapPlainEnum::Apple, 55 ]],
+                TestMapPlainEnum::Apple,
+                "55",
+            ],
+            "missing_backed" => [ [], TestMapBackedEnum::Red, "" ],
+            "backed_string"  => [
+                [[ TestMapBackedEnum::Red, "red value" ]],
+                TestMapBackedEnum::Red,
+                "red value",
+            ],
+            "plain_null" => [
+                [[ TestMapPlainEnum::None, null ]],
+                TestMapPlainEnum::None,
+                "",
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerCount")]
+    public function testCount(array $operations, int $expected): void {
+        $map = $this->createMap($operations);
+        $this->assertSame($expected, $map->count());
+    }
+
+    public static function providerCount(): array {
+        return [
+            "empty"  => [ [], 0 ],
+            "filled" => [
+                [
+                    [ TestMapPlainEnum::Apple, 1 ],
+                    [ TestMapPlainEnum::Banana, 2 ],
+                ],
+                2,
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetIterator")]
+    public function testGetIterator(array $operations, array $expected): void {
+        $map = $this->createMap($operations);
 
         $collected = [];
         foreach ($map->getIterator() as $key => $value) {
             $collected[$key->toString()] = $value;
         }
 
-        $this->assertSame([ "Apple" => "a", "Banana" => "b" ], $collected);
+        $this->assertSame($expected, $collected);
     }
 
-    public function testJsonSerialize(): void {
-        $map = new Map();
-        $map->set(TestMapPlainEnum::Apple, "a");
-        $map->set(TestMapBackedEnum::Red, "r");
+    public static function providerGetIterator(): array {
+        return [
+            "empty"  => [ [], [] ],
+            "filled" => [
+                [
+                    [ TestMapPlainEnum::Apple, "a" ],
+                    [ TestMapPlainEnum::Banana, "b" ],
+                ],
+                [ "Apple" => "a", "Banana" => "b" ],
+            ],
+        ];
+    }
 
+
+    #[DataProvider("providerJsonSerialize")]
+    public function testJsonSerialize(array $operations, array $expected, bool $expectEmpty): void {
+        $map = $this->createMap($operations);
         $serialized = $map->jsonSerialize();
 
-        // keys should be the enum string representations
-        $this->assertArrayHasKey('Apple', $serialized);
-        $this->assertArrayHasKey('red', $serialized);
-        $this->assertSame("a", $serialized["Apple"]);
-        $this->assertSame("r", $serialized["red"]);
+        if ($expectEmpty) {
+            $this->assertSame([], $serialized);
+            return;
+        }
+        foreach ($expected as $key => $value) {
+            $this->assertArrayHasKey($key, $serialized);
+            $this->assertSame($value, $serialized[$key]);
+        }
+    }
+
+    public static function providerJsonSerialize(): array {
+        return [
+            "empty" => [ [], [], true ],
+            "mixed" => [
+                [
+                    [ TestMapPlainEnum::Apple, "a" ],
+                    [ TestMapBackedEnum::Red, "r" ],
+                ],
+                [ "Apple" => "a", "red" => "r" ],
+                false,
+            ],
+        ];
+    }
+
+
+    private function createMap(array $operations): Map {
+        $map = new Map();
+        foreach ($operations as [ $key, $value ]) {
+            $map->set($key, $value);
+        }
+        return $map;
     }
 }
