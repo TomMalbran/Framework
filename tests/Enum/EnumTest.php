@@ -6,6 +6,7 @@ use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 enum TestPlainEnum implements Enum {
     use IsEnum;
@@ -25,137 +26,230 @@ enum TestBackedEnum: string implements Enum {
 
 class EnumTest extends TestCase {
 
-    public function testFromValue(): void {
-        // plain enum should match case name
-        $this->assertSame(TestPlainEnum::Apple, TestPlainEnum::fromValue("Apple"));
-        $this->assertSame(TestPlainEnum::Apple, TestPlainEnum::fromValue("apple"));
-        $this->assertSame(TestPlainEnum::Banana, TestPlainEnum::fromValue(TestPlainEnum::Banana));
-        $this->assertSame(TestPlainEnum::None, TestPlainEnum::fromValue("Unknown"));
-
-        // backed enum should match case value
-        $this->assertSame(TestBackedEnum::Red, TestBackedEnum::fromValue("Red"));
-        $this->assertSame(TestBackedEnum::Red, TestBackedEnum::fromValue("red"));
-        $this->assertSame(TestBackedEnum::Red, TestBackedEnum::fromValue(TestBackedEnum::Red));
-        $this->assertSame(TestBackedEnum::None, TestBackedEnum::fromValue("x"));
+    #[DataProvider("providerFromValue")]
+    public function testFromValue(string $enumClass, mixed $input, Enum $expected): void {
+        $this->assertSame($expected, $enumClass::fromValue($input));
     }
 
-    public function testFromRequest(): void {
-        // plain enum should match case name
-        $req = new Request([ "fruit" => "Banana" ]);
-        $this->assertSame(TestPlainEnum::Banana, TestPlainEnum::fromRequest($req, "fruit"));
-
-        // backed enum should match case value
-        $req2 = new Request([ "color" => "green" ]);
-        $this->assertSame(TestBackedEnum::Green, TestBackedEnum::fromRequest($req2, "color"));
-
-        // missing key should return default
-        $this->assertSame(TestPlainEnum::None, TestPlainEnum::fromRequest($req, "missing"));
-        $this->assertSame(TestBackedEnum::None, TestBackedEnum::fromRequest($req2, "missing"));
+    public static function providerFromValue(): array {
+        return [
+            "plain_name"           => [ TestPlainEnum::class, "Apple", TestPlainEnum::Apple ],
+            "plain_name_lowercase" => [ TestPlainEnum::class, "apple", TestPlainEnum::Apple ],
+            "plain_enum_instance"  => [ TestPlainEnum::class, TestPlainEnum::Banana, TestPlainEnum::Banana ],
+            "plain_invalid"        => [ TestPlainEnum::class, "Unknown", TestPlainEnum::None ],
+            "backed_name"          => [ TestBackedEnum::class, "Red", TestBackedEnum::Red ],
+            "backed_value"         => [ TestBackedEnum::class, "red", TestBackedEnum::Red ],
+            "backed_enum_instance" => [ TestBackedEnum::class, TestBackedEnum::Red, TestBackedEnum::Red ],
+            "backed_invalid"       => [ TestBackedEnum::class, "x", TestBackedEnum::None ],
+        ];
     }
 
-    public function testFromList(): void {
-        // plain enum should match case name
-        $list = TestPlainEnum::fromList([ "Apple", "Banana" ]);
-        $this->assertSame([ TestPlainEnum::Apple, TestPlainEnum::Banana ], $list);
 
-        // backed enum should match case value
-        $list2 = TestBackedEnum::fromList([ "red", "green" ]);
-        $this->assertSame([ TestBackedEnum::Red, TestBackedEnum::Green ], $list2);
-
-        // with Enum instances in the list, they should be returned as-is
-        $list3 = TestPlainEnum::fromList([ TestPlainEnum::Apple, "Unknown", TestPlainEnum::Banana ]);
-        $this->assertSame([ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ], $list3);
-
-        // invalid values are converted to None
-        $list4 = TestPlainEnum::fromList([ "Apple", "Unknown", "Banana" ]);
-        $this->assertSame([ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ], $list4);
-
-        // it works with non-array input by treating it as a single value
-        $list5 = TestPlainEnum::fromList("Apple");
-        $this->assertSame([ TestPlainEnum::Apple ], $list5);
-
-        // with a single enum
-        $list6 = TestPlainEnum::fromList(TestPlainEnum::Banana);
-        $this->assertSame([ TestPlainEnum::Banana ], $list6);
-
-        // empty string should return empty list
-        $this->assertSame([], TestPlainEnum::fromList(""));
-
-        // null should return empty list
-        $this->assertSame([], TestPlainEnum::fromList(null));
+    #[DataProvider("providerFromRequest")]
+    public function testFromRequest(string $enumClass, Request $request, string $key, Enum $expected): void {
+        $this->assertSame($expected, $enumClass::fromRequest($request, $key));
     }
 
-    public function testIsValid(): void {
-        // plain enum should match case name
-        $this->assertTrue(TestPlainEnum::isValid("Apple"));
-        $this->assertTrue(TestPlainEnum::isValid("apple"));
-        $this->assertFalse(TestPlainEnum::isValid("Nope"));
-
-        // backed enum should match case value
-        $this->assertTrue(TestBackedEnum::isValid("green"));
-        $this->assertTrue(TestBackedEnum::isValid("Red"));
-        $this->assertFalse(TestBackedEnum::isValid("blue"));
+    public static function providerFromRequest(): array {
+        return [
+            "plain_key" => [
+                TestPlainEnum::class,
+                new Request([ "fruit" => "Banana" ]),
+                "fruit",
+                TestPlainEnum::Banana,
+            ],
+            "backed_key" => [
+                TestBackedEnum::class,
+                new Request([ "color" => "green" ]),
+                "color",
+                TestBackedEnum::Green,
+            ],
+            "plain_missing" => [
+                TestPlainEnum::class,
+                new Request([ "fruit" => "Banana" ]),
+                "missing",
+                TestPlainEnum::None,
+            ],
+            "backed_missing" => [
+                TestBackedEnum::class,
+                new Request([ "color" => "green" ]),
+                "missing",
+                TestBackedEnum::None,
+            ],
+        ];
     }
 
-    public function testGetAll(): void {
-        // getAll should return all cases except None
-        $all = TestPlainEnum::getAll();
-        $this->assertNotContains(TestPlainEnum::None, $all);
-        $this->assertContains(TestPlainEnum::Apple, $all);
 
-        // backed enum getAll should also return all cases except None
-        $allBacked = TestBackedEnum::getAll();
-        $this->assertNotContains(TestBackedEnum::None, $allBacked);
-        $this->assertContains(TestBackedEnum::Red, $allBacked);
+    #[DataProvider("providerFromList")]
+    public function testFromList(string $enumClass, mixed $input, array $expected): void {
+        $this->assertSame($expected, $enumClass::fromList($input));
     }
 
-    public function testGetNames(): void {
-        // getNames should return the case names for plain enum
-        $names = TestPlainEnum::getNames();
-        $this->assertContains("Apple", $names);
-        $this->assertContains("Banana", $names);
-
-        // getNames for backed enum should return the case values
-        $backedNames = TestBackedEnum::getNames();
-        $this->assertContains("red", $backedNames);
-        $this->assertContains("green", $backedNames);
+    public static function providerFromList(): array {
+        return [
+            "plain_list" => [
+                TestPlainEnum::class,
+                [ "Apple", "Banana" ],
+                [ TestPlainEnum::Apple, TestPlainEnum::Banana ],
+            ],
+            "backed_list" => [
+                TestBackedEnum::class,
+                [ "red", "green" ],
+                [ TestBackedEnum::Red, TestBackedEnum::Green ],
+            ],
+            "plain_mixed_with_enums" => [
+                TestPlainEnum::class,
+                [ TestPlainEnum::Apple, "Unknown", TestPlainEnum::Banana ],
+                [ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ],
+            ],
+            "plain_invalid_in_list" => [
+                TestPlainEnum::class,
+                [ "Apple", "Unknown", "Banana" ],
+                [ TestPlainEnum::Apple, TestPlainEnum::None, TestPlainEnum::Banana ],
+            ],
+            "single_string" => [
+                TestPlainEnum::class,
+                "Apple",
+                [ TestPlainEnum::Apple ],
+            ],
+            "single_enum" => [
+                TestPlainEnum::class,
+                TestPlainEnum::Banana,
+                [ TestPlainEnum::Banana ],
+            ],
+            "empty_string" => [
+                TestPlainEnum::class,
+                "",
+                [],
+            ],
+            "null" => [
+                TestPlainEnum::class,
+                null,
+                [],
+            ],
+        ];
     }
 
-    public function testContains(): void {
-        // contains should check if a value is in a list of cases
-        $this->assertTrue(TestPlainEnum::contains([ TestPlainEnum::Apple, TestPlainEnum::Banana ], TestPlainEnum::Apple));
 
-        // contains should return false if value is not in list
-        $this->assertFalse(TestPlainEnum::contains([], TestPlainEnum::Apple));
-
-        // contains should work with backed enums too
-        $this->assertTrue(TestBackedEnum::contains([ TestBackedEnum::Red ], TestBackedEnum::Red));
-        $this->assertFalse(TestBackedEnum::contains([ TestBackedEnum::Green ], TestBackedEnum::Red));
-
-        // contains should return false if value is None
-        $this->assertFalse(TestPlainEnum::contains([ TestPlainEnum::Apple ], TestPlainEnum::None));
-        $this->assertFalse(TestBackedEnum::contains([ TestBackedEnum::Red ], TestBackedEnum::None));
+    #[DataProvider("providerIsValid")]
+    public function testIsValid(string $enumClass, mixed $input, bool $expected): void {
+        $this->assertSame($expected, $enumClass::isValid($input));
     }
 
-    public function testToString(): void {
-        // toString should return case name for plain enum
-        $this->assertSame("Apple", TestPlainEnum::Apple->toString());
-
-        // toString should return case value for backed enum
-        $this->assertSame("red", TestBackedEnum::Red->toString());
-
-        // None case should return empty string
-        $this->assertSame("", TestPlainEnum::None->toString());
+    public static function providerIsValid(): array {
+        return [
+            "plain_valid"           => [ TestPlainEnum::class, "Apple", true ],
+            "plain_valid_lowercase" => [ TestPlainEnum::class, "apple", true ],
+            "plain_invalid"         => [ TestPlainEnum::class, "Nope", false ],
+            "backed_valid_value"    => [ TestBackedEnum::class, "green", true ],
+            "backed_valid_name"     => [ TestBackedEnum::class, "Red", true ],
+            "backed_invalid"        => [ TestBackedEnum::class, "blue", false ],
+        ];
     }
 
-    public function testJsonSerialize(): void {
-        // jsonSerialize should return same as toString
-        $this->assertSame("Apple", TestPlainEnum::Apple->jsonSerialize());
 
-        // jsonSerialize for backed enum should return case value
-        $this->assertSame("red", TestBackedEnum::Red->jsonSerialize());
+    #[DataProvider("providerGetAll")]
+    public function testGetAll(string $enumClass, Enum $excluded, Enum $included): void {
+        $all = $enumClass::getAll();
+        $this->assertNotContains($excluded, $all);
+        $this->assertContains($included, $all);
+    }
 
-        // None case should return empty string
-        $this->assertSame("", TestPlainEnum::None->jsonSerialize());
+    public static function providerGetAll(): array {
+        return [
+            "plain"  => [ TestPlainEnum::class, TestPlainEnum::None, TestPlainEnum::Apple ],
+            "backed" => [ TestBackedEnum::class, TestBackedEnum::None, TestBackedEnum::Red ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetNames")]
+    public function testGetNames(string $enumClass, array $expectedIncluded): void {
+        $names = $enumClass::getNames();
+        foreach ($expectedIncluded as $value) {
+            $this->assertContains($value, $names);
+        }
+    }
+
+    public static function providerGetNames(): array {
+        return [
+            "plain"  => [ TestPlainEnum::class, [ "Apple", "Banana" ] ],
+            "backed" => [ TestBackedEnum::class, [ "red", "green" ] ],
+        ];
+    }
+
+
+    #[DataProvider("providerContains")]
+    public function testContains(string $enumClass, array $values, Enum $value, bool $expected): void {
+        $this->assertSame($expected, $enumClass::contains($values, $value));
+    }
+
+    public static function providerContains(): array {
+        return [
+            "plain_contained" => [
+                TestPlainEnum::class,
+                [ TestPlainEnum::Apple, TestPlainEnum::Banana ],
+                TestPlainEnum::Apple,
+                true,
+            ],
+            "plain_empty_list" => [
+                TestPlainEnum::class,
+                [],
+                TestPlainEnum::Apple,
+                false,
+            ],
+            "backed_contained" => [
+                TestBackedEnum::class,
+                [ TestBackedEnum::Red ],
+                TestBackedEnum::Red,
+                true,
+            ],
+            "backed_not_contained" => [
+                TestBackedEnum::class,
+                [ TestBackedEnum::Green ],
+                TestBackedEnum::Red,
+                false,
+            ],
+            "plain_none" => [
+                TestPlainEnum::class,
+                [ TestPlainEnum::Apple ],
+                TestPlainEnum::None,
+                false,
+            ],
+            "backed_none" => [
+                TestBackedEnum::class,
+                [ TestBackedEnum::Red ],
+                TestBackedEnum::None,
+                false,
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerToString")]
+    public function testToString(Enum $input, string $expected): void {
+        $this->assertSame($expected, $input->toString());
+    }
+
+    public static function providerToString(): array {
+        return [
+            "plain"  => [ TestPlainEnum::Apple, "Apple" ],
+            "backed" => [ TestBackedEnum::Red, "red" ],
+            "none"  => [ TestPlainEnum::None, "" ],
+        ];
+    }
+
+
+    #[DataProvider("providerJsonSerialize")]
+    public function testJsonSerialize(Enum $input, string $expected): void {
+        $this->assertSame($expected, $input->jsonSerialize());
+    }
+
+    public static function providerJsonSerialize(): array {
+        return [
+            "plain"  => [ TestPlainEnum::Apple, "Apple" ],
+            "backed" => [ TestBackedEnum::Red, "red" ],
+            "none"   => [ TestPlainEnum::None, "" ],
+        ];
     }
 }
