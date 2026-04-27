@@ -17,321 +17,385 @@ enum TestErrorEnum implements Enum {
 
 class ErrorsTest extends TestCase {
 
-    public function testConstruct() {
-        $e = new Errors([ "a" => "msg" ]);
-        $this->assertTrue($e->has("a"));
-        $this->assertEquals(1, $e->getTotal());
-
-        // construct should allow null
-        $e2 = new Errors(null);
-        $this->assertFalse($e2->has());
-
-        // construct with multiple entries
-        $e3 = new Errors([ "x" => "1", "y" => "2" ]);
-        $this->assertEquals(2, $e3->getTotal());
+    /** @dataProvider providerConstruct */
+    public function testConstruct(mixed $input, mixed $checkKey, int $expectedTotal) {
+        $e = new Errors($input);
+        if ($input === null && $checkKey === null) {
+            $this->assertFalse($e->has());
+        } elseif ($checkKey !== null) {
+            $this->assertTrue($e->has($checkKey));
+        }
+        $this->assertEquals($expectedTotal, $e->getTotal());
     }
 
-    public function testMagicSetAndGet() {
-        $e = new Errors();
-        $e->b = "msg";
-        $this->assertTrue($e->has("b"));
-        $this->assertEquals("msg", $e->b);
-
-        // get should return empty string for non-existing keys
-        $this->assertEquals("", $e->c);
-
-        // set another string via magic and read it
-        $e->e = "valid";
-        $this->assertEquals("valid", $e->e);
-
-        // set should overwrite existing value
-        $e->b = "new";
-        $this->assertEquals("new", $e->b);
+    public static function providerConstruct() {
+        return [
+            "single"   => [ [ "a" => "msg" ], "a", 1 ],
+            "null"     => [ null, null, 0 ],
+            "multiple" => [ [ "x" => "1", "y" => "2" ], null, 2 ],
+        ];
     }
 
-    public function testIncCount() {
+
+    /** @dataProvider providerMagicSetAndGet */
+    public function testMagicSetAndGet(string $key, string $value, string $expected, bool $exists = true) {
         $e = new Errors();
-        $e->incCount("counter", 2);
-        $this->assertEquals(2, $e->get()["counter"]);
+        $e->{$key} = $value;
+        $this->assertEquals($exists, $e->has($key));
+        $this->assertEquals($expected, $e->{$key});
+    }
+
+    public static function providerMagicSetAndGet() {
+        return [
+            "set_b"       => [ "b", "msg", "msg", true ],
+            "set_e"       => [ "e", "valid", "valid", true ],
+            "overwrite_b" => [ "b", "new", "new", true ],
+            "missing_c"   => [ "c", "", "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerIncCount */
+    public function testIncCount(string $key, int $amount, int $expectedAfterFirst, int $expectedAfterSecond, string $newKey, int $expectedNew) {
+        $e = new Errors();
+        $e->incCount($key, $amount);
+        $this->assertEquals($expectedAfterFirst, $e->get()[$key]);
 
         // increment again by default amount (1)
-        $e->incCount("counter");
-        $this->assertEquals(3, $e->get()["counter"]);
+        $e->incCount($key);
+        $this->assertEquals($expectedAfterSecond, $e->get()[$key]);
 
         // new counter defaults to 1
-        $e->incCount("newCounter");
-        $this->assertEquals(1, $e->get()["newCounter"]);
+        $e->incCount($newKey);
+        $this->assertEquals($expectedNew, $e->get()[$newKey]);
     }
 
-    public function testForm() {
-        $e = new Errors();
-        $e->form("msg");
-        $this->assertEquals("msg", $e->get()["form"]);
+    public static function providerIncCount() {
+        return [
+            "counter_2" => [ "counter", 2, 2, 3, "newCounter", 1 ],
+            "total_5"   => [ "total", 5, 5, 6, "anotherCounter", 1 ],
+        ];
+    }
 
-        // form should be present in keys and counted
+
+    /** @dataProvider providerForm */
+    public function testForm(string $initialMsg, string $newMsg, string $otherKey, string $otherValue) {
+        $e = new Errors();
+        $e->form($initialMsg);
+
+        $this->assertEquals($initialMsg, $e->get()["form"]);
         $this->assertTrue(in_array("form", $e->keys()));
 
         // form should overwrite existing value
-        $e->form("new");
-        $this->assertEquals("new", $e->get()["form"]);
+        $e->form($newMsg);
+        $this->assertEquals($newMsg, $e->get()["form"]);
 
         // form should not affect other keys
-        $e->add("other", "o");
-        $this->assertTrue($e->has("other"));
+        $e->add($otherKey, $otherValue);
+        $this->assertTrue($e->has($otherKey));
     }
 
-    public function testGlobal() {
+    public static function providerForm() {
+        return [
+            "basic"     => [ "msg", "new", "other", "o" ],
+            "empty"     => [ "", "newForm", "other2", "o2" ],
+            "overwrite" => [ "initial", "overwritten", "other3", "o3" ],
+        ];
+    }
+
+
+    /** @dataProvider providerGlobal */
+    public function testGlobal(string $initial, string $new) {
         $e = new Errors();
-        $e->global("msg");
-        $this->assertEquals("msg", $e->get()["global"]);
+        $e->global($initial);
+        $this->assertEquals($initial, $e->get()["global"]);
 
         // global should be present and not affect other keys
         $this->assertTrue($e->has("global"));
         $this->assertFalse($e->has("nonexistent"));
 
         // global should overwrite existing value
-        $e->global("new");
-        $this->assertEquals("new", $e->get()["global"]);
+        $e->global($new);
+        $this->assertEquals($new, $e->get()["global"]);
     }
 
-    public function testAdd() {
+    public static function providerGlobal() {
+        return [
+            "basic"     => [ "msg", "new" ],
+            "empty"     => [ "", "newGlobal" ],
+            "overwrite" => [ "initial", "overwritten" ],
+        ];
+    }
+
+
+    /** @dataProvider providerAdd */
+    public function testAdd(string $key, mixed $args, mixed $expected, bool $shouldExist) {
         $e = new Errors();
-        $e->add("k", "m");
-        $this->assertTrue($e->has("k"));
-        $this->assertEquals("m", $e->get()["k"]);
+        $e->add($key, ...$args);
 
-        // add should overwrite existing value
-        $e->add("k", "new");
-        $this->assertEquals("new", $e->get()["k"]);
-
-        // add should allow different keys
-        $e->add("k2", "m2");
-        $this->assertTrue($e->has("k2"));
-        $this->assertEquals("m2", $e->get()["k2"]);
-
-        // adding multiple keys increases total
-        $totalBefore = $e->getTotal();
-        $e->add("k3", "m3");
-        $this->assertEquals($totalBefore + 1, $e->getTotal());
-
-        // add with values should store an array [message, ...values]
-        $e->add("kv", "mv", 10, "extra");
-        $this->assertTrue($e->has("kv"));
-        $this->assertIsArray($e->get()["kv"]);
-        $this->assertEquals([ "mv", 10, "extra" ], $e->get()["kv"]);
-
-        // overwriting an existing key with values replaces previous value
-        $e->add("k", "third", 5);
-        $this->assertIsArray($e->get()["k"]);
-        $this->assertEquals([ "third", 5 ], $e->get()["k"]);
-
-        // should skip empty messages
-        $e->add("empty", "", 1);
-        $this->assertFalse($e->has("empty"));
+        $this->assertEquals($shouldExist, $e->has($key));
+        if ($shouldExist) {
+            $this->assertEquals($expected, $e->get()[$key]);
+        }
     }
 
-    public function testAddIf() {
+    public static function providerAdd(): array {
+        return [
+            "simple_key_value"   => [ "k", [ "m" ], "m", true ],
+            "overwrite_existing" => [ "k", [ "new" ], "new", true ],
+            "multiple_values"    => [ "kv", [ "mv", 10, "extra" ], [ "mv", 10, "extra" ], true ],
+            "skip_empty_message" => [ "empty", [ "", 1 ], null, false ],
+        ];
+    }
+
+
+    /** @dataProvider providerAddIf */
+    public function testAddIf(bool $condition, string $key, string $message, bool $shouldExist) {
         $e = new Errors();
-        $e->addIf(false, "x", "no");
-        $this->assertFalse($e->has("x"));
+        $e->addIf($condition, $key, $message);
 
-        $e->addIf(true, "x", "yes");
-        $this->assertTrue($e->has("x"));
-
-        // addIf with false again should not change value
-        $e->addIf(false, "x", "nope");
-        $this->assertEquals("yes", $e->get()["x"]);
+        $this->assertEquals($shouldExist, $e->has($key));
+        if ($shouldExist) {
+            $this->assertEquals($message, $e->get()[$key]);
+        }
     }
 
-    public function testAddFor() {
+    public static function providerAddIf(): array {
+        return [
+            "true_condition"  => [ true, "key1", "message1", true ],
+            "false_condition" => [ false, "key2", "message2", false ],
+            "overwrite"       => [ true, "key1", "newMessage", true ],
+            "empty_message"   => [ true, "key3", "", false ],
+        ];
+    }
+
+
+    /** @dataProvider providerAddFor */
+    public function testAddFor(Enum|string $section, Enum|string $error, mixed $message, array $values, bool $expectedHasError, mixed $expectedErrorValue, bool $expectedHasSection, mixed $expectedSectionValue) {
         $e = new Errors();
-        $e->addFor("section", "err", "message");
-        $this->assertTrue($e->has("section"));
-        $this->assertTrue($e->has("err"));
-        $this->assertEquals(2, $e->getTotal());
+        $e->addFor($section, $error, $message, ...$values);
 
-        // adding another error for same section increases total appropriately
-        $e->addFor("section", "err2", "m2");
-        $this->assertTrue($e->has("err2"));
-        $this->assertEquals(3, $e->getTotal());
-
-        // addFor with values should store an array [message, ...values]
-        $e->addFor("section4", "err4", "m4", 7, "more");
-        $this->assertTrue($e->has("err4"));
-        $this->assertIsArray($e->get()["err4"]);
-        $this->assertEquals([ "m4", 7, "more" ], $e->get()["err4"]);
-        $this->assertEquals(1, $e->get()["section4"]);
-
-        // overwriting the same key with values replaces previous value and increments section count
-        $e->addFor("section4", "err4", "newMsg", 2);
-        $this->assertEquals([ "newMsg", 2 ], $e->get()["err4"]);
-        $this->assertEquals(2, $e->get()["section4"]);
-
-        // should skip empty messages
-        $e->addFor("section4", "empty", "", 1);
-        $this->assertFalse($e->has("empty"));
-
-        // should work with an Enum section and error
-        $e->addFor(TestErrorEnum::Section, TestErrorEnum::Error, "enum message", 3);
-        $this->assertTrue($e->has("Section"));
-        $this->assertTrue($e->has("Error"));
-        $this->assertEquals([ "enum message", 3 ], $e->get()["Error"]);
-        $this->assertEquals(1, $e->get()["Section"]);
+        $this->assertEquals($expectedHasError, $e->has($error));
+        if ($expectedHasError) {
+            $errorIndex = $error instanceof Enum ? $error->toString() : $error;
+            $this->assertEquals($expectedErrorValue, $e->get()[$errorIndex]);
+        }
+        if ($expectedHasSection) {
+            $sectionIndex = $section instanceof Enum ? $section->toString() : $section;
+            $this->assertEquals($expectedSectionValue, $e->get()[$sectionIndex]);
+        }
     }
 
-    public function testMerge() {
+    public static function providerAddFor(): array {
+        return [
+            "basic"                  => [ "section", "err", "message", [], true, "message", true, 1 ],
+            "multiple_errors_same"   => [ "section", "err2", "m2", [], true, "m2", true, 1 ],
+            "with_values"            => [ "section4", "err4", "m4", [ 7, "more" ], true, [ "m4", 7, "more" ], true, 1 ],
+            "overwrite_with_values"  => [ "section4", "err4", "newMsg", [ 2 ], true, [ "newMsg", 2 ], true, 1 ],
+            "empty_message"          => [ "section4", "empty", "", [ 1 ], false, null, false, null ],
+            "enum_section_and_error" => [ TestErrorEnum::Section, TestErrorEnum::Error, "enum message", [ 3 ], true, [ "enum message", 3 ], true, 1 ],
+        ];
+    }
+
+
+    /** @dataProvider providerMerge */
+    public function testMerge(array $baseErrors, array $incomingErrors, string $prefix, string $suffix, array $expectedHasKeys, array $expectedValues) {
         $a = new Errors();
-        $a->add("one", "o");
+        foreach ($baseErrors as $key => $value) {
+            $a->add($key, $value);
+        }
+
         $b = new Errors();
-        $b->add("two", "t");
-        $a->merge($b);
-        $this->assertTrue($a->has("two"));
-        $this->assertEquals("t", $a->get()["two"]);
+        foreach ($incomingErrors as $key => $value) {
+            $b->add($key, $value);
+        }
 
-        // merging does not remove existing keys
-        $this->assertTrue($a->has("one"));
+        $a->merge($b, $prefix, $suffix);
 
-        // merging with prefix and suffix should modify keys appropriately
-        $a = new Errors();
-        $a->add("one", "o");
-        $b = new Errors();
-        $b->add("two", "t");
-        $a->merge($b, "p_", "_s");
-        $this->assertTrue($a->has("p_two_s"));
-        $this->assertEquals("t", $a->get()["p_two_s"]);
-
-        // merging with empty prefix/suffix behaves like normal merge
-        $c = new Errors();
-        $c->add("three", "3");
-        $a->merge($c, "", "");
-        $this->assertTrue($a->has("three"));
+        foreach ($expectedHasKeys as $key) {
+            $this->assertTrue($a->has($key));
+        }
+        foreach ($expectedValues as $key => $value) {
+            $this->assertEquals($value, $a->get()[$key]);
+        }
     }
 
-    public function testMergeFor() {
+    public static function providerMerge(): array {
+        return [
+            "basic_merge_keeps_existing" => [
+                [ "one" => "o" ],
+                [ "two" => "t" ],
+                "",
+                "",
+                [ "one", "two" ],
+                [ "two" => "t" ],
+            ],
+            "merge_with_prefix_and_suffix" => [
+                [ "one" => "o" ],
+                [ "two" => "t" ],
+                "p_",
+                "_s",
+                [ "one", "p_two_s" ],
+                [ "p_two_s" => "t" ],
+            ],
+            "merge_with_empty_prefix_suffix" => [
+                [ "one" => "o" ],
+                [ "three" => "3" ],
+                "",
+                "",
+                [ "one", "three" ],
+                [ "three" => "3" ],
+            ],
+        ];
+    }
+
+
+    /** @dataProvider providerMergeFor */
+    public function testMergeFor(array $initial, string $sec, array $new, array $fix, mixed $expectedKey, mixed $expectedVal, int $expectedCount) {
         $e = new Errors();
-        $e2 = new Errors();
-        $e2->add("x", "m");
-        $e->mergeFor("sec2", $e2);
-        $data = $e->get();
-        $this->assertArrayHasKey("sec2", $data);
-        $this->assertEquals(1, $data["sec2"]);
-        $this->assertTrue($e->has("x"));
+        foreach ($initial as $k => $v) {
+            $e->add($k, $v);
+        }
 
-        // merging another errors object for same section increments count
-        $e3 = new Errors();
-        $e3->add("y", "n");
-        $e->mergeFor("sec2", $e3);
-        $this->assertEquals(2, $e->get()["sec2"]);
-        $this->assertTrue($e->has("y"));
-
-        // merging with prefix/suffix should rename keys and count correctly
         $src = new Errors();
-        $src->add("arr", "val", 1);
-        $e->mergeFor("sec3", $src, "p_", "_s");
-        $this->assertTrue($e->has("p_arr_s"));
-        $this->assertEquals(["val", 1], $e->get()["p_arr_s"]);
-        $this->assertEquals(1, $e->get()["sec3"]);
+        foreach ($new as $k => $v) {
+            $src->add($k, ...(array)$v);
+        }
 
-        // merging an empty Errors object should not change the section count
-        $before = $e->get()["sec3"];
-        $empty = new Errors();
-        $e->mergeFor("sec3", $empty);
-        $this->assertEquals($before, $e->get()["sec3"]);
+        $e->mergeFor($sec, $src, ...$fix);
 
-        // merging where keys collide should overwrite the key value and still increment
-        $collideSrc = new Errors();
-        $collideSrc->add("x", "overwritten");
-        $prev = $e->get()["sec2"];
-        $e->mergeFor("sec2", $collideSrc);
-        $this->assertEquals($prev + 1, $e->get()["sec2"]);
-        $this->assertEquals("overwritten", $e->get()["x"]);
+        $this->assertEquals($expectedVal, $e->get()[$expectedKey] ?? null);
+        $this->assertEquals($expectedCount, $e->get()[$sec] ?? 0);
     }
 
-    public function testHas() {
+    public static function providerMergeFor(): array {
+        return [
+            "basic_merge"   => [ [], "sec2", [ "x" => "m" ], [], "x", "m", 1 ],
+            "prefix_suffix" => [ [], "sec3", [ "arr" => [ "val", 1 ] ], [ "p_", "_s" ], "p_arr_s", [ "val", 1 ], 1 ],
+            "empty_src"     => [ [ "sec3" => 5 ], "sec3", [], [], "sec3", 5, 5 ],
+            "collision"     => [ [ "x" => "old", "sec2" => 1 ], "sec2", [ "x" => "new" ], [], "x", "new", 1 ],
+        ];
+}
+
+
+    /** @dataProvider providerHas */
+    public function testHas(array $initial, mixed $args, bool $expected) {
         $e = new Errors();
-        $e->add("field-name-error", "err");
-        $this->assertTrue($e->has("field-name"));
+        foreach ($initial as $k => $v) {
+            $e->add($k, $v);
+        }
 
-        // original full key should also be present
-        $this->assertTrue($e->has("field-name-error"));
-        $this->assertFalse($e->has("field"));
-
-        // has() with no arguments should return true when there is at least one error
-        $this->assertTrue($e->has());
-
-        // a fresh Errors object has no errors
-        $empty = new Errors();
-        $this->assertFalse($empty->has());
-
-        // has() accepts an array and returns true if any of the keys exist
-        $this->assertTrue($e->has([ "nope", "field-name" ]));
+        if ($args === null) {
+            $this->assertEquals($expected, $e->has());
+        } else {
+            $this->assertEquals($expected, $e->has($args));
+        }
     }
 
-    public function testKeys() {
-        $e = new Errors();
-        $e->add("a", "v");
-        $e->add("b", "w");
-        $keys = $e->keys();
-        $this->assertContains("a", $keys);
-        $this->assertContains("b", $keys);
-        $this->assertCount(2, $keys);
-
-        // keys after merge with prefix/suffix are reflected
-        $src = new Errors();
-        $src->add("c", "cv", 1);
-        $e->merge($src, "p_", "_s");
-        $this->assertTrue(in_array("p_c_s", $e->keys()));
-
-        // form and global appear in keys
-        $e->form("fromMsg");
-        $e->global("globalMsg");
-        $this->assertTrue(in_array("form", $e->keys()));
-        $this->assertTrue(in_array("global", $e->keys()));
+    public static function providerHas(): array {
+        return [
+            "partial_key_match"  => [ [ "field-name-error" => "err" ], "field-name", true ],
+            "full_key"           => [ [ "field-name-error" => "err" ], "field-name-error", true ],
+            "missing_key"        => [ [ "field-name-error" => "err" ], "field", false ],
+            "has_no_args_true"   => [ [ "field-name-error" => "err" ], null, true ],
+            "empty_errors_false" => [ [], null, false ],
+            "array_any_match"    => [ [ "field-name-error" => "err" ], [ "nope", "field-name" ], true ],
+        ];
     }
 
-    public function testGetTotal() {
+
+    /** @dataProvider providerKeys */
+    public function testKeys(string $method, array $args, string $expectedKey) {
         $e = new Errors();
-        $this->assertEquals(0, $e->getTotal());
+        if ($method === "merge") {
+            $src = new Errors();
+            $src->add("c", "cv");
+            $e->merge($src, ...$args);
+        } else {
+            $e->$method(...$args);
+        }
 
-        $e->add("a", "v");
-        $this->assertEquals(1, $e->getTotal());
-
-        $e->addFor("sec", "err", "m");
-        // addFor adds both the section counter and the error key
-        $this->assertEquals(3, $e->getTotal());
-
-        // merging another Errors increases total by that object's total
-        $other = new Errors();
-        $other->add("x", "xv");
-        $other->addFor("s2", "e2", "m2");
-        $before = $e->getTotal();
-        $e->merge($other);
-        $this->assertEquals($before + $other->getTotal(), $e->getTotal());
+        $this->assertContains($expectedKey, $e->keys());
     }
 
-    public function testJsonSerialize() {
+    public static function providerKeys(): array {
+        return [
+            "add_key"        => [ "add",    [ "a", "v" ], "a" ],
+            "form_key"       => [ "form",   [ "msg" ], "form" ],
+            "global_key"     => [ "global", [ "msg" ], "global" ],
+            "merge_with_fix" => [ "merge",  [ "p_", "_s" ], "p_c_s" ],
+        ];
+    }
+
+
+    /** @dataProvider providerGetTotal */
+    public function testGetTotal(array $actions, int $expectedTotal) {
         $e = new Errors();
-        $e->add("a", "v");
-        $e->add("b", "w");
-        $e->add("arr", "val", 1);
-        $e->form("fromMsg");
-        $e->global("globalMsg");
+        foreach ($actions as $method => $args) {
+            if ($method === "merge") {
+                $other = new Errors();
+                foreach ($args["data"] as $k => $v) { $other->add($k, $v); }
+                $e->merge($other);
+            } elseif ($method === "addFor") {
+                $e->addFor(...$args);
+            } else {
+                $e->add(...$args);
+            }
+        }
+
+        $this->assertEquals($expectedTotal, $e->getTotal());
+    }
+
+    public static function providerGetTotal(): array {
+        return [
+            "empty_initial"  => [ [], 0 ],
+            "single_add"     => [ [ "add" => [ "a", "v" ]], 1 ],
+            "add_for_logic"  => [ [ "addFor" => [ "sec", "err", "m" ]], 2 ],
+            "merge_increase" => [
+                [
+                    "add"   => [ "a", "v" ],
+                    "merge" => [ "data" => [ "x" => "xv", "y" => "yv" ]],
+                ],
+                3,
+            ],
+        ];
+    }
+
+
+
+    /** @dataProvider providerJsonSerialize */
+    public function testJsonSerialize(array $inputs, array $expected) {
+        $e = new Errors();
+
+        foreach ($inputs as $method => $calls) {
+            foreach ($calls as $args) {
+                $e->$method(...$args);
+            }
+        }
 
         $json = json_encode($e);
+
         $this->assertNotFalse($json);
-        $decoded = json_decode($json, true);
+        $this->assertEquals($expected, json_decode($json, true));
+        $this->assertEquals($expected, $e->jsonSerialize());
+    }
 
-        $this->assertIsArray($decoded);
-        $this->assertArrayHasKey("a", $decoded);
-        $this->assertArrayHasKey("b", $decoded);
-        $this->assertArrayHasKey("arr", $decoded);
-        $this->assertArrayHasKey("form", $decoded);
-        $this->assertArrayHasKey("global", $decoded);
-        $this->assertEquals($e->get(), $decoded);
-
-        // empty Errors json encodes to empty array
-        $e2 = new Errors();
-        $this->assertEquals([], $e2->jsonSerialize());
-        $this->assertEquals("[]", json_encode($e2));
+    public static function providerJsonSerialize(): array {
+        return [
+            "empty_errors" => [ [], [] ],
+            "mixed_errors" => [
+                [
+                    "add"    => [ [ "a", "v" ], [ "arr", "val", 1 ]],
+                    "form"   => [ [ "fromMsg" ]],
+                    "global" => [ [ "globalMsg" ]]
+                ],
+                [
+                    "a"      => "v",
+                    "arr"    => [ "val", 1 ],
+                    "form"   => "fromMsg",
+                    "global" => "globalMsg"
+                ],
+            ],
+        ];
     }
 }
