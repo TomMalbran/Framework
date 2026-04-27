@@ -1,221 +1,357 @@
 <?php
 namespace Tests\IO;
 
+use Framework\IO\Errors;
 use Framework\IO\Response;
 use Framework\IO\Search;
-use Framework\IO\Errors;
 use Framework\Utils\JSON;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use JsonSerializable;
 
 class ResponseTest extends TestCase {
 
-    public function testAddTokens() {
-        // with tokens enabled
-        $r1 = Response::empty(true);
-        $r1->addTokens("a-token", "r-token");
-        $a1 = $r1->toArray();
-        $this->assertArrayHasKey("xAccessToken", $a1);
-        $this->assertArrayHasKey("xRefreshToken", $a1);
-        $this->assertSame("a-token", $a1["xAccessToken"]);
-        $this->assertSame("r-token", $a1["xRefreshToken"]);
+    #[DataProvider("providerAddTokens")]
+    public function testAddTokens(bool $withTokens, string $accessToken, string $refreshToken, array $expectedData, array $missingKeys = []) {
+        $response = Response::empty($withTokens);
+        $response->addTokens($accessToken, $refreshToken);
 
-        // empty refresh token should omit refresh field
-        $r2 = Response::empty(true);
-        $r2->addTokens("only-access", "");
-        $a2 = $r2->toArray();
-        $this->assertArrayHasKey("xAccessToken", $a2);
-        $this->assertArrayNotHasKey("xRefreshToken", $a2);
-
-        // withTokens disabled should not add tokens
-        $r3 = Response::empty(false);
-        $r3->addTokens("x","y");
-        $a3 = $r3->toArray();
-        $this->assertArrayNotHasKey("xAccessToken", $a3);
+        $data = $response->toArray();
+        foreach ($expectedData as $key => $value) {
+            $this->assertArrayHasKey($key, $data);
+            $this->assertSame($value, $data[$key]);
+        }
+        foreach ($missingKeys as $key) {
+            $this->assertArrayNotHasKey($key, $data);
+        }
     }
 
-    public function testToArray() {
-        $data = [ "a" => 1, "b" => "v" ];
-        $r = new Response($data, true);
-        $this->assertSame($data, $r->toArray());
+    public static function providerAddTokens() {
+        return [
+            "access_and_refresh" => [
+                true,
+                "a-token",
+                "r-token",
+                [
+                    "xAccessToken"  => "a-token",
+                    "xRefreshToken" => "r-token",
+                ],
+            ],
+            "access_only" => [
+                true,
+                "only-access",
+                "",
+                [
+                    "xAccessToken" => "only-access",
+                ],
+                [ "xRefreshToken" ],
+            ],
+            "tokens_disabled" => [
+                false,
+                "x",
+                "y",
+                [],
+                [ "xAccessToken", "xRefreshToken" ],
+            ],
+        ];
     }
 
-    public function testPrintData() {
+
+    #[DataProvider("providerToArray")]
+    public function testToArray(array $data, bool $withTokens) {
+        $response = new Response($data, $withTokens);
+        $this->assertSame($data, $response->toArray());
+    }
+
+    public static function providerToArray() {
+        return [
+            "basic" => [ [ "a" => 1, "b" => "v" ], true ],
+            "empty" => [ [], false ],
+        ];
+    }
+
+
+    #[DataProvider("providerPrintData")]
+    public function testPrintData(Response $response, string $expectedOutput) {
+        ob_start();
+        $response->printData();
+        $output = ob_get_clean();
+
+        $this->assertSame($expectedOutput, $output);
+    }
+
+    public static function providerPrintData() {
         $payload = [ "k" => "v", "n" => 3 ];
-        $r1 = Response::data($payload);
-        $expected = JSON::encode($payload, asPretty: true);
-        ob_start();
-        $r1->printData();
-        $o1 = ob_get_clean();
-        $this->assertSame($expected, $o1);
 
-        // should print empty JSON object if data is empty
-        $r2 = Response::data([]);
-        ob_start();
-        $r2->printData();
-        $o2 = ob_get_clean();
-        $this->assertSame("[]", $o2);
-
-        // should print nothing if "data" key is missing
-        $r3 = Response::result([ "x" => 1 ]);
-        ob_start();
-        $r3->printData();
-        $o3 = ob_get_clean();
-        $this->assertSame("", $o3);
+        return [
+            "payload" => [
+                Response::data($payload),
+                JSON::encode($payload, asPretty: true),
+            ],
+            "empty_data" => [
+                Response::data([]),
+                "[]",
+            ],
+            "missing_data_key" => [
+                Response::result([ "x" => 1 ]),
+                "",
+            ],
+        ];
     }
 
-    public function testEmpty() {
-        // default empty response
-        $e = Response::empty();
-        $this->assertSame([], $e->toArray());
 
-        // with tokens enabled the empty response should accept tokens
-        $e2 = Response::empty(true);
-        $e2->addTokens("a", "b");
-        $a = $e2->toArray();
-        $this->assertArrayHasKey("xAccessToken", $a);
+    #[DataProvider("providerEmpty")]
+    public function testEmpty(bool $withTokens, ?array $tokens, array $expectedData) {
+        $response = Response::empty($withTokens);
+        if ($tokens !== null) {
+            $response->addTokens($tokens[0], $tokens[1]);
+        }
+
+        $this->assertSame($expectedData, $response->toArray());
     }
 
-    public function testExit() {
-        // exit: result should be present and tokens disabled
-        $r1 = Response::exit(7);
-        $a1 = $r1->toArray();
-        $this->assertArrayHasKey("result", $a1);
-        $this->assertSame(7, $a1["result"]);
-        $r1->addTokens("a","b");
-        $this->assertArrayNotHasKey("xAccessToken", $r1->toArray());
-
-        // exit with different code
-        $r2 = Response::exit(0);
-        $a2 = $r2->toArray();
-        $this->assertArrayHasKey("result", $a2);
-        $this->assertSame(0, $a2["result"]);
+    public static function providerEmpty() {
+        return [
+            "default" => [ true, null, [] ],
+            "with_tokens" => [
+                true,
+                [ "a", "b" ],
+                [
+                    "xAccessToken"  => "a",
+                    "xRefreshToken" => "b",
+                ],
+            ],
+            "tokens_disabled" => [ false, [ "a", "b" ], [] ],
+        ];
     }
 
-    public function testResult() {
-        // result helper wraps provided array as top-level data
-        $r1 = Response::result([ "res" => 1 ]);
-        $this->assertSame([ "res" => 1 ], $r1->toArray());
 
-        // empty result preserved
-        $r2 = Response::result([]);
-        $this->assertSame([], $r2->toArray());
+    #[DataProvider("providerExit")]
+    public function testExit(int $exitCode) {
+        $response = Response::exit($exitCode);
+
+        $this->assertSame([ "result" => $exitCode ], $response->toArray());
+
+        $response->addTokens("a", "b");
+        $this->assertSame([ "result" => $exitCode ], $response->toArray());
     }
 
-    public function testData() {
-        // data creates a "data" key with provided payload
-        $r1 = Response::data([ "x" => 2 ]);
-        $this->assertArrayHasKey("data", $r1->toArray());
-        $this->assertSame([ "x" => 2 ], $r1->toArray()["data"]);
-
-        // data with empty payload should still create "data" key
-        $r2 = Response::data([]);
-        $a2 = $r2->toArray();
-        $this->assertArrayHasKey("data", $a2);
-
-        // data should allow a JSON-serializable object as payload
-        $s = new Search(1, "T", null);
-        $r3 = Response::data($s);
-        $a3 = $r3->toArray();
-        $this->assertArrayHasKey("data", $a3);
-        $this->assertInstanceOf(Search::class, $a3["data"]);
+    public static function providerExit() {
+        return [
+            "non_zero" => [ 7 ],
+            "zero"     => [ 0 ],
+        ];
     }
 
-    public function testSearch() {
-        $s1 = new Search(1, "T", null);
-        $r1 = Response::search([ $s1 ]);
-        $this->assertArrayHasKey("data", $r1->toArray());
-        $this->assertInstanceOf(Search::class, $r1->toArray()["data"][0]);
 
-        // empty search list should produce empty data array
-        $r2 = Response::search([]);
-        $this->assertArrayHasKey("data", $r2->toArray());
-        $this->assertSame([], $r2->toArray()["data"]);
+    #[DataProvider("providerResult")]
+    public function testResult(array $result) {
+        $this->assertSame($result, Response::result($result)->toArray());
     }
 
-    public function testInvalid() {
-        $r = Response::invalid();
-        $this->assertArrayHasKey("data", $r->toArray());
-        $this->assertSame([ "error" => true ], $r->toArray()["data"]);
+    public static function providerResult() {
+        return [
+            "filled" => [ [ "res" => 1 ] ],
+            "empty"  => [ [] ],
+        ];
     }
 
-    public function testLogout() {
-        $r = Response::logout();
-        $this->assertArrayHasKey("userLoggedOut", $r->toArray());
-        $this->assertTrue($r->toArray()["userLoggedOut"]);
+
+    #[DataProvider("providerData")]
+    public function testData(JsonSerializable|array $payload, mixed $expectedData, ?string $expectedClass = null) {
+        $data = Response::data($payload)->toArray();
+
+        $this->assertArrayHasKey("data", $data);
+        $this->assertSame($expectedData, $data["data"]);
+        if ($expectedClass !== null) {
+            $this->assertInstanceOf($expectedClass, $data["data"]);
+        }
     }
 
-    public function testSuccess() {
-        // success with null data and default param
-        $r1 = Response::success("ok");
-        $a1 = $r1->toArray();
-        $this->assertArrayHasKey("success", $a1);
-        $this->assertSame("ok", $a1["success"]);
-        $this->assertArrayHasKey("param", $a1);
-        $this->assertSame("", $a1["param"]);
-        $this->assertArrayHasKey("data", $a1);
-        $this->assertNull($a1["data"]);
+    public static function providerData() {
+        $search = new Search(1, "T", null);
 
-        // success with data and param
-        $r2 = Response::success("done", [ "x" => 1 ], "p");
-        $a2 = $r2->toArray();
-        $this->assertSame("p", $a2["param"]);
-        $this->assertSame([ "x" => 1 ], $a2["data"]);
+        return [
+            "array_payload" => [
+                [ "x" => 2 ],
+                [ "x" => 2 ],
+            ],
+            "empty_array" => [
+                [],
+                [],
+            ],
+            "json_serializable" => [
+                $search,
+                $search,
+                Search::class,
+            ],
+        ];
     }
 
-    public function testWarning() {
-        // warning with default param and null data
-        $r1 = Response::warning("be careful");
-        $a1 = $r1->toArray();
-        $this->assertArrayHasKey("warning", $a1);
-        $this->assertSame("be careful", $a1["warning"]);
-        $this->assertArrayHasKey("param", $a1);
-        $this->assertSame("", $a1["param"]);
-        $this->assertArrayHasKey("data", $a1);
-        $this->assertNull($a1["data"]);
 
-        // warning mirrors same shape
-        $r2 = Response::warning("warn", null, "pp");
-        $a2 = $r2->toArray();
-        $this->assertArrayHasKey("warning", $a2);
-        $this->assertSame("warn", $a2["warning"]);
-        $this->assertSame("pp", $a2["param"]);
+    #[DataProvider("providerSearch")]
+    public function testSearch(array $searches, array $expectedData, ?string $expectedClass = null) {
+        $data = Response::search($searches)->toArray();
+
+        $this->assertArrayHasKey("data", $data);
+        $this->assertSame($expectedData, $data["data"]);
+        if ($expectedClass !== null && $data["data"] !== []) {
+            $this->assertInstanceOf($expectedClass, $data["data"][0]);
+        }
     }
 
-    public function testError() {
-        // string error
-        $r1 = Response::error("oops", null, "p1");
-        $a1 = $r1->toArray();
-        $this->assertArrayHasKey("error", $a1);
-        $this->assertSame("oops", $a1["error"]);
-        $this->assertArrayHasKey("params", $a1);
-        $this->assertSame([ "p1" ], $a1["params"]);
+    public static function providerSearch() {
+        $search = new Search(1, "T", null);
 
-        // with multiple params
-        $r2 = Response::error("error", null, [ "pA", "pB" ]);
-        $a2 = $r2->toArray();
-        $this->assertArrayHasKey("error", $a2);
-        $this->assertSame("error", $a2["error"]);
-        $this->assertArrayHasKey("params", $a2);
-        $this->assertSame([ "pA", "pB" ], $a2["params"]);
+        return [
+            "single" => [ [ $search ], [ $search ], Search::class ],
+            "empty"  => [ [], [] ],
+        ];
+    }
 
-        // Errors instance with global
-        $e3 = new Errors();
-        $e3->global("global-msg");
-        $r3 = Response::error($e3, [ "dd" => 1 ], [ "pA", "pB" ]);
-        $a3 = $r3->toArray();
-        $this->assertArrayHasKey("error", $a3);
-        $this->assertSame("global-msg", $a3["error"]);
-        $this->assertSame("pA", $a3["param"]);
-        $this->assertSame([ "pA", "pB" ], $a3["params"]);
-        $this->assertSame([ "dd" => 1 ], $a3["data"]);
 
-        // Errors instance without global should produce "errors" key
-        $e4 = new Errors();
-        $e4->add("f", "m");
-        $r4 = Response::error($e4);
-        $a4 = $r4->toArray();
-        $this->assertArrayHasKey("errors", $a4);
-        $this->assertIsArray($a4["errors"]);
+    #[DataProvider("providerInvalid")]
+    public function testInvalid(array $expectedData) {
+        $this->assertSame($expectedData, Response::invalid()->toArray());
+    }
+
+    public static function providerInvalid() {
+        return [
+            "invalid" => [ [ "data" => [ "error" => true ] ] ],
+        ];
+    }
+
+
+    #[DataProvider("providerLogout")]
+    public function testLogout(array $expectedData) {
+        $this->assertSame($expectedData, Response::logout()->toArray());
+    }
+
+    public static function providerLogout() {
+        return [
+            "logout" => [ [ "userLoggedOut" => true ] ],
+        ];
+    }
+
+
+    #[DataProvider("providerSuccess")]
+    public function testSuccess(string $message, JsonSerializable|array|null $data, string $param, array $expectedData) {
+        $this->assertSame($expectedData, Response::success($message, $data, $param)->toArray());
+    }
+
+    public static function providerSuccess() {
+        return [
+            "default_param_and_null_data" => [
+                "ok",
+                null,
+                "",
+                [
+                    "success" => "ok",
+                    "param"   => "",
+                    "data"    => null,
+                ],
+            ],
+            "with_data_and_param" => [
+                "done",
+                [ "x" => 1 ],
+                "p",
+                [
+                    "success" => "done",
+                    "param"   => "p",
+                    "data"    => [ "x" => 1 ],
+                ],
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerWarning")]
+    public function testWarning(string $message, JsonSerializable|array|null $data, string $param, array $expectedData) {
+        $this->assertSame($expectedData, Response::warning($message, $data, $param)->toArray());
+    }
+
+    public static function providerWarning() {
+        return [
+            "default_param_and_null_data" => [
+                "be careful",
+                null,
+                "",
+                [
+                    "warning" => "be careful",
+                    "param"   => "",
+                    "data"    => null,
+                ],
+            ],
+            "with_param" => [
+                "warn",
+                null,
+                "pp",
+                [
+                    "warning" => "warn",
+                    "param"   => "pp",
+                    "data"    => null,
+                ],
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerError")]
+    public function testError(Errors|string $error, JsonSerializable|array|null $data, array|string $param, array $expectedData) {
+        $this->assertSame($expectedData, Response::error($error, $data, $param)->toArray());
+    }
+
+    public static function providerError() {
+        $errorsWithGlobal = new Errors();
+        $errorsWithGlobal->global("global-msg");
+
+        $errorsWithoutGlobal = new Errors();
+        $errorsWithoutGlobal->add("f", "m");
+
+        return [
+            "string_error_single_param" => [
+                "oops",
+                null,
+                "p1",
+                [
+                    "error"  => "oops",
+                    "param"  => "p1",
+                    "params" => [ "p1" ],
+                    "data"   => null,
+                ],
+            ],
+            "string_error_multiple_params" => [
+                "error",
+                null,
+                [ "pA", "pB" ],
+                [
+                    "error"  => "error",
+                    "param"  => "pA",
+                    "params" => [ "pA", "pB" ],
+                    "data"   => null,
+                ],
+            ],
+            "errors_with_global" => [
+                $errorsWithGlobal,
+                [ "dd" => 1 ],
+                [ "pA", "pB" ],
+                [
+                    "error"  => "global-msg",
+                    "param"  => "pA",
+                    "params" => [ "pA", "pB" ],
+                    "data"   => [ "dd" => 1 ],
+                ],
+            ],
+            "errors_without_global" => [
+                $errorsWithoutGlobal,
+                null,
+                "",
+                [
+                    "errors" => [ "f" => "m" ],
+                    "data"   => null,
+                ],
+            ],
+        ];
     }
 }
