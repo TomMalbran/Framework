@@ -218,15 +218,19 @@ class Errors implements JsonSerializable {
 
     /**
      * Returns true if there are errors or if the given error exists
-     * @param list<string>|string|null $error Optional.
+     * @param Enum|list<string>|string|null $error Optional.
      * @return bool
      */
-    public function has(array|string|null $error = null): bool {
+    public function has(Enum|array|string|null $error = null): bool {
         if ($error === null) {
             return count($this->errors) > 0;
         }
 
+        if ($error instanceof Enum) {
+            $error = $error->toString();
+        }
         $errors = Arrays::toStrings($error);
+
         foreach ($errors as $errorKey) {
             if (Strings::contains($errorKey, "-")) {
                 foreach (array_keys($this->errors) as $key) {

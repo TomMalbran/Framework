@@ -301,6 +301,7 @@ class ErrorsTest extends TestCase {
             "has_no_args_true"   => [ [ "field-name-error" => "err" ], null, true ],
             "empty_errors_false" => [ [], null, false ],
             "array_any_match"    => [ [ "field-name-error" => "err" ], [ "nope", "field-name" ], true ],
+            "enum_key"           => [ [ TestErrorEnum::Error->toString() => "err" ], TestErrorEnum::Error, true ],
         ];
     }
 
