@@ -6,6 +6,7 @@ use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 enum TestErrorEnum implements Enum {
     use IsEnum;
@@ -17,7 +18,7 @@ enum TestErrorEnum implements Enum {
 
 class ErrorsTest extends TestCase {
 
-    /** @dataProvider providerConstruct */
+    #[DataProvider("providerConstruct")]
     public function testConstruct(mixed $input, mixed $checkKey, int $expectedTotal) {
         $e = new Errors($input);
         if ($input === null && $checkKey === null) {
@@ -37,7 +38,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMagicSetAndGet */
+    #[DataProvider("providerMagicSetAndGet")]
     public function testMagicSetAndGet(string $key, string $value, string $expected, bool $exists = true) {
         $e = new Errors();
         $e->{$key} = $value;
@@ -55,7 +56,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIncCount */
+    #[DataProvider("providerIncCount")]
     public function testIncCount(string $key, int $amount, int $expectedAfterFirst, int $expectedAfterSecond, string $newKey, int $expectedNew) {
         $e = new Errors();
         $e->incCount($key, $amount);
@@ -78,7 +79,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerForm */
+    #[DataProvider("providerForm")]
     public function testForm(string $initialMsg, string $newMsg, string $otherKey, string $otherValue) {
         $e = new Errors();
         $e->form($initialMsg);
@@ -104,7 +105,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGlobal */
+    #[DataProvider("providerGlobal")]
     public function testGlobal(string $initial, string $new) {
         $e = new Errors();
         $e->global($initial);
@@ -128,7 +129,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAdd */
+    #[DataProvider("providerAdd")]
     public function testAdd(string $key, mixed $args, mixed $expected, bool $shouldExist) {
         $e = new Errors();
         $e->add($key, ...$args);
@@ -149,7 +150,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAddIf */
+    #[DataProvider("providerAddIf")]
     public function testAddIf(bool $condition, string $key, string $message, bool $shouldExist) {
         $e = new Errors();
         $e->addIf($condition, $key, $message);
@@ -170,7 +171,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAddFor */
+    #[DataProvider("providerAddFor")]
     public function testAddFor(Enum|string $section, Enum|string $error, mixed $message, array $values, bool $expectedHasError, mixed $expectedErrorValue, bool $expectedHasSection, mixed $expectedSectionValue) {
         $e = new Errors();
         $e->addFor($section, $error, $message, ...$values);
@@ -198,7 +199,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMerge */
+    #[DataProvider("providerMerge")]
     public function testMerge(array $baseErrors, array $incomingErrors, string $prefix, string $suffix, array $expectedHasKeys, array $expectedValues) {
         $a = new Errors();
         foreach ($baseErrors as $key => $value) {
@@ -250,7 +251,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMergeFor */
+    #[DataProvider("providerMergeFor")]
     public function testMergeFor(array $initial, string $sec, array $new, array $fix, mixed $expectedKey, mixed $expectedVal, int $expectedCount) {
         $e = new Errors();
         foreach ($initial as $k => $v) {
@@ -278,7 +279,7 @@ class ErrorsTest extends TestCase {
 }
 
 
-    /** @dataProvider providerHas */
+    #[DataProvider("providerHas")]
     public function testHas(array $initial, mixed $args, bool $expected) {
         $e = new Errors();
         foreach ($initial as $k => $v) {
@@ -304,7 +305,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerKeys */
+    #[DataProvider("providerKeys")]
     public function testKeys(string $method, array $args, string $expectedKey) {
         $e = new Errors();
         if ($method === "merge") {
@@ -328,7 +329,7 @@ class ErrorsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetTotal */
+    #[DataProvider("providerGetTotal")]
     public function testGetTotal(array $actions, int $expectedTotal) {
         $e = new Errors();
         foreach ($actions as $method => $args) {
@@ -363,7 +364,7 @@ class ErrorsTest extends TestCase {
 
 
 
-    /** @dataProvider providerJsonSerialize */
+    #[DataProvider("providerJsonSerialize")]
     public function testJsonSerialize(array $inputs, array $expected) {
         $e = new Errors();
 

@@ -7,6 +7,7 @@ use Framework\Date\Date;
 use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 enum TestDictionaryEnum implements Enum {
@@ -19,7 +20,7 @@ enum TestDictionaryEnum implements Enum {
 
 class DictionaryTest extends TestCase {
 
-    /** @dataProvider providerConstruct */
+    #[DataProvider("providerConstruct")]
     public function testConstruct(mixed $input, int|string $expectedKey, mixed $expectedValue, bool $shouldBeEmpty) {
         $d = new Dictionary($input);
 
@@ -51,7 +52,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsEmpty */
+    #[DataProvider("providerIsEmpty")]
     public function testIsEmpty(mixed $input, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->isEmpty());
@@ -65,7 +66,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsNotEmpty */
+    #[DataProvider("providerIsNotEmpty")]
     public function testIsNotEmpty(mixed $input, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->isNotEmpty());
@@ -79,7 +80,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetTotal */
+    #[DataProvider("providerGetTotal")]
     public function testGetTotal(mixed $input, int $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getTotal());
@@ -95,7 +96,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsEqual */
+    #[DataProvider("providerIsEqual")]
     public function testIsEqual(mixed $input1, mixed $input2, bool $expected) {
         $d1 = new Dictionary($input1);
         $d2 = new Dictionary($input2);
@@ -111,7 +112,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsNotEqual */
+    #[DataProvider("providerIsNotEqual")]
     public function testIsNotEqual(mixed $input1, mixed $input2, bool $expected) {
         $d1 = new Dictionary($input1);
         $d2 = new Dictionary($input2);
@@ -127,7 +128,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsList */
+    #[DataProvider("providerIsList")]
     public function testIsList(mixed $input, string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->isList($key));
@@ -143,7 +144,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsArrayList */
+    #[DataProvider("providerIsArrayList")]
     public function testIsArrayList(mixed $input, string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->isArrayList($key));
@@ -159,7 +160,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHas */
+    #[DataProvider("providerHas")]
     public function testHas(mixed $input, Enum|int|string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->has($key));
@@ -180,7 +181,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHasValue */
+    #[DataProvider("providerHasValue")]
     public function testHasValue(mixed $input, Enum|int|string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->hasValue($key));
@@ -206,7 +207,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerContains */
+    #[DataProvider("providerContains")]
     public function testContains(mixed $input, int|string|null $key, mixed $value, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->contains($value, $key));
@@ -226,7 +227,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerContainsInt */
+    #[DataProvider("providerContainsInt")]
     public function testContainsInt(mixed $input, int $value, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->containsInt($value));
@@ -243,7 +244,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMerge */
+    #[DataProvider("providerMerge")]
     public function testMerge(mixed $input1, mixed $input2, int|string $checkKey, mixed $expectedValue, int $expectedTotal) {
         $d1 = new Dictionary($input1);
         $d2 = new Dictionary($input2);
@@ -262,7 +263,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerPush */
+    #[DataProvider("providerPush")]
     public function testPush(mixed $input, mixed $pushValue, array $expectedList, bool $shouldBeListed) {
         $d = new Dictionary($input);
         $d->push($pushValue);
@@ -287,7 +288,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSet */
+    #[DataProvider("providerSet")]
     public function testSet(mixed $input, Enum|int|string $key, mixed $value) {
         $d = new Dictionary($input);
         $d->set($key, $value);
@@ -303,7 +304,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSetString */
+    #[DataProvider("providerSetString")]
     public function testSetString(Enum|int|string $key, string $value) {
         $d = new Dictionary();
         $d->setString($key, $value);
@@ -319,7 +320,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSetInt */
+    #[DataProvider("providerSetInt")]
     public function testSetInt(Enum|int|string $key, int $value) {
         $d = new Dictionary();
         $d->setInt($key, $value);
@@ -335,7 +336,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSetEnum */
+    #[DataProvider("providerSetEnum")]
     public function testSetEnum(Enum|int|string $key, Enum $value) {
         $d = new Dictionary();
         $d->setEnum($key, $value);
@@ -351,7 +352,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRemove */
+    #[DataProvider("providerRemove")]
     public function testRemove(mixed $input, Enum|int|string $key, bool $shouldExist, int $expectedTotal) {
         $d = new Dictionary($input);
         $d->remove($key);
@@ -369,7 +370,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGet */
+    #[DataProvider("providerGet")]
     public function testGet(mixed $input, Enum|int|string $key, mixed $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->get($key));
@@ -388,7 +389,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetBool */
+    #[DataProvider("providerGetBool")]
     public function testGetBool(mixed $input, Enum|int|string $key, bool $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getBool($key));
@@ -411,7 +412,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetInt */
+    #[DataProvider("providerGetInt")]
     public function testGetInt(mixed $input, Enum|int|string $key, int $decimals, int $default, int $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getInt($key, $decimals, $default));
@@ -432,7 +433,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetFloat */
+    #[DataProvider("providerGetFloat")]
     public function testGetFloat(mixed $input, Enum|int|string $key, float $default, float $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getFloat($key, $default));
@@ -451,7 +452,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetPrice */
+    #[DataProvider("providerGetPrice")]
     public function testGetPrice(mixed $input, Enum|int|string $key, float $default, float $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getPrice($key, $default));
@@ -471,7 +472,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetString */
+    #[DataProvider("providerGetString")]
     public function testGetString(mixed $input, Enum|int|string $key, string $default, string $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getString($key, $default));
@@ -490,7 +491,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDate */
+    #[DataProvider("providerGetDate")]
     public function testGetDate(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, int|null $expectedNumber) {
         $d = new Dictionary($input);
         $date = $d->getDate($key);
@@ -521,7 +522,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDateParsed */
+    #[DataProvider("providerGetDateParsed")]
     public function testGetDateParsed(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, int|null $expectedNumber) {
         $d = new Dictionary($input);
         $date = $d->getDateParsed($key);
@@ -547,7 +548,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetKeys */
+    #[DataProvider("providerGetKeys")]
     public function testGetKeys(mixed $input, array $expectedKeys) {
         $d = new Dictionary($input);
         $keys = $d->getKeys();
@@ -575,7 +576,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDict */
+    #[DataProvider("providerGetDict")]
     public function testGetDict(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $result = $d->getDict($key);
@@ -602,7 +603,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFindDict */
+    #[DataProvider("providerFindDict")]
     public function testFindDict(mixed $input, Enum|int|string $key, mixed $searchValue, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $found = $d->findDict($key, $searchValue);
@@ -626,7 +627,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetList */
+    #[DataProvider("providerGetList")]
     public function testGetList(mixed $input, Enum|int|string $key, array $expectedList, bool $shouldBeEmpty, mixed $expectedId) {
         $d = new Dictionary($input);
         $list = $d->getList($key);
@@ -662,7 +663,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetFirst */
+    #[DataProvider("providerGetFirst")]
     public function testGetFirst(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $result = $d->getFirst($key);
@@ -685,7 +686,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetLast */
+    #[DataProvider("providerGetLast")]
     public function testGetLast(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $result = $d->getLast($key);
@@ -708,7 +709,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetInts */
+    #[DataProvider("providerGetInts")]
     public function testGetInts(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getInts($key));
@@ -726,7 +727,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetStrings */
+    #[DataProvider("providerGetStrings")]
     public function testGetStrings(mixed $input, Enum|int|string $key, bool $skipEmpty, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getStrings($key, $skipEmpty));
@@ -745,7 +746,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetArray */
+    #[DataProvider("providerGetArray")]
     public function testGetArray(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getArray($key));
@@ -763,7 +764,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetJSON */
+    #[DataProvider("providerGetJSON")]
     public function testGetJSON(mixed $input, Enum|int|string $key, string $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->getJSON($key));
@@ -781,7 +782,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeAsArray */
+    #[DataProvider("providerDecodeAsArray")]
     public function testDecodeAsArray(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->decodeAsArray($key));
@@ -799,7 +800,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeAsStrings */
+    #[DataProvider("providerDecodeAsStrings")]
     public function testDecodeAsStrings(mixed $input, Enum|int|string $key, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->decodeAsStrings($key));
@@ -818,7 +819,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerCreateMap */
+    #[DataProvider("providerCreateMap")]
     public function testCreateMap(mixed $input, Enum|int|string $key, array $expectedKeys, array $unexpectedKeys) {
         $d = new Dictionary($input);
         $map = $d->createMap($key);
@@ -843,7 +844,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToArray */
+    #[DataProvider("providerToArray")]
     public function testToArray(mixed $input, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toArray());
@@ -858,7 +859,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToList */
+    #[DataProvider("providerToList")]
     public function testToList(mixed $input, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toList());
@@ -874,7 +875,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToStringsMap */
+    #[DataProvider("providerToStringsMap")]
     public function testToStringsMap(mixed $input, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toStringsMap());
@@ -889,7 +890,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToIntStringMap */
+    #[DataProvider("providerToIntStringMap")]
     public function testToIntStringMap(mixed $input, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toIntStringMap());
@@ -903,7 +904,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToStringIntMap */
+    #[DataProvider("providerToStringIntMap")]
     public function testToStringIntMap(mixed $input, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toStringIntMap());
@@ -917,7 +918,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToStringMixedMap */
+    #[DataProvider("providerToStringMixedMap")]
     public function testToStringMixedMap(mixed $input, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toStringMixedMap());
@@ -932,7 +933,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToStrings */
+    #[DataProvider("providerToStrings")]
     public function testToStrings(mixed $input, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toStrings());
@@ -947,7 +948,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToInts */
+    #[DataProvider("providerToInts")]
     public function testToInts(mixed $input, bool $withoutEmpty, array $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->toInts($withoutEmpty));
@@ -964,7 +965,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToJSON */
+    #[DataProvider("providerToJSON")]
     public function testToJSON(mixed $input, array $expectedKeys, bool $shouldBeEmpty) {
         $d       = new Dictionary($input);
         $json    = $d->toJSON();
@@ -990,7 +991,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerCount */
+    #[DataProvider("providerCount")]
     public function testCount(mixed $input, int $expected) {
         $d = new Dictionary($input);
         $this->assertEquals($expected, $d->count());
@@ -1006,7 +1007,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIterator */
+    #[DataProvider("providerIterator")]
     public function testIterator(mixed $input, array $expectedKeys, int $expectedCount) {
         $d = new Dictionary($input);
         $collected = [];
@@ -1028,7 +1029,7 @@ class DictionaryTest extends TestCase {
     }
 
 
-    /** @dataProvider providerJsonSerialize */
+    #[DataProvider("providerJsonSerialize")]
     public function testJsonSerialize(mixed $input, array $expectedKeys, bool $shouldBeEmpty, mixed $expectedValue) {
         $d = new Dictionary($input);
         $serialized = $d->jsonSerialize();

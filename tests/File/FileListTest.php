@@ -5,6 +5,7 @@ use Framework\File\FileList;
 use Framework\File\Type\FileItem;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FileListTest extends TestCase {
 
@@ -31,7 +32,7 @@ class FileListTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAdd */
+    #[DataProvider("providerAdd")]
     public function testAdd(
         string $name,
         string $path,
@@ -124,7 +125,7 @@ class FileListTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAddBack */
+    #[DataProvider("providerAddBack")]
     public function testAddBack(string $path, array $expected): void {
         $list = new FileList();
 
@@ -174,7 +175,7 @@ class FileListTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGet */
+    #[DataProvider("providerGet")]
     public function testGet(array $operations, array $expectedNames): void {
         $list = new FileList();
 
@@ -241,7 +242,7 @@ class FileListTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetSorted */
+    #[DataProvider("providerGetSorted")]
     public function testGetSorted(
         array $operations,
         array $expectedNames,

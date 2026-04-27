@@ -4,10 +4,11 @@ namespace Tests\Utils;
 use Framework\Utils\AES;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AESTest extends TestCase {
 
-    /** @dataProvider providerToUtf8Bytes */
+    #[DataProvider("providerToUtf8Bytes")]
     public function testToUtf8Bytes(string $input, array $expected) {
         $this->assertSame($expected, AES::toUtf8Bytes($input));
     }
@@ -22,7 +23,7 @@ class AESTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToHexBytes */
+    #[DataProvider("providerToHexBytes")]
     public function testToHexBytes(string $input, array $expected) {
         $this->assertSame($expected, AES::toHexBytes($input));
     }
@@ -39,7 +40,7 @@ class AESTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFromBytes */
+    #[DataProvider("providerFromBytes")]
     public function testFromBytes(array $input, string $expected) {
         $this->assertSame($expected, AES::fromBytes($input));
     }

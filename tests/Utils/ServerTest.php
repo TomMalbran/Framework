@@ -4,6 +4,7 @@ namespace Tests\Utils;
 use Framework\Utils\Server;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ServerTest extends TestCase {
 
@@ -21,7 +22,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHas */
+    #[DataProvider("providerHas")]
     public function testHas(string $key, bool $expected) {
         $_SERVER["SOME_KEY"] = "value";
         $this->assertEquals($expected, Server::has($key));
@@ -35,7 +36,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetString */
+    #[DataProvider("providerGetString")]
     public function testGetString(string $key, string $expected) {
         $_SERVER["SOME_KEY"] = "value";
         $this->assertEquals($expected, Server::getString($key));
@@ -49,7 +50,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsPostRequest */
+    #[DataProvider("providerIsPostRequest")]
     public function testIsPostRequest(string $method, bool $expected) {
         $_SERVER["REQUEST_METHOD"] = $method;
         $this->assertEquals($expected, Server::isPostRequest());
@@ -64,7 +65,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetAuthToken */
+    #[DataProvider("providerGetAuthToken")]
     public function testGetAuthToken(array $serverVars, ?array $headers, string $expected) {
         $_SERVER = $serverVars;
         if ($headers !== null) {
@@ -83,7 +84,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetPayload */
+    #[DataProvider("providerGetPayload")]
     public function testGetPayload(array $request, ?string $input, array $expected) {
         $_REQUEST = $request;
         if ($input !== null) {
@@ -104,7 +105,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsLocalHost */
+    #[DataProvider("providerIsLocalHost")]
     public function testIsLocalHost(?string $remoteAddr, ?array $allowedIps, bool $expected) {
         if ($remoteAddr !== null) {
             $_SERVER["REMOTE_ADDR"] = $remoteAddr;
@@ -127,7 +128,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHostStartsWith */
+    #[DataProvider("providerHostStartsWith")]
     public function testHostStartsWith(string $host, string $prefix, bool $expected) {
         if ($host !== "") {
             $_SERVER["HTTP_HOST"] = $host;
@@ -144,7 +145,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetUrlAndFullUrl */
+    #[DataProvider("providerGetUrlAndFullUrl")]
     public function testGetUrlAndFullUrl(array $serverVars, bool $useForwarded, string $expectedUrl, string $expectedFullUrl) {
         $_SERVER = $serverVars;
         $this->assertEquals($expectedUrl, Server::getUrl($useForwarded));
@@ -170,7 +171,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetIP */
+    #[DataProvider("providerGetIP")]
     public function testGetIP(array $serverVars, ?array $envVars, string $expected) {
         $_SERVER = $serverVars;
         if ($envVars !== null) {
@@ -198,7 +199,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetUserAgent */
+    #[DataProvider("providerGetUserAgent")]
     public function testGetUserAgent(?string $userAgent, string $expected) {
         if ($userAgent !== null) {
             $_SERVER["HTTP_USER_AGENT"] = $userAgent;
@@ -214,7 +215,7 @@ class ServerTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetPlatform */
+    #[DataProvider("providerGetPlatform")]
     public function testGetPlatform(string $ua, string $expected) {
         $this->assertEquals($expected, Server::getPlatform($ua));
     }

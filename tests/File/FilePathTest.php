@@ -9,6 +9,7 @@ use Framework\System\Config;
 use Tests\ReflectionHelpers;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FilePathTest extends TestCase {
     use ReflectionHelpers;
@@ -34,7 +35,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRegister */
+    #[DataProvider("providerRegister")]
     public function testRegister(string $input, bool $expected) {
         FilePath::register($input);
         $paths = $this->getPrivateStaticProperty(FilePath::class, "paths");
@@ -54,7 +55,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRegisterDirectory */
+    #[DataProvider("providerRegisterDirectory")]
     public function testRegisterDirectory(string $input, bool $expected) {
         FilePath::registerDirectory($input);
         $directories = $this->getPrivateStaticProperty(FilePath::class, "directories");
@@ -74,7 +75,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetBasePath */
+    #[DataProvider("providerGetBasePath")]
     public function testGetBasePath(bool $forFramework, bool $forBackend, bool $forPrivate, string $ip, string $expected) {
         $_SERVER["REMOTE_ADDR"] = $ip;
         $basePath = FilePath::getBasePath($forFramework, $forBackend, $forPrivate);
@@ -92,7 +93,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetPath */
+    #[DataProvider("providerGetPath")]
     public function testGetPath(array $pathParts, string $expectedEnd) {
         $path     = FilePath::getPath(...$pathParts);
         $expected = Application::getIndexPath() . "/" . Config::getFileDir() .  $expectedEnd;
@@ -109,7 +110,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetPrivatePath */
+    #[DataProvider("providerGetPrivatePath")]
     public function testPrivatePath(array $pathParts, string $expectedEnd) {
         $path     = FilePath::getPrivatePath(...$pathParts);
         $expected = FilePath::getBasePath(forPrivate: true) . $expectedEnd;
@@ -126,7 +127,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetFTPPath */
+    #[DataProvider("providerGetFTPPath")]
     public function testFTPPath(array $pathParts, string $expectedEnd) {
         $path     = FilePath::getFTPPath(...$pathParts);
         $expected = FilePath::getBasePath(forPrivate: true) . "/" . Config::getFileFtp() . $expectedEnd;
@@ -143,7 +144,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDir */
+    #[DataProvider("providerGetDir")]
     public function testGetDir(array $pathParts, string $expectedEnd) {
         $path     = FilePath::getDir(...$pathParts);
         $expected = Config::getFileDir() . $expectedEnd;
@@ -160,7 +161,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetInternalDir */
+    #[DataProvider("providerGetInternalDir")]
     public function testGetInternalDir(array $pathParts, string $expectedEnd) {
         $path     = FilePath::getInternalDir(...$pathParts);
         $expected = Application::getBaseDir() . "/" . Config::getFileDir() . $expectedEnd;
@@ -177,7 +178,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetUrl */
+    #[DataProvider("providerGetUrl")]
     public function testGetUrl(array $pathParts, string $expectedEnd) {
         $url      = FilePath::getUrl(...$pathParts);
         $expected = Config::getFileUrl() . Config::getFileDir() . $expectedEnd;
@@ -194,7 +195,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetTempPath */
+    #[DataProvider("providerGetTempPath")]
     public function testGetTempPath(int $id, bool $create, bool $expectEmpty = false) {
         $path = FilePath::getTempPath($id, $create);
         if ($expectEmpty) {
@@ -221,7 +222,7 @@ class FilePathTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetTempUrl */
+    #[DataProvider("providerGetTempUrl")]
     public function testGetTempUrl(int $id, array $pathParts, string $expectedEnd, bool $expectEmpty = false) {
         $path     = FilePath::getTempUrl($id, ...$pathParts);
         if ($expectEmpty) {

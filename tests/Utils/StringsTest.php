@@ -8,6 +8,7 @@ use Framework\Enum\IsEnum;
 use Framework\Utils\Strings;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 enum TestStringEnum implements Enum {
@@ -20,7 +21,7 @@ enum TestStringEnum implements Enum {
 
 class StringsTest extends TestCase {
 
-    /** @dataProvider providerIsString */
+    #[DataProvider("providerIsString")]
     public function testIsString(mixed $value, bool $expected) {
         $this->assertEquals($expected, Strings::isString($value));
     }
@@ -38,7 +39,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToString */
+    #[DataProvider("providerToString")]
     public function testToString(mixed $value, string $expected) {
         $this->assertEquals($expected, Strings::toString($value));
     }
@@ -55,7 +56,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerTrim */
+    #[DataProvider("providerTrim")]
     public function testTrim(mixed $value, string $expected) {
         $this->assertEquals($expected, Strings::trim($value));
     }
@@ -71,7 +72,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerNormalized */
+    #[DataProvider("providerNormalized")]
     public function testNormalized(mixed $value, string $expected) {
         $this->assertEquals($expected, Strings::normalized($value));
     }
@@ -85,7 +86,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerLength */
+    #[DataProvider("providerLength")]
     public function testLength(mixed $value, int $expected) {
         $this->assertEquals($expected, Strings::length($value));
     }
@@ -100,7 +101,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsEqual */
+    #[DataProvider("providerIsEqual")]
     public function testIsEqual(mixed $value, mixed $compare, bool $ignoreCase, bool $trim, bool $expected) {
         $this->assertEquals($expected, Strings::isEqual($value, $compare, $ignoreCase, $trim));
     }
@@ -121,7 +122,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEquals */
+    #[DataProvider("providerEquals")]
     public function testEquals(mixed $value, array $compare, bool $expected) {
         $this->assertEquals($expected, Strings::equals($value, ...$compare));
     }
@@ -140,7 +141,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEqualsCaseInsensitive */
+    #[DataProvider("providerEqualsCaseInsensitive")]
     public function testEqualsCaseInsensitive(mixed $value, array $compare, bool $expected) {
         $this->assertEquals($expected, Strings::equalsCaseInsensitive($value, ...$compare));
     }
@@ -160,7 +161,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerContains */
+    #[DataProvider("providerContains")]
     public function testContains(string $value, string|array $needle, bool $ignoreCase, bool $atLeastOne, bool $expected) {
         $this->assertEquals($expected, Strings::contains($value, $needle, $ignoreCase, $atLeastOne));
     }
@@ -182,7 +183,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerStartsWith */
+    #[DataProvider("providerStartsWith")]
     public function testStartsWith(string $value, array $needles, bool $expected) {
         $this->assertEquals($expected, Strings::startsWith($value, ...$needles));
     }
@@ -197,7 +198,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerStartsWithCaseInsensitive */
+    #[DataProvider("providerStartsWithCaseInsensitive")]
     public function testStartsWithCaseInsensitive(string $value, array $needles, bool $expected) {
         $this->assertEquals($expected, Strings::startsWithCaseInsensitive($value, ...$needles));
     }
@@ -211,7 +212,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEndsWith */
+    #[DataProvider("providerEndsWith")]
     public function testEndsWith(string $value, array $needles, bool $expected) {
         $this->assertEquals($expected, Strings::endsWith($value, ...$needles));
     }
@@ -228,7 +229,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEndsWithCaseInsensitive */
+    #[DataProvider("providerEndsWithCaseInsensitive")]
     public function testEndsWithCaseInsensitive(string $value, array $needles, bool $expected) {
         $this->assertEquals($expected, Strings::endsWithCaseInsensitive($value, ...$needles));
     }
@@ -243,7 +244,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMatch */
+    #[DataProvider("providerMatch")]
     public function testMatch(string $value, string $pattern, bool $expected) {
         $this->assertEquals($expected, Strings::match($value, $pattern));
     }
@@ -261,7 +262,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetAllMatches */
+    #[DataProvider("providerGetAllMatches")]
     public function testGetAllMatches(string $value, string $pattern, array $expected) {
         $this->assertEquals($expected, Strings::getAllMatches($value, $pattern));
     }
@@ -287,7 +288,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerOnlyOneCharacter */
+    #[DataProvider("providerOnlyOneCharacter")]
     public function testOnlyOneCharacter(string $value, string $character, bool $expected) {
         $this->assertEquals($expected, Strings::onlyOneCharacter($value, $character));
     }
@@ -303,7 +304,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerCompare */
+    #[DataProvider("providerCompare")]
     public function testCompare(string $value, string $compare, bool $orderAsc, bool $ignoreCase, int $expectedSign) {
         $actual = Strings::compare($value, $compare, $orderAsc, $ignoreCase);
         $this->assertSame($expectedSign, $actual <=> 0);
@@ -333,7 +334,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetLetter */
+    #[DataProvider("providerGetLetter")]
     public function testGetLetter(int $index, bool $uppercase, string $expected) {
         $this->assertEquals($expected, Strings::getLetter($index, $uppercase));
     }
@@ -350,7 +351,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetNumber */
+    #[DataProvider("providerGetNumber")]
     public function testGetNumber(string $value, int $expected) {
         $this->assertEquals($expected, Strings::getNumber($value));
     }
@@ -366,7 +367,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRepeat */
+    #[DataProvider("providerRepeat")]
     public function testRepeat(string $value, int $count, string $expected) {
         $this->assertEquals($expected, Strings::repeat($value, $count));
     }
@@ -388,7 +389,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRandomChar */
+    #[DataProvider("providerRandomChar")]
     public function testRandomChar(string $chars, string|array $expected) {
         $actual = Strings::randomChar($chars);
         if (is_array($expected)) {
@@ -407,7 +408,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRandomCode */
+    #[DataProvider("providerRandomCode")]
     public function testRandomCode(?int $length, ?string $set, int $expectedLength, ?string $expectedPattern, ?string $expectedValue = null) {
         if ($length === null && $set === null) {
             $code = Strings::randomCode();
@@ -444,7 +445,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToNumber */
+    #[DataProvider("providerToNumber")]
     public function testToNumber(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toNumber($value));
     }
@@ -457,7 +458,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReplace */
+    #[DataProvider("providerReplace")]
     public function testReplace(string $value, string|array $search, string|array|null $replace, string $expected) {
         if (is_array($search) && $replace === null) {
             $this->assertEquals($expected, Strings::replace($value, $search));
@@ -488,7 +489,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReplaceStart */
+    #[DataProvider("providerReplaceStart")]
     public function testReplaceStart(string $value, string $search, string $replace, string $expected) {
         $this->assertEquals($expected, Strings::replaceStart($value, $search, $replace));
     }
@@ -505,7 +506,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReplaceEnd */
+    #[DataProvider("providerReplaceEnd")]
     public function testReplaceEnd(string $value, string $search, string $replace, string $expected) {
         $this->assertEquals($expected, Strings::replaceEnd($value, $search, $replace));
     }
@@ -522,7 +523,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReplacePattern */
+    #[DataProvider("providerReplacePattern")]
     public function testReplacePattern(string $value, string|array $pattern, string|array $replace, ?int $limit, string $expected) {
         if ($limit === null) {
             $actual = Strings::replacePattern($value, $pattern, $replace);
@@ -544,7 +545,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReplaceCallback */
+    #[DataProvider("providerReplaceCallback")]
     public function testReplaceCallback(string $value, string|array $pattern, callable $callback, ?int $limit, string $expected) {
         if ($limit === null) {
             $actual = Strings::replaceCallback($value, $pattern, $callback);
@@ -593,7 +594,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerStripStart */
+    #[DataProvider("providerStripStart")]
     public function testStripStart(string $value, array $needles, string $expected) {
         $this->assertEquals($expected, Strings::stripStart($value, ...$needles));
     }
@@ -609,7 +610,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerStripEnd */
+    #[DataProvider("providerStripEnd")]
     public function testStripEnd(string $value, array $needles, string $expected) {
         $this->assertEquals($expected, Strings::stripEnd($value, ...$needles));
     }
@@ -625,7 +626,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerStripStartEnd */
+    #[DataProvider("providerStripStartEnd")]
     public function testStripStartEnd(string $value, string $start, string $end, string $expected) {
         $this->assertEquals($expected, Strings::stripStartEnd($value, $start, $end));
     }
@@ -641,7 +642,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerPadLeft */
+    #[DataProvider("providerPadLeft")]
     public function testPadLeft(string $value, int $length, string $needle, string $expected) {
         $this->assertEquals($expected, Strings::padLeft($value, $length, $needle));
     }
@@ -657,7 +658,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerPadRight */
+    #[DataProvider("providerPadRight")]
     public function testPadRight(string $value, int $length, ?string $needle, string $expected) {
         if ($needle === null) {
             $this->assertEquals($expected, Strings::padRight($value, $length));
@@ -677,7 +678,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAddPrefix */
+    #[DataProvider("providerAddPrefix")]
     public function testAddPrefix(string $value, string $prefix, string $expected) {
         $this->assertEquals($expected, Strings::addPrefix($value, $prefix));
     }
@@ -693,7 +694,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAddSuffix */
+    #[DataProvider("providerAddSuffix")]
     public function testAddSuffix(string $value, string $suffix, string $expected) {
         $this->assertEquals($expected, Strings::addSuffix($value, $suffix));
     }
@@ -709,7 +710,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAddPrefixSuffix */
+    #[DataProvider("providerAddPrefixSuffix")]
     public function testAddPrefixSuffix(string $value, string $prefix, string $suffix, string $expected) {
         $this->assertEquals($expected, Strings::addPrefixSuffix($value, $prefix, $suffix));
     }
@@ -725,7 +726,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSubstring */
+    #[DataProvider("providerSubstring")]
     public function testSubstring(string $value, int $start, ?int $length, bool $asUtf8, string $expected) {
         if ($length === null) {
             $actual = Strings::substring($value, $start, asUtf8: $asUtf8);
@@ -745,7 +746,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSubstringAfter */
+    #[DataProvider("providerSubstringAfter")]
     public function testSubstringAfter(string $value, string $needle, bool $useFirst, string $expected) {
         $this->assertEquals($expected, Strings::substringAfter($value, $needle, $useFirst));
     }
@@ -761,7 +762,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSubstringBefore */
+    #[DataProvider("providerSubstringBefore")]
     public function testSubstringBefore(string $value, string $needle, ?bool $useFirst, string $expected) {
         if ($useFirst === null) {
             $actual = Strings::substringBefore($value, $needle);
@@ -782,7 +783,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSubstringBetween */
+    #[DataProvider("providerSubstringBetween")]
     public function testSubstringBetween(string $value, string $start, string $end, string $expected) {
         $this->assertEquals($expected, Strings::substringBetween($value, $start, $end));
     }
@@ -797,7 +798,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSplit */
+    #[DataProvider("providerSplit")]
     public function testSplit(mixed $value, string $needle, bool $trim, bool $skipEmpty, array $expected) {
         $this->assertEquals($expected, Strings::split($value, $needle, trim: $trim, skipEmpty: $skipEmpty));
     }
@@ -826,7 +827,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSplitToWords */
+    #[DataProvider("providerSplitToWords")]
     public function testSplitToWords(string $value, array $expectedContains, ?array $expectedExact = null) {
         $words = Strings::splitToWords($value);
         foreach ($expectedContains as $expectedWord) {
@@ -846,7 +847,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerJoin */
+    #[DataProvider("providerJoin")]
     public function testJoin(mixed $value, ?string $glue, ?bool $withoutEmpty, string $expected) {
         if ($glue === null && $withoutEmpty === null) {
             $actual = Strings::join($value);
@@ -876,7 +877,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerJoinKeys */
+    #[DataProvider("providerJoinKeys")]
     public function testJoinKeys(mixed $value, string $expected) {
         $this->assertEquals($expected, Strings::joinKeys($value));
     }
@@ -891,7 +892,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerJoinValues */
+    #[DataProvider("providerJoinValues")]
     public function testJoinValues(mixed $value, string $key, string $glue, string $expected) {
         $this->assertEquals($expected, Strings::joinValues($value, $key, $glue));
     }
@@ -906,7 +907,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMerge */
+    #[DataProvider("providerMerge")]
     public function testMerge(string $first, string $second, string $glue, string $expected) {
         $this->assertEquals($expected, Strings::merge($first, $second, $glue));
     }
@@ -921,7 +922,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToLowerCase */
+    #[DataProvider("providerToLowerCase")]
     public function testToLowerCase(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toLowerCase($value));
     }
@@ -936,7 +937,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerLowerCaseFirst */
+    #[DataProvider("providerLowerCaseFirst")]
     public function testLowerCaseFirst(string $value, string $expected) {
         $this->assertEquals($expected, Strings::lowerCaseFirst($value));
     }
@@ -950,7 +951,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToUpperCase */
+    #[DataProvider("providerToUpperCase")]
     public function testToUpperCase(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toUpperCase($value));
     }
@@ -965,7 +966,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerUpperCaseFirst */
+    #[DataProvider("providerUpperCaseFirst")]
     public function testUpperCaseFirst(string $value, string $expected) {
         $this->assertEquals($expected, Strings::upperCaseFirst($value));
     }
@@ -979,7 +980,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsConstantCase */
+    #[DataProvider("providerIsConstantCase")]
     public function testIsConstantCase(string $value, bool $expected) {
         $this->assertEquals($expected, Strings::isConstantCase($value));
     }
@@ -997,7 +998,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToConstantCase */
+    #[DataProvider("providerToConstantCase")]
     public function testToConstantCase(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toConstantCase($value));
     }
@@ -1032,7 +1033,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsSnakeCase */
+    #[DataProvider("providerIsSnakeCase")]
     public function testIsSnakeCase(string $value, bool $expected) {
         $this->assertEquals($expected, Strings::isSnakeCase($value));
     }
@@ -1051,7 +1052,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToSnakeCase */
+    #[DataProvider("providerToSnakeCase")]
     public function testToSnakeCase(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toSnakeCase($value));
     }
@@ -1089,7 +1090,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsKebabCase */
+    #[DataProvider("providerIsKebabCase")]
     public function testIsKebabCase(string $value, bool $expected) {
         $this->assertEquals($expected, Strings::isKebabCase($value));
     }
@@ -1108,7 +1109,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToKebabCase */
+    #[DataProvider("providerToKebabCase")]
     public function testToKebabCase(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toKebabCase($value));
     }
@@ -1145,7 +1146,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsPascalCase */
+    #[DataProvider("providerIsPascalCase")]
     public function testIsPascalCase(string $value, bool $expected) {
         $this->assertEquals($expected, Strings::isPascalCase($value));
     }
@@ -1165,7 +1166,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToPascalCase */
+    #[DataProvider("providerToPascalCase")]
     public function testToPascalCase(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toPascalCase($value));
     }
@@ -1202,7 +1203,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsCamelCase */
+    #[DataProvider("providerIsCamelCase")]
     public function testIsCamelCase(string $value, bool $expected) {
         $this->assertEquals($expected, Strings::isCamelCase($value));
     }
@@ -1220,7 +1221,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToCamelCase */
+    #[DataProvider("providerToCamelCase")]
     public function testToCamelCase(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toCamelCase($value));
     }
@@ -1257,7 +1258,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToHtml */
+    #[DataProvider("providerToHtml")]
     public function testToHtml(string $value, string $expected) {
         $this->assertEquals($expected, Strings::toHtml($value));
     }
@@ -1272,7 +1273,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRemoveHtml */
+    #[DataProvider("providerRemoveHtml")]
     public function testRemoveHtml(string $value, string $expected) {
         $this->assertEquals($expected, Strings::removeHtml($value));
     }
@@ -1288,7 +1289,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeHtml */
+    #[DataProvider("providerDecodeHtml")]
     public function testDecodeHtml(string $value, string $expected) {
         $this->assertEquals($expected, Strings::decodeHtml($value));
     }
@@ -1305,7 +1306,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMakeShort */
+    #[DataProvider("providerMakeShort")]
     public function testMakeShort(string $value, int $length, string $expected, ?bool $asUtf8 = null) {
         if ($asUtf8 === null) {
             $actual = Strings::makeShort($value, $length);
@@ -1328,7 +1329,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsShort */
+    #[DataProvider("providerIsShort")]
     public function testIsShort(string $value, int $length, bool $expected) {
         $this->assertEquals($expected, Strings::isShort($value, $length));
     }
@@ -1341,7 +1342,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsAlphaNum */
+    #[DataProvider("providerIsAlphaNum")]
     public function testIsAlphaNum(string $value, bool $allowDashUnderscore, ?int $length, bool $expected) {
         if ($length === null) {
             $actual = Strings::isAlphaNum($value, $allowDashUnderscore);
@@ -1371,7 +1372,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerSanitize */
+    #[DataProvider("providerSanitize")]
     public function testSanitize(string $value, bool $lowercase, bool $anal, string $expected) {
         $this->assertEquals($expected, Strings::sanitize($value, lowercase: $lowercase, anal: $anal));
     }
@@ -1390,7 +1391,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHasEmoji */
+    #[DataProvider("providerHasEmoji")]
     public function testHasEmoji(string $value, bool $expected) {
         $this->assertSame($expected, Strings::hasEmoji($value));
     }
@@ -1410,7 +1411,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsOnlyEmojis */
+    #[DataProvider("providerIsOnlyEmojis")]
     public function testIsOnlyEmojis(string $value, bool $expected) {
         $this->assertSame($expected, Strings::isOnlyEmojis($value));
     }
@@ -1431,7 +1432,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerConvertEncoding */
+    #[DataProvider("providerConvertEncoding")]
     public function testConvertEncoding(string $value, string $expected) {
         $actual = Strings::convertEncoding($value);
 
@@ -1450,7 +1451,7 @@ class StringsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerBase64Decode */
+    #[DataProvider("providerBase64Decode")]
     public function testBase64Decode(string $input, string $expected) {
         $this->assertEquals($expected, Strings::base64Decode($input));
     }

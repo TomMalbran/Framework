@@ -4,10 +4,11 @@ namespace Tests\Date;
 use Framework\Date\DateUtils;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DateUtilsTest extends TestCase {
 
-    /** @dataProvider providerTimeToMinutes */
+    #[DataProvider("providerTimeToMinutes")]
     public function testTimeToMinutes(string $time, ?float $timeZone, int $expected): void {
         $this->assertSame($expected, DateUtils::timeToMinutes($time, $timeZone));
     }
@@ -34,7 +35,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMinutesToTime */
+    #[DataProvider("providerMinutesToTime")]
     public function testMinutesToTime(int $minutes, string $expected): void {
         $this->assertSame($expected, DateUtils::minutesToTime($minutes));
     }
@@ -54,7 +55,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidDate */
+    #[DataProvider("providerIsValidDate")]
     public function testIsValidDate(string $text, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidDate($text));
     }
@@ -78,7 +79,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidDay */
+    #[DataProvider("providerIsValidDay")]
     public function testIsValidDay(int|string $value, bool $withHolidays, bool $startMonday, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidDay($value, $withHolidays, $startMonday));
     }
@@ -97,7 +98,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidHour */
+    #[DataProvider("providerIsValidHour")]
     public function testIsValidHour(string $text, ?array $minutes, int $minHour, int $maxHour, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidHour($text, $minutes, $minHour, $maxHour));
     }
@@ -125,7 +126,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidPeriod */
+    #[DataProvider("providerIsValidPeriod")]
     public function testIsValidPeriod(string $from, string $to, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidPeriod($from, $to));
     }
@@ -142,7 +143,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidHourPeriod */
+    #[DataProvider("providerIsValidHourPeriod")]
     public function testIsValidHourPeriod(string $from, string $to, bool $allow24, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidHourPeriod($from, $to, $allow24));
     }
@@ -161,7 +162,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidFullPeriod */
+    #[DataProvider("providerIsValidFullPeriod")]
     public function testIsValidFullPeriod(string $fromDate, string $fromHour, string $toDate, string $toHour, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidFullPeriod($fromDate, $fromHour, $toDate, $toHour));
     }
@@ -190,7 +191,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidWeekDay */
+    #[DataProvider("providerIsValidWeekDay")]
     public function testIsValidWeekDay(int $wd, bool $startMonday, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidWeekDay($wd, $startMonday));
     }
@@ -210,7 +211,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDayName */
+    #[DataProvider("providerGetDayName")]
     public function testGetDayName(int $day, bool $startMonday, int $length, bool $upper, bool $isEmpty): void {
         $result = DateUtils::getDayName($day, $startMonday, $length, $upper);
         $this->assertIsString($result);
@@ -249,7 +250,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetMonthName */
+    #[DataProvider("providerGetMonthName")]
     public function testGetMonthName(int $month, int $length, bool $upper, bool $isEmpty): void {
         $result = DateUtils::getMonthName($month, $length, $upper);
         $this->assertIsString($result);
@@ -288,7 +289,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDayString */
+    #[DataProvider("providerGetDayString")]
     public function testGetDayString(int $seconds, string $expected): void {
         $this->assertSame($expected, DateUtils::getDayString($seconds));
     }
@@ -304,7 +305,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetMinString */
+    #[DataProvider("providerGetMinString")]
     public function testGetMinString(int|float $minutes, int $decimals, string $expected): void {
         $this->assertSame($expected, DateUtils::getMinString($minutes, $decimals));
     }
@@ -332,7 +333,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetSecString */
+    #[DataProvider("providerGetSecString")]
     public function testGetSecString(int $seconds, int $decimals, string $expected): void {
         $this->assertSame($expected, DateUtils::getSecString($seconds, $decimals));
     }
@@ -357,7 +358,7 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerParseDate */
+    #[DataProvider("providerParseDate")]
     public function testParseDate(string $text, string $expectedYmd): void {
         $ts = DateUtils::parseDate($text);
         if ($expectedYmd === "") {

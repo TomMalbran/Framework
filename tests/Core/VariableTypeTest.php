@@ -4,11 +4,12 @@ namespace Tests\Core;
 use Framework\Core\VariableType;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 class VariableTypeTest extends TestCase {
 
-    /** @dataProvider providerGet */
+    #[DataProvider("providerGet")]
     public function testGet(mixed $value, bool $useLists, VariableType $expected): void {
         $this->assertSame($expected, VariableType::get($value, $useLists));
     }
@@ -26,7 +27,7 @@ class VariableTypeTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetType */
+    #[DataProvider("providerGetType")]
     public function testGetType(VariableType $type, string $expected): void {
         $this->assertSame($expected, VariableType::getType($type));
     }
@@ -44,7 +45,7 @@ class VariableTypeTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDocType */
+    #[DataProvider("providerGetDocType")]
     public function testGetDocType(VariableType $type, string $expected): void {
         $this->assertSame($expected, VariableType::getDocType($type));
     }
@@ -62,7 +63,7 @@ class VariableTypeTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEncodeValue */
+    #[DataProvider("providerEncodeValue")]
     public function testEncodeValue(VariableType $type, mixed $value, string $expected): void {
         $this->assertSame($expected, VariableType::encodeValue($type, $value));
     }

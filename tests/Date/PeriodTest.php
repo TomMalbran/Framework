@@ -8,10 +8,11 @@ use Framework\Date\Type\PeriodType;
 use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PeriodTest extends TestCase {
 
-    /** @dataProvider providerConstruct */
+    #[DataProvider("providerConstruct")]
     public function testConstruct(array $input, string $prefix, PeriodType $expectedPeriod, bool $expectFromEmpty, bool $expectToEmpty, ?int $expectedFromNum, ?int $expectedToNum): void {
         $p = new Period(new Request($input), $prefix);
 
@@ -41,7 +42,7 @@ class PeriodTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFromPeriod */
+    #[DataProvider("providerFromPeriod")]
     public function testFromPeriod(PeriodType|string $periodType, ?int $expectedFrom, ?int $expectedTo): void {
         $p = Period::fromPeriod($periodType);
 
@@ -105,7 +106,7 @@ class PeriodTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFromDictionary */
+    #[DataProvider("providerFromDictionary")]
     public function testFromDictionary(array $dictData, int $expectedFrom, int $expectedTo): void {
         $dict = new Dictionary($dictData);
         $p = Period::fromDictionary($dict);
@@ -140,7 +141,7 @@ class PeriodTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsEmpty */
+    #[DataProvider("providerIsEmpty")]
     public function testIsEmpty(array $input, bool $expected): void {
         $p = new Period(new Request($input));
         $this->assertSame($expected, $p->isEmpty());
@@ -157,7 +158,7 @@ class PeriodTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValid */
+    #[DataProvider("providerIsValid")]
     public function testIsValid(PeriodType|string $value, bool $expected): void {
         $this->assertSame($expected, Period::isValid($value));
     }
@@ -172,7 +173,7 @@ class PeriodTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDaysAmount */
+    #[DataProvider("providerGetDaysAmount")]
     public function testGetDaysAmount(PeriodType $period, int $expected): void {
         $p = Period::fromPeriod($period);
         $this->assertSame($expected, $p->getDaysAmount());
@@ -214,7 +215,7 @@ class PeriodTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIterator */
+    #[DataProvider("providerIterator")]
     public function testIterator(array $requestData, array $expectedNumbers): void {
         $p = new Period(new Request($requestData));
         $numbers = [];

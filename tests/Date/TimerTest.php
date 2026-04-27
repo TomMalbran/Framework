@@ -5,7 +5,7 @@ use Framework\Date\Timer;
 use Tests\ReflectionHelpers;
 
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class TimerTest extends TestCase {
     use ReflectionHelpers;
@@ -18,17 +18,13 @@ class TimerTest extends TestCase {
 
         $timer->end();
 
-        $ref = new ReflectionClass($timer);
-        $prop = $ref->getProperty("endTime");
-        $prop->setAccessible(true);
-        $end = $prop->getValue($timer);
-
+        $end = $this->getPrivateProperty($timer, "endTime");
         $this->assertIsFloat($end);
         $this->assertGreaterThan(1000.0, $end);
     }
 
 
-    /** @dataProvider elapsedSecondsProvider */
+    #[DataProvider("elapsedSecondsProvider")]
     public function testGetElapsedSeconds(float $start, float $end, float $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);
@@ -46,7 +42,7 @@ class TimerTest extends TestCase {
     }
 
 
-    /** @dataProvider elapsedSecondsIntProvider */
+    #[DataProvider("elapsedSecondsIntProvider")]
     public function testGetElapsedSecondsInt(float $start, float $end, int $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);
@@ -64,7 +60,7 @@ class TimerTest extends TestCase {
     }
 
 
-    /** @dataProvider elapsedMinutesProvider */
+    #[DataProvider("elapsedMinutesProvider")]
     public function testGetElapsedMinutes(float $start, float $end, float $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);
@@ -82,7 +78,7 @@ class TimerTest extends TestCase {
     }
 
 
-    /** @dataProvider elapsedTextProvider */
+    #[DataProvider("elapsedTextProvider")]
     public function testGetElapsedText(float $start, float $end, string $expected): void {
         $timer = new Timer();
         $this->setPrivateProperty($timer, "startTime", $start);

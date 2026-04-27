@@ -4,10 +4,11 @@ namespace Tests\Utils;
 use Framework\Utils\Utils;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class UtilsTest extends TestCase {
 
-    /** @dataProvider providerIsValidPassword */
+    #[DataProvider("providerIsValidPassword")]
     public function testIsValidPassword(string $password, string $requirements, int $minLength, bool $expected) {
         $this->assertEquals($expected, Utils::isValidPassword($password, $requirements, $minLength));
     }
@@ -30,7 +31,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidColor */
+    #[DataProvider("providerIsValidColor")]
     public function testIsValidColor(string $color, bool $expected) {
         $this->assertEquals($expected, Utils::isValidColor($color));
     }
@@ -49,7 +50,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidFullName */
+    #[DataProvider("providerIsValidFullName")]
     public function testIsValidFullName(string $fullName, bool $expected) {
         $this->assertEquals($expected, Utils::isValidFullName($fullName));
     }
@@ -66,7 +67,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerParseName */
+    #[DataProvider("providerParseName")]
     public function testParseName(string $name, bool $lastNameFirst, string $separator, array $expected) {
         $this->assertEquals($expected, Utils::parseName($name, $lastNameFirst, $separator));
     }
@@ -83,7 +84,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidUsername */
+    #[DataProvider("providerIsValidUsername")]
     public function testIsValidUsername(string $username, bool $expected) {
         $this->assertEquals($expected, Utils::isValidUsername($username));
     }
@@ -102,7 +103,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGenerateUsername */
+    #[DataProvider("providerGenerateUsername")]
     public function testGenerateUsername(string $domain, string $email, string $expected) {
         $this->assertEquals($expected, Utils::generateUsername($domain, $email));
     }
@@ -122,7 +123,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidEmail */
+    #[DataProvider("providerIsValidEmail")]
     public function testIsValidEmail(string $email, bool $expected) {
         $this->assertEquals($expected, Utils::isValidEmail($email));
     }
@@ -143,7 +144,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetEmailDomain */
+    #[DataProvider("providerGetEmailDomain")]
     public function testGetEmailDomain(string $email, string $expected) {
         $this->assertEquals($expected, Utils::getEmailDomain($email));
     }
@@ -163,7 +164,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerExtractEmail */
+    #[DataProvider("providerExtractEmail")]
     public function testExtractEmail(string $input, string $expected) {
         $this->assertEquals($expected, Utils::extractEmail($input));
     }
@@ -182,7 +183,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHideEmail */
+    #[DataProvider("providerHideEmail")]
     public function testHideEmail(string $email, string $expected) {
         $this->assertEquals($expected, Utils::hideEmail($email));
     }
@@ -204,7 +205,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidPhone */
+    #[DataProvider("providerIsValidPhone")]
     public function testIsValidPhone(string $phone, bool $expected) {
         $this->assertEquals($expected, Utils::isValidPhone($phone));
     }
@@ -221,7 +222,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerPhoneToNumber */
+    #[DataProvider("providerPhoneToNumber")]
     public function testPhoneToNumber(string $phone, string $expected) {
         $this->assertEquals($expected, Utils::phoneToNumber($phone));
     }
@@ -237,7 +238,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHidePhone */
+    #[DataProvider("providerHidePhone")]
     public function testHidePhone(string $phone, string $expected) {
         $this->assertEquals($expected, Utils::hidePhone($phone));
     }
@@ -259,7 +260,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidCUIT */
+    #[DataProvider("providerIsValidCUIT")]
     public function testIsValidCUIT(string $cuit, bool $expected) {
         $this->assertEquals($expected, Utils::isValidCUIT($cuit));
     }
@@ -278,7 +279,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerParseCUIT */
+    #[DataProvider("providerParseCUIT")]
     public function testParseCUIT(string $cuit, string $expected) {
         $this->assertEquals($expected, Utils::parseCUIT($cuit));
     }
@@ -297,7 +298,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerCuitToNumber */
+    #[DataProvider("providerCuitToNumber")]
     public function testCuitToNumber(string $cuit, string $expected) {
         $this->assertEquals($expected, Utils::cuitToNumber($cuit));
     }
@@ -311,7 +312,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidDNI */
+    #[DataProvider("providerIsValidDNI")]
     public function testIsValidDNI(string $dni, bool $expected) {
         $this->assertEquals($expected, Utils::isValidDNI($dni));
     }
@@ -329,7 +330,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDniToNumber */
+    #[DataProvider("providerDniToNumber")]
     public function testDniToNumber(string $dni, string $expected) {
         $this->assertEquals($expected, Utils::dniToNumber($dni));
     }
@@ -346,7 +347,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetAvatarUrl */
+    #[DataProvider("providerGetAvatarUrl")]
     public function testGetAvatarUrl(string $custom, string $email, string $expected) {
         $this->assertEquals($expected, Utils::getAvatarUrl($custom, $email));
     }
@@ -360,7 +361,7 @@ class UtilsTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetWhatsAppUrl */
+    #[DataProvider("providerGetWhatsAppUrl")]
     public function testGetWhatsAppUrl(string $phone, string $expected) {
         $this->assertEquals($expected, Utils::getWhatsAppUrl($phone));
     }

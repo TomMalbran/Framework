@@ -4,10 +4,11 @@ namespace Tests\Utils;
 use Framework\Utils\Encoding;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class EncodingTest extends TestCase {
 
-    /** @dataProvider providerToUTF8 */
+    #[DataProvider("providerToUTF8")]
     public function testToUTF8(string $input, string $expected) {
         $this->assertSame($expected, Encoding::toUTF8($input));
     }
@@ -21,7 +22,7 @@ class EncodingTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToWin1252AndAliases */
+    #[DataProvider("providerToWin1252AndAliases")]
     public function testToWin1252AndAliases(string $input, string $expected, string $method) {
         $this->assertSame($expected, Encoding::$method($input));
     }
@@ -35,7 +36,7 @@ class EncodingTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFixUTF8 */
+    #[DataProvider("providerFixUTF8")]
     public function testFixUTF8(string $input, string $expected) {
         $this->assertSame($expected, Encoding::fixUTF8($input));
     }
@@ -47,7 +48,7 @@ class EncodingTest extends TestCase {
     }
 
 
-    /** @dataProvider providerUTF8FixWin1252Chars */
+    #[DataProvider("providerUTF8FixWin1252Chars")]
     public function testUTF8FixWin1252Chars(string $input, string $expected) {
         $this->assertSame($expected, Encoding::UTF8FixWin1252Chars($input));
     }
@@ -59,7 +60,7 @@ class EncodingTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRemoveBOM */
+    #[DataProvider("providerRemoveBOM")]
     public function testRemoveBOM(string $input, string $expected) {
         $this->assertSame($expected, Encoding::removeBOM($input));
     }
@@ -73,7 +74,7 @@ class EncodingTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeUTF8 */
+    #[DataProvider("providerDecodeUTF8")]
     public function testDecodeUTF8(string $input, string $expected) {
         $this->assertSame($expected, Encoding::decodeUTF8($input));
     }

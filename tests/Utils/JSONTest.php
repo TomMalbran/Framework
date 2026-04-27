@@ -5,6 +5,7 @@ use Framework\Utils\JSON;
 use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 class JSONTest extends TestCase {
@@ -18,7 +19,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValid */
+    #[DataProvider("providerIsValid")]
     public function testIsValid(mixed $json, bool $expected) {
         $this->assertEquals($expected, JSON::isValid($json));
     }
@@ -36,7 +37,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEncodeDecode */
+    #[DataProvider("providerEncodeDecode")]
     public function testEncodeDecode(mixed $input, string $expectedEncoded, mixed $expectedDecoded) {
         $encoded = JSON::encode($input);
         $this->assertEquals($expectedEncoded, $encoded);
@@ -58,7 +59,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeAsArray */
+    #[DataProvider("providerDecodeAsArray")]
     public function testDecodeAsArray(mixed $input, array $expected) {
         $result = JSON::decodeAsArray($input);
         $this->assertEquals($expected, $result);
@@ -75,7 +76,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeAsDictionary */
+    #[DataProvider("providerDecodeAsDictionary")]
     public function testDecodeAsDictionary(mixed $json, string $expectedA, int $expectedC) {
         $dict = JSON::decodeAsDictionary($json);
         $this->assertInstanceOf(Dictionary::class, $dict);
@@ -92,7 +93,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeAsStrings */
+    #[DataProvider("providerDecodeAsStrings")]
     public function testDecodeAsStrings(mixed $input, bool $skipEmpty, array $expected) {
         $result = JSON::decodeAsStrings($input, $skipEmpty);
         $this->assertEquals($expected, $result);
@@ -111,7 +112,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFromCSV */
+    #[DataProvider("providerFromCSV")]
     public function testFromCSV(string $csv, array $expectedStrings) {
         $csvJson = JSON::fromCSV($csv);
         foreach ($expectedStrings as $expected) {
@@ -127,7 +128,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReadFileAndWriteFile */
+    #[DataProvider("providerReadFileAndWriteFile")]
     public function testReadFileAndWriteFile(array $data, string $key, mixed $expectedValue) {
         $this->tmpFile = sys_get_temp_dir() . "/json_utils_test_" . uniqid() . ".json";
 
@@ -155,7 +156,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReadUrl */
+    #[DataProvider("providerReadUrl")]
     public function testReadUrl(string $url, array $expected) {
         $fromUrl = JSON::readUrl($url);
         $this->assertEquals($expected, $fromUrl);
@@ -172,7 +173,7 @@ class JSONTest extends TestCase {
     }
 
 
-    /** @dataProvider providerPostUrl */
+    #[DataProvider("providerPostUrl")]
     public function testPostUrl(string $url, array $data, bool $shouldSucceed) {
         $res = JSON::postUrl($url, $data);
         $this->assertIsArray($res);

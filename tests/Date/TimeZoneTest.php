@@ -5,6 +5,7 @@ use Framework\Date\TimeZone;
 use Tests\ReflectionHelpers;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class TimeZoneTest extends TestCase {
     use ReflectionHelpers;
@@ -17,7 +18,7 @@ class TimeZoneTest extends TestCase {
     }
 
 
-    /** @dataProvider setTimeZoneProvider */
+    #[DataProvider("setTimeZoneProvider")]
     public function testSetTimeZone(float $input, float $expected): void {
         $result = TimeZone::setTimeZone($input);
         $this->assertSame($expected, $result);
@@ -33,7 +34,7 @@ class TimeZoneTest extends TestCase {
     }
 
 
-    /** @dataProvider pushPopProvider */
+    #[DataProvider("pushPopProvider")]
     public function testPushAndPopTimeZone(array $initialStack, float $pushValue, float $expectedAfterPush, float $expectedAfterPop): void {
         // set initial stack
         $this->setPrivateStaticProperty(TimeZone::class, "stackZones", $initialStack);
@@ -56,7 +57,7 @@ class TimeZoneTest extends TestCase {
     }
 
 
-    /** @dataProvider currentDiffProvider */
+    #[DataProvider("currentDiffProvider")]
     public function testGetCurrentTimeDiff(float $value): void {
         $this->setPrivateStaticProperty(TimeZone::class, "timeDiff", $value);
         $this->assertSame($value, TimeZone::getCurrentTimeDiff());
@@ -70,7 +71,7 @@ class TimeZoneTest extends TestCase {
     }
 
 
-    /** @dataProvider calcProvider */
+    #[DataProvider("calcProvider")]
     public function testCalcTimeDiff(float $input, float $expected): void {
         $this->assertSame($expected, TimeZone::calcTimeDiff($input));
     }
@@ -84,7 +85,7 @@ class TimeZoneTest extends TestCase {
     }
 
 
-    /** @dataProvider toUserProvider */
+    #[DataProvider("toUserProvider")]
     public function testToUserTime(float $timeDiff, int $input, bool $useTimeZone, int $expected): void {
         $this->setPrivateStaticProperty(TimeZone::class, "timeDiff", $timeDiff);
         $this->assertSame($expected, TimeZone::toUserTime($input, $useTimeZone));
@@ -99,7 +100,7 @@ class TimeZoneTest extends TestCase {
     }
 
 
-    /** @dataProvider toServerProvider */
+    #[DataProvider("toServerProvider")]
     public function testToServerTime(float $timeDiff, int $input, bool $useTimeZone, int $expected): void {
         $this->setPrivateStaticProperty(TimeZone::class, "timeDiff", $timeDiff);
         $this->assertSame($expected, TimeZone::toServerTime($input, $useTimeZone));
@@ -114,7 +115,7 @@ class TimeZoneTest extends TestCase {
     }
 
 
-    /** @dataProvider toStringProvider */
+    #[DataProvider("toStringProvider")]
     public function testToString(float $input, string $expected): void {
         $this->assertSame($expected, TimeZone::toString($input));
     }

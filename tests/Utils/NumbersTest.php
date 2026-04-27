@@ -5,11 +5,12 @@ use Framework\Date\Date;
 use Framework\Utils\Numbers;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 class NumbersTest extends TestCase {
 
-    /** @dataProvider providerIsValid */
+    #[DataProvider("providerIsValid")]
     public function testIsValid(mixed $value, $min = null, $max = null, $expected) {
         $this->assertSame($expected, Numbers::isValid($value, $min, $max));
     }
@@ -41,7 +42,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToInt */
+    #[DataProvider("providerToInt")]
     public function testToInt(mixed $value, int $decimals = 0, int $expected) {
         $this->assertEquals($expected, Numbers::toInt($value, $decimals));
     }
@@ -65,7 +66,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToFloat */
+    #[DataProvider("providerToFloat")]
     public function testToFloat(mixed $value, $decimals = 0, $expected) {
         $this->assertEquals($expected, Numbers::toFloat($value, $decimals));
     }
@@ -87,7 +88,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToIntOrFloat */
+    #[DataProvider("providerToIntOrFloat")]
     public function testToIntOrFloat(mixed $value, int|float $expected, string $expectedType) {
         $result = Numbers::toIntOrFloat($value);
         $this->assertEquals($expected, $result);
@@ -107,7 +108,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerHasDecimals */
+    #[DataProvider("providerHasDecimals")]
     public function testHasDecimals(mixed $value, bool $expected) {
         $this->assertSame($expected, Numbers::hasDecimals($value));
     }
@@ -122,7 +123,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerLength */
+    #[DataProvider("providerLength")]
     public function testLength(int $value, int $expected) {
         $this->assertEquals($expected, Numbers::length($value));
     }
@@ -137,7 +138,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerCompare */
+    #[DataProvider("providerCompare")]
     public function testCompare(mixed $a, mixed $b, bool $orderAsc = true, int|float $expected) {
         $this->assertEquals($expected, Numbers::compare($a, $b, $orderAsc));
     }
@@ -158,7 +159,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRound */
+    #[DataProvider("providerRound")]
     public function testRound(mixed $value, int $decimals, float $expected) {
         $this->assertEquals($expected, Numbers::round($value, $decimals));
     }
@@ -175,7 +176,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRoundInt */
+    #[DataProvider("providerRoundInt")]
     public function testRoundInt(mixed $value, bool $useFloor = false, int $expected) {
         $this->assertSame($expected, Numbers::roundInt($value, $useFloor));
     }
@@ -210,7 +211,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFormatInt */
+    #[DataProvider("providerFormatInt")]
     public function testFormatInt(mixed $value, int $decimals, int $maxForDecimals, string $default, string $expected) {
         $this->assertEquals($expected, Numbers::formatInt($value, $decimals, $maxForDecimals, $default));
     }
@@ -240,7 +241,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFormatFloat */
+    #[DataProvider("providerFormatFloat")]
     public function testFormatFloat(mixed $value, int $decimals, int $maxForDecimals, string $default, string $decimalSeparator, string $thousandsSeparator, string $expected) {
         $this->assertEquals($expected, Numbers::formatFloat($value, $decimals, $maxForDecimals, $default, $decimalSeparator, $thousandsSeparator));
     }
@@ -263,7 +264,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerClampInt */
+    #[DataProvider("providerClampInt")]
     public function testClampInt(mixed $value, int $min, int $max, int $expected) {
         $this->assertEquals($expected, Numbers::clampInt($value, $min, $max));
     }
@@ -281,7 +282,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerClampFloat */
+    #[DataProvider("providerClampFloat")]
     public function testClampFloat(mixed $value, float $min, float $max, float $expected) {
         $this->assertEquals($expected, Numbers::clampFloat($value, $min, $max));
     }
@@ -300,7 +301,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerMap */
+    #[DataProvider("providerMap")]
     public function testMap(mixed $value, int|float $fromLow, int|float $fromHigh, int|float $toLow, int|float $toHigh, int|float $expected) {
         $this->assertEquals($expected, Numbers::map($value, $fromLow, $fromHigh, $toLow, $toHigh));
     }
@@ -319,7 +320,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerPercent */
+    #[DataProvider("providerPercent")]
     public function testPercent(mixed $numerator, mixed $total, int $decimals = 0, int|float $expected) {
         $this->assertEquals($expected, Numbers::percent($numerator, $total, $decimals));
     }
@@ -344,7 +345,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDivide */
+    #[DataProvider("providerDivide")]
     public function testDivide(mixed $numerator, mixed $divisor, int $decimals = 0, int|float $expected) {
         $this->assertEquals($expected, Numbers::divide($numerator, $divisor, $decimals));
     }
@@ -365,7 +366,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDivideInt */
+    #[DataProvider("providerDivideInt")]
     public function testDivideInt(mixed $numerator, mixed $divisor, bool $useFloor = false, int $expected) {
         $this->assertEquals($expected, Numbers::divideInt($numerator, $divisor, $useFloor));
     }
@@ -394,7 +395,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerApplyDiscount */
+    #[DataProvider("providerApplyDiscount")]
     public function testApplyDiscount(mixed $value, int|float $percent, int|float $expected) {
         $this->assertEquals($expected, Numbers::applyDiscount($value, $percent));
     }
@@ -414,7 +415,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerApplyIncrement */
+    #[DataProvider("providerApplyIncrement")]
     public function testApplyIncrement(mixed $value, int|float $percent, int|float $expected, float $delta = 0.0001) {
         if ($delta > 0) {
             $this->assertEqualsWithDelta($expected, Numbers::applyIncrement($value, $percent), $delta);
@@ -436,7 +437,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetCommonDivisor */
+    #[DataProvider("providerGetCommonDivisor")]
     public function testGetCommonDivisor(int $a, int $b, int $expected) {
         $this->assertEquals($expected, Numbers::getCommonDivisor($a, $b));
     }
@@ -453,7 +454,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidFloat */
+    #[DataProvider("providerIsValidFloat")]
     public function testIsValidFloat(mixed $value, int $min, ?int $max, int $decimals, bool $expected) {
         $this->assertSame($expected, Numbers::isValidFloat($value, $min, $max, $decimals));
     }
@@ -475,7 +476,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidPrice */
+    #[DataProvider("providerIsValidPrice")]
     public function testIsValidPrice(mixed $value, int $min, ?int $max, bool $expected) {
         $this->assertSame($expected, Numbers::isValidPrice($value, $min, $max));
     }
@@ -495,7 +496,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerRoundCents */
+    #[DataProvider("providerRoundCents")]
     public function testRoundCents(mixed $value, float|int $expected) {
         $this->assertEquals($expected, Numbers::roundCents($value));
     }
@@ -514,7 +515,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToCents */
+    #[DataProvider("providerToCents")]
     public function testToCents(mixed $value, int $expected) {
         $this->assertEquals($expected, Numbers::toCents($value));
     }
@@ -537,7 +538,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFromCents */
+    #[DataProvider("providerFromCents")]
     public function testFromCents(mixed $value, float $expected) {
         $this->assertEquals($expected, Numbers::fromCents($value));
     }
@@ -559,7 +560,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFormatPrice */
+    #[DataProvider("providerFormatPrice")]
     public function testFormatPrice(mixed $value, int $decimals, int $maxForDecimals, string $default, string $expected) {
         $this->assertEquals($expected, Numbers::formatPrice($value, $decimals, $maxForDecimals, $default));
     }
@@ -579,7 +580,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerFormatCents */
+    #[DataProvider("providerFormatCents")]
     public function testFormatCents(mixed $value, int $decimals, string $expected) {
         $this->assertEquals($expected, Numbers::formatCents($value, $decimals));
     }
@@ -598,7 +599,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToPriceString */
+    #[DataProvider("providerToPriceString")]
     public function testToPriceString(mixed $value, string $expected) {
         $this->assertEquals($expected, Numbers::toPriceString($value));
     }
@@ -615,7 +616,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToBytesString */
+    #[DataProvider("providerToBytesString")]
     public function testToBytesString(mixed $value, bool $inGigas = false, string $expected) {
         $this->assertEquals($expected, Numbers::toBytesString($value, $inGigas));
     }
@@ -633,7 +634,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerZerosPad */
+    #[DataProvider("providerZerosPad")]
     public function testZerosPad(mixed $value, int $length, string $expected) {
         $this->assertEquals($expected, Numbers::zerosPad($value, $length));
     }
@@ -649,7 +650,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerCoordinatesDistance */
+    #[DataProvider("providerCoordinatesDistance")]
     public function testCoordinatesDistance(float $lat1, float $lon1, float $lat2, float $lon2, float $expected, float $delta) {
         $this->assertEqualsWithDelta($expected, Numbers::coordinatesDistance($lat1, $lon1, $lat2, $lon2), $delta);
     }
@@ -666,7 +667,7 @@ class NumbersTest extends TestCase {
     }
 
 
-    /** @dataProvider providerCalcExpression */
+    #[DataProvider("providerCalcExpression")]
     public function testCalcExpression(string $expression, int|float $expected) {
         $this->assertEquals($expected, Numbers::calcExpression($expression));
     }

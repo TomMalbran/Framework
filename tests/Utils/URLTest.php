@@ -4,10 +4,11 @@ namespace Tests\Utils;
 use Framework\Utils\URL;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class URLTest extends TestCase {
 
-    /** @dataProvider providerIsValidUrl */
+    #[DataProvider("providerIsValidUrl")]
     public function testIsValid(string $url, bool $expected) {
         $this->assertEquals($expected, URL::isValid($url));
     }
@@ -27,7 +28,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetHost */
+    #[DataProvider("providerGetHost")]
     public function testGetHost(string $url, string $expected) {
         $this->assertEquals($expected, URL::getHost($url));
     }
@@ -44,7 +45,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidDomain */
+    #[DataProvider("providerIsValidDomain")]
     public function testIsValidDomain(string $domain, bool $expected) {
         $this->assertEquals($expected, URL::isValidDomain($domain));
     }
@@ -63,7 +64,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDomain */
+    #[DataProvider("providerGetDomain")]
     public function testGetDomain(string $input, string $expected) {
         $this->assertEquals($expected, URL::getDomain($input));
     }
@@ -85,7 +86,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerGetDomainExtension */
+    #[DataProvider("providerGetDomainExtension")]
     public function testGetDomainExtension(string $input, string $expected) {
         $this->assertEquals($expected, URL::getDomainExtension($input));
     }
@@ -103,7 +104,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsDelegated */
+    #[DataProvider("providerIsDelegated")]
     public function testIsDelegated(string $host, string $serverIp, bool $expected) {
         $this->assertEquals($expected, URL::isDelegated($host, $serverIp));
     }
@@ -119,7 +120,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerVerifyDelegation */
+    #[DataProvider("providerVerifyDelegation")]
     public function testVerifyDelegation(string $host, string $serverIp, bool $expected) {
         $this->assertEquals($expected, URL::verifyDelegation($host, $serverIp));
     }
@@ -136,7 +137,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerIsValidSlug */
+    #[DataProvider("providerIsValidSlug")]
     public function testIsValidSlug(string $slug, bool $expected) {
         $this->assertEquals($expected, URL::isValidSlug($slug));
     }
@@ -152,7 +153,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerToSlug */
+    #[DataProvider("providerToSlug")]
     public function testToSlug(string $input, string $expected) {
         $this->assertEquals($expected, URL::toSlug($input));
     }
@@ -168,7 +169,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEncode */
+    #[DataProvider("providerEncode")]
     public function testEncode(string $input, string $expectedFragment) {
         $encoded = URL::encode($input);
         $this->assertStringContainsString($expectedFragment, $encoded);
@@ -184,7 +185,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerEncodeSpaces */
+    #[DataProvider("providerEncodeSpaces")]
     public function testEncodeSpaces(string $input, string $expected) {
         $this->assertEquals($expected, URL::encodeSpaces($input));
     }
@@ -200,7 +201,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerAddParams */
+    #[DataProvider("providerAddParams")]
     public function testAddParams(string $path, array $params, string $expectedFragment) {
         $result = URL::addParams($path, $params);
         $this->assertStringContainsString($expectedFragment, $result);
@@ -217,7 +218,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerParseUrlParams */
+    #[DataProvider("providerParseUrlParams")]
     public function testParseUrlParams(array $params, string $expectedFragment) {
         $result = URL::parseParams($params);
         $this->assertStringContainsString($expectedFragment, $result);
@@ -234,7 +235,7 @@ class URLTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReplaceInHtml */
+    #[DataProvider("providerReplaceInHtml")]
     public function testReplaceInHtml(string $html, string $baseUrl, string $expectedFragment) {
         $out = URL::replaceInHtml($html, $baseUrl);
         $this->assertStringContainsString($expectedFragment, $out);

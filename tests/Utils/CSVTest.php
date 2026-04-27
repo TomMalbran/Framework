@@ -4,6 +4,7 @@ namespace Tests\Utils;
 use Framework\Utils\CSV;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CSVTest extends TestCase {
 
@@ -15,7 +16,8 @@ class CSVTest extends TestCase {
         }
     }
 
-    /** @dataProvider providerEncode */
+
+    #[DataProvider("providerEncode")]
     public function testEncode(mixed $input, string $separator, string $expected) {
         $this->assertEquals($expected, CSV::encode($input, $separator));
     }
@@ -36,7 +38,7 @@ class CSVTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecode */
+    #[DataProvider("providerDecode")]
     public function testDecode(mixed $input, string $separator, array $fields, mixed $expected) {
         $this->assertEquals($expected, CSV::decode($input, $separator, $fields));
     }
@@ -55,7 +57,7 @@ class CSVTest extends TestCase {
     }
 
 
-    /** @dataProvider providerDecodeFile */
+    #[DataProvider("providerDecodeFile")]
     public function testDecodeFile(string $input, array $expected) {
         $res = CSV::decode($input);
         $this->assertIsArray($res);
@@ -75,7 +77,7 @@ class CSVTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReadFileAndWriteFile */
+    #[DataProvider("providerReadFileAndWriteFile")]
     public function testReadFileAndWriteFile(bool $validFile, array $data, array $expected) {
         $this->tmpFile = sys_get_temp_dir() . "/csv_utils_test_" . uniqid() . ".csv";
         if ($validFile) {
@@ -98,7 +100,7 @@ class CSVTest extends TestCase {
     }
 
 
-    /** @dataProvider providerReadFileSkipHeader */
+    #[DataProvider("providerReadFileSkipHeader")]
     public function testReadFileSkipHeader(string $data, array $expected) {
         $this->tmpFile = sys_get_temp_dir() . "/csv_utils_test_" . uniqid() . ".csv";
         file_put_contents($this->tmpFile, $data);
