@@ -5,86 +5,132 @@ use Framework\IO\Search;
 use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SearchTest extends TestCase {
 
-    public function testConstruct(): void {
-        // integer id
-        $d = new Dictionary([ "k" => "v" ]);
-        $s = new Search(10, "Title", $d);
-        $this->assertEquals(10, $s->id);
-        $this->assertEquals("Title", $s->title);
-        $this->assertSame($d, $s->data);
+    #[DataProvider("providerConstruct")]
+    public function testConstruct(int|string $id, string $title, ?Dictionary $data, int $expectedId, string $expectedTitle, bool $shouldReuseData): void {
+        $search = new Search($id, $title, $data);
 
-        // string numeric id should coerce to int
-        $s2 = new Search("20", "T2", null);
-        $this->assertIsInt($s2->id);
-        $this->assertEquals(20, $s2->id);
+        $this->assertSame($expectedId, $search->id);
+        $this->assertSame($expectedTitle, $search->title);
+        $this->assertIsInt($search->id);
 
-        // non-numeric id coerces to 0 when cast to int
-        $s3 = new Search("nope", "T3");
-        $this->assertEquals(0, $s3->id);
+        if ($shouldReuseData) {
+            $this->assertSame($data, $search->data);
+        } else {
+            $this->assertInstanceOf(Dictionary::class, $search->data);
+            $this->assertNotSame($data, $search->data);
+            $this->assertTrue($search->data->isEmpty());
+        }
     }
 
-    public function testGetString(): void {
-        $data = new Dictionary([ "field" => "value", "num" => 5 ]);
-        $s = new Search(1, "MyTitle", $data);
+    public static function providerConstruct(): array {
+        $dictionary = new Dictionary([ "k" => "v" ]);
 
-        // property access returns title/id as string
-        $this->assertEquals("MyTitle", $s->getString("title"));
-        $this->assertEquals("1", $s->getString("id"));
-
-        // data-backed keys
-        $this->assertEquals("value", $s->getString("field"));
-        $this->assertEquals("5", $s->getString("num"));
-
-        // missing key returns empty string
-        $this->assertEquals("", $s->getString("missing"));
+        return [
+            "integer_id" => [ 10, "Title", $dictionary, 10, "Title", true ],
+            "numeric_string_id" => [ "20", "T2", null, 20, "T2", false ],
+            "non_numeric_string_id" => [ "nope", "T3", null, 0, "T3", false ],
+        ];
     }
 
-    public function testGetInt(): void {
-        $data = new Dictionary([ "a" => "3", "b" => 7, "bad" => [ 1, 2 ]]);
-        $s = new Search("2", "T", $data);
 
-        // properties: id and title
-        $this->assertEquals(2, $s->getInt("id"));
-        $this->assertEquals(0, $s->getInt("title"));
-
-        // data backed
-        $this->assertEquals(3, $s->getInt("a"));
-        $this->assertEquals(7, $s->getInt("b"));
-
-        // arrays should return 0
-        $this->assertEquals(0, $s->getInt("bad"));
-
-        // missing key returns 0
-        $this->assertEquals(0, $s->getInt("missing"));
+    #[DataProvider("providerGetString")]
+    public function testGetString(Search $search, string $key, string $expected): void {
+        $this->assertSame($expected, $search->getString($key));
     }
 
-    public function testJsonSerialize(): void {
-        $data = new Dictionary(["x" => "xx"]);
-        $s = new Search(5, "TitleX", $data);
+    public static function providerGetString(): array {
+        $search = new Search(1, "MyTitle", new Dictionary([ "field" => "value", "num" => 5 ]));
 
-        $serialized = $s->jsonSerialize();
+        return [
+            "title_property" => [ $search, "title", "MyTitle" ],
+            "id_property"    => [ $search, "id", "1" ],
+            "data_field"     => [ $search, "field", "value" ],
+            "data_number"    => [ $search, "num", "5" ],
+            "missing_key"    => [ $search, "missing", "" ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetInt")]
+    public function testGetInt(Search $search, string $key, int $expected): void {
+        $this->assertSame($expected, $search->getInt($key));
+    }
+
+    public static function providerGetInt(): array {
+        $search = new Search("2", "T", new Dictionary([ "a" => "3", "b" => 7, "bad" => [ 1, 2 ]]));
+
+        return [
+            "id_property"    => [ $search, "id", 2 ],
+            "title_property" => [ $search, "title", 0 ],
+            "data_a"         => [ $search, "a", 3 ],
+            "data_b"         => [ $search, "b", 7 ],
+            "array_value"    => [ $search, "bad", 0 ],
+            "missing_key"    => [ $search, "missing", 0 ],
+        ];
+    }
+
+
+    #[DataProvider("providerJsonSerialize")]
+    public function testJsonSerialize(Search $search, array $expected): void {
+        $serialized = $search->jsonSerialize();
+
         $this->assertIsArray($serialized);
         $this->assertArrayHasKey("id", $serialized);
         $this->assertArrayHasKey("title", $serialized);
         $this->assertArrayHasKey("data", $serialized);
-        $this->assertEquals(5, $serialized["id"]);
-        $this->assertEquals("TitleX", $serialized["title"]);
+        $this->assertSame($expected["id"], $serialized["id"]);
+        $this->assertSame($expected["title"], $serialized["title"]);
         $this->assertInstanceOf(Dictionary::class, $serialized["data"]);
 
-        // json encode roundtrip
-        $json = json_encode($s);
+        $json = json_encode($search);
         $this->assertNotFalse($json);
         $decoded = json_decode($json, true);
-        $this->assertEquals($serialized["id"], $decoded["id"]);
-        $this->assertEquals($serialized["title"], $decoded["title"]);
+        $this->assertSame($expected["id"], $decoded["id"]);
+        $this->assertSame($expected["title"], $decoded["title"]);
+        $this->assertSame($expected["data"], $decoded["data"]);
         $this->assertIsArray($decoded["data"]);
     }
 
-    public function testCreate(): void {
-        // prepare rows: list of arrays with id and name
+    public static function providerJsonSerialize(): array {
+        return [
+            "with_data" => [
+                new Search(5, "TitleX", new Dictionary([ "x" => "xx" ])),
+                [
+                    "id"    => 5,
+                    "title" => "TitleX",
+                    "data"  => [ "x" => "xx" ],
+                ],
+            ],
+            "without_data" => [
+                new Search("abc", "TitleY"),
+                [
+                    "id"    => 0,
+                    "title" => "TitleY",
+                    "data"  => [],
+                ],
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerCreate")]
+    public function testCreate(Dictionary $rows, array|string $nameKey, int $expectedCount, array $expectedChecks): void {
+        $list = Search::create($rows, "id", $nameKey);
+
+        $this->assertIsArray($list);
+        $this->assertCount($expectedCount, $list);
+
+        foreach ($expectedChecks as $index => $checks) {
+            $this->assertSame($checks["id"], $list[$index]->id);
+            $this->assertSame($checks["title"], $list[$index]->title);
+        }
+    }
+
+    public static function providerCreate(): array {
         $rows = new Dictionary([
             [ "id" => "1", "name" => "One", "first" => "First", "last" => "A" ],
             [ "id" => "2", "name" => "Two", "first" => "Second", "last" => "B" ],
@@ -92,19 +138,27 @@ class SearchTest extends TestCase {
             [ "id" => "x", "name" => "ZeroId", "first" => "Z", "last" => "Z" ],
         ]);
 
-        // single name key
-        $list = Search::create($rows, "id", "name");
-        $this->assertIsArray($list);
-        $this->assertCount(3, $list); // duplicate id filtered
-        $this->assertEquals(1, $list[0]->id);
-        $this->assertEquals("One", $list[0]->title);
-
-        // multi-part name key
-        $list2 = Search::create($rows, "id", ["first", "last"]);
-        $this->assertEquals("First - A", $list2[0]->title);
-
-        // non-numeric id becomes 0 when cast in constructor
-        $last = end($list2);
-        $this->assertEquals(0, $last->id);
+        return [
+            "single_name_key" => [
+                $rows,
+                "name",
+                3,
+                [
+                    0 => [ "id" => 1, "title" => "One" ],
+                    1 => [ "id" => 2, "title" => "Two" ],
+                    2 => [ "id" => 0, "title" => "ZeroId" ],
+                ],
+            ],
+            "multi_part_name_key" => [
+                $rows,
+                [ "first", "last" ],
+                3,
+                [
+                    0 => [ "id" => 1, "title" => "First - A" ],
+                    1 => [ "id" => 2, "title" => "Second - B" ],
+                    2 => [ "id" => 0, "title" => "Z - Z" ],
+                ],
+            ],
+        ];
     }
 }
