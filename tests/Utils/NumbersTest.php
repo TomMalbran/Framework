@@ -346,20 +346,22 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerDivide")]
-    public function testDivide(mixed $numerator, mixed $divisor, int $decimals = 0, int|float $expected): void {
-        $this->assertEquals($expected, Numbers::divide($numerator, $divisor, $decimals));
+    public function testDivide(mixed $numerator, mixed $divisor, int $decimals = 0, float $expected): void {
+        $result = Numbers::divide($numerator, $divisor, $decimals);
+        $this->assertIsFloat($result);
+        $this->assertEquals($expected, $result);
     }
 
     public static function providerDivide(): array {
         return [
             "int_div_decimals" => [ 5, 2, 2, 2.5 ],
-            "exact_div"        => [ 4, 2, 0, 2 ],
+            "exact_div"        => [ 4, 2, 0, 2.0 ],
             "float_1_dec"      => [ 5.0, 2.0, 1, 2.5 ],
             "float_2_dec"      => [ 7.0, 3.0, 2, 2.33 ],
             "round_2_dec"      => [ 7, 3, 2, 2.33 ],
             "round_3_dec"      => [ 7, 3, 3, 2.333 ],
-            "zero_num"         => [ 0, 5, 0, 0 ],
-            "zero_div"         => [ 5, 0, 0, 0 ],
+            "zero_num"         => [ 0, 5, 0, 0.0 ],
+            "zero_div"         => [ 5, 0, 0, 0.0 ],
             "neg_num_1_dec"    => [ -5, 2, 1, -2.5 ],
             "neg_num_2_dec"    => [ -7, 3, 2, -2.33 ],
         ];
@@ -368,7 +370,9 @@ class NumbersTest extends TestCase {
 
     #[DataProvider("providerDivideInt")]
     public function testDivideInt(mixed $numerator, mixed $divisor, bool $useFloor = false, int $expected): void {
-        $this->assertEquals($expected, Numbers::divideInt($numerator, $divisor, $useFloor));
+        $result = Numbers::divideInt($numerator, $divisor, $useFloor);
+        $this->assertIsInt($result);
+        $this->assertEquals($expected, $result);
     }
 
     public static function providerDivideInt(): array {

@@ -274,10 +274,13 @@ class Numbers {
      * @param int|float $numerator
      * @param int|float $divisor
      * @param int       $decimals  Optional.
-     * @return int|float
+     * @return float
      */
-    public static function divide(int|float $numerator, int|float $divisor, int $decimals = 0): int|float {
-        return (int)$divisor === 0 ? 0 : self::round($numerator / $divisor, $decimals);
+    public static function divide(int|float $numerator, int|float $divisor, int $decimals = 0): float {
+        if ((int)$divisor === 0) {
+            return 0.0;
+        }
+        return self::round($numerator / $divisor, $decimals);
     }
 
     /**
@@ -288,7 +291,10 @@ class Numbers {
      * @return int
      */
     public static function divideInt(int $numerator, int $divisor, bool $useFloor = false): int {
-        return $divisor === 0 ? 0 : self::roundInt($numerator / $divisor, $useFloor);
+        if ($divisor === 0) {
+            return 0;
+        }
+        return self::roundInt($numerator / $divisor, $useFloor);
     }
 
     /**
