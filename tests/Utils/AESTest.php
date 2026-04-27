@@ -9,11 +9,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class AESTest extends TestCase {
 
     #[DataProvider("providerToUtf8Bytes")]
-    public function testToUtf8Bytes(string $input, array $expected) {
+    public function testToUtf8Bytes(string $input, array $expected): void {
         $this->assertSame($expected, AES::toUtf8Bytes($input));
     }
 
-    public static function providerToUtf8Bytes() {
+    public static function providerToUtf8Bytes(): array {
         return [
             "ascii" => [ "abc", [ 97, 98, 99 ] ],
             "ñ"     => [ "ñ", [ 195, 177 ] ],
@@ -24,11 +24,11 @@ class AESTest extends TestCase {
 
 
     #[DataProvider("providerToHexBytes")]
-    public function testToHexBytes(string $input, array $expected) {
+    public function testToHexBytes(string $input, array $expected): void {
         $this->assertSame($expected, AES::toHexBytes($input));
     }
 
-    public static function providerToHexBytes() {
+    public static function providerToHexBytes(): array {
         return [
             "hex"   => [ "0a1b", [ 10, 27 ] ],
             "upper" => [ "FF10", [ 255, 16 ] ],
@@ -41,11 +41,11 @@ class AESTest extends TestCase {
 
 
     #[DataProvider("providerFromBytes")]
-    public function testFromBytes(array $input, string $expected) {
+    public function testFromBytes(array $input, string $expected): void {
         $this->assertSame($expected, AES::fromBytes($input));
     }
 
-    public static function providerFromBytes() {
+    public static function providerFromBytes(): array {
         return [
             "ascii" => [ [ 97, 98, 99 ], "abc" ],
             "ñ"     => [ [ 195, 177 ], "ñ" ],
@@ -55,7 +55,7 @@ class AESTest extends TestCase {
     }
 
 
-    public function testEncrypt() {
+    public function testEncrypt(): void {
         // empty input remains empty
         $key = array_fill(0, 16, 1);
         $this->assertSame([], AES::encrypt([], $key));

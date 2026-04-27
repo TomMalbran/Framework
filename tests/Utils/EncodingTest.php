@@ -9,11 +9,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class EncodingTest extends TestCase {
 
     #[DataProvider("providerToUTF8")]
-    public function testToUTF8(string $input, string $expected) {
+    public function testToUTF8(string $input, string $expected): void {
         $this->assertSame($expected, Encoding::toUTF8($input));
     }
 
-    public static function providerToUTF8() {
+    public static function providerToUTF8(): array {
         return [
             "latin1_single_byte_to_utf8" => [ "\xE9", "é" ],
             "win1252_0x80_to_euro"       => [ "\x80", "€" ],
@@ -23,11 +23,11 @@ class EncodingTest extends TestCase {
 
 
     #[DataProvider("providerToWin1252AndAliases")]
-    public function testToWin1252AndAliases(string $input, string $expected, string $method) {
+    public function testToWin1252AndAliases(string $input, string $expected, string $method): void {
         $this->assertSame($expected, Encoding::$method($input));
     }
 
-    public static function providerToWin1252AndAliases() {
+    public static function providerToWin1252AndAliases(): array {
         return [
             "euro_to_win1252" => [ "€", "\x80", "toWin1252" ],
             "euro_to_iso8859" => [ "€", "\x80", "toISO8859" ],
@@ -37,11 +37,11 @@ class EncodingTest extends TestCase {
 
 
     #[DataProvider("providerFixUTF8")]
-    public function testFixUTF8(string $input, string $expected) {
+    public function testFixUTF8(string $input, string $expected): void {
         $this->assertSame($expected, Encoding::fixUTF8($input));
     }
 
-    public static function providerFixUTF8() {
+    public static function providerFixUTF8(): array {
         return [
             "already_correct_text_unchanged" => [ "hello", "hello" ],
         ];
@@ -49,11 +49,11 @@ class EncodingTest extends TestCase {
 
 
     #[DataProvider("providerUTF8FixWin1252Chars")]
-    public function testUTF8FixWin1252Chars(string $input, string $expected) {
+    public function testUTF8FixWin1252Chars(string $input, string $expected): void {
         $this->assertSame($expected, Encoding::UTF8FixWin1252Chars($input));
     }
 
-    public static function providerUTF8FixWin1252Chars() {
+    public static function providerUTF8FixWin1252Chars(): array {
         return [
             "broken_utf8_to_proper_utf8" => [ "\xC2\x80", "€" ],
         ];
@@ -61,11 +61,11 @@ class EncodingTest extends TestCase {
 
 
     #[DataProvider("providerRemoveBOM")]
-    public function testRemoveBOM(string $input, string $expected) {
+    public function testRemoveBOM(string $input, string $expected): void {
         $this->assertSame($expected, Encoding::removeBOM($input));
     }
 
-    public static function providerRemoveBOM() {
+    public static function providerRemoveBOM(): array {
         $bom = pack("CCC", 0xef, 0xbb, 0xbf);
         return [
             "removes_bom_from_string"    => [ $bom . "abc", "abc" ],
@@ -75,11 +75,11 @@ class EncodingTest extends TestCase {
 
 
     #[DataProvider("providerDecodeUTF8")]
-    public function testDecodeUTF8(string $input, string $expected) {
+    public function testDecodeUTF8(string $input, string $expected): void {
         $this->assertSame($expected, Encoding::decodeUTF8($input));
     }
 
-    public static function providerDecodeUTF8() {
+    public static function providerDecodeUTF8(): array {
         return [
             "latin1_single_byte_to_utf8" => [ "\xE9", "?" ],
             "utf8_unchanged"             => [ "abc", "abc" ],

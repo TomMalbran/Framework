@@ -13,7 +13,7 @@ use JsonSerializable;
 class ResponseTest extends TestCase {
 
     #[DataProvider("providerAddTokens")]
-    public function testAddTokens(bool $withTokens, string $accessToken, string $refreshToken, array $expectedData, array $missingKeys = []) {
+    public function testAddTokens(bool $withTokens, string $accessToken, string $refreshToken, array $expectedData, array $missingKeys = []): void {
         $response = Response::empty($withTokens);
         $response->addTokens($accessToken, $refreshToken);
 
@@ -27,7 +27,7 @@ class ResponseTest extends TestCase {
         }
     }
 
-    public static function providerAddTokens() {
+    public static function providerAddTokens(): array {
         return [
             "access_and_refresh" => [
                 true,
@@ -59,12 +59,12 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerToArray")]
-    public function testToArray(array $data, bool $withTokens) {
+    public function testToArray(array $data, bool $withTokens): void {
         $response = new Response($data, $withTokens);
         $this->assertSame($data, $response->toArray());
     }
 
-    public static function providerToArray() {
+    public static function providerToArray(): array {
         return [
             "basic" => [ [ "a" => 1, "b" => "v" ], true ],
             "empty" => [ [], false ],
@@ -73,7 +73,7 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerPrintData")]
-    public function testPrintData(Response $response, string $expectedOutput) {
+    public function testPrintData(Response $response, string $expectedOutput): void {
         ob_start();
         $response->printData();
         $output = ob_get_clean();
@@ -81,7 +81,7 @@ class ResponseTest extends TestCase {
         $this->assertSame($expectedOutput, $output);
     }
 
-    public static function providerPrintData() {
+    public static function providerPrintData(): array {
         $payload = [ "k" => "v", "n" => 3 ];
 
         return [
@@ -102,7 +102,7 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerEmpty")]
-    public function testEmpty(bool $withTokens, ?array $tokens, array $expectedData) {
+    public function testEmpty(bool $withTokens, ?array $tokens, array $expectedData): void {
         $response = Response::empty($withTokens);
         if ($tokens !== null) {
             $response->addTokens($tokens[0], $tokens[1]);
@@ -111,7 +111,7 @@ class ResponseTest extends TestCase {
         $this->assertSame($expectedData, $response->toArray());
     }
 
-    public static function providerEmpty() {
+    public static function providerEmpty(): array {
         return [
             "default" => [ true, null, [] ],
             "with_tokens" => [
@@ -128,7 +128,7 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerExit")]
-    public function testExit(int $exitCode) {
+    public function testExit(int $exitCode): void {
         $response = Response::exit($exitCode);
 
         $this->assertSame([ "result" => $exitCode ], $response->toArray());
@@ -137,7 +137,7 @@ class ResponseTest extends TestCase {
         $this->assertSame([ "result" => $exitCode ], $response->toArray());
     }
 
-    public static function providerExit() {
+    public static function providerExit(): array {
         return [
             "non_zero" => [ 7 ],
             "zero"     => [ 0 ],
@@ -146,11 +146,11 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerResult")]
-    public function testResult(array $result) {
+    public function testResult(array $result): void {
         $this->assertSame($result, Response::result($result)->toArray());
     }
 
-    public static function providerResult() {
+    public static function providerResult(): array {
         return [
             "filled" => [ [ "res" => 1 ] ],
             "empty"  => [ [] ],
@@ -159,7 +159,7 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerData")]
-    public function testData(JsonSerializable|array $payload, mixed $expectedData, ?string $expectedClass = null) {
+    public function testData(JsonSerializable|array $payload, mixed $expectedData, ?string $expectedClass = null): void {
         $data = Response::data($payload)->toArray();
 
         $this->assertArrayHasKey("data", $data);
@@ -169,7 +169,7 @@ class ResponseTest extends TestCase {
         }
     }
 
-    public static function providerData() {
+    public static function providerData(): array {
         $search = new Search(1, "T", null);
 
         return [
@@ -191,7 +191,7 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerSearch")]
-    public function testSearch(array $searches, array $expectedData, ?string $expectedClass = null) {
+    public function testSearch(array $searches, array $expectedData, ?string $expectedClass = null): void {
         $data = Response::search($searches)->toArray();
 
         $this->assertArrayHasKey("data", $data);
@@ -201,7 +201,7 @@ class ResponseTest extends TestCase {
         }
     }
 
-    public static function providerSearch() {
+    public static function providerSearch(): array {
         $search = new Search(1, "T", null);
 
         return [
@@ -212,11 +212,11 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerInvalid")]
-    public function testInvalid(array $expectedData) {
+    public function testInvalid(array $expectedData): void {
         $this->assertSame($expectedData, Response::invalid()->toArray());
     }
 
-    public static function providerInvalid() {
+    public static function providerInvalid(): array {
         return [
             "invalid" => [ [ "data" => [ "error" => true ] ] ],
         ];
@@ -224,11 +224,11 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerLogout")]
-    public function testLogout(array $expectedData) {
+    public function testLogout(array $expectedData): void {
         $this->assertSame($expectedData, Response::logout()->toArray());
     }
 
-    public static function providerLogout() {
+    public static function providerLogout(): array {
         return [
             "logout" => [ [ "userLoggedOut" => true ] ],
         ];
@@ -236,11 +236,11 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerSuccess")]
-    public function testSuccess(string $message, JsonSerializable|array|null $data, string $param, array $expectedData) {
+    public function testSuccess(string $message, JsonSerializable|array|null $data, string $param, array $expectedData): void {
         $this->assertSame($expectedData, Response::success($message, $data, $param)->toArray());
     }
 
-    public static function providerSuccess() {
+    public static function providerSuccess(): array {
         return [
             "default_param_and_null_data" => [
                 "ok",
@@ -267,11 +267,11 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerWarning")]
-    public function testWarning(string $message, JsonSerializable|array|null $data, string $param, array $expectedData) {
+    public function testWarning(string $message, JsonSerializable|array|null $data, string $param, array $expectedData): void {
         $this->assertSame($expectedData, Response::warning($message, $data, $param)->toArray());
     }
 
-    public static function providerWarning() {
+    public static function providerWarning(): array {
         return [
             "default_param_and_null_data" => [
                 "be careful",
@@ -298,11 +298,11 @@ class ResponseTest extends TestCase {
 
 
     #[DataProvider("providerError")]
-    public function testError(Errors|string $error, JsonSerializable|array|null $data, array|string $param, array $expectedData) {
+    public function testError(Errors|string $error, JsonSerializable|array|null $data, array|string $param, array $expectedData): void {
         $this->assertSame($expectedData, Response::error($error, $data, $param)->toArray());
     }
 
-    public static function providerError() {
+    public static function providerError(): array {
         $errorsWithGlobal = new Errors();
         $errorsWithGlobal->global("global-msg");
 

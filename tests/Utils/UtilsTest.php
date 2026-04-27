@@ -9,11 +9,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class UtilsTest extends TestCase {
 
     #[DataProvider("providerIsValidPassword")]
-    public function testIsValidPassword(string $password, string $requirements, int $minLength, bool $expected) {
+    public function testIsValidPassword(string $password, string $requirements, int $minLength, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidPassword($password, $requirements, $minLength));
     }
 
-    public static function providerIsValidPassword() {
+    public static function providerIsValidPassword(): array {
         return [
             "def_ld6_valid"          => [ "abc123", "ld", 6, true ],
             "def_ld6_invalid_short"  => [ "abc12", "ld", 6, false ],
@@ -32,11 +32,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerIsValidColor")]
-    public function testIsValidColor(string $color, bool $expected) {
+    public function testIsValidColor(string $color, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidColor($color));
     }
 
-    public static function providerIsValidColor() {
+    public static function providerIsValidColor(): array {
         return [
             "valid_short_black" => [ "#000", true ],
             "valid_short_white" => [ "#fff", true ],
@@ -51,11 +51,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerIsValidFullName")]
-    public function testIsValidFullName(string $fullName, bool $expected) {
+    public function testIsValidFullName(string $fullName, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidFullName($fullName));
     }
 
-    public static function providerIsValidFullName() {
+    public static function providerIsValidFullName(): array {
         return [
             "valid_simple"        => [ "John Doe", true ],
             "valid_with_spaces"   => [ " Ana María ", true ],
@@ -68,11 +68,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerParseName")]
-    public function testParseName(string $name, bool $lastNameFirst, string $separator, array $expected) {
+    public function testParseName(string $name, bool $lastNameFirst, string $separator, array $expected): void {
         $this->assertEquals($expected, Utils::parseName($name, $lastNameFirst, $separator));
     }
 
-    public static function providerParseName() {
+    public static function providerParseName(): array {
         return [
             "simple_first_last"     => [ "John Doe", false, " ", [ "John", "Doe" ] ],
             "last_name_first_comma" => [ "Doe,John", true, ",", [ "John", "Doe" ] ],
@@ -85,11 +85,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerIsValidUsername")]
-    public function testIsValidUsername(string $username, bool $expected) {
+    public function testIsValidUsername(string $username, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidUsername($username));
     }
 
-    public static function providerIsValidUsername() {
+    public static function providerIsValidUsername(): array {
         return [
             "valid_with_dash_number" => [ "user-name1", true ],
             "valid_simple"           => [ "username", true ],
@@ -104,11 +104,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerGenerateUsername")]
-    public function testGenerateUsername(string $domain, string $email, string $expected) {
+    public function testGenerateUsername(string $domain, string $email, string $expected): void {
         $this->assertEquals($expected, Utils::generateUsername($domain, $email));
     }
 
-    public static function providerGenerateUsername() {
+    public static function providerGenerateUsername(): array {
         return [
             "simple_domain"         => [ "example.com", "", "example" ],
             "with_email_prefix"     => [ "1domain.com", "e@mail.com", "e1domain" ],
@@ -124,11 +124,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerIsValidEmail")]
-    public function testIsValidEmail(string $email, bool $expected) {
+    public function testIsValidEmail(string $email, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidEmail($email));
     }
 
-    public static function providerIsValidEmail() {
+    public static function providerIsValidEmail(): array {
         return [
             "valid_simple"       => [ "test@example.com", true ],
             "valid_with_tag"     => [ "user+tag@example.co.uk", true ],
@@ -145,11 +145,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerGetEmailDomain")]
-    public function testGetEmailDomain(string $email, string $expected) {
+    public function testGetEmailDomain(string $email, string $expected): void {
         $this->assertEquals($expected, Utils::getEmailDomain($email));
     }
 
-    public static function providerGetEmailDomain() {
+    public static function providerGetEmailDomain(): array {
         return [
             "valid_simple"         => [ "user@Example.COM", "example.com" ],
             "valid_subdomain"      => [ "user@Sub.Example.Co.UK", "sub.example.co.uk" ],
@@ -165,11 +165,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerExtractEmail")]
-    public function testExtractEmail(string $input, string $expected) {
+    public function testExtractEmail(string $input, string $expected): void {
         $this->assertEquals($expected, Utils::extractEmail($input));
     }
 
-    public static function providerExtractEmail() {
+    public static function providerExtractEmail(): array {
         return [
             "simple_email"          => [ "contact: foo@bar.com here", "foo@bar.com" ],
             "email_in_brackets"     => [ "Contact: <john.smith@sub.example.com> is listed", "john.smith@sub.example.com" ],
@@ -184,11 +184,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerHideEmail")]
-    public function testHideEmail(string $email, string $expected) {
+    public function testHideEmail(string $email, string $expected): void {
         $this->assertEquals($expected, Utils::hideEmail($email));
     }
 
-    public static function providerHideEmail() {
+    public static function providerHideEmail(): array {
         return [
             "simple_email"      => [ "john.doe@example.com", "joh*****@example.com" ],
             "invalid_empty"     => [ "", "" ],
@@ -206,11 +206,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerIsValidPhone")]
-    public function testIsValidPhone(string $phone, bool $expected) {
+    public function testIsValidPhone(string $phone, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidPhone($phone));
     }
 
-    public static function providerIsValidPhone() {
+    public static function providerIsValidPhone(): array {
         return [
             "valid_plain"         => [ "1234567890", true ],
             "valid_formatted"     => [ "(123) 456-7890", true ],
@@ -223,11 +223,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerPhoneToNumber")]
-    public function testPhoneToNumber(string $phone, string $expected) {
+    public function testPhoneToNumber(string $phone, string $expected): void {
         $this->assertEquals($expected, Utils::phoneToNumber($phone));
     }
 
-    public static function providerPhoneToNumber() {
+    public static function providerPhoneToNumber(): array {
         return [
             "formatted_parentheses" => [ "(123) 456-7890", "1234567890" ],
             "formatted_dashed"      => [ "123-456-7890", "1234567890" ],
@@ -239,11 +239,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerHidePhone")]
-    public function testHidePhone(string $phone, string $expected) {
+    public function testHidePhone(string $phone, string $expected): void {
         $this->assertEquals($expected, Utils::hidePhone($phone));
     }
 
-    public static function providerHidePhone() {
+    public static function providerHidePhone(): array {
         return [
             "plain_digits"            => [ "1234567890", "123****890" ],
             "short_two_chars"         => [ "03", "*3" ],
@@ -261,11 +261,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerIsValidCUIT")]
-    public function testIsValidCUIT(string $cuit, bool $expected) {
+    public function testIsValidCUIT(string $cuit, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidCUIT($cuit));
     }
 
-    public static function providerIsValidCUIT() {
+    public static function providerIsValidCUIT(): array {
         return [
             "valid_raw_digits_1" => [ "20123456786", true ],
             "valid_raw_digits_2" => [ "20123456840", true ],
@@ -280,11 +280,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerParseCUIT")]
-    public function testParseCUIT(string $cuit, string $expected) {
+    public function testParseCUIT(string $cuit, string $expected): void {
         $this->assertEquals($expected, Utils::parseCUIT($cuit));
     }
 
-    public static function providerParseCUIT() {
+    public static function providerParseCUIT(): array {
         return [
             "valid_formatted_1"    => [ "20-12345678-6", "20-12345678-6" ],
             "valid_raw_digits_1"   => [ "20123456786", "20-12345678-6" ],
@@ -299,11 +299,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerCuitToNumber")]
-    public function testCuitToNumber(string $cuit, string $expected) {
+    public function testCuitToNumber(string $cuit, string $expected): void {
         $this->assertEquals($expected, Utils::cuitToNumber($cuit));
     }
 
-    public static function providerCuitToNumber() {
+    public static function providerCuitToNumber(): array {
         return [
             "valid_formatted"   => [ "20-12345678-6", "20123456786" ],
             "valid_with_spaces" => [ "20 12345678 6", "20123456786" ],
@@ -313,11 +313,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerIsValidDNI")]
-    public function testIsValidDNI(string $dni, bool $expected) {
+    public function testIsValidDNI(string $dni, bool $expected): void {
         $this->assertEquals($expected, Utils::isValidDNI($dni));
     }
 
-    public static function providerIsValidDNI() {
+    public static function providerIsValidDNI(): array {
         return [
             "valid_plain_digits"   => [ "12345678", true ],
             "valid_formatted_dots" => [ "12.345.678", true ],
@@ -331,11 +331,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerDniToNumber")]
-    public function testDniToNumber(string $dni, string $expected) {
+    public function testDniToNumber(string $dni, string $expected): void {
         $this->assertEquals($expected, Utils::dniToNumber($dni));
     }
 
-    public static function providerDniToNumber() {
+    public static function providerDniToNumber(): array {
         return [
             "formatted_dots"          => [ "12.345.678", "12345678" ],
             "formatted_dots_spaces"   => [ " 12.345.678 ", "12345678" ],
@@ -348,11 +348,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerGetAvatarUrl")]
-    public function testGetAvatarUrl(string $custom, string $email, string $expected) {
+    public function testGetAvatarUrl(string $custom, string $email, string $expected): void {
         $this->assertEquals($expected, Utils::getAvatarUrl($custom, $email));
     }
 
-    public static function providerGetAvatarUrl() {
+    public static function providerGetAvatarUrl(): array {
         return [
             "with_email"        => [ "", "me@example.com", "https://gravatar.com/avatar/" . md5("me@example.com") . "?default=mp" ],
             "with_custom"       => [ "custom", "me@example.com", "custom" ],
@@ -362,11 +362,11 @@ class UtilsTest extends TestCase {
 
 
     #[DataProvider("providerGetWhatsAppUrl")]
-    public function testGetWhatsAppUrl(string $phone, string $expected) {
+    public function testGetWhatsAppUrl(string $phone, string $expected): void {
         $this->assertEquals($expected, Utils::getWhatsAppUrl($phone));
     }
 
-    public static function providerGetWhatsAppUrl() {
+    public static function providerGetWhatsAppUrl(): array {
         return [
             "simple_number"  => [ "12345", "https://wa.me/12345" ],
             "with_plus_sign" => [ "+5412345", "https://wa.me/+5412345" ],

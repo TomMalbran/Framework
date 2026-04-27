@@ -25,7 +25,7 @@ enum TestMapBackedEnum: string implements Enum {
 
 class MapTest extends TestCase {
 
-    public function testIsEmpty() {
+    public function testIsEmpty(): void {
         $map = new Map();
         $this->assertTrue($map->isEmpty());
 
@@ -33,7 +33,7 @@ class MapTest extends TestCase {
         $this->assertFalse($map->isEmpty());
     }
 
-    public function testIsNotEmpty() {
+    public function testIsNotEmpty(): void {
         $map = new Map();
         $this->assertFalse($map->isNotEmpty());
 
@@ -41,7 +41,7 @@ class MapTest extends TestCase {
         $this->assertTrue($map->isNotEmpty());
     }
 
-    public function testSet() {
+    public function testSet(): void {
         $map = new Map();
         $map->set(TestMapPlainEnum::Apple, "value");
 
@@ -66,7 +66,7 @@ class MapTest extends TestCase {
         $this->assertNull($map->get(TestMapPlainEnum::None));
     }
 
-    public function testHas() {
+    public function testHas(): void {
         $map = new Map();
         $this->assertFalse($map->has(TestMapPlainEnum::Apple));
 
@@ -80,7 +80,7 @@ class MapTest extends TestCase {
         $this->assertTrue($map->has(TestMapBackedEnum::Red));
     }
 
-    public function testGet() {
+    public function testGet(): void {
         $map = new Map();
         $this->assertNull($map->get(TestMapPlainEnum::Apple));
 
@@ -93,7 +93,7 @@ class MapTest extends TestCase {
         $this->assertSame("red", $map->get(TestMapBackedEnum::Red));
     }
 
-    public function testGetInt() {
+    public function testGetInt(): void {
         $map = new Map();
         $this->assertSame(0, $map->getInt(TestMapPlainEnum::Apple));
 
@@ -119,7 +119,7 @@ class MapTest extends TestCase {
         $this->assertSame(0, $map->getInt(TestMapPlainEnum::None));
     }
 
-    public function testGetString() {
+    public function testGetString(): void {
         $map = new Map();
         $this->assertSame("", $map->getString(TestMapPlainEnum::Apple));
 
@@ -141,7 +141,7 @@ class MapTest extends TestCase {
         $this->assertSame("", $map->getString(TestMapPlainEnum::None));
     }
 
-    public function testCount() {
+    public function testCount(): void {
         $map = new Map();
         $this->assertSame(0, $map->count());
 
@@ -150,7 +150,7 @@ class MapTest extends TestCase {
         $this->assertSame(2, $map->count());
     }
 
-    public function testGetIterator() {
+    public function testGetIterator(): void {
         $map = new Map();
         $map->set(TestMapPlainEnum::Apple, "a");
         $map->set(TestMapPlainEnum::Banana, "b");
@@ -163,7 +163,7 @@ class MapTest extends TestCase {
         $this->assertSame([ "Apple" => "a", "Banana" => "b" ], $collected);
     }
 
-    public function testJsonSerialize() {
+    public function testJsonSerialize(): void {
         $map = new Map();
         $map->set(TestMapPlainEnum::Apple, "a");
         $map->set(TestMapBackedEnum::Red, "r");

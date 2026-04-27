@@ -11,12 +11,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class DateTest extends TestCase {
 
-    public function testEmpty() {
+    public function testEmpty(): void {
         $d = Date::empty();
         $this->assertTrue($d->isEmpty());
     }
 
-    public function testNow() {
+    public function testNow(): void {
         $d = Date::now();
         $this->assertTrue($d->isNotEmpty());
         $this->assertSame(time(), $d->toTime());
@@ -24,7 +24,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerCreate")]
-    public function testCreate(mixed $input, mixed $hour, int $expected) {
+    public function testCreate(mixed $input, mixed $hour, int $expected): void {
         $d = Date::create($input, $hour);
         $this->assertSame($expected, $d->toTime());
     }
@@ -58,7 +58,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerCreateOrNow")]
-    public function testCreateOrNow($input, $hour = null, $expectNow = false) {
+    public function testCreateOrNow($input, $hour = null, $expectNow = false): void {
         if ($expectNow) {
             $now = time();
             $d = Date::createOrNow($input, $hour);
@@ -89,7 +89,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerParse")]
-    public function testParse(string $input, int $expY, int $expM, int $expD) {
+    public function testParse(string $input, int $expY, int $expM, int $expD): void {
         $d = Date::parse($input);
         $this->assertSame($expY, $d->getYear());
         $this->assertSame($expM, $d->getMonth());
@@ -111,7 +111,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerCreateTime")]
-    public function testCreateTime(int $day, int $month, int $year, int $hour, int $minute, int $second, array $expect) {
+    public function testCreateTime(int $day, int $month, int $year, int $hour, int $minute, int $second, array $expect): void {
         $d = Date::createTime($day, $month, $year, $hour, $minute, $second);
         $this->assertSame($expect["year"], $d->getYear());
         $this->assertSame($expect["month"], $d->getMonth());
@@ -135,7 +135,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerMax")]
-    public function testMax(array $dates, int $expected) {
+    public function testMax(array $dates, int $expected): void {
         $result = Date::max(...$dates);
         $this->assertSame($expected, $result->toTime());
     }
@@ -152,7 +152,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsEmpty")]
-    public function testIsEmpty(mixed $input, mixed $hour = null, bool $expect) {
+    public function testIsEmpty(mixed $input, mixed $hour = null, bool $expect): void {
         $d = Date::create($input, $hour);
         $this->assertSame($expect, $d->isEmpty());
     }
@@ -172,7 +172,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsNotEmpty")]
-    public function testIsNotEmpty(mixed $input, mixed $hour = null, bool $expect) {
+    public function testIsNotEmpty(mixed $input, mixed $hour = null, bool $expect): void {
         $d = Date::create($input, $hour);
         $this->assertSame($expect, $d->isNotEmpty());
     }
@@ -192,7 +192,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerSet")]
-    public function testSet(array $setArgs, Date $date) {
+    public function testSet(array $setArgs, Date $date): void {
         $d = $date->set(...$setArgs);
 
         $expected = array_merge([
@@ -231,7 +231,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerSetHourMinute")]
-    public function testSetHourMinute(string $input, int $expectHour, int $expectMinute, bool $expectEmpty) {
+    public function testSetHourMinute(string $input, int $expectHour, int $expectMinute, bool $expectEmpty): void {
         $d = Date::createTime(1, 1, 2020, 5, 6, 7);
         $d3 = $d->setHourMinute($input);
 
@@ -259,7 +259,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerAdd")]
-    public function testAdd(array $addArgs, array $base, array $expect) {
+    public function testAdd(array $addArgs, array $base, array $expect): void {
         $d = Date::createTime($base["day"], $base["month"], $base["year"], $base["hour"], $base["minute"], $base["second"]);
         $d2 = $d->add(...$addArgs);
 
@@ -289,7 +289,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerSubtract")]
-    public function testSubtract(array $subArgs, array $base, array $expect) {
+    public function testSubtract(array $subArgs, array $base, array $expect): void {
         $d = Date::createTime($base["day"], $base["month"], $base["year"], $base["hour"], $base["minute"], $base["second"]);
         $d2 = $d->subtract(...$subArgs);
 
@@ -319,7 +319,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToTime")]
-    public function testToTime(mixed $input, int $expected) {
+    public function testToTime(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toTime());
     }
@@ -338,7 +338,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToNumber")]
-    public function testToNumber(mixed $input, int $expected) {
+    public function testToNumber(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toNumber());
     }
@@ -357,7 +357,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToMinutes")]
-    public function testToMinutes(mixed $input, int $expected) {
+    public function testToMinutes(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toMinutes());
     }
@@ -376,7 +376,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToServerTime")]
-    public function testToServerTime(int $input, bool $useTimeZone, int $expected) {
+    public function testToServerTime(int $input, bool $useTimeZone, int $expected): void {
         $d = Date::create($input);
         $d2 = $d->toServerTime($useTimeZone);
         $this->assertSame($expected, $d2->toTime());
@@ -392,12 +392,12 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToDayMoment")]
-    public function testToDayMoment(mixed $input, DateType $type, int $expected) {
+    public function testToDayMoment(mixed $input, DateType $type, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toDayMoment($type)->toTime());
     }
 
-    public static function providerToDayMoment() {
+    public static function providerToDayMoment(): array {
         return [
             "null"        => [ null, DateType::None, 0 ],
             "empty"       => [ "", DateType::Start, 0 ],
@@ -414,7 +414,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToWeekStart")]
-    public function testToWeekStart(mixed $input, bool $startMonday, int $expected) {
+    public function testToWeekStart(mixed $input, bool $startMonday, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toWeekStart($startMonday)->toTime());
     }
@@ -433,7 +433,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToWeekEnd")]
-    public function testToWeekEnd(mixed $input, bool $startMonday, int $expected) {
+    public function testToWeekEnd(mixed $input, bool $startMonday, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toWeekEnd($startMonday)->toTime());
     }
@@ -452,7 +452,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToMonthStart")]
-    public function testToMonthStart(mixed $input, int $expected) {
+    public function testToMonthStart(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toMonthStart()->toTime());
     }
@@ -470,7 +470,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToMonthEnd")]
-    public function testToMonthEnd(mixed $input, int $expected) {
+    public function testToMonthEnd(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toMonthEnd()->toTime());
     }
@@ -489,7 +489,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToYearStart")]
-    public function testToYearStart(mixed $input, int $expected) {
+    public function testToYearStart(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toYearStart()->toTime());
     }
@@ -507,7 +507,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToYearEnd")]
-    public function testToYearEnd(mixed $input, int $expected) {
+    public function testToYearEnd(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toYearEnd()->toTime());
     }
@@ -525,7 +525,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetYear")]
-    public function testGetYear(mixed $input, int $expected) {
+    public function testGetYear(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getYear());
     }
@@ -543,7 +543,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetYearDays")]
-    public function testGetYearDays(mixed $input, int $expected) {
+    public function testGetYearDays(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getYearDays());
     }
@@ -561,7 +561,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetMonth")]
-    public function testGetMonth(mixed $input, int $expected) {
+    public function testGetMonth(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getMonth());
     }
@@ -579,7 +579,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetMonthZero")]
-    public function testGetMonthZero(mixed $input, string $expected) {
+    public function testGetMonthZero(mixed $input, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getMonthZero());
     }
@@ -597,7 +597,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetMonthDays")]
-    public function testGetMonthDays(mixed $input, int $expected) {
+    public function testGetMonthDays(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getMonthDays());
     }
@@ -616,7 +616,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetMonthName")]
-    public function testGetMonthName(mixed $input, string $expected) {
+    public function testGetMonthName(mixed $input, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getMonthName());
     }
@@ -634,7 +634,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetDay")]
-    public function testGetDay(mixed $input, int $expected) {
+    public function testGetDay(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getDay());
     }
@@ -652,7 +652,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetDayZero")]
-    public function testGetDayZero(mixed $input, string $expected) {
+    public function testGetDayZero(mixed $input, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getDayZero());
     }
@@ -670,7 +670,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetDayOfWeek")]
-    public function testGetDayOfWeek(mixed $input, bool $startMonday, int $expected) {
+    public function testGetDayOfWeek(mixed $input, bool $startMonday, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getDayOfWeek($startMonday));
     }
@@ -689,7 +689,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetDayName")]
-    public function testGetDayName(mixed $input, bool $startMonday, int $length, bool $inUpperCase, string $expected) {
+    public function testGetDayName(mixed $input, bool $startMonday, int $length, bool $inUpperCase, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getDayName($startMonday, $length, $inUpperCase));
     }
@@ -704,7 +704,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetDayMonth")]
-    public function testGetDayMonth(mixed $input, int $monthLength, bool $inUpperCase, string $language, string $expected) {
+    public function testGetDayMonth(mixed $input, int $monthLength, bool $inUpperCase, string $language, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getDayMonth($monthLength, $inUpperCase, $language));
     }
@@ -722,7 +722,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetHour")]
-    public function testGetHour(mixed $input, int $expected) {
+    public function testGetHour(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getHour());
     }
@@ -740,7 +740,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetMinute")]
-    public function testGetMinute(mixed $input, int $expected) {
+    public function testGetMinute(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getMinute());
     }
@@ -758,7 +758,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetSecond")]
-    public function testGetSecond(mixed $input, int $expected) {
+    public function testGetSecond(mixed $input, int $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->getSecond());
     }
@@ -776,7 +776,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsToday")]
-    public function testIsToday(mixed $input, bool $expected) {
+    public function testIsToday(mixed $input, bool $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->isToday());
     }
@@ -793,7 +793,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsPast")]
-    public function testIsPast(mixed $input, bool $expected) {
+    public function testIsPast(mixed $input, bool $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->isPast());
     }
@@ -810,7 +810,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsFuture")]
-    public function testIsFuture(mixed $input, bool $expected) {
+    public function testIsFuture(mixed $input, bool $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->isFuture());
     }
@@ -827,7 +827,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsCurrentMonth")]
-    public function testIsCurrentMonth(mixed $input, bool $expected) {
+    public function testIsCurrentMonth(mixed $input, bool $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->isCurrentMonth());
     }
@@ -845,7 +845,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsEqual")]
-    public function testIsEqual(mixed $input1, mixed $input2, bool $expected) {
+    public function testIsEqual(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->isEqual($d2));
@@ -867,7 +867,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsNotEqual")]
-    public function testIsNotEqual(mixed $input1, mixed $input2, bool $expected) {
+    public function testIsNotEqual(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->isNotEqual($d2));
@@ -889,7 +889,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsBefore")]
-    public function testIsBefore(mixed $input1, mixed $input2, bool $expected) {
+    public function testIsBefore(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->isBefore($d2));
@@ -910,7 +910,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsBeforeOrEqual")]
-    public function testIsBeforeOrEqual(mixed $input1, mixed $input2, bool $expected) {
+    public function testIsBeforeOrEqual(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->isBeforeOrEqual($d2));
@@ -931,7 +931,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsAfter")]
-    public function testIsAfter(mixed $input1, mixed $input2, bool $expected) {
+    public function testIsAfter(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->isAfter($d2));
@@ -952,7 +952,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsAfterOrEqual")]
-    public function testIsAfterOrEqual(mixed $input1, mixed $input2, bool $expected) {
+    public function testIsAfterOrEqual(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->isAfterOrEqual($d2));
@@ -973,7 +973,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsBetween")]
-    public function testIsBetween(mixed $input, mixed $start, mixed $end, bool $expected) {
+    public function testIsBetween(mixed $input, mixed $start, mixed $end, bool $expected): void {
         $d = Date::create($input);
         $s = Date::create($start);
         $e = Date::create($end);
@@ -997,7 +997,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsAtDayStart")]
-    public function testIsAtDayStart(mixed $input, bool $expected) {
+    public function testIsAtDayStart(mixed $input, bool $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->isAtDayStart());
     }
@@ -1015,7 +1015,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetDaysDiff")]
-    public function testGetDaysDiff(mixed $input1, mixed $input2, int $expected) {
+    public function testGetDaysDiff(mixed $input1, mixed $input2, int $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->getDaysDiff($d2));
@@ -1036,7 +1036,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetWeeksDiff")]
-    public function testGetWeeksDiff(mixed $input1, mixed $input2, int $expected) {
+    public function testGetWeeksDiff(mixed $input1, mixed $input2, int $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->getWeeksDiff($d2));
@@ -1057,7 +1057,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetHoursDiff")]
-    public function testGetHoursDiff(mixed $input1, mixed $input2, int $expected) {
+    public function testGetHoursDiff(mixed $input1, mixed $input2, int $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->getHoursDiff($d2));
@@ -1078,7 +1078,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetMinutesDiff")]
-    public function testGetMinutesDiff(mixed $input1, mixed $input2, int $expected) {
+    public function testGetMinutesDiff(mixed $input1, mixed $input2, int $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->getMinutesDiff($d2));
@@ -1099,7 +1099,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetSecondsDiff")]
-    public function testGetSecondsDiff(mixed $input1, mixed $input2, int $expected) {
+    public function testGetSecondsDiff(mixed $input1, mixed $input2, int $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->getSecondsDiff($d2));
@@ -1120,7 +1120,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerGetAge")]
-    public function testGetAge(mixed $input, mixed $reference, int $expected) {
+    public function testGetAge(mixed $input, mixed $reference, int $expected): void {
         $d = Date::create($input);
         $r = Date::create($reference);
         $this->assertSame($expected, $d->getAge($r));
@@ -1143,7 +1143,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerFormat")]
-    public function testFormat(mixed $input, string $format, string $expected) {
+    public function testFormat(mixed $input, string $format, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->format($format));
     }
@@ -1160,7 +1160,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToString")]
-    public function testToString(mixed $input, DateFormat $format, string $expected) {
+    public function testToString(mixed $input, DateFormat $format, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toString($format));
     }
@@ -1186,7 +1186,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToISOString")]
-    public function testToISOString(mixed $input, string $expected) {
+    public function testToISOString(mixed $input, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toISOString());
     }
@@ -1203,7 +1203,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToUTCString")]
-    public function testToUTCString(mixed $input, string $expected) {
+    public function testToUTCString(mixed $input, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, $d->toUTCString());
     }
@@ -1220,7 +1220,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerToHourPeriodString")]
-    public function testToHourPeriodString(mixed $input, mixed $input2, string $expected) {
+    public function testToHourPeriodString(mixed $input, mixed $input2, string $expected): void {
         $d1 = Date::create($input);
         $d2 = Date::create($input2);
         $this->assertSame($expected, $d1->toHourPeriodString($d2));
@@ -1239,7 +1239,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerJsonSerialize")]
-    public function testJsonSerialize(mixed $input, string $expected) {
+    public function testJsonSerialize(mixed $input, string $expected): void {
         $d = Date::create($input);
         $this->assertSame($expected, json_encode($d));
     }
@@ -1257,7 +1257,7 @@ class DateTest extends TestCase {
     }
 
 
-    public function testDateTypeName() {
+    public function testDateTypeName(): void {
         $this->assertSame("none", DateType::None->getName());
         $this->assertSame("start", DateType::Start->getName());
         $this->assertSame("middle", DateType::Middle->getName());

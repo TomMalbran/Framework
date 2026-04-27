@@ -18,11 +18,11 @@ class CSVTest extends TestCase {
 
 
     #[DataProvider("providerEncode")]
-    public function testEncode(mixed $input, string $separator, string $expected) {
+    public function testEncode(mixed $input, string $separator, string $expected): void {
         $this->assertEquals($expected, CSV::encode($input, $separator));
     }
 
-    public static function providerEncode() {
+    public static function providerEncode(): array {
         return [
             "array_basic"            => [ ["a", "b", "c"], ",", "a,b,c" ],
             "array_skip_empty"       => [ ["a", "", "b"], ",", "a,b" ],
@@ -39,11 +39,11 @@ class CSVTest extends TestCase {
 
 
     #[DataProvider("providerDecode")]
-    public function testDecode(mixed $input, string $separator, array $fields, mixed $expected) {
+    public function testDecode(mixed $input, string $separator, array $fields, mixed $expected): void {
         $this->assertEquals($expected, CSV::decode($input, $separator, $fields));
     }
 
-    public static function providerDecode() {
+    public static function providerDecode(): array {
         return [
             "string_basic"          => [ "a,b,c", ",", [], ["a", "b", "c"] ],
             "numeric_strings"       => [ "1,2,3", ",", [], ["1", "2", "3"] ],
@@ -58,7 +58,7 @@ class CSVTest extends TestCase {
 
 
     #[DataProvider("providerDecodeFile")]
-    public function testDecodeFile(string $input, array $expected) {
+    public function testDecodeFile(string $input, array $expected): void {
         $res = CSV::decode($input);
         $this->assertIsArray($res);
         $this->assertCount(count($expected), $res);
@@ -67,7 +67,7 @@ class CSVTest extends TestCase {
         }
     }
 
-    public static function providerDecodeFile() {
+    public static function providerDecodeFile(): array {
         return [
             "basic_multiline"  => [ "a,b\nc,d", [["a", "b"], ["c", "d"]] ],
             "trailing_newline" => [ "a,b\nc,d\n", [["a", "b"], ["c", "d"]] ],
@@ -78,7 +78,7 @@ class CSVTest extends TestCase {
 
 
     #[DataProvider("providerReadFileAndWriteFile")]
-    public function testReadFileAndWriteFile(bool $validFile, array $data, array $expected) {
+    public function testReadFileAndWriteFile(bool $validFile, array $data, array $expected): void {
         $this->tmpFile = sys_get_temp_dir() . "/csv_utils_test_" . uniqid() . ".csv";
         if ($validFile) {
             touch($this->tmpFile);
@@ -91,7 +91,7 @@ class CSVTest extends TestCase {
         $this->assertEquals($expected, $read);
     }
 
-    public static function providerReadFileAndWriteFile() {
+    public static function providerReadFileAndWriteFile(): array {
         return [
             "basic_write_read" => [ true, [["p", "q"], ["r", "s"]], [["p", "q"], ["r", "s"]] ],
             "empty_fields"     => [ true, [["a", ""], ["", "b"]], [["a"], ["b"]] ],
@@ -101,7 +101,7 @@ class CSVTest extends TestCase {
 
 
     #[DataProvider("providerReadFileSkipHeader")]
-    public function testReadFileSkipHeader(string $data, array $expected) {
+    public function testReadFileSkipHeader(string $data, array $expected): void {
         $this->tmpFile = sys_get_temp_dir() . "/csv_utils_test_" . uniqid() . ".csv";
         file_put_contents($this->tmpFile, $data);
 
@@ -111,7 +111,7 @@ class CSVTest extends TestCase {
         $this->assertEquals($expected, $res);
     }
 
-    public static function providerReadFileSkipHeader() {
+    public static function providerReadFileSkipHeader(): array {
         return [
             "basic_skip_header" => [ "h1,h2\nv1,v2\nv3,v4\n", [["v1", "v2"], ["v3", "v4"]] ],
             "only_header"       => [ "h1,h2\n", [] ],

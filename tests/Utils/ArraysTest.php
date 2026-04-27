@@ -9,11 +9,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class ArraysTest extends TestCase {
 
     #[DataProvider("providerIsList")]
-    public function testIsList(mixed $input, bool $expected) {
+    public function testIsList(mixed $input, bool $expected): void {
         $this->assertSame($expected, Arrays::isList($input));
     }
 
-    public static function providerIsList() {
+    public static function providerIsList(): array {
         return [
             "list"    => [ [ 1, 2, 3 ], true ],
             "assoc"   => [ [ "a" => 1 ], false ],
@@ -25,11 +25,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIsArrayList")]
-    public function testIsArrayList(mixed $input, bool $expected) {
+    public function testIsArrayList(mixed $input, bool $expected): void {
         $this->assertSame($expected, Arrays::isArrayList($input));
     }
 
-    public static function providerIsArrayList() {
+    public static function providerIsArrayList(): array {
         return [
             "array_list" => [ [[ 1 ], [ 2 ]], true ],
             "assoc"      => [ [ "a" => [ "x" ]], false ],
@@ -42,11 +42,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIsDict")]
-    public function testIsDict(mixed $input, bool $expected) {
+    public function testIsDict(mixed $input, bool $expected): void {
         $this->assertSame($expected, Arrays::isDict($input));
     }
 
-    public static function providerIsDict() {
+    public static function providerIsDict(): array {
         return [
             "dict"    => [ [ "a" => 1 ], true ],
             "list"    => [ [ 1, 2 ], false ],
@@ -58,11 +58,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIsMap")]
-    public function testIsMap(mixed $input, bool $expected) {
+    public function testIsMap(mixed $input, bool $expected): void {
         $this->assertSame($expected, Arrays::isMap($input));
     }
 
-    public static function providerIsMap() {
+    public static function providerIsMap(): array {
         return [
             "map"     => [ [ "a" => [ "x" => 1 ] ], true ],
             "assoc"   => [ [ "a" => 1 ], false ],
@@ -75,11 +75,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToArray")]
-    public function testToArray(mixed $input, array $expected) {
+    public function testToArray(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::toArray($input));
     }
 
-    public static function providerToArray() {
+    public static function providerToArray(): array {
         return [
             "array"  => [ [ 1, 2 ], [ 1, 2 ] ],
             "string" => [ "x", [ "x" ] ],
@@ -91,11 +91,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToList")]
-    public function testToList(mixed $input, array $expected) {
+    public function testToList(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::toList($input));
     }
 
-    public static function providerToList() {
+    public static function providerToList(): array {
         return [
             "array"  => [ [ 1, 2 ], [ 1, 2 ] ],
             "number" => [ 1, [ 1 ] ],
@@ -108,11 +108,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToObject")]
-    public function testToObject(mixed $input, mixed $expected) {
+    public function testToObject(mixed $input, mixed $expected): void {
         $this->assertEquals($expected, Arrays::toObject($input));
     }
 
-    public static function providerToObject() {
+    public static function providerToObject(): array {
         return [
             "array" => [ [ "a" => 1 ], [ "a" => 1 ] ],
             "null"  => [ null, (object)[] ],
@@ -122,11 +122,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToInts")]
-    public function testToInts(mixed $input, string $key, bool $withoutEmpty, array $expected) {
+    public function testToInts(mixed $input, string $key, bool $withoutEmpty, array $expected): void {
         $this->assertSame($expected, Arrays::toInts($input, $key, $withoutEmpty));
     }
 
-    public static function providerToInts() {
+    public static function providerToInts(): array {
         return [
             "zero_no_empty"      => [ 0, "", true, [] ],
             "single_int"         => [ 5, "", false, [ 5 ] ],
@@ -141,11 +141,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToStrings")]
-    public function testToStrings(mixed $input, string $key, bool $withoutEmpty, array $expected) {
+    public function testToStrings(mixed $input, string $key, bool $withoutEmpty, array $expected): void {
         $this->assertSame($expected, Arrays::toStrings($input, $key, $withoutEmpty));
     }
 
-    public static function providerToStrings() {
+    public static function providerToStrings(): array {
         return [
             "simple_list"           => [ [ "a", "b" ], "", false, [ "a", "b" ] ],
             "non_array_non_string"  => [ 123, "", false, [] ],
@@ -163,11 +163,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToStringsMap")]
-    public function testToStringsMap(mixed $input, array $expected) {
+    public function testToStringsMap(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::toStringsMap($input));
     }
 
-    public static function providerToStringsMap() {
+    public static function providerToStringsMap(): array {
         return [
             "simple_conversion"   => [ [ "a" => 1 ], [ "a" => "1" ] ],
             "numeric_keys"        => [ [ 1 => "v" ], [ "1" => "v" ] ],
@@ -181,11 +181,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToIntStringMap")]
-    public function testToIntStringMap(mixed $input, array $expected) {
+    public function testToIntStringMap(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::toIntStringMap($input));
     }
 
-    public static function providerToIntStringMap() {
+    public static function providerToIntStringMap(): array {
         return [
             "numeric_string_keys" => [ [ "1" => "v" ], [ 1 => "v" ] ],
             "integer_keys"        => [ [ 2 => "x" ], [ 2 => "x" ] ],
@@ -201,11 +201,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToStringIntMap")]
-    public function testToStringIntMap(mixed $input, array $expected) {
+    public function testToStringIntMap(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::toStringIntMap($input));
     }
 
-    public static function providerToStringIntMap() {
+    public static function providerToStringIntMap(): array {
         return [
             "string_numeric"    => [ [ "k" => "1" ], [ "k" => 1 ] ],
             "integer"           => [ [ "k" => 2 ], [ "k" => 2 ] ],
@@ -219,11 +219,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToStringFloatMap")]
-    public function testToStringFloatMap(mixed $input, int $decimals, array $expected) {
+    public function testToStringFloatMap(mixed $input, int $decimals, array $expected): void {
         $this->assertSame($expected, Arrays::toStringFloatMap($input, $decimals));
     }
 
-    public static function providerToStringFloatMap() {
+    public static function providerToStringFloatMap(): array {
         return [
             "string_numeric_with_decimals" => [ [ "k" => "1.23" ], 2, [ "k" => 1.23 ] ],
             "integer_with_decimals"        => [ [ "k" => 123 ], 2, [ "k" => 1.23 ] ],
@@ -236,11 +236,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerToStringMixedMap")]
-    public function testToStringMixedMap(mixed $input, array $expected) {
+    public function testToStringMixedMap(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::toStringMixedMap($input));
     }
 
-    public static function providerToStringMixedMap() {
+    public static function providerToStringMixedMap(): array {
         $obj = (object)[ "x" => 1 ];
         return [
             "nested_array_preserved"   => [ [ "k" => [ "x" => 1 ] ], [ "k" => [ "x" => 1 ] ] ],
@@ -253,11 +253,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetValues")]
-    public function testGetValues(mixed $input, array $expected) {
+    public function testGetValues(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::getValues($input));
     }
 
-    public static function providerGetValues() {
+    public static function providerGetValues(): array {
         $obj = (object)[ "x" => 1 ];
         return [
             "assoc"          => [ [ "a" => 1, "b" => 2 ], [ 1, 2 ] ],
@@ -270,11 +270,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIsEmpty")]
-    public function testIsEmpty(mixed $input, ?string $key, bool $expected) {
+    public function testIsEmpty(mixed $input, ?string $key, bool $expected): void {
         $this->assertSame($expected, Arrays::isEmpty($input, $key));
     }
 
-    public static function providerIsEmpty() {
+    public static function providerIsEmpty(): array {
         return [
             "empty_array"           => [ [], null, true ],
             "array_with_value"      => [ [ 1 ], null, false ],
@@ -293,11 +293,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerLength")]
-    public function testLength(mixed $input, int $expected) {
+    public function testLength(mixed $input, int $expected): void {
         $this->assertSame($expected, Arrays::length($input));
     }
 
-    public static function providerLength() {
+    public static function providerLength(): array {
         return [
             "list"   => [ [ 1, 2, 3 ], 3 ],
             "assoc"  => [ [ "a" => 1, "b" => 2 ], 2 ],
@@ -309,11 +309,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerContains")]
-    public function testContains(mixed $input, mixed $needle, ?string $key, bool $caseInsensitive, bool $atLeastOne, bool $expected) {
+    public function testContains(mixed $input, mixed $needle, ?string $key, bool $caseInsensitive, bool $atLeastOne, bool $expected): void {
         $this->assertSame($expected, Arrays::contains($input, $needle, $key, $caseInsensitive, $atLeastOne));
     }
 
-    public static function providerContains() {
+    public static function providerContains(): array {
         $rowsObj       = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
         $rowsObjSingle = [(object)[ "id" => 1 ]];
 
@@ -337,11 +337,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerContainsKey")]
-    public function testContainsKey(mixed $input, mixed $key, bool $expected) {
+    public function testContainsKey(mixed $input, mixed $key, bool $expected): void {
         $this->assertSame($expected, Arrays::containsKey($input, $key));
     }
 
-    public static function providerContainsKey() {
+    public static function providerContainsKey(): array {
         return [
             "simple_key"            => [ [ "a" => 1 ], "a", true ],
             "missing_key"           => [ [ "a" => 1 ], "b", false ],
@@ -355,11 +355,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIsEqual")]
-    public function testIsEqual(mixed $a, mixed $b, string $key, bool $expected) {
+    public function testIsEqual(mixed $a, mixed $b, string $key, bool $expected): void {
         $this->assertSame($expected, Arrays::isEqual($a, $b, $key));
     }
 
-    public static function providerIsEqual() {
+    public static function providerIsEqual(): array {
         return [
             "simple_equal"            => [ [ 1, 2 ], [ 1, 2 ], "", true ],
             "different_length"        => [ [ 1 ], [ 1, 2 ], "", false ],
@@ -373,11 +373,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIsEqualWithKeys")]
-    public function testIsEqualWithKeys(mixed $a, mixed $b, array $keys, bool $expected) {
+    public function testIsEqualWithKeys(mixed $a, mixed $b, array $keys, bool $expected): void {
         $this->assertSame($expected, Arrays::isEqualWithKeys($a, $b, $keys));
     }
 
-    public static function providerIsEqualWithKeys() {
+    public static function providerIsEqualWithKeys(): array {
         return [
             "equal_arrays"       => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 2 ], [ "x", "y" ], true ],
             "unequal_values"     => [ [ "x" => 1, "y" => 2 ], [ "x" => 1, "y" => 3 ], [ "x", "y" ], false ],
@@ -390,11 +390,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIsEqualJSON")]
-    public function testIsEqualJSON(mixed $a, mixed $b, bool $expected) {
+    public function testIsEqualJSON(mixed $a, mixed $b, bool $expected): void {
         $this->assertSame($expected, Arrays::isEqualJSON($a, $b));
     }
 
-    public static function providerIsEqualJSON() {
+    public static function providerIsEqualJSON(): array {
         return [
             "array_vs_object"         => [ [ "a" => 1 ], (object)[ "a" => 1 ], true ],
             "array_vs_json_string"    => [ [ "a" => 1 ], '{"a":1}', true ],
@@ -408,11 +408,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerIntersects")]
-    public function testIntersects(mixed $a, mixed $b, bool $expected) {
+    public function testIntersects(mixed $a, mixed $b, bool $expected): void {
         $this->assertSame($expected, Arrays::intersects($a, $b));
     }
 
-    public static function providerIntersects() {
+    public static function providerIntersects(): array {
         $obj = (object)[ "x" => 1 ];
         return [
             "simple_overlap"            => [ [ 1, 2 ], [ 2, 3 ], true ],
@@ -429,11 +429,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetDiff")]
-    public function testGetDiff(mixed $a, mixed $b, string $key, ?string $returnKey, array $expected) {
+    public function testGetDiff(mixed $a, mixed $b, string $key, ?string $returnKey, array $expected): void {
         $this->assertSame($expected, Arrays::getDiff($a, $b, $key, $returnKey));
     }
 
-    public static function providerGetDiff() {
+    public static function providerGetDiff(): array {
         return [
             "basic_diff"          => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", null, [[ "id" => 1 ]] ],
             "extract_id_key"      => [ [[ "id" => 1 ], [ "id" => 2 ]], [[ "id" => 2 ]], "id", "id", [ 1 ] ],
@@ -447,11 +447,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerAddFirst")]
-    public function testAddFirst(mixed $input, array $elements, array $expected) {
+    public function testAddFirst(mixed $input, array $elements, array $expected): void {
         $this->assertSame($expected, Arrays::addFirst($input, ...$elements));
     }
 
-    public static function providerAddFirst() {
+    public static function providerAddFirst(): array {
         $o = (object)[ "x" => 1 ];
         return [
             "single_element"    => [ [ 1, 2 ], [ 0 ], [ 0, 1, 2 ] ],
@@ -463,11 +463,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerAddAt")]
-    public function testAddAt(mixed $input, int $index, array $elements, array $expected) {
+    public function testAddAt(mixed $input, int $index, array $elements, array $expected): void {
         $this->assertSame($expected, Arrays::addAt($input, $index, ...$elements));
     }
 
-    public static function providerAddAt() {
+    public static function providerAddAt(): array {
         $o = (object)[ "x" => 1 ];
         return [
             "insert_middle"         => [ [ 1, 2 ], 1, [ 99 ], [ 1, 99, 2 ] ],
@@ -481,11 +481,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerRemoveFirst")]
-    public function testRemoveFirst(mixed $input, array $expected) {
+    public function testRemoveFirst(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::removeFirst($input));
     }
 
-    public static function providerRemoveFirst() {
+    public static function providerRemoveFirst(): array {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
         return [
@@ -498,11 +498,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerRemoveLast")]
-    public function testRemoveLast(mixed $input, array $expected) {
+    public function testRemoveLast(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::removeLast($input));
     }
 
-    public static function providerRemoveLast() {
+    public static function providerRemoveLast(): array {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
         return [
@@ -516,11 +516,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerRemoveAt")]
-    public function testRemoveAt(mixed $input, int $index, array $expected) {
+    public function testRemoveAt(mixed $input, int $index, array $expected): void {
         $this->assertSame($expected, Arrays::removeAt($input, $index));
     }
 
-    public static function providerRemoveAt() {
+    public static function providerRemoveAt(): array {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
         return [
@@ -535,11 +535,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerRemoveValue")]
-    public function testRemoveValue(mixed $input, mixed $value, string $key, array $expected) {
+    public function testRemoveValue(mixed $input, mixed $value, string $key, array $expected): void {
         $this->assertSame($expected, Arrays::removeValue($input, $value, $key));
     }
 
-    public static function providerRemoveValue() {
+    public static function providerRemoveValue(): array {
         $o1 = (object)[ "id" => 1 ];
         $o2 = (object)[ "id" => 2 ];
         return [
@@ -555,11 +555,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerRemoveEmpty")]
-    public function testRemoveEmpty(mixed $input, array $expected) {
+    public function testRemoveEmpty(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::removeEmpty($input));
     }
 
-    public static function providerRemoveEmpty() {
+    public static function providerRemoveEmpty(): array {
         $o1 = (object)[];
         $o2 = (object)[ "x" => 1 ];
         return [
@@ -572,11 +572,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerRemoveDuplicates")]
-    public function testRemoveDuplicates(mixed $input, array $expected) {
+    public function testRemoveDuplicates(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::removeDuplicates($input));
     }
 
-    public static function providerRemoveDuplicates() {
+    public static function providerRemoveDuplicates(): array {
         return [
             "basic_numeric"     => [ [ 1, 2, 1, 2 ], [ 1, 2 ] ],
             "string_duplicates" => [ [ "a", "b", "a" ], [ "a", "b" ] ],
@@ -587,11 +587,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerMerge")]
-    public function testMerge(mixed $a, mixed $b, array $expected) {
+    public function testMerge(mixed $a, mixed $b, array $expected): void {
         $this->assertSame($expected, Arrays::merge($a, $b));
     }
 
-    public static function providerMerge() {
+    public static function providerMerge(): array {
         $o = (object)[ "k" => "v" ];
         return [
             "simple_associative_merge" => [ [ "a" => 1 ], [ "b" => 2 ], [ "a" => 1, "b" => 2 ] ],
@@ -605,11 +605,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerMergeLists")]
-    public function testMergeLists(mixed $a, mixed $b, array $expected) {
+    public function testMergeLists(mixed $a, mixed $b, array $expected): void {
         $this->assertSame($expected, Arrays::mergeLists($a, $b));
     }
 
-    public static function providerMergeLists() {
+    public static function providerMergeLists(): array {
         $o = (object)[ "x" => 1 ];
         return [
             "simple_concatenation"      => [ [ 1, 2 ], [ 3 ], [ 1, 2, 3 ] ],
@@ -622,11 +622,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerSlice")]
-    public function testSlice(mixed $input, int $from, ?int $amount, array $expected) {
+    public function testSlice(mixed $input, int $from, ?int $amount, array $expected): void {
         $this->assertSame($expected, Arrays::slice($input, $from, $amount));
     }
 
-    public static function providerSlice() {
+    public static function providerSlice(): array {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
         return [
@@ -641,11 +641,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerPaginate")]
-    public function testPaginate(mixed $input, int $page, int $amount, array $expected) {
+    public function testPaginate(mixed $input, int $page, int $amount, array $expected): void {
         $this->assertSame($expected, Arrays::paginate($input, $page, $amount));
     }
 
-    public static function providerPaginate() {
+    public static function providerPaginate(): array {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
         return [
@@ -660,11 +660,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerSubArray")]
-    public function testSubArray(mixed $input, mixed $selector, array $expected) {
+    public function testSubArray(mixed $input, mixed $selector, array $expected): void {
         $this->assertSame($expected, Arrays::subArray($input, $selector));
     }
 
-    public static function providerSubArray() {
+    public static function providerSubArray(): array {
         $o1 = (object)[ "id" => 1 ];
         $o2 = (object)[ "id" => 2 ];
         return [
@@ -679,11 +679,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerExtend")]
-    public function testExtend(mixed $a, mixed $b, array $expected) {
+    public function testExtend(mixed $a, mixed $b, array $expected): void {
         $this->assertSame($expected, Arrays::extend($a, $b));
     }
 
-    public static function providerExtend() {
+    public static function providerExtend(): array {
         $obj = (object)[ "x" => 1 ];
         return [
             "nested_merge"              => [ [ "x" => [ "y" => 1 ] ], [ "x" => [ "z" => 2 ] ], [ "x" => [ "y" => 1, "z" => 2 ] ] ],
@@ -696,11 +696,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerSort")]
-    public function testSort(mixed $input, ?callable $comparator, array $expected) {
+    public function testSort(mixed $input, ?callable $comparator, array $expected): void {
         $this->assertSame($expected, Arrays::sort($input, $comparator));
     }
 
-    public static function providerSort() {
+    public static function providerSort(): array {
         $o1 = (object)[ "v" => 2 ];
         $o2 = (object)[ "v" => 1 ];
         return [
@@ -713,11 +713,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerSortList")]
-    public function testSortList(mixed $input, ?callable $comparator, array $expected) {
+    public function testSortList(mixed $input, ?callable $comparator, array $expected): void {
         $this->assertSame($expected, Arrays::sortList($input, $comparator));
     }
 
-    public static function providerSortList() {
+    public static function providerSortList(): array {
         $o1 = (object)[ "v" => 2 ];
         $o2 = (object)[ "v" => 1 ];
         return [
@@ -731,11 +731,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerReverse")]
-    public function testReverse(mixed $input, array $expected) {
+    public function testReverse(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::reverse($input));
     }
 
-    public static function providerReverse() {
+    public static function providerReverse(): array {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
         return [
@@ -748,11 +748,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerMap")]
-    public function testMap(mixed $input, callable $callback, array $expected) {
+    public function testMap(mixed $input, callable $callback, array $expected): void {
         $this->assertSame($expected, Arrays::map($input, $callback));
     }
 
-    public static function providerMap() {
+    public static function providerMap(): array {
         $o1 = (object)[ "x" => 1 ];
         $o2 = (object)[ "x" => 2 ];
         return [
@@ -766,11 +766,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerRandom")]
-    public function testRandom(mixed $input, array $expected) {
+    public function testRandom(mixed $input, array $expected): void {
         $this->assertContains(Arrays::random($input), $expected);
     }
 
-    public static function providerRandom() {
+    public static function providerRandom(): array {
         $o1 = (object)[ "a" => 1 ];
         $o2 = (object)[ "b" => 2 ];
         return [
@@ -785,11 +785,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerMax")]
-    public function testMax(mixed $input, int|float $expected) {
+    public function testMax(mixed $input, int|float $expected): void {
         $this->assertSame($expected, Arrays::max($input));
     }
 
-    public static function providerMax() {
+    public static function providerMax(): array {
         return [
             "simple_values"    => [ [ 1, 5, 3 ], 5 ],
             "empty_array"      => [ [], 0 ],
@@ -802,11 +802,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerSum")]
-    public function testSum(mixed $input, ?string $key, int|float $expected) {
+    public function testSum(mixed $input, ?string $key, int|float $expected): void {
         $this->assertSame($expected, Arrays::sum($input, $key));
     }
 
-    public static function providerSum() {
+    public static function providerSum(): array {
         return [
             "simple_sum"           => [ [ 1, 2, 3 ], null, 6 ],
             "sum_by_key"           => [ [[ "v" => 1 ], [ "v" => 2 ]], "v", 3 ],
@@ -820,11 +820,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerAverage")]
-    public function testAverage(mixed $input, int $decimals, ?string $key, float $expected) {
+    public function testAverage(mixed $input, int $decimals, ?string $key, float $expected): void {
         $this->assertSame($expected, Arrays::average($input, $decimals, $key));
     }
 
-    public static function providerAverage() {
+    public static function providerAverage(): array {
         return [
             "simple_average"        => [ [ 1, 2, 3 ], 0, null, 2.0 ],
             "single_element"        => [ [ 4 ], 0, null, 4.0 ],
@@ -840,11 +840,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerCreateMap")]
-    public function testCreateMap(mixed $input, string $key, array $expected) {
+    public function testCreateMap(mixed $input, string $key, array $expected): void {
         $this->assertSame($expected, Arrays::createMap($input, $key));
     }
 
-    public static function providerCreateMap() {
+    public static function providerCreateMap(): array {
         $o1 = (object)[ "id" => 1, "v" => "a" ];
         $o2 = (object)[ "id" => 2, "v" => "b" ];
         return [
@@ -857,11 +857,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerCreateArray")]
-    public function testCreateArray(mixed $input, mixed $key, bool $distinct, array $expected) {
+    public function testCreateArray(mixed $input, mixed $key, bool $distinct, array $expected): void {
         $this->assertSame($expected, Arrays::createArray($input, $key, false, $distinct));
     }
 
-    public static function providerCreateArray() {
+    public static function providerCreateArray(): array {
         $o1 = (object)[ "id" => 1 ];
         $o2 = (object)[ "id" => 2 ];
         return [
@@ -877,11 +877,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetFirst")]
-    public function testGetFirst(mixed $input, string $key, mixed $expected) {
+    public function testGetFirst(mixed $input, string $key, mixed $expected): void {
         $this->assertSame($expected, Arrays::getFirst($input, $key));
     }
 
-    public static function providerGetFirst() {
+    public static function providerGetFirst(): array {
         $obj = (object)[ "v" => "z" ];
         return [
             "simple_list"      => [ [ 1, 2, 3 ], "", 1 ],
@@ -895,11 +895,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetFirstKey")]
-    public function testGetFirstKey(mixed $input, mixed $expected) {
+    public function testGetFirstKey(mixed $input, mixed $expected): void {
         $this->assertSame($expected, Arrays::getFirstKey($input));
     }
 
-    public static function providerGetFirstKey() {
+    public static function providerGetFirstKey(): array {
         return [
             "assoc_array"          => [ [ "a" => 1, "b" => 2 ], "a" ],
             "empty_array"          => [ [], null ],
@@ -911,11 +911,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetLast")]
-    public function testGetLast(mixed $input, string $key, mixed $expected) {
+    public function testGetLast(mixed $input, string $key, mixed $expected): void {
         $this->assertSame($expected, Arrays::getLast($input, $key));
     }
 
-    public static function providerGetLast() {
+    public static function providerGetLast(): array {
         return [
             "simple_list"          => [ [ 1, 2, 3 ], "", 3 ],
             "assoc_array"          => [ [ "a" => 1, "b" => 2 ], "", 2 ],
@@ -928,11 +928,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetIndex")]
-    public function testGetIndex(mixed $input, mixed $needle, bool $caseInsensitive, int $expected) {
+    public function testGetIndex(mixed $input, mixed $needle, bool $caseInsensitive, int $expected): void {
         $this->assertSame($expected, Arrays::getIndex($input, $needle, $caseInsensitive));
     }
 
-    public static function providerGetIndex() {
+    public static function providerGetIndex(): array {
         return [
             "simple_value_found"      => [ [ 1, 2, 3 ], 2, false, 1 ],
             "not_found"               => [ [ 1 ], 5, false, -1 ],
@@ -945,11 +945,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerFindIndex")]
-    public function testFindIndex(mixed $input, string $key, mixed $value, mixed $expected) {
+    public function testFindIndex(mixed $input, string $key, mixed $value, mixed $expected): void {
         $this->assertSame($expected, Arrays::findIndex($input, $key, $value));
     }
 
-    public static function providerFindIndex() {
+    public static function providerFindIndex(): array {
         $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
         $assoc   = [ "a" => [ "id" => 1 ], "b" => [ "id" => 2 ] ];
         return [
@@ -965,11 +965,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerHasValue")]
-    public function testHasValue(mixed $input, string $key, mixed $value, bool $expected) {
+    public function testHasValue(mixed $input, string $key, mixed $value, bool $expected): void {
         $this->assertSame($expected, Arrays::hasValue($input, $key, $value));
     }
 
-    public static function providerHasValue() {
+    public static function providerHasValue(): array {
         $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
         return [
             "simple_present"         => [ [[ "id" => 1 ]], "id", 1, true ],
@@ -983,11 +983,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerFindValue")]
-    public function testFindValue(mixed $input, string $key, mixed $value, mixed $expected) {
+    public function testFindValue(mixed $input, string $key, mixed $value, mixed $expected): void {
         $this->assertSame($expected, Arrays::findValue($input, $key, $value));
     }
 
-    public static function providerFindValue() {
+    public static function providerFindValue(): array {
         $rowsObj = [(object)[ "id" => 1, "x" => 9 ], (object)[ "id" => 2, "x" => 8 ]];
         $assoc   = [ "a" => [ "id" => 1, "x" => 9 ], "b" => [ "id" => 2, "x" => 8 ] ];
         return [
@@ -1003,11 +1003,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerFindValues")]
-    public function testFindValues(mixed $input, string $key, mixed $value, array $expected) {
+    public function testFindValues(mixed $input, string $key, mixed $value, array $expected): void {
         $this->assertSame($expected, Arrays::findValues($input, $key, $value));
     }
 
-    public static function providerFindValues() {
+    public static function providerFindValues(): array {
         $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ], (object)[ "id" => 1 ]];
         $assoc   = [ "a" => [ "id" => 1 ], "b" => [ "id" => 1 ] ];
         return [
@@ -1022,11 +1022,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetKey")]
-    public function testGetKey(string $key, string $prefix, string $expected) {
+    public function testGetKey(string $key, string $prefix, string $expected): void {
         $this->assertSame($expected, Arrays::getKey($key, $prefix));
     }
 
-    public static function providerGetKey() {
+    public static function providerGetKey(): array {
         return [
             "no_prefix"                => [ "name", "", "name" ],
             "with_prefix"              => [ "name", "Pref", "PrefName" ],
@@ -1038,11 +1038,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetValue")]
-    public function testGetValue(mixed $input, mixed $key, string $glue, string $prefix, bool $useEmpty, mixed $default, mixed $expected) {
+    public function testGetValue(mixed $input, mixed $key, string $glue, string $prefix, bool $useEmpty, mixed $default, mixed $expected): void {
         $this->assertSame($expected, Arrays::getValue($input, $key, $glue, $prefix, $useEmpty, $default));
     }
 
-    public static function providerGetValue() {
+    public static function providerGetValue(): array {
         $obj     = (object)[ "k" => "v" ];
         $objMult = (object)[ "name" => "n", "age" => 10 ];
         return [
@@ -1065,11 +1065,11 @@ class ArraysTest extends TestCase {
 
 
     #[DataProvider("providerGetOneValue")]
-    public function testGetOneValue(mixed $input, mixed $key, bool $useEmpty, mixed $default, mixed $expected) {
+    public function testGetOneValue(mixed $input, mixed $key, bool $useEmpty, mixed $default, mixed $expected): void {
         $this->assertSame($expected, Arrays::getOneValue($input, $key, $useEmpty, $default));
     }
 
-    public static function providerGetOneValue() {
+    public static function providerGetOneValue(): array {
         $obj = (object)[ "k" => "v" ];
         return [
             "simple_array_key"            => [ [ "k" => "v" ], "k", false, null, "v" ],

@@ -33,7 +33,7 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsDir")]
-    public function testIsDir(string $input, bool $expected) {
+    public function testIsDir(string $input, bool $expected): void {
         if ($input === "tmpDir") {
             $value = $this->tmpDir;
         } elseif ($input === "tmpFile") {
@@ -44,7 +44,7 @@ class FileTypeTest extends TestCase {
         $this->assertSame($expected, FileType::isDir($value));
     }
 
-    public static function providerIsDir() {
+    public static function providerIsDir(): array {
         return [
             "tmp_dir"      => [ "tmpDir", true ],
             "tmp_file"     => [ "tmpFile", false ],
@@ -54,11 +54,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsHidden")]
-    public function testIsHidden(string $input, bool $expected) {
+    public function testIsHidden(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isHidden($input));
     }
 
-    public static function providerIsHidden() {
+    public static function providerIsHidden(): array {
         return [
             "hidden"       => [ ".hidden", true ],
             "visible"      => [ "visible.txt", false ],
@@ -69,11 +69,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsImage")]
-    public function testIsImage(string $input, bool $expected) {
+    public function testIsImage(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isImage($input));
     }
 
-    public static function providerIsImage() {
+    public static function providerIsImage(): array {
         return [
             "jpg"    => [ "image.jpg", true ],
             "jpeg"   => [ "photo.jpeg", true ],
@@ -92,11 +92,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsPNG")]
-    public function testIsPNG(string $input, bool $expected) {
+    public function testIsPNG(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isPNG($input));
     }
 
-    public static function providerIsPNG() {
+    public static function providerIsPNG(): array {
         return [
             "png"    => [ "photo.png", true ],
             "jpg"    => [ "image.jpg", false ],
@@ -107,11 +107,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsICO")]
-    public function testIsICO(string $input, bool $expected) {
+    public function testIsICO(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isICO($input));
     }
 
-    public static function providerIsICO() {
+    public static function providerIsICO(): array {
         return [
             "ico"    => [ "icon.ico", true ],
             "png"    => [ "photo.png", false ],
@@ -123,11 +123,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsVideo")]
-    public function testIsVideo(string $input, bool $expected) {
+    public function testIsVideo(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isVideo($input));
     }
 
-    public static function providerIsVideo() {
+    public static function providerIsVideo(): array {
         return [
             "mov"    => [ "film.mov", true ],
             "mpeg"   => [ "clip.mpeg", true ],
@@ -147,11 +147,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsAudio")]
-    public function testIsAudio(string $input, bool $expected) {
+    public function testIsAudio(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isAudio($input));
     }
 
-    public static function providerIsAudio() {
+    public static function providerIsAudio(): array {
         return [
             "mp3"    => [ "music.mp3", true ],
             "mpga"   => [ "audio.mpga", true ],
@@ -170,11 +170,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsCode")]
-    public function testIsCode(string $input, bool $expected) {
+    public function testIsCode(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isCode($input));
     }
 
-    public static function providerIsCode() {
+    public static function providerIsCode(): array {
         return [
             "html"   => [ "index.html", true ],
             "xhtml"  => [ "page.xhtml", true ],
@@ -192,11 +192,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsText")]
-    public function testIsText(string $input, bool $expected) {
+    public function testIsText(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isText($input));
     }
 
-    public static function providerIsText() {
+    public static function providerIsText(): array {
         return [
             "txt"    => [ "notes.txt", true ],
             "md"     => [ "readme.md", true ],
@@ -213,11 +213,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsDocument")]
-    public function testIsDocument(string $input, bool $expected) {
+    public function testIsDocument(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isDocument($input));
     }
 
-    public static function providerIsDocument() {
+    public static function providerIsDocument(): array {
         return [
             "doc"    => [ "document.doc", true ],
             "docx"   => [ "report.docx", true ],
@@ -232,11 +232,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsSpreadsheet")]
-    public function testIsSpreadsheet(string $input, bool $expected) {
+    public function testIsSpreadsheet(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isSpreadsheet($input));
     }
 
-    public static function providerIsSpreadsheet() {
+    public static function providerIsSpreadsheet(): array {
         return [
             "xls"    => [ "data.xls", true ],
             "xlsx"   => [ "report.xlsx", true ],
@@ -251,11 +251,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsPresentation")]
-    public function testIsPresentation(string $input, bool $expected) {
+    public function testIsPresentation(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isPresentation($input));
     }
 
-    public static function providerIsPresentation() {
+    public static function providerIsPresentation(): array {
         return [
             "ppt"    => [ "slides.ppt", true ],
             "pptx"   => [ "presentation.pptx", true ],
@@ -269,11 +269,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsPDF")]
-    public function testIsPDF(string $input, bool $expected) {
+    public function testIsPDF(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isPDF($input));
     }
 
-    public static function providerIsPDF() {
+    public static function providerIsPDF(): array {
         return [
             "pdf"    => [ "document.pdf", true ],
 
@@ -285,11 +285,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsZip")]
-    public function testIsZip(string $input, bool $expected) {
+    public function testIsZip(string $input, bool $expected): void {
         $this->assertSame($expected, FileType::isZip($input));
     }
 
-    public static function providerIsZip() {
+    public static function providerIsZip(): array {
         return [
             "zip"    => [ "archive.zip", true ],
             "rar"    => [ "archive.rar", true ],
@@ -306,7 +306,7 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerIsFile")]
-    public function testIsFile(string $input, bool $expected) {
+    public function testIsFile(string $input, bool $expected): void {
         if ($input === "tmpDir") {
             $value = $this->tmpDir;
         } else {
@@ -315,7 +315,7 @@ class FileTypeTest extends TestCase {
         $this->assertSame($expected, FileType::isFile($value));
     }
 
-    public static function providerIsFile() {
+    public static function providerIsFile(): array {
         return [
             "txt"   => [ "notes.txt", true ],
             "dir"   => [ "tmpDir", false ],
@@ -327,11 +327,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerGetIcon")]
-    public function testGetIcon(string $input, string $expected) {
+    public function testGetIcon(string $input, string $expected): void {
         $this->assertSame($expected, FileType::getIcon($input));
     }
 
-    public static function providerGetIcon() {
+    public static function providerGetIcon(): array {
         return [
             "image"        => [ "photo.png", "file-image" ],
             "video"        => [ "movie.mp4", "file-video" ],
@@ -349,11 +349,11 @@ class FileTypeTest extends TestCase {
 
 
     #[DataProvider("providerGetExtension")]
-    public function testGetExtension(string $input, string $expected) {
+    public function testGetExtension(string $input, string $expected): void {
         $this->assertSame($expected, FileType::getExtension($input));
     }
 
-    public static function providerGetExtension() {
+    public static function providerGetExtension(): array {
         return [
             "3gp"               => [ "video/3gp", "3gp" ],
             "aac"               => [ "audio/x-acc", "aac" ],

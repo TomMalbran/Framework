@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class SearchTest extends TestCase {
 
-    public function testConstruct() {
+    public function testConstruct(): void {
         // integer id
         $d = new Dictionary([ "k" => "v" ]);
         $s = new Search(10, "Title", $d);
@@ -26,7 +26,7 @@ class SearchTest extends TestCase {
         $this->assertEquals(0, $s3->id);
     }
 
-    public function testGetString() {
+    public function testGetString(): void {
         $data = new Dictionary([ "field" => "value", "num" => 5 ]);
         $s = new Search(1, "MyTitle", $data);
 
@@ -42,7 +42,7 @@ class SearchTest extends TestCase {
         $this->assertEquals("", $s->getString("missing"));
     }
 
-    public function testGetInt() {
+    public function testGetInt(): void {
         $data = new Dictionary([ "a" => "3", "b" => 7, "bad" => [ 1, 2 ]]);
         $s = new Search("2", "T", $data);
 
@@ -61,7 +61,7 @@ class SearchTest extends TestCase {
         $this->assertEquals(0, $s->getInt("missing"));
     }
 
-    public function testJsonSerialize() {
+    public function testJsonSerialize(): void {
         $data = new Dictionary(["x" => "xx"]);
         $s = new Search(5, "TitleX", $data);
 
@@ -83,7 +83,7 @@ class SearchTest extends TestCase {
         $this->assertIsArray($decoded["data"]);
     }
 
-    public function testCreate() {
+    public function testCreate(): void {
         // prepare rows: list of arrays with id and name
         $rows = new Dictionary([
             [ "id" => "1", "name" => "One", "first" => "First", "last" => "A" ],

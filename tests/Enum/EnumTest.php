@@ -25,7 +25,7 @@ enum TestBackedEnum: string implements Enum {
 
 class EnumTest extends TestCase {
 
-    public function testFromValue() {
+    public function testFromValue(): void {
         // plain enum should match case name
         $this->assertSame(TestPlainEnum::Apple, TestPlainEnum::fromValue("Apple"));
         $this->assertSame(TestPlainEnum::Apple, TestPlainEnum::fromValue("apple"));
@@ -39,7 +39,7 @@ class EnumTest extends TestCase {
         $this->assertSame(TestBackedEnum::None, TestBackedEnum::fromValue("x"));
     }
 
-    public function testFromRequest() {
+    public function testFromRequest(): void {
         // plain enum should match case name
         $req = new Request([ "fruit" => "Banana" ]);
         $this->assertSame(TestPlainEnum::Banana, TestPlainEnum::fromRequest($req, "fruit"));
@@ -53,7 +53,7 @@ class EnumTest extends TestCase {
         $this->assertSame(TestBackedEnum::None, TestBackedEnum::fromRequest($req2, "missing"));
     }
 
-    public function testFromList() {
+    public function testFromList(): void {
         // plain enum should match case name
         $list = TestPlainEnum::fromList([ "Apple", "Banana" ]);
         $this->assertSame([ TestPlainEnum::Apple, TestPlainEnum::Banana ], $list);
@@ -85,7 +85,7 @@ class EnumTest extends TestCase {
         $this->assertSame([], TestPlainEnum::fromList(null));
     }
 
-    public function testIsValid() {
+    public function testIsValid(): void {
         // plain enum should match case name
         $this->assertTrue(TestPlainEnum::isValid("Apple"));
         $this->assertTrue(TestPlainEnum::isValid("apple"));
@@ -97,7 +97,7 @@ class EnumTest extends TestCase {
         $this->assertFalse(TestBackedEnum::isValid("blue"));
     }
 
-    public function testGetAll() {
+    public function testGetAll(): void {
         // getAll should return all cases except None
         $all = TestPlainEnum::getAll();
         $this->assertNotContains(TestPlainEnum::None, $all);
@@ -109,7 +109,7 @@ class EnumTest extends TestCase {
         $this->assertContains(TestBackedEnum::Red, $allBacked);
     }
 
-    public function testGetNames() {
+    public function testGetNames(): void {
         // getNames should return the case names for plain enum
         $names = TestPlainEnum::getNames();
         $this->assertContains("Apple", $names);
@@ -121,7 +121,7 @@ class EnumTest extends TestCase {
         $this->assertContains("green", $backedNames);
     }
 
-    public function testContains() {
+    public function testContains(): void {
         // contains should check if a value is in a list of cases
         $this->assertTrue(TestPlainEnum::contains([ TestPlainEnum::Apple, TestPlainEnum::Banana ], TestPlainEnum::Apple));
 
@@ -137,7 +137,7 @@ class EnumTest extends TestCase {
         $this->assertFalse(TestBackedEnum::contains([ TestBackedEnum::Red ], TestBackedEnum::None));
     }
 
-    public function testToString() {
+    public function testToString(): void {
         // toString should return case name for plain enum
         $this->assertSame("Apple", TestPlainEnum::Apple->toString());
 
@@ -148,7 +148,7 @@ class EnumTest extends TestCase {
         $this->assertSame("", TestPlainEnum::None->toString());
     }
 
-    public function testJsonSerialize() {
+    public function testJsonSerialize(): void {
         // jsonSerialize should return same as toString
         $this->assertSame("Apple", TestPlainEnum::Apple->jsonSerialize());
 

@@ -77,7 +77,7 @@ class RequestTest extends TestCase {
     }
 
 
-    public function testConstruct() {
+    public function testConstruct(): void {
         // test with $_REQUEST
         $_REQUEST = [
             "a" => 1,
@@ -89,7 +89,7 @@ class RequestTest extends TestCase {
         $this->assertSame("x", $r->get("b"));
     }
 
-    public function testGet() {
+    public function testGet(): void {
         $r = new Request([
             "a" => 1,
             "b" => "x",
@@ -104,7 +104,7 @@ class RequestTest extends TestCase {
         $this->assertSame(null, $r->get("missing", null));
     }
 
-    public function testGetOr() {
+    public function testGetOr(): void {
         $r = new Request([
             "a" => 1,
             "b" => "x",
@@ -119,7 +119,7 @@ class RequestTest extends TestCase {
         $this->assertSame(5, $r->getOr("missing", 5));
     }
 
-    public function testGetInt() {
+    public function testGetInt(): void {
         $r = new Request([
             "a" => 10,
             "b" => "10",
@@ -136,7 +136,7 @@ class RequestTest extends TestCase {
         $this->assertSame(5, $r->getInt("missing", 5));
     }
 
-    public function testGetFloat() {
+    public function testGetFloat(): void {
         $r = new Request([
             "a" => "1.5",
             "b" => 2.5,
@@ -153,7 +153,7 @@ class RequestTest extends TestCase {
         $this->assertEquals(3.5, $r->getFloat("missing", 3.5));
     }
 
-    public function testGetString() {
+    public function testGetString(): void {
         $r = new Request([
             "a" => "  hello  ",
             "b" => 123,
@@ -168,7 +168,7 @@ class RequestTest extends TestCase {
         $this->assertSame("default", $r->getString("missing", "default"));
     }
 
-    public function testGetArray() {
+    public function testGetArray(): void {
         $r = new Request([
             "a" => [ "", "a", null, 1 ],
             "b" => "x",
@@ -181,7 +181,7 @@ class RequestTest extends TestCase {
         $this->assertSame([], $r->getArray("missing"));
     }
 
-    public function testGetDictionary() {
+    public function testGetDictionary(): void {
         $r = new Request([
             "a" => JSON::encode([ "x" => 1 ]),
             "b" => "x",
@@ -192,7 +192,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->getDictionary("missing")->isEmpty());
     }
 
-    public function testGetJSONArray() {
+    public function testGetJSONArray(): void {
         $r = new Request([
             "a" => JSON::encode([ 1, 2, 3 ]),
             "b" => "x",
@@ -205,7 +205,7 @@ class RequestTest extends TestCase {
         $this->assertSame([], $r->getJSONArray("missing"));
     }
 
-    public function testGetInts() {
+    public function testGetInts(): void {
         $r = new Request([
             "a" => JSON::encode([ "4", "5" ]),
             "b" => "1,2,3",
@@ -225,7 +225,7 @@ class RequestTest extends TestCase {
         $this->assertSame([], $r->getInts("missing"));
     }
 
-    public function testGetStrings() {
+    public function testGetStrings(): void {
         $r = new Request([
             "a" => JSON::encode([ "x", "y" ]),
             "b" => "a,b,c",
@@ -243,7 +243,7 @@ class RequestTest extends TestCase {
         $this->assertSame([], $r->getStrings("missing"));
     }
 
-    public function testGetStringsMap() {
+    public function testGetStringsMap(): void {
         $r = new Request([
             "a" => JSON::encode([ "a" => "v" ]),
             "b" => [ "a" => 1, "b" => "x" ],
@@ -259,7 +259,7 @@ class RequestTest extends TestCase {
         $this->assertSame([], $r->getStringsMap("missing"));
     }
 
-    public function testGetStringIntMap() {
+    public function testGetStringIntMap(): void {
         $r = new Request([
             "a" => JSON::encode([ "a" => 2 ]),
             "b" => [ "a" => "2", "b" => "x" ],
@@ -275,7 +275,7 @@ class RequestTest extends TestCase {
         $this->assertSame([], $r->getStringIntMap("missing"));
     }
 
-    public function testSet() {
+    public function testSet(): void {
         $r = new Request([]);
 
         $r->set("x", 1);
@@ -293,7 +293,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->get("n"));
     }
 
-    public function testRemove() {
+    public function testRemove(): void {
         $r = new Request([
             "a" => 1,
             "b" => "x",
@@ -308,7 +308,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->exists("missing"));
     }
 
-    public function testHas() {
+    public function testHas(): void {
         $r = new Request([
             "a" => "",
             "b" => "1",
@@ -341,7 +341,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($empty->has(null));
     }
 
-    public function testExists() {
+    public function testExists(): void {
         $r = new Request([
             "a" => "",
             "b" => "1",
@@ -366,7 +366,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->exists([ "a", "c" ]));
     }
 
-    public function testIsActive() {
+    public function testIsActive(): void {
         $r = new Request([
             "a" => "1",
             "b" => true,
@@ -396,7 +396,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isActive("missing"));
     }
 
-    public function testIsEmpty() {
+    public function testIsEmpty(): void {
         $r = new Request([
             "a" => "1",
             "b" => "2",
@@ -415,7 +415,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->isEmpty([ "e" ]));
     }
 
-    public function testIsEmptyArray() {
+    public function testIsEmptyArray(): void {
         $r = new Request([
             "a" => [],
             "b" => [ 1 ],
@@ -428,7 +428,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->isEmptyArray("missing"));
     }
 
-    public function testIsValidString() {
+    public function testIsValidString(): void {
         $r = new Request([
             "a" => "ok",
             "b" => "",
@@ -445,7 +445,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidString("missing"));
     }
 
-    public function testIsValidLength() {
+    public function testIsValidLength(): void {
         $r = new Request([
             "a" => "abcd",
             "b" => "abcde",
@@ -458,7 +458,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->isValidLength("missing", 4));
     }
 
-    public function testIsValidNumber() {
+    public function testIsValidNumber(): void {
         $r = new Request([
             "a" => "12",
             "b" => "12.5",
@@ -477,7 +477,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidNumber("missing"));
     }
 
-    public function testIsNumeric() {
+    public function testIsNumeric(): void {
         $r = new Request([
             "a" => "5",
             "b" => "00",
@@ -513,7 +513,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->isNumeric("c", null, null, 0));
     }
 
-    public function testIsValidPrice() {
+    public function testIsValidPrice(): void {
         $r = new Request([
             "a" => "10.50",
             "b" => "10",
@@ -547,7 +547,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidPrice("neg"));
     }
 
-    public function testIsAlphaNum() {
+    public function testIsAlphaNum(): void {
         $r = new Request([
             "a" => "abc-123",
             "b" => "abc123",
@@ -579,7 +579,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isAlphaNum("missing", true));
     }
 
-    public function testIsValidEmail() {
+    public function testIsValidEmail(): void {
         $r = new Request([
             "a" => "test@example.com",
             "b" => "invalid-email",
@@ -594,7 +594,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidEmail("missing"));
     }
 
-    public function testIsValidPassword() {
+    public function testIsValidPassword(): void {
         $r = new Request([
             "a" => "abc123",
             "b" => "aBc123",
@@ -615,7 +615,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidPassword("missing"));
     }
 
-    public function testIsValidUsername() {
+    public function testIsValidUsername(): void {
         $r = new Request([
             "a" => "user1",
             "b" => "2user",
@@ -639,7 +639,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidUsername("missing"));
     }
 
-    public function testIsValidColor() {
+    public function testIsValidColor(): void {
         $r = new Request([
             "a" => "#fff",
             "b" => "#ffffff",
@@ -665,7 +665,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidColor("missing"));
     }
 
-    public function testIsValidCUIT() {
+    public function testIsValidCUIT(): void {
         $r = new Request([
             "a" => "20-12345678-6",
             "b" => "20123456786",
@@ -687,7 +687,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidCUIT("missing"));
     }
 
-    public function testIsValidDNI() {
+    public function testIsValidDNI(): void {
         $r = new Request([
             "a" => "12.345.678",
             "b" => "12345678",
@@ -714,7 +714,7 @@ class RequestTest extends TestCase {
         $this->assertSame("12345678", $r->dniToNumber("c"));
     }
 
-    public function testIsValidPhone() {
+    public function testIsValidPhone(): void {
         $r = new Request([
             "a" => "(123) 456-7890",
             "b" => "123-456-7890",
@@ -741,7 +741,7 @@ class RequestTest extends TestCase {
         $this->assertMatchesRegularExpression('/^1?1234567890$/', $r->phoneToNumber("c"));
     }
 
-    public function testIsValidUrl() {
+    public function testIsValidUrl(): void {
         $r = new Request([
             "a" => "https://example.com/path",
             "b" => "http://sub.example.com",
@@ -765,7 +765,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidUrl("missing"));
     }
 
-    public function testIsValidDomain() {
+    public function testIsValidDomain(): void {
         $r = new Request([
             "a" => "https://example.com/path",
             "b" => "http://sub.example.com",
@@ -787,7 +787,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidDomain("missing"));
     }
 
-    public function testIsValidSlug() {
+    public function testIsValidSlug(): void {
         $r = new Request([
             "a" => "valid-slug",
             "b" => "valid-slug-123",
@@ -811,7 +811,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidSlug("missing"));
     }
 
-    public function testIsValidPosition() {
+    public function testIsValidPosition(): void {
         $r = new Request([
             "a" => "0",
             "b" => "1",
@@ -830,7 +830,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->isValidPosition("missing"));
     }
 
-    public function testIsValidDate() {
+    public function testIsValidDate(): void {
         $r = new Request([
             "a" => "2020-01-01",
             "b" => "2020-02-29",
@@ -850,7 +850,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidDate("missing"));
     }
 
-    public function testIsValidHour() {
+    public function testIsValidHour(): void {
         $r = new Request([
             "a" => "00:00",
             "b" => "12:00",
@@ -894,7 +894,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidHour("n"));
     }
 
-    public function testIsValidPeriod() {
+    public function testIsValidPeriod(): void {
         $r = new Request([
             "a" => "2020-01-01",
             "b" => "2020-01-02",
@@ -915,7 +915,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidPeriod("a", "missing"));
     }
 
-    public function testIsValidHourPeriod() {
+    public function testIsValidHourPeriod(): void {
         $r = new Request([
             "a" => "08:00", "b" => "10:00",
             "c" => "10:00", "d" => "08:00",
@@ -944,7 +944,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidHourPeriod("a", "missing"));
     }
 
-    public function testIsValidFullPeriod() {
+    public function testIsValidFullPeriod(): void {
         $r = new Request([
             // normal range: same day, from < to
             "a_date" => "2020-01-01", "a_hour" => "08:00",
@@ -988,7 +988,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidFullPeriod("a_date", "missing", "b_date", "b_hour"));
     }
 
-    public function testIsValidWeekDay() {
+    public function testIsValidWeekDay(): void {
         $r = new Request([
             "a" => 0,
             "b" => 6,
@@ -1024,7 +1024,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidWeekDay("missing", true));
     }
 
-    public function testIsFutureDate() {
+    public function testIsFutureDate(): void {
         $r = new Request([
             "future" => "2099-01-01",
             "past"   => "2000-01-01",
@@ -1040,7 +1040,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->isFutureDate("future", DateType::Start));
     }
 
-    public function testToBinary() {
+    public function testToBinary(): void {
         $r = new Request([
             "a" => "1",
             "b" => true,
@@ -1064,7 +1064,7 @@ class RequestTest extends TestCase {
         $this->assertSame(0, $r->toBinary("missing", 1));
     }
 
-    public function testToInt() {
+    public function testToInt(): void {
         $r = new Request([
             "a" => "12.34",
             "b" => "12.345",
@@ -1084,7 +1084,7 @@ class RequestTest extends TestCase {
         $this->assertSame(0, $r->toInt("missing", 2));
     }
 
-    public function testToCents() {
+    public function testToCents(): void {
         $r = new Request([
             "a" => "12.34",
             "b" => "-1.23",
@@ -1102,7 +1102,7 @@ class RequestTest extends TestCase {
         $this->assertSame(0, $r->toCents("missing"));
     }
 
-    public function testToJSON() {
+    public function testToJSON(): void {
         $r = new Request([
             "a" => [ 1, 2 ],
             "b" => "1,2,3",
@@ -1120,7 +1120,7 @@ class RequestTest extends TestCase {
         $this->assertSame(JSON::encode([]), $r->toJSON("missing"));
     }
 
-    public function testCuitToNumber() {
+    public function testCuitToNumber(): void {
         $r = new Request([
             "a" => "20 12345678 6",
             "b" => "20123456786",
@@ -1138,7 +1138,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->cuitToNumber("missing"));
     }
 
-    public function testDniToNumber() {
+    public function testDniToNumber(): void {
         $r = new Request([
             "a" => "12.345.678",
             "b" => "12345678",
@@ -1156,7 +1156,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->dniToNumber("missing"));
     }
 
-    public function testPhoneToNumber() {
+    public function testPhoneToNumber(): void {
         $r = new Request([
             "a" => "(123)456-7890",
             "b" => "123-456-7890",
@@ -1176,7 +1176,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->phoneToNumber("missing"));
     }
 
-    public function testToDomain() {
+    public function testToDomain(): void {
         $r = new Request([
             "a" => "https://sub.example.com/path",
             "b" => "http://www.example.com",
@@ -1194,7 +1194,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->toDomain("missing"));
     }
 
-    public function testToDate() {
+    public function testToDate(): void {
         $r = new Request([
             "a" => "2020-02-01",
             "b" => "01-02-2020",
@@ -1210,7 +1210,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toDate("missing")->isEmpty());
     }
 
-    public function testToTimeHour() {
+    public function testToTimeHour(): void {
         $r = new Request([
             "a" => "2020-02-01",
             "b" => "01-02-2020",
@@ -1229,7 +1229,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toTimeHour("missing", "c", true, true)->isEmpty());
     }
 
-    public function testToDayMoment() {
+    public function testToDayMoment(): void {
         $r = new Request([
             "a" => "2020-01-01",
             "b" => "01-01-2020",
@@ -1255,7 +1255,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toDayMoment("missing", DateType::Start)->isEmpty());
     }
 
-    public function testToDayStart() {
+    public function testToDayStart(): void {
         $r = new Request([
             "a" => "2020-03-15",
             "b" => "15-03-2020",
@@ -1271,7 +1271,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toDayStart("missing")->isEmpty());
     }
 
-    public function testToDayStartHour() {
+    public function testToDayStartHour(): void {
         $r = new Request([
             "a"   => "2020-03-15",
             "a_h" => "09:30",
@@ -1299,7 +1299,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toDayStartHour("missing", "missing")->isEmpty());
     }
 
-    public function testToDayMiddle() {
+    public function testToDayMiddle(): void {
         $r = new Request([
             "a" => "2020-03-15",
             "b" => "15-03-2020",
@@ -1315,7 +1315,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toDayMiddle("missing")->isEmpty());
     }
 
-    public function testToDayEnd() {
+    public function testToDayEnd(): void {
         $r = new Request([
             "a" => "2020-03-15",
             "b" => "15-03-2020",
@@ -1331,7 +1331,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toDayEnd("missing")->isEmpty());
     }
 
-    public function testToDayEndHour() {
+    public function testToDayEndHour(): void {
         $r = new Request([
             "a"   => "2020-03-15",
             "a_h" => "18:45",
@@ -1359,7 +1359,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->toDayEndHour("missing", "missing")->isEmpty());
     }
 
-    public function testGetFile() {
+    public function testGetFile(): void {
         $r = new Request(withFiles: true);
 
         $this->assertSame($_FILES["f"], $r->getFile("f"));
@@ -1367,7 +1367,7 @@ class RequestTest extends TestCase {
         $this->assertNull($r->getFile("missing"));
     }
 
-    public function testGetFileName() {
+    public function testGetFileName(): void {
         $r = new Request(withFiles: true);
 
         $this->assertSame("a.txt", $r->getFileName("f"));
@@ -1375,7 +1375,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->getFileName("missing"));
     }
 
-    public function testGetFileType() {
+    public function testGetFileType(): void {
         $r = new Request(withFiles: true);
 
         $this->assertSame("text/plain", $r->getFileType("f"));
@@ -1383,7 +1383,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->getFileType("missing"));
     }
 
-    public function testGetTmpName() {
+    public function testGetTmpName(): void {
         $r = new Request(withFiles: true);
 
         $this->assertSame($this->tmpFileF, $r->getTmpName("f"));
@@ -1391,7 +1391,7 @@ class RequestTest extends TestCase {
         $this->assertSame("", $r->getTmpName("missing"));
     }
 
-    public function testGetCurlFile() {
+    public function testGetCurlFile(): void {
         $r = new Request(withFiles: true);
 
         $curl = $r->getCurlFile("f");
@@ -1406,7 +1406,7 @@ class RequestTest extends TestCase {
         $this->assertNull($r->getCurlFile("missing"));
     }
 
-    public function testHasFile() {
+    public function testHasFile(): void {
         $r = new Request(withFiles: true);
 
         $this->assertTrue($r->hasFile("f"));
@@ -1414,7 +1414,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->hasFile("missing"));
     }
 
-    public function testHasSizeError() {
+    public function testHasSizeError(): void {
         $r = new Request(withFiles: true);
 
         $this->assertFalse($r->hasSizeError("f"));
@@ -1422,7 +1422,7 @@ class RequestTest extends TestCase {
         $this->assertTrue($r->hasSizeError("missing"));
     }
 
-    public function testHasExtension() {
+    public function testHasExtension(): void {
         $r = new Request([ "img" => "photo.jpg" ], withFiles: true);
 
         $this->assertTrue($r->hasExtension("f", "txt"));
@@ -1433,7 +1433,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->hasExtension("missing", "txt"));
     }
 
-    public function testIsValidImage() {
+    public function testIsValidImage(): void {
         $r = new Request([ "img" => "image.png" ], withFiles: true);
 
         $this->assertFalse($r->isValidImage("f"));
@@ -1443,7 +1443,7 @@ class RequestTest extends TestCase {
         $this->assertFalse($r->isValidImage("missing"));
     }
 
-    public function testToArray() {
+    public function testToArray(): void {
         $data = [
             "a" => 1,
             "b" => "x",
@@ -1454,7 +1454,7 @@ class RequestTest extends TestCase {
         $this->assertSame($data, $r->toArray());
     }
 
-    public function testToDictionary() {
+    public function testToDictionary(): void {
         $r = new Request([ "a" => 2, "b" => "y" ]);
 
         $dict = $r->toDictionary();
@@ -1463,7 +1463,7 @@ class RequestTest extends TestCase {
         $this->assertSame("y", $dict->getString("b"));
     }
 
-    public function testGetIterator() {
+    public function testGetIterator(): void {
         $data = [ "a" => 1, "b" => "x", "c" => ["k" => "v"] ];
         $r = new Request($data);
 
@@ -1475,7 +1475,7 @@ class RequestTest extends TestCase {
         $this->assertSame($data, $collected);
     }
 
-    public function testJsonSerialize() {
+    public function testJsonSerialize(): void {
         $data = [ "a" => 1, "b" => "x" ];
         $r = new Request($data);
 

@@ -9,11 +9,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class URLTest extends TestCase {
 
     #[DataProvider("providerIsValidUrl")]
-    public function testIsValid(string $url, bool $expected) {
+    public function testIsValid(string $url, bool $expected): void {
         $this->assertEquals($expected, URL::isValid($url));
     }
 
-    public static function providerIsValidUrl() {
+    public static function providerIsValidUrl(): array {
         return [
             "http_url"         => [ "http://example.com", true ],
             "https_url"        => [ "https://example.com", true ],
@@ -29,11 +29,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerGetHost")]
-    public function testGetHost(string $url, string $expected) {
+    public function testGetHost(string $url, string $expected): void {
         $this->assertEquals($expected, URL::getHost($url));
     }
 
-    public static function providerGetHost() {
+    public static function providerGetHost(): array {
         return [
             "http_url"            => [ "http://example.com/path", "example.com" ],
             "https_url_subdomain" => [ "https://www.example.co.uk/some/page", "www.example.co.uk" ],
@@ -46,11 +46,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerIsValidDomain")]
-    public function testIsValidDomain(string $domain, bool $expected) {
+    public function testIsValidDomain(string $domain, bool $expected): void {
         $this->assertEquals($expected, URL::isValidDomain($domain));
     }
 
-    public static function providerIsValidDomain() {
+    public static function providerIsValidDomain(): array {
         return [
             "valid_domain"            => [ "example.com", true ],
             "valid_subdomain"         => [ "sub.example.co.uk", true ],
@@ -65,11 +65,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerGetDomain")]
-    public function testGetDomain(string $input, string $expected) {
+    public function testGetDomain(string $input, string $expected): void {
         $this->assertEquals($expected, URL::getDomain($input));
     }
 
-    public static function providerGetDomain() {
+    public static function providerGetDomain(): array {
         return [
             "simple_domain"           => [ "Example.Com", "example.com" ],
             "www_prefix"              => [ "www.example.com", "example.com" ],
@@ -87,11 +87,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerGetDomainExtension")]
-    public function testGetDomainExtension(string $input, string $expected) {
+    public function testGetDomainExtension(string $input, string $expected): void {
         $this->assertEquals($expected, URL::getDomainExtension($input));
     }
 
-    public static function providerGetDomainExtension() {
+    public static function providerGetDomainExtension(): array {
         return [
             "simple_domain"         => [ "example.com", "com" ],
             "subdomain_co_uk"       => [ "sub.example.co.uk", "uk" ],
@@ -105,11 +105,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerIsDelegated")]
-    public function testIsDelegated(string $host, string $serverIp, bool $expected) {
+    public function testIsDelegated(string $host, string $serverIp, bool $expected): void {
         $this->assertEquals($expected, URL::isDelegated($host, $serverIp));
     }
 
-    public static function providerIsDelegated() {
+    public static function providerIsDelegated(): array {
         $hostIp = gethostbyname("localhost");
         return [
             "localhost_no_ip"      => [ "localhost", "", true ],
@@ -121,11 +121,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerVerifyDelegation")]
-    public function testVerifyDelegation(string $host, string $serverIp, bool $expected) {
+    public function testVerifyDelegation(string $host, string $serverIp, bool $expected): void {
         $this->assertEquals($expected, URL::verifyDelegation($host, $serverIp));
     }
 
-    public static function providerVerifyDelegation() {
+    public static function providerVerifyDelegation(): array {
         $hostIp = gethostbyname("localhost");
         return [
             "localhost_no_ip"      => [ "localhost", "", true ],
@@ -138,11 +138,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerIsValidSlug")]
-    public function testIsValidSlug(string $slug, bool $expected) {
+    public function testIsValidSlug(string $slug, bool $expected): void {
         $this->assertEquals($expected, URL::isValidSlug($slug));
     }
 
-    public static function providerIsValidSlug() {
+    public static function providerIsValidSlug(): array {
         return [
             "basic_slug"             => [ "a-slug-1", true ],
             "single_char"            => [ "a", true ],
@@ -154,11 +154,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerToSlug")]
-    public function testToSlug(string $input, string $expected) {
+    public function testToSlug(string $input, string $expected): void {
         $this->assertEquals($expected, URL::toSlug($input));
     }
 
-    public static function providerToSlug() {
+    public static function providerToSlug(): array {
         return [
             "lowercase_hyphen"   => [ "A-Slug", "a-slug" ],
             "spaces_and_special" => [ "A Slug!!", "a-slug" ],
@@ -170,12 +170,12 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerEncode")]
-    public function testEncode(string $input, string $expectedFragment) {
+    public function testEncode(string $input, string $expectedFragment): void {
         $encoded = URL::encode($input);
         $this->assertStringContainsString($expectedFragment, $encoded);
     }
 
-    public static function providerEncode() {
+    public static function providerEncode(): array {
         return [
             "spaces_encoded"           => [ "a b", "%20" ],
             "complex_no_raw_spaces"    => [ "a b/c?d=e&f=g", "%20" ],
@@ -186,11 +186,11 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerEncodeSpaces")]
-    public function testEncodeSpaces(string $input, string $expected) {
+    public function testEncodeSpaces(string $input, string $expected): void {
         $this->assertEquals($expected, URL::encodeSpaces($input));
     }
 
-    public static function providerEncodeSpaces() {
+    public static function providerEncodeSpaces(): array {
         return [
             "spaces_single"   => [ "a b", "a%20b" ],
             "spaces_multiple" => [ "a  b", "a%20%20b" ],
@@ -202,12 +202,12 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerAddParams")]
-    public function testAddParams(string $path, array $params, string $expectedFragment) {
+    public function testAddParams(string $path, array $params, string $expectedFragment): void {
         $result = URL::addParams($path, $params);
         $this->assertStringContainsString($expectedFragment, $result);
     }
 
-    public static function providerAddParams() {
+    public static function providerAddParams(): array {
         return [
             "basic_params"   => [ "/path", [ "a" => 1, "b" => 2 ], "a=1&b=2" ],
             "existing_query" => [ "/path?existing=1", [ "a" => 2 ], "existing=1&a=2" ],
@@ -219,12 +219,12 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerParseUrlParams")]
-    public function testParseUrlParams(array $params, string $expectedFragment) {
+    public function testParseUrlParams(array $params, string $expectedFragment): void {
         $result = URL::parseParams($params);
         $this->assertStringContainsString($expectedFragment, $result);
     }
 
-    public static function providerParseUrlParams() {
+    public static function providerParseUrlParams(): array {
         return [
             "array_json_encoded" => [ [ "a" => [ "k" => "v" ]], "%7B" ],
             "special_characters" => [ [ "q" => "a b" ], "+" ],
@@ -236,12 +236,12 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerReplaceInHtml")]
-    public function testReplaceInHtml(string $html, string $baseUrl, string $expectedFragment) {
+    public function testReplaceInHtml(string $html, string $baseUrl, string $expectedFragment): void {
         $out = URL::replaceInHtml($html, $baseUrl);
         $this->assertStringContainsString($expectedFragment, $out);
     }
 
-    public static function providerReplaceInHtml() {
+    public static function providerReplaceInHtml(): array {
         return [
             "image_tag"           => [
                 "<img src=\"img/pic.jpg\">",

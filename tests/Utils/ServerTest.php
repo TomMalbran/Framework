@@ -23,12 +23,12 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerHas")]
-    public function testHas(string $key, bool $expected) {
+    public function testHas(string $key, bool $expected): void {
         $_SERVER["SOME_KEY"] = "value";
         $this->assertEquals($expected, Server::has($key));
     }
 
-    public static function providerHas() {
+    public static function providerHas(): array {
         return [
             "key_exists"     => [ "SOME_KEY", true ],
             "key_not_exists" => [ "NOPE", false ],
@@ -37,12 +37,12 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetString")]
-    public function testGetString(string $key, string $expected) {
+    public function testGetString(string $key, string $expected): void {
         $_SERVER["SOME_KEY"] = "value";
         $this->assertEquals($expected, Server::getString($key));
     }
 
-    public static function providerGetString() {
+    public static function providerGetString(): array {
         return [
             "key_exists"     => [ "SOME_KEY", "value" ],
             "key_not_exists" => [ "NOPE", "" ],
@@ -51,12 +51,12 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerIsPostRequest")]
-    public function testIsPostRequest(string $method, bool $expected) {
+    public function testIsPostRequest(string $method, bool $expected): void {
         $_SERVER["REQUEST_METHOD"] = $method;
         $this->assertEquals($expected, Server::isPostRequest());
     }
 
-    public static function providerIsPostRequest() {
+    public static function providerIsPostRequest(): array {
         return [
             "no_method"    => [ "", false ],
             "post_request" => [ "POST", true ],
@@ -66,7 +66,7 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetAuthToken")]
-    public function testGetAuthToken(array $serverVars, ?array $headers, string $expected) {
+    public function testGetAuthToken(array $serverVars, ?array $headers, string $expected): void {
         $_SERVER = $serverVars;
         if ($headers !== null) {
             global $test_getallheaders;
@@ -75,7 +75,7 @@ class ServerTest extends TestCase {
         $this->assertEquals($expected, Server::getAuthToken());
     }
 
-    public static function providerGetAuthToken() {
+    public static function providerGetAuthToken(): array {
         return [
             "empty"                => [ [], null, "" ],
             "http_authorization"   => [ [ "HTTP_AUTHORIZATION" => "Bearer xyz789" ], null, "xyz789" ],
@@ -85,7 +85,7 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetPayload")]
-    public function testGetPayload(array $request, ?string $input, array $expected) {
+    public function testGetPayload(array $request, ?string $input, array $expected): void {
         $_REQUEST = $request;
         if ($input !== null) {
             global $test_file_get_contents;
@@ -97,7 +97,7 @@ class ServerTest extends TestCase {
         }
     }
 
-    public static function providerGetPayload() {
+    public static function providerGetPayload(): array {
         return [
             "request_data" => [ [ "a" => "1", "b" => "2" ], null, [ "a" => "1", "b" => "2" ] ],
             "json_input"   => [ [], '{"x":"y","num":123}', [ "x" => "y", "num" => "123" ] ],
@@ -106,7 +106,7 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerIsLocalHost")]
-    public function testIsLocalHost(?string $remoteAddr, ?array $allowedIps, bool $expected) {
+    public function testIsLocalHost(?string $remoteAddr, ?array $allowedIps, bool $expected): void {
         if ($remoteAddr !== null) {
             $_SERVER["REMOTE_ADDR"] = $remoteAddr;
         }
@@ -118,7 +118,7 @@ class ServerTest extends TestCase {
         }
     }
 
-    public static function providerIsLocalHost() {
+    public static function providerIsLocalHost(): array {
         return [
             "no_remote_addr"           => [ null, null, false ],
             "localhost_default"        => [ "127.0.0.1", null, true ],
@@ -129,14 +129,14 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerHostStartsWith")]
-    public function testHostStartsWith(string $host, string $prefix, bool $expected) {
+    public function testHostStartsWith(string $host, string $prefix, bool $expected): void {
         if ($host !== "") {
             $_SERVER["HTTP_HOST"] = $host;
         }
         $this->assertEquals($expected, Server::hostStartsWith($prefix));
     }
 
-    public static function providerHostStartsWith() {
+    public static function providerHostStartsWith(): array {
         return [
             "no_host"       => [ "", "api.", false ],
             "host_matches"  => [ "api.example.com", "api.", true ],
@@ -146,13 +146,13 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetUrlAndFullUrl")]
-    public function testGetUrlAndFullUrl(array $serverVars, bool $useForwarded, string $expectedUrl, string $expectedFullUrl) {
+    public function testGetUrlAndFullUrl(array $serverVars, bool $useForwarded, string $expectedUrl, string $expectedFullUrl): void {
         $_SERVER = $serverVars;
         $this->assertEquals($expectedUrl, Server::getUrl($useForwarded));
         $this->assertEquals($expectedFullUrl, Server::getFullUrl($useForwarded));
     }
 
-    public static function providerGetUrlAndFullUrl() {
+    public static function providerGetUrlAndFullUrl(): array {
         return [
             "empty_server" => [ [], false, "", "" ],
             "http_request" => [
@@ -172,7 +172,7 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetIP")]
-    public function testGetIP(array $serverVars, ?array $envVars, string $expected) {
+    public function testGetIP(array $serverVars, ?array $envVars, string $expected): void {
         $_SERVER = $serverVars;
         if ($envVars !== null) {
             foreach ($envVars as $key => $value) {
@@ -187,7 +187,7 @@ class ServerTest extends TestCase {
         }
     }
 
-    public static function providerGetIP() {
+    public static function providerGetIP(): array {
         return [
             "http_x_forwarded_for"     => [ [ "HTTP_X_FORWARDED_FOR" => "10.0.0.1" ], null, "10.0.0.1" ],
             "http_client_ip"           => [ [ "HTTP_CLIENT_IP" => "192.0.2.4" ], null, "192.0.2.4" ],
@@ -200,14 +200,14 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetUserAgent")]
-    public function testGetUserAgent(?string $userAgent, string $expected) {
+    public function testGetUserAgent(?string $userAgent, string $expected): void {
         if ($userAgent !== null) {
             $_SERVER["HTTP_USER_AGENT"] = $userAgent;
         }
         $this->assertEquals($expected, Server::getUserAgent());
     }
 
-    public static function providerGetUserAgent() {
+    public static function providerGetUserAgent(): array {
         return [
             "no_user_agent"   => [ null, "" ],
             "with_user_agent" => [ "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/90.0", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/90.0" ],
@@ -216,11 +216,11 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetPlatform")]
-    public function testGetPlatform(string $ua, string $expected) {
+    public function testGetPlatform(string $ua, string $expected): void {
         $this->assertEquals($expected, Server::getPlatform($ua));
     }
 
-    public static function providerGetPlatform() {
+    public static function providerGetPlatform(): array {
         return [
             "empty_ua"      => [ "", "Unknown" ],
             "macos_firefox" => [ "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Firefox/88.0", "MacOS FireFox" ],

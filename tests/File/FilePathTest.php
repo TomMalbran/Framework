@@ -36,7 +36,7 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerRegister")]
-    public function testRegister(string $input, bool $expected) {
+    public function testRegister(string $input, bool $expected): void {
         FilePath::register($input);
         $paths = $this->getPrivateStaticProperty(FilePath::class, "paths");
         if ($expected) {
@@ -46,7 +46,7 @@ class FilePathTest extends TestCase {
         }
     }
 
-    public static function providerRegister() {
+    public static function providerRegister(): array {
         return [
             "valid"   => [ "test1", true ],
             "invalid" => [ "", false ],
@@ -56,7 +56,7 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerRegisterDirectory")]
-    public function testRegisterDirectory(string $input, bool $expected) {
+    public function testRegisterDirectory(string $input, bool $expected): void {
         FilePath::registerDirectory($input);
         $directories = $this->getPrivateStaticProperty(FilePath::class, "directories");
         if ($expected) {
@@ -66,7 +66,7 @@ class FilePathTest extends TestCase {
         }
     }
 
-    public static function providerRegisterDirectory() {
+    public static function providerRegisterDirectory(): array {
         return [
             "valid"   => [ "testDir1", true ],
             "invalid" => [ "", false ],
@@ -76,13 +76,13 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetBasePath")]
-    public function testGetBasePath(bool $forFramework, bool $forBackend, bool $forPrivate, string $ip, string $expected) {
+    public function testGetBasePath(bool $forFramework, bool $forBackend, bool $forPrivate, string $ip, string $expected): void {
         $_SERVER["REMOTE_ADDR"] = $ip;
         $basePath = FilePath::getBasePath($forFramework, $forBackend, $forPrivate);
         $this->assertEquals($expected, $basePath);
     }
 
-    public static function providerGetBasePath() {
+    public static function providerGetBasePath(): array {
         return [
             "framework"     => [ true, false, false, "", Package::getBasePath() ],
             "backend"       => [ false, true, false, "", Application::getBasePath() ],
@@ -94,13 +94,13 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetPath")]
-    public function testGetPath(array $pathParts, string $expectedEnd) {
+    public function testGetPath(array $pathParts, string $expectedEnd): void {
         $path     = FilePath::getPath(...$pathParts);
         $expected = Application::getIndexPath() . "/" . Config::getFileDir() .  $expectedEnd;
         $this->assertEquals($expected, $path);
     }
 
-    public static function providerGetPath() {
+    public static function providerGetPath(): array {
         return [
             "empty"    => [ [], "" ],
             "single"   => [ [ "test" ], "/test" ],
@@ -111,13 +111,13 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetPrivatePath")]
-    public function testPrivatePath(array $pathParts, string $expectedEnd) {
+    public function testPrivatePath(array $pathParts, string $expectedEnd): void {
         $path     = FilePath::getPrivatePath(...$pathParts);
         $expected = FilePath::getBasePath(forPrivate: true) . $expectedEnd;
         $this->assertEquals($expected, $path);
     }
 
-    public static function providerGetPrivatePath() {
+    public static function providerGetPrivatePath(): array {
         return [
             "empty"    => [ [], "" ],
             "single"   => [ [ "test" ], "/test" ],
@@ -128,13 +128,13 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetFTPPath")]
-    public function testFTPPath(array $pathParts, string $expectedEnd) {
+    public function testFTPPath(array $pathParts, string $expectedEnd): void {
         $path     = FilePath::getFTPPath(...$pathParts);
         $expected = FilePath::getBasePath(forPrivate: true) . "/" . Config::getFileFtp() . $expectedEnd;
         $this->assertEquals($expected, $path);
     }
 
-    public static function providerGetFTPPath() {
+    public static function providerGetFTPPath(): array {
         return [
             "empty"    => [ [], "" ],
             "single"   => [ [ "test" ], "/test" ],
@@ -145,13 +145,13 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetDir")]
-    public function testGetDir(array $pathParts, string $expectedEnd) {
+    public function testGetDir(array $pathParts, string $expectedEnd): void {
         $path     = FilePath::getDir(...$pathParts);
         $expected = Config::getFileDir() . $expectedEnd;
         $this->assertEquals($expected, $path);
     }
 
-    public static function providerGetDir() {
+    public static function providerGetDir(): array {
         return [
             "empty"    => [ [], "" ],
             "single"   => [ [ "test" ], "/test" ],
@@ -162,13 +162,13 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetInternalDir")]
-    public function testGetInternalDir(array $pathParts, string $expectedEnd) {
+    public function testGetInternalDir(array $pathParts, string $expectedEnd): void {
         $path     = FilePath::getInternalDir(...$pathParts);
         $expected = Application::getBaseDir() . "/" . Config::getFileDir() . $expectedEnd;
         $this->assertEquals($expected, $path);
     }
 
-    public static function providerGetInternalDir() {
+    public static function providerGetInternalDir(): array {
         return [
             "empty"    => [ [], "" ],
             "single"   => [ [ "test" ], "/test" ],
@@ -179,13 +179,13 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetUrl")]
-    public function testGetUrl(array $pathParts, string $expectedEnd) {
+    public function testGetUrl(array $pathParts, string $expectedEnd): void {
         $url      = FilePath::getUrl(...$pathParts);
         $expected = Config::getFileUrl() . Config::getFileDir() . $expectedEnd;
         $this->assertEquals($expected, $url);
     }
 
-    public static function providerGetUrl() {
+    public static function providerGetUrl(): array {
         return [
             "empty"    => [ [], "" ],
             "single"   => [ [ "test" ], "/test" ],
@@ -196,7 +196,7 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetTempPath")]
-    public function testGetTempPath(int $id, bool $create, bool $expectEmpty = false) {
+    public function testGetTempPath(int $id, bool $create, bool $expectEmpty = false): void {
         $path = FilePath::getTempPath($id, $create);
         if ($expectEmpty) {
             $this->assertEmpty($path);
@@ -212,7 +212,7 @@ class FilePathTest extends TestCase {
         }
     }
 
-    public static function providerGetTempPath() {
+    public static function providerGetTempPath(): array {
         return [
             "zero"            => [ 0, true, true ],
             "negative"        => [ -1, true, true ],
@@ -223,7 +223,7 @@ class FilePathTest extends TestCase {
 
 
     #[DataProvider("providerGetTempUrl")]
-    public function testGetTempUrl(int $id, array $pathParts, string $expectedEnd, bool $expectEmpty = false) {
+    public function testGetTempUrl(int $id, array $pathParts, string $expectedEnd, bool $expectEmpty = false): void {
         $path     = FilePath::getTempUrl($id, ...$pathParts);
         if ($expectEmpty) {
             $this->assertEmpty($path);
@@ -233,7 +233,7 @@ class FilePathTest extends TestCase {
         }
     }
 
-    public static function providerGetTempUrl() {
+    public static function providerGetTempUrl(): array {
         return [
             "zero"     => [ 0, [], "", true ],
             "negative" => [ -1, [], "", true ],
