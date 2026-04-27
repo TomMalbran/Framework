@@ -8,6 +8,7 @@ use Framework\Enum\Map;
 use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 enum TestSelectEnum implements Enum {
     use IsEnum;
@@ -19,153 +20,309 @@ enum TestSelectEnum implements Enum {
 
 class SelectTest extends TestCase {
 
-    public function testConstruct() {
-        $s = new Select(1, "One");
-        $this->assertSame(1, $s->id);
-        $this->assertSame("1", $s->field);
-        $this->assertSame(1, $s->key);
-        $this->assertSame("One", $s->value);
-        $this->assertSame([], $s->getExtras());
+    #[DataProvider("providerConstruct")]
+    public function testConstruct(
+        Enum|int|string $key,
+        Enum|string $value,
+        int $expectedId,
+        string $expectedField,
+        int|string $expectedKey,
+        string $expectedValue,
+        array $expectedExtras = [],
+    ): void {
+        $select = new Select($key, $value);
 
-        // enum keys/values should be converted to strings for field/value, and id cast to int
-        $s2 = new Select(TestSelectEnum::One, TestSelectEnum::Two);
-        $this->assertSame("One", $s2->field);
-        $this->assertSame("Two", $s2->value);
+        $this->assertSame($expectedId, $select->id);
+        $this->assertSame($expectedField, $select->field);
+        $this->assertSame($expectedKey, $select->key);
+        $this->assertSame($expectedValue, $select->value);
+        $this->assertSame($expectedExtras, $select->getExtras());
     }
 
-    public function testHas() {
-        $s = new Select(5, "Five", [ "extra" => "x", "empty" => "" ]);
-        $this->assertTrue($s->has("id"));
-        $this->assertTrue($s->has("value"));
-        $this->assertTrue($s->has("extra"));
-        $this->assertTrue($s->has("empty"));
-        $this->assertFalse($s->has("missing"));
-
-        // even if the property exists, has should return false if it's empty
-        $s2 = new Select(0, "", [ "extra" => "" ]);
-        $this->assertTrue($s2->has("id"));
-        $this->assertTrue($s2->has("value"));
-        $this->assertTrue($s2->has("extra"));
+    public static function providerConstruct(): array {
+        return [
+            "string" => [ "abc", "Value", 0, "abc", "abc", "Value" ],
+            "int"    => [ 1, "One", 1, "1", 1, "One" ],
+            "enum"   => [ TestSelectEnum::One, TestSelectEnum::Two, 0, "One", "One", "Two" ],
+        ];
     }
 
-    public function testHasValue() {
-        $s = new Select(5, "Five", [ "extra" => "x", "empty" => "" ]);
-        $this->assertTrue($s->hasValue("id"));
-        $this->assertTrue($s->hasValue("value"));
-        $this->assertTrue($s->hasValue("extra"));
-        $this->assertFalse($s->hasValue("empty"));
-        $this->assertFalse($s->hasValue("missing"));
 
-        // even if the property exists, if it's empty it should return false
-        $s2 = new Select(0, "", [ "extra" => "" ]);
-        $this->assertFalse($s2->hasValue("id"));
-        $this->assertFalse($s2->hasValue("value"));
-        $this->assertFalse($s2->hasValue("extra"));
+    #[DataProvider("providerHas")]
+    public function testHas(Select $select, string $key, bool $expected): void {
+        $this->assertSame($expected, $select->has($key));
     }
 
-    public function testGetString() {
-        $s = new Select("10", "Ten", [ "count" => "7", "mixed" => 3 ]);
-        $this->assertSame("10", $s->getString("id"));
-        $this->assertSame("10", $s->getString("field"));
-        $this->assertSame("Ten", $s->getString("value"));
-        $this->assertSame("7", $s->getString("count"));
-        $this->assertSame("3", $s->getString("mixed"));
-        $this->assertSame("", $s->getString("nope"));
+    public static function providerHas(): array {
+        $filled = new Select(5, "Five", [ "extra" => "x", "empty" => "" ]);
+        $empty  = new Select(0, "", [ "extra" => "" ]);
+
+        return [
+            "filled_id"      => [ $filled, "id", true ],
+            "filled_value"   => [ $filled, "value", true ],
+            "filled_extra"   => [ $filled, "extra", true ],
+            "filled_empty"   => [ $filled, "empty", true ],
+            "filled_missing" => [ $filled, "missing", false ],
+            "empty_id"       => [ $empty, "id", true ],
+            "empty_value"    => [ $empty, "value", true ],
+            "empty_extra"    => [ $empty, "extra", true ],
+        ];
     }
 
-    public function testGetInt() {
-        $s = new Select("10", "Ten", [ "count" => "7", "mixed" => 3 ]);
-        $this->assertSame(10, $s->getInt("id"));
-        $this->assertSame(10, $s->getInt("field"));
-        $this->assertSame(0, $s->getInt("value"));
-        $this->assertSame(7, $s->getInt("count"));
-        $this->assertSame(3, $s->getInt("mixed"));
-        $this->assertSame(0, $s->getInt("nope"));
+
+    #[DataProvider("providerHasValue")]
+    public function testHasValue(Select $select, string $key, bool $expected): void {
+        $this->assertSame($expected, $select->hasValue($key));
     }
 
-    public function testGetDictionary() {
-        $s = new Select(1, "One", [ "data" => [ "a" => 1 ]]);
-        $dict = $s->getDictionary("data");
+    public static function providerHasValue(): array {
+        $filled = new Select(5, "Five", [ "extra" => "x", "empty" => "" ]);
+        $empty  = new Select(0, "", [ "extra" => "" ]);
+
+        return [
+            "filled_id"      => [ $filled, "id", true ],
+            "filled_value"   => [ $filled, "value", true ],
+            "filled_extra"   => [ $filled, "extra", true ],
+            "filled_empty"   => [ $filled, "empty", false ],
+            "filled_missing" => [ $filled, "missing", false ],
+            "empty_id"       => [ $empty, "id", false ],
+            "empty_value"    => [ $empty, "value", false ],
+            "empty_extra"    => [ $empty, "extra", false ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetString")]
+    public function testGetString(Select $select, string $key, string $expected): void {
+        $this->assertSame($expected, $select->getString($key));
+    }
+
+    public static function providerGetString(): array {
+        $select = new Select("10", "Ten", [ "count" => "7", "mixed" => 3 ]);
+
+        return [
+            "id"    => [ $select, "id", "10" ],
+            "field" => [ $select, "field", "10" ],
+            "value" => [ $select, "value", "Ten" ],
+            "count" => [ $select, "count", "7" ],
+            "mixed" => [ $select, "mixed", "3" ],
+            "nope"  => [ $select, "nope", "" ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetInt")]
+    public function testGetInt(Select $select, string $key, int $expected): void {
+        $this->assertSame($expected, $select->getInt($key));
+    }
+
+    public static function providerGetInt(): array {
+        $select = new Select("10", "Ten", [ "count" => "7", "mixed" => 3 ]);
+
+        return [
+            "id"    => [ $select, "id", 10 ],
+            "field" => [ $select, "field", 10 ],
+            "value" => [ $select, "value", 0 ],
+            "count" => [ $select, "count", 7 ],
+            "mixed" => [ $select, "mixed", 3 ],
+            "nope"  => [ $select, "nope", 0 ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetDictionary")]
+    public function testGetDictionary(Select $select, string $key, int $expectedTotal, ?string $expectedItemKey = null, mixed $expectedItemValue = null): void {
+        $dict = $select->getDictionary($key);
         $this->assertInstanceOf(Dictionary::class, $dict);
-        $this->assertSame(1, $dict->get("a"));
+        $this->assertSame($expectedTotal, $dict->getTotal());
 
-        // missing key should return empty dictionary
-        $emptyDict = $s->getDictionary("missing");
-        $this->assertInstanceOf(Dictionary::class, $emptyDict);
-        $this->assertSame(0, $emptyDict->getTotal());
-
-        // when extras has null the dictionary should be empty
-        $sNull = new Select(1, "One", [ "data" => null ]);
-        $nullDict = $sNull->getDictionary("data");
-        $this->assertInstanceOf(Dictionary::class, $nullDict);
-        $this->assertSame(0, $nullDict->getTotal());
-
-        // when extras has an empty array the dictionary should be empty
-        $sEmpty = new Select(1, "One", [ "data" => [] ]);
-        $emptyArrDict = $sEmpty->getDictionary("data");
-        $this->assertInstanceOf(Dictionary::class, $emptyArrDict);
-        $this->assertSame(0, $emptyArrDict->getTotal());
+        if ($expectedItemKey !== null) {
+            $this->assertSame($expectedItemValue, $dict->get($expectedItemKey));
+        }
     }
 
-    public function testGetExtras() {
-        $s = new Select(1, "One", [ "data" => [ "a" => 1 ]]);
-        $this->assertSame(["data" => [ "a" => 1 ]], $s->getExtras());
-
-        // when no extras were provided it should return an empty array
-        $sNo = new Select(1, "One");
-        $this->assertSame([], $sNo->getExtras());
-
-        // extras should reflect values set via set()
-        $sNo->set("added", "val");
-        $this->assertSame([ "added" => "val" ], $sNo->getExtras());
+    public static function providerGetDictionary(): array {
+        return [
+            "existing_data" => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), "data", 1, "a", 1 ],
+            "missing_key"   => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), "missing", 0 ],
+            "null_data"     => [ new Select(1, "One", [ "data" => null ]), "data", 0 ],
+            "empty_array"   => [ new Select(1, "One", [ "data" => [] ]), "data", 0 ],
+        ];
     }
 
-    public function testSet() {
-        $s = new Select(1, "One", [ "data" => [ "a" => 1 ]]);
 
-        // set existing property
-        $s->set("description", "desc");
-        $this->assertSame("desc", $s->description);
-
-        // set extra
-        $s->set("newExtra", 123);
-        $this->assertTrue($s->has("newExtra"));
-        $this->assertSame("123", $s->getString("newExtra"));
-
-        // overwrite existing extra
-        $s->set("newExtra", 456);
-        $this->assertSame("456", $s->getString("newExtra"));
-
-        // set extra to null should be present but hasValue should be false
-        $s->set("nullable", null);
-        $this->assertTrue($s->has("nullable"));
-        $this->assertFalse($s->hasValue("nullable"));
-
-        // chaining should work
-        $s->set("c1", "v1")->set("c2", "v2");
-        $this->assertSame("v2", $s->getString("c2"));
+    #[DataProvider("providerGetExtras")]
+    public function testGetExtras(Select $select, array $expected): void {
+        $this->assertSame($expected, $select->getExtras());
     }
 
-    public function testJsonSerialize() {
-        $s = new Select(2, "Two", [ "foo" => "bar" ]);
-        $s->description = "desc";
-        $serialized = $s->jsonSerialize();
-        $this->assertArrayHasKey("key", $serialized);
-        $this->assertArrayHasKey("value", $serialized);
-        $this->assertArrayHasKey("description", $serialized);
-        $this->assertArrayHasKey("foo", $serialized);
-        $this->assertSame(2, $serialized["key"]);
-        $this->assertSame("Two", $serialized["value"]);
-        $this->assertSame("desc", $serialized["description"]);
-        $this->assertSame("bar", $serialized["foo"]);
+    public static function providerGetExtras(): array {
+        $withSet = new Select(1, "One");
+        $withSet->set("added", "val");
 
-        // when description is empty it should not appear
-        $s2 = new Select(3, "Three");
-        $serialized2 = $s2->jsonSerialize();
-        $this->assertArrayNotHasKey("description", $serialized2);
+        return [
+            "with_data"      => [ new Select(1, "One", [ "data" => [ "a" => 1 ]]), [ "data" => [ "a" => 1 ]]],
+            "without_extras" => [ new Select(1, "One"), [] ],
+            "reflect_set"    => [ $withSet, [ "added" => "val" ] ],
+        ];
     }
 
-    public function testCreate() {
+
+    #[DataProvider("providerSet")]
+    public function testSet(array $groups, array $expectedProperties, array $expectedStrings, array $expectedHas, array $expectedHasValue): void {
+        $select = new Select(1, "One", [ "data" => [ "a" => 1 ]]);
+
+        foreach ($groups as $group) {
+            $result = $select;
+            foreach ($group as [ $key, $value ]) {
+                $result = $result->set($key, $value);
+            }
+            $this->assertSame($select, $result);
+        }
+
+        foreach ($expectedProperties as $property => $expected) {
+            $this->assertSame($expected, $select->{$property});
+        }
+        foreach ($expectedStrings as $key => $expected) {
+            $this->assertSame($expected, $select->getString($key));
+        }
+        foreach ($expectedHas as $key => $expected) {
+            $this->assertSame($expected, $select->has($key));
+        }
+        foreach ($expectedHasValue as $key => $expected) {
+            $this->assertSame($expected, $select->hasValue($key));
+        }
+    }
+
+    public static function providerSet(): array {
+        return [
+            "set_existing_property" => [
+                [
+                    [ [ "description", "desc" ]],
+                ],
+                [ "description" => "desc" ],
+                [],
+                [],
+                [],
+            ],
+            "set_extra" => [
+                [
+                    [ [ "newExtra", 123 ]],
+                ],
+                [],
+                [ "newExtra" => "123" ],
+                [ "newExtra" => true ],
+                [],
+            ],
+            "overwrite_existing_extra" => [
+                [
+                    [ [ "newExtra", 123 ]],
+                    [ [ "newExtra", 456 ]],
+                ],
+                [],
+                [ "newExtra" => "456" ],
+                [],
+                [],
+            ],
+            "nullable_extra" => [
+                [
+                    [ [ "nullable", null ]],
+                ],
+                [],
+                [],
+                [ "nullable" => true ],
+                [ "nullable" => false ],
+            ],
+            "chaining" => [
+                [
+                    [ [ "c1", "v1" ], [ "c2", "v2" ]],
+                ],
+                [],
+                [ "c2" => "v2" ],
+                [],
+                [],
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerJsonSerialize")]
+    public function testJsonSerialize(Select $select, array $expected): void {
+        $this->assertSame($expected, $select->jsonSerialize());
+    }
+
+    public static function providerJsonSerialize(): array {
+        $withDescription = new Select(2, "Two", [ "foo" => "bar" ]);
+        $withDescription->description = "desc";
+
+        return [
+            "with_description" => [
+                $withDescription,
+                [
+                    "key"         => 2,
+                    "value"       => "Two",
+                    "description" => "desc",
+                    "foo"         => "bar",
+                ],
+            ],
+            "without_description" => [
+                new Select(3, "Three"),
+                [
+                    "key"   => 3,
+                    "value" => "Three",
+                ],
+            ],
+        ];
+    }
+
+
+    #[DataProvider("providerCreate")]
+    public function testCreate(
+        array $rows,
+        string $keyName,
+        array|string $valName,
+        ?string $descName,
+        array|string|null $extraKey,
+        bool $useEmpty,
+        bool $distinct,
+        ?int $expectedCount,
+        ?int $expectedMinCount,
+        array $expectedItems = [],
+        array $expectedIds = [],
+    ): void {
+        $list = Select::create($rows, $keyName, $valName, $descName, $extraKey, $useEmpty, $distinct);
+
+        if ($expectedCount !== null) {
+            $this->assertCount($expectedCount, $list);
+        }
+        if ($expectedMinCount !== null) {
+            $this->assertGreaterThanOrEqual($expectedMinCount, count($list));
+        }
+        if ($expectedIds !== []) {
+            $ids = array_map(fn($item) => $item->id, $list);
+            $this->assertSame($expectedIds, array_values($ids));
+        }
+        foreach ($expectedItems as $id => $checks) {
+            $item = $this->findSelectById($list, $id);
+            $this->assertInstanceOf(Select::class, $item);
+            if (isset($checks["field"])) {
+                $this->assertSame($checks["field"], $item->field);
+            }
+            if (isset($checks["value"])) {
+                $this->assertSame($checks["value"], $item->value);
+            }
+            if (isset($checks["description"])) {
+                $this->assertSame($checks["description"], $item->description);
+            }
+            if (isset($checks["extras"])) {
+                foreach ($checks["extras"] as $key => $value) {
+                    $this->assertSame($value, $item->getString($key));
+                }
+            }
+        }
+    }
+
+    public static function providerCreate(): array {
         $rows = [
             [ "id" => 1, "name" => "One", "desc" => "d1", "extra" => "e1" ],
             [ "id" => "2", "first" => "John", "last" => "Doe", "extra" => "e2" ],
@@ -173,87 +330,145 @@ class SelectTest extends TestCase {
             [ "id" => "x", "name" => "", "desc" => "dx", "extra" => "ex" ],
         ];
 
-        // basic create: use name as valName, include description and extra
-        $list = Select::create($rows, "id", "name", "desc", "extra", useEmpty: false, distinct: false);
-        // row with id 'x' has empty name and useEmpty=false so it should be skipped
-        $this->assertGreaterThanOrEqual(2, count($list));
-        $first = $list[0];
-        $this->assertInstanceOf(Select::class, $first);
-        $this->assertSame(1, $first->id);
-        $this->assertSame("One", $first->value);
-        $this->assertSame("d1", $first->description);
-        $this->assertSame("e1", $first->getString("extra"));
+        return [
+            "basic_create" => [
+                $rows,
+                "id",
+                "name",
+                "desc",
+                "extra",
+                false,
+                false,
+                null,
+                2,
+                [
+                    1 => [
+                        "value"       => "One",
+                        "description" => "d1",
+                        "extras"      => [ "extra" => "e1" ],
+                    ],
+                ],
+            ],
+            "distinct" => [
+                $rows,
+                "id",
+                "name",
+                "desc",
+                "extra",
+                false,
+                true,
+                1,
+                null,
+                [],
+                [ 1 ],
+            ],
+            "use_empty" => [
+                $rows,
+                "id",
+                "name",
+                "desc",
+                "extra",
+                true,
+                false,
+                null,
+                3,
+            ],
+            "combined_fields" => [
+                $rows,
+                "id",
+                [ "first", "last" ],
+                null,
+                null,
+                false,
+                false,
+                null,
+                1,
+                [
+                    2 => [
+                        "value" => "John - Doe",
+                    ],
+                ],
+            ],
+            "invalid_input" => [
+                [ [] ],
+                "",
+                "name",
+                null,
+                null,
+                false,
+                false,
+                0,
+                null,
+            ],
+        ];
+    }
 
-        // distinct true should remove duplicate id=1 second occurrence
-        $distinct = Select::create($rows, "id", "name", "desc", "extra", useEmpty: false, distinct: true);
-        $ids = array_map(fn($it) => $it->id, $distinct);
-        $this->assertSame(1, count($distinct));
-        $this->assertSame([ 1 ], array_values($ids));
 
-        // useEmpty true should include empty name rows
-        $withEmpty = Select::create($rows, "id", "name", "desc", "extra", useEmpty: true, distinct: false);
-        $this->assertGreaterThanOrEqual(3, count($withEmpty));
+    #[DataProvider("providerCreateFromList")]
+    public function testCreateFromList(array $input, array $expectedValues): void {
+        $list = Select::createFromList($input);
+        $this->assertCount(count($expectedValues), $list);
 
-        // test valName as array combining fields (first + last)
-        $combined = Select::create($rows, "id", ["first", "last"], null, null, useEmpty: false, distinct: false);
-        // second row should produce "John - Doe"
-        $found = false;
-        foreach ($combined as $it) {
-            if ($it->id === 2) {
-                $this->assertSame("John - Doe", $it->value);
-                $found = true;
-            }
+        foreach ($expectedValues as $index => $expectedValue) {
+            $this->assertSame($expectedValue, $list[$index]->value);
         }
-        $this->assertTrue($found, "combined name not found for id=2");
-
-        // test with invalid keys/values, should be skipped
-        $invalid = Select::create([ [] ], "", "name");
-        $this->assertCount(0, $invalid);
     }
 
-    public function testCreateFromList() {
-        $list = Select::createFromList([ "a", "b" ]);
-        $this->assertCount(2, $list);
-        $this->assertSame("a", $list[0]->value);
-        $this->assertSame("b", $list[1]->value);
-
-        // empty list should return an empty array
-        $empty = Select::createFromList([]);
-        $this->assertSame([], $empty);
+    public static function providerCreateFromList(): array {
+        return [
+            "filled" => [ [ "a", "b" ], [ "a", "b" ] ],
+            "empty"  => [ [], [] ],
+        ];
     }
 
-    public function testCreateFromArray() {
-        $arr = Select::createFromArray([ "k" => "v", 5 => "five" ]);
-        $this->assertCount(2, $arr);
-        $this->assertSame("v", $arr[0]->value);
-        $this->assertSame("five", $arr[1]->value);
 
-        // empty array should return an empty array
-        $emptyArr = Select::createFromArray([]);
-        $this->assertSame([], $emptyArr);
+    #[DataProvider("providerCreateFromArray")]
+    public function testCreateFromArray(array $input, array $expectedValues): void {
+        $list = Select::createFromArray($input);
+        $this->assertCount(count($expectedValues), $list);
 
-        // numeric and string keys preserve values order
-        $numericKeys = Select::createFromArray([ 0 => "zero", "1" => "one" ]);
-        $this->assertCount(2, $numericKeys);
-        $this->assertSame("zero", $numericKeys[0]->value);
-        $this->assertSame("one", $numericKeys[1]->value);
+        foreach ($expectedValues as $index => $expectedValue) {
+            $this->assertSame($expectedValue, $list[$index]->value);
+        }
     }
 
-    public function testCreateFromMap() {
-        // createFromMap using an Enum Map
+    public static function providerCreateFromArray(): array {
+        return [
+            "mixed_keys"     => [ [ "k" => "v", 5 => "five" ], [ "v", "five" ] ],
+            "numeric_string" => [ [ 0 => "zero", "1" => "one" ], [ "zero", "one" ] ],
+            "empty"          => [ [], [], ],
+        ];
+    }
+
+
+    #[DataProvider("providerCreateFromMap")]
+    public function testCreateFromMap(Map $map, array $expectedValues): void {
+        $list = Select::createFromMap($map);
+        $this->assertCount(count($expectedValues), $list);
+
+        foreach ($expectedValues as $index => $expectedValue) {
+            $this->assertSame($expectedValue, $list[$index]->value);
+        }
+    }
+
+    public static function providerCreateFromMap(): array {
         $map = new Map();
         $map->set(TestSelectEnum::One, "one-val");
         $map->set(TestSelectEnum::Two, 2);
-        $fromMap = Select::createFromMap($map);
-        $this->assertCount(2, $fromMap);
 
-        // keys should be enum values as provided
-        $this->assertSame("one-val", $fromMap[0]->value);
-        $this->assertSame("2", $fromMap[1]->value);
+        return [
+            "filled" => [ $map, [ "one-val", "2" ] ],
+            "empty"  => [ new Map(), [] ],
+        ];
+    }
 
-        // empty map should return an empty array
-        $emptyMap = new Map();
-        $fromEmpty = Select::createFromMap($emptyMap);
-        $this->assertSame([], $fromEmpty);
+
+    private function findSelectById(array $list, int $id): ?Select {
+        foreach ($list as $item) {
+            if ($item->id === $id) {
+                return $item;
+            }
+        }
+        return null;
     }
 }
