@@ -24,6 +24,8 @@ class QueryBuilder {
 
     private string $asTable;
 
+    private ?Query $fromQuery = null;
+
     /** @var list<string> */
     private array $joins = [];
 
@@ -51,6 +53,21 @@ class QueryBuilder {
         $this->whereBuilder = $whereBuilder;
     }
 
+
+    /**
+     * Sets the From in the Query
+     * @param Query|string $queryOrTable
+     * @param string       $as           Optional.
+     * @return void
+     */
+    public function setFrom(Query|string $queryOrTable, string $as = ""): void {
+        if ($queryOrTable instanceof Query) {
+            $this->fromQuery = $queryOrTable;
+        } else {
+            $this->tableName = $queryOrTable;
+        }
+        $this->asTable = $as;
+    }
 
     /**
      * Adds a join to the Query Builder
@@ -215,7 +232,11 @@ class QueryBuilder {
             $expression[] = Strings::join($this->selects, $glue);
         }
 
-        $expression[] = "FROM `{$this->tableName}`";
+        if ($this->fromQuery !== null) {
+            $expression[] = "FROM ({$this->fromQuery->toSQL()})";
+        } else {
+            $expression[] = "FROM `{$this->tableName}`";
+        }
         if ($this->asTable !== "") {
             $expression[] = "AS {$this->asTable}";
         }
@@ -325,6 +346,9 @@ class QueryBuilder {
      */
     public function getBindings(): array {
         $bindings = [];
+        if ($this->fromQuery !== null) {
+            $bindings = $this->fromQuery->getBindings();
+        }
         foreach ($this->fields as $value) {
             if ($value instanceof Assign) {
                 foreach ($value->getParams() as $param) {

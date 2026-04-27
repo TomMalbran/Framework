@@ -107,6 +107,17 @@ class Query implements QueryLike {
 
 
     /**
+     * Sets the From in the Query
+     * @param Query|string $queryOrTable
+     * @param string       $as           Optional.
+     * @return Query
+     */
+    public function from(Query|string $queryOrTable, string $as = ""): Query {
+        $this->queryBuilder->setFrom($queryOrTable, $as);
+        return $this;
+    }
+
+    /**
      * Adds a Join to the Query
      * @param SchemaQuery|string $queryOrTable
      * @param string             $as           Optional.
