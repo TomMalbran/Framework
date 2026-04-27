@@ -3,7 +3,6 @@ namespace Framework\Database\Model;
 
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Query;
-use Framework\Database\Query\Operator;
 
 use Attribute;
 
@@ -127,9 +126,8 @@ class Count {
         if ($this->query !== "") {
             $query->whereExp($this->query);
         }
-
         if ($this->hasDeleted) {
-            $query->where("isDeleted", Operator::Equal, 0);
+            $query->whereExp("isDeleted = 0");
         }
 
         return $query;
