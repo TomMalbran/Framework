@@ -55,18 +55,23 @@ class Image {
      * @return int
      */
     public static function getType(string $fileName): int {
+        if (!File::exists($fileName)) {
+            return 0;
+        }
         $result = exif_imagetype($fileName);
         return $result === false ? 0 : $result;
     }
 
     /**
      * Returns the Mime Type of the Image
-     * @param string $fileUrl
+     * @param string $fileName
      * @return string
      */
-    public static function getMimeType(string $fileUrl): string {
-        $fileUrl   = URL::encodeSpaces($fileUrl);
-        $imageType = self::getType($fileUrl);
+    public static function getMimeType(string $fileName): string {
+        if (!File::exists($fileName)) {
+            return "";
+        }
+        $imageType = self::getType($fileName);
         return image_type_to_mime_type($imageType);
     }
 
@@ -94,6 +99,10 @@ class Image {
      * @return array{int,int,int}
      */
     public static function getSizeFromUrl(string $fileUrl): array {
+        if ($fileUrl === "") {
+            return [ 0, 0, 0 ];
+        }
+
         $fileUrl = URL::encodeSpaces($fileUrl);
         $size    = getimagesize($fileUrl);
         if ($size === false) {
@@ -338,7 +347,10 @@ class Image {
         int $cropHeight,
     ): bool {
         [ $imgWidth, $imgHeight, $imgType ] = self::getSize($src);
-        if (!self::hasType($imgType) || $resWidth <= 0 || $resHeight <= 0 || $cropWidth <= 0 || $cropHeight <= 0) {
+        if (!self::hasType($imgType) ||
+            $resWidth <= 0 || $resHeight <= 0 ||
+            $cropWidth <= 0 || $cropHeight <= 0
+        ) {
             return false;
         }
 
