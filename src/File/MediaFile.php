@@ -24,7 +24,7 @@ class MediaFile {
      * @return void
      */
     public static function setID(int $id): void {
-        self::$id = $id;
+        self::$id = $id > 0 ? $id : 0;
     }
 
 
@@ -43,7 +43,7 @@ class MediaFile {
      * @param int|string ...$pathParts
      * @return string
      */
-    private static function getThumbPath(int|string ...$pathParts): string {
+    public static function getThumbPath(int|string ...$pathParts): string {
         return Path::getThumbsPath(self::$id, ...$pathParts);
     }
 
