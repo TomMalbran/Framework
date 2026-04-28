@@ -224,9 +224,6 @@ class Image {
 
         // Create the Image
         self::createImage($imgType, $dstImage, $dst);
-
-        // Free Resources
-        imagedestroy($srcImage);
         return true;
     }
 
@@ -315,9 +312,6 @@ class Image {
 
         // Create Image
         self::createImage($imgType, $dstResize, $dst);
-
-        // Free Resources
-        imagedestroy($srcResize);
         return true;
     }
 
@@ -370,10 +364,6 @@ class Image {
 
         // Create Image
         self::createImage($imgType, $dstCrop, $dst);
-
-        // Free Resources
-        imagedestroy($srcResize);
-        imagedestroy($dstResize);
         return true;
     }
 
@@ -482,19 +472,7 @@ class Image {
             16 => imagexbm($image, $fileName),
             default => false,
         };
-        if ($result === false) {
-            return false;
-        }
-        return imagedestroy($image);
-    }
-
-    /**
-     * Destroys the Image
-     * @param GdImage $image
-     * @return bool
-     */
-    public static function destroy(GdImage $image): bool {
-        return imagedestroy($image);
+        return $result !== false;
     }
 
 
