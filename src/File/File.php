@@ -312,11 +312,18 @@ class File {
      * Returns true if the file has the given extension
      * @param string              $name
      * @param list<string>|string $extensions
+     * @param string              ...$otherExtensions
      * @return bool
      */
-    public static function hasExtension(string $name, array|string $extensions): bool {
-        $extension = self::getExtension($name);
-        $extension = Strings::toLowerCase($extension);
+    public static function hasExtension(
+        string $name,
+        array|string $extensions,
+        string ...$otherExtensions,
+    ): bool {
+        $extension  = self::getExtension($name);
+        $extension  = Strings::toLowerCase($extension);
+        $extensions = is_array($extensions) ? $extensions : [ $extensions ];
+        $extensions = array_merge($extensions, $otherExtensions);
         return Arrays::contains($extensions, $extension);
     }
 

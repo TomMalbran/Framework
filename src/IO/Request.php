@@ -896,14 +896,19 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns true if the file at the given key has the given extension
      * @param string              $key
      * @param list<string>|string $extensions
+     * @param string              ...$otherExtensions
      * @return bool
      */
-    public function hasExtension(string $key, array|string $extensions): bool {
+    public function hasExtension(
+        string $key,
+        array|string $extensions,
+        string ...$otherExtensions,
+    ): bool {
         $fileName = $this->getString($key);
         if ($this->hasFile($key)) {
             $fileName = $this->getFileName($key);
         }
-        return File::hasExtension($fileName, $extensions);
+        return File::hasExtension($fileName, $extensions, ...$otherExtensions);
     }
 
     /**
