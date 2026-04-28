@@ -57,7 +57,7 @@ class Map implements Countable, IteratorAggregate, JsonSerializable {
      * @return void
      */
     public function set(Enum $key, mixed $value): void {
-        $this->data->attach($key, $value);
+        $this->data->offsetSet($key, $value);
     }
 
     /**
@@ -66,7 +66,7 @@ class Map implements Countable, IteratorAggregate, JsonSerializable {
      * @return bool
      */
     public function has(Enum $key): bool {
-        return $this->data->contains($key);
+        return $this->data->offsetExists($key);
     }
 
     /**
@@ -75,8 +75,8 @@ class Map implements Countable, IteratorAggregate, JsonSerializable {
      * @return TValue|null
      */
     public function get(Enum $key): mixed {
-        if ($this->data->contains($key)) {
-            return $this->data[$key];
+        if ($this->data->offsetExists($key)) {
+            return $this->data->offsetGet($key);
         }
         return null;
     }
