@@ -23,7 +23,7 @@ class Picture {
      * @param string $path
      */
     public function __construct(string $path) {
-        $size  = Image::getSize($path);
+        $size = Image::getSize($path);
 
         $this->type   = Image::getType($path);
         $this->width  = $size[0];
