@@ -71,6 +71,7 @@ class NotificationQueue extends NotificationQueueSchema {
         $query->notificationResult->equal(NotificationResult::NotProcessed);
         $query->createdTime->greaterThan($time);
         $query->createdTime->orderByDesc();
+        $query->limit(Config::getNotificationLimit());
         return self::getEntityList($query);
     }
 
