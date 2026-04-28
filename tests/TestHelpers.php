@@ -5,6 +5,20 @@ use ReflectionClass;
 
 trait TestHelpers {
 
+    protected function runWithSuppressedWarnings(callable $callback, bool $suppress): mixed {
+        if (!$suppress) {
+            return $callback();
+        }
+
+        set_error_handler(static fn() => true, E_WARNING);
+        try {
+            return $callback();
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+
     protected function getPrivateProperty(object $obj, string $name): mixed {
         $ref = new ReflectionClass($obj);
         $prop = $ref->getProperty($name);

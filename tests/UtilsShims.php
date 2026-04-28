@@ -23,3 +23,26 @@ function file_get_contents($filename, $use_include_path = false, $context = null
     }
     return \file_get_contents($filename, $use_include_path, $context, $offset, $maxLen);
 }
+
+namespace Framework\File;
+
+// move_uploaded_file shim for CLI tests
+if (!function_exists("Framework\\File\\move_uploaded_file")) {
+    function move_uploaded_file(string $from, string $to): bool {
+        if (($GLOBALS["test_move_uploaded_file"] ?? false) === true) {
+            if ($from === "" || $to === "" || !is_file($from)) {
+                return false;
+            }
+
+            if (@rename($from, $to)) {
+                return true;
+            }
+            if (@copy($from, $to)) {
+                @unlink($from);
+                return true;
+            }
+            return false;
+        }
+        return \move_uploaded_file($from, $to);
+    }
+}
