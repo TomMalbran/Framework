@@ -1,14 +1,16 @@
 <?php
 namespace Tests\File;
 
-use Framework\File\Image;
 use Framework\File\File;
+use Framework\File\Image;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use GdImage;
 
 class ImageTest extends TestCase {
+    use TestHelpers;
 
     private string $tmpDir = "";
 
@@ -38,36 +40,6 @@ class ImageTest extends TestCase {
 
         @file_put_contents($this->files["text"], "not an image");
     }
-
-    private function writeFixtureImage(string $path, int $imgType, int $width, int $height, bool $transparent = false): void {
-        $image = imagecreatetruecolor($width, $height);
-        $this->assertNotFalse($image);
-
-        if ($transparent) {
-            imagealphablending($image, false);
-            imagesavealpha($image, true);
-            $fillColor = imagecolorallocatealpha($image, 255, 255, 255, 127);
-        } else {
-            $fillColor = imagecolorallocate($image, 20, 80, 140);
-        }
-
-        $this->assertNotFalse($fillColor);
-        imagefilledrectangle($image, 0, 0, $width, $height, $fillColor);
-
-        if ($transparent) {
-            $dotColor = imagecolorallocatealpha($image, 255, 0, 0, 80);
-            $this->assertNotFalse($dotColor);
-            imagesetpixel($image, 0, 0, $dotColor);
-        }
-
-        match ($imgType) {
-            1 => imagegif($image, $path),
-            2 => imagejpeg($image, $path, 90),
-            3 => imagepng($image, $path),
-            default => false,
-        };
-    }
-
 
     protected function tearDown(): void {
         File::deleteDir($this->tmpDir);
@@ -228,24 +200,6 @@ class ImageTest extends TestCase {
         $this->assertGreaterThan(0, $smallWidth);
         $this->assertGreaterThan($smallWidth, $largeWidth);
         $this->assertSame(0, $emptyWidth);
-    }
-
-    private function findFontFile(): string {
-        $candidates = [
-            "/System/Library/Fonts/Supplemental/NotoSansLepcha-Regular.ttf",
-            "/System/Library/Fonts/Supplemental/Arial.ttf",
-            "/System/Library/Fonts/SFNS.ttf",
-            "/System/Library/Fonts/Supplemental/Times New Roman.ttf",
-            "/Library/Fonts/Arial.ttf",
-        ];
-
-        foreach ($candidates as $candidate) {
-            if (is_file($candidate)) {
-                return $candidate;
-            }
-        }
-
-        $this->markTestSkipped("No TrueType/OpenType font file available for imagettfbbox");
     }
 
 

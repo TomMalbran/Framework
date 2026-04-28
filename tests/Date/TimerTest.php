@@ -2,13 +2,13 @@
 namespace Tests\Date;
 
 use Framework\Date\Timer;
-use Tests\ReflectionHelpers;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class TimerTest extends TestCase {
-    use ReflectionHelpers;
+    use TestHelpers;
 
     public function testEnd(): void {
         $timer = new Timer();

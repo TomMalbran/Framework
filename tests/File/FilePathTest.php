@@ -6,13 +6,13 @@ use Framework\Discovery\Package;
 use Framework\File\File;
 use Framework\File\FilePath;
 use Framework\System\Config;
-use Tests\ReflectionHelpers;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class FilePathTest extends TestCase {
-    use ReflectionHelpers;
+    use TestHelpers;
 
     private string $tmpDir = "";
 

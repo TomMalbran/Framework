@@ -2,13 +2,13 @@
 namespace Tests\Date;
 
 use Framework\Date\TimeZone;
-use Tests\ReflectionHelpers;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class TimeZoneTest extends TestCase {
-    use ReflectionHelpers;
+    use TestHelpers;
 
     protected function setUp(): void {
         // reset internal static state before each test
