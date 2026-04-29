@@ -26,6 +26,8 @@ class ImageTest extends TestCase {
             "gif"         => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.gif",
             "jpeg"        => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.jpg",
             "png"         => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.png",
+            "bmp"         => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.bmp",
+            "xbm"         => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.xbm",
             "transparent" => $this->tmpDir . DIRECTORY_SEPARATOR . "transparent.png",
             "large"       => $this->tmpDir . DIRECTORY_SEPARATOR . "large-transparent.png",
             "text"        => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.txt",
@@ -34,7 +36,9 @@ class ImageTest extends TestCase {
 
         $this->writeFixtureImage($this->files["gif"], 1, 30, 15);
         $this->writeFixtureImage($this->files["jpeg"], 2, 200, 100);
-        $this->writeFixtureImage($this->files["png"], 3, 20, 10);
+        $this->writeFixtureImage($this->files["png"], 3, 10, 20);
+        $this->writeFixtureImage($this->files["bmp"], 15, 100, 100);
+        $this->writeFixtureImage($this->files["xbm"], 16, 100, 100);
         $this->writeFixtureImage($this->files["transparent"], 3, 20, 10, transparent: true);
         $this->writeFixtureImage($this->files["large"], 3, 60, 60, transparent: true);
 
@@ -128,9 +132,10 @@ class ImageTest extends TestCase {
     public static function providerGetSize(): array {
         return [
             "jpeg_full_path" => [ "jpeg", [], [ 200, 100, 2 ] ],
-            "png_split_path" => [ "tmpDir", [ "sample.png" ], [ 20, 10, 3 ] ],
+            "png_split_path" => [ "tmpDir", [ "sample.png" ], [ 10, 20, 3 ] ],
             "text_file"      => [ "text", [], [ 0, 0, 0 ] ],
-            "missing_file"   => [ "missing", [], [ 0, 0, 0 ] ],
+            "missing"        => [ "missing", [], [ 0, 0, 0 ] ],
+            "invalid"        => [ "invalid", [], [ 0, 0, 0 ] ],
         ];
     }
 
@@ -146,7 +151,7 @@ class ImageTest extends TestCase {
         return [
             "gif"     => [ "gif", [ 30, 15, 1 ] ],
             "jpeg"    => [ "jpeg", [ 200, 100, 2 ] ],
-            "png"     => [ "png", [ 20, 10, 3 ] ],
+            "png"     => [ "png", [ 10, 20, 3 ] ],
             "text"    => [ "text", [ 0, 0, 0 ] ],
             "missing" => [ "missing", [ 0, 0, 0 ] ],
             "invalid" => [ "invalid", [ 0, 0, 0 ] ],
@@ -190,16 +195,28 @@ class ImageTest extends TestCase {
     }
 
 
-    public function testGetTextWidth(): void {
-        $fontFile = $this->findFontFile();
+    #[DataProvider("providerGetTextWidth")]
+    public function testGetTextWidth(string $text, bool $useFontFile, int $fontSize, bool $expectPositive): void {
+        $fontFile = "";
+        if ($useFontFile) {
+            $fontFile = $this->findFontFile();
+        }
 
-        $smallWidth = Image::getTextWidth("Framework", $fontFile, 12);
-        $largeWidth = Image::getTextWidth("Framework", $fontFile, 24);
-        $emptyWidth = Image::getTextWidth("", $fontFile, 12);
+        $width = Image::getTextWidth($text, $fontFile, $fontSize);
 
-        $this->assertGreaterThan(0, $smallWidth);
-        $this->assertGreaterThan($smallWidth, $largeWidth);
-        $this->assertSame(0, $emptyWidth);
+        if ($expectPositive) {
+            $this->assertGreaterThan(0, $width);
+        } else {
+            $this->assertSame(0, $width);
+        }
+    }
+
+    public static function providerGetTextWidth(): array {
+        return [
+            "normal"  => [ "Framework", true, 12, true ],
+            "empty"   => [ "", true, 12, false ],
+            "no_font" => [ "Framework", false, 0, false ],
+        ];
     }
 
 
@@ -207,7 +224,7 @@ class ImageTest extends TestCase {
     public function testResample(
         string $srcToken,
         string $dstName,
-        int $orientation,
+        ?int $orientation,
         bool $expected,
         ?array $expectedSize,
     ): void {
@@ -230,7 +247,8 @@ class ImageTest extends TestCase {
         return [
             "jpeg_rotate_180" => [ "jpeg", "resample-180.jpg", 3, true, [ 200, 100, 2 ] ],
             "jpeg_rotate_90"  => [ "jpeg", "resample-90.jpg", 6, true, [ 100, 200, 2 ] ],
-            "png_rotate_270"  => [ "png", "resample-270.png", 8, true, [ 10, 20, 3 ] ],
+            "png_rotate_270"  => [ "png", "resample-270.png", 8, true, [ 20, 10, 3 ] ],
+            "no_orientation"  => [ "jpeg", "resample-none.jpg", null, false, null ],
             "invalid"         => [ "jpeg", "resample-invalid.jpg", 0, false, null ],
         ];
     }
@@ -264,7 +282,8 @@ class ImageTest extends TestCase {
     public static function providerResize(): array {
         return [
             "resize_jpeg"    => [ "jpeg", "resize.jpg", 50, 50, Image::Resize, true, [ 50, 25, 2 ] ],
-            "maximum_small"  => [ "png", "maximum.png", 50, 50, Image::Maximum, true, [ 20, 10, 3 ] ],
+            "resize_png"     => [ "png", "resize.png", 50, 50, Image::Resize, true, [ 25, 50, 3 ] ],
+            "maximum_small"  => [ "png", "maximum.png", 50, 50, Image::Maximum, true, [ 10, 20, 3 ] ],
             "thumb_jpeg"     => [ "jpeg", "thumb.jpg", 50, 50, Image::Thumb, true, [ 50, 50, 2 ] ],
             "missing_source" => [ "missing", "missing.jpg", 50, 50, Image::Resize, false, null ],
         ];
@@ -370,6 +389,8 @@ class ImageTest extends TestCase {
             "gif"        => [ 1, "gif", true ],
             "jpeg"       => [ 2, "jpeg", true ],
             "png"        => [ 3, "png", true ],
+            "bmp"        => [ 15, "bmp", false ],
+            "xbm"        => [ 16, "xbm", false ],
             "wrong_type" => [ 99, "jpeg", false ],
         ];
     }
@@ -425,6 +446,8 @@ class ImageTest extends TestCase {
             "gif"     => [ 1, "created.gif", true ],
             "jpeg"    => [ 2, "created.jpg", true ],
             "png"     => [ 3, "created.png", true ],
+            "bmp"     => [ 15, "created.bmp", true ],
+            "xbm"     => [ 16, "created.xbm", true ],
             "unknown" => [ 99, "created.bin", false ],
         ];
     }
@@ -457,7 +480,7 @@ class ImageTest extends TestCase {
 
     public static function providerThumbnail(): array {
         return [
-            "small_thumb_copies" => [ "png", "thumb-copy.png", 50, 50, Image::Thumb, true, [ 20, 10, 3 ] ],
+            "small_thumb_copies" => [ "png", "thumb-copy.png", 50, 50, Image::Thumb, true, [ 10, 20, 3 ] ],
             "maximum_jpeg"       => [ "jpeg", "thumb-maximum.jpg", 50, 50, Image::Maximum, true, [ 50, 25, 2 ] ],
             "thumb_large_png"    => [ "large", "thumb-large.png", 30, 30, Image::Thumb, true, [ 30, 30, 3 ] ],
         ];
