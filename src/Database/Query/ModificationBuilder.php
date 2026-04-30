@@ -3,12 +3,14 @@ namespace Framework\Database\Query;
 
 use Framework\IO\Request;
 use Framework\Database\SchemaModel;
+use Framework\Database\Query\QueryBuilder;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
 /**
  * The Modification Builder
+ * @phpstan-import-type QueryValue from QueryBuilder
  */
 class ModificationBuilder {
 
@@ -68,8 +70,8 @@ class ModificationBuilder {
 
     /**
      * Sets a Field
-     * @param string $key
-     * @param mixed  $value
+     * @param string     $key
+     * @param QueryValue $value
      * @return ModificationBuilder
      */
     public function setField(string $key, mixed $value): ModificationBuilder {
@@ -79,10 +81,10 @@ class ModificationBuilder {
 
     /**
      * Adds all the Fields
-     * @param Request|null        $request
-     * @param array<string,mixed> $fields    Optional.
-     * @param bool                $skipEmpty Optional.
-     * @param bool                $skipUnset Optional.
+     * @param Request|null             $request
+     * @param array<string,QueryValue> $fields    Optional.
+     * @param bool                     $skipEmpty Optional.
+     * @param bool                     $skipUnset Optional.
      * @return ModificationBuilder
      */
     public function addFields(
@@ -105,7 +107,7 @@ class ModificationBuilder {
      * @param Request $request
      * @param bool    $skipEmpty Optional.
      * @param bool    $skipUnset Optional.
-     * @return array<string,mixed>
+     * @return array<string,QueryValue>
      */
     private function parseFields(Request $request, bool $skipEmpty = false, bool $skipUnset = false): array {
         $result = [];
@@ -118,7 +120,7 @@ class ModificationBuilder {
             }
 
             $value = $field->getValue($request);
-            if ($skipEmpty && Arrays::isEmpty($value)) {
+            if ($value === null || ($skipEmpty && Arrays::isEmpty($value))) {
                 continue;
             }
 

@@ -5,6 +5,7 @@ use Framework\IO\Request;
 use Framework\IO\Search;
 use Framework\IO\Select;
 use Framework\Database\Query\Operator;
+use Framework\Database\Query\QueryBuilder;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialColumn;
@@ -20,6 +21,7 @@ use Framework\Utils\Utils;
 
 /**
  * The Auth Credential
+ * @phpstan-import-type QueryValue from QueryBuilder
  */
 class Credential extends CredentialSchema {
 
@@ -591,8 +593,8 @@ class Credential extends CredentialSchema {
 
     /**
      * Updates the given Credential
-     * @param int                 $credentialID
-     * @param array<string,mixed> $fields
+     * @param int                      $credentialID
+     * @param array<string,QueryValue> $fields
      * @return bool
      */
     public static function update(int $credentialID, array $fields): bool {

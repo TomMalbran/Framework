@@ -10,6 +10,7 @@ use Framework\Database\Query\Query;
 use Framework\Database\Query\Assign;
 use Framework\Database\Query\Operator;
 use Framework\Database\Query\QueryLike;
+use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\SelectionBuilder;
 use Framework\Database\Query\ModificationBuilder;
 use Framework\Database\Model\SubRequest;
@@ -21,6 +22,7 @@ use Framework\Utils\Strings;
 
 /**
  * The Schema
+ * @phpstan-import-type QueryValue from QueryBuilder
  */
 class Schema {
 
@@ -318,9 +320,9 @@ class Schema {
 
     /**
      * Creates a new Entity with data
-     * @param Request|null        $request      Optional.
-     * @param array<string,mixed> $fields       Optional.
-     * @param int                 $credentialID Optional.
+     * @param Request|null             $request      Optional.
+     * @param array<string,QueryValue> $fields       Optional.
+     * @param int                      $credentialID Optional.
      * @return int
      */
     protected static function createSchemaEntity(
@@ -337,9 +339,9 @@ class Schema {
 
     /**
      * Replaces the Data of an Entity
-     * @param Request|null        $request      Optional.
-     * @param array<string,mixed> $fields       Optional.
-     * @param int                 $credentialID Optional.
+     * @param Request|null             $request      Optional.
+     * @param array<string,QueryValue> $fields       Optional.
+     * @param int                      $credentialID Optional.
      * @return int
      */
     protected static function replaceSchemaEntity(
@@ -357,7 +359,7 @@ class Schema {
      * Edits the Data of an Entity
      * @param QueryLike|Enum|int|string $query
      * @param Request|null              $request        Optional.
-     * @param array<string,mixed>       $fields         Optional.
+     * @param array<string,QueryValue>  $fields         Optional.
      * @param int                       $credentialID   Optional.
      * @param bool                      $skipTimestamps Optional.
      * @param bool                      $skipEmpty      Optional.
@@ -411,10 +413,10 @@ class Schema {
 
     /**
      * Creates an Entity and ensures the Order
-     * @param Request|null        $request      Optional.
-     * @param array<string,mixed> $fields       Optional.
-     * @param int                 $credentialID Optional.
-     * @param QueryLike|null      $orderQuery   Optional.
+     * @param Request|null             $request      Optional.
+     * @param array<string,QueryValue> $fields       Optional.
+     * @param int                      $credentialID Optional.
+     * @param QueryLike|null           $orderQuery   Optional.
      * @return int
      */
     protected static function createSchemaEntityWithOrder(
@@ -437,7 +439,7 @@ class Schema {
      * Edits the Data of an Entity and ensures the Order
      * @param QueryLike|Enum|int|string $query
      * @param Request|null              $request        Optional.
-     * @param array<string,mixed>       $fields         Optional.
+     * @param array<string,QueryValue>  $fields         Optional.
      * @param int                       $credentialID   Optional.
      * @param QueryLike|null            $orderQuery     Optional.
      * @param bool                      $skipTimestamps Optional.

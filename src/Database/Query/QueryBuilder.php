@@ -13,6 +13,7 @@ use Framework\Utils\Strings;
 
 /**
  * The Query Builder
+ * @phpstan-type QueryValue Query|Enum|Dictionary|Date|array<int|string,mixed>|bool|Assign|float|int|string
  */
 class QueryBuilder {
 
@@ -98,8 +99,8 @@ class QueryBuilder {
 
     /**
      * Sets a field to be Inserted or Updated
-     * @param string $field
-     * @param mixed  $value
+     * @param string     $field
+     * @param QueryValue $value
      * @return void
      */
     public function setField(string $field, mixed $value): void {
@@ -128,14 +129,14 @@ class QueryBuilder {
             $this->fields[$field] = $value ? 1 : 0;
 
         // Set any Assign, float, int or string as is
-        } elseif ($value instanceof Assign || is_float($value) || is_int($value) || is_string($value)) {
+        } else {
             $this->fields[$field] = $value;
         }
     }
 
     /**
      * Sets multiple fields to be Inserted or Updated
-     * @param array<string,mixed> $fields
+     * @param array<string,QueryValue> $fields
      * @return void
      */
     public function setFields(array $fields): void {

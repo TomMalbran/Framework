@@ -4,6 +4,7 @@ namespace Framework\Database\Model;
 use Framework\IO\Request;
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\Assign;
+use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Model\FieldType;
 use Framework\File\FilePath;
 use Framework\System\Config;
@@ -18,6 +19,7 @@ use Attribute;
 
 /**
  * The Field Attribute
+ * @phpstan-import-type QueryValue from QueryBuilder
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Field {
@@ -204,12 +206,13 @@ class Field {
 
 
     // Used internally when parsing the Model
-    public FieldType $type       = FieldType::String;
-    public string    $name       = "";
-    public string    $dbName     = "";
-    public string    $prefixName = "";
-    public string    $enumClass  = "";
-    public bool      $isStatus   = false;
+    public FieldType $type        = FieldType::String;
+    public string    $name        = "";
+    public string    $dbName      = "";
+    public string    $prefixName  = "";
+    public string    $enumClass   = "";
+    public bool      $isStatus    = false;
+    public bool      $hasValidate = false;
 
 
     /**
@@ -439,7 +442,7 @@ class Field {
     /**
      * Returns the Field Value from the given Request
      * @param Request $request
-     * @return mixed
+     * @return QueryValue|null
      */
     public function getValue(Request $request): mixed {
         if ($this->isAutoInc()) {

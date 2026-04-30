@@ -14,6 +14,7 @@ use Framework\Utils\Dictionary;
 
 /**
  * The Database Query
+ * @phpstan-import-type QueryValue from QueryBuilder
  */
 class Query implements QueryLike {
 
@@ -218,8 +219,8 @@ class Query implements QueryLike {
 
     /**
      * Sets a field to be Inserted or Updated
-     * @param string $field
-     * @param mixed  $value
+     * @param string     $field
+     * @param QueryValue $value
      * @return Query
      */
     public function set(string $field, mixed $value): Query {
@@ -240,7 +241,7 @@ class Query implements QueryLike {
 
     /**
      * Sets multiple fields to be Inserted or Updated
-     * @param array<string,mixed> $fields
+     * @param array<string,QueryValue> $fields
      * @return Query
      */
     public function fields(array $fields): Query {
