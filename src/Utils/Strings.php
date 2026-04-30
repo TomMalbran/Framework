@@ -22,6 +22,16 @@ class Strings {
     }
 
     /**
+     * Returns true if the given value is a valid string
+     * @param mixed $string
+     * @return bool
+     */
+    public static function isValid(mixed $string): bool {
+        $value = Strings::normalized($string);
+        return $value !== "";
+    }
+
+    /**
      * Returns the given value as a string
      * @param mixed $value
      * @return string

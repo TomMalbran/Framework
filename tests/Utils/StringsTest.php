@@ -39,6 +39,25 @@ class StringsTest extends TestCase {
     }
 
 
+    #[DataProvider("providerIsValid")]
+    public function testIsValid(mixed $string, bool $expected): void {
+        $this->assertEquals($expected, Strings::isValid($string));
+    }
+
+    public static function providerIsValid(): array {
+        return [
+            "empty"   => [ "", false ],
+            "space"   => [ " ", false ],
+            "char"    => [ "x", true],
+            "numeric" => [ "123", true ],
+            "spaced"  => [ " xx ", true ],
+            "null"    => [ null, false ],
+            "boolean" => [ false, false ],
+            "object"  => [ new stdClass(), false ],
+        ];
+    }
+
+
     #[DataProvider("providerToString")]
     public function testToString(mixed $value, string $expected): void {
         $this->assertEquals($expected, Strings::toString($value));
