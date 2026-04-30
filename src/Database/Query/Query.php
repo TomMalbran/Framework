@@ -8,13 +8,13 @@ use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\WhereBuilder;
 use Framework\Database\Query\Operator;
 use Framework\Database\Type\Column;
-use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
 /**
  * The Database Query
  * @phpstan-import-type QueryValue from QueryBuilder
+ * @phpstan-import-type WhereValue from WhereBuilder
  */
 class Query implements QueryLike {
 
@@ -253,17 +253,17 @@ class Query implements QueryLike {
 
     /**
      * Adds a Where expression
-     * @param string                           $column
-     * @param Operator|string                  $operator
-     * @param Date|list<int|string>|int|string $value
-     * @param bool                             $caseSensitive Optional.
-     * @param bool|null                        $condition     Optional.
+     * @param string          $column
+     * @param Operator|string $operator
+     * @param WhereValue      $value
+     * @param bool            $caseSensitive Optional.
+     * @param bool|null       $condition     Optional.
      * @return Query
      */
     public function where(
         string $column,
         Operator|string $operator,
-        Date|array|int|string $value,
+        mixed $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): Query {
@@ -276,17 +276,17 @@ class Query implements QueryLike {
 
     /**
      * Adds an OR Where expression
-     * @param string                      $column
-     * @param Operator|string             $operator
-     * @param list<int|string>|int|string $value
-     * @param bool                        $caseSensitive Optional.
-     * @param bool|null                   $condition     Optional.
+     * @param string          $column
+     * @param Operator|string $operator
+     * @param WhereValue      $value
+     * @param bool            $caseSensitive Optional.
+     * @param bool|null       $condition     Optional.
      * @return Query
      */
     public function orWhere(
         string $column,
         Operator|string $operator,
-        array|int|string $value,
+        mixed $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): Query {
@@ -299,17 +299,17 @@ class Query implements QueryLike {
 
     /**
      * Adds a Where expression if the value is not empty
-     * @param string                           $column
-     * @param Operator|string                  $operator
-     * @param list<int|string>|int|string|null $value
-     * @param bool|null                        $condition     Optional.
-     * @param bool                             $caseSensitive Optional.
+     * @param string          $column
+     * @param Operator|string $operator
+     * @param WhereValue|null $value
+     * @param bool|null       $condition     Optional.
+     * @param bool            $caseSensitive Optional.
      * @return Query
      */
     public function whereIf(
         string $column,
         Operator|string $operator,
-        array|int|string|null $value,
+        mixed $value,
         ?bool $condition = null,
         bool $caseSensitive = false,
     ): Query {

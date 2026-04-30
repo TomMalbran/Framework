@@ -2,12 +2,14 @@
 namespace Framework\Database\Query;
 
 use Framework\Database\Query\Operator;
+use Framework\Enum\Enum;
 use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
  * The Where Builder
+ * @phpstan-type WhereValue Date|Enum|list<int|string>|int|string
  */
 class WhereBuilder {
 
@@ -84,25 +86,27 @@ class WhereBuilder {
 
     /**
      * Adds a Where expression
-     * @param string                           $column
-     * @param Operator|string                  $operator
-     * @param Date|list<int|string>|int|string $value
-     * @param bool                             $caseSensitive
+     * @param string          $column
+     * @param Operator|string $operator
+     * @param WhereValue      $value
+     * @param bool            $caseSensitive
      * @return void
      */
     public function where(
         string $column,
         Operator|string $operator,
-        Date|array|int|string $value,
+        mixed $value,
         bool $caseSensitive,
     ): void {
+        if ($value instanceof Date) {
+            $value = $value->toTime();
+        } elseif ($value instanceof Enum) {
+            $value = $value->toString();
+        }
+
         $operator = Operator::fromValue($operator);
         $param    = null;
         $binds    = "?";
-
-        if ($value instanceof Date) {
-            $value = $value->toTime();
-        }
 
         switch ($operator) {
         case Operator::None:
@@ -216,16 +220,16 @@ class WhereBuilder {
 
     /**
      * Adds an OR Where expression
-     * @param string                      $column
-     * @param Operator|string             $operator
-     * @param list<int|string>|int|string $value
-     * @param bool                        $caseSensitive
+     * @param string          $column
+     * @param Operator|string $operator
+     * @param WhereValue      $value
+     * @param bool            $caseSensitive
      * @return void
      */
     public function orWhere(
         string $column,
         Operator|string $operator,
-        array|int|string $value,
+        mixed $value,
         bool $caseSensitive,
     ): void {
         // Add an OR before the next expression if needed
