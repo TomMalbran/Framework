@@ -5,6 +5,7 @@ rules:
     - Framework\Analysis\Enum\EnumHasNoneCaseRule
     - Framework\Analysis\Enum\EnumInternalMethodsRule
     - Framework\Analysis\Route\RouteMethodNameRule
+    - Framework\Analysis\Route\RouteParamTypeRule
     - Framework\Analysis\Route\RouteReturnTypeRule
     - Framework\Analysis\Route\RouteDuplicateRule
     - Framework\Analysis\Signal\ListenerReturnVoidRule

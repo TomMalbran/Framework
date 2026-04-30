@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Analysis\Route;
 
-use Framework\IO\Response;
 use Framework\Discovery\Attr\Route;
 
 use PHPStan\Analyser\Scope;
@@ -9,17 +8,16 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Type\ObjectType;
-use PHPStan\Type\NeverType;
 
 use PhpParser\Node;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\ClassMethod;
 
 /**
- * The Route Return Type Rule
+ * The Route Param Type Rule
  * @implements Rule<ClassMethod>
  */
-class RouteReturnTypeRule implements Rule {
+class RouteParamTypeRule implements Rule {
 
     /**
      * Returns the type of node this rule is interested in
@@ -55,32 +53,40 @@ class RouteReturnTypeRule implements Rule {
             return [];
         }
 
-        // Check the return type
-        $responseType = new ObjectType(Response::class);
-        $neverType    = new NeverType();
+        // Check the parameters
+        $params     = $node->getParams();
+        $paramCount = count($params);
 
-        // getVariants() handles multiple possible signatures (common in built-in PHP, less in user code)
-        foreach ($methodReflection->getVariants() as $variant) {
-            // Check that the return type is a subtype of Response or Never
-            $returnType = $variant->getReturnType();
-            if ($responseType->isSuperTypeOf($returnType)->yes() ||
-                $neverType->isSuperTypeOf($returnType)->yes()
-            ) {
-                continue;
-            }
-
-            // Build the error message
-            $className = $classReflection->getName();
-            $method    = "{$className}::{$methodName}()";
-            return [
-                RuleErrorBuilder::message("Method {$method} must return a Response since is a Route.")
-                    ->line($node->getStartLine())
-                    ->identifier("framework.routeReturn")
-                    ->build()
-            ];
+        // Allow 0 parameters
+        if ($paramCount === 0) {
+            return [];
         }
 
-        return [];
+        // If there is exactly 1 parameter, validate it
+        if ($paramCount === 1 && isset($params[0])) {
+            $param = $params[0];
+            $type  = $param->type;
+
+            // Ensure the parameter has a class/interface
+            if ($type instanceof Name) {
+                $resolvedType = $scope->resolveName($type);
+
+                // Check if class name is "Request" or ends in "Request"
+                if (str_ends_with($resolvedType, "Request")) {
+                    return [];
+                }
+            }
+        }
+
+        // Build the error message
+        $className = $classReflection->getName();
+        $method    = "{$className}::{$methodName}()";
+        return [
+            RuleErrorBuilder::message("Method {$method} must have no params or a Request param since is a Route.")
+                ->line($node->getStartLine())
+                ->identifier("framework.routeParam")
+                ->build()
+        ];
     }
 
     /**
