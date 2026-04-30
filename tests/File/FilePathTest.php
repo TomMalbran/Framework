@@ -32,6 +32,8 @@ class FilePathTest extends TestCase {
         if ($this->tmpDir !== "" && file_exists($this->tmpDir)) {
             @rmdir($this->tmpDir);
         }
+
+        File::deleteDir(FilePath::getPath());
     }
 
 
@@ -224,7 +226,7 @@ class FilePathTest extends TestCase {
 
     #[DataProvider("providerGetTempUrl")]
     public function testGetTempUrl(int $id, array $pathParts, string $expectedEnd, bool $expectEmpty = false): void {
-        $path     = FilePath::getTempUrl($id, ...$pathParts);
+        $path = FilePath::getTempUrl($id, ...$pathParts);
         if ($expectEmpty) {
             $this->assertEmpty($path);
         } else {
@@ -242,5 +244,4 @@ class FilePathTest extends TestCase {
             "multiple" => [ 999, [ "subdir", "file.txt" ], "/999/subdir/file.txt" ],
         ];
     }
-
 }
