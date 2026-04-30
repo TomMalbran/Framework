@@ -71,11 +71,10 @@ enum FieldType implements Enum, JsonSerializable {
 
     /**
      * Returns true if the Field Type is a String type
-     * @param FieldType $type
      * @return bool
      */
-    public static function isString(FieldType $type): bool {
-        return match ($type) {
+    public function isString(): bool {
+        return match ($this) {
             FieldType::String,
             FieldType::Text,
             FieldType::LongText => true,
@@ -85,17 +84,16 @@ enum FieldType implements Enum, JsonSerializable {
 
     /**
      * Returns the PHP Type from the given Field Type
-     * @param FieldType $type
-     * @param string    $enumClass
-     * @param bool      $forEntity Optional.
+     * @param string $enumClass Optional.
+     * @param bool   $forEntity Optional.
      * @return string
      */
-    public static function getCodeType(FieldType $type, string $enumClass, bool $forEntity = false): string {
-        return match ($type) {
+    public function getCodeType(string $enumClass = "", bool $forEntity = false): string {
+        return match ($this) {
             FieldType::None    => "",
 
             FieldType::Date    => "Date",
-            FieldType::Enum    => Strings::substringAfter($enumClass, "\\"),
+            FieldType::Enum    => $enumClass !== "" ? Strings::substringAfter($enumClass, "\\") : "string",
             FieldType::JSON    => $forEntity ? "Dictionary" : "JsonSerializable|array",
             FieldType::Array   => "array",
 

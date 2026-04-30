@@ -170,15 +170,15 @@ class EntityCode {
         string $enumClass = "",
     ): void {
         if ($fieldType === FieldType::Enum) {
-            $type     = FieldType::getCodeType($fieldType, $enumClass, forEntity: true);
             $result[] = self::getTypeData($fieldKey, $type, default: "{$type}::None");
+            $type     = $fieldType->getCodeType($enumClass, forEntity: true);
         } elseif ($fieldType === FieldType::File) {
             $result[] = self::getTypeData($fieldKey, "string");
             $result[] = self::getTypeData("{$fieldKey}Url", "string");
             $result[] = self::getTypeData("{$fieldKey}Thumb", "string");
         } else {
-            $type     = FieldType::getCodeType($fieldType, $enumClass, forEntity: true);
             $result[] = self::getTypeData($fieldKey, $type, $subType);
+            $type     = $fieldType->getCodeType($enumClass, forEntity: true);
         }
     }
 
@@ -220,11 +220,11 @@ class EntityCode {
         $result = [];
         foreach ($schemaModel->mainFields as $field) {
             if ($field->type === FieldType::Enum) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
+                $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
             } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type);
+                $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
             }
         }
 
@@ -232,11 +232,11 @@ class EntityCode {
             if ($field->type === FieldType::Array) {
                 $result[] = self::getTypeData($field->name, "array", $field->subType);
             } elseif ($field->type === FieldType::Enum) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
+                $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
             } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
-                $type     = FieldType::getCodeType($field->type, $field->enumClass, forEntity: true);
                 $result[] = self::getTypeData($field->name, $type);
+                $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
             }
         }
 

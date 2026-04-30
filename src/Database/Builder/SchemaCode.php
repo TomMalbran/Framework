@@ -43,7 +43,7 @@ class SchemaCode {
         $hasFloatType = count(self::getSomeFields($schemaModel, isFloatType: true)) > 0;
         $queryName    = $schemaModel->queryClass;
 
-        $idType       = FieldType::getCodeType($schemaModel->idType, $schemaModel->idEnumClass, forEntity: false);
+        $idType       = $schemaModel->idType->getCodeType($schemaModel->idEnumClass, forEntity: false);
         $idIsEnum     = $schemaModel->idType === FieldType::Enum;
         $idSuffix     = $idIsEnum ? "->toString()" : "";
         $hasIntID     = $schemaModel->hasID && $schemaModel->idType === FieldType::Number;
@@ -222,7 +222,7 @@ class SchemaCode {
      * @return array<string,string>
      */
     private static function getField(Field $field): array {
-        $type        = FieldType::getCodeType($field->type, $field->enumClass, forEntity: false);
+        $type        = $field->type->getCodeType($field->enumClass, forEntity: false);
         $isDate      = $field->type === FieldType::Date;
         $isEnum      = $field->type === FieldType::Enum;
         $isJSON      = $field->type === FieldType::JSON;
