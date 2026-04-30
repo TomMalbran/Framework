@@ -263,19 +263,9 @@ class SchemaCode {
         $assign      = $param;
         $assignEdit  = $param;
 
-        if ($isEnum) {
-            $value      = "{$param}->toString()";
-            $valueNull  = "$param !== null ? $value : null";
-            $assign     = $value;
-            $assignEdit = $assign;
-        } elseif ($isDate) {
-            $assign     = "{$param}->toTime()";
-            $assignEdit = $assign;
-        } elseif ($isJSON) {
+        if ($isJSON) {
             $typeNull   = "$type|null";
             $typeDoc    = Strings::replace($type, "array", "array<int|string,mixed>");
-            $assign     = "JSON::encode($param)";
-            $assignEdit = "$param instanceof Assign ? $param : $assign";
         } elseif ($type === "float") {
             $assign     = "Numbers::toInt($param, {$field->decimals})";
             $assignEdit = "$param instanceof Assign ? $param : $assign";
