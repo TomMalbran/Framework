@@ -12,6 +12,26 @@ use Framework\Utils\Strings;
 
 /**
  * The Schema Code
+ * @phpstan-type Property array{
+ *   fieldKey: string,
+ *   fieldName: string,
+ *   fieldText: string,
+ *   fieldDoc: string,
+ *   fieldArg: string,
+ *   fieldDocNull: string,
+ *   fieldArgNull: string,
+ *   fieldDocDefault: string,
+ *   fieldArgDefault: string,
+ *   fieldDocEdit: string,
+ *   fieldArgEdit: string,
+ *   fieldArgCreate: string,
+ *   fieldParam: string,
+ *   fieldValue: string,
+ *   fieldValueNull: string,
+ *   fieldAssign: string,
+ *   fieldAssignEdit: string,
+ *   fieldHasRequest: bool,
+ * }
  */
 class SchemaCode {
 
@@ -157,7 +177,7 @@ class SchemaCode {
     /**
      * Returns a list of all the Fields to set
      * @param SchemaModel $schemaModel
-     * @return list<array<string,string>>
+     * @return list<Property>
      */
     private static function getAllFields(SchemaModel $schemaModel): array {
         $result = [];
@@ -183,7 +203,7 @@ class SchemaCode {
      * @param bool        $isDateType  Optional.
      * @param bool        $isJsonType  Optional.
      * @param bool        $isFloatType Optional.
-     * @return list<array<string,string>>
+     * @return list<Property>
      */
     private static function getSomeFields(
         SchemaModel $schemaModel,
@@ -219,7 +239,7 @@ class SchemaCode {
     /**
      * Returns the Fields data for the Schema
      * @param Field $field
-     * @return array<string,string>
+     * @return Property
      */
     private static function getField(Field $field): array {
         $type        = $field->type->getCodeType($field->enumClass, forEntity: false);
@@ -287,9 +307,9 @@ class SchemaCode {
 
     /**
      * Summary of joinFields
-     * @param list<array<string,mixed>> $fields
-     * @param string                    $key
-     * @param string                    $prefix Optional.
+     * @param list<Property> $fields
+     * @param string         $key
+     * @param string         $prefix Optional.
      * @return string
      */
     private static function joinFields(array $fields, string $key, string $prefix = ""): string {

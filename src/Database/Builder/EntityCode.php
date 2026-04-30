@@ -9,6 +9,25 @@ use Framework\Utils\Strings;
 
 /**
  * The Entity Code
+ * @phpstan-type Property array{
+ *   name: string,
+ *   type: string,
+ *   subType: string,
+ *   docType: string,
+ *   hasDefault: bool,
+ *   default: string,
+ * }
+ * @phpstan-type Category array{
+ *   name: string,
+ *   list: list<Property>,
+ * }
+ * @phpstan-type SubType array{
+ *   name: string,
+ *   type: string,
+ *   namespace: string,
+ *   useIndex: bool,
+ *   keyType: string,
+ * }
  */
 class EntityCode {
 
@@ -54,7 +73,7 @@ class EntityCode {
     /**
      * Returns the Properties of the Entity
      * @param SchemaModel $schemaModel
-     * @return list<array{name:string,list:list<array<string,string|bool>>}>
+     * @return list<Category>
      */
     private static function getProperties(SchemaModel $schemaModel): array {
         $result = [];
@@ -69,13 +88,13 @@ class EntityCode {
         }
         self::addCategory($result, "Main", $fields, $parsed);
 
-        // Status Fields
+        // Status Field
         $fields = [];
         if ($schemaModel->hasStatus) {
             $statusClass = $schemaModel->statusClass;
-            $fields[] = self::getTypeData("status", $statusClass, default: "{$statusClass}::None");
-            $fields[] = self::getTypeData("statusName", "string");
-            $fields[] = self::getTypeData("statusColor", "string");
+            $fields[] = self::getPropertyData("status", $statusClass, default: "{$statusClass}::None");
+            $fields[] = self::getPropertyData("statusName", "string");
+            $fields[] = self::getPropertyData("statusColor", "string");
         }
         self::addCategory($result, "Status", $fields, $parsed);
 
@@ -105,7 +124,7 @@ class EntityCode {
             $fields = [];
             foreach ($relation->fields as $field) {
                 if ($field->isStatus) {
-                    $fields[] = self::getTypeData(
+                    $fields[] = self::getPropertyData(
                         name:    "{$field->prefixName}",
                         type:    "{$relation->relationModelName}Status",
                         default: "{$relation->relationModelName}Status::None",
@@ -120,7 +139,7 @@ class EntityCode {
         // SubRequest Fields
         $fields = [];
         foreach ($schemaModel->subRequests as $subRequest) {
-            $fields[] = self::getTypeData($subRequest->name, "array", $subRequest->getDocType());
+            $fields[] = self::getPropertyData($subRequest->name, "array", $subRequest->getDocType());
         }
         self::addCategory($result, "SubRequest", $fields, $parsed);
 
@@ -129,18 +148,17 @@ class EntityCode {
 
     /**
      * Adds a Category to the Properties
-     * @param list<array{name:string,list:list<array<string,string|bool>>}> $result
-     * @param string                                                        $name
-     * @param list<array<string,string|bool>>                               $fields
-     * @param array<string,bool>                                            $parsed
+     * @param list<Category>     $result
+     * @param string             $name
+     * @param list<Property>     $fields
+     * @param array<string,bool> $parsed
      * @return void
      */
     private static function addCategory(array &$result, string $name, array $fields, array &$parsed): void {
         $list = [];
         foreach ($fields as $field) {
-            $fieldName = Strings::toString($field["name"] ?? "");
-            if (!isset($parsed[$fieldName])) {
-                $parsed[$fieldName] = true;
+            if (!isset($parsed[$field["name"]])) {
+                $parsed[$field["name"]] = true;
                 $list[] = $field;
             }
         }
@@ -155,11 +173,11 @@ class EntityCode {
 
     /**
      * Adds the Property to the Entity
-     * @param list<array<string,string|bool>> $result
-     * @param string                          $fieldKey
-     * @param FieldType                       $fieldType
-     * @param string                          $subType   Optional.
-     * @param string                          $enumClass Optional.
+     * @param list<Property> $result
+     * @param string         $fieldKey
+     * @param FieldType      $fieldType
+     * @param string         $subType   Optional.
+     * @param string         $enumClass Optional.
      * @return void
      */
     private static function addProperty(
@@ -170,15 +188,15 @@ class EntityCode {
         string $enumClass = "",
     ): void {
         if ($fieldType === FieldType::Enum) {
-            $result[] = self::getTypeData($fieldKey, $type, default: "{$type}::None");
             $type     = $fieldType->getCodeType($enumClass, forEntity: true);
+            $result[] = self::getPropertyData($fieldKey, $type, default: "{$type}::None");
         } elseif ($fieldType === FieldType::File) {
-            $result[] = self::getTypeData($fieldKey, "string");
-            $result[] = self::getTypeData("{$fieldKey}Url", "string");
-            $result[] = self::getTypeData("{$fieldKey}Thumb", "string");
+            $result[] = self::getPropertyData($fieldKey, "string");
+            $result[] = self::getPropertyData("{$fieldKey}Url", "string");
+            $result[] = self::getPropertyData("{$fieldKey}Thumb", "string");
         } else {
-            $result[] = self::getTypeData($fieldKey, $type, $subType);
             $type     = $fieldType->getCodeType($enumClass, forEntity: true);
+            $result[] = self::getPropertyData($fieldKey, $type, $subType);
         }
     }
 
@@ -188,9 +206,9 @@ class EntityCode {
      * @param string      $type
      * @param string      $subType Optional.
      * @param string|null $default Optional.
-     * @return array<string,string|bool>
+     * @return Property
      */
-    private static function getTypeData(
+    private static function getPropertyData(
         string $name,
         string $type,
         string $subType = "",
@@ -214,35 +232,35 @@ class EntityCode {
     /**
      * Returns the Main Fields of the Entity
      * @param SchemaModel $schemaModel
-     * @return list<array<string,string|bool>>
+     * @return list<Property>
      */
     private static function getMainFields(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->mainFields as $field) {
             if ($field->type === FieldType::Enum) {
-                $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
+                $result[] = self::getPropertyData($field->name, $type, default: "{$type}::None");
             } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
-                $result[] = self::getTypeData($field->name, $type);
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
+                $result[] = self::getPropertyData($field->name, $type);
             }
         }
 
         foreach ($schemaModel->virtualFields as $field) {
             if ($field->type === FieldType::Array) {
-                $result[] = self::getTypeData($field->name, "array", $field->subType);
+                $result[] = self::getPropertyData($field->name, "array", $field->subType);
             } elseif ($field->type === FieldType::Enum) {
-                $result[] = self::getTypeData($field->name, $type, default: "{$type}::None");
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
+                $result[] = self::getPropertyData($field->name, $type, default: "{$type}::None");
             } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
-                $result[] = self::getTypeData($field->name, $type);
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
+                $result[] = self::getPropertyData($field->name, $type);
             }
         }
 
         foreach ($schemaModel->subRequests as $subRequest) {
             if ($subRequest->type !== "") {
-                $result[] = self::getTypeData($subRequest->name, "array", $subRequest->getDocType());
+                $result[] = self::getPropertyData($subRequest->name, "array", $subRequest->getDocType());
             }
         }
         return $result;
@@ -283,7 +301,7 @@ class EntityCode {
     /**
      * Returns the Sub Types from the Sub Requests
      * @param SchemaModel $schemaModel
-     * @return list<array{name:string,type:string,namespace:string,useIndex:bool,keyType:string}>
+     * @return list<SubType>
      */
     private static function getSubTypes(SchemaModel $schemaModel): array {
         $models = [];

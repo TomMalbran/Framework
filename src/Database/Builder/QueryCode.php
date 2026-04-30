@@ -9,6 +9,12 @@ use Framework\Utils\Strings;
 
 /**
  * The Query Code
+ * @phpstan-type Property array{
+ *   type: string,
+ *   name: string,
+ *   value: string,
+ *   propName: string,
+ * }
  */
 class QueryCode {
 
@@ -36,7 +42,7 @@ class QueryCode {
     /**
      * Returns the Field properties for the Query
      * @param SchemaModel $schemaModel
-     * @return list<array{fieldType:FieldType,status:string,column:string,name:string,value:string}>
+     * @return list<Property>
      */
     private static function getProperties(SchemaModel $schemaModel): array {
         $nameLength = 0;
@@ -44,40 +50,35 @@ class QueryCode {
         $result     = [];
 
         foreach ($schemaModel->fields as $field) {
+            $status = $field->isStatus ? $schemaModel->statusClass : "";
             $list[] = [
-                "fieldType" => $field->type,
-                "status"    => $field->isStatus ? $schemaModel->statusClass : "",
-                "column"    => $field->name,
-                "name"      => $field->name,
-                "value"     => "{$schemaModel->tableName}.{$field->dbName}",
+                "type"  => self::getWhereType($field->type, $status),
+                "name"  => $field->name,
+                "value" => "{$schemaModel->tableName}.{$field->dbName}",
             ];
         }
 
         foreach ($schemaModel->expressions as $expression) {
             $list[] = [
-                "fieldType" => $expression->type,
-                "status"    => "",
-                "column"    => $expression->name,
-                "name"      => $expression->name,
-                "value"     => $expression->name,
+                "type"  => self::getWhereType($expression->type),
+                "name"  => $expression->name,
+                "value" => $expression->name,
             ];
         }
 
         foreach ($schemaModel->relations as $relation) {
             $tableName = $relation->getDbTableName();
             foreach ($relation->fields as $field) {
+                $status = $field->isStatus ? "{$relation->relationModelName}Status" : "";
                 $list[] = [
-                    "fieldType" => $field->type,
-                    "status"    => $field->isStatus ? "{$relation->relationModelName}Status" : "",
-                    "column"    => $field->name,
-                    "name"      => $field->prefixName,
-                    "value"     => "{$tableName}.{$field->dbName}",
+                    "type"  => self::getWhereType($field->type, $status),
+                    "name"  => $field->prefixName,
+                    "value" => "{$tableName}.{$field->dbName}",
                 ];
             }
         }
 
         foreach ($list as $property) {
-            $property["type"] = self::getWhereType($property["fieldType"], $property["status"]);
             if ($property["type"] !== "") {
                 $nameLength = max($nameLength, Strings::length($property["name"]));
                 $result[]   = $property;
@@ -118,17 +119,17 @@ class QueryCode {
 
     /**
      * Returns the Queries used in the Query
-     * @param list<array<string,mixed>> $properties
+     * @param list<Property> $properties
      * @return list<string>
      */
     private static function getQueries(array $properties): array {
         $result = [];
         foreach ($properties as $property) {
-            $type = Strings::toString($property["type"] ?? "");
-            if ($type !== "Query" && !Strings::endsWith($type, "StatusWhere") &&
-                !Arrays::contains($result, $type)
+            if ($property["type"] !== "Query" &&
+                !Strings::endsWith($property["type"], "StatusWhere") &&
+                !Arrays::contains($result, $property["type"])
             ) {
-                $result[] = $type;
+                $result[] = $property["type"];
             }
         }
         return $result;
@@ -138,10 +139,10 @@ class QueryCode {
     /**
      * Returns the Where Type for a Field Type
      * @param FieldType $type
-     * @param string    $status
+     * @param string    $status Optional.
      * @return string
      */
-    private static function getWhereType(FieldType $type, string $status): string {
+    private static function getWhereType(FieldType $type, string $status = ""): string {
         if ($status !== "") {
             return "{$status}Where";
         }
