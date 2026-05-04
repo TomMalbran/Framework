@@ -21,8 +21,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns the List Query
-     * @param Request              $request
-     * @param array<string,string> $mappings Optional.
+     * @param Request                       $request
+     * @param array<string,LogActionColumn> $mappings Optional.
      * @return LogActionQuery
      */
     private static function createQuery(Request $request, array $mappings = []): LogActionQuery {
@@ -30,9 +30,8 @@ class ActionLog extends LogActionSchema {
         $search       = $request->getString("search");
 
         $query = new LogActionQuery();
-        foreach ($mappings as $key => $columnName) {
-            $column = LogActionColumn::fromValue($columnName);
-            $value  = $request->getString($key);
+        foreach ($mappings as $key => $column) {
+            $value = $request->getString($key);
             $query->where($column, Operator::Equal, $value, condition: $value !== "");
         }
 
@@ -49,8 +48,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns all the Actions Log items
-     * @param Request              $request
-     * @param array<string,string> $mappings Optional.
+     * @param Request                       $request
+     * @param array<string,LogActionColumn> $mappings Optional.
      * @return list<array<string,mixed>>
      */
     public static function getAll(Request $request, array $mappings = []): array {
@@ -95,8 +94,8 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns the total amount of Actions Log items
-     * @param Request              $request
-     * @param array<string,string> $mappings Optional.
+     * @param Request                       $request
+     * @param array<string,LogActionColumn> $mappings Optional.
      * @return int
      */
     public static function getAmount(Request $request, array $mappings = []): int {
