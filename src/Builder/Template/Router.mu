@@ -52,7 +52,7 @@ class Router {
     {{#hasRoutes}}
         return match ($route) {
         {{#routes}}
-            {{{route}}} => {{className}}::{{method}}({{#hasRequest}}$request{{/hasRequest}}),
+            {{{route}}} => {{className}}::{{method}}({{{requestParam}}}),
             {{#addSpace}}
 
             {{/addSpace}}

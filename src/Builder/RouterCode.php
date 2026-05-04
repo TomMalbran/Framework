@@ -8,6 +8,8 @@ use Framework\Discovery\Attr\Route;
 use Framework\Builder\Builder;
 use Framework\Utils\Strings;
 
+use ReflectionNamedType;
+
 /**
  * The Router Code
  */
@@ -41,17 +43,42 @@ class RouterCode implements DiscoveryBuilder {
 
                 /** @var Route */
                 $route      = $attributes[0]->newInstance();
-                $params     = $method->getNumberOfParameters();
                 $methodName = $method->getName();
+
+                // Check the Parameters
+                $params       = $method->getParameters();
+                $requestParam = "";
+
+                // Get the first Param type if exists
+                if (count($params) > 1) {
+                    continue;
+                }
+                if (count($params) === 1) {
+                    $paramType = $params[0]->getType();
+                    if ($paramType === null) {
+                        continue;
+                    }
+                    if (!$paramType instanceof ReflectionNamedType) {
+                        continue;
+                    }
+
+                    $typeName = $paramType->getName();
+                    if (Strings::endsWith($typeName, "\\Request")) {
+                        $requestParam = "\$request";
+                    } elseif (Strings::endsWith($typeName, "Request")) {
+                        $requestParam = "new \\$typeName(\$request)";
+                    }
+                }
+
 
                 // Add the Route
                 $routes[] = [
-                    "className"  => $class->getFullyQualifiedName(),
-                    "method"     => $methodName,
-                    "hasRequest" => $params > 0,
-                    "route"      => $route->route,
-                    "access"     => $route->access->toString(),
-                    "addSpace"   => false,
+                    "className"    => $class->getFullyQualifiedName(),
+                    "method"       => $methodName,
+                    "requestParam" => $requestParam,
+                    "route"        => $route->route,
+                    "access"       => $route->access->toString(),
+                    "addSpace"     => false,
                 ];
             }
         }
