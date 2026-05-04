@@ -150,7 +150,6 @@ class Validate {
     public bool   $isUnique  = false;
     public string $dateInput = "";
     public string $hourInput = "";
-    public int    $decimals  = 0;
 
 
     /**
@@ -164,7 +163,6 @@ class Validate {
         $this->isUnique  = $field->isUnique;
         $this->dateInput = $field->dateInput;
         $this->hourInput = $field->hourInput;
-        $this->decimals  = $field->decimals;
 
         $this->type      = $this->getType($field);
         $this->fieldType = $field->type;
@@ -214,7 +212,7 @@ class Validate {
         if ($field->type === FieldType::Enum) {
             return ValidateType::Enum;
         }
-        if (FieldType::isString($field->type)) {
+        if ($field->type->isString()) {
             return ValidateType::String;
         }
         return ValidateType::None;
@@ -286,13 +284,6 @@ class Validate {
             $result[] = $this->maxValue;
         }
 
-        if ($this->fieldType === FieldType::Float && $this->decimals !== 0) {
-            for ($i = count($result); $i < 2; $i += 1) {
-                $result[] = "null";
-            }
-            $result[] = $this->decimals;
-        }
-
         if (count($result) === 0) {
             return "";
         }
@@ -317,6 +308,6 @@ class Validate {
             default => "=",
         };
 
-        return "if (\$request->getString(\"{$field}\") {$op} \"{$value}\") {";
+        return "if (\$request->{$field}->get() {$op} \"{$value}\") {";
     }
 }

@@ -8,46 +8,20 @@ use Framework\IO\Errors;
  */
 class Result {
 
-    public bool   $isCreate    = false;
-    public bool   $isEdit      = false;
-    public bool   $canValidate = false;
-
-    public int    $id          = 0;
-    public string $code        = "";
-    public string $name        = "";
-
+    public bool   $canValidate;
     public Errors $errors;
 
 
 
     /**
      * Creates a new Result
-     * @param bool        $isEdit      Optional.
-     * @param bool        $canValidate Optional.
-     * @param int         $id          Optional.
-     * @param string      $code        Optional.
-     * @param string      $name        Optional.
-     * @param Errors|null $errors      Optional.
+     * @param bool   $canValidate
+     * @param Errors $errors
      */
-    public function __construct(
-        bool $isEdit = false,
-        bool $canValidate = false,
-        int $id = 0,
-        string $code = "",
-        string $name = "",
-        ?Errors $errors = null,
-    ) {
-        $this->isCreate    = !$isEdit;
-        $this->isEdit      = $isEdit;
+    public function __construct(bool $canValidate, Errors $errors) {
         $this->canValidate = $canValidate;
-
-        $this->id          = $id;
-        $this->code        = $code;
-        $this->name        = $name;
-
-        $this->errors      = $errors ?? new Errors();
+        $this->errors      = $errors;
     }
-
 
     /**
      * Returns whether there are any Error

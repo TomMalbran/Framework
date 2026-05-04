@@ -6,7 +6,8 @@ namespace {{namespace}};
 {{/imports}}
 
 {{/hasImports}}
-use {{namespace}}\{{entityClass}};
+use {{namespace}}\{{entityClass}};{{#hasRequest}}
+use {{namespace}}\{{requestClass}};{{/hasRequest}}
 use {{namespace}}\{{columnClass}};
 use {{namespace}}\{{queryClass}};{{#hasStatus}}
 use {{namespace}}\{{statusClass}};{{/hasStatus}}
@@ -134,30 +135,26 @@ class {{name}}Schema extends Schema {
 
     /**
      * Validates the {{name}} Request
-     * @param Request $request{{#parents}}
+     * @param {{requestClass}} $request{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @return Result
      */
     public static function validateRequest(
-        Request $request,{{#parents}}
+        {{requestClass}} $request,{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}
     ): Result {
-        $isEdit      = $request->has("{{idName}}");
-        {{#hasIntID}}
-        $id          = $request->getInt("{{idName}}");
-        {{/hasIntID}}
-        {{#hasStringID}}
-        $id          = $request->getString("{{idName}}");
-        {{/hasStringID}}
         {{#hasEnumID}}
-        $id          = {{idEnumClass}}::fromRequest($request, "{{idName}}");
+        $id          = {{idEnumClass}}::fromRequest($request->getRequest(), "{{idName}}");
+        {{/hasEnumID}}
+        {{^hasEnumID}}
+        $id          = $request->id;
         {{/hasEnumID}}
         $errors      = new Errors();
         $canValidate = false;
 
         if (!self::canEdit({{parentsList}})) {
             $errors->form = "{{errorPrefix}}EDIT";
-        } elseif ($isEdit && !self::exists($id{{parentsSecList}})) {
+        } elseif ($request->isEdit && !self::exists($id{{parentsSecList}})) {
             $errors->form = "{{errorPrefix}}EXISTS";
         } else {
 {{#validations}}
@@ -166,91 +163,91 @@ class {{name}}Schema extends Schema {
     {{/hasIf}}
     {{#isString}}
         {{#isRequired}}
-            {{pads}}if (!$request->isValidString("{{fieldName}}")) {
+            {{pads}}if (!$request->{{fieldName}}->isValid()) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
         {{/isRequired}}
         {{#typeOf}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!{{typeOf}}::{{method}}($request->getString("{{fieldName}}"))) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!{{typeOf}}::{{method}}($request->{{fieldName}}->get())) {
             {{pads}}    $errors->{{fieldName}} = "{{typeInvError}}";
         {{/typeOf}}
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}->get(){{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#maxLength}}
-            {{pads}}} elseif (!$request->isValidLength("{{fieldName}}", {{maxLength}})) {
+            {{pads}}} elseif (!$request->{{fieldName}}->isValidLength({{maxLength}})) {
             {{pads}}    $errors->add("{{fieldName}}", "{{fieldError}}_LENGTH", {{maxLength}});
         {{/maxLength}}
             {{pads}}}
     {{/isString}}
     {{#isEmail}}
         {{#isRequired}}
-            {{pads}}if (!$request->isValidString("{{fieldName}}")) {
+            {{pads}}if (!$request->{{fieldName}}->isValid()) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_EMPTY";
         {{/isRequired}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidEmail("{{fieldName}}")) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !$request->{{fieldName}}->isValidEmail()) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_INVALID";
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->getString("{{fieldName}}"){{parentsSecList}}, $id)) {
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}->get(){{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
             {{pads}}}
     {{/isEmail}}
     {{#isUrl}}
         {{#isRequired}}
-            {{pads}}if (!$request->isValidString("{{fieldName}}")) {
+            {{pads}}if (!$request->{{fieldName}}->isValid()) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_EMPTY";
         {{/isRequired}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !$request->isValidUrl("{{fieldName}}")) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !$request->{{fieldName}}->isValidUrl()) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_INVALID";
             {{pads}}}
     {{/isUrl}}
     {{#isNumber}}
         {{#isRequired}}
-            {{pads}}if (!$request->has("{{fieldName}}")) {
+            {{pads}}if (!$request->{{fieldName}}->hasValue()) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
         {{/isRequired}}
         {{#typeOf}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{typeOf}}::{{method}}($request->getInt("{{fieldName}}"))) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !{{typeOf}}::{{method}}($request->{{fieldName}}->get())) {
             {{pads}}    $errors->{{fieldName}} = "{{typeExistsError}}";
         {{/typeOf}}
         {{#belongsTo}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->has("{{fieldName}}") && !{{belongsTo}}::{{method}}($request->getInt("{{fieldName}}"{{#withParent}}{{parentsSecList}}{{/withParent}}))) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !{{belongsTo}}::{{method}}($request->{{fieldName}}->get(){{#withParent}}{{parentsSecList}}{{/withParent}})) {
             {{pads}}    $errors->{{fieldName}} = "{{belongsToError}}";
         {{/belongsTo}}
         {{#isNumeric}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!$request->isNumeric("{{fieldName}}"{{numericParams}})) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!$request->{{fieldName}}->{{validFunc}}({{numericParams}})) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
         {{/isNumeric}}
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->getInt("{{fieldName}}"){{parentsSecList}}, $id)) {
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}->get(){{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
             {{pads}}}
     {{/isNumber}}
     {{#isDate}}
-            {{pads}}if (!$request->has("{{dateName}}")) {
+            {{pads}}if (!$request->{{fieldName}}->hasValue()) {
             {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_EMPTY";
-            {{pads}}} elseif (!$request->isValidDate("{{dateName}}")) {
+            {{pads}}} elseif (!$request->{{fieldName}}->isValid()) {
             {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_INVALID";
-            {{pads}}} elseif (!$request->has("{{hourName}}")) {
+            {{pads}}} elseif (!$request->{{fieldName}}->hasHour()) {
             {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_EMPTY";
-            {{pads}}} elseif (!$request->isValidHour("{{hourName}}")) {
+            {{pads}}} elseif (!$request->{{fieldName}}->isValidHour()) {
             {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_INVALID";
             {{pads}}}
         {{#hasPeriod}}
-            {{pads}}if (!$request->isValidFullPeriod("{{fromDateName}}", "{{fromHourName}}", "{{toDateName}}", "{{toHourName}}")) {
+            {{pads}}if (!$request->{{fromDateName}}->isValidFullPeriod($request->{{toDateName}})) {
             {{pads}}    $errors->toDate = "GENERAL_ERROR_DATE_PERIOD";
             {{pads}}}
         {{/hasPeriod}}
     {{/isDate}}
     {{#isPrice}}
-            {{pads}}if (!$request->isValidPrice("{{fieldName}}", 0)) {
+            {{pads}}if (!$request->{{fieldName}}->isValidPrice(0)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}";
             {{pads}}}
     {{/isPrice}}
     {{#isStatus}}
-            {{pads}}if (!{{statusClass}}::isValid($request->getString("status"))) {
+            {{pads}}if (!{{statusClass}}::isValid($request->status->get())) {
             {{pads}}    $errors->status = "GENERAL_ERROR_STATUS";
             {{pads}}}
     {{/isStatus}}
@@ -260,7 +257,7 @@ class {{name}}Schema extends Schema {
 
 {{/validations}}
     {{#hasPositions}}
-            if (!$request->isValidPosition("position")) {
+            if (!$request->position->isValid(0)) {
                 $errors->position = "GENERAL_ERROR_POSITION";
             }
 
@@ -268,15 +265,7 @@ class {{name}}Schema extends Schema {
             $canValidate = true;
         }
 
-        return new Result(
-            isEdit:      $isEdit,{{#hasIntID}}
-            id:          $id,{{/hasIntID}}{{#hasStringID}}
-            code:        $id,{{/hasStringID}}{{#hasEnumID}}
-            code:        $id->toString(),{{/hasEnumID}}
-            name:        $request->getString("name"),
-            canValidate: $canValidate,
-            errors:      $errors,
-        );
+        return new Result($canValidate, $errors);
     }
 {{/hasValidation}}
 
@@ -663,8 +652,8 @@ class {{name}}Schema extends Schema {
 {{#canCreate}}
 
     /**
-     * Creates a new {{name}} Entity{{#usesRequest}}
-     * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
+     * Creates a new {{name}} Entity{{#hasRequest}}
+     * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
      * @param {{{fieldDocNull}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
      * @param Date|null $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
@@ -672,28 +661,32 @@ class {{name}}Schema extends Schema {
      * @param bool $skipOrder Optional.{{/hasPositions}}
      * @return int
      */
-    protected static function createEntity({{#usesRequest}}
-        ?Request $entityRequest = null,{{/usesRequest}}{{#fields}}
+    protected static function createEntity({{#hasRequest}}
+        ?{{requestClass}} $entityRequest = null,{{/hasRequest}}{{#fields}}
         {{fieldArgCreate}},{{/fields}}{{#hasStatus}}
         ?{{statusClass}} $status = null,{{/hasStatus}}{{#hasTimestamps}}
         ?Date $createdTime = null,{{/hasTimestamps}}{{#hasUsers}}
         int $createdUser = 0,{{/hasUsers}}{{#hasPositions}}
         bool $skipOrder = false,{{/hasPositions}}
     ): int {
-        $entityFields = [];
+        $fields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $entityFields["{{fieldKey}}"] = {{{fieldAssign}}};
-        }
+            $fields["{{fieldKey}}"] = {{{fieldAssign}}};
+        }{{#fieldIsRequested}} elseif ($entityRequest !== null) {
+            $fields["{{fieldKey}}"] = $entityRequest->{{fieldName}};
+        }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
-            $entityFields["status"] = $status->toString();
-        }
+            $fields["status"] = $status;
+        }{{#hasStatusRequest}} elseif ($entityRequest !== null) {
+            $fields["status"] = $entityRequest->status;
+        }{{/hasStatusRequest}}
         {{/hasStatus}}
         {{#hasTimestamps}}
         if ($createdTime !== null) {
-            $entityFields["createdTime"] = $createdTime->toTime();
+            $fields["createdTime"] = $createdTime;
         }
         {{/hasTimestamps}}
         {{#hasUsers}}
@@ -704,23 +697,20 @@ class {{name}}Schema extends Schema {
 
         {{#hasPositions}}
         if ($skipOrder) {
-            return self::createSchemaEntity({{#usesRequest}}
-                request: $entityRequest,{{/usesRequest}}
-                fields: $entityFields,{{#hasUsers}}
+            return self::createSchemaEntity(
+                fields: $fields,{{#hasUsers}}
                 credentialID: $createdUser,{{/hasUsers}}
             );
         }
-        return self::createSchemaEntityWithOrder({{#usesRequest}}
-            request: $entityRequest,{{/usesRequest}}
-            fields: $entityFields,{{#hasEditParents}}
+        return self::createSchemaEntityWithOrder(
+            fields: $fields,{{#hasEditParents}}
             orderQuery: self::createParentQuery({{parentsList}}),{{/hasEditParents}}{{#hasUsers}}
             credentialID: $createdUser,{{/hasUsers}}
         );
         {{/hasPositions}}
         {{^hasPositions}}
-        return self::createSchemaEntity({{#usesRequest}}
-            request: $entityRequest,{{/usesRequest}}
-            fields: $entityFields,{{#hasUsers}}
+        return self::createSchemaEntity(
+            fields: $fields,{{#hasUsers}}
             credentialID: $createdUser,{{/hasUsers}}
         );
         {{/hasPositions}}
@@ -729,29 +719,33 @@ class {{name}}Schema extends Schema {
 {{#canReplace}}
 
     /**
-     * Replaces the {{name}} Entity{{#usesRequest}}
-     * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
+     * Replaces the {{name}} Entity{{#hasRequest}}
+     * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
      * @param {{{fieldDocNull}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}
      * @return bool
      */
-    protected static function replaceEntity({{#usesRequest}}
-        ?Request $entityRequest = null,{{/usesRequest}}{{#fields}}
+    protected static function replaceEntity({{#hasRequest}}
+        ?{{requestClass}} $entityRequest = null,{{/hasRequest}}{{#fields}}
         {{fieldArgCreate}},{{/fields}}{{#hasStatus}}
         ?{{statusClass}} $status = null,{{/hasStatus}}{{#hasUsers}}
         int $createdUser = 0,{{/hasUsers}}
     ): bool {
-        $entityFields = [];
+        $fields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $entityFields["{{fieldKey}}"] = {{{fieldAssign}}};
-        }
+            $fields["{{fieldKey}}"] = {{{fieldAssign}}};
+        }{{#fieldIsRequested}} elseif ($entityRequest !== null) {
+            $fields["{{fieldKey}}"] = $entityRequest->{{fieldName}};
+        }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
-            $entityFields["status"] = $status->toString();
-        }
+            $fields["status"] = $status;
+        }{{#hasStatusRequest}} elseif ($entityRequest !== null) {
+            $fields["status"] = $entityRequest->status;
+        }{{/hasStatusRequest}}
         {{/hasStatus}}
         {{#hasUsers}}
         if ($createdUser === 0) {
@@ -759,9 +753,8 @@ class {{name}}Schema extends Schema {
         }
         {{/hasUsers}}
 
-        $result = self::replaceSchemaEntity({{#usesRequest}}
-            request: $entityRequest,{{/usesRequest}}
-            fields: $entityFields,{{#hasUsers}}
+        $result = self::replaceSchemaEntity(
+            fields: $fields,{{#hasUsers}}
             credentialID: $createdUser,{{/hasUsers}}
         );
         return $result > 0;
@@ -771,44 +764,44 @@ class {{name}}Schema extends Schema {
 
     /**
      * Edits a {{name}} Entity
-     * @param {{editType}} $query{{#usesRequest}}
-     * @param Request|null $entityRequest Optional.{{/usesRequest}}{{#fields}}
+     * @param {{editType}} $query{{#hasRequest}}
+     * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
      * @param {{{fieldDocEdit}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
      * @param bool|null $isDeleted Optional.{{/canDelete}}{{#hasPositions}}
      * @param bool $skipOrder Optional.{{/hasPositions}}{{#hasTimestamps}}
      * @param bool $skipTimestamps Optional.{{/hasTimestamps}}
-     * @param bool $skipEmpty Optional.
-     * @param bool $skipUnset Optional.
      * @return bool
      */
     protected static function editEntity(
-        {{editType}} $query,{{#usesRequest}}
-        ?Request $entityRequest = null,{{/usesRequest}}{{#fields}}
+        {{editType}} $query,{{#hasRequest}}
+        ?{{requestClass}} $entityRequest = null,{{/hasRequest}}{{#fields}}
         {{fieldArgEdit}},{{/fields}}{{#hasStatus}}
         ?{{statusClass}} $status = null,{{/hasStatus}}{{#hasUsers}}
         int $modifiedUser = 0,{{/hasUsers}}{{#canDelete}}
         ?bool $isDeleted = null,{{/canDelete}}{{#hasPositions}}
         bool $skipOrder = false,{{/hasPositions}}{{#hasTimestamps}}
         bool $skipTimestamps = false,{{/hasTimestamps}}
-        bool $skipEmpty = false,
-        bool $skipUnset = false,
     ): bool {
-        $entityFields = [];
+        $fields = [];
         {{#fields}}
         if ({{fieldParam}} !== null) {
-            $entityFields["{{fieldKey}}"] = {{{fieldAssignEdit}}};
-        }
+            $fields["{{fieldKey}}"] = {{{fieldAssignEdit}}};
+        }{{#fieldIsRequested}} elseif ($entityRequest !== null) {
+            $fields["{{fieldKey}}"] = $entityRequest->{{fieldName}};
+        }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
-            $entityFields["status"] = $status->toString();
-        }
+            $fields["status"] = $status;
+        }{{#hasStatusRequest}} elseif ($entityRequest !== null) {
+            $fields["status"] = $entityRequest->status;
+        }{{/hasStatusRequest}}
         {{/hasStatus}}
         {{#canDelete}}
         if ($isDeleted !== null) {
-            $entityFields["isDeleted"] = $isDeleted;
+            $fields["isDeleted"] = $isDeleted;
         }
         {{/canDelete}}
         {{#hasUsers}}
@@ -820,35 +813,26 @@ class {{name}}Schema extends Schema {
         {{#hasPositions}}
         if ($skipOrder) {
             return self::editSchemaEntity(
-                query: $query,{{#usesRequest}}
-                request: $entityRequest,{{/usesRequest}}
-                fields: $entityFields,{{#hasUsers}}
+                query: $query,
+                fields: $fields,{{#hasUsers}}
                 credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
                 skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
-                skipEmpty: $skipEmpty,
-                skipUnset: $skipUnset,
             );
         }
         return self::editSchemaEntityWithOrder(
-            query: $query,{{#usesRequest}}
-            request: $entityRequest,{{/usesRequest}}
-            fields: $entityFields,{{#hasEditParents}}
+            query: $query,
+            fields: $fields,{{#hasEditParents}}
             orderQuery: self::createParentQuery({{parentsList}}),{{/hasEditParents}}{{#hasUsers}}
             credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
             skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
-            skipEmpty: $skipEmpty,
-            skipUnset: $skipUnset,
         );
         {{/hasPositions}}
         {{^hasPositions}}
         return self::editSchemaEntity(
-            query: $query,{{#usesRequest}}
-            request: $entityRequest,{{/usesRequest}}
-            fields: $entityFields,{{#hasUsers}}
+            query: $query,
+            fields: $fields,{{#hasUsers}}
             credentialID: $modifiedUser,{{/hasUsers}}{{#hasTimestamps}}
             skipTimestamps: $skipTimestamps,{{/hasTimestamps}}
-            skipEmpty: $skipEmpty,
-            skipUnset: $skipUnset,
         );
         {{/hasPositions}}
     }
@@ -964,29 +948,30 @@ class {{name}}Schema extends Schema {
         return self::removeSchemaEntity($query);
         {{/hasPositions}}
     }
-{{#hasPositions}}
 
+{{#hasPositions}}
     /**
      * Removes the {{name}} Entity
      * @param {{editType}} $query
      * @return bool
      */
-    protected static function removeAllEntities({{editType}} $query): bool {
+    protected static function removeAllEntities(
+        {{editType}} $query,
+    ): bool {
         return self::removeSchemaEntity($query);
     }
-{{/hasPositions}}
-{{#hasPositions}}
 
+{{#hasRequest}}
     /**
      * Ensures that the order of the Elements is correct
      * @param {{entityClass}}|null $entity
-     * @param Request|null $fields{{#parents}}
+     * @param {{requestClass}}|null $fields{{#parents}}
      * @param {{fieldDoc}}{{/parents}}
      * @return int
      */
     protected static function ensureEntityOrder(
         ?{{entityClass}} $entity,
-        Request|null $fields,{{#editParents}}
+        {{requestClass}}|null $fields,{{#editParents}}
         {{fieldArg}},{{/editParents}}
     ): int {
         {{#hasEditParents}}
@@ -998,8 +983,9 @@ class {{name}}Schema extends Schema {
             query:     $orderQuery,{{/hasEditParents}}
         );
     }
-{{/hasPositions}}
 
+{{/hasRequest}}
+{{/hasPositions}}
     /**
      * Ensures that only one Entity has the Unique column set
      * @param {{queryClass}} $query

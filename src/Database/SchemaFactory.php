@@ -9,8 +9,9 @@ use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Database\Model\Validate;
-use Framework\Database\Model\Expression;
 use Framework\Database\Model\Virtual;
+use Framework\Database\Model\Requested;
+use Framework\Database\Model\Expression;
 use Framework\Database\Model\Count;
 use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
@@ -111,17 +112,17 @@ class SchemaFactory {
             }
 
             // Get data from the Properties
-            $hasStatus     = false;
-            $hasPositions  = false;
-            $usesRequest   = false;
-            $mainFields    = [];
-            $validates     = [];
-            $virtualFields = [];
-            $expressions   = [];
-            $counts        = [];
-            $relations     = [];
-            $subRequests   = [];
-            $states        = [];
+            $hasStatus       = false;
+            $hasPositions    = false;
+            $mainFields      = [];
+            $validates       = [];
+            $virtualFields   = [];
+            $requestedFields = [];
+            $expressions     = [];
+            $counts          = [];
+            $relations       = [];
+            $subRequests     = [];
+            $states          = [];
 
             // Parse the Properties
             $props = $class->getPropertiesBaseFirst();
@@ -135,6 +136,7 @@ class SchemaFactory {
                 // Get the Type
                 $typeName     = $propType->getName();
                 $isFieldClass = FieldType::isValidClass($typeName);
+                $isPosition   = $fieldName === "position";
                 $isStatus     = $typeName === Status::class;
                 $isArray      = $typeName === "array";
                 $isEnum       = false;
@@ -150,11 +152,12 @@ class SchemaFactory {
 
                 // Get the Attributes
                 $propAttributes = $prop->getAttributes();
-                $field          = new Field();
                 $relation       = new Relation();
-                $subRequest     = new SubRequest();
+                $subRequest     = null;
+                $field          = null;
                 $validate       = null;
                 $virtual        = null;
+                $requested      = null;
                 $expression     = null;
                 $count          = null;
 
@@ -170,10 +173,12 @@ class SchemaFactory {
                         $field = $instance;
                     } elseif ($instance instanceof Validate) {
                         $validate = $instance;
-                    } elseif ($instance instanceof Expression) {
-                        $expression = $instance;
                     } elseif ($instance instanceof Virtual) {
                         $virtual = $instance;
+                    } elseif ($instance instanceof Requested) {
+                        $requested = $instance;
+                    } elseif ($instance instanceof Expression) {
+                        $expression = $instance;
                     } elseif ($instance instanceof Count) {
                         $count = $instance;
                     } elseif ($instance instanceof Relation) {
@@ -185,7 +190,7 @@ class SchemaFactory {
 
 
                 // POSITION: If the Name is Position, mark it in the Model.
-                if ($fieldName === "position") {
+                if ($isPosition) {
                     $hasPositions = true;
 
                 // STATUS: If the Type is Status, mark it in the Model.
@@ -221,6 +226,9 @@ class SchemaFactory {
 
                 // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
                 } elseif ($isArray) {
+                    if ($subRequest === null) {
+                        $subRequest = new SubRequest();
+                    }
                     [ $arrayType, $subModelName ] = self::getArrayType($class, $prop);
                     if ($arrayType !== "" || $subModelName !== "") {
                         $subRequests[] = $subRequest->setData($fieldName, $subModelName, $arrayType);
@@ -236,42 +244,62 @@ class SchemaFactory {
 
                 // FIELD: Anything else is a Main Field and can have a Field attribute.
                 // VALIDATE: A Main Field can also have a Validate attribute.
-                } else {
-                    if ($field->fromRequest) {
-                        $usesRequest = true;
+                } elseif ($field !== null || $validate !== null || $requested === null) {
+                    if ($field === null) {
+                        $field = new Field();
                     }
-                    $mainField    = $field->setData($fieldName, $typeName, $isEnum);
-                    $mainFields[] = $mainField;
+                    $field->setData($fieldName, $typeName, $isEnum);
 
+                    $mainFields[] = $field;
                     if ($validate !== null) {
-                        $validates[] = $validate->setField($mainField, $fantasyName);
+                        $validates[] = $validate->setField($field, $fantasyName);
+                    }
+                }
+
+
+                // Add a Requested Field
+                if ($validate !== null || ($hasPositions && count($requestedFields) > 0)) {
+                    $requested = new Requested();
+                }
+                if ($requested !== null) {
+                    if ($field !== null) {
+                        $requestedFields[] = $requested->fromField($field, $validate !== null);
+                    } elseif ($subRequest !== null) {
+                        $requestedFields[] = $requested->fromSubRequest($subRequest);
+                    } elseif ($isStatus) {
+                        $requestedFields[] = $requested->fromStatus();
+                    } elseif ($isPosition) {
+                        $requestedFields[] = $requested->fromPosition();
+                    } else {
+                        $requestedFields[] = $requested->setData($fieldName, $typeName);
                     }
                 }
             }
 
+
             // Add the Model
             $schemaModel = new SchemaModel(
-                name:          $modelName,
-                fantasyName:   $fantasyName,
-                path:          $path,
-                namespace:     $namespace,
-                fromFramework: $fromFramework,
-                hasUsers:      $model->hasUsers,
-                hasTimestamps: $model->hasTimestamps,
-                hasPositions:  $hasPositions,
-                hasStatus:     $hasStatus,
-                canCreate:     $model->canCreate,
-                canEdit:       $model->canEdit,
-                canDelete:     $model->canDelete,
-                usesRequest:   $usesRequest,
-                mainFields:    $mainFields,
-                validates:     $validates,
-                virtualFields: $virtualFields,
-                expressions:   $expressions,
-                relations:     $relations,
-                counts:        $counts,
-                subRequests:   $subRequests,
-                states:        $states,
+                name:            $modelName,
+                fantasyName:     $fantasyName,
+                path:            $path,
+                namespace:       $namespace,
+                fromFramework:   $fromFramework,
+                hasUsers:        $model->hasUsers,
+                hasTimestamps:   $model->hasTimestamps,
+                hasPositions:    $hasPositions,
+                hasStatus:       $hasStatus,
+                canCreate:       $model->canCreate,
+                canEdit:         $model->canEdit,
+                canDelete:       $model->canDelete,
+                validates:       $validates,
+                mainFields:      $mainFields,
+                virtualFields:   $virtualFields,
+                requestedFields: $requestedFields,
+                expressions:     $expressions,
+                relations:       $relations,
+                counts:          $counts,
+                subRequests:     $subRequests,
+                states:          $states,
             );
             $schemaModels[$modelName] = $schemaModel;
 

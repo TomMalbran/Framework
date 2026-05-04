@@ -8,6 +8,7 @@ use Framework\Database\Builder\EntityCode;
 use Framework\Database\Builder\ColumnCode;
 use Framework\Database\Builder\QueryCode;
 use Framework\Database\Builder\StatusCode;
+use Framework\Database\Builder\RequestCode;
 use Framework\File\File;
 
 /**
@@ -74,6 +75,13 @@ class SchemaBuilder implements DiscoveryBuilder {
                 $statusQueryName = "{$schemaModel->statusClass}Where.php";
                 $statusQueryCode = StatusCode::getWhereCode($schemaModel);
                 File::create($schemaModel->path, $statusQueryName, $statusQueryCode);
+                $created += 1;
+            }
+
+            if (count($schemaModel->requestedFields) > 0) {
+                $requestName = "{$schemaModel->requestClass}.php";
+                $requestCode = RequestCode::getCode($schemaModel);
+                File::create($schemaModel->path, $requestName, $requestCode);
                 $created += 1;
             }
         }

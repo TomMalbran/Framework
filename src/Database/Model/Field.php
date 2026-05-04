@@ -102,9 +102,6 @@ class Field {
     public string $hourInput = "";
 
 
-    // Used to indicate that the field can be set directly from a Request
-    public bool $fromRequest = true;
-
     // Skip empty values when parsing from Request.
     public bool $noEmpty = false;
 
@@ -114,30 +111,29 @@ class Field {
 
     /**
      * The Field Attribute
-     * @param bool              $isID        Optional.
-     * @param bool              $notAutoInc  Optional.
-     * @param bool              $isPrimary   Optional.
-     * @param bool              $isKey       Optional.
-     * @param bool              $isParent    Optional.
-     * @param bool              $isUnique    Optional.
-     * @param bool              $isCode      Optional.
-     * @param class-string|null $belongsTo   Optional.
-     * @param string            $otherField  Optional.
-     * @param int               $length      Optional.
-     * @param bool              $isSigned    Optional.
-     * @param int               $decimals    Optional.
-     * @param bool              $isText      Optional.
-     * @param bool              $isLongText  Optional.
-     * @param bool              $isEncrypt   Optional.
-     * @param bool              $isFile      Optional.
-     * @param bool              $hasFile     Optional.
-     * @param string            $filePath    Optional.
-     * @param DateType          $dateType    Optional.
-     * @param string            $dateInput   Optional.
-     * @param string            $hourInput   Optional.
-     * @param bool              $fromRequest Optional.
-     * @param bool              $noEmpty     Optional.
-     * @param bool              $noExists    Optional.
+     * @param bool              $isID       Optional.
+     * @param bool              $notAutoInc Optional.
+     * @param bool              $isPrimary  Optional.
+     * @param bool              $isKey      Optional.
+     * @param bool              $isParent   Optional.
+     * @param bool              $isUnique   Optional.
+     * @param bool              $isCode     Optional.
+     * @param class-string|null $belongsTo  Optional.
+     * @param string            $otherField Optional.
+     * @param int               $length     Optional.
+     * @param bool              $isSigned   Optional.
+     * @param int               $decimals   Optional.
+     * @param bool              $isText     Optional.
+     * @param bool              $isLongText Optional.
+     * @param bool              $isEncrypt  Optional.
+     * @param bool              $isFile     Optional.
+     * @param bool              $hasFile    Optional.
+     * @param string            $filePath   Optional.
+     * @param DateType          $dateType   Optional.
+     * @param string            $dateInput  Optional.
+     * @param string            $hourInput  Optional.
+     * @param bool              $noEmpty    Optional.
+     * @param bool              $noExists   Optional.
      */
     public function __construct(
         bool $isID = false,
@@ -161,7 +157,6 @@ class Field {
         DateType $dateType = DateType::None,
         string $dateInput = "",
         string $hourInput = "",
-        bool $fromRequest = false,
         bool $noEmpty = false,
         bool $noExists = false,
     ) {
@@ -198,43 +193,40 @@ class Field {
         $this->hourInput = $hourInput;
 
         // Request parsing
-        $this->fromRequest = $fromRequest;
-        $this->noEmpty     = $noEmpty;
-        $this->noExists    = $noExists;
+        $this->noEmpty   = $noEmpty;
+        $this->noExists  = $noExists;
     }
 
 
 
     // Used internally when parsing the Model
-    public FieldType $type        = FieldType::String;
-    public string    $name        = "";
-    public string    $dbName      = "";
-    public string    $prefixName  = "";
-    public string    $enumClass   = "";
-    public bool      $isStatus    = false;
-    public bool      $hasValidate = false;
+    public FieldType $type       = FieldType::String;
+    public string    $name       = "";
+    public string    $dbName     = "";
+    public string    $prefixName = "";
+    public string    $enumClass  = "";
+    public bool      $isStatus   = false;
 
 
     /**
      * Creates a Field
-     * @param string    $name        Optional.
-     * @param string    $dbName      Optional.
-     * @param string    $prefixName  Optional.
-     * @param FieldType $type        Optional.
-     * @param bool      $isID        Optional.
-     * @param bool      $isPrimary   Optional.
-     * @param bool      $isKey       Optional.
-     * @param int       $length      Optional.
-     * @param bool      $isSigned    Optional.
-     * @param int       $decimals    Optional.
-     * @param DateType  $dateType    Optional.
-     * @param string    $dateInput   Optional.
-     * @param string    $hourInput   Optional.
-     * @param string    $filePath    Optional.
-     * @param bool      $fromRequest Optional.
-     * @param bool      $noEmpty     Optional.
-     * @param bool      $noExists    Optional.
-     * @param bool      $isStatus    Optional.
+     * @param string    $name       Optional.
+     * @param string    $dbName     Optional.
+     * @param string    $prefixName Optional.
+     * @param FieldType $type       Optional.
+     * @param bool      $isID       Optional.
+     * @param bool      $isPrimary  Optional.
+     * @param bool      $isKey      Optional.
+     * @param int       $length     Optional.
+     * @param bool      $isSigned   Optional.
+     * @param int       $decimals   Optional.
+     * @param DateType  $dateType   Optional.
+     * @param string    $dateInput  Optional.
+     * @param string    $hourInput  Optional.
+     * @param string    $filePath   Optional.
+     * @param bool      $noEmpty    Optional.
+     * @param bool      $noExists   Optional.
+     * @param bool      $isStatus   Optional.
      * @return Field
      */
     public static function create(
@@ -252,25 +244,23 @@ class Field {
         string $dateInput = "",
         string $hourInput = "",
         string $filePath = "",
-        bool $fromRequest = false,
         bool $noEmpty = false,
         bool $noExists = false,
         bool $isStatus = false,
     ): Field {
         $result = new self(
-            isID:        $isID,
-            isPrimary:   $isPrimary,
-            isKey:       $isKey,
-            length:      $length,
-            isSigned:    $isSigned,
-            decimals:    $decimals,
-            dateType:    $dateType,
-            dateInput:   $dateInput,
-            hourInput:   $hourInput,
-            filePath:    $filePath,
-            fromRequest: $fromRequest,
-            noEmpty:     $noEmpty,
-            noExists:    $noExists,
+            isID:      $isID,
+            isPrimary: $isPrimary,
+            isKey:     $isKey,
+            length:    $length,
+            isSigned:  $isSigned,
+            decimals:  $decimals,
+            dateType:  $dateType,
+            dateInput: $dateInput,
+            hourInput: $hourInput,
+            filePath:  $filePath,
+            noEmpty:   $noEmpty,
+            noExists:  $noExists,
         );
 
         $result->type       = $type;
@@ -562,9 +552,6 @@ class Field {
         }
         if ($this->filePath !== "") {
             $result["filePath"] = $this->filePath;
-        }
-        if ($this->fromRequest) {
-            $result["fromRequest"] = $this->fromRequest;
         }
         if ($this->noEmpty) {
             $result["noEmpty"] = $this->noEmpty;

@@ -112,9 +112,6 @@ class ModificationBuilder {
     private function parseFields(Request $request, bool $skipEmpty = false, bool $skipUnset = false): array {
         $result = [];
         foreach ($this->schemaModel->fields as $field) {
-            if (!$field->fromRequest) {
-                continue;
-            }
             if ($skipUnset && !$request->exists($field->name)) {
                 continue;
             }

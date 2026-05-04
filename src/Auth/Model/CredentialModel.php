@@ -4,6 +4,7 @@ namespace Framework\Auth\Model;
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Virtual;
+use Framework\Database\Model\Requested;
 use Framework\Database\Status\Status;
 use Framework\System\Access;
 use Framework\Date\Date;
@@ -27,34 +28,34 @@ class CredentialModel {
     public string $name = "";
 
 
-    #[Field(fromRequest: true)]
+    #[Field, Requested]
     public string $firstName = "";
 
-    #[Field(fromRequest: true)]
+    #[Field, Requested]
     public string $lastName = "";
 
-    #[Field(fromRequest: true)]
+    #[Field, Requested]
     public string $email = "";
 
-    #[Field(fromRequest: true, noExists: true)]
+    #[Field(noExists: true), Requested]
     public string $phone = "";
 
-    #[Field(fromRequest: true)]
+    #[Field, Requested]
     public string $language = "";
 
-    #[Field(fromRequest: true, noExists: true, isText: true)]
+    #[Field(noExists: true, isText: true), Requested]
     public string $observations = "";
 
-    #[Field(fromRequest: true, noExists: true)]
+    #[Field(noExists: true), Requested]
     public bool $sendEmails = false;
 
-    #[Field(fromRequest: true, noExists: true)]
+    #[Field(noExists: true), Requested]
     public bool $sendEmailNotis = false;
 
-    #[Field(fromRequest: true, noExists: true)]
+    #[Field(noExists: true), Requested]
     public bool $sendTickets = false;
 
-    #[Field(fromRequest: true, isSigned: true)]
+    #[Field(isSigned: true), Requested]
     public int $timezone = 0;
 
 

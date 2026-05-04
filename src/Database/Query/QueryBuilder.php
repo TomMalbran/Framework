@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
+use Framework\IO\Value\Value;
 use Framework\Database\Query\QueryMode;
 use Framework\Database\Query\Assign;
 use Framework\Database\Type\Column;
@@ -11,9 +12,12 @@ use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
+use JsonSerializable;
+
 /**
  * The Query Builder
- * @phpstan-type QueryValue Query|Enum|Dictionary|Date|array<int|string,mixed>|bool|Assign|float|int|string
+ * phpcs:ignore Generic.Files.LineLength.TooLong
+ * @phpstan-type QueryValue Query|Value|Enum|Dictionary|Date|JsonSerializable|array<int|string,mixed>|bool|Assign|float|int|string
  */
 class QueryBuilder {
 
@@ -108,6 +112,12 @@ class QueryBuilder {
         if ($value instanceof Query) {
             $this->fields[$field] = $value->toAssign();
 
+        // Convert a Value to an integer or string
+        } elseif ($value instanceof Value) {
+            if ($value->exists()) {
+                $this->fields[$field] = $value->getValue();
+            }
+
         // Convert any Enum to a string
         } elseif ($value instanceof Enum) {
             $this->fields[$field] = $value->toString();
@@ -121,7 +131,7 @@ class QueryBuilder {
             $this->fields[$field] = $value->toTime();
 
         // Encode any array to JSON
-        } elseif (is_array($value)) {
+        } elseif (is_array($value) || $value instanceof JsonSerializable) {
             $this->fields[$field] = JSON::encode($value);
 
         // Convert any boolean to an integer

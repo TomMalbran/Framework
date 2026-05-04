@@ -6,6 +6,7 @@ use Framework\Database\Model\FieldType;
 use Framework\Database\Model\Validate;
 use Framework\Database\Model\Expression;
 use Framework\Database\Model\Virtual;
+use Framework\Database\Model\Requested;
 use Framework\Database\Model\Count;
 use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
@@ -35,7 +36,6 @@ class SchemaModel {
     public bool $canCreate        = false;
     public bool $canEdit          = false;
     public bool $canDelete        = false;
-    public bool $usesRequest      = true;
 
 
     // Subclass Names
@@ -43,6 +43,7 @@ class SchemaModel {
     public string $columnClass    = "";
     public string $queryClass     = "";
     public string $statusClass    = "";
+    public string $requestClass   = "";
 
 
     // Main column data
@@ -54,6 +55,9 @@ class SchemaModel {
     public string    $idEnumClass = "";
 
 
+    /** @var list<Validate> */
+    public array $validates       = [];
+
     /** @var list<Field> */
     public array $fields          = [];
 
@@ -63,11 +67,11 @@ class SchemaModel {
     /** @var list<Field> */
     public array $extraFields     = [];
 
-    /** @var list<Validate> */
-    public array $validates       = [];
-
     /** @var list<Virtual> */
     public array $virtualFields   = [];
+
+    /** @var list<Requested> */
+    public array $requestedFields = [];
 
     /** @var list<Expression> */
     public array $expressions     = [];
@@ -88,27 +92,27 @@ class SchemaModel {
 
     /**
      * The Schema Model
-     * @param string           $name          Optional.
-     * @param string           $fantasyName   Optional.
-     * @param string           $path          Optional.
-     * @param string           $namespace     Optional.
-     * @param bool             $fromFramework Optional.
-     * @param bool             $hasUsers      Optional.
-     * @param bool             $hasTimestamps Optional.
-     * @param bool             $hasPositions  Optional.
-     * @param bool             $hasStatus     Optional.
-     * @param bool             $canCreate     Optional.
-     * @param bool             $canEdit       Optional.
-     * @param bool             $canDelete     Optional.
-     * @param bool             $usesRequest   Optional.
-     * @param list<Field>      $mainFields    Optional.
-     * @param list<Validate>   $validates     Optional.
-     * @param list<Virtual>    $virtualFields Optional.
-     * @param list<Expression> $expressions   Optional.
-     * @param list<Count>      $counts        Optional.
-     * @param list<Relation>   $relations     Optional.
-     * @param list<SubRequest> $subRequests   Optional.
-     * @param list<State>      $states        Optional.
+     * @param string           $name            Optional.
+     * @param string           $fantasyName     Optional.
+     * @param string           $path            Optional.
+     * @param string           $namespace       Optional.
+     * @param bool             $fromFramework   Optional.
+     * @param bool             $hasUsers        Optional.
+     * @param bool             $hasTimestamps   Optional.
+     * @param bool             $hasPositions    Optional.
+     * @param bool             $hasStatus       Optional.
+     * @param bool             $canCreate       Optional.
+     * @param bool             $canEdit         Optional.
+     * @param bool             $canDelete       Optional.
+     * @param list<Validate>   $validates       Optional.
+     * @param list<Field>      $mainFields      Optional.
+     * @param list<Virtual>    $virtualFields   Optional.
+     * @param list<Requested>  $requestedFields Optional.
+     * @param list<Expression> $expressions     Optional.
+     * @param list<Count>      $counts          Optional.
+     * @param list<Relation>   $relations       Optional.
+     * @param list<SubRequest> $subRequests     Optional.
+     * @param list<State>      $states          Optional.
      */
     public function __construct(
         string $name = "",
@@ -123,45 +127,46 @@ class SchemaModel {
         bool $canCreate = false,
         bool $canEdit = false,
         bool $canDelete = false,
-        bool $usesRequest = true,
-        array $mainFields = [],
         array $validates = [],
+        array $mainFields = [],
         array $virtualFields = [],
+        array $requestedFields = [],
         array $expressions = [],
         array $counts = [],
         array $relations = [],
         array $subRequests = [],
         array $states = [],
     ) {
-        $this->name          = $name;
-        $this->fantasyName   = $fantasyName;
-        $this->tableName     = self::getDbTableName($name);
-        $this->path          = $path;
-        $this->namespace     = $namespace;
-        $this->fromFramework = $fromFramework;
+        $this->name            = $name;
+        $this->fantasyName     = $fantasyName;
+        $this->tableName       = self::getDbTableName($name);
+        $this->path            = $path;
+        $this->namespace       = $namespace;
+        $this->fromFramework   = $fromFramework;
 
-        $this->hasUsers      = $hasUsers;
-        $this->hasTimestamps = $hasTimestamps;
-        $this->hasPositions  = $hasPositions;
-        $this->hasStatus     = $hasStatus;
-        $this->canCreate     = $canCreate;
-        $this->canEdit       = $canEdit;
-        $this->canDelete     = $canDelete;
-        $this->usesRequest   = $usesRequest;
+        $this->hasUsers        = $hasUsers;
+        $this->hasTimestamps   = $hasTimestamps;
+        $this->hasPositions    = $hasPositions;
+        $this->hasStatus       = $hasStatus;
+        $this->canCreate       = $canCreate;
+        $this->canEdit         = $canEdit;
+        $this->canDelete       = $canDelete;
 
-        $this->mainFields    = $mainFields;
-        $this->validates     = $validates;
-        $this->virtualFields = $virtualFields;
-        $this->expressions   = $expressions;
-        $this->counts        = $counts;
-        $this->relations     = $relations;
-        $this->subRequests   = $subRequests;
-        $this->states        = $states;
+        $this->validates       = $validates;
+        $this->mainFields      = $mainFields;
+        $this->virtualFields   = $virtualFields;
+        $this->requestedFields = $requestedFields;
+        $this->expressions     = $expressions;
+        $this->counts          = $counts;
+        $this->relations       = $relations;
+        $this->subRequests     = $subRequests;
+        $this->states          = $states;
 
-        $this->entityClass   = "{$this->name}Entity";
-        $this->columnClass   = "{$this->name}Column";
-        $this->queryClass    = "{$this->name}Query";
-        $this->statusClass   = "{$this->name}Status";
+        $this->entityClass     = "{$this->name}Entity";
+        $this->columnClass     = "{$this->name}Column";
+        $this->queryClass      = "{$this->name}Query";
+        $this->statusClass     = "{$this->name}Status";
+        $this->requestClass    = "{$this->name}Request";
 
         $this->setExtraFields();
         $this->setIDField();
@@ -179,19 +184,17 @@ class SchemaModel {
     private function setExtraFields(): void {
         if ($this->hasPositions) {
             $this->extraFields[] = Field::create(
-                type:        FieldType::Number,
-                name:        "position",
-                fromRequest: true,
+                type: FieldType::Number,
+                name: "position",
             );
         }
         if ($this->hasStatus) {
             $this->extraFields[] = Field::create(
-                type:        FieldType::String,
-                name:        "status",
-                noEmpty:     true,
-                isKey:       true,
-                isStatus:    true,
-                fromRequest: true,
+                type:     FieldType::String,
+                name:     "status",
+                noEmpty:  true,
+                isKey:    true,
+                isStatus: true,
             );
         }
 
@@ -321,6 +324,20 @@ class SchemaModel {
     }
 
     /**
+     * Returns true if there is a Requested Field with the given name
+     * @param string $fieldName
+     * @return bool
+     */
+    public function isRequested(string $fieldName): bool {
+        foreach ($this->requestedFields as $field) {
+            if ($field->name === $fieldName && $field->hasValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns the Key adding the table as the prefix
      * @param string $key
      * @return string
@@ -409,7 +426,7 @@ class SchemaModel {
         if (isset($data["fields"]) && is_array($data["fields"])) {
             foreach ($data["fields"] as $value) {
                 $value    = Arrays::toStringMixedMap($value);
-                $fields[] = self::generateBuildData($value, withKey: true);
+                $fields[] = $this->generateBuildData($value, withKey: true);
             }
         }
 

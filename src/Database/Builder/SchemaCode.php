@@ -30,7 +30,7 @@ use Framework\Utils\Strings;
  *   fieldValueNull: string,
  *   fieldAssign: string,
  *   fieldAssignEdit: string,
- *   fieldHasRequest: bool,
+ *   fieldIsRequested: bool,
  * }
  */
 class SchemaCode {
@@ -49,6 +49,7 @@ class SchemaCode {
 
         $imports      = self::getImports($schemaModel);
         $fields       = self::getAllFields($schemaModel);
+        $hasRequest   = self::hasRequest($fields);
         $uniques      = self::getSomeFields($schemaModel, isUnique: true);
         $parents      = self::getSomeFields($schemaModel, isParent: true);
         $editParents  = $schemaModel->hasPositions ? $parents : [];
@@ -74,6 +75,7 @@ class SchemaCode {
             "tableName"          => $schemaModel->tableName,
             "entityName"         => Strings::lowerCaseFirst($schemaModel->name),
             "entityClass"        => $schemaModel->entityClass,
+            "requestClass"       => $schemaModel->requestClass,
             "columnClass"        => $schemaModel->columnClass,
             "statusClass"        => $schemaModel->statusClass,
             "queryClass"         => $schemaModel->queryClass,
@@ -101,6 +103,7 @@ class SchemaCode {
             "hasTimestampsValue" => $schemaModel->hasTimestamps ? "true" : "false",
             "hasStatus"          => $schemaModel->hasStatus,
             "hasStatusValue"     => $schemaModel->hasStatus ? "true" : "false",
+            "hasStatusRequest"   => $schemaModel->isRequested("status"),
             "hasUsers"           => $schemaModel->hasUsers,
             "hasUsersValue"      => $schemaModel->hasUsers ? "true" : "false",
             "hasEncrypt"         => $schemaModel->hasEncrypt(),
@@ -111,7 +114,6 @@ class SchemaCode {
             "canReplace"         => $schemaModel->canEdit && !$schemaModel->hasAutoInc,
             "canDelete"          => $schemaModel->canDelete,
             "canDeleteValue"     => $schemaModel->canDelete ? "true" : "false",
-            "usesRequest"        => $schemaModel->usesRequest,
             "hasImports"         => count($imports) > 0,
             "imports"            => $imports,
             "hasVirtual"         => $hasVirtual,
@@ -124,6 +126,7 @@ class SchemaCode {
             "relations"          => $relations,
             "hasSubRequests"     => count($subRequests) > 0,
             "subRequests"        => $subRequests,
+            "hasRequest"         => $hasRequest,
             "fields"             => $fields,
             "uniques"            => $uniques,
             "hasParents"         => $hasParents,
@@ -183,15 +186,29 @@ class SchemaCode {
         $result = [];
         foreach ($schemaModel->mainFields as $field) {
             if (!$field->isAutoInc()) {
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             }
         }
         foreach ($schemaModel->extraFields as $field) {
             if ($field->name === "position") {
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             }
         }
         return $result;
+    }
+
+    /**
+     * Returns true if there is at least one Field requested
+     * @param list<Property> $fields
+     * @return bool
+     */
+    private static function hasRequest(array $fields): bool {
+        foreach ($fields as $field) {
+            if ($field["fieldIsRequested"]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -217,20 +234,20 @@ class SchemaCode {
         $result = [];
         foreach ($schemaModel->fields as $field) {
             if ($isUnique && $field->isUnique) {
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             } elseif ($isParent && $field->isParent) {
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             } elseif ($isDate && $field->type === FieldType::Date) {
                 if ((!$schemaModel->canCreate && $field->name === "createdTime") || $field->name === "modifiedTime") {
                     continue;
                 }
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             } elseif ($isDateType && $field->dateType !== DateType::None) {
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             } elseif ($isJsonType && $field->type === FieldType::JSON) {
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             } elseif ($isFloatType && $field->type === FieldType::Float) {
-                $result[] = self::getField($field);
+                $result[] = self::getField($schemaModel, $field);
             }
         }
         return $result;
@@ -238,10 +255,11 @@ class SchemaCode {
 
     /**
      * Returns the Fields data for the Schema
-     * @param Field $field
+     * @param SchemaModel $schemaModel
+     * @param Field       $field
      * @return Property
      */
-    private static function getField(Field $field): array {
+    private static function getField(SchemaModel $schemaModel, Field $field): array {
         $type        = $field->type->getCodeType($field->enumClass, forEntity: false);
         $isDate      = $field->type === FieldType::Date;
         $isEnum      = $field->type === FieldType::Enum;
@@ -275,23 +293,24 @@ class SchemaCode {
         }
 
         return [
-            "fieldKey"        => $field->dbName,
-            "fieldName"       => $field->name,
-            "fieldText"       => Strings::upperCaseFirst($field->name),
-            "fieldDoc"        => "$type $param",
-            "fieldArg"        => "$type $param",
-            "fieldDocNull"    => "$typeDoc|null $param",
-            "fieldArgNull"    => "$typeNull $param",
-            "fieldDocDefault" => "$type$docNull $param",
-            "fieldArgDefault" => "$prefixNull$type $param = $default",
-            "fieldDocEdit"    => "$assignDoc$typeDoc|null $param",
-            "fieldArgEdit"    => ($canAssign ? "Assign|$type|null" : $typeNull) . " $param = null",
-            "fieldArgCreate"  => "$typeNull $param = null",
-            "fieldParam"      => $param,
-            "fieldValue"      => $value,
-            "fieldValueNull"  => $valueNull,
-            "fieldAssign"     => $assign,
-            "fieldAssignEdit" => $assignEdit,
+            "fieldKey"         => $field->dbName,
+            "fieldName"        => $field->name,
+            "fieldText"        => Strings::upperCaseFirst($field->name),
+            "fieldDoc"         => "$type $param",
+            "fieldArg"         => "$type $param",
+            "fieldDocNull"     => "$typeDoc|null $param",
+            "fieldArgNull"     => "$typeNull $param",
+            "fieldDocDefault"  => "$type$docNull $param",
+            "fieldArgDefault"  => "$prefixNull$type $param = $default",
+            "fieldDocEdit"     => "$assignDoc$typeDoc|null $param",
+            "fieldArgEdit"     => ($canAssign ? "Assign|$type|null" : $typeNull) . " $param = null",
+            "fieldArgCreate"   => "$typeNull $param = null",
+            "fieldParam"       => $param,
+            "fieldValue"       => $value,
+            "fieldValueNull"   => $valueNull,
+            "fieldAssign"      => $assign,
+            "fieldAssignEdit"  => $assignEdit,
+            "fieldIsRequested" => $schemaModel->isRequested($field->name),
         ];
     }
 
@@ -376,6 +395,7 @@ class SchemaCode {
                     "method"          => $validate->method,
                     "withParent"      => $validate->withParent,
                     "isNumeric"       => $validate->typeOf === "" && $validate->belongsTo === "",
+                    "validFunc"       => $validate->isNumeric ? "isValidNumber" : "isValid",
                     "invalidPrefix"   => $validate->isRequired,
                     "numericParams"   => $validate->getNumericParams(),
                     "fieldName"       => $validate->name,
@@ -390,6 +410,7 @@ class SchemaCode {
                     "dateName"   => $validate->dateInput,
                     "hourName"   => $validate->hourInput,
                     "errorText"  => Strings::startsWith($validate->name, "from") ? "FROM" : "TO",
+                    "fieldName"  => $validate->name,
                     "fieldError" => $validate->getFieldError(),
                 ];
                 if (Strings::startsWith($validate->name, "from")) {
@@ -397,10 +418,8 @@ class SchemaCode {
                 } elseif (Strings::startsWith($validate->name, "to") && $hasFromDate) {
                     $validation += [
                         "hasPeriod"    => true,
-                        "fromDateName" => "fromDate",
-                        "fromHourName" => "fromHour",
-                        "toDateName"   => "toDate",
-                        "toHourName"   => "toHour",
+                        "fromDateName" => "fromTime",
+                        "toDateName"   => "toTime",
                     ];
                     $hasFromDate = false;
                 }
