@@ -1,10 +1,20 @@
 <?php
 namespace Tests\Utils;
 
+use Framework\Date\Date;
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Utils\URL;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+enum TestUrlEnum implements Enum {
+    use IsEnum;
+
+    case None;
+    case Value;
+}
 
 class URLTest extends TestCase {
 
@@ -202,35 +212,44 @@ class URLTest extends TestCase {
 
 
     #[DataProvider("providerAddParams")]
-    public function testAddParams(string $path, array $params, string $expectedFragment): void {
+    public function testAddParams(string $path, array|null $params, string $expected): void {
         $result = URL::addParams($path, $params);
-        $this->assertStringContainsString($expectedFragment, $result);
+        $this->assertEquals($expected, $result);
     }
 
     public static function providerAddParams(): array {
         return [
-            "basic_params"   => [ "/path", [ "a" => 1, "b" => 2 ], "a=1&b=2" ],
-            "existing_query" => [ "/path?existing=1", [ "a" => 2 ], "existing=1&a=2" ],
-            "encoded_spaces" => [ "/path", [ "q" => "a b" ], "+" ],
-            "boolean_true"   => [ "/path", [ "flag" => true ], "flag=true" ],
-            "numeric_zero"   => [ "/path", [ "num" => 0 ], "num=0" ],
+            "basic"    => [ "/path", [ "a" => 1, "b" => 2 ], "/path?a=1&b=2" ],
+            "existing" => [ "/path?existing=1", [ "a" => 2 ], "/path?existing=1&a=2" ],
+            "spaced"   => [ "/path", [ "q" => "a b" ], "/path?q=a+b" ],
+            "boolean"  => [ "/path", [ "flag" => true ], "/path?flag=true" ],
+            "numeric"  => [ "/path", [ "num" => 0 ], "/path?num=0" ],
+            "enum"     => [ "/path", [ "e" => TestUrlEnum::Value ], "/path?e=Value" ],
+            "null_val" => [ "/path", [ "n" => null ], "/path" ],
+            "null"     => [ "/path", null, "/path" ],
+            "empty"    => [ "/path", [], "/path" ],
         ];
     }
 
 
-    #[DataProvider("providerParseUrlParams")]
-    public function testParseUrlParams(array $params, string $expectedFragment): void {
+    #[DataProvider("providerParseParams")]
+    public function testParseParams(array|null $params, string $expected): void {
         $result = URL::parseParams($params);
-        $this->assertStringContainsString($expectedFragment, $result);
+        $this->assertEquals($expected, $result);
     }
 
-    public static function providerParseUrlParams(): array {
+    public static function providerParseParams(): array {
         return [
-            "array_json_encoded" => [ [ "a" => [ "k" => "v" ]], "%7B" ],
-            "special_characters" => [ [ "q" => "a b" ], "+" ],
-            "empty_input"        => [ [], "" ],
-            "numeric_value"      => [ [ "n" => 123 ], "n=123" ],
-            "boolean_true_value" => [ [ "t" => true ], "t=true" ],
+            "string"   => [ [ "a" => "1", "b" => "2" ], "a=1&b=2" ],
+            "numeric"  => [ [ "n" => 123 ], "n=123" ],
+            "boolean"  => [ [ "t" => true ], "t=true" ],
+            "array"    => [ [ "a" => [ "k" => "v" ]], "a=%7B%22k%22%3A%22v%22%7D" ],
+            "spaced"   => [ [ "q" => "a b" ], "q=a+b" ],
+            "enum"     => [ [ "e" => TestUrlEnum::Value ], "e=Value" ],
+            "date"     => [ [ "d" => Date::create("2024-01-01") ], "d=2024-01-01+00%3A00%3A00" ],
+            "null_val" => [ [ "n" => null, "m" => "12" ], "m=12" ],
+            "null"     => [ null, "" ],
+            "empty"    => [ [], "" ],
         ];
     }
 
