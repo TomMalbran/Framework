@@ -56,6 +56,11 @@
                     "message": 1,
                     "code": 2,
                     "column": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^PHPUnit.*by Sebastian Bergmann",
+                    "endsPattern": "^Time: .*, Memory: .*"
                 }
             },
             "presentation": {
@@ -76,6 +81,11 @@
             "label": "Frame: Test the code",
             "type": "shell",
             "command": "./framework test"
+        },
+        {
+            "label": "Frame: Run tests",
+            "type": "shell",
+            "command": "./vendor/bin/phpunit --display-warnings --display-notices --display-deprecations"
         }
     ]
 }
