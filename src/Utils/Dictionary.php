@@ -33,6 +33,8 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
             $this->data = (array)$input;
         } elseif (JSON::isValid($input)) {
             $this->data = JSON::decodeAsArray($input);
+        } elseif (is_string($input)) {
+            $this->data = Strings::split($input, ",", trim: true, skipEmpty: true);
         } else {
             $this->data = [];
         }

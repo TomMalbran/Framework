@@ -46,8 +46,10 @@ class DictionaryTest extends TestCase {
             "object"          => [ $obj, "x", 10, false ],
             "json_string"     => [ $json, "m", 5, false ],
             "dictionary"      => [ $dict, "k", "val", false ],
+            "strings"         => [ "a,b,c", 1, "b", false ],
+            "simple_string"   => [ "simple string", 0, "simple string", false ],
             "invalid_integer" => [ 12345, 0, null, true ],
-            "invalid_string"  => [ "not a json string", 0, null, true ],
+            "invalid_string"  => [ "", 0, null, true ],
         ];
     }
 
@@ -90,7 +92,7 @@ class DictionaryTest extends TestCase {
         return [
             "associative_array" => [ [ "a" => 1, "b" => 2 ], 2 ],
             "list_of_arrays"    => [ [[ "id" => "x" ], [ "id" => "y" ]], 2 ],
-            "invalid_input"     => [ "not json", 0 ],
+            "invalid_input"     => [ "", 0 ],
             "empty_dictionary"  => [ [], 0 ],
         ];
     }
@@ -123,7 +125,7 @@ class DictionaryTest extends TestCase {
         return [
             "unequal_dictionaries" => [ [ "k" => "v" ], [ "k" => "x" ], true ],
             "equal_dictionaries"   => [ [ "k" => "v" ], [ "k" => "v" ], false ],
-            "invalid_input"        => [ "not json", [ "k" => "v" ], true ],
+            "invalid_input"        => [ "", [ "k" => "v" ], true ],
         ];
     }
 
@@ -139,7 +141,7 @@ class DictionaryTest extends TestCase {
             "top_level_list" => [ [ 1, 2, 3 ], "", true ],
             "nested_list"    => [ [ "list" => [ "a", "b" ] ], "list", true ],
             "non_list_array" => [ [ "a" => "b" ], "", false ],
-            "invalid_input"  => [ "not json", "", false ],
+            "invalid_input"  => [ "", "", false ],
         ];
     }
 
@@ -283,7 +285,7 @@ class DictionaryTest extends TestCase {
             "to_assoc_map"        => [ [ "k" => "v" ], "new", [], false ],
             "array_to_assoc_map"  => [ [ "k" => "v" ], [ "new" ], [], false ],
             "to_empty_dictionary" => [ [], "first", [ "first" ], true ],
-            "to_invalid_input"    => [ "not json", "value", [ "value" ], true ],
+            "to_invalid_input"    => [ "", "value", [ "value" ], true ],
         ];
     }
 
@@ -577,7 +579,7 @@ class DictionaryTest extends TestCase {
 
 
     #[DataProvider("providerGetDict")]
-    public function testGetDict(mixed $input, Enum|int|string $key, bool $shouldBeEmpty, mixed $expectedValue): void {
+    public function testGetDict(mixed $input, Enum|int|string $key, int|string $intKey, bool $shouldBeEmpty, mixed $expectedValue): void {
         $d = new Dictionary($input);
         $result = $d->getDict($key);
         $this->assertInstanceOf(Dictionary::class, $result);
@@ -585,20 +587,20 @@ class DictionaryTest extends TestCase {
         if ($shouldBeEmpty) {
             $this->assertTrue($result->isEmpty());
         } else {
-            $this->assertEquals($expectedValue, $result->get($key === 0 ? "id" : "x"));
+            $this->assertEquals($expectedValue, $result->get($intKey));
         }
     }
 
     public static function providerGetDict(): array {
         $orig = new Dictionary([ "x" => 2 ]);
         return [
-            "nested_array"       => [ [ "sub" => [ "x" => 1 ]], "sub", false, 1 ],
-            "missing_key"        => [ [], "no", true, null ],
-            "dict_instance"      => [ [ "sub" => $orig ], "sub", false, 2 ],
-            "scalar_value"       => [ [ "s" => "string" ], "s", true, null ],
-            "list_element_valid" => [ [[ "id" => "x" ]], 0, false, "x" ],
-            "list_element_oob"   => [ [[ "id" => "x" ]], 1, true, null ],
-            "enum_key"           => [ [ "Key" => [ "x" => 1 ]], TestDictionaryEnum::Key, false, 1 ],
+            "nested_array"    => [ [ "sub" => [ "x" => 1 ]], "sub", "x", false, 1 ],
+            "missing_key"     => [ [], "no", 0, true, null ],
+            "dict_instance"   => [ [ "sub" => $orig ], "sub", "x", false, 2 ],
+            "scalar_value"    => [ [ "x" => "string" ], "x", 0, false, "string" ],
+            "list_elem_valid" => [ [[ "id" => "x" ]], 0, "id", false, "x" ],
+            "list_elem_oob"   => [ [[ "id" => "x" ]], 1, "id", true, null ],
+            "enum_key"        => [ [ "Key" => [ "x" => 1 ]], TestDictionaryEnum::Key, "x", false, 1 ],
         ];
     }
 
@@ -854,7 +856,7 @@ class DictionaryTest extends TestCase {
         return [
             "basic_array"         => [ [ "a" => "1", "b" => 2, "c" => [ "x" ]], [ "a" => "1", "b" => 2, "c" => [ "x" ]] ],
             "nested_dictionaries" => [ [ "sub" => [ "k" => "v" ]], [ "sub" => [ "k" => "v" ]] ],
-            "invalid_input"       => [ "not json", [] ],
+            "invalid_input"       => [ "", [] ],
         ];
     }
 
@@ -870,7 +872,7 @@ class DictionaryTest extends TestCase {
             "list_style_data"     => [ [ 1, "x" ], [ 1, "x" ] ],
             "associative_map"     => [ [ "a" => "1", "b" => "2" ], [ "1", "2" ] ],
             "nested_dictionaries" => [ [[ "k" => "v" ]], [[ "k" => "v" ]] ],
-            "invalid_input"       => [ "not json", [] ],
+            "invalid_input"       => [ "", [] ],
         ];
     }
 
@@ -885,7 +887,7 @@ class DictionaryTest extends TestCase {
         return [
             "basic_strings_map" => [ [ "a" => 1, "b" => "", "c" => null ], [ "a" => "1", "b" => "", "c" => "" ] ],
             "numeric_keys"      => [ [ "id", 3, null ], [ "id", "3", "" ] ],
-            "invalid_input"     => [ "not json", [] ],
+            "invalid_input"     => [ "", [] ],
         ];
     }
 
@@ -899,7 +901,7 @@ class DictionaryTest extends TestCase {
     public static function providerToIntStringMap(): array {
         return [
             "basic_int_string_map" => [ [ "1" => "one", "2" => "two" ], [ "1" => "one", "2" => "two" ] ],
-            "invalid_input"        => [ "not json", [] ],
+            "invalid_input"        => [ "", [] ],
         ];
     }
 
@@ -913,7 +915,7 @@ class DictionaryTest extends TestCase {
     public static function providerToStringIntMap(): array {
         return [
             "basic_string_int_map" => [ [ "a" => 1, "b" => "2" ], [ "a" => 1, "b" => 2 ] ],
-            "invalid_input"        => [ "not json", [] ],
+            "invalid_input"        => [ "", [] ],
         ];
     }
 
@@ -927,8 +929,8 @@ class DictionaryTest extends TestCase {
     public static function providerToStringMixedMap(): array {
         return [
             "basic_string_mixed_map" => [ [ "a" => 1, "b" => "s" ], [ "a" => 1, "b" => "s" ] ],
-            "invalid_input"          => [ "not json", [] ],
             "nested_dictionaries"    => [ [ "sub" => [ "k" => "v" ]], [ "sub" => [ "k" => "v" ]] ],
+            "invalid_input"          => [ "", [] ],
         ];
     }
 
@@ -943,7 +945,7 @@ class DictionaryTest extends TestCase {
         return [
             "basic_strings" => [ [ "a" => "1", "b" => "", "c" => 3 ], [ "1", "", "3" ] ],
             "nested_arrays" => [ [ "x" => [ 1 ], "y" => null ], [ "", "" ] ],
-            "invalid_input" => [ "not json", [] ],
+            "invalid_input" => [ "", [] ],
         ];
     }
 
@@ -960,7 +962,7 @@ class DictionaryTest extends TestCase {
             "skip_empty_strings"    => [ [ "a" => "1", "b" => "", "c" => "2.5" ], true, [ 1, 3 ] ],
             "include_empty_strings" => [ [ "a" => "1", "b" => "0", "c" => "2.5" ], false, [ 1, 0, 3 ] ],
             "negative_decimal"      => [ [ "n" => "-1.6", "p" => "2.4" ], false, [ -2, 2 ] ],
-            "invalid_input"         => [ "not json", true, [] ],
+            "invalid_input"         => [ "", true, [] ],
         ];
     }
 
@@ -986,7 +988,7 @@ class DictionaryTest extends TestCase {
     public static function providerToJSON(): array {
         return [
             "basic_json"    => [ [ "a" => "1", "b" => "" ], [ "a", "b" ], false ],
-            "invalid_input" => [ "not json", [], true ],
+            "invalid_input" => [ "", [], true ],
         ];
     }
 
@@ -1002,7 +1004,7 @@ class DictionaryTest extends TestCase {
             "associative_array" => [ [ "a" => 1, "b" => 2 ], 2 ],
             "empty_dictionary"  => [ [], 0 ],
             "list_style_data"   => [ [ "x", "y", "z" ], 3 ],
-            "invalid_input"     => [ "not json", 0 ],
+            "invalid_input"     => [ "", 0 ],
         ];
     }
 
@@ -1053,8 +1055,8 @@ class DictionaryTest extends TestCase {
     public static function providerJsonSerialize(): array {
         return [
             "basic_array"         => [ [ "a" => 1, "b" => 2 ], [ "a", "b" ], false, 1 ],
-            "invalid_input"       => [ "not json", [], true, null ],
             "nested_dictionaries" => [ [ "sub" => [ "k" => "v" ]], [ "sub" ], false, null ],
+            "invalid_input"       => [ "", [], true, null ],
         ];
     }
 }
