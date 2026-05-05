@@ -6,6 +6,7 @@ use Framework\Notification\NotificationResult;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 use Framework\Database\Model\Expression;
 use Framework\Database\Model\Relation;
 use Framework\Date\Date;
@@ -21,7 +22,7 @@ use Framework\Utils\JSON;
 )]
 class NotificationQueueModel {
 
-    #[Field(isID: true)]
+    #[Field(isID: true), Requested(isMultiID: true)]
     public int $notificationQueueID = 0;
 
     public int $credentialID = 0;

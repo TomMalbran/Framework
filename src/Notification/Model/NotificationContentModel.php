@@ -3,6 +3,7 @@ namespace Framework\Notification\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 
 /**
  * The Notification Content Model
@@ -12,7 +13,7 @@ use Framework\Database\Model\Field;
 )]
 class NotificationContentModel {
 
-    #[Field(isID: true)]
+    #[Field(isID: true), Requested]
     public int $notificationContentID = 0;
 
     public string $notificationCode = "";
