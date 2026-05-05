@@ -320,7 +320,11 @@ class File {
         array|string $extensions,
         string ...$otherExtensions,
     ): bool {
-        $extension  = self::getExtension($name);
+        $extension = self::getExtension($name);
+        if ($extension === "") {
+            return false;
+        }
+
         $extension  = Strings::toLowerCase($extension);
         $extensions = is_array($extensions) ? $extensions : [ $extensions ];
         $extensions = array_merge($extensions, $otherExtensions);
@@ -334,6 +338,10 @@ class File {
      * @return string
      */
     public static function parseName(string $newName, string $oldName): string {
+        if ($newName === "") {
+            return $oldName;
+        }
+
         $newExt = self::getExtension($newName);
         $oldExt = self::getExtension($oldName);
 
@@ -439,6 +447,9 @@ class File {
      * @return bool
      */
     public static function createDir(string $path): bool {
+        if ($path === "") {
+            return false;
+        }
         if (!self::exists($path)) {
             mkdir($path, 0777, recursive: true);
             return true;
@@ -478,6 +489,9 @@ class File {
      * @return bool
      */
     public static function deleteDir(string $path, int &$deleted = 0): bool {
+        if ($path === "") {
+            return false;
+        }
         if (is_dir($path)) {
             $files = self::scanPath($path);
             foreach ($files as $file) {
@@ -500,6 +514,9 @@ class File {
      * @return bool
      */
     public static function emptyDir(string $path, int &$deleted = 0): bool {
+        if ($path === "") {
+            return false;
+        }
         $files  = self::scanPath($path);
         $result = true;
         foreach ($files as $file) {
@@ -516,15 +533,15 @@ class File {
 
     /**
      * Creates a new zip archive and adds the given files/directories
-     * @param string              $name
+     * @param string              $zipPath
      * @param list<string>|string $files
      * @return ZipArchive|null
      */
-    public static function createZip(string $name, array|string $files): ?ZipArchive {
+    public static function createZip(string $zipPath, array|string $files): ?ZipArchive {
         $zip   = new ZipArchive();
         $files = Arrays::toStrings($files);
 
-        if ($zip->open($name, ZipArchive::CREATE) === true) {
+        if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
             foreach ($files as $file) {
                 self::addDirToZip($zip, $file, pathinfo($file, PATHINFO_BASENAME));
             }
@@ -571,6 +588,10 @@ class File {
      * @return bool
      */
     public static function extractZip(string $zipPath, string $extractPath): bool {
+        if ($zipPath === "" || $extractPath === "") {
+            return false;
+        }
+
         $zip = new ZipArchive();
         if ($zip->open($zipPath) !== true) {
             return false;

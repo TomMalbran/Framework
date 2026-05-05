@@ -26,6 +26,26 @@ function file_get_contents($filename, $use_include_path = false, $context = null
 
 namespace Framework\File;
 
+// file_get_contents shim for encoded local file URLs in CLI tests
+if (!function_exists("Framework\\File\\file_get_contents")) {
+    function file_get_contents(
+        string $filename,
+        bool $use_include_path = false,
+        mixed $context = null,
+        int $offset = 0,
+        ?int $maxLen = null,
+    ): string|false {
+        if (str_starts_with($filename, "file://")) {
+            $filename = str_replace("%20", " ", $filename);
+        }
+
+        if ($maxLen !== null) {
+            return \file_get_contents($filename, $use_include_path, $context, $offset, $maxLen);
+        }
+        return \file_get_contents($filename, $use_include_path, $context, $offset);
+    }
+}
+
 // move_uploaded_file shim for CLI tests
 if (!function_exists("Framework\\File\\move_uploaded_file")) {
     function move_uploaded_file(string $from, string $to): bool {
