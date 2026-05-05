@@ -3,6 +3,7 @@ namespace Framework\Email\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 use Framework\System\EmailCode;
 
 /**
@@ -13,7 +14,7 @@ use Framework\System\EmailCode;
 )]
 class EmailContentModel {
 
-    #[Field(isID: true)]
+    #[Field(isID: true), Requested]
     public int $emailContentID = 0;
 
     public EmailCode $emailCode = EmailCode::None;

@@ -5,6 +5,7 @@ use Framework\Email\EmailResult;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 use Framework\Database\Model\Expression;
 use Framework\System\EmailCode;
 use Framework\Date\Date;
@@ -20,7 +21,7 @@ use Framework\Utils\JSON;
 )]
 class EmailQueueModel {
 
-    #[Field(isID: true)]
+    #[Field(isID: true), Requested(isMultiID: true)]
     public int $emailQueueID = 0;
 
     public EmailCode $emailCode = EmailCode::None;
