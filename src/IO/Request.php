@@ -302,6 +302,15 @@ class Request implements IteratorAggregate, JsonSerializable {
         return false;
     }
 
+    /**
+     * Returns the value at the given key as a boolean
+     * @param string $key
+     * @return bool
+     */
+    public function getBool(string $key): bool   {
+        return $this->isActive($key);
+    }
+
 
 
     /**
