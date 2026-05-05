@@ -142,9 +142,13 @@ class ImageTest extends TestCase {
 
     #[DataProvider("providerGetSizeFromUrl")]
     public function testGetSizeFromUrl(string $token, array $expected): void {
-        $path = $this->files[$token] ?? "";
-        $size = Image::getSizeFromUrl($path);
-        $this->assertSame($expected, [ $size[0], $size[1], $size[2] ]);
+        $path   = $this->files[$token] ?? "";
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::getSizeFromUrl($path),
+            suppress: true,
+        );
+
+        $this->assertSame($expected, [ $result[0], $result[1], $result[2] ]);
     }
 
     public static function providerGetSizeFromUrl(): array {
@@ -161,18 +165,23 @@ class ImageTest extends TestCase {
 
     #[DataProvider("providerGetOrientation")]
     public function testGetOrientation(string $token, int $expected): void {
-        $path = $this->files[$token] ?? "";
-        $this->assertSame($expected, Image::getOrientation($path));
+        $path   = $this->files[$token] ?? "";
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::getOrientation($path),
+            suppress: true,
+        );
+
+        $this->assertSame($expected, $result);
     }
 
     public static function providerGetOrientation(): array {
         return [
-            "opaque_png"            => [ "png", 0 ],
-            "transparent_png"       => [ "transparent", 0 ],
-            "large_transparent_png" => [ "large", 0 ],
-            "jpeg"                  => [ "jpeg", 0 ],
-            "missing"               => [ "missing", 0 ],
-            "invalid"               => [ "invalid", 0 ],
+            "opaque_png"        => [ "png", 0 ],
+            "transparent_png"   => [ "transparent", 0 ],
+            "large_transparent" => [ "large", 0 ],
+            "jpeg"              => [ "jpeg", 0 ],
+            "missing"           => [ "missing", 0 ],
+            "invalid"           => [ "invalid", 0 ],
         ];
     }
 

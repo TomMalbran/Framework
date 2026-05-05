@@ -11,7 +11,7 @@ use stdClass;
 class NumbersTest extends TestCase {
 
     #[DataProvider("providerIsValid")]
-    public function testIsValid(mixed $value, $min = null, $max = null, $expected): void {
+    public function testIsValid(mixed $value, int|null $min, int|null $max, bool $expected): void {
         $this->assertSame($expected, Numbers::isValid($value, $min, $max));
     }
 
@@ -43,7 +43,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerToInt")]
-    public function testToInt(mixed $value, int $decimals = 0, int $expected): void {
+    public function testToInt(mixed $value, int $decimals, int $expected): void {
         $this->assertEquals($expected, Numbers::toInt($value, $decimals));
     }
 
@@ -67,7 +67,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerToFloat")]
-    public function testToFloat(mixed $value, $decimals = 0, $expected): void {
+    public function testToFloat(mixed $value, int $decimals, float $expected): void {
         $this->assertEquals($expected, Numbers::toFloat($value, $decimals));
     }
 
@@ -139,7 +139,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerCompare")]
-    public function testCompare(mixed $a, mixed $b, bool $orderAsc = true, int|float $expected): void {
+    public function testCompare(mixed $a, mixed $b, bool $orderAsc, int|float $expected): void {
         $this->assertEquals($expected, Numbers::compare($a, $b, $orderAsc));
     }
 
@@ -177,7 +177,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerRoundInt")]
-    public function testRoundInt(mixed $value, bool $useFloor = false, int $expected): void {
+    public function testRoundInt(mixed $value, bool $useFloor, int $expected): void {
         $this->assertSame($expected, Numbers::roundInt($value, $useFloor));
     }
 
@@ -321,7 +321,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerPercent")]
-    public function testPercent(mixed $numerator, mixed $total, int $decimals = 0, int|float $expected): void {
+    public function testPercent(mixed $numerator, mixed $total, int $decimals, int|float $expected): void {
         $this->assertEquals($expected, Numbers::percent($numerator, $total, $decimals));
     }
 
@@ -346,7 +346,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerDivide")]
-    public function testDivide(mixed $numerator, mixed $divisor, int $decimals = 0, float $expected): void {
+    public function testDivide(mixed $numerator, mixed $divisor, int $decimals, float $expected): void {
         $result = Numbers::divide($numerator, $divisor, $decimals);
         $this->assertIsFloat($result);
         $this->assertEquals($expected, $result);
@@ -369,7 +369,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerDivideInt")]
-    public function testDivideInt(mixed $numerator, mixed $divisor, bool $useFloor = false, int $expected): void {
+    public function testDivideInt(mixed $numerator, mixed $divisor, bool $useFloor, int $expected): void {
         $result = Numbers::divideInt($numerator, $divisor, $useFloor);
         $this->assertIsInt($result);
         $this->assertEquals($expected, $result);
@@ -621,7 +621,7 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerToBytesString")]
-    public function testToBytesString(mixed $value, bool $inGigas = false, string $expected): void {
+    public function testToBytesString(mixed $value, bool $inGigas, string $expected): void {
         $this->assertEquals($expected, Numbers::toBytesString($value, $inGigas));
     }
 

@@ -6,6 +6,7 @@ use Framework\Date\Type\DateType;
 use Framework\Date\Type\DateFormat;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use CURLFile;
 
 class RequestTest extends TestCase {
+    use TestHelpers;
 
     protected string $tmpFileF = "";
     protected string $tmpFileG = "";
@@ -1827,7 +1829,12 @@ class RequestTest extends TestCase {
     #[DataProvider("providerIsValidImage")]
     public function testIsValidImage(array $input, array $args, bool $expected): void {
         $request = new Request($input, withFiles: true);
-        $this->assertSame($expected, $request->isValidImage(...$args));
+        $result  = $this->runWithSuppressedWarnings(
+            fn() => $request->isValidImage(...$args),
+            suppress: true,
+        );
+
+        $this->assertSame($expected, $result);
     }
 
     public static function providerIsValidImage(): array {

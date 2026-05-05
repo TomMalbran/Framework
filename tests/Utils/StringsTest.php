@@ -6,6 +6,7 @@ use Framework\Date\Date;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 use Framework\Utils\Strings;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +21,7 @@ enum TestStringEnum implements Enum {
 }
 
 class StringsTest extends TestCase {
+    use TestHelpers;
 
     #[DataProvider("providerIsString")]
     public function testIsString(mixed $value, bool $expected): void {
@@ -265,7 +267,11 @@ class StringsTest extends TestCase {
 
     #[DataProvider("providerMatch")]
     public function testMatch(string $value, string $pattern, bool $expected): void {
-        $this->assertEquals($expected, Strings::match($value, $pattern));
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Strings::match($value, $pattern),
+            suppress: true,
+        );
+        $this->assertEquals($expected, $result);
     }
 
     public static function providerMatch(): array {

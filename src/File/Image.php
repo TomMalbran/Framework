@@ -180,6 +180,10 @@ class Image {
      * @return int
      */
     public static function getTextWidth(string $text, string $fontFile, int $fontSize): int {
+        if (!File::exists($fontFile)) {
+            return 0;
+        }
+
         $dimensions = imagettfbbox($fontSize, 0, $fontFile, $text);
         if ($dimensions === false) {
             return 0;
@@ -420,6 +424,10 @@ class Image {
      * @return GdImage|null
      */
     public static function createSrcImage(int $imgType, string $fileName): ?GdImage {
+        if (!File::exists($fileName)) {
+            return null;
+        }
+
         $result = match ($imgType) {
             1  => imagecreatefromgif($fileName),
             2  => imagecreatefromjpeg($fileName),
@@ -428,10 +436,7 @@ class Image {
             16 => imagecreatefromxbm($fileName),
             default => null,
         };
-        if ($result === false) {
-            return null;
-        }
-        return $result;
+        return $result === false ? null : $result;
     }
 
     /**

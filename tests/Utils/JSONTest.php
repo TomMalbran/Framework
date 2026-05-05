@@ -3,12 +3,14 @@ namespace Tests\Utils;
 
 use Framework\Utils\JSON;
 use Framework\Utils\Dictionary;
+use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 class JSONTest extends TestCase {
+    use TestHelpers;
 
     private string $tmpFile = "";
 
@@ -158,8 +160,11 @@ class JSONTest extends TestCase {
 
     #[DataProvider("providerReadUrl")]
     public function testReadUrl(string $url, array $expected): void {
-        $fromUrl = JSON::readUrl($url);
-        $this->assertEquals($expected, $fromUrl);
+        $result = $this->runWithSuppressedWarnings(
+            fn() => JSON::readUrl($url),
+            suppress: true,
+        );
+        $this->assertEquals($expected, $result);
     }
 
     public static function providerReadUrl(): array {
@@ -175,14 +180,17 @@ class JSONTest extends TestCase {
 
     #[DataProvider("providerPostUrl")]
     public function testPostUrl(string $url, array $data, bool $shouldSucceed): void {
-        $res = JSON::postUrl($url, $data);
-        $this->assertIsArray($res);
+        $result = $this->runWithSuppressedWarnings(
+            fn() => JSON::postUrl($url, $data),
+            suppress: true,
+        );
+        $this->assertIsArray($result);
 
         if ($shouldSucceed) {
-            $this->assertArrayHasKey("ok", $res);
-            $this->assertTrue($res["ok"]);
+            $this->assertArrayHasKey("ok", $result);
+            $this->assertTrue($result["ok"]);
         } else {
-            $this->assertEquals([], $res);
+            $this->assertEquals([], $result);
         }
     }
 
