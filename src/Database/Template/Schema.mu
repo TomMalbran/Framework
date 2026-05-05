@@ -34,7 +34,6 @@ use Framework\Date\Type\DateType;{{/hasDateType}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
 use Framework\Utils\Dictionary;{{#usesNumbers}}
 use Framework\Utils\Numbers;{{/usesNumbers}}{{#hasJsonType}}
-use Framework\Utils\JSON;
 
 use JsonSerializable;{{/hasJsonType}}
 
