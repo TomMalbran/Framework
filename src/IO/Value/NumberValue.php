@@ -95,6 +95,6 @@ class NumberValue extends Value implements ValueInterface {
      * @return bool
      */
     public function isValid(?int $min = 1, ?int $max = null): bool {
-        return Numbers::isValid($this->raw, $min, $max);
+        return Numbers::isValid($this->value, $min, $max);
     }
 }

@@ -9,47 +9,70 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Requested {
 
-    public bool $isParent = false;
-    public bool $isJSON   = false;
+    public bool $canEdit   = true;
+    public bool $isMultiID = false;
+    public bool $isNative  = false;
+    public bool $isJSON    = false;
 
 
     /**
      * The Requested Attribute
-     * @param bool $isParent Optional.
-     * @param bool $isJSON   Optional.
+     * @param bool $canEdit   Optional.
+     * @param bool $isMultiID Optional.
+     * @param bool $isNative  Optional.
+     * @param bool $isJSON    Optional.
      */
     public function __construct(
-        bool $isParent = false,
+        bool $canEdit = true,
+        bool $isMultiID = false,
+        bool $isNative = false,
         bool $isJSON = false,
     ) {
-        $this->isParent = $isParent;
-        $this->isJSON   = $isJSON;
+        $this->canEdit   = $canEdit;
+        $this->isMultiID = $isMultiID;
+        $this->isNative  = $isNative;
+        $this->isJSON    = $isJSON;
     }
 
 
-    // Internal data used when parsing the Model
+
+    // Used internally when parsing the Model
     public string    $name = "";
     public FieldType $type = FieldType::String;
 
+    public bool      $isField   = false;
+    public bool      $hasValue  = false;
+    public string    $enumClass = "";
     public string    $dateInput = "";
     public string    $hourInput = "";
-    public int       $decimals = 0;
-
+    public int       $decimals  = 0;
 
 
     /**
      * Sets the Data from the Model
      * @param string $name
      * @param string $typeName
+     * @param bool   $isEnum
      * @return Requested
      */
-    public function setData(string $name, string $typeName): Requested {
+    public function setData(
+        string $name,
+        string $typeName,
+        bool $isEnum,
+    ): Requested {
         $this->name = $name;
 
         if ($this->isJSON) {
             $this->type = FieldType::JSON;
+        } elseif ($isEnum) {
+            $this->type      = FieldType::Enum;
+            $this->enumClass = $typeName;
+            $this->isNative  = true;
         } else {
             $this->type = FieldType::fromType($typeName);
+            if ($this->type !== FieldType::JSON) {
+                $this->hasValue = true;
+            }
         }
         return $this;
     }
@@ -64,12 +87,20 @@ class Requested {
         $this->name      = $field->name;
         $this->type      = $field->type;
 
+        $this->enumClass = $field->enumClass;
         $this->dateInput = $field->dateInput;
         $this->hourInput = $field->hourInput;
         $this->decimals  = $field->decimals;
 
-        if (!$this->isParent) {
-            $this->isParent = $field->isParent && !$isValidated;
+        if (!$this->isNative) {
+            $this->isNative = $field->isParent && !$isValidated;
+        }
+
+        if (!$field->isID && !$field->isParent) {
+            $this->isField = $this->canEdit;
+            if (!$this->isNative && $this->type !== FieldType::JSON) {
+                $this->hasValue = true;
+            }
         }
         return $this;
     }
@@ -90,8 +121,10 @@ class Requested {
      * @return Requested
      */
     public function fromStatus(): Requested {
-        $this->name = "status";
-        $this->type = FieldType::String;
+        $this->name     = "status";
+        $this->type     = FieldType::String;
+        $this->isField  = $this->canEdit;
+        $this->hasValue = true;
         return $this;
     }
 
@@ -100,26 +133,20 @@ class Requested {
      * @return Requested
      */
     public function fromPosition(): Requested {
-        $this->name = "position";
-        $this->type = FieldType::Number;
+        $this->name     = "position";
+        $this->type     = FieldType::Number;
+        $this->isField  = true;
+        $this->hasValue = true;
         return $this;
     }
 
 
 
     /**
-     * Returns true if the Requested Field has a value
-     * @return bool
-     */
-    public function hasValue(): bool {
-        return $this->type !== FieldType::JSON && !$this->isParent;
-    }
-
-    /**
      * Returns true if the Requested Field is a Dictionary
      * @return bool
      */
     public function isDictionary(): bool {
-        return $this->type === FieldType::JSON && !$this->isParent;
+        return $this->type === FieldType::JSON && !$this->isNative;
     }
 }

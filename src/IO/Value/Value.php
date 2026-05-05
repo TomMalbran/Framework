@@ -38,7 +38,7 @@ class Value {
      * @return bool
      */
     public function isEmpty(): bool {
-        return $this->raw === "";
+        return !$this->request->has($this->key);
     }
 
     /**
@@ -46,7 +46,7 @@ class Value {
      * @return bool
      */
     public function hasValue(): bool {
-        return $this->raw !== "";
+        return $this->request->has($this->key);
     }
 
     /**

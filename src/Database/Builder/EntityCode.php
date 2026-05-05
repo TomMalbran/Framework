@@ -62,8 +62,8 @@ class EntityCode {
             "dictionaries"    => $dictionaries,
             "hasDates"        => count($dates) > 0,
             "dates"           => $dates,
-            "imports"         => $imports,
             "hasImports"      => count($imports) > 0,
+            "imports"         => $imports,
         ]);
         return $contents;
     }
@@ -330,7 +330,7 @@ class EntityCode {
     }
 
     /**
-     * Returns used Imports
+     * Returns the used Imports
      * @param SchemaModel $schemaModel
      * @return list<string>
      */

@@ -278,11 +278,18 @@ class Field {
      * @param bool   $isEnum
      * @return Field
      */
-    public function setData(string $name, string $typeName, bool $isEnum): Field {
+    public function setData(
+        string $name,
+        string $typeName,
+        bool $isEnum,
+    ): Field {
         $this->name   = $name;
         $this->dbName = $name;
 
-        if ($typeName === "string") {
+        if ($isEnum) {
+            $this->type      = FieldType::Enum;
+            $this->enumClass = $typeName;
+        } elseif ($typeName === "string") {
             if ($this->isText) {
                 $this->type = FieldType::Text;
             } elseif ($this->isLongText) {
@@ -294,9 +301,6 @@ class Field {
             } else {
                 $this->type = FieldType::String;
             }
-        } elseif ($isEnum) {
-            $this->type      = FieldType::Enum;
-            $this->enumClass = $typeName;
         } else {
             $this->type = FieldType::fromType($typeName);
         }

@@ -330,7 +330,7 @@ class SchemaModel {
      */
     public function isRequested(string $fieldName): bool {
         foreach ($this->requestedFields as $field) {
-            if ($field->name === $fieldName && $field->hasValue()) {
+            if ($field->isField && $field->name === $fieldName) {
                 return true;
             }
         }

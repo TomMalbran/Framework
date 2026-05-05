@@ -137,6 +137,15 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @param string $key
      * @return Dictionary
      */
+    public function getDict(string $key): Dictionary {
+        return new Dictionary($this->get($key, []));
+    }
+
+    /**
+     * Returns the request data at the given key as a Dictionary
+     * @param string $key
+     * @return Dictionary
+     */
     public function getDictionary(string $key): Dictionary {
         return JSON::decodeAsDictionary($this->get($key, "[]"));
     }

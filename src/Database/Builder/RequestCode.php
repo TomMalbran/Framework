@@ -24,30 +24,82 @@ class RequestCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
+        $natives      = self::getNatives($schemaModel);
         $properties   = self::getProperties($schemaModel);
         $dictionaries = self::getDictionaries($schemaModel);
+        $imports      = self::getImports($schemaModel);
 
-        $contents   = Builder::render("Request", [
-            "namespace"    => $schemaModel->namespace,
-            "name"         => $schemaModel->name,
-            "tableName"    => $schemaModel->tableName,
+        $contents = Builder::render("Request", [
+            "namespace"       => $schemaModel->namespace,
+            "name"            => $schemaModel->name,
+            "tableName"       => $schemaModel->tableName,
 
-            "hasIntID"     => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
-            "hasStringID"  => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
-            "hasEnumID"    => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
-            "idName"       => $schemaModel->idName,
+            "hasIntID"        => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
+            "hasStringID"     => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
+            "hasEnumID"       => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
+            "idName"          => $schemaModel->idName,
+            "idEnumName"      => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
+            "hasMultiID"      => self::hasMultiID($schemaModel),
 
-            "requestClass" => $schemaModel->requestClass,
-            "statusClass"  => $schemaModel->statusClass,
-            "hasStatus"    => $schemaModel->hasStatus,
+            "requestClass"    => $schemaModel->requestClass,
+            "statusClass"     => $schemaModel->statusClass,
+            "hasStatus"       => $schemaModel->hasStatus,
 
-            "properties"   => $properties,
-            "dictionaries" => $dictionaries,
-            "parents"      => self::getParents($schemaModel),
-            "imports"      => self::getImports($schemaModel),
-            "values"       => self::getValues($properties),
+            "hasNatives"      => count($natives) > 0,
+            "natives"         => $natives,
+            "hasProperties"   => count($properties) > 0,
+            "properties"      => $properties,
+            "hasDictionaries" => count($dictionaries) > 0,
+            "dictionaries"    => $dictionaries,
+
+            "values"          => self::getValues($properties),
+            "hasImports"      => count($imports) > 0,
+            "imports"         => $imports,
         ]);
         return $contents;
+    }
+
+    /**
+     * Returns if the ID can be Requested multiple times
+     * @param SchemaModel $schemaModel
+     * @return bool
+     */
+    private static function hasMultiID(SchemaModel $schemaModel): bool {
+        foreach ($schemaModel->requestedFields as $field) {
+            if ($field->isMultiID && $field->name === $schemaModel->idName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns the Native Fields
+     * @param SchemaModel $schemaModel
+     * @return list<array{type:string,getter:string,name:string}>
+     */
+    private static function getNatives(SchemaModel $schemaModel): array {
+        $result = [];
+        foreach ($schemaModel->requestedFields as $field) {
+            if (!$field->isNative) {
+                continue;
+            }
+
+            $type     = $field->type->getCodeType($field->enumClass);
+            $typeName = Strings::upperCaseFirst($type);
+
+            $getter = "\$request->get{$typeName}(\"{$field->name}\")";
+            if ($field->type === FieldType::Enum) {
+                $getter = "{$type}::fromRequest(\$request, \"{$field->name}\")";
+            }
+
+            $result[] = [
+                "type"   => $type,
+                "getter" => $getter,
+                "name"   => $field->name,
+            ];
+        }
+        return $result;
     }
 
     /**
@@ -58,7 +110,7 @@ class RequestCode {
     private static function getProperties(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $field) {
-            if (!$field->hasValue()) {
+            if (!$field->hasValue) {
                 continue;
             }
 
@@ -104,56 +156,28 @@ class RequestCode {
         return $result;
     }
 
-    /**
-     * Returns the Parent Fields
-     * @param SchemaModel $schemaModel
-     * @return list<array{type:string,getter:string,name:string}>
-     */
-    private static function getParents(SchemaModel $schemaModel): array {
-        $result = [];
-        foreach ($schemaModel->requestedFields as $field) {
-            if ($field->isParent) {
-                $type     = $field->type->getCodeType();
-                $result[] = [
-                    "type"   => $type,
-                    "getter" => "get" . Strings::upperCaseFirst($type),
-                    "name"   => $field->name,
-                ];
-            }
-        }
-        return $result;
-    }
-
 
 
     /**
-     * Returns the Field Imports
+     * Returns the used Imports
      * @param SchemaModel $schemaModel
      * @return list<string>
      */
     private static function getImports(SchemaModel $schemaModel): array {
         $result = [];
-        foreach ($schemaModel->fields as $field) {
-            if ($field->isStatus) {
-                $queryName = "{$schemaModel->statusClass}Where";
-                $result["{$schemaModel->namespace}\\$queryName"] = 1;
+        if ($schemaModel->hasID && $schemaModel->idType === FieldType::Enum) {
+            $result[$schemaModel->idEnumClass] = 1;
+        }
+        foreach ($schemaModel->requestedFields as $field) {
+            if ($field->isNative && $field->type === FieldType::Enum) {
+                $result[$field->enumClass] = 1;
             }
         }
-
-        foreach ($schemaModel->relations as $relation) {
-            foreach ($relation->fields as $field) {
-                if ($field->isStatus && $relation->relationModel !== null) {
-                    $queryName = "{$relation->relationModelName}StatusWhere";
-                    $result["{$relation->relationModel->namespace}\\$queryName"] = 1;
-                }
-            }
-        }
-
         return array_keys($result);
     }
 
     /**
-     * Returns the Field Values
+     * Returns the used Values
      * @param list<Property> $properties
      * @return list<string>
      */

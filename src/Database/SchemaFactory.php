@@ -271,7 +271,7 @@ class SchemaFactory {
                     } elseif ($isPosition) {
                         $requestedFields[] = $requested->fromPosition();
                     } else {
-                        $requestedFields[] = $requested->setData($fieldName, $typeName);
+                        $requestedFields[] = $requested->setData($fieldName, $typeName, $isEnum);
                     }
                 }
             }

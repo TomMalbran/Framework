@@ -5,6 +5,9 @@ namespace {{namespace}};
 use {{namespace}}\{{statusClass}};
 
 {{/hasStatus}}
+{{#imports}}use {{.}};
+{{/imports}}{{#hasImports}}
+{{/hasImports}}
 use Framework\IO\Request;{{#values}}
 use Framework\IO\Value\{{.}};{{/values}}
 use Framework\Utils\Dictionary;
@@ -26,19 +29,40 @@ class {{requestClass}} {
     public string $code;
     {{/hasStringID}}
     {{#hasEnumID}}
-    public string $code;
+    public {{idEnumName}} $code = {{idEnumName}}::None;
     {{/hasEnumID}}
-    {{#parents}}
-    public {{type}} ${{name}};
-    {{/parents}}
+{{#hasMultiID}}
 
+    {{#hasIntID}}
+    /** @var list<int> */
+    public array $ids;
+    {{/hasIntID}}
+    {{#hasStringID}}
+    /** @var list<string> */
+    public array $codes;
+    {{/hasStringID}}
+{{/hasMultiID}}
+{{#hasNatives}}
+
+    // Native Fields
+    {{#natives}}
+    public {{type}} ${{name}};
+    {{/natives}}
+{{/hasNatives}}
+{{#hasProperties}}
+
+    // Properties
     {{#properties}}
     public {{type}} ${{name}};
     {{/properties}}
+{{/hasProperties}}
+{{#hasDictionaries}}
 
+    // Dictionaries
     {{#dictionaries}}
     public Dictionary ${{.}};
     {{/dictionaries}}
+{{/hasDictionaries}}
 
 
     /**
@@ -61,19 +85,37 @@ class {{requestClass}} {
         $this->code = $request->getString("{{idName}}");
         {{/hasStringID}}
         {{#hasEnumID}}
-        $this->code = $request->getString("{{idName}}");
+        $this->code = {{idEnumName}}::fromRequest($request, "{{idName}}");
         {{/hasEnumID}}
-        {{#parents}}
-        $this->{{name}} = $request->{{getter}}("{{name}}");
-        {{/parents}}
+    {{#hasMultiID}}
+        {{#hasIntID}}
+        $this->ids = $request->getInts("{{idName}}s");
+        {{/hasIntID}}
+        {{#hasStringID}}
+        $this->codes = $request->getStrings("{{idName}}s");
+        {{/hasStringID}}
+    {{/hasMultiID}}
+    {{#hasNatives}}
 
+        // Set the Native Fields
+        {{#natives}}
+        $this->{{name}} = {{{getter}}};
+        {{/natives}}
+    {{/hasNatives}}
+    {{#hasProperties}}
+
+        // Set the Properties
         {{#properties}}
         $this->{{name}} = new {{type}}($request, "{{value}}"{{{extras}}});
         {{/properties}}
+    {{/hasProperties}}
+    {{#hasDictionaries}}
 
+        // Set the Dictionaries
         {{#dictionaries}}
-        $this->{{.}} = $request->getDictionary("{{.}}");
+        $this->{{.}} = $request->getDict("{{.}}");
         {{/dictionaries}}
+    {{/hasDictionaries}}
     }
 
     /**
