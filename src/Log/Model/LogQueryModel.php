@@ -3,6 +3,7 @@ namespace Framework\Log\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 use Framework\Date\Date;
 
 /**
@@ -16,7 +17,7 @@ use Framework\Date\Date;
 )]
 class LogQueryModel {
 
-    #[Field(isID: true)]
+    #[Field(isID: true), Requested(isMultiID: true)]
     public int $logID = 0;
 
     #[Field(isText: true)]

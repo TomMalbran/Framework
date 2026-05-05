@@ -1,11 +1,11 @@
 <?php
 namespace Framework\Log;
 
-use Framework\IO\Request;
 use Framework\Auth\Auth;
 use Framework\Database\Query\Operator;
 use Framework\Log\SessionLog;
 use Framework\Log\Schema\LogActionSchema;
+use Framework\Log\Schema\LogActionRequest;
 use Framework\Log\Schema\LogActionColumn;
 use Framework\Log\Schema\LogActionQuery;
 use Framework\System\Config;
@@ -21,17 +21,16 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns the List Query
-     * @param Request                       $request
+     * @param LogActionRequest              $request
      * @param array<string,LogActionColumn> $mappings Optional.
      * @return LogActionQuery
      */
-    private static function createQuery(Request $request, array $mappings = []): LogActionQuery {
-        $credentialID = $request->getInt("credentialID");
-        $search       = $request->getString("search");
+    private static function createQuery(LogActionRequest $request, array $mappings = []): LogActionQuery {
+        $query       = new LogActionQuery();
+        $realRequest = $request->getRequest();
 
-        $query = new LogActionQuery();
         foreach ($mappings as $key => $column) {
-            $value = $request->getString($key);
+            $value = $realRequest->getString($key);
             $query->where($column, Operator::Equal, $value, condition: $value !== "");
         }
 
@@ -39,26 +38,26 @@ class ActionLog extends LogActionSchema {
             LogActionColumn::CredentialName,
             LogActionColumn::Module,
             LogActionColumn::Action,
-        ], $search);
+        ], $request->search->get());
 
-        $query->credentialID->equalIf($credentialID);
-        $query->createdTime->inPeriod($request);
+        $query->credentialID->equalIf($request->credentialID->get());
+        $query->createdTime->inPeriod($realRequest);
         return $query;
     }
 
     /**
      * Returns all the Actions Log items
-     * @param Request                       $request
+     * @param LogActionRequest              $request
      * @param array<string,LogActionColumn> $mappings Optional.
      * @return list<array<string,mixed>>
      */
-    public static function getAll(Request $request, array $mappings = []): array {
+    public static function getAll(LogActionRequest $request, array $mappings = []): array {
         $query = self::createQuery($request, $mappings);
         $query->sessionCreatedTime->orderByDesc();
         $query->sessionID->orderByDesc();
         $query->createdTime->orderByDesc();
 
-        $list          = self::getEntityList($query, $request);
+        $list          = self::getEntityList($query, $request->getRequest());
         $result        = [];
         $lastSessionID = 0;
         $lastIndex     = -1;
@@ -94,11 +93,11 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Returns the total amount of Actions Log items
-     * @param Request                       $request
+     * @param LogActionRequest              $request
      * @param array<string,LogActionColumn> $mappings Optional.
      * @return int
      */
-    public static function getAmount(Request $request, array $mappings = []): int {
+    public static function getAmount(LogActionRequest $request, array $mappings = []): int {
         $query = self::createQuery($request, $mappings);
         return self::getEntityTotal($query);
     }

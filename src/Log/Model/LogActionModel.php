@@ -6,6 +6,7 @@ use Framework\Log\Model\LogSessionModel;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 use Framework\Database\Model\Relation;
 
 /**
@@ -23,7 +24,7 @@ class LogActionModel {
     #[Field(isKey: true)]
     public int $sessionID = 0;
 
-    #[Field(isKey: true)]
+    #[Field(isKey: true), Requested]
     public int $credentialID = 0;
 
     public int $currentUser = 0;
@@ -34,6 +35,11 @@ class LogActionModel {
 
     #[Field(isText: true)]
     public string $dataID = "";
+
+
+
+    #[Requested]
+    public string $search = "";
 
 
 
