@@ -122,7 +122,7 @@ class Requested {
      */
     public function fromStatus(): Requested {
         $this->name     = "status";
-        $this->type     = FieldType::String;
+        $this->type     = FieldType::Enum;
         $this->isField  = $this->canEdit;
         $this->hasValue = true;
         return $this;
