@@ -15,6 +15,7 @@ class Model {
     public bool $canCreate;
     public bool $canEdit;
     public bool $canDelete;
+    public bool $skipList;
 
 
 
@@ -26,6 +27,7 @@ class Model {
      * @param bool   $canCreate     Optional.
      * @param bool   $canEdit       Optional.
      * @param bool   $canDelete     Optional.
+     * @param bool   $skipList      Optional.
      */
     public function __construct(
         string $fantasyName = "",
@@ -34,6 +36,7 @@ class Model {
         bool $canCreate = false,
         bool $canEdit = false,
         bool $canDelete = false,
+        bool $skipList = false,
     ) {
         $this->fantasyName   = $fantasyName;
         $this->hasUsers      = $hasUsers;
@@ -41,5 +44,6 @@ class Model {
         $this->canCreate     = $canCreate;
         $this->canEdit       = $canEdit;
         $this->canDelete     = $canDelete;
+        $this->skipList      = $skipList;
     }
 }

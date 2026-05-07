@@ -291,6 +291,7 @@ class SchemaFactory {
                 canCreate:       $model->canCreate,
                 canEdit:         $model->canEdit,
                 canDelete:       $model->canDelete,
+                skipList:        $model->skipList,
                 validates:       $validates,
                 mainFields:      $mainFields,
                 virtualFields:   $virtualFields,

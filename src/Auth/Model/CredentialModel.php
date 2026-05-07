@@ -17,6 +17,7 @@ use Framework\Date\Date;
     canCreate:     true,
     canEdit:       true,
     canDelete:     true,
+    skipList:      true,
 )]
 class CredentialModel {
 

@@ -96,6 +96,7 @@ class SchemaCode {
             "idEnumClass"        => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
             "editType"           => $schemaModel->hasID ? "$queryName|$idType" : $queryName,
             "hasQuery"           => $schemaModel->hasID || count($uniques) > 0,
+            "hasList"            => !$schemaModel->skipList,
 
             "hasPositions"       => $schemaModel->hasPositions,
             "hasPositionsValue"  => $schemaModel->hasPositions ? "true" : "false",

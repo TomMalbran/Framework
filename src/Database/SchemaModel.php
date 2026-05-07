@@ -36,6 +36,7 @@ class SchemaModel {
     public bool $canCreate        = false;
     public bool $canEdit          = false;
     public bool $canDelete        = false;
+    public bool $skipList         = false;
 
 
     // Subclass Names
@@ -104,6 +105,7 @@ class SchemaModel {
      * @param bool             $canCreate       Optional.
      * @param bool             $canEdit         Optional.
      * @param bool             $canDelete       Optional.
+     * @param bool             $skipList        Optional.
      * @param list<Validate>   $validates       Optional.
      * @param list<Field>      $mainFields      Optional.
      * @param list<Virtual>    $virtualFields   Optional.
@@ -127,6 +129,7 @@ class SchemaModel {
         bool $canCreate = false,
         bool $canEdit = false,
         bool $canDelete = false,
+        bool $skipList = false,
         array $validates = [],
         array $mainFields = [],
         array $virtualFields = [],
@@ -151,6 +154,7 @@ class SchemaModel {
         $this->canCreate       = $canCreate;
         $this->canEdit         = $canEdit;
         $this->canDelete       = $canDelete;
+        $this->skipList        = $skipList;
 
         $this->validates       = $validates;
         $this->mainFields      = $mainFields;

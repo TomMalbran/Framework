@@ -526,6 +526,7 @@ class {{name}}Schema extends Schema {
     }
 
 {{/hasID}}
+{{#hasList}}
     /**
      * Returns a list of {{name}} Entities
      * @param Request $request{{#parents}}
@@ -544,6 +545,7 @@ class {{name}}Schema extends Schema {
         return self::constructEntities($list);
     }
 
+{{/hasList}}
     /**
      * Returns an array of {{name}} Entities
      * @param {{queryClass}}|null $query Optional.
@@ -566,6 +568,7 @@ class {{name}}Schema extends Schema {
         return self::constructEntities($list);
     }
 
+{{#hasList}}
     /**
      * Returns a Total number of {{name}} Entities
      * @param Request $request{{#parents}}
@@ -583,6 +586,7 @@ class {{name}}Schema extends Schema {
         return self::getSchemaTotal($query);
     }
 
+{{/hasList}}
     /**
      * Returns a Total number of {{name}} Entities
      * @param {{queryClass}}|null $query Optional.
