@@ -320,18 +320,16 @@ class Schema {
 
     /**
      * Creates a new Entity with data
-     * @param Request|null             $request      Optional.
-     * @param array<string,QueryValue> $fields       Optional.
+     * @param array<string,QueryValue> $fields
      * @param int                      $credentialID Optional.
      * @return int
      */
     protected static function createSchemaEntity(
-        ?Request $request = null,
-        array $fields = [],
+        array $fields,
         int $credentialID = 0,
     ): int {
         return ModificationBuilder::insert(static::getModel())
-            ->addFields($request, $fields)
+            ->addFields($fields)
             ->addCreation($credentialID)
             ->addModification()
             ->execute();
@@ -339,18 +337,16 @@ class Schema {
 
     /**
      * Replaces the Data of an Entity
-     * @param Request|null             $request      Optional.
-     * @param array<string,QueryValue> $fields       Optional.
+     * @param array<string,QueryValue> $fields
      * @param int                      $credentialID Optional.
      * @return int
      */
     protected static function replaceSchemaEntity(
-        ?Request $request = null,
-        array $fields = [],
+        array $fields,
         int $credentialID = 0,
     ): int {
         return ModificationBuilder::replace(static::getModel())
-            ->addFields($request, $fields)
+            ->addFields($fields)
             ->addModification($credentialID)
             ->execute();
     }
@@ -358,26 +354,20 @@ class Schema {
     /**
      * Edits the Data of an Entity
      * @param QueryLike|Enum|int|string $query
-     * @param Request|null              $request        Optional.
-     * @param array<string,QueryValue>  $fields         Optional.
+     * @param array<string,QueryValue>  $fields
      * @param int                       $credentialID   Optional.
      * @param bool                      $skipTimestamps Optional.
-     * @param bool                      $skipEmpty      Optional.
-     * @param bool                      $skipUnset      Optional.
      * @return bool
      */
     protected static function editSchemaEntity(
         QueryLike|Enum|int|string $query,
-        ?Request $request = null,
-        array $fields = [],
+        array $fields,
         int $credentialID = 0,
         bool $skipTimestamps = false,
-        bool $skipEmpty = false,
-        bool $skipUnset = false,
     ): bool {
         $query = self::generateQueryID($query, withDeleted: false);
         return ModificationBuilder::update(static::getModel(), $query)
-            ->addFields($request, $fields, $skipEmpty, $skipUnset)
+            ->addFields($fields)
             ->addModification($credentialID, $skipTimestamps)
             ->execute() > 0;
     }
@@ -394,7 +384,7 @@ class Schema {
     ): bool {
         $query = self::generateQueryID($query, withDeleted: false);
         if (static::$canDelete) {
-            return self::editSchemaEntity($query, null, [ "isDeleted" => 1 ], $credentialID);
+            return self::editSchemaEntity($query, [ "isDeleted" => 1 ], $credentialID);
         }
         return false;
     }
@@ -413,20 +403,18 @@ class Schema {
 
     /**
      * Creates an Entity and ensures the Order
-     * @param Request|null             $request      Optional.
-     * @param array<string,QueryValue> $fields       Optional.
+     * @param array<string,QueryValue> $fields
      * @param int                      $credentialID Optional.
      * @param QueryLike|null           $orderQuery   Optional.
      * @return int
      */
     protected static function createSchemaEntityWithOrder(
-        ?Request $request = null,
-        array $fields = [],
+        array $fields,
         int $credentialID = 0,
         ?QueryLike $orderQuery = null,
     ): int {
         $modification = ModificationBuilder::insert(static::getModel())
-            ->addFields($request, $fields)
+            ->addFields($fields)
             ->addCreation($credentialID)
             ->addModification();
 
@@ -438,34 +426,28 @@ class Schema {
     /**
      * Edits the Data of an Entity and ensures the Order
      * @param QueryLike|Enum|int|string $query
-     * @param Request|null              $request        Optional.
-     * @param array<string,QueryValue>  $fields         Optional.
+     * @param array<string,QueryValue>  $fields
      * @param int                       $credentialID   Optional.
      * @param QueryLike|null            $orderQuery     Optional.
      * @param bool                      $skipTimestamps Optional.
-     * @param bool                      $skipEmpty      Optional.
-     * @param bool                      $skipUnset      Optional.
      * @return bool
      */
     protected static function editSchemaEntityWithOrder(
         QueryLike|Enum|int|string $query,
-        ?Request $request = null,
-        array $fields = [],
+        array $fields,
         int $credentialID = 0,
         ?QueryLike $orderQuery = null,
         bool $skipTimestamps = false,
-        bool $skipEmpty = false,
-        bool $skipUnset = false,
     ): bool {
         $modifyQuery  = self::generateQueryID($query, withDeleted: false);
         $modification = ModificationBuilder::update(static::getModel(), $modifyQuery)
-            ->addFields($request, $fields, $skipEmpty, $skipUnset)
+            ->addFields($fields)
             ->addModification($credentialID, $skipTimestamps);
 
-        $fields = $modification->getFields();
-        if ($fields->has("position")) {
+        $newFields = $modification->getFields();
+        if ($newFields->has("position")) {
             $elem         = self::getSchemaEntity($query);
-            $savePosition = self::ensureSchemaOrder($elem, $fields, $orderQuery);
+            $savePosition = self::ensureSchemaOrder($elem, $newFields, $orderQuery);
             $modification->setField("position", $savePosition);
         }
 
@@ -611,13 +593,13 @@ class Schema {
         if ($newValue !== 0 && $oldValue === 0) {
             $query->where(static::$idDbName, Operator::NotEqual, $id);
             $query->where($column, Operator::Equal, 1);
-            self::editSchemaEntity($query, null, [ $column => 0 ]);
+            self::editSchemaEntity($query, [ $column => 0 ]);
             return true;
         }
         if ($newValue === 0 && $oldValue !== 0) {
             $query = self::generateQuery($query, withDeleted: true);
             $query->limit(1);
-            self::editSchemaEntity($query, null, [ $column => 1 ]);
+            self::editSchemaEntity($query, [ $column => 1 ]);
             return true;
         }
         return false;
@@ -631,7 +613,10 @@ class Schema {
      * @param bool                      $withDeleted Optional.
      * @return Query
      */
-    private static function generateQueryID(QueryLike|Enum|int|string $queryOrID, bool $withDeleted = true): Query {
+    private static function generateQueryID(
+        QueryLike|Enum|int|string $queryOrID,
+        bool $withDeleted = true,
+    ): Query {
         if ($queryOrID instanceof QueryLike) {
             $query = $queryOrID->getQuery();
             return self::generateQuery($query, $withDeleted);
@@ -654,7 +639,10 @@ class Schema {
      * @param Request|null   $sort  Optional.
      * @return Query
      */
-    private static function generateQuerySort(?QueryLike $query = null, ?Request $sort = null): Query {
+    private static function generateQuerySort(
+        ?QueryLike $query = null,
+        ?Request $sort = null,
+    ): Query {
         $query = self::generateQuery($query);
 
         if ($sort !== null) {
@@ -676,7 +664,10 @@ class Schema {
      * @param bool           $withDeleted Optional.
      * @return Query
      */
-    private static function generateQuery(?QueryLike $query = null, bool $withDeleted = true): Query {
+    private static function generateQuery(
+        ?QueryLike $query = null,
+        bool $withDeleted = true,
+    ): Query {
         if ($query === null) {
             $query = Query::select(static::$tableName);
         } else {

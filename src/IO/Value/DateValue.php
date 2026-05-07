@@ -6,6 +6,7 @@ use Framework\IO\Value\Value;
 use Framework\IO\Value\ValueInterface;
 use Framework\Date\Date;
 use Framework\Date\DateUtils;
+use Framework\Date\Type\DateType;
 use Framework\Date\Type\DateFormat;
 
 /**
@@ -21,17 +22,26 @@ class DateValue extends Value implements ValueInterface {
 
     /**
      * Creates a new DateValue instance
-     * @param Request $request
-     * @param string  $dateKey
-     * @param string  $hourKey
+     * @param Request  $request
+     * @param string   $dateKey
+     * @param string   $hourKey
+     * @param DateType $dateType Optional.
      */
-    public function __construct(Request $request, string $dateKey, string $hourKey) {
+    public function __construct(
+        Request $request,
+        string $dateKey,
+        string $hourKey,
+        DateType $dateType = DateType::None,
+    ) {
         parent::__construct($request, $dateKey);
         if ($hourKey !== "") {
             $this->value = $request->toTimeHour($dateKey, $hourKey);
+        } elseif ($dateType !== DateType::None) {
+            $this->value = $request->toDayMoment($dateKey, $dateType);
         } else {
             $this->value = $request->toDate($dateKey);
         }
+
         $this->date = $request->getString($dateKey);
         $this->hour = $request->getString($hourKey);
     }
@@ -89,11 +99,11 @@ class DateValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns the value for the database
+     * Returns the value for database storage
      * @return int
      */
     #[\Override]
-    public function getValue(): int {
+    public function toDatabase(): int {
         return $this->value->toTime();
     }
 

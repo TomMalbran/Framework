@@ -1,11 +1,9 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\IO\Request;
 use Framework\Database\SchemaModel;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Date\Date;
-use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
 /**
@@ -81,59 +79,12 @@ class ModificationBuilder {
 
     /**
      * Adds all the Fields
-     * @param Request|null             $request
-     * @param array<string,QueryValue> $fields    Optional.
-     * @param bool                     $skipEmpty Optional.
-     * @param bool                     $skipUnset Optional.
+     * @param array<string,QueryValue> $fields
      * @return ModificationBuilder
      */
-    public function addFields(
-        ?Request $request,
-        array $fields = [],
-        bool $skipEmpty = false,
-        bool $skipUnset = false,
-    ): ModificationBuilder {
-        if ($request !== null) {
-            $this->builder->fields($this->parseFields($request, $skipEmpty, $skipUnset));
-        }
-        if (count($fields) > 0) {
-            $this->builder->fields($fields);
-        }
+    public function addFields(array $fields): ModificationBuilder {
+        $this->builder->fields($fields);
         return $this;
-    }
-
-    /**
-     * Parses the data and returns the fields
-     * @param Request $request
-     * @param bool    $skipEmpty Optional.
-     * @param bool    $skipUnset Optional.
-     * @return array<string,QueryValue>
-     */
-    private function parseFields(Request $request, bool $skipEmpty = false, bool $skipUnset = false): array {
-        $result = [];
-        foreach ($this->schemaModel->fields as $field) {
-            if ($skipUnset && !$request->exists($field->name)) {
-                continue;
-            }
-
-            $value = $field->getValue($request);
-            if ($value === null || ($skipEmpty && Arrays::isEmpty($value))) {
-                continue;
-            }
-
-            if ($field->noExists) {
-                if ($request->exists($field->name)) {
-                    $result[$field->dbName] = $value;
-                }
-            } elseif ($field->noEmpty) {
-                if (!Arrays::isEmpty($value)) {
-                    $result[$field->dbName] = $value;
-                }
-            } elseif ($value !== null) {
-                $result[$field->dbName] = $value;
-            }
-        }
-        return $result;
     }
 
     /**

@@ -80,11 +80,11 @@ class EnumValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns the value for the database
+     * Returns the value for database storage
      * @return string
      */
     #[\Override]
-    public function getValue(): string {
+    public function toDatabase(): string {
         return $this->value;
     }
 

@@ -115,7 +115,7 @@ class QueryBuilder {
         // Convert a Value to an integer or string
         } elseif ($value instanceof Value) {
             if ($value->exists()) {
-                $this->fields[$field] = $value->getValue();
+                $this->fields[$field] = $value->toDatabase();
             }
 
         // Convert any Enum to a string

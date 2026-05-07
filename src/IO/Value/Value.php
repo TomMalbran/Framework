@@ -2,6 +2,7 @@
 namespace Framework\IO\Value;
 
 use Framework\IO\Request;
+use Framework\Database\Query\Assign;
 use Framework\Utils\Strings;
 
 /**
@@ -50,10 +51,10 @@ class Value {
     }
 
     /**
-     * Returns the value as string
-     * @return string|int
+     * Returns the value for database storage
+     * @return Assign|string|int
      */
-    public function getValue(): string|int {
+    public function toDatabase(): Assign|string|int {
         return $this->raw;
     }
 

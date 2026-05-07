@@ -196,7 +196,6 @@ class SchemaModel {
             $this->extraFields[] = Field::create(
                 type:     FieldType::String,
                 name:     "status",
-                noEmpty:  true,
                 isKey:    true,
                 isStatus: true,
             );

@@ -78,11 +78,11 @@ class NumberValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns the value
+     * Returns the value for database storage
      * @return int
      */
     #[\Override]
-    public function getValue(): int {
+    public function toDatabase(): int {
         return $this->value;
     }
 

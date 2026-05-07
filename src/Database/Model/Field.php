@@ -1,13 +1,10 @@
 <?php
 namespace Framework\Database\Model;
 
-use Framework\IO\Request;
 use Framework\Database\SchemaModel;
-use Framework\Database\Query\Assign;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Model\FieldType;
 use Framework\File\FilePath;
-use Framework\System\Config;
 use Framework\System\Path;
 use Framework\Date\Type\DateType;
 use Framework\Utils\Arrays;
@@ -102,13 +99,6 @@ class Field {
     public string $hourInput = "";
 
 
-    // Skip empty values when parsing from Request.
-    public bool $noEmpty = false;
-
-    // Skip non-existing values when parsing from Request.
-    public bool $noExists = false;
-
-
     /**
      * The Field Attribute
      * @param bool              $isID       Optional.
@@ -132,8 +122,6 @@ class Field {
      * @param DateType          $dateType   Optional.
      * @param string            $dateInput  Optional.
      * @param string            $hourInput  Optional.
-     * @param bool              $noEmpty    Optional.
-     * @param bool              $noExists   Optional.
      */
     public function __construct(
         bool $isID = false,
@@ -157,8 +145,6 @@ class Field {
         DateType $dateType = DateType::None,
         string $dateInput = "",
         string $hourInput = "",
-        bool $noEmpty = false,
-        bool $noExists = false,
     ) {
         $this->isID       = $isID;
         $this->notAutoInc = $notAutoInc;
@@ -191,10 +177,6 @@ class Field {
         $this->dateType  = $dateType;
         $this->dateInput = $dateInput;
         $this->hourInput = $hourInput;
-
-        // Request parsing
-        $this->noEmpty   = $noEmpty;
-        $this->noExists  = $noExists;
     }
 
 
@@ -220,12 +202,7 @@ class Field {
      * @param int       $length     Optional.
      * @param bool      $isSigned   Optional.
      * @param int       $decimals   Optional.
-     * @param DateType  $dateType   Optional.
-     * @param string    $dateInput  Optional.
-     * @param string    $hourInput  Optional.
      * @param string    $filePath   Optional.
-     * @param bool      $noEmpty    Optional.
-     * @param bool      $noExists   Optional.
      * @param bool      $isStatus   Optional.
      * @return Field
      */
@@ -240,12 +217,7 @@ class Field {
         int $length = 0,
         bool $isSigned = false,
         int $decimals = 2,
-        DateType $dateType = DateType::None,
-        string $dateInput = "",
-        string $hourInput = "",
         string $filePath = "",
-        bool $noEmpty = false,
-        bool $noExists = false,
         bool $isStatus = false,
     ): Field {
         $result = new self(
@@ -255,12 +227,7 @@ class Field {
             length:    $length,
             isSigned:  $isSigned,
             decimals:  $decimals,
-            dateType:  $dateType,
-            dateInput: $dateInput,
-            hourInput: $hourInput,
             filePath:  $filePath,
-            noEmpty:   $noEmpty,
-            noExists:  $noExists,
         );
 
         $result->type       = $type;
@@ -434,54 +401,6 @@ class Field {
     }
 
     /**
-     * Returns the Field Value from the given Request
-     * @param Request $request
-     * @return QueryValue|null
-     */
-    public function getValue(Request $request): mixed {
-        if ($this->isAutoInc()) {
-            return null;
-        }
-
-        return match ($this->type) {
-            FieldType::None     => "",
-
-            FieldType::Date     => $this->getDateValue($request),
-            FieldType::Enum     => $request->getString($this->name),
-            FieldType::JSON,
-            FieldType::Array    => $request->toJSON($this->name),
-
-            FieldType::Boolean  => $request->toBinary($this->name),
-            FieldType::Number   => $request->getInt($this->name),
-            FieldType::Float    => $request->toInt($this->name, $this->decimals),
-
-            FieldType::String,
-            FieldType::Text,
-            FieldType::LongText => $request->getString($this->name),
-            FieldType::Encrypt  => Assign::encrypt($request->getString($this->name), Config::getDbKey()),
-            FieldType::File     => $request->getString($this->name),
-        };
-    }
-
-    /**
-     * Returns the Date Field Value from the given Request
-     * @param Request $request
-     * @return int
-     */
-    private function getDateValue(Request $request): int {
-        $result = 0;
-        if ($this->dateInput !== "" && $this->hourInput !== "") {
-            $result = $request->toTimeHour($this->dateInput, $this->hourInput, useTimeZone: true)->toTime();
-        } elseif ($this->dateInput !== "") {
-            $dateType = $this->dateType !== DateType::None ? $this->dateType : DateType::Start;
-            $result   = $request->toDayMoment($this->dateInput, $dateType, useTimeZone: true)->toTime();
-        } else {
-            $result = $request->getInt($this->name);
-        }
-        return $result;
-    }
-
-    /**
      * Returns the Field Values from the given Data
      * @param array<string,mixed> $data
      * @return array<string,int|string|float|bool|array<int|string,mixed>>
@@ -545,23 +464,8 @@ class Field {
         if ($this->decimals !== 2) {
             $result["decimals"] = $this->decimals;
         }
-        if ($this->dateType !== DateType::None) {
-            $result["dateType"] = $this->dateType;
-        }
-        if ($this->dateInput !== "") {
-            $result["dateInput"] = $this->dateInput;
-        }
-        if ($this->hourInput !== "") {
-            $result["hourInput"] = $this->hourInput;
-        }
         if ($this->filePath !== "") {
             $result["filePath"] = $this->filePath;
-        }
-        if ($this->noEmpty) {
-            $result["noEmpty"] = $this->noEmpty;
-        }
-        if ($this->noExists) {
-            $result["noExists"] = $this->noExists;
         }
         return $result;
     }

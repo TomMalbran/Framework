@@ -4,6 +4,8 @@ namespace Framework\IO\Value;
 use Framework\IO\Request;
 use Framework\IO\Value\Value;
 use Framework\IO\Value\ValueInterface;
+use Framework\Database\Query\Assign;
+use Framework\System\Config;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 use Framework\Utils\URL;
@@ -16,16 +18,19 @@ use Framework\Utils\Utils;
 class StringValue extends Value implements ValueInterface {
 
     private string $value;
+    private bool $isEncrypted;
 
 
     /**
      * Creates a new StringValue instance
      * @param Request $request
      * @param string  $key
+     * @param bool    $isEncrypted Optional.
      */
-    public function __construct(Request $request, string $key) {
+    public function __construct(Request $request, string $key, bool $isEncrypted = false) {
         parent::__construct($request, $key);
-        $this->value = $request->getString($key);
+        $this->value       = $request->getString($key);
+        $this->isEncrypted = $isEncrypted;
     }
 
     /**
@@ -81,11 +86,14 @@ class StringValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns the value for the database
-     * @return string
+     * Returns the value for database storage
+     * @return Assign|string
      */
     #[\Override]
-    public function getValue(): string {
+    public function toDatabase(): Assign|string {
+        if ($this->isEncrypted) {
+            return Assign::encrypt($this->value, Config::getDbKey());
+        }
         return $this->value;
     }
 

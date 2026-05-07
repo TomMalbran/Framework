@@ -40,22 +40,22 @@ class CredentialModel {
     #[Field, Requested]
     public string $email = "";
 
-    #[Field(noExists: true), Requested]
+    #[Field, Requested]
     public string $phone = "";
 
     #[Field, Requested]
     public string $language = "";
 
-    #[Field(noExists: true, isText: true), Requested]
+    #[Field(isText: true), Requested]
     public string $observations = "";
 
-    #[Field(noExists: true), Requested]
+    #[Field, Requested]
     public bool $sendEmails = false;
 
-    #[Field(noExists: true), Requested]
+    #[Field, Requested]
     public bool $sendEmailNotis = false;
 
-    #[Field(noExists: true), Requested]
+    #[Field, Requested]
     public bool $sendTickets = false;
 
     #[Field(isSigned: true), Requested]

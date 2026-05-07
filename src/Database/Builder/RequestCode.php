@@ -4,6 +4,7 @@ namespace Framework\Database\Builder;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
 use Framework\Builder\Builder;
+use Framework\Date\Type\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -109,31 +110,36 @@ class RequestCode {
      */
     private static function getProperties(SchemaModel $schemaModel): array {
         $result = [];
-        foreach ($schemaModel->requestedFields as $field) {
-            if (!$field->hasValue) {
+        foreach ($schemaModel->requestedFields as $requested) {
+            if (!$requested->hasValue) {
                 continue;
             }
 
-            $type = self::getValueType($field->type);
+            $type = self::getValueType($requested->type);
             if ($type === "") {
                 continue;
             }
 
-            $value = $field->name;
-            if ($field->dateInput !== "") {
-                $value = $field->dateInput;
+            $value = $requested->name;
+            if ($requested->dateInput !== "") {
+                $value = $requested->dateInput;
             }
 
             $extras = "";
-            if ($field->type === FieldType::Float) {
-                $extras = ", {$field->decimals}";
-            } elseif ($field->type === FieldType::Date) {
-                $extras = ", \"{$field->hourInput}\"";
+            if ($requested->type === FieldType::Float) {
+                $extras = ", {$requested->decimals}";
+            } elseif ($requested->type === FieldType::Date) {
+                $extras = ", \"{$requested->hourInput}\"";
+                if ($requested->dateType !== DateType::None) {
+                    $extras .= ", DateType::{$requested->dateType->toString()}";
+                }
+            } elseif ($requested->type === FieldType::Encrypt) {
+                $extras = ", true";
             }
 
             $result[] = [
                 "type"   => $type,
-                "name"   => $field->name,
+                "name"   => $requested->name,
                 "value"  => $value,
                 "extras" => $extras,
             ];
@@ -148,9 +154,9 @@ class RequestCode {
      */
     private static function getDictionaries(SchemaModel $schemaModel): array {
         $result = [];
-        foreach ($schemaModel->requestedFields as $field) {
-            if ($field->isDictionary()) {
-                $result[] = $field->name;
+        foreach ($schemaModel->requestedFields as $requested) {
+            if ($requested->isDictionary()) {
+                $result[] = $requested->name;
             }
         }
         return $result;
@@ -168,9 +174,12 @@ class RequestCode {
         if ($schemaModel->hasID && $schemaModel->idType === FieldType::Enum) {
             $result[$schemaModel->idEnumClass] = 1;
         }
-        foreach ($schemaModel->requestedFields as $field) {
-            if ($field->isNative && $field->type === FieldType::Enum) {
-                $result[$field->enumClass] = 1;
+        foreach ($schemaModel->requestedFields as $requested) {
+            if ($requested->isNative && $requested->type === FieldType::Enum) {
+                $result[$requested->enumClass] = 1;
+            }
+            if ($requested->dateType !== DateType::None) {
+                $result[DateType::class] = 1;
             }
         }
         return array_keys($result);

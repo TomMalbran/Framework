@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Database\Model;
 
+use Framework\Date\Type\DateType;
+
 use Attribute;
 
 /**
@@ -43,6 +45,7 @@ class Requested {
     public bool      $isField   = false;
     public bool      $hasValue  = false;
     public string    $enumClass = "";
+    public DateType  $dateType  = DateType::None;
     public string    $dateInput = "";
     public string    $hourInput = "";
     public int       $decimals  = 0;
@@ -88,6 +91,7 @@ class Requested {
         $this->type      = $field->type;
 
         $this->enumClass = $field->enumClass;
+        $this->dateType  = $field->dateType;
         $this->dateInput = $field->dateInput;
         $this->hourInput = $field->hourInput;
         $this->decimals  = $field->decimals;

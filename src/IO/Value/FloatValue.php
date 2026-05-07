@@ -81,11 +81,11 @@ class FloatValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns the value for the database
+     * Returns the value for database storage
      * @return int
      */
     #[\Override]
-    public function getValue(): int {
+    public function toDatabase(): int {
         return Numbers::toInt($this->value, $this->decimals);
     }
 
