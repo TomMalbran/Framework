@@ -385,22 +385,32 @@ class SchemaCode {
 
             case ValidateType::Number:
                 $validation = [
-                    "isNumber"        => true,
-                    "isRequired"      => $validate->isRequired,
-                    "isUnique"        => $validate->isUnique,
-                    "emptySuffix"     => $validate->isUnique || $validate->isNumeric,
-                    "typeOf"          => Strings::substringAfter($validate->typeOf, "\\"),
-                    "typeExistsError" => $validate->getTypeExistsError(),
-                    "belongsTo"       => Strings::substringAfter($validate->belongsTo, "\\"),
-                    "belongsToError"  => $validate->getBelongsToError(),
-                    "method"          => $validate->method,
-                    "withParent"      => $validate->withParent,
-                    "isNumeric"       => $validate->typeOf === "" && $validate->belongsTo === "",
-                    "validFunc"       => $validate->isNumeric ? "isValidNumber" : "isValid",
-                    "invalidPrefix"   => $validate->isRequired,
-                    "numericParams"   => $validate->getNumericParams(),
-                    "fieldName"       => $validate->name,
-                    "fieldError"      => $validate->getFieldError(),
+                    "isNumber"       => true,
+                    "isRequired"     => $validate->isRequired,
+                    "isUnique"       => $validate->isUnique,
+                    "emptySuffix"    => $validate->isUnique || $validate->isNumeric,
+                    "typeOf"         => Strings::substringAfter($validate->typeOf, "\\"),
+                    "typeOfError"    => $validate->getTypeOfError(),
+                    "belongsTo"      => Strings::substringAfter($validate->belongsTo, "\\"),
+                    "belongsToError" => $validate->getBelongsToError(),
+                    "method"         => $validate->method,
+                    "withParent"     => $validate->withParent,
+                    "isNumeric"      => $validate->typeOf === "" && $validate->belongsTo === "",
+                    "validFunc"      => $validate->isNumeric ? "isValidNumber" : "isValid",
+                    "invalidPrefix"  => $validate->isRequired || $validate->greaterThan !== "",
+                    "numericParams"  => $validate->getNumericParams(),
+                    "greaterThan"    => $validate->greaterThan,
+                    "fieldName"      => $validate->name,
+                    "fieldError"     => $validate->getFieldError(),
+                ];
+                break;
+
+            case ValidateType::Price:
+                $validation = [
+                    "isPrice"    => true,
+                    "isRequired" => $validate->isRequired,
+                    "fieldName"  => $validate->name,
+                    "fieldError" => $validate->getFieldError(),
                 ];
                 break;
 
@@ -426,7 +436,6 @@ class SchemaCode {
                 }
                 break;
 
-            case ValidateType::Price:
                 $validation = [
                     "isPrice"    => true,
                     "isRequired" => $validate->isRequired,

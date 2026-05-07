@@ -97,4 +97,16 @@ class NumberValue extends Value implements ValueInterface {
     public function isValid(?int $min = 1, ?int $max = null): bool {
         return Numbers::isValid($this->value, $min, $max);
     }
+
+    /**
+     * Returns true if the value is greater than the other value
+     * @param NumberValue $other
+     * @return bool
+     */
+    public function isGreaterThan(NumberValue $other): bool {
+        if (!$this->hasValue() || !$other->hasValue()) {
+            return true;
+        }
+        return $this->value > $other->get();
+    }
 }

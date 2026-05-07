@@ -208,7 +208,7 @@ class {{name}}Schema extends Schema {
         {{/isRequired}}
         {{#typeOf}}
             {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !{{typeOf}}::{{method}}($request->{{fieldName}}->get())) {
-            {{pads}}    $errors->{{fieldName}} = "{{typeExistsError}}";
+            {{pads}}    $errors->{{fieldName}} = "{{typeOfError}}";
         {{/typeOf}}
         {{#belongsTo}}
             {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !{{belongsTo}}::{{method}}($request->{{fieldName}}->get(){{#withParent}}{{parentsSecList}}{{/withParent}})) {
@@ -222,8 +222,17 @@ class {{name}}Schema extends Schema {
             {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}->get(){{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
+        {{#greaterThan}}
+            {{pads}}} elseif (!$request->{{fieldName}}->isGreaterThan($request->{{greaterThan}})) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_GREATER";
+        {{/greaterThan}}
             {{pads}}}
     {{/isNumber}}
+    {{#isPrice}}
+            {{pads}}if (!$request->{{fieldName}}->isValidPrice(0)) {
+            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}";
+            {{pads}}}
+    {{/isPrice}}
     {{#isDate}}
             {{pads}}if (!$request->{{fieldName}}->hasValue()) {
             {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_EMPTY";
@@ -240,11 +249,7 @@ class {{name}}Schema extends Schema {
             {{pads}}}
         {{/hasPeriod}}
     {{/isDate}}
-    {{#isPrice}}
-            {{pads}}if (!$request->{{fieldName}}->isValidPrice(0)) {
-            {{pads}}    $errors->{{fieldName}} = "{{fieldError}}";
             {{pads}}}
-    {{/isPrice}}
     {{#isStatus}}
             {{pads}}if (!{{statusClass}}::isValid($request->status->get())) {
             {{pads}}    $errors->status = "GENERAL_ERROR_STATUS";

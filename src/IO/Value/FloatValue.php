@@ -110,4 +110,16 @@ class FloatValue extends Value implements ValueInterface {
     public function isValidPrice(?int $min = 1, ?int $max = null): bool {
         return Numbers::isValidPrice($this->value, $min, $max);
     }
+
+    /**
+     * Returns true if the value is greater than the other value
+     * @param FloatValue $other
+     * @return bool
+     */
+    public function isGreaterThan(FloatValue $other): bool {
+        if (!$this->hasValue() || !$other->hasValue()) {
+            return true;
+        }
+        return $this->value > $other->get();
+    }
 }

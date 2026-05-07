@@ -63,6 +63,9 @@ class Validate {
     // The maximum value of a Number field.
     public int $maxValue = 0;
 
+    // A property indicating that this value should be greater than another field.
+    public string $greaterThan = "";
+
 
     // Used to use a different prefix for error messages.
     // NOTE: The default is to use the name of the Model in uppercase.
@@ -90,6 +93,7 @@ class Validate {
      * @param int               $maxLength   Optional.
      * @param int               $minValue    Optional.
      * @param int               $maxValue    Optional.
+     * @param string            $greaterThan Optional.
      * @param string            $prefix      Optional.
      * @param string            $belongsName Optional.
      */
@@ -108,6 +112,7 @@ class Validate {
         int $maxLength = 0,
         int $minValue = 0,
         int $maxValue = 0,
+        string $greaterThan = "",
         string $prefix = "",
         string $belongsName = "",
     ) {
@@ -127,6 +132,7 @@ class Validate {
         $this->maxLength   = $maxLength;
         $this->minValue    = $minValue;
         $this->maxValue    = $maxValue;
+        $this->greaterThan = $greaterThan;
 
         $this->prefix      = Strings::toConstantCase($prefix);
         $this->belongsName = Strings::toConstantCase($belongsName);
