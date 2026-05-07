@@ -138,7 +138,6 @@ class SchemaFactory {
                 $isFieldClass = FieldType::isValidClass($typeName);
                 $isPosition   = $fieldName === "position";
                 $isStatus     = $typeName === Status::class;
-                $isArray      = $typeName === "array";
                 $isEnum       = false;
                 $isModel      = false;
 
@@ -152,14 +151,14 @@ class SchemaFactory {
 
                 // Get the Attributes
                 $propAttributes = $prop->getAttributes();
-                $relation       = new Relation();
-                $subRequest     = null;
                 $field          = null;
                 $validate       = null;
                 $virtual        = null;
                 $requested      = null;
                 $expression     = null;
                 $count          = null;
+                $relation       = null;
+                $subRequest     = null;
 
                 foreach ($propAttributes as $propAttribute) {
                     try {
@@ -189,6 +188,7 @@ class SchemaFactory {
                 }
 
 
+
                 // POSITION: If the Name is Position, mark it in the Model.
                 if ($isPosition) {
                     $hasPositions = true;
@@ -206,33 +206,24 @@ class SchemaFactory {
                         $validates[] = $validate->setStatus();
                     }
 
-                // RELATION: If the type is a class representing a Model.
-                } elseif ($isModel) {
-                    $relationModelName = Strings::substringAfter($typeName, "\\");
-                    $relationModelName = Strings::stripEnd($relationModelName, "Model");
-                    $relation->setDataFromAttribute($relationModelName, $fieldName);
-                    $relation->parseRelationJoin();
-                    $relation->parseOwnerJoin();
-                    $relations[] = $relation;
+                // FIELD: Anything else is a Main Field and can have a Field attribute.
+                // VALIDATE: A Main Field can also have a Validate attribute.
+                } elseif ($field !== null) {
+                    $field->setData($fieldName, $typeName, $isEnum);
+
+                    $mainFields[] = $field;
+                    if ($validate !== null) {
+                        $validates[] = $validate->setField($field, $fantasyName);
+                    }
 
                 // VIRTUAL: If it has a Virtual attribute. It can be an array.
                 } elseif ($virtual !== null) {
                     $arrayType  = "";
                     $arrayClass = "";
-                    if ($isArray) {
+                    if ($typeName === "array") {
                         [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType($class, $prop);
                     }
                     $virtualFields[] = $virtual->setData($fieldName, $typeName, $arrayType, $arrayClass, $isEnum);
-
-                // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
-                } elseif ($isArray) {
-                    if ($subRequest === null) {
-                        $subRequest = new SubRequest();
-                    }
-                    [ $arrayType, $subModelName ] = self::getArrayType($class, $prop);
-                    if ($arrayType !== "" || $subModelName !== "") {
-                        $subRequests[] = $subRequest->setData($fieldName, $subModelName, $arrayType);
-                    }
 
                 // EXPRESSION: If it has an Expression attribute.
                 } elseif ($expression !== null) {
@@ -242,34 +233,37 @@ class SchemaFactory {
                 } elseif ($count !== null) {
                     $counts[] = $count->setData($fieldName);
 
-                // FIELD: Anything else is a Main Field and can have a Field attribute.
-                // VALIDATE: A Main Field can also have a Validate attribute.
-                } elseif ($field !== null || $validate !== null || $requested === null) {
-                    if ($field === null) {
-                        $field = new Field();
-                    }
-                    $field->setData($fieldName, $typeName, $isEnum);
+                // RELATION: If the type is a class representing a Model.
+                } elseif ($relation !== null) {
+                    $relationModelName = Strings::substringAfter($typeName, "\\");
+                    $relationModelName = Strings::stripEnd($relationModelName, "Model");
+                    $relation->setDataFromAttribute($relationModelName, $fieldName);
+                    $relation->parseRelationJoin();
+                    $relation->parseOwnerJoin();
+                    $relations[] = $relation;
 
-                    $mainFields[] = $field;
-                    if ($validate !== null) {
-                        $validates[] = $validate->setField($field, $fantasyName);
+                // SUB-REQUEST: If the type is an Array (No SubRequest attribute required).
+                } elseif ($subRequest !== null) {
+                    [ $arrayType, $subModelName ] = self::getArrayType($class, $prop);
+                    if ($arrayType !== "" || $subModelName !== "") {
+                        $subRequests[] = $subRequest->setData($fieldName, $subModelName, $arrayType);
                     }
                 }
 
 
-                // Add a Requested Field
-                if ($validate !== null || ($hasPositions && count($requestedFields) > 0)) {
+                // REQUESTED: Any property might also be Requested
+                if ($hasPositions && count($requestedFields) > 0) {
                     $requested = new Requested();
                 }
                 if ($requested !== null) {
-                    if ($field !== null) {
-                        $requestedFields[] = $requested->fromField($field, $validate !== null);
-                    } elseif ($subRequest !== null) {
-                        $requestedFields[] = $requested->fromSubRequest($subRequest);
-                    } elseif ($isStatus) {
+                    if ($isStatus) {
                         $requestedFields[] = $requested->fromStatus();
                     } elseif ($isPosition) {
                         $requestedFields[] = $requested->fromPosition();
+                    } elseif ($field !== null) {
+                        $requestedFields[] = $requested->fromField($field, $validate !== null);
+                    } elseif ($subRequest !== null) {
+                        $requestedFields[] = $requested->fromSubRequest($subRequest);
                     } else {
                         $requestedFields[] = $requested->setData($fieldName, $typeName, $isEnum);
                     }
