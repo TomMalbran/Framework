@@ -36,6 +36,22 @@ class BoolValue extends Value implements ValueInterface {
     }
 
     /**
+     * Sets the value to true
+     * @return void
+     */
+    public function setTrue(): void {
+        $this->set(value: true);
+    }
+
+    /**
+     * Sets the value to false
+     * @return void
+     */
+    public function setFalse(): void {
+        $this->set(value: false);
+    }
+
+    /**
      * Sets the value if the value is not empty
      * @param bool $value
      * @return void
