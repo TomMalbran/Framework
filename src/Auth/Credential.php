@@ -4,9 +4,9 @@ namespace Framework\Auth;
 use Framework\IO\Request;
 use Framework\IO\Search;
 use Framework\IO\Select;
-use Framework\Database\Query\Operator;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Auth\Schema\CredentialSchema;
+use Framework\Auth\Schema\CredentialRequest;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialColumn;
 use Framework\Auth\Schema\CredentialStatus;
@@ -26,45 +26,16 @@ use Framework\Utils\Utils;
 class Credential extends CredentialSchema {
 
     /**
-     * Creates an Access Query
-     * @param list<Access>|Access|null $access
-     * @param list<string>|string|null $filter Optional.
-     * @param int|string               $value  Optional.
-     * @return CredentialQuery
-     */
-    private static function createAccessQuery(
-        array|Access|null $access,
-        array|string|null $filter = null,
-        int|string $value = 1,
-    ): CredentialQuery {
-        $accesses = Access::fromList($access);
-        if (count($accesses) === 0) {
-            return new CredentialQuery();
-        }
-
-        $query = new CredentialQuery();
-        $query->access->in($accesses);
-
-        if (!Arrays::isEmpty($filter)) {
-            $filters = Arrays::toStrings($filter);
-            foreach ($filters as $key) {
-                $column = CredentialColumn::fromValue($key);
-                $query->where($column, Operator::Equal, $value);
-            }
-        }
-        return $query;
-    }
-
-
-
-    /**
      * Returns the Credential with the given ID
      * @param int  $credentialID
      * @param bool $complete     Optional.
      * @return CredentialEntity
      */
     #[\Override]
-    public static function getByID(int $credentialID, bool $complete = false): CredentialEntity {
+    public static function getByID(
+        int $credentialID,
+        bool $complete = false,
+    ): CredentialEntity {
         $query = new CredentialQuery();
         $query->credentialID->equal($credentialID);
         return self::getCredential($query, $complete);
@@ -76,7 +47,10 @@ class Credential extends CredentialSchema {
      * @param bool   $complete Optional.
      * @return CredentialEntity
      */
-    public static function getByEmail(string $email, bool $complete = true): CredentialEntity {
+    public static function getByEmail(
+        string $email,
+        bool $complete = true,
+    ): CredentialEntity {
         $query = new CredentialQuery();
         $query->email->equal($email);
         return self::getCredential($query, $complete);
@@ -98,65 +72,60 @@ class Credential extends CredentialSchema {
         return self::getCredential($query, $complete);
     }
 
+    /**
+     * Requests a single row from the database
+     * @param CredentialQuery|null $query    Optional.
+     * @param bool                 $complete Optional.
+     * @return CredentialEntity
+     */
+    private static function getCredential(
+        ?CredentialQuery $query = null,
+        bool $complete = false,
+    ): CredentialEntity {
+        $list = self::getCredentials($query, null, $complete);
+        if (isset($list[0])) {
+            return $list[0];
+        }
+        return new CredentialEntity();
+    }
+
 
 
     /**
      * Returns true if there is a Credential with the given ID and Access(s)
-     * @param int                      $credentialID
-     * @param list<Access>|Access      $access
-     * @param list<string>|string|null $filter       Optional.
-     * @param int|string               $value        Optional.
+     * @param int                  $credentialID
+     * @param CredentialQuery|null $query        Optional.
      * @return bool
      */
-    public static function existsWithAccess(
+    #[\Override]
+    public static function exists(
         int $credentialID,
-        array|Access $access,
-        array|string|null $filter = null,
-        int|string $value = 1,
+        ?CredentialQuery $query = null,
     ): bool {
-        $query = self::createAccessQuery($access, $filter, $value);
-        if ($query->isEmpty()) {
-            return false;
+        if ($query === null) {
+            $query = new CredentialQuery();
         }
-
-        $query = new CredentialQuery();
         $query->credentialID->equal($credentialID);
         return self::entityExists($query);
     }
 
     /**
      * Returns true if there is a Credential with the given Email
-     * @param string                   $email
-     * @param int                      $skipID Optional.
-     * @param list<Access>|Access|null $access Optional.
+     * @param string               $email
+     * @param int                  $skipID Optional.
+     * @param CredentialQuery|null $query  Optional.
      * @return bool
      */
     public static function emailExists(
         string $email,
         int $skipID = 0,
-        array|Access|null $access = null,
+        ?CredentialQuery $query = null,
     ): bool {
-        $query = self::createAccessQuery($access);
+        if ($query === null) {
+            $query = new CredentialQuery();
+        }
         $query->email->equal($email);
         $query->credentialID->notEqual($skipID);
-        return self::entityExists($query);
-    }
-
-    /**
-     * Returns true if there is a Credential with the given Value for the given Field
-     * @param CredentialColumn $column
-     * @param int|string       $value
-     * @param int              $skipID Optional.
-     * @return bool
-     */
-    public static function fieldExists(
-        CredentialColumn $column,
-        int|string $value,
-        int $skipID = 0,
-    ): bool {
-        $query = new CredentialQuery();
-        $query->where($column, Operator::Equal, $value);
-        $query->credentialID->notEqualIf($skipID);
         return self::entityExists($query);
     }
 
@@ -164,156 +133,15 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials
-     * @param Request|null         $sort  Optional.
-     * @param CredentialQuery|null $query Optional.
+     * @param CredentialQuery $query
+     * @param Request|null    $sort  Optional.
      * @return list<CredentialEntity>
      */
-    public static function getAll(?Request $sort = null, ?CredentialQuery $query = null): array {
-        return self::getCredentials($query, $sort, complete: false);
-    }
-
-    /**
-     * Returns all the Credentials for the given Access(s)
-     * @param list<Access>|Access $access
-     * @param Request|null        $sort   Optional.
-     * @return list<CredentialEntity>
-     */
-    public static function getAllForAccess(array|Access $access, ?Request $sort = null): array {
-        $query = self::createAccessQuery($access);
-        if ($query->isEmpty()) {
-            return [];
-        }
-
-        return self::getCredentials($query, $sort, complete: false);
-    }
-
-    /**
-     * Returns all the Credentials for the given IDs
-     * @param list<int>    $credentialIDs
-     * @param Request|null $sort          Optional.
-     * @return list<CredentialEntity>
-     */
-    public static function getAllWithIDs(array $credentialIDs, ?Request $sort = null): array {
-        if (count($credentialIDs) === 0) {
-            return [];
-        }
-
-        $query = new CredentialQuery();
-        $query->credentialID->in($credentialIDs);
-        return self::getCredentials($query, $sort, complete: false);
-    }
-
-    /**
-     * Returns all the Credentials for the given Access(s) and filter
-     * @param list<Access>|Access $access
-     * @param string              $filter
-     * @param int|string          $value  Optional.
-     * @param Request|null        $sort   Optional.
-     * @return list<CredentialEntity>
-     */
-    public static function getAllWithFilter(
-        array|Access $access,
-        string $filter,
-        int|string $value = 1,
+    public static function getList(
+        CredentialQuery $query,
         ?Request $sort = null,
     ): array {
-        $query = self::createAccessQuery($access, $filter, $value);
-        if ($query->isEmpty()) {
-            return [];
-        }
-
         return self::getCredentials($query, $sort, complete: false);
-    }
-
-    /**
-     * Returns all the Credentials for the given Access(s)
-     * @param list<Access>|Access $access
-     * @param Request|null        $sort   Optional.
-     * @return list<CredentialEntity>
-     */
-    public static function getActiveForAccess(
-        array|Access $access,
-        ?Request $sort = null,
-    ): array {
-        $query = self::createAccessQuery($access);
-        if ($query->isEmpty()) {
-            return [];
-        }
-
-        $query->status->equal(CredentialStatus::Active);
-        return self::getCredentials($query, $sort, complete: false);
-    }
-
-    /**
-     * Returns the latest Credentials for the given Access(s)
-     * @param list<Access>|Access $access
-     * @param int                 $amount
-     * @param string|null         $filter Optional.
-     * @param int|string          $value  Optional.
-     * @return list<CredentialEntity>
-     */
-    public static function getLatestForAccess(
-        array|Access $access,
-        int $amount,
-        ?string $filter = null,
-        int|string $value = 1,
-    ): array {
-        $query = self::createAccessQuery($access, $filter, $value);
-        if ($query->isEmpty()) {
-            return [];
-        }
-
-        $query->createdTime->orderByDesc();
-        $query->limit($amount);
-        return self::getCredentials($query, null, complete: false);
-    }
-
-    /**
-     * Returns the created times for all the Credentials with the given Access
-     * @param Date        $fromTime
-     * @param Access|null $access   Optional.
-     * @return array<int,Date>
-     */
-    public static function getAllCreateTimes(Date $fromTime, ?Access $access = null): array {
-        $query = self::createAccessQuery($access);
-        $query->createdTime->greaterOrEqual($fromTime);
-
-        $list   = self::getEntityList($query);
-        $result = [];
-
-        foreach ($list as $elem) {
-            $result[$elem->credentialID] = $elem->createdTime;
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the total amount of Credentials
-     * @param CredentialQuery|null $query Optional.
-     * @return int
-     */
-    public static function getTotalForQuery(?CredentialQuery $query = null): int {
-        return self::getEntityTotal($query);
-    }
-
-    /**
-     * Returns the total amount of Credentials for the given Access(s)
-     * @param list<Access>|Access $access
-     * @param string|null         $filter Optional.
-     * @param int|string          $value  Optional.
-     * @return int
-     */
-    public static function getTotalForAccess(
-        array|Access $access,
-        ?string $filter = null,
-        int|string $value = 1,
-    ): int {
-        $query = self::createAccessQuery($access, $filter, $value);
-        if ($query->isEmpty()) {
-            return 0;
-        }
-
-        return self::getEntityTotal($query);
     }
 
     /**
@@ -350,119 +178,24 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Requests a single row from the database
-     * @param CredentialQuery|null $query    Optional.
-     * @param bool                 $complete Optional.
-     * @return CredentialEntity
+     * Returns the total amount of Credentials
+     * @param CredentialQuery $query
+     * @return int
      */
-    private static function getCredential(
-        ?CredentialQuery $query = null,
-        bool $complete = false,
-    ): CredentialEntity {
-        $list = self::getCredentials($query, null, $complete);
-        if (isset($list[0])) {
-            return $list[0];
-        }
-        return new CredentialEntity();
+    public static function getTotal(CredentialQuery $query): int {
+        return self::getEntityTotal($query);
     }
 
 
 
     /**
-     * Returns a select of all the Credentials
+     * Returns a select of Credentials for the given Query
+     * @param CredentialQuery $query
      * @return list<Select>
      */
-    public static function getSelect(): array {
-        return self::requestSelect();
-    }
-
-    /**
-     * Returns a select of Credentials for the given Access(s)
-     * @param list<Access>|Access      $access
-     * @param list<string>|string|null $filter Optional.
-     * @param int|string               $value  Optional.
-     * @return list<Select>
-     */
-    public static function getSelectForAccess(
-        array|Access $access,
-        array|string|null $filter = null,
-        int|string $value = 1,
-    ): array {
-        $query = self::createAccessQuery($access, $filter, $value);
-        if ($query->isEmpty()) {
-            return [];
-        }
-
-        $query->access->orderByDesc();
-        return self::requestSelect($query);
-    }
-
-    /**
-     * Returns a select of Credentials with the given IDs
-     * @param list<int> $credentialIDs
-     * @return list<Select>
-     */
-    public static function getSelectForIDs(array $credentialIDs): array {
-        if (count($credentialIDs) === 0) {
-            return [];
-        }
-
-        $query = new CredentialQuery();
-        $query->credentialID->in($credentialIDs);
-        $query->firstName->orderByAsc();
-        return self::requestSelect($query);
-    }
-
-    /**
-     * Returns the Credentials that contains the text and the given Accesses
-     * @param string                   $text
-     * @param int                      $amount       Optional.
-     * @param list<Access>|Access|null $access       Optional.
-     * @param list<int>|int|null       $credentialID Optional.
-     * @param bool                     $withEmail    Optional.
-     * @param bool                     $splitValue   Optional.
-     * @return list<Search>
-     */
-    public static function search(
-        string $text,
-        int $amount = 10,
-        array|Access|null $access = null,
-        array|int|null $credentialID = null,
-        bool $withEmail = true,
-        bool $splitValue = true,
-    ): array {
-        $query = self::createAccessQuery($access);
-        $query->search([
-            CredentialColumn::FirstName,
-            CredentialColumn::LastName,
-            CredentialColumn::Email,
-        ], $text, splitValue: $splitValue);
-
-        if ($credentialID !== null) {
-            $query->credentialID->in(Arrays::toInts($credentialID));
-        }
-        $query->limit($amount);
-
+    public static function getSelect(CredentialQuery $query): array {
         $list   = self::getEntityList($query);
         $result = [];
-        foreach ($list as $elem) {
-            $result[] = new Search(
-                $elem->credentialID,
-                self::getName($elem, $withEmail),
-            );
-        }
-        return $result;
-    }
-
-    /**
-     * Returns a select of Credentials under the given conditions
-     * @param CredentialQuery|null $query Optional.
-     * @return list<Select>
-     */
-    private static function requestSelect(?CredentialQuery $query = null): array {
-        $list   = self::getEntityList($query);
-        $result = [];
-
         foreach ($list as $elem) {
             $result[] = new Select(
                 $elem->credentialID,
@@ -473,26 +206,38 @@ class Credential extends CredentialSchema {
     }
 
     /**
-     * Returns a list of emails of the Credentials with the given Accesses
-     * @param list<Access>|Access      $access
-     * @param list<string>|string|null $filter Optional.
-     * @param int|string               $value  Optional.
-     * @return array<string,string>
+     * Returns the Credentials that contains the text and the given Accesses
+     * @param string               $text
+     * @param int                  $amount     Optional.
+     * @param CredentialQuery|null $query      Optional.
+     * @param bool                 $withEmail  Optional.
+     * @param bool                 $splitValue Optional.
+     * @return list<Search>
      */
-    public static function getEmailsForAccess(
-        array|Access $access,
-        array|string|null $filter = null,
-        int|string $value = 1,
+    public static function search(
+        string $text,
+        int $amount = 10,
+        ?CredentialQuery $query = null,
+        bool $withEmail = true,
+        bool $splitValue = true,
     ): array {
-        $query = self::createAccessQuery($access, $filter, $value);
-        if ($query->isEmpty()) {
-            return [];
+        if ($query === null) {
+            $query = new CredentialQuery();
         }
+        $query->search([
+            CredentialColumn::FirstName,
+            CredentialColumn::LastName,
+            CredentialColumn::Email,
+        ], $text, splitValue: $splitValue);
+        $query->limit($amount);
 
         $list   = self::getEntityList($query);
         $result = [];
         foreach ($list as $elem) {
-            $result[$elem->email] = $elem->language;
+            $result[] = new Search(
+                $elem->credentialID,
+                self::getName($elem, $withEmail),
+            );
         }
         return $result;
     }
@@ -546,59 +291,48 @@ class Credential extends CredentialSchema {
 
     /**
      * Creates a new Credential
-     * @param Request|null             $request       Optional.
-     * @param array<string,int|string> $fields        Optional.
-     * @param Access|null              $access        Optional.
-     * @param CredentialStatus|null    $status        Optional.
-     * @param bool|null                $reqPassChange Optional.
+     * @param CredentialRequest $request
      * @return int
      */
-    public static function create(
-        ?Request $request = null,
-        array $fields = [],
-        ?Access $access = null,
-        ?CredentialStatus $status = null,
-        ?bool $reqPassChange = null,
-    ): int {
-        $fields = self::parseFields($request, $fields, $access, $status, $reqPassChange);
-        $fields["lastLogin"]        = Date::now();
-        $fields["currentLogin"]     = Date::now();
-        $fields["askNotifications"] = 1;
-        return self::createSchemaEntity($request, $fields);
+    public static function create(CredentialRequest $request): int {
+        self::parseFields($request);
+        return self::createEntity(
+            $request,
+            lastLogin:        Date::now(),
+            currentLogin:     Date::now(),
+            askNotifications: true,
+        );
     }
 
     /**
      * Edits the given Credential
-     * @param int                      $credentialID
-     * @param Request|null             $request       Optional.
-     * @param array<string,int|string> $fields        Optional.
-     * @param Access|null              $access        Optional.
-     * @param CredentialStatus|null    $status        Optional.
-     * @param bool|null                $reqPassChange Optional.
-     * @param bool                     $skipEmpty     Optional.
+     * @param int               $credentialID
+     * @param CredentialRequest $request
      * @return bool
      */
-    public static function edit(
-        int $credentialID,
-        ?Request $request = null,
-        array $fields = [],
-        ?Access $access = null,
-        ?CredentialStatus $status = null,
-        ?bool $reqPassChange = null,
-        bool $skipEmpty = false,
-    ): bool {
-        $fields = self::parseFields($request, $fields, $access, $status, $reqPassChange);
-        return self::editSchemaEntity($credentialID, $request, $fields, skipEmpty: $skipEmpty);
+    public static function edit(int $credentialID, CredentialRequest $request): bool {
+        self::parseFields($request);
+        return self::editEntity($credentialID, $request);
     }
 
     /**
-     * Updates the given Credential
-     * @param int                      $credentialID
-     * @param array<string,QueryValue> $fields
-     * @return bool
+     * Parses the data and returns the fields
+     * @param CredentialRequest $request
+     * @return void
      */
-    public static function update(int $credentialID, array $fields): bool {
-        return self::editSchemaEntity($credentialID, fields: $fields);
+    private static function parseFields(CredentialRequest $request): void {
+        // Parse the Name
+        $firstName = $request->firstName->get();
+        $lastName  = $request->lastName->get();
+        $request->name->set(Strings::merge($firstName, $lastName));
+
+        // Parse the Password
+        $password = $request->password->get();
+        if ($password !== "") {
+            $hash = self::createHash($password);
+            $request->password->set($hash["password"]);
+            $request->salt->set($hash["salt"]);
+        }
     }
 
     /**
@@ -641,59 +375,6 @@ class Credential extends CredentialSchema {
             status:           CredentialStatus::Inactive,
             isDeleted:        true,
         );
-    }
-
-    /**
-     * Parses the data and returns the fields
-     * @param Request|null             $request       Optional.
-     * @param array<string,int|string> $fields        Optional.
-     * @param Access|null              $access        Optional.
-     * @param CredentialStatus|null    $status        Optional.
-     * @param bool|null                $reqPassChange Optional.
-     * @return array<string,int|string>
-     */
-    private static function parseFields(
-        ?Request $request = null,
-        array $fields = [],
-        ?Access $access = null,
-        ?CredentialStatus $status = null,
-        ?bool $reqPassChange = null,
-    ): array {
-        $result = $fields;
-
-        // Parse the Name
-        $firstName = isset($result["firstName"]) ? Strings::toString($result["firstName"]) : "";
-        $lastName  = isset($result["lastName"])  ? Strings::toString($result["lastName"])  : "";
-        if ($request !== null) {
-            $firstName = $request->getString("firstName");
-            $lastName  = $request->getString("lastName");
-        }
-        $result["name"] = Strings::merge($firstName, $lastName);
-
-        // Parse the Password
-        $password = "";
-        if ($request !== null) {
-            $password = $request->getString("password");
-        } elseif (isset($fields["password"])) {
-            $password = Strings::toString($fields["password"]);
-        }
-        if ($password !== "") {
-            $hash = self::createHash($password);
-            $result["password"] = $hash["password"];
-            $result["salt"]     = $hash["salt"];
-        }
-
-        // Parse the Access, Status and Request Password Change
-        if ($access !== null) {
-            $result["access"] = $access->toString();
-        }
-        if ($status !== null) {
-            $result["status"] = $status->toString();
-        }
-        if ($reqPassChange !== null) {
-            $result["reqPassChange"] = $reqPassChange ? 1 : 0;
-        }
-        return $result;
     }
 
 
