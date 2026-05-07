@@ -23,17 +23,24 @@ class LogQueryModel {
     #[Field(isText: true)]
     public string $expression = "";
 
+    #[Field]
     public string $environment = "";
 
+    #[Field]
     public int $amount = 0;
 
+    #[Field]
     public bool $isResolved = false;
 
+    #[Field]
     public int $elapsedTime = 0;
 
+    #[Field]
     public int $totalTime = 0;
 
+    #[Field]
     public ?Date $updatedTime = null;
 
+    #[Field]
     public int $updatedUser = 0;
 }

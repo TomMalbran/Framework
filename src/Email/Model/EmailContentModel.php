@@ -17,14 +17,19 @@ class EmailContentModel {
     #[Field(isID: true), Requested]
     public int $emailContentID = 0;
 
+    #[Field]
     public EmailCode $emailCode = EmailCode::None;
 
+    #[Field]
     public string $language = "";
 
+    #[Field]
     public string $languageName = "";
 
+    #[Field]
     public string $description = "";
 
+    #[Field]
     public string $subject = "";
 
     #[Field(isText: true)]

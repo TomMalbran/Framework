@@ -19,16 +19,22 @@ class LogErrorModel {
     #[Field(isID: true), Requested(isMultiID: true)]
     public int $logID = 0;
 
+    #[Field]
     public int $errorCode = 0;
 
+    #[Field]
     public string $errorText = "";
 
+    #[Field]
     public int $errorLevel = 0;
 
+    #[Field]
     public string $environment = "";
 
+    #[Field]
     public string $file = "";
 
+    #[Field]
     public int $line = 0;
 
     #[Field(isLongText: true)]
@@ -37,9 +43,12 @@ class LogErrorModel {
     #[Field(isLongText: true)]
     public string $backtrace = "";
 
+    #[Field]
     public int $amount = 0;
 
+    #[Field]
     public bool $isResolved = false;
 
+    #[Field]
     public ?Date $updatedTime = null;
 }

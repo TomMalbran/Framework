@@ -23,5 +23,6 @@ class SettingsModel {
     #[Field(isText: true)]
     public string $value = "";
 
+    #[Field]
     public VariableType $variableType = VariableType::None;
 }

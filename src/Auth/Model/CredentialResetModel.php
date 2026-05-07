@@ -19,7 +19,9 @@ class CredentialResetModel {
     #[Field(isPrimary: true)]
     public string $email = "";
 
+    #[Field]
     public string $resetCode = "";
 
+    #[Field]
     public ?Date $time = null;
 }

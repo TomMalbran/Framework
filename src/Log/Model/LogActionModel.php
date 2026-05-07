@@ -27,10 +27,13 @@ class LogActionModel {
     #[Field(isKey: true), Requested]
     public int $credentialID = 0;
 
+    #[Field]
     public int $currentUser = 0;
 
+    #[Field]
     public string $module = "";
 
+    #[Field]
     public string $action = "";
 
     #[Field(isText: true)]

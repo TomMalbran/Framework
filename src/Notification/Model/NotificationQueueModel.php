@@ -25,30 +25,43 @@ class NotificationQueueModel {
     #[Field(isID: true), Requested(isMultiID: true)]
     public int $notificationQueueID = 0;
 
+    #[Field]
     public int $credentialID = 0;
 
+    #[Field]
     public int $currentUser = 0;
 
+    #[Field]
     public string $title = "";
 
+    #[Field]
     public string $message = "";
 
+    #[Field]
     public string $url = "";
 
+    #[Field]
     public string $dataType = "";
 
+    #[Field]
     public int $dataID = 0;
 
+    #[Field]
     public NotificationResult $notificationResult = NotificationResult::None;
 
+    #[Field]
     public string $externalID = "";
 
+    #[Field]
     public ?JSON $playerIDs = null;
 
+    #[Field]
     public ?Date $sentTime = null;
 
+    #[Field]
     public bool $isRead = false;
 
+    #[Field]
     public bool $isDiscarded = false;
 
 

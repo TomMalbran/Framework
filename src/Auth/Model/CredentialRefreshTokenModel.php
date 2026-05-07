@@ -15,12 +15,15 @@ use Framework\Date\Date;
 )]
 class CredentialRefreshTokenModel {
 
+    #[Field]
     public int $credentialID = 0;
 
     #[Field(isPrimary: true)]
     public string $refreshToken = "";
 
+    #[Field]
     public string $userAgent = "";
 
+    #[Field]
     public ?Date $expirationTime = null;
 }

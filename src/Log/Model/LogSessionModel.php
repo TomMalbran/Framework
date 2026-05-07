@@ -23,12 +23,16 @@ class LogSessionModel {
     #[Field(isKey: true)]
     public int $credentialID = 0;
 
+    #[Field]
     public int $currentUser = 0;
 
+    #[Field]
     public string $ip = "";
 
+    #[Field]
     public string $userAgent = "";
 
+    #[Field]
     public bool $isOpen = false;
 
 

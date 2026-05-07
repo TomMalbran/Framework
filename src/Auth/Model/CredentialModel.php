@@ -24,8 +24,10 @@ class CredentialModel {
     #[Field(isID: true)]
     public int $credentialID = 0;
 
+    #[Field]
     public int $currentUser = 0;
 
+    #[Field, Requested]
     public string $name = "";
 
 
@@ -60,32 +62,46 @@ class CredentialModel {
     public int $timezone = 0;
 
 
+    #[Field]
     public string $avatar = "";
 
+    #[Field]
     public string $appearance = "";
 
+    #[Field, Requested]
     public Access $access = Access::None;
 
+    #[Field, Requested]
     public string $password = "";
 
+    #[Field, Requested]
     public string $salt = "";
 
+    #[Field, Requested]
     public bool $reqPassChange = false;
 
+    #[Field]
     public ?Date $passExpiration = null;
 
+    #[Field]
     public string $accessToken = "";
 
+    #[Field]
     public ?Date $tokenExpiration = null;
 
+    #[Field]
     public ?Date $currentLogin = null;
 
+    #[Field]
     public ?Date $lastLogin = null;
 
+    #[Field]
     public bool $askNotifications = true;
 
+    #[Field]
     public int $progressValue = 0;
 
+    #[Field, Requested]
     public Status $status = Status::None;
 
 

@@ -16,5 +16,6 @@ class CredentialSpamModel {
     #[Field(isPrimary: true)]
     public string $ip = "";
 
+    #[Field]
     public ?Date $time = null;
 }
