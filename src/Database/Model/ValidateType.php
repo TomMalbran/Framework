@@ -23,5 +23,6 @@ enum ValidateType implements Enum, JsonSerializable {
     case Date;
 
     case Enum;
+    case List;
     case Status;
 }

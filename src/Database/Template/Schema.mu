@@ -249,7 +249,21 @@ class {{name}}Schema extends Schema {
             {{pads}}}
         {{/hasPeriod}}
     {{/isDate}}
+    {{#isList}}
+            {{pads}}${{fieldName}} = $request->{{fieldName}}->toInts();
+            {{pads}}foreach (${{fieldName}} as $id) {
+            {{#typeOf}}
+                {{pads}}if (!{{typeOf}}::{{method}}($id)) {
+                {{pads}}    $errors->{{fieldName}} = "{{typeInvError}}";
+            {{/typeOf}}
+            {{#belongsTo}}
+                {{pads}}if (!{{belongsTo}}::{{method}}($id{{#withParent}}{{parentsSecList}}{{/withParent}})) {
+                {{pads}}    $errors->{{fieldName}} = "{{belongsToError}}";
+            {{/belongsTo}}
+            {{pads}}        break;
+            {{pads}}    }
             {{pads}}}
+    {{/isList}}
     {{#isStatus}}
             {{pads}}if (!{{statusClass}}::isValid($request->status->get())) {
             {{pads}}    $errors->status = "GENERAL_ERROR_STATUS";

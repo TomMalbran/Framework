@@ -436,11 +436,18 @@ class SchemaCode {
                 }
                 break;
 
+            case ValidateType::List:
                 $validation = [
-                    "isPrice"    => true,
-                    "isRequired" => $validate->isRequired,
-                    "fieldName"  => $validate->name,
-                    "fieldError" => $validate->getFieldError(),
+                    "isList"         => true,
+                    "isRequired"     => $validate->isRequired,
+                    "typeOf"         => Strings::substringAfter($validate->typeOf, "\\"),
+                    "typeInvError"   => $validate->getTypeInvalidError(),
+                    "belongsTo"      => Strings::substringAfter($validate->belongsTo, "\\"),
+                    "belongsToError" => $validate->getBelongsToError(forList: true),
+                    "method"         => $validate->method,
+                    "withParent"     => $validate->withParent,
+                    "fieldName"      => $validate->name,
+                    "fieldError"     => $validate->getFieldError(),
                 ];
                 break;
 

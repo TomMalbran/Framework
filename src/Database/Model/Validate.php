@@ -221,6 +221,9 @@ class Validate {
         if ($field->type->isString()) {
             return ValidateType::String;
         }
+        if ($field->type === FieldType::JSON) {
+            return ValidateType::List;
+        }
         return ValidateType::None;
     }
 
@@ -252,10 +255,10 @@ class Validate {
     }
 
     /**
-     * Gets the Type Exists Error string for this Validate
+     * Gets the TypeOf Error string for this Validate
      * @return string
      */
-    public function getTypeExistsError(): string {
+    public function getTypeOfError(): string {
         $typeName = Strings::substringAfter($this->typeOf, "\\");
         $prefix   = Strings::toConstantCase($typeName);
         return "{$prefix}_ERROR_EXISTS";
@@ -263,15 +266,18 @@ class Validate {
 
     /**
      * Gets the BelongsTo Error string for this Validate
+     * @param bool $forList Optional.
      * @return string
      */
-    public function getBelongsToError(): string {
+    public function getBelongsToError(bool $forList = false): string {
         $prefix = $this->belongsName;
         if ($prefix === "") {
             $belongsName = Strings::substringAfter($this->belongsTo, "\\");
             $prefix      = Strings::toConstantCase($belongsName);
         }
-        return "{$prefix}_ERROR_EXISTS";
+
+        $some = $forList ? "SOME_" : "";
+        return "{$prefix}_ERROR_{$some}EXISTS";
     }
 
     /**
