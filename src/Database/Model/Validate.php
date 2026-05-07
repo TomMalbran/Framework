@@ -5,6 +5,7 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Color;
+use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
 
 use Attribute;
@@ -313,13 +314,18 @@ class Validate {
         }
 
         $field = $parts[0];
+
         $value = trim(Strings::replace($parts[2], [ "'", '"'], ""));
-        $op    = match ($parts[1]) {
+        if (!Numbers::isValid($value) && $value !== "true" && $value !== "false") {
+            $value = "\"{$value}\"";
+        }
+
+        $op = match ($parts[1]) {
             "=", "==", "==="  => "===",
             "!=", "!==", "<>" => "!==",
-            default => "=",
+            default           => "===",
         };
 
-        return "if (\$request->{$field}->get() {$op} \"{$value}\") {";
+        return "if (\$request->{$field}->get() {$op} {$value}) {";
     }
 }
