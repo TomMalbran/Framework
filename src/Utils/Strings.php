@@ -865,14 +865,8 @@ class Strings {
         }
 
         if (self::isPascalCase($string) || self::isCamelCase($string)) {
-            $parts = preg_split('/(?=[A-Z])/', $string);
-            if ($parts === false) {
-                return strtoupper($string);
-            }
-
-            $result = implode("_", $parts);
+            $result = self::toSnakeCase($string);
             $result = strtoupper($result);
-            $result = self::stripStart($result, "_");
             return $result;
         }
 

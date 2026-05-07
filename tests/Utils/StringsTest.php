@@ -1040,10 +1040,12 @@ class StringsTest extends TestCase {
             "kebab_case" => [ "some-constant", "SOME_CONSTANT" ],
 
             // converts camelCase to CONSTANT_CASE
-            "camelCase" => [ "someConstant", "SOME_CONSTANT" ],
+            "camel_case" => [ "someConstant", "SOME_CONSTANT" ],
 
             // converts PascalCase to CONSTANT_CASE
-            "pascalCase" => [ "SomeConstant", "SOME_CONSTANT" ],
+            "pascal_case" => [ "SomeConstant", "SOME_CONSTANT" ],
+            "pascal_with_acronym_mid" => [ "SomeHEYData", "SOME_HEY_DATA" ],
+            "pascal_with_acronym_start" => [ "HEYSomeData", "HEY_SOME_DATA" ],
 
             // converts various delimiters to CONSTANT_CASE
             "space_delimiter" => [ "Hello world", "HELLO_WORLD" ],
