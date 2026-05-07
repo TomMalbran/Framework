@@ -1,4 +1,5 @@
 rules:
+    - Framework\Analysis\Database\ModelAttributeRule
     - Framework\Analysis\Database\ModelIdFieldRule
     - Framework\Analysis\Database\ModelEnumRule
     - Framework\Analysis\Database\QueryArgumentRule

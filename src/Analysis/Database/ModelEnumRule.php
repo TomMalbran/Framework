@@ -99,7 +99,7 @@ class ModelEnumRule implements Rule {
         return [
             RuleErrorBuilder::message("Enum '{$typeName}' must implement Enum and JsonSerializable.")
                 ->line($prop->getStartLine())
-                ->identifier("framework.invalidEnumInModel")
+                ->identifier("framework.modelEnum")
                 ->build()
         ];
     }
