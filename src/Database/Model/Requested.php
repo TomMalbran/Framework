@@ -15,6 +15,9 @@ class Requested {
     public bool $isMultiID = false;
     public bool $isNative  = false;
     public bool $isJSON    = false;
+    public bool $isDate    = false;
+    public bool $isFile    = false;
+    public bool $isHour    = false;
 
 
     /**
@@ -23,17 +26,26 @@ class Requested {
      * @param bool $isMultiID Optional.
      * @param bool $isNative  Optional.
      * @param bool $isJSON    Optional.
+     * @param bool $isDate    Optional.
+     * @param bool $isFile    Optional.
+     * @param bool $isHour    Optional.
      */
     public function __construct(
         bool $canEdit = true,
         bool $isMultiID = false,
         bool $isNative = false,
         bool $isJSON = false,
+        bool $isDate = false,
+        bool $isFile = false,
+        bool $isHour = false,
     ) {
         $this->canEdit   = $canEdit;
         $this->isMultiID = $isMultiID;
         $this->isNative  = $isNative;
         $this->isJSON    = $isJSON;
+        $this->isDate    = $isDate;
+        $this->isFile    = $isFile;
+        $this->isHour    = $isHour;
     }
 
 
@@ -67,13 +79,24 @@ class Requested {
 
         if ($this->isJSON) {
             $this->type = FieldType::JSON;
+        } elseif ($this->isDate) {
+            $this->type     = FieldType::Date;
+            $this->hasValue = true;
+        } elseif ($this->isFile) {
+            $this->type     = FieldType::File;
+            $this->hasValue = true;
+        } elseif ($this->isHour) {
+            $this->hasValue = true;
         } elseif ($isEnum) {
             $this->type      = FieldType::Enum;
             $this->enumClass = $typeName;
             $this->isNative  = true;
         } else {
             $this->type = FieldType::fromType($typeName);
-            if ($this->type !== FieldType::JSON) {
+
+            if (!$this->isNative && $this->type !== FieldType::JSON &&
+                $this->type !== FieldType::Array
+            ) {
                 $this->hasValue = true;
             }
         }
@@ -87,8 +110,11 @@ class Requested {
      * @return Requested
      */
     public function fromField(Field $field, bool $isValidated): Requested {
-        $this->name      = $field->name;
-        $this->type      = $field->type;
+        $this->name = $field->name;
+        $this->type = $field->type;
+        if ($this->isFile) {
+            $this->type = FieldType::File;
+        }
 
         $this->enumClass = $field->enumClass;
         $this->dateType  = $field->dateType;
@@ -147,10 +173,42 @@ class Requested {
 
 
     /**
+     * Returns the Value Type for a Field Type
+     * @return string
+     */
+    public function getValueType(): string {
+        if ($this->isHour) {
+            return "HourValue";
+        }
+
+        return match ($this->type) {
+            FieldType::None    => "",
+
+            FieldType::Date    => "DateValue",
+            FieldType::Enum    => "EnumValue",
+            FieldType::JSON,
+            FieldType::Array   => "StringValue",
+
+            FieldType::Boolean => "BoolValue",
+            FieldType::Number  => "NumberValue",
+            FieldType::Float   => "FloatValue",
+
+            FieldType::String,
+            FieldType::Text,
+            FieldType::LongText,
+            FieldType::Encrypt => "StringValue",
+            FieldType::File    => "FileValue",
+        };
+    }
+
+    /**
      * Returns true if the Requested Field is a Dictionary
      * @return bool
      */
     public function isDictionary(): bool {
-        return $this->type === FieldType::JSON && !$this->isNative;
+        return !$this->isNative && (
+            $this->type === FieldType::JSON ||
+            $this->type === FieldType::Array
+        );
     }
 }

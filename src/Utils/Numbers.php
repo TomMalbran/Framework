@@ -1,6 +1,8 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\IO\Value\NumberValue;
+use Framework\IO\Value\FloatValue;
 use Framework\Date\Date;
 use Framework\Utils\Strings;
 
@@ -38,32 +40,38 @@ class Numbers {
      * @return int
      */
     public static function toInt(mixed $value, int $decimals = 0): int {
-        if (is_numeric($value)) {
-            $padding = pow(10, $decimals);
-            return self::roundInt($value * $padding);
+        if ($value instanceof NumberValue) {
+            return $value->get();
         }
         if ($value instanceof Date) {
             return $value->toTime();
+        }
+        if (is_numeric($value)) {
+            $padding = pow(10, $decimals);
+            return self::roundInt($value * $padding);
         }
         return 0;
     }
 
     /**
      * Returns the given number as a float using the given decimals
-     * @param mixed $number
+     * @param mixed $value
      * @param int   $decimals Optional.
      * @return float
      */
-    public static function toFloat(mixed $number, int $decimals = 0): float {
-        if (is_int($number)) {
+    public static function toFloat(mixed $value, int $decimals = 0): float {
+        if ($value instanceof FloatValue) {
+            return $value->get();
+        }
+        if (is_int($value)) {
             $padding = pow(10, $decimals);
-            return $number / $padding;
+            return $value / $padding;
         }
-        if (is_float($number)) {
-            return $number;
+        if (is_float($value)) {
+            return $value;
         }
-        if (is_numeric($number)) {
-            return floatval($number);
+        if (is_numeric($value)) {
+            return floatval($value);
         }
         return 0;
     }

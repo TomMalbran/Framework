@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\IO\Value\Value;
 use Framework\Utils\Numbers;
 
 /**
@@ -272,17 +273,20 @@ class Arrays {
 
     /**
      * Returns true if the given array is empty
-     * @param mixed           $array
+     * @param mixed           $value
      * @param int|string|null $key   Optional.
      * @return bool
      */
-    public static function isEmpty(mixed $array, int|string|null $key = null): bool {
-        if ($key !== null && is_array($array)) {
+    public static function isEmpty(mixed $value, int|string|null $key = null): bool {
+        if ($value instanceof Value) {
+            return $value->isEmpty();
+        }
+        if ($key !== null && is_array($value)) {
             // @phpstan-ignore empty.notAllowed
-            return empty($array[$key]);
+            return empty($value[$key]);
         }
         // @phpstan-ignore empty.notAllowed
-        return empty($array);
+        return empty($value);
     }
 
     /**

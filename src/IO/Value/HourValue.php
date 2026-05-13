@@ -4,22 +4,22 @@ namespace Framework\IO\Value;
 use Framework\IO\Request;
 use Framework\IO\Value\Value;
 use Framework\IO\Value\ValueInterface;
-use Framework\Enum\Enum;
+use Framework\Date\DateUtils;
 use Framework\Utils\Strings;
 
 use JsonSerializable;
 
 /**
- * The Enum Value
- * @implements ValueInterface<Enum,string>
+ * The Hour Value
+ * @implements ValueInterface<string,string>
  */
-class EnumValue extends Value implements ValueInterface, JsonSerializable {
+class HourValue extends Value implements ValueInterface, JsonSerializable {
 
     private string $value;
 
 
     /**
-     * Creates a new EnumValue instance
+     * Creates a new DateValue instance
      * @param Request $request
      * @param string  $key
      */
@@ -30,35 +30,34 @@ class EnumValue extends Value implements ValueInterface, JsonSerializable {
 
     /**
      * Sets the value
-     * @param Enum $value
+     * @param HourValue|string $value
      * @return void
      */
     #[\Override]
     public function set(mixed $value): void {
-        $this->value = $value->toString();
+        $this->value = Strings::toString($value);
         $this->setRaw($this->value);
     }
 
     /**
      * Sets the value if the value is not empty
-     * @param Enum $value
+     * @param string $value
      * @return void
      */
     #[\Override]
     public function setIf(mixed $value): void {
-        if ($value->toString() !== "") {
+        if ($value !== "") {
             $this->set($value);
         }
     }
 
     /**
-     * Unsets the value
-     * @return void
-     */
+    * Unsets the value
+    * @return void
+    */
     #[\Override]
     public function unset(): void {
-        $this->value = "";
-        $this->setRaw("");
+        $this->set("");
     }
 
 
@@ -78,7 +77,7 @@ class EnumValue extends Value implements ValueInterface, JsonSerializable {
      */
     #[\Override]
     public function getOrNull(): ?string {
-        return $this->value === "" ? null : $this->value;
+        return $this->hasValue() ? $this->value : null;
     }
 
     /**
@@ -97,7 +96,19 @@ class EnumValue extends Value implements ValueInterface, JsonSerializable {
      * @return bool
      */
     public function isValid(): bool {
-        return Strings::isValid($this->raw);
+        return DateUtils::isValidHour($this->raw);
+    }
+
+    /**
+     * Returns true if the period between this hour and the end hour is valid
+     * @param HourValue $endHour
+     * @return bool
+     */
+    public function isValidPeriod(HourValue $endHour): bool {
+        if (!$this->hasValue() || !$endHour->hasValue()) {
+            return true;
+        }
+        return DateUtils::isValidHourPeriod($this->value, $endHour->value);
     }
 
 

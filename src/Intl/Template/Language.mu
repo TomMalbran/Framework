@@ -2,6 +2,7 @@
 namespace {{namespace}};
 
 use Framework\IO\Select;
+use Framework\IO\Value\StringValue;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -34,10 +35,11 @@ class Language {
 
     /**
      * Returns true if the given Language Value is valid for the given Group
-     * @param string $value
+     * @param StringValue|string $value
      * @return bool
      */
-    public static function isValid(string $value): bool {
+    public static function isValid(StringValue|string $value): bool {
+        $value = Strings::toString($value);
         return Arrays::containsKey(self::getAll(), $value);
     }
 

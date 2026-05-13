@@ -83,17 +83,18 @@ enum FieldType implements Enum, JsonSerializable {
     }
 
     /**
-     * Returns the PHP Type from the given Field Type
+     * Returns the Native Type from the given Field Type
      * @param string $enumClass Optional.
      * @param bool   $forEntity Optional.
      * @return string
      */
     public function getCodeType(string $enumClass = "", bool $forEntity = false): string {
+        $enumType = $enumClass !== "" ? Strings::substringAfter($enumClass, "\\") : "string";
         return match ($this) {
             FieldType::None    => "",
 
             FieldType::Date    => "Date",
-            FieldType::Enum    => $enumClass !== "" ? Strings::substringAfter($enumClass, "\\") : "string",
+            FieldType::Enum    => $enumType,
             FieldType::JSON    => $forEntity ? "Dictionary" : "JsonSerializable|array",
             FieldType::Array   => "array",
 
@@ -106,6 +107,32 @@ enum FieldType implements Enum, JsonSerializable {
             FieldType::LongText,
             FieldType::Encrypt,
             FieldType::File    => "string",
+        };
+    }
+
+    /**
+     * Returns the Native or Value Type from the given Field Type
+     * @param string $enumClass Optional.
+     * @return string
+     */
+    public function getValueType(string $enumClass = ""): string {
+        return match ($this) {
+            FieldType::None    => "",
+
+            FieldType::Date    => "DateValue",
+            FieldType::Enum    => "EnumValue",
+            FieldType::JSON    => "",
+            FieldType::Array   => "",
+
+            FieldType::Boolean => "BoolValue",
+            FieldType::Number  => "NumberValue",
+            FieldType::Float   => "FloatValue",
+
+            FieldType::String,
+            FieldType::Text,
+            FieldType::LongText,
+            FieldType::Encrypt,
+            FieldType::File    => "StringValue",
         };
     }
 

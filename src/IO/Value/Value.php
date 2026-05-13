@@ -51,6 +51,14 @@ class Value {
     }
 
     /**
+     * Returns the value
+     * @return string
+     */
+    public function getValue(): string {
+        return $this->raw;
+    }
+
+    /**
      * Returns the value for database storage
      * @return Assign|string|int
      */

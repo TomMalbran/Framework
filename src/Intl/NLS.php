@@ -2,6 +2,7 @@
 namespace Framework\Intl;
 
 use Framework\IO\Select;
+use Framework\IO\Value\Value;
 use Framework\Intl\IntlConfig;
 use Framework\System\Config;
 use Framework\System\Language;
@@ -85,12 +86,12 @@ class NLS {
 
     /**
      * Returns a string from the data at the given index
-     * @param string          $key
-     * @param Enum|int|string $index
-     * @param string          $language Optional.
+     * @param string                $key
+     * @param Value|Enum|int|string $index
+     * @param string                $language Optional.
      * @return string
      */
-    public static function getIndex(string $key, Enum|int|string $index, string $language = ""): string {
+    public static function getIndex(string $key, Value|Enum|int|string $index, string $language = ""): string {
         $data  = self::load($language);
         $dict  = $data->getDict($key);
         $index = Strings::toString($index);

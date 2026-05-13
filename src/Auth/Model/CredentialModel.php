@@ -117,4 +117,12 @@ class CredentialModel {
 
     #[Virtual]
     public string $accessName = "";
+
+
+
+    #[Requested]
+    public string $newPassword = "";
+
+    #[Requested]
+    public string $confirmPassword = "";
 }

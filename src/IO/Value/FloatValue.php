@@ -6,11 +6,13 @@ use Framework\IO\Value\Value;
 use Framework\IO\Value\ValueInterface;
 use Framework\Utils\Numbers;
 
+use JsonSerializable;
+
 /**
  * The Float Value
  * @implements ValueInterface<float,float>
  */
-class FloatValue extends Value implements ValueInterface {
+class FloatValue extends Value implements ValueInterface, JsonSerializable {
 
     private float $value;
     private int $decimals;
@@ -121,5 +123,16 @@ class FloatValue extends Value implements ValueInterface {
             return true;
         }
         return $this->value > $other->get();
+    }
+
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->get();
     }
 }

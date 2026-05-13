@@ -5,11 +5,13 @@ use Framework\IO\Request;
 use Framework\IO\Value\Value;
 use Framework\IO\Value\ValueInterface;
 
+use JsonSerializable;
+
 /**
  * The Bool Value
  * @implements ValueInterface<bool,bool>
  */
-class BoolValue extends Value implements ValueInterface {
+class BoolValue extends Value implements ValueInterface, JsonSerializable {
 
     private bool $value;
 
@@ -117,5 +119,16 @@ class BoolValue extends Value implements ValueInterface {
      */
     public function isFalse(): bool {
         return $this->value === false;
+    }
+
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->get();
     }
 }

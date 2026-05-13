@@ -11,11 +11,13 @@ use Framework\Utils\Strings;
 use Framework\Utils\URL;
 use Framework\Utils\Utils;
 
+use JsonSerializable;
+
 /**
  * The String Value
  * @implements ValueInterface<string,string>
  */
-class StringValue extends Value implements ValueInterface {
+class StringValue extends Value implements ValueInterface, JsonSerializable {
 
     private string $value;
     private bool $isEncrypted;
@@ -35,13 +37,13 @@ class StringValue extends Value implements ValueInterface {
 
     /**
      * Sets the value
-     * @param string $value
+     * @param StringValue|string $value
      * @return void
      */
     #[\Override]
     public function set(mixed $value): void {
-        $this->value = $value;
-        $this->setRaw($value);
+        $this->value = Strings::toString($value);
+        $this->setRaw($this->value);
     }
 
     /**
@@ -82,7 +84,7 @@ class StringValue extends Value implements ValueInterface {
      */
     #[\Override]
     public function getOrNull(): ?string {
-        return $this->value !== "" ? $this->value : null;
+        return $this->hasValue() ? $this->value : null;
     }
 
     /**
@@ -95,6 +97,22 @@ class StringValue extends Value implements ValueInterface {
             return Assign::encrypt($this->value, Config::getDbKey());
         }
         return $this->value;
+    }
+
+    /**
+     * Returns the value with only numbers
+     * @return string
+     */
+    public function toNumber(): string {
+        return Strings::toNumber($this->value);
+    }
+
+    /**
+     * Returns the value as a slug
+     * @return string
+     */
+    public function toSlug(): string {
+        return URL::toSlug($this->value);
     }
 
 
@@ -117,7 +135,7 @@ class StringValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns true if the value is a valid email
+     * Returns true if the value is a valid Email
      * @return bool
      */
     public function isValidEmail(): bool {
@@ -125,7 +143,15 @@ class StringValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns true if the value is a valid username
+     * Returns true if the value is a valid Phone
+     * @return bool
+     */
+    public function isValidPhone(): bool {
+        return Utils::isValidPhone($this->raw);
+    }
+
+    /**
+     * Returns true if the value is a valid Username
      * @return bool
      */
     public function isValidUsername(): bool {
@@ -133,7 +159,7 @@ class StringValue extends Value implements ValueInterface {
     }
 
     /**
-     * Returns true if the value is a valid password
+     * Returns true if the value is a valid Password
      * @param string $checkSets Optional.
      * @param int    $minLength Optional.
      * @return bool
@@ -159,5 +185,100 @@ class StringValue extends Value implements ValueInterface {
     public function isValidNumber(?int $min = 1, ?int $max = null): bool {
         $float = Numbers::toFloat($this->raw);
         return Numbers::isValidFloat($float, $min, $max);
+    }
+
+
+
+    /**
+     * Returns true if the value is equal to the given value
+     * @param StringValue|string $value
+     * @param bool               $caseInsensitive Optional.
+     * @return bool
+     */
+    public function isEqual(StringValue|string $value, bool $caseInsensitive = false): bool {
+        return Strings::isEqual($this->value, $value, $caseInsensitive);
+    }
+
+    /**
+     * Returns true if the value is not equal to the given value
+     * @param StringValue|string $value
+     * @param bool               $caseInsensitive Optional.
+     * @return bool
+     */
+    public function isNotEqual(StringValue|string $value, bool $caseInsensitive = false): bool {
+        return !Strings::isEqual($this->value, $value, $caseInsensitive);
+    }
+
+    /**
+     * Returns true if the value contains any of the given Needles
+     * @param list<string>|string $needle
+     * @param bool                $caseInsensitive Optional.
+     * @param bool                $atLeastOne      Optional.
+     * @return bool
+     */
+    public function contains(
+        array|string $needle,
+        bool $caseInsensitive = false,
+        bool $atLeastOne = true,
+    ): bool {
+        return Strings::contains($this->value, $needle, $caseInsensitive, $atLeastOne);
+    }
+
+    /**
+     * Returns true if the value starts any of the given Needles
+     * @param string ...$needles
+     * @return bool
+     */
+    public function startsWith(string ...$needles): bool {
+        return Strings::startsWith($this->value, ...$needles);
+    }
+
+    /**
+     * Returns true if the value ends with the given Needle
+     * @param string ...$needles
+     * @return bool
+     */
+    public function endsWith(string ...$needles): bool {
+        return Strings::endsWith($this->value, ...$needles);
+    }
+
+
+
+    /**
+     * Transforms the value to lowercase
+     * @return string
+     */
+    public function toLowerCase(): string {
+        return Strings::toLowerCase($this->value);
+    }
+
+    /**
+     * Returns a Substring from the Needle to the end
+     * @param string $needle
+     * @param bool   $useFirst Optional.
+     * @return string
+     */
+    public function substringAfter(string $needle, bool $useFirst = false): string {
+        return Strings::substringAfter($this->value, $needle, $useFirst);
+    }
+
+    /**
+     * Merges the value with the given StringValue
+     * @param StringValue $value
+     * @return string
+     */
+    public function merge(StringValue $value): string {
+        return Strings::merge($this->value, $value->value);
+    }
+
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->get();
     }
 }

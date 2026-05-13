@@ -4,6 +4,8 @@ namespace Framework\Auth;
 use Framework\IO\Request;
 use Framework\IO\Search;
 use Framework\IO\Select;
+use Framework\IO\Value\NumberValue;
+use Framework\IO\Value\StringValue;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialRequest;
@@ -27,13 +29,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credential with the given ID
-     * @param int  $credentialID
-     * @param bool $complete     Optional.
+     * @param NumberValue|int $credentialID
+     * @param bool            $complete     Optional.
      * @return CredentialEntity
      */
     #[\Override]
     public static function getByID(
-        int $credentialID,
+        NumberValue|int $credentialID,
         bool $complete = false,
     ): CredentialEntity {
         $query = new CredentialQuery();
@@ -43,12 +45,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credential with the given Email
-     * @param string $email
-     * @param bool   $complete Optional.
+     * @param StringValue|string $email
+     * @param bool               $complete Optional.
      * @return CredentialEntity
      */
     public static function getByEmail(
-        string $email,
+        StringValue|string $email,
         bool $complete = true,
     ): CredentialEntity {
         $query = new CredentialQuery();
@@ -93,13 +95,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is a Credential with the given ID and Access(s)
-     * @param int                  $credentialID
+     * @param NumberValue|int      $credentialID
      * @param CredentialQuery|null $query        Optional.
      * @return bool
      */
     #[\Override]
     public static function exists(
-        int $credentialID,
+        NumberValue|int $credentialID,
         ?CredentialQuery $query = null,
     ): bool {
         if ($query === null) {
@@ -111,13 +113,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is a Credential with the given Email
-     * @param string               $email
+     * @param StringValue|string   $email
      * @param int                  $skipID Optional.
      * @param CredentialQuery|null $query  Optional.
      * @return bool
      */
     public static function emailExists(
-        string $email,
+        StringValue|string $email,
         int $skipID = 0,
         ?CredentialQuery $query = null,
     ): bool {
@@ -322,9 +324,7 @@ class Credential extends CredentialSchema {
      */
     private static function parseFields(CredentialRequest $request): void {
         // Parse the Name
-        $firstName = $request->firstName->get();
-        $lastName  = $request->lastName->get();
-        $request->name->set(Strings::merge($firstName, $lastName));
+        $request->name->set($request->firstName->merge($request->lastName));
 
         // Parse the Password
         $password = $request->password->get();

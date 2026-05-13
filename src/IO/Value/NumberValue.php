@@ -4,13 +4,16 @@ namespace Framework\IO\Value;
 use Framework\IO\Request;
 use Framework\IO\Value\Value;
 use Framework\IO\Value\ValueInterface;
+use Framework\Date\DateUtils;
 use Framework\Utils\Numbers;
+
+use JsonSerializable;
 
 /**
  * The Number Value
  * @implements ValueInterface<int,int>
  */
-class NumberValue extends Value implements ValueInterface {
+class NumberValue extends Value implements ValueInterface, JsonSerializable {
 
     private int $value;
 
@@ -27,13 +30,13 @@ class NumberValue extends Value implements ValueInterface {
 
     /**
      * Sets the value
-     * @param int $value
+     * @param NumberValue|int $value
      * @return void
      */
     #[\Override]
     public function set(mixed $value): void {
-        $this->value = $value;
-        $this->setRaw($value);
+        $this->value = Numbers::toInt($value);
+        $this->setRaw($this->value);
     }
 
     /**
@@ -99,6 +102,35 @@ class NumberValue extends Value implements ValueInterface {
     }
 
     /**
+     * Returns true if the value is a valid week day
+     * @param bool $startMonday Optional.
+     * @return bool
+     */
+    public function isValidWeekDay(bool $startMonday = false): bool {
+        return DateUtils::isValidWeekDay($this->value, $startMonday);
+    }
+
+
+
+    /**
+     * Returns true if the value is equal to the other value
+     * @param NumberValue|int $other
+     * @return bool
+     */
+    public function isEqual(NumberValue|int $other): bool {
+        return $this->value === Numbers::toInt($other);
+    }
+
+    /**
+     * Returns true if the value is not equal to the other value
+     * @param NumberValue|int $other
+     * @return bool
+     */
+    public function isNotEqual(NumberValue|int $other): bool {
+        return $this->value !== Numbers::toInt($other);
+    }
+
+    /**
      * Returns true if the value is greater than the other value
      * @param NumberValue $other
      * @return bool
@@ -108,5 +140,16 @@ class NumberValue extends Value implements ValueInterface {
             return true;
         }
         return $this->value > $other->get();
+    }
+
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->get();
     }
 }

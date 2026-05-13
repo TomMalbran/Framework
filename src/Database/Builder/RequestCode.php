@@ -81,23 +81,23 @@ class RequestCode {
      */
     private static function getNatives(SchemaModel $schemaModel): array {
         $result = [];
-        foreach ($schemaModel->requestedFields as $field) {
-            if (!$field->isNative) {
+        foreach ($schemaModel->requestedFields as $requested) {
+            if (!$requested->isNative) {
                 continue;
             }
 
-            $type     = $field->type->getCodeType($field->enumClass);
+            $type     = $requested->type->getCodeType($requested->enumClass);
             $typeName = Strings::upperCaseFirst($type);
 
-            $getter = "\$request->get{$typeName}(\"{$field->name}\")";
-            if ($field->type === FieldType::Enum) {
-                $getter = "{$type}::fromRequest(\$request, \"{$field->name}\")";
+            $getter = "\$request->get{$typeName}(\"{$requested->name}\")";
+            if ($requested->type === FieldType::Enum) {
+                $getter = "{$type}::fromRequest(\$request, \"{$requested->name}\")";
             }
 
             $result[] = [
                 "type"   => $type,
                 "getter" => $getter,
-                "name"   => $field->name,
+                "name"   => $requested->name,
             ];
         }
         return $result;
@@ -115,7 +115,7 @@ class RequestCode {
                 continue;
             }
 
-            $type = self::getValueType($requested->type);
+            $type = $requested->getValueType();
             if ($type === "") {
                 continue;
             }
@@ -198,32 +198,5 @@ class RequestCode {
             }
         }
         return $result;
-    }
-
-
-    /**
-     * Returns the Value Type for a Field Type
-     * @param FieldType $type
-     * @return string
-     */
-    private static function getValueType(FieldType $type): string {
-        return match ($type) {
-            FieldType::None    => "",
-
-            FieldType::Date    => "DateValue",
-            FieldType::Enum    => "EnumValue",
-            FieldType::JSON,
-            FieldType::Array   => "StringValue",
-
-            FieldType::Boolean => "BoolValue",
-            FieldType::Number  => "NumberValue",
-            FieldType::Float   => "FloatValue",
-
-            FieldType::String,
-            FieldType::Text,
-            FieldType::LongText,
-            FieldType::File,
-            FieldType::Encrypt => "StringValue",
-        };
     }
 }

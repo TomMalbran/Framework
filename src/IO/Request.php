@@ -4,6 +4,7 @@ namespace Framework\IO;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
+use Framework\Enum\Enum;
 use Framework\Date\Date;
 use Framework\Date\DateUtils;
 use Framework\Date\Type\DateType;
@@ -220,11 +221,12 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Sets the given key on the request data with the given value
-     * @param string       $key
+     * @param Enum|string  $key
      * @param mixed|string $value Optional.
      * @return Request
      */
-    public function set(string $key, mixed $value = ""): Request {
+    public function set(Enum|string $key, mixed $value = ""): Request {
+        $key = Strings::toString($key);
         $this->request[$key] = $value;
         return $this;
     }
@@ -245,14 +247,15 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the given key exists in the request data
-     * @param list<string>|string|null $key   Optional.
-     * @param int|null                 $index Optional.
+     * @param Enum|list<string>|string|null $key   Optional.
+     * @param int|null                      $index Optional.
      * @return bool
      */
-    public function has(array|string|null $key = null, ?int $index = null): bool {
+    public function has(Enum|array|string|null $key = null, ?int $index = null): bool {
         if ($key === null) {
             return !Arrays::isEmpty($this->request);
         }
+
         if (is_array($key)) {
             foreach ($key as $keyID) {
                 if (Arrays::isEmpty($this->request, $keyID)) {
@@ -261,6 +264,8 @@ class Request implements IteratorAggregate, JsonSerializable {
             }
             return true;
         }
+
+        $key = Strings::toString($key);
         if ($index !== null) {
             return (
                 isset($this->request[$key]) &&
@@ -273,10 +278,10 @@ class Request implements IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the given key is set in the request data
-     * @param list<string>|string $key
+     * @param Enum|list<string>|string $key
      * @return bool
      */
-    public function exists(array|string $key): bool {
+    public function exists(Enum|array|string $key): bool {
         if (is_array($key)) {
             foreach ($key as $keyID) {
                 if (!isset($this->request[$keyID])) {
@@ -285,6 +290,8 @@ class Request implements IteratorAggregate, JsonSerializable {
             }
             return true;
         }
+
+        $key = Strings::toString($key);
         return isset($this->request[$key]);
     }
 

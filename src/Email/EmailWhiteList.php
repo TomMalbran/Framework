@@ -3,27 +3,11 @@ namespace Framework\Email;
 
 use Framework\Email\Schema\EmailWhiteListSchema;
 use Framework\Email\Schema\EmailWhiteListRequest;
-use Framework\Email\Schema\EmailWhiteListQuery;
 
 /**
  * The Email White List
  */
 class EmailWhiteList extends EmailWhiteListSchema {
-
-    /**
-     * Returns true if the given Email exists in the White List
-     * @param string $email
-     * @param int    $skipID Optional.
-     * @return bool
-     */
-    public static function emailExists(string $email, int $skipID = 0): bool {
-        $query = new EmailWhiteListQuery();
-        $query->email->equal($email);
-        $query->emailID->notEqualIf($skipID);
-        return self::entityExists($query);
-    }
-
-
 
     /**
      * Adds the given Email to the White List

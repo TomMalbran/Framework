@@ -2,6 +2,7 @@
 namespace {{namespace}};
 
 use Framework\IO\Select;
+use Framework\IO\Value\EnumValue;
 use Framework\Intl\NLS;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
@@ -41,20 +42,20 @@ enum {{statusClass}} implements Enum, JsonSerializable {
 
     /**
      * Returns the Name of the given Status
-     * @param {{statusClass}}|string $value
+     * @param {{statusClass}}|EnumValue|string $value
      * @param string $isoCode Optional.
      * @return string
      */
-    public static function getName({{statusClass}}|string $value, string $isoCode = ""): string {
+    public static function getName({{statusClass}}|EnumValue|string $value, string $isoCode = ""): string {
         return NLS::getIndex("SELECT_STATUS", $value, $isoCode);
     }
 
     /**
      * Returns the Color of the given Status
-     * @param {{statusClass}}|string $value
+     * @param {{statusClass}}|EnumValue|string $value
      * @return string
      */
-    public static function getColor({{statusClass}}|string $value): string {
+    public static function getColor({{statusClass}}|EnumValue|string $value): string {
         return match (self::fromValue($value)) {
         {{#statuses}}
             self::{{name}} => "{{color}}",
@@ -65,12 +66,15 @@ enum {{statusClass}} implements Enum, JsonSerializable {
 
     /**
      * Returns true if the given value is valid
-     * @param {{statusClass}}|string $value
+     * @param {{statusClass}}|EnumValue|string $value
      * @return bool
      */
-    public static function isValid({{statusClass}}|string $value): bool {
-        return self::contains([ {{values}} ], self::fromValue($value));
+    public static function isValid({{statusClass}}|EnumValue|string $value): bool {
+        $status = self::fromValue($value);
+        return self::contains([ {{values}} ], $status);
     }
+
+
 
     /**
      * Returns a Select of Statuses

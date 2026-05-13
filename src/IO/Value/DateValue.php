@@ -9,11 +9,13 @@ use Framework\Date\DateUtils;
 use Framework\Date\Type\DateType;
 use Framework\Date\Type\DateFormat;
 
+use JsonSerializable;
+
 /**
  * The Date Value
  * @implements ValueInterface<Date,Date>
  */
-class DateValue extends Value implements ValueInterface {
+class DateValue extends Value implements ValueInterface, JsonSerializable {
 
     private Date $value;
     private string $date;
@@ -140,6 +142,14 @@ class DateValue extends Value implements ValueInterface {
     }
 
     /**
+     * Returns the hour
+     * @return string
+     */
+    public function getHour(): string {
+        return $this->hour;
+    }
+
+    /**
      * Returns true if the hour is valid
      * @return bool
      */
@@ -148,12 +158,24 @@ class DateValue extends Value implements ValueInterface {
     }
 
     /**
+     * Returns true if the period between this hour and the end hour is valid
+     * @param DateValue $endDate
+     * @return bool
+     */
+    public function isValidHourPeriod(DateValue $endDate): bool {
+        if (!$this->hasHour() || !$endDate->hasHour()) {
+            return true;
+        }
+        return DateUtils::isValidHourPeriod($this->hour, $endDate->hour);
+    }
+
+    /**
      * Returns true if the period between this date and the end date is valid, including the hour
      * @param DateValue $endDate
      * @return bool
      */
     public function isValidFullPeriod(DateValue $endDate): bool {
-        if ($this->date === "" || $this->hour === "" || $endDate->date === "" || $endDate->hour === "") {
+        if (!$this->hasValue() || !$this->hasHour() || !$endDate->hasValue() || !$endDate->hasHour()) {
             return true;
         }
         return DateUtils::isValidFullPeriod(
@@ -162,5 +184,16 @@ class DateValue extends Value implements ValueInterface {
             $endDate->date,
             $endDate->hour,
         );
+    }
+
+
+
+    /**
+     * Implements the JSON Serializable Interface
+     * @return mixed
+     */
+    #[\Override]
+    public function jsonSerialize(): mixed {
+        return $this->value->toString(DateFormat::Reverse);
     }
 }

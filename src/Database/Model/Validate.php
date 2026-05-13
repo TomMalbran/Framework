@@ -282,6 +282,34 @@ class Validate {
     }
 
     /**
+     * Gets the Date Error string for this Validate
+     * @return string
+     */
+    public function getDateError(): string {
+        if (Strings::startsWith($this->name, "from")) {
+            return "GENERAL_ERROR_FROM_DATE";
+        }
+        if (Strings::startsWith($this->name, "to")) {
+            return "GENERAL_ERROR_TO_DATE";
+        }
+        return "GENERAL_ERROR_DATE";
+    }
+
+    /**
+     * Gets the Hour Error string for this Validate
+     * @return string
+     */
+    public function getHourError(): string {
+        if (Strings::startsWith($this->name, "from")) {
+            return "GENERAL_ERROR_FROM_HOUR";
+        }
+        if (Strings::startsWith($this->name, "to")) {
+            return "GENERAL_ERROR_TO_HOUR";
+        }
+        return "GENERAL_ERROR_HOUR";
+    }
+
+    /**
      * Gets the parameters for the isNumeric validation
      * @return string
      */

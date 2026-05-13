@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Where;
 
+use Framework\IO\Value\NumberValue;
 use Framework\Database\Query\Operator;
 use Framework\Database\Where\BaseWhere;
 
@@ -11,12 +12,16 @@ class NumberWhere extends BaseWhere {
 
     /**
      * Adds a Compare condition
-     * @param Operator      $operator
-     * @param list<int>|int $value
-     * @param bool|null     $condition Optional.
+     * @param Operator                  $operator
+     * @param NumberValue|list<int>|int $value
+     * @param bool|null                 $condition Optional.
      * @return void
      */
-    public function compare(Operator $operator, array|int $value, ?bool $condition = null): void {
+    public function compare(
+        Operator $operator,
+        NumberValue|array|int $value,
+        ?bool $condition = null,
+    ): void {
         $this->query->where(
             column:    $this->column,
             operator:  $operator,
@@ -27,12 +32,16 @@ class NumberWhere extends BaseWhere {
 
     /**
      * Adds a Compare If condition
-     * @param Operator      $operator
-     * @param list<int>|int $value
-     * @param bool|null     $condition Optional.
+     * @param Operator                  $operator
+     * @param NumberValue|list<int>|int $value
+     * @param bool|null                 $condition Optional.
      * @return void
      */
-    public function compareIf(Operator $operator, array|int $value, ?bool $condition = null): void {
+    public function compareIf(
+        Operator $operator,
+        NumberValue|array|int $value,
+        ?bool $condition = null,
+    ): void {
         $this->query->whereIf(
             column:    $this->column,
             operator:  $operator,
@@ -45,39 +54,39 @@ class NumberWhere extends BaseWhere {
 
     /**
      * Adds an Equal condition
-     * @param int $value
+     * @param NumberValue|int $value
      * @return void
      */
-    public function equal(int $value): void {
+    public function equal(NumberValue|int $value): void {
         $this->compare(Operator::Equal, $value);
     }
 
     /**
      * Adds an Equal If condition
-     * @param int       $value
-     * @param bool|null $condition Optional.
+     * @param NumberValue|int $value
+     * @param bool|null       $condition Optional.
      * @return void
      */
-    public function equalIf(int $value, ?bool $condition = null): void {
+    public function equalIf(NumberValue|int $value, ?bool $condition = null): void {
         $this->compareIf(Operator::Equal, $value, $condition);
     }
 
     /**
      * Adds a Not Equal condition
-     * @param int $value
+     * @param NumberValue|int $value
      * @return void
      */
-    public function notEqual(int $value): void {
+    public function notEqual(NumberValue|int $value): void {
         $this->compare(Operator::NotEqual, $value);
     }
 
     /**
      * Adds a Not Equal If condition
-     * @param int       $value
-     * @param bool|null $condition Optional.
+     * @param NumberValue|int $value
+     * @param bool|null       $condition Optional.
      * @return void
      */
-    public function notEqualIf(int $value, ?bool $condition = null): void {
+    public function notEqualIf(NumberValue|int $value, ?bool $condition = null): void {
         $this->compareIf(Operator::NotEqual, $value, $condition);
     }
 
@@ -85,41 +94,41 @@ class NumberWhere extends BaseWhere {
 
     /**
      * Adds a Greater Than condition
-     * @param int       $value
-     * @param bool|null $condition Optional.
+     * @param NumberValue|int $value
+     * @param bool|null       $condition Optional.
      * @return void
      */
-    public function greaterThan(int $value, ?bool $condition = null): void {
+    public function greaterThan(NumberValue|int $value, ?bool $condition = null): void {
         $this->compare(Operator::GreaterThan, $value, $condition);
     }
 
     /**
      * Adds a Greater or Equal condition
-     * @param int       $value
-     * @param bool|null $condition Optional.
+     * @param NumberValue|int $value
+     * @param bool|null       $condition Optional.
      * @return void
      */
-    public function greaterOrEqual(int $value, ?bool $condition = null): void {
+    public function greaterOrEqual(NumberValue|int $value, ?bool $condition = null): void {
         $this->compare(Operator::GreaterOrEqual, $value, $condition);
     }
 
     /**
      * Adds a Less Than condition
-     * @param int       $value
-     * @param bool|null $condition Optional.
+     * @param NumberValue|int $value
+     * @param bool|null       $condition Optional.
      * @return void
      */
-    public function lessThan(int $value, ?bool $condition = null): void {
+    public function lessThan(NumberValue|int $value, ?bool $condition = null): void {
         $this->compare(Operator::LessThan, $value, $condition);
     }
 
     /**
      * Adds a Less or Equal condition
-     * @param int       $value
-     * @param bool|null $condition Optional.
+     * @param NumberValue|int $value
+     * @param bool|null       $condition Optional.
      * @return void
      */
-    public function lessOrEqual(int $value, ?bool $condition = null): void {
+    public function lessOrEqual(NumberValue|int $value, ?bool $condition = null): void {
         $this->compare(Operator::LessOrEqual, $value, $condition);
     }
 

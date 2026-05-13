@@ -252,7 +252,7 @@ class SchemaFactory {
 
 
                 // REQUESTED: Any property might also be Requested
-                if ($hasPositions && count($requestedFields) > 0) {
+                if ($isPosition && count($requestedFields) > 0) {
                     $requested = new Requested();
                 }
                 if ($requested !== null) {

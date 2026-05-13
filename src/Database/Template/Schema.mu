@@ -15,7 +15,8 @@ use {{namespace}}\{{statusClass}};{{/hasStatus}}
 use Framework\IO\Request;{{#hasValidation}}
 use Framework\IO\Errors;{{/hasValidation}}
 use Framework\IO\Search;
-use Framework\IO\Select;{{#hasUsers}}
+use Framework\IO\Select;{{#valueImports}}
+use Framework\IO\Value\{{.}};{{/valueImports}}{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
 use Framework\Database\SchemaModel;{{#hasQuery}}
@@ -29,8 +30,7 @@ use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
 use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
 use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasValidation}}
 use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
-use Framework\Date\Date;{{/hasDate}}{{#hasDateType}}
-use Framework\Date\Type\DateType;{{/hasDateType}}{{#hasID}}
+use Framework\Date\Date;{{/hasDate}}{{#hasID}}
 use Framework\Utils\Arrays;{{/hasID}}
 use Framework\Utils\Dictionary;{{#usesNumbers}}
 use Framework\Utils\Numbers;{{/usesNumbers}}{{#hasJsonType}}
@@ -125,7 +125,7 @@ class {{name}}Schema extends Schema {
 
     /**
      * Returns true if the {{name}} Entity can be edited{{#parents}}
-     * @param {{fieldDoc}}{{/parents}}
+     * @param {{fieldArg}}{{/parents}}
      * @return bool
      */
     public static function canEdit({{parentsArgList}}): bool {
@@ -234,14 +234,20 @@ class {{name}}Schema extends Schema {
             {{pads}}}
     {{/isPrice}}
     {{#isDate}}
+        {{#isRequired}}
             {{pads}}if (!$request->{{fieldName}}->hasValue()) {
-            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_EMPTY";
-            {{pads}}} elseif (!$request->{{fieldName}}->isValid()) {
-            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_DATE_INVALID";
+            {{pads}}    $errors->{{dateName}} = "{{dateError}}_EMPTY";
+        {{/isRequired}}
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !$request->{{fieldName}}->isValid()) {
+            {{pads}}    $errors->{{dateName}} = "{{dateError}}_INVALID";
+        {{#hasHour}}
+        {{#isRequired}}
             {{pads}}} elseif (!$request->{{fieldName}}->hasHour()) {
-            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_EMPTY";
-            {{pads}}} elseif (!$request->{{fieldName}}->isValidHour()) {
-            {{pads}}    $errors->{{dateName}} = "GENERAL_ERROR_{{errorText}}_HOUR_INVALID";
+            {{pads}}    $errors->{{dateName}} = "{{hourError}}_EMPTY";
+        {{/isRequired}}
+            {{pads}}} elseif ($request->{{fieldName}}->hasHour() && !$request->{{fieldName}}->isValidHour()) {
+            {{pads}}    $errors->{{dateName}} = "{{hourError}}_INVALID";
+        {{/hasHour}}
             {{pads}}}
         {{#hasPeriod}}
             {{pads}}if (!$request->{{fromDateName}}->isValidFullPeriod($request->{{toDateName}})) {
@@ -265,7 +271,7 @@ class {{name}}Schema extends Schema {
             {{pads}}}
     {{/isList}}
     {{#isStatus}}
-            {{pads}}if (!{{statusClass}}::isValid($request->status->get())) {
+            {{pads}}if (!{{statusClass}}::isValid($request->status)) {
             {{pads}}    $errors->status = "GENERAL_ERROR_STATUS";
             {{pads}}}
     {{/isStatus}}
@@ -359,13 +365,13 @@ class {{name}}Schema extends Schema {
 {{#hasID}}
     /**
      * Returns true if there is a {{name}} Entity with the given {{idText}}
-     * @param {{idType}} ${{idName}}{{#parents}}
+     * @param {{idParamType}} ${{idName}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}{{#hasDeleted}}
      * @param bool $withDeleted Optional.{{/hasDeleted}}
      * @return bool
      */
     public static function exists(
-        {{idType}} ${{idName}},{{#parents}}
+        {{idParamType}} ${{idName}},{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}{{#hasDeleted}}
         bool $withDeleted = true,{{/hasDeleted}}
     ): bool {
@@ -381,13 +387,13 @@ class {{name}}Schema extends Schema {
 {{#uniques}}
     /**
      * Returns true if there is a {{name}} Entity with the given {{fieldText}}
-     * @param {{fieldDoc}}{{#parents}}
+     * @param {{fieldArgValue}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @param int $skipID Optional.
      * @return bool
      */
     public static function {{fieldName}}Exists(
-        {{fieldArg}},{{#parents}}
+        {{fieldArgValue}},{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}
         int $skipID = 0,
     ): bool {
@@ -416,14 +422,14 @@ class {{name}}Schema extends Schema {
 {{#hasID}}
     /**
      * Returns the {{name}} Entity with the given ID
-     * @param {{idType}} ${{idName}}{{#parents}}
+     * @param {{idParamType}} ${{idName}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}{{#canDelete}}
      * @param bool $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
      * @return {{entityClass}}
      */
     public static function getByID(
-        {{idType}} ${{idName}},{{#parents}}
+        {{idParamType}} ${{idName}},{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}{{#canDelete}}
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
@@ -441,14 +447,14 @@ class {{name}}Schema extends Schema {
 {{#uniques}}
     /**
      * Returns the {{name}} Entity with the given {{fieldText}}
-     * @param {{fieldDoc}}{{#parents}}
+     * @param {{fieldArgValue}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}{{#canDelete}}
      * @param bool $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
      * @return {{entityClass}}
      */
     public static function getBy{{fieldText}}(
-        {{fieldArg}},{{#parents}}
+        {{fieldArgValue}},{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}{{#canDelete}}
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
@@ -511,9 +517,9 @@ class {{name}}Schema extends Schema {
     /**
      * Returns the {{idText}} for the given query
      * @param {{queryClass}} $query
-     * @return {{idType}}
+     * @return {{idReturnType}}
      */
-    public static function get{{idText}}({{queryClass}} $query): {{idType}} {
+    public static function get{{idText}}({{queryClass}} $query): {{idReturnType}} {
         $result = self::getSchemaValue($query, "{{idDbName}}");
         {{#hasStringID}}
         return $result;
@@ -529,7 +535,7 @@ class {{name}}Schema extends Schema {
     /**
      * Returns an array with all the {{idText}}s
      * @param {{queryClass}}|null $query Optional.
-     * @return list<{{idType}}>
+     * @return list<{{idReturnType}}>
      */
     public static function get{{idText}}s(?{{queryClass}} $query = null): array {
         $result = self::getSchemaColumn($query, "{{idDbName}}", "{{idName}}");
@@ -676,7 +682,7 @@ class {{name}}Schema extends Schema {
     /**
      * Creates a new {{name}} Entity{{#hasRequest}}
      * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
-     * @param {{{fieldDocNull}}} Optional.{{/fields}}{{#hasStatus}}
+     * @param {{{fieldDocCreate}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
      * @param Date|null $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}{{#hasPositions}}
@@ -743,7 +749,7 @@ class {{name}}Schema extends Schema {
     /**
      * Replaces the {{name}} Entity{{#hasRequest}}
      * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
-     * @param {{{fieldDocNull}}} Optional.{{/fields}}{{#hasStatus}}
+     * @param {{{fieldDocCreate}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}
      * @return bool
@@ -914,7 +920,7 @@ class {{name}}Schema extends Schema {
     /**
      * Deletes the {{name}} Entity
      * @param {{editType}} $query{{#editParents}}
-     * @param {{fieldDoc}}{{/editParents}}{{#hasUsers}}
+     * @param {{fieldArg}}{{/editParents}}{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}{{#hasPositions}}
      * @param bool $skipOrder Optional.{{/hasPositions}}
      * @return bool
@@ -953,7 +959,7 @@ class {{name}}Schema extends Schema {
     /**
      * Removes the {{name}} Entity
      * @param {{editType}} $query{{#editParents}}
-     * @param {{fieldDoc}}{{/editParents}}
+     * @param {{fieldArg}}{{/editParents}}
      * @return bool
      */
     protected static function removeEntity(
@@ -988,7 +994,7 @@ class {{name}}Schema extends Schema {
      * Ensures that the order of the Elements is correct
      * @param {{entityClass}}|null $entity
      * @param {{requestClass}}|null $fields{{#parents}}
-     * @param {{fieldDoc}}{{/parents}}
+     * @param {{fieldArg}}{{/parents}}
      * @return int
      */
     protected static function ensureEntityOrder(
