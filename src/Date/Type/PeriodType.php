@@ -3,6 +3,7 @@ namespace Framework\Date\Type;
 
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
+use Framework\Utils\Strings;
 
 use JsonSerializable;
 
@@ -42,4 +43,14 @@ enum PeriodType implements Enum, JsonSerializable {
 
     case AllPeriod;
     case Custom;
+
+
+
+    /**
+     * Returns a Name of the Enum
+     * @return string
+     */
+    public function getName(): string {
+        return Strings::lowerCaseFirst($this->name);
+    }
 }
