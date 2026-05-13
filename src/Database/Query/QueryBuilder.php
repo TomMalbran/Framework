@@ -18,6 +18,7 @@ use JsonSerializable;
  * The Query Builder
  * phpcs:ignore Generic.Files.LineLength.TooLong
  * @phpstan-type QueryValue Query|Value|Enum|Dictionary|Date|JsonSerializable|array<int|string,mixed>|bool|Assign|float|int|string
+ * @phpstan-type SelectValue Query|Column|string
  */
 class QueryBuilder {
 
@@ -85,11 +86,11 @@ class QueryBuilder {
 
     /**
      * Adds a select to the Select Builder
-     * @param Query|Column|string $select
-     * @param string              $as     Optional.
+     * @param SelectValue $select
+     * @param string      $as     Optional.
      * @return void
      */
-    public function addSelect(Query|Column|string $select, string $as = ""): void {
+    public function addSelect(mixed $select, string $as = ""): void {
         if ($select instanceof Query) {
             $select = "({$select->toSQL()})";
         } elseif ($select instanceof Column) {

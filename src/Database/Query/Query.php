@@ -7,14 +7,14 @@ use Framework\Database\Query\QueryMode;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\WhereBuilder;
 use Framework\Database\Query\Operator;
-use Framework\Database\Type\Column;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 
 /**
  * The Database Query
- * @phpstan-import-type QueryValue from QueryBuilder
- * @phpstan-import-type WhereValue from WhereBuilder
+ * @phpstan-import-type QueryValue  from QueryBuilder
+ * @phpstan-import-type SelectValue from QueryBuilder
+ * @phpstan-import-type WhereValue  from WhereBuilder
  */
 class Query implements QueryLike {
 
@@ -176,22 +176,22 @@ class Query implements QueryLike {
 
     /**
      * Adds a new Column to the Query
-     * @param Column|string $column
-     * @param string        $as     Optional.
+     * @param SelectValue $column
+     * @param string      $as     Optional.
      * @return Query
      */
-    public function column(Column|string $column, string $as = ""): Query {
+    public function column(mixed $column, string $as = ""): Query {
         $this->queryBuilder->addSelect($column, $as);
         return $this;
     }
 
     /**
      * Sets the Columns used in a SELECT query
-     * @param array<string,Column|string>|Column|string $columns
-     * @param Column|string                             ...$selects
+     * @param array<string,SelectValue>|SelectValue $columns
+     * @param SelectValue                           ...$selects
      * @return Query
      */
-    public function columns(array|Column|string $columns, Column|string ...$selects): Query {
+    public function columns(mixed $columns, mixed ...$selects): Query {
         if (is_array($columns)) {
             foreach ($columns as $alias => $column) {
                 $this->queryBuilder->addSelect($column, $alias);
@@ -208,11 +208,11 @@ class Query implements QueryLike {
 
     /**
      * Adds a new Select clause
-     * @param Query|Column|string $select
-     * @param string              $as     Optional.
+     * @param SelectValue $select
+     * @param string      $as     Optional.
      * @return Query
      */
-    public function addSelect(Query|Column|string $select, string $as = ""): Query {
+    public function addSelect(mixed $select, string $as = ""): Query {
         $this->queryBuilder->addSelect($select, $as);
         return $this;
     }
