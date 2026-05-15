@@ -31,10 +31,10 @@ use Framework\Utils\Strings;
  *   fieldValueType: string,
  *   fieldArg: string,
  *   fieldArgValue: string,
- *   fieldDocNull: string,
- *   fieldArgNull: string,
  *   fieldDocDefault: string,
  *   fieldArgDefault: string,
+ *   fieldDocParent: string,
+ *   fieldArgParent: string,
  *   fieldDocEdit: string,
  *   fieldArgEdit: string,
  *   fieldArgCreate: string,
@@ -319,7 +319,6 @@ class SchemaCode {
 
         $typeDoc       = $type;
         $typeValueDoc  = "$typeValue|$type";
-        $typeNull      = "?$type";
         $typeValueNull = "$typeValue|$type|null";
         $canAssign     = !$field->isID && !$field->isParent && !$isDate && !$isEnum;
         $assignDoc     = $canAssign ? "Assign|" : "";
@@ -327,7 +326,6 @@ class SchemaCode {
         $default       = FieldType::getDefault($type);
         $defaultNull   = $default === "null";
         $docNull       = $defaultNull ? "|null" : "";
-        $prefixNull    = $defaultNull ? "?" : "";
 
         $param         = "\${$field->name}";
         $value         = $param;
@@ -336,7 +334,6 @@ class SchemaCode {
         $assignEdit    = $param;
 
         if ($isJSON) {
-            $typeNull      = "$type|null";
             $typeValueNull = "$type|null";
             $typeDoc       = Strings::replace($type, "array", "array<int|string,mixed>");
             $typeValueDoc  = $typeDoc;
@@ -355,10 +352,10 @@ class SchemaCode {
             "fieldValueType"   => $typeValue,
             "fieldArg"         => "$type $param",
             "fieldArgValue"    => "$typeValueDoc $param",
-            "fieldDocNull"     => "$typeDoc|null $param",
-            "fieldArgNull"     => "$typeNull $param",
-            "fieldDocDefault"  => "$type$docNull $param",
-            "fieldArgDefault"  => "$prefixNull$type $param = $default",
+            "fieldDocDefault"  => "$typeDoc$docNull $param",
+            "fieldArgDefault"  => "$typeDoc$docNull $param = $default",
+            "fieldDocParent"   => "$typeValueDoc|null $param",
+            "fieldArgParent"   => "$typeValueNull $param",
             "fieldDocCreate"   => "$typeValueDoc|null $param",
             "fieldArgCreate"   => "$typeValueNull $param = null",
             "fieldDocEdit"     => "$assignDoc$typeValueDoc|null $param",

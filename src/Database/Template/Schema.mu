@@ -335,11 +335,11 @@ class {{name}}Schema extends Schema {
 {{#hasParents}}
     /**
      * Returns the Parents Query{{#parents}}
-     * @param {{fieldDocNull}}{{/parents}}
+     * @param {{fieldDocParent}}{{/parents}}
      * @return {{queryClass}}
      */
     protected static function createParentQuery({{#parents}}
-        {{fieldArgNull}},{{/parents}}
+        {{fieldArgParent}},{{/parents}}
     ): {{queryClass}} {
         $query = new {{queryClass}}();
         {{#parents}}
