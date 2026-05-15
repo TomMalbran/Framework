@@ -188,7 +188,7 @@ class Migration {
         }
 
         // Save the Last Migration
-        SettingData::setCore("migration", $lastMigration);
+        SettingData::setCore("migration", $lastMigration - 1);
         return true;
     }
 }
