@@ -83,7 +83,7 @@ class CredentialModel {
     #[Field]
     public ?Date $passExpiration = null;
 
-    #[Field]
+    #[Field, Requested(isNative: true, canEdit: false)]
     public string $accessToken = "";
 
     #[Field]
@@ -120,9 +120,21 @@ class CredentialModel {
 
 
 
+    #[Requested(isNative: true)]
+    public string $value = "";
+
+    #[Requested(isNative: true)]
+    public string $resetCode = "";
+
+    #[Requested]
+    public string $oldPassword = "";
+
     #[Requested]
     public string $newPassword = "";
 
     #[Requested]
     public string $confirmPassword = "";
+
+    #[Requested(isFile: true)]
+    public string $file = "";
 }

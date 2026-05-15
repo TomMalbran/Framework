@@ -139,14 +139,14 @@ class SchemaFactory {
                 $isPosition   = $fieldName === "position";
                 $isStatus     = $typeName === Status::class;
                 $isEnum       = false;
-                $isModel      = false;
+                $arrayType    = "";
+                $arrayClass   = "";
 
                 if (!$isFieldClass && !$isStatus && !$propType->isBuiltin()) {
                     [ $isEnum, $isValidEnum ] = self::isPropEnum($typeName);
                     if ($isEnum && !$isValidEnum) {
                         continue 2;
                     }
-                    $isModel = !$isEnum;
                 }
 
                 // Get the Attributes
@@ -218,8 +218,6 @@ class SchemaFactory {
 
                 // VIRTUAL: If it has a Virtual attribute. It can be an array.
                 } elseif ($virtual !== null) {
-                    $arrayType  = "";
-                    $arrayClass = "";
                     if ($typeName === "array") {
                         [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType($class, $prop);
                     }
@@ -265,7 +263,16 @@ class SchemaFactory {
                     } elseif ($subRequest !== null) {
                         $requestedFields[] = $requested->fromSubRequest($subRequest);
                     } else {
-                        $requestedFields[] = $requested->setData($fieldName, $typeName, $isEnum);
+                        if ($typeName === "array") {
+                            [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType($class, $prop);
+                        }
+                        $requestedFields[] = $requested->setData(
+                            $fieldName,
+                            $typeName,
+                            $arrayType,
+                            $arrayClass,
+                            $isEnum,
+                        );
                     }
                 }
             }

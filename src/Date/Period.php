@@ -2,6 +2,7 @@
 namespace Framework\Date;
 
 use Framework\IO\Request;
+use Framework\Database\Type\SchemaRequest;
 use Framework\Date\Date;
 use Framework\Date\Type\PeriodType;
 use Framework\Utils\Dictionary;
@@ -22,10 +23,17 @@ class Period implements IteratorAggregate {
 
     /**
      * Creates a new Period instance
-     * @param Request $request
-     * @param string  $prefix  Optional.
+     * @param SchemaRequest|Request $request
+     * @param string                $prefix  Optional.
      */
-    public function __construct(Request $request, string $prefix = "") {
+    public function __construct(
+        SchemaRequest|Request $request,
+        string $prefix = "",
+    ) {
+        if ($request instanceof SchemaRequest) {
+            $request = $request->getRequest();
+        }
+
         $period   = $request->getString("period");
         $fromDate = $request->getString("fromDate");
         $fromHour = $request->getString("fromHour");

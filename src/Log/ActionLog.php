@@ -38,9 +38,9 @@ class ActionLog extends LogActionSchema {
             LogActionColumn::CredentialName,
             LogActionColumn::Module,
             LogActionColumn::Action,
-        ], $request->search->get());
+        ], $request->search);
 
-        $query->credentialID->equalIf($request->credentialID->get());
+        $query->credentialID->equalIf($request->credentialID);
         $query->createdTime->inPeriod($realRequest);
         return $query;
     }
@@ -57,7 +57,7 @@ class ActionLog extends LogActionSchema {
         $query->sessionID->orderByDesc();
         $query->createdTime->orderByDesc();
 
-        $list          = self::getEntityList($query, $request->getRequest());
+        $list          = self::getEntityList($query, $request);
         $result        = [];
         $lastSessionID = 0;
         $lastIndex     = -1;

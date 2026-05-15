@@ -14,38 +14,59 @@ class Requested {
     public bool $canEdit   = true;
     public bool $isMultiID = false;
     public bool $isNative  = false;
+    public bool $isString  = false;
+    public bool $isNumber  = false;
     public bool $isJSON    = false;
     public bool $isDate    = false;
     public bool $isFile    = false;
     public bool $isHour    = false;
 
+    public DateType $dateType  = DateType::None;
+    public string   $dateInput = "";
+    public string   $hourInput = "";
+
 
     /**
      * The Requested Attribute
-     * @param bool $canEdit   Optional.
-     * @param bool $isMultiID Optional.
-     * @param bool $isNative  Optional.
-     * @param bool $isJSON    Optional.
-     * @param bool $isDate    Optional.
-     * @param bool $isFile    Optional.
-     * @param bool $isHour    Optional.
+     * @param bool     $canEdit   Optional.
+     * @param bool     $isMultiID Optional.
+     * @param bool     $isNative  Optional.
+     * @param bool     $isString  Optional.
+     * @param bool     $isNumber  Optional.
+     * @param bool     $isJSON    Optional.
+     * @param bool     $isDate    Optional.
+     * @param bool     $isFile    Optional.
+     * @param bool     $isHour    Optional.
+     * @param DateType $dateType  Optional.
+     * @param string   $dateInput Optional.
+     * @param string   $hourInput Optional.
      */
     public function __construct(
         bool $canEdit = true,
         bool $isMultiID = false,
         bool $isNative = false,
+        bool $isString = false,
+        bool $isNumber = false,
         bool $isJSON = false,
         bool $isDate = false,
         bool $isFile = false,
         bool $isHour = false,
+        DateType $dateType = DateType::None,
+        string $dateInput = "",
+        string $hourInput = "",
     ) {
         $this->canEdit   = $canEdit;
         $this->isMultiID = $isMultiID;
         $this->isNative  = $isNative;
+        $this->isString  = $isString;
+        $this->isNumber  = $isNumber;
         $this->isJSON    = $isJSON;
         $this->isDate    = $isDate;
         $this->isFile    = $isFile;
         $this->isHour    = $isHour;
+        $this->dateType  = $dateType;
+        $this->dateInput = $dateInput;
+        $this->hourInput = $hourInput;
     }
 
 
@@ -56,10 +77,9 @@ class Requested {
 
     public bool      $isField   = false;
     public bool      $hasValue  = false;
+    public string    $subType   = "";
+    public string    $subClass  = "";
     public string    $enumClass = "";
-    public DateType  $dateType  = DateType::None;
-    public string    $dateInput = "";
-    public string    $hourInput = "";
     public int       $decimals  = 0;
 
 
@@ -67,18 +87,28 @@ class Requested {
      * Sets the Data from the Model
      * @param string $name
      * @param string $typeName
+     * @param string $subType
+     * @param string $subClass
      * @param bool   $isEnum
      * @return Requested
      */
     public function setData(
         string $name,
         string $typeName,
+        string $subType,
+        string $subClass,
         bool $isEnum,
     ): Requested {
         $this->name = $name;
 
-        if ($this->isJSON) {
-            $this->type = FieldType::JSON;
+        if ($this->isString) {
+            $this->type     = FieldType::String;
+            $this->hasValue = true;
+        } elseif ($this->isNumber) {
+            $this->type     = FieldType::Number;
+            $this->hasValue = true;
+        } elseif ($this->isJSON) {
+            $this->type     = FieldType::JSON;
         } elseif ($this->isDate) {
             $this->type     = FieldType::Date;
             $this->hasValue = true;
@@ -92,7 +122,9 @@ class Requested {
             $this->enumClass = $typeName;
             $this->isNative  = true;
         } else {
-            $this->type = FieldType::fromType($typeName);
+            $this->type     = FieldType::fromType($typeName);
+            $this->subType  = $subType;
+            $this->subClass = $subClass;
 
             if (!$this->isNative && $this->type !== FieldType::JSON &&
                 $this->type !== FieldType::Array
@@ -111,8 +143,13 @@ class Requested {
      */
     public function fromField(Field $field, bool $isValidated): Requested {
         $this->name = $field->name;
+
         $this->type = $field->type;
-        if ($this->isFile) {
+        if ($this->isString) {
+            $this->type = FieldType::String;
+        } elseif ($this->isNumber) {
+            $this->type = FieldType::Number;
+        } elseif ($this->isFile) {
             $this->type = FieldType::File;
         }
 

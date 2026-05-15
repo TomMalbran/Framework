@@ -12,7 +12,7 @@ use {{namespace}}\{{columnClass}};
 use {{namespace}}\{{queryClass}};{{#hasStatus}}
 use {{namespace}}\{{statusClass}};{{/hasStatus}}
 
-use Framework\IO\Request;{{#hasValidation}}
+{{#hasValidation}}
 use Framework\IO\Errors;{{/hasValidation}}
 use Framework\IO\Search;
 use Framework\IO\Select;{{#valueImports}}
@@ -323,15 +323,17 @@ class {{name}}Schema extends Schema {
         return $result;
     }
 
+{{#hasRequest}}
     /**
      * Creates the List Query
-     * @param Request $request
+     * @param {{requestClass}} $request
      * @return {{queryClass}}
      */
-    protected static function createListQuery(Request $request): {{queryClass}} {
+    protected static function createListQuery({{requestClass}} $request): {{queryClass}} {
         return new {{queryClass}}();
     }
 
+{{/hasRequest}}
 {{#hasParents}}
     /**
      * Returns the Parents Query{{#parents}}
@@ -553,28 +555,33 @@ class {{name}}Schema extends Schema {
 {{/hasID}}
 {{#hasList}}
     /**
-     * Returns a list of {{name}} Entities
-     * @param Request $request{{#parents}}
+     * Returns a list of {{name}} Entities{{#hasRequest}}
+     * @param {{requestClass}} $request{{/hasRequest}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @return list<{{entityClass}}>
      */
-    public static function getList(
-        Request $request,{{#parents}}
+    public static function getList({{#hasRequest}}
+        {{requestClass}} $request,{{/hasRequest}}{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}
     ): array {
+        {{#hasRequest}}
         $query = static::createListQuery($request)->getQuery();
+        {{/hasRequest}}
+        {{^hasRequest}}
+        $query = Query::select("{{tableName}}");
+        {{/hasRequest}}
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
-        $list  = self::getSchemaEntities($query, sort: $request);
+        $list = self::getSchemaEntities($query{{#hasRequest}}, sort: $request{{/hasRequest}});
         return self::constructEntities($list);
     }
 
 {{/hasList}}
     /**
      * Returns an array of {{name}} Entities
-     * @param {{queryClass}}|null $query Optional.
-     * @param Request|null $sort Optional.
+     * @param {{queryClass}}|null $query Optional.{{#hasRequest}}
+     * @param {{requestClass}}|null $request Optional.{{/hasRequest}}
      * @param array<string,string> $selects Optional.
      * @param list<string> $joins Optional.{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
@@ -582,29 +589,41 @@ class {{name}}Schema extends Schema {
      * @return list<{{entityClass}}>
      */
     protected static function getEntityList(
-        ?{{queryClass}} $query = null,
-        ?Request $sort = null,
+        ?{{queryClass}} $query = null,{{#hasRequest}}
+        ?{{requestClass}} $request = null,{{/hasRequest}}
         array $selects = [],
         array $joins = [],{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
         bool $skipSubRequest = false,
     ): array {
-        $list = self::getSchemaEntities($query, $sort, $selects, $joins{{#hasEncrypt}}, decrypted: $decrypted{{/hasEncrypt}}, skipSubRequest: $skipSubRequest);
+        $list = self::getSchemaEntities(
+            query: $query,{{#hasRequest}}
+            sort: $request,{{/hasRequest}}
+            selects: $selects,
+            joins: $joins,{{#hasEncrypt}}
+            decrypted: $decrypted,{{/hasEncrypt}}
+            skipSubRequest: $skipSubRequest,
+        );
         return self::constructEntities($list);
     }
 
 {{#hasList}}
     /**
-     * Returns a Total number of {{name}} Entities
-     * @param Request $request{{#parents}}
+     * Returns a Total number of {{name}} Entities{{#hasRequest}}
+     * @param {{requestClass}} $request{{/hasRequest}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}
      * @return int
      */
-    public static function getTotal(
-        Request $request,{{#parents}}
+    public static function getTotal({{#hasRequest}}
+        {{requestClass}} $request,{{/hasRequest}}{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}
     ): int {
+        {{#hasRequest}}
         $query = static::createListQuery($request)->getQuery();
+        {{/hasRequest}}
+        {{^hasRequest}}
+        $query = Query::select("{{tableName}}");
+        {{/hasRequest}}
         {{#parents}}
         $query->whereIf("{{fieldKey}}", QueryOperator::Equal, {{{fieldValueNull}}});
         {{/parents}}
@@ -680,8 +699,8 @@ class {{name}}Schema extends Schema {
 {{#canCreate}}
 
     /**
-     * Creates a new {{name}} Entity{{#hasRequest}}
-     * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
+     * Creates a new {{name}} Entity{{#hasRequestFields}}
+     * @param {{requestClass}}|null $request Optional.{{/hasRequestFields}}{{#fields}}
      * @param {{{fieldDocCreate}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasTimestamps}}
      * @param Date|null $createdTime Optional.{{/hasTimestamps}}{{#hasUsers}}
@@ -689,8 +708,8 @@ class {{name}}Schema extends Schema {
      * @param bool $skipOrder Optional.{{/hasPositions}}
      * @return int
      */
-    protected static function createEntity({{#hasRequest}}
-        ?{{requestClass}} $entityRequest = null,{{/hasRequest}}{{#fields}}
+    protected static function createEntity({{#hasRequestFields}}
+        ?{{requestClass}} $request = null,{{/hasRequestFields}}{{#fields}}
         {{fieldArgCreate}},{{/fields}}{{#hasStatus}}
         ?{{statusClass}} $status = null,{{/hasStatus}}{{#hasTimestamps}}
         ?Date $createdTime = null,{{/hasTimestamps}}{{#hasUsers}}
@@ -701,15 +720,15 @@ class {{name}}Schema extends Schema {
         {{#fields}}
         if ({{fieldParam}} !== null) {
             $fields["{{fieldKey}}"] = {{{fieldAssign}}};
-        }{{#fieldIsRequested}} elseif ($entityRequest !== null) {
-            $fields["{{fieldKey}}"] = $entityRequest->{{fieldName}};
+        }{{#fieldIsRequested}} elseif ($request !== null) {
+            $fields["{{fieldKey}}"] = $request->{{fieldName}};
         }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
             $fields["status"] = $status;
-        }{{#hasStatusRequest}} elseif ($entityRequest !== null) {
-            $fields["status"] = $entityRequest->status;
+        }{{#hasStatusRequest}} elseif ($request !== null) {
+            $fields["status"] = $request->status;
         }{{/hasStatusRequest}}
         {{/hasStatus}}
         {{#hasTimestamps}}
@@ -747,15 +766,15 @@ class {{name}}Schema extends Schema {
 {{#canReplace}}
 
     /**
-     * Replaces the {{name}} Entity{{#hasRequest}}
-     * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
+     * Replaces the {{name}} Entity{{#hasRequestFields}}
+     * @param {{requestClass}}|null $request Optional.{{/hasRequestFields}}{{#fields}}
      * @param {{{fieldDocCreate}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param int $createdUser Optional.{{/hasUsers}}
      * @return bool
      */
-    protected static function replaceEntity({{#hasRequest}}
-        ?{{requestClass}} $entityRequest = null,{{/hasRequest}}{{#fields}}
+    protected static function replaceEntity({{#hasRequestFields}}
+        ?{{requestClass}} $request = null,{{/hasRequestFields}}{{#fields}}
         {{fieldArgCreate}},{{/fields}}{{#hasStatus}}
         ?{{statusClass}} $status = null,{{/hasStatus}}{{#hasUsers}}
         int $createdUser = 0,{{/hasUsers}}
@@ -764,15 +783,15 @@ class {{name}}Schema extends Schema {
         {{#fields}}
         if ({{fieldParam}} !== null) {
             $fields["{{fieldKey}}"] = {{{fieldAssign}}};
-        }{{#fieldIsRequested}} elseif ($entityRequest !== null) {
-            $fields["{{fieldKey}}"] = $entityRequest->{{fieldName}};
+        }{{#fieldIsRequested}} elseif ($request !== null) {
+            $fields["{{fieldKey}}"] = $request->{{fieldName}};
         }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
             $fields["status"] = $status;
-        }{{#hasStatusRequest}} elseif ($entityRequest !== null) {
-            $fields["status"] = $entityRequest->status;
+        }{{#hasStatusRequest}} elseif ($request !== null) {
+            $fields["status"] = $request->status;
         }{{/hasStatusRequest}}
         {{/hasStatus}}
         {{#hasUsers}}
@@ -792,8 +811,8 @@ class {{name}}Schema extends Schema {
 
     /**
      * Edits a {{name}} Entity
-     * @param {{editType}} $query{{#hasRequest}}
-     * @param {{requestClass}}|null $entityRequest Optional.{{/hasRequest}}{{#fields}}
+     * @param {{editType}} $query{{#hasRequestFields}}
+     * @param {{requestClass}}|null $request Optional.{{/hasRequestFields}}{{#fields}}
      * @param {{{fieldDocEdit}}} Optional.{{/fields}}{{#hasStatus}}
      * @param {{statusClass}}|null $status Optional.{{/hasStatus}}{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}{{#canDelete}}
@@ -803,8 +822,8 @@ class {{name}}Schema extends Schema {
      * @return bool
      */
     protected static function editEntity(
-        {{editType}} $query,{{#hasRequest}}
-        ?{{requestClass}} $entityRequest = null,{{/hasRequest}}{{#fields}}
+        {{editType}} $query,{{#hasRequestFields}}
+        ?{{requestClass}} $request = null,{{/hasRequestFields}}{{#fields}}
         {{fieldArgEdit}},{{/fields}}{{#hasStatus}}
         ?{{statusClass}} $status = null,{{/hasStatus}}{{#hasUsers}}
         int $modifiedUser = 0,{{/hasUsers}}{{#canDelete}}
@@ -816,15 +835,15 @@ class {{name}}Schema extends Schema {
         {{#fields}}
         if ({{fieldParam}} !== null) {
             $fields["{{fieldKey}}"] = {{{fieldAssignEdit}}};
-        }{{#fieldIsRequested}} elseif ($entityRequest !== null) {
-            $fields["{{fieldKey}}"] = $entityRequest->{{fieldName}};
+        }{{#fieldIsRequested}} elseif ($request !== null) {
+            $fields["{{fieldKey}}"] = $request->{{fieldName}};
         }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
         if ($status !== null) {
             $fields["status"] = $status;
-        }{{#hasStatusRequest}} elseif ($entityRequest !== null) {
-            $fields["status"] = $entityRequest->status;
+        }{{#hasStatusRequest}} elseif ($request !== null) {
+            $fields["status"] = $request->status;
         }{{/hasStatusRequest}}
         {{/hasStatus}}
         {{#canDelete}}
@@ -989,7 +1008,7 @@ class {{name}}Schema extends Schema {
         return self::removeSchemaEntity($query);
     }
 
-{{#hasRequest}}
+{{#hasRequestFields}}
     /**
      * Ensures that the order of the Elements is correct
      * @param {{entityClass}}|null $entity
@@ -1012,7 +1031,7 @@ class {{name}}Schema extends Schema {
         );
     }
 
-{{/hasRequest}}
+{{/hasRequestFields}}
 {{/hasPositions}}
     /**
      * Ensures that only one Entity has the Unique column set

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Auth;
 
+use Framework\IO\Value\StringValue;
 use Framework\Auth\AuthToken;
 use Framework\Auth\Credential;
 use Framework\Auth\Reset;
@@ -261,10 +262,11 @@ class Auth {
 
     /**
      * Returns the Credential to Login from the given Email
-     * @param string $email
+     * @param StringValue|string $email
      * @return CredentialEntity
      */
-    public static function getLoginCredential(string $email): CredentialEntity {
+    public static function getLoginCredential(StringValue|string $email): CredentialEntity {
+        $email = Strings::toString($email);
         $parts = Strings::split($email, "|");
         $user  = null;
 

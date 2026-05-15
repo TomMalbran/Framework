@@ -10,6 +10,7 @@ use Framework\Database\Model\Requested;
 use Framework\Database\Model\Expression;
 use Framework\Database\Model\Relation;
 use Framework\Date\Date;
+use Framework\Date\Type\DateType;
 use Framework\Utils\JSON;
 
 /**
@@ -63,6 +64,21 @@ class NotificationQueueModel {
 
     #[Field]
     public bool $isDiscarded = false;
+
+
+
+    #[Requested(isNative: true)]
+    public string $search = "";
+
+    #[Requested(isNative: true, dateType: DateType::Start, hourInput: "fromHour")]
+    public ?Date $fromDate = null;
+
+    #[Requested(isNative: true, dateType: DateType::End, hourInput: "toHour")]
+    public ?Date $toDate = null;
+
+    /** @var list<string> */
+    #[Requested(isNative: true)]
+    public array $results = [];
 
 
 

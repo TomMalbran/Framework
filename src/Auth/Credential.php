@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Auth;
 
-use Framework\IO\Request;
 use Framework\IO\Search;
 use Framework\IO\Select;
 use Framework\IO\Value\NumberValue;
@@ -135,27 +134,27 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns all the Credentials
-     * @param CredentialQuery $query
-     * @param Request|null    $sort  Optional.
+     * @param CredentialQuery        $query
+     * @param CredentialRequest|null $sort  Optional.
      * @return list<CredentialEntity>
      */
     public static function getList(
         CredentialQuery $query,
-        ?Request $sort = null,
+        ?CredentialRequest $sort = null,
     ): array {
         return self::getCredentials($query, $sort, complete: false);
     }
 
     /**
      * Returns all the Credentials for the given Query
-     * @param CredentialQuery|null $query    Optional.
-     * @param Request|null         $sort     Optional.
-     * @param bool                 $complete Optional.
+     * @param CredentialQuery|null   $query    Optional.
+     * @param CredentialRequest|null $sort     Optional.
+     * @param bool                   $complete Optional.
      * @return list<CredentialEntity>
      */
     private static function getCredentials(
         ?CredentialQuery $query = null,
-        ?Request $sort = null,
+        ?CredentialRequest $sort = null,
         bool $complete = false,
     ): array {
         $list   = self::getEntityList($query, $sort);
@@ -249,12 +248,12 @@ class Credential extends CredentialSchema {
     /**
      * Returns true if the given password is correct for the given Credential ID
      * @param CredentialEntity|int $credential
-     * @param string               $password
+     * @param StringValue|string   $password
      * @return bool
      */
     public static function isPasswordCorrect(
         CredentialEntity|int $credential,
-        string $password,
+        StringValue|string $password,
     ): bool {
         if (!($credential instanceof CredentialEntity)) {
             $credential = self::getByID($credential, complete: true);
@@ -262,21 +261,25 @@ class Credential extends CredentialSchema {
         if ($credential->isEmpty()) {
             return false;
         }
-
         if ($credential->passExpiration->isPast()) {
             return false;
         }
+
         $hash = self::createHash($password, $credential->salt);
         return $hash["password"] === $credential->password;
     }
 
     /**
      * Returns true if the given Credential requires a password change
-     * @param int    $credentialID Optional.
-     * @param string $email        Optional.
+     * @param int                $credentialID Optional.
+     * @param StringValue|string $email        Optional.
      * @return bool
      */
-    public static function reqPassChange(int $credentialID = 0, string $email = ""): bool {
+    public static function reqPassChange(
+        int $credentialID = 0,
+        StringValue|string $email = "",
+    ): bool {
+        $email = Strings::toString($email);
         if ($credentialID === 0 && $email === "") {
             return false;
         }
@@ -452,11 +455,11 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Password
-     * @param int    $credentialID
-     * @param string $password
+     * @param int                $credentialID
+     * @param StringValue|string $password
      * @return array{password:string,salt:string}
      */
-    public static function setPassword(int $credentialID, string $password): array {
+    public static function setPassword(int $credentialID, StringValue|string $password): array {
         $hash = self::createHash($password);
         self::editEntity(
             $credentialID,
@@ -608,11 +611,15 @@ class Credential extends CredentialSchema {
 
     /**
      * Creates a Hash and Salt (if required) for the given Password
-     * @param string $pass
-     * @param string $salt Optional.
+     * @param StringValue|string $password
+     * @param string             $salt     Optional.
      * @return array{password:string,salt:string}
      */
-    public static function createHash(string $pass, string $salt = ""): array {
+    public static function createHash(
+        StringValue|string $password,
+        string $salt = "",
+    ): array {
+        $pass = Strings::toString($password);
         $salt = $salt !== "" ? $salt : Strings::random(50);
         $hash = base64_encode(hash_hmac("sha256", $pass, $salt, binary: true));
         return [ "password" => $hash, "salt" => $salt ];

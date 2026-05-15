@@ -3,7 +3,10 @@ namespace Framework\Log\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 use Framework\Auth\Model\CredentialDeviceModel;
+use Framework\Date\Date;
+use Framework\Date\Type\DateType;
 
 /**
  * The Log Device Model
@@ -28,4 +31,15 @@ class LogDeviceModel {
 
     #[Field]
     public bool $wasAdded = false;
+
+
+
+    #[Requested(isNative: true)]
+    public string $search = "";
+
+    #[Requested(isNative: true, dateType: DateType::Start)]
+    public ?Date $fromDate = null;
+
+    #[Requested(isNative: true, dateType: DateType::End)]
+    public ?Date $toDate = null;
 }

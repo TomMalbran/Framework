@@ -4,6 +4,7 @@ namespace Framework\Database\Builder;
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
 use Framework\Builder\Builder;
+use Framework\Date\Date;
 use Framework\Date\Type\DateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -86,18 +87,41 @@ class RequestCode {
                 continue;
             }
 
-            $type     = $requested->type->getCodeType($requested->enumClass);
-            $typeName = Strings::upperCaseFirst($type);
+            $type = $requested->type->getCodeType($requested->enumClass);
 
-            $getter = "\$request->get{$typeName}(\"{$requested->name}\")";
-            if ($requested->type === FieldType::Enum) {
-                $getter = "{$type}::fromRequest(\$request, \"{$requested->name}\")";
+            switch ($requested->type) {
+            case FieldType::Enum:
+                $getter   = "{$type}::fromRequest(\$this->request, \"{$requested->name}\")";
+                break;
+
+            case FieldType::Date:
+                $dateType = $requested->dateType->toString();
+                $name     = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
+                $hour     = $requested->hourInput !== "" ? ", \"{$requested->hourInput}\"" : "";
+                $getter   = "\$this->request->toDayMoment(\"{$name}\", DateType::{$dateType}{$hour})";
+                break;
+
+            case FieldType::Array:
+                if ($requested->subClass !== "") {
+                    $typeName = Strings::substringAfter($requested->subClass, "\\");
+                    $getter   = "{$typeName}::fromList(\$this->request->getStrings(\"{$requested->name}\"))";
+                } else {
+                    $typeName = Strings::substringBetween($requested->subType, "list<", ">");
+                    $typeName = Strings::upperCaseFirst($typeName);
+                    $getter   = "\$this->request->get{$typeName}s(\"{$requested->name}\")";
+                }
+                break;
+
+            default:
+                $typeName = Strings::upperCaseFirst($type);
+                $getter   = "\$this->request->get{$typeName}(\"{$requested->name}\")";
             }
 
             $result[] = [
-                "type"   => $type,
-                "getter" => $getter,
-                "name"   => $requested->name,
+                "type"    => $type,
+                "subType" => $requested->subType,
+                "getter"  => $getter,
+                "name"    => $requested->name,
             ];
         }
         return $result;
@@ -177,6 +201,12 @@ class RequestCode {
         foreach ($schemaModel->requestedFields as $requested) {
             if ($requested->isNative && $requested->type === FieldType::Enum) {
                 $result[$requested->enumClass] = 1;
+            }
+            if ($requested->isNative && $requested->subClass !== "") {
+                $result[$requested->subClass] = 1;
+            }
+            if ($requested->isNative && $requested->type === FieldType::Date) {
+                $result[Date::class] = 1;
             }
             if ($requested->dateType !== DateType::None) {
                 $result[DateType::class] = 1;

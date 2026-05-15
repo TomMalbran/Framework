@@ -303,8 +303,10 @@ class Request implements IteratorAggregate, JsonSerializable {
     public function isActive(string $key): bool {
         if (isset($this->request[$key])) {
             $value = $this->request[$key];
-            return $value === "true" || $value === true ||
-                $value === "1" || $value === 1;
+            return $value === "true" ||
+                $value === true ||
+                $value === "1" ||
+                $value === 1;
         }
         return false;
     }
@@ -760,10 +762,19 @@ class Request implements IteratorAggregate, JsonSerializable {
      * Returns the given string as a time at the given moment of the day
      * @param string   $key
      * @param DateType $dateType    Optional.
+     * @param string   $hourKey     Optional.
      * @param bool     $useTimeZone Optional.
      * @return Date
      */
-    public function toDayMoment(string $key, DateType $dateType = DateType::Start, bool $useTimeZone = true): Date {
+    public function toDayMoment(
+        string $key,
+        DateType $dateType = DateType::Start,
+        string $hourKey = "",
+        bool $useTimeZone = true,
+    ): Date {
+        if ($hourKey !== "" && $this->has($hourKey)) {
+            return $this->toTimeHour($key, $hourKey, $useTimeZone);
+        }
         $value = $this->getString($key);
         return Date::create($value)->toServerTime($useTimeZone)->toDayMoment($dateType);
     }
@@ -877,7 +888,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request file at the given key
+     * Returns the request file at the given key as CURLFile
      * @param string $key
      * @return CURLFile|null
      */

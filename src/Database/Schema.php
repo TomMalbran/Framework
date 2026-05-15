@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database;
 
-use Framework\IO\Request;
 use Framework\IO\Search;
 use Framework\IO\Select;
 use Framework\Database\Database;
@@ -14,6 +13,7 @@ use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Query\SelectionBuilder;
 use Framework\Database\Query\ModificationBuilder;
 use Framework\Database\Model\SubRequest;
+use Framework\Database\Type\SchemaRequest;
 use Framework\System\Config;
 use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
@@ -229,7 +229,7 @@ class Schema {
     /**
      * Returns an array of Entities Data
      * @param QueryLike|null       $query          Optional.
-     * @param Request|null         $sort           Optional.
+     * @param SchemaRequest|null   $sort           Optional.
      * @param array<string,string> $selects        Optional.
      * @param list<string>         $joins          Optional.
      * @param bool                 $decrypted      Optional.
@@ -238,7 +238,7 @@ class Schema {
      */
     protected static function getSchemaEntities(
         ?QueryLike $query = null,
-        ?Request $sort = null,
+        ?SchemaRequest $sort = null,
         array $selects = [],
         array $joins = [],
         bool $decrypted = false,
@@ -285,7 +285,7 @@ class Schema {
     /**
      * Returns the SQL expression of the Query for Debugging
      * @param QueryLike|null       $query     Optional.
-     * @param Request|null         $sort      Optional.
+     * @param SchemaRequest|null   $sort      Optional.
      * @param array<string,string> $selects   Optional.
      * @param list<string>         $joins     Optional.
      * @param bool                 $decrypted Optional.
@@ -293,7 +293,7 @@ class Schema {
      */
     protected static function getDebugSQL(
         ?QueryLike $query = null,
-        ?Request $sort = null,
+        ?SchemaRequest $sort = null,
         array $selects = [],
         array $joins = [],
         bool $decrypted = false,
@@ -635,22 +635,22 @@ class Schema {
 
     /**
      * Generates a Query with Sorting
-     * @param QueryLike|null $query Optional.
-     * @param Request|null   $sort  Optional.
+     * @param QueryLike|null     $query Optional.
+     * @param SchemaRequest|null $sort  Optional.
      * @return Query
      */
     private static function generateQuerySort(
         ?QueryLike $query = null,
-        ?Request $sort = null,
+        ?SchemaRequest $sort = null,
     ): Query {
         $query = self::generateQuery($query);
 
         if ($sort !== null) {
-            if ($sort->has("orderBy")) {
-                $query->orderBy($sort->getString("orderBy"), $sort->has("orderAsc"));
+            if ($sort->orderBy !== "") {
+                $query->orderBy($sort->orderBy, $sort->orderAsc);
             }
-            if ($sort->exists("page")) {
-                $query->paginate($sort->getInt("page"), $sort->getInt("amount"));
+            if ($sort->page !== -1 && $sort->amount > 0) {
+                $query->paginate($sort->page, $sort->amount);
             }
         } elseif (!$query->hasOrder() && static::$idDbName !== "") {
             $query->orderBy(static::$idDbName, isASC: true);

@@ -1,10 +1,10 @@
 <?php
 namespace Framework\Email;
 
-use Framework\IO\Request;
 use Framework\Email\Email;
 use Framework\Email\EmailResult;
 use Framework\Email\Schema\EmailQueueSchema;
+use Framework\Email\Schema\EmailQueueRequest;
 use Framework\Email\Schema\EmailQueueEntity;
 use Framework\Email\Schema\EmailQueueColumn;
 use Framework\Email\Schema\EmailQueueQuery;
@@ -20,28 +20,22 @@ class EmailQueue extends EmailQueueSchema {
 
     /**
      * Creates the List Query
-     * @param Request $request
+     * @param EmailQueueRequest $request
      * @return EmailQueueQuery
      */
     #[\Override]
-    protected static function createListQuery(Request $request): EmailQueueQuery {
-        $search   = $request->getString("search");
-        $fromTime = $request->toDayStartHour("fromDate", "fromHour");
-        $toTime   = $request->toDayEndHour("toDate", "toHour");
-        $dataID   = $request->getInt("dataID");
-        $results  = EmailResult::fromList($request->getStrings("results"));
-
+    protected static function createListQuery(EmailQueueRequest $request): EmailQueueQuery {
         $query = new EmailQueueQuery();
         $query->search([
             EmailQueueColumn::SendTo,
             EmailQueueColumn::Subject,
             EmailQueueColumn::Message,
-        ], $search);
+        ], $request->search);
 
-        $query->createdTime->greaterThan($fromTime);
-        $query->createdTime->lessThan($toTime);
-        $query->dataID->equalIf($dataID);
-        $query->emailResult->in($results);
+        $query->createdTime->greaterThan($request->fromDate);
+        $query->createdTime->lessThan($request->toDate);
+        $query->dataID->equalIf($request->dataID);
+        $query->emailResult->in(EmailResult::fromList($request->results));
         return $query;
     }
 

@@ -63,12 +63,12 @@ class SchemaCode {
         $imports      = self::getImports($schemaModel);
         $idField      = self::getIDField($schemaModel);
         $fields       = self::getAllFields($schemaModel);
-        $hasRequest   = self::hasRequest($fields);
         $uniques      = self::getSomeFields($schemaModel, isUnique: true);
         $parents      = self::getSomeFields($schemaModel, isParent: true);
         $editParents  = $schemaModel->hasPositions ? $parents : [];
         $validations  = self::getValidations($schemaModel, $parents);
 
+        $hasRequest   = count($schemaModel->requestedFields) > 0;
         $hasVirtual   = count($schemaModel->virtualFields) > 0;
         $hasUniques   = count($uniques) > 0;
         $hasParents   = count($parents) > 0;
@@ -97,7 +97,7 @@ class SchemaCode {
             "errorPrefix"        => Strings::toConstantCase($schemaModel->fantasyName) . "_ERROR_",
 
             "editType"           => $schemaModel->hasID ? "$queryName|{$idField["idReturnType"]}" : $queryName,
-            "hasQuery"           => $schemaModel->hasID || count($uniques) > 0,
+            "hasQuery"           => $schemaModel->hasID || count($uniques) > 0 || !$hasRequest,
             "hasList"            => !$schemaModel->skipList,
 
             "hasPositions"       => $schemaModel->hasPositions,
@@ -118,6 +118,8 @@ class SchemaCode {
             "canDelete"          => $schemaModel->canDelete,
             "canDeleteValue"     => $schemaModel->canDelete ? "true" : "false",
 
+            "hasRequest"         => $hasRequest,
+            "hasRequestFields"   => self::hasRequestFields($fields),
             "hasVirtual"         => $hasVirtual,
             "mainFields"         => $mainFields,
             "hasExpressions"     => count($expressions) > 0,
@@ -128,7 +130,6 @@ class SchemaCode {
             "relations"          => $relations,
             "hasSubRequests"     => count($subRequests) > 0,
             "subRequests"        => $subRequests,
-            "hasRequest"         => $hasRequest,
             "fields"             => $fields,
             "uniques"            => $uniques,
             "hasParents"         => $hasParents,
@@ -257,7 +258,7 @@ class SchemaCode {
      * @param list<Property> $fields
      * @return bool
      */
-    private static function hasRequest(array $fields): bool {
+    private static function hasRequestFields(array $fields): bool {
         foreach ($fields as $field) {
             if ($field["fieldIsRequested"]) {
                 return true;

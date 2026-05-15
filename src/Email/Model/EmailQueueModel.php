@@ -9,6 +9,7 @@ use Framework\Database\Model\Requested;
 use Framework\Database\Model\Expression;
 use Framework\System\EmailCode;
 use Framework\Date\Date;
+use Framework\Date\Type\DateType;
 use Framework\Utils\JSON;
 
 /**
@@ -39,7 +40,7 @@ class EmailQueueModel {
     #[Field]
     public EmailResult $emailResult = EmailResult::None;
 
-    #[Field]
+    #[Field, Requested(isNative: true)]
     public int $dataID = 0;
 
 
@@ -48,6 +49,23 @@ class EmailQueueModel {
 
     #[Field]
     public ?Date $sentTime = null;
+
+
+
+    #[Requested(isNative: true)]
+    public string $search = "";
+
+    #[Requested(isNative: true, dateType: DateType::Start, hourInput: "fromHour")]
+    public ?Date $fromDate = null;
+
+    #[Requested(isNative: true, dateType: DateType::End, hourInput: "toHour")]
+    public ?Date $toDate = null;
+
+    /** @var list<string> */
+    #[Requested(isNative: true)]
+    public array $results = [];
+
+
 
 
 

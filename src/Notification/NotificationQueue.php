@@ -1,11 +1,11 @@
 <?php
 namespace Framework\Notification;
 
-use Framework\IO\Request;
 use Framework\Auth\Device;
 use Framework\Notification\Notification;
 use Framework\Notification\NotificationResult;
 use Framework\Notification\Schema\NotificationQueueSchema;
+use Framework\Notification\Schema\NotificationQueueRequest;
 use Framework\Notification\Schema\NotificationQueueEntity;
 use Framework\Notification\Schema\NotificationQueueColumn;
 use Framework\Notification\Schema\NotificationQueueQuery;
@@ -34,27 +34,22 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Creates the List Query
-     * @param Request $request
+     * @param NotificationQueueRequest $request
      * @return NotificationQueueQuery
      */
     #[\Override]
-    protected static function createListQuery(Request $request): NotificationQueueQuery {
-        $search   = $request->getString("search");
-        $fromTime = $request->toDayStartHour("fromDate", "fromHour");
-        $toTime   = $request->toDayEndHour("toDate", "toHour");
-        $results  = NotificationResult::fromList($request->getStrings("results"));
-
+    protected static function createListQuery(NotificationQueueRequest $request): NotificationQueueQuery {
         $query = new NotificationQueueQuery();
         $query->search([
             NotificationQueueColumn::Title,
             NotificationQueueColumn::Message,
             NotificationQueueColumn::CredentialFirstName,
             NotificationQueueColumn::CredentialLastName,
-        ], $search);
+        ], $request->search);
 
-        $query->createdTime->greaterThan($fromTime);
-        $query->createdTime->lessThan($toTime);
-        $query->notificationResult->in($results);
+        $query->createdTime->greaterThan($request->fromDate);
+        $query->createdTime->lessThan($request->toDate);
+        $query->notificationResult->in(NotificationResult::fromList($request->results));
         return $query;
     }
 
@@ -96,12 +91,16 @@ class NotificationQueue extends NotificationQueueSchema {
 
     /**
      * Returns all the Notifications for the given Credential
-     * @param int     $credentialID
-     * @param int     $currentUser
-     * @param Request $sort
+     * @param int                      $credentialID
+     * @param int                      $currentUser
+     * @param NotificationQueueRequest $sort
      * @return list<NotificationQueueEntity>
      */
-    public static function getAllForCredential(int $credentialID, int $currentUser, Request $sort): array {
+    public static function getAllForCredential(
+        int $credentialID,
+        int $currentUser,
+        NotificationQueueRequest $sort,
+    ): array {
         $time  = Date::now()->subtract(days: 30);
 
         $query = new NotificationQueueQuery();

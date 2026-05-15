@@ -1,8 +1,8 @@
 <?php
 namespace Framework\Log;
 
-use Framework\IO\Request;
 use Framework\Log\Schema\LogDeviceSchema;
+use Framework\Log\Schema\LogDeviceRequest;
 use Framework\Log\Schema\LogDeviceColumn;
 use Framework\Log\Schema\LogDeviceQuery;
 use Framework\System\Config;
@@ -16,23 +16,19 @@ class DeviceLog extends LogDeviceSchema {
 
     /**
      * Creates the List Query
-     * @param Request $request
+     * @param LogDeviceRequest $request
      * @return LogDeviceQuery
      */
     #[\Override]
-    protected static function createListQuery(Request $request): LogDeviceQuery {
-        $search   = $request->getString("search");
-        $fromTime = $request->toDayStart("fromDate");
-        $toTime   = $request->toDayEnd("toDate");
-
+    protected static function createListQuery(LogDeviceRequest $request): LogDeviceQuery {
         $query = new LogDeviceQuery();
         $query->search([
             LogDeviceColumn::PlayerID,
             LogDeviceColumn::UserAgent,
-        ], $search);
+        ], $request->search);
 
-        $query->createdTime->greaterThan($fromTime);
-        $query->createdTime->lessThan($toTime);
+        $query->createdTime->greaterThan($request->fromDate);
+        $query->createdTime->lessThan($request->toDate);
         return $query;
     }
 

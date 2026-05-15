@@ -148,7 +148,9 @@ class Builder {
 
         $content = self::$templates[$name];
         $result  = Mustache::render($content, $data);
-        return self::alignParams($result);
+        $result  = self::alignParams($result);
+        $result  = Strings::replace($result, "(\n    ): ", "(): ");
+        return $result;
     }
 
     /**

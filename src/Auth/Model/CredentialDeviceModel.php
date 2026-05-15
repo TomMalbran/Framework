@@ -3,6 +3,7 @@ namespace Framework\Auth\Model;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
 
 /**
  * The Credential Device Model
@@ -19,6 +20,6 @@ class CredentialDeviceModel {
     #[Field(isPrimary: true)]
     public string $userAgent = "";
 
-    #[Field(isPrimary: true)]
+    #[Field(isPrimary: true), Requested(isNative: true)]
     public string $playerID = "";
 }

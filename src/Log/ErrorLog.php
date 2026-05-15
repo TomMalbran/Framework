@@ -2,10 +2,10 @@
 namespace Framework\Log;
 
 use Framework\Application;
-use Framework\IO\Request;
 use Framework\Discovery\Package;
 use Framework\Database\Query\Assign;
 use Framework\Log\Schema\LogErrorSchema;
+use Framework\Log\Schema\LogErrorRequest;
 use Framework\Log\Schema\LogErrorColumn;
 use Framework\Log\Schema\LogErrorQuery;
 use Framework\System\Config;
@@ -46,28 +46,23 @@ class ErrorLog extends LogErrorSchema {
 
     /**
      * Creates the List Query
-     * @param Request $request
+     * @param LogErrorRequest $request
      * @return LogErrorQuery
      */
     #[\Override]
-    protected static function createListQuery(Request $request): LogErrorQuery {
-        $search     = $request->getString("search");
-        $fromTime   = $request->toDayStartHour("fromDate", "fromHour");
-        $toTime     = $request->toDayEndHour("toDate", "toHour");
-        $isResolved = $request->getString("isResolved");
-
+    protected static function createListQuery(LogErrorRequest $request): LogErrorQuery {
         $query = new LogErrorQuery();
         $query->search([
             LogErrorColumn::Description,
             LogErrorColumn::File,
-        ], $search);
+        ], $request->search);
 
-        $query->createdTime->greaterThan($fromTime);
-        $query->createdTime->lessThan($toTime);
+        $query->createdTime->greaterThan($request->fromDate);
+        $query->createdTime->lessThan($request->toDate);
 
-        if ($isResolved === "yes") {
+        if ($request->isResolved === "yes") {
             $query->isResolved->isTrue();
-        } elseif ($isResolved === "no") {
+        } elseif ($request->isResolved === "no") {
             $query->isResolved->isFalse();
         }
         return $query;

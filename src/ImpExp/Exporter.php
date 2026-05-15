@@ -1,7 +1,7 @@
 <?php
 namespace Framework\ImpExp;
 
-use Framework\IO\Request;
+use Framework\Database\Type\SchemaRequest;
 use Framework\Intl\NLS;
 use Framework\ImpExp\ExporterWriter;
 use Framework\ImpExp\XLSXWriter;
@@ -108,13 +108,13 @@ class Exporter {
 
     /**
      * Starts a Chunk to Export
-     * @param Request $request
-     * @param int     $perPage Optional.
+     * @param SchemaRequest $request
+     * @param int           $perPage Optional.
      * @return Exporter
      */
-    public function startChunk(Request $request, int $perPage = 2000): Exporter {
-        $request->set("amount", $perPage);
-        $request->set("page", $this->page);
+    public function startChunk(SchemaRequest $request, int $perPage = 2000): Exporter {
+        $request->amount = $perPage;
+        $request->page   = $this->page;
 
         $this->page     += 1;
         $this->requests += $perPage;

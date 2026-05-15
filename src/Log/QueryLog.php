@@ -2,11 +2,11 @@
 namespace Framework\Log;
 
 use Framework\Application;
-use Framework\IO\Request;
 use Framework\Database\Query\Assign;
 use Framework\Auth\Auth;
 use Framework\System\Config;
 use Framework\Log\Schema\LogQuerySchema;
+use Framework\Log\Schema\LogQueryRequest;
 use Framework\Log\Schema\LogQueryColumn;
 use Framework\Log\Schema\LogQueryQuery;
 use Framework\Date\Date;
@@ -20,27 +20,22 @@ class QueryLog extends LogQuerySchema {
 
     /**
      * Creates the List Query
-     * @param Request $request
+     * @param LogQueryRequest $request
      * @return LogQueryQuery
      */
     #[\Override]
-    protected static function createListQuery(Request $request): LogQueryQuery {
-        $search     = $request->getString("search");
-        $fromTime   = $request->toDayStartHour("fromDate", "fromHour");
-        $toTime     = $request->toDayEndHour("toDate", "toHour");
-        $isResolved = $request->getString("isResolved");
-
+    protected static function createListQuery(LogQueryRequest $request): LogQueryQuery {
         $query = new LogQueryQuery();
         $query->search([
             LogQueryColumn::Expression,
-        ], $search);
+        ], $request->search);
 
-        $query->createdTime->greaterThan($fromTime);
-        $query->createdTime->lessThan($toTime);
+        $query->createdTime->greaterThan($request->fromDate);
+        $query->createdTime->lessThan($request->toDate);
 
-        if ($isResolved === "yes") {
+        if ($request->isResolved === "yes") {
             $query->isResolved->isTrue();
-        } elseif ($isResolved === "no") {
+        } elseif ($request->isResolved === "no") {
             $query->isResolved->isFalse();
         }
         return $query;

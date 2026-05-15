@@ -5,6 +5,7 @@ use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Requested;
 use Framework\Date\Date;
+use Framework\Date\Type\DateType;
 
 /**
  * The Log Query Model
@@ -29,7 +30,7 @@ class LogQueryModel {
     #[Field]
     public int $amount = 0;
 
-    #[Field]
+    #[Field, Requested(isNative: true, isString: true)]
     public bool $isResolved = false;
 
     #[Field]
@@ -43,4 +44,15 @@ class LogQueryModel {
 
     #[Field]
     public int $updatedUser = 0;
+
+
+
+    #[Requested(isNative: true)]
+    public string $search = "";
+
+    #[Requested(isNative: true, dateType: DateType::Start, hourInput: "fromHour")]
+    public ?Date $fromDate = null;
+
+    #[Requested(isNative: true, dateType: DateType::End, hourInput: "toHour")]
+    public ?Date $toDate = null;
 }

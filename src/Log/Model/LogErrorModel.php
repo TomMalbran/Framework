@@ -5,6 +5,7 @@ use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Requested;
 use Framework\Date\Date;
+use Framework\Date\Type\DateType;
 
 /**
  * The Log Error Model
@@ -46,9 +47,20 @@ class LogErrorModel {
     #[Field]
     public int $amount = 0;
 
-    #[Field]
+    #[Field, Requested(isNative: true, isString: true)]
     public bool $isResolved = false;
 
     #[Field]
     public ?Date $updatedTime = null;
+
+
+
+    #[Requested(isNative: true)]
+    public string $search = "";
+
+    #[Requested(isNative: true, dateType: DateType::Start, hourInput: "fromHour")]
+    public ?Date $fromDate = null;
+
+    #[Requested(isNative: true, dateType: DateType::End, hourInput: "toHour")]
+    public ?Date $toDate = null;
 }

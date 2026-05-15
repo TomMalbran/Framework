@@ -10,14 +10,13 @@ use {{namespace}}\{{statusClass}};
 {{/hasImports}}
 use Framework\IO\Request;{{#values}}
 use Framework\IO\Value\{{.}};{{/values}}
-use Framework\Utils\Dictionary;
+use Framework\Database\Type\SchemaRequest;{{#hasDictionaries}}
+use Framework\Utils\Dictionary;{{/hasDictionaries}}
 
 /**
  * The {{name}} Request
  */
-class {{requestClass}} {
-
-    private Request $request;
+class {{requestClass}} extends SchemaRequest {
 
     public bool $isCreate;
     public bool $isEdit;
@@ -46,7 +45,10 @@ class {{requestClass}} {
 
     // Native Fields
     {{#natives}}
-    public {{type}} ${{name}};
+    {{#subType}}
+
+    /** @var {{{subType}}} */
+{{/subType}}    public {{type}} ${{name}};
     {{/natives}}
 {{/hasNatives}}
 {{#hasProperties}}
@@ -67,32 +69,29 @@ class {{requestClass}} {
 
     /**
      * Creates a new {{requestClass}} instance
-     * @param Request|null $request Optional.
+     * @param SchemaRequest|Request|null $request Optional.
      */
-    public function __construct(?Request $request = null) {
-        if ($request === null) {
-            $request = new Request();
-        }
+    public function __construct(SchemaRequest|Request|null $request = null) {
+        parent::__construct($request);
 
-        $this->request = $request;
-        $this->isCreate = !$request->has("{{idName}}");
-        $this->isEdit = $request->has("{{idName}}");
+        $this->isCreate = !$this->request->has("{{idName}}");
+        $this->isEdit = $this->request->has("{{idName}}");
 
         {{#hasIntID}}
-        $this->id = $request->getInt("{{idName}}");
+        $this->id = $this->request->getInt("{{idName}}");
         {{/hasIntID}}
         {{#hasStringID}}
-        $this->code = $request->getString("{{idName}}");
+        $this->code = $this->request->getString("{{idName}}");
         {{/hasStringID}}
         {{#hasEnumID}}
-        $this->code = {{idEnumName}}::fromRequest($request, "{{idName}}");
+        $this->code = {{idEnumName}}::fromRequest($this->request, "{{idName}}");
         {{/hasEnumID}}
     {{#hasMultiID}}
         {{#hasIntID}}
-        $this->ids = $request->getInts("{{idName}}s");
+        $this->ids = $this->request->getInts("{{idName}}s");
         {{/hasIntID}}
         {{#hasStringID}}
-        $this->codes = $request->getStrings("{{idName}}s");
+        $this->codes = $this->request->getStrings("{{idName}}s");
         {{/hasStringID}}
     {{/hasMultiID}}
     {{#hasNatives}}
@@ -106,35 +105,19 @@ class {{requestClass}} {
 
         // Set the Properties
         {{#properties}}
-        $this->{{name}} = new {{type}}($request, "{{value}}"{{{extras}}});
+        $this->{{name}} = new {{type}}($this->request, "{{value}}"{{{extras}}});
         {{/properties}}
     {{/hasProperties}}
     {{#hasDictionaries}}
 
         // Set the Dictionaries
         {{#dictionaries}}
-        $this->{{.}} = $request->getDict("{{.}}");
+        $this->{{.}} = $this->request->getDict("{{.}}");
         {{/dictionaries}}
     {{/hasDictionaries}}
     }
+{{#hasStatus}}
 
-    /**
-     * Returns true if the Request is empty
-     * @return bool
-     */
-    public function isEmpty(): bool {
-        return !$this->request->has();
-    }
-
-    /**
-     * Returns true if the Request is not empty
-     * @return bool
-     */
-    public function isNotEmpty(): bool {
-        return $this->request->has();
-    }
-
-    {{#hasStatus}}
     /**
      * Returns the Status from the Request
      * @return {{statusClass}}
@@ -142,21 +125,5 @@ class {{requestClass}} {
     public function getStatus(): {{statusClass}} {
         return {{statusClass}}::fromRequest($this->request, "status");
     }
-    {{/hasStatus}}
-
-    /**
-     * Returns the original Request
-     * @return Request
-     */
-    public function getRequest(): Request {
-        return $this->request;
-    }
-
-    /**
-     * Converts the Request to a Dictionary
-     * @return Dictionary
-     */
-    public function toDictionary(): Dictionary {
-        return $this->request->toDictionary();
-    }
+{{/hasStatus}}
 }
