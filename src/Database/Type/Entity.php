@@ -25,7 +25,8 @@ class Entity implements JsonSerializable {
      * @param Dictionary $data
      */
     public function __construct(Dictionary $data) {
-        foreach ($this->getPropertiesTypes() as $property => $type) {
+        $properties = Discovery::getProperties($this);
+        foreach ($properties as $property => $type) {
             $added = $this->setValue($data, $property, $type);
             if ($added) {
                 $this->isEmpty = false;
@@ -75,19 +76,11 @@ class Entity implements JsonSerializable {
     }
 
     /**
-     * Returns a list of Properties and Types
-     * @return array<string,string>
-     */
-    private function getPropertiesTypes(): array {
-        return Discovery::getProperties($this);
-    }
-
-    /**
      * Returns a list of Properties
      * @return list<string>
      */
     public function getProperties(): array {
-        return array_keys($this->getPropertiesTypes());
+        return array_keys(Discovery::getProperties($this));
     }
 
 
