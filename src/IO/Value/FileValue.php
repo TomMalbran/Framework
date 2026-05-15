@@ -9,6 +9,8 @@ use Framework\File\FileType;
 use Framework\File\MediaFile;
 use Framework\Utils\Strings;
 
+use CURLFile;
+
 /**
  * The File Value
  * @implements ValueInterface<string,string>
@@ -109,6 +111,21 @@ class FileValue extends Value implements ValueInterface {
             return $this->request->getTmpName($this->key);
         }
         return $this->value;
+    }
+
+    /**
+     * Returns the request file as CURLFile
+     * @return CURLFile|null
+     */
+    public function getCurlFile(): ?CURLFile {
+        if ($this->hasFile()) {
+            return curl_file_create(
+                $this->request->getTmpName($this->key),
+                $this->request->getFileType($this->key),
+                $this->request->getFileName($this->key),
+            );
+        }
+        return null;
     }
 
 

@@ -50,22 +50,28 @@ class DateValue extends Value implements ValueInterface, JsonSerializable {
 
     /**
      * Sets the value
-     * @param Date $value
+     * @param DateValue|Date $value
      * @return void
      */
     #[\Override]
     public function set(mixed $value): void {
+        if ($value instanceof DateValue) {
+            $value = $value->get();
+        }
         $this->value = $value;
         $this->setRaw($value->toString(DateFormat::Reverse));
     }
 
     /**
      * Sets the value if the value is not empty
-     * @param Date $value
+     * @param DateValue|Date $value
      * @return void
      */
     #[\Override]
     public function setIf(mixed $value): void {
+        if ($value instanceof DateValue) {
+            $value = $value->get();
+        }
         if ($value->isNotEmpty()) {
             $this->set($value);
         }
@@ -109,6 +115,38 @@ class DateValue extends Value implements ValueInterface, JsonSerializable {
         return $this->value->toTime();
     }
 
+    /**
+     * Returns a Date instance as a timestamp
+     * @return int
+     */
+    public function toTime(): int {
+        return $this->value->toTime();
+    }
+
+    /**
+     * Returns a Date instance set to the start of the day
+     * @return Date
+     */
+    public function toDayStart(): Date {
+        return $this->value->toDayStart();
+    }
+
+    /**
+     * Returns a Date instance set to the middle of the day
+     * @return Date
+     */
+    public function toDayMiddle(): Date {
+        return $this->value->toDayMiddle();
+    }
+
+    /**
+     * Returns a Date instance set to the end of the day
+     * @return Date
+     */
+    public function toDayEnd(): Date {
+        return $this->value->toDayEnd();
+    }
+
 
 
     /**
@@ -131,6 +169,15 @@ class DateValue extends Value implements ValueInterface, JsonSerializable {
         return DateUtils::isValidPeriod($this->date, $endDate->date);
     }
 
+    /**
+     * Returns true if the date at the given key is in the Future
+     * @param DateType $dateType Optional.
+     * @return bool
+     */
+    public function isFutureDate(DateType $dateType = DateType::Middle): bool {
+        return $this->value->toDayMoment($dateType)->isFuture();
+    }
+
 
 
     /**
@@ -151,10 +198,11 @@ class DateValue extends Value implements ValueInterface, JsonSerializable {
 
     /**
      * Returns true if the hour is valid
+     * @param list<int>|null $minutes Optional.
      * @return bool
      */
-    public function isValidHour(): bool {
-        return DateUtils::isValidHour($this->hour);
+    public function isValidHour(?array $minutes = null): bool {
+        return DateUtils::isValidHour($this->hour, $minutes);
     }
 
     /**

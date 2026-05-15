@@ -46,6 +46,14 @@ class Value {
      * Returns true if the value is Not Empty
      * @return bool
      */
+    public function isNotEmpty(): bool {
+        return $this->request->has($this->key);
+    }
+
+    /**
+     * Returns true if the value is Not Empty
+     * @return bool
+     */
     public function hasValue(): bool {
         return $this->request->has($this->key);
     }

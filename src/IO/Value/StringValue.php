@@ -169,6 +169,22 @@ class StringValue extends Value implements ValueInterface, JsonSerializable {
     }
 
     /**
+     * Returns true if the value is a valid CUIT
+     * @return bool
+     */
+    public function isValidCUIT(): bool {
+        return Utils::isValidCUIT($this->raw);
+    }
+
+    /**
+     * Returns true if the value is a valid DNI
+     * @return bool
+     */
+    public function isValidDNI(): bool {
+        return Utils::isValidDNI($this->raw);
+    }
+
+    /**
      * Returns true if the value is a valid URL
      * @return bool
      */
