@@ -183,21 +183,27 @@ class WhereBuilder {
         case Operator::Like:
         case Operator::NotLike:
             if (!is_array($value)) {
-                $param = Strings::addPrefixSuffix(trim(strtolower((string)$value)), "%", "%");
+                $param = Strings::trim($value);
+                $param = Strings::toLowerCase($param);
+                $param = Strings::addPrefixSuffix($param, "%", "%");
             }
             break;
 
         case Operator::StartsWith:
         case Operator::NotStartsWith:
             if (!is_array($value)) {
-                $param = Strings::addSuffix(trim(strtolower((string)$value)), "%");
+                $param = Strings::trim($value);
+                $param = Strings::toLowerCase($param);
+                $param = Strings::addSuffix($param, "%");
             }
             break;
 
         case Operator::EndsWith:
         case Operator::NotEndsWith:
             if (!is_array($value)) {
-                $param = Strings::addPrefix(trim(strtolower((string)$value)), "%");
+                $param = Strings::trim($value);
+                $param = Strings::toLowerCase($param);
+                $param = Strings::addPrefix($param, "%");
             }
             break;
         }
