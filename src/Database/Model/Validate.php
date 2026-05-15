@@ -3,6 +3,8 @@ namespace Framework\Database\Model;
 
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Model\Requested;
+use Framework\Database\Builder\SchemaCode;
 use Framework\Utils\Arrays;
 use Framework\Utils\Color;
 use Framework\Utils\Numbers;
@@ -12,6 +14,7 @@ use Attribute;
 
 /**
  * The Validate Attribute
+ * @phpstan-import-type Property from SchemaCode
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Validate {
@@ -333,27 +336,53 @@ class Validate {
 
     /**
      * Creates the If statement for this Validate
+     * @param list<Requested> $requestedFields
+     * @param list<Property>  $parents
      * @return string
      */
-    public function createCondition(): string {
+    public function createCondition(array $requestedFields, array $parents): string {
         $parts = Strings::split($this->if, " ");
         if (count($parts) !== 3) {
             return "";
         }
 
-        $field = $parts[0];
-
-        $value = trim(Strings::replace($parts[2], [ "'", '"'], ""));
-        if (!Numbers::isValid($value) && $value !== "true" && $value !== "false") {
-            $value = "\"{$value}\"";
+        // Generate the getter for the field in the condition
+        $field  = $parts[0];
+        $getter = "";
+        foreach ($parents as $parent) {
+            if ($parent["fieldName"] === $field) {
+                $getter = "\${$field}";
+                break;
+            }
+        }
+        if ($getter === "") {
+            foreach ($requestedFields as $requested) {
+                if ($requested->name === $field) {
+                    $getter = "\$request->{$field}";
+                    if (!$requested->isNative) {
+                        $getter .= "->get()";
+                    }
+                    break;
+                }
+            }
+        }
+        if ($getter === "") {
+            return "";
         }
 
+        // Generate the operator for the condition
         $op = match ($parts[1]) {
             "=", "==", "==="  => "===",
             "!=", "!==", "<>" => "!==",
             default           => "===",
         };
 
-        return "if (\$request->{$field}->get() {$op} {$value}) {";
+        // Generate the value for the condition
+        $value = trim(Strings::replace($parts[2], [ "'", '"'], ""));
+        if (!Numbers::isValid($value) && $value !== "true" && $value !== "false") {
+            $value = "\"{$value}\"";
+        }
+
+        return "if ($getter $op $value) {";
     }
 }

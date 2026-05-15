@@ -67,7 +67,7 @@ class SchemaCode {
         $uniques      = self::getSomeFields($schemaModel, isUnique: true);
         $parents      = self::getSomeFields($schemaModel, isParent: true);
         $editParents  = $schemaModel->hasPositions ? $parents : [];
-        $validations  = self::getValidations($schemaModel);
+        $validations  = self::getValidations($schemaModel, $parents);
 
         $hasVirtual   = count($schemaModel->virtualFields) > 0;
         $hasUniques   = count($uniques) > 0;
@@ -392,10 +392,11 @@ class SchemaCode {
 
     /**
      * Returns the Validations for the Schema
-     * @param SchemaModel $schemaModel
+     * @param SchemaModel    $schemaModel
+     * @param list<Property> $parents
      * @return list<array<string,mixed>>
      */
-    private static function getValidations(SchemaModel $schemaModel): array {
+    private static function getValidations(SchemaModel $schemaModel, array $parents): array {
         $hasFromDate = false;
         $result      = [];
 
@@ -517,10 +518,11 @@ class SchemaCode {
                 break;
             }
 
-            $result[] = $validation + [
-                "hasIf"     => $validate->if !== "",
-                "condition" => $validate->createCondition(),
-                "pads"      => $validate->if !== "" ? "    " : "",
+            $condition = $validate->createCondition($schemaModel->requestedFields, $parents);
+            $result[]  = $validation + [
+                "hasIf"     => $condition !== "",
+                "condition" => $condition,
+                "pads"      => $condition !== "" ? "    " : "",
             ];
         }
         return $result;
