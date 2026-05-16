@@ -540,19 +540,37 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     /**
      * Creates a map from the list using the given key
      * @param Enum|int|string $key
+     * @param Enum|int|string $value Optional.
      * @return Dictionary
      */
-    public function createMap(Enum|int|string $key): Dictionary {
-        $key    = Strings::toString($key);
+    public function createMap(
+        Enum|int|string $key,
+        Enum|int|string $value = "",
+    ): Dictionary {
         $result = new Dictionary();
-        if (array_is_list($this->data)) {
-            foreach ($this->data as $elem) {
-                if (is_array($elem)) {
-                    $keyVal = Strings::toString($elem[$key] ?? "");
-                    if ($keyVal !== "") {
-                        $result->set($keyVal, $elem);
-                    }
+        if (!array_is_list($this->data)) {
+            return $result;
+        }
+
+        $key   = Strings::toString($key);
+        $value = Strings::toString($value);
+
+        foreach ($this->data as $elem) {
+            if (!is_array($elem)) {
+                continue;
+            }
+            $keyVal = Strings::toString($elem[$key] ?? "");
+            if ($keyVal === "") {
+                continue;
+            }
+
+            if ($value !== "") {
+                if (!isset($elem[$value])) {
+                    continue;
                 }
+                $result->set($keyVal, $elem[$value]);
+            } else {
+                $result->set($keyVal, $elem);
             }
         }
         return $result;
