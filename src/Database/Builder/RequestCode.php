@@ -11,6 +11,14 @@ use Framework\Utils\Strings;
 
 /**
  * The Request Code
+ * @phpstan-type IDProperty array{
+ *   hasID: bool,
+ *   hasIntID: bool,
+ *   hasStringID: bool,
+ *   hasEnumID: bool,
+ *   idName: string,
+ *   idEnumName: string,
+ * }
  * @phpstan-type Property array{
  *   type: string,
  *   name: string,
@@ -26,6 +34,7 @@ class RequestCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
+        $idField      = self::getIDField($schemaModel);
         $natives      = self::getNatives($schemaModel);
         $properties   = self::getProperties($schemaModel);
         $dictionaries = self::getDictionaries($schemaModel);
@@ -36,17 +45,11 @@ class RequestCode {
             "name"            => $schemaModel->name,
             "tableName"       => $schemaModel->tableName,
 
-            "hasIntID"        => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
-            "hasStringID"     => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
-            "hasEnumID"       => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
-            "idName"          => $schemaModel->idName,
-            "idEnumName"      => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
-            "hasMultiID"      => self::hasMultiID($schemaModel),
-
             "requestClass"    => $schemaModel->requestClass,
             "statusClass"     => $schemaModel->statusClass,
             "hasStatus"       => $schemaModel->hasStatus,
 
+            "hasMultiID"      => self::hasMultiID($schemaModel),
             "hasNatives"      => count($natives) > 0,
             "natives"         => $natives,
             "hasProperties"   => count($properties) > 0,
@@ -57,8 +60,45 @@ class RequestCode {
             "values"          => self::getValues($properties),
             "hasImports"      => count($imports) > 0,
             "imports"         => $imports,
-        ]);
+        ] + $idField);
         return $contents;
+    }
+
+    /**
+     * Returns the ID Field properties
+     * @param SchemaModel $schemaModel
+     * @return IDProperty
+     */
+    private static function getIDField(SchemaModel $schemaModel): array {
+        $hasID     = false;
+        $type      = FieldType::None;
+        $name      = "";
+        $enumClass = "";
+
+        if ($schemaModel->hasID) {
+            $hasID     = true;
+            $type      = $schemaModel->idType;
+            $name      = $schemaModel->idName;
+            $enumClass = $schemaModel->idEnumClass;
+        } else {
+            foreach ($schemaModel->requestedFields as $field) {
+                if ($field->isID) {
+                    $hasID = true;
+                    $type  = $field->type;
+                    $name  = $field->name;
+                    break;
+                }
+            }
+        }
+
+        return [
+            "hasID"       => $hasID,
+            "hasIntID"    => $hasID && $type === FieldType::Number,
+            "hasStringID" => $hasID && $type === FieldType::String,
+            "hasEnumID"   => $hasID && $type === FieldType::Enum,
+            "idName"      => $name,
+            "idEnumName"  => Strings::substringAfter($enumClass, "\\"),
+        ];
     }
 
     /**
@@ -83,7 +123,7 @@ class RequestCode {
     private static function getNatives(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if (!$requested->isNative) {
+            if (!$requested->isNative || $requested->isID) {
                 continue;
             }
 
@@ -135,7 +175,7 @@ class RequestCode {
     private static function getProperties(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if (!$requested->hasValue) {
+            if (!$requested->hasValue || $requested->isID) {
                 continue;
             }
 

@@ -46,26 +46,39 @@ class SchemaBuilder implements DiscoveryBuilder {
         }
 
         foreach ($schemaModels as $schemaModel) {
-            $schemaName = "{$schemaModel->name}Schema.php";
-            $schemaCode = SchemaCode::getCode($schemaModel);
-            File::create($schemaModel->path, $schemaName, $schemaCode);
-            $created += 1;
+            // Build the main Schema file
+            if (!$schemaModel->isEmpty) {
+                $schemaName = "{$schemaModel->name}Schema.php";
+                $schemaCode = SchemaCode::getCode($schemaModel);
+                File::create($schemaModel->path, $schemaName, $schemaCode);
+                $created += 1;
+            }
 
-            $entityName = "{$schemaModel->entityClass}.php";
-            $entityCode = EntityCode::getCode($schemaModel);
-            File::create($schemaModel->path, $entityName, $entityCode);
-            $created += 1;
+            // Build the Entity file
+            if (!$schemaModel->isEmpty) {
+                $entityName = "{$schemaModel->entityClass}.php";
+                $entityCode = EntityCode::getCode($schemaModel);
+                File::create($schemaModel->path, $entityName, $entityCode);
+                $created += 1;
+            }
 
-            $columnName = "{$schemaModel->columnClass}.php";
-            $columnCode = ColumnCode::getCode($schemaModel);
-            File::create($schemaModel->path, $columnName, $columnCode);
-            $created += 1;
+            // Build the Column file
+            if (!$schemaModel->isEmpty) {
+                $columnName = "{$schemaModel->columnClass}.php";
+                $columnCode = ColumnCode::getCode($schemaModel);
+                File::create($schemaModel->path, $columnName, $columnCode);
+                $created += 1;
+            }
 
-            $queryName = "{$schemaModel->queryClass}.php";
-            $queryCode = QueryCode::getCode($schemaModel);
-            File::create($schemaModel->path, $queryName, $queryCode);
-            $created += 1;
+            // Build the Query file
+            if (!$schemaModel->isEmpty) {
+                $queryName = "{$schemaModel->queryClass}.php";
+                $queryCode = QueryCode::getCode($schemaModel);
+                File::create($schemaModel->path, $queryName, $queryCode);
+                $created += 1;
+            }
 
+            // Build the Status files
             if ($schemaModel->hasStatus) {
                 $statusName = "{$schemaModel->statusClass}.php";
                 $statusCode = StatusCode::getCode($schemaModel);
@@ -78,6 +91,7 @@ class SchemaBuilder implements DiscoveryBuilder {
                 $created += 1;
             }
 
+            // Build the Request file
             if (count($schemaModel->requestedFields) > 0) {
                 $requestName = "{$schemaModel->requestClass}.php";
                 $requestCode = RequestCode::getCode($schemaModel);

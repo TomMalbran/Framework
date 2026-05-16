@@ -12,13 +12,15 @@ use Attribute;
 class Requested {
 
     public bool $canEdit   = true;
+    public bool $isID      = false;
     public bool $isMultiID = false;
     public bool $isNative  = false;
+
     public bool $isString  = false;
     public bool $isNumber  = false;
     public bool $isJSON    = false;
-    public bool $isDate    = false;
     public bool $isFile    = false;
+    public bool $isDate    = false;
     public bool $isHour    = false;
 
     public DateType $dateType  = DateType::None;
@@ -29,13 +31,14 @@ class Requested {
     /**
      * The Requested Attribute
      * @param bool     $canEdit   Optional.
+     * @param bool     $isID      Optional.
      * @param bool     $isMultiID Optional.
      * @param bool     $isNative  Optional.
      * @param bool     $isString  Optional.
      * @param bool     $isNumber  Optional.
      * @param bool     $isJSON    Optional.
-     * @param bool     $isDate    Optional.
      * @param bool     $isFile    Optional.
+     * @param bool     $isDate    Optional.
      * @param bool     $isHour    Optional.
      * @param DateType $dateType  Optional.
      * @param string   $dateInput Optional.
@@ -43,27 +46,31 @@ class Requested {
      */
     public function __construct(
         bool $canEdit = true,
+        bool $isID = false,
         bool $isMultiID = false,
         bool $isNative = false,
         bool $isString = false,
         bool $isNumber = false,
         bool $isJSON = false,
-        bool $isDate = false,
         bool $isFile = false,
+        bool $isDate = false,
         bool $isHour = false,
         DateType $dateType = DateType::None,
         string $dateInput = "",
         string $hourInput = "",
     ) {
         $this->canEdit   = $canEdit;
+        $this->isID      = $isID;
         $this->isMultiID = $isMultiID;
         $this->isNative  = $isNative;
+
         $this->isString  = $isString;
         $this->isNumber  = $isNumber;
         $this->isJSON    = $isJSON;
-        $this->isDate    = $isDate;
         $this->isFile    = $isFile;
+        $this->isDate    = $isDate;
         $this->isHour    = $isHour;
+
         $this->dateType  = $dateType;
         $this->dateInput = $dateInput;
         $this->hourInput = $hourInput;

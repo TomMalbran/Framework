@@ -137,6 +137,9 @@ class SchemaMigration {
 
         // Create or update the Tables
         foreach ($schemaModels as $schemaModel) {
+            if ($schemaModel->isEmpty) {
+                continue;
+            }
             $modelNames[] = $schemaModel->tableName;
 
             if (!Arrays::contains($tableNames, $schemaModel->tableName)) {

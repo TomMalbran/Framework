@@ -20,6 +20,7 @@ use Framework\Utils\Strings;
  */
 class SchemaModel {
 
+    public bool   $isEmpty        = false;
     public string $name           = "";
     public string $tableName      = "";
     public string $fantasyName    = "";
@@ -140,6 +141,8 @@ class SchemaModel {
         array $subRequests = [],
         array $states = [],
     ) {
+        $this->isEmpty         = count($mainFields) === 0;
+
         $this->name            = $name;
         $this->fantasyName     = $fantasyName;
         $this->tableName       = self::getDbTableName($name);

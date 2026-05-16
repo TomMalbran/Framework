@@ -17,6 +17,7 @@ use Framework\Utils\Dictionary;{{/hasDictionaries}}
  * The {{name}} Request
  */
 class {{requestClass}} extends SchemaRequest {
+{{#hasID}}
 
     public bool $isCreate;
     public bool $isEdit;
@@ -30,6 +31,7 @@ class {{requestClass}} extends SchemaRequest {
     {{#hasEnumID}}
     public {{idEnumName}} $code = {{idEnumName}}::None;
     {{/hasEnumID}}
+{{/hasID}}
 {{#hasMultiID}}
 
     {{#hasIntID}}
@@ -73,6 +75,7 @@ class {{requestClass}} extends SchemaRequest {
      */
     public function __construct(SchemaRequest|Request|null $request = null) {
         parent::__construct($request);
+    {{#hasID}}
 
         $this->isCreate = !$this->request->has("{{idName}}");
         $this->isEdit = $this->request->has("{{idName}}");
@@ -86,6 +89,7 @@ class {{requestClass}} extends SchemaRequest {
         {{#hasEnumID}}
         $this->code = {{idEnumName}}::fromRequest($this->request, "{{idName}}");
         {{/hasEnumID}}
+    {{/hasID}}
     {{#hasMultiID}}
         {{#hasIntID}}
         $this->ids = $this->request->getInts("{{idName}}s");
