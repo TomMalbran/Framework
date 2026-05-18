@@ -3,6 +3,7 @@ namespace Framework\Database\Query;
 
 use Framework\IO\Value\Value;
 use Framework\Database\Query\QueryMode;
+use Framework\Database\Query\TableDefinition;
 use Framework\Database\Query\Assign;
 use Framework\Database\Type\Column;
 use Framework\Date\Date;
@@ -26,11 +27,10 @@ class QueryBuilder {
 
     private WhereBuilder $whereBuilder;
 
-    private string $tableName;
+    private TableDefinition $table;
 
-    private string $asTable;
-
-    private ?Query $fromQuery = null;
+    /** @var list<TableDefinition> */
+    private array $otherTables = [];
 
     /** @var list<string> */
     private array $joins = [];
@@ -54,8 +54,7 @@ class QueryBuilder {
      */
     public function __construct(QueryMode $mode, string $tableName, string $asTable, WhereBuilder $whereBuilder) {
         $this->mode         = $mode;
-        $this->tableName    = $tableName;
-        $this->asTable      = $asTable;
+        $this->table        = new TableDefinition($tableName, $asTable);
         $this->whereBuilder = $whereBuilder;
     }
 
@@ -67,12 +66,17 @@ class QueryBuilder {
      * @return void
      */
     public function setFrom(Query|string $queryOrTable, string $as = ""): void {
-        if ($queryOrTable instanceof Query) {
-            $this->fromQuery = $queryOrTable;
-        } else {
-            $this->tableName = $queryOrTable;
-        }
-        $this->asTable = $as;
+        $this->table = new TableDefinition($queryOrTable, $as);
+    }
+
+    /**
+     * Adds a new table to the Query
+     * @param string $tableName
+     * @param string $as        Optional.
+     * @return void
+     */
+    public function addTable(string $tableName, string $as = ""): void {
+        $this->otherTables[] = new TableDefinition($tableName, $as);
     }
 
     /**
@@ -172,7 +176,7 @@ class QueryBuilder {
      * @return string
      */
     public function getTableName(): string {
-        return $this->tableName;
+        return $this->table->getName();
     }
 
     /**
@@ -244,14 +248,7 @@ class QueryBuilder {
             $expression[] = Strings::join($this->selects, $glue);
         }
 
-        if ($this->fromQuery !== null) {
-            $expression[] = "FROM ({$this->fromQuery->toSQL()})";
-        } else {
-            $expression[] = "FROM `{$this->tableName}`";
-        }
-        if ($this->asTable !== "") {
-            $expression[] = "AS {$this->asTable}";
-        }
+        $expression[] = "FROM " . $this->table->toSQL();
         foreach ($this->joins as $join) {
             $expression[] = $join;
         }
@@ -270,9 +267,9 @@ class QueryBuilder {
             $values[] = $value instanceof Assign ? $value->toSQL($field) : "?";
         }
 
-        $expression  = "INSERT INTO `{$this->tableName}` ";
-        $expression .= "(`" . Strings::joinKeys($this->fields, "`, `") . "`) ";
-        $expression .= "VALUES (" . Strings::join($values, ", ") . ")";
+        $expression  = "INSERT INTO " . $this->table->toSQL();
+        $expression .= " (`" . Strings::joinKeys($this->fields, "`, `") . "`)";
+        $expression .= " VALUES (" . Strings::join($values, ", ") . ")";
 
         return $expression;
     }
@@ -287,9 +284,10 @@ class QueryBuilder {
             $values[] = $value instanceof Assign ? $value->toSQL($field) : "?";
         }
 
-        $expression  = "REPLACE INTO `{$this->tableName}` ";
-        $expression .= "(`" . Strings::joinKeys($this->fields, "`, `") . "`) ";
-        $expression .= "VALUES (" . Strings::join($values, ", ") . ")";
+        $expression  = "REPLACE INTO ";
+        $expression .= $this->table->toSQL();
+        $expression .= " (`" . Strings::joinKeys($this->fields, "`, `") . "`)";
+        $expression .= " VALUES (" . Strings::join($values, ", ") . ")";
 
         return $expression;
     }
@@ -299,25 +297,31 @@ class QueryBuilder {
      * @return string
      */
     private function toUpdateSQL(): string {
-        $assigns = [];
-        foreach ($this->fields as $field => $value) {
-            if ($value instanceof Assign) {
-                $assigns[] = "`$field` = " . $value->toSQL($field);
-            } else {
-                $assigns[] = "`$field` = ?";
-            }
+        // Start the expression with the Update and From part
+        $expression   = [];
+        $expression[] = "UPDATE " . $this->table->toSQL();
+        foreach ($this->otherTables as $table) {
+            $expression[] = ", " . $table->toSQL();
         }
 
-        $expression   = [];
-        $expression[] = "UPDATE `{$this->tableName}`";
-        if ($this->asTable !== "") {
-            $expression[] = "AS {$this->asTable}";
-        }
+        // Add the Joins if they exist
         foreach ($this->joins as $join) {
             $expression[] = $join;
         }
 
+        // Add the Set part with the fields to update
+        $assigns = [];
+        foreach ($this->fields as $field => $value) {
+            $fieldKey = !Strings::contains($field, ".") ? "`$field`" : $field;
+            if ($value instanceof Assign) {
+                $assigns[] = "$fieldKey = " . $value->toSQL($field);
+            } else {
+                $assigns[] = "$fieldKey = ?";
+            }
+        }
         $expression[] = "SET " . Strings::join($assigns, ", ");
+
+        // Add the Where part
         $expression[] = $this->whereBuilder->toSQL(addWhere: true);
 
         return Strings::join($expression, " ");
@@ -330,10 +334,10 @@ class QueryBuilder {
     private function toDeleteSQL(): string {
         $expression = [ "DELETE" ];
         if (count($this->joins) > 0) {
-            $expression[] = "`{$this->tableName}`";
+            $expression[] = $this->table->toSQL();
         }
 
-        $expression[] = "FROM `{$this->tableName}`";
+        $expression[] = "FROM " . $this->table->toSQL();
         foreach ($this->joins as $join) {
             $expression[] = $join;
         }
@@ -347,7 +351,7 @@ class QueryBuilder {
      * @return string
      */
     private function toTruncateSQL(): string {
-        return "TRUNCATE TABLE `{$this->tableName}`";
+        return "TRUNCATE TABLE " . $this->table->toSQL();
     }
 
 
@@ -357,10 +361,7 @@ class QueryBuilder {
      * @return list<float|int|string>
      */
     public function getBindings(): array {
-        $bindings = [];
-        if ($this->fromQuery !== null) {
-            $bindings = $this->fromQuery->getBindings();
-        }
+        $bindings = $this->table->getBindings();
         foreach ($this->fields as $value) {
             if ($value instanceof Assign) {
                 foreach ($value->getParams() as $param) {

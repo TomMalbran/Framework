@@ -119,6 +119,17 @@ class Query implements QueryLike {
     }
 
     /**
+     * Adds a new table to the Query
+     * @param string $tableName
+     * @param string $as        Optional.
+     * @return Query
+     */
+    public function withTable(string $tableName, string $as = ""): Query {
+        $this->queryBuilder->addTable($tableName, $as);
+        return $this;
+    }
+
+    /**
      * Adds a Join to the Query
      * @param SchemaQuery|string $queryOrTable
      * @param string             $as           Optional.
