@@ -135,8 +135,12 @@ class RequestCode {
                 break;
 
             case FieldType::Date:
+                $name = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
+                if ($requested->dateType === DateType::None) {
+                    $getter = "\$this->request->toDate(\"{$name}\")";
+                    break;
+                }
                 $dateType = $requested->dateType->toString();
-                $name     = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
                 $hour     = $requested->hourInput !== "" ? ", \"{$requested->hourInput}\"" : "";
                 $getter   = "\$this->request->toDayMoment(\"{$name}\", DateType::{$dateType}{$hour})";
                 break;
