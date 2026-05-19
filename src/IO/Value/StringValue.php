@@ -100,6 +100,14 @@ class StringValue extends Value implements ValueInterface, JsonSerializable {
     }
 
     /**
+     * Returns the value as an integer
+     * @return int
+     */
+    public function toInt(): int {
+        return Numbers::toInt($this->value);
+    }
+
+    /**
      * Returns the value with only numbers
      * @return string
      */
