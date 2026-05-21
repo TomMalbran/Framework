@@ -34,12 +34,12 @@ class LogDeviceModel {
 
 
 
-    #[Requested(isNative: true)]
+    #[Requested]
     public string $search = "";
 
-    #[Requested(isNative: true, dateType: DateType::Start)]
+    #[Requested(dateType: DateType::Start)]
     public ?Date $fromDate = null;
 
-    #[Requested(isNative: true, dateType: DateType::End)]
+    #[Requested(dateType: DateType::End)]
     public ?Date $toDate = null;
 }

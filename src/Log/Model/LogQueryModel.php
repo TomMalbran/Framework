@@ -30,7 +30,7 @@ class LogQueryModel {
     #[Field]
     public int $amount = 0;
 
-    #[Field, Requested(isNative: true, isString: true)]
+    #[Field, Requested(isString: true)]
     public bool $isResolved = false;
 
     #[Field]
@@ -47,12 +47,12 @@ class LogQueryModel {
 
 
 
-    #[Requested(isNative: true)]
+    #[Requested]
     public string $search = "";
 
-    #[Requested(isNative: true, dateType: DateType::Start, hourInput: "fromHour")]
+    #[Requested(dateType: DateType::Start, hourInput: "fromHour")]
     public ?Date $fromDate = null;
 
-    #[Requested(isNative: true, dateType: DateType::End, hourInput: "toHour")]
+    #[Requested(dateType: DateType::End, hourInput: "toHour")]
     public ?Date $toDate = null;
 }

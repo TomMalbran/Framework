@@ -40,7 +40,7 @@ class EmailQueueModel {
     #[Field]
     public EmailResult $emailResult = EmailResult::None;
 
-    #[Field, Requested(isNative: true)]
+    #[Field, Requested]
     public int $dataID = 0;
 
 
@@ -52,17 +52,17 @@ class EmailQueueModel {
 
 
 
-    #[Requested(isNative: true)]
+    #[Requested]
     public string $search = "";
 
-    #[Requested(isNative: true, dateType: DateType::Start, hourInput: "fromHour")]
+    #[Requested(dateType: DateType::Start, hourInput: "fromHour")]
     public ?Date $fromDate = null;
 
-    #[Requested(isNative: true, dateType: DateType::End, hourInput: "toHour")]
+    #[Requested(dateType: DateType::End, hourInput: "toHour")]
     public ?Date $toDate = null;
 
     /** @var list<string> */
-    #[Requested(isNative: true)]
+    #[Requested]
     public array $results = [];
 
 

@@ -27,63 +27,63 @@ class CredentialModel {
     #[Field]
     public int $currentUser = 0;
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $name = "";
 
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $firstName = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $lastName = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $email = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $phone = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $language = "";
 
-    #[Field(isText: true), Requested]
+    #[Field(isText: true), Requested(forValidate: true)]
     public string $observations = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public bool $sendEmails = false;
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public bool $sendEmailNotis = false;
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public bool $sendTickets = false;
 
-    #[Field(isSigned: true), Requested]
+    #[Field(isSigned: true), Requested(forValidate: true)]
     public int $timezone = 0;
 
 
     #[Field]
     public string $avatar = "";
 
-    #[Field]
+    #[Field, Requested(canEdit: false)]
     public string $appearance = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public Access $access = Access::None;
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $password = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public string $salt = "";
 
-    #[Field, Requested]
+    #[Field, Requested(forValidate: true)]
     public bool $reqPassChange = false;
 
     #[Field]
     public ?Date $passExpiration = null;
 
-    #[Field, Requested(isNative: true, canEdit: false)]
+    #[Field, Requested(canEdit: false)]
     public string $accessToken = "";
 
     #[Field]
@@ -120,19 +120,22 @@ class CredentialModel {
 
 
 
-    #[Requested(isNative: true)]
+    #[Requested]
     public string $value = "";
 
-    #[Requested(isNative: true)]
+    #[Requested]
+    public string $code = "";
+
+    #[Requested]
     public string $resetCode = "";
 
-    #[Requested]
+    #[Requested(forValidate: true)]
     public string $oldPassword = "";
 
-    #[Requested]
+    #[Requested(forValidate: true)]
     public string $newPassword = "";
 
-    #[Requested]
+    #[Requested(forValidate: true)]
     public string $confirmPassword = "";
 
     #[Requested(isFile: true)]

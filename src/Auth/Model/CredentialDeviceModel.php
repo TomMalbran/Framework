@@ -14,12 +14,12 @@ use Framework\Database\Model\Requested;
 )]
 class CredentialDeviceModel {
 
-    #[Field(isPrimary: true)]
+    #[Field(isPrimary: true), Requested]
     public int $credentialID = 0;
 
     #[Field(isPrimary: true)]
     public string $userAgent = "";
 
-    #[Field(isPrimary: true), Requested(isNative: true)]
+    #[Field(isPrimary: true), Requested]
     public string $playerID = "";
 }
