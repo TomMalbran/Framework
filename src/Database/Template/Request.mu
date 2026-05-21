@@ -5,11 +5,12 @@ namespace {{namespace}};
 use {{namespace}}\{{statusClass}};
 
 {{/hasStatus}}
+{{#hasImports}}
 {{#imports}}use {{.}};
-{{/imports}}{{#hasImports}}
+{{/imports}}
+
 {{/hasImports}}
-use Framework\IO\Request;{{#values}}
-use Framework\IO\Value\{{.}};{{/values}}
+use Framework\IO\Request;
 use Framework\Database\Type\SchemaRequest;{{#hasDictionaries}}
 use Framework\Utils\Dictionary;{{/hasDictionaries}}
 
@@ -43,23 +44,23 @@ class {{requestClass}} extends SchemaRequest {
     public array $codes;
     {{/hasStringID}}
 {{/hasMultiID}}
-{{#hasNatives}}
+{{#hasFields}}
 
-    // Native Fields
-    {{#natives}}
+    // Fields
+    {{#fields}}
     {{#subType}}
 
     /** @var {{{subType}}} */
 {{/subType}}    public {{type}} ${{name}};
-    {{/natives}}
-{{/hasNatives}}
-{{#hasProperties}}
+    {{/fields}}
+{{/hasFields}}
+{{#hasValues}}
 
-    // Properties
-    {{#properties}}
+    // Values
+    {{#values}}
     public {{type}} ${{name}};
-    {{/properties}}
-{{/hasProperties}}
+    {{/values}}
+{{/hasValues}}
 {{#hasDictionaries}}
 
     // Dictionaries
@@ -98,20 +99,20 @@ class {{requestClass}} extends SchemaRequest {
         $this->codes = $this->request->getStrings("{{idName}}s");
         {{/hasStringID}}
     {{/hasMultiID}}
-    {{#hasNatives}}
+    {{#hasFields}}
 
-        // Set the Native Fields
-        {{#natives}}
+        // Set the Fields
+        {{#fields}}
         $this->{{name}} = {{{getter}}};
-        {{/natives}}
-    {{/hasNatives}}
-    {{#hasProperties}}
+        {{/fields}}
+    {{/hasFields}}
+    {{#hasValues}}
 
-        // Set the Properties
-        {{#properties}}
+        // Set the Values
+        {{#values}}
         $this->{{name}} = new {{type}}($this->request, "{{value}}"{{{extras}}});
-        {{/properties}}
-    {{/hasProperties}}
+        {{/values}}
+    {{/hasValues}}
     {{#hasDictionaries}}
 
         // Set the Dictionaries

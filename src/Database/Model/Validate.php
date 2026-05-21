@@ -360,7 +360,7 @@ class Validate {
             foreach ($requestedFields as $requested) {
                 if ($requested->name === $field) {
                     $getter = "\$request->{$field}";
-                    if (!$requested->isNative) {
+                    if ($requested->forValidate) {
                         $getter .= "->get()";
                     }
                     break;

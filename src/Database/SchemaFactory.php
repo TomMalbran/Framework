@@ -141,6 +141,7 @@ class SchemaFactory {
                 $isEnum       = false;
                 $arrayType    = "";
                 $arrayClass   = "";
+                $subModelName = "";
 
                 if (!$isFieldClass && !$isStatus && !$propType->isBuiltin()) {
                     [ $isEnum, $isValidEnum ] = self::isPropEnum($typeName);
@@ -260,8 +261,6 @@ class SchemaFactory {
                         $requestedFields[] = $requested->fromPosition();
                     } elseif ($field !== null) {
                         $requestedFields[] = $requested->fromField($field, $validate !== null);
-                    } elseif ($subRequest !== null) {
-                        $requestedFields[] = $requested->fromSubRequest($subRequest);
                     } else {
                         if ($typeName === "array") {
                             [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType($class, $prop);
@@ -271,6 +270,7 @@ class SchemaFactory {
                             $typeName,
                             $arrayType,
                             $arrayClass,
+                            $subModelName,
                             $isEnum,
                         );
                     }

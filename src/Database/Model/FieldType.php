@@ -49,12 +49,12 @@ enum FieldType implements Enum, JsonSerializable {
         }
 
         return match ($typeName) {
-            "array"  => FieldType::Array,
-            "bool"   => FieldType::Boolean,
-            "float"  => FieldType::Float,
-            "int"    => FieldType::Number,
-            "string" => FieldType::String,
-            default  => FieldType::String,
+            "array"  => self::Array,
+            "bool"   => self::Boolean,
+            "float"  => self::Float,
+            "int"    => self::Number,
+            "string" => self::String,
+            default  => self::String,
         };
     }
 
@@ -75,10 +75,10 @@ enum FieldType implements Enum, JsonSerializable {
      */
     public function isString(): bool {
         return match ($this) {
-            FieldType::String,
-            FieldType::Text,
-            FieldType::LongText => true,
-            default             => false,
+            self::String,
+            self::Text,
+            self::LongText => true,
+            default        => false,
         };
     }
 
@@ -91,22 +91,22 @@ enum FieldType implements Enum, JsonSerializable {
     public function getCodeType(string $enumClass = "", bool $forEntity = false): string {
         $enumType = $enumClass !== "" ? Strings::substringAfter($enumClass, "\\") : "string";
         return match ($this) {
-            FieldType::None    => "",
+            self::None    => "",
 
-            FieldType::Date    => "Date",
-            FieldType::Enum    => $enumType,
-            FieldType::JSON    => $forEntity ? "Dictionary" : "JsonSerializable|array",
-            FieldType::Array   => "array",
+            self::Date    => "Date",
+            self::Enum    => $enumType,
+            self::JSON    => $forEntity ? "Dictionary" : "JsonSerializable|array",
+            self::Array   => "array",
 
-            FieldType::Boolean => "bool",
-            FieldType::Number  => "int",
-            FieldType::Float   => "float",
+            self::Boolean => "bool",
+            self::Number  => "int",
+            self::Float   => "float",
 
-            FieldType::String,
-            FieldType::Text,
-            FieldType::LongText,
-            FieldType::Encrypt,
-            FieldType::File    => "string",
+            self::String,
+            self::Text,
+            self::LongText,
+            self::Encrypt,
+            self::File    => "string",
         };
     }
 
@@ -117,22 +117,22 @@ enum FieldType implements Enum, JsonSerializable {
      */
     public function getValueType(string $enumClass = ""): string {
         return match ($this) {
-            FieldType::None    => "",
+            self::None    => "",
 
-            FieldType::Date    => "DateValue",
-            FieldType::Enum    => "EnumValue",
-            FieldType::JSON    => "",
-            FieldType::Array   => "",
+            self::Date    => "DateValue",
+            self::Enum    => "EnumValue",
+            self::JSON    => "",
+            self::Array   => "",
 
-            FieldType::Boolean => "BoolValue",
-            FieldType::Number  => "NumberValue",
-            FieldType::Float   => "FloatValue",
+            self::Boolean => "BoolValue",
+            self::Number  => "NumberValue",
+            self::Float   => "FloatValue",
 
-            FieldType::String,
-            FieldType::Text,
-            FieldType::LongText,
-            FieldType::Encrypt,
-            FieldType::File    => "StringValue",
+            self::String,
+            self::Text,
+            self::LongText,
+            self::Encrypt,
+            self::File    => "StringValue",
         };
     }
 

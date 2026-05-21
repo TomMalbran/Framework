@@ -3,10 +3,10 @@ namespace Framework\Database\Builder;
 
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
+use Framework\Database\Type\ValueType;
 use Framework\Builder\Builder;
 use Framework\Date\Date;
 use Framework\Date\Type\DateType;
-use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -35,8 +35,8 @@ class RequestCode {
      */
     public static function getCode(SchemaModel $schemaModel): string {
         $idField      = self::getIDField($schemaModel);
-        $natives      = self::getNatives($schemaModel);
-        $properties   = self::getProperties($schemaModel);
+        $fields       = self::getFields($schemaModel);
+        $values       = self::getValues($schemaModel);
         $dictionaries = self::getDictionaries($schemaModel);
         $imports      = self::getImports($schemaModel);
 
@@ -50,14 +50,13 @@ class RequestCode {
             "hasStatus"       => $schemaModel->hasStatus,
 
             "hasMultiID"      => self::hasMultiID($schemaModel),
-            "hasNatives"      => count($natives) > 0,
-            "natives"         => $natives,
-            "hasProperties"   => count($properties) > 0,
-            "properties"      => $properties,
+            "hasFields"       => count($fields) > 0,
+            "fields"          => $fields,
+            "hasValues"       => count($values) > 0,
+            "values"          => $values,
             "hasDictionaries" => count($dictionaries) > 0,
             "dictionaries"    => $dictionaries,
 
-            "values"          => self::getValues($properties),
             "hasImports"      => count($imports) > 0,
             "imports"         => $imports,
         ] + $idField);
@@ -70,22 +69,28 @@ class RequestCode {
      * @return IDProperty
      */
     private static function getIDField(SchemaModel $schemaModel): array {
-        $hasID     = false;
-        $type      = FieldType::None;
-        $name      = "";
-        $enumClass = "";
+        $hasID       = false;
+        $hasIntID    = false;
+        $hasStringID = false;
+        $hasEnumID   = false;
+        $name        = "";
+        $enumClass   = "";
 
         if ($schemaModel->hasID) {
-            $hasID     = true;
-            $type      = $schemaModel->idType;
-            $name      = $schemaModel->idName;
-            $enumClass = $schemaModel->idEnumClass;
+            $hasID       = true;
+            $hasIntID    = $schemaModel->idType === FieldType::Number;
+            $hasStringID = $schemaModel->idType === FieldType::String;
+            $hasEnumID   = $schemaModel->idType === FieldType::Enum;
+            $name        = $schemaModel->idName;
+            $enumClass   = $schemaModel->idEnumClass;
         } else {
             foreach ($schemaModel->requestedFields as $field) {
                 if ($field->isID) {
-                    $hasID = true;
-                    $type  = $field->type;
-                    $name  = $field->name;
+                    $hasID       = true;
+                    $hasIntID    = $field->type === ValueType::Number;
+                    $hasStringID = $field->type === ValueType::String;
+                    $hasEnumID   = $field->type === ValueType::Enum;
+                    $name        = $field->name;
                     break;
                 }
             }
@@ -93,9 +98,9 @@ class RequestCode {
 
         return [
             "hasID"       => $hasID,
-            "hasIntID"    => $hasID && $type === FieldType::Number,
-            "hasStringID" => $hasID && $type === FieldType::String,
-            "hasEnumID"   => $hasID && $type === FieldType::Enum,
+            "hasIntID"    => $hasIntID,
+            "hasStringID" => $hasStringID,
+            "hasEnumID"   => $hasEnumID,
             "idName"      => $name,
             "idEnumName"  => Strings::substringAfter($enumClass, "\\"),
         ];
@@ -116,25 +121,25 @@ class RequestCode {
     }
 
     /**
-     * Returns the Native Fields
+     * Returns the Fields
      * @param SchemaModel $schemaModel
      * @return list<array{type:string,getter:string,name:string}>
      */
-    private static function getNatives(SchemaModel $schemaModel): array {
+    private static function getFields(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if (!$requested->isNative || $requested->isID) {
+            if (!$requested->isField()) {
                 continue;
             }
 
             $type = $requested->type->getCodeType($requested->enumClass);
 
             switch ($requested->type) {
-            case FieldType::Enum:
+            case ValueType::Enum:
                 $getter   = "{$type}::fromRequest(\$this->request, \"{$requested->name}\")";
                 break;
 
-            case FieldType::Date:
+            case ValueType::Date:
                 $name = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
                 if ($requested->dateType === DateType::None) {
                     $getter = "\$this->request->toDate(\"{$name}\")";
@@ -145,7 +150,7 @@ class RequestCode {
                 $getter   = "\$this->request->toDayMoment(\"{$name}\", DateType::{$dateType}{$hour})";
                 break;
 
-            case FieldType::Array:
+            case ValueType::Array:
                 if ($requested->subClass !== "") {
                     $typeName = Strings::substringAfter($requested->subClass, "\\");
                     $getter   = "{$typeName}::fromList(\$this->request->getStrings(\"{$requested->name}\"))";
@@ -172,18 +177,18 @@ class RequestCode {
     }
 
     /**
-     * Returns the Field properties
+     * Returns the Values
      * @param SchemaModel $schemaModel
      * @return list<Property>
      */
-    private static function getProperties(SchemaModel $schemaModel): array {
+    private static function getValues(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if (!$requested->hasValue || $requested->isID) {
+            if (!$requested->isValue()) {
                 continue;
             }
 
-            $type = $requested->getValueType();
+            $type = $requested->getValueClass();
             if ($type === "") {
                 continue;
             }
@@ -194,14 +199,14 @@ class RequestCode {
             }
 
             $extras = "";
-            if ($requested->type === FieldType::Float) {
+            if ($requested->type === ValueType::Float) {
                 $extras = ", {$requested->decimals}";
-            } elseif ($requested->type === FieldType::Date) {
+            } elseif ($requested->type === ValueType::Date) {
                 $extras = ", \"{$requested->hourInput}\"";
                 if ($requested->dateType !== DateType::None) {
                     $extras .= ", DateType::{$requested->dateType->toString()}";
                 }
-            } elseif ($requested->type === FieldType::Encrypt) {
+            } elseif ($requested->type === ValueType::Encrypt) {
                 $extras = ", true";
             }
 
@@ -216,7 +221,7 @@ class RequestCode {
     }
 
     /**
-     * Returns the Dictionary properties
+     * Returns the Dictionaries
      * @param SchemaModel $schemaModel
      * @return list<string>
      */
@@ -242,35 +247,28 @@ class RequestCode {
         if ($schemaModel->hasID && $schemaModel->idType === FieldType::Enum) {
             $result[$schemaModel->idEnumClass] = 1;
         }
+
         foreach ($schemaModel->requestedFields as $requested) {
-            if ($requested->isNative && $requested->type === FieldType::Enum) {
-                $result[$requested->enumClass] = 1;
+            if ($requested->isField()) {
+                if ($requested->type === ValueType::Enum) {
+                    $result[$requested->enumClass] = 1;
+                } elseif ($requested->type === ValueType::Date) {
+                    $result[Date::class] = 1;
+                }
+                if ($requested->subClass !== "") {
+                    $result[$requested->subClass] = 1;
+                }
+            } elseif ($requested->isValue()) {
+                $type = $requested->getValueClass();
+                if ($type !== "") {
+                    $result["Framework\IO\Value\\$type"] = 1;
+                }
             }
-            if ($requested->isNative && $requested->subClass !== "") {
-                $result[$requested->subClass] = 1;
-            }
-            if ($requested->isNative && $requested->type === FieldType::Date) {
-                $result[Date::class] = 1;
-            }
+
             if ($requested->dateType !== DateType::None) {
                 $result[DateType::class] = 1;
             }
         }
         return array_keys($result);
-    }
-
-    /**
-     * Returns the used Values
-     * @param list<Property> $properties
-     * @return list<string>
-     */
-    private static function getValues(array $properties): array {
-        $result = [];
-        foreach ($properties as $property) {
-            if (!Arrays::contains($result, $property["type"])) {
-                $result[] = $property["type"];
-            }
-        }
-        return $result;
     }
 }
