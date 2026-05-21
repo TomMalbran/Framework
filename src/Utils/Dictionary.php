@@ -138,11 +138,12 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
     /**
      * Returns true if the key exits in the data or in the list
-     * @param int|string      $needle
+     * @param Enum|int|string $needle
      * @param int|string|null $key    Optional.
      * @return bool
      */
-    public function contains(int|string $needle, int|string|null $key = null): bool {
+    public function contains(Enum|int|string $needle, int|string|null $key = null): bool {
+        $needle = Strings::toString($needle);
         if ($this->isList()) {
             return Arrays::contains($this->data, $needle, $key);
         }
