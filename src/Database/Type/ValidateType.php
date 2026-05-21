@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Database\Model;
+namespace Framework\Database\Type;
 
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;

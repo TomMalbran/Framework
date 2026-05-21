@@ -5,6 +5,7 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Database\Model\Requested;
 use Framework\Database\Builder\SchemaCode;
+use Framework\Database\Type\ValidateType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Color;
 use Framework\Utils\Numbers;
