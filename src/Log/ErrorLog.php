@@ -21,7 +21,6 @@ class ErrorLog extends LogErrorSchema {
     private static bool   $loaded    = false;
     private static string $framePath = "";
     private static string $basePath  = "";
-    private static int    $maxLog    = 1000;
 
 
     /**
@@ -172,15 +171,6 @@ class ErrorLog extends LogErrorSchema {
                 isResolved:  false,
                 updatedTime: Date::now(),
             );
-
-            $total = self::getEntityTotal();
-            if ($total > self::$maxLog) {
-                $query = new LogErrorQuery();
-                $query->updatedTime->orderByAsc();
-                $query->limit($total - self::$maxLog);
-
-                self::removeEntity($query);
-            }
         }
         return true;
     }
