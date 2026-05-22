@@ -1,7 +1,7 @@
 <?php
 namespace Framework\File;
 
-use Framework\IO\Request;
+use Framework\IO\Value\FileValue;
 use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
@@ -128,13 +128,13 @@ class MediaFile {
 
     /**
      * Uploads a File
-     * @param Request    $request
+     * @param FileValue  $file
      * @param int|string ...$pathParts
      * @return bool
      */
-    public static function uploadFile(Request $request, int|string ...$pathParts): bool {
-        $fileName = $request->getFileName("file");
-        $tmpFile  = $request->getTmpName("file");
+    public static function uploadFile(FileValue $file, int|string ...$pathParts): bool {
+        $fileName = $file->getFileName();
+        $tmpFile  = $file->getTmpName();
         $source   = self::getPath(...$pathParts);
 
         if (!File::upload($source, $fileName, $tmpFile)) {

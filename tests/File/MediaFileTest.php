@@ -1,11 +1,12 @@
 <?php
 namespace Tests\File;
 
+use Framework\IO\Request;
+use Framework\IO\Value\FileValue;
 use Framework\File\File;
 use Framework\File\Image;
 use Framework\File\MediaFile;
 use Framework\File\Type\MediaType;
-use Framework\IO\Request;
 use Framework\System\Path;
 use Tests\TestHelpers;
 
@@ -214,8 +215,16 @@ class MediaFileTest extends TestCase {
     ): void {
         $GLOBALS["test_move_uploaded_file"] = true;
 
-        $request = $this->createUploadRequest($fileName, $this->uploadSources[$uploadKey]);
-        $result  = MediaFile::uploadFile($request, ...$pathParts);
+        $request = new Request();
+        $this->setPrivateProperty($request, "files", [
+            "file" => [
+                "name"     => $fileName,
+                "tmp_name" => $this->uploadSources[$uploadKey],
+            ],
+        ]);
+
+        $file     = new FileValue($request, "file");
+        $result   = MediaFile::uploadFile($file, ...$pathParts);
         $filePath = [ ...$pathParts, $fileName ];
 
         $sourcePath = Path::getSourcePath($this->mediaID, ...$filePath);
@@ -380,19 +389,6 @@ class MediaFileTest extends TestCase {
         $this->createImageFile($sourcePath, $width, $height);
         File::createDir(File::getDirectory($thumbPath));
         Image::resize($sourcePath, $thumbPath, 200, 200, Image::Resize);
-    }
-
-    private function createUploadRequest(string $fileName, string $tmpPath): Request {
-        $request = new Request();
-
-        $this->setPrivateProperty($request, "files", [
-            "file" => [
-                "name"     => $fileName,
-                "tmp_name" => $tmpPath,
-            ],
-        ]);
-
-        return $request;
     }
 
     private function getTempFilePath(string $name): string {
