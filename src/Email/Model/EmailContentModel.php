@@ -35,5 +35,6 @@ class EmailContentModel {
     #[Field(isText: true)]
     public string $message = "";
 
+    #[Field(isPosition: true)]
     public int $position = 0;
 }
