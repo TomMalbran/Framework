@@ -39,10 +39,18 @@ class OpenAI {
      * @return Dictionary
      */
     private static function post(string $route, ?array $request = null): Dictionary {
-        $response = Curl::execute(CurlMethod::POST, self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . Config::getOpenAiKey(),
-            "Content-Type"  => "application/json",
-        ], jsonBody: true, jsonResponse: true);
+        $response = Curl::execute(
+            method:  CurlMethod::POST,
+            url:     self::BaseUrl . $route,
+            params:  $request,
+            headers: [
+                "Authorization" => "Bearer " . Config::getOpenAiKey(),
+                "Content-Type"  => "application/json",
+            ],
+            jsonBody:     true,
+            jsonResponse: true,
+            returnError:  true,
+        );
         return new Dictionary($response);
     }
 
@@ -270,9 +278,24 @@ class OpenAI {
             ];
         }
 
+
+        // Perform the Request
         $result   = new OpenAIOutput();
         $response = self::post("/chat/completions", $params);
-        $choice   = $response->getFirst("choices");
+
+        // Check for errors
+        if ($response->hasValue("error")) {
+            $error = $response->get("error");
+            if (is_string($error)) {
+                $result->error = $error;
+            } else {
+                $result->error = $response->getDict("error")->getString("message");
+            }
+            return $result;
+        }
+
+        // Generate the Output
+        $choice = $response->getFirst("choices");
         if ($choice->isEmpty()) {
             return $result;
         }
@@ -366,13 +389,25 @@ class OpenAI {
             $params["tools"] = $tools;
         }
 
-        // Perform the request and get the Result
+
+        // Perform the Request
         $result   = new OpenAIOutput();
         $response = self::post("/responses", $params);
-        $outputs  = $response->getList("output");
-        $text     = "";
 
-        foreach ($outputs as $output) {
+        // Check for errors
+        if ($response->hasValue("error")) {
+            $error = $response->get("error");
+            if (is_string($error)) {
+                $result->error = $error;
+            } else {
+                $result->error = $response->getDict("error")->getString("message");
+            }
+            return $result;
+        }
+
+        // Generate the Output
+        $text = "";
+        foreach ($response->getList("output") as $output) {
             if ($output->getString("type") === "message") {
                 $text = $output->getFirst("content")->getString("text");
                 break;

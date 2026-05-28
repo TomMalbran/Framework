@@ -6,6 +6,8 @@ namespace Framework\Provider\Type;
  */
 class OpenAIOutput {
 
+    public string $error         = "";
+
     public string $externalID    = "";
     public string $vectorStoreID = "";
     public string $fileIDs       = "";
