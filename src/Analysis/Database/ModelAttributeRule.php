@@ -75,13 +75,8 @@ class ModelAttributeRule implements Rule {
             return [];
         }
 
-        // The property can be named position
-        $propName = $node->getName();
-        if ($propName === "position") {
-            return [];
-        }
-
         // Get some property info
+        $propName         = $node->getName();
         $nativeReflection = $classReflection->getNativeReflection();
         $nativeProperty   = $nativeReflection->getProperty($propName);
         $propReflection   = $classReflection->getNativeProperty($propName);
