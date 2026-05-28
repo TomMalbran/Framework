@@ -161,6 +161,22 @@ class ArraysTest extends TestCase {
         ];
     }
 
+    #[DataProvider("providerToIntsMap")]
+    public function testToIntsMap(mixed $input, array $expected): void {
+        $this->assertSame($expected, Arrays::toIntsMap($input));
+    }
+
+    public static function providerToIntsMap(): array {
+        return [
+            "simple_conversion"   => [ [ "1" => 1 ], [ 1 => 1 ] ],
+            "numeric_keys"        => [ [ 1 => "1" ], [ 1 => 1 ] ],
+            "string_numeric_keys" => [ [ "1.23" => "x" ], [ 1 => 0 ] ],
+            "non_array_string"    => [ "x", [] ],
+            "null_input"          => [ null, [] ],
+            "null_values"         => [ [ "1" => null ], [ 1 => 0 ] ],
+            "object_values"       => [ [ "2" => (object)[] ], [ 2 => 0 ] ],
+        ];
+    }
 
     #[DataProvider("providerToStringsMap")]
     public function testToStringsMap(mixed $input, array $expected): void {

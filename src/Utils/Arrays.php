@@ -174,18 +174,18 @@ class Arrays {
     }
 
     /**
-     * Converts an array into a Map of string keys and values
+     * Converts an array into a Map of int keys and int values
      * @param mixed $array
-     * @return array<string,string>
+     * @return array<int,int>
      */
-    public static function toStringsMap(mixed $array): array {
+    public static function toIntsMap(mixed $array): array {
         if (!is_array($array)) {
             return [];
         }
 
         $result = [];
         foreach ($array as $key => $value) {
-            $result[Strings::toString($key)] = Strings::toString($value);
+            $result[Numbers::toInt($key)] = Numbers::toInt($value);
         }
         return $result;
     }
@@ -203,6 +203,23 @@ class Arrays {
         $result = [];
         foreach ($array as $key => $value) {
             $result[Numbers::toInt($key)] = Strings::toString($value);
+        }
+        return $result;
+    }
+
+    /**
+     * Converts an array into a Map of string keys and values
+     * @param mixed $array
+     * @return array<string,string>
+     */
+    public static function toStringsMap(mixed $array): array {
+        if (!is_array($array)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $key => $value) {
+            $result[Strings::toString($key)] = Strings::toString($value);
         }
         return $result;
     }
