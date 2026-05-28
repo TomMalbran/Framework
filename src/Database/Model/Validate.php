@@ -235,6 +235,20 @@ class Validate {
 
 
     /**
+     * Returns true if the value is Validated
+     * @return bool
+     */
+    public function shouldValidate(): bool {
+        return match ($this->type) {
+            ValidateType::None => false,
+            ValidateType::Enum,
+            ValidateType::String => $this->isRequired || $this->typeOf !== "" ||
+                $this->isUnique || $this->maxLength > 0,
+            default => true,
+        };
+    }
+
+    /**
      * Gets the Field Error for this Validate
      * @return string
      */

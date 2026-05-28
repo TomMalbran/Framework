@@ -399,6 +399,10 @@ class SchemaCode {
         $result      = [];
 
         foreach ($schemaModel->validates as $validate) {
+            if (!$validate->shouldValidate()) {
+                continue;
+            }
+
             $validation = [];
             switch ($validate->type) {
             case ValidateType::None:
