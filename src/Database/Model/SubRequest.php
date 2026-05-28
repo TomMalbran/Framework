@@ -241,7 +241,7 @@ class SubRequest {
                 $query->where($isDeleted, Operator::Equal, 0);
             }
             if ($this->schemaModel->hasPositions) {
-                $query->orderBy($this->schemaModel->getKey("position"), isASC: true);
+                $query->orderBy($this->schemaModel->getKey($this->schemaModel->positionName), isASC: true);
             }
         }
         return $query;

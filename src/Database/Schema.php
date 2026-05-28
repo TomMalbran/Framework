@@ -28,11 +28,13 @@ class Schema {
 
     protected static ?SchemaModel $model = null;
 
-    protected static string $modelName = "";
-    protected static string $tableName = "";
-    protected static string $idName    = "";
-    protected static string $idDbName  = "";
-    protected static bool   $canDelete = false;
+    protected static string $modelName    = "";
+    protected static string $tableName    = "";
+    protected static string $idName       = "";
+    protected static string $idDbName     = "";
+    protected static string $positionName = "";
+    protected static int    $minPosition  = 0;
+    protected static bool   $canDelete    = false;
 
 
 
@@ -419,7 +421,7 @@ class Schema {
             ->addModification();
 
         $newPosition = self::ensureSchemaOrder(null, $modification->getFields(), $orderQuery);
-        $modification->setField("position", $newPosition);
+        $modification->setField(static::$positionName, $newPosition);
         return $modification->execute();
     }
 
@@ -445,10 +447,10 @@ class Schema {
             ->addModification($credentialID, $skipTimestamps);
 
         $newFields = $modification->getFields();
-        if ($newFields->has("position")) {
+        if ($newFields->has(static::$positionName)) {
             $elem         = self::getSchemaEntity($query);
             $savePosition = self::ensureSchemaOrder($elem, $newFields, $orderQuery);
-            $modification->setField("position", $savePosition);
+            $modification->setField(static::$positionName, $savePosition);
         }
 
         return $modification->execute() > 0;
@@ -496,22 +498,20 @@ class Schema {
      * Ensures that the Order of the Schema is correct
      * @param Dictionary|null $oldFields
      * @param Dictionary|null $newFields
-     * @param QueryLike|null  $query       Optional.
-     * @param int             $minPosition Optional.
+     * @param QueryLike|null  $query     Optional.
      * @return int
      */
     protected static function ensureSchemaOrder(
         ?Dictionary $oldFields,
         ?Dictionary $newFields,
         ?QueryLike $query = null,
-        int $minPosition = 0,
     ): int {
         $isCreate     = Arrays::isEmpty($oldFields)  && !Arrays::isEmpty($newFields);
         $isEdit       = !Arrays::isEmpty($oldFields) && !Arrays::isEmpty($newFields);
         $isDelete     = !Arrays::isEmpty($oldFields) && Arrays::isEmpty($newFields);
 
-        $oldPosition  = $oldFields !== null ? $oldFields->getInt("position") : 0;
-        $newPosition  = $newFields !== null ? $newFields->getInt("position") : 0;
+        $oldPosition  = $oldFields !== null ? $oldFields->getInt(static::$positionName) : 0;
+        $newPosition  = $newFields !== null ? $newFields->getInt(static::$positionName) : 0;
         $nextPosition = self::getNextPosition($query);
 
         $oldPosition  = $isCreate ? $nextPosition : $oldPosition;
@@ -529,8 +529,9 @@ class Schema {
         }
 
         // Apply the minimum position
-        if ($newPosition < $minPosition) {
-            $newPosition = $minPosition;
+        if ($newPosition < static::$minPosition) {
+            $newPosition  = static::$minPosition;
+            $savePosition = $newPosition;
         }
 
         // On an edit if the position is the last one, set it to 1 lower
@@ -541,13 +542,13 @@ class Schema {
         $builder = Query::update(self::generateQuery($query));
 
         if ($newPosition > $oldPosition) {
-            $builder->set("position", Assign::decrease(1));
-            $builder->where("position", Operator::GreaterThan, $oldPosition);
-            $builder->where("position", Operator::LessOrEqual, $newPosition);
+            $builder->set(static::$positionName, Assign::decrease(1));
+            $builder->where(static::$positionName, Operator::GreaterThan, $oldPosition);
+            $builder->where(static::$positionName, Operator::LessOrEqual, $newPosition);
         } else {
-            $builder->set("position", Assign::increase(1));
-            $builder->where("position", Operator::GreaterOrEqual, $newPosition);
-            $builder->where("position", Operator::LessThan, $oldPosition);
+            $builder->set(static::$positionName, Assign::increase(1));
+            $builder->where(static::$positionName, Operator::GreaterOrEqual, $newPosition);
+            $builder->where(static::$positionName, Operator::LessThan, $oldPosition);
         }
 
         $builder->execute();
@@ -561,16 +562,16 @@ class Schema {
      */
     private static function getNextPosition(?QueryLike $query = null): int {
         $query = self::generateQuery($query);
-        $query->orderBy("position", isASC: false);
+        $query->orderBy(static::$positionName, isASC: false);
         $query->limit(1);
 
         $request = SelectionBuilder::create(static::getModel(), $query)
-            ->addSelects("position", addMainKey: true)
+            ->addSelects(static::$positionName, addMainKey: true)
             ->addJoins(withSelects: false)
             ->request()
             ->getResult();
 
-        return $request->getFirst()->getInt("position") + 1;
+        return $request->getFirst()->getInt(static::$positionName) + 1;
     }
 
     /**

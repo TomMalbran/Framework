@@ -43,6 +43,12 @@ class Field {
     // Used to skip the prefix when doing a Join
     public bool $isCode = false;
 
+    // Used to indicate that the Field is for the Position and should follow the Position rules.
+    public bool $isPosition = false;
+
+    // Used to indicate the minimum position of the field when isPosition is true.
+    public int $minPosition = 0;
+
 
     // Marks the field as being the ID of a different Model
     // Is not used in the code, but it can be used to create a DER
@@ -101,27 +107,29 @@ class Field {
 
     /**
      * The Field Attribute
-     * @param bool              $isID       Optional.
-     * @param bool              $notAutoInc Optional.
-     * @param bool              $isPrimary  Optional.
-     * @param bool              $isKey      Optional.
-     * @param bool              $isParent   Optional.
-     * @param bool              $isUnique   Optional.
-     * @param bool              $isCode     Optional.
-     * @param class-string|null $belongsTo  Optional.
-     * @param string            $otherField Optional.
-     * @param int               $length     Optional.
-     * @param bool              $isSigned   Optional.
-     * @param int               $decimals   Optional.
-     * @param bool              $isText     Optional.
-     * @param bool              $isLongText Optional.
-     * @param bool              $isEncrypt  Optional.
-     * @param bool              $isFile     Optional.
-     * @param bool              $hasFile    Optional.
-     * @param string            $filePath   Optional.
-     * @param DateType          $dateType   Optional.
-     * @param string            $dateInput  Optional.
-     * @param string            $hourInput  Optional.
+     * @param bool              $isID        Optional.
+     * @param bool              $notAutoInc  Optional.
+     * @param bool              $isPrimary   Optional.
+     * @param bool              $isKey       Optional.
+     * @param bool              $isParent    Optional.
+     * @param bool              $isUnique    Optional.
+     * @param bool              $isCode      Optional.
+     * @param bool              $isPosition  Optional.
+     * @param int               $minPosition Optional.
+     * @param class-string|null $belongsTo   Optional.
+     * @param string            $otherField  Optional.
+     * @param int               $length      Optional.
+     * @param bool              $isSigned    Optional.
+     * @param int               $decimals    Optional.
+     * @param bool              $isText      Optional.
+     * @param bool              $isLongText  Optional.
+     * @param bool              $isEncrypt   Optional.
+     * @param bool              $isFile      Optional.
+     * @param bool              $hasFile     Optional.
+     * @param string            $filePath    Optional.
+     * @param DateType          $dateType    Optional.
+     * @param string            $dateInput   Optional.
+     * @param string            $hourInput   Optional.
      */
     public function __construct(
         bool $isID = false,
@@ -131,6 +139,8 @@ class Field {
         bool $isParent = false,
         bool $isUnique = false,
         bool $isCode = false,
+        bool $isPosition = false,
+        int $minPosition = 0,
         ?string $belongsTo = null,
         string $otherField = "",
         int $length = 0,
@@ -146,37 +156,39 @@ class Field {
         string $dateInput = "",
         string $hourInput = "",
     ) {
-        $this->isID       = $isID;
-        $this->notAutoInc = $notAutoInc;
-        $this->isPrimary  = $isID || $isPrimary;
-        $this->isKey      = $isKey;
-        $this->isParent   = $isParent;
-        $this->isUnique   = $isUnique;
-        $this->isCode     = $isCode;
+        $this->isID        = $isID;
+        $this->notAutoInc  = $notAutoInc;
+        $this->isPrimary   = $isID || $isPrimary;
+        $this->isKey       = $isKey;
+        $this->isParent    = $isParent;
+        $this->isUnique    = $isUnique;
+        $this->isCode      = $isCode;
+        $this->isPosition  = $isPosition;
+        $this->minPosition = $minPosition;
 
         // Foreign key
-        $this->belongsTo  = SchemaModel::getBaseModelName($belongsTo);
-        $this->otherField = $otherField;
+        $this->belongsTo   = SchemaModel::getBaseModelName($belongsTo);
+        $this->otherField  = $otherField;
 
         // Number types
-        $this->length   = $length;
-        $this->isSigned = $isSigned;
-        $this->decimals = $decimals;
+        $this->length      = $length;
+        $this->isSigned    = $isSigned;
+        $this->decimals    = $decimals;
 
         // Text types
-        $this->isText     = $isText;
-        $this->isLongText = $isLongText;
-        $this->isEncrypt  = $isEncrypt;
+        $this->isText      = $isText;
+        $this->isLongText  = $isLongText;
+        $this->isEncrypt   = $isEncrypt;
 
         // File types
-        $this->isFile   = $isFile;
-        $this->hasFile  = $hasFile;
-        $this->filePath = $filePath;
+        $this->isFile      = $isFile;
+        $this->hasFile     = $hasFile;
+        $this->filePath    = $filePath;
 
         // Date types
-        $this->dateType  = $dateType;
-        $this->dateInput = $dateInput;
-        $this->hourInput = $hourInput;
+        $this->dateType    = $dateType;
+        $this->dateInput   = $dateInput;
+        $this->hourInput   = $hourInput;
     }
 
 

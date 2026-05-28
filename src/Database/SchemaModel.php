@@ -32,7 +32,6 @@ class SchemaModel {
     // Special flags
     public bool $hasUsers         = false;
     public bool $hasTimestamps    = false;
-    public bool $hasPositions     = false;
     public bool $hasStatus        = false;
     public bool $canCreate        = false;
     public bool $canEdit          = false;
@@ -55,6 +54,11 @@ class SchemaModel {
     public string    $idDbName    = "";
     public FieldType $idType      = FieldType::String;
     public string    $idEnumClass = "";
+
+    // Position column data
+    public bool   $hasPositions   = false;
+    public string $positionName   = "";
+    public int    $minPosition    = 0;
 
 
     /** @var list<Validate> */
@@ -101,7 +105,6 @@ class SchemaModel {
      * @param bool             $fromFramework   Optional.
      * @param bool             $hasUsers        Optional.
      * @param bool             $hasTimestamps   Optional.
-     * @param bool             $hasPositions    Optional.
      * @param bool             $hasStatus       Optional.
      * @param bool             $canCreate       Optional.
      * @param bool             $canEdit         Optional.
@@ -125,7 +128,6 @@ class SchemaModel {
         bool $fromFramework = false,
         bool $hasUsers = false,
         bool $hasTimestamps = false,
-        bool $hasPositions = false,
         bool $hasStatus = false,
         bool $canCreate = false,
         bool $canEdit = false,
@@ -152,7 +154,6 @@ class SchemaModel {
 
         $this->hasUsers        = $hasUsers;
         $this->hasTimestamps   = $hasTimestamps;
-        $this->hasPositions    = $hasPositions;
         $this->hasStatus       = $hasStatus;
         $this->canCreate       = $canCreate;
         $this->canEdit         = $canEdit;
@@ -177,6 +178,7 @@ class SchemaModel {
 
         $this->setExtraFields();
         $this->setIDField();
+        $this->setPositionField();
 
         $this->fields = array_merge(
             $this->mainFields,
@@ -189,12 +191,6 @@ class SchemaModel {
      * @return void
      */
     private function setExtraFields(): void {
-        if ($this->hasPositions) {
-            $this->extraFields[] = Field::create(
-                type: FieldType::Number,
-                name: "position",
-            );
-        }
         if ($this->hasStatus) {
             $this->extraFields[] = Field::create(
                 type:     FieldType::String,
@@ -239,10 +235,10 @@ class SchemaModel {
     }
 
     /**
-     * Returns the ID Field of the Model
-     * @return bool
+     * Sets the ID Field of the Model
+     * @return void
      */
-    public function setIDField(): bool {
+    public function setIDField(): void {
         foreach ($this->mainFields as $field) {
             if ($field->isID) {
                 $this->hasID       = true;
@@ -251,10 +247,24 @@ class SchemaModel {
                 $this->idDbName    = $field->dbName;
                 $this->idType      = $field->type;
                 $this->idEnumClass = $field->enumClass;
-                return true;
+                break;
             }
         }
-        return false;
+    }
+
+    /**
+     * Sets the Position Field of the Model
+     * @return void
+     */
+    public function setPositionField(): void {
+        foreach ($this->mainFields as $field) {
+            if ($field->isPosition) {
+                $this->hasPositions = true;
+                $this->positionName = $field->name;
+                $this->minPosition  = $field->minPosition;
+                break;
+            }
+        }
     }
 
 
@@ -267,11 +277,7 @@ class SchemaModel {
      */
     public function getFields(bool $withTimestamps, bool $withDeleted): array {
         $result = [];
-        foreach ($this->mainFields as $field) {
-            $result[] = $field;
-        }
-
-        foreach ($this->extraFields as $field) {
+        foreach ($this->fields as $field) {
             $fieldName = $field->dbName;
             if (!$withTimestamps && ($fieldName === "createdTime" || $fieldName === "modifiedTime")) {
                 continue;
@@ -290,10 +296,7 @@ class SchemaModel {
      */
     public function getFieldNames(): array {
         $result = [];
-        foreach ($this->mainFields as $field) {
-            $result[] = $field->name;
-        }
-        foreach ($this->extraFields as $field) {
+        foreach ($this->fields as $field) {
             $result[] = $field->name;
         }
         foreach ($this->expressions as $expression) {
@@ -451,7 +454,6 @@ class SchemaModel {
         $result = [
             "hasTimestamps" => $this->hasTimestamps,
             "hasStatus"     => $this->hasStatus,
-            "hasPositions"  => $this->hasPositions,
             "hasUsers"      => $this->hasUsers,
             "canCreate"     => $this->canCreate,
             "canEdit"       => $this->canEdit,

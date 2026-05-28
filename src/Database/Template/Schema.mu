@@ -44,11 +44,13 @@ class {{name}}Schema extends Schema {
 
     protected static ?SchemaModel $model = null;
 
-    protected static string $modelName = "{{name}}";
-    protected static string $tableName = "{{tableName}}";
-    protected static string $idName    = "{{idName}}";
-    protected static string $idDbName  = "{{idDbName}}";
-    protected static bool   $canDelete = {{canDeleteValue}};
+    protected static string $modelName    = "{{name}}";
+    protected static string $tableName    = "{{tableName}}";
+    protected static string $idName       = "{{idName}}";
+    protected static string $idDbName     = "{{idDbName}}";
+    protected static string $positionName = "{{positionName}}";
+    protected static int    $minPosition  = {{minPositionValue}};
+    protected static bool   $canDelete    = {{canDeleteValue}};
 
 
 
@@ -63,7 +65,6 @@ class {{name}}Schema extends Schema {
                 name:          "{{name}}",
                 hasUsers:      {{hasUsersValue}},
                 hasTimestamps: {{hasTimestampsValue}},
-                hasPositions:  {{hasPositionsValue}},
                 hasStatus:     {{hasStatusValue}},
                 canCreate:     {{canCreateValue}},
                 canEdit:       {{canEditValue}},
@@ -280,12 +281,6 @@ class {{name}}Schema extends Schema {
     {{/hasIf}}
 
 {{/validations}}
-    {{#hasPositions}}
-            if (!$request->position->isValid(0)) {
-                $errors->position = "GENERAL_ERROR_POSITION";
-            }
-
-    {{/hasPositions}}
             $canValidate = true;
         }
 

@@ -101,7 +101,8 @@ class SchemaCode {
             "hasList"            => !$schemaModel->skipList,
 
             "hasPositions"       => $schemaModel->hasPositions,
-            "hasPositionsValue"  => $schemaModel->hasPositions ? "true" : "false",
+            "positionName"       => $schemaModel->positionName,
+            "minPositionValue"   => $schemaModel->minPosition,
             "hasTimestamps"      => $schemaModel->hasTimestamps,
             "hasTimestampsValue" => $schemaModel->hasTimestamps ? "true" : "false",
             "hasStatus"          => $schemaModel->hasStatus,

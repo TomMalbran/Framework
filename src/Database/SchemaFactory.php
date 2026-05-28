@@ -113,7 +113,6 @@ class SchemaFactory {
 
             // Get data from the Properties
             $hasStatus       = false;
-            $hasPositions    = false;
             $mainFields      = [];
             $validates       = [];
             $virtualFields   = [];
@@ -136,7 +135,6 @@ class SchemaFactory {
                 // Get the Type
                 $typeName     = $propType->getName();
                 $isFieldClass = FieldType::isValidClass($typeName);
-                $isPosition   = $fieldName === "position";
                 $isStatus     = $typeName === Status::class;
                 $isEnum       = false;
                 $arrayType    = "";
@@ -145,9 +143,16 @@ class SchemaFactory {
 
                 if (!$isFieldClass && !$isStatus && !$propType->isBuiltin()) {
                     [ $isEnum, $isValidEnum ] = self::isPropEnum($typeName);
+
+                    // Skip Enums that are not valid
                     if ($isEnum && !$isValidEnum) {
                         continue 2;
                     }
+                }
+
+                // Skip a second time the Position and Status is found
+                if ($isStatus && $hasStatus) {
+                    continue;
                 }
 
                 // Get the Attributes
@@ -190,12 +195,8 @@ class SchemaFactory {
 
 
 
-                // POSITION: If the Name is Position, mark it in the Model.
-                if ($isPosition) {
-                    $hasPositions = true;
-
                 // STATUS: If the Type is Status, mark it in the Model.
-                } elseif ($isStatus) {
+                if ($isStatus) {
                     $hasStatus = true;
                     foreach ($propAttributes as $attribute) {
                         $instance = $attribute->newInstance();
@@ -251,14 +252,9 @@ class SchemaFactory {
 
 
                 // REQUESTED: Any property might also be Requested
-                if ($isPosition && count($requestedFields) > 0) {
-                    $requested = new Requested();
-                }
                 if ($requested !== null) {
                     if ($isStatus) {
                         $requestedFields[] = $requested->fromStatus();
-                    } elseif ($isPosition) {
-                        $requestedFields[] = $requested->fromPosition();
                     } elseif ($field !== null) {
                         $requestedFields[] = $requested->fromField($field, $validate !== null);
                     } else {
@@ -287,7 +283,6 @@ class SchemaFactory {
                 fromFramework:   $fromFramework,
                 hasUsers:        $model->hasUsers,
                 hasTimestamps:   $model->hasTimestamps,
-                hasPositions:    $hasPositions,
                 hasStatus:       $hasStatus,
                 canCreate:       $model->canCreate,
                 canEdit:         $model->canEdit,
