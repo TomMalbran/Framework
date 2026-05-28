@@ -7,6 +7,7 @@ use Framework\ImpExp\ImporterData;
 use Framework\ImpExp\ImporterRow;
 use Framework\ImpExp\InvalidReader;
 use Framework\ImpExp\XLSXReader;
+use Framework\Utils\Dictionary;
 
 use Iterator;
 
@@ -62,10 +63,13 @@ class Importer implements Iterator {
 
     /**
      * Sets the Columns
-     * @param array<string,int> $columns
+     * @param Dictionary|array<string,int> $columns
      * @return Importer
      */
-    public function setColumns(array $columns): Importer {
+    public function setColumns(Dictionary|array $columns): Importer {
+        if ($columns instanceof Dictionary) {
+            $columns = $columns->toStringIntMap();
+        }
         foreach ($columns as $key => $index) {
             $this->columns[$key] = $index;
         }
