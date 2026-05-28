@@ -25,12 +25,14 @@ class ActionLog extends LogActionSchema {
      * @param array<string,LogActionColumn> $mappings Optional.
      * @return LogActionQuery
      */
-    private static function createQuery(LogActionRequest $request, array $mappings = []): LogActionQuery {
-        $query       = new LogActionQuery();
-        $realRequest = $request->getRequest();
+    private static function createQuery(
+        LogActionRequest $request,
+        array $mappings = [],
+    ): LogActionQuery {
+        $query = new LogActionQuery();
 
         foreach ($mappings as $key => $column) {
-            $value = $realRequest->getString($key);
+            $value = $request->getString($key);
             $query->where($column, Operator::Equal, $value, condition: $value !== "");
         }
 
@@ -41,7 +43,7 @@ class ActionLog extends LogActionSchema {
         ], $request->search);
 
         $query->credentialID->equalIf($request->credentialID);
-        $query->createdTime->inPeriod($realRequest);
+        $query->createdTime->inPeriod($request);
         return $query;
     }
 
