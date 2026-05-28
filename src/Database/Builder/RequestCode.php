@@ -7,6 +7,7 @@ use Framework\Database\Type\ValueType;
 use Framework\Builder\Builder;
 use Framework\Date\Date;
 use Framework\Date\Type\DateType;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
@@ -154,10 +155,16 @@ class RequestCode {
                 if ($requested->subClass !== "") {
                     $typeName = Strings::substringAfter($requested->subClass, "\\");
                     $getter   = "{$typeName}::fromList(\$this->request->getStrings(\"{$requested->name}\"))";
-                } else {
+                } elseif (Strings::startsWith($requested->subType, "list<")) {
                     $typeName = Strings::substringBetween($requested->subType, "list<", ">");
                     $typeName = Strings::upperCaseFirst($typeName);
                     $getter   = "\$this->request->get{$typeName}s(\"{$requested->name}\")";
+                } else {
+                    $arrayFunc = self::getArrayFunction($requested->subType);
+                    if ($arrayFunc === "") {
+                        continue 2;
+                    }
+                    $getter = "Arrays::{$arrayFunc}(\$this->request->getJSONArray(\"{$requested->name}\"))";
                 }
                 break;
 
@@ -174,6 +181,23 @@ class RequestCode {
             ];
         }
         return $result;
+    }
+
+    /**
+     * Returns the Array function for the given SubType
+     * @param string $subType
+     * @return string
+     */
+    private static function getArrayFunction(string $subType): string {
+        return match ($subType) {
+            "array<int,int>"       => "toIntsMap",
+            "array<int,string>"    => "toIntStringMap",
+            "array<string,string>" => "toStringsMap",
+            "array<string,int>"    => "toStringIntMap",
+            "array<string,float>"  => "toStringFloatMap",
+            "array<string,mixed>"  => "toStringMixedMap",
+            default                => "",
+        };
     }
 
     /**
@@ -257,6 +281,9 @@ class RequestCode {
                 }
                 if ($requested->subClass !== "") {
                     $result[$requested->subClass] = 1;
+                }
+                if (Strings::startsWith($requested->subType, "array<")) {
+                    $result[Arrays::class] = 1;
                 }
             } elseif ($requested->isValue()) {
                 $type = $requested->getValueClass();
