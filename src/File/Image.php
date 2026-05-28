@@ -55,7 +55,7 @@ class Image {
      * @return int
      */
     public static function getType(string $fileName): int {
-        if (!File::exists($fileName)) {
+        if (!URL::isValid($fileName) && !File::exists($fileName)) {
             return 0;
         }
         $result = exif_imagetype($fileName);
@@ -68,7 +68,7 @@ class Image {
      * @return string
      */
     public static function getMimeType(string $fileName): string {
-        if (!File::exists($fileName)) {
+        if (!URL::isValid($fileName) && !File::exists($fileName)) {
             return "";
         }
         $imageType = self::getType($fileName);
