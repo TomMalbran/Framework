@@ -82,6 +82,24 @@ class SchemaQuery implements QueryLike {
 
 
     /**
+     * Adds a Join to the Query
+     * @param SchemaQuery|string $queryOrTable
+     * @param string             $as           Optional.
+     * @param string             $on           Optional.
+     * @param string             $type         Optional.
+     * @return SchemaQuery
+     */
+    public function join(
+        SchemaQuery|string $queryOrTable,
+        string $as = "",
+        string $on = "",
+        string $type = "LEFT",
+    ): SchemaQuery {
+        $this->query->join($queryOrTable, $as, $on, $type);
+        return $this;
+    }
+
+    /**
      * Adds a param to the Query
      * @param int|string $param
      * @return SchemaQuery

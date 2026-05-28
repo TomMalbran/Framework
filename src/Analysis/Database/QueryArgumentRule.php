@@ -3,6 +3,7 @@ namespace Framework\Analysis\Database;
 
 use Framework\Database\Query\Query;
 use Framework\Database\Query\Operator;
+use Framework\Utils\Arrays;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
@@ -13,10 +14,11 @@ use PHPStan\Reflection\ReflectionProvider;
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
-use Framework\Utils\Arrays;
+use PhpParser\Node\Expr\Variable;
 
 /**
  * The Query Argument Rule
@@ -88,7 +90,7 @@ class QueryArgumentRule implements Rule {
 
         // Check Static Methods (select/update)
         if ($node instanceof StaticCall && ($methodName === "select" || $methodName === "update")) {
-            if (isset($args[1]) && $args[1]->name === null) {
+            if (isset($args[1]) && $args[1]->name === null && !$this->isValidName($args[1], "as")) {
                 $errors[] = RuleErrorBuilder::message(
                     "The 'as' parameter in Query::{$methodName} must be a named argument."
                 )
@@ -103,14 +105,14 @@ class QueryArgumentRule implements Rule {
             return $errors;
         }
         if ($methodName === "join") {
-            if (isset($args[1]) && $args[1]->name === null) {
+            if (isset($args[1]) && $args[1]->name === null && !$this->isValidName($args[1], "as")) {
                 $errors[] = RuleErrorBuilder::message("The 'as' parameter in Query->join must be a named argument.")
                     ->line($node->getLine())
                     ->identifier("framework.queryNamedAs")
                     ->build();
             }
 
-            if (isset($args[2]) && $args[2]->name === null) {
+            if (isset($args[2]) && $args[2]->name === null && !$this->isValidName($args[2], "on")) {
                 $errors[] = RuleErrorBuilder::message("The 'on' parameter in Query->join must be a named argument.")
                     ->line($node->getLine())
                     ->identifier("framework.queryNamedOn")
@@ -138,5 +140,17 @@ class QueryArgumentRule implements Rule {
         }
 
         return $errors;
+    }
+
+    /**
+     * Checks if a positional argument is a variable matching the expected name.
+     * @param Arg    $arg
+     * @param string $expectedName
+     * @return bool
+     */
+    private function isValidName(Arg $arg, string $expectedName): bool {
+        return $arg->value instanceof Variable &&
+            is_string($arg->value->name) &&
+            $arg->value->name === $expectedName;
     }
 }
