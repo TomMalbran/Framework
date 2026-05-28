@@ -3,6 +3,8 @@ namespace Framework\Database\Type;
 
 use Framework\IO\Request;
 use Framework\Utils\Dictionary;
+use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
 
 /**
  * The Schema Request
@@ -68,5 +70,37 @@ class SchemaRequest {
      */
     public function toDictionary(): Dictionary {
         return $this->request->toDictionary();
+    }
+
+    /**
+     * Returns the Data as a String
+     * @param string $key
+     * @param string $default Optional.
+     * @return string
+     */
+    public function getString(string $key, string $default = ""): string {
+        if (property_exists($this, $key)) {
+            return Strings::toString($this->$key);
+        }
+        if ($this->request->exists($key)) {
+            return $this->request->getString($key, $default);
+        }
+        return $default;
+    }
+
+    /**
+     * Returns the Data as an Integer
+     * @param string $key
+     * @param int    $default Optional.
+     * @return int
+     */
+    public function getInt(string $key, int $default = 0): int {
+        if (property_exists($this, $key)) {
+            return Numbers::toInt($this->$key);
+        }
+        if ($this->request->exists($key)) {
+            return $this->request->getInt($key, $default);
+        }
+        return $default;
     }
 }
