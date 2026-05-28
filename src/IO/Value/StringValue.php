@@ -287,6 +287,16 @@ class StringValue extends Value implements ValueInterface, JsonSerializable {
     }
 
     /**
+     * Returns a short version of the given string
+     * @param int  $length
+     * @param bool $asUtf8 Optional.
+     * @return string
+     */
+    public function makeShort(int $length, bool $asUtf8 = false): string {
+        return Strings::makeShort($this->value, $length, $asUtf8);
+    }
+
+    /**
      * Merges the value with the given StringValue
      * @param StringValue $value
      * @return string
