@@ -17,18 +17,23 @@ use JsonSerializable;
 class Date implements JsonSerializable {
 
     private bool $hasDate;
+    private bool $isValid;
     private int $timestamp;
+    private string $hour;
 
 
     /**
      * Creates a new Date instance
-     * @param mixed $date Optional.
-     * @param mixed $hour Optional.
+     * @param mixed  $date Optional.
+     * @param string $hour Optional.
      */
-    private function __construct(mixed $date = null, mixed $hour = null) {
+    private function __construct(mixed $date = null, string $hour = "") {
+        $this->hour = $hour;
+
         // Use the Date from the other Date
         if ($date instanceof Date) {
-            $this->hasDate   = true;
+            $this->hasDate   = $date->hasDate;
+            $this->isValid   = $date->isValid();
             $this->timestamp = $date->toTime();
             return;
         }
@@ -38,27 +43,42 @@ class Date implements JsonSerializable {
             $number = Numbers::toInt($date);
             if ($number !== 0) {
                 $this->hasDate   = true;
+                $this->isValid   = true;
                 $this->timestamp = $number;
                 return;
             }
+
+            // If the number is 0, create an invalid Date
+            $this->hasDate   = false;
+            $this->isValid   = false;
+            $this->timestamp = 0;
+            return;
         }
 
         // Try to parse the Date from the string
         if (is_string($date) && $date !== "") {
             $dateTime = $date;
-            if (is_string($hour) && $hour !== "") {
+            if ($hour !== "") {
                 $dateTime = "$date $hour";
             }
             $timestamp = strtotime($dateTime);
             if ($timestamp !== false) {
                 $this->hasDate   = true;
+                $this->isValid   = true;
                 $this->timestamp = $timestamp;
                 return;
             }
+
+            // If the string is not a valid Date, create an invalid Date
+            $this->hasDate   = false;
+            $this->isValid   = false;
+            $this->timestamp = 0;
+            return;
         }
 
         // If the Date is not valid, create an empty Date
         $this->hasDate   = false;
+        $this->isValid   = true;
         $this->timestamp = 0;
     }
 
@@ -80,21 +100,21 @@ class Date implements JsonSerializable {
 
     /**
      * Creates a new Date instance
-     * @param mixed $date Optional.
-     * @param mixed $hour Optional.
+     * @param mixed  $date Optional.
+     * @param string $hour Optional.
      * @return Date
      */
-    public static function create(mixed $date = null, mixed $hour = null): Date {
+    public static function create(mixed $date = null, string $hour = ""): Date {
         return new Date($date, $hour);
     }
 
     /**
      * Creates a Date instance from the given value or now
-     * @param mixed $date Optional.
-     * @param mixed $hour Optional.
+     * @param mixed  $date Optional.
+     * @param string $hour Optional.
      * @return Date
      */
-    public static function createOrNow(mixed $date = null, mixed $hour = null): Date {
+    public static function createOrNow(mixed $date = null, string $hour = ""): Date {
         $result = new Date($date, $hour);
         if ($result->isNotEmpty()) {
             return $result;
@@ -170,6 +190,14 @@ class Date implements JsonSerializable {
      */
     public function isNotEmpty(): bool {
         return $this->hasDate;
+    }
+
+    /**
+     * Returns true if the Date is valid
+     * @return bool
+     */
+    public function isValid(): bool {
+        return $this->isValid;
     }
 
 
@@ -320,6 +348,9 @@ class Date implements JsonSerializable {
      * @return Date
      */
     public function toServerTime(bool $useTimeZone = true): Date {
+        if ($this->isEmpty()) {
+            return Date::empty();
+        }
         $timestamp = TimeZone::toServerTime($this->timestamp, $useTimeZone);
         return new Date($timestamp);
     }
@@ -727,6 +758,58 @@ class Date implements JsonSerializable {
             return false;
         }
         return $this->getHour() === 0 && $this->getMinute() === 0 && $this->getSecond() === 0;
+    }
+
+    /**
+     * Returns true if the period between this date and the end date is valid
+     * @param Date $endDate
+     * @return bool
+     */
+    public function isValidPeriod(Date $endDate): bool {
+        if ($this->isEmpty() || $endDate->isEmpty()) {
+            return true;
+        }
+        return $this->isNotEmpty() && $endDate->isNotEmpty() &&
+            $this->toDayStart()->isBefore($endDate->toDayEnd());
+    }
+
+
+
+    /**
+     * Returns true if the hour is not empty
+     * @return bool
+     */
+    public function hasHour(): bool {
+        return $this->hour !== "";
+    }
+
+    /**
+     * Returns the hour
+     * @return string
+     */
+    public function getHourText(): string {
+        return $this->hour;
+    }
+
+    /**
+     * Returns true if the hour is valid
+     * @param list<int>|null $minutes Optional.
+     * @return bool
+     */
+    public function isValidHour(?array $minutes = null): bool {
+        return DateUtils::isValidHour($this->hour, $minutes);
+    }
+
+    /**
+     * Returns true if the period between this hour and the end hour is valid
+     * @param Date $endDate
+     * @return bool
+     */
+    public function isValidHourPeriod(Date $endDate): bool {
+        if (!$this->hasHour() || !$endDate->hasHour()) {
+            return true;
+        }
+        return DateUtils::isValidHourPeriod($this->hour, $endDate->hour);
     }
 
 

@@ -1166,39 +1166,6 @@ class RequestTest extends TestCase {
     }
 
 
-    #[DataProvider("providerIsValidFullPeriod")]
-    public function testIsValidFullPeriod(array $input, array $args, bool $expected): void {
-        $request = new Request($input);
-        $this->assertSame($expected, $request->isValidFullPeriod(...$args));
-    }
-
-    public static function providerIsValidFullPeriod(): array {
-        $input = [
-            "a_date" => "2020-01-01", "a_hour" => "08:00",
-            "b_date" => "2020-01-01", "b_hour" => "10:00",
-            "c_date" => "2020-01-01", "c_hour" => "23:00",
-            "d_date" => "2020-01-02", "d_hour" => "01:00",
-            "e_date" => "2020-01-01", "e_hour" => "09:00",
-            "f_date" => "2020-01-01", "f_hour" => "09:00",
-            "g_date" => "2020-01-02", "g_hour" => "12:00",
-            "h_date" => "2020-01-01", "h_hour" => "12:00",
-            "i_date" => "not-a-date", "i_hour" => "08:00",
-            "j_date" => "2020-01-01", "j_hour" => "25:00",
-        ];
-        return [
-            "same_day"       => [ $input, [ "a_date", "a_hour", "b_date", "b_hour" ], true ],
-            "next_day"       => [ $input, [ "c_date", "c_hour", "d_date", "d_hour" ], true ],
-            "same_moment"    => [ $input, [ "e_date", "e_hour", "f_date", "f_hour" ], false ],
-            "descending_day" => [ $input, [ "g_date", "g_hour", "h_date", "h_hour" ], false ],
-            "bad_start_date" => [ $input, [ "i_date", "i_hour", "b_date", "b_hour" ], false ],
-            "bad_end_hour"   => [ $input, [ "a_date", "a_hour", "j_date", "j_hour" ], false ],
-            "missing_start"  => [ $input, [ "missing", "a_hour", "b_date", "b_hour" ], false ],
-            "missing_hour"   => [ $input, [ "a_date", "missing", "b_date", "b_hour" ], false ],
-            "empty_input"    => [ [], [ "missing", "missing", "missing", "missing" ], false ],
-        ];
-    }
-
-
     #[DataProvider("providerIsValidWeekDay")]
     public function testIsValidWeekDay(array $input, array $args, bool $expected): void {
         $request = new Request($input);

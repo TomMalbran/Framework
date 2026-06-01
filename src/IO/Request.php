@@ -584,31 +584,6 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the dates and hours at the given keys are a valid Period
-     * @param string $fromDateKey
-     * @param string $fromHourKey
-     * @param string $toDateKey
-     * @param string $toHourKey
-     * @return bool
-     */
-    public function isValidFullPeriod(
-        string $fromDateKey,
-        string $fromHourKey,
-        string $toDateKey,
-        string $toHourKey,
-    ): bool {
-        if ($this->isEmpty([ $fromDateKey, $fromHourKey, $toDateKey, $toHourKey ])) {
-            return false;
-        }
-        return DateUtils::isValidFullPeriod(
-            $this->getString($fromDateKey),
-            $this->getString($fromHourKey),
-            $this->getString($toDateKey),
-            $this->getString($toHourKey)
-        );
-    }
-
-    /**
      * Returns true if the week day at the given keys are a valid Period
      * @param string $key
      * @param bool   $startMonday Optional.
@@ -626,8 +601,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return bool
      */
     public function isFutureDate(string $key, DateType $dateType = DateType::Middle): bool {
-        $value = $this->getString($key);
-        return Date::create($value)->toDayMoment($dateType)->isFuture();
+        return $this->toDate($key)->toDayMoment($dateType)->isFuture();
     }
 
 
@@ -732,6 +706,9 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return Date
      */
     public function toDate(string $key): Date {
+        if (!$this->has($key)) {
+            return Date::empty();
+        }
         return Date::create($this->get($key));
     }
 
@@ -775,8 +752,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         if ($hourKey !== "" && $this->has($hourKey)) {
             return $this->toTimeHour($key, $hourKey, $useTimeZone);
         }
-        $value = $this->getString($key);
-        return Date::create($value)->toServerTime($useTimeZone)->toDayMoment($dateType);
+        return $this->toDate($key)->toServerTime($useTimeZone)->toDayMoment($dateType);
     }
 
     /**
@@ -786,8 +762,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return Date
      */
     public function toDayStart(string $key, bool $useTimeZone = true): Date {
-        $value = $this->getString($key);
-        return Date::create($value)->toServerTime($useTimeZone)->toDayStart();
+        return $this->toDate($key)->toServerTime($useTimeZone)->toDayStart();
     }
 
     /**
@@ -811,8 +786,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return Date
      */
     public function toDayMiddle(string $key, bool $useTimeZone = true): Date {
-        $value = $this->getString($key);
-        return Date::create($value)->toServerTime($useTimeZone)->toDayMiddle();
+        return $this->toDate($key)->toServerTime($useTimeZone)->toDayMiddle();
     }
 
     /**
@@ -822,8 +796,7 @@ class Request implements IteratorAggregate, JsonSerializable {
      * @return Date
      */
     public function toDayEnd(string $key, bool $useTimeZone = true): Date {
-        $value = $this->getString($key);
-        return Date::create($value)->toServerTime($useTimeZone)->toDayEnd();
+        return $this->toDate($key)->toServerTime($useTimeZone)->toDayEnd();
     }
 
     /**

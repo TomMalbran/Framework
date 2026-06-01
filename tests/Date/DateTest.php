@@ -24,7 +24,7 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerCreate")]
-    public function testCreate(mixed $input, mixed $hour, int $expected): void {
+    public function testCreate(mixed $input, string $hour, int $expected): void {
         $d = Date::create($input, $hour);
         $this->assertSame($expected, $d->toTime());
     }
@@ -33,32 +33,32 @@ class DateTest extends TestCase {
         // Use fixed timestamps for reproducible tests
         return [
             // Date instance input
-            "date" => [ Date::create(1609459200), null, 1609459200 ],
+            "date" => [ Date::create(1609459200), "", 1609459200 ],
             // number input (2021-01-01 00:00:00 UTC0)
-            "numeric" => [ 1609459200, null, 1609459200 ],
+            "numeric" => [ 1609459200, "", 1609459200 ],
             // dashes date input (no hour)
-            "dashes" => [ "2021-01-01", null, 1609455600 ],
+            "dashes" => [ "2021-01-01", "", 1609455600 ],
             // dashes date with hour as string (appended)
             "dashes_hour" => [ "2021-01-01", "15:30", 1609511400 ],
-            // dashes date with hour as numeric (NOT added to date)
-            "dashes_numeric_hour" => [ "2021-01-01", 15, 1609455600 ],
+            // dashes date invalid hour as numeric
+            "dashes_invalid_hour" => [ "2021-01-01", "15", 0 ],
             // slashes date input (no hour)
-            "slashes" => [ "01/01/2021", null, 1609455600 ],
+            "slashes" => [ "01/01/2021", "", 1609455600 ],
             // special strings
-            "today" => [ "today", null, strtotime(date("Y-m-d")) ],
-            "tomorrow" => [ "tomorrow", null, strtotime(date("Y-m-d", time() + 86400)) ],
+            "today" => [ "today", "", strtotime(date("Y-m-d")) ],
+            "tomorrow" => [ "tomorrow", "", strtotime(date("Y-m-d", time() + 86400)) ],
             // negative timestamp (should be treated as valid timestamp, not empty)
-            "negative_timestamp" => [ -100000, null, -100000 ],
+            "negative_timestamp" => [ -100000, "", -100000 ],
             // invalid inputs -> empty date (timestamp 0)
-            "empty_string" => [ "", null, 0 ],
-            "invalid_date_string" => [ "invalid-date-string", null, 0 ],
-            "zero_timestamp" => [ 0, null, 0 ],
+            "empty_string" => [ "", "", 0 ],
+            "invalid_date_string" => [ "invalid-date-string", "", 0 ],
+            "zero_timestamp" => [ 0, "", 0 ],
         ];
     }
 
 
     #[DataProvider("providerCreateOrNow")]
-    public function testCreateOrNow($input, $hour = null, $expectNow = false): void {
+    public function testCreateOrNow($input, string $hour, bool $expectNow): void {
         if ($expectNow) {
             $now = time();
             $d = Date::createOrNow($input, $hour);
@@ -74,16 +74,16 @@ class DateTest extends TestCase {
     public static function providerCreateOrNow(): array {
         return [
             // valid inputs should create same date as create()
-            "date" => [ Date::create(1609459200), null, false ],
-            "numeric" => [ 1609459200, null, false ],
-            "string" => [ "2021-01-01", null, false ],
+            "date" => [ Date::create(1609459200), "", false ],
+            "numeric" => [ 1609459200, "", false ],
+            "string" => [ "2021-01-01", "", false ],
             "string_hour" => [ "2023-01-01", "15:30", false ],
-            "string_numeric_hour" => [ "2023-01-01", 15, false ],
-            "negative_timestamp" => [ -100000, null, false ],
+            "string_invalid_hour" => [ "2023-01-01", "15", true ],
+            "negative_timestamp" => [ -100000, "", false ],
             // invalid inputs should return current date
-            "empty_string" => [ "", null, true ],
-            "invalid_date_string" => [ "invalid-date-string", null, true ],
-            "zero_timestamp" => [ 0, null, true ],
+            "empty_string" => [ "", "", true ],
+            "invalid_date_string" => [ "invalid-date-string", "", true ],
+            "zero_timestamp" => [ 0, "", true ],
         ];
     }
 
@@ -152,41 +152,41 @@ class DateTest extends TestCase {
 
 
     #[DataProvider("providerIsEmpty")]
-    public function testIsEmpty(mixed $input, mixed $hour = null, bool $expect): void {
+    public function testIsEmpty(mixed $input, string $hour, bool $expect): void {
         $d = Date::create($input, $hour);
         $this->assertSame($expect, $d->isEmpty());
     }
 
     public static function providerIsEmpty(): array {
         return [
-            "date" => [ Date::create(1609459200), null, false ],
-            "numeric" => [ 1609459200, null, false ],
-            "string" => [ "2021-01-01", null, false ],
+            "date" => [ Date::create(1609459200), "", false ],
+            "numeric" => [ 1609459200, "", false ],
+            "string" => [ "2021-01-01", "", false ],
             "string_hour" => [ "2023-01-01", "15:30", false ],
-            "string_numeric_hour" => [ "2023-01-01", 15, false ],
+            "string_invalid_hour" => [ "2023-01-01", "15", true ],
             // invalid inputs should return empty date
-            "empty_string" => [ "", null, true ],
-            "invalid_date_string" => [ "invalid-date-string", null, true ],
+            "empty_string" => [ "", "", true ],
+            "invalid_date_string" => [ "invalid-date-string", "", true ],
         ];
     }
 
 
     #[DataProvider("providerIsNotEmpty")]
-    public function testIsNotEmpty(mixed $input, mixed $hour = null, bool $expect): void {
+    public function testIsNotEmpty(mixed $input, string $hour, bool $expect): void {
         $d = Date::create($input, $hour);
         $this->assertSame($expect, $d->isNotEmpty());
     }
 
     public static function providerIsNotEmpty(): array {
         return [
-            "date" => [ Date::create(1609459200), null, true ],
-            "numeric" => [ 1609459200, null, true ],
-            "string" => [ "2021-01-01", null, true ],
+            "date" => [ Date::create(1609459200), "", true ],
+            "numeric" => [ 1609459200, "", true ],
+            "string" => [ "2021-01-01", "", true ],
             "string_hour" => [ "2023-01-01", "15:30", true ],
-            "string_numeric_hour" => [ "2023-01-01", 15, true ],
+            "string_invalid_hour" => [ "2023-01-01", "15", false ],
             // invalid inputs should return empty date
-            "empty_string" => [ "", null, false ],
-            "invalid_date_string" => [ "invalid-date-string", null, false ],
+            "empty_string" => [ "", "", false ],
+            "invalid_date_string" => [ "invalid-date-string", "", false ],
         ];
     }
 

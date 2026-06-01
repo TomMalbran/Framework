@@ -162,35 +162,6 @@ class DateUtilsTest extends TestCase {
     }
 
 
-    #[DataProvider("providerIsValidFullPeriod")]
-    public function testIsValidFullPeriod(string $fromDate, string $fromHour, string $toDate, string $toHour, bool $expected): void {
-        $this->assertSame($expected, DateUtils::isValidFullPeriod($fromDate, $fromHour, $toDate, $toHour));
-    }
-
-    public static function providerIsValidFullPeriod(): array {
-        return [
-            // same day, from < to
-            [ "2020-01-01", "09:00", "2020-01-01", "17:00", true ],
-            // same day, from > to
-            [ "2020-01-01", "17:00", "2020-01-01", "09:00", false ],
-            // spanning multiple days
-            [ "2020-01-01", "09:00", "2020-01-02", "08:00", true ],
-            // reversed dates
-            [ "2020-01-02", "00:00", "2020-01-01", "23:59", false ],
-            // same date and same time (not allowed)
-            [ "2020-01-01", "09:00", "2020-01-01", "09:00", false ],
-            // invalid inputs: bad date or hour
-            [ "invalid", "09:00", "2020-01-01", "10:00", false ],
-            [ "2020-01-01", "invalid", "2020-01-01", "10:00", false ],
-            [ "2020-01-01", "09:00", "invalid", "10:00", false ],
-            [ "2020-01-01", "09:00", "2020-01-01", "invalid", false ],
-            // empty parts
-            [ "", "09:00", "2020-01-01", "10:00", false ],
-            [ "2020-01-01", "invalid", "2020-01-01", "10:00", false ],
-        ];
-    }
-
-
     #[DataProvider("providerIsValidWeekDay")]
     public function testIsValidWeekDay(int $wd, bool $startMonday, bool $expected): void {
         $this->assertSame($expected, DateUtils::isValidWeekDay($wd, $startMonday));

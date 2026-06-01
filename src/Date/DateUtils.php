@@ -160,29 +160,6 @@ class DateUtils {
     }
 
     /**
-     * Returns true if the given dates with hours are a valid period
-     * @param string $fromDate
-     * @param string $fromHour
-     * @param string $toDate
-     * @param string $toHour
-     * @return bool
-     */
-    public static function isValidFullPeriod(
-        string $fromDate,
-        string $fromHour,
-        string $toDate,
-        string $toHour,
-    ): bool {
-        $fromTime = Date::create($fromDate, $fromHour);
-        $toTime   = Date::create($toDate, $toHour);
-        return (
-            $fromTime->isNotEmpty() &&
-            $toTime->isNotEmpty() &&
-            $fromTime->isBefore($toTime)
-        );
-    }
-
-    /**
      * Returns true if the given week day is valid
      * @param int  $weekDay
      * @param bool $startMonday Optional.
