@@ -5,7 +5,7 @@ use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
 use Framework\Intl\IntlConfig;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Strings;
 
 /**
@@ -21,7 +21,7 @@ class LanguageBuilder implements DiscoveryBuilder {
     #[\Override]
     public static function generateCode(): int {
         $path      = IntlConfig::getStringsPath();
-        $files     = File::getFilesInDir($path);
+        $files     = Storage::getFilesInDir($path);
         $rootCode  = IntlConfig::getDefaultLanguage();
         $rootFound = false;
         $languages = [];

@@ -11,7 +11,7 @@ use Framework\Database\SchemaMigration;
 use Framework\Database\DataMigration;
 use Framework\Core\Configs;
 use Framework\Core\SettingData;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Date\Timer;
 use Framework\Utils\Strings;
 
@@ -124,7 +124,7 @@ class Migration {
      */
     public static function migrateData(): bool {
         $appPath    = Application::getBasePath();
-        $filePaths  = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
+        $filePaths  = Storage::getFilesInDir($appPath, recursive: true, skipVendor: true);
         $migrations = [];
 
         // Find all the Migrations
@@ -133,7 +133,7 @@ class Migration {
                 continue;
             }
 
-            $content = File::read($filePath);
+            $content = Storage::readFile($filePath);
             if (Strings::contains($content, DataMigration::class) && Strings::contains($content, " implements ")) {
                 $className = trim(Strings::substringBetween($content, "class", "implements"));
                 $migrations[$className] = $filePath;

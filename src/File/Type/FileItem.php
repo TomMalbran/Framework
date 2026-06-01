@@ -1,7 +1,7 @@
 <?php
 namespace Framework\File\Type;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\FileType;
 use Framework\File\Image;
 
@@ -53,7 +53,7 @@ class FileItem {
         string $thumbPath,
         string $thumbUrl,
     ): FileItem {
-        $isImage = !$isDir && FileType::isImage($name) && File::exists($thumbPath);
+        $isImage = !$isDir && FileType::isImage($name) && Storage::fileExists($thumbPath);
         [ $imgWidth, $imgHeight ] = Image::getSize($sourcePath);
 
         $item = new FileItem();
@@ -87,7 +87,7 @@ class FileItem {
      * @return FileItem
      */
     public static function createBack(string $path): FileItem {
-        $dir  = File::getDirectory($path);
+        $dir  = Storage::getDirectory($path);
         $item = new FileItem();
 
         $item->name      = "...";

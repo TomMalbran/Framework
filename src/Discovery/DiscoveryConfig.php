@@ -3,7 +3,7 @@ namespace Framework\Discovery;
 
 use Framework\Application;
 use Framework\Discovery\Package;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Strings;
 
 /**
@@ -36,7 +36,7 @@ class DiscoveryConfig {
 
         // Load all the Config files
         $appPath   = Application::getBasePath();
-        $filePaths = File::getFilesInDir($appPath, recursive: true, skipVendor: true);
+        $filePaths = Storage::getFilesInDir($appPath, recursive: true, skipVendor: true);
         foreach ($filePaths as $filePath) {
             if (Strings::endsWith($filePath, self::Extension)) {
                 include_once $filePath;

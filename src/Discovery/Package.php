@@ -2,7 +2,7 @@
 namespace Framework\Discovery;
 
 use Framework\Application;
-use Framework\File\File;
+use Framework\File\Storage;
 
 /**
  * The Framework Package
@@ -82,8 +82,8 @@ class Package {
      * @return string
      */
     public static function getBasePath(string ...$pathParts): string {
-        $path = File::getDirectory(__FILE__, 3);
-        return File::parsePath($path, ...$pathParts);
+        $path = Storage::getDirectory(__FILE__, 3);
+        return Storage::parsePath($path, ...$pathParts);
     }
 
     /**

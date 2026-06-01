@@ -7,7 +7,7 @@ use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\Builder\Builder;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\System\Config;
 use Framework\Utils\Server;
 use Framework\Utils\Strings;
@@ -75,7 +75,7 @@ class FilePath implements DiscoveryBuilder {
         }
 
         if ($forPrivate && !Server::isLocalHost()) {
-            return File::getDirectory($result);
+            return Storage::getDirectory($result);
         }
         return $result;
     }
@@ -87,7 +87,7 @@ class FilePath implements DiscoveryBuilder {
      */
     public static function getPath(int|string ...$pathParts): string {
         $basePath = self::getBasePath();
-        return File::parsePath($basePath, Config::getFileDir(), ...$pathParts);
+        return Storage::parsePath($basePath, Config::getFileDir(), ...$pathParts);
     }
 
     /**
@@ -97,7 +97,7 @@ class FilePath implements DiscoveryBuilder {
      */
     public static function getPrivatePath(int|string ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
-        return File::parsePath($basePath, ...$pathParts);
+        return Storage::parsePath($basePath, ...$pathParts);
     }
 
     /**
@@ -107,7 +107,7 @@ class FilePath implements DiscoveryBuilder {
      */
     public static function getFTPPath(int|string ...$pathParts): string {
         $basePath = self::getBasePath(forPrivate: true);
-        return File::parsePath($basePath, Config::getFileFtp(), ...$pathParts);
+        return Storage::parsePath($basePath, Config::getFileFtp(), ...$pathParts);
     }
 
 
@@ -118,7 +118,7 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getDir(int|string ...$pathParts): string {
-        return File::parsePath(Config::getFileDir(), ...$pathParts);
+        return Storage::parsePath(Config::getFileDir(), ...$pathParts);
     }
 
     /**
@@ -127,7 +127,7 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getInternalDir(int|string ...$pathParts): string {
-        return File::parsePath(Application::getBaseDir(), Config::getFileDir(), ...$pathParts);
+        return Storage::parsePath(Application::getBaseDir(), Config::getFileDir(), ...$pathParts);
     }
 
     /**
@@ -153,10 +153,10 @@ class FilePath implements DiscoveryBuilder {
         }
 
         $path   = self::getPath(self::Temp, $credentialID);
-        $exists = File::exists($path);
+        $exists = Storage::fileExists($path);
 
         if (!$exists && $create) {
-            File::createDir($path);
+            Storage::createDir($path);
             return $path;
         }
         return $exists ? $path : "";
@@ -229,7 +229,7 @@ class FilePath implements DiscoveryBuilder {
         }
         foreach ($basePaths as $basePath) {
             $path = self::getPath($basePath);
-            if (File::createDir($path)) {
+            if (Storage::createDir($path)) {
                 $paths[] = $basePath;
             }
         }
@@ -261,18 +261,18 @@ class FilePath implements DiscoveryBuilder {
 
         foreach ($basePaths as $basePath) {
             $path = self::getPath($basePath);
-            if (File::createDir($path)) {
+            if (Storage::createDir($path)) {
                 $result[] = $basePath;
             }
 
             $path = self::getPath($basePath, $id);
-            if (File::createDir($path)) {
+            if (Storage::createDir($path)) {
                 $result[] = "$basePath/$id";
             }
 
             foreach (self::$directories as $directory) {
                 $path = self::getPath($basePath, $id, $directory);
-                if (File::createDir($path)) {
+                if (Storage::createDir($path)) {
                     $result[] = "$basePath/$id/$directory";
                 }
             }

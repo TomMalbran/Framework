@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -119,7 +119,7 @@ class CSV {
         string $separator = ",",
         bool $skipHeader = false,
     ): array {
-        $content = File::read($path);
+        $content = Storage::readFile($path);
         if ($content === "") {
             return [];
         }
@@ -146,7 +146,7 @@ class CSV {
         array $contents,
         string $separator = ",",
     ): bool {
-        if (!File::exists($path)) {
+        if (!Storage::fileExists($path)) {
             return false;
         }
 
@@ -154,6 +154,6 @@ class CSV {
         foreach ($contents as $row) {
             $lines[] = self::encode($row, $separator);
         }
-        return File::write($path, Strings::join($lines, "\n"));
+        return Storage::writeFile($path, Strings::join($lines, "\n"));
     }
 }

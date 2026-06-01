@@ -9,7 +9,7 @@ use Framework\Auth\Spam;
 use Framework\Auth\Schema\CredentialEntity;
 use Framework\Auth\Schema\CredentialStatus;
 use Framework\Intl\NLS;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\FilePath;
 use Framework\Log\ActionLog;
 use Framework\System\Access;
@@ -182,7 +182,7 @@ class Auth {
         ActionLog::startSession(destroy: true);
 
         $path = FilePath::getTempPath($credential->id, create: false);
-        File::emptyDir($path);
+        Storage::emptyDir($path);
         Reset::delete($credential->id);
 
         if ($isNew) {

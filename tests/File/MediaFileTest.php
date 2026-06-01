@@ -3,7 +3,7 @@ namespace Tests\File;
 
 use Framework\IO\Request;
 use Framework\IO\Value\FileValue;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\Image;
 use Framework\File\MediaFile;
 use Framework\File\Type\MediaType;
@@ -35,8 +35,8 @@ class MediaFileTest extends TestCase {
     }
 
     protected function tearDown(): void {
-        File::deleteDir(Path::getSourcePath($this->mediaID));
-        File::deleteDir(Path::getThumbsPath($this->mediaID));
+        Storage::deleteDir(Path::getSourcePath($this->mediaID));
+        Storage::deleteDir(Path::getThumbsPath($this->mediaID));
 
         foreach ($this->tempFiles as $tempFile) {
             if (is_file($tempFile)) {
@@ -231,8 +231,8 @@ class MediaFileTest extends TestCase {
         $thumbPath  = Path::getThumbsPath($this->mediaID, ...$filePath);
 
         $this->assertSame($expected, $result);
-        $this->assertSame($expected, File::exists($sourcePath));
-        $this->assertSame($expectThumb, File::exists($thumbPath));
+        $this->assertSame($expected, Storage::fileExists($sourcePath));
+        $this->assertSame($expectThumb, Storage::fileExists($thumbPath));
     }
 
     public static function providerUploadFile(): array {
@@ -252,8 +252,8 @@ class MediaFileTest extends TestCase {
         $result = MediaFile::deletePath(...$pathParts);
 
         $this->assertSame($expected, $result);
-        $this->assertFalse(File::exists($sourcePath));
-        $this->assertFalse(File::exists($thumbPath));
+        $this->assertFalse(Storage::fileExists($sourcePath));
+        $this->assertFalse(Storage::fileExists($thumbPath));
     }
 
     public static function providerDeletePath(): array {
@@ -278,10 +278,10 @@ class MediaFileTest extends TestCase {
         );
 
         $this->assertSame($expected, $result);
-        $this->assertFalse(File::exists($oldSource));
-        $this->assertSame($expected, File::exists($newSource));
-        $this->assertFalse(File::exists($oldThumb));
-        $this->assertSame($expectThumb, File::exists($newThumb));
+        $this->assertFalse(Storage::fileExists($oldSource));
+        $this->assertSame($expected, Storage::fileExists($newSource));
+        $this->assertFalse(Storage::fileExists($oldThumb));
+        $this->assertSame($expectThumb, Storage::fileExists($newThumb));
     }
 
     public static function providerRenamePath(): array {
@@ -306,10 +306,10 @@ class MediaFileTest extends TestCase {
         );
 
         $this->assertSame($expected, $result);
-        $this->assertFalse(File::exists($oldSource));
-        $this->assertSame($expected, File::exists($newSource));
-        $this->assertFalse(File::exists($oldThumb));
-        $this->assertSame($expectThumb, File::exists($newThumb));
+        $this->assertFalse(Storage::fileExists($oldSource));
+        $this->assertSame($expected, Storage::fileExists($newSource));
+        $this->assertFalse(Storage::fileExists($oldThumb));
+        $this->assertSame($expectThumb, Storage::fileExists($newThumb));
     }
 
     public static function providerMovePath(): array {
@@ -371,23 +371,23 @@ class MediaFileTest extends TestCase {
         $this->uploadSources["image"] = $this->getTempFilePath("upload-source.png");
         $this->uploadSources["missing"] = $this->getTempFilePath("missing.tmp");
 
-        File::write($this->uploadSources["text"], "upload");
+        Storage::writeFile($this->uploadSources["text"], "upload");
         $this->writeFixtureImage($this->uploadSources["image"], 3, 50, 25);
     }
 
     private function createTextFile(string $path, string $content = "content"): void {
-        File::createDir(File::getDirectory($path));
-        File::write($path, $content);
+        Storage::createDir(Storage::getDirectory($path));
+        Storage::writeFile($path, $content);
     }
 
     private function createImageFile(string $path, int $width, int $height): void {
-        File::createDir(File::getDirectory($path));
+        Storage::createDir(Storage::getDirectory($path));
         $this->writeFixtureImage($path, 3, $width, $height);
     }
 
     private function createImageWithThumb(string $sourcePath, string $thumbPath, int $width, int $height): void {
         $this->createImageFile($sourcePath, $width, $height);
-        File::createDir(File::getDirectory($thumbPath));
+        Storage::createDir(Storage::getDirectory($thumbPath));
         Image::resize($sourcePath, $thumbPath, 200, 200, Image::Resize);
     }
 

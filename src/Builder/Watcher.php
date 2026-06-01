@@ -3,7 +3,7 @@ namespace Framework\Builder;
 
 use Framework\Application;
 use Framework\Discovery\Attr\ConsoleCommand;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Date\Timer;
 use Framework\Utils\Strings;
 
@@ -74,11 +74,11 @@ class Watcher {
      * @return list<string>
      */
     private static function parseGitignore(string $basePath): array {
-        if (!File::exists($basePath, ".gitignore")) {
+        if (!Storage::fileExists($basePath, ".gitignore")) {
             return [];
         }
 
-        $content  = File::read($basePath, ".gitignore");
+        $content  = Storage::readFile($basePath, ".gitignore");
         $patterns = Strings::split($content, "\n", trim: true, skipEmpty: true);
         $regexes  = [];
 
@@ -127,7 +127,7 @@ class Watcher {
         string $basePath,
         array $ignorePatterns,
     ): array {
-        $files  = File::getFilesInDir($path, recursive: true);
+        $files  = Storage::getFilesInDir($path, recursive: true);
         $result = [];
         foreach ($files as $file) {
             if (!self::isIgnored($file, $basePath, $ignorePatterns)) {

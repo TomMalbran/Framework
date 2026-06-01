@@ -5,7 +5,7 @@ use Framework\Application;
 use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Builder\Builder;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Strings;
 
 /**
@@ -21,7 +21,7 @@ class TemplateCode implements DiscoveryBuilder {
     #[\Override]
     public static function generateCode(): int {
         $path      = Application::getBasePath();
-        $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
+        $filePaths = Storage::getFilesInDir($path, recursive: true, skipVendor: true);
         $templates = [];
         $maxLength = 0;
 
@@ -31,7 +31,7 @@ class TemplateCode implements DiscoveryBuilder {
                 continue;
             }
 
-            $fileName  = File::getBaseName(File::getName($filePath));
+            $fileName  = Storage::getBaseName(Storage::getFileName($filePath));
             $maxLength = max($maxLength, Strings::length($fileName));
             $relPath   = Strings::replace($filePath, $path, "");
 

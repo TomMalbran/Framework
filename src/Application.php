@@ -2,7 +2,7 @@
 namespace Framework;
 
 use Framework\Discovery\Composer;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\System\Config;
 use Framework\Utils\Strings;
 
@@ -30,7 +30,7 @@ class Application {
         }
 
         // Determine the Base Path
-        $framePath = File::getDirectory(__FILE__, 2);
+        $framePath = Storage::getDirectory(__FILE__, 2);
         if (Strings::contains($framePath, "vendor")) {
             $basePath = Strings::substringBefore($framePath, "/vendor");
             $baseDir  = Strings::substringAfter($basePath, "/");
@@ -94,12 +94,12 @@ class Application {
      * @return string
      */
     public static function getIndexPath(string ...$pathParts): string {
-        $path = File::getDirectory(__FILE__, 2);
+        $path = Storage::getDirectory(__FILE__, 2);
         if (Strings::contains($path, "vendor")) {
             $path = Strings::substringBefore($path, "/vendor");
             $path = Strings::substringBefore($path, "/", useFirst: false);
         }
-        return File::parsePath($path, ...$pathParts);
+        return Storage::parsePath($path, ...$pathParts);
     }
 
     /**

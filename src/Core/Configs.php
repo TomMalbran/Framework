@@ -7,7 +7,7 @@ use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\Priority;
 use Framework\Builder\Builder;
 use Framework\Core\VariableType;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Server;
@@ -74,7 +74,7 @@ class Configs implements DiscoveryBuilder {
 
         // Read all the .env.* files in the App Path
         } else {
-            $files = File::getFilesInDir($appPath);
+            $files = Storage::getFilesInDir($appPath);
             foreach ($files as $file) {
                 // Skip the example and main env files
                 if ($file === ".env.example" || $file === ".env" || !Strings::startsWith($file, ".env.")) {
@@ -112,7 +112,7 @@ class Configs implements DiscoveryBuilder {
      * @return array<string,mixed>
      */
     private static function loadENV(string $path, string $fileName): array {
-        $contents = File::read($path, $fileName);
+        $contents = Storage::readFile($path, $fileName);
         $lines    = Strings::split($contents, "\n");
         $result   = [];
 

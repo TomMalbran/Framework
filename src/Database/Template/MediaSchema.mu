@@ -1,7 +1,7 @@
 <?php
 namespace {{namespace}};
 
-use Framework\File\File;{{#hasFields}}
+use Framework\File\Storage;{{#hasFields}}
 use Framework\Database\Query\Query;
 use Framework\Database\Query\Operator;{{/hasFields}}{{#hasReplace}}
 use Framework\Database\Query\Assign;{{/hasReplace}}
@@ -24,8 +24,8 @@ class MediaSchema {
                 "new" => $newPath,
             ],
             [
-                "old" => File::addFirstSlash($oldPath),
-                "new" => File::addFirstSlash($newPath),
+                "old" => Storage::addFirstSlash($oldPath),
+                "new" => Storage::addFirstSlash($newPath),
             ],
         ];
 

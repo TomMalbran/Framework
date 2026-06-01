@@ -8,9 +8,9 @@ use Framework\Utils\URL;
 use ZipArchive;
 
 /**
- * The File Utils
+ * The File Storage
  */
-class File {
+class Storage {
 
     /**
      * Returns the directory of the given path
@@ -110,7 +110,7 @@ class File {
      * @param int|string ...$pathParts
      * @return bool
      */
-    public static function exists(int|string ...$pathParts): bool {
+    public static function fileExists(int|string ...$pathParts): bool {
         $fullPath = self::parsePath(...$pathParts);
         return $fullPath !== "" && file_exists($fullPath);
     }
@@ -136,7 +136,7 @@ class File {
      * @param int|string ...$pathParts
      * @return string
      */
-    public static function read(int|string ...$pathParts): string {
+    public static function readFile(int|string ...$pathParts): string {
         $fullPath = self::parsePath(...$pathParts);
         if ($fullPath === "" || !file_exists($fullPath)) {
             return "";
@@ -167,7 +167,7 @@ class File {
      * @param string $tmpFile
      * @return bool
      */
-    public static function upload(string $path, string $fileName, string $tmpFile): bool {
+    public static function uploadFile(string $path, string $fileName, string $tmpFile): bool {
         $fullPath = self::parsePath($path, $fileName);
         return self::uploadPath($fullPath, $tmpFile);
     }
@@ -193,7 +193,7 @@ class File {
      * @param bool                $createDir Optional.
      * @return bool
      */
-    public static function create(
+    public static function createFile(
         string $path,
         string $fileName,
         array|string $content,
@@ -207,7 +207,7 @@ class File {
         if ($createDir) {
             self::createDir($path);
         }
-        return self::write($fullPath, Strings::join($content, "\n"));
+        return self::writeFile($fullPath, Strings::join($content, "\n"));
     }
 
     /**
@@ -216,7 +216,7 @@ class File {
      * @param mixed  $content
      * @return bool
      */
-    public static function write(string $path, mixed $content): bool {
+    public static function writeFile(string $path, mixed $content): bool {
         $result = file_put_contents($path, $content);
         return $result !== false;
     }
@@ -232,7 +232,7 @@ class File {
         if ($content === "") {
             return false;
         }
-        return self::write($path, $content);
+        return self::writeFile($path, $content);
     }
 
     /**
@@ -241,7 +241,7 @@ class File {
      * @param string $toPath
      * @return bool
      */
-    public static function move(string $fromPath, string $toPath): bool {
+    public static function moveFile(string $fromPath, string $toPath): bool {
         if ($fromPath === "" || $toPath === "") {
             return false;
         }
@@ -254,7 +254,7 @@ class File {
      * @param string $toPath
      * @return bool
      */
-    public static function copy(string $fromPath, string $toPath): bool {
+    public static function copyFile(string $fromPath, string $toPath): bool {
         if ($fromPath === "" || $toPath === "") {
             return false;
         }
@@ -262,12 +262,12 @@ class File {
     }
 
     /**
-     * Deletes the given file/directory
+     * Deletes the given file
      * @param string $path
      * @param string $name Optional.
      * @return bool
      */
-    public static function delete(string $path, string $name = ""): bool {
+    public static function deleteFile(string $path, string $name = ""): bool {
         $fullPath = self::parsePath($path, $name);
         if ($fullPath === "" || !file_exists($fullPath)) {
             return false;
@@ -287,11 +287,11 @@ class File {
     }
 
     /**
-     * Returns the name without the extension
+     * Returns the file name without the extension
      * @param string $name
      * @return string
      */
-    public static function getName(string $name): string {
+    public static function getFileName(string $name): string {
         $extension = pathinfo($name, PATHINFO_EXTENSION);
         return Strings::replace($name, ".$extension", "");
     }
@@ -450,7 +450,7 @@ class File {
         if ($path === "") {
             return false;
         }
-        if (!self::exists($path)) {
+        if (!self::fileExists($path)) {
             mkdir($path, 0777, recursive: true);
             return true;
         }

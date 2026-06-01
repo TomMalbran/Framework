@@ -3,7 +3,7 @@ namespace Tests\File;
 
 use Framework\Application;
 use Framework\Discovery\Package;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\FilePath;
 use Framework\System\Config;
 use Tests\TestHelpers;
@@ -33,7 +33,7 @@ class FilePathTest extends TestCase {
             @rmdir($this->tmpDir);
         }
 
-        File::deleteDir(FilePath::getPath());
+        Storage::deleteDir(FilePath::getPath());
     }
 
 
@@ -89,7 +89,7 @@ class FilePathTest extends TestCase {
             "framework"     => [ true, false, false, "", Package::getBasePath() ],
             "backend"       => [ false, true, false, "", Application::getBasePath() ],
             "normal"        => [ false, false, false, "", Application::getIndexPath() ],
-            "private"       => [ false, false, true, "", File::getDirectory(Application::getIndexPath()) ],
+            "private"       => [ false, false, true, "", Storage::getDirectory(Application::getIndexPath()) ],
             "private_local" => [ false, false, true, "127.0.0.1", Application::getIndexPath() ],
         ];
     }

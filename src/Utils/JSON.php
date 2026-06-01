@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
@@ -102,7 +102,7 @@ class JSON {
      * @return array<int|string,mixed>
      */
     public static function readFile(int|string ...$pathParts): array {
-        $response = File::read(...$pathParts);
+        $response = Storage::readFile(...$pathParts);
         if ($response === "") {
             return [];
         }
@@ -115,7 +115,7 @@ class JSON {
      * @return array<int|string,mixed>
      */
     public static function readUrl(string $url): array {
-        $response = File::readUrl($url);
+        $response = Storage::readUrl($url);
         if ($response === "") {
             return [];
         }
@@ -152,6 +152,6 @@ class JSON {
      */
     public static function writeFile(string $path, mixed $contents): bool {
         $value = Arrays::toArray($contents);
-        return File::write($path, self::encode($value, asPretty: true));
+        return Storage::writeFile($path, self::encode($value, asPretty: true));
     }
 }

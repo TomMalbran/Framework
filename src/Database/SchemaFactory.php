@@ -17,7 +17,7 @@ use Framework\Database\Model\Relation;
 use Framework\Database\Model\SubRequest;
 use Framework\Database\Status\Status;
 use Framework\Database\Status\State;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
@@ -83,7 +83,7 @@ class SchemaFactory {
 
 
             // Get the Path
-            $path  = File::getDirectory($fileName, 1);
+            $path  = Storage::getDirectory($fileName, 1);
             $path  = Strings::stripEnd($path, "/" . Package::ModelDir);
             $path .= "/" . Package::SchemaDir;
 

@@ -1,7 +1,7 @@
 <?php
 namespace Framework\File;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Arrays;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
@@ -55,7 +55,7 @@ class Image {
      * @return int
      */
     public static function getType(string $fileName): int {
-        if (!URL::isValid($fileName) && !File::exists($fileName)) {
+        if (!URL::isValid($fileName) && !Storage::fileExists($fileName)) {
             return 0;
         }
         $result = exif_imagetype($fileName);
@@ -68,7 +68,7 @@ class Image {
      * @return string
      */
     public static function getMimeType(string $fileName): string {
-        if (!URL::isValid($fileName) && !File::exists($fileName)) {
+        if (!URL::isValid($fileName) && !Storage::fileExists($fileName)) {
             return "";
         }
         $imageType = self::getType($fileName);
@@ -81,8 +81,8 @@ class Image {
      * @return array{int,int,int}
      */
     public static function getSize(int|string ...$pathParts): array {
-        $filePath = File::parsePath(...$pathParts);
-        if (!File::exists($filePath) || !FileType::isImage($filePath)) {
+        $filePath = Storage::parsePath(...$pathParts);
+        if (!Storage::fileExists($filePath) || !FileType::isImage($filePath)) {
             return [ 0, 0, 0 ];
         }
 
@@ -117,11 +117,11 @@ class Image {
      * @return int
      */
     public static function getOrientation(int|string ...$pathParts): int {
-        if (!File::exists(...$pathParts)) {
+        if (!Storage::fileExists(...$pathParts)) {
             return 0;
         }
 
-        $filePath = File::parsePath(...$pathParts);
+        $filePath = Storage::parsePath(...$pathParts);
         $exif     = exif_read_data($filePath);
         if ($exif !== false && isset($exif["Orientation"])) {
             return Numbers::toInt($exif["Orientation"]);
@@ -135,8 +135,8 @@ class Image {
      * @return bool
      */
     public static function hasTransparency(int|string ...$pathParts): bool {
-        $filePath = File::parsePath(...$pathParts);
-        if (!File::exists($filePath) || !FileType::isPNG($filePath)) {
+        $filePath = Storage::parsePath(...$pathParts);
+        if (!Storage::fileExists($filePath) || !FileType::isPNG($filePath)) {
             return false;
         }
 
@@ -180,7 +180,7 @@ class Image {
      * @return int
      */
     public static function getTextWidth(string $text, string $fontFile, int $fontSize): int {
-        if (!File::exists($fontFile)) {
+        if (!Storage::fileExists($fontFile)) {
             return 0;
         }
 
@@ -424,7 +424,7 @@ class Image {
      * @return GdImage|null
      */
     public static function createSrcImage(int $imgType, string $fileName): ?GdImage {
-        if (!File::exists($fileName)) {
+        if (!Storage::fileExists($fileName)) {
             return null;
         }
 
@@ -517,7 +517,7 @@ class Image {
         if ($bestFit && $imgWidth <= $width && $imgHeight <= $height) {
             // If is a thumb, just copy the file
             if ($action === self::Thumb) {
-                File::copy($src, $dst);
+                Storage::copyFile($src, $dst);
             }
             return true;
         }

@@ -1,7 +1,7 @@
 <?php
 namespace Framework\IO;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\Enum\Enum;
@@ -944,7 +944,7 @@ class Request implements IteratorAggregate, JsonSerializable {
         if ($this->hasFile($key)) {
             $fileName = $this->getFileName($key);
         }
-        return File::hasExtension($fileName, $extensions, ...$otherExtensions);
+        return Storage::hasExtension($fileName, $extensions, ...$otherExtensions);
     }
 
     /**

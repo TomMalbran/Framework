@@ -5,7 +5,7 @@ use Framework\Application;
 use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryClass;
 use Framework\Discovery\Attr\Priority;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
@@ -29,12 +29,12 @@ class Discovery {
     public static function loadEmailTemplate(string $fileName): string {
         $path   = Application::getBasePath($fileName);
         $result = "";
-        if (File::exists($path)) {
-            $result = File::read($path);
+        if (Storage::fileExists($path)) {
+            $result = Storage::readFile($path);
         }
         if ($result === "") {
             $path   = Package::getBasePath($fileName);
-            $result = File::read($path);
+            $result = Storage::readFile($path);
         }
         return $result;
     }
@@ -99,7 +99,7 @@ class Discovery {
                 continue;
             }
 
-            $file        = File::read($filePath);
+            $file        = Storage::readFile($filePath);
             $usedClasses = self::getUsedClasses($file);
 
             // Skip the Class if any of its used Classes is not found
@@ -130,7 +130,7 @@ class Discovery {
             }
 
             // Check the path
-            $path = File::addLastSlash($path);
+            $path = Storage::addLastSlash($path);
             if ($path !== "" && !Strings::startsWith($filePath, $path)) {
                 continue;
             }
@@ -167,7 +167,7 @@ class Discovery {
             $sourcePath = Application::getSourcePath();
         }
 
-        $filePaths = File::getFilesInDir($sourcePath, recursive: true);
+        $filePaths = Storage::getFilesInDir($sourcePath, recursive: true);
         $result    = [];
 
         foreach ($filePaths as $filePath) {

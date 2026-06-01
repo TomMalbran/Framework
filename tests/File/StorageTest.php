@@ -1,14 +1,14 @@
 <?php
 namespace Tests\File;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Tests\TestHelpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ZipArchive;
 
-class FileTest extends TestCase {
+class StorageTest extends TestCase {
     use TestHelpers;
 
     private string $tmpDir = "";
@@ -87,7 +87,7 @@ class FileTest extends TestCase {
             @unlink($this->brokenEmptyDir . DIRECTORY_SEPARATOR . "nested" . DIRECTORY_SEPARATOR . "broken");
         }
 
-        File::deleteDir($this->tmpDir);
+        Storage::deleteDir($this->tmpDir);
         unset($GLOBALS["test_move_uploaded_file"]);
     }
 
@@ -128,9 +128,9 @@ class FileTest extends TestCase {
             [
                 $this->tmpDir,
                 $this->browseRoot,
-                File::addLastSlash($this->browseRoot),
+                Storage::addLastSlash($this->browseRoot),
                 $this->emptyRoot,
-                File::addLastSlash($this->emptyRoot),
+                Storage::addLastSlash($this->emptyRoot),
                 $this->plainFile,
                 "file://" . $this->spaceFile,
                 $this->existingDir,
@@ -147,7 +147,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerGetDirectory")]
     public function testGetDirectory(string $path, int $levels, string $expected): void {
-        $this->assertSame($expected, File::getDirectory($path, $levels));
+        $this->assertSame($expected, Storage::getDirectory($path, $levels));
     }
 
     public static function providerGetDirectory(): array {
@@ -163,7 +163,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerParsePath")]
     public function testParsePath(array $pathParts, string $expected): void {
-        $this->assertSame($expected, File::parsePath(...$pathParts));
+        $this->assertSame($expected, Storage::parsePath(...$pathParts));
     }
 
     public static function providerParsePath(): array {
@@ -178,7 +178,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerParseUrl")]
     public function testParseUrl(array $pathParts, string $expected): void {
-        $this->assertSame($expected, File::parseUrl(...$pathParts));
+        $this->assertSame($expected, Storage::parseUrl(...$pathParts));
     }
 
     public static function providerParseUrl(): array {
@@ -193,7 +193,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerAddLastSlash")]
     public function testAddLastSlash(string $path, string $expected): void {
-        $this->assertSame($expected, File::addLastSlash($path));
+        $this->assertSame($expected, Storage::addLastSlash($path));
     }
 
     public static function providerAddLastSlash(): array {
@@ -207,7 +207,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerAddFirstSlash")]
     public function testAddFirstSlash(string $path, string $expected): void {
-        $this->assertSame($expected, File::addFirstSlash($path));
+        $this->assertSame($expected, Storage::addFirstSlash($path));
     }
 
     public static function providerAddFirstSlash(): array {
@@ -221,7 +221,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerRemoveLastSlash")]
     public function testRemoveLastSlash(string $path, string $expected): void {
-        $this->assertSame($expected, File::removeLastSlash($path));
+        $this->assertSame($expected, Storage::removeLastSlash($path));
     }
 
     public static function providerRemoveLastSlash(): array {
@@ -235,7 +235,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerRemoveFirstSlash")]
     public function testRemoveFirstSlash(string $path, string $expected): void {
-        $this->assertSame($expected, File::removeFirstSlash($path));
+        $this->assertSame($expected, Storage::removeFirstSlash($path));
     }
 
     public static function providerRemoveFirstSlash(): array {
@@ -247,13 +247,13 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerExists")]
-    public function testExists(array $pathParts, bool $expected): void {
+    #[DataProvider("providerFileExists")]
+    public function testFileExists(array $pathParts, bool $expected): void {
         $pathParts = $this->resolveTokens($pathParts);
-        $this->assertSame($expected, File::exists(...$pathParts));
+        $this->assertSame($expected, Storage::fileExists(...$pathParts));
     }
 
-    public static function providerExists(): array {
+    public static function providerFileExists(): array {
         return [
             "file"    => [ [ "__PLAIN_FILE__" ], true ],
             "nested"  => [ [ "__BROWSE_ROOT__", "sub", "child.txt" ], true ],
@@ -266,7 +266,7 @@ class FileTest extends TestCase {
     #[DataProvider("providerGetModifiedTime")]
     public function testGetModifiedTime(array $pathParts, int|string $expected): void {
         $pathParts = $this->resolveTokens($pathParts);
-        $time = File::getModifiedTime(...$pathParts);
+        $time = Storage::getModifiedTime(...$pathParts);
 
         if ($expected === "current") {
             $this->assertSame(filemtime($this->plainFile), $time);
@@ -284,13 +284,13 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerRead")]
-    public function testRead(array $pathParts, string $expected): void {
+    #[DataProvider("providerReadFile")]
+    public function testReadFile(array $pathParts, string $expected): void {
         $pathParts = $this->resolveTokens($pathParts);
-        $this->assertSame($expected, File::read(...$pathParts));
+        $this->assertSame($expected, Storage::readFile(...$pathParts));
     }
 
-    public static function providerRead(): array {
+    public static function providerReadFile(): array {
         return [
             "plain"   => [ [ "__PLAIN_FILE__" ], "plain" ],
             "nested"  => [ [ "__BROWSE_ROOT__", "sub", "child.txt" ], "child" ],
@@ -303,7 +303,7 @@ class FileTest extends TestCase {
     #[DataProvider("providerReadUrl")]
     public function testReadUrl(string $url, string $expected): void {
         $url = $this->resolveStringToken($url);
-        $this->assertSame($expected, File::readUrl($url));
+        $this->assertSame($expected, Storage::readUrl($url));
     }
 
     public static function providerReadUrl(): array {
@@ -314,24 +314,24 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerUpload")]
-    public function testUpload(string $path, string $fileName, string $tmpFile, bool $expected, ?string $expectedPath): void {
+    #[DataProvider("providerUploadFile")]
+    public function testUploadFile(string $path, string $fileName, string $tmpFile, bool $expected, ?string $expectedPath): void {
         $GLOBALS["test_move_uploaded_file"] = true;
         $path         = $this->resolveStringToken($path);
         $tmpFile      = $this->resolveStringToken($tmpFile);
         $expectedPath = $expectedPath !== null ? $this->resolveStringToken($expectedPath) : null;
-        $result       = File::upload($path, $fileName, $tmpFile);
+        $result       = Storage::uploadFile($path, $fileName, $tmpFile);
 
         $this->assertSame($expected, $result);
         if ($expectedPath !== null) {
             $this->assertFileExists($expectedPath);
-            $this->assertSame("upload", File::read($expectedPath));
+            $this->assertSame("upload", Storage::readFile($expectedPath));
         } else {
-            $this->assertFalse(File::exists(File::parsePath($path, $fileName)));
+            $this->assertFalse(Storage::fileExists(Storage::parsePath($path, $fileName)));
         }
     }
 
-    public static function providerUpload(): array {
+    public static function providerUploadFile(): array {
         return [
             "valid"   => [ "__EXISTING_DIR__", "uploaded.txt", "__UPLOAD_SOURCE__", true, "__EXISTING_DIR__/uploaded.txt" ],
             "missing" => [ "__EXISTING_DIR__", "uploaded.txt", "__TMP_DIR__/missing-upload.txt", false, null ],
@@ -345,13 +345,13 @@ class FileTest extends TestCase {
         $GLOBALS["test_move_uploaded_file"] = true;
         $path    = $this->resolveStringToken($path);
         $tmpFile = $this->resolveStringToken($tmpFile);
-        $result  = File::uploadPath($path, $tmpFile);
+        $result  = Storage::uploadPath($path, $tmpFile);
 
         $this->assertSame($expected, $result);
         if ($expectedContent !== null) {
-            $this->assertSame($expectedContent, File::read($path));
+            $this->assertSame($expectedContent, Storage::readFile($path));
         } else {
-            $this->assertFalse(File::exists($path));
+            $this->assertFalse(Storage::fileExists($path));
         }
     }
 
@@ -364,24 +364,24 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerCreate")]
-    public function testCreate(string $path, string $fileName, array|string $content, bool $createDir, bool $expected, ?string $expectedPath, ?string $expectedContent): void {
+    #[DataProvider("providerCreateFile")]
+    public function testCreateFile(string $path, string $fileName, array|string $content, bool $createDir, bool $expected, ?string $expectedPath, ?string $expectedContent): void {
         $path         = $this->resolveStringToken($path);
         $expectedPath = $expectedPath !== null ? $this->resolveStringToken($expectedPath) : null;
         $result       = $this->runWithSuppressedWarnings(
-            fn() => File::create($path, $fileName, $content, $createDir),
+            fn() => Storage::createFile($path, $fileName, $content, $createDir),
             suppress: !$expected,
         );
 
         $this->assertSame($expected, $result);
         if ($expectedPath !== null) {
-            $this->assertSame($expectedContent, File::read($expectedPath));
+            $this->assertSame($expectedContent, Storage::readFile($expectedPath));
         } else {
-            $this->assertFalse(File::exists(File::parsePath($path, $fileName)));
+            $this->assertFalse(Storage::fileExists(Storage::parsePath($path, $fileName)));
         }
     }
 
-    public static function providerCreate(): array {
+    public static function providerCreateFile(): array {
         return [
             "string" => [ "__EXISTING_DIR__", "created.txt", "hello", false, true, "__EXISTING_DIR__/created.txt", "hello" ],
             "list"   => [ "__TMP_DIR__/new-dir", "created.txt", [ "a", "b" ], true, true, "__TMP_DIR__/new-dir/created.txt", "a\nb" ],
@@ -390,23 +390,23 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerWrite")]
-    public function testWrite(string $path, string $content, bool $expected): void {
+    #[DataProvider("providerWriteFile")]
+    public function testWriteFile(string $path, string $content, bool $expected): void {
         $path   = $this->resolveStringToken($path);
         $result = $this->runWithSuppressedWarnings(
-            fn() => File::write($path, $content),
+            fn() => Storage::writeFile($path, $content),
             suppress: !$expected,
         );
 
         $this->assertSame($expected, $result);
         if ($expected) {
-            $this->assertSame($content, File::read($path));
+            $this->assertSame($content, Storage::readFile($path));
         } else {
-            $this->assertFalse(File::exists($path));
+            $this->assertFalse(Storage::fileExists($path));
         }
     }
 
-    public static function providerWrite(): array {
+    public static function providerWriteFile(): array {
         return [
             "existing" => [ "__EXISTING_DIR__/written.txt", "written", true ],
             "missing"  => [ "__TMP_DIR__/missing-dir/written.txt", "written", false ],
@@ -418,15 +418,15 @@ class FileTest extends TestCase {
     public function testWriteFromUrl(string $path, string $url, bool $expected, ?string $expectedContent): void {
         $path   = $this->resolveStringToken($path);
         $url    = $this->resolveStringToken($url);
-        $result = File::writeFromUrl($path, $url);
+        $result = Storage::writeFromUrl($path, $url);
 
         $this->assertSame($expected, $result);
         if ($expectedContent !== null) {
-            $this->assertSame($expectedContent, File::read($path));
+            $this->assertSame($expectedContent, Storage::readFile($path));
             return;
         }
 
-        $this->assertFalse(File::exists($path));
+        $this->assertFalse(Storage::fileExists($path));
     }
 
     public static function providerWriteFromUrl(): array {
@@ -437,25 +437,25 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerMove")]
-    public function testMove(string $fromPath, string $toPath, bool $expected, ?string $expectedContent): void {
+    #[DataProvider("providerMoveFile")]
+    public function testMoveFile(string $fromPath, string $toPath, bool $expected, ?string $expectedContent): void {
         $fromPath = $this->resolveStringToken($fromPath);
         $toPath   = $this->resolveStringToken($toPath);
         $result   = $this->runWithSuppressedWarnings(
-            fn() => File::move($fromPath, $toPath),
+            fn() => Storage::moveFile($fromPath, $toPath),
             suppress: !$expected,
         );
 
         $this->assertSame($expected, $result);
         if ($expectedContent !== null) {
-            $this->assertFalse(File::exists($fromPath));
-            $this->assertSame($expectedContent, File::read($toPath));
+            $this->assertFalse(Storage::fileExists($fromPath));
+            $this->assertSame($expectedContent, Storage::readFile($toPath));
         } else {
-            $this->assertFalse(File::exists($toPath));
+            $this->assertFalse(Storage::fileExists($toPath));
         }
     }
 
-    public static function providerMove(): array {
+    public static function providerMoveFile(): array {
         return [
             "valid"      => [ "__TMP_DIR__/from/move-me.txt", "__TMP_DIR__/copy-target/moved.txt", true, "move" ],
             "empty_from" => [ "", "__TMP_DIR__/copy-target/moved.txt", false, null ],
@@ -464,25 +464,25 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerCopy")]
-    public function testCopy(string $fromPath, string $toPath, bool $expected, ?string $expectedContent): void {
+    #[DataProvider("providerCopyFile")]
+    public function testCopyFile(string $fromPath, string $toPath, bool $expected, ?string $expectedContent): void {
         $fromPath = $this->resolveStringToken($fromPath);
         $toPath   = $this->resolveStringToken($toPath);
         $result   = $this->runWithSuppressedWarnings(
-            fn() => File::copy($fromPath, $toPath),
+            fn() => Storage::copyFile($fromPath, $toPath),
             suppress: !$expected,
         );
 
         $this->assertSame($expected, $result);
         if ($expectedContent !== null) {
-            $this->assertSame($expectedContent, File::read($fromPath));
-            $this->assertSame($expectedContent, File::read($toPath));
+            $this->assertSame($expectedContent, Storage::readFile($fromPath));
+            $this->assertSame($expectedContent, Storage::readFile($toPath));
         } else {
-            $this->assertFalse(File::exists($toPath));
+            $this->assertFalse(Storage::fileExists($toPath));
         }
     }
 
-    public static function providerCopy(): array {
+    public static function providerCopyFile(): array {
         return [
             "valid"      => [ "__TMP_DIR__/source-copy.txt", "__TMP_DIR__/copy-target/copied.txt", true, "copy" ],
             "empty_from" => [ "", "__TMP_DIR__/copy-target/copied.txt", false, null ],
@@ -491,17 +491,17 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerDelete")]
-    public function testDelete(string $path, string $name, bool $expected): void {
+    #[DataProvider("providerDeleteFile")]
+    public function testDeleteFile(string $path, string $name, bool $expected): void {
         $path     = $this->resolveStringToken($path);
-        $fullPath = File::parsePath($path, $name);
-        $result   = File::delete($path, $name);
+        $fullPath = Storage::parsePath($path, $name);
+        $result   = Storage::deleteFile($path, $name);
 
         $this->assertSame($expected, $result);
-        $this->assertFalse(File::exists($fullPath));
+        $this->assertFalse(Storage::fileExists($fullPath));
     }
 
-    public static function providerDelete(): array {
+    public static function providerDeleteFile(): array {
         return [
             "file"      => [ "__TMP_DIR__", "delete-file.txt", true ],
             "full_path" => [ "__PLAIN_FILE__", "", true ],
@@ -513,7 +513,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerGetBaseName")]
     public function testGetBaseName(string $path, string $expected): void {
-        $this->assertSame($expected, File::getBaseName($path));
+        $this->assertSame($expected, Storage::getBaseName($path));
     }
 
     public static function providerGetBaseName(): array {
@@ -525,12 +525,12 @@ class FileTest extends TestCase {
     }
 
 
-    #[DataProvider("providerGetName")]
-    public function testGetName(string $name, string $expected): void {
-        $this->assertSame($expected, File::getName($name));
+    #[DataProvider("providerGetFileName")]
+    public function testGetFileName(string $name, string $expected): void {
+        $this->assertSame($expected, Storage::getFileName($name));
     }
 
-    public static function providerGetName(): array {
+    public static function providerGetFileName(): array {
         return [
             "simple"   => [ "file.txt", "file" ],
             "multiple" => [ "archive.tar.gz", "archive.tar" ],
@@ -542,7 +542,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerGetExtension")]
     public function testGetExtension(string $name, string $expected): void {
-        $this->assertSame($expected, File::getExtension($name));
+        $this->assertSame($expected, Storage::getExtension($name));
     }
 
     public static function providerGetExtension(): array {
@@ -557,7 +557,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerHasExtension")]
     public function testHasExtension(string $name, array|string $extensions, array $otherExtensions, bool $expected): void {
-        $this->assertSame($expected, File::hasExtension($name, $extensions, ...$otherExtensions));
+        $this->assertSame($expected, Storage::hasExtension($name, $extensions, ...$otherExtensions));
     }
 
     public static function providerHasExtension(): array {
@@ -577,7 +577,7 @@ class FileTest extends TestCase {
 
     #[DataProvider("providerParseName")]
     public function testParseName(string $newName, string $oldName, string $expected): void {
-        $this->assertSame($expected, File::parseName($newName, $oldName));
+        $this->assertSame($expected, Storage::parseName($newName, $oldName));
     }
 
     public static function providerParseName(): array {
@@ -596,7 +596,7 @@ class FileTest extends TestCase {
     public function testGetAllInDir(string $path, array $expected): void {
         $path     = $this->resolveStringToken($path);
         $expected = $this->resolveTokens($expected);
-        $this->assertSame($expected, File::getAllInDir($path));
+        $this->assertSame($expected, Storage::getAllInDir($path));
     }
 
     public static function providerGetAllInDir(): array {
@@ -619,7 +619,7 @@ class FileTest extends TestCase {
     public function testGetDirectoriesInDir(string $path, array $expected): void {
         $path     = $this->resolveStringToken($path);
         $expected = $this->resolveTokens($expected);
-        $this->assertSame($expected, File::getDirectoriesInDir($path));
+        $this->assertSame($expected, Storage::getDirectoriesInDir($path));
     }
 
     public static function providerGetDirectoriesInDir(): array {
@@ -641,7 +641,7 @@ class FileTest extends TestCase {
     public function testGetFilesInDir(string $path, bool $recursive, bool $skipVendor, array $expected): void {
         $path     = $this->resolveStringToken($path);
         $expected = $this->resolveTokens($expected);
-        $this->assertSame($expected, File::getFilesInDir($path, $recursive, $skipVendor));
+        $this->assertSame($expected, Storage::getFilesInDir($path, $recursive, $skipVendor));
     }
 
     public static function providerGetFilesInDir(): array {
@@ -676,7 +676,7 @@ class FileTest extends TestCase {
     public function testGetFirstFileInDir(string $path, string $expected): void {
         $path     = $this->resolveStringToken($path);
         $expected = $this->resolveStringToken($expected);
-        $this->assertSame($expected, File::getFirstFileInDir($path));
+        $this->assertSame($expected, Storage::getFirstFileInDir($path));
     }
 
     public static function providerGetFirstFileInDir(): array {
@@ -691,7 +691,7 @@ class FileTest extends TestCase {
     #[DataProvider("providerCreateDir")]
     public function testCreateDir(string $path, bool $expected, bool $directoryShouldExist): void {
         $path   = $this->resolveStringToken($path);
-        $result = File::createDir($path);
+        $result = Storage::createDir($path);
 
         $this->assertSame($expected, $result);
         if ($directoryShouldExist) {
@@ -713,7 +713,7 @@ class FileTest extends TestCase {
         $basePath            = $this->resolveStringToken($basePath);
         $expectedPath        = $this->resolveStringToken($expectedPath);
         $expectedDirectories = $this->resolveTokens($expectedDirectories);
-        $path = File::ensureDir($basePath, ...$pathParts);
+        $path = Storage::ensureDir($basePath, ...$pathParts);
 
         $this->assertSame($expectedPath, $path);
 
@@ -744,11 +744,11 @@ class FileTest extends TestCase {
     public function testDeleteDir(string $path, bool $expected, int $expectedDeleted): void {
         $path    = $this->resolveStringToken($path);
         $deleted = 0;
-        $result  = File::deleteDir($path, $deleted);
+        $result  = Storage::deleteDir($path, $deleted);
 
         $this->assertSame($expected, $result);
         $this->assertSame($expectedDeleted, $deleted);
-        $this->assertFalse(File::exists($path));
+        $this->assertFalse(Storage::fileExists($path));
     }
 
     public static function providerDeleteDir(): array {
@@ -768,7 +768,7 @@ class FileTest extends TestCase {
         $deleted = 0;
         $result  = $this->runWithSuppressedWarnings(
             function () use ($path, &$deleted): bool {
-                return File::emptyDir($path, $deleted);
+                return Storage::emptyDir($path, $deleted);
             },
             suppress: $expectBrokenChild,
         );
@@ -803,7 +803,7 @@ class FileTest extends TestCase {
             $this->markTestSkipped("Broken symlink setup is not available in this environment");
         }
 
-        $zip = File::createZip($zipPath, $files);
+        $zip = Storage::createZip($zipPath, $files);
 
         if ($expectedEntries === null) {
             $this->assertNull($zip);
@@ -868,13 +868,13 @@ class FileTest extends TestCase {
     public function testExtractZip(string $zipPath, string $extractPath, bool $expected, array $expectedFiles): void {
         $zipPath     = $this->resolveStringToken($zipPath);
         $extractPath = $this->resolveStringToken($extractPath);
-        $result      = File::extractZip($zipPath, $extractPath);
+        $result      = Storage::extractZip($zipPath, $extractPath);
 
         $this->assertSame($expected, $result);
 
         foreach ($expectedFiles as $relativePath => $content) {
-            $path = File::parsePath($extractPath, $relativePath);
-            $this->assertSame($content, File::read($path));
+            $path = Storage::parsePath($extractPath, $relativePath);
+            $this->assertSame($content, Storage::readFile($path));
         }
     }
 

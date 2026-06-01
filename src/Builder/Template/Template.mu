@@ -3,7 +3,7 @@ namespace {{namespace}};
 
 use Framework\Application;
 use Framework\Provider\Mustache;
-use Framework\File\File;
+use Framework\File\Storage;
 
 /**
  * The Template
@@ -33,7 +33,7 @@ enum Template {
      * @return bool
      */
     public function create(string $path, array $data): bool {
-        return File::create($path, $this->getFileName(), $this->render($data));
+        return Storage::createFile($path, $this->getFileName(), $this->render($data));
     }
 
     /**
@@ -53,7 +53,7 @@ enum Template {
         }
 
         $path = Application::getBasePath($relPath);
-        $code = File::read($path);
+        $code = Storage::readFile($path);
         return Mustache::render($code, $data);
     }
 
@@ -64,7 +64,7 @@ enum Template {
      * @return bool
      */
     public function delete(string $path, int &$deleted = 0): bool {
-        $result   = File::delete($path, $this->getFileName());
+        $result   = Storage::deleteFile($path, $this->getFileName());
         $deleted += $result ? 1 : 0;
         return $result;
     }

@@ -6,7 +6,7 @@ use Framework\Discovery\DiscoveryConfig;
 use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Discovery\Attr\ConsoleCommand;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Provider\Mustache;
 use Framework\Date\Timer;
 use Framework\Utils\Arrays;
@@ -35,8 +35,8 @@ class Builder {
         $writePath = Package::getBuildPath();
         $created   = 0;
 
-        File::createDir($writePath);
-        File::emptyDir($writePath);
+        Storage::createDir($writePath);
+        Storage::emptyDir($writePath);
 
 
         // Find all the Builders in the Framework and App
@@ -85,7 +85,7 @@ class Builder {
             }
         }
 
-        File::deleteDir($writePath, $deleted);
+        Storage::deleteDir($writePath, $deleted);
 
         print("\nDestroyed $deleted generated files\n\n");
     }
@@ -98,12 +98,12 @@ class Builder {
      */
     private static function loadTemplates(): void {
         $path      = Package::getBasePath();
-        $filePaths = File::getFilesInDir($path, recursive: true, skipVendor: true);
+        $filePaths = Storage::getFilesInDir($path, recursive: true, skipVendor: true);
 
         foreach ($filePaths as $filePath) {
             if (Strings::endsWith($filePath, ".mu")) {
-                $fileName = File::getBaseName(File::getName($filePath));
-                self::$templates[$fileName] = File::read($filePath);
+                $fileName = Storage::getBaseName(Storage::getFileName($filePath));
+                self::$templates[$fileName] = Storage::readFile($filePath);
             }
         }
     }
@@ -124,7 +124,7 @@ class Builder {
         $contents  = self::render($name, $data + [
             "namespace" => Package::Namespace . Package::SystemDir,
         ]);
-        File::create($writePath, "$name.php", $contents);
+        Storage::createFile($writePath, "$name.php", $contents);
 
         $total = "";
         if (isset($data["total"]) && is_int($data["total"])) {

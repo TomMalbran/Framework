@@ -5,9 +5,9 @@ use Framework\Application;
 use Framework\Discovery\Type\DiscoveryBuilder;
 use Framework\Database\SchemaFactory;
 use Framework\System\Config;
+use Framework\File\Storage;
 use Framework\Utils\Strings;
 use Framework\Utils\JSON;
-use Framework\File\File;
 
 /**
  * The Schema JSON
@@ -56,7 +56,7 @@ class SchemaJSON implements DiscoveryBuilder {
 
         $file = Strings::addSuffix($schemaFile, ".json");
         $path = Application::getBasePath();
-        File::delete($path, $file);
+        Storage::deleteFile($path, $file);
         return 1;
     }
 }

@@ -5,7 +5,7 @@ use Framework\Discovery\Discovery;
 use Framework\Discovery\Package;
 use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Attr\ConsoleCommand;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -72,14 +72,14 @@ class Console {
         if (self::confirm("- Install Framework console command?")) {
             $fromPath = "$framePath/framework";
             $toPath   = "$appPath/framework";
-            File::copy($fromPath, $toPath);
+            Storage::copyFile($fromPath, $toPath);
             chmod($toPath, 0755);
         }
 
         if (self::confirm("- Install phpcs file?")) {
             $fromPath = "$framePath/phpcs.xml";
             $toPath   = "$appPath/phpcs.xml";
-            File::copy($fromPath, $toPath);
+            Storage::copyFile($fromPath, $toPath);
         }
 
         print("\nInstallation completed.\n");

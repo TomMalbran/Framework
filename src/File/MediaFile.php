@@ -2,7 +2,7 @@
 namespace Framework\File;
 
 use Framework\IO\Value\FileValue;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\File\Type\MediaType;
@@ -72,7 +72,7 @@ class MediaFile {
      */
     public static function exists(int|string ...$pathParts): bool {
         $path = self::getPath(...$pathParts);
-        return File::exists($path);
+        return Storage::fileExists($path);
     }
 
 
@@ -87,8 +87,8 @@ class MediaFile {
     public static function getList(string $mediaType = "", string $path = "", string $basePath = ""): array {
         $path   = $path !== "" && self::exists($basePath, $path) ? $path : "";
         $source = self::getPath($basePath, $path);
-        $files  = File::getAllInDir($source);
-        $source = File::addLastSlash($source);
+        $files  = Storage::getAllInDir($source);
+        $source = Storage::addLastSlash($source);
         $list   = new FileList();
 
         foreach ($files as $file) {
@@ -96,7 +96,7 @@ class MediaFile {
             if (MediaType::isValid($mediaType, $file, $fileName)) {
                 $list->add(
                     name       : $fileName,
-                    path       : File::parsePath($path, $fileName),
+                    path       : Storage::parsePath($path, $fileName),
                     isDir      : FileType::isDir($file),
                     sourcePath : self::getPath($basePath, $path, $fileName),
                     sourceUrl  : self::getUrl($basePath, $path, $fileName),
@@ -111,7 +111,7 @@ class MediaFile {
 
         return [
             "list" => $list->getSorted(),
-            "path" => File::removeFirstSlash($path),
+            "path" => Storage::removeFirstSlash($path),
         ];
     }
 
@@ -123,7 +123,7 @@ class MediaFile {
     public static function createDir(int|string ...$pathParts): bool {
         $source = self::getPath(...$pathParts);
         $thumbs = self::getThumbPath(...$pathParts);
-        return File::createDir($source) && File::createDir($thumbs);
+        return Storage::createDir($source) && Storage::createDir($thumbs);
     }
 
     /**
@@ -137,7 +137,7 @@ class MediaFile {
         $tmpFile  = $file->getTmpName();
         $source   = self::getPath(...$pathParts);
 
-        if (!File::upload($source, $fileName, $tmpFile)) {
+        if (!Storage::uploadFile($source, $fileName, $tmpFile)) {
             return false;
         }
         if (!FileType::isImage($fileName)) {
@@ -156,11 +156,11 @@ class MediaFile {
      * @return bool
      */
     public static function deletePath(int|string ...$pathParts): bool {
-        $relPath = File::parsePath(...$pathParts);
+        $relPath = Storage::parsePath(...$pathParts);
         $source  = self::getPath(...$pathParts);
         $thumbs  = self::getThumbPath(...$pathParts);
 
-        if (!File::deleteDir($source) || !File::deleteDir($thumbs)) {
+        if (!Storage::deleteDir($source) || !Storage::deleteDir($thumbs)) {
             return false;
         }
 
@@ -201,22 +201,22 @@ class MediaFile {
      * @return bool
      */
     private static function updatePath(string $oldPath, string $newPath, string $oldName, string $newName): bool {
-        $oldRelPath = File::removeFirstSlash(File::parsePath($oldPath, $oldName));
-        $newRelPath = File::removeFirstSlash(File::parsePath($newPath, $newName));
+        $oldRelPath = Storage::removeFirstSlash(Storage::parsePath($oldPath, $oldName));
+        $newRelPath = Storage::removeFirstSlash(Storage::parsePath($newPath, $newName));
         $oldSource  = self::getPath($oldPath, $oldName);
         $newSource  = self::getPath($newPath, $newName);
         $oldThumbs  = self::getThumbPath($oldPath, $oldName);
         $newThumbs  = self::getThumbPath($newPath, $newName);
 
-        if (!File::move($oldSource, $newSource)) {
+        if (!Storage::moveFile($oldSource, $newSource)) {
             return false;
         }
         if (FileType::isImage($oldName)) {
-            if (!File::exists($oldThumbs)) {
+            if (!Storage::fileExists($oldThumbs)) {
                 if (!Image::resize($oldSource, $oldThumbs, 200, 200, Image::Resize)) {
                     return false;
                 }
-            } elseif (!File::move($oldThumbs, $newThumbs)) {
+            } elseif (!Storage::moveFile($oldThumbs, $newThumbs)) {
                 return false;
             }
         }

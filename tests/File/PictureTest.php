@@ -1,7 +1,7 @@
 <?php
 namespace Tests\File;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\Picture;
 use Tests\TestHelpers;
 
@@ -32,7 +32,7 @@ class PictureTest extends TestCase {
     }
 
     protected function tearDown(): void {
-        File::deleteDir($this->tmpDir);
+        Storage::deleteDir($this->tmpDir);
     }
 
 

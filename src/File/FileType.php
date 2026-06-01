@@ -4,7 +4,7 @@
 // spell-checker: ignore  flac, gtar, pjpeg, mpegurl, videolan, wbxml, wmlc, xspf, scriptzsh
 namespace Framework\File;
 
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Strings;
 
 /**
@@ -74,7 +74,7 @@ class FileType {
      * @return bool
      */
     public static function isImage(string $file): bool {
-        return File::hasExtension($file, self::$imageExts);
+        return Storage::hasExtension($file, self::$imageExts);
     }
 
     /**
@@ -83,7 +83,7 @@ class FileType {
      * @return bool
      */
     public static function isPNG(string $file): bool {
-        return File::hasExtension($file, self::$pngExts);
+        return Storage::hasExtension($file, self::$pngExts);
     }
 
     /**
@@ -92,7 +92,7 @@ class FileType {
      * @return bool
      */
     public static function isICO(string $file): bool {
-        return File::hasExtension($file, self::$icoExts);
+        return Storage::hasExtension($file, self::$icoExts);
     }
 
     /**
@@ -101,7 +101,7 @@ class FileType {
      * @return bool
      */
     public static function isVideo(string $file): bool {
-        return File::hasExtension($file, self::$videoExts);
+        return Storage::hasExtension($file, self::$videoExts);
     }
 
     /**
@@ -110,7 +110,7 @@ class FileType {
      * @return bool
      */
     public static function isAudio(string $file): bool {
-        return File::hasExtension($file, self::$audioExts);
+        return Storage::hasExtension($file, self::$audioExts);
     }
 
     /**
@@ -119,7 +119,7 @@ class FileType {
      * @return bool
      */
     public static function isCode(string $file): bool {
-        return File::hasExtension($file, self::$codeExts);
+        return Storage::hasExtension($file, self::$codeExts);
     }
 
     /**
@@ -128,7 +128,7 @@ class FileType {
      * @return bool
      */
     public static function isText(string $file): bool {
-        return File::hasExtension($file, self::$textExts);
+        return Storage::hasExtension($file, self::$textExts);
     }
 
     /**
@@ -137,7 +137,7 @@ class FileType {
      * @return bool
      */
     public static function isDocument(string $file): bool {
-        return File::hasExtension($file, self::$documentExts);
+        return Storage::hasExtension($file, self::$documentExts);
     }
 
     /**
@@ -146,7 +146,7 @@ class FileType {
      * @return bool
      */
     public static function isSpreadsheet(string $file): bool {
-        return File::hasExtension($file, self::$spreadsheetExts);
+        return Storage::hasExtension($file, self::$spreadsheetExts);
     }
 
     /**
@@ -155,7 +155,7 @@ class FileType {
      * @return bool
      */
     public static function isPresentation(string $file): bool {
-        return File::hasExtension($file, self::$presentationExts);
+        return Storage::hasExtension($file, self::$presentationExts);
     }
 
     /**
@@ -164,7 +164,7 @@ class FileType {
      * @return bool
      */
     public static function isPDF(string $file): bool {
-        return File::hasExtension($file, self::$pdfExts);
+        return Storage::hasExtension($file, self::$pdfExts);
     }
 
     /**
@@ -173,7 +173,7 @@ class FileType {
      * @return bool
      */
     public static function isZip(string $file): bool {
-        return File::hasExtension($file, self::$zipExts);
+        return Storage::hasExtension($file, self::$zipExts);
     }
 
     /**

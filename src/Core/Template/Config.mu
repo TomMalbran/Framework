@@ -2,7 +2,7 @@
 namespace {{namespace}};
 
 use Framework\Core\Configs;
-use Framework\File\File;
+use Framework\File\Storage;
 
 /**
  * The Config
@@ -40,8 +40,8 @@ class Config {
             $url = Configs::getString("url");
         }
 
-        $path = File::parsePath(...$urlParts);
-        $path = File::removeFirstSlash($path);
+        $path = Storage::parsePath(...$urlParts);
+        $path = Storage::removeFirstSlash($path);
         return $url . $path;
     }
 {{#urls}}

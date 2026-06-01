@@ -4,7 +4,7 @@ namespace Framework\IO\Value;
 use Framework\IO\Request;
 use Framework\IO\Value\Value;
 use Framework\IO\Value\ValueInterface;
-use Framework\File\File;
+use Framework\File\Storage;
 use Framework\File\FileType;
 use Framework\File\MediaFile;
 use Framework\Utils\Strings;
@@ -161,7 +161,7 @@ class FileValue extends Value implements ValueInterface {
      */
     public function hasExtension(string ...$extensions): bool {
         $fileName = $this->getFileName();
-        return File::hasExtension($fileName, ...$extensions);
+        return Storage::hasExtension($fileName, ...$extensions);
     }
 
     /**
