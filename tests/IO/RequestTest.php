@@ -12,29 +12,10 @@ use Tests\TestHelpers;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-use CURLFile;
-
 class RequestTest extends TestCase {
     use TestHelpers;
 
-    protected string $tmpFileF = "";
-    protected string $tmpFileG = "";
-    protected string $tmpFileH = "";
-
-
     protected function setUp(): void {
-        $tmpDir = sys_get_temp_dir();
-        $this->tmpFileF = $tmpDir . DIRECTORY_SEPARATOR . "req_test_f_" . uniqid();
-        $this->tmpFileG = $tmpDir . DIRECTORY_SEPARATOR . "req_test_g_" . uniqid() . ".png";
-        $this->tmpFileH = $tmpDir . DIRECTORY_SEPARATOR . "req_test_h_" . uniqid();
-
-        @file_put_contents($this->tmpFileF, "hello");
-
-        $pngData = base64_decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/w8AAn8B9o7s3wAAAABJRU5ErkJggg==");
-        @file_put_contents($this->tmpFileG, $pngData);
-
-        @file_put_contents($this->tmpFileH, "");
-
         $_FILES = [
             "f" => [
                 "name"     => "a.txt",
@@ -61,16 +42,6 @@ class RequestTest extends TestCase {
     }
 
     protected function tearDown(): void {
-        if ($this->tmpFileF !== "" && file_exists($this->tmpFileF)) {
-            @unlink($this->tmpFileF);
-        }
-        if ($this->tmpFileG !== "" && file_exists($this->tmpFileG)) {
-            @unlink($this->tmpFileG);
-        }
-        if ($this->tmpFileH !== "" && file_exists($this->tmpFileH)) {
-            @unlink($this->tmpFileH);
-        }
-
         $_REQUEST = [];
         $_FILES = [];
     }
@@ -1645,7 +1616,7 @@ class RequestTest extends TestCase {
 
     #[DataProvider("providerGetFile")]
     public function testGetFile(string $key, bool $isValid): void {
-        $request = new Request(withFiles: true);
+        $request = new Request();
         $file    = $request->getFile($key);
         $this->assertInstanceOf(File::class, $file);
         $this->assertSame($isValid, $file->isValid());
@@ -1656,160 +1627,6 @@ class RequestTest extends TestCase {
             "text"    => [ "f", true ],
             "image"   => [ "g", true ],
             "missing" => [ "missing", false ],
-        ];
-    }
-
-
-    #[DataProvider("providerGetFileName")]
-    public function testGetFileName(string $key, string $expected): void {
-        $request = new Request(withFiles: true);
-        $this->assertSame($expected, $request->getFileName($key));
-    }
-
-    public static function providerGetFileName(): array {
-        return [
-            "text"    => [ "f", "a.txt" ],
-            "image"   => [ "g", "image.PNG" ],
-            "missing" => [ "missing", "" ],
-        ];
-    }
-
-
-    #[DataProvider("providerGetFileType")]
-    public function testGetFileType(string $key, string $expected): void {
-        $request = new Request(withFiles: true);
-        $this->assertSame($expected, $request->getFileType($key));
-    }
-
-    public static function providerGetFileType(): array {
-        return [
-            "text"    => [ "f", "text/plain" ],
-            "image"   => [ "g", "image/png" ],
-            "missing" => [ "missing", "" ],
-        ];
-    }
-
-
-    #[DataProvider("providerGetTmpName")]
-    public function testGetTmpName(string $key, string $expected): void {
-        $request = new Request(withFiles: true);
-        $result = $request->getTmpName($key);
-        if (str_starts_with($expected, "tmpFile")) {
-            $this->assertSame($this->{$expected}, $result);
-            return;
-        }
-        $this->assertSame($expected, $result);
-    }
-
-    public static function providerGetTmpName(): array {
-        return [
-            "text"    => [ "f", "tmpFileF" ],
-            "image"   => [ "g", "tmpFileG" ],
-            "missing" => [ "missing", "" ],
-        ];
-    }
-
-
-    #[DataProvider("providerGetCurlFile")]
-    public function testGetCurlFile(string $key, ?array $expected): void {
-        $request = new Request(withFiles: true);
-        $curl = $request->getCurlFile($key);
-        if ($expected === null) {
-            $this->assertNull($curl);
-            return;
-        }
-
-        $this->assertInstanceOf(CURLFile::class, $curl);
-        $this->assertSame($this->{$expected["path"]}, $curl->getFilename());
-        $this->assertSame($expected["mime"], $curl->getMimeType());
-        $this->assertSame($expected["name"], $curl->getPostFilename());
-    }
-
-    public static function providerGetCurlFile(): array {
-        return [
-            "text" => [
-                "f",
-                [
-                    "path" => "tmpFileF",
-                    "mime" => "text/plain",
-                    "name" => "a.txt",
-                ],
-            ],
-            "missing" => [ "missing", null ],
-        ];
-    }
-
-
-    #[DataProvider("providerHasFile")]
-    public function testHasFile(array $args, bool $expected): void {
-        $request = new Request(withFiles: true);
-        $this->assertSame($expected, $request->hasFile(...$args));
-    }
-
-    public static function providerHasFile(): array {
-        return [
-            "text"        => [ [ "f" ], true ],
-            "image"       => [ [ "g" ], true ],
-            "missing"     => [ [ "missing" ], false ],
-            "empty_input" => [ [ "" ], false ],
-        ];
-    }
-
-
-    #[DataProvider("providerHasSizeError")]
-    public function testHasSizeError(array $args, bool $expected): void {
-        $request = new Request(withFiles: true);
-        $this->assertSame($expected, $request->hasSizeError(...$args));
-    }
-
-    public static function providerHasSizeError(): array {
-        return [
-            "text"        => [ [ "f" ], false ],
-            "size_error"  => [ [ "h" ], true ],
-            "missing"     => [ [ "missing" ], true ],
-            "empty_input" => [ [ "" ], true ],
-        ];
-    }
-
-
-    #[DataProvider("providerHasExtension")]
-    public function testHasExtension(array $input, array $args, bool $expected): void {
-        $request = new Request($input, withFiles: true);
-        $this->assertSame($expected, $request->hasExtension(...$args));
-    }
-
-    public static function providerHasExtension(): array {
-        $input = [ "img" => "photo.jpg" ];
-        return [
-            "file_string" => [ $input, [ "f", "txt" ], true ],
-            "file_array"  => [ $input, [ "g", [ "png" ] ], true ],
-            "request"     => [ $input, [ "img", "jpg" ], true ],
-            "missing"     => [ $input, [ "missing", "txt" ], false ],
-            "multiple"    => [ $input, [ "multiple", "jpg", "png" ], false ],
-            "empty_input" => [ [], [ "missing", "txt" ], false ],
-        ];
-    }
-
-
-    #[DataProvider("providerIsValidImage")]
-    public function testIsValidImage(array $input, array $args, bool $expected): void {
-        $request = new Request($input, withFiles: true);
-        $result  = $this->runWithSuppressedWarnings(
-            fn() => $request->isValidImage(...$args),
-            suppress: true,
-        );
-
-        $this->assertSame($expected, $result);
-    }
-
-    public static function providerIsValidImage(): array {
-        $input = [ "img" => "image.png" ];
-        return [
-            "text_file"   => [ $input, [ "f" ], false ],
-            "png_file"    => [ $input, [ "g" ], true ],
-            "request"     => [ $input, [ "img" ], true ],
-            "missing"     => [ $input, [ "missing" ], false ],
-            "empty_input" => [ [], [ "missing" ], false ],
         ];
     }
 

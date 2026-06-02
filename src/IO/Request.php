@@ -1,9 +1,6 @@
 <?php
 namespace Framework\IO;
 
-use Framework\File\Storage;
-use Framework\File\FileType;
-use Framework\File\Image;
 use Framework\Date\Date;
 use Framework\Date\DateUtils;
 use Framework\Date\Type\DateType;
@@ -21,7 +18,6 @@ use ArrayIterator;
 use IteratorAggregate;
 use Traversable;
 use JsonSerializable;
-use CURLFile;
 
 /**
  * The Request Wrapper
@@ -32,25 +28,20 @@ class Request implements IteratorAggregate, JsonSerializable {
     /** @var array<string,mixed> */
     private array $request;
 
-    /** @var array<string,mixed> */
-    private array $files = [];
-
 
     /**
      * Creates a new Request instance
      * @param array<string,mixed> $request     Optional.
      * @param bool                $withRequest Optional.
-     * @param bool                $withFiles   Optional.
      */
-    public function __construct(array $request = [], bool $withRequest = false, bool $withFiles = false) {
+    public function __construct(
+        array $request = [],
+        bool $withRequest = false,
+    ) {
         if ($withRequest) {
             $this->request = Arrays::toStringMixedMap($_REQUEST);
         } else {
             $this->request = $request;
-        }
-
-        if ($withFiles) {
-            $this->files = Arrays::toStringMixedMap($_FILES);
         }
     }
 
@@ -814,129 +805,13 @@ class Request implements IteratorAggregate, JsonSerializable {
         return $this->toDayEnd($dateKey, $useTimeZone);
     }
 
-
-
     /**
      * Returns the request file at the given key
      * @param string $key
      * @return File
      */
     public function getFile(string $key): File {
-        if (isset($_FILES[$key])) {
-            return new File($key);
-        }
-        if ($this->has($key)) {
-            return new File($this->getString($key));
-        }
-        return new File();
-    }
-
-    /**
-     * Returns the request file name at the given key
-     * @param string $key
-     * @return string
-     */
-    public function getFileName(string $key): string {
-        if (isset($this->files[$key]) && is_array($this->files[$key])) {
-            return Strings::toString($this->files[$key]["name"] ?? "");
-        }
-        return "";
-    }
-
-    /**
-     * Returns the request file type at the given key
-     * @param string $key
-     * @return string
-     */
-    public function getFileType(string $key): string {
-        if (isset($this->files[$key]) && is_array($this->files[$key])) {
-            return Strings::toString($this->files[$key]["type"] ?? "");
-        }
-        return "";
-    }
-
-    /**
-     * Returns the request file temporal name at the given key
-     * @param string $key
-     * @return string
-     */
-    public function getTmpName(string $key): string {
-        if (isset($this->files[$key]) && is_array($this->files[$key])) {
-            return Strings::toString($this->files[$key]["tmp_name"] ?? "");
-        }
-        return "";
-    }
-
-    /**
-     * Returns the request file at the given key as CURLFile
-     * @param string $key
-     * @return CURLFile|null
-     */
-    public function getCurlFile(string $key): ?CURLFile {
-        if ($this->hasFile($key)) {
-            return curl_file_create(
-                $this->getTmpName($key),
-                $this->getFileType($key),
-                $this->getFileName($key),
-            );
-        }
-        return null;
-    }
-
-    /**
-     * Returns true if the given key exists in the files data
-     * @param string $key
-     * @return bool
-     */
-    public function hasFile(string $key): bool {
-        return (
-            isset($this->files[$key]) &&
-            is_array($this->files[$key]) &&
-            isset($this->files[$key]["name"])
-        );
-    }
-
-    /**
-     * Returns true if there was a size error in the upload
-     * @param string $key
-     * @return bool
-     */
-    public function hasSizeError(string $key): bool {
-        if (isset($this->files[$key]) && is_array($this->files[$key]) && isset($this->files[$key]["error"])) {
-            return $this->files[$key]["error"] === UPLOAD_ERR_INI_SIZE;
-        }
-        return true;
-    }
-
-    /**
-     * Returns true if the file at the given key has the given extension
-     * @param string              $key
-     * @param list<string>|string $extensions
-     * @param string              ...$otherExtensions
-     * @return bool
-     */
-    public function hasExtension(
-        string $key,
-        array|string $extensions,
-        string ...$otherExtensions,
-    ): bool {
-        $fileName = $this->getString($key);
-        if ($this->hasFile($key)) {
-            $fileName = $this->getFileName($key);
-        }
-        return Storage::hasExtension($fileName, $extensions, ...$otherExtensions);
-    }
-
-    /**
-     * Returns true if the file at the given key is a valid image
-     * @param string $key
-     * @return bool
-     */
-    public function isValidImage(string $key): bool {
-        if ($this->hasFile($key)) {
-            return Image::isValidType($this->getTmpName($key));
-        }
-        return FileType::isImage($this->getString($key));
+        return File::fromRequest($key, $this->getString($key));
     }
 
 

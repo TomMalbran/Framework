@@ -144,7 +144,7 @@ class Framework {
      */
     public static function getRequest(): Request {
         if (self::$request === null) {
-            self::$request = new Request(withRequest: true, withFiles: true);
+            self::$request = new Request(withRequest: true);
         }
         return self::$request;
     }
