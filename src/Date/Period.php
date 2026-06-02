@@ -30,10 +30,6 @@ class Period implements IteratorAggregate {
         SchemaRequest|Request $request,
         string $prefix = "",
     ) {
-        if ($request instanceof SchemaRequest) {
-            $request = $request->getRequest();
-        }
-
         $period   = $request->getString("period");
         $fromDate = $request->getString("fromDate");
         $fromHour = $request->getString("fromHour");

@@ -143,7 +143,7 @@ class {{name}}Schema extends Schema {
         {{{fieldArgDefault}}},{{/parents}}
     ): Result {
         {{#hasEnumID}}
-        $id          = {{idEnumClass}}::fromRequest($request->getRequest(), "{{idName}}");
+        $id          = {{idEnumClass}}::fromValue($request->getString("{{idName}}"));
         {{/hasEnumID}}
         {{^hasEnumID}}
         $id          = $request->id;
