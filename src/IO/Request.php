@@ -10,8 +10,6 @@ use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
 use Framework\Utils\Strings;
-use Framework\Utils\Utils;
-use Framework\Utils\URL;
 
 use ArrayIterator;
 use IteratorAggregate;
@@ -47,6 +45,70 @@ class Request implements IteratorAggregate, JsonSerializable {
 
 
     /**
+     * Returns true if the request is empty
+     * @return bool
+     */
+    public function isEmpty(): bool {
+        return count($this->request) === 0;
+    }
+
+    /**
+     * Returns true if the request is not empty
+     * @return bool
+     */
+    public function isNotEmpty(): bool {
+        return count($this->request) !== 0;
+    }
+
+    /**
+     * Returns true if the given key exists in the request
+     * @param Enum|string $key
+     * @return bool
+     */
+    public function has(Enum|string $key): bool {
+        $key = Strings::toString($key);
+        return isset($this->request[$key]);
+    }
+
+    /**
+     * Returns true if the key exits and has a value in the request
+     * @param Enum|string $key Optional.
+     * @return bool
+     */
+    public function hasValue(Enum|string $key): bool {
+        $key = Strings::toString($key);
+        return !Arrays::isEmpty($this->request, $key);
+    }
+
+
+
+    /**
+     * Sets the given key on the request data with the given value
+     * @param Enum|string  $key
+     * @param mixed|string $value Optional.
+     * @return Request
+     */
+    public function set(Enum|string $key, mixed $value = ""): Request {
+        $key = Strings::toString($key);
+        $this->request[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * Removes the request data at the given key
+     * @param string $key
+     * @return Request
+     */
+    public function remove(string $key): Request {
+        if ($this->has($key)) {
+            unset($this->request[$key]);
+        }
+        return $this;
+    }
+
+
+
+    /**
      * Returns the request data at the given key or the default
      * @param string       $key
      * @param mixed|string $default Optional.
@@ -60,16 +122,19 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key or the default
+     * Returns the value at the given key as a boolean
      * @param string $key
-     * @param mixed  $default Optional.
-     * @return mixed
+     * @return bool
      */
-    public function getOr(string $key, mixed $default): mixed {
-        if (isset($this->request[$key]) && $this->has($key)) {
-            return $this->request[$key];
+    public function getBool(string $key): bool {
+        if (isset($this->request[$key])) {
+            $value = $this->request[$key];
+            return $value === "true" ||
+                $value === true ||
+                $value === "1" ||
+                $value === 1;
         }
-        return $default;
+        return false;
     }
 
     /**
@@ -112,17 +177,43 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the request data at the given key as an array and removing the empty entries
-     * @param string $key
-     * @return list<mixed>
+     * Returns the given string as a time at the given moment of the day
+     * @param string   $dateKey
+     * @param string   $hourKey     Optional.
+     * @param DateType $dateType    Optional.
+     * @param bool     $useTimeZone Optional.
+     * @return Date
      */
-    public function getArray(string $key): array {
-        $value = $this->get($key, []);
-        if (!is_array($value)) {
-            return [];
+    public function getDate(
+        string $dateKey,
+        string $hourKey = "",
+        DateType $dateType = DateType::Start,
+        bool $useTimeZone = true,
+    ): Date {
+        if (!$this->hasValue($dateKey)) {
+            return Date::empty();
         }
-        return Arrays::removeEmpty(Arrays::getValues($value));
+
+        $date = Date::create(
+            date: $this->getString($dateKey),
+            hour: $this->getString($hourKey),
+        );
+        if ($hourKey === "" || !$this->hasValue($hourKey)) {
+            $date = $date->toDayMoment($dateType);
+        }
+        return $date->toServerTime($useTimeZone);
     }
+
+    /**
+     * Returns the request file at the given key
+     * @param string $key
+     * @return File
+     */
+    public function getFile(string $key): File {
+        return File::fromRequest($key, $this->getString($key));
+    }
+
+
 
     /**
      * Returns the request data at the given key as a Dictionary
@@ -131,15 +222,6 @@ class Request implements IteratorAggregate, JsonSerializable {
      */
     public function getDict(string $key): Dictionary {
         return new Dictionary($this->get($key, []));
-    }
-
-    /**
-     * Returns the request data at the given key as a Dictionary
-     * @param string $key
-     * @return Dictionary
-     */
-    public function getDictionary(string $key): Dictionary {
-        return JSON::decodeAsDictionary($this->get($key, "[]"));
     }
 
     /**
@@ -186,379 +268,6 @@ class Request implements IteratorAggregate, JsonSerializable {
             $result = $value;
         }
         return Arrays::toStrings($result, withoutEmpty: true);
-    }
-
-    /**
-     * Returns the request data at the given key as a map of Strings
-     * @param string $key
-     * @return array<string,string>
-     */
-    public function getStringsMap(string $key): array {
-        $value = $this->getJSONArray($key);
-        return Arrays::toStringsMap($value);
-    }
-
-    /**
-     * Returns the request data at the given key as a map of String-Integer
-     * @param string $key
-     * @return array<string,int>
-     */
-    public function getStringIntMap(string $key): array {
-        $value = $this->getJSONArray($key);
-        return Arrays::toStringIntMap($value);
-    }
-
-
-
-    /**
-     * Sets the given key on the request data with the given value
-     * @param Enum|string  $key
-     * @param mixed|string $value Optional.
-     * @return Request
-     */
-    public function set(Enum|string $key, mixed $value = ""): Request {
-        $key = Strings::toString($key);
-        $this->request[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * Removes the request data at the given key
-     * @param string $key
-     * @return Request
-     */
-    public function remove(string $key): Request {
-        if ($this->exists($key)) {
-            unset($this->request[$key]);
-        }
-        return $this;
-    }
-
-
-
-    /**
-     * Returns true if the given key exists in the request data
-     * @param Enum|list<string>|string|null $key   Optional.
-     * @param int|null                      $index Optional.
-     * @return bool
-     */
-    public function has(Enum|array|string|null $key = null, ?int $index = null): bool {
-        if ($key === null) {
-            return !Arrays::isEmpty($this->request);
-        }
-
-        if (is_array($key)) {
-            foreach ($key as $keyID) {
-                if (Arrays::isEmpty($this->request, $keyID)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        $key = Strings::toString($key);
-        if ($index !== null) {
-            return (
-                isset($this->request[$key]) &&
-                is_array($this->request[$key]) &&
-                !Arrays::isEmpty($this->request[$key], $index)
-            );
-        }
-        return !Arrays::isEmpty($this->request, $key);
-    }
-
-    /**
-     * Returns true if the given key is set in the request data
-     * @param Enum|list<string>|string $key
-     * @return bool
-     */
-    public function exists(Enum|array|string $key): bool {
-        if (is_array($key)) {
-            foreach ($key as $keyID) {
-                if (!isset($this->request[$keyID])) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        $key = Strings::toString($key);
-        return isset($this->request[$key]);
-    }
-
-    /**
-     * Returns true if the given key exists and is active
-     * @param string $key
-     * @return bool
-     */
-    public function isActive(string $key): bool {
-        if (isset($this->request[$key])) {
-            $value = $this->request[$key];
-            return $value === "true" ||
-                $value === true ||
-                $value === "1" ||
-                $value === 1;
-        }
-        return false;
-    }
-
-    /**
-     * Returns the value at the given key as a boolean
-     * @param string $key
-     * @return bool
-     */
-    public function getBool(string $key): bool   {
-        return $this->isActive($key);
-    }
-
-
-
-    /**
-     * Checks if all the given keys are not empty or set
-     * @param list<string> $emptyKeys
-     * @param list<string> $setKeys   Optional.
-     * @return bool
-     */
-    public function isEmpty(array $emptyKeys, array $setKeys = []): bool {
-        foreach ($emptyKeys as $field) {
-            if (!$this->has($field)) {
-                return true;
-            }
-        }
-        foreach ($setKeys as $field) {
-            if (!$this->exists($field)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if the array is empty
-     * @param string $key
-     * @return bool
-     */
-    public function isEmptyArray(string $key): bool {
-        $array = $this->getArray($key);
-        return Arrays::isEmpty($array);
-    }
-
-
-
-    /**
-     * Converts the request data on the given key to binary
-     * @param string $key
-     * @param int    $default Optional.
-     * @return int
-     */
-    public function toBinary(string $key, int $default = 1): int {
-        if (!$this->has($key)) {
-            return 0;
-        }
-        $value = $this->get($key);
-        return $value === true || $value === 1 || $value === "true" || $value === "1" ? $default : 0;
-    }
-
-    /**
-     * Returns the given number as an integer using the given decimals
-     * @param string $key
-     * @param int    $decimals
-     * @return int
-     */
-    public function toInt(string $key, int $decimals): int {
-        $value = $this->getFloat($key);
-        return Numbers::toInt($value, $decimals);
-    }
-
-    /**
-     * Returns the given price in Cents
-     * @param string $key
-     * @return int
-     */
-    public function toCents(string $key): int {
-        $value = $this->getFloat($key);
-        return Numbers::toCents($value);
-    }
-
-    /**
-     * Returns the given array encoded as JSON
-     * @param string $key
-     * @return string
-     */
-    public function toJSON(string $key): string {
-        $value = $this->get($key);
-        if (Arrays::isEmpty($value)) {
-            $value = [];
-        } elseif (JSON::isValid($value)) {
-            $value = JSON::decodeAsArray($value);
-        } elseif (is_string($value)) {
-            $value = Strings::split($value, ",");
-        }
-        return JSON::encode($value);
-    }
-
-    /**
-     * Removes spaces and dots in the CUIT
-     * @param string $key
-     * @return string
-     */
-    public function cuitToNumber(string $key): string {
-        $value = $this->getString($key);
-        return Utils::cuitToNumber($value);
-    }
-
-    /**
-     * Removes spaces and dots in the DNI
-     * @param string $key
-     * @return string
-     */
-    public function dniToNumber(string $key): string {
-        $value = $this->getString($key);
-        return Utils::dniToNumber($value);
-    }
-
-    /**
-     * Removes spaces, dashes and parenthesis in the Phone
-     * @param string $key
-     * @return string
-     */
-    public function phoneToNumber(string $key): string {
-        $value = $this->getString($key);
-        return Utils::phoneToNumber($value);
-    }
-
-    /**
-     * Parses a Domain to try and return something like "domain.com"
-     * @param string $key
-     * @return string
-     */
-    public function toDomain(string $key): string {
-        $value = $this->getString($key);
-        return URL::getDomain($value);
-    }
-
-
-
-    /**
-     * Returns the request data at the given key or the default
-     * @param string $key
-     * @return Date
-     */
-    public function toDate(string $key): Date {
-        if (!$this->has($key)) {
-            return Date::empty();
-        }
-        return Date::create($this->get($key));
-    }
-
-    /**
-     * Returns the given strings as a Date at the given hour
-     * @param string $dateKey
-     * @param string $hourKey
-     * @param bool   $useTimeZone Optional.
-     * @param bool   $skipEmpty   Optional.
-     * @return Date
-     */
-    public function toTimeHour(
-        string $dateKey,
-        string $hourKey,
-        bool $useTimeZone = true,
-        bool $skipEmpty = false,
-    ): Date {
-        if ($skipEmpty && (!$this->has($dateKey) || !$this->has($hourKey))) {
-            return Date::empty();
-        }
-        return Date::create(
-            date: $this->getString($dateKey),
-            hour: $this->getString($hourKey)
-        )->toServerTime($useTimeZone);
-    }
-
-    /**
-     * Returns the given string as a time at the given moment of the day
-     * @param string   $key
-     * @param DateType $dateType    Optional.
-     * @param string   $hourKey     Optional.
-     * @param bool     $useTimeZone Optional.
-     * @return Date
-     */
-    public function toDayMoment(
-        string $key,
-        DateType $dateType = DateType::Start,
-        string $hourKey = "",
-        bool $useTimeZone = true,
-    ): Date {
-        if ($hourKey !== "" && $this->has($hourKey)) {
-            return $this->toTimeHour($key, $hourKey, $useTimeZone);
-        }
-        return $this->toDate($key)->toServerTime($useTimeZone)->toDayMoment($dateType);
-    }
-
-    /**
-     * Returns the given string as a time at the start of the day
-     * @param string $key
-     * @param bool   $useTimeZone Optional.
-     * @return Date
-     */
-    public function toDayStart(string $key, bool $useTimeZone = true): Date {
-        return $this->toDate($key)->toServerTime($useTimeZone)->toDayStart();
-    }
-
-    /**
-     * Returns the given string as a Date at the given hour or the start of the day
-     * @param string $dateKey
-     * @param string $hourKey
-     * @param bool   $useTimeZone Optional.
-     * @return Date
-     */
-    public function toDayStartHour(string $dateKey, string $hourKey, bool $useTimeZone = true): Date {
-        if ($this->has($hourKey)) {
-            return $this->toTimeHour($dateKey, $hourKey, $useTimeZone);
-        }
-        return $this->toDayStart($dateKey, $useTimeZone);
-    }
-
-    /**
-     * Returns the given string as a time at the middle of the day
-     * @param string $key
-     * @param bool   $useTimeZone Optional.
-     * @return Date
-     */
-    public function toDayMiddle(string $key, bool $useTimeZone = true): Date {
-        return $this->toDate($key)->toServerTime($useTimeZone)->toDayMiddle();
-    }
-
-    /**
-     * Returns the given string as a time at the end of the day
-     * @param string $key
-     * @param bool   $useTimeZone Optional.
-     * @return Date
-     */
-    public function toDayEnd(string $key, bool $useTimeZone = true): Date {
-        return $this->toDate($key)->toServerTime($useTimeZone)->toDayEnd();
-    }
-
-    /**
-     * Returns the given string as a Date at the given hour or the end of the day
-     * @param string $dateKey
-     * @param string $hourKey
-     * @param bool   $useTimeZone Optional.
-     * @return Date
-     */
-    public function toDayEndHour(string $dateKey, string $hourKey, bool $useTimeZone = true): Date {
-        if ($this->has($hourKey)) {
-            return $this->toTimeHour($dateKey, $hourKey, $useTimeZone);
-        }
-        return $this->toDayEnd($dateKey, $useTimeZone);
-    }
-
-    /**
-     * Returns the request file at the given key
-     * @param string $key
-     * @return File
-     */
-    public function getFile(string $key): File {
-        return File::fromRequest($key, $this->getString($key));
     }
 
 

@@ -1,9 +1,9 @@
 <?php
 namespace Tests\Utils;
 
+use Framework\Date\Date;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
-use Framework\Date\Date;
 use Framework\Utils\Dictionary;
 
 use PHPUnit\Framework\TestCase;
@@ -62,8 +62,8 @@ class DictionaryTest extends TestCase {
 
     public static function providerIsEmpty(): array {
         return [
-            "empty_dictionary"     => [ [], true ],
-            "non_empty_dictionary" => [ [ "a" => 1 ], false ],
+            "empty"     => [ [], true ],
+            "non_empty" => [ [ "a" => 1 ], false ],
         ];
     }
 
@@ -76,8 +76,8 @@ class DictionaryTest extends TestCase {
 
     public static function providerIsNotEmpty(): array {
         return [
-            "empty_dictionary"     => [ [], false ],
-            "non_empty_dictionary" => [ [ "a" => 1 ], true ],
+            "empty"     => [ [], false ],
+            "non_empty" => [ [ "a" => 1 ], true ],
         ];
     }
 

@@ -57,7 +57,7 @@ class SchemaRequest {
      * @return bool
      */
     public function isEmpty(): bool {
-        return !$this->request->has();
+        return $this->request->isEmpty();
     }
 
     /**
@@ -65,7 +65,7 @@ class SchemaRequest {
      * @return bool
      */
     public function isNotEmpty(): bool {
-        return $this->request->has();
+        return $this->request->isNotEmpty();
     }
 
 
@@ -80,7 +80,7 @@ class SchemaRequest {
         if (property_exists($this, $key)) {
             return Strings::toString($this->$key);
         }
-        if ($this->request->exists($key)) {
+        if ($this->request->has($key)) {
             return $this->request->getString($key, $default);
         }
         return $default;
@@ -96,7 +96,7 @@ class SchemaRequest {
         if (property_exists($this, $key)) {
             return Numbers::toInt($this->$key);
         }
-        if ($this->request->exists($key)) {
+        if ($this->request->has($key)) {
             return $this->request->getInt($key, $default);
         }
         return $default;
@@ -112,7 +112,7 @@ class SchemaRequest {
         if (property_exists($this, $key) && is_bool($this->$key)) {
             return $this->$key;
         }
-        if ($this->request->exists($key)) {
+        if ($this->request->has($key)) {
             return $this->request->getBool($key);
         }
         return $default;
@@ -139,8 +139,8 @@ class SchemaRequest {
         if (property_exists($this, $key) && $this->$key instanceof Dictionary) {
             return $this->$key;
         }
-        if ($this->request->exists($key)) {
-            return $this->request->getDictionary($key);
+        if ($this->request->has($key)) {
+            return $this->request->getDict($key);
         }
         return new Dictionary();
     }

@@ -125,8 +125,8 @@ class {{requestClass}} extends SchemaRequest {
         }
     {{#hasID}}
 
-        $instance->isCreate = !$instance->request->has("{{idName}}");
-        $instance->isEdit = $instance->request->has("{{idName}}");
+        $instance->isCreate = !$instance->request->hasValue("{{idName}}");
+        $instance->isEdit = $instance->request->hasValue("{{idName}}");
 
         // Set the ID
         {{#hasIntID}}

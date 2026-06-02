@@ -157,8 +157,8 @@ class RequestedCode {
                 }
 
                 $name   = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
-                $hour   = $requested->hourInput !== "" ? ", \"{$requested->hourInput}\"" : "";
-                $getter = "\$instance->request->toDayMoment(\"{$name}\", DateType::{$dateType}{$hour})";
+                $hour   = $requested->hourInput;
+                $getter = "\$instance->request->getDate(\"{$name}\", \"{$hour}\", DateType::{$dateType})";
                 $setter = "\${$requested->name} === null ? Date::empty() : \${$requested->name}";
                 break;
 
