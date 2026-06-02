@@ -3,7 +3,7 @@ namespace Framework\Database\Builder;
 
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
-use Framework\Database\Type\RequestType;
+use Framework\Database\Type\RequestedType;
 use Framework\Builder\Builder;
 use Framework\Date\Date;
 use Framework\Date\Type\DateType;
@@ -12,7 +12,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
 /**
- * The Request Code
+ * The Requested Code
  * @phpstan-type IDProperty array{
  *   hasID: bool,
  *   hasIntID: bool,
@@ -32,7 +32,7 @@ use Framework\Utils\Strings;
  *   default: string,
  * }
  */
-class RequestCode {
+class RequestedCode {
 
     /**
      * Returns the Request code
@@ -49,7 +49,6 @@ class RequestCode {
             "namespace"       => $schemaModel->namespace,
             "name"            => $schemaModel->name,
             "tableName"       => $schemaModel->tableName,
-
             "requestClass"    => $schemaModel->requestClass,
 
             "hasMultiID"      => self::hasMultiID($schemaModel),
@@ -88,9 +87,9 @@ class RequestCode {
             foreach ($schemaModel->requestedFields as $field) {
                 if ($field->isID) {
                     $hasID       = true;
-                    $hasIntID    = $field->type === RequestType::Number;
-                    $hasStringID = $field->type === RequestType::String;
-                    $hasEnumID   = $field->type === RequestType::Enum;
+                    $hasIntID    = $field->type === RequestedType::Number;
+                    $hasStringID = $field->type === RequestedType::String;
+                    $hasEnumID   = $field->type === RequestedType::Enum;
                     $name        = $field->name;
                     break;
                 }
@@ -129,7 +128,7 @@ class RequestCode {
     private static function getFields(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if ($requested->type === RequestType::Dictionary) {
+            if ($requested->type === RequestedType::Dictionary) {
                 continue;
             }
 
@@ -141,19 +140,11 @@ class RequestCode {
             $default = $requested->type->getDefaultValue($requested->enumClass);
 
             switch ($requested->type) {
-            case RequestType::Enum:
-                if ($requested->isStatus) {
-                    $type    = $schemaModel->statusClass;
-                    $docType = $schemaModel->statusClass;
-                    $argType = $docType;
-                    $default = "{$schemaModel->statusClass}::None";
-                    $getter  = "{$schemaModel->statusClass}::fromRequest(\$instance->request, \"{$requested->name}\")";
-                } else {
-                    $getter = "{$type}::fromRequest(\$instance->request, \"{$requested->name}\")";
-                }
+            case RequestedType::Enum:
+                $getter = "{$type}::fromRequest(\$instance->request, \"{$requested->name}\")";
                 break;
 
-            case RequestType::Date:
+            case RequestedType::Date:
                 $docType = "Date|null";
                 $argType = "?Date";
 
@@ -171,7 +162,15 @@ class RequestCode {
                 $setter = "\${$requested->name} === null ? Date::empty() : \${$requested->name}";
                 break;
 
-            case RequestType::Array:
+            case RequestedType::Status:
+                $type    = $schemaModel->statusClass;
+                $docType = $schemaModel->statusClass;
+                $argType = $docType;
+                $default = "{$schemaModel->statusClass}::None";
+                $getter  = "{$schemaModel->statusClass}::fromRequest(\$instance->request, \"{$requested->name}\")";
+                break;
+
+            case RequestedType::Array:
                 if ($requested->subClass !== "") {
                     $typeName = Strings::substringAfter($requested->subClass, "\\");
                     $getter   = "{$typeName}::fromList(\$instance->request->getStrings(\"{$requested->name}\"))";
@@ -232,7 +231,7 @@ class RequestCode {
     private static function getDictionaries(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if ($requested->type === RequestType::Dictionary) {
+            if ($requested->type === RequestedType::Dictionary) {
                 $result[] = $requested->name;
             }
         }
@@ -253,20 +252,25 @@ class RequestCode {
         }
 
         foreach ($schemaModel->requestedFields as $requested) {
-            if ($requested->type === RequestType::Enum && $requested->enumClass !== "") {
-                $result[$requested->enumClass] = 1;
-            }
-            if ($requested->type === RequestType::Date) {
+            switch ($requested->type) {
+            case RequestedType::Enum:
+                if ($requested->enumClass !== "") {
+                    $result[$requested->enumClass] = 1;
+                }
+                break;
+            case RequestedType::Date:
                 $result[Date::class] = 1;
                 $result[DateType::class] = 1;
-            }
-            if ($requested->type === RequestType::File) {
+                break;
+            case RequestedType::File:
                 $result[File::class] = 1;
+                break;
+            case RequestedType::Status:
+                $result["{$schemaModel->namespace}\\{$schemaModel->statusClass}"] = 1;
+                break;
+            default:
             }
 
-            if ($requested->isStatus) {
-                $result["{$schemaModel->namespace}\\{$schemaModel->statusClass}"] = 1;
-            }
             if ($requested->subClass !== "") {
                 $result[$requested->subClass] = 1;
             }

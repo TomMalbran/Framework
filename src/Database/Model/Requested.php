@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Database\Model;
 
-use Framework\Database\Type\RequestType;
+use Framework\Database\Type\RequestedType;
 use Framework\Date\Type\DateType;
 
 use Attribute;
@@ -72,11 +72,10 @@ class Requested {
 
 
     // Used internally when parsing the Model
-    public RequestType $type = RequestType::String;
+    public RequestedType $type = RequestedType::String;
 
     public string $name      = "";
     public bool   $isField   = false;
-    public bool   $isStatus  = false;
     public string $subType   = "";
     public string $subClass  = "";
     public string $enumClass = "";
@@ -144,10 +143,9 @@ class Requested {
      * @return Requested
      */
     public function fromStatus(): Requested {
-        $this->name     = "status";
-        $this->type     = RequestType::Enum;
-        $this->isField  = $this->canEdit;
-        $this->isStatus = true;
+        $this->name    = "status";
+        $this->type    = RequestedType::Status;
+        $this->isField = $this->canEdit;
         return $this;
     }
 
@@ -168,23 +166,23 @@ class Requested {
         bool $isEnum = false,
     ): void {
         if ($this->isString) {
-            $this->type = RequestType::String;
+            $this->type = RequestedType::String;
         } elseif ($this->isNumber) {
-            $this->type = RequestType::Number;
+            $this->type = RequestedType::Number;
         } elseif ($this->isJSON) {
-            $this->type = RequestType::Dictionary;
+            $this->type = RequestedType::Dictionary;
         } elseif ($this->isDate) {
-            $this->type = RequestType::Date;
+            $this->type = RequestedType::Date;
         } elseif ($this->isFile) {
-            $this->type = RequestType::File;
+            $this->type = RequestedType::File;
         } elseif ($subModelName !== "") {
-            $this->type = RequestType::Dictionary;
+            $this->type = RequestedType::Dictionary;
         } elseif ($isEnum) {
-            $this->type = RequestType::Enum;
+            $this->type = RequestedType::Enum;
         } elseif ($fieldType !== null) {
-            $this->type = RequestType::fromField($fieldType);
+            $this->type = RequestedType::fromField($fieldType);
         } elseif ($typeName !== "") {
-            $this->type = RequestType::fromType($typeName);
+            $this->type = RequestedType::fromType($typeName);
         }
     }
 }

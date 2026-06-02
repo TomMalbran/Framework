@@ -12,22 +12,23 @@ use Framework\Utils\Strings;
 use JsonSerializable;
 
 /**
- * The Request Type
+ * The Requested Type
  */
-enum RequestType implements Enum, JsonSerializable {
+enum RequestedType implements Enum, JsonSerializable {
     use IsEnum;
 
     case None;
 
     case Date;
     case Enum;
+    case File;
+    case Status;
 
     case String;
     case Encrypt;
     case Boolean;
     case Number;
     case Float;
-    case File;
 
     case Array;
     case Dictionary;
@@ -37,19 +38,19 @@ enum RequestType implements Enum, JsonSerializable {
     /**
      * Creates an RequestType from a FieldType
      * @param FieldType $fieldType
-     * @return RequestType
+     * @return RequestedType
      */
-    public static function fromField(FieldType $fieldType): RequestType {
+    public static function fromField(FieldType $fieldType): RequestedType {
         return match ($fieldType) {
             FieldType::Date    => self::Date,
             FieldType::Enum    => self::Enum,
-            FieldType::JSON    => self::Dictionary,
-            FieldType::Array   => self::Array,
+            FieldType::File    => self::File,
             FieldType::Boolean => self::Boolean,
             FieldType::Number  => self::Number,
             FieldType::Float   => self::Float,
             FieldType::Encrypt => self::Encrypt,
-            FieldType::File    => self::File,
+            FieldType::Array   => self::Array,
+            FieldType::JSON    => self::Dictionary,
             default            => self::String,
         };
     }
@@ -57,9 +58,9 @@ enum RequestType implements Enum, JsonSerializable {
     /**
      * Creates an RequestType from a Type
      * @param string $typeName
-     * @return RequestType
+     * @return RequestedType
      */
-    public static function fromType(string $typeName): RequestType {
+    public static function fromType(string $typeName): RequestedType {
         if ($typeName === Date::class) {
             return self::Date;
         }
@@ -90,8 +91,10 @@ enum RequestType implements Enum, JsonSerializable {
         return match ($this) {
             self::None       => "",
 
-            self::Enum       => $enumType !== "" ? $enumType : "string",
             self::Date       => "Date",
+            self::Enum       => $enumType !== "" ? $enumType : "string",
+            self::File       => "File",
+            self::Status     => "string",
 
             self::String,
             self::Encrypt    => "string",
@@ -99,7 +102,6 @@ enum RequestType implements Enum, JsonSerializable {
             self::Number     => "int",
             self::Float      => "float",
 
-            self::File       => "File",
             self::Dictionary => "Dictionary",
             self::Array      => "array",
         };
@@ -115,8 +117,10 @@ enum RequestType implements Enum, JsonSerializable {
         return match ($this) {
             self::None       => "null",
 
-            self::Enum       => $enumType !== "" ? "$enumType::None" : "\"\"",
             self::Date       => "null",
+            self::Enum       => $enumType !== "" ? "$enumType::None" : "\"\"",
+            self::File       => "new File()",
+            self::Status     => "\"\"",
 
             self::String,
             self::Encrypt    => "\"\"",
@@ -124,7 +128,6 @@ enum RequestType implements Enum, JsonSerializable {
             self::Number,
             self::Float      => "0",
 
-            self::File       => "new File()",
             self::Dictionary => "new Dictionary()",
             self::Array      => "[]",
         };
