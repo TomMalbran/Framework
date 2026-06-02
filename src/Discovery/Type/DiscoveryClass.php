@@ -24,14 +24,17 @@ class DiscoveryClass {
 
     /**
      * Creates a new DiscoveryClass from a class name and its uses
-     * @param ReflectionClass<object>|null $reflection Optional.
-     * @param list<string>                 $uses       Optional.
+     * @param ReflectionClass<object>|class-string|null $class Optional.
+     * @param list<string>                              $uses  Optional.
      */
     public function __construct(
-        ?ReflectionClass $reflection = null,
+        ReflectionClass|string|null $class = null,
         array $uses = [],
     ) {
-        $this->reflection = $reflection;
+        if (is_string($class)) {
+            $class = new ReflectionClass($class);
+        }
+        $this->reflection = $class;
         $this->uses       = $uses;
     }
 
@@ -140,6 +143,14 @@ class DiscoveryClass {
     }
 
     /**
+     * Returns the constructor of the class
+     * @return ReflectionMethod|null
+     */
+    public function getConstructor(): ReflectionMethod|null {
+        return $this->reflection?->getConstructor() ?? null;
+    }
+
+    /**
      * Returns the methods of the class
      * @return list<ReflectionMethod>
      */
@@ -179,6 +190,8 @@ class DiscoveryClass {
         return $result;
     }
 
+
+
     /**
      * Creates a new instance of the class
      * @param mixed ...$args
@@ -189,5 +202,29 @@ class DiscoveryClass {
             return null;
         }
         return $this->reflection->newInstance(...$args);
+    }
+
+    /**
+     * Creates a new instance of the class without calling the constructor
+     * @return object|null
+     */
+    public function newInstanceWithoutConstructor(): object|null {
+        if ($this->reflection === null) {
+            return null;
+        }
+        return $this->reflection->newInstanceWithoutConstructor();
+    }
+
+    /**
+     * Invokes the constructor of the class on an instance
+     * @param object $instance
+     * @param mixed  ...$args
+     * @return void
+     */
+    public function invokeConstructor(object $instance, mixed ...$args): void {
+        $constructor = $this->getConstructor();
+        if ($constructor !== null) {
+            $constructor->invoke($instance, ...$args);
+        }
     }
 }
