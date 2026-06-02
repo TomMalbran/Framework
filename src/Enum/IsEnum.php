@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Enum;
 
+use Framework\Enum\Enum;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -13,13 +14,17 @@ trait IsEnum {
 
     /**
      * Creates an Enum from a String
-     * @param self|string $value
-     * @param self        $default Optional.
+     * @param self|Enum|string $value
+     * @param self             $default Optional.
      * @return self
      */
-    public static function fromValue(self|string $value, self $default = self::None): self {
+    public static function fromValue(self|Enum|string $value, self $default = self::None): self {
         if ($value instanceof self) {
             return $value;
+        }
+
+        if ($value instanceof Enum) {
+            $value = $value->toString();
         }
         foreach (self::cases() as $case) {
             if (Strings::isEqual($case->toString(), $value)) {

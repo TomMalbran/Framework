@@ -14,6 +14,7 @@ enum TestPlainEnum implements Enum {
     case None;
     case Apple;
     case Banana;
+    case All;
 }
 
 enum TestBackedEnum: string implements Enum {
@@ -22,6 +23,7 @@ enum TestBackedEnum: string implements Enum {
     case None  = "";
     case Red   = "red";
     case Green = "green";
+    case All   = "all";
 }
 
 class EnumTest extends TestCase {
@@ -41,6 +43,7 @@ class EnumTest extends TestCase {
             "backed_value"         => [ TestBackedEnum::class, "red", TestBackedEnum::Red ],
             "backed_enum_instance" => [ TestBackedEnum::class, TestBackedEnum::Red, TestBackedEnum::Red ],
             "backed_invalid"       => [ TestBackedEnum::class, "x", TestBackedEnum::None ],
+            "mixed_enums"          => [ TestBackedEnum::class, TestPlainEnum::All, TestBackedEnum::All ],
         ];
     }
 
