@@ -4,6 +4,7 @@ namespace Tests\IO;
 use Framework\IO\Request;
 use Framework\Date\Type\DateType;
 use Framework\Date\Type\DateFormat;
+use Framework\File\File;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Tests\TestHelpers;
@@ -1643,21 +1644,18 @@ class RequestTest extends TestCase {
 
 
     #[DataProvider("providerGetFile")]
-    public function testGetFile(string $key, ?string $expectedKey): void {
+    public function testGetFile(string $key, bool $isValid): void {
         $request = new Request(withFiles: true);
-        $result = $request->getFile($key);
-        if ($expectedKey === null) {
-            $this->assertNull($result);
-            return;
-        }
-        $this->assertSame($_FILES[$expectedKey], $result);
+        $file    = $request->getFile($key);
+        $this->assertInstanceOf(File::class, $file);
+        $this->assertSame($isValid, $file->isValid());
     }
 
     public static function providerGetFile(): array {
         return [
-            "text"    => [ "f", "f" ],
-            "image"   => [ "g", "g" ],
-            "missing" => [ "missing", null ],
+            "text"    => [ "f", true ],
+            "image"   => [ "g", true ],
+            "missing" => [ "missing", false ],
         ];
     }
 

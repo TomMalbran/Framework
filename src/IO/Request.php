@@ -4,10 +4,11 @@ namespace Framework\IO;
 use Framework\File\Storage;
 use Framework\File\FileType;
 use Framework\File\Image;
-use Framework\Enum\Enum;
 use Framework\Date\Date;
 use Framework\Date\DateUtils;
 use Framework\Date\Type\DateType;
+use Framework\Enum\Enum;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
@@ -818,10 +819,16 @@ class Request implements IteratorAggregate, JsonSerializable {
     /**
      * Returns the request file at the given key
      * @param string $key
-     * @return mixed
+     * @return File
      */
-    public function getFile(string $key): mixed {
-        return isset($this->files[$key]) ? $this->files[$key] : null;
+    public function getFile(string $key): File {
+        if (isset($_FILES[$key])) {
+            return new File($key);
+        }
+        if ($this->has($key)) {
+            return new File($this->getString($key));
+        }
+        return new File();
     }
 
     /**
