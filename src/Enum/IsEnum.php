@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Enum;
 
-use Framework\IO\Request;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -28,18 +27,6 @@ trait IsEnum {
             }
         }
         return $default;
-    }
-
-    /**
-     * Creates an Enum from a Request
-     * @param Request $request
-     * @param string  $key
-     * @param self    $default Optional.
-     * @return self
-     */
-    public static function fromRequest(Request $request, string $key, self $default = self::None): self {
-        $value = $request->getString($key);
-        return self::fromValue($value, $default);
     }
 
     /**

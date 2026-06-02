@@ -132,6 +132,7 @@ class RequestedCode {
                 continue;
             }
 
+            $name    = $requested->name;
             $type    = $requested->type->getCodeType($requested->enumClass);
             $docType = $requested->subType !== "" ? $requested->subType : $type;
             $argType = $type;
@@ -141,7 +142,7 @@ class RequestedCode {
 
             switch ($requested->type) {
             case RequestedType::Enum:
-                $getter = "{$type}::fromRequest(\$instance->request, \"{$requested->name}\")";
+                $getter = "{$type}::fromValue(\$instance->request->getString(\"{$requested->name}\"))";
                 break;
 
             case RequestedType::Date:
@@ -156,10 +157,10 @@ class RequestedCode {
                     $dateType = "None";
                 }
 
-                $name   = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
+                $date   = $requested->dateInput !== "" ? $requested->dateInput : $name;
                 $hour   = $requested->hourInput;
-                $getter = "\$instance->request->getDate(\"{$name}\", \"{$hour}\", DateType::{$dateType})";
-                $setter = "\${$requested->name} === null ? Date::empty() : \${$requested->name}";
+                $getter = "\$instance->request->getDate(\"{$date}\", \"{$hour}\", DateType::{$dateType})";
+                $setter = "\${$requested->name} === null ? Date::empty() : \${$name}";
                 break;
 
             case RequestedType::Status:
@@ -167,33 +168,33 @@ class RequestedCode {
                 $docType = $schemaModel->statusClass;
                 $argType = $docType;
                 $default = "{$schemaModel->statusClass}::None";
-                $getter  = "{$schemaModel->statusClass}::fromRequest(\$instance->request, \"{$requested->name}\")";
+                $getter  = "{$schemaModel->statusClass}::fromValue(\$instance->request->getString(\"{$name}\"))";
                 break;
 
             case RequestedType::Array:
                 if ($requested->subClass !== "") {
                     $typeName = Strings::substringAfter($requested->subClass, "\\");
-                    $getter   = "{$typeName}::fromList(\$instance->request->getStrings(\"{$requested->name}\"))";
+                    $getter   = "{$typeName}::fromList(\$instance->request->getStrings(\"{$name}\"))";
                 } elseif (Strings::startsWith($requested->subType, "list<")) {
                     $typeName = Strings::substringBetween($requested->subType, "list<", ">");
                     $typeName = Strings::upperCaseFirst($typeName);
-                    $getter   = "\$instance->request->get{$typeName}s(\"{$requested->name}\")";
+                    $getter   = "\$instance->request->get{$typeName}s(\"{$name}\")";
                 } else {
                     $arrayFunc = self::getArrayFunction($requested->subType);
                     if ($arrayFunc === "") {
                         continue 2;
                     }
-                    $getter = "Arrays::{$arrayFunc}(\$instance->request->getJSONArray(\"{$requested->name}\"))";
+                    $getter = "Arrays::{$arrayFunc}(\$instance->request->getJSONArray(\"{$name}\"))";
                 }
                 break;
 
             default:
                 $typeName = Strings::upperCaseFirst($type);
-                $getter   = "\$instance->request->get{$typeName}(\"{$requested->name}\")";
+                $getter   = "\$instance->request->get{$typeName}(\"{$name}\")";
             }
 
             $result[] = [
-                "name"    => $requested->name,
+                "name"    => $name,
                 "type"    => $type,
                 "subType" => $requested->subType,
                 "docType" => $docType,

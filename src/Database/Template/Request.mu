@@ -136,7 +136,7 @@ class {{requestClass}} extends SchemaRequest {
         $instance->code = $instance->request->getString("{{idName}}");
         {{/hasStringID}}
         {{#hasEnumID}}
-        $instance->code = {{idEnumName}}::fromRequest($instance->request, "{{idName}}");
+        $instance->code = {{idEnumName}}::fromValue($instance->request->getString("{{idName}}"));
         {{/hasEnumID}}
     {{/hasID}}
     {{#hasMultiID}}

@@ -45,41 +45,6 @@ class EnumTest extends TestCase {
     }
 
 
-    #[DataProvider("providerFromRequest")]
-    public function testFromRequest(string $enumClass, Request $request, string $key, Enum $expected): void {
-        $this->assertSame($expected, $enumClass::fromRequest($request, $key));
-    }
-
-    public static function providerFromRequest(): array {
-        return [
-            "plain_key" => [
-                TestPlainEnum::class,
-                new Request([ "fruit" => "Banana" ]),
-                "fruit",
-                TestPlainEnum::Banana,
-            ],
-            "backed_key" => [
-                TestBackedEnum::class,
-                new Request([ "color" => "green" ]),
-                "color",
-                TestBackedEnum::Green,
-            ],
-            "plain_missing" => [
-                TestPlainEnum::class,
-                new Request([ "fruit" => "Banana" ]),
-                "missing",
-                TestPlainEnum::None,
-            ],
-            "backed_missing" => [
-                TestBackedEnum::class,
-                new Request([ "color" => "green" ]),
-                "missing",
-                TestBackedEnum::None,
-            ],
-        ];
-    }
-
-
     #[DataProvider("providerFromList")]
     public function testFromList(string $enumClass, mixed $input, array $expected): void {
         $this->assertSame($expected, $enumClass::fromList($input));
