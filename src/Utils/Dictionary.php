@@ -463,6 +463,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     public function getInts(Enum|int|string $key): array {
         $key = Strings::toString($key);
         if (isset($this->data[$key])) {
+            if ($this->data[$key] instanceof self) {
+                return $this->data[$key]->toInts();
+            }
             return Arrays::toInts($this->data[$key]);
         }
         return [];
@@ -477,6 +480,9 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     public function getStrings(Enum|int|string $key, bool $withoutEmpty = false): array {
         $key = Strings::toString($key);
         if (isset($this->data[$key])) {
+            if ($this->data[$key] instanceof self) {
+                return $this->data[$key]->toStrings(withoutEmpty: $withoutEmpty);
+            }
             return Arrays::toStrings($this->data[$key], withoutEmpty: $withoutEmpty);
         }
         return [];

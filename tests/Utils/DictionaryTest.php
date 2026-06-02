@@ -725,6 +725,7 @@ class DictionaryTest extends TestCase {
             "decimals_rounded" => [ [ "ints" => [ "2.5", "-1.2" ]], "ints", [ 3, -1 ] ],
             "enum_key"         => [ [ "Key" => [ "1", 2 ]], TestDictionaryEnum::Key, [ 1, 2 ] ],
             "integer_key"      => [ [[ "1", 2 ]], 0, [ 1, 2 ] ],
+            "dictionary_value" => [ [ "ints" => new Dictionary([ 1, 2 ]) ], "ints", [ 1, 2 ] ],
         ];
     }
 
@@ -744,6 +745,7 @@ class DictionaryTest extends TestCase {
             "numeric_to_strings" => [ [ "strings" => [ 1, 2 ]], "strings", false, [ "1", "2" ] ],
             "enum_key"           => [ [ "Key" => [ "1", 2 ]], TestDictionaryEnum::Key, false, [ "1", "2" ] ],
             "integer_key"        => [ [[ "a", "b" ]], 0, false, [ "a", "b" ] ],
+            "dictionary_value"   => [ [ "strings" => new Dictionary([ "k", "v" ]) ], "strings", false, [ "k", "v" ] ],
         ];
     }
 
