@@ -214,13 +214,13 @@ class MediaFileTest extends TestCase {
     ): void {
         $GLOBALS["test_move_uploaded_file"] = true;
 
-        $file = new File("file");
-        $this->setPrivateProperty($file, "file", [
+        $tmpName = $this->uploadSources[$uploadKey];
+        $file = new File("", [
             "name"     => $fileName,
             "type"     => "",
-            "tmp_name" => $this->uploadSources[$uploadKey],
+            "tmp_name" => $tmpName,
             "error"    => 0,
-            "size"     => filesize($this->uploadSources[$uploadKey]),
+            "size"     => is_file($tmpName) ? filesize($tmpName) : 0,
         ]);
 
         $result   = MediaFile::uploadFile($file, ...$pathParts);
