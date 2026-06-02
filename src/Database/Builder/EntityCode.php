@@ -6,6 +6,8 @@ use Framework\Builder\Builder;
 use Framework\Database\Model\FieldType;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
+use Framework\Date\Date;
+use Framework\File\File;
 
 /**
  * The Entity Code
@@ -14,8 +16,11 @@ use Framework\Utils\Strings;
  *   type: string,
  *   subType: string,
  *   docType: string,
+ *   paramType: string,
  *   hasDefault: bool,
  *   default: string,
+ *   paramDefault: string,
+ *   setter: string,
  * }
  * @phpstan-type Category array{
  *   name: string,
@@ -38,7 +43,6 @@ class EntityCode {
      */
     public static function getCode(SchemaModel $schemaModel): string {
         $dictionaries = self::getFieldsByType($schemaModel, FieldType::JSON);
-        $dates        = self::getFieldsByType($schemaModel, FieldType::Date);
         $imports      = self::getImports($schemaModel);
 
         $contents = Builder::render("Entity", [
@@ -60,8 +64,6 @@ class EntityCode {
             "mainFields"      => self::getMainFields($schemaModel),
             "hasDictionaries" => count($dictionaries) > 0,
             "dictionaries"    => $dictionaries,
-            "hasDates"        => count($dates) > 0,
-            "dates"           => $dates,
             "hasImports"      => count($imports) > 0,
             "imports"         => $imports,
         ]);
@@ -187,15 +189,15 @@ class EntityCode {
         string $subType = "",
         string $enumClass = "",
     ): void {
+        $type = $fieldType->getCodeType($enumClass, forEntity: true);
+
         if ($fieldType === FieldType::Enum) {
-            $type     = $fieldType->getCodeType($enumClass, forEntity: true);
             $result[] = self::getPropertyData($fieldKey, $type, default: "{$type}::None");
         } elseif ($fieldType === FieldType::File) {
-            $result[] = self::getPropertyData($fieldKey, "string");
+            $result[] = self::getPropertyData($fieldKey, $type);
             $result[] = self::getPropertyData("{$fieldKey}Url", "string");
             $result[] = self::getPropertyData("{$fieldKey}Thumb", "string");
         } else {
-            $type     = $fieldType->getCodeType($enumClass, forEntity: true);
             $result[] = self::getPropertyData($fieldKey, $type, $subType);
         }
     }
@@ -217,13 +219,31 @@ class EntityCode {
         if ($default === null) {
             $default = FieldType::getDefault($type);
         }
+
+        $docType   = $subType !== "" ? $subType : $type;
+        $paramType = $type;
+        if ($default === null) {
+            $docType   = "$docType|null";
+            $paramType = "?$paramType";
+        }
+
+        $setter = "\${$name}";
+        if ($type === "Date") {
+            $setter = "\${$name} ?? Date::empty()";
+        } elseif ($type === "File") {
+            $setter = "\${$name} ?? new File()";
+        }
+
         return [
-            "name"       => $name,
-            "type"       => $type,
-            "subType"    => $subType,
-            "docType"    => $subType !== "" ? $subType : $type,
-            "hasDefault" => $default !== null,
-            "default"    => $default !== null ? $default : "",
+            "name"         => $name,
+            "type"         => $type,
+            "subType"      => $subType,
+            "docType"      => $docType,
+            "paramType"    => $paramType,
+            "hasDefault"   => $default !== null,
+            "default"      => $default !== null ? $default : "",
+            "paramDefault" => $default !== null ? $default : "null",
+            "setter"       => $setter,
         ];
     }
 
@@ -236,11 +256,14 @@ class EntityCode {
      */
     private static function getMainFields(SchemaModel $schemaModel): array {
         $result = [];
-        foreach ($schemaModel->mainFields as $field) {
+        foreach ($schemaModel->fields as $field) {
+            if ($field->isStatus || $field->name === "isDeleted") {
+                continue;
+            }
             if ($field->type === FieldType::Enum) {
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
                 $result[] = self::getPropertyData($field->name, $type, default: "{$type}::None");
-            } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
+            } elseif ($field->type !== FieldType::JSON) {
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
                 $result[] = self::getPropertyData($field->name, $type);
             }
@@ -252,9 +275,17 @@ class EntityCode {
             } elseif ($field->type === FieldType::Enum) {
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
                 $result[] = self::getPropertyData($field->name, $type, default: "{$type}::None");
-            } elseif ($field->type !== FieldType::JSON && $field->type !== FieldType::Date) {
+            } elseif ($field->type !== FieldType::JSON) {
                 $type     = $field->type->getCodeType($field->enumClass, forEntity: true);
                 $result[] = self::getPropertyData($field->name, $type);
+            }
+        }
+
+        foreach ($schemaModel->relations as $relation) {
+            foreach ($relation->fields as $field) {
+                if ($field->type === FieldType::Date || $field->type === FieldType::File) {
+                    $result[] = self::getPropertyData($field->prefixName, $field->type->toString());
+                }
             }
         }
 
@@ -280,17 +311,17 @@ class EntityCode {
             }
         }
 
+        foreach ($schemaModel->virtualFields as $field) {
+            if ($field->type === $type) {
+                $result[] = $field->name;
+            }
+        }
+
         foreach ($schemaModel->relations as $relation) {
             foreach ($relation->fields as $field) {
                 if ($field->type === $type) {
                     $result[] = $field->prefixName;
                 }
-            }
-        }
-
-        foreach ($schemaModel->virtualFields as $field) {
-            if ($field->type === $type) {
-                $result[] = $field->name;
             }
         }
         return $result;
@@ -342,12 +373,18 @@ class EntityCode {
                 $result["{$schemaModel->namespace}\\{$schemaModel->statusClass}"] = 1;
             } elseif ($field->type === FieldType::Enum) {
                 $result[$field->enumClass] = 1;
+            } elseif ($field->type === FieldType::Date) {
+                $result[Date::class] = 1;
+            } elseif ($field->type === FieldType::File) {
+                $result[File::class] = 1;
             }
         }
 
         foreach ($schemaModel->virtualFields as $field) {
             if ($field->type === FieldType::Enum) {
                 $result[$field->enumClass] = 1;
+            } elseif ($field->type === FieldType::Date) {
+                $result[Date::class] = 1;
             } elseif ($field->subClass !== "") {
                 $result[$field->subClass] = 1;
             }
@@ -357,6 +394,10 @@ class EntityCode {
             foreach ($relation->fields as $field) {
                 if ($field->type === FieldType::Enum) {
                     $result[$field->enumClass] = 1;
+                } elseif ($field->type === FieldType::Date) {
+                    $result[Date::class] = 1;
+                } elseif ($field->type === FieldType::File) {
+                   $result[File::class] = 1;
                 } elseif ($field->isStatus && $relation->relationModel !== null) {
                     $result["{$relation->relationModel->namespace}\\{$relation->relationModelName}Status"] = 1;
                 }

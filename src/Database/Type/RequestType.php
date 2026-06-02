@@ -2,25 +2,26 @@
 namespace Framework\Database\Type;
 
 use Framework\Database\Model\FieldType;
+use Framework\Date\Date;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
-use Framework\Date\Date;
+use Framework\File\File;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
 use JsonSerializable;
 
 /**
- * The Value Type
+ * The Request Type
  */
-enum ValueType implements Enum, JsonSerializable {
+enum RequestType implements Enum, JsonSerializable {
     use IsEnum;
 
     case None;
 
-    case Enum;
     case Date;
-    case Hour;
+    case Enum;
+
     case String;
     case Encrypt;
     case Boolean;
@@ -34,11 +35,11 @@ enum ValueType implements Enum, JsonSerializable {
 
 
     /**
-     * Creates an ValueType from a FieldType
+     * Creates an RequestType from a FieldType
      * @param FieldType $fieldType
-     * @return ValueType
+     * @return RequestType
      */
-    public static function fromField(FieldType $fieldType): ValueType {
+    public static function fromField(FieldType $fieldType): RequestType {
         return match ($fieldType) {
             FieldType::Date    => self::Date,
             FieldType::Enum    => self::Enum,
@@ -54,16 +55,19 @@ enum ValueType implements Enum, JsonSerializable {
     }
 
     /**
-     * Creates an ValueType from a Type
+     * Creates an RequestType from a Type
      * @param string $typeName
-     * @return ValueType
+     * @return RequestType
      */
-    public static function fromType(string $typeName): ValueType {
+    public static function fromType(string $typeName): RequestType {
         if ($typeName === Date::class) {
             return self::Date;
         }
         if ($typeName === JSON::class) {
             return self::Dictionary;
+        }
+        if ($typeName === File::class) {
+            return self::File;
         }
 
         return match ($typeName) {
@@ -82,22 +86,47 @@ enum ValueType implements Enum, JsonSerializable {
      * @return string
      */
     public function getCodeType(string $enumClass = ""): string {
+        $enumType = Strings::substringAfter($enumClass, "\\");
         return match ($this) {
             self::None       => "",
 
-            self::Enum       => $enumClass !== "" ? Strings::substringAfter($enumClass, "\\") : "string",
+            self::Enum       => $enumType !== "" ? $enumType : "string",
             self::Date       => "Date",
-            self::Hour       => "string",
 
             self::String,
             self::Encrypt    => "string",
             self::Boolean    => "bool",
             self::Number     => "int",
             self::Float      => "float",
-            self::File       => "string",
 
+            self::File       => "File",
             self::Dictionary => "Dictionary",
             self::Array      => "array",
+        };
+    }
+
+    /**
+     * Returns the Default Value for the given Type
+     * @param string $enumClass Optional.
+     * @return string
+     */
+    public function getDefaultValue(string $enumClass = ""): string {
+        $enumType = Strings::substringAfter($enumClass, "\\");
+        return match ($this) {
+            self::None       => "null",
+
+            self::Enum       => $enumType !== "" ? "$enumType::None" : "\"\"",
+            self::Date       => "null",
+
+            self::String,
+            self::Encrypt    => "\"\"",
+            self::Boolean    => "false",
+            self::Number,
+            self::Float      => "0",
+
+            self::File       => "new File()",
+            self::Dictionary => "new Dictionary()",
+            self::Array      => "[]",
         };
     }
 }

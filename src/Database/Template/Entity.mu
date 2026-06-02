@@ -4,8 +4,7 @@ namespace {{namespace}};
 {{#imports}}use {{.}};
 {{/imports}}{{#hasImports}}
 {{/hasImports}}
-use Framework\Database\Type\Entity;{{#hasDates}}
-use Framework\Date\Date;{{/hasDates}}
+use Framework\Database\Type\Entity;
 use Framework\Utils\Dictionary;
 
 /**
@@ -40,20 +39,18 @@ class {{entityClass}} extends Entity {
      * Creates a new {{name}} Entity instance
      * @param Dictionary|null $data Optional.{{#mainFields}}
      * @param {{{docType}}} ${{name}} Optional.{{/mainFields}}{{#dictionaries}}
-     * @param Dictionary|null ${{.}} Optional.{{/dictionaries}}{{#dates}}
-     * @param Date|null ${{.}} Optional.{{/dates}}{{#hasStatus}}
+     * @param Dictionary|null ${{.}} Optional.{{/dictionaries}}{{#hasStatus}}
      * @param {{statusClass}} $status Optional.{{/hasStatus}}
      */
     public function __construct(
         ?Dictionary $data = null,{{#mainFields}}
-        {{type}} ${{name}}{{#hasDefault}} = {{{default}}}{{/hasDefault}},{{/mainFields}}{{#dictionaries}}
-        ?Dictionary ${{.}} = null,{{/dictionaries}}{{#dates}}
-        ?Date ${{.}} = null,{{/dates}}{{#hasStatus}}
+        {{paramType}} ${{name}} = {{{paramDefault}}},{{/mainFields}}{{#dictionaries}}
+        ?Dictionary ${{.}} = null,{{/dictionaries}}{{#hasStatus}}
         {{statusClass}} $status = {{statusClass}}::None,{{/hasStatus}}
     ) {
         // Set the Main Fields
         {{#mainFields}}
-        $this->{{name}} = ${{name}};
+        $this->{{name}} = {{{setter}}};
         {{/mainFields}}
     {{#hasDictionaries}}
 
@@ -62,13 +59,6 @@ class {{entityClass}} extends Entity {
         $this->{{.}} = new Dictionary(${{.}});
         {{/dictionaries}}
     {{/hasDictionaries}}
-    {{#hasDates}}
-
-        // Set the Dates
-        {{#dates}}
-        $this->{{.}} = ${{.}} ?? Date::empty();
-        {{/dates}}
-    {{/hasDates}}
 
         // Set all the Fields using the Dictionary
         if ($data !== null) {

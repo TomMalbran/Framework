@@ -18,9 +18,9 @@ class EmailWhiteListModel {
     #[Field(isID: true)]
     public int $emailID = 0;
 
-    #[Field(isUnique: true), Requested(forValidate: true)]
+    #[Field(isUnique: true), Requested]
     public string $email = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public string $description = "";
 }

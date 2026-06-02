@@ -8,6 +8,7 @@ use Framework\Database\Model\Requested;
 use Framework\Database\Status\Status;
 use Framework\System\Access;
 use Framework\Date\Date;
+use Framework\File\File;
 
 /**
  * The Credential Model
@@ -27,38 +28,38 @@ class CredentialModel {
     #[Field]
     public int $currentUser = 0;
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested(canEdit: false)]
     public string $name = "";
 
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public string $firstName = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public string $lastName = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public string $email = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public string $phone = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public string $language = "";
 
-    #[Field(isText: true), Requested(forValidate: true)]
+    #[Field(isText: true), Requested]
     public string $observations = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public bool $sendEmails = false;
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public bool $sendEmailNotis = false;
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public bool $sendTickets = false;
 
-    #[Field(isSigned: true), Requested(forValidate: true)]
+    #[Field(isSigned: true), Requested]
     public int $timezone = 0;
 
 
@@ -68,16 +69,16 @@ class CredentialModel {
     #[Field, Requested(canEdit: false)]
     public string $appearance = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public Access $access = Access::None;
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested(canEdit: false)]
     public string $password = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested(canEdit: false)]
     public string $salt = "";
 
-    #[Field, Requested(forValidate: true)]
+    #[Field, Requested]
     public bool $reqPassChange = false;
 
     #[Field]
@@ -129,15 +130,15 @@ class CredentialModel {
     #[Requested]
     public string $resetCode = "";
 
-    #[Requested(forValidate: true)]
+    #[Requested]
     public string $oldPassword = "";
 
-    #[Requested(forValidate: true)]
+    #[Requested]
     public string $newPassword = "";
 
-    #[Requested(forValidate: true)]
+    #[Requested]
     public string $confirmPassword = "";
 
-    #[Requested(isFile: true)]
-    public string $file = "";
+    #[Requested]
+    public ?File $file = null;
 }

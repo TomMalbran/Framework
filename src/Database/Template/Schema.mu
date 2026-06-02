@@ -15,30 +15,29 @@ use {{namespace}}\{{statusClass}};{{/hasStatus}}
 {{#hasValidation}}
 use Framework\IO\Errors;{{/hasValidation}}
 use Framework\IO\Search;
-use Framework\IO\Select;{{#valueImports}}
-use Framework\IO\Value\{{.}};{{/valueImports}}{{#hasUsers}}
+use Framework\IO\Select;{{#hasUsers}}
 use Framework\Auth\Auth;{{/hasUsers}}
 use Framework\Database\Schema;
 use Framework\Database\SchemaModel;{{#hasQuery}}
 use Framework\Database\Query\Query;{{/hasQuery}}{{#canEdit}}
 use Framework\Database\Query\Assign;{{/canEdit}}{{#hasOperator}}
 use Framework\Database\Query\Operator as QueryOperator;{{/hasOperator}}
+use Framework\Database\Query\QueryBuilder;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;{{#hasExpressions}}
 use Framework\Database\Model\Expression;{{/hasExpressions}}{{#hasCounts}}
 use Framework\Database\Model\Count;{{/hasCounts}}{{#hasRelations}}
 use Framework\Database\Model\Relation;{{/hasRelations}}{{#hasSubRequests}}
 use Framework\Database\Model\SubRequest;{{/hasSubRequests}}{{#hasValidation}}
-use Framework\Database\Type\Result;{{/hasValidation}}{{#hasDate}}
-use Framework\Date\Date;{{/hasDate}}{{#hasID}}
-use Framework\Utils\Arrays;{{/hasID}}
-use Framework\Utils\Dictionary;{{#usesNumbers}}
-use Framework\Utils\Numbers;{{/usesNumbers}}{{#hasJsonType}}
+use Framework\Database\Type\Result;{{/hasValidation}}
+use Framework\Utils\Dictionary;{{#frameworkImports}}
+use {{.}};{{/frameworkImports}}{{#hasJsonType}}
 
 use JsonSerializable;{{/hasJsonType}}
 
 /**
  * The {{name}} Schema
+ * @phpstan-import-type QueryValue from QueryBuilder
  */
 class {{name}}Schema extends Schema {
 
@@ -163,83 +162,83 @@ class {{name}}Schema extends Schema {
     {{/hasIf}}
     {{#isString}}
         {{#isRequired}}
-            {{pads}}if (!$request->{{fieldName}}->isValid()) {
+            {{pads}}if ($request->{{fieldName}} === "") {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
         {{/isRequired}}
         {{#typeOf}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!{{typeOf}}::{{method}}($request->{{fieldName}}->get())) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!{{typeOf}}::{{method}}($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "{{typeInvError}}";
         {{/typeOf}}
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}->get(){{parentsSecList}}, $id)) {
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#maxLength}}
-            {{pads}}} elseif (!$request->{{fieldName}}->isValidLength({{maxLength}})) {
+            {{pads}}} elseif (Strings::length($request->{{fieldName}}) > {{maxLength}}) {
             {{pads}}    $errors->add("{{fieldName}}", "{{fieldError}}_LENGTH", {{maxLength}});
         {{/maxLength}}
             {{pads}}}
     {{/isString}}
     {{#isEmail}}
         {{#isRequired}}
-            {{pads}}if (!$request->{{fieldName}}->isValid()) {
+            {{pads}}if ($request->{{fieldName}} === "") {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_EMPTY";
         {{/isRequired}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !$request->{{fieldName}}->isValidEmail()) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== "" && !Utils::isValidEmail($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_EMAIL_INVALID";
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}->get(){{parentsSecList}}, $id)) {
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
             {{pads}}}
     {{/isEmail}}
     {{#isUrl}}
         {{#isRequired}}
-            {{pads}}if (!$request->{{fieldName}}->isValid()) {
+            {{pads}}if ($request->{{fieldName}} === "") {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_EMPTY";
         {{/isRequired}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !$request->{{fieldName}}->isValidUrl()) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== "" && !URL::isValidUrl($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_INVALID";
             {{pads}}}
     {{/isUrl}}
     {{#isNumber}}
         {{#isRequired}}
-            {{pads}}if (!$request->{{fieldName}}->hasValue()) {
+            {{pads}}if ($request->{{fieldName}} === 0) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
         {{/isRequired}}
         {{#typeOf}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !{{typeOf}}::{{method}}($request->{{fieldName}}->get())) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== 0 && !{{typeOf}}::{{method}}($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "{{typeOfError}}";
         {{/typeOf}}
         {{#belongsTo}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !{{belongsTo}}::{{method}}($request->{{fieldName}}->get(){{#withParent}}{{parentsSecList}}{{/withParent}})) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== 0 && !{{belongsTo}}::{{method}}($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "{{belongsToError}}";
         {{/belongsTo}}
         {{#isNumeric}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!$request->{{fieldName}}->{{validFunc}}({{numericParams}})) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!Numbers::isValid($request->{{fieldName}}{{numericParams}})) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
         {{/isNumeric}}
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}->get(){{parentsSecList}}, $id)) {
+            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#greaterThan}}
-            {{pads}}} elseif (!$request->{{fieldName}}->isGreaterThan($request->{{greaterThan}})) {
+            {{pads}}} elseif ($request->{{fieldName}} < $request->{{greaterThan}}) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_GREATER";
         {{/greaterThan}}
             {{pads}}}
     {{/isNumber}}
     {{#isPrice}}
-            {{pads}}if (!$request->{{fieldName}}->isValidPrice(0)) {
+            {{pads}}if (!Numbers::isValidPrice($request->{{fieldName}}, 0)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}";
             {{pads}}}
     {{/isPrice}}
     {{#isDate}}
         {{#isRequired}}
-            {{pads}}if (!$request->{{fieldName}}->hasValue()) {
+            {{pads}}if ($request->{{fieldName}}->isEmpty()) {
             {{pads}}    $errors->{{dateName}} = "{{dateError}}_EMPTY";
         {{/isRequired}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->hasValue() && !$request->{{fieldName}}->isValid()) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}}->isNotEmpty() && !$request->{{fieldName}}->isValid()) {
             {{pads}}    $errors->{{dateName}} = "{{dateError}}_INVALID";
         {{#hasHour}}
         {{#isRequired}}
@@ -251,7 +250,7 @@ class {{name}}Schema extends Schema {
         {{/hasHour}}
             {{pads}}}
         {{#hasPeriod}}
-            {{pads}}if (!$request->{{fromDateName}}->isValidFullPeriod($request->{{toDateName}})) {
+            {{pads}}if (!$request->{{fromDateName}}->isValidPeriod($request->{{toDateName}})) {
             {{pads}}    $errors->toDate = "GENERAL_ERROR_DATE_PERIOD";
             {{pads}}}
         {{/hasPeriod}}
@@ -362,13 +361,13 @@ class {{name}}Schema extends Schema {
 {{#hasID}}
     /**
      * Returns true if there is a {{name}} Entity with the given {{idText}}
-     * @param {{idParamType}} ${{idName}}{{#parents}}
+     * @param {{idType}} ${{idName}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}{{#hasDeleted}}
      * @param bool $withDeleted Optional.{{/hasDeleted}}
      * @return bool
      */
     public static function exists(
-        {{idParamType}} ${{idName}},{{#parents}}
+        {{idType}} ${{idName}},{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}{{#hasDeleted}}
         bool $withDeleted = true,{{/hasDeleted}}
     ): bool {
@@ -419,14 +418,14 @@ class {{name}}Schema extends Schema {
 {{#hasID}}
     /**
      * Returns the {{name}} Entity with the given ID
-     * @param {{idParamType}} ${{idName}}{{#parents}}
+     * @param {{idType}} ${{idName}}{{#parents}}
      * @param {{fieldDocDefault}} Optional.{{/parents}}{{#canDelete}}
      * @param bool $withDeleted Optional.{{/canDelete}}{{#hasEncrypt}}
      * @param bool $decrypted Optional.{{/hasEncrypt}}
      * @return {{entityClass}}
      */
     public static function getByID(
-        {{idParamType}} ${{idName}},{{#parents}}
+        {{idType}} ${{idName}},{{#parents}}
         {{{fieldArgDefault}}},{{/parents}}{{#canDelete}}
         bool $withDeleted = true,{{/canDelete}}{{#hasEncrypt}}
         bool $decrypted = false,{{/hasEncrypt}}
@@ -514,9 +513,9 @@ class {{name}}Schema extends Schema {
     /**
      * Returns the {{idText}} for the given query
      * @param {{queryClass}} $query
-     * @return {{idReturnType}}
+     * @return {{idType}}
      */
-    public static function get{{idText}}({{queryClass}} $query): {{idReturnType}} {
+    public static function get{{idText}}({{queryClass}} $query): {{idType}} {
         $result = self::getSchemaValue($query, "{{idDbName}}");
         {{#hasStringID}}
         return $result;
@@ -532,7 +531,7 @@ class {{name}}Schema extends Schema {
     /**
      * Returns an array with all the {{idText}}s
      * @param {{queryClass}}|null $query Optional.
-     * @return list<{{idReturnType}}>
+     * @return list<{{idType}}>
      */
     public static function get{{idText}}s(?{{queryClass}} $query = null): array {
         $result = self::getSchemaColumn($query, "{{idDbName}}", "{{idName}}");
@@ -716,7 +715,7 @@ class {{name}}Schema extends Schema {
         if ({{fieldParam}} !== null) {
             $fields["{{fieldKey}}"] = {{{fieldAssign}}};
         }{{#fieldIsRequested}} elseif ($request !== null) {
-            $fields["{{fieldKey}}"] = $request->{{fieldName}};
+            $fields["{{fieldKey}}"] = {{{fieldAssignReq}}};
         }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
@@ -779,7 +778,7 @@ class {{name}}Schema extends Schema {
         if ({{fieldParam}} !== null) {
             $fields["{{fieldKey}}"] = {{{fieldAssign}}};
         }{{#fieldIsRequested}} elseif ($request !== null) {
-            $fields["{{fieldKey}}"] = $request->{{fieldName}};
+            $fields["{{fieldKey}}"] = {{{fieldAssignReq}}};
         }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
@@ -831,7 +830,7 @@ class {{name}}Schema extends Schema {
         if ({{fieldParam}} !== null) {
             $fields["{{fieldKey}}"] = {{{fieldAssignEdit}}};
         }{{#fieldIsRequested}} elseif ($request !== null) {
-            $fields["{{fieldKey}}"] = $request->{{fieldName}};
+            $fields["{{fieldKey}}"] = {{{fieldAssignReq}}};
         }{{/fieldIsRequested}}
         {{/fields}}
         {{#hasStatus}}
@@ -883,14 +882,14 @@ class {{name}}Schema extends Schema {
      * Edits a value in a {{name}} Entity
      * @param {{editType}} $query
      * @param {{columnClass}} $column
-     * @param int|string $value{{#hasUsers}}
+     * @param QueryValue $value{{#hasUsers}}
      * @param int $modifiedUser Optional.{{/hasUsers}}
      * @return bool
      */
     protected static function editEntityValue(
         {{editType}} $query,
         {{columnClass}} $column,
-        int|string $value,{{#hasUsers}}
+        mixed $value,{{#hasUsers}}
         int $modifiedUser = 0,{{/hasUsers}}
     ): bool {
         {{#hasUsers}}

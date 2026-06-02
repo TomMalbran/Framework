@@ -1,13 +1,13 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\IO\Value\Value;
 use Framework\Database\Query\QueryMode;
 use Framework\Database\Query\TableDefinition;
 use Framework\Database\Query\Assign;
 use Framework\Database\Type\Column;
 use Framework\Date\Date;
 use Framework\Enum\Enum;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
@@ -18,7 +18,7 @@ use JsonSerializable;
 /**
  * The Query Builder
  * phpcs:ignore Generic.Files.LineLength.TooLong
- * @phpstan-type QueryValue Query|Value|Enum|Dictionary|Date|JsonSerializable|array<int|string,mixed>|bool|Assign|float|int|string
+ * @phpstan-type QueryValue Query|Dictionary|Date|Enum|File|JsonSerializable|array<int|string,mixed>|bool|Assign|float|int|string
  * @phpstan-type SelectValue Query|Column|string
  */
 class QueryBuilder {
@@ -117,16 +117,6 @@ class QueryBuilder {
         if ($value instanceof Query) {
             $this->fields[$field] = $value->toAssign();
 
-        // Convert a Value to an integer or string
-        } elseif ($value instanceof Value) {
-            if ($value->exists()) {
-                $this->fields[$field] = $value->toDatabase();
-            }
-
-        // Convert any Enum to a string
-        } elseif ($value instanceof Enum) {
-            $this->fields[$field] = $value->toString();
-
         // Encode any Dictionary to JSON
         } elseif ($value instanceof Dictionary) {
             $this->fields[$field] = $value->toJSON();
@@ -134,6 +124,14 @@ class QueryBuilder {
         // Convert any Date to a timestamp
         } elseif ($value instanceof Date) {
             $this->fields[$field] = $value->toTime();
+
+        // Convert any Enum to a string
+        } elseif ($value instanceof Enum) {
+            $this->fields[$field] = $value->toString();
+
+        // Convert a File to an string
+        } elseif ($value instanceof File) {
+            $this->fields[$field] = $value->toString();
 
         // Encode any array to JSON
         } elseif (is_array($value) || $value instanceof JsonSerializable) {

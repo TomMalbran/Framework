@@ -66,7 +66,7 @@ class RouterCode implements DiscoveryBuilder {
                     if (Strings::endsWith($typeName, "\\Request")) {
                         $requestParam = "\$request";
                     } elseif (Strings::endsWith($typeName, "Request")) {
-                        $requestParam = "new \\$typeName(\$request)";
+                        $requestParam = "\\$typeName::fromRequest(\$request)";
                     }
                 }
 

@@ -1,9 +1,10 @@
 <?php
 namespace Framework\Database\Model;
 
+use Framework\Date\Date;
 use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
-use Framework\Date\Date;
+use Framework\File\File;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -20,6 +21,7 @@ enum FieldType implements Enum, JsonSerializable {
 
     case Date;
     case Enum;
+    case File;
     case JSON;
     case Array;
 
@@ -31,7 +33,6 @@ enum FieldType implements Enum, JsonSerializable {
     case Text;
     case LongText;
     case Encrypt;
-    case File;
 
 
 
@@ -43,6 +44,9 @@ enum FieldType implements Enum, JsonSerializable {
     public static function fromType(string $typeName): FieldType {
         if ($typeName === Date::class) {
             return self::Date;
+        }
+        if ($typeName === File::class) {
+            return self::File;
         }
         if ($typeName === JSON::class) {
             return self::JSON;
@@ -64,7 +68,9 @@ enum FieldType implements Enum, JsonSerializable {
      * @return bool
      */
     public static function isValidClass(string $typeName): bool {
-        return $typeName === Date::class || $typeName === JSON::class;
+        return $typeName === Date::class ||
+            $typeName === File::class ||
+            $typeName === JSON::class;
     }
 
 
@@ -95,6 +101,7 @@ enum FieldType implements Enum, JsonSerializable {
 
             self::Date    => "Date",
             self::Enum    => $enumType,
+            self::File    => "File",
             self::JSON    => $forEntity ? "Dictionary" : "JsonSerializable|array",
             self::Array   => "array",
 
@@ -105,34 +112,7 @@ enum FieldType implements Enum, JsonSerializable {
             self::String,
             self::Text,
             self::LongText,
-            self::Encrypt,
-            self::File    => "string",
-        };
-    }
-
-    /**
-     * Returns the Native or Value Type from the given Field Type
-     * @param string $enumClass Optional.
-     * @return string
-     */
-    public function getValueType(string $enumClass = ""): string {
-        return match ($this) {
-            self::None    => "",
-
-            self::Date    => "DateValue",
-            self::Enum    => "EnumValue",
-            self::JSON    => "",
-            self::Array   => "",
-
-            self::Boolean => "BoolValue",
-            self::Number  => "NumberValue",
-            self::Float   => "FloatValue",
-
-            self::String,
-            self::Text,
-            self::LongText,
-            self::Encrypt,
-            self::File    => "StringValue",
+            self::Encrypt => "string",
         };
     }
 
@@ -150,6 +130,7 @@ enum FieldType implements Enum, JsonSerializable {
             "array"           => '[]',
             "Date"            => null,
             "Dictionary"      => null,
+            "File"            => null,
             default           => "null",
         };
     }

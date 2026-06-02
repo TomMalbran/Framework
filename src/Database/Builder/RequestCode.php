@@ -3,10 +3,11 @@ namespace Framework\Database\Builder;
 
 use Framework\Database\SchemaModel;
 use Framework\Database\Model\FieldType;
-use Framework\Database\Type\ValueType;
+use Framework\Database\Type\RequestType;
 use Framework\Builder\Builder;
 use Framework\Date\Date;
 use Framework\Date\Type\DateType;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -20,11 +21,15 @@ use Framework\Utils\Strings;
  *   idName: string,
  *   idEnumName: string,
  * }
- * @phpstan-type Property array{
- *   type: string,
+ * @phpstan-type Field array{
  *   name: string,
- *   value: string,
- *   extras: string,
+ *   type: string,
+ *   subType: string,
+ *   docType: string,
+ *   argType: string,
+ *   getter: string,
+ *   setter: string,
+ *   default: string,
  * }
  */
 class RequestCode {
@@ -37,7 +42,6 @@ class RequestCode {
     public static function getCode(SchemaModel $schemaModel): string {
         $idField      = self::getIDField($schemaModel);
         $fields       = self::getFields($schemaModel);
-        $values       = self::getValues($schemaModel);
         $dictionaries = self::getDictionaries($schemaModel);
         $imports      = self::getImports($schemaModel);
 
@@ -47,14 +51,10 @@ class RequestCode {
             "tableName"       => $schemaModel->tableName,
 
             "requestClass"    => $schemaModel->requestClass,
-            "statusClass"     => $schemaModel->statusClass,
-            "hasStatus"       => $schemaModel->hasStatus,
 
             "hasMultiID"      => self::hasMultiID($schemaModel),
             "hasFields"       => count($fields) > 0,
             "fields"          => $fields,
-            "hasValues"       => count($values) > 0,
-            "values"          => $values,
             "hasDictionaries" => count($dictionaries) > 0,
             "dictionaries"    => $dictionaries,
 
@@ -88,9 +88,9 @@ class RequestCode {
             foreach ($schemaModel->requestedFields as $field) {
                 if ($field->isID) {
                     $hasID       = true;
-                    $hasIntID    = $field->type === ValueType::Number;
-                    $hasStringID = $field->type === ValueType::String;
-                    $hasEnumID   = $field->type === ValueType::Enum;
+                    $hasIntID    = $field->type === RequestType::Number;
+                    $hasStringID = $field->type === RequestType::String;
+                    $hasEnumID   = $field->type === RequestType::Enum;
                     $name        = $field->name;
                     break;
                 }
@@ -124,60 +124,84 @@ class RequestCode {
     /**
      * Returns the Fields
      * @param SchemaModel $schemaModel
-     * @return list<array{type:string,getter:string,name:string}>
+     * @return list<Field>
      */
     private static function getFields(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if (!$requested->isField()) {
+            if ($requested->type === RequestType::Dictionary) {
                 continue;
             }
 
-            $type = $requested->type->getCodeType($requested->enumClass);
+            $type    = $requested->type->getCodeType($requested->enumClass);
+            $docType = $requested->subType !== "" ? $requested->subType : $type;
+            $argType = $type;
+            $getter  = "";
+            $setter  = "\${$requested->name}";
+            $default = $requested->type->getDefaultValue($requested->enumClass);
 
             switch ($requested->type) {
-            case ValueType::Enum:
-                $getter   = "{$type}::fromRequest(\$this->request, \"{$requested->name}\")";
+            case RequestType::Enum:
+                if ($requested->isStatus) {
+                    $type    = $schemaModel->statusClass;
+                    $docType = $schemaModel->statusClass;
+                    $argType = $docType;
+                    $default = "{$schemaModel->statusClass}::None";
+                    $getter  = "{$schemaModel->statusClass}::fromRequest(\$instance->request, \"{$requested->name}\")";
+                } else {
+                    $getter = "{$type}::fromRequest(\$instance->request, \"{$requested->name}\")";
+                }
                 break;
 
-            case ValueType::Date:
-                $name = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
-                if ($requested->dateType === DateType::None) {
-                    $getter = "\$this->request->toDate(\"{$name}\")";
-                    break;
+            case RequestType::Date:
+                $docType = "Date|null";
+                $argType = "?Date";
+
+                if ($requested->hourInput !== "") {
+                    $default = "null";
                 }
                 $dateType = $requested->dateType->toString();
-                $hour     = $requested->hourInput !== "" ? ", \"{$requested->hourInput}\"" : "";
-                $getter   = "\$this->request->toDayMoment(\"{$name}\", DateType::{$dateType}{$hour})";
+                if ($requested->dateType === DateType::None) {
+                    $dateType = "None";
+                }
+
+                $name   = $requested->dateInput !== "" ? $requested->dateInput : $requested->name;
+                $hour   = $requested->hourInput !== "" ? ", \"{$requested->hourInput}\"" : "";
+                $getter = "\$instance->request->toDayMoment(\"{$name}\", DateType::{$dateType}{$hour})";
+                $setter = "\${$requested->name} === null ? Date::empty() : \${$requested->name}";
                 break;
 
-            case ValueType::Array:
+            case RequestType::Array:
                 if ($requested->subClass !== "") {
                     $typeName = Strings::substringAfter($requested->subClass, "\\");
-                    $getter   = "{$typeName}::fromList(\$this->request->getStrings(\"{$requested->name}\"))";
+                    $getter   = "{$typeName}::fromList(\$instance->request->getStrings(\"{$requested->name}\"))";
                 } elseif (Strings::startsWith($requested->subType, "list<")) {
                     $typeName = Strings::substringBetween($requested->subType, "list<", ">");
                     $typeName = Strings::upperCaseFirst($typeName);
-                    $getter   = "\$this->request->get{$typeName}s(\"{$requested->name}\")";
+                    $getter   = "\$instance->request->get{$typeName}s(\"{$requested->name}\")";
                 } else {
                     $arrayFunc = self::getArrayFunction($requested->subType);
                     if ($arrayFunc === "") {
                         continue 2;
                     }
-                    $getter = "Arrays::{$arrayFunc}(\$this->request->getJSONArray(\"{$requested->name}\"))";
+                    $getter = "Arrays::{$arrayFunc}(\$instance->request->getJSONArray(\"{$requested->name}\"))";
                 }
                 break;
 
             default:
                 $typeName = Strings::upperCaseFirst($type);
-                $getter   = "\$this->request->get{$typeName}(\"{$requested->name}\")";
+                $getter   = "\$instance->request->get{$typeName}(\"{$requested->name}\")";
             }
 
             $result[] = [
+                "name"    => $requested->name,
                 "type"    => $type,
                 "subType" => $requested->subType,
+                "docType" => $docType,
+                "argType" => $argType,
                 "getter"  => $getter,
-                "name"    => $requested->name,
+                "setter"  => $setter,
+                "default" => $default,
             ];
         }
         return $result;
@@ -201,50 +225,6 @@ class RequestCode {
     }
 
     /**
-     * Returns the Values
-     * @param SchemaModel $schemaModel
-     * @return list<Property>
-     */
-    private static function getValues(SchemaModel $schemaModel): array {
-        $result = [];
-        foreach ($schemaModel->requestedFields as $requested) {
-            if (!$requested->isValue()) {
-                continue;
-            }
-
-            $type = $requested->getValueClass();
-            if ($type === "") {
-                continue;
-            }
-
-            $value = $requested->name;
-            if ($requested->dateInput !== "") {
-                $value = $requested->dateInput;
-            }
-
-            $extras = "";
-            if ($requested->type === ValueType::Float) {
-                $extras = ", {$requested->decimals}";
-            } elseif ($requested->type === ValueType::Date) {
-                $extras = ", \"{$requested->hourInput}\"";
-                if ($requested->dateType !== DateType::None) {
-                    $extras .= ", DateType::{$requested->dateType->toString()}";
-                }
-            } elseif ($requested->type === ValueType::Encrypt) {
-                $extras = ", true";
-            }
-
-            $result[] = [
-                "type"   => $type,
-                "name"   => $requested->name,
-                "value"  => $value,
-                "extras" => $extras,
-            ];
-        }
-        return $result;
-    }
-
-    /**
      * Returns the Dictionaries
      * @param SchemaModel $schemaModel
      * @return list<string>
@@ -252,7 +232,7 @@ class RequestCode {
     private static function getDictionaries(SchemaModel $schemaModel): array {
         $result = [];
         foreach ($schemaModel->requestedFields as $requested) {
-            if ($requested->isDictionary()) {
+            if ($requested->type === RequestType::Dictionary) {
                 $result[] = $requested->name;
             }
         }
@@ -273,27 +253,25 @@ class RequestCode {
         }
 
         foreach ($schemaModel->requestedFields as $requested) {
-            if ($requested->isField()) {
-                if ($requested->type === ValueType::Enum) {
-                    $result[$requested->enumClass] = 1;
-                } elseif ($requested->type === ValueType::Date) {
-                    $result[Date::class] = 1;
-                }
-                if ($requested->subClass !== "") {
-                    $result[$requested->subClass] = 1;
-                }
-                if (Strings::startsWith($requested->subType, "array<")) {
-                    $result[Arrays::class] = 1;
-                }
-            } elseif ($requested->isValue()) {
-                $type = $requested->getValueClass();
-                if ($type !== "") {
-                    $result["Framework\IO\Value\\$type"] = 1;
-                }
+            if ($requested->type === RequestType::Enum && $requested->enumClass !== "") {
+                $result[$requested->enumClass] = 1;
+            }
+            if ($requested->type === RequestType::Date) {
+                $result[Date::class] = 1;
+                $result[DateType::class] = 1;
+            }
+            if ($requested->type === RequestType::File) {
+                $result[File::class] = 1;
             }
 
-            if ($requested->dateType !== DateType::None) {
-                $result[DateType::class] = 1;
+            if ($requested->isStatus) {
+                $result["{$schemaModel->namespace}\\{$schemaModel->statusClass}"] = 1;
+            }
+            if ($requested->subClass !== "") {
+                $result[$requested->subClass] = 1;
+            }
+            if (Strings::startsWith($requested->subType, "array<")) {
+                $result[Arrays::class] = 1;
             }
         }
         return array_keys($result);

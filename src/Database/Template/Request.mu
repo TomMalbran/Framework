@@ -1,10 +1,6 @@
 <?php
 namespace {{namespace}};
 
-{{#hasStatus}}
-use {{namespace}}\{{statusClass}};
-
-{{/hasStatus}}
 {{#hasImports}}
 {{#imports}}use {{.}};
 {{/imports}}
@@ -14,14 +10,16 @@ use Framework\IO\Request;
 use Framework\Database\Type\SchemaRequest;{{#hasDictionaries}}
 use Framework\Utils\Dictionary;{{/hasDictionaries}}
 
+use ReflectionClass;
+
 /**
  * The {{name}} Request
  */
 class {{requestClass}} extends SchemaRequest {
 {{#hasID}}
 
-    public bool $isCreate;
-    public bool $isEdit;
+    public bool $isCreate = false;
+    public bool $isEdit = false;
 
     {{#hasIntID}}
     public int $id;
@@ -37,11 +35,11 @@ class {{requestClass}} extends SchemaRequest {
 
     {{#hasIntID}}
     /** @var list<int> */
-    public array $ids;
+    public array $ids = [];
     {{/hasIntID}}
     {{#hasStringID}}
     /** @var list<string> */
-    public array $codes;
+    public array $codes = [];
     {{/hasStringID}}
 {{/hasMultiID}}
 {{#hasFields}}
@@ -54,13 +52,6 @@ class {{requestClass}} extends SchemaRequest {
 {{/subType}}    public {{type}} ${{name}};
     {{/fields}}
 {{/hasFields}}
-{{#hasValues}}
-
-    // Values
-    {{#values}}
-    public {{type}} ${{name}};
-    {{/values}}
-{{/hasValues}}
 {{#hasDictionaries}}
 
     // Dictionaries
@@ -70,65 +61,107 @@ class {{requestClass}} extends SchemaRequest {
 {{/hasDictionaries}}
 
 
+
     /**
-     * Creates a new {{requestClass}} instance
-     * @param SchemaRequest|Request|null $request Optional.
+     * Creates a new {{requestClass}} instance{{#hasIntID}}
+     * @param int $id Optional.{{/hasIntID}}{{#hasStringID}}
+     * @param string $code Optional.{{/hasStringID}}{{#hasEnumID}}
+     * @param {{idEnumName}} $code Optional.{{/hasEnumID}}{{#fields}}
+     * @param {{{docType}}} ${{name}} Optional.{{/fields}}{{#values}}
+     * @param {{{docType}}} ${{name}} Optional.{{/values}}{{#dictionaries}}
+     * @param Dictionary ${{.}} Optional.{{/dictionaries}}
      */
-    public function __construct(SchemaRequest|Request|null $request = null) {
-        parent::__construct($request);
+    public function __construct({{#hasIntID}}
+        int $id = 0,{{/hasIntID}}{{#hasStringID}}
+        string $code = "",{{/hasStringID}}{{#hasEnumID}}
+        {{idEnumName}} $code = {{idEnumName}}::None,{{/hasEnumID}}{{#fields}}
+        {{argType}} ${{name}} = {{{default}}},{{/fields}}{{#values}}
+        {{argType}} ${{name}} = {{{default}}},{{/values}}{{#dictionaries}}
+        Dictionary ${{.}} = new Dictionary(),{{/dictionaries}}
+    ) {
+        parent::__construct();
     {{#hasID}}
 
-        $this->isCreate = !$this->request->has("{{idName}}");
-        $this->isEdit = $this->request->has("{{idName}}");
-
+        // Set the ID
         {{#hasIntID}}
-        $this->id = $this->request->getInt("{{idName}}");
+        $this->id = $id;
         {{/hasIntID}}
         {{#hasStringID}}
-        $this->code = $this->request->getString("{{idName}}");
+        $this->code = $code;
         {{/hasStringID}}
         {{#hasEnumID}}
-        $this->code = {{idEnumName}}::fromRequest($this->request, "{{idName}}");
+        $this->code = $code;
+        {{/hasEnumID}}
+    {{/hasID}}
+    {{#hasFields}}
+
+        // Set the Fields
+        {{#fields}}
+        $this->{{name}} = {{{setter}}};
+        {{/fields}}
+    {{/hasFields}}
+    {{#hasDictionaries}}
+
+        // Set the Dictionaries
+        {{#dictionaries}}
+        $this->{{.}} = ${{.}};
+        {{/dictionaries}}
+    {{/hasDictionaries}}
+    }
+
+    /**
+     * Creates a new {{requestClass}} instance from a Request
+     * @param SchemaRequest|Request $request
+     * @return self
+     */
+    public static function fromRequest(SchemaRequest|Request $request): self {
+        $reflection  = new ReflectionClass(self::class);
+        $parentClass = $reflection->getParentClass();
+
+        /** @var self */
+        $instance = $reflection->newInstanceWithoutConstructor();
+        if ($parentClass !== false) {
+            $parentClass->getConstructor()?->invoke($instance, $request);
+        }
+    {{#hasID}}
+
+        $instance->isCreate = !$instance->request->has("{{idName}}");
+        $instance->isEdit = $instance->request->has("{{idName}}");
+
+        // Set the ID
+        {{#hasIntID}}
+        $instance->id = $instance->request->getInt("{{idName}}");
+        {{/hasIntID}}
+        {{#hasStringID}}
+        $instance->code = $instance->request->getString("{{idName}}");
+        {{/hasStringID}}
+        {{#hasEnumID}}
+        $instance->code = {{idEnumName}}::fromRequest($instance->request, "{{idName}}");
         {{/hasEnumID}}
     {{/hasID}}
     {{#hasMultiID}}
         {{#hasIntID}}
-        $this->ids = $this->request->getInts("{{idName}}s");
+        $instance->ids = $instance->request->getInts("{{idName}}s");
         {{/hasIntID}}
         {{#hasStringID}}
-        $this->codes = $this->request->getStrings("{{idName}}s");
+        $instance->codes = $instance->request->getStrings("{{idName}}s");
         {{/hasStringID}}
     {{/hasMultiID}}
     {{#hasFields}}
 
         // Set the Fields
         {{#fields}}
-        $this->{{name}} = {{{getter}}};
+        $instance->{{name}} = {{{getter}}};
         {{/fields}}
     {{/hasFields}}
-    {{#hasValues}}
-
-        // Set the Values
-        {{#values}}
-        $this->{{name}} = new {{type}}($this->request, "{{value}}"{{{extras}}});
-        {{/values}}
-    {{/hasValues}}
     {{#hasDictionaries}}
 
         // Set the Dictionaries
         {{#dictionaries}}
-        $this->{{.}} = $this->request->getDict("{{.}}");
+        $instance->{{.}} = $instance->request->getDict("{{.}}");
         {{/dictionaries}}
     {{/hasDictionaries}}
-    }
-{{#hasStatus}}
 
-    /**
-     * Returns the Status from the Request
-     * @return {{statusClass}}
-     */
-    public function getStatus(): {{statusClass}} {
-        return {{statusClass}}::fromRequest($this->request, "status");
+        return $instance;
     }
-{{/hasStatus}}
 }

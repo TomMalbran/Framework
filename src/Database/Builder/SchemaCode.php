@@ -6,8 +6,13 @@ use Framework\Database\Model\Field;
 use Framework\Database\Model\FieldType;
 use Framework\Database\Type\ValidateType;
 use Framework\Builder\Builder;
+use Framework\Date\Date;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
+use Framework\Utils\Numbers;
+use Framework\Utils\URL;
+use Framework\Utils\Utils;
 
 /**
  * The Schema Code
@@ -19,8 +24,7 @@ use Framework\Utils\Strings;
  *   idName: string,
  *   idDbName: string,
  *   idValue: string,
- *   idParamType: string,
- *   idReturnType: string,
+ *   idType: string,
  *   idText: string,
  *   idEnumClass: string,
  * }
@@ -28,7 +32,6 @@ use Framework\Utils\Strings;
  *   fieldKey: string,
  *   fieldName: string,
  *   fieldText: string,
- *   fieldValueType: string,
  *   fieldArg: string,
  *   fieldArgValue: string,
  *   fieldDocDefault: string,
@@ -43,6 +46,7 @@ use Framework\Utils\Strings;
  *   fieldValueNull: string,
  *   fieldAssign: string,
  *   fieldAssignEdit: string,
+ *   fieldAssignReq: string,
  *   fieldIsRequested: bool,
  * }
  */
@@ -72,9 +76,7 @@ class SchemaCode {
         $hasVirtual   = count($schemaModel->virtualFields) > 0;
         $hasUniques   = count($uniques) > 0;
         $hasParents   = count($parents) > 0;
-        $hasDate      = count(self::getSomeFields($schemaModel, isDate: true)) > 0;
         $hasJsonType  = count(self::getSomeFields($schemaModel, isJsonType: true)) > 0;
-        $hasFloatType = count(self::getSomeFields($schemaModel, isFloatType: true)) > 0;
         $queryName    = $schemaModel->queryClass;
 
         $contents     = Builder::render("Schema", [
@@ -90,13 +92,13 @@ class SchemaCode {
 
             "hasImports"         => count($imports) > 0,
             "imports"            => $imports,
-            "valueImports"       => self::getValueImport($schemaModel, $uniques, $fields),
+            "frameworkImports"   => self::getFrameworkImports($schemaModel, $idField),
 
             "hasValidation"      => count($validations) > 0,
             "validations"        => $validations,
             "errorPrefix"        => Strings::toConstantCase($schemaModel->fantasyName) . "_ERROR_",
 
-            "editType"           => $schemaModel->hasID ? "$queryName|{$idField["idReturnType"]}" : $queryName,
+            "editType"           => $schemaModel->hasID ? "$queryName|{$idField["idType"]}" : $queryName,
             "hasQuery"           => $schemaModel->hasID || count($uniques) > 0 || !$hasRequest,
             "hasList"            => !$schemaModel->skipList,
 
@@ -141,9 +143,7 @@ class SchemaCode {
             "hasEditParents"     => $schemaModel->hasPositions && $hasParents,
             "editParents"        => $editParents,
 
-            "hasDate"            => $hasDate,
             "hasJsonType"        => $hasJsonType,
-            "usesNumbers"        => $hasFloatType || $idField["hasIntID"],
             "hasOperator"        => $schemaModel->hasID || $hasUniques || $hasParents,
         ] + $idField);
         return Strings::replace($contents, "(, ", "(");
@@ -181,56 +181,22 @@ class SchemaCode {
     }
 
     /**
-     * Returns the Value Imports
-     * @param SchemaModel    $schemaModel
-     * @param list<Property> $uniques
-     * @param list<Property> $fields
-     * @return list<string>
-     */
-    private static function getValueImport(SchemaModel $schemaModel, array $uniques, array $fields): array {
-        $result = [];
-
-        if ($schemaModel->hasID) {
-            $idValueType = $schemaModel->idType->getValueType();
-            if ($idValueType !== "") {
-                $result[$idValueType] = 1;
-            }
-        }
-
-        foreach ($uniques as $unique) {
-            if ($unique["fieldValueType"] !== "") {
-                $result[$unique["fieldValueType"]] = 1;
-            }
-        }
-        foreach ($fields as $field) {
-            if ($field["fieldValueType"] !== "") {
-                $result[$field["fieldValueType"]] = 1;
-            }
-        }
-        return array_keys($result);
-    }
-
-    /**
      * Returns the ID Field data
      * @param SchemaModel $schemaModel
      * @return IDProperty
      */
     private static function getIDField(SchemaModel $schemaModel): array {
-        $type      = $schemaModel->idType->getCodeType($schemaModel->idEnumClass, forEntity: false);
-        $valueType = $schemaModel->idType->getValueType();
-
         return [
-            "hasID"        => $schemaModel->hasID,
-            "hasIntID"     => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
-            "hasStringID"  => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
-            "hasEnumID"    => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
-            "idName"       => $schemaModel->idName,
-            "idDbName"     => $schemaModel->idDbName,
-            "idValue"      => "\${$schemaModel->idName}",
-            "idParamType"  => Strings::merge($valueType, $type, "|"),
-            "idReturnType" => $type,
-            "idText"       => Strings::upperCaseFirst($schemaModel->idName),
-            "idEnumClass"  => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
+            "hasID"       => $schemaModel->hasID,
+            "hasIntID"    => $schemaModel->hasID && $schemaModel->idType === FieldType::Number,
+            "hasStringID" => $schemaModel->hasID && $schemaModel->idType === FieldType::String,
+            "hasEnumID"   => $schemaModel->hasID && $schemaModel->idType === FieldType::Enum,
+            "idName"      => $schemaModel->idName,
+            "idDbName"    => $schemaModel->idDbName,
+            "idValue"     => "\${$schemaModel->idName}",
+            "idType"      => $schemaModel->idType->getCodeType($schemaModel->idEnumClass, forEntity: false),
+            "idText"      => Strings::upperCaseFirst($schemaModel->idName),
+            "idEnumClass" => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
         ];
     }
 
@@ -273,7 +239,6 @@ class SchemaCode {
      * @param SchemaModel $schemaModel
      * @param bool        $isUnique    Optional.
      * @param bool        $isParent    Optional.
-     * @param bool        $isDate      Optional.
      * @param bool        $isJsonType  Optional.
      * @param bool        $isFloatType Optional.
      * @return list<Property>
@@ -282,7 +247,6 @@ class SchemaCode {
         SchemaModel $schemaModel,
         bool $isUnique = false,
         bool $isParent = false,
-        bool $isDate = false,
         bool $isJsonType = false,
         bool $isFloatType = false,
     ): array {
@@ -291,11 +255,6 @@ class SchemaCode {
             if ($isUnique && $field->isUnique) {
                 $result[] = self::getField($schemaModel, $field);
             } elseif ($isParent && $field->isParent) {
-                $result[] = self::getField($schemaModel, $field);
-            } elseif ($isDate && $field->type === FieldType::Date) {
-                if ((!$schemaModel->canCreate && $field->name === "createdTime") || $field->name === "modifiedTime") {
-                    continue;
-                }
                 $result[] = self::getField($schemaModel, $field);
             } elseif ($isJsonType && $field->type === FieldType::JSON) {
                 $result[] = self::getField($schemaModel, $field);
@@ -313,60 +272,59 @@ class SchemaCode {
      * @return Property
      */
     private static function getField(SchemaModel $schemaModel, Field $field): array {
-        $type          = $field->type->getCodeType($field->enumClass, forEntity: false);
-        $typeValue     = $field->type->getValueType();
-        $isDate        = $field->type === FieldType::Date;
-        $isEnum        = $field->type === FieldType::Enum;
-        $isJSON        = $field->type === FieldType::JSON;
+        $type        = $field->type->getCodeType($field->enumClass, forEntity: false);
+        $isDate      = $field->type === FieldType::Date;
+        $isEnum      = $field->type === FieldType::Enum;
+        $isJSON      = $field->type === FieldType::JSON;
 
-        $typeDoc       = $type;
-        $typeValueDoc  = "$typeValue|$type";
-        $typeValueNull = "$typeValue|$type|null";
-        $canAssign     = !$field->isID && !$field->isParent && !$isDate && !$isEnum;
-        $assignDoc     = $canAssign ? "Assign|" : "";
+        $typeDoc     = $type;
+        $typeNull    = "$type|null";
+        $canAssign   = !$field->isID && !$field->isParent && !$isDate && !$isEnum;
+        $assignDoc   = $canAssign ? "Assign|" : "";
 
-        $default       = FieldType::getDefault($type);
-        $defaultNull   = $default === "null";
-        $docNull       = $defaultNull ? "|null" : "";
+        $default     = FieldType::getDefault($type);
+        $defaultNull = $default === "null";
+        $docNull     = $defaultNull ? "|null" : "";
 
-        $param         = "\${$field->name}";
-        $value         = $param;
-        $valueNull     = $param;
-        $assign        = $param;
-        $assignEdit    = $param;
+        $param       = "\${$field->name}";
+        $value       = $param;
+        $valueNull   = $param;
+        $assign      = $param;
+        $assignEdit  = $param;
+        $assignReq   = "\$request->{$field->name}";
 
         if ($isJSON) {
-            $typeValueNull = "$type|null";
-            $typeDoc       = Strings::replace($type, "array", "array<int|string,mixed>");
-            $typeValueDoc  = $typeDoc;
+            $typeNull   = "$type|null";
+            $typeDoc    = Strings::replace($type, "array", "array<int|string,mixed>");
         } elseif ($type === "float") {
-            $assign        = "Numbers::toInt($param, {$field->decimals})";
-            $assignEdit    = "$param instanceof Assign ? $param : $assign";
+            $assign     = "Numbers::toInt($param, {$field->decimals})";
+            $assignEdit = "$param instanceof Assign ? $param : $assign";
+            $assignReq  = "Numbers::toInt($assignReq, {$field->decimals})";
         } elseif ($type === "bool") {
-            $value         = "$param === true ? 1 : 0";
-            $valueNull     = $value;
+            $value      = "$param === true ? 1 : 0";
+            $valueNull  = $value;
         }
 
         return [
             "fieldKey"         => $field->dbName,
             "fieldName"        => $field->name,
             "fieldText"        => Strings::upperCaseFirst($field->name),
-            "fieldValueType"   => $typeValue,
             "fieldArg"         => "$type $param",
-            "fieldArgValue"    => "$typeValueDoc $param",
+            "fieldArgValue"    => "$typeDoc $param",
             "fieldDocDefault"  => "$typeDoc$docNull $param",
             "fieldArgDefault"  => "$typeDoc$docNull $param = $default",
-            "fieldDocParent"   => "$typeValueDoc|null $param",
-            "fieldArgParent"   => "$typeValueNull $param",
-            "fieldDocCreate"   => "$typeValueDoc|null $param",
-            "fieldArgCreate"   => "$typeValueNull $param = null",
-            "fieldDocEdit"     => "$assignDoc$typeValueDoc|null $param",
-            "fieldArgEdit"     => ($canAssign ? "Assign|$typeValueNull" : $typeValueNull) . " $param = null",
+            "fieldDocParent"   => "$typeDoc|null $param",
+            "fieldArgParent"   => "$typeNull $param",
+            "fieldDocCreate"   => "$typeDoc|null $param",
+            "fieldArgCreate"   => "$typeNull $param = null",
+            "fieldDocEdit"     => "$assignDoc$typeDoc|null $param",
+            "fieldArgEdit"     => ($canAssign ? "Assign|$typeNull" : $typeNull) . " $param = null",
             "fieldParam"       => $param,
             "fieldValue"       => $value,
             "fieldValueNull"   => $valueNull,
             "fieldAssign"      => $assign,
             "fieldAssignEdit"  => $assignEdit,
+            "fieldAssignReq"   => $assignReq,
             "fieldIsRequested" => $schemaModel->isRequested($field->name),
         ];
     }
@@ -529,5 +487,54 @@ class SchemaCode {
             ];
         }
         return $result;
+    }
+
+    /**
+     * Returns the Framework Imports
+     * @param SchemaModel $schemaModel
+     * @param IDProperty  $idField
+     * @return list<string>
+     */
+    private static function getFrameworkImports(
+        SchemaModel $schemaModel,
+        array $idField,
+    ): array {
+        $result = [];
+
+        $hasFloatType = count(self::getSomeFields($schemaModel, isFloatType: true)) > 0;
+        if ($hasFloatType || $idField["hasIntID"]) {
+            $result[Numbers::class] = 1;
+        }
+        if ($idField["hasID"]) {
+            $result[Arrays::class] = 1;
+        }
+
+        foreach ($schemaModel->fields as $field) {
+            if ($field->type === FieldType::Date) {
+                if ((!$schemaModel->canCreate && $field->name === "createdTime") || $field->name === "modifiedTime") {
+                    continue;
+                }
+                $result[Date::class] = 1;
+            } elseif ($field->type === FieldType::File) {
+                $result[File::class] = 1;
+            }
+        }
+
+        foreach ($schemaModel->validates as $validate) {
+            if (!$validate->shouldValidate()) {
+                continue;
+            }
+
+            if ($validate->type === ValidateType::Number && $validate->isNumeric) {
+                $result[Numbers::class] = 1;
+            } elseif ($validate->type === ValidateType::String && $validate->maxLength > 0) {
+                $result[Strings::class] = 1;
+            } elseif ($validate->type === ValidateType::Email) {
+                $result[Utils::class] = 1;
+            } elseif ($validate->type === ValidateType::Url) {
+                $result[URL::class] = 1;
+            }
+        }
+        return array_keys($result);
     }
 }

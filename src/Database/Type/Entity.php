@@ -2,8 +2,9 @@
 namespace Framework\Database\Type;
 
 use Framework\Discovery\Discovery;
-use Framework\Enum\Enum;
 use Framework\Date\Date;
+use Framework\Enum\Enum;
+use Framework\File\File;
 use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Numbers;
@@ -52,6 +53,9 @@ class Entity implements JsonSerializable {
             break;
         case Dictionary::class:
             $this->$property = $data->getDict($property);
+            break;
+        case File::class:
+            $this->$property = new File($data->getString($property));
             break;
         case "bool":
             $this->$property = $data->getBool($property);
@@ -134,6 +138,9 @@ class Entity implements JsonSerializable {
             }
             if ($this->$key instanceof Date) {
                 return Date::class;
+            }
+            if ($this->$key instanceof File) {
+                return File::class;
             }
             return gettype($this->$key);
         }
