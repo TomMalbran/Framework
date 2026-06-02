@@ -56,14 +56,6 @@ class RequestTest extends TestCase {
         $_FILES = [];
     }
 
-    private function assertDateResult(mixed $result, DateFormat $format, ?string $expected, bool $shouldBeEmpty): void {
-        if ($shouldBeEmpty) {
-            $this->assertTrue($result->isEmpty());
-        } else {
-            $this->assertSame($expected, $result->toString($format));
-        }
-    }
-
 
     #[DataProvider("providerConstruct")]
     public function testConstruct(array $requestData, array $cases): void {
@@ -84,7 +76,7 @@ class RequestTest extends TestCase {
 
     #[DataProvider("providerIsEmpty")]
     public function testIsEmpty(mixed $input, bool $expected): void {
-        $d = new Dictionary($input);
+        $d = new Request($input);
         $this->assertEquals($expected, $d->isEmpty());
     }
 
@@ -98,7 +90,7 @@ class RequestTest extends TestCase {
 
     #[DataProvider("providerIsNotEmpty")]
     public function testIsNotEmpty(mixed $input, bool $expected): void {
-        $d = new Dictionary($input);
+        $d = new Request($input);
         $this->assertEquals($expected, $d->isNotEmpty());
     }
 
@@ -321,7 +313,11 @@ class RequestTest extends TestCase {
         bool $shouldBeEmpty,
     ): void {
         $result = (new Request($input))->getDate($dateKey, $hourKey, $type);
-        $this->assertDateResult($result, $format, $expected, $shouldBeEmpty);
+        if ($shouldBeEmpty) {
+            $this->assertTrue($result->isEmpty());
+        } else {
+            $this->assertSame($expected, $result->toString($format));
+        }
     }
 
     public static function providerGetDate(): array {
@@ -362,6 +358,27 @@ class RequestTest extends TestCase {
             "text"    => [ "f", true ],
             "image"   => [ "g", true ],
             "missing" => [ "missing", false ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetDict")]
+    public function testGetDict(array $input, string $key, array $expected): void {
+        $result = (new Request($input))->getDict($key);
+        $this->assertInstanceOf(Dictionary::class, $result);
+        $this->assertSame($expected, $result->toArray());
+    }
+
+    public static function providerGetDict(): array {
+        $input = [
+            "a" => JSON::encode([ "x" => 1 ]),
+            "b" => 123,
+        ];
+        return [
+            "json"        => [ $input, "a", [ "x" => 1 ] ],
+            "invalid"     => [ $input, "b", [] ],
+            "missing"     => [ $input, "missing", [] ],
+            "empty_input" => [ [], "missing", [] ],
         ];
     }
 

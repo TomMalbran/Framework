@@ -172,8 +172,14 @@ class ErrorsTest extends TestCase {
 
 
     #[DataProvider("providerAddFor")]
-    public function testAddFor(Enum|string $section, Enum|string $error, mixed $message, array $values, bool $expectedHasError, mixed $expectedErrorValue, bool $expectedHasSection, mixed $expectedSectionValue): void {
+    public function testAddFor(Enum|string $section, Enum|string $error, mixed $message, array $values, bool $expectedHasError, mixed $expectedErrorValue, bool $expectedHasSection, mixed $expectedSectionValue, array $initial = []): void {
         $e = new Errors();
+        foreach ($initial as $initialSection => $initialErrors) {
+            foreach ($initialErrors as $initialError => $initialMessage) {
+                $e->addFor($initialSection, $initialError, $initialMessage);
+            }
+        }
+
         $e->addFor($section, $error, $message, ...$values);
 
         $this->assertEquals($expectedHasError, $e->has($error));
@@ -190,7 +196,7 @@ class ErrorsTest extends TestCase {
     public static function providerAddFor(): array {
         return [
             "basic"                  => [ "section", "err", "message", [], true, "message", true, 1 ],
-            "multiple_errors_same"   => [ "section", "err2", "m2", [], true, "m2", true, 1 ],
+            "multiple_errors_same"   => [ "section", "err2", "m2", [], true, "m2", true, 2, [ "section" => [ "err1" => "m1" ]]],
             "with_values"            => [ "section4", "err4", "m4", [ 7, "more" ], true, [ "m4", 7, "more" ], true, 1 ],
             "overwrite_with_values"  => [ "section4", "err4", "newMsg", [ 2 ], true, [ "newMsg", 2 ], true, 1 ],
             "empty_message"          => [ "section4", "empty", "", [ 1 ], false, null, false, null ],

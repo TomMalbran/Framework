@@ -191,6 +191,28 @@ class DateTest extends TestCase {
     }
 
 
+    #[DataProvider("providerIsValid")]
+    public function testIsValid(mixed $input, string $hour, bool $expected): void {
+        $d = Date::create($input, $hour);
+        $this->assertSame($expected, $d->isValid());
+    }
+
+    public static function providerIsValid(): array {
+        return [
+            "null"                => [ null, "", true ],
+            "empty_string"        => [ "", "", true ],
+            "valid_timestamp"     => [ 1609459200, "", true ],
+            "negative_timestamp"  => [ -100000, "", true ],
+            "zero_timestamp"      => [ 0, "", false ],
+            "valid_date"          => [ "2021-01-01", "", true ],
+            "valid_date_hour"     => [ "2021-01-01", "15:30", true ],
+            "invalid_date"        => [ "not-a-date", "", false ],
+            "invalid_hour"        => [ "2021-01-01", "15", false ],
+            "invalid_date_object" => [ Date::create("not-a-date"), "", false ],
+        ];
+    }
+
+
     #[DataProvider("providerSet")]
     public function testSet(array $setArgs, Date $date): void {
         $d = $date->set(...$setArgs);
@@ -409,6 +431,60 @@ class DateTest extends TestCase {
             "date_start"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::Start, 1580684400 ],
             "date_middle" => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::Middle, 1580727600 ],
             "date_end"    => [ Date::createTime(3, 2, 2020, 12, 34, 56), DateType::End, 1580770799 ],
+        ];
+    }
+
+
+    #[DataProvider("providerToDayStart")]
+    public function testToDayStart(mixed $input, int $expected): void {
+        $d = Date::create($input);
+        $this->assertSame($expected, $d->toDayStart()->toTime());
+    }
+
+    public static function providerToDayStart(): array {
+        return [
+            "null"     => [ null, 0 ],
+            "empty"    => [ "", 0 ],
+            "invalid"  => [ "not-a-date", 0 ],
+            "day"      => [ "2020-02-03", 1580684400 ],
+            "day_time" => [ "2020-02-03 12:34:56", 1580684400 ],
+            "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1580684400 ],
+        ];
+    }
+
+
+    #[DataProvider("providerToDayMiddle")]
+    public function testToDayMiddle(mixed $input, int $expected): void {
+        $d = Date::create($input);
+        $this->assertSame($expected, $d->toDayMiddle()->toTime());
+    }
+
+    public static function providerToDayMiddle(): array {
+        return [
+            "null"     => [ null, 0 ],
+            "empty"    => [ "", 0 ],
+            "invalid"  => [ "not-a-date", 0 ],
+            "day"      => [ "2020-02-03", 1580727600 ],
+            "day_time" => [ "2020-02-03 12:34:56", 1580727600 ],
+            "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1580727600 ],
+        ];
+    }
+
+
+    #[DataProvider("providerToDayEnd")]
+    public function testToDayEnd(mixed $input, int $expected): void {
+        $d = Date::create($input);
+        $this->assertSame($expected, $d->toDayEnd()->toTime());
+    }
+
+    public static function providerToDayEnd(): array {
+        return [
+            "null"     => [ null, 0 ],
+            "empty"    => [ "", 0 ],
+            "invalid"  => [ "not-a-date", 0 ],
+            "day"      => [ "2020-02-03", 1580770799 ],
+            "day_time" => [ "2020-02-03 12:34:56", 1580770799 ],
+            "date"     => [ Date::createTime(3, 2, 2020, 12, 34, 56), 1580770799 ],
         ];
     }
 
@@ -834,12 +910,12 @@ class DateTest extends TestCase {
 
     public static function providerIsCurrentMonth(): array {
         return [
-            "null"      => [ null, false ],
-            "empty"     => [ "", false ],
-            "invalid"   => [ "not-a-date", false ],
-            "current"   => [ date("Y-m-d"), true ],
-            "past"      => [ date("Y-m-d", time() - 86400 * 30), false ],
-            "future"    => [ date("Y-m-d", time() + 86400 * 30), false ],
+            "null"    => [ null, false ],
+            "empty"   => [ "", false ],
+            "invalid" => [ "not-a-date", false ],
+            "current" => [ date("Y-m-d"), true ],
+            "past"    => [ date("Y-m-d", time() - 86400 * 30), false ],
+            "future"  => [ date("Y-m-d", time() + 86400 * 30), false ],
         ];
     }
 
@@ -1010,6 +1086,102 @@ class DateTest extends TestCase {
             "day"      => [ "2020-02-03", true ],
             "day_time" => [ "2020-02-03 12:34:56", false ],
             "date"     => [ Date::createTime(3, 2, 2020, 0, 0, 0), true ],
+        ];
+    }
+
+
+    #[DataProvider("providerIsValidPeriod")]
+    public function testIsValidPeriod(mixed $start, mixed $end, bool $expected): void {
+        $d1 = Date::create($start);
+        $d2 = Date::create($end);
+        $this->assertSame($expected, $d1->isValidPeriod($d2));
+    }
+
+    public static function providerIsValidPeriod(): array {
+        return [
+            "both_empty"     => [ null, null, true ],
+            "start_empty"    => [ null, "2020-02-03", true ],
+            "end_empty"      => [ "2020-02-03", null, true ],
+            "same_day"       => [ "2020-02-03", "2020-02-03", true ],
+            "start_before"   => [ "2020-02-03", "2020-02-04", true ],
+            "start_after"    => [ "2020-02-04", "2020-02-03", false ],
+            "same_timestamp" => [ "2020-02-03 12:00:00", "2020-02-03 12:00:00", true ],
+            "invalid_start"  => [ "not-a-date", "2020-02-03", true ],
+            "invalid_end"    => [ "2020-02-03", "not-a-date", true ],
+        ];
+    }
+
+
+    #[DataProvider("providerHasHour")]
+    public function testHasHour(mixed $input, string $hour, bool $expected): void {
+        $d = Date::create($input, $hour);
+        $this->assertSame($expected, $d->hasHour());
+    }
+
+    public static function providerHasHour(): array {
+        return [
+            "no_input"         => [ null, "", false ],
+            "date_without"     => [ "2020-02-03", "", false ],
+            "date_with_hour"   => [ "2020-02-03", "10:30", true ],
+            "date_time_string" => [ "2020-02-03 10:30:00", "", false ],
+            "invalid_hour"     => [ "2020-02-03", "25:00", true ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetHourText")]
+    public function testGetHourText(mixed $input, string $hour, string $expected): void {
+        $d = Date::create($input, $hour);
+        $this->assertSame($expected, $d->getHourText());
+    }
+
+    public static function providerGetHourText(): array {
+        return [
+            "empty"          => [ null, "", "" ],
+            "valid_hour"     => [ "2020-02-03", "10:30", "10:30" ],
+            "invalid_hour"   => [ "2020-02-03", "25:00", "25:00" ],
+            "malformed_hour" => [ "2020-02-03", "abc", "abc" ],
+        ];
+    }
+
+
+    #[DataProvider("providerIsValidHour")]
+    public function testIsValidHour(mixed $input, string $hour, ?array $minutes, bool $expected): void {
+        $d = Date::create($input, $hour);
+        $this->assertSame($expected, $d->isValidHour($minutes));
+    }
+
+    public static function providerIsValidHour(): array {
+        return [
+            "empty"              => [ null, "", null, false ],
+            "valid"              => [ "2020-02-03", "10:30", null, true ],
+            "valid_minute_allow" => [ "2020-02-03", "10:30", [ 0, 30 ], true ],
+            "minute_not_allowed" => [ "2020-02-03", "10:45", [ 0, 30 ], false ],
+            "invalid_hour"       => [ "2020-02-03", "24:00", null, false ],
+            "invalid_minute"     => [ "2020-02-03", "10:60", null, false ],
+            "malformed"          => [ "2020-02-03", "10", null, false ],
+        ];
+    }
+
+
+    #[DataProvider("providerIsValidHourPeriod")]
+    public function testIsValidHourPeriod(string $startHour, string $endHour, bool $expected): void {
+        $d1 = Date::create("2020-02-03", $startHour);
+        $d2 = Date::create("2020-02-03", $endHour);
+        $this->assertSame($expected, $d1->isValidHourPeriod($d2));
+    }
+
+    public static function providerIsValidHourPeriod(): array {
+        return [
+            "both_empty"    => [ "", "", true ],
+            "start_empty"   => [ "", "10:00", true ],
+            "end_empty"     => [ "10:00", "", true ],
+            "valid_period"  => [ "10:00", "11:00", true ],
+            "same_hour"     => [ "10:00", "10:00", false ],
+            "reverse"       => [ "11:00", "10:00", false ],
+            "midnight"      => [ "00:00", "10:00", false ],
+            "invalid_start" => [ "25:00", "10:00", false ],
+            "invalid_end"   => [ "10:00", "25:00", false ],
         ];
     }
 

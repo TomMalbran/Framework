@@ -215,6 +215,27 @@ class PeriodTest extends TestCase {
     }
 
 
+    #[DataProvider("providerPeriodTypeGetName")]
+    public function testPeriodTypeGetName(PeriodType $period, string $expected): void {
+        $this->assertSame($expected, $period->getName());
+    }
+
+    public static function providerPeriodTypeGetName(): array {
+        return [
+            "none"          => [ PeriodType::None, "none" ],
+            "today"         => [ PeriodType::Today, "today" ],
+            "prevYesterday" => [ PeriodType::PrevYesterday, "prevYesterday" ],
+            "last7Days"     => [ PeriodType::Last7Days, "last7Days" ],
+            "lastYear"      => [ PeriodType::LastYear, "lastYear" ],
+            "thisMonth"     => [ PeriodType::ThisMonth, "thisMonth" ],
+            "pastYear"      => [ PeriodType::PastYear, "pastYear" ],
+            "nextWeek"      => [ PeriodType::NextWeek, "nextWeek" ],
+            "allPeriod"     => [ PeriodType::AllPeriod, "allPeriod" ],
+            "custom"        => [ PeriodType::Custom, "custom" ],
+        ];
+    }
+
+
     #[DataProvider("providerIterator")]
     public function testIterator(array $requestData, array $expectedNumbers): void {
         $p = new Period(new Request($requestData));
