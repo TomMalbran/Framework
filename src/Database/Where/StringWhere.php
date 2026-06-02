@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database\Where;
 
-use Framework\IO\Value\StringValue;
 use Framework\Database\Query\Operator;
 use Framework\Database\Where\BaseWhere;
 
@@ -41,15 +40,15 @@ class StringWhere extends BaseWhere {
 
     /**
      * Adds a Compare condition
-     * @param Operator                        $operator
-     * @param StringValue|list<string>|string $value
-     * @param bool                            $caseSensitive Optional.
-     * @param bool|null                       $condition     Optional.
+     * @param Operator            $operator
+     * @param list<string>|string $value
+     * @param bool                $caseSensitive Optional.
+     * @param bool|null           $condition     Optional.
      * @return void
      */
     public function compare(
         Operator $operator,
-        StringValue|array|string $value,
+        array|string $value,
         bool $caseSensitive = false,
         ?bool $condition = null,
     ): void {
@@ -64,15 +63,15 @@ class StringWhere extends BaseWhere {
 
     /**
      * Adds a Compare If condition
-     * @param Operator                        $operator
-     * @param StringValue|list<string>|string $value
-     * @param bool|null                       $condition     Optional.
-     * @param bool                            $caseSensitive Optional.
+     * @param Operator            $operator
+     * @param list<string>|string $value
+     * @param bool|null           $condition     Optional.
+     * @param bool                $caseSensitive Optional.
      * @return void
      */
     public function compareIf(
         Operator $operator,
-        StringValue|array|string $value,
+        array|string $value,
         ?bool $condition = null,
         bool $caseSensitive = false,
     ): void {
@@ -89,40 +88,40 @@ class StringWhere extends BaseWhere {
 
     /**
      * Adds an Equal condition
-     * @param StringValue|string $value
-     * @param bool               $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return void
      */
-    public function equal(StringValue|string $value, bool $caseSensitive = false): void {
+    public function equal(string $value, bool $caseSensitive = false): void {
         $this->compare(Operator::Equal, $value, $caseSensitive);
     }
 
     /**
      * Adds an Equal If condition
-     * @param StringValue|string $value
-     * @param bool|null          $condition Optional.
+     * @param string    $value
+     * @param bool|null $condition Optional.
      * @return void
      */
-    public function equalIf(StringValue|string $value, ?bool $condition = null): void {
+    public function equalIf(string $value, ?bool $condition = null): void {
         $this->compareIf(Operator::Equal, $value, $condition);
     }
 
     /**
      * Adds a Not Equal condition
-     * @param StringValue|string $value
+     * @param string $value
      * @return void
      */
-    public function notEqual(StringValue|string $value): void {
+    public function notEqual(string $value): void {
         $this->compare(Operator::NotEqual, $value);
     }
 
     /**
      * Adds a Not Equal If condition
-     * @param StringValue|string $value
-     * @param bool|null          $condition Optional.
+     * @param string    $value
+     * @param bool|null $condition Optional.
      * @return void
      */
-    public function notEqualIf(StringValue|string $value, ?bool $condition = null): void {
+    public function notEqualIf(string $value, ?bool $condition = null): void {
         $this->compareIf(Operator::NotEqual, $value, $condition);
     }
 
@@ -130,63 +129,63 @@ class StringWhere extends BaseWhere {
 
     /**
      * Adds a Like condition
-     * @param StringValue|string $value
-     * @param bool               $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return void
      */
-    public function like(StringValue|string $value, bool $caseSensitive = false): void {
+    public function like(string $value, bool $caseSensitive = false): void {
         $this->compare(Operator::Like, $value, $caseSensitive);
     }
 
     /**
      * Adds a Like If condition
-     * @param StringValue|string $value
-     * @param bool|null          $condition     Optional.
-     * @param bool               $caseSensitive Optional.
+     * @param string    $value
+     * @param bool|null $condition     Optional.
+     * @param bool      $caseSensitive Optional.
      * @return void
      */
-    public function likeIf(StringValue|string $value, ?bool $condition = null, bool $caseSensitive = false): void {
+    public function likeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): void {
         $this->compareIf(Operator::Like, $value, $condition, $caseSensitive);
     }
 
     /**
      * Adds a Not Like condition
-     * @param StringValue|string $value
-     * @param bool               $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return void
      */
-    public function notLike(StringValue|string $value, bool $caseSensitive = false): void {
+    public function notLike(string $value, bool $caseSensitive = false): void {
         $this->compare(Operator::NotLike, $value, $caseSensitive);
     }
 
     /**
      * Adds a Not Like If condition
-     * @param StringValue|string $value
-     * @param bool|null          $condition     Optional.
-     * @param bool               $caseSensitive Optional.
+     * @param string    $value
+     * @param bool|null $condition     Optional.
+     * @param bool      $caseSensitive Optional.
      * @return void
      */
-    public function notLikeIf(StringValue|string $value, ?bool $condition = null, bool $caseSensitive = false): void {
+    public function notLikeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): void {
         $this->compareIf(Operator::NotLike, $value, $condition, $caseSensitive);
     }
 
     /**
      * Adds a Starts With condition
-     * @param StringValue|string $value
-     * @param bool               $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return void
      */
-    public function startsWith(StringValue|string $value, bool $caseSensitive = false): void {
+    public function startsWith(string $value, bool $caseSensitive = false): void {
         $this->compare(Operator::StartsWith, $value, $caseSensitive);
     }
 
     /**
      * Adds an Ends With condition
-     * @param StringValue|string $value
-     * @param bool               $caseSensitive Optional.
+     * @param string $value
+     * @param bool   $caseSensitive Optional.
      * @return void
      */
-    public function endsWith(StringValue|string $value, bool $caseSensitive = false): void {
+    public function endsWith(string $value, bool $caseSensitive = false): void {
         $this->compare(Operator::EndsWith, $value, $caseSensitive);
     }
 

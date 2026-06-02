@@ -3,8 +3,6 @@ namespace Framework\Auth;
 
 use Framework\IO\Search;
 use Framework\IO\Select;
-use Framework\IO\Value\NumberValue;
-use Framework\IO\Value\StringValue;
 use Framework\Database\Query\QueryBuilder;
 use Framework\Auth\Schema\CredentialSchema;
 use Framework\Auth\Schema\CredentialRequest;
@@ -28,13 +26,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credential with the given ID
-     * @param NumberValue|int $credentialID
-     * @param bool            $complete     Optional.
+     * @param int  $credentialID
+     * @param bool $complete     Optional.
      * @return CredentialEntity
      */
     #[\Override]
     public static function getByID(
-        NumberValue|int $credentialID,
+        int $credentialID,
         bool $complete = false,
     ): CredentialEntity {
         $query = new CredentialQuery();
@@ -44,12 +42,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns the Credential with the given Email
-     * @param StringValue|string $email
-     * @param bool               $complete Optional.
+     * @param string $email
+     * @param bool   $complete Optional.
      * @return CredentialEntity
      */
     public static function getByEmail(
-        StringValue|string $email,
+        string $email,
         bool $complete = true,
     ): CredentialEntity {
         $query = new CredentialQuery();
@@ -94,13 +92,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is a Credential with the given ID and Access(s)
-     * @param NumberValue|int      $credentialID
+     * @param int                  $credentialID
      * @param CredentialQuery|null $query        Optional.
      * @return bool
      */
     #[\Override]
     public static function exists(
-        NumberValue|int $credentialID,
+        int $credentialID,
         ?CredentialQuery $query = null,
     ): bool {
         if ($query === null) {
@@ -112,13 +110,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if there is a Credential with the given Email
-     * @param StringValue|string   $email
+     * @param string               $email
      * @param int                  $skipID Optional.
      * @param CredentialQuery|null $query  Optional.
      * @return bool
      */
     public static function emailExists(
-        StringValue|string $email,
+        string $email,
         int $skipID = 0,
         ?CredentialQuery $query = null,
     ): bool {
@@ -248,12 +246,12 @@ class Credential extends CredentialSchema {
     /**
      * Returns true if the given password is correct for the given Credential ID
      * @param CredentialEntity|int $credential
-     * @param StringValue|string   $password
+     * @param string               $password
      * @return bool
      */
     public static function isPasswordCorrect(
         CredentialEntity|int $credential,
-        StringValue|string $password,
+        string $password,
     ): bool {
         if (!($credential instanceof CredentialEntity)) {
             $credential = self::getByID($credential, complete: true);
@@ -271,13 +269,13 @@ class Credential extends CredentialSchema {
 
     /**
      * Returns true if the given Credential requires a password change
-     * @param int                $credentialID Optional.
-     * @param StringValue|string $email        Optional.
+     * @param int    $credentialID Optional.
+     * @param string $email        Optional.
      * @return bool
      */
     public static function reqPassChange(
         int $credentialID = 0,
-        StringValue|string $email = "",
+        string $email = "",
     ): bool {
         $email = Strings::toString($email);
         if ($credentialID === 0 && $email === "") {
@@ -300,42 +298,30 @@ class Credential extends CredentialSchema {
      * @return int
      */
     public static function create(CredentialRequest $request): int {
-        self::parseFields($request);
-        return self::createEntity(
+        $credentialID = self::createEntity(
             $request,
+            name:             Strings::merge($request->firstName, $request->lastName),
             lastLogin:        Date::now(),
             currentLogin:     Date::now(),
             askNotifications: true,
         );
+        self::setPassword($credentialID, $request->password);
+        return $credentialID;
     }
 
     /**
      * Edits the given Credential
      * @param int               $credentialID
      * @param CredentialRequest $request
-     * @return bool
-     */
-    public static function edit(int $credentialID, CredentialRequest $request): bool {
-        self::parseFields($request);
-        return self::editEntity($credentialID, $request);
-    }
-
-    /**
-     * Parses the data and returns the fields
-     * @param CredentialRequest $request
      * @return void
      */
-    private static function parseFields(CredentialRequest $request): void {
-        // Parse the Name
-        $request->name->set($request->firstName->merge($request->lastName));
-
-        // Parse the Password
-        $password = $request->password->get();
-        if ($password !== "") {
-            $hash = self::createHash($password);
-            $request->password->set($hash["password"]);
-            $request->salt->set($hash["salt"]);
-        }
+    public static function edit(int $credentialID, CredentialRequest $request): void {
+        self::editEntity(
+            $credentialID,
+            $request,
+            name: Strings::merge($request->firstName, $request->lastName),
+        );
+        self::setPassword($credentialID, $request->password);
     }
 
     /**
@@ -455,11 +441,15 @@ class Credential extends CredentialSchema {
 
     /**
      * Sets the Credential Password
-     * @param int                $credentialID
-     * @param StringValue|string $password
+     * @param int    $credentialID
+     * @param string $password
      * @return array{password:string,salt:string}
      */
-    public static function setPassword(int $credentialID, StringValue|string $password): array {
+    public static function setPassword(int $credentialID, string $password): array {
+        if ($password === "") {
+            return [ "password" => "", "salt" => "" ];
+        }
+
         $hash = self::createHash($password);
         self::editEntity(
             $credentialID,
@@ -596,13 +586,13 @@ class Credential extends CredentialSchema {
      * Sets a Credential Value
      * @param int              $credentialID
      * @param CredentialColumn $column
-     * @param int|string       $value
+     * @param QueryValue       $value
      * @return bool
      */
     public static function setValue(
         int $credentialID,
         CredentialColumn $column,
-        int|string $value,
+        mixed $value,
     ): bool {
         return self::editEntityValue($credentialID, $column, $value);
     }
@@ -611,12 +601,12 @@ class Credential extends CredentialSchema {
 
     /**
      * Creates a Hash and Salt (if required) for the given Password
-     * @param StringValue|string $password
-     * @param string             $salt     Optional.
+     * @param string $password
+     * @param string $salt     Optional.
      * @return array{password:string,salt:string}
      */
     public static function createHash(
-        StringValue|string $password,
+        string $password,
         string $salt = "",
     ): array {
         $pass = Strings::toString($password);

@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database\Query;
 
-use Framework\IO\Value\Value;
 use Framework\Database\Query\Operator;
 use Framework\Enum\Enum;
 use Framework\Date\Date;
@@ -10,7 +9,7 @@ use Framework\Utils\Strings;
 
 /**
  * The Where Builder
- * @phpstan-type WhereValue Value|Date|Enum|list<int|string>|int|string
+ * @phpstan-type WhereValue Date|Enum|list<int|string>|int|string
  */
 class WhereBuilder {
 
@@ -99,9 +98,7 @@ class WhereBuilder {
         mixed $value,
         bool $caseSensitive,
     ): void {
-        if ($value instanceof Value) {
-            $value = $value->getValue();
-        } elseif ($value instanceof Date) {
+        if ($value instanceof Date) {
             $value = $value->toTime();
         } elseif ($value instanceof Enum) {
             $value = $value->toString();

@@ -2,7 +2,6 @@
 namespace Framework\Enum;
 
 use Framework\IO\Request;
-use Framework\IO\Value\EnumValue;
 use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
 
@@ -15,11 +14,11 @@ trait IsEnum {
 
     /**
      * Creates an Enum from a String
-     * @param self|EnumValue|string $value
-     * @param self                  $default Optional.
+     * @param self|string $value
+     * @param self        $default Optional.
      * @return self
      */
-    public static function fromValue(self|EnumValue|string $value, self $default = self::None): self {
+    public static function fromValue(self|string $value, self $default = self::None): self {
         if ($value instanceof self) {
             return $value;
         }
@@ -72,10 +71,10 @@ trait IsEnum {
 
     /**
      * Checks if the given value is valid
-     * @param self|EnumValue|string $value
+     * @param self|string $value
      * @return bool
      */
-    public static function isValid(self|EnumValue|string $value): bool {
+    public static function isValid(self|string $value): bool {
         return self::fromValue($value) !== self::None;
     }
 

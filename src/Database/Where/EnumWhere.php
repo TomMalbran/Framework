@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Database\Where;
 
-use Framework\IO\Value\EnumValue;
 use Framework\Database\Query\Operator;
 use Framework\Database\Where\BaseWhere;
 use Framework\Enum\Enum;
@@ -54,20 +53,20 @@ class EnumWhere extends BaseWhere {
 
     /**
      * Adds an Equals condition
-     * @param Enum|EnumValue ...$values
+     * @param Enum ...$values
      * @return void
      */
-    public function equal(Enum|EnumValue ...$values): void {
+    public function equal(Enum ...$values): void {
         $names = $this->toNames(array_values($values));
         $this->compare(Operator::Equal, $names);
     }
 
     /**
      * Adds a Not Equals condition
-     * @param Enum|EnumValue ...$values
+     * @param Enum ...$values
      * @return void
      */
-    public function notEqual(Enum|EnumValue ...$values): void {
+    public function notEqual(Enum ...$values): void {
         $names = $this->toNames(array_values($values));
         $this->compare(Operator::NotEqual, $names);
     }
@@ -140,17 +139,13 @@ class EnumWhere extends BaseWhere {
 
     /**
      * Creates a list of Names from the given Enums
-     * @param list<Enum|EnumValue> $values
+     * @param list<Enum> $values
      * @return list<string>
      */
     private function toNames(array $values): array {
         $result = [];
         foreach ($values as $value) {
-            if ($value instanceof EnumValue) {
-                $value = $value->get();
-            } else {
-                $value = $value->toString();
-            }
+            $value = $value->toString();
             if ($value !== "") {
                 $result[] = $value;
             }

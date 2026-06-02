@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\IO\Value\StringValue;
 use Framework\Utils\JSON;
 use Framework\Utils\Strings;
 
@@ -112,10 +111,10 @@ class URL {
 
     /**
      * Returns a Slug from the given string
-     * @param StringValue|string $string
+     * @param string $string
      * @return string
      */
-    public static function toSlug(StringValue|string $string): string {
+    public static function toSlug(string $string): string {
         $result = Strings::toString($string);
         $result = Strings::sanitize($result, lowercase: true, anal: true);
         $result = Strings::replace($result, "---", "-");

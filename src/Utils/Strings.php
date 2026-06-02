@@ -2,7 +2,6 @@
 // spell-checker: ignore NOQUOTES
 namespace Framework\Utils;
 
-use Framework\IO\Value\Value;
 use Framework\Date\Date;
 use Framework\Date\Type\DateFormat;
 use Framework\Enum\Enum;
@@ -49,9 +48,6 @@ class Strings {
         }
         if ($value instanceof Date) {
             return $value->toString(DateFormat::ReverseSeconds);
-        }
-        if ($value instanceof Value) {
-            return $value->getValue();
         }
         return "";
     }

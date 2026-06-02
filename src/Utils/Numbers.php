@@ -1,8 +1,6 @@
 <?php
 namespace Framework\Utils;
 
-use Framework\IO\Value\NumberValue;
-use Framework\IO\Value\FloatValue;
 use Framework\Date\Date;
 use Framework\Utils\Strings;
 
@@ -20,7 +18,11 @@ class Numbers {
      * @param int|null $max    Optional.
      * @return bool
      */
-    public static function isValid(mixed $number, ?int $min = 1, ?int $max = null): bool {
+    public static function isValid(
+        mixed $number,
+        ?int $min = 1,
+        ?int $max = null,
+    ): bool {
         if (!is_numeric($number)) {
             return false;
         }
@@ -40,9 +42,6 @@ class Numbers {
      * @return int
      */
     public static function toInt(mixed $value, int $decimals = 0): int {
-        if ($value instanceof NumberValue) {
-            return $value->get();
-        }
         if ($value instanceof Date) {
             return $value->toTime();
         }
@@ -60,9 +59,6 @@ class Numbers {
      * @return float
      */
     public static function toFloat(mixed $value, int $decimals = 0): float {
-        if ($value instanceof FloatValue) {
-            return $value->get();
-        }
         if (is_int($value)) {
             $padding = pow(10, $decimals);
             return $value / $padding;

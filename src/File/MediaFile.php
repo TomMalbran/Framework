@@ -1,8 +1,8 @@
 <?php
 namespace Framework\File;
 
-use Framework\IO\Value\FileValue;
 use Framework\File\Storage;
+use Framework\File\File;
 use Framework\File\FileType;
 use Framework\File\Image;
 use Framework\File\Type\MediaType;
@@ -128,12 +128,12 @@ class MediaFile {
 
     /**
      * Uploads a File
-     * @param FileValue  $file
+     * @param File       $file
      * @param int|string ...$pathParts
      * @return bool
      */
-    public static function uploadFile(FileValue $file, int|string ...$pathParts): bool {
-        $fileName = $file->getFileName();
+    public static function uploadFile(File $file, int|string ...$pathParts): bool {
+        $fileName = $file->getName();
         $tmpFile  = $file->getTmpName();
         $source   = self::getPath(...$pathParts);
 

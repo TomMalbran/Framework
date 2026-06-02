@@ -1,9 +1,8 @@
 <?php
 namespace Tests\File;
 
-use Framework\IO\Request;
-use Framework\IO\Value\FileValue;
 use Framework\File\Storage;
+use Framework\File\File;
 use Framework\File\Image;
 use Framework\File\MediaFile;
 use Framework\File\Type\MediaType;
@@ -215,15 +214,15 @@ class MediaFileTest extends TestCase {
     ): void {
         $GLOBALS["test_move_uploaded_file"] = true;
 
-        $request = new Request();
-        $this->setPrivateProperty($request, "files", [
-            "file" => [
-                "name"     => $fileName,
-                "tmp_name" => $this->uploadSources[$uploadKey],
-            ],
+        $file = new File("file");
+        $this->setPrivateProperty($file, "file", [
+            "name"     => $fileName,
+            "type"     => "",
+            "tmp_name" => $this->uploadSources[$uploadKey],
+            "error"    => 0,
+            "size"     => filesize($this->uploadSources[$uploadKey]),
         ]);
 
-        $file     = new FileValue($request, "file");
         $result   = MediaFile::uploadFile($file, ...$pathParts);
         $filePath = [ ...$pathParts, $fileName ];
 

@@ -1,7 +1,6 @@
 <?php
 namespace Framework\Date;
 
-use Framework\IO\Value\StringValue;
 use Framework\Date\DateUtils;
 use Framework\Date\Type\DateType;
 use Framework\Date\Type\DateFormat;
@@ -124,12 +123,15 @@ class Date implements JsonSerializable {
 
     /**
      * Creates a Date instance parsing the given string
-     * @param StringValue|string $text
-     * @param string             $language Optional.
+     * @param string $text
+     * @param string $language Optional.
      * @return Date
      */
-    public static function parse(StringValue|string $text, string $language = ""): Date {
-        $string   = Strings::toString($text);
+    public static function parse(string $text, string $language = ""): Date {
+        $string = Strings::toString($text);
+        if ($string === "") {
+            return Date::empty();
+        }
         $dateTime = DateUtils::parseDate($string, $language);
         return new Date($dateTime);
     }
