@@ -358,6 +358,19 @@ class Strings {
     }
 
     /**
+     * Returns the amount of times the Needle is in the String
+     * @param string $string
+     * @param string $needle
+     * @return int
+     */
+    public static function countOcurrences(string $string, string $needle): int {
+        if ($string === "" || $needle === "") {
+            return 0;
+        }
+        return substr_count($string, $needle);
+    }
+
+    /**
      * Returns a random String with the given length
      * @param int $length Optional.
      * @return string

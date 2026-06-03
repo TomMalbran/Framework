@@ -407,6 +407,24 @@ class StringsTest extends TestCase {
     }
 
 
+    #[DataProvider("providerCountOcurrences")]
+    public function testCountOcurrences(string $value, string $needle, int $expected): void {
+        $this->assertEquals($expected, Strings::countOcurrences($value, $needle));
+    }
+
+    public static function providerCountOcurrences(): array {
+        return [
+            "simple"         => [ "Hello World", "o", 2 ],
+            "words"          => [ "one two three two", "two", 2 ],
+            "overlapping"    => [ "aaaa", "aa", 2 ],
+            "larger_needle"  => [ "abc", "abcd", 0 ],
+            "no_occurrences" => [ "abc", "x", 0 ],
+            "empty_string"   => [ "", "o", 0 ],
+            "empty_needle"   => [ "Hello World", "", 0 ],
+        ];
+    }
+
+
     public function testRandom(): void {
         $r = Strings::random(5);
         $this->assertIsString($r);
