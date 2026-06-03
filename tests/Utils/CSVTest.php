@@ -17,6 +17,21 @@ class CSVTest extends TestCase {
     }
 
 
+    #[DataProvider("providerParse")]
+    public function testParse(string $line, string $separator, array $expected): void {
+        $this->assertEquals($expected, CSV::parse($line, $separator));
+    }
+
+    public static function providerParse(): array {
+        return [
+            "basic"            => [ "a,b,c", ",", [ "a", "b", "c" ] ],
+            "empty_fields"     => [ "a,,b", ",", [ "a", "", "b" ] ],
+            "custom_separator" => [ "a;b;c", ";", [ "a", "b", "c" ] ],
+            "quoted_fields"    => [ "\"a,b\",c", ",", [ "a,b", "c" ] ],
+        ];
+    }
+
+
     #[DataProvider("providerEncode")]
     public function testEncode(mixed $input, string $separator, string $expected): void {
         $this->assertEquals($expected, CSV::encode($input, $separator));

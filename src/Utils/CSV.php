@@ -11,6 +11,17 @@ use Framework\Utils\Strings;
 class CSV {
 
     /**
+     * Parses a CSV line
+     * @param string $line
+     * @param string $separator Optional.
+     * @return list<string>
+     */
+    public static function parse(string $line, string $separator = ","): array {
+        $result = str_getcsv($line, $separator);
+        return Arrays::toStrings($result);
+    }
+
+    /**
      * Converts an array or string to a CSV string
      * @param list<string>|string $value
      * @param string              $separator Optional.
@@ -44,7 +55,7 @@ class CSV {
     ): array {
         // If is already an array just prase it in case is associative
         if (is_array($value)) {
-            return self::parseLine($value, $fields);
+            return self::normalize($value, $fields);
         }
 
         // If the value is a single line, convert it to a list of strings
@@ -54,9 +65,8 @@ class CSV {
                 return [ $value ];
             }
 
-            $csv = str_getcsv($value, $separator);
-            $csv = Arrays::toStrings($csv);
-            return self::parseLine($csv, $fields);
+            $csv = self::parse($value, $separator);
+            return self::normalize($csv, $fields);
         }
 
         // If the value contains multiple lines, decode it as a file
@@ -79,21 +89,20 @@ class CSV {
         $result = [];
         foreach ($lines as $line) {
             if (trim($line) !== "") {
-                $csv = str_getcsv($line, $separator);
-                $csv = Arrays::toStrings($csv);
-                $result[] = self::parseLine($csv, $fields);
+                $csv = self::parse($line, $separator);
+                $result[] = self::normalize($csv, $fields);
             }
         }
         return $result;
     }
 
     /**
-     * Parses a CSV Line
+     * Normalizes a CSV Line
      * @param array<int,string> $value
      * @param list<string>      $fields
      * @return array<int|string,string>
      */
-    private static function parseLine(array $value, array $fields): array {
+    private static function normalize(array $value, array $fields): array {
         if (count($fields) === 0) {
             return $value;
         }
