@@ -46,10 +46,12 @@ class XLSXReader implements ImporterReader {
 
     /**
      * Returns true if the XLSXReader is available
+     * @param string $extension
      * @return bool
      */
-    public static function isAvailable(): bool {
-        return class_exists(Reader::class);
+    public static function isAvailable(string $extension): bool {
+        return (Strings::isEqual($extension, "xlsx") || Strings::isEqual($extension, "xls")) &&
+            class_exists(Reader::class);
     }
 
 

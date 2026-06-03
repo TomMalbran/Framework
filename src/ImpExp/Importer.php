@@ -6,7 +6,9 @@ use Framework\ImpExp\ImporterReader;
 use Framework\ImpExp\ImporterData;
 use Framework\ImpExp\ImporterRow;
 use Framework\ImpExp\InvalidReader;
+use Framework\ImpExp\CSVReader;
 use Framework\ImpExp\XLSXReader;
+use Framework\File\Storage;
 use Framework\Utils\Dictionary;
 
 use Iterator;
@@ -29,7 +31,10 @@ class Importer implements Iterator {
      * @param string $path
      */
     public function __construct(string $path) {
-        if (XLSXReader::isAvailable()) {
+        $extension = Storage::getExtension($path);
+        if (CSVReader::isAvailable($extension)) {
+            $this->reader = new CSVReader($path);
+        } elseif (XLSXReader::isAvailable($extension)) {
             $this->reader = new XLSXReader($path);
         } else {
             $this->reader = new InvalidReader();
