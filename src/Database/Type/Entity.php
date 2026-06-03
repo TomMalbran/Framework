@@ -107,19 +107,21 @@ class Entity implements JsonSerializable {
 
     /**
      * Returns true if the key exists
-     * @param string $key
+     * @param Enum|string $key
      * @return bool
      */
-    final public function has(string $key): bool {
+    final public function has(Enum|string $key): bool {
+        $key = Strings::toString($key);
         return property_exists($this, $key);
     }
 
     /**
      * Returns true if the value at the given key is not empty
-     * @param string $key
+     * @param Enum|string $key
      * @return bool
      */
-    final public function hasValue(string $key): bool {
+    final public function hasValue(Enum|string $key): bool {
+        $key = Strings::toString($key);
         if ($this->has($key)) {
             return !Arrays::isEmpty($this->$key);
         }
@@ -128,10 +130,11 @@ class Entity implements JsonSerializable {
 
     /**
      * Returns the Type of the Data at the given key
-     * @param string $key
+     * @param Enum|string $key
      * @return string
      */
-    final public function getType(string $key): string {
+    final public function getType(Enum|string $key): string {
+        $key = Strings::toString($key);
         if ($this->has($key)) {
             if ($this->$key instanceof Enum) {
                 return get_class($this->$key);
@@ -149,11 +152,12 @@ class Entity implements JsonSerializable {
 
     /**
      * Gets the Data at the given key
-     * @param string     $key
-     * @param mixed|null $default Optional.
+     * @param Enum|string $key
+     * @param mixed|null  $default Optional.
      * @return mixed
      */
-    final public function get(string $key, mixed $default = null): mixed {
+    final public function get(Enum|string $key, mixed $default = null): mixed {
+        $key = Strings::toString($key);
         if ($this->has($key)) {
             return $this->$key;
         }
@@ -162,33 +166,34 @@ class Entity implements JsonSerializable {
 
     /**
      * Gets the Data as a String
-     * @param string $key
-     * @param string $default Optional.
+     * @param Enum|string $key
+     * @param string      $default Optional.
      * @return string
      */
-    final public function getString(string $key, string $default = ""): string {
+    final public function getString(Enum|string $key, string $default = ""): string {
         $result = $this->get($key, $default);
         return Strings::toString($result);
     }
 
     /**
      * Gets the Data as an Integer
-     * @param string $key
-     * @param int    $default Optional.
+     * @param Enum|string $key
+     * @param int         $default Optional.
      * @return int
      */
-    final public function getInt(string $key, int $default = 0): int {
+    final public function getInt(Enum|string $key, int $default = 0): int {
         $result = $this->get($key, $default);
         return Numbers::toInt($result);
     }
 
     /**
      * Sets the Data at the given key
-     * @param string $key
-     * @param mixed  $value
+     * @param Enum|string $key
+     * @param mixed       $value
      * @return bool
      */
-    final public function set(string $key, mixed $value): bool {
+    final public function set(Enum|string $key, mixed $value): bool {
+        $key = Strings::toString($key);
         if ($this->has($key)) {
             $this->$key = $value;
             return true;
