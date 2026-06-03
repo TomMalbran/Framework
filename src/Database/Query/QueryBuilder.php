@@ -226,7 +226,8 @@ class QueryBuilder {
 
         $expression = "({$expression})";
         if ($this->ifNullValue !== null) {
-            $expression = "IFNULL($expression, {$this->ifNullValue})";
+            $value      = is_string($this->ifNullValue) ? "'{$this->ifNullValue}'" : $this->ifNullValue;
+            $expression = "IFNULL($expression, $value)";
         }
         return Assign::exp($expression, $bindings);
     }
