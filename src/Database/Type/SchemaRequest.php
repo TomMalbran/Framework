@@ -29,7 +29,7 @@ class SchemaRequest {
      * Creates a new SchemaRequest instance
      * @param SchemaRequest|Request|null $request Optional.
      */
-    protected function __construct(SchemaRequest|Request|null $request = null) {
+    public function __construct(SchemaRequest|Request|null $request = null) {
         if ($request instanceof SchemaRequest) {
             $this->request = $request->request;
         } else {

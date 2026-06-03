@@ -22,6 +22,9 @@
         <testsuite name="IO Tests">
             <directory>tests/IO</directory>
         </testsuite>
+        <testsuite name="ImpExp Tests">
+            <directory>tests/ImpExp</directory>
+        </testsuite>
         <testsuite name="Utils Tests">
             <directory>tests/Utils</directory>
         </testsuite>

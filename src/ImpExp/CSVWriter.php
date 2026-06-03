@@ -11,7 +11,7 @@ use Framework\Utils\Arrays;
 class CSVWriter implements ExporterWriter {
 
     /** @var array<string,string> */
-    private array  $headers;
+    private array  $headers = [];
     private string $fileName;
     private string $lang;
 
@@ -23,20 +23,32 @@ class CSVWriter implements ExporterWriter {
 
     /**
      * Creates a new CSVWriter instance
-     * @param string $fileName
-     * @param string $lang     Optional.
+     * @param string        $fileName
+     * @param string        $lang        Optional.
+     * @param resource|null $file        Optional.
+     * @param bool          $sendHeaders Optional.
      */
-    public function __construct(string $fileName, string $lang = "root") {
-        $this->headers  = [];
+    public function __construct(
+        string $fileName,
+        string $lang = "root",
+        mixed $file = null,
+        bool $sendHeaders = true,
+    ) {
         $this->fileName = $fileName;
         $this->lang     = $lang;
 
-        $handle = fopen("php://output", "w");
-        if ($handle !== false) {
-            $this->file = $handle;
+        if (is_resource($file)) {
+            $this->file = $file;
+        } else {
+            $handle = fopen("php://output", "w");
+            if ($handle !== false) {
+                $this->file = $handle;
+            }
         }
 
-        $this->start();
+        if ($sendHeaders) {
+            $this->start();
+        }
     }
 
     /**

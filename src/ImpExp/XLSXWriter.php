@@ -26,9 +26,15 @@ class XLSXWriter implements ExporterWriter {
      * Creates a new XLSXWriter instance
      * @param string $title
      * @param string $fileName
-     * @param string $lang     Optional.
+     * @param string $lang       Optional.
+     * @param string $outputPath Optional.
      */
-    public function __construct(string $title, string $fileName, string $lang = "root") {
+    public function __construct(
+        string $title,
+        string $fileName,
+        string $lang = "root",
+        string $outputPath = "",
+    ) {
         $this->title = NLS::getString($title, $lang);
         $this->lang  = $lang;
 
@@ -36,7 +42,11 @@ class XLSXWriter implements ExporterWriter {
         $options->DEFAULT_ROW_STYLE = new Style();
 
         $this->writer = new Writer($options);
-        $this->writer->openToBrowser("$fileName.xlsx");
+        if ($outputPath === "") {
+            $this->writer->openToBrowser("$fileName.xlsx");
+        } else {
+            $this->writer->openToFile($outputPath);
+        }
 
         $sheet = $this->writer->getCurrentSheet();
         $sheet->setName($this->title);

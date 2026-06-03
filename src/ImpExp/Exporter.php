@@ -32,8 +32,9 @@ class Exporter {
      * @param int    $total
      * @param string $title
      * @param string $fileName
-     * @param string $lang     Optional.
-     * @param bool   $useCSV   Optional.
+     * @param string $lang        Optional.
+     * @param bool   $useCSV      Optional.
+     * @param bool   $sendHeaders Optional.
      */
     public function __construct(
         int $total,
@@ -41,6 +42,7 @@ class Exporter {
         string $fileName,
         string $lang = "root",
         bool $useCSV = false,
+        bool $sendHeaders = true,
     ) {
         $this->fileName  = NLS::getString($fileName, $lang);
         $this->fileName .= "_" . Date::now()->toString(DateFormat::Reverse);
@@ -51,7 +53,7 @@ class Exporter {
         if (XLSXWriter::isAvailable() && !$useCSV) {
             $this->writer = new XLSXWriter($title, $this->fileName, $lang);
         } else {
-            $this->writer = new CSVWriter($this->fileName, $lang);
+            $this->writer = new CSVWriter($this->fileName, $lang, sendHeaders: $sendHeaders);
         }
     }
 
@@ -146,6 +148,14 @@ class Exporter {
      */
     public function download(): never {
         $this->writer->downloadFile();
+        $this->terminate();
+    }
+
+    /**
+     * Terminates the current request
+     * @return never
+     */
+    protected function terminate(): never {
         exit();
     }
 }
