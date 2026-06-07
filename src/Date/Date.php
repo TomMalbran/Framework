@@ -523,6 +523,25 @@ class Date implements JsonSerializable {
 
 
     /**
+     * Returns the Week of the month
+     * @return int
+     */
+    public function getWeekOfMonth(): int {
+        return Numbers::roundInt($this->getDay() / 7, useCeil: true);
+    }
+
+    /**
+     * Returns the Week of the year
+     * @return int
+     */
+    public function getWeekOfYear(): int {
+        // W: ISO-8601 week number of year, weeks starting on Monday (01 to 53)
+        return (int)$this->format("W");
+    }
+
+
+
+    /**
      * Returns the Day of the month
      * @return int
      */

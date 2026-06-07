@@ -709,6 +709,46 @@ class DateTest extends TestCase {
     }
 
 
+    #[DataProvider("providerGetWeekOfMonth")]
+    public function testGetWeekOfMonth(mixed $input, int $expected): void {
+        $d = Date::create($input);
+        $this->assertSame($expected, $d->getWeekOfMonth());
+    }
+
+    public static function providerGetWeekOfMonth(): array {
+        return [
+            "null"          => [ null, 0 ],
+            "empty"         => [ "", 0 ],
+            "invalid"       => [ "not-a-date", 0 ],
+            "month_start"   => [ "2020-02-03", 1 ],
+            "month_end"     => [ "2020-02-29", 5 ],
+            "iso_year_prev" => [ "2021-01-01", 1 ],
+            "iso_year_new"  => [ "2021-01-04", 1 ],
+            "date"          => [ Date::createTime(31, 12, 2020), 5 ],
+        ];
+    }
+
+
+    #[DataProvider("providerGetWeekOfYear")]
+    public function testGetWeek(mixed $input, int $expected): void {
+        $d = Date::create($input);
+        $this->assertSame($expected, $d->getWeekOfYear());
+    }
+
+    public static function providerGetWeekOfYear(): array {
+        return [
+            "null"          => [ null, 0 ],
+            "empty"         => [ "", 0 ],
+            "invalid"       => [ "not-a-date", 0 ],
+            "month_start"   => [ "2020-02-03", 6 ],
+            "month_end"     => [ "2020-02-29", 9 ],
+            "iso_year_prev" => [ "2021-01-01", 53 ],
+            "iso_year_new"  => [ "2021-01-04", 1 ],
+            "date"          => [ Date::createTime(31, 12, 2020), 53 ],
+        ];
+    }
+
+
     #[DataProvider("providerGetDay")]
     public function testGetDay(mixed $input, int $expected): void {
         $d = Date::create($input);
