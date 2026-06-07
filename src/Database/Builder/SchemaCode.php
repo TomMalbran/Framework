@@ -369,12 +369,13 @@ class SchemaCode {
 
             case ValidateType::String:
             case ValidateType::Enum:
+                $invSuffix  = $validate->isRequired || $validate->isUnique || $validate->maxLength > 0;
                 $validation = [
                     "isString"     => true,
                     "isRequired"   => $validate->isRequired,
                     "isUnique"     => $validate->isUnique,
                     "typeOf"       => Strings::substringAfter($validate->typeOf, "\\"),
-                    "typeInvError" => $validate->getTypeInvalidError(),
+                    "typeInvError" => $validate->getTypeInvalidError($invSuffix),
                     "method"       => $validate->method,
                     "emptySuffix"  => $validate->isUnique || $validate->typeOf !== "" || $validate->maxLength > 0,
                     "maxLength"    => $validate->maxLength,

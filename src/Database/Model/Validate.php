@@ -262,15 +262,19 @@ class Validate {
 
     /**
      * Gets the Type Invalid Error string for this Validate
+     * @param bool $withSuffix Optional.
      * @return string
      */
-    public function getTypeInvalidError(): string {
+    public function getTypeInvalidError(bool $withSuffix = true): string {
         if ($this->typeOf === Color::class) {
             return "GENERAL_ERROR_COLOR";
         }
 
-        $prefix = $this->getFieldError();
-        return "{$prefix}_INVALID";
+        $error = $this->getFieldError();
+        if ($withSuffix) {
+            $error .= "_INVALID";
+        }
+        return $error;
     }
 
     /**
