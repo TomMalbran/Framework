@@ -138,14 +138,22 @@ class Numbers {
      * Rounds the given number to the nearest integer
      * @param int|float $number
      * @param bool      $useFloor Optional.
+     * @param bool      $useCeil  Optional.
      * @return int
      */
-    public static function roundInt(int|float $number, bool $useFloor = false): int {
+    public static function roundInt(
+        int|float $number,
+        bool $useFloor = false,
+        bool $useCeil = false,
+    ): int {
         if (is_int($number)) {
             return $number;
         }
         if ($useFloor) {
             return (int)floor($number);
+        }
+        if ($useCeil) {
+            return (int)ceil($number);
         }
         return (int)round($number);
     }
