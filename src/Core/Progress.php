@@ -20,38 +20,61 @@ class Progress {
     /**
      * Sets the Progress
      * @param int $value
-     * @return bool
+     * @return void
      */
-    public static function set(int $value): bool {
+    private static function set(int $value): void {
         $credentialID = Auth::getID();
-        return Credential::setProgress($credentialID, $value);
+        Credential::setProgress($credentialID, $value);
     }
 
 
 
     /**
      * Starts the Progress
-     * @return bool
+     * @return void
      */
-    public static function start(): bool {
-        return self::set(0);
+    public static function start(): void {
+        // Force PHP to stop executing if the client disconnects
+        ignore_user_abort(enable: false);
+        ob_end_clean();
+
+        self::set(0);
+    }
+
+    /**
+     * Updates the Progress
+     * @param int $value
+     * @return void
+     */
+    public static function update(int $value): void {
+        // Force PHP to send a tiny echo or heartbeat to the web server.
+        // Without this flush, PHP won't realize the client socket is dead!
+        echo " ";
+        flush();
+
+        // Check if the browser canceled the request and if so, stop the script.
+        if (connection_aborted() === 1) {
+            exit;
+        }
+
+        self::set($value);
     }
 
     /**
      * Increments the Progress
      * @param int $value Optional.
-     * @return bool
+     * @return void
      */
-    public static function increment(int $value = 1): bool {
+    public static function increment(int $value = 1): void {
         $currentValue = self::get();
-        return self::set($currentValue + $value);
+        self::update($currentValue + $value);
     }
 
     /**
      * Ends the Progress
-     * @return bool
+     * @return void
      */
-    public static function end(): bool {
-        return self::start();
+    public static function end(): void {
+        self::set(0);
     }
 }
