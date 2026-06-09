@@ -38,7 +38,12 @@ class JSON {
             return $value;
         }
 
-        $result = json_encode($value, $asPretty ? JSON_PRETTY_PRINT : 0);
+        $options = JSON_UNESCAPED_SLASHES;
+        if ($asPretty) {
+            $options |= JSON_PRETTY_PRINT;
+        }
+
+        $result = json_encode($value, $options);
         return is_string($result) ? $result : "";
     }
 
