@@ -127,7 +127,7 @@ class SchemaRequest {
         if (property_exists($this, $key) && $this->$key instanceof File) {
             return $this->$key;
         }
-        return new File($key);
+        return File::fromRequest($key);
     }
 
     /**
