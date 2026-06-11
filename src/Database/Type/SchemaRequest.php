@@ -71,6 +71,19 @@ class SchemaRequest {
 
 
     /**
+     * Returns a Property
+     * @param string     $key
+     * @param int|string $default Optional.
+     * @return int|string
+     */
+    public function getProp(string $key, int|string $default = ""): int|string {
+        if (property_exists($this, $key) && (is_int($this->$key) || is_string($this->$key))) {
+            return $this->$key;
+        }
+        return $default;
+    }
+
+    /**
      * Returns the Data as a String
      * @param string $key
      * @param string $default Optional.
