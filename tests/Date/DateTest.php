@@ -960,6 +960,28 @@ class DateTest extends TestCase {
     }
 
 
+    #[DataProvider("providerIsNotEqual")]
+    public function testIsNotEqual(mixed $input1, mixed $input2, bool $expected): void {
+        $d1 = Date::create($input1);
+        $d2 = Date::create($input2);
+        $this->assertSame($expected, $d1->isNotEqual($d2));
+    }
+
+    public static function providerIsNotEqual(): array {
+        return [
+            "both_null"      => [ null, null, false ],
+            "both_empty"     => [ "", "", false ],
+            "both_invalid"   => [ "not-a-date", "not-a-date", false ],
+            "one_invalid"    => [ "2020-02-03", "not-a-date", true ],
+            "same_date"      => [ "2020-02-03", "2020-02-03", false ],
+            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
+            "same_date_obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), false ],
+            "different"      => [ "2020-02-03", "2021-02-03", true ],
+            "different_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", true ],
+        ];
+    }
+
+
     #[DataProvider("providerIsEqual")]
     public function testIsEqual(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
@@ -982,23 +1004,23 @@ class DateTest extends TestCase {
     }
 
 
-    #[DataProvider("providerIsNotEqual")]
-    public function testIsNotEqual(mixed $input1, mixed $input2, bool $expected): void {
+    #[DataProvider("providerIsEqualDay")]
+    public function testIsEqualDay(mixed $input1, mixed $input2, bool $expected): void {
         $d1 = Date::create($input1);
         $d2 = Date::create($input2);
-        $this->assertSame($expected, $d1->isNotEqual($d2));
+        $this->assertSame($expected, $d1->isEqualDay($d2));
     }
 
-    public static function providerIsNotEqual(): array {
+    public static function providerIsEqualDay(): array {
         return [
             "both_null"      => [ null, null, false ],
             "both_empty"     => [ "", "", false ],
             "both_invalid"   => [ "not-a-date", "not-a-date", false ],
-            "one_invalid"    => [ "2020-02-03", "not-a-date", true ],
-            "same_date"      => [ "2020-02-03", "2020-02-03", false ],
-            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", false ],
-            "same_date_obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), false ],
-            "different"      => [ "2020-02-03", "2021-02-03", true ],
+            "one_invalid"    => [ "2020-02-03", "not-a-date", false ],
+            "same_date"      => [ "2020-02-03", "2020-02-03", true ],
+            "same_date_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:56", true ],
+            "same_date_obj"  => [ Date::createTime(3, 2, 2020, 12, 34, 56), Date::createTime(3, 2, 2020, 12, 34, 56), true ],
+            "different_day"  => [ "2020-02-03", "2020-02-04", false ],
             "different_time" => [ "2020-02-03 12:34:56", "2020-02-03 12:34:57", true ],
         ];
     }

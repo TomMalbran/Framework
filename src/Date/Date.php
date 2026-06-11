@@ -698,6 +698,15 @@ class Date implements JsonSerializable {
     }
 
     /**
+     * Returns true if the current Date is not equal to another Date
+     * @param Date $date
+     * @return bool
+     */
+    public function isNotEqual(Date $date): bool {
+        return $this->timestamp !== $date->toTime();
+    }
+
+    /**
      * Returns true if the current Date is equal to another Date
      * @param Date $date
      * @return bool
@@ -707,12 +716,19 @@ class Date implements JsonSerializable {
     }
 
     /**
-     * Returns true if the current Date is not equal to another Date
+     * Returns true if the current Date is in the same Day as another Date
      * @param Date $date
      * @return bool
      */
-    public function isNotEqual(Date $date): bool {
-        return $this->timestamp !== $date->toTime();
+    public function isEqualDay(Date $date): bool {
+        if ($this->isEmpty() || $date->isEmpty()) {
+            return false;
+        }
+        return (
+            $this->getYear()  === $date->getYear() &&
+            $this->getMonth() === $date->getMonth() &&
+            $this->getDay()   === $date->getDay()
+        );
     }
 
     /**
