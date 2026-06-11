@@ -121,6 +121,39 @@ class Assign {
         return new Assign("CONCAT(UCASE(LEFT(`__FIELD__`, 1)), SUBSTRING(`__FIELD__`, 2))");
     }
 
+    /**
+     * Assigns the Field value with the first letter in Lower Case
+     * @return Assign
+     */
+    public static function lowerCaseFirst(): Assign {
+        return new Assign("CONCAT(LCASE(LEFT(`__FIELD__`, 1)), SUBSTRING(`__FIELD__`, 2))");
+    }
+
+    /**
+     * Assigns the Field replacing a value in a JSON field
+     * @param string $value
+     * @param string $replace
+     * @return Assign
+     */
+    public static function jsonReplace(string $value, string $replace): Assign {
+        return new Assign(
+            "JSON_REPLACE(`__FIELD__`, CAST(JSON_UNQUOTE(JSON_SEARCH(`__FIELD__`, 'one', ?)) AS CHAR), ?)",
+            [ $value, $replace ],
+        );
+    }
+
+    /**
+     * Assigns the Field removing a value in a JSON field
+     * @param string $value
+     * @return Assign
+     */
+    public static function jsonRemove(string $value): Assign {
+        return new Assign(
+            "JSON_REMOVE(`__FIELD__`, CAST(JSON_UNQUOTE(JSON_SEARCH(`__FIELD__`, 'one', ?)) AS CHAR))",
+            [ $value ],
+        );
+    }
+
 
 
     /**
