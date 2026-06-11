@@ -30,7 +30,10 @@ class JSON {
      * @param bool  $asPretty Optional.
      * @return string
      */
-    public static function encode(mixed $value, bool $asPretty = false): string {
+    public static function encode(
+        mixed $value,
+        bool $asPretty = false,
+    ): string {
         if (is_null($value)) {
             return "";
         }
@@ -38,7 +41,7 @@ class JSON {
             return $value;
         }
 
-        $options = JSON_UNESCAPED_SLASHES;
+        $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         if ($asPretty) {
             $options |= JSON_PRETTY_PRINT;
         }
