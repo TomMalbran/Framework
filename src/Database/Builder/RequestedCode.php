@@ -43,6 +43,7 @@ class RequestedCode {
         $idField      = self::getIDField($schemaModel);
         $fields       = self::getFields($schemaModel);
         $dictionaries = self::getDictionaries($schemaModel);
+        $entityFields = self::getEntityFields($schemaModel);
         $imports      = self::getImports($schemaModel);
 
         $contents = Builder::render("Request", [
@@ -50,12 +51,15 @@ class RequestedCode {
             "name"            => $schemaModel->name,
             "tableName"       => $schemaModel->tableName,
             "requestClass"    => $schemaModel->requestClass,
+            "entityClass"     => $schemaModel->entityClass,
 
             "hasMultiID"      => self::hasMultiID($schemaModel),
             "hasFields"       => count($fields) > 0,
             "fields"          => $fields,
             "hasDictionaries" => count($dictionaries) > 0,
             "dictionaries"    => $dictionaries,
+            "hasEntityFields" => count($entityFields) > 0,
+            "entityFields"    => $entityFields,
 
             "hasImports"      => count($imports) > 0,
             "imports"         => $imports,
@@ -239,6 +243,21 @@ class RequestedCode {
         return $result;
     }
 
+    /**
+     * Returns the Entity Fields
+     * @param SchemaModel $schemaModel
+     * @return list<string>
+     */
+    private static function getEntityFields(SchemaModel $schemaModel): array {
+        $result = [];
+        foreach ($schemaModel->requestedFields as $requested) {
+            if ($schemaModel->isRequested($requested->name)) {
+                $result[] = $requested->name;
+            }
+        }
+        return $result;
+    }
+
 
 
     /**
@@ -277,6 +296,9 @@ class RequestedCode {
             }
             if (Strings::startsWith($requested->subType, "array<")) {
                 $result[Arrays::class] = 1;
+            }
+            if ($schemaModel->isRequested($requested->name)) {
+                $result["{$schemaModel->namespace}\\{$schemaModel->entityClass}"] = 1;
             }
         }
         return array_keys($result);

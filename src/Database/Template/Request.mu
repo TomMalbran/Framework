@@ -109,6 +109,22 @@ class {{requestClass}} extends SchemaRequest {
     {{/hasDictionaries}}
     }
 
+{{#hasEntityFields}}
+    /**
+     * Creates a new {{requestClass}} instance from a Entity
+     * @param {{entityClass}} $entity
+     * @return self
+     */
+    public static function fromEntity({{entityClass}} $entity): self {
+        $instance = new self();
+
+        {{#entityFields}}
+        $instance->{{.}} = $entity->{{.}};
+        {{/entityFields}}
+        return $instance;
+    }
+
+{{/hasEntityFields}}
     /**
      * Creates a new {{requestClass}} instance from a Request
      * @param SchemaRequest|Request $request
