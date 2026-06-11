@@ -24,23 +24,32 @@ class MediaCode implements DiscoveryBuilder {
         $hasReplace = false;
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->fields as $field) {
-                if ($field->isFile || $field->hasFile) {
-                    $isReplace = (
-                        $field->type === FieldType::Text ||
-                        $field->type === FieldType::LongText ||
-                        $field->type === FieldType::JSON
-                    );
+                if (!$field->isFile && !$field->hasFile) {
+                    continue;
+                }
 
-                    $fields[]  = [
-                        "name"      => $schemaModel->name,
-                        "query"     => Strings::lowerCaseFirst($schemaModel->queryClass),
-                        "tableName" => $schemaModel->tableName,
-                        "fieldName" => $field->name,
-                        "isReplace" => $isReplace,
-                    ];
-                    if ($isReplace) {
-                        $hasReplace = true;
-                    }
+                $isJSON    = false;
+                $isReplace = (
+                    $field->type === FieldType::Text ||
+                    $field->type === FieldType::LongText ||
+                    $field->type === FieldType::JSON
+                );
+                if ($field->jsonFiles) {
+                    $isJSON    = true;
+                    $isReplace = false;
+                }
+
+                $fields[]  = [
+                    "name"      => $schemaModel->name,
+                    "query"     => Strings::lowerCaseFirst($schemaModel->queryClass),
+                    "tableName" => $schemaModel->tableName,
+                    "fieldName" => $field->name,
+                    "isSet"     => !$isReplace && !$isJSON,
+                    "isReplace" => $isReplace,
+                    "isJSON"    => $isJSON,
+                ];
+                if ($isReplace || $isJSON) {
+                    $hasReplace = true;
                 }
             }
         }

@@ -18,6 +18,10 @@ class MediaSchema {
      * @return void
      */
     public static function updatePaths(string $oldPath, string $newPath): void {
+        if ($oldPath === $newPath || $oldPath === "") {
+            return;
+        }
+
         $files = [
             [
                 "old" => $oldPath,
@@ -32,22 +36,73 @@ class MediaSchema {
         foreach ($files as $file) {
             $old = $file["old"];
             $new = $file["new"];
-        {{#fields}}
 
-            // Replace the File Path in {{name}}.{{fieldName}}
-            {{#isReplace}}
-            Query::update("{{tableName}}")
-                ->set("{{fieldName}}", Assign::replace($old, $new))
-                ->where("{{fieldName}}", Operator::Like, "\"$old\"")
-                ->execute();
-            {{/isReplace}}
-            {{^isReplace}}
-            Query::update("{{tableName}}")
-                ->set("{{fieldName}}", $new)
-                ->where("{{fieldName}}", Operator::Equal, $old)
-                ->execute();
-            {{/isReplace}}
-        {{/fields}}
+            if ($newPath === "") {
+                self::removePath($old);
+            } else {
+                self::replacePath($old, $new);
+            }
         }
+    }
+
+    /**
+     * Replaces the Path in the Database
+     * @param string $old
+     * @param string $new
+     * @return void
+     */
+    private static function replacePath(string $old, string $new): void {
+    {{#fields}}
+
+        // Replace the File Path in {{name}}.{{fieldName}}
+        {{#isSet}}
+        Query::update("{{tableName}}")
+            ->set("{{fieldName}}", $new)
+            ->where("{{fieldName}}", Operator::Equal, $old)
+            ->execute();
+        {{/isSet}}
+        {{#isReplace}}
+        Query::update("{{tableName}}")
+            ->set("{{fieldName}}", Assign::replace($old, $new))
+            ->where("{{fieldName}}", Operator::Like, "\"$old\"")
+            ->execute();
+        {{/isReplace}}
+        {{#isJSON}}
+        Query::update("{{tableName}}")
+            ->set("{{fieldName}}", Assign::jsonReplace($old, $new))
+            ->whereExp("JSON_VALID(`{{fieldName}}`) AND JSON_SEARCH(`{{fieldName}}`, 'one', ?) IS NOT NULL", $old)
+            ->execute();
+        {{/isJSON}}
+    {{/fields}}
+    }
+
+    /**
+     * Removes the Path from the Database
+     * @param string $old
+     * @return void
+     */
+    private static function removePath(string $old): void {
+    {{#fields}}
+
+        // Remove the File Path in {{name}}.{{fieldName}}
+        {{#isSet}}
+        Query::update("{{tableName}}")
+            ->set("{{fieldName}}", "")
+            ->where("{{fieldName}}", Operator::Equal, $old)
+            ->execute();
+        {{/isSet}}
+        {{#isReplace}}
+        Query::update("{{tableName}}")
+            ->set("{{fieldName}}", Assign::replace($old, ""))
+            ->where("{{fieldName}}", Operator::Like, "\"$old\"")
+            ->execute();
+        {{/isReplace}}
+        {{#isJSON}}
+        Query::update("{{tableName}}")
+            ->set("{{fieldName}}", Assign::jsonRemove($old))
+            ->whereExp("JSON_VALID(`{{fieldName}}`) AND JSON_SEARCH(`{{fieldName}}`, 'one', ?) IS NOT NULL", $old)
+            ->execute();
+        {{/isJSON}}
+    {{/fields}}
     }
 }

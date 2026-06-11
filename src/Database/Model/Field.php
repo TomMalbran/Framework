@@ -90,6 +90,9 @@ class Field {
     // The file paths are updated automatically when the file is moved.
     public bool $hasFile = false;
 
+    // Indicates that the files are stored as a simple array of file paths as a JSON.
+    public bool $jsonFiles = false;
+
     // Used to generate the path and url of the file.
     public string $filePath = "";
 
@@ -126,6 +129,7 @@ class Field {
      * @param bool              $isEncrypt   Optional.
      * @param bool              $isFile      Optional.
      * @param bool              $hasFile     Optional.
+     * @param bool              $jsonFiles   Optional.
      * @param string            $filePath    Optional.
      * @param DateType          $dateType    Optional.
      * @param string            $dateInput   Optional.
@@ -151,6 +155,7 @@ class Field {
         bool $isEncrypt = false,
         bool $isFile = false,
         bool $hasFile = false,
+        bool $jsonFiles = false,
         string $filePath = "",
         DateType $dateType = DateType::None,
         string $dateInput = "",
@@ -183,6 +188,7 @@ class Field {
         // File types
         $this->isFile      = $isFile;
         $this->hasFile     = $hasFile;
+        $this->jsonFiles   = $jsonFiles;
         $this->filePath    = $filePath;
 
         // Date types
