@@ -16,30 +16,34 @@ class Requested {
     public bool $isID      = false;
     public bool $isMultiID = false;
 
+    // Set the Value Type different from the Field Type
     public bool $isString  = false;
     public bool $isNumber  = false;
     public bool $isJSON    = false;
     public bool $isFile    = false;
     public bool $isDate    = false;
 
-    public DateType $dateType  = DateType::None;
-    public string   $dateInput = "";
-    public string   $hourInput = "";
+    // Special date options
+    public DateType $dateType    = DateType::None;
+    public string   $dateInput   = "";
+    public string   $hourInput   = "";
+    public bool     $useTimeZone = true;
 
 
     /**
      * The Requested Attribute
-     * @param bool     $canEdit   Optional.
-     * @param bool     $isID      Optional.
-     * @param bool     $isMultiID Optional.
-     * @param bool     $isString  Optional.
-     * @param bool     $isNumber  Optional.
-     * @param bool     $isJSON    Optional.
-     * @param bool     $isFile    Optional.
-     * @param bool     $isDate    Optional.
-     * @param DateType $dateType  Optional.
-     * @param string   $dateInput Optional.
-     * @param string   $hourInput Optional.
+     * @param bool     $canEdit     Optional.
+     * @param bool     $isID        Optional.
+     * @param bool     $isMultiID   Optional.
+     * @param bool     $isString    Optional.
+     * @param bool     $isNumber    Optional.
+     * @param bool     $isJSON      Optional.
+     * @param bool     $isFile      Optional.
+     * @param bool     $isDate      Optional.
+     * @param DateType $dateType    Optional.
+     * @param string   $dateInput   Optional.
+     * @param string   $hourInput   Optional.
+     * @param bool     $useTimeZone Optional.
      */
     public function __construct(
         bool $canEdit = true,
@@ -53,20 +57,22 @@ class Requested {
         DateType $dateType = DateType::None,
         string $dateInput = "",
         string $hourInput = "",
+        bool $useTimeZone = true,
     ) {
-        $this->canEdit   = $canEdit;
-        $this->isID      = $isID;
-        $this->isMultiID = $isMultiID;
+        $this->canEdit     = $canEdit;
+        $this->isID        = $isID;
+        $this->isMultiID   = $isMultiID;
 
-        $this->isString  = $isString;
-        $this->isNumber  = $isNumber;
-        $this->isJSON    = $isJSON;
-        $this->isFile    = $isFile;
-        $this->isDate    = $isDate;
+        $this->isString    = $isString;
+        $this->isNumber    = $isNumber;
+        $this->isJSON      = $isJSON;
+        $this->isFile      = $isFile;
+        $this->isDate      = $isDate;
 
-        $this->dateType  = $dateType;
-        $this->dateInput = $dateInput;
-        $this->hourInput = $hourInput;
+        $this->dateType    = $dateType;
+        $this->dateInput   = $dateInput;
+        $this->hourInput   = $hourInput;
+        $this->useTimeZone = $useTimeZone;
     }
 
 

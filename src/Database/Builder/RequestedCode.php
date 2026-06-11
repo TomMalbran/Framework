@@ -156,15 +156,16 @@ class RequestedCode {
                 if ($requested->hourInput !== "") {
                     $default = "null";
                 }
-                $dateType = $requested->dateType->toString();
+                $dateType = "DateType::{$requested->dateType->toString()}";
                 if ($requested->dateType === DateType::None) {
-                    $dateType = "None";
+                    $dateType = "DateType::None";
                 }
 
-                $date   = $requested->dateInput !== "" ? $requested->dateInput : $name;
-                $hour   = $requested->hourInput;
-                $getter = "\$instance->request->getDate(\"{$date}\", \"{$hour}\", DateType::{$dateType})";
-                $setter = "\${$requested->name} === null ? Date::empty() : \${$name}";
+                $date     = $requested->dateInput !== "" ? $requested->dateInput : $name;
+                $hour     = $requested->hourInput;
+                $timeZone = $requested->useTimeZone ? "useTimeZone: true" : "useTimeZone: false";
+                $getter   = "\$instance->request->getDate(\"{$date}\", \"{$hour}\", {$dateType}, {$timeZone})";
+                $setter   = "\${$requested->name} === null ? Date::empty() : \${$name}";
                 break;
 
             case RequestedType::Status:
