@@ -33,7 +33,9 @@ class ActionLog extends LogActionSchema {
 
         foreach ($mappings as $key => $column) {
             $value = $request->getString($key);
-            $query->where($column, Operator::Equal, $value, condition: $value !== "");
+            if (!Arrays::isEmpty($value)) {
+                $query->where($column, Operator::Equal, $value);
+            }
         }
 
         $query->search([
