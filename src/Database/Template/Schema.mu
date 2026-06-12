@@ -197,7 +197,7 @@ class {{name}}Schema extends Schema {
             {{pads}}if ($request->{{fieldName}} === "") {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_EMPTY";
         {{/isRequired}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== "" && !URL::isValidUrl($request->{{fieldName}})) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== "" && !URL::isValid($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "GENERAL_ERROR_URL_INVALID";
             {{pads}}}
     {{/isUrl}}
