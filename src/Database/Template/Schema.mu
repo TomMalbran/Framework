@@ -170,12 +170,12 @@ class {{name}}Schema extends Schema {
             {{pads}}    $errors->{{fieldName}} = "{{typeInvError}}";
         {{/typeOf}}
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#maxLength}}
-            {{pads}}} elseif (Strings::length($request->{{fieldName}}) > {{maxLength}}) {
-            {{pads}}    $errors->add("{{fieldName}}", "{{fieldError}}_LENGTH", {{maxLength}});
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (Strings::length($request->{{fieldName}}) > {{maxLength}}) {
+            {{pads}}    $errors->add("{{fieldName}}", "{{fieldError}}{{#lengthSuffix}}_LENGTH{{/lengthSuffix}}", {{maxLength}});
         {{/maxLength}}
             {{pads}}}
     {{/isString}}
@@ -219,11 +219,11 @@ class {{name}}Schema extends Schema {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
         {{/isNumeric}}
         {{#isUnique}}
-            {{pads}}} elseif (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#greaterThan}}
-            {{pads}}} elseif ($request->{{fieldName}} < $request->{{greaterThan}}) {
+            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} < $request->{{greaterThan}}) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_GREATER";
         {{/greaterThan}}
             {{pads}}}
