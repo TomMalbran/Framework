@@ -233,7 +233,7 @@ class Date implements JsonSerializable {
             $day    !== null ? $day    : $this->getDay(),
             $year   !== null ? $year   : $this->getYear(),
         );
-        return new Date($time);
+        return new Date($time, $this->hour);
     }
 
     /**
@@ -354,7 +354,7 @@ class Date implements JsonSerializable {
             return Date::empty();
         }
         $timestamp = TimeZone::toServerTime($this->timestamp, $useTimeZone);
-        return new Date($timestamp);
+        return new Date($timestamp, $this->hour);
     }
 
     /**

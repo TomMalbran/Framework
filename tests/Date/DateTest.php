@@ -1174,6 +1174,18 @@ class DateTest extends TestCase {
     }
 
 
+    public function testKeepsHourText(): void {
+        $d = Date::create("2020-02-03", "10:30");
+
+        $this->assertSame("10:30", $d->set(day: 4)->getHourText());
+        $this->assertSame("10:30", $d->add(days: 1)->getHourText());
+        $this->assertSame("10:30", $d->subtract(days: 1)->getHourText());
+        $this->assertSame("10:30", $d->setHourMinute("12:45")->getHourText());
+        $this->assertSame("10:30", $d->toDayStart()->getHourText());
+        $this->assertSame("10:30", $d->toServerTime(false)->getHourText());
+    }
+
+
     #[DataProvider("providerHasHour")]
     public function testHasHour(mixed $input, string $hour, bool $expected): void {
         $d = Date::create($input, $hour);
