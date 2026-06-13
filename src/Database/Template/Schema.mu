@@ -207,23 +207,23 @@ class {{name}}Schema extends Schema {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#emptySuffix}}_EMPTY{{/emptySuffix}}";
         {{/isRequired}}
         {{#typeOf}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== 0 && !{{typeOf}}::{{method}}($request->{{fieldName}})) {
+            {{pads}}{{#useTypeOfElse}}} else{{/useTypeOfElse}}if ($request->{{fieldName}} !== 0 && !{{typeOf}}::{{method}}($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "{{typeOfError}}";
         {{/typeOf}}
         {{#belongsTo}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} !== 0 && !{{belongsTo}}::{{method}}($request->{{fieldName}})) {
+            {{pads}}{{#useBelongsToElse}}} else{{/useBelongsToElse}}if ($request->{{fieldName}} !== 0 && !{{belongsTo}}::{{method}}($request->{{fieldName}})) {
             {{pads}}    $errors->{{fieldName}} = "{{belongsToError}}";
         {{/belongsTo}}
         {{#isNumeric}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if (!Numbers::isValid($request->{{fieldName}}{{numericParams}})) {
+            {{pads}}{{#useNumericElse}}} else{{/useNumericElse}}if (!Numbers::isValid($request->{{fieldName}}{{numericParams}})) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}{{#invalidPrefix}}_INVALID{{/invalidPrefix}}";
         {{/isNumeric}}
         {{#isUnique}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
+            {{pads}}{{#useUniqueElse}}} else{{/useUniqueElse}}if (self::{{fieldName}}Exists($request->{{fieldName}}{{parentsSecList}}, $id)) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_EXISTS";
         {{/isUnique}}
         {{#greaterThan}}
-            {{pads}}{{#isRequired}}} else{{/isRequired}}if ($request->{{fieldName}} < $request->{{greaterThan}}) {
+            {{pads}}{{#useGreaterElse}}} else{{/useGreaterElse}}if ($request->{{fieldName}} < $request->{{greaterThan}}) {
             {{pads}}    $errors->{{fieldName}} = "{{fieldError}}_GREATER";
         {{/greaterThan}}
             {{pads}}}

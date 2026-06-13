@@ -406,24 +406,38 @@ class SchemaCode {
                 break;
 
             case ValidateType::Number:
+                $hasTypeOf    = $validate->typeOf !== "";
+                $hasBelongsTo = $validate->belongsTo !== "";
+                $isNumeric    = !$hasTypeOf && !$hasBelongsTo;
+
                 $validation = [
-                    "isNumber"       => true,
-                    "isRequired"     => $validate->isRequired,
-                    "isUnique"       => $validate->isUnique,
-                    "emptySuffix"    => $validate->isUnique || $validate->isNumeric,
-                    "typeOf"         => Strings::substringAfter($validate->typeOf, "\\"),
-                    "typeOfError"    => $validate->getTypeOfError(),
-                    "belongsTo"      => Strings::substringAfter($validate->belongsTo, "\\"),
-                    "belongsToError" => $validate->getBelongsToError(),
-                    "method"         => $validate->method,
-                    "withParent"     => $validate->withParent,
-                    "isNumeric"      => $validate->typeOf === "" && $validate->belongsTo === "",
-                    "validFunc"      => $validate->isNumeric ? "isValidNumber" : "isValid",
-                    "invalidPrefix"  => $validate->isRequired || $validate->greaterThan !== "",
-                    "numericParams"  => $validate->getNumericParams(),
-                    "greaterThan"    => $validate->greaterThan,
-                    "fieldName"      => $validate->name,
-                    "fieldError"     => $validate->getFieldError(),
+                    "isNumber"         => true,
+                    "fieldName"        => $validate->name,
+                    "fieldError"       => $validate->getFieldError(),
+
+                    "isRequired"       => $validate->isRequired,
+                    "emptySuffix"      => $validate->isUnique || $validate->isNumeric,
+
+                    "useTypeOfElse"    => $validate->isRequired,
+                    "typeOf"           => Strings::substringAfter($validate->typeOf, "\\"),
+                    "typeOfError"      => $validate->getTypeOfError(),
+                    "method"           => $validate->method,
+
+                    "useBelongsToElse" => $validate->isRequired || $hasTypeOf,
+                    "belongsTo"        => Strings::substringAfter($validate->belongsTo, "\\"),
+                    "belongsToError"   => $validate->getBelongsToError(),
+
+                    "useNumericElse"   => $validate->isRequired || $hasTypeOf || $hasBelongsTo,
+                    "isNumeric"        => $isNumeric,
+                    "numericParams"    => $validate->getNumericParams(),
+                    "invalidPrefix"    => $validate->isRequired || $validate->greaterThan !== "",
+
+                    "useUniqueElse"    => $validate->isRequired || $hasTypeOf || $hasBelongsTo || $isNumeric,
+                    "isUnique"         => $validate->isUnique,
+
+                    "useGreaterElse"   => $validate->isRequired || $hasTypeOf || $hasBelongsTo ||
+                        $isNumeric || $validate->isUnique,
+                    "greaterThan"      => $validate->greaterThan,
                 ];
                 break;
 
