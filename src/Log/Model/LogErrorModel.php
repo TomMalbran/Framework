@@ -47,7 +47,7 @@ class LogErrorModel {
     #[Field]
     public int $amount = 0;
 
-    #[Field, Requested(isString: true)]
+    #[Field, Requested(isString: true, canEdit: false)]
     public bool $isResolved = false;
 
     #[Field]
