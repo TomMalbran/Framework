@@ -59,7 +59,7 @@ class CredentialModel {
     #[Field, Requested]
     public bool $sendTickets = false;
 
-    #[Field(isSigned: true), Requested]
+    #[Field(isSigned: true), Requested(canEdit: false)]
     public int $timezone = 0;
 
 
@@ -69,7 +69,7 @@ class CredentialModel {
     #[Field, Requested(canEdit: false)]
     public string $appearance = "";
 
-    #[Field, Requested]
+    #[Field, Requested(canEdit: false)]
     public Access $access = Access::None;
 
     #[Field, Requested(canEdit: false)]
@@ -78,7 +78,7 @@ class CredentialModel {
     #[Field, Requested(canEdit: false)]
     public string $salt = "";
 
-    #[Field, Requested]
+    #[Field, Requested(canEdit: false)]
     public bool $reqPassChange = false;
 
     #[Field]
@@ -102,7 +102,7 @@ class CredentialModel {
     #[Field]
     public int $progressValue = 0;
 
-    #[Field, Requested]
+    #[Field, Requested(canEdit: false)]
     public Status $status = Status::None;
 
 

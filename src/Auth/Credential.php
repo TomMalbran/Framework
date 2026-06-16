@@ -295,17 +295,25 @@ class Credential extends CredentialSchema {
     /**
      * Creates a new Credential
      * @param CredentialRequest $request
+     * @param bool              $fromAdmin Optional.
      * @return int
      */
-    public static function create(CredentialRequest $request): int {
+    public static function create(
+        CredentialRequest $request,
+        bool $fromAdmin = false,
+    ): int {
         $credentialID = self::createEntity(
             $request,
             name:             Strings::merge($request->firstName, $request->lastName),
             lastLogin:        Date::now(),
             currentLogin:     Date::now(),
+            reqPassChange:    $fromAdmin ? $request->reqPassChange : null,
+            observations:     $fromAdmin ? $request->observations  : null,
             askNotifications: true,
         );
+        self::setAccess($credentialID, $request->access);
         self::setPassword($credentialID, $request->password);
+        self::setStatus($credentialID, $request->status);
         return $credentialID;
     }
 
@@ -313,15 +321,24 @@ class Credential extends CredentialSchema {
      * Edits the given Credential
      * @param int               $credentialID
      * @param CredentialRequest $request
+     * @param bool              $fromAdmin    Optional.
      * @return void
      */
-    public static function edit(int $credentialID, CredentialRequest $request): void {
+    public static function edit(
+        int $credentialID,
+        CredentialRequest $request,
+        bool $fromAdmin = false,
+    ): void {
         self::editEntity(
             $credentialID,
             $request,
-            name: Strings::merge($request->firstName, $request->lastName),
+            name:          Strings::merge($request->firstName, $request->lastName),
+            reqPassChange: $fromAdmin ? $request->reqPassChange : null,
+            observations:  $fromAdmin ? $request->observations  : null,
         );
+        self::setAccess($credentialID, $request->access);
         self::setPassword($credentialID, $request->password);
+        self::setStatus($credentialID, $request->status);
     }
 
     /**
@@ -336,10 +353,10 @@ class Credential extends CredentialSchema {
     /**
      * Destroys the Credential
      * @param int $credentialID
-     * @return bool
+     * @return void
      */
-    public static function destroy(int $credentialID): bool {
-        return self::editEntity(
+    public static function destroy(int $credentialID): void {
+        self::editEntity(
             $credentialID,
             currentUser:      0,
             email:            "mail@mail.com",
@@ -372,71 +389,85 @@ class Credential extends CredentialSchema {
      * Sets the current User for the given Credential
      * @param int $credentialID
      * @param int $userID
-     * @return bool
+     * @return void
      */
-    public static function setCurrentUser(int $credentialID, int $userID): bool {
-        return self::editEntity($credentialID, currentUser: $userID);
+    public static function setCurrentUser(int $credentialID, int $userID): void {
+        self::editEntity($credentialID, currentUser: $userID);
     }
 
     /**
      * Sets the Credential Access
      * @param int    $credentialID
      * @param Access $access
-     * @return bool
+     * @return void
      */
-    public static function setAccess(int $credentialID, Access $access): bool {
-        return self::editEntity($credentialID, access: $access);
+    public static function setAccess(int $credentialID, Access $access): void {
+        if ($access !== Access::None) {
+            self::editEntity($credentialID, access: $access);
+        }
     }
 
     /**
      * Sets the Credential Email
      * @param int    $credentialID
      * @param string $email
-     * @return bool
+     * @return void
      */
-    public static function setEmail(int $credentialID, string $email): bool {
-        return self::editEntity($credentialID, email: $email);
+    public static function setEmail(int $credentialID, string $email): void {
+        self::editEntity($credentialID, email: $email);
     }
 
     /**
      * Updates the Language for the given Credential
      * @param int    $credentialID
      * @param string $language
-     * @return bool
+     * @return void
      */
-    public static function setLanguage(int $credentialID, string $language): bool {
+    public static function setLanguage(int $credentialID, string $language): void {
         $language = Strings::substringBefore($language, "-");
-        return self::editEntity($credentialID, language: $language);
+        self::editEntity($credentialID, language: $language);
     }
 
     /**
      * Updates the Timezone for the given Credential
      * @param int $credentialID
      * @param int $timezone
-     * @return bool
+     * @return void
      */
-    public static function setTimezone(int $credentialID, int $timezone): bool {
-        return self::editEntity($credentialID, timezone: $timezone);
+    public static function setTimezone(int $credentialID, int $timezone): void {
+        self::editEntity($credentialID, timezone: $timezone);
     }
 
     /**
      * Sets the Credential Avatar
      * @param int    $credentialID
      * @param string $avatar
-     * @return bool
+     * @return void
      */
-    public static function setAvatar(int $credentialID, string $avatar): bool {
-        return self::editEntity($credentialID, avatar: $avatar);
+    public static function setAvatar(int $credentialID, string $avatar): void {
+        self::editEntity($credentialID, avatar: $avatar);
     }
 
     /**
      * Sets the Credential Appearance
      * @param int    $credentialID
      * @param string $appearance
-     * @return bool
+     * @return void
      */
-    public static function setAppearance(int $credentialID, string $appearance): bool {
-        return self::editEntity($credentialID, appearance: $appearance);
+    public static function setAppearance(int $credentialID, string $appearance): void {
+        self::editEntity($credentialID, appearance: $appearance);
+    }
+
+    /**
+     * Sets the Credential Status
+     * @param int              $credentialID
+     * @param CredentialStatus $status
+     * @return void
+     */
+    public static function setStatus(int $credentialID, CredentialStatus $status): void {
+        if ($status !== CredentialStatus::None) {
+            self::editEntity($credentialID, status: $status);
+        }
     }
 
     /**
@@ -558,16 +589,6 @@ class Credential extends CredentialSchema {
      */
     public static function setProgress(int $credentialID, int $value): bool {
         return self::editEntity($credentialID, progressValue: $value);
-    }
-
-    /**
-     * Sets the Credential Status
-     * @param int              $credentialID
-     * @param CredentialStatus $status
-     * @return bool
-     */
-    public static function setStatus(int $credentialID, CredentialStatus $status): bool {
-        return self::editEntity($credentialID, status: $status);
     }
 
     /**
