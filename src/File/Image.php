@@ -55,9 +55,12 @@ class Image {
      * @return int
      */
     public static function getType(string $fileName): int {
-        if (!URL::isValid($fileName) && !Storage::fileExists($fileName)) {
+        if (URL::isValid($fileName)) {
+            $fileName = URL::encode($fileName);
+        } elseif (!Storage::fileExists($fileName)) {
             return 0;
         }
+
         $result = exif_imagetype($fileName);
         return $result === false ? 0 : $result;
     }
