@@ -7,6 +7,7 @@
 # generated files
 src/System
 src/*/Schema
+src/Log/Type
 
 # misc
 .DS_Store

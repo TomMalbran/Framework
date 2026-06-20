@@ -60,6 +60,7 @@ parameters:
         requireNamedBoolArg: true
         requireOptionalComment: true
         requireReturnType: true
+        actionLogLanguages: ['es','en']
 
     # Ignore Errors
     ignoreErrors:

@@ -6,6 +6,7 @@ use Framework\Log\Model\LogSessionModel;
 
 use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
+use Framework\Database\Model\Virtual;
 use Framework\Database\Model\Requested;
 use Framework\Database\Model\Relation;
 
@@ -38,6 +39,14 @@ class LogActionModel {
 
     #[Field(isText: true)]
     public string $dataID = "";
+
+
+
+    #[Virtual]
+    public string $moduleName = "";
+
+    #[Virtual]
+    public string $actionName = "";
 
 
 

@@ -4,8 +4,10 @@ namespace Framework\Log;
 use Framework\Auth\Auth;
 use Framework\Database\Query\Operator;
 use Framework\Log\SessionLog;
+use Framework\Log\Type\LogIntl;
 use Framework\Log\Schema\LogActionSchema;
 use Framework\Log\Schema\LogActionRequest;
+use Framework\Log\Schema\LogActionEntity;
 use Framework\Log\Schema\LogActionColumn;
 use Framework\Log\Schema\LogActionQuery;
 use Framework\System\Config;
@@ -48,6 +50,20 @@ class ActionLog extends LogActionSchema {
         $query->createdTime->inPeriod($request);
         return $query;
     }
+
+    /**
+     * Post Process the Result
+     * @param LogActionEntity $logAction
+     * @return LogActionEntity
+     */
+    #[\Override]
+    protected static function postProcess(LogActionEntity $logAction): LogActionEntity {
+        $logAction->moduleName = LogIntl::getModuleName($logAction->module);
+        $logAction->actionName = LogIntl::getActionName($logAction->module, $logAction->action);
+        return $logAction;
+    }
+
+
 
     /**
      * Returns all the Actions Log items
@@ -101,7 +117,10 @@ class ActionLog extends LogActionSchema {
      * @param array<string,LogActionColumn> $mappings Optional.
      * @return int
      */
-    public static function getAmount(LogActionRequest $request, array $mappings = []): int {
+    public static function getAmount(
+        LogActionRequest $request,
+        array $mappings = [],
+    ): int {
         $query = self::createQuery($request, $mappings);
         return self::getEntityTotal($query);
     }
@@ -163,7 +182,12 @@ class ActionLog extends LogActionSchema {
      * @param int       $credentialID Optional.
      * @return bool
      */
-    public static function add(string $module, string $action, mixed $dataID = 0, int $credentialID = 0): bool {
+    public static function add(
+        string $module,
+        string $action,
+        mixed $dataID = 0,
+        int $credentialID = 0,
+    ): bool {
         $credentialID = self::getCredentialID($credentialID);
         $sessionID    = SessionLog::getID($credentialID);
         if ($sessionID === 0) {

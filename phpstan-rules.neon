@@ -10,6 +10,7 @@ rules:
     - Framework\Analysis\Route\RouteReturnTypeRule
     - Framework\Analysis\Route\RouteDuplicateRule
     - Framework\Analysis\Signal\ListenerReturnVoidRule
+    - Framework\Analysis\Log\ActionSectionRule
 
 services:
     -
@@ -100,6 +101,12 @@ services:
             enabled: %framework.requireReturnType%
         tags:
             - phpstan.rules.rule
+    -
+        class: Framework\Analysis\Log\ActionAttributeRule
+        arguments:
+            requiredLanguages: %framework.actionLogLanguages%
+        tags:
+            - phpstan.rules.rule
 
 
 parameters:
@@ -118,6 +125,7 @@ parameters:
         requireNamedBoolArg: false
         requireOptionalComment: false
         requireReturnType: false
+        actionLogLanguages: ['en', 'es']
 
 parametersSchema:
     framework: structure([
@@ -135,4 +143,5 @@ parametersSchema:
         requireNamedBoolArg: bool()
         requireOptionalComment: bool()
         requireReturnType: bool()
+        actionLogLanguages: listOf(string())
     ])

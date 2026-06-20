@@ -126,13 +126,23 @@ class Builder {
         ]);
         Storage::createFile($writePath, "$name.php", $contents);
 
+        self::printResult($name, $data);
+        return 1;
+    }
+
+    /**
+     * Prints the result of a generated code
+     * @param string              $name
+     * @param array<string,mixed> $data Optional.
+     * @return void
+     */
+    public static function printResult(string $name, array $data = []): void {
         $total = "";
         if (isset($data["total"]) && is_int($data["total"])) {
             $plural = $data["total"] !== 1 ? "s" : "";
             $total  = "-> {$data["total"]} item$plural";
         }
         print("- $name code $total\n");
-        return 1;
     }
 
     /**
