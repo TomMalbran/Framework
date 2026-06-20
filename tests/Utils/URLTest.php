@@ -211,6 +211,22 @@ class URLTest extends TestCase {
     }
 
 
+    #[DataProvider("providerDecodeSpaces")]
+    public function testDecodeSpaces(string $input, string $expected): void {
+        $this->assertEquals($expected, URL::decodeSpaces($input));
+    }
+
+    public static function providerDecodeSpaces(): array {
+        return [
+            "encoded_spaces_single"   => [ "a%20b", "a b" ],
+            "encoded_spaces_multiple" => [ "a%20%20b", "a  b" ],
+            "no_encoded_spaces"       => [ "a", "a" ],
+            "forward_slash"           => [ "a/b", "a/b" ],
+            "plus_sign"               => [ "a+b", "a+b" ],
+        ];
+    }
+
+
     #[DataProvider("providerAddParams")]
     public function testAddParams(string $path, array|null $params, string $expected): void {
         $result = URL::addParams($path, $params);

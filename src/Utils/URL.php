@@ -145,6 +145,15 @@ class URL {
         return str_replace(" ", "%20", $url);
     }
 
+    /**
+     * Decodes the URL spaces
+     * @param string $url
+     * @return string
+     */
+    public static function decodeSpaces(string $url): string {
+        return str_replace("%20", " ", $url);
+    }
+
 
 
     /**
