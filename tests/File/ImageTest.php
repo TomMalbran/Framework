@@ -30,6 +30,7 @@ class ImageTest extends TestCase {
             "xbm"         => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.xbm",
             "transparent" => $this->tmpDir . DIRECTORY_SEPARATOR . "transparent.png",
             "large"       => $this->tmpDir . DIRECTORY_SEPARATOR . "large-transparent.png",
+            "spaced"      => $this->tmpDir . DIRECTORY_SEPARATOR . "space image.png",
             "text"        => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.txt",
             "missing"     => $this->tmpDir . DIRECTORY_SEPARATOR . "missing.png",
         ];
@@ -41,11 +42,18 @@ class ImageTest extends TestCase {
         $this->writeFixtureImage($this->files["xbm"], 16, 100, 100);
         $this->writeFixtureImage($this->files["transparent"], 3, 20, 10, transparent: true);
         $this->writeFixtureImage($this->files["large"], 3, 60, 60, transparent: true);
+        $this->writeFixtureImage($this->files["spaced"], 3, 12, 18);
 
         @file_put_contents($this->files["text"], "not an image");
+
+        $GLOBALS["test_image_url_files"] = [];
+        foreach ($this->files as $path) {
+            $GLOBALS["test_image_url_files"][basename($path)] = $path;
+        }
     }
 
     protected function tearDown(): void {
+        unset($GLOBALS["test_image_url_files"]);
         Storage::deleteDir($this->tmpDir);
     }
 
@@ -69,55 +77,82 @@ class ImageTest extends TestCase {
 
 
     #[DataProvider("providerIsValidType")]
-    public function testIsValidType(string $token, bool $expected): void {
-        $path = $this->files[$token] ?? "";
-        $this->assertSame($expected, Image::isValidType($path));
+    public function testIsValidType(string $token, bool $expected, bool $url = false): void {
+        $path = $url ? $this->getFixtureUrl($token) : ($this->files[$token] ?? "");
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::isValidType($path),
+            suppress: $url,
+        );
+
+        $this->assertSame($expected, $result);
     }
 
     public static function providerIsValidType(): array {
         return [
-            "gif"     => [ "gif", true ],
-            "jpeg"    => [ "jpeg", true ],
-            "png"     => [ "png", true ],
-            "text"    => [ "text", false ],
-            "missing" => [ "missing", false ],
-            "invalid" => [ "invalid", false ],
+            "gif"         => [ "gif", true ],
+            "jpeg"        => [ "jpeg", true ],
+            "png"         => [ "png", true ],
+            "text"        => [ "text", false ],
+            "missing"     => [ "missing", false ],
+            "invalid"     => [ "invalid", false ],
+            "png_url"     => [ "png", true, true ],
+            "spaced_url"  => [ "spaced", true, true ],
+            "text_url"    => [ "text", false, true ],
+            "missing_url" => [ "missing", false, true ],
         ];
     }
 
 
     #[DataProvider("providerGetType")]
-    public function testGetType(string $token, int $expected): void {
-        $path = $this->files[$token] ?? "";
-        $this->assertSame($expected, Image::getType($path));
+    public function testGetType(string $token, int $expected, bool $url = false): void {
+        $path = $url ? $this->getFixtureUrl($token) : ($this->files[$token] ?? "");
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::getType($path),
+            suppress: $url,
+        );
+
+        $this->assertSame($expected, $result);
     }
 
     public static function providerGetType(): array {
         return [
-            "gif"     => [ "gif", 1 ],
-            "jpeg"    => [ "jpeg", 2 ],
-            "png"     => [ "png", 3 ],
-            "text"    => [ "text", 0 ],
-            "missing" => [ "missing", 0 ],
-            "invalid" => [ "invalid", 0 ],
+            "gif"         => [ "gif", 1 ],
+            "jpeg"        => [ "jpeg", 2 ],
+            "png"         => [ "png", 3 ],
+            "text"        => [ "text", 0 ],
+            "missing"     => [ "missing", 0 ],
+            "invalid"     => [ "invalid", 0 ],
+            "png_url"     => [ "png", 3, true ],
+            "spaced_url"  => [ "spaced", 3, true ],
+            "text_url"    => [ "text", 0, true ],
+            "missing_url" => [ "missing", 0, true ],
         ];
     }
 
 
     #[DataProvider("providerGetMimeType")]
-    public function testGetMimeType(string $token, string $expected): void {
-        $path = $this->files[$token] ?? "";
-        $this->assertSame($expected, Image::getMimeType($path));
+    public function testGetMimeType(string $token, string $expected, bool $url = false): void {
+        $path = $url ? $this->getFixtureUrl($token) : ($this->files[$token] ?? "");
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::getMimeType($path),
+            suppress: $url,
+        );
+
+        $this->assertSame($expected, $result);
     }
 
     public static function providerGetMimeType(): array {
         return [
-            "gif"     => [ "gif", "image/gif" ],
-            "jpeg"    => [ "jpeg", "image/jpeg" ],
-            "png"     => [ "png", "image/png" ],
-            "text"    => [ "text", "application/octet-stream" ],
-            "missing" => [ "missing", "" ],
-            "invalid" => [ "invalid", "" ],
+            "gif"         => [ "gif", "image/gif" ],
+            "jpeg"        => [ "jpeg", "image/jpeg" ],
+            "png"         => [ "png", "image/png" ],
+            "text"        => [ "text", "application/octet-stream" ],
+            "missing"     => [ "missing", "" ],
+            "invalid"     => [ "invalid", "" ],
+            "jpeg_url"    => [ "jpeg", "image/jpeg", true ],
+            "spaced_url"  => [ "spaced", "image/png", true ],
+            "text_url"    => [ "text", "application/octet-stream", true ],
+            "missing_url" => [ "missing", "application/octet-stream", true ],
         ];
     }
 
@@ -141,8 +176,8 @@ class ImageTest extends TestCase {
 
 
     #[DataProvider("providerGetSizeFromUrl")]
-    public function testGetSizeFromUrl(string $token, array $expected): void {
-        $path   = $this->files[$token] ?? "";
+    public function testGetSizeFromUrl(string $token, array $expected, bool $url = false): void {
+        $path   = $url ? $this->getFixtureUrl($token) : ($this->files[$token] ?? "");
         $result = $this->runWithSuppressedWarnings(
             fn() => Image::getSizeFromUrl($path),
             suppress: true,
@@ -153,12 +188,17 @@ class ImageTest extends TestCase {
 
     public static function providerGetSizeFromUrl(): array {
         return [
-            "gif"     => [ "gif", [ 30, 15, 1 ] ],
-            "jpeg"    => [ "jpeg", [ 200, 100, 2 ] ],
-            "png"     => [ "png", [ 10, 20, 3 ] ],
-            "text"    => [ "text", [ 0, 0, 0 ] ],
-            "missing" => [ "missing", [ 0, 0, 0 ] ],
-            "invalid" => [ "invalid", [ 0, 0, 0 ] ],
+            "gif"         => [ "gif", [ 30, 15, 1 ] ],
+            "jpeg"        => [ "jpeg", [ 200, 100, 2 ] ],
+            "png"         => [ "png", [ 10, 20, 3 ] ],
+            "text"        => [ "text", [ 0, 0, 0 ] ],
+            "missing"     => [ "missing", [ 0, 0, 0 ] ],
+            "invalid"     => [ "invalid", [ 0, 0, 0 ] ],
+            "gif_url"     => [ "gif", [ 30, 15, 1 ], true ],
+            "jpeg_url"    => [ "jpeg", [ 200, 100, 2 ], true ],
+            "spaced_url"  => [ "spaced", [ 12, 18, 3 ], true ],
+            "text_url"    => [ "text", [ 0, 0, 0 ], true ],
+            "missing_url" => [ "missing", [ 0, 0, 0 ], true ],
         ];
     }
 
@@ -493,5 +533,11 @@ class ImageTest extends TestCase {
             "maximum_jpeg"       => [ "jpeg", "thumb-maximum.jpg", 50, 50, Image::Maximum, true, [ 50, 25, 2 ] ],
             "thumb_large_png"    => [ "large", "thumb-large.png", 30, 30, Image::Thumb, true, [ 30, 30, 3 ] ],
         ];
+    }
+
+
+    private function getFixtureUrl(string $token): string {
+        $path = $this->files[$token] ?? $this->files["missing"];
+        return "http://image.test/" . basename($path);
     }
 }
