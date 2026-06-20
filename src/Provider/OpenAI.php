@@ -429,7 +429,11 @@ class OpenAI {
      * @param string $language
      * @return OpenAIOutput
      */
-    public static function transcribeAudio(string $fileContent, string $fileName, string $language): OpenAIOutput {
+    public static function transcribeAudio(
+        string $fileContent,
+        string $fileName,
+        string $language,
+    ): OpenAIOutput {
         $timer    = new Timer();
         $response = self::upload("/audio/transcriptions", [
             "file"            => new CURLStringFile($fileContent, $fileName),

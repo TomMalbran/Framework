@@ -129,7 +129,12 @@ class ErrorLog extends LogErrorSchema {
      * @param int    $line        Optional.
      * @return bool
      */
-    public static function handler(int $errorCode, string $description, string $filePath = "", int $line = 0): bool {
+    public static function handler(
+        int $errorCode,
+        string $description,
+        string $filePath = "",
+        int $line = 0,
+    ): bool {
         if (!self::hasPrimaryKey()) {
             return false;
         }
@@ -261,7 +266,8 @@ class ErrorLog extends LogErrorSchema {
             $index     = 1;
             foreach ($trace as $item) {
                 if (Strings::startsWith($item, "#") && !Strings::contains($item, "{main}")) {
-                    $backtrace .= "#{$index}- " . Strings::substringAfter($item, " ", useFirst: true) . "\n";
+                    $line       = Strings::substringAfter($item, " ", useFirst: true);
+                    $backtrace .= "#{$index}- $line\n";
                     $index     += 1;
                 }
             }
@@ -272,11 +278,15 @@ class ErrorLog extends LogErrorSchema {
         $backtrace = "";
         $index     = 1;
         for ($i = count($trace) - 1; $i >= 2; $i -= 1) {
-            $item       = $trace[$i] ?? [];
-            $function   = $item["function"] ?? "";
+            $item     = $trace[$i] ?? [];
+            $function = $item["function"] ?? "";
+            $file     = "<unknown file>";
+            if (isset($item["file"])) {
+                $file = self::getFilePath($item["file"]);
+            }
 
             $backtrace .= "#{$index}- ";
-            $backtrace .= (isset($item["file"]) ? self::getFilePath($item["file"]) : "<unknown file>") . " ";
+            $backtrace .= "$file ";
             $backtrace .= "(" . ($item["line"] ?? "<unknown line>") . ") ";
             $backtrace .= " -> {$function}()" . "\n";
             $index     += 1;

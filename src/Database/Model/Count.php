@@ -115,9 +115,13 @@ class Count {
      */
     public function getExpression(string $mainKey): Query {
         $table    = SchemaModel::getDbTableName($this->modelName);
-        $onTable  = $this->otherModelName !== "" ? SchemaModel::getDbTableName($this->otherModelName) : $mainKey;
         $leftKey  = SchemaModel::getDbFieldName($this->fieldName);
         $rightKey = SchemaModel::getDbFieldName($this->fieldName);
+
+        $onTable = $mainKey;
+        if ($this->otherModelName !== "") {
+            $onTable = SchemaModel::getDbTableName($this->otherModelName);
+        }
 
         $query = Query::select($table)
             ->column("COUNT(*)")

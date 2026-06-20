@@ -100,7 +100,13 @@ class Database {
      * @return void
      */
     public function connect(): void {
-        $this->mysqli = new mysqli($this->host, $this->username, $this->password, $this->database, $this->port);
+        $this->mysqli = new mysqli(
+            $this->host,
+            $this->username,
+            $this->password,
+            $this->database,
+            $this->port,
+        );
         if ($this->mysqli->connect_error !== null) {
             $errno = $this->mysqli->connect_errno;
             $error = $this->mysqli->connect_error;
@@ -229,11 +235,12 @@ class Database {
                 $types  = "";
                 $params = [];
                 foreach ($bindings as $value) {
-                    // NOTE: For bind_params the first parameter is a string with the types of the following parameters:
-                    //       i | corresponding variable has type `int`
-                    //       d | corresponding variable has type `float`
-                    //       s | corresponding variable has type `string`
-                    //       b | corresponding variable is a blob and will be sent in packets
+                    // NOTE: For bind_params the first parameter is a string with
+                    // the types of the following parameters:
+                    //   i | corresponding variable has type `int`
+                    //   d | corresponding variable has type `float`
+                    //   s | corresponding variable has type `string`
+                    //   b | corresponding variable is a blob and will be sent in packets
                     $types .= match (gettype($value)) {
                         "NULL", "string"     => "s",
                         "boolean", "integer" => "i",
@@ -277,7 +284,8 @@ class Database {
     }
 
     /**
-     * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
+     * Takes care of prepared statements' bind_result method,
+     * when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
      * @return bool
      */
@@ -296,7 +304,8 @@ class Database {
     }
 
     /**
-     * Takes care of prepared statements' bind_result method, when the number of variables to pass is unknown.
+     * Takes care of prepared statements' bind_result method,
+     * when the number of variables to pass is unknown.
      * @param mysqli_stmt|null $statement
      * @return list<array<string,int|string|null>>
      */
@@ -480,7 +489,12 @@ class Database {
      * @param list<string>         $keys
      * @return string
      */
-    public function createTable(string $tableName, array $fields, array $primary, array $keys): string {
+    public function createTable(
+        string $tableName,
+        array $fields,
+        array $primary,
+        array $keys,
+    ): string {
         $charset = $this->charset !== "" ? $this->charset : "utf8";
         $sql     = "CREATE TABLE `$tableName` (\n";
 
@@ -578,7 +592,12 @@ class Database {
      * @param string $afterColumn Optional.
      * @return string
      */
-    public function addColumn(string $tableName, string $column, string $type, string $afterColumn = ""): string {
+    public function addColumn(
+        string $tableName,
+        string $column,
+        string $type,
+        string $afterColumn = "",
+    ): string {
         $sql  = "ALTER TABLE `$tableName` ADD COLUMN `$column` $type ";
         $sql .= $afterColumn !== "" ? "AFTER `$afterColumn`" : "FIRST";
         $this->execute($sql);
@@ -593,7 +612,12 @@ class Database {
      * @param string $type      Optional.
      * @return string
      */
-    public function renameColumn(string $tableName, string $oldColumn, string $newColumn, string $type = ""): string {
+    public function renameColumn(
+        string $tableName,
+        string $oldColumn,
+        string $newColumn,
+        string $type = "",
+    ): string {
         if ($type === "") {
             $sql = "ALTER TABLE `$tableName` RENAME COLUMN `$oldColumn` TO `$newColumn`";
         } else {
@@ -611,7 +635,12 @@ class Database {
      * @param string $afterColumn Optional.
      * @return string
      */
-    public function updateColumn(string $tableName, string $column, string $type, string $afterColumn = ""): string {
+    public function updateColumn(
+        string $tableName,
+        string $column,
+        string $type,
+        string $afterColumn = "",
+    ): string {
         $sql  = "ALTER TABLE `$tableName` MODIFY COLUMN `$column` $type ";
         $sql .= $afterColumn !== "" ? "AFTER `$afterColumn`" : "FIRST";
         $this->execute($sql);

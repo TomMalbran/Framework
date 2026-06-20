@@ -294,7 +294,10 @@ class Strings {
     }
 
     /**
-     * Returns < 0 if string is less than other; > 0 if string is greater than other, and 0 if they are equal
+     * Returns:
+     *   < 0 if string is less than other.
+     *   > 0 if string is greater than other.
+     *   0 if they are equal.
      * @param string $string
      * @param string $other
      * @param bool   $orderAsc        Optional.
@@ -456,7 +459,11 @@ class Strings {
      * @param list<string>|string|null                 $replace Optional.
      * @return string
      */
-    public static function replace(string $string, array|string $search, array|string|null $replace = null): string {
+    public static function replace(
+        string $string,
+        array|string $search,
+        array|string|null $replace = null,
+    ): string {
         if ($replace === null && is_array($search)) {
             $keys   = Arrays::toStrings(array_keys($search));
             $values = Arrays::getValues($search);
@@ -574,7 +581,11 @@ class Strings {
      * @param string $endNeedle
      * @return string
      */
-    public static function stripStartEnd(string $string, string $startNeedle, string $endNeedle): string {
+    public static function stripStartEnd(
+        string $string,
+        string $startNeedle,
+        string $endNeedle,
+    ): string {
         $result = self::stripStart($string, $startNeedle);
         $result = self::stripEnd($result, $endNeedle);
         return $result;
@@ -657,7 +668,12 @@ class Strings {
      * @param bool     $asUtf8 Optional.
      * @return string
      */
-    public static function substring(string $string, int $start, ?int $length = null, bool $asUtf8 = false): string {
+    public static function substring(
+        string $string,
+        int $start,
+        ?int $length = null,
+        bool $asUtf8 = false,
+    ): string {
         if ($asUtf8) {
             return mb_substr($string, $start, $length, "utf-8");
         }
@@ -671,7 +687,11 @@ class Strings {
      * @param bool   $useFirst Optional.
      * @return string
      */
-    public static function substringAfter(string $string, string $needle, bool $useFirst = false): string {
+    public static function substringAfter(
+        string $string,
+        string $needle,
+        bool $useFirst = false,
+    ): string {
         $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
         if ($position === false) {
             return $string;
@@ -686,7 +706,11 @@ class Strings {
      * @param bool   $useFirst Optional.
      * @return string
      */
-    public static function substringBefore(string $string, string $needle, bool $useFirst = true): string {
+    public static function substringBefore(
+        string $string,
+        string $needle,
+        bool $useFirst = true,
+    ): string {
         $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
         if ($position > 0) {
             return substr($string, 0, $position);
@@ -761,7 +785,11 @@ class Strings {
      * @param bool   $withoutEmpty Optional.
      * @return string
      */
-    public static function join(mixed $value, string $glue = "", bool $withoutEmpty = false): string {
+    public static function join(
+        mixed $value,
+        string $glue = "",
+        bool $withoutEmpty = false,
+    ): string {
         if (is_string($value)) {
             return $value;
         }
@@ -908,10 +936,15 @@ class Strings {
         }
 
         if (self::isPascalCase($string) || self::isCamelCase($string)) {
-            // Insert an underscore before any uppercase letter that is not followed by another uppercase letter,
-            // or before an uppercase letter that is followed by a lowercase letter.
+            // Insert an underscore before any uppercase letter that is not
+            // followed by another uppercase letter, or before an uppercase letter
+            // that is followed by a lowercase letter.
             // This handles cases like "CamelCase" -> "camel_case" and "SomeID" -> "some_id".
-            $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', "_" . '$1');
+            $result = self::replacePattern(
+                $string,
+                '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/',
+                "_" . '$1'
+            );
 
             // Insert an underscore before any sequence of two or more uppercase letters
             // that is preceded by a lowercase letter.
@@ -946,10 +979,15 @@ class Strings {
         }
 
         if (self::isPascalCase($string) || self::isCamelCase($string)) {
-            // Insert a hyphen before any uppercase letter that is not followed by another uppercase letter,
-            // or before an uppercase letter that is followed by a lowercase letter.
+            // Insert a hyphen before any uppercase letter that is not
+            // followed by another uppercase letter, or before an uppercase
+            // letter that is followed by a lowercase letter.
             // This handles cases like "CamelCase" -> "camel-case" and "SomeID" -> "some-id".
-            $result = self::replacePattern($string, '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/', "-" . '$1');
+            $result = self::replacePattern(
+                $string,
+                '/(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])/',
+                "-" . '$1',
+            );
 
             // Insert a hyphen before any sequence of two or more uppercase letters
             // that is preceded by a lowercase letter.
@@ -1124,7 +1162,11 @@ class Strings {
      * @param int|null $length     Optional.
      * @return bool
      */
-    public static function isAlphaNum(string $string, bool $withDashes = false, ?int $length = null): bool {
+    public static function isAlphaNum(
+        string $string,
+        bool $withDashes = false,
+        ?int $length = null,
+    ): bool {
         if ($length !== null && strlen($string) !== $length) {
             return false;
         }
@@ -1141,10 +1183,15 @@ class Strings {
      * @param bool   $anal      Optional.
      * @return string
      */
-    public static function sanitize(string $string, bool $lowercase = true, bool $anal = false): string {
+    public static function sanitize(
+        string $string,
+        bool $lowercase = true,
+        bool $anal = false,
+    ): string {
         $strip = [
-            "~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
-            "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
+            "~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")",
+            "_", "=", "+", "[", "{", "]", "}", "\\", "|", ";", ":", "\"", "'",
+            "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
             "â€”", "â€“", ",", "<", ".", ">", "/", "?",
         ];
         $clean = trim(str_replace($strip, "", strip_tags($string)));
@@ -1156,10 +1203,14 @@ class Strings {
             $clean = str_replace($tilde, $with, $clean);
             $clean = self::replacePattern($clean, "/[^a-zA-Z0-9\-]/", "");
         }
-        if ($lowercase) {
-            return function_exists("mb_strtolower") ? mb_strtolower($clean, "UTF-8") : strtolower($clean);
+
+        if (!$lowercase) {
+            return $clean;
         }
-        return $clean;
+        if (function_exists("mb_strtolower")) {
+            return mb_strtolower($clean, "UTF-8");
+        }
+        return strtolower($clean);
     }
 
     /**
@@ -1177,7 +1228,7 @@ class Strings {
             . '\x{1DC0}-\x{1DFF}'      // Combining Diacritical Marks Supplement
             . '\x{1E00}-\x{1EFF}'      // Latin Extended Additional
             . '\x{2000}-\x{209F}'      // General Punctuation
-            . '\x{20D0}-\x{214F}'      // Combining Diacritical Marks for Symbols, Letter-like Symbols
+            . '\x{20D0}-\x{214F}'      // Combining Diacritical Marks for Symbols
             . '\x{2190}-\x{23FF}'      // Arrows, Mathematical Operators
             . '\x{2460}-\x{25FF}'      // Enclosed Alphanumerics, Geometric Shapes
             . '\x{2600}-\x{27EF}'      // Miscellaneous Symbols, Dingbats

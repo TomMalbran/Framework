@@ -95,7 +95,11 @@ class DisallowIntFloatWideningRule implements Rule {
                 return [];
             }
 
-            $variant = ParametersAcceptorSelector::selectFromArgs($scope, $node->getArgs(), $reflection->getVariants());
+            $variant = ParametersAcceptorSelector::selectFromArgs(
+                $scope,
+                $node->getArgs(),
+                $reflection->getVariants(),
+            );
             $parameters = $variant->getParameters();
         } catch (\Exception $e) {
             return [];

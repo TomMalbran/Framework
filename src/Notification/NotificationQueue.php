@@ -38,7 +38,9 @@ class NotificationQueue extends NotificationQueueSchema {
      * @return NotificationQueueQuery
      */
     #[\Override]
-    protected static function createListQuery(NotificationQueueRequest $request): NotificationQueueQuery {
+    protected static function createListQuery(
+        NotificationQueueRequest $request,
+    ): NotificationQueueQuery {
         $query = new NotificationQueueQuery();
         $query->search([
             NotificationQueueColumn::Title,
@@ -77,7 +79,11 @@ class NotificationQueue extends NotificationQueueSchema {
      * @param Date $time
      * @return list<NotificationQueueEntity>
      */
-    public static function getUnsentForCredential(int $credentialID, int $currentUser, Date $time): array {
+    public static function getUnsentForCredential(
+        int $credentialID,
+        int $currentUser,
+        Date $time,
+    ): array {
         $time  = $time->subtract(hours: 1);
 
         $query = new NotificationQueueQuery();

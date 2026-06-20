@@ -278,7 +278,9 @@ class TimeTable {
                     $newDate = $weekStart->add(days: $day + $week);
                     $newDate = $newDate->add(minutes: $fromMinutes);
 
-                    if ($newDate->isAfter($date) && ($resultDate->isEmpty() || $newDate->isBefore($resultDate))) {
+                    if ($newDate->isAfter($date) &&
+                        ($resultDate->isEmpty() || $newDate->isBefore($resultDate))
+                    ) {
                         $resultDate = $newDate;
                     }
                 }
@@ -319,7 +321,11 @@ class TimeTable {
             }
 
             foreach ($timeTable->days as $day) {
-                $weekTime = Date::now()->toWeekStart($this->startMonday)->add(days: $day)->toServerTime();
+                $weekTime = Date::now()
+                    ->toWeekStart($this->startMonday)
+                    ->add(days: $day)
+                    ->toServerTime();
+
                 $weekDate = $weekTime->toString(DateFormat::Dashes);
 
                 $fromTime = Date::create($weekDate, $timeTable->from);

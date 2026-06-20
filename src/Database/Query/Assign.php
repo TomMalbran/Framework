@@ -137,7 +137,7 @@ class Assign {
      */
     public static function jsonReplace(string $value, string $replace): Assign {
         return new Assign(
-            "JSON_REPLACE(`__FIELD__`, CAST(JSON_UNQUOTE(JSON_SEARCH(`__FIELD__`, 'one', ?)) AS CHAR), ?)",
+            "JSON_REPLACE(`__FIELD__`, CAST(JSON_UNQUOTE(JSON_SEARCH(`__FIELD__`, 'one', ?)) AS CHAR), ?)",  // phpcs:ignore
             [ $value, $replace ],
         );
     }
@@ -149,7 +149,7 @@ class Assign {
      */
     public static function jsonRemove(string $value): Assign {
         return new Assign(
-            "JSON_REMOVE(`__FIELD__`, CAST(JSON_UNQUOTE(JSON_SEARCH(`__FIELD__`, 'one', ?)) AS CHAR))",
+            "JSON_REMOVE(`__FIELD__`, CAST(JSON_UNQUOTE(JSON_SEARCH(`__FIELD__`, 'one', ?)) AS CHAR))",  // phpcs:ignore
             [ $value ],
         );
     }

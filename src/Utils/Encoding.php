@@ -129,7 +129,8 @@ class Encoding {
      * The "«" (%AB) character will be converted, but the "É" followed by "»" (%C9%BB)
      * is also a valid unicode character, and will be left unchanged.
      *
-     * 2) when any of these: à|á|â|ã|ä|å|æ|ç|è|é|ê|ë|ì|í|î|ï  are followed by TWO chars from group B,
+     * 2) when any of these: à|á|â|ã|ä|å|æ|ç|è|é|ê|ë|ì|í|î|ï  are followed
+     *    by TWO chars from group B,
      * 3) when any of these: ð|ñ|ò|ó  are followed by THREE chars from group B.
      *
      * @param string $text
@@ -217,7 +218,11 @@ class Encoding {
      * @return string
      */
     public static function toWin1252(string $text): string {
-        $text = str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), self::toUTF8($text));
+        $text = str_replace(
+            array_keys(self::$utf8ToWin1252),
+            array_values(self::$utf8ToWin1252),
+            self::toUTF8($text),
+        );
         return self::decodeUTF8($text);
     }
 
@@ -248,11 +253,19 @@ class Encoding {
         $last = "";
         while ($last !== $text) {
             $last = $text;
-            $text = str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), $text);
+            $text = str_replace(
+                array_keys(self::$utf8ToWin1252),
+                array_values(self::$utf8ToWin1252),
+                $text,
+            );
             $text = self::toUTF8(self::decodeUTF8($text));
         }
 
-        $text = str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), $text);
+        $text = str_replace(
+            array_keys(self::$utf8ToWin1252),
+            array_values(self::$utf8ToWin1252),
+            $text,
+        );
         $text = self::toUTF8(self::decodeUTF8($text));
         return $text;
     }
@@ -267,7 +280,11 @@ class Encoding {
         // (ignoring Windows-1252 chars from 80 to 9F) use this function to fix it.
         // See: http://en.wikipedia.org/wiki/Windows-1252
 
-        return str_replace(array_keys(self::$brokenUtf8ToUtf8), array_values(self::$brokenUtf8ToUtf8), $text);
+        return str_replace(
+            array_keys(self::$brokenUtf8ToUtf8),
+            array_values(self::$brokenUtf8ToUtf8),
+            $text,
+        );
     }
 
     /**

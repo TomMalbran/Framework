@@ -110,13 +110,20 @@ class Numbers {
     }
 
     /**
-     * Returns < 0 if number is less than other; > 0 if number is greater than other, and 0 if they are equal
+     * Returns
+     *   < 0 if number is less than other.
+     *   > 0 if number is greater than other.
+     *   0 if they are equal.
      * @param int|float $number
      * @param int|float $other
      * @param bool      $orderAsc Optional.
      * @return int|float
      */
-    public static function compare(int|float $number, int|float $other, bool $orderAsc = true): int|float {
+    public static function compare(
+        int|float $number,
+        int|float $other,
+        bool $orderAsc = true,
+    ): int|float {
         return ($number - $other) * ($orderAsc ? 1 : -1);
     }
 
@@ -208,11 +215,14 @@ class Numbers {
         string $thousandsSeparator = ".",
     ): string {
         $float = floatval($number);
-        if ($float !== 0.0) {
-            $decimals = ($maxForDecimals === 0 || $float < $maxForDecimals) && !is_int($number) ? $decimals : 0;
-            return number_format($float, $decimals, $decimalSeparator, $thousandsSeparator);
+        if ($float === 0.0) {
+            return $default;
         }
-        return $default;
+
+        if (($maxForDecimals !== 0 && $float >= $maxForDecimals) || is_int($number)) {
+            $decimals = 0;
+        }
+        return number_format($float, $decimals, $decimalSeparator, $thousandsSeparator);
     }
 
 
@@ -277,7 +287,11 @@ class Numbers {
      * @param int       $decimals Optional.
      * @return int|float
      */
-    public static function percent(int|float $number, int|float $total, int $decimals = 0): int|float {
+    public static function percent(
+        int|float $number,
+        int|float $total,
+        int $decimals = 0,
+    ): int|float {
         return (int)$total === 0 ? 0 : self::round($number * 100 / $total, $decimals);
     }
 
@@ -288,7 +302,11 @@ class Numbers {
      * @param int       $decimals  Optional.
      * @return float
      */
-    public static function divide(int|float $numerator, int|float $divisor, int $decimals = 0): float {
+    public static function divide(
+        int|float $numerator,
+        int|float $divisor,
+        int $decimals = 0,
+    ): float {
         if ((int)$divisor === 0) {
             return 0.0;
         }

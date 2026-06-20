@@ -24,7 +24,10 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
      * @param string    $language  Optional.
      * @return EmailContentEntity
      */
-    public static function get(EmailCode $emailCode, string $language = "root"): EmailContentEntity {
+    public static function get(
+        EmailCode $emailCode,
+        string $language = "root",
+    ): EmailContentEntity {
         $langCode = Language::getCode($language);
 
         $query = new EmailContentQuery();
@@ -40,9 +43,12 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
      * @return string
      */
     public static function render(string $message, array $data = []): string {
-        $html   = !Strings::contains($message, "</p>\n\n<p>") ? Strings::toHtml($message) : $message;
-        $result = Mustache::render($html, $data);
+        $html = $message;
+        if (!Strings::contains($message, "</p>\n\n<p>")) {
+            $html = Strings::toHtml($message);
+        }
 
+        $result = Mustache::render($html, $data);
         $result = Strings::replace($result, "<p></p>", "");
         while (Strings::contains($result, "<br><br><br>")) {
             $result = Strings::replace($result, "<br><br><br>", "<br><br>");

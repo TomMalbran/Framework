@@ -83,7 +83,10 @@ class Migration {
 
 
         // Apply other Migrations from the Framework
-        $frameClasses = Discovery::findClasses(interface: DiscoveryMigration::class, forFramework: true);
+        $frameClasses = Discovery::findClasses(
+            interface:    DiscoveryMigration::class,
+            forFramework: true,
+        );
         if (count($frameClasses) > 0) {
             print("\nFRAMEWORK MIGRATIONS\n");
             foreach ($frameClasses as $class) {
@@ -96,7 +99,10 @@ class Migration {
 
 
         // Apply the Migrations from the App
-        $appMigrations = Discovery::findClasses(interface: DiscoveryMigration::class, forFramework: false);
+        $appMigrations = Discovery::findClasses(
+            interface:    DiscoveryMigration::class,
+            forFramework: false,
+        );
         if (count($appMigrations) > 0) {
             print("\nAPP MIGRATIONS\n");
             foreach ($appMigrations as $class) {
@@ -134,7 +140,9 @@ class Migration {
             }
 
             $content = Storage::readFile($filePath);
-            if (Strings::contains($content, DataMigration::class) && Strings::contains($content, " implements ")) {
+            if (Strings::contains($content, DataMigration::class) &&
+                Strings::contains($content, " implements ")
+            ) {
                 $className = trim(Strings::substringBetween($content, "class", "implements"));
                 $migrations[$className] = $filePath;
             }

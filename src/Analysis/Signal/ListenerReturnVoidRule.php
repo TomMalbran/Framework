@@ -58,9 +58,13 @@ class ListenerReturnVoidRule implements Rule {
 
         // Check if the return type is missing or is not explicitly 'void'
         $returnType = $node->returnType;
-        if ($returnType === null || !($returnType instanceof Identifier && $returnType->toLowerString() === "void")) {
+        if ($returnType === null ||
+            !($returnType instanceof Identifier && $returnType->toLowerString() === "void")
+        ) {
             return [
-                RuleErrorBuilder::message("Method with #[Listener] attribute must return 'void'.")
+                RuleErrorBuilder::message(
+                    "Method with #[Listener] attribute must return 'void'."
+                )
                     ->line($node->getLine())
                     ->identifier("framework.listenerVoid")
                     ->build(),

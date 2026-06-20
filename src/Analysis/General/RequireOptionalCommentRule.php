@@ -78,7 +78,8 @@ class RequireOptionalCommentRule implements Rule {
                 continue;
             }
 
-            // Regex checks for the @param tag and uses negative lookahead to ensure "Optional." is missing
+            // Regex checks for the @param tag and uses negative
+            // lookahead to ensure "Optional." is missing
             $paramName  = $param->var->name;
             $quotedName = preg_quote($paramName, "/");
             $pattern    = '/@param\s+\S+\s+\$' .  $quotedName . '\s+Optional\./';
@@ -98,7 +99,7 @@ class RequireOptionalCommentRule implements Rule {
                 }
 
                 $errors[] = RuleErrorBuilder::message(
-                    "Optional parameter '\${$paramName}' must have a description starting with 'Optional.'"
+                    "Optional parameter '\${$paramName}' must have a description as 'Optional.'"
                 )
                     ->line($errorLine)
                     ->identifier("framework.requireOptional")

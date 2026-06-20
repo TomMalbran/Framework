@@ -445,14 +445,18 @@ class Field {
             FieldType::String,
             FieldType::Text,
             FieldType::LongText => $string,
-            FieldType::Encrypt  => isset($data["{$key}Decrypt"]) ? Strings::toString($data["{$key}Decrypt"]) : "",
             FieldType::File     => $string,
+            FieldType::Encrypt  => isset($data["{$key}Decrypt"]) ?
+                Strings::toString($data["{$key}Decrypt"]) : "",
         };
 
         // Set additional values for the File type
         if ($this->type === FieldType::File) {
             if ($this->filePath !== "") {
-                $result["{$key}Url"] = $string !== "" ? FilePath::getUrl($this->filePath, $string) : "";
+                $result["{$key}Url"] = "";
+                if ($string !== "") {
+                    $result["{$key}Url"] = FilePath::getUrl($this->filePath, $string);
+                }
             } else {
                 $result["{$key}Url"]   = $string !== "" ? Path::getSourceUrl("0", $string) : "";
                 $result["{$key}Thumb"] = $string !== "" ? Path::getThumbsUrl("0", $string) : "";
@@ -510,7 +514,9 @@ class Field {
         return [
             "fromField" => $this->dbName,
             "toTable"   => SchemaModel::getDbTableName($this->belongsTo),
-            "toField"   => $this->otherField !== "" ? SchemaModel::getDbFieldName($this->otherField) : $this->dbName,
+            "toField"   => $this->otherField !== "" ?
+                SchemaModel::getDbFieldName($this->otherField) :
+                $this->dbName,
         ];
     }
 }

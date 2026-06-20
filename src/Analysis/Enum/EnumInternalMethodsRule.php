@@ -76,13 +76,17 @@ class EnumInternalMethodsRule implements Rule {
 
         // Allow if the call is made from within an Enum class without an IsEnum trait
         $classReflection = $scope->getClassReflection();
-        if ($classReflection !== null && $classReflection->isEnum() && !$classReflection->hasTraitUse(IsEnum::class)) {
+        if ($classReflection !== null && $classReflection->isEnum() &&
+            !$classReflection->hasTraitUse(IsEnum::class)
+        ) {
             return [];
         }
 
         // Generate an error message
         return [
-            RuleErrorBuilder::message("Usage of Enum::{$name}() is disallowed. Use methods provided by IsEnum instead.")
+            RuleErrorBuilder::message(
+                "Usage of Enum::{$name}() is disallowed. Use methods provided by IsEnum instead."
+            )
                 ->line($node->getLine())
                 ->identifier("framework.disallowEnumInt")
                 ->build(),

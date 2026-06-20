@@ -67,10 +67,12 @@ class DisallowDebugPrintRule implements Rule {
 
         // Build and return the error message
         return [
-            RuleErrorBuilder::message("Usage of {$functionName}() is disallowed. Remove debug calls.")
-            ->line($node->getLine())
-            ->identifier("framework.disallowDebugPrint")
-            ->build(),
+            RuleErrorBuilder::message(
+                "Usage of {$functionName}() is disallowed. Remove debug calls."
+            )
+                ->line($node->getLine())
+                ->identifier("framework.disallowDebugPrint")
+                ->build(),
         ];
     }
 }

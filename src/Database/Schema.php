@@ -121,7 +121,11 @@ class Schema {
      * @param string         $columnKey Optional.
      * @return array<int|string>
      */
-    protected static function getSchemaColumn(?QueryLike $query, string $column, string $columnKey = ""): array {
+    protected static function getSchemaColumn(
+        ?QueryLike $query,
+        string $column,
+        string $columnKey = "",
+    ): array {
         $query   = self::generateQuery($query);
         $request = SelectionBuilder::create(static::getModel(), $query)
             ->addFields()
@@ -152,7 +156,10 @@ class Schema {
      * @param bool           $withDeleted Optional.
      * @return int
      */
-    protected static function getSchemaTotal(?QueryLike $query = null, bool $withDeleted = true): int {
+    protected static function getSchemaTotal(
+        ?QueryLike $query = null,
+        bool $withDeleted = true,
+    ): int {
         $query   = self::generateQuery($query, $withDeleted);
         $request = SelectionBuilder::create(static::getModel(), $query)
             ->addSelects("COUNT(*) AS cnt")

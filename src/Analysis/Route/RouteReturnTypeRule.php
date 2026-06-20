@@ -59,7 +59,8 @@ class RouteReturnTypeRule implements Rule {
         $responseType = new ObjectType(Response::class);
         $neverType    = new NeverType();
 
-        // getVariants() handles multiple possible signatures (common in built-in PHP, less in user code)
+        // getVariants() handles multiple possible signatures
+        // (common in built-in PHP, less in user code)
         foreach ($methodReflection->getVariants() as $variant) {
             // Check that the return type is a subtype of Response or Never
             $returnType = $variant->getReturnType();
@@ -73,7 +74,9 @@ class RouteReturnTypeRule implements Rule {
             $className = $classReflection->getName();
             $method    = "{$className}::{$methodName}()";
             return [
-                RuleErrorBuilder::message("Method {$method} must return a Response since is a Route.")
+                RuleErrorBuilder::message(
+                    "Method {$method} must return a Response since is a Route."
+                )
                     ->line($node->getStartLine())
                     ->identifier("framework.routeReturn")
                     ->build()

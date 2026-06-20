@@ -114,7 +114,10 @@ class ModificationBuilder {
      * @param bool $skipTimestamps Optional.
      * @return ModificationBuilder
      */
-    public function addModification(int $credentialID = 0, bool $skipTimestamps = false): ModificationBuilder {
+    public function addModification(
+        int $credentialID = 0,
+        bool $skipTimestamps = false,
+    ): ModificationBuilder {
         if (!$this->schemaModel->canEdit || $skipTimestamps) {
             return $this;
         }

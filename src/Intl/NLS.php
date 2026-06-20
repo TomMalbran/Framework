@@ -90,7 +90,11 @@ class NLS {
      * @param string          $language Optional.
      * @return string
      */
-    public static function getIndex(string $key, Enum|int|string $index, string $language = ""): string {
+    public static function getIndex(
+        string $key,
+        Enum|int|string $index,
+        string $language = "",
+    ): string {
         $data  = self::load($language);
         $dict  = $data->getDict($key);
         $index = Strings::toString($index);
@@ -218,7 +222,12 @@ class NLS {
      * @param string       $language Optional.
      * @return string
      */
-    public static function formatJoin(string $key, array $strings, bool $useOr = false, string $language = ""): string {
+    public static function formatJoin(
+        string $key,
+        array $strings,
+        bool $useOr = false,
+        string $language = "",
+    ): string {
         $args = [ self::join($strings, $useOr, $language) ];
         return self::format($key, $args, $language);
     }
@@ -268,7 +277,11 @@ class NLS {
      * @param string       $language Optional.
      * @return string
      */
-    public static function join(array $strings, bool $useOr = false, string $language = ""): string {
+    public static function join(
+        array $strings,
+        bool $useOr = false,
+        string $language = "",
+    ): string {
         $strings = Arrays::getValues($strings);
         if (count($strings) === 0) {
             return "";

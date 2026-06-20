@@ -74,10 +74,12 @@ class DisallowNativeDateRule implements Rule {
 
         // Build and return the error message
         return [
-            RuleErrorBuilder::message("Usage of {$functionName}() is disallowed. Use the Date class instead.")
-            ->line($node->getLine())
-            ->identifier("framework.disallowNativeDate")
-            ->build(),
+            RuleErrorBuilder::message(
+                "Usage of {$functionName}() is disallowed. Use the Date class instead."
+            )
+                ->line($node->getLine())
+                ->identifier("framework.disallowNativeDate")
+                ->build(),
         ];
     }
 }

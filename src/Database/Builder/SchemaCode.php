@@ -98,7 +98,7 @@ class SchemaCode {
             "validations"        => $validations,
             "errorPrefix"        => Strings::toConstantCase($schemaModel->fantasyName) . "_ERROR_",
 
-            "editType"           => $schemaModel->hasID ? "$queryName|{$idField["idType"]}" : $queryName,
+            "editType"           => $schemaModel->hasID ? "$queryName|{$idField["idType"]}" : $queryName,  // phpcs:ignore
             "hasQuery"           => $schemaModel->hasID || count($uniques) > 0 || !$hasRequest,
             "hasList"            => !$schemaModel->skipList,
 
@@ -194,7 +194,10 @@ class SchemaCode {
             "idName"      => $schemaModel->idName,
             "idDbName"    => $schemaModel->idDbName,
             "idValue"     => "\${$schemaModel->idName}",
-            "idType"      => $schemaModel->idType->getCodeType($schemaModel->idEnumClass, forEntity: false),
+            "idType"      => $schemaModel->idType->getCodeType(
+                $schemaModel->idEnumClass,
+                forEntity: false,
+            ),
             "idText"      => Strings::upperCaseFirst($schemaModel->idName),
             "idEnumClass" => Strings::substringAfter($schemaModel->idEnumClass, "\\"),
         ];
@@ -378,8 +381,8 @@ class SchemaCode {
                     "typeOf"       => Strings::substringAfter($validate->typeOf, "\\"),
                     "typeInvError" => $validate->getTypeInvalidError($invSuffix),
                     "method"       => $validate->method,
-                    "emptySuffix"  => $validate->isUnique || $validate->typeOf !== "" || $validate->maxLength > 0,
-                    "lengthSuffix" => $isRequired || $validate->isUnique || $validate->typeOf !== "",
+                    "emptySuffix"  => $validate->isUnique || $validate->typeOf !== "" || $validate->maxLength > 0,  // phpcs:ignore
+                    "lengthSuffix" => $isRequired || $validate->isUnique || $validate->typeOf !== "",  // phpcs:ignore
                     "maxLength"    => $validate->maxLength,
                     "fieldName"    => $validate->name,
                     "fieldError"   => $validate->getFieldError(),
@@ -432,7 +435,7 @@ class SchemaCode {
                     "numericParams"    => $validate->getNumericParams(),
                     "invalidPrefix"    => $validate->isRequired || $validate->greaterThan !== "",
 
-                    "useUniqueElse"    => $validate->isRequired || $hasTypeOf || $hasBelongsTo || $isNumeric,
+                    "useUniqueElse"    => $validate->isRequired || $hasTypeOf || $hasBelongsTo || $isNumeric,  // phpcs:ignore
                     "isUnique"         => $validate->isUnique,
 
                     "useGreaterElse"   => $validate->isRequired || $hasTypeOf || $hasBelongsTo ||
@@ -528,7 +531,9 @@ class SchemaCode {
 
         foreach ($schemaModel->fields as $field) {
             if ($field->type === FieldType::Date) {
-                if ((!$schemaModel->canCreate && $field->name === "createdTime") || $field->name === "modifiedTime") {
+                if ((!$schemaModel->canCreate && $field->name === "createdTime") ||
+                    $field->name === "modifiedTime"
+                ) {
                     continue;
                 }
                 $result[Date::class] = 1;

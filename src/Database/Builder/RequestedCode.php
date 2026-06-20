@@ -146,7 +146,7 @@ class RequestedCode {
 
             switch ($requested->type) {
             case RequestedType::Enum:
-                $getter = "{$type}::fromValue(\$instance->request->getString(\"{$requested->name}\"))";
+                $getter = "{$type}::fromValue(\$instance->request->getString(\"{$requested->name}\"))";  // phpcs:ignore
                 break;
 
             case RequestedType::Date:
@@ -164,7 +164,7 @@ class RequestedCode {
                 $date     = $requested->dateInput !== "" ? $requested->dateInput : $name;
                 $hour     = $requested->hourInput;
                 $timeZone = $requested->useTimeZone ? "useTimeZone: true" : "useTimeZone: false";
-                $getter   = "\$instance->request->getDate(\"{$date}\", \"{$hour}\", {$dateType}, {$timeZone})";
+                $getter   = "\$instance->request->getDate(\"{$date}\", \"{$hour}\", {$dateType}, {$timeZone})";  // phpcs:ignore
                 $setter   = "\${$requested->name} === null ? Date::empty() : \${$name}";
                 break;
 
@@ -173,13 +173,13 @@ class RequestedCode {
                 $docType = $schemaModel->statusClass;
                 $argType = $docType;
                 $default = "{$schemaModel->statusClass}::None";
-                $getter  = "{$schemaModel->statusClass}::fromValue(\$instance->request->getString(\"{$name}\"))";
+                $getter  = "{$schemaModel->statusClass}::fromValue(\$instance->request->getString(\"{$name}\"))";  // phpcs:ignore
                 break;
 
             case RequestedType::Array:
                 if ($requested->subClass !== "") {
                     $typeName = Strings::substringAfter($requested->subClass, "\\");
-                    $getter   = "{$typeName}::fromList(\$instance->request->getStrings(\"{$name}\"))";
+                    $getter   = "{$typeName}::fromList(\$instance->request->getStrings(\"{$name}\"))";  // phpcs:ignore
                 } elseif (Strings::startsWith($requested->subType, "list<")) {
                     $typeName = Strings::substringBetween($requested->subType, "list<", ">");
                     $typeName = Strings::upperCaseFirst($typeName);
@@ -189,7 +189,7 @@ class RequestedCode {
                     if ($arrayFunc === "") {
                         continue 2;
                     }
-                    $getter = "Arrays::{$arrayFunc}(\$instance->request->getJSONArray(\"{$name}\"))";
+                    $getter = "Arrays::{$arrayFunc}(\$instance->request->getJSONArray(\"{$name}\"))";  // phpcs:ignore
                 }
                 break;
 

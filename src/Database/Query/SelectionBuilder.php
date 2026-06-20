@@ -116,7 +116,10 @@ class SelectionBuilder {
             if ($withSelects) {
                 $tableName = $relation->getDbTableName();
                 foreach ($relation->fields as $field) {
-                    $this->builder->addSelect("$tableName.{$field->dbName}", as: $field->prefixName);
+                    $this->builder->addSelect(
+                        "$tableName.{$field->dbName}",
+                        as: $field->prefixName,
+                    );
                 }
             }
         }
@@ -163,7 +166,10 @@ class SelectionBuilder {
                     foreach ($relation->fields as $field) {
                         if ($column === $field->dbName) {
                             $tableName = $relation->getDbTableName();
-                            $this->builder->updateWhereColumn($column, "$tableName.{$field->dbName}");
+                            $this->builder->updateWhereColumn(
+                                $column,
+                                "$tableName.{$field->dbName}",
+                            );
                             $found = true;
                             break;
                         }

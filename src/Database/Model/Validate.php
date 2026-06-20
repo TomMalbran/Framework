@@ -217,7 +217,10 @@ class Validate {
         if ($field->dateInput !== "") {
             return ValidateType::Date;
         }
-        if ($this->isNumeric || $field->type === FieldType::Number || $field->type === FieldType::Float) {
+        if ($this->isNumeric ||
+            $field->type === FieldType::Number ||
+            $field->type === FieldType::Float
+        ) {
             return ValidateType::Number;
         }
         if ($field->type === FieldType::Enum) {

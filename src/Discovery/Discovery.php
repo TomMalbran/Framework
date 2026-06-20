@@ -239,7 +239,9 @@ class Discovery {
 
         // Check that the used Class exists
         $fullClassName = $usedClasses[$parentClassName] ?? "";
-        if (Strings::startsWith($fullClassName, $namespace) && !isset($classPaths[$fullClassName])) {
+        if (Strings::startsWith($fullClassName, $namespace) &&
+            !isset($classPaths[$fullClassName])
+        ) {
             return false;
         }
 
@@ -248,7 +250,9 @@ class Discovery {
         $matches       = Strings::getAllMatches($fileContent, $traitPattern);
         $traitClass    = $matches[1] ?? "";
         $fullClassName = $usedClasses[$traitClass] ?? "";
-        if (Strings::startsWith($fullClassName, $namespace) && !isset($classPaths[$fullClassName])) {
+        if (Strings::startsWith($fullClassName, $namespace) &&
+            !isset($classPaths[$fullClassName])
+        ) {
             return false;
         }
 

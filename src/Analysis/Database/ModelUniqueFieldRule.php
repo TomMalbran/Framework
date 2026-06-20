@@ -114,7 +114,9 @@ class ModelUniqueFieldRule implements Rule {
 
         if (count($idFields) > 1) {
             $fields   = Strings::join($idFields, ", ");
-            $errors[] = RuleErrorBuilder::message("A model can only have 1 field marked as isID. Found: $fields")
+            $errors[] = RuleErrorBuilder::message(
+                "A model can only have 1 field marked as isID. Found: $fields"
+            )
                 ->line($idLineNumber)
                 ->identifier("framework.modelID")
                 ->build();
@@ -122,7 +124,9 @@ class ModelUniqueFieldRule implements Rule {
 
         if (count($positionFields) > 1) {
             $fields   = Strings::join($positionFields, ", ");
-            $errors[] = RuleErrorBuilder::message("A model can only have 1 field marked as isPosition. Found: $fields")
+            $errors[] = RuleErrorBuilder::message(
+                "A model can only have 1 field marked as isPosition. Found: $fields"
+            )
                 ->line($positionLineNumber)
                 ->identifier("framework.modelPosition")
                 ->build();
@@ -130,7 +134,9 @@ class ModelUniqueFieldRule implements Rule {
 
         if (count($statusFields) > 1) {
             $fields   = Strings::join($statusFields, ", ");
-            $errors[] = RuleErrorBuilder::message("A model can only have 1 field using the Status type. Found: $fields")
+            $errors[] = RuleErrorBuilder::message(
+                "A model can only have 1 field using the Status type. Found: $fields"
+            )
                 ->line($statusLineNumber)
                 ->identifier("framework.modelStatus")
                 ->build();

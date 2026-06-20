@@ -94,7 +94,11 @@ class EntityCode {
         $fields = [];
         if ($schemaModel->hasStatus) {
             $statusClass = $schemaModel->statusClass;
-            $fields[] = self::getPropertyData("status", $statusClass, default: "{$statusClass}::None");
+            $fields[] = self::getPropertyData(
+                "status",
+                $statusClass,
+                default: "{$statusClass}::None",
+            );
             $fields[] = self::getPropertyData("statusName", "string");
             $fields[] = self::getPropertyData("statusColor", "string");
         }
@@ -103,14 +107,24 @@ class EntityCode {
         // Virtual Fields
         $fields = [];
         foreach ($schemaModel->virtualFields as $field) {
-            self::addProperty($fields, $field->name, $field->type, $field->subType, $field->enumClass);
+            self::addProperty(
+                result:    $fields,
+                fieldKey:  $field->name,
+                fieldType: $field->type,
+                subType:   $field->subType,
+                enumClass: $field->enumClass,
+            );
         }
         self::addCategory($result, "Virtual", $fields, $parsed);
 
         // Expression Fields
         $fields = [];
         foreach ($schemaModel->expressions as $expression) {
-            self::addProperty($fields, $expression->name, $expression->type);
+            self::addProperty(
+                result:    $fields,
+                fieldKey:  $expression->name,
+                fieldType: $expression->type,
+            );
         }
         self::addCategory($result, "Expression", $fields, $parsed);
 
@@ -132,7 +146,13 @@ class EntityCode {
                         default: "{$relation->relationModelName}Status::None",
                     );
                 } else {
-                    self::addProperty($fields, $field->prefixName, $field->type, "", $field->enumClass);
+                    self::addProperty(
+                        result:    $fields,
+                        fieldKey:  $field->prefixName,
+                        fieldType: $field->type,
+                        subType:   "",
+                        enumClass: $field->enumClass
+                    );
                 }
             }
             self::addCategory($result, $relation->relationModelName, $fields, $parsed);
@@ -141,7 +161,11 @@ class EntityCode {
         // SubRequest Fields
         $fields = [];
         foreach ($schemaModel->subRequests as $subRequest) {
-            $fields[] = self::getPropertyData($subRequest->name, "array", $subRequest->getDocType());
+            $fields[] = self::getPropertyData(
+                name:    $subRequest->name,
+                type:    "array",
+                subType: $subRequest->getDocType(),
+            );
         }
         self::addCategory($result, "SubRequest", $fields, $parsed);
 
@@ -156,7 +180,12 @@ class EntityCode {
      * @param array<string,bool> $parsed
      * @return void
      */
-    private static function addCategory(array &$result, string $name, array $fields, array &$parsed): void {
+    private static function addCategory(
+        array &$result,
+        string $name,
+        array $fields,
+        array &$parsed,
+    ): void {
         $list = [];
         foreach ($fields as $field) {
             if (!isset($parsed[$field["name"]])) {
@@ -291,7 +320,11 @@ class EntityCode {
 
         foreach ($schemaModel->subRequests as $subRequest) {
             if ($subRequest->type !== "") {
-                $result[] = self::getPropertyData($subRequest->name, "array", $subRequest->getDocType());
+                $result[] = self::getPropertyData(
+                    name:    $subRequest->name,
+                    type:    "array",
+                    subType: $subRequest->getDocType(),
+                );
             }
         }
         return $result;
@@ -303,7 +336,10 @@ class EntityCode {
      * @param FieldType   $type
      * @return list<string>
      */
-    private static function getFieldsByType(SchemaModel $schemaModel, FieldType $type): array {
+    private static function getFieldsByType(
+        SchemaModel $schemaModel,
+        FieldType $type,
+    ): array {
         $result = [];
         foreach ($schemaModel->fields as $field) {
             if ($field->type === $type) {
@@ -399,7 +435,9 @@ class EntityCode {
                 } elseif ($field->type === FieldType::File) {
                    $result[File::class] = 1;
                 } elseif ($field->isStatus && $relation->relationModel !== null) {
-                    $result["{$relation->relationModel->namespace}\\{$relation->relationModelName}Status"] = 1;
+                    $namespace = $relation->relationModel->namespace;
+                    $modelName = $relation->relationModelName;
+                    $result["{$namespace}\\{$modelName}Status"] = 1;
                 }
             }
         }

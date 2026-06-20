@@ -66,19 +66,32 @@ class WhereBuilder {
      * @return WhereBuilder
      */
     public function join(WhereBuilder $builder): WhereBuilder {
-        $this->where         = Strings::join([ $this->where, $builder->where ], " AND ", withoutEmpty: true);
+        $this->where = Strings::join(
+            value:        [ $this->where, $builder->where ],
+            glue:         " AND ",
+            withoutEmpty: true,
+        );
+
         $this->addOperator   = $builder->addOperator;
         $this->nextOperator  = $builder->nextOperator;
         $this->usedOperators = Arrays::mergeLists($this->usedOperators, $builder->usedOperators);
 
-        $this->limit         = $builder->limit;
-        $this->orderBy       = Strings::join([ $this->orderBy, $builder->orderBy ], ", ", withoutEmpty: true);
-        $this->groupBy       = Strings::join([ $this->groupBy, $builder->groupBy ], ", ", withoutEmpty: true);
+        $this->limit   = $builder->limit;
+        $this->orderBy = Strings::join(
+            value:        [ $this->orderBy, $builder->orderBy ],
+            glue:         ", ",
+            withoutEmpty: true,
+        );
+        $this->groupBy = Strings::join(
+            value:        [ $this->groupBy, $builder->groupBy ],
+            glue:         ", ",
+            withoutEmpty: true,
+        );
 
-        $this->params        = Arrays::mergeLists($this->params, $builder->params);
-        $this->columns       = Arrays::mergeLists($this->columns, $builder->columns);
-        $this->groups        = Arrays::mergeLists($this->groups, $builder->groups);
-        $this->orders        = Arrays::mergeLists($this->orders, $builder->orders);
+        $this->params  = Arrays::mergeLists($this->params, $builder->params);
+        $this->columns = Arrays::mergeLists($this->columns, $builder->columns);
+        $this->groups  = Arrays::mergeLists($this->groups, $builder->groups);
+        $this->orders  = Arrays::mergeLists($this->orders, $builder->orders);
         return $this;
     }
 

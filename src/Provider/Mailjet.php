@@ -22,11 +22,19 @@ class Mailjet {
      * @param array<string,mixed> $params Optional.
      * @return Dictionary
      */
-    private static function execute(CurlMethod $method, string $route, array $params = []): Dictionary {
-        $url      = self::BaseUrl . $route;
-        $userPass = Config::getMailjetKey() . ":" . Config::getMailjetSecret();
-        $headers  = [ "Content-Type" => "application/json" ];
-        $response = Curl::execute($method, $url, $params, $headers, $userPass, jsonBody: true);
+    private static function execute(
+        CurlMethod $method,
+        string $route,
+        array $params = [],
+    ): Dictionary {
+        $response = Curl::execute(
+            method:   $method,
+            url:      self::BaseUrl . $route,
+            params:   $params,
+            headers:  [ "Content-Type" => "application/json" ],
+            userPass: Config::getMailjetKey() . ":" . Config::getMailjetSecret(),
+            jsonBody: true,
+        );
         return new Dictionary($response);
     }
 
@@ -83,7 +91,11 @@ class Mailjet {
      * @param string $email
      * @return bool
      */
-    public static function createContact(string $firstName, string $lastName, string $email): bool {
+    public static function createContact(
+        string $firstName,
+        string $lastName,
+        string $email,
+    ): bool {
         $contactList = Config::getMailjetList();
         if ($contactList === 0) {
             $response = self::execute(CurlMethod::POST, "/v3/REST/contact", [
@@ -91,11 +103,15 @@ class Mailjet {
                 "Email" => $email,
             ]);
         } else {
-            $response = self::execute(CurlMethod::POST, "/v3/REST/contactslist/$contactList/managecontact", [
-                "Action" => "addforce",
-                "Name"   => "$firstName $lastName",
-                "Email"  => $email,
-            ]);
+            $response = self::execute(
+                CurlMethod::POST,
+                "/v3/REST/contactslist/$contactList/managecontact",
+                [
+                    "Action" => "addforce",
+                    "Name"   => "$firstName $lastName",
+                    "Email"  => $email,
+                ],
+            );
         }
         return !$response->hasValue("ErrorMessage");
     }
@@ -108,7 +124,12 @@ class Mailjet {
      * @param string $newEmail
      * @return bool
      */
-    public static function editContact(string $firstName, string $lastName, string $oldEmail, string $newEmail): bool {
+    public static function editContact(
+        string $firstName,
+        string $lastName,
+        string $oldEmail,
+        string $newEmail,
+    ): bool {
         $response = self::execute(CurlMethod::PUT, "/v3/REST/contact/$oldEmail", [
             "Name"  => "$firstName $lastName",
             "Email" => $newEmail,

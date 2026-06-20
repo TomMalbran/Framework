@@ -184,7 +184,9 @@ class Server {
 
         if (Strings::contains($userAgent, "Firefox")) {
             $result[] = "FireFox";
-        } elseif (Strings::contains($userAgent, "MSIE") || Strings::contains($userAgent, "Trident")) {
+        } elseif (Strings::contains($userAgent, "MSIE") ||
+            Strings::contains($userAgent, "Trident")
+        ) {
             $result[] = "IE";
         } elseif (Strings::contains($userAgent, "Chrome")) {
             $result[] = "Chrome";

@@ -53,7 +53,8 @@ class MethodReturnNotNeededRule implements Rule {
         $method = $node->getMethodReflection();
 
         // Check if the method is an override or interface implementation
-        if ($method->getPrototype()->getDeclaringClass()->getName() !== $method->getDeclaringClass()->getName()) {
+        $classMethodName = $method->getPrototype()->getDeclaringClass()->getName();
+        if ($classMethodName !== $method->getDeclaringClass()->getName()) {
             return [];
         }
 
@@ -97,7 +98,8 @@ class MethodReturnNotNeededRule implements Rule {
                 continue;
             }
 
-            // If a different boolean value is found, the method is not "always" returning the same thing
+            // If a different boolean value is found, the method is
+            // not "always" returning the same thing
             if ($name !== $firstValue) {
                 return [];
             }
@@ -106,7 +108,9 @@ class MethodReturnNotNeededRule implements Rule {
         // Build and return the error message
         $methodName = $method->getName();
         return [
-            RuleErrorBuilder::message("Method $methodName always returns $firstValue.")
+            RuleErrorBuilder::message(
+                "Method $methodName always returns $firstValue."
+            )
                 ->line($node->getLine())
                 ->identifier("general.methodReturnNotNeeded")
                 ->build(),
@@ -149,7 +153,8 @@ class MethodReturnNotNeededRule implements Rule {
                     $found = array_merge($found, $this->findReturns($node->stmts));
                 }
                 if (property_exists($node, "else") && $node->else !== null &&
-                    is_object($node->else) && property_exists($node->else, "stmts") && is_array($node->else->stmts)
+                    is_object($node->else) && property_exists($node->else, "stmts") &&
+                    is_array($node->else->stmts)
                 ) {
                     $found = array_merge($found, $this->findReturns($node->else->stmts));
                 }

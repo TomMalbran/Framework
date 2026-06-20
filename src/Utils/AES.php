@@ -406,7 +406,16 @@ class AES {
                 $p4 = self::$T4[ $t[($i + 3) % 4]        & 0xff];
                 $p5 = $Ke[$r][$i];
 
-                $a[$i] = self::xor32($p1, self::xor32($p2, self::xor32($p3, self::xor32($p4, $p5))));
+                $a[$i] = self::xor32(
+                    $p1,
+                    self::xor32(
+                        $p2,
+                        self::xor32(
+                            $p3,
+                            self::xor32($p4, $p5),
+                        ),
+                    ),
+                );
             }
             $t = $a;
         }
@@ -416,10 +425,10 @@ class AES {
         for ($i = 0; $i < 4; $i += 1) {
             $tt = $Ke[$rounds][$i];
 
-            $result[4 * $i    ] = self::xor32(self::$S[($t[ $i         ] >> 24) & 0xff], ($tt >> 24)) & 0xff;
-            $result[4 * $i + 1] = self::xor32(self::$S[($t[($i + 1) % 4] >> 16) & 0xff], ($tt >> 16)) & 0xff;
-            $result[4 * $i + 2] = self::xor32(self::$S[($t[($i + 2) % 4] >>  8) & 0xff], ($tt >>  8)) & 0xff;
-            $result[4 * $i + 3] = self::xor32(self::$S[ $t[($i + 3) % 4]        & 0xff], $tt)         & 0xff;
+            $result[4 * $i    ] = self::xor32(self::$S[($t[ $i         ] >> 24) & 0xff], ($tt >> 24)) & 0xff;  // phpcs:ignore
+            $result[4 * $i + 1] = self::xor32(self::$S[($t[($i + 1) % 4] >> 16) & 0xff], ($tt >> 16)) & 0xff;  // phpcs:ignore
+            $result[4 * $i + 2] = self::xor32(self::$S[($t[($i + 2) % 4] >>  8) & 0xff], ($tt >>  8)) & 0xff;  // phpcs:ignore
+            $result[4 * $i + 3] = self::xor32(self::$S[ $t[($i + 3) % 4]        & 0xff], $tt)         & 0xff;  // phpcs:ignore
         }
 
         return $result;
@@ -464,7 +473,19 @@ class AES {
             $p4 = self::$S[($tt >> 24) & 0xFF];
             $p5 = self::shiftLeft32(self::$rCon[$rConPointer], 24);
 
-            $tk[0] = self::xor32($tk[0], self::xor32($p1, self::xor32($p2, self::xor32($p3, self::xor32($p4, $p5)))));
+            $tk[0] = self::xor32(
+                $tk[0],
+                self::xor32(
+                    $p1,
+                    self::xor32(
+                        $p2,
+                        self::xor32(
+                            $p3,
+                            self::xor32($p4, $p5),
+                        ),
+                    ),
+                ),
+            );
 
             $rConPointer += 1;
 
@@ -485,7 +506,16 @@ class AES {
                 $p3 = self::shiftLeft32(self::$S[($tt >> 16) & 0xFF], 16);
                 $p4 = self::shiftLeft32(self::$S[($tt >> 24) & 0xFF], 24);
 
-                $tk[$KC / 2] = self::xor32($tk[$KC / 2], self::xor32($p1, self::xor32($p2, self::xor32($p3, $p4))));
+                $tk[$KC / 2] = self::xor32(
+                    $tk[$KC / 2],
+                    self::xor32(
+                        $p1,
+                        self::xor32(
+                            $p2,
+                            self::xor32($p3, $p4),
+                        ),
+                    ),
+                );
 
                 for ($i = ($KC / 2) + 1; $i < $KC; $i += 1) {
                     $tk[$i] = self::xor32($tk[$i], $tk[$i - 1]);

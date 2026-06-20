@@ -40,7 +40,7 @@ class URL {
      * @return bool
      */
     public static function isValidDomain(string $domain): bool {
-        return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');
+        return Strings::match($domain, '/^([a-z]+\.)?([a-z0-9ñ]([-a-z0-9ñ]*[a-z0-9ñ])?)\.[a-z]{2,5}(\.[a-z]{2})?$/i');  // phpcs:ignore
     }
 
     /**
@@ -130,10 +130,14 @@ class URL {
      * @return string
      */
     public static function encode(string $url): string {
-        return Strings::replaceCallback($url, "/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u", function (array $match) {
-            $value = Strings::toString($match[0] ?? "");
-            return rawurlencode($value);
-        });
+        return Strings::replaceCallback(
+            string:   $url,
+            pattern:  "/[\ \"<>`\\x{0080}-\\x{FFFF}]+/u",
+            callback: function (array $match) {
+                $value = Strings::toString($match[0] ?? "");
+                return rawurlencode($value);
+            },
+        );
     }
 
     /**
@@ -202,14 +206,17 @@ class URL {
      * @return string
      */
     public static function replaceInHtml(string $string, string $url): string {
-        $regex = '/<(img|audio|video)([^>]*?)src=["\']((?!https?:\/\/|\/\/|data:)[^"\']+)["\']([^>]*?)>/i';
-        return Strings::replaceCallback($string, $regex, function (array $matches) use ($url) {
-            $tag          = Strings::toString($matches[1] ?? "");
-            $beforeSrc    = Strings::toString($matches[2] ?? "");
-            $relativePath = Strings::toString($matches[3] ?? "");
-            $afterSrc     = Strings::toString($matches[4] ?? "");
-            $absolutePath = "$url/{$relativePath}";
-            return "<$tag{$beforeSrc}src=\"$absolutePath\"{$afterSrc}>";
-        });
+        return Strings::replaceCallback(
+            string:   $string,
+            pattern:  '/<(img|audio|video)([^>]*?)src=["\']((?!https?:\/\/|\/\/|data:)[^"\']+)["\']([^>]*?)>/i',  // phpcs:ignore,
+            callback: function (array $matches) use ($url) {
+                $tag          = Strings::toString($matches[1] ?? "");
+                $beforeSrc    = Strings::toString($matches[2] ?? "");
+                $relativePath = Strings::toString($matches[3] ?? "");
+                $afterSrc     = Strings::toString($matches[4] ?? "");
+                $absolutePath = "$url/{$relativePath}";
+                return "<$tag{$beforeSrc}src=\"$absolutePath\"{$afterSrc}>";
+            },
+        );
     }
 }

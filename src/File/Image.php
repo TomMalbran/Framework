@@ -225,7 +225,16 @@ class Image {
         if ($srcImage === null || $dstImage === null) {
             return false;
         }
-        imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $imgWidth, $imgHeight, $imgWidth, $imgHeight);
+        self::copyImage(
+            dstImage:  $dstImage,
+            srcImage:  $srcImage,
+            xCorner:   0,
+            yCorner:   0,
+            dstWidth:  $imgWidth,
+            dstHeight: $imgHeight,
+            srcWidth:  $imgWidth,
+            srcHeight: $imgHeight,
+        );
 
         // Update the Orientation
         $dstImage = match ($orientation) {
@@ -324,7 +333,16 @@ class Image {
         if ($srcResize === null || $dstResize === null) {
             return false;
         }
-        imagecopyresampled($dstResize, $srcResize, 0, 0, $xCorner, $yCorner, $width, $height, $oldWidth, $oldHeight);
+        self::copyImage(
+            dstImage:  $dstResize,
+            srcImage:  $srcResize,
+            xCorner:   $xCorner,
+            yCorner:   $yCorner,
+            dstWidth:  $width,
+            dstHeight: $height,
+            srcWidth:  $oldWidth,
+            srcHeight: $oldHeight,
+        );
 
         // Create Image
         self::createImage($imgType, $dstResize, $dst);
@@ -367,7 +385,16 @@ class Image {
         if ($srcResize === null || $dstResize === null) {
             return false;
         }
-        imagecopyresampled($dstResize, $srcResize, 0, 0, 0, 0, $resWidth, $resHeight, $imgWidth, $imgHeight);
+        self::copyImage(
+            dstImage:  $dstResize,
+            srcImage:  $srcResize,
+            xCorner:   0,
+            yCorner:   0,
+            dstWidth:  $resWidth,
+            dstHeight: $resHeight,
+            srcWidth:  $imgWidth,
+            srcHeight: $imgHeight,
+        );
 
         // Crop Image
         $dstCrop = imagecreatetruecolor($cropWidth, $cropHeight);
@@ -493,6 +520,42 @@ class Image {
             default => false,
         };
         return $result !== false;
+    }
+
+    /**
+     * Copies and Resamples an Image
+     * @param GdImage $dstImage
+     * @param GdImage $srcImage
+     * @param int     $xCorner
+     * @param int     $yCorner
+     * @param int     $dstWidth
+     * @param int     $dstHeight
+     * @param int     $srcWidth
+     * @param int     $srcHeight
+     * @return void
+     */
+    private static function copyImage(
+        GdImage $dstImage,
+        GdImage $srcImage,
+        int $xCorner,
+        int $yCorner,
+        int $dstWidth,
+        int $dstHeight,
+        int $srcWidth,
+        int $srcHeight,
+    ): void {
+        imagecopyresampled(
+            $dstImage,
+            $srcImage,
+            0,
+            0,
+            $xCorner,
+            $yCorner,
+            $dstWidth,
+            $dstHeight,
+            $srcWidth,
+            $srcHeight,
+        );
     }
 
 

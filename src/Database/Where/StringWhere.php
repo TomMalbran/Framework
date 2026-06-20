@@ -144,7 +144,11 @@ class StringWhere extends BaseWhere {
      * @param bool      $caseSensitive Optional.
      * @return void
      */
-    public function likeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): void {
+    public function likeIf(
+        string $value,
+        ?bool $condition = null,
+        bool $caseSensitive = false,
+    ): void {
         $this->compareIf(Operator::Like, $value, $condition, $caseSensitive);
     }
 
@@ -165,7 +169,11 @@ class StringWhere extends BaseWhere {
      * @param bool      $caseSensitive Optional.
      * @return void
      */
-    public function notLikeIf(string $value, ?bool $condition = null, bool $caseSensitive = false): void {
+    public function notLikeIf(
+        string $value,
+        ?bool $condition = null,
+        bool $caseSensitive = false,
+    ): void {
         $this->compareIf(Operator::NotLike, $value, $condition, $caseSensitive);
     }
 
@@ -211,7 +219,11 @@ class StringWhere extends BaseWhere {
      * @param bool         $caseSensitive Optional.
      * @return void
      */
-    public function notIn(array $values, ?bool $condition = null, bool $caseSensitive = false): void {
+    public function notIn(
+        array $values,
+        ?bool $condition = null,
+        bool $caseSensitive = false,
+    ): void {
         if (count($values) > 0) {
             $this->compare(Operator::NotIn, $values, $caseSensitive, $condition);
         }

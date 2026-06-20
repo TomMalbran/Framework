@@ -569,10 +569,12 @@ class Date implements JsonSerializable {
             return 0;
         }
         if ($startMonday) {
-            // N: ISO-8601 numeric representation of the day of the week (1 for Monday through 7 for Sunday)
+            // N: ISO-8601 numeric representation of the day of the week
+            //    (1 for Monday through 7 for Sunday)
             return (int)$this->format("N");
         }
-        // w: Numeric representation of the day of the week (0 for Sunday through 6 for Saturday)
+        // w: Numeric representation of the day of the week
+        //    (0 for Sunday through 6 for Saturday)
         return (int)$this->format("w");
     }
 

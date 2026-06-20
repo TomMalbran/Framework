@@ -61,7 +61,12 @@ class MailChimp {
      * @return Dictionary
      */
     private static function get(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute(CurlMethod::GET, self::getUrl($route), $request, self::getHeaders());
+        $result = Curl::execute(
+            method:  CurlMethod::GET,
+            url:     self::getUrl($route),
+            params:  $request,
+            headers: self::getHeaders(),
+        );
         return new Dictionary($result);
     }
 
@@ -72,7 +77,13 @@ class MailChimp {
      * @return Dictionary
      */
     private static function post(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute(CurlMethod::POST, self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        $result = Curl::execute(
+            method:   CurlMethod::POST,
+            url:      self::getUrl($route),
+            params:   $request,
+            headers:  self::getHeaders(),
+            jsonBody: true,
+        );
         return new Dictionary($result);
     }
 
@@ -83,7 +94,13 @@ class MailChimp {
      * @return Dictionary
      */
     private static function patch(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute(CurlMethod::PATCH, self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        $result = Curl::execute(
+            method:   CurlMethod::PATCH,
+            url:      self::getUrl($route),
+            params:   $request,
+            headers:  self::getHeaders(),
+            jsonBody: true,
+        );
         return new Dictionary($result);
     }
 
@@ -94,7 +111,13 @@ class MailChimp {
      * @return Dictionary
      */
     private static function put(string $route, ?array $request = null): Dictionary {
-        $result = Curl::execute(CurlMethod::PUT, self::getUrl($route), $request, self::getHeaders(), jsonBody: true);
+        $result = Curl::execute(
+            method:   CurlMethod::PUT,
+            url:      self::getUrl($route),
+            params:   $request,
+            headers:  self::getHeaders(),
+            jsonBody: true,
+        );
         return new Dictionary($result);
     }
 
@@ -104,7 +127,11 @@ class MailChimp {
      * @return Dictionary
      */
     private static function delete(string $route): Dictionary {
-        $result = Curl::execute(CurlMethod::DELETE, self::getUrl($route), null, self::getHeaders());
+        $result = Curl::execute(
+            method:  CurlMethod::DELETE,
+            url:     self::getUrl($route),
+            headers: self::getHeaders()
+        );
         return new Dictionary($result);
     }
 
@@ -396,7 +423,11 @@ class MailChimp {
      * @param int               $folderID Optional.
      * @return string
      */
-    private static function createCampaign(string $subject, ?array $emails = null, int $folderID = 0): string {
+    private static function createCampaign(
+        string $subject,
+        ?array $emails = null,
+        int $folderID = 0,
+    ): string {
         $recipients = self::parseRecipients($emails);
         if ($recipients === null || count($recipients) === 0) {
             return "";
@@ -499,7 +530,11 @@ class MailChimp {
      * @param list<array<string,string>>|null $sections    Optional.
      * @return bool
      */
-    private static function placeContent(string $mailChimpID, int $templateID, ?array $sections = null): bool {
+    private static function placeContent(
+        string $mailChimpID,
+        int $templateID,
+        ?array $sections = null,
+    ): bool {
         $post = [ "template" => [ "id" => $templateID ] ];
         if ($sections !== null && count($sections) > 0) {
             $post["template"]["sections"] = $sections;

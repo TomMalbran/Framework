@@ -279,7 +279,9 @@ class SchemaModel {
         $result = [];
         foreach ($this->fields as $field) {
             $fieldName = $field->dbName;
-            if (!$withTimestamps && ($fieldName === "createdTime" || $fieldName === "modifiedTime")) {
+            if (!$withTimestamps &&
+                ($fieldName === "createdTime" || $fieldName === "modifiedTime")
+            ) {
                 continue;
             }
             if (!$withDeleted && $fieldName === "isDeleted") {

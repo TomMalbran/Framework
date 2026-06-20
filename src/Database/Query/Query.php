@@ -387,7 +387,15 @@ class Query implements QueryLike {
             return $this;
         }
 
-        $this->whereBuilder->search($column, $value, $operator, $caseInsensitive, $splitValue, $splitText, $matchAny);
+        $this->whereBuilder->search(
+            $column,
+            $value,
+            $operator,
+            $caseInsensitive,
+            $splitValue,
+            $splitText,
+            $matchAny,
+        );
         return $this;
     }
 

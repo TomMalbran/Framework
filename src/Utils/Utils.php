@@ -167,8 +167,9 @@ class Utils {
         $name    = Strings::substringBefore($email, "@");
         $length  = Strings::length($name);
         $nameLen = $length > 3 ? 3 : 1;
-        $hidden  = Strings::substring($name, 0, $nameLen) . Strings::repeat("*", $length - $nameLen);
-        return "$hidden@$domain";
+        $hidden  = Strings::substring($name, 0, $nameLen);
+        $stars   = Strings::repeat("*", $length - $nameLen);
+        return "$hidden$stars@$domain";
     }
 
 
@@ -214,7 +215,10 @@ class Utils {
         for ($i = 0; $i < $middleSize; $i += 1) {
             $middle .= "*";
         }
-        return Strings::substring($phone, 0, $partSize) . $middle . Strings::substring($phone, -$partSize);
+
+        $result  = Strings::substring($phone, 0, $partSize);
+        $result .= $middle . Strings::substring($phone, -$partSize);
+        return $result;
     }
 
 

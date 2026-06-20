@@ -106,14 +106,18 @@ class QueryArgumentRule implements Rule {
         }
         if ($methodName === "join") {
             if (isset($args[1]) && $args[1]->name === null && !$this->isValidName($args[1], "as")) {
-                $errors[] = RuleErrorBuilder::message("The 'as' parameter in Query->join must be a named argument.")
+                $errors[] = RuleErrorBuilder::message(
+                    "The 'as' parameter in Query->join must be a named argument."
+                )
                     ->line($node->getLine())
                     ->identifier("framework.queryNamedAs")
                     ->build();
             }
 
             if (isset($args[2]) && $args[2]->name === null && !$this->isValidName($args[2], "on")) {
-                $errors[] = RuleErrorBuilder::message("The 'on' parameter in Query->join must be a named argument.")
+                $errors[] = RuleErrorBuilder::message(
+                    "The 'on' parameter in Query->join must be a named argument."
+                )
                     ->line($node->getLine())
                     ->identifier("framework.queryNamedOn")
                     ->build();
@@ -132,7 +136,9 @@ class QueryArgumentRule implements Rule {
                     continue;
                 }
 
-                $errors[] = RuleErrorBuilder::message("The value '{$value}' is not a valid Operator.")
+                $errors[] = RuleErrorBuilder::message(
+                    "The value '{$value}' is not a valid Operator."
+                )
                     ->line($node->getLine())
                     ->identifier("framework.queryInvOpp")
                     ->build();

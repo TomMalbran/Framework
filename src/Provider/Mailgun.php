@@ -24,10 +24,18 @@ class Mailgun {
      * @param array<string,mixed> $params Optional.
      * @return Dictionary
      */
-    private static function execute(CurlMethod $method, string $route, array $params = []): Dictionary {
-        $url      = self::BaseUrl . $route;
-        $userPass = "api:" . Config::getMailgunKey();
-        $response = Curl::execute($method, $url, $params, userPass: $userPass);
+    private static function execute(
+        CurlMethod $method,
+        string $route,
+        array $params = [],
+    ): Dictionary {
+        $response = Curl::execute(
+            method:   $method,
+            url:      self::BaseUrl . $route,
+            params:   $params,
+            userPass: "api:" . Config::getMailgunKey(),
+            jsonBody: true,
+        );
         return new Dictionary($response);
     }
 

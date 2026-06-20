@@ -84,7 +84,11 @@ class MediaFile {
      * @param string $basePath  Optional.
      * @return array{list:list<FileItem>,path:string}
      */
-    public static function getList(string $mediaType = "", string $path = "", string $basePath = ""): array {
+    public static function getList(
+        string $mediaType = "",
+        string $path = "",
+        string $basePath = "",
+    ): array {
         $path   = $path !== "" && self::exists($basePath, $path) ? $path : "";
         $source = self::getPath($basePath, $path);
         $files  = Storage::getAllInDir($source);
@@ -200,7 +204,12 @@ class MediaFile {
      * @param string $newName
      * @return bool
      */
-    private static function updatePath(string $oldPath, string $newPath, string $oldName, string $newName): bool {
+    private static function updatePath(
+        string $oldPath,
+        string $newPath,
+        string $oldName,
+        string $newName,
+    ): bool {
         $oldRelPath = Storage::removeFirstSlash(Storage::parsePath($oldPath, $oldName));
         $newRelPath = Storage::removeFirstSlash(Storage::parsePath($newPath, $newName));
         $oldSource  = self::getPath($oldPath, $oldName);

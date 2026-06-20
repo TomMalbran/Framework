@@ -88,7 +88,9 @@ class PreferMatchOverSwitchRule implements Rule {
 
         // Build and return the error message
         return [
-            RuleErrorBuilder::message("This switch statement can be refactored to a match expression.")
+            RuleErrorBuilder::message(
+                "This switch statement can be refactored to a match expression."
+            )
                 ->line($node->getLine())
                 ->identifier("general.preferMatch")
                 ->build(),

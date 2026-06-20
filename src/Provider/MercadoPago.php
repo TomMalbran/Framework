@@ -54,10 +54,16 @@ class MercadoPago {
         string $accessToken = "",
     ): Dictionary {
         $accessToken = $accessToken !== "" ? $accessToken : Config::getMpAccessToken();
-        $response    =  Curl::execute(CurlMethod::POST, self::BaseUrl . $route, $request, Arrays::merge([
-            "content-type"  => "application/json",
-            "Authorization" => "Bearer $accessToken",
-        ], $headers), jsonBody: true);
+        $response    =  Curl::execute(
+            method:   CurlMethod::POST,
+            url:      self::BaseUrl . $route,
+            params:   $request,
+            headers:  Arrays::merge([
+                "content-type"  => "application/json",
+                "Authorization" => "Bearer $accessToken",
+            ], $headers),
+            jsonBody: true,
+        );
         return new Dictionary($response);
     }
 
@@ -68,12 +74,22 @@ class MercadoPago {
      * @param string              $accessToken Optional.
      * @return Dictionary
      */
-    private static function put(string $route, array $request, string $accessToken = ""): Dictionary {
+    private static function put(
+        string $route,
+        array $request,
+        string $accessToken = "",
+    ): Dictionary {
         $accessToken = $accessToken !== "" ? $accessToken : Config::getMpAccessToken();
-        $response    = Curl::execute(CurlMethod::PUT, self::BaseUrl . $route, $request, [
-            "content-type"  => "application/json",
-            "Authorization" => "Bearer $accessToken",
-        ], jsonBody: true);
+        $response    = Curl::execute(
+            method:   CurlMethod::PUT,
+            url:      self::BaseUrl . $route,
+            params:   $request,
+            headers:  [
+                "content-type"  => "application/json",
+                "Authorization" => "Bearer $accessToken",
+            ],
+            jsonBody: true,
+        );
         return new Dictionary($response);
     }
 
@@ -128,7 +144,9 @@ class MercadoPago {
             "userID"         => $response->getString("user_id"),
             "accessToken"    => $response->getString("access_token"),
             "refreshToken"   => $response->getString("refresh_token"),
-            "expirationTime" => Date::now()->add(seconds: $response->getInt("expires_in"))->toTime(),
+            "expirationTime" => Date::now()->add(
+                seconds: $response->getInt("expires_in"),
+            )->toTime(),
         ];
     }
 
@@ -152,7 +170,9 @@ class MercadoPago {
             "userID"         => $response->getString("user_id"),
             "accessToken"    => $response->getString("access_token"),
             "refreshToken"   => $response->getString("refresh_token"),
-            "expirationTime" => Date::now()->add(seconds: $response->getInt("expires_in"))->toTime(),
+            "expirationTime" => Date::now()->add(
+                seconds: $response->getInt("expires_in"),
+            )->toTime(),
         ];
     }
 

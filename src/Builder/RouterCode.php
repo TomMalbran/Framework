@@ -26,7 +26,6 @@ class RouterCode implements DiscoveryBuilder {
         $routes  = [];
 
         foreach ($classes as $class) {
-            // Get the Methods
             $methods = $class->getMethods();
 
             // Add a space between the classes

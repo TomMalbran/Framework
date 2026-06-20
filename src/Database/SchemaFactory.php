@@ -170,7 +170,7 @@ class SchemaFactory {
                     try {
                         $instance = $propAttribute->newInstance();
                     } catch (Throwable $e) {
-                        $errors[] = "$modelName: $fieldName attribute could not be instantiated ($fileName)";
+                        $errors[] = "$modelName: $fieldName attribute could not be instantiated ($fileName)";  // phpcs:ignore
                         continue 2;
                     }
 
@@ -221,9 +221,18 @@ class SchemaFactory {
                 // VIRTUAL: If it has a Virtual attribute. It can be an array.
                 } elseif ($virtual !== null) {
                     if ($typeName === "array") {
-                        [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType($class, $prop);
+                        [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType(
+                            $class,
+                            $prop,
+                        );
                     }
-                    $virtualFields[] = $virtual->setData($fieldName, $typeName, $arrayType, $arrayClass, $isEnum);
+                    $virtualFields[] = $virtual->setData(
+                        $fieldName,
+                        $typeName,
+                        $arrayType,
+                        $arrayClass,
+                        $isEnum,
+                    );
 
                 // EXPRESSION: If it has an Expression attribute.
                 } elseif ($expression !== null) {
@@ -246,7 +255,11 @@ class SchemaFactory {
                 } elseif ($subRequest !== null) {
                     [ $arrayType, $subModelName ] = self::getArrayType($class, $prop);
                     if ($arrayType !== "" || $subModelName !== "") {
-                        $subRequests[] = $subRequest->setData($fieldName, $subModelName, $arrayType);
+                        $subRequests[] = $subRequest->setData(
+                            $fieldName,
+                            $subModelName,
+                            $arrayType,
+                        );
                     }
                 }
 
@@ -259,7 +272,10 @@ class SchemaFactory {
                         $requestedFields[] = $requested->fromField($field, $validate !== null);
                     } else {
                         if ($typeName === "array") {
-                            [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType($class, $prop);
+                            [ $arrayType, $subModelName, $arrayClass ] = self::getArrayType(
+                                $class,
+                                $prop,
+                            );
                         }
                         $requestedFields[] = $requested->setData(
                             $fieldName,
@@ -421,7 +437,11 @@ class SchemaFactory {
      * @param array<string,string>      $dbNames
      * @return void
      */
-    private static function parseMainFields(array $schemaModels, array $modelIDs, array &$dbNames): void {
+    private static function parseMainFields(
+        array $schemaModels,
+        array $modelIDs,
+        array &$dbNames,
+    ): void {
         foreach ($schemaModels as $schemaModel) {
             foreach ($schemaModel->mainFields as $field) {
                 if (!$field->isID && $field->belongsTo === "") {
@@ -441,7 +461,9 @@ class SchemaFactory {
                 } else {
                     foreach ($schemaModel->relations as $relation) {
                         $ownerKey = $relation->ownerFieldName;
-                        if ($ownerKey === $field->name && isset($modelIDs[$relation->relationFieldName])) {
+                        if ($ownerKey === $field->name &&
+                            isset($modelIDs[$relation->relationFieldName])
+                        ) {
                             $dbNames[$field->name] = $field->setDbName();
                             break;
                         }

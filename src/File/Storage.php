@@ -59,7 +59,9 @@ class Storage {
     public static function parseUrl(int|string ...$pathParts): string {
         $protocols = [ "http://", "https://" ];
         foreach ($protocols as $protocol) {
-            if (isset($pathParts[0]) && is_string($pathParts[0]) && Strings::startsWith($pathParts[0], $protocol)) {
+            if (isset($pathParts[0]) && is_string($pathParts[0]) &&
+                Strings::startsWith($pathParts[0], $protocol)
+            ) {
                 $pathParts[0] = Strings::substringAfter($pathParts[0], $protocol);
                 return $protocol . self::parsePath(...$pathParts);
             }
@@ -401,7 +403,11 @@ class Storage {
      * @param bool   $skipVendor Optional.
      * @return list<string>
      */
-    public static function getFilesInDir(string $path, bool $recursive = false, bool $skipVendor = false): array {
+    public static function getFilesInDir(
+        string $path,
+        bool $recursive = false,
+        bool $skipVendor = false,
+    ): array {
         $result = [];
         if ($path === "") {
             return $result;
@@ -416,7 +422,11 @@ class Storage {
                     continue;
                 }
                 if ($recursive) {
-                    $response = self::getFilesInDir("$path/$file", recursive: true, skipVendor: $skipVendor);
+                    $response = self::getFilesInDir(
+                        path:       "$path/$file",
+                        recursive:  true,
+                        skipVendor: $skipVendor,
+                    );
                     $result   = array_merge($result, $response);
                 } else {
                     $result[] = $file;

@@ -46,7 +46,9 @@ class Email {
         if (!$sendTest && !Config::isEmailActive()) {
             return EmailResult::InactiveSend;
         }
-        if (!$sendTest && !$sendAlways && Config::isEmailUseWhiteList() && !EmailWhiteList::emailExists($toEmail)) {
+        if (!$sendTest && !$sendAlways && Config::isEmailUseWhiteList() &&
+            !EmailWhiteList::emailExists($toEmail)
+        ) {
             return EmailResult::WhiteListFilter;
         }
         if (!Utils::isValidEmail($toEmail)) {
@@ -76,13 +78,49 @@ class Email {
         $fromEmail = Config::getEmailEmail();
         $replyTo   = Config::getEmailReplyTo();
 
+
         // Try to send the email
         $wasSent = match ($provider) {
-            EmailProvider::Mandrill => Mandrill::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
-            EmailProvider::Mailjet  => Mailjet::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
-            EmailProvider::Mailgun  => Mailgun::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
-            EmailProvider::SendGrid => SendGrid::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
-            default                 => SMTP::sendEmail($toEmail, $fromEmail, $fromName, $replyTo, $subject, $body),
+            EmailProvider::Mandrill => Mandrill::sendEmail(
+                $toEmail,
+                $fromEmail,
+                $fromName,
+                $replyTo,
+                $subject,
+                $body,
+            ),
+            EmailProvider::Mailjet  => Mailjet::sendEmail(
+                $toEmail,
+                $fromEmail,
+                $fromName,
+                $replyTo,
+                $subject,
+                $body,
+            ),
+            EmailProvider::Mailgun  => Mailgun::sendEmail(
+                $toEmail,
+                $fromEmail,
+                $fromName,
+                $replyTo,
+                $subject,
+                $body,
+            ),
+            EmailProvider::SendGrid => SendGrid::sendEmail(
+                $toEmail,
+                $fromEmail,
+                $fromName,
+                $replyTo,
+                $subject,
+                $body,
+            ),
+            default                 => SMTP::sendEmail(
+                $toEmail,
+                $fromEmail,
+                $fromName,
+                $replyTo,
+                $subject,
+                $body,
+            ),
         };
         return $wasSent ? EmailResult::Sent : EmailResult::ProviderError;
     }
@@ -129,7 +167,7 @@ class Email {
         }
         $secretKey = urlencode($recaptchaSecret);
         $captcha   = urlencode($request->getString("g-recaptcha-response"));
-        $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";
+        $url       = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha";  // phpcs:ignore
         $response  = JSON::readUrl($url);
 
         if (!isset($response["success"])) {

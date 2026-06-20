@@ -129,7 +129,9 @@ class ModelAttributeRule implements Rule {
 
         // A property cannot combine main attributes (except #[Requested])
         if ($totalExclusive > 1) {
-            $errors[] = RuleErrorBuilder::message("Property '{$propName}' cannot combine main attributes.")
+            $errors[] = RuleErrorBuilder::message(
+                "Property '{$propName}' cannot combine main attributes."
+            )
                 ->line($node->getLine())
                 ->identifier("framework.modelAttribute")
                 ->build();
@@ -138,7 +140,9 @@ class ModelAttributeRule implements Rule {
 
         // A property with #[Validate] requires #[Requested]
         if ($hasValidate && !$hasRequested) {
-            $errors[] = RuleErrorBuilder::message("Property '{$propName}' is missing the #[Requested] attribute.")
+            $errors[] = RuleErrorBuilder::message(
+                "Property '{$propName}' is missing the #[Requested] attribute."
+            )
                 ->line($node->getLine())
                 ->identifier("framework.modelAttribute")
                 ->build();
@@ -150,7 +154,9 @@ class ModelAttributeRule implements Rule {
         $isStatus   = isset($refClasses[0]) && $refClasses[0] === Status::class;
 
         if ($isStatus && !$hasField) {
-            $errors[] = RuleErrorBuilder::message("Property '{$propName}' is missing the #[Field] attribute.")
+            $errors[] = RuleErrorBuilder::message(
+                "Property '{$propName}' is missing the #[Field] attribute."
+            )
                 ->line($node->getLine())
                 ->identifier("framework.modelAttribute")
                 ->build();
@@ -172,7 +178,9 @@ class ModelAttributeRule implements Rule {
                     continue;
                 }
 
-                $errors[] = RuleErrorBuilder::message("Property '{$propName}' must relate to a #[Model].")
+                $errors[] = RuleErrorBuilder::message(
+                    "Property '{$propName}' must relate to a #[Model]."
+                )
                     ->line($node->getLine())
                     ->identifier("framework.modelAttribute")
                     ->build();
@@ -182,7 +190,9 @@ class ModelAttributeRule implements Rule {
 
         // A property with #[SubRequest] must be an array
         if ($hasSubRequest && !$propType->isArray()->yes()) {
-            $errors[] = RuleErrorBuilder::message("Property '{$propName}' must have type array.")
+            $errors[] = RuleErrorBuilder::message(
+                "Property '{$propName}' must have type array."
+            )
                 ->line($node->getLine())
                 ->identifier("framework.modelAttribute")
                 ->build();

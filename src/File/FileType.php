@@ -1,7 +1,9 @@
 <?php
-// spell-checker: ignore  msvideo, binhex, compactpro, coreldraw, troff, macbinary, xbitmap, pkix msdownload, msexcel
-// spell-checker: ignore  quicktime, powerpoint, msword, photoshop, realaudio, realvideo, stuffit, smil, vcard
-// spell-checker: ignore  flac, gtar, pjpeg, mpegurl, videolan, wbxml, wmlc, xspf, scriptzsh
+// spell-checker: ignore  msvideo, binhex, compactpro, coreldraw, troff
+// spell-checker: ignore  macbinary, xbitmap, pkix msdownload, msexcel
+// spell-checker: ignore  quicktime, powerpoint, msword, photoshop, realaudio
+// spell-checker: ignore  realvideo, stuffit, smil, vcard, xspf, scriptzsh
+// spell-checker: ignore  flac, gtar, pjpeg, mpegurl, videolan, wbxml, wmlc
 namespace Framework\File;
 
 use Framework\File\Storage;
@@ -22,7 +24,9 @@ class FileType {
     private static array $icoExts = [ "ico" ];
 
     /** @var list<string> */
-    private static array $videoExts = [ "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm" ];
+    private static array $videoExts = [
+        "mov", "mpeg", "m4v", "mp4", "avi", "mpg", "wma", "flv", "webm",
+    ];
 
     /** @var list<string> */
     private static array $audioExts = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];

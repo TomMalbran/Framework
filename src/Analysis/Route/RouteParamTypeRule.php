@@ -82,7 +82,9 @@ class RouteParamTypeRule implements Rule {
         $className = $classReflection->getName();
         $method    = "{$className}::{$methodName}()";
         return [
-            RuleErrorBuilder::message("Method {$method} must have no params or a Request param since is a Route.")
+            RuleErrorBuilder::message(
+                "Method {$method} must have no params or a Request param since is a Route."
+            )
                 ->line($node->getStartLine())
                 ->identifier("framework.routeParam")
                 ->build()

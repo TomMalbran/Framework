@@ -61,7 +61,12 @@ class NotificationContent extends NotificationContentSchema implements Discovery
         foreach ($languages as $language => $languageName) {
             $notifications = IntlConfig::loadNotifications($language);
             if ($notifications->isNotEmpty()) {
-                $position  = self::migrateLanguage($notifications, $language, $languageName, $position);
+                $position  = self::migrateLanguage(
+                    $notifications,
+                    $language,
+                    $languageName,
+                    $position,
+                );
                 $didUpdate = true;
             }
         }

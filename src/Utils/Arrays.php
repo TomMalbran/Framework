@@ -481,7 +481,9 @@ class Arrays {
     ): array {
         $result = [];
         foreach ($array as $row) {
-            if (is_array($row) && (!isset($row[$checkKey]) || !self::contains($other, $row[$checkKey], $checkKey))) {
+            if (is_array($row) && (!isset($row[$checkKey]) ||
+                !self::contains($other, $row[$checkKey], $checkKey))
+            ) {
                 if ($getKey !== null) {
                     $result[] = $row[$getKey] ?? "";
                 } else {
@@ -926,7 +928,11 @@ class Arrays {
      * @param bool                    $caseInsensitive Optional.
      * @return int
      */
-    public static function getIndex(array $array, mixed $needle, bool $caseInsensitive = false): int {
+    public static function getIndex(
+        array $array,
+        mixed $needle,
+        bool $caseInsensitive = false,
+    ): int {
         $index = 0;
         foreach ($array as $elem) {
             if (Strings::isEqual($elem, $needle, $caseInsensitive)) {

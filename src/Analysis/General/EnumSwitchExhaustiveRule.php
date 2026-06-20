@@ -92,7 +92,9 @@ class EnumSwitchExhaustiveRule implements Rule {
             $typeName    = $caseType->describe(VerbosityLevel::typeOnly());
 
             if (count($caseClasses) !== 1 || $caseClasses[0] !== $enumClassName) {
-                $errors[] = RuleErrorBuilder::message("Case type {$typeName} does not match enum {$enumClassName}.")
+                $errors[] = RuleErrorBuilder::message(
+                    "Case type {$typeName} does not match enum {$enumClassName}."
+                )
                     ->line($case->getLine())
                     ->identifier("framework.invalidCaseType")
                     ->build();
@@ -101,7 +103,9 @@ class EnumSwitchExhaustiveRule implements Rule {
 
             // Ensure 'None' is always the first case
             if (Strings::endsWith($typeName, "::None") && $index !== 0) {
-                $errors[] = RuleErrorBuilder::message("The 'None' case must be the first case in the switch.")
+                $errors[] = RuleErrorBuilder::message(
+                    "The 'None' case must be the first case in the switch."
+                )
                     ->line($case->getLine())
                     ->identifier("framework.noneCaseMustBeFirst")
                     ->build();
@@ -126,9 +130,13 @@ class EnumSwitchExhaustiveRule implements Rule {
         }
 
         // Check if only 'None' is missing and there is a default
-        if ($defaultNode !== null && count($missingCases) === 1 && reset($missingCases) === "None") {
+        if ($defaultNode !== null && count($missingCases) === 1 &&
+            reset($missingCases) === "None"
+        ) {
             return [
-                RuleErrorBuilder::message("Switch on {$enumClassName} uses a default for the only missing case 'None'.")
+                RuleErrorBuilder::message(
+                    "Switch on {$enumClassName} uses a default for the only missing case 'None'."
+                )
                     ->line($defaultNode->getLine())
                     ->identifier("framework.replaceDefaultWithNone")
                     ->build(),
@@ -142,7 +150,9 @@ class EnumSwitchExhaustiveRule implements Rule {
             $missingList   = Strings::join($missingCases, ", ");
 
             return [
-                RuleErrorBuilder::message("Switch on {$enumName} is missing cases: {$missingList}.")
+                RuleErrorBuilder::message(
+                    "Switch on {$enumName} is missing cases: {$missingList}."
+                )
                     ->line($node->getLine())
                     ->identifier("framework.switchExhaustive")
                     ->build(),

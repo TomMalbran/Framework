@@ -21,6 +21,11 @@ use PhpParser\Node\Stmt\Expression;
 /**
  * The Private Method Return Unused Rule
  * @implements Rule<Class_>
+ * @phpstan-type PrivateMethodInfo array{
+ *   node: ClassMethod,
+ *   hasUsedCall: bool,
+ *   hasIgnoredCall: bool,
+ * }
  */
 class PrivateMethodReturnUnusedRule implements Rule {
 
@@ -63,7 +68,9 @@ class PrivateMethodReturnUnusedRule implements Rule {
             }
 
             // Simple check: if it has a return type and it's not void
-            if ($method->returnType instanceof Identifier && $method->returnType->toLowerString() === "void") {
+            if ($method->returnType instanceof Identifier &&
+                $method->returnType->toLowerString() === "void"
+            ) {
                 continue;
             }
 
@@ -87,7 +94,9 @@ class PrivateMethodReturnUnusedRule implements Rule {
             if (!$data["hasIgnoredCall"] || $data["hasUsedCall"]) {
                 continue;
             }
-            $errors[] = RuleErrorBuilder::message("Private method '{$name}' returns a value, but is never used.")
+            $errors[] = RuleErrorBuilder::message(
+                "Private method '{$name}' returns a value, but is never used."
+            )
                 ->line($data["node"]->getLine())
                 ->identifier("general.unusedPrivateReturn")
                 ->build();
@@ -98,16 +107,22 @@ class PrivateMethodReturnUnusedRule implements Rule {
 
     /**
      * Recursively scans a node for method calls to the private methods we're tracking
-     * @param Node                                                                       $node
-     * @param array<string,array{node:ClassMethod,hasUsedCall:bool,hasIgnoredCall:bool}> $privateMethods
-     * @param Node|null                                                                  $parent         Optional.
+     * @param Node                            $node
+     * @param array<string,PrivateMethodInfo> $privateMethods
+     * @param Node|null                       $parent         Optional.
      * @return void
      */
-    private function scanUsage(Node $node, array &$privateMethods, ?Node $parent = null): void {
+    private function scanUsage(
+        Node $node,
+        array &$privateMethods,
+        ?Node $parent = null,
+    ): void {
         if ($node instanceof MethodCall && $node->name instanceof Identifier) {
             $name = $node->name->toString();
             // Check for $this->method()
-            if (isset($privateMethods[$name]) && $node->var instanceof Variable && $node->var->name === "this") {
+            if (isset($privateMethods[$name]) && $node->var instanceof Variable &&
+                $node->var->name === "this"
+            ) {
                 if ($parent instanceof Expression) {
                     $privateMethods[$name]["hasIgnoredCall"] = true;
                 } else {

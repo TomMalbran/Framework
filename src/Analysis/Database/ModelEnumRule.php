@@ -97,7 +97,9 @@ class ModelEnumRule implements Rule {
         // Generate an error message
         $typeName = Strings::substringAfter($className, "\\");
         return [
-            RuleErrorBuilder::message("Enum '{$typeName}' must implement Enum and JsonSerializable.")
+            RuleErrorBuilder::message(
+                "Enum '{$typeName}' must implement Enum and JsonSerializable."
+            )
                 ->line($prop->getStartLine())
                 ->identifier("framework.modelEnum")
                 ->build()

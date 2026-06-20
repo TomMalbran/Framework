@@ -227,7 +227,10 @@ class SubRequest {
             $total      = count($queryParts);
             if ($total % 3 === 0) {
                 for ($i = 0; $i < $total; $i += 3) {
-                    if (isset($queryParts[$i]) && isset($queryParts[$i + 1]) && isset($queryParts[$i + 2])) {
+                    if (isset($queryParts[$i]) &&
+                        isset($queryParts[$i + 1]) &&
+                        isset($queryParts[$i + 2])
+                    ) {
                         $operator = Operator::fromValue($queryParts[$i + 1]);
                         $query->where($queryParts[$i], $operator, $queryParts[$i + 2]);
                     }
@@ -241,7 +244,8 @@ class SubRequest {
                 $query->where($isDeleted, Operator::Equal, 0);
             }
             if ($this->schemaModel->hasPositions) {
-                $query->orderBy($this->schemaModel->getKey($this->schemaModel->positionName), isASC: true);
+                $positionKey = $this->schemaModel->getKey($this->schemaModel->positionName);
+                $query->orderBy($positionKey, isASC: true);
             }
         }
         return $query;

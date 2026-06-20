@@ -29,7 +29,8 @@ class Relation {
     private string $relationJoin;
 
     // Name of the column to do the join in the owner Model (parent)
-    // If there are 2 relations with the same Model, use "AsModelName.fieldName" to give the Model a different name
+    // If there are 2 relations with the same Model, use
+    // "AsModelName.fieldName" to give the Model a different name
     // By default the primary key of the Related Model is used
     private string $ownerJoin;
 
@@ -183,8 +184,9 @@ class Relation {
     }
 
     /**
-     * BUILD STEP 1: When parsing the attributes of a Model, set the name of the Relation Model and prefix
-     * @param string $relationModelName The Relation Model Name comes from the type of the attribute.
+     * BUILD STEP 1: When parsing the attributes of a Model,
+     * set the name of the Relation Model and prefix
+     * @param string $relationModelName The name comes from the type of the attribute.
      * @param string $fieldName         The name of the attribute used as the prefix.
      * @return void
      */
@@ -209,7 +211,8 @@ class Relation {
             return false;
         }
 
-        // If the Relation Join does not contain a dot, the name of the Relation Field is the Relation Join
+        // If the Relation Join does not contain a dot,
+        // the name of the Relation Field is the Relation Join
         if (!Strings::contains($this->relationJoin, ".")) {
             $this->relationFieldName = $this->relationJoin;
             return true;
@@ -245,7 +248,11 @@ class Relation {
         $ownerJoin = $this->ownerJoin;
         if (Strings::contains($this->ownerJoin, " AND ")) {
             $ownerJoin           = trim(Strings::substringBefore($this->ownerJoin, " AND "));
-            $this->ownerAndQuery = trim(Strings::substringAfter($this->ownerJoin, " AND ", useFirst: true));
+            $this->ownerAndQuery = trim(Strings::substringAfter(
+                string:   $this->ownerJoin,
+                needle:   " AND ",
+                useFirst: true,
+            ));
         }
 
         // The Owner Join is in the format "fieldName"
@@ -265,10 +272,12 @@ class Relation {
     }
 
     /**
-     * BUILD STEP 4: After creating all the models we can get the Relation Model and the Parent Model
-     * @param SchemaModel $relationModel The Relation Model is the one associated to the type of the Attribute.
-     * @param SchemaModel $parentModel   The Parent Model is the Model where the Relation is defined.
-     *                                   It might not be the Owner in the JOIN.
+     * BUILD STEP 4: After creating all the models we can get the
+     * Relation Model and the Parent Model
+     * @param SchemaModel $relationModel The Relation Model is
+     *   the one associated to the type of the Attribute.
+     * @param SchemaModel $parentModel   The Parent Model is the Model
+     *   where the Relation is defined. It might not be the Owner in the JOIN.
      * @return Relation
      */
     public function setModels(SchemaModel $relationModel, SchemaModel $parentModel): Relation {
@@ -298,11 +307,16 @@ class Relation {
             return false;
         }
 
-        $withTimestamps = Arrays::contains($this->fieldNames, [ "createdTime", "modifiedTime" ], atLeastOne: true);
-        $withDeleted    = $this->withDeleted || Arrays::contains($this->fieldNames, "isDeleted");
-        $fields         = $this->relationModel->getFields($withTimestamps, $withDeleted);
-        $parentFields   = $this->parentModel->getFieldNames();
-        $hasFields      = count($this->fieldNames) > 0;
+        $withTimestamps = Arrays::contains(
+            array:      $this->fieldNames,
+            needle:     [ "createdTime", "modifiedTime" ],
+            atLeastOne: true,
+        );
+
+        $withDeleted  = $this->withDeleted || Arrays::contains($this->fieldNames, "isDeleted");
+        $fields       = $this->relationModel->getFields($withTimestamps, $withDeleted);
+        $parentFields = $this->parentModel->getFieldNames();
+        $hasFields    = count($this->fieldNames) > 0;
 
         foreach ($fields as $field) {
             $prefixName = $this->prefix . Strings::upperCaseFirst($field->name);
@@ -339,7 +353,8 @@ class Relation {
     }
 
     /**
-     * BUILD STEP 6: Tries to find the Owner Model Name using the Fields and Relations from the Parent Model
+     * BUILD STEP 6: Tries to find the Owner Model Name using the Fields
+     * and Relations from the Parent Model
      * - If the ownerModelName was set in the previous steps, it does nothing
      * - If there is a field in the parent with the same ID as the Relation
      *   then the ownerModel is the parent Model
@@ -416,8 +431,12 @@ class Relation {
             return [];
         }
 
-        $withTimestamps = Arrays::contains($this->fieldNames, [ "createdTime", "modifiedTime" ], atLeastOne: true);
-        $withDeleted    = $this->withDeleted || Arrays::contains($this->fieldNames, "isDeleted");
+        $withTimestamps = Arrays::contains(
+            array:      $this->fieldNames,
+            needle:     [ "createdTime", "modifiedTime" ],
+            atLeastOne: true,
+        );
+        $withDeleted = $this->withDeleted || Arrays::contains($this->fieldNames, "isDeleted");
         return $this->relationModel->getFields($withTimestamps, $withDeleted);
     }
 
@@ -597,7 +616,8 @@ class Relation {
 
     /**
      * Returns the Name of the Relation
-     * @param list<string> $otherRelationNames List of the names of the Relations in the Parent Model.
+     * @param list<string> $otherRelationNames List of the names of the
+     *   Relations in the Parent Model.
      * @return string
      */
     public function getName(array $otherRelationNames): string {
@@ -633,7 +653,8 @@ class Relation {
         return [
             "fromField" => $this->ownerFieldDbName !== $dbName ? $this->ownerFieldDbName : $dbName,
             "toTable"   => SchemaModel::getDbTableName($this->relationModelName),
-            "toField"   => $this->relationFieldDbName !== $dbName ? $this->relationFieldDbName : $dbName,
+            "toField"   => $this->relationFieldDbName !== $dbName ?
+                $this->relationFieldDbName : $dbName,
         ];
     }
 }

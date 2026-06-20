@@ -20,7 +20,11 @@ class SchemaMigration {
      * @param bool                                            $canDelete     Optional.
      * @return void
      */
-    public static function migrateData(array $tableRenames, array $columnRenames, bool $canDelete = false): void {
+    public static function migrateData(
+        array $tableRenames,
+        array $columnRenames,
+        bool $canDelete = false,
+    ): void {
         $db            = Database::getInstance();
         $schemaModels  = SchemaFactory::getData();
         $startMovement = SettingData::getCore("movement");
@@ -84,7 +88,11 @@ class SchemaMigration {
      * @param list<array{table:string,from:string,to:string}> $columnRenames
      * @return int
      */
-    private static function renameColumns(Database $db, int $startRename, array $columnRenames): int {
+    private static function renameColumns(
+        Database $db,
+        int $startRename,
+        array $columnRenames,
+    ): int {
         $lastRename = count($columnRenames);
         $didRename  = false;
 
@@ -131,7 +139,11 @@ class SchemaMigration {
      * @param bool              $canDelete    Optional.
      * @return void
      */
-    private static function migrateTables(Database $db, array $schemaModels, bool $canDelete = false): void {
+    private static function migrateTables(
+        Database $db,
+        array $schemaModels,
+        bool $canDelete = false,
+    ): void {
         $tableNames = $db->getTables();
         $modelNames = [];
 
@@ -187,7 +199,12 @@ class SchemaMigration {
      * @param bool         $canDelete
      * @return void
      */
-    private static function deleteTables(Database $db, array $tableNames, array $modelNames, bool $canDelete): void {
+    private static function deleteTables(
+        Database $db,
+        array $tableNames,
+        array $modelNames,
+        bool $canDelete,
+    ): void {
         $preBreak = "\n";
         foreach ($tableNames as $tableName) {
             if (!Arrays::contains($modelNames, $tableName)) {
@@ -209,7 +226,11 @@ class SchemaMigration {
      * @param bool        $canDelete
      * @return void
      */
-    private static function updateTable(Database $db, SchemaModel $schemaModel, bool $canDelete): void {
+    private static function updateTable(
+        Database $db,
+        SchemaModel $schemaModel,
+        bool $canDelete,
+    ): void {
         $autoKey     = $db->getAutoIncrement($schemaModel->tableName);
         $primaryKeys = $db->getPrimaryKeys($schemaModel->tableName);
         $tableKeys   = $db->getTableKeys($schemaModel->tableName);
@@ -299,7 +320,8 @@ class SchemaMigration {
                             "key"    => $field->dbName,
                             "type"   => $newData,
                             "after"  => $newPrev,
-                            "toInts" => Strings::contains($newData, "int") && Strings::contains($oldData, "varchar"),
+                            "toInts" => Strings::contains($newData, "int") &&
+                                Strings::contains($oldData, "varchar"),
                         ];
                     }
                     break;
@@ -313,7 +335,9 @@ class SchemaMigration {
         foreach ($tableFields as $tableKey => $tableField) {
             $found = false;
             foreach ($schemaModel->fields as $field) {
-                if (Strings::isEqual($field->dbName, $tableKey) || Arrays::contains($renamed, $tableKey)) {
+                if (Strings::isEqual($field->dbName, $tableKey) ||
+                    Arrays::contains($renamed, $tableKey)
+                ) {
                     $found = true;
                 }
             }
@@ -360,12 +384,22 @@ class SchemaMigration {
         }
 
         foreach ($renames as $rename) {
-            $sql = $db->renameColumn($schemaModel->tableName, $rename["key"], $rename["new"], $rename["type"]);
+            $sql = $db->renameColumn(
+                $schemaModel->tableName,
+                $rename["key"],
+                $rename["new"],
+                $rename["type"],
+            );
             print("$sql\n");
         }
 
         foreach ($adds as $add) {
-            $sql = $db->addColumn($schemaModel->tableName, $add["key"], $add["type"], $add["after"]);
+            $sql = $db->addColumn(
+                $schemaModel->tableName,
+                $add["key"],
+                $add["type"],
+                $add["after"],
+            );
             print("$sql\n");
         }
 
@@ -377,7 +411,12 @@ class SchemaMigration {
                     WHERE `{$modify["key"]}` = ''
                 ");
             }
-            $sql = $db->updateColumn($schemaModel->tableName, $modify["key"], $modify["type"], $modify["after"]);
+            $sql = $db->updateColumn(
+                $schemaModel->tableName,
+                $modify["key"],
+                $modify["type"],
+                $modify["after"],
+            );
             print("$sql\n");
         }
 

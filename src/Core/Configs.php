@@ -77,7 +77,9 @@ class Configs implements DiscoveryBuilder {
             $files = Storage::getFilesInDir($appPath);
             foreach ($files as $file) {
                 // Skip the example and main env files
-                if ($file === ".env.example" || $file === ".env" || !Strings::startsWith($file, ".env.")) {
+                if ($file === ".env.example" || $file === ".env" ||
+                    !Strings::startsWith($file, ".env.")
+                ) {
                     continue;
                 }
 

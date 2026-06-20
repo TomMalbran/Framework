@@ -89,10 +89,12 @@ class DisallowClassCompareRule implements Rule {
         $rightName = Strings::substringAfter($rightName, "\\");
 
         return [
-            RuleErrorBuilder::message("Direct comparison between classes '$leftName' and '$rightName' is disallowed.")
-            ->line($node->getLine())
-            ->identifier("framework.disallowClassCompare")
-            ->build(),
+            RuleErrorBuilder::message(
+                "Direct comparison between classes '$leftName' and '$rightName' is disallowed."
+            )
+                ->line($node->getLine())
+                ->identifier("framework.disallowClassCompare")
+                ->build(),
         ];
     }
 }

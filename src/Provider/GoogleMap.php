@@ -50,7 +50,11 @@ class GoogleMap {
      * @param float  $longitude
      * @return array{address:string,latitude:float,longitude:float}|null
      */
-    public static function getAddress(string $address, float $latitude, float $longitude): array|null {
+    public static function getAddress(
+        string $address,
+        float $latitude,
+        float $longitude,
+    ): array|null {
         if (!self::isActive()) {
             return null;
         }
@@ -149,7 +153,12 @@ class GoogleMap {
         $result   = Curl::execute(CurlMethod::GET, $url, $params);
         $response = new Dictionary($result);
 
-        $value    = $response->getFirst("rows")->getFirst("elements")->getDict("distance")->getFloat("value");
+        $value = $response
+            ->getFirst("rows")
+            ->getFirst("elements")
+            ->getDict("distance")
+            ->getFloat("value");
+
         if ($value === 0.0) {
             return null;
         }

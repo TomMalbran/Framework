@@ -52,7 +52,12 @@ class QueryBuilder {
      * @param string       $asTable
      * @param WhereBuilder $whereBuilder
      */
-    public function __construct(QueryMode $mode, string $tableName, string $asTable, WhereBuilder $whereBuilder) {
+    public function __construct(
+        QueryMode $mode,
+        string $tableName,
+        string $asTable,
+        WhereBuilder $whereBuilder,
+    ) {
         $this->mode         = $mode;
         $this->table        = new TableDefinition($tableName, $asTable);
         $this->whereBuilder = $whereBuilder;
@@ -226,7 +231,10 @@ class QueryBuilder {
 
         $expression = "({$expression})";
         if ($this->ifNullValue !== null) {
-            $value      = is_string($this->ifNullValue) ? "'{$this->ifNullValue}'" : $this->ifNullValue;
+            $value = $this->ifNullValue;
+            if (is_string($this->ifNullValue)) {
+                $value = "'{$this->ifNullValue}'";
+            }
             $expression = "IFNULL($expression, $value)";
         }
         return Assign::exp($expression, $bindings);
@@ -392,7 +400,11 @@ class QueryBuilder {
         }
 
         // Add new lines for better readability
-        foreach ([ "FROM", "LEFT JOIN", "VALUES", "SET", "WHERE", "ORDER BY", "GROUP BY", "LIMIT" ] as $key) {
+        $keywords = [
+            "FROM", "LEFT JOIN", "VALUES", "SET", "WHERE",
+            "ORDER BY", "GROUP BY", "LIMIT",
+        ];
+        foreach ($keywords as $key) {
             $expression = Strings::replace($expression, "$key ", "\n$key ");
         }
 
