@@ -131,24 +131,24 @@ class OpenAI {
      * Uploads the given File
      * @param string $fileName
      * @param string $fileContent
-     * @return string
+     * @return OpenAIOutput
      */
-    public static function uploadFile(string $fileName, string $fileContent): string {
+    public static function uploadFile(string $fileName, string $fileContent): OpenAIOutput {
         $response = self::upload("/files", [
             "purpose" => "assistants",
             "file"    => new CURLStringFile($fileContent, $fileName, "text/plain"),
         ]);
-        return $response->getString("id");
+        return new OpenAIOutput($response);
     }
 
     /**
      * Deletes the given File
      * @param string $fileID
-     * @return bool
+     * @return OpenAIOutput
      */
-    public static function deleteFile(string $fileID): bool {
+    public static function deleteFile(string $fileID): OpenAIOutput {
         $response = self::delete("/files/$fileID");
-        return $response->hasValue("id");
+        return new OpenAIOutput($response);
     }
 
 
@@ -165,36 +165,36 @@ class OpenAI {
     /**
      * Creates a Vector Store
      * @param string $name
-     * @return string
+     * @return OpenAIOutput
      */
-    public static function createVectorStore(string $name): string {
+    public static function createVectorStore(string $name): OpenAIOutput {
         $response = self::post("/vector_stores", [
             "name" => $name,
         ]);
-        return $response->getString("id");
+        return new OpenAIOutput($response);
     }
 
     /**
      * Edits a Vector Store
      * @param string $vectorStoreID
      * @param string $name
-     * @return string
+     * @return OpenAIOutput
      */
-    public static function editVectorStore(string $vectorStoreID, string $name): string {
+    public static function editVectorStore(string $vectorStoreID, string $name): OpenAIOutput {
         $response = self::post("/vector_stores/$vectorStoreID", [
             "name" => $name,
         ]);
-        return $response->getString("id");
+        return new OpenAIOutput($response);
     }
 
     /**
      * Deletes a Vector Store
      * @param string $vectorStoreID
-     * @return string
+     * @return OpenAIOutput
      */
-    public static function deleteVectorStore(string $vectorStoreID): string {
+    public static function deleteVectorStore(string $vectorStoreID): OpenAIOutput {
         $response = self::delete("/vector_stores/$vectorStoreID");
-        return $response->getString("id");
+        return new OpenAIOutput($response);
     }
 
     /**
@@ -213,24 +213,24 @@ class OpenAI {
      * Creates a Vector Store File
      * @param string $vectorStoreID
      * @param string $fileID
-     * @return string
+     * @return OpenAIOutput
      */
-    public static function createVectorFile(string $vectorStoreID, string $fileID): string {
+    public static function createVectorFile(string $vectorStoreID, string $fileID): OpenAIOutput {
         $response = self::post("/vector_stores/$vectorStoreID/files", [
             "file_id" => $fileID,
         ]);
-        return $response->getString("id");
+        return new OpenAIOutput($response);
     }
 
     /**
      * Deletes a Vector Store File
      * @param string $vectorStoreID
      * @param string $fileID
-     * @return string
+     * @return OpenAIOutput
      */
-    public static function deleteVectorFile(string $vectorStoreID, string $fileID): string {
+    public static function deleteVectorFile(string $vectorStoreID, string $fileID): OpenAIOutput {
         $response = self::delete("/vector_stores/$vectorStoreID/files/$fileID");
-        return $response->getString("id");
+        return new OpenAIOutput($response);
     }
 
 
@@ -280,17 +280,11 @@ class OpenAI {
 
 
         // Perform the Request
-        $result   = new OpenAIOutput();
         $response = self::post("/chat/completions", $params);
+        $result   = new OpenAIOutput($response);
 
         // Check for errors
-        if ($response->hasValue("error")) {
-            $error = $response->get("error");
-            if (is_string($error)) {
-                $result->error = $error;
-            } else {
-                $result->error = $response->getDict("error")->getString("message");
-            }
+        if ($result->error !== "") {
             return $result;
         }
 
@@ -305,7 +299,6 @@ class OpenAI {
             $text = Strings::replacePattern($text, '/【.*】/', "");
         }
 
-        $result->externalID   = $response->getString("id");
         $result->text         = $text;
         $result->inputTokens  = $response->getDict("usage")->getInt("prompt_tokens");
         $result->outputTokens = $response->getDict("usage")->getInt("completion_tokens");
@@ -391,17 +384,11 @@ class OpenAI {
 
 
         // Perform the Request
-        $result   = new OpenAIOutput();
         $response = self::post("/responses", $params);
+        $result   = new OpenAIOutput($response);
 
         // Check for errors
-        if ($response->hasValue("error")) {
-            $error = $response->get("error");
-            if (is_string($error)) {
-                $result->error = $error;
-            } else {
-                $result->error = $response->getDict("error")->getString("message");
-            }
+        if ($result->error !== "") {
             return $result;
         }
 
@@ -418,7 +405,6 @@ class OpenAI {
         }
 
         if ($text !== "") {
-            $result->externalID    = $response->getString("id");
             $result->vectorStoreID = $vectorStoreID;
             $result->text          = $text;
             $result->inputTokens   = $response->getDict("usage")->getInt("input_tokens");
@@ -445,13 +431,13 @@ class OpenAI {
      */
     public static function transcribeAudio(string $fileContent, string $fileName, string $language): OpenAIOutput {
         $timer    = new Timer();
-        $result   = new OpenAIOutput();
         $response = self::upload("/audio/transcriptions", [
             "file"            => new CURLStringFile($fileContent, $fileName),
             "model"           => "whisper-1",
             "language"        => $language,
             "response_format" => "verbose_json",
         ]);
+        $result   = new OpenAIOutput($response);
         if (!$response->hasValue("text")) {
             return $result;
         }
