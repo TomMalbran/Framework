@@ -86,7 +86,10 @@ class QueryCode {
         }
 
         foreach ($result as $index => $property) {
-            $result[$index]["propName"] = Strings::padRight($property["name"], $nameLength);
+            $result[$index]["propName"] = Strings::padRight(
+                $property["name"],
+                $nameLength,
+            );
         }
         return $result;
     }

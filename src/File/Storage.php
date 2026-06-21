@@ -169,7 +169,11 @@ class Storage {
      * @param string $tmpFile
      * @return bool
      */
-    public static function uploadFile(string $path, string $fileName, string $tmpFile): bool {
+    public static function uploadFile(
+        string $path,
+        string $fileName,
+        string $tmpFile,
+    ): bool {
         $fullPath = self::parsePath($path, $fileName);
         return self::uploadPath($fullPath, $tmpFile);
     }

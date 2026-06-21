@@ -181,7 +181,11 @@ class MediaFile {
      * @param string $newName
      * @return bool
      */
-    public static function renamePath(string $path, string $oldName, string $newName): bool {
+    public static function renamePath(
+        string $path,
+        string $oldName,
+        string $newName,
+    ): bool {
         return self::updatePath($path, $path, $oldName, $newName);
     }
 
@@ -192,7 +196,11 @@ class MediaFile {
      * @param string $name
      * @return bool
      */
-    public static function movePath(string $oldPath, string $newPath, string $name): bool {
+    public static function movePath(
+        string $oldPath,
+        string $newPath,
+        string $name,
+    ): bool {
         return self::updatePath($oldPath, $newPath, $name, $name);
     }
 

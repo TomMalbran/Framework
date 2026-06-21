@@ -290,7 +290,10 @@ class Auth {
      * @param CredentialEntity $user
      * @return bool
      */
-    public static function canLoginAs(CredentialEntity $admin, CredentialEntity $user): bool {
+    public static function canLoginAs(
+        CredentialEntity $admin,
+        CredentialEntity $user,
+    ): bool {
         return (
             self::canLogin($admin) &&
             $user->exists() &&
@@ -523,7 +526,8 @@ class Auth {
      * @return bool
      */
     public static function isAdmin(): bool {
-        return self::$credential !== null && Access::isValidAdmin(self::$credential->access);
+        return self::$credential !== null &&
+            Access::isValidAdmin(self::$credential->access);
     }
 
 

@@ -87,7 +87,10 @@ class JSON {
      * @param bool  $withoutEmpty Optional.
      * @return list<string>
      */
-    public static function decodeAsStrings(mixed $value, bool $withoutEmpty = false): array {
+    public static function decodeAsStrings(
+        mixed $value,
+        bool $withoutEmpty = false,
+    ): array {
         $result = self::decodeAsArray($value);
         return Arrays::toStrings($result, withoutEmpty: $withoutEmpty);
     }

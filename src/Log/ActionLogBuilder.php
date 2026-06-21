@@ -226,7 +226,10 @@ class ActionLogBuilder implements DiscoveryBuilder {
      * @param list<SectionData>  $sections
      * @return list<IntlLanguageData>
      */
-    private static function getModuleTranslations(array $languages, array $sections): array {
+    private static function getModuleTranslations(
+        array $languages,
+        array $sections,
+    ): array {
         $result = [];
         foreach ($languages as $language) {
             $languageSections = [];

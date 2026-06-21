@@ -96,7 +96,10 @@ class SettingData extends SettingsSchema implements DiscoveryMigration {
      * @param bool        $asObject Optional.
      * @return array<string,array<string,string>|string>|object
      */
-    public static function getAll(?string $section = null, bool $asObject = false): array|object {
+    public static function getAll(
+        ?string $section = null,
+        bool $asObject = false,
+    ): array|object {
         $query = new SettingsQuery();
         if ($section !== null && $section !== "") {
             $query->section->equal($section);

@@ -44,7 +44,10 @@ class Picture {
         if ($this->image === null) {
             return 0;
         }
-        if ($red < 0 || $red > 255 || $green < 0 || $green > 255 || $blue < 0 || $blue > 255) {
+        if ($red < 0 || $red > 255 ||
+            $green < 0 || $green > 255 ||
+            $blue < 0 || $blue > 255
+        ) {
             return 0;
         }
 

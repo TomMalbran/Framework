@@ -52,7 +52,10 @@ class ModificationBuilder {
      * @param Query       $query
      * @return ModificationBuilder
      */
-    public static function update(SchemaModel $schemaModel, Query $query): ModificationBuilder {
+    public static function update(
+        SchemaModel $schemaModel,
+        Query $query,
+    ): ModificationBuilder {
         $builder = Query::update($query);
         return new ModificationBuilder($builder, $schemaModel);
     }
@@ -98,7 +101,9 @@ class ModificationBuilder {
         }
 
         if ($this->schemaModel->canCreate) {
-            if ($this->schemaModel->hasTimestamps && !$this->builder->hasField("createdTime")) {
+            if ($this->schemaModel->hasTimestamps &&
+                !$this->builder->hasField("createdTime")
+            ) {
                 $this->builder->set("createdTime", Date::now());
             }
             if ($this->schemaModel->hasUsers && $credentialID !== 0) {
@@ -122,7 +127,9 @@ class ModificationBuilder {
             return $this;
         }
 
-        if ($this->schemaModel->hasTimestamps && !$this->builder->hasField("modifiedTime")) {
+        if ($this->schemaModel->hasTimestamps &&
+            !$this->builder->hasField("modifiedTime")
+        ) {
             $this->builder->set("modifiedTime", Date::now());
         }
         if ($this->schemaModel->hasUsers && $credentialID !== 0) {

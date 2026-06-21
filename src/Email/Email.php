@@ -160,7 +160,10 @@ class Email {
      * @param bool    $withScore Optional.
      * @return bool
      */
-    public static function isCaptchaValid(Request $request, bool $withScore = false): bool {
+    public static function isCaptchaValid(
+        Request $request,
+        bool $withScore = false,
+    ): bool {
         $recaptchaSecret = Config::getEmailRecaptchaSecret();
         if (!$request->has("g-recaptcha-response") || $recaptchaSecret === "") {
             return false;

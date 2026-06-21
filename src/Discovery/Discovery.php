@@ -344,7 +344,9 @@ class Discovery {
      * @param ReflectionClass<object>|ReflectionMethod $reflection
      * @return int
      */
-    public static function getPriority(ReflectionClass|ReflectionMethod $reflection): int {
+    public static function getPriority(
+        ReflectionClass|ReflectionMethod $reflection,
+    ): int {
         $attributes = $reflection->getAttributes(Priority::class);
         if (isset($attributes[0])) {
             return $attributes[0]->newInstance()->priority;

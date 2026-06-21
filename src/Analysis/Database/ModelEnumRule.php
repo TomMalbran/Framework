@@ -55,7 +55,8 @@ class ModelEnumRule implements Rule {
         }
 
         // Check if the class has the #[Model] attribute
-        if (count($classReflection->getNativeReflection()->getAttributes(Model::class)) !== 1) {
+        $reflection = $classReflection->getNativeReflection();
+        if (count($reflection->getAttributes(Model::class)) !== 1) {
             return [];
         }
 
@@ -86,7 +87,8 @@ class ModelEnumRule implements Rule {
         }
         $typeClass = $this->reflectionProvider->getClass($className);
 
-        // Check if the type is an enum and implements both Enum and JsonSerializable interfaces
+        // Check if the type is an enum and implements both Enum and
+        // JsonSerializable interfaces
         if (!$typeClass->isEnum() ||
             $typeClass->implementsInterface(Enum::class) &&
             $typeClass->implementsInterface(JsonSerializable::class)

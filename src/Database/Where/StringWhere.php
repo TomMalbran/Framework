@@ -206,7 +206,11 @@ class StringWhere extends BaseWhere {
      * @param bool         $caseSensitive Optional.
      * @return void
      */
-    public function in(array $values, ?bool $condition = null, bool $caseSensitive = false): void {
+    public function in(
+        array $values,
+        ?bool $condition = null,
+        bool $caseSensitive = false,
+    ): void {
         if (count($values) > 0) {
             $this->compare(Operator::In, $values, $caseSensitive, $condition);
         }

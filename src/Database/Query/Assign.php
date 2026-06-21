@@ -118,7 +118,7 @@ class Assign {
      * @return Assign
      */
     public static function upperCaseFirst(): Assign {
-        return new Assign("CONCAT(UCASE(LEFT(`__FIELD__`, 1)), SUBSTRING(`__FIELD__`, 2))");
+        return new Assign("CONCAT(UCASE(LEFT(`__FIELD__`, 1)), SUBSTRING(`__FIELD__`, 2))");  // phpcs:ignore
     }
 
     /**
@@ -126,7 +126,7 @@ class Assign {
      * @return Assign
      */
     public static function lowerCaseFirst(): Assign {
-        return new Assign("CONCAT(LCASE(LEFT(`__FIELD__`, 1)), SUBSTRING(`__FIELD__`, 2))");
+        return new Assign("CONCAT(LCASE(LEFT(`__FIELD__`, 1)), SUBSTRING(`__FIELD__`, 2))");  // phpcs:ignore
     }
 
     /**

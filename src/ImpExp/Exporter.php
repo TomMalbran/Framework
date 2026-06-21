@@ -51,9 +51,17 @@ class Exporter {
         $this->headers  = [];
 
         if (XLSXWriter::isAvailable() && !$useCSV) {
-            $this->writer = new XLSXWriter($title, $this->fileName, $lang);
+            $this->writer = new XLSXWriter(
+                title:    $title,
+                fileName: $this->fileName,
+                lang:     $lang,
+            );
         } else {
-            $this->writer = new CSVWriter($this->fileName, $lang, sendHeaders: $sendHeaders);
+            $this->writer = new CSVWriter(
+                fileName:    $this->fileName,
+                lang:        $lang,
+                sendHeaders: $sendHeaders,
+            );
         }
     }
 
@@ -78,7 +86,11 @@ class Exporter {
      * @param bool   $condition Optional.
      * @return Exporter
      */
-    public function addHeader(string $key, string $value, bool $condition = true): Exporter {
+    public function addHeader(
+        string $key,
+        string $value,
+        bool $condition = true,
+    ): Exporter {
         if ($condition) {
             $this->headers[$key] = $value;
         }

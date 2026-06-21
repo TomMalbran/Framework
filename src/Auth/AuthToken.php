@@ -71,10 +71,16 @@ class AuthToken {
      * @param string $refreshToken
      * @return array{int,int}
      */
-    public static function getCredentials(string $accessToken, string $refreshToken): array {
+    public static function getCredentials(
+        string $accessToken,
+        string $refreshToken,
+    ): array {
         $accessData = self::getAccessData($accessToken);
         if ($accessData->hasValue("credentialID")) {
-            return [ $accessData->getInt("credentialID"), $accessData->getInt("adminID") ];
+            return [
+                $accessData->getInt("credentialID"),
+                $accessData->getInt("adminID"),
+            ];
         }
 
         if ($refreshToken !== "") {
@@ -107,7 +113,8 @@ class AuthToken {
     private static function getAccessData(string $accessToken): Dictionary {
         JWT::$leeway = 1000;
         try {
-            $jwt = JWT::decode($accessToken, new Key(Config::getAuthKey(), self::Algorithm));
+            $key = new Key(Config::getAuthKey(), self::Algorithm);
+            $jwt = JWT::decode($accessToken, $key);
         } catch (Exception $e) {
             return new Dictionary();
         }
@@ -143,7 +150,9 @@ class AuthToken {
      * @return CredentialRefreshTokenEntity
      */
     private static function getOne(string $refreshToken): CredentialRefreshTokenEntity {
-        if (self::$tokenData !== null && self::$tokenData->refreshToken === $refreshToken) {
+        if (self::$tokenData !== null &&
+            self::$tokenData->refreshToken === $refreshToken
+        ) {
             return self::$tokenData;
         }
 

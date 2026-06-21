@@ -50,7 +50,11 @@ class QueryLog extends LogQuerySchema {
      * @param list<mixed> $params
      * @return void
      */
-    public static function createOrEdit(float $time, string $expression, array $params): void {
+    public static function createOrEdit(
+        float $time,
+        string $expression,
+        array $params,
+    ): void {
         $elapsedTime = (int)floor($time);
         $expression  = Strings::replacePattern($expression, "/ +/", " ");
         foreach ($params as $param) {

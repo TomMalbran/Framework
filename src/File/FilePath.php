@@ -127,7 +127,11 @@ class FilePath implements DiscoveryBuilder {
      * @return string
      */
     public static function getInternalDir(int|string ...$pathParts): string {
-        return Storage::parsePath(Application::getBaseDir(), Config::getFileDir(), ...$pathParts);
+        return Storage::parsePath(
+            Application::getBaseDir(),
+            Config::getFileDir(),
+            ...$pathParts,
+        );
     }
 
     /**
@@ -168,7 +172,10 @@ class FilePath implements DiscoveryBuilder {
      * @param int|string ...$pathParts
      * @return string
      */
-    public static function getTempUrl(int $credentialID, int|string ...$pathParts): string {
+    public static function getTempUrl(
+        int $credentialID,
+        int|string ...$pathParts,
+    ): string {
         if ($credentialID <= 0) {
             return "";
         }

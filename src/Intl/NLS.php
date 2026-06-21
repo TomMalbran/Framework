@@ -181,7 +181,11 @@ class NLS {
      * @param string      $language Optional.
      * @return string
      */
-    public static function urlPath(string $urlKey, array $args, string $language = ""): string {
+    public static function urlPath(
+        string $urlKey,
+        array $args,
+        string $language = "",
+    ): string {
         $result = [];
         foreach ($args as $arg) {
             if (is_string($arg)) {
@@ -200,7 +204,11 @@ class NLS {
      * @param string      $language Optional.
      * @return string
      */
-    public static function format(string $key, array $args, string $language = ""): string {
+    public static function format(
+        string $key,
+        array $args,
+        string $language = "",
+    ): string {
         $subject = self::getString($key, $language);
         return Strings::replaceCallback(
             string:   $subject,

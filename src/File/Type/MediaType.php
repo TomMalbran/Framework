@@ -29,7 +29,9 @@ class MediaType {
         if ($type === self::Any && !FileType::isHidden($name)) {
             return true;
         }
-        if ($type === self::Media && (FileType::isImage($name) || FileType::isVideo($name))) {
+        if ($type === self::Media &&
+            (FileType::isImage($name) || FileType::isVideo($name))
+        ) {
             return true;
         }
         if ($type === self::Image && FileType::isImage($name)) {

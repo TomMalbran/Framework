@@ -265,7 +265,9 @@ class ErrorLog extends LogErrorSchema {
             $backtrace = "";
             $index     = 1;
             foreach ($trace as $item) {
-                if (Strings::startsWith($item, "#") && !Strings::contains($item, "{main}")) {
+                if (Strings::startsWith($item, "#") &&
+                    !Strings::contains($item, "{main}")
+                ) {
                     $line       = Strings::substringAfter($item, " ", useFirst: true);
                     $backtrace .= "#{$index}- $line\n";
                     $index     += 1;

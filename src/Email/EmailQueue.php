@@ -24,7 +24,9 @@ class EmailQueue extends EmailQueueSchema {
      * @return EmailQueueQuery
      */
     #[\Override]
-    protected static function createListQuery(EmailQueueRequest $request): EmailQueueQuery {
+    protected static function createListQuery(
+        EmailQueueRequest $request,
+    ): EmailQueueQuery {
         $query = new EmailQueueQuery();
         $query->search([
             EmailQueueColumn::SendTo,

@@ -796,7 +796,9 @@ class Date implements JsonSerializable {
         if ($this->isEmpty()) {
             return false;
         }
-        return $this->getHour() === 0 && $this->getMinute() === 0 && $this->getSecond() === 0;
+        return $this->getHour() === 0 &&
+            $this->getMinute() === 0 &&
+            $this->getSecond() === 0;
     }
 
     /**
@@ -970,7 +972,8 @@ class Date implements JsonSerializable {
      * @return string
      */
     public function toUTCString(): string {
-        // P: Difference to Greenwich time (GMT) with colon between hours and minutes (e.g. +02:00)
+        // P: Difference to Greenwich time (GMT) with colon
+        //    between hours and minutes (e.g. +02:00)
         $timeZone = $this->format("P");
         return Strings::replace($this->format("c"), $timeZone, "Z");
     }

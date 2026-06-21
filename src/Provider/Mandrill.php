@@ -73,7 +73,13 @@ class Mandrill {
             "async"   => false,
             "send_at" => Date::now()->toString(DateFormat::ReverseSeconds),
         ];
-        $result   = Curl::execute(CurlMethod::POST, $url, $params, $headers, jsonBody: true);
+        $result   = Curl::execute(
+            method:   CurlMethod::POST,
+            url:      $url,
+            params:   $params,
+            headers:  $headers,
+            jsonBody: true,
+        );
 
         $response = new Dictionary($result);
         return $response->getString("status") === "sent";

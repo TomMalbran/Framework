@@ -23,7 +23,10 @@ class NotificationQueue extends NotificationQueueSchema {
      * @param int $credentialID
      * @return bool
      */
-    public static function existsForCredential(int $notificationQueueID, int $credentialID): bool {
+    public static function existsForCredential(
+        int $notificationQueueID,
+        int $credentialID,
+    ): bool {
         $query = new NotificationQueueQuery();
         $query->notificationQueueID->equal($notificationQueueID);
         $query->credentialID->equal($credentialID);

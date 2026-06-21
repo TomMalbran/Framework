@@ -290,7 +290,11 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
      * @param int             $default  Optional.
      * @return int
      */
-    public function getInt(Enum|int|string $key, int $decimals = 0, int $default = 0): int {
+    public function getInt(
+        Enum|int|string $key,
+        int $decimals = 0,
+        int $default = 0,
+    ): int {
         $key = Strings::toString($key);
         if (isset($this->data[$key]) && !is_array($this->data[$key])) {
             return Numbers::toInt($this->data[$key], $decimals);

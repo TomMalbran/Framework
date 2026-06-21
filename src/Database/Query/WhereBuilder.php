@@ -74,7 +74,10 @@ class WhereBuilder {
 
         $this->addOperator   = $builder->addOperator;
         $this->nextOperator  = $builder->nextOperator;
-        $this->usedOperators = Arrays::mergeLists($this->usedOperators, $builder->usedOperators);
+        $this->usedOperators = Arrays::mergeLists(
+            $this->usedOperators,
+            $builder->usedOperators,
+        );
 
         $this->limit   = $builder->limit;
         $this->orderBy = Strings::join(

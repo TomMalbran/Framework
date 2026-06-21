@@ -149,10 +149,14 @@ class Mailjet {
     public static function deleteContact(string $email): void {
         $contactList = Config::getMailjetList();
         if ($contactList !== 0) {
-            self::execute(CurlMethod::POST, "/v3/REST/contactslist/$contactList/managecontact", [
-                "Action" => "remove",
-                "Email"  => $email,
-            ]);
+            self::execute(
+                method: CurlMethod::POST,
+                route:  "/v3/REST/contactslist/$contactList/managecontact",
+                params: [
+                    "Action" => "remove",
+                    "Email"  => $email,
+                ],
+            );
         }
 
         $response = self::execute(CurlMethod::GET, "/v3/REST/contact/$email");
@@ -249,11 +253,17 @@ class Mailjet {
         $result = new DomainData();
 
         if ($validateOwner) {
-            $response = self::execute(CurlMethod::POST, "/v3/REST/sender/*@$domain/validate");
+            $response = self::execute(
+                method: CurlMethod::POST,
+                route:  "/v3/REST/sender/*@$domain/validate",
+            );
             $result->ownerValid = $response->getString("GlobalError") === "";
         } else {
-            $response = self::execute(CurlMethod::POST, "/v3/REST/dns/$domain/check");
-            $data     = $response->getFirst("Data");
+            $response = self::execute(
+                method: CurlMethod::POST,
+                route:  "/v3/REST/dns/$domain/check"
+            );
+            $data = $response->getFirst("Data");
 
             $result->spfValid  = $data->getString("SPFStatus")  === "OK";
             $result->dkimValid = $data->getString("DKIMStatus") === "OK";

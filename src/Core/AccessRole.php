@@ -28,7 +28,11 @@ class AccessRole implements DiscoveryBuilder {
      * @param int    $level     Optional.
      * @return void
      */
-    public static function register(string $roleName, string $groupName, int $level = -1): void {
+    public static function register(
+        string $roleName,
+        string $groupName,
+        int $level = -1,
+    ): void {
         if ($level >= 0) {
             self::$level = $level;
         } else {

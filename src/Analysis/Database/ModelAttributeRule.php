@@ -120,7 +120,9 @@ class ModelAttributeRule implements Rule {
 
         // Every property must have one of the main attributes
         if (!$hasAttribute) {
-            $errors[] = RuleErrorBuilder::message("Property '{$propName}' must have an attribute.")
+            $errors[] = RuleErrorBuilder::message(
+                "Property '{$propName}' must have an attribute."
+            )
                 ->line($node->getLine())
                 ->identifier("framework.modelAttribute")
                 ->build();
@@ -202,19 +204,21 @@ class ModelAttributeRule implements Rule {
     }
 
     /**
-     * Checks if the given class or any of its parents has the #[Model] attribute
+     * Checks if the given class or any of its parents has #[Model]
      * @param ClassReflection $classReflection
      * @return bool
      */
     private function isModelClass(ClassReflection $classReflection): bool {
         // Check current class
-        if (count($classReflection->getNativeReflection()->getAttributes(Model::class)) > 0) {
+        $reflection = $classReflection->getNativeReflection();
+        if (count($reflection->getAttributes(Model::class)) > 0) {
             return true;
         }
 
         // Check parents
         foreach ($classReflection->getParents() as $parent) {
-            if (count($parent->getNativeReflection()->getAttributes(Model::class)) > 0) {
+            $reflection = $parent->getNativeReflection();
+            if (count($reflection->getAttributes(Model::class)) > 0) {
                 return true;
             }
         }

@@ -132,7 +132,9 @@ class Notification {
             jsonBody: true,
         );
 
-        if (!is_array($response) || !isset($response["id"]) || Arrays::isEmpty($response["id"])) {
+        if (!is_array($response) || !isset($response["id"]) ||
+            Arrays::isEmpty($response["id"])
+        ) {
             return null;
         }
         return Strings::toString($response["id"]);

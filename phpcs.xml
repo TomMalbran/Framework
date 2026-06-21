@@ -20,7 +20,7 @@
     </rule>
 
 
-    <!-- Lines can be 120 chars long, but never show errors -->
+    <!-- Lines can be 100 chars long, but never show errors -->
     <rule ref="Generic.Files.LineLength">
         <properties>
             <property name="lineLimit" value="100"/>

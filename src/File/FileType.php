@@ -15,7 +15,9 @@ use Framework\Utils\Strings;
 class FileType {
 
     /** @var list<string> */
-    private static array $imageExts = [ "jpg", "jpeg", "gif", "png", "ico", "avif", "webp" ];
+    private static array $imageExts = [
+        "jpg", "jpeg", "gif", "png", "ico", "avif", "webp",
+    ];
 
     /** @var list<string> */
     private static array $pngExts = [ "png" ];
@@ -29,13 +31,19 @@ class FileType {
     ];
 
     /** @var list<string> */
-    private static array $audioExts = [ "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav" ];
+    private static array $audioExts = [
+        "mp3", "mpga", "m4a", "ac3", "aiff", "mid", "ogg", "wav",
+    ];
 
     /** @var list<string> */
-    private static array $codeExts = [ "html", "xhtml", "sql", "xml", "js", "json", "css" ];
+    private static array $codeExts = [
+        "html", "xhtml", "sql", "xml", "js", "json", "css",
+    ];
 
     /** @var list<string> */
-    private static array $textExts = [ "txt", "md", "csv", "log", "rtf", "json" ];
+    private static array $textExts = [
+        "txt", "md", "csv", "log", "rtf", "json",
+    ];
 
     /** @var list<string> */
     private static array $documentExts = [ "doc", "docx", "odt", "ott" ];

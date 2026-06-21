@@ -18,7 +18,10 @@ trait IsEnum {
      * @param self             $default Optional.
      * @return self
      */
-    public static function fromValue(self|Enum|string $value, self $default = self::None): self {
+    public static function fromValue(
+        self|Enum|string $value,
+        self $default = self::None,
+    ): self {
         if ($value instanceof self) {
             return $value;
         }

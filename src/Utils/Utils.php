@@ -23,16 +23,24 @@ class Utils {
         if (Strings::length($password) < $minLength) {
             return false;
         }
-        if (Strings::contains($checkSets, "a") && !Strings::match($password, "#[a-zA-Z]+#")) {
+        if (Strings::contains($checkSets, "a") &&
+            !Strings::match($password, "#[a-zA-Z]+#")
+        ) {
             return false;
         }
-        if (Strings::contains($checkSets, "l") && !Strings::match($password, "#[a-z]+#")) {
+        if (Strings::contains($checkSets, "l") &&
+            !Strings::match($password, "#[a-z]+#")
+        ) {
             return false;
         }
-        if (Strings::contains($checkSets, "u") && !Strings::match($password, "#[A-Z]+#")) {
+        if (Strings::contains($checkSets, "u") &&
+            !Strings::match($password, "#[A-Z]+#")
+        ) {
             return false;
         }
-        if (Strings::contains($checkSets, "d") && !Strings::match($password, "#[0-9]+#")) {
+        if (Strings::contains($checkSets, "d") &&
+            !Strings::match($password, "#[0-9]+#")
+        ) {
             return false;
         }
         return true;

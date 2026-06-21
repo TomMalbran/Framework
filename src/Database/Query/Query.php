@@ -42,7 +42,12 @@ class Query implements QueryLike {
 
         $this->mode         = $mode;
         $this->whereBuilder = new WhereBuilder();
-        $this->queryBuilder = new QueryBuilder($mode, $tableName, $asTable, $this->whereBuilder);
+        $this->queryBuilder = new QueryBuilder(
+            $mode,
+            $tableName,
+            $asTable,
+            $this->whereBuilder,
+        );
 
         if ($queryOrTable instanceof QueryLike) {
             $this->whereBuilder->copy($queryOrTable->getQuery()->whereBuilder);
@@ -55,7 +60,10 @@ class Query implements QueryLike {
      * @param string           $as           Optional.
      * @return Query
      */
-    public static function select(QueryLike|string $queryOrTable, string $as = ""): Query {
+    public static function select(
+        QueryLike|string $queryOrTable,
+        string $as = "",
+    ): Query {
         return new Query(QueryMode::Select, $queryOrTable, $as);
     }
 
@@ -83,7 +91,10 @@ class Query implements QueryLike {
      * @param string           $as           Optional.
      * @return Query
      */
-    public static function update(QueryLike|string $queryOrTable, string $as = ""): Query {
+    public static function update(
+        QueryLike|string $queryOrTable,
+        string $as = "",
+    ): Query {
         return new Query(QueryMode::Update, $queryOrTable, $as);
     }
 

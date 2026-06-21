@@ -120,7 +120,10 @@ class TimeTable {
             }
             foreach ($timeTable->days as $day) {
                 if (!DateUtils::isValidDay($day, $withHolidays, $this->startMonday)) {
-                    $errors->add("$fieldKey-$index-days", "GENERAL_ERROR_PERIOD_DAYS_INVALID");
+                    $errors->add(
+                        error:   "$fieldKey-$index-days",
+                        message: "GENERAL_ERROR_PERIOD_DAYS_INVALID",
+                    );
                     $hasError = true;
                     break;
                 }
@@ -450,7 +453,11 @@ class TimeTable {
             if ($elem->fromHour === "") {
                 $timeText = NLS::getString($closedText, $isoCode);
             } else {
-                $timeText = NLS::format("TIME_TABLE_HOURS", [ $elem->fromHour, $toHour ], $isoCode);
+                $timeText = NLS::format(
+                    key:      "TIME_TABLE_HOURS",
+                    args:     [ $elem->fromHour, $toHour ],
+                    language: $isoCode,
+                );
             }
 
             $result[] = new TimeTableData(

@@ -95,7 +95,11 @@ enum FieldType implements Enum, JsonSerializable {
      * @return string
      */
     public function getCodeType(string $enumClass = "", bool $forEntity = false): string {
-        $enumType = $enumClass !== "" ? Strings::substringAfter($enumClass, "\\") : "string";
+        $enumType = "string";
+        if ($enumClass !== "") {
+            $enumType = Strings::lowerCaseFirst($enumType);
+        }
+
         return match ($this) {
             self::None    => "",
 

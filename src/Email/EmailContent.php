@@ -73,7 +73,12 @@ class EmailContent extends EmailContentSchema implements DiscoveryMigration {
         foreach ($languages as $language => $languageName) {
             $emails = IntlConfig::loadEmails($language);
             if ($emails->isNotEmpty()) {
-                $position  = self::migrateLanguage($emails, $language, $languageName, $position);
+                $position  = self::migrateLanguage(
+                    $emails,
+                    $language,
+                    $languageName,
+                    $position,
+                );
                 $didUpdate = true;
             }
         }

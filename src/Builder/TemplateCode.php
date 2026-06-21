@@ -42,7 +42,10 @@ class TemplateCode implements DiscoveryBuilder {
         }
 
         foreach ($templates as $index => $template) {
-            $templates[$index]["constant"] = Strings::padRight($template["name"], $maxLength, " ");
+            $templates[$index]["constant"] = Strings::padRight(
+                $template["name"],
+                $maxLength,
+            );
         }
 
         // Builds the code

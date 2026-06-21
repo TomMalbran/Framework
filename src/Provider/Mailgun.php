@@ -198,17 +198,21 @@ class Mailgun {
      */
     public static function setDomainTracking(string $domain, bool $tracking): bool {
         // Activate the open tracking
-        $response = self::execute(CurlMethod::PUT, "/v3/domains/$domain/tracking/open", [
-            "active" => $tracking ? "true" : "false",
-        ]);
+        $response = self::execute(
+            method: CurlMethod::PUT,
+            route:  "/v3/domains/$domain/tracking/open",
+            params: [ "active" => $tracking ? "true" : "false" ],
+        );
         if (!$response->hasValue("open")) {
             return false;
         }
 
         // Activate the unsubscribe tracking
-        $response = self::execute(CurlMethod::PUT, "/v3/domains/$domain/tracking/unsubscribe", [
-            "active" => $tracking ? "true" : "false",
-        ]);
+        $response = self::execute(
+            method: CurlMethod::PUT,
+            route:  "/v3/domains/$domain/tracking/unsubscribe",
+            params: [ "active" => $tracking ? "true" : "false" ],
+        );
         if (!$response->hasValue("unsubscribe")) {
             return false;
         }
