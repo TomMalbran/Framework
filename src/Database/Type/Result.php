@@ -38,7 +38,11 @@ class Result {
      * @param int|string ...$value
      * @return Result
      */
-    public function addError(string $error, string $message, int|string ...$value): Result {
+    public function addError(
+        string $error,
+        string $message,
+        int|string ...$value,
+    ): Result {
         $this->errors->add($error, $message, ...$value);
         return $this;
     }

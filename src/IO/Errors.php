@@ -111,7 +111,10 @@ class Errors implements JsonSerializable {
             return $this;
         }
         if (count($value) > 0) {
-            $this->errors[$error] = [ $message, ...$value ];
+            $this->errors[$error] = [
+                $message,
+                ...array_values($value),
+            ];
         } else {
             $this->errors[$error] = $message;
         }
