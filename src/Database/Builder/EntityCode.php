@@ -95,8 +95,8 @@ class EntityCode {
         if ($schemaModel->hasStatus) {
             $statusClass = $schemaModel->statusClass;
             $fields[] = self::getPropertyData(
-                "status",
-                $statusClass,
+                name:    "status",
+                type:    $statusClass,
                 default: "{$statusClass}::None",
             );
             $fields[] = self::getPropertyData("statusName", "string");
