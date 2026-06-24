@@ -71,7 +71,7 @@ class Request implements IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the key exits and has a value in the request
+     * Returns true if the key exists and has a value in the request
      * @param Enum|string $key Optional.
      * @return bool
      */

@@ -117,7 +117,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the key exits in the data
+     * Returns true if the key exists in the data
      * @param Enum|int|string $key
      * @return bool
      */
@@ -127,7 +127,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the key exits and has a value in the data
+     * Returns true if the key exists and has a value in the data
      * @param Enum|int|string $key
      * @return bool
      */
@@ -137,7 +137,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the key exits in the data or in the list
+     * Returns true if the key exists in the data or in the list
      * @param Enum|int|string $needle
      * @param int|string|null $key    Optional.
      * @return bool
@@ -151,7 +151,7 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns true if the key exits in the data or in the list as an Integer
+     * Returns true if the key exists in the data or in the list as an Integer
      * @param int $key
      * @return bool
      */
