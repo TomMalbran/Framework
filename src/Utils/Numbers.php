@@ -462,13 +462,20 @@ class Numbers {
 
     /**
      * Returns a price using the right format
-     * @param int $cents
-     * @param int $decimals Optional.
+     * @param int    $cents
+     * @param int    $decimals       Optional.
+     * @param int    $maxForDecimals Optional.
+     * @param string $default        Optional.
      * @return string
      */
-    public static function formatCents(int $cents, int $decimals = 2): string {
+    public static function formatCents(
+        int $cents,
+        int $decimals = 2,
+        int $maxForDecimals = 1000,
+        string $default = "0",
+    ): string {
         $price = self::fromCents($cents);
-        return self::formatFloat($price, $decimals);
+        return self::formatFloat($price, $decimals, $maxForDecimals, $default);
     }
 
     /**

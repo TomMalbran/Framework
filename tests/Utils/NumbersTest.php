@@ -585,20 +585,21 @@ class NumbersTest extends TestCase {
 
 
     #[DataProvider("providerFormatCents")]
-    public function testFormatCents(mixed $value, int $decimals, string $expected): void {
-        $this->assertEquals($expected, Numbers::formatCents($value, $decimals));
+    public function testFormatCents(mixed $value, int $decimals, int $maxForDecimals, string $default, string $expected): void {
+        $this->assertEquals($expected, Numbers::formatCents($value, $decimals, $maxForDecimals, $default));
     }
 
     public static function providerFormatCents(): array {
         return [
-            "basic_cents"          => [ 1234, 2, "12,34" ],
-            "small_cents"          => [ 100, 2, "1,00" ],
-            "zero_cents"           => [ 0, 2, "" ],
-            "negative_cents"       => [ -1234, 2, "-12,34" ],
-            "thousands_separator"  => [ 123456, 2, "1.235" ],
-            "one_decimal"          => [ 1234, 1, "12,3" ],
-            "three_decimals"       => [ 123456, 3, "1.235" ],
-            "numeric_string_input" => [ "1234", 2, "12,34" ],
+            "basic_cents"          => [ 1234, 2, 1000, "0", "12,34" ],
+            "small_cents"          => [ 100, 2, 1000, "0", "1,00" ],
+            "zero_cents"           => [ 0, 2, 1000, "0", "0" ],
+            "zero_custom_default"  => [ 0, 2, 1000, "-", "-" ],
+            "negative_cents"       => [ -1234, 2, 1000, "0", "-12,34" ],
+            "thousands_separator"  => [ 123456, 2, 1000, "0", "1.235" ],
+            "one_decimal"          => [ 1234, 1, 1000, "0", "12,3" ],
+            "three_decimals"       => [ 123456, 3, 1000, "0", "1.235" ],
+            "numeric_string_input" => [ "1234", 2, 1000, "0", "12,34" ],
         ];
     }
 
