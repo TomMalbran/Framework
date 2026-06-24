@@ -243,10 +243,11 @@ class Validate {
      */
     public function shouldValidate(): bool {
         return match ($this->type) {
-            ValidateType::None => false,
+            ValidateType::None   => false,
             ValidateType::Enum,
             ValidateType::String => $this->isRequired || $this->typeOf !== "" ||
                 $this->isUnique || $this->maxLength > 0,
+            ValidateType::List   => $this->typeOf !== "" || $this->belongsTo !== "",
             default => true,
         };
     }

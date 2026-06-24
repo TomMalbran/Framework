@@ -480,7 +480,6 @@ class SchemaCode {
             case ValidateType::List:
                 $validation = [
                     "isList"         => true,
-                    "isRequired"     => $validate->isRequired,
                     "typeOf"         => Strings::substringAfter($validate->typeOf, "\\"),
                     "typeInvError"   => $validate->getTypeInvalidError(),
                     "belongsTo"      => Strings::substringAfter($validate->belongsTo, "\\"),
