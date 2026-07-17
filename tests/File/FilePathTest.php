@@ -197,6 +197,23 @@ class FilePathTest extends TestCase {
     }
 
 
+    #[DataProvider("providerGetSystemTempPath")]
+    public function testGetSystemTempPath(array $pathParts, string $expectedEnd): void {
+        $path     = FilePath::getSystemTempPath(...$pathParts);
+        $expected = Storage::parsePath(sys_get_temp_dir()) . $expectedEnd;
+        $this->assertEquals($expected, $path);
+    }
+
+    public static function providerGetSystemTempPath(): array {
+        return [
+            "empty"    => [ [], "" ],
+            "single"   => [ [ "test" ], "/test" ],
+            "multiple" => [ [ "test", "subdir", "file.txt" ], "/test/subdir/file.txt" ],
+            "mixed"    => [ [ "test", 123, "file.txt" ], "/test/123/file.txt" ],
+        ];
+    }
+
+
     #[DataProvider("providerGetTempPath")]
     public function testGetTempPath(int $id, bool $create, bool $expectEmpty = false): void {
         $path = FilePath::getTempPath($id, $create);

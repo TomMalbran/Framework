@@ -146,6 +146,15 @@ class FilePath implements DiscoveryBuilder {
 
 
     /**
+     * Returns the system temp path
+     * @param int|string ...$pathParts
+     * @return string
+     */
+    public static function getSystemTempPath(int|string ...$pathParts): string {
+        return Storage::parsePath(sys_get_temp_dir(), ...$pathParts);
+    }
+
+    /**
      * Returns the path used to store the temp files
      * @param int  $credentialID
      * @param bool $create       Optional.
