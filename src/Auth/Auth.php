@@ -477,6 +477,17 @@ class Auth {
     }
 
     /**
+     * Returns the Language of the Credential
+     * @return string
+     */
+    public static function getLanguage(): string {
+        if (self::$credential === null) {
+            return "";
+        }
+        return self::$credential->language;
+    }
+
+    /**
      * Returns the path used to store the temp files
      * @return string
      */
