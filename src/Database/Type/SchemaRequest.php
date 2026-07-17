@@ -116,6 +116,22 @@ class SchemaRequest {
     }
 
     /**
+     * Returns the Data as a Float
+     * @param string $key
+     * @param float  $default Optional.
+     * @return float
+     */
+    public function getFloat(string $key, float $default = 0.0): float {
+        if (property_exists($this, $key)) {
+            return Numbers::toFloat($this->$key);
+        }
+        if ($this->request->has($key)) {
+            return $this->request->getFloat($key, $default);
+        }
+        return $default;
+    }
+
+    /**
      * Returns the Data as a Boolean
      * @param string $key
      * @param bool   $default Optional.
