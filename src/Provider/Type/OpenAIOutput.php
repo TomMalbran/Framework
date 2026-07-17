@@ -30,12 +30,17 @@ class OpenAIOutput {
     /**
      * Creates a Basic Output
      * @param Dictionary $response
+     * @param string     $error    Optional.
      */
-    public function __construct(Dictionary $response) {
+    public function __construct(
+        Dictionary $response,
+        string $error = "",
+    ) {
         $this->response   = $response;
         $this->externalID = $response->getString("id");
+        $this->error      = $error;
 
-        if ($response->hasValue("error")) {
+        if ($error === "" && $response->hasValue("error")) {
             $error = $response->get("error");
             if (is_string($error)) {
                 $this->error = $error;

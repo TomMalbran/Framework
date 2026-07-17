@@ -151,6 +151,16 @@ class OpenAI {
         return new OpenAIOutput($response);
     }
 
+    /**
+     * Retrieves the given File
+     * @param string $fileID
+     * @return OpenAIOutput
+     */
+    public static function getFile(string $fileID): OpenAIOutput {
+        $response = self::get("/files/$fileID");
+        return new OpenAIOutput($response);
+    }
+
 
 
     /**
@@ -198,15 +208,36 @@ class OpenAI {
     }
 
     /**
-     * Lists all the Files of a Vector Store
+     * Lists the Files of a Vector Store
      * @param string $vectorStoreID
-     * @return Dictionary
+     * @param bool   $all           Optional.
+     * @return list<Dictionary>
      */
-    public static function getVectorStoreFiles(string $vectorStoreID): Dictionary {
-        $response = self::get("/vector_stores/$vectorStoreID/files", [
-            "limit" => 100,
-        ]);
-        return $response->getDict("data");
+    public static function getVectorStoreFiles(
+        string $vectorStoreID,
+        bool $all = false,
+    ): array {
+        $result = [];
+        $after  = "";
+
+        do {
+            $request = [ "limit" => 100 ];
+            if ($after !== "") {
+                $request["after"] = $after;
+            }
+
+            $response = self::get("/vector_stores/$vectorStoreID/files", $request);
+            foreach ($response->getDict("data") as $elem) {
+                $result[] = $elem;
+            }
+
+            $after = "";
+            if ($response->getBool("has_more")) {
+                $after = $response->getString("last_id");
+            }
+        } while ($after !== "" && $all);
+
+        return $result;
     }
 
     /**
@@ -220,6 +251,60 @@ class OpenAI {
             "file_id" => $fileID,
         ]);
         return new OpenAIOutput($response);
+    }
+
+    /**
+     * Retrieves a single Vector Store File
+     * @param string $vectorStoreID
+     * @param string $fileID
+     * @return OpenAIOutput
+     */
+    public static function getVectorFile(string $vectorStoreID, string $fileID): OpenAIOutput {
+        $response = self::get("/vector_stores/$vectorStoreID/files/$fileID");
+        return new OpenAIOutput($response);
+    }
+
+    /**
+     * Waits until a Vector Store File is fully processed
+     * @param string $vectorStoreID
+     * @param string $fileID
+     * @param int    $maxAttempts   Optional.
+     * @param int    $waitMs        Optional.
+     * @return OpenAIOutput
+     */
+    public static function waitForVectorFile(
+        string $vectorStoreID,
+        string $fileID,
+        int $maxAttempts = 30,
+        int $waitMs = 500,
+    ): OpenAIOutput {
+        $result = new OpenAIOutput(new Dictionary([]));
+
+        for ($i = 0; $i < $maxAttempts; $i += 1) {
+            $result = self::getVectorFile($vectorStoreID, $fileID);
+            if ($result->error !== "") {
+                return $result;
+            }
+
+            $status = $result->response->getString("status");
+            if ($status === "completed") {
+                return $result;
+            }
+            if ($status === "failed" || $status === "cancelled") {
+                $lastError = $result->response->getDict("last_error")->getString("message");
+                if ($lastError !== "") {
+                    $result->error = $lastError;
+                } else {
+                    $result->error = "The vector store file could not be processed.";
+                }
+                return $result;
+            }
+
+            usleep($waitMs * 1000);
+        }
+
+        $result->error = "Timed out while waiting for the vector store file to finish processing.";
+        return $result;
     }
 
     /**
