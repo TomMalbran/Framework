@@ -1496,6 +1496,23 @@ class StringsTest extends TestCase {
     }
 
 
+    #[DataProvider("providerBase64Encode")]
+    public function testBase64Encode(string $input, string $expected): void {
+        $this->assertEquals($expected, Strings::base64Encode($input));
+    }
+
+    public static function providerBase64Encode(): array {
+        return [
+            "simple_ascii"  => [ "hi", "aGk=" ],
+            "empty_input"   => [ "", "" ],
+            "with_padding"  => [ "foobar", "Zm9vYmFy" ],
+            "utf8_string"   => [ "tést", base64_encode("tést") ],
+            "binary_string" => [ "\x00\x01\xFF", base64_encode("\x00\x01\xFF") ],
+            "round_trip"    => [ "hello world", base64_encode("hello world") ],
+        ];
+    }
+
+
     #[DataProvider("providerBase64Decode")]
     public function testBase64Decode(string $input, string $expected): void {
         $this->assertEquals($expected, Strings::base64Decode($input));

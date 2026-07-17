@@ -1294,6 +1294,15 @@ class Strings {
     }
 
     /**
+     * Returns the Base64 Encoded String
+     * @param string $string
+     * @return string
+     */
+    public static function base64Encode(string $string): string {
+        return base64_encode($string);
+    }
+
+    /**
      * Returns the Base64 Decoded String
      * @param string $string
      * @return string

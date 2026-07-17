@@ -632,7 +632,7 @@ class Credential extends CredentialSchema {
     ): array {
         $pass = Strings::toString($password);
         $salt = $salt !== "" ? $salt : Strings::random(50);
-        $hash = base64_encode(hash_hmac("sha256", $pass, $salt, binary: true));
+        $hash = Strings::base64Encode(hash_hmac("sha256", $pass, $salt, binary: true));
         return [ "password" => $hash, "salt" => $salt ];
     }
 
