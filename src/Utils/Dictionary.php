@@ -40,6 +40,14 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
         }
     }
 
+    /**
+     * Clones the Dictionary
+     * @return Dictionary
+     */
+    public function clone(): Dictionary {
+        return new Dictionary($this->data);
+    }
+
 
 
     /**
@@ -604,19 +612,25 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
+     * Returns the data as an array of Strings
+     * @param bool $withoutEmpty Optional.
+     * @return list<string>
+     */
+    public function toStrings(bool $withoutEmpty = false): array {
+        if (Arrays::isList($this->data)) {
+            return Arrays::toStrings($this->data, withoutEmpty: $withoutEmpty);
+        }
+
+        $values = Arrays::getValues($this->data);
+        return Arrays::toStrings($values, withoutEmpty: $withoutEmpty);
+    }
+
+    /**
      * Returns the data as a Map of string keys and values
      * @return array<string,string>
      */
     public function toStringsMap(): array {
         return Arrays::toStringsMap($this->data);
-    }
-
-    /**
-     * Returns the data as a Map of int keys and string values
-     * @return array<int,string>
-     */
-    public function toIntStringMap(): array {
-        return Arrays::toIntStringMap($this->data);
     }
 
     /**
@@ -636,20 +650,6 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
     }
 
     /**
-     * Returns the data as an array of Strings
-     * @param bool $withoutEmpty Optional.
-     * @return list<string>
-     */
-    public function toStrings(bool $withoutEmpty = false): array {
-        if (Arrays::isList($this->data)) {
-            return Arrays::toStrings($this->data, withoutEmpty: $withoutEmpty);
-        }
-
-        $values = Arrays::getValues($this->data);
-        return Arrays::toStrings($values, withoutEmpty: $withoutEmpty);
-    }
-
-    /**
      * Returns the data as an array of Ints
      * @param bool $withoutEmpty Optional.
      * @return list<int>
@@ -661,6 +661,30 @@ class Dictionary implements Countable, IteratorAggregate, JsonSerializable {
 
         $values = Arrays::getValues($this->data);
         return Arrays::toInts($values, withoutEmpty: $withoutEmpty);
+    }
+
+    /**
+     * Returns the data as a Map of int keys and values
+     * @return array<int,int>
+     */
+    public function toIntsMap(): array {
+        return Arrays::toIntsMap($this->data);
+    }
+
+    /**
+     * Returns the data as a Map of int keys and float values
+     * @return array<int,float>
+     */
+    public function toIntFloatMap(): array {
+        return Arrays::toIntFloatMap($this->data);
+    }
+
+    /**
+     * Returns the data as a Map of int keys and string values
+     * @return array<int,string>
+     */
+    public function toIntStringMap(): array {
+        return Arrays::toIntStringMap($this->data);
     }
 
     /**

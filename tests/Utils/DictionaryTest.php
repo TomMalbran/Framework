@@ -54,6 +54,29 @@ class DictionaryTest extends TestCase {
     }
 
 
+    #[DataProvider("providerClone")]
+    public function testClone(mixed $input): void {
+        $d     = new Dictionary($input);
+        $clone = $d->clone();
+
+        $this->assertNotSame($d, $clone);
+        $this->assertTrue($d->isEqual($clone));
+
+        $clone->set("added", "value");
+        $this->assertTrue($clone->has("added"));
+        $this->assertFalse($d->has("added"));
+    }
+
+    public static function providerClone(): array {
+        return [
+            "associative_array" => [ [ "a" => 1, "b" => 2 ] ],
+            "list_style_data"   => [ [ "x", "y", "z" ] ],
+            "empty_dictionary"  => [ [] ],
+            "invalid_input"     => [ "" ],
+        ];
+    }
+
+
     #[DataProvider("providerIsEmpty")]
     public function testIsEmpty(mixed $input, bool $expected): void {
         $d = new Dictionary($input);
@@ -879,6 +902,21 @@ class DictionaryTest extends TestCase {
     }
 
 
+    #[DataProvider("providerToStrings")]
+    public function testToStrings(mixed $input, array $expected): void {
+        $d = new Dictionary($input);
+        $this->assertEquals($expected, $d->toStrings());
+    }
+
+    public static function providerToStrings(): array {
+        return [
+            "basic_strings" => [ [ "a" => "1", "b" => "", "c" => 3 ], [ "1", "", "3" ] ],
+            "nested_arrays" => [ [ "x" => [ 1 ], "y" => null ], [ "", "" ] ],
+            "invalid_input" => [ "", [] ],
+        ];
+    }
+
+
     #[DataProvider("providerToStringsMap")]
     public function testToStringsMap(mixed $input, array $expected): void {
         $d = new Dictionary($input);
@@ -890,20 +928,6 @@ class DictionaryTest extends TestCase {
             "basic_strings_map" => [ [ "a" => 1, "b" => "", "c" => null ], [ "a" => "1", "b" => "", "c" => "" ] ],
             "numeric_keys"      => [ [ "id", 3, null ], [ "id", "3", "" ] ],
             "invalid_input"     => [ "", [] ],
-        ];
-    }
-
-
-    #[DataProvider("providerToIntStringMap")]
-    public function testToIntStringMap(mixed $input, array $expected): void {
-        $d = new Dictionary($input);
-        $this->assertEquals($expected, $d->toIntStringMap());
-    }
-
-    public static function providerToIntStringMap(): array {
-        return [
-            "basic_int_string_map" => [ [ "1" => "one", "2" => "two" ], [ "1" => "one", "2" => "two" ] ],
-            "invalid_input"        => [ "", [] ],
         ];
     }
 
@@ -937,21 +961,6 @@ class DictionaryTest extends TestCase {
     }
 
 
-    #[DataProvider("providerToStrings")]
-    public function testToStrings(mixed $input, array $expected): void {
-        $d = new Dictionary($input);
-        $this->assertEquals($expected, $d->toStrings());
-    }
-
-    public static function providerToStrings(): array {
-        return [
-            "basic_strings" => [ [ "a" => "1", "b" => "", "c" => 3 ], [ "1", "", "3" ] ],
-            "nested_arrays" => [ [ "x" => [ 1 ], "y" => null ], [ "", "" ] ],
-            "invalid_input" => [ "", [] ],
-        ];
-    }
-
-
     #[DataProvider("providerToInts")]
     public function testToInts(mixed $input, bool $withoutEmpty, array $expected): void {
         $d = new Dictionary($input);
@@ -965,6 +974,52 @@ class DictionaryTest extends TestCase {
             "include_empty_strings" => [ [ "a" => "1", "b" => "0", "c" => "2.5" ], false, [ 1, 0, 3 ] ],
             "negative_decimal"      => [ [ "n" => "-1.6", "p" => "2.4" ], false, [ -2, 2 ] ],
             "invalid_input"         => [ "", true, [] ],
+        ];
+    }
+
+
+    #[DataProvider("providerToIntsMap")]
+    public function testToIntsMap(mixed $input, array $expected): void {
+        $d = new Dictionary($input);
+        $this->assertEquals($expected, $d->toIntsMap());
+    }
+
+    public static function providerToIntsMap(): array {
+        return [
+            "basic_ints_map" => [ [ "1" => "2", "3" => 4 ], [ 1 => 2, 3 => 4 ] ],
+            "float_like"     => [ [ "1.2" => "3.4" ], [ 1 => 3 ] ],
+            "null_values"    => [ [ "1" => null ], [ 1 => 0 ] ],
+            "invalid_input"  => [ "", [] ],
+        ];
+    }
+
+
+    #[DataProvider("providerToIntFloatMap")]
+    public function testToIntFloatMap(mixed $input, array $expected): void {
+        $d = new Dictionary($input);
+        $this->assertEquals($expected, $d->toIntFloatMap());
+    }
+
+    public static function providerToIntFloatMap(): array {
+        return [
+            "basic_int_float_map" => [ [ "1" => "2.5", "3" => 4 ], [ 1 => 2.5, 3 => 4.0 ] ],
+            "float_like_keys"     => [ [ "1.2" => "2.5" ], [ 1 => 2.5 ] ],
+            "null_values"         => [ [ "1" => null ], [ 1 => 0.0 ] ],
+            "invalid_input"       => [ "", [] ],
+        ];
+    }
+
+
+    #[DataProvider("providerToIntStringMap")]
+    public function testToIntStringMap(mixed $input, array $expected): void {
+        $d = new Dictionary($input);
+        $this->assertEquals($expected, $d->toIntStringMap());
+    }
+
+    public static function providerToIntStringMap(): array {
+        return [
+            "basic_int_string_map" => [ [ "1" => "one", "2" => "two" ], [ "1" => "one", "2" => "two" ] ],
+            "invalid_input"        => [ "", [] ],
         ];
     }
 
