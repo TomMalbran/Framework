@@ -178,6 +178,25 @@ class ArraysTest extends TestCase {
         ];
     }
 
+    #[DataProvider("providerToIntFloatMap")]
+    public function testToIntFloatMap(mixed $input, array $expected): void {
+        $this->assertSame($expected, Arrays::toIntFloatMap($input));
+    }
+
+    public static function providerToIntFloatMap(): array {
+        return [
+            "simple_conversion" => [ [ "1" => "1.5" ], [ 1 => 1.5 ] ],
+            "numeric_keys"      => [ [ 2 => 3 ], [ 2 => 3.0 ] ],
+            "float_like_keys"   => [ [ "1.23" => "4.5" ], [ 1 => 4.5 ] ],
+            "non_numeric_keys"  => [ [ "a" => "2.5" ], [ 0 => 2.5 ] ],
+            "key_collisions"    => [ [ "1" => "a", "1.0" => "2.5" ], [ 1 => 2.5 ] ],
+            "non_array_string"  => [ "x", [] ],
+            "null_input"        => [ null, [] ],
+            "null_values"       => [ [ "1" => null ], [ 1 => 0.0 ] ],
+            "object_values"     => [ [ "2" => (object)[] ], [ 2 => 0.0 ] ],
+        ];
+    }
+
     #[DataProvider("providerToStringsMap")]
     public function testToStringsMap(mixed $input, array $expected): void {
         $this->assertSame($expected, Arrays::toStringsMap($input));
