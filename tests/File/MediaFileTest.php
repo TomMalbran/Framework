@@ -215,7 +215,7 @@ class MediaFileTest extends TestCase {
         $GLOBALS["test_move_uploaded_file"] = true;
 
         $tmpName = $this->uploadSources[$uploadKey];
-        $file = new File("", [
+        $file = new File(fileRequest: [
             "name"     => $fileName,
             "type"     => "",
             "tmp_name" => $tmpName,

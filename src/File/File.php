@@ -2,6 +2,7 @@
 namespace Framework\File;
 
 use Framework\File\Storage;
+use Framework\File\FilePath;
 use Framework\File\FileType;
 use Framework\File\MediaFile;
 
@@ -24,6 +25,8 @@ class File implements JsonSerializable {
     private ?array $fileRequest = null;
 
     private string $filePath = "";
+
+    public string $tmpPath = "";
 
 
     /**
@@ -52,7 +55,33 @@ class File implements JsonSerializable {
 
         /** @var FileRequest */
         $fileRequest = $_FILES[$key];
-        return new File("", $fileRequest);
+        return new File(fileRequest: $fileRequest);
+    }
+
+    /**
+     * Creates a new File instance from content
+     * @param string $content
+     * @param string $fileName
+     * @param string $fileType Optional.
+     * @return File
+     */
+    public static function fromContent(
+        string $content,
+        string $fileName,
+        string $fileType = "",
+    ): File {
+        $tmpPath = FilePath::getSystemTempPath($fileName);
+        Storage::writeFile($tmpPath, $content);
+
+        $result = new File(fileRequest: [
+            "name"     => $fileName,
+            "type"     => $fileType,
+            "tmp_name" => $tmpPath,
+            "error"    => UPLOAD_ERR_OK,
+            "size"     => strlen($content),
+        ]);
+        $result->tmpPath = $tmpPath;
+        return $result;
     }
 
 

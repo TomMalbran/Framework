@@ -96,6 +96,29 @@ class FileTest extends TestCase {
     }
 
 
+    #[DataProvider("providerFromContent")]
+    public function testFromContent(string $content, string $fileName, string $fileType, string $expectedName, string $expectedType): void {
+        $file = File::fromContent($content, $fileName, $fileType);
+
+        $this->assertTrue($file->hasFile());
+        $this->assertTrue($file->isValid());
+        $this->assertSame($expectedName, $file->getName());
+        $this->assertSame($expectedType, $file->getType());
+        $this->assertNotSame("", $file->tmpPath);
+        $this->assertSame($content, Storage::readFile($file->tmpPath));
+
+        @unlink($file->tmpPath);
+    }
+
+    public static function providerFromContent(): array {
+        return [
+            "with_type"     => [ "hello world", "note.txt", "text/plain", "note.txt", "text/plain" ],
+            "without_type"  => [ "some data", "data.csv", "", "data.csv", "" ],
+            "empty_content" => [ "", "empty.txt", "text/plain", "empty.txt", "text/plain" ],
+        ];
+    }
+
+
     #[DataProvider("providerHasFile")]
     public function testHasFile(string $mode, string $key, bool $expected): void {
         $this->setUploadFile("upload", "request.txt", "text/plain", $this->files["text"], UPLOAD_ERR_OK);
