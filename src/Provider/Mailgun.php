@@ -34,7 +34,6 @@ class Mailgun {
             url:      self::BaseUrl . $route,
             params:   $params,
             userPass: "api:" . Config::getMailgunKey(),
-            jsonBody: true,
         );
         return new Dictionary($response);
     }
