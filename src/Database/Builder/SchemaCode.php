@@ -58,28 +58,28 @@ class SchemaCode {
      * @return string
      */
     public static function getCode(SchemaModel $schemaModel): string {
-        $mainFields   = $schemaModel->toBuildData("mainFields");
-        $expressions  = $schemaModel->toBuildData("expressions");
-        $counts       = $schemaModel->toBuildData("counts");
-        $relations    = $schemaModel->toBuildData("relations");
-        $subRequests  = $schemaModel->toBuildData("subRequests");
+        $mainFields  = $schemaModel->toBuildData("mainFields");
+        $expressions = $schemaModel->toBuildData("expressions");
+        $counts      = $schemaModel->toBuildData("counts");
+        $relations   = $schemaModel->toBuildData("relations");
+        $subRequests = $schemaModel->toBuildData("subRequests");
 
-        $imports      = self::getImports($schemaModel);
-        $idField      = self::getIDField($schemaModel);
-        $fields       = self::getAllFields($schemaModel);
-        $uniques      = self::getSomeFields($schemaModel, isUnique: true);
-        $parents      = self::getSomeFields($schemaModel, isParent: true);
-        $editParents  = $schemaModel->hasPositions ? $parents : [];
-        $validations  = self::getValidations($schemaModel, $parents);
+        $imports     = self::getImports($schemaModel);
+        $idField     = self::getIDField($schemaModel);
+        $fields      = self::getAllFields($schemaModel);
+        $uniques     = self::getSomeFields($schemaModel, isUnique: true);
+        $parents     = self::getSomeFields($schemaModel, isParent: true);
+        $editParents = $schemaModel->hasPositions ? $parents : [];
+        $validations = self::getValidations($schemaModel, $parents);
 
-        $hasRequest   = count($schemaModel->requestedFields) > 0;
-        $hasVirtual   = count($schemaModel->virtualFields) > 0;
-        $hasUniques   = count($uniques) > 0;
-        $hasParents   = count($parents) > 0;
-        $hasJsonType  = count(self::getSomeFields($schemaModel, isJsonType: true)) > 0;
-        $queryName    = $schemaModel->queryClass;
+        $hasRequest  = count($schemaModel->requestedFields) > 0;
+        $hasVirtual  = count($schemaModel->virtualFields) > 0;
+        $hasUniques  = count($uniques) > 0;
+        $hasParents  = count($parents) > 0;
+        $hasJsonType = count(self::getSomeFields($schemaModel, isJsonType: true)) > 0;
+        $queryName   = $schemaModel->queryClass;
 
-        $contents     = Builder::render("Schema", [
+        $contents    = Builder::render("Schema", [
             "namespace"          => $schemaModel->namespace,
             "name"               => $schemaModel->name,
             "tableName"          => $schemaModel->tableName,
@@ -411,6 +411,7 @@ class SchemaCode {
             case ValidateType::Number:
                 $hasTypeOf    = $validate->typeOf !== "";
                 $hasBelongsTo = $validate->belongsTo !== "";
+                $hasGreater   = $validate->greaterThan !== "";
                 $isNumeric    = !$hasTypeOf && !$hasBelongsTo;
 
                 $validation = [
@@ -433,9 +434,11 @@ class SchemaCode {
                     "useNumericElse"   => $validate->isRequired || $hasTypeOf || $hasBelongsTo,
                     "isNumeric"        => $isNumeric,
                     "numericParams"    => $validate->getNumericParams(),
-                    "invalidPrefix"    => $validate->isRequired || $validate->greaterThan !== "",
+                    "invalidPrefix"    => $validate->isRequired || $validate->isUnique ||
+                        $hasGreater,
 
-                    "useUniqueElse"    => $validate->isRequired || $hasTypeOf || $hasBelongsTo || $isNumeric,  // phpcs:ignore
+                    "useUniqueElse"    => $validate->isRequired || $hasTypeOf ||
+                        $hasBelongsTo || $isNumeric,
                     "isUnique"         => $validate->isUnique,
 
                     "useGreaterElse"   => $validate->isRequired || $hasTypeOf || $hasBelongsTo ||
