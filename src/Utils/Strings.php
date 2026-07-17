@@ -712,10 +712,10 @@ class Strings {
         bool $useFirst = true,
     ): string {
         $position = $useFirst ? strpos($string, $needle) : strrpos($string, $needle);
-        if ($position > 0) {
-            return substr($string, 0, $position);
+        if ($position === false) {
+            return $string;
         }
-        return $string;
+        return substr($string, 0, $position);
     }
 
     /**

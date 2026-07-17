@@ -820,8 +820,8 @@ class StringsTest extends TestCase {
             "default_uses_first" => [ "a.b.c", ".", null, "a" ],
             "use_last"           => [ "a.b.c", ".", false, "a.b" ],
             "needle_not_found"   => [ "abc", ".", true, "abc" ],
-            "needle_at_start"    => [ ".a", ".", true, ".a" ],
-            "empty_needle"       => [ "abc", "", true, "abc" ],
+            "needle_at_start"    => [ ".a", ".", true, "" ],
+            "empty_needle"       => [ "abc", "", true, "" ],
         ];
     }
 
