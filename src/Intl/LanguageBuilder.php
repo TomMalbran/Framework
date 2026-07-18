@@ -15,11 +15,10 @@ use Framework\Utils\Strings;
 class LanguageBuilder implements DiscoveryBuilder {
 
     /**
-     * Generates the code
-     * @return int
+     * Collects the Languages from the Strings files
+     * @return array{languages:list<array{code:string,name:string}>,rootCode:string}
      */
-    #[\Override]
-    public static function generateCode(): int {
+    public static function collectLanguages(): array {
         $path      = IntlConfig::getStringsPath();
         $files     = Storage::getFilesInDir($path);
         $rootCode  = IntlConfig::getDefaultLanguage();
@@ -68,12 +67,27 @@ class LanguageBuilder implements DiscoveryBuilder {
             return Strings::compare($a["name"], $b["name"]);
         });
 
+        return [
+            "languages" => $languages,
+            "rootCode"  => $rootCode,
+        ];
+    }
+
+
+
+    /**
+     * Generates the code
+     * @return int
+     */
+    #[\Override]
+    public static function generateCode(): int {
+        $result = self::collectLanguages();
 
         // Builds the code
         return Builder::generateCode("Language", [
-            "languages" => $languages,
-            "rootCode"  => $rootCode,
-            "total"     => count($languages),
+            "languages" => $result["languages"],
+            "rootCode"  => $result["rootCode"],
+            "total"     => count($result["languages"]),
         ]);
     }
 

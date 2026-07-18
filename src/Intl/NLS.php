@@ -214,10 +214,8 @@ class NLS {
             string:   $subject,
             pattern:  "/\{(\d+)\}/",
             callback: function (array $match) use ($args): string {
-                if (!isset($match[1])) {
-                    return "";
-                }
-                return Strings::toString($args[(int)$match[1]] ?? "");
+                $key = isset($match[1]) ? (int)$match[1] : 0;
+                return Strings::toString($args[$key] ?? "");
             },
         );
     }

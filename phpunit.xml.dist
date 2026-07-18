@@ -25,6 +25,9 @@
         <testsuite name="ImpExp Tests">
             <directory>tests/ImpExp</directory>
         </testsuite>
+        <testsuite name="Intl Tests">
+            <directory>tests/Intl</directory>
+        </testsuite>
         <testsuite name="Utils Tests">
             <directory>tests/Utils</directory>
         </testsuite>
