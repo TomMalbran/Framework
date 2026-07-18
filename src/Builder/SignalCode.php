@@ -3,6 +3,7 @@ namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Type\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryClass;
 use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Attr\Listener;
 use Framework\Builder\Builder;
@@ -15,6 +16,27 @@ use ReflectionUnionType;
 
 /**
  * The Signal Code
+ * @phpstan-type SignalParam array{
+ *   isFirst: bool,
+ *   name:    string,
+ *   type:    string,
+ *   docType: string,
+ * }
+ * @phpstan-type SignalTrigger array{
+ *   name:   string,
+ *   params: list<SignalParam>,
+ * }
+ * @phpstan-type SignalData array{
+ *   event:    string,
+ *   params:   list<SignalParam>,
+ *   triggers: list<SignalTrigger>,
+ * }
+ * @phpstan-type SignalResult array{
+ *   uses?:    list<string>,
+ *   hasUses?: bool,
+ *   signals?: list<SignalData>,
+ *   total?:   int,
+ * }
  */
 #[Priority(Priority::Lowest)]
 class SignalCode implements DiscoveryBuilder {
@@ -25,7 +47,27 @@ class SignalCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $classes = Discovery::findClasses();
+        $data = self::collectSignals(Discovery::findClasses());
+        return Builder::generateCode("Signal", $data);
+    }
+
+    /**
+     * Destroys the Code
+     * @return int
+     */
+    #[\Override]
+    public static function destroyCode(): int {
+        return 1;
+    }
+
+
+
+    /**
+     * Collects the Signals used to generate the code
+     * @param list<DiscoveryClass> $classes
+     * @return SignalResult
+     */
+    public static function collectSignals(array $classes): array {
         $signals = [];
         $uses    = [];
 
@@ -77,41 +119,32 @@ class SignalCode implements DiscoveryBuilder {
         }
 
         $signals = Arrays::getValues($signals);
-        $signals = Arrays::sort($signals, function (array $a, array $b) {
+        $signals = Arrays::sortList($signals, function (array $a, array $b) {
             return $a["event"] <=> $b["event"];
         });
 
 
-        // Builds the code if required
         if (Arrays::isEmpty($signals)) {
-            return Builder::generateCode("Signal");
+            return [];
         }
-        return Builder::generateCode("Signal", [
+        return [
             "uses"    => array_keys($uses),
             "hasUses" => count($uses) > 0,
             "signals" => $signals,
             "total"   => count($signals),
-        ]);
+        ];
     }
-
-    /**
-     * Destroys the Code
-     * @return int
-     */
-    #[\Override]
-    public static function destroyCode(): int {
-        return 1;
-    }
-
-
 
     /**
      * Generates the Params of the Method
      * @param ReflectionMethod  $method
      * @param array<string,int> $uses
-     * @return list<array{isFirst:bool,name:string,type:string,docType:string}>
+     * @return list<SignalParam>
      */
-    private static function getParams(ReflectionMethod $method, array &$uses): array {
+    private static function getParams(
+        ReflectionMethod $method,
+        array &$uses,
+    ): array {
         $parameters = $method->getParameters();
         $params     = [];
 

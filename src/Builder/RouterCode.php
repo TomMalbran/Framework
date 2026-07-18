@@ -3,6 +3,7 @@ namespace Framework\Builder;
 
 use Framework\Discovery\Discovery;
 use Framework\Discovery\Type\DiscoveryBuilder;
+use Framework\Discovery\Type\DiscoveryClass;
 use Framework\Discovery\Attr\Priority;
 use Framework\Discovery\Attr\Route;
 use Framework\Builder\Builder;
@@ -12,6 +13,19 @@ use ReflectionNamedType;
 
 /**
  * The Router Code
+ * @phpstan-type RouteData array{
+ *   className:    string,
+ *   method:       string,
+ *   requestParam: string,
+ *   route:        string,
+ *   access:       string,
+ *   addSpace:     bool,
+ * }
+ * @phpstan-type RouterResult array{
+ *   hasRoutes: bool,
+ *   routes:    list<RouteData>,
+ *   total:     int,
+ * }
  */
 #[Priority(Priority::Lowest)]
 class RouterCode implements DiscoveryBuilder {
@@ -22,8 +36,28 @@ class RouterCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $classes = Discovery::findClasses();
-        $routes  = [];
+        $data = self::collectRoutes(Discovery::findClasses());
+        return Builder::generateCode("Router", $data);
+    }
+
+    /**
+     * Destroys the Code
+     * @return int
+     */
+    #[\Override]
+    public static function destroyCode(): int {
+        return 1;
+    }
+
+
+
+    /**
+     * Collects the Routes from the given Classes
+     * @param list<DiscoveryClass> $classes
+     * @return RouterResult
+     */
+    public static function collectRoutes(array $classes): array {
+        $routes = [];
 
         foreach ($classes as $class) {
             $methods = $class->getMethods();
@@ -92,21 +126,11 @@ class RouterCode implements DiscoveryBuilder {
         }
 
 
-        // Builds the code
         $total = count($routes);
-        return Builder::generateCode("Router", [
+        return [
             "hasRoutes" => $total > 0,
             "routes"    => $routes,
             "total"     => $total,
-        ]);
-    }
-
-    /**
-     * Destroys the Code
-     * @return int
-     */
-    #[\Override]
-    public static function destroyCode(): int {
-        return 1;
+        ];
     }
 }

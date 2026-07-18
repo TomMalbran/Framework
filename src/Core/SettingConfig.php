@@ -9,6 +9,38 @@ use Framework\Utils\Strings;
 
 /**
  * The Setting Config
+ * @phpstan-type SettingEntry array{
+ *   variable:     string,
+ *   section:      string,
+ *   variableType: VariableType,
+ *   value:        mixed,
+ * }
+ * @phpstan-type SettingSectionData array{
+ *   section: string,
+ *   name:    string,
+ * }
+ * @phpstan-type SettingVariableData array{
+ *   isFirst:   bool,
+ *   section:   string,
+ *   variable:  string,
+ *   prefix:    string,
+ *   title:     string,
+ *   name:      string,
+ *   type:      string,
+ *   docType:   string,
+ *   getter:    string,
+ *   isBoolean: bool,
+ *   isInteger: bool,
+ *   isFloat:   bool,
+ *   isString:  bool,
+ *   isArray:   bool,
+ * }
+ * @phpstan-type SettingResult array{
+ *   sections?:  list<SettingSectionData>,
+ *   variables?: list<SettingVariableData>,
+ *   hasJSON?:   bool,
+ *   total?:     int,
+ * }
  */
 #[Priority(Priority::Highest)]
 class SettingConfig implements DiscoveryBuilder {
@@ -17,7 +49,7 @@ class SettingConfig implements DiscoveryBuilder {
     public const General = "General";
 
 
-    /** @var list<array{variable:string,section:string,variableType:VariableType,value:mixed}> */
+    /** @var list<SettingEntry> */
     private static array $settings = [];
 
 
@@ -45,7 +77,7 @@ class SettingConfig implements DiscoveryBuilder {
 
     /**
      * Returns the registered Settings
-     * @return list<array{variable:string,section:string,variableType:VariableType,value:mixed}>
+     * @return list<SettingEntry>
      */
     public static function getSettings(): array {
         return self::$settings;
@@ -59,17 +91,8 @@ class SettingConfig implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        if (count(self::$settings) === 0) {
-            return Builder::generateCode("Setting");
-        }
-
-        [ $variables, $hasJSON ] = self::getVariables();
-        return Builder::generateCode("Setting", [
-            "sections"  => self::getSections(),
-            "variables" => $variables,
-            "hasJSON"   => $hasJSON,
-            "total"     => count($variables),
-        ]);
+        $data = self::collectSettings();
+        return Builder::generateCode("Setting", $data);
     }
 
     /**
@@ -81,9 +104,29 @@ class SettingConfig implements DiscoveryBuilder {
         return 1;
     }
 
+
+
+    /**
+     * Collects the Settings used to generate the code
+     * @return SettingResult
+     */
+    public static function collectSettings(): array {
+        if (count(self::$settings) === 0) {
+            return [];
+        }
+
+        [ $variables, $hasJSON ] = self::getVariables();
+        return [
+            "sections"  => self::getSections(),
+            "variables" => $variables,
+            "hasJSON"   => $hasJSON,
+            "total"     => count($variables),
+        ];
+    }
+
     /**
      * Returns the Settings Sections for the generator
-     * @return list<array{section:string,name:string}>
+     * @return list<SettingSectionData>
      */
     private static function getSections(): array {
         $result = [];
@@ -102,7 +145,7 @@ class SettingConfig implements DiscoveryBuilder {
 
     /**
      * Returns the Settings Variables for the generator
-     * @return array{list<array<string,mixed>>,bool}
+     * @return array{list<SettingVariableData>,bool}
      */
     private static function getVariables(): array {
         $result  = [];

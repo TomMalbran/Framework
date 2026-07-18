@@ -10,13 +10,43 @@ use Framework\Utils\Strings;
 
 /**
  * The Language Builder
+ * @phpstan-type LanguageData array{
+ *   code: string,
+ *   name: string,
+ * }
+ * @phpstan-type LanguageResult array{
+ *   languages: list<LanguageData>,
+ *   rootCode:  string,
+ *   total:     int,
+ * }
  */
 #[Priority(Priority::Highest)]
 class LanguageBuilder implements DiscoveryBuilder {
 
     /**
+     * Generates the code
+     * @return int
+     */
+    #[\Override]
+    public static function generateCode(): int {
+        $data = self::collectLanguages();
+        return Builder::generateCode("Language", $data);
+    }
+
+    /**
+     * Destroys the Code
+     * @return int
+     */
+    #[\Override]
+    public static function destroyCode(): int {
+        return 1;
+    }
+
+
+
+    /**
      * Collects the Languages from the Strings files
-     * @return array{languages:list<array{code:string,name:string}>,rootCode:string}
+     * @return LanguageResult
      */
     public static function collectLanguages(): array {
         $path      = IntlConfig::getStringsPath();
@@ -70,33 +100,7 @@ class LanguageBuilder implements DiscoveryBuilder {
         return [
             "languages" => $languages,
             "rootCode"  => $rootCode,
+            "total"     => count($languages),
         ];
-    }
-
-
-
-    /**
-     * Generates the code
-     * @return int
-     */
-    #[\Override]
-    public static function generateCode(): int {
-        $result = self::collectLanguages();
-
-        // Builds the code
-        return Builder::generateCode("Language", [
-            "languages" => $result["languages"],
-            "rootCode"  => $result["rootCode"],
-            "total"     => count($result["languages"]),
-        ]);
-    }
-
-    /**
-     * Destroys the Code
-     * @return int
-     */
-    #[\Override]
-    public static function destroyCode(): int {
-        return 1;
     }
 }

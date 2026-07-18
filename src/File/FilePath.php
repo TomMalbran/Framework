@@ -14,6 +14,10 @@ use Framework\Utils\Strings;
 
 /**
  * The File Paths
+ * @phpstan-type FilePathData array{
+ *   name:  string,
+ *   title: string,
+ * }
  */
 class FilePath implements DiscoveryBuilder {
 
@@ -194,26 +198,6 @@ class FilePath implements DiscoveryBuilder {
 
 
     /**
-     * Collects the Paths used to generate the code
-     * @return list<array{name:string,title:string}>
-     */
-    public static function collectPaths(): array {
-        $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
-        $paths     = [];
-
-        if (count(self::$paths) > 0) {
-            $basePaths = array_merge($basePaths, self::$paths);
-        }
-        foreach ($basePaths as $basePath) {
-            $paths[] = [
-                "name"  => $basePath,
-                "title" => Strings::upperCaseFirst($basePath),
-            ];
-        }
-        return $paths;
-    }
-
-    /**
      * Generates the code
      * @return int
      */
@@ -236,6 +220,28 @@ class FilePath implements DiscoveryBuilder {
     public static function destroyCode(): int {
         return 1;
     }
+
+    /**
+     * Collects the Paths used to generate the code
+     * @return list<FilePathData>
+     */
+    public static function collectPaths(): array {
+        $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
+        $paths     = [];
+
+        if (count(self::$paths) > 0) {
+            $basePaths = array_merge($basePaths, self::$paths);
+        }
+        foreach ($basePaths as $basePath) {
+            $paths[] = [
+                "name"  => $basePath,
+                "title" => Strings::upperCaseFirst($basePath),
+            ];
+        }
+        return $paths;
+    }
+
+
 
     /**
      * Ensures that the Paths are created

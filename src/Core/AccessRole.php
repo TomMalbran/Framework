@@ -9,6 +9,24 @@ use Framework\Utils\Strings;
 
 /**
  * The Access Role
+ * @phpstan-type AccessData array{
+ *   addSpace: bool,
+ *   group:    string,
+ *   name:     string,
+ *   constant: string,
+ *   level:    int,
+ * }
+ * @phpstan-type AccessGroupData array{
+ *   name:   string,
+ *   roles:  string,
+ *   values: string,
+ * }
+ * @phpstan-type AccessResult array{
+ *   roles:   list<AccessData>,
+ *   groups:  list<AccessGroupData>,
+ *   default: string,
+ *   total:   int,
+ * }
  */
 class AccessRole implements DiscoveryBuilder {
 
@@ -57,20 +75,8 @@ class AccessRole implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        if (count(self::$roles) === 0) {
-            DiscoveryConfig::loadDefault("access");
-        }
-
-        $roleList  = self::getAccesses(self::$groups, self::$roles);
-        $maxLength = self::alignNames($roleList);
-
-        // Builds the code
-        return Builder::generateCode("Access", [
-            "roles"   => $roleList,
-            "groups"  => self::getGroups(self::$groups),
-            "default" => Strings::padRight("default", $maxLength + 6),
-            "total"   => count(self::$roles),
-        ]);
+        $data = self::collectRoles();
+        return Builder::generateCode("Access", $data);
     }
 
     /**
@@ -82,11 +88,33 @@ class AccessRole implements DiscoveryBuilder {
         return 1;
     }
 
+
+
+    /**
+     * Collects the Access Roles used to generate the code
+     * @return AccessResult
+     */
+    public static function collectRoles(): array {
+        if (count(self::$roles) === 0) {
+            DiscoveryConfig::loadDefault("access");
+        }
+
+        $roleList  = self::getAccesses(self::$groups, self::$roles);
+        $maxLength = self::alignNames($roleList);
+
+        return [
+            "roles"   => $roleList,
+            "groups"  => self::getGroups(self::$groups),
+            "default" => Strings::padRight("default", $maxLength + 6),
+            "total"   => count(self::$roles),
+        ];
+    }
+
     /**
      * Returns the Access Roles for the generator
      * @param array<string,array<string>> $groups
      * @param array<string,int>           $roles
-     * @return list<array{addSpace:bool,group:string,name:string,constant:string,level:int}>
+     * @return list<AccessData>
      */
     private static function getAccesses(array $groups, array $roles): array {
         $result = [];
@@ -109,7 +137,7 @@ class AccessRole implements DiscoveryBuilder {
     /**
      * Returns the Access Groups for the generator
      * @param array<string,array<string>> $groups
-     * @return list<array<string,string>>
+     * @return list<AccessGroupData>
      */
     private static function getGroups(array $groups): array {
         $result = [];
@@ -125,7 +153,7 @@ class AccessRole implements DiscoveryBuilder {
 
     /**
      * Aligns the List Names
-     * @param list<array{addSpace:bool,group:string,name:string,constant:string,level:int}> $list
+     * @param list<AccessData> $list
      * @return int
      */
     private static function alignNames(array &$list): int {

@@ -10,6 +10,10 @@ use Framework\Utils\Dictionary;
 
 /**
  * The Email Builder
+ * @phpstan-type EmailCodesResult array{
+ *   codes: list<string>,
+ *   total: int,
+ * }
  */
 #[Priority(Priority::High)]
 class EmailBuilder implements DiscoveryBuilder {
@@ -20,6 +24,26 @@ class EmailBuilder implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
+        $data = self::collectEmails();
+        return Builder::generateCode("EmailCode", $data);
+    }
+
+    /**
+     * Destroys the Code
+     * @return int
+     */
+    #[\Override]
+    public static function destroyCode(): int {
+        return 1;
+    }
+
+
+
+    /**
+     * Collects the Emails from the Emails files
+     * @return EmailCodesResult
+     */
+    public static function collectEmails(): array {
         $languages = Language::getAll();
         $data      = new Dictionary();
 
@@ -40,19 +64,9 @@ class EmailBuilder implements DiscoveryBuilder {
             $codes[] = "Test";
         }
 
-        // Builds the code
-        return Builder::generateCode("EmailCode", [
+        return [
             "codes" => $codes,
             "total" => count($codes),
-        ]);
-    }
-
-    /**
-     * Destroys the Code
-     * @return int
-     */
-    #[\Override]
-    public static function destroyCode(): int {
-        return 1;
+        ];
     }
 }

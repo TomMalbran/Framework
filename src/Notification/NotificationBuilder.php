@@ -9,6 +9,10 @@ use Framework\Utils\Dictionary;
 
 /**
  * The Notification Builder
+ * @phpstan-type NotificationCodesResult array{
+ *   codes: list<string>,
+ *   total: int,
+ * }
  */
 class NotificationBuilder implements DiscoveryBuilder {
 
@@ -18,6 +22,26 @@ class NotificationBuilder implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
+        $data = self::collectNotifications();
+        return Builder::generateCode("NotificationCode", $data);
+    }
+
+    /**
+     * Destroys the Code
+     * @return int
+     */
+    #[\Override]
+    public static function destroyCode(): int {
+        return 1;
+    }
+
+
+
+    /**
+     * Collects the Notifications from the Notification files
+     * @return NotificationCodesResult
+     */
+    public static function collectNotifications(): array {
         $languages = Language::getAll();
         $data      = new Dictionary();
 
@@ -33,19 +57,9 @@ class NotificationBuilder implements DiscoveryBuilder {
             $codes[] = $notificationCode;
         }
 
-        // Builds the code
-        return Builder::generateCode("NotificationCode", [
+        return [
             "codes" => $codes,
             "total" => count($codes),
-        ]);
-    }
-
-    /**
-     * Destroys the Code
-     * @return int
-     */
-    #[\Override]
-    public static function destroyCode(): int {
-        return 1;
+        ];
     }
 }

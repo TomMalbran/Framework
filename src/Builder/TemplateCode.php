@@ -10,6 +10,15 @@ use Framework\Utils\Strings;
 
 /**
  * The Template Code
+ * @phpstan-type TemplateData array{
+ *   name:     string,
+ *   relPath:  string,
+ *   constant: string,
+ * }
+ * @phpstan-type TemplateResult array{
+ *   templates: list<TemplateData>,
+ *   total:     int,
+ * }
  */
 #[Priority(Priority::Highest)]
 class TemplateCode implements DiscoveryBuilder {
@@ -20,7 +29,28 @@ class TemplateCode implements DiscoveryBuilder {
      */
     #[\Override]
     public static function generateCode(): int {
-        $path      = Application::getBasePath();
+        $data = self::collectTemplates();
+        return Builder::generateCode("Template", $data);
+    }
+
+    /**
+     * Destroys the Code
+     * @return int
+     */
+    #[\Override]
+    public static function destroyCode(): int {
+        return 1;
+    }
+
+
+
+    /**
+     * Collects the Templates from the Files in the Base Path
+     * @param string $basePath Optional.
+     * @return TemplateResult
+     */
+    public static function collectTemplates(string $basePath = ""): array {
+        $path      = $basePath !== "" ? $basePath : Application::getBasePath();
         $filePaths = Storage::getFilesInDir($path, recursive: true, skipVendor: true);
         $templates = [];
         $maxLength = 0;
@@ -48,19 +78,9 @@ class TemplateCode implements DiscoveryBuilder {
             );
         }
 
-        // Builds the code
-        return Builder::generateCode("Template", [
+        return [
             "templates" => $templates,
             "total"     => count($templates),
-        ]);
-    }
-
-    /**
-     * Destroys the Code
-     * @return int
-     */
-    #[\Override]
-    public static function destroyCode(): int {
-        return 1;
+        ];
     }
 }
