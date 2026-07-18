@@ -261,4 +261,96 @@ class FilePathTest extends TestCase {
             "multiple" => [ 999, [ "subdir", "file.txt" ], "/999/subdir/file.txt" ],
         ];
     }
+
+
+    #[DataProvider("providerCollectPaths")]
+    public function testCollectPaths(array $register, array $expected): void {
+        foreach ($register as $name) {
+            FilePath::register($name);
+        }
+        $this->assertSame($expected, FilePath::collectPaths());
+    }
+
+    public static function providerCollectPaths(): array {
+        $base = [
+            [ "name" => "source",  "title" => "Source" ],
+            [ "name" => "thumbs",  "title" => "Thumbs" ],
+            [ "name" => "avatars", "title" => "Avatars" ],
+        ];
+        return [
+            "defaults"        => [ [], $base ],
+            "with_registered" => [ [ "docs" ], [ ...$base, [ "name" => "docs", "title" => "Docs" ] ] ],
+            "skips_invalid"   => [ [ "", "example" ], $base ],
+        ];
+    }
+
+
+    public function testDestroyCode(): void {
+        $this->assertSame(1, FilePath::destroyCode());
+    }
+
+
+    #[DataProvider("providerCreateDirs")]
+    public function testCreateDirs(array $directories, int $id, array $expected): void {
+        foreach ($directories as $directory) {
+            FilePath::registerDirectory($directory);
+        }
+
+        $this->assertSame($expected, FilePath::createDirs($id));
+        foreach ($expected as $path) {
+            $this->assertDirectoryExists(FilePath::getPath($path));
+        }
+    }
+
+    public static function providerCreateDirs(): array {
+        return [
+            "default_id" => [
+                [],
+                0,
+                [ "source", "source/0", "thumbs", "thumbs/0" ],
+            ],
+            "with_id_and_directories" => [
+                [ "images" ],
+                5,
+                [ "source", "source/5", "source/5/images", "thumbs", "thumbs/5", "thumbs/5/images" ],
+            ],
+        ];
+    }
+
+
+    public function testCreateDirsIsIdempotent(): void {
+        $this->assertNotEmpty(FilePath::createDirs(7));
+        $this->assertSame([], FilePath::createDirs(7));
+    }
+
+
+    public function testEnsurePaths(): void {
+        FilePath::register("docs");
+        FilePath::registerDirectory("images");
+
+        ob_start();
+        FilePath::ensurePaths();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString("ENSURE PATHS", $output);
+        $this->assertStringContainsString("Added", $output);
+
+        foreach ([ "temp", "source", "thumbs", "avatars", "docs" ] as $basePath) {
+            $this->assertDirectoryExists(FilePath::getPath($basePath));
+        }
+        $this->assertDirectoryExists(FilePath::getPath("source/0/images"));
+    }
+
+
+    public function testEnsurePathsWhenAlreadyCreated(): void {
+        ob_start();
+        FilePath::ensurePaths();
+        ob_end_clean();
+
+        ob_start();
+        FilePath::ensurePaths();
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString("No paths added", $output);
+    }
 }

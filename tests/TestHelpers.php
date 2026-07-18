@@ -66,9 +66,11 @@ trait TestHelpers {
         }
 
         match ($imgType) {
-            1 => imagegif($image, $path),
-            2 => imagejpeg($image, $path, 90),
-            3 => imagepng($image, $path),
+            1  => imagegif($image, $path),
+            2  => imagejpeg($image, $path, 90),
+            3  => imagepng($image, $path),
+            15 => imagewbmp($image, $path),
+            16 => imagexbm($image, $path),
             default => false,
         };
     }

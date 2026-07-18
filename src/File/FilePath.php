@@ -194,11 +194,10 @@ class FilePath implements DiscoveryBuilder {
 
 
     /**
-     * Generates the code
-     * @return int
+     * Collects the Paths used to generate the code
+     * @return list<array{name:string,title:string}>
      */
-    #[\Override]
-    public static function generateCode(): int {
+    public static function collectPaths(): array {
         $basePaths = [ self::Source, self::Thumbs, self::Avatars ];
         $paths     = [];
 
@@ -211,6 +210,16 @@ class FilePath implements DiscoveryBuilder {
                 "title" => Strings::upperCaseFirst($basePath),
             ];
         }
+        return $paths;
+    }
+
+    /**
+     * Generates the code
+     * @return int
+     */
+    #[\Override]
+    public static function generateCode(): int {
+        $paths = self::collectPaths();
 
         // Builds the code
         return Builder::generateCode("Path", [

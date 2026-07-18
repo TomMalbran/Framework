@@ -33,6 +33,9 @@ class ImageTest extends TestCase {
             "spaced"      => $this->tmpDir . DIRECTORY_SEPARATOR . "space image.png",
             "text"        => $this->tmpDir . DIRECTORY_SEPARATOR . "sample.txt",
             "missing"     => $this->tmpDir . DIRECTORY_SEPARATOR . "missing.png",
+            "corrupt"     => $this->tmpDir . DIRECTORY_SEPARATOR . "corrupt.png",
+            "truncated"   => $this->tmpDir . DIRECTORY_SEPARATOR . "truncated.png",
+            "oriented"    => $this->tmpDir . DIRECTORY_SEPARATOR . "oriented.jpg",
         ];
 
         $this->writeFixtureImage($this->files["gif"], 1, 30, 15);
@@ -45,6 +48,18 @@ class ImageTest extends TestCase {
         $this->writeFixtureImage($this->files["spaced"], 3, 12, 18);
 
         @file_put_contents($this->files["text"], "not an image");
+
+        // A .png file with garbage content: passes the extension checks but cannot be read
+        @file_put_contents($this->files["corrupt"], "this is not a png");
+
+        // A .png with a valid header but a truncated body: getimagesize works, imagecreatefrompng fails
+        $this->writeFixtureImage($this->files["truncated"], 3, 60, 40);
+        $pngData = (string)@file_get_contents($this->files["truncated"]);
+        @file_put_contents($this->files["truncated"], substr($pngData, 0, 40));
+
+        // A JPEG carrying an EXIF Orientation tag
+        $this->writeFixtureImage($this->files["oriented"], 2, 30, 20);
+        $this->writeExifOrientation($this->files["oriented"], 6);
 
         $GLOBALS["test_image_url_files"] = [];
         foreach ($this->files as $path) {
@@ -438,9 +453,10 @@ class ImageTest extends TestCase {
             "gif"        => [ 1, "gif", true ],
             "jpeg"       => [ 2, "jpeg", true ],
             "png"        => [ 3, "png", true ],
-            "bmp"        => [ 15, "bmp", false ],
-            "xbm"        => [ 16, "xbm", false ],
+            "bmp"        => [ 15, "bmp", true ],
+            "xbm"        => [ 16, "xbm", true ],
             "wrong_type" => [ 99, "jpeg", false ],
+            "missing"    => [ 3, "missing", false ],
         ];
     }
 
@@ -535,6 +551,140 @@ class ImageTest extends TestCase {
         ];
     }
 
+
+    #[DataProvider("providerUnreadableImage")]
+    public function testGetSizeWithUnreadableImage(string $token): void {
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::getSize($this->files[$token]),
+            suppress: true,
+        );
+        $this->assertSame([ 0, 0, 0 ], $result);
+    }
+
+    public static function providerUnreadableImage(): array {
+        return [
+            "corrupt_png" => [ "corrupt" ],
+        ];
+    }
+
+
+    public function testHasTransparencyWithUnreadableImage(): void {
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::hasTransparency($this->files["corrupt"]),
+            suppress: true,
+        );
+        $this->assertFalse($result);
+    }
+
+
+    public function testGetTextWidthWithInvalidFont(): void {
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::getTextWidth("Hello", $this->files["text"], 12),
+            suppress: true,
+        );
+        $this->assertSame(0, $result);
+    }
+
+
+    #[DataProvider("providerResampleOrientation")]
+    public function testResampleOrientation(string $token, int $orientation, bool $expected): void {
+        $dstPath = $this->tmpDir . DIRECTORY_SEPARATOR . "resampled.png";
+        $result  = Image::resample($this->files[$token], $dstPath, $orientation);
+
+        $this->assertSame($expected, $result);
+        if ($expected) {
+            $this->assertFileExists($dstPath);
+        }
+    }
+
+    public static function providerResampleOrientation(): array {
+        return [
+            "unsupported_type"    => [ "text", 1, false ],
+            "default_orientation" => [ "png", 1, true ],
+            "rotate_180"          => [ "png", 3, true ],
+        ];
+    }
+
+
+    #[DataProvider("providerResizeUnreadable")]
+    public function testResizeWithUnreadableImage(string $action): void {
+        $dstPath = $this->tmpDir . DIRECTORY_SEPARATOR . "resized-broken.png";
+        $result  = $this->runWithSuppressedWarnings(
+            fn() => Image::resize($this->files["truncated"], $dstPath, 10, 10, $action),
+            suppress: true,
+        );
+        $this->assertFalse($result);
+    }
+
+    public static function providerResizeUnreadable(): array {
+        return [
+            "resize"  => [ Image::Resize ],
+            "maximum" => [ Image::Maximum ],
+        ];
+    }
+
+
+    public function testResampleWithUnreadableImage(): void {
+        $dstPath = $this->tmpDir . DIRECTORY_SEPARATOR . "resampled-broken.png";
+        $result  = $this->runWithSuppressedWarnings(
+            fn() => Image::resample($this->files["truncated"], $dstPath, 1),
+            suppress: true,
+        );
+        $this->assertFalse($result);
+    }
+
+
+    #[DataProvider("providerGetOrientationFromExif")]
+    public function testGetOrientationFromExif(int $orientation): void {
+        $path = $this->tmpDir . DIRECTORY_SEPARATOR . "exif-$orientation.jpg";
+        $this->writeFixtureImage($path, 2, 30, 20);
+        $this->writeExifOrientation($path, $orientation);
+
+        $result = $this->runWithSuppressedWarnings(
+            fn() => Image::getOrientation($path),
+            suppress: true,
+        );
+        $this->assertSame($orientation, $result);
+    }
+
+    public static function providerGetOrientationFromExif(): array {
+        return [
+            "normal"      => [ 1 ],
+            "rotate_180"  => [ 3 ],
+            "rotate_270"  => [ 6 ],
+            "rotate_90"   => [ 8 ],
+        ];
+    }
+
+
+    public function testResizeCropWithUnreadableImage(): void {
+        $dstPath = $this->tmpDir . DIRECTORY_SEPARATOR . "cropped-broken.png";
+        $result  = $this->runWithSuppressedWarnings(
+            fn() => Image::resizeCrop($this->files["truncated"], $dstPath, 20, 20, 0, 0, 10, 10),
+            suppress: true,
+        );
+        $this->assertFalse($result);
+    }
+
+
+    /**
+     * Injects an EXIF APP1 segment with the given Orientation into a JPEG
+     */
+    private function writeExifOrientation(string $path, int $orientation): void {
+        $tiff  = "II*\x00\x08\x00\x00\x00";           // little endian, IFD0 at offset 8
+        $tiff .= "\x01\x00";                          // 1 entry
+        $tiff .= "\x12\x01";                          // tag 0x0112 (Orientation)
+        $tiff .= "\x03\x00";                          // type SHORT
+        $tiff .= "\x01\x00\x00\x00";                  // count 1
+        $tiff .= pack("v", $orientation) . "\x00\x00";
+        $tiff .= "\x00\x00\x00\x00";                  // no next IFD
+
+        $exif = "Exif\x00\x00" . $tiff;
+        $app1 = "\xFF\xE1" . pack("n", strlen($exif) + 2) . $exif;
+        $jpeg = (string)@file_get_contents($path);
+
+        @file_put_contents($path, "\xFF\xD8" . $app1 . substr($jpeg, 2));
+    }
 
     private function getFixtureUrl(string $token): string {
         $path = $this->files[$token] ?? $this->files["missing"];
