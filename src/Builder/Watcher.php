@@ -35,23 +35,7 @@ class Watcher {
             sleep(self::Interval);
 
             $currentState = self::scanDirectory($watchPath, $basePath, $ignorePatterns);
-            $fileChanged  = false;
-
-            // Check for added or modified files
-            foreach ($currentState as $file => $mtime) {
-                if (!isset($previousState[$file])) {
-                    $fileChanged = true;
-                } elseif ($previousState[$file] !== $mtime) {
-                    $fileChanged = true;
-                }
-            }
-
-            // Check for deleted files
-            foreach ($previousState as $file => $mtime) {
-                if (!isset($currentState[$file])) {
-                    $fileChanged = true;
-                }
-            }
+            $fileChanged  = self::hasChanges($previousState, $currentState);
 
             // Update the previous state
             $previousState = $currentState;
@@ -66,6 +50,32 @@ class Watcher {
             $duration = $timer->getElapsedText();
             print("\n│ $result in $duration s\n");
         }
+    }
+
+
+
+    /**
+     * Returns true if a file was added, modified or deleted between the two states
+     * @param array<string,int> $previousState
+     * @param array<string,int> $currentState
+     * @return bool
+     */
+    private static function hasChanges(array $previousState, array $currentState): bool {
+        // Check for added or modified files
+        foreach ($currentState as $file => $mtime) {
+            if (!isset($previousState[$file]) || $previousState[$file] !== $mtime) {
+                return true;
+            }
+        }
+
+        // Check for deleted files
+        foreach ($previousState as $file => $mtime) {
+            if (!isset($currentState[$file])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
