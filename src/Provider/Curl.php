@@ -92,6 +92,9 @@ class Curl {
             if ($jsonBody) {
                 $options[CURLOPT_URL]        = $url;
                 $options[CURLOPT_POSTFIELDS] = JSON::encode($params);
+            } elseif ($urlBody) {
+                $options[CURLOPT_URL]        = $url;
+                $options[CURLOPT_POSTFIELDS] = URL::parseParams($params);
             } else {
                 $options[CURLOPT_URL] = URL::addParams($url, $params);
             }
