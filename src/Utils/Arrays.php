@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Utils;
 
+use Framework\Enum\Enum;
 use Framework\Utils\Numbers;
 
 /**
@@ -970,11 +971,11 @@ class Arrays {
     public static function findIndex(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $index => $elem) {
             if (is_object($elem)) {
-                if ($elem->$idKey === $idValue) {
+                if (isset($elem->$idKey) && self::isEqualValue($elem->$idKey, $idValue)) {
                     return $index;
                 }
             } elseif (is_array($elem)) {
-                if (isset($elem[$idKey]) && $elem[$idKey] === $idValue) {
+                if (isset($elem[$idKey]) && self::isEqualValue($elem[$idKey], $idValue)) {
                     return $index;
                 }
             }
@@ -1004,11 +1005,11 @@ class Arrays {
     public static function findValue(array $array, string $idKey, mixed $idValue): mixed {
         foreach ($array as $elem) {
             if (is_object($elem)) {
-                if (isset($elem->$idKey) && $elem->$idKey === $idValue) {
+                if (isset($elem->$idKey) && self::isEqualValue($elem->$idKey, $idValue)) {
                     return $elem;
                 }
             } elseif (is_array($elem)) {
-                if (isset($elem[$idKey]) && $elem[$idKey] === $idValue) {
+                if (isset($elem[$idKey]) && self::isEqualValue($elem[$idKey], $idValue)) {
                     return $elem;
                 }
             }
@@ -1028,17 +1029,30 @@ class Arrays {
         $result = [];
         foreach ($array as $elem) {
             if (is_object($elem)) {
-                if (isset($elem->$idKey) && $elem->$idKey === $idValue) {
+                if (isset($elem->$idKey) && self::isEqualValue($elem->$idKey, $idValue)) {
                     $result[] = $elem;
                 }
             } elseif (is_array($elem)) {
-                if (isset($elem[$idKey]) && $elem[$idKey] === $idValue) {
+                if (isset($elem[$idKey]) && self::isEqualValue($elem[$idKey], $idValue)) {
                     $result[] = $elem;
                 }
             }
         }
         // @phpstan-ignore return.type
         return $result;
+    }
+
+    /**
+     * Returns true if the two Values are equal, comparing Enums by their string
+     * @param mixed $value
+     * @param mixed $other
+     * @return bool
+     */
+    private static function isEqualValue(mixed $value, mixed $other): bool {
+        if ($value instanceof Enum || $other instanceof Enum) {
+            return Strings::toString($value) === Strings::toString($other);
+        }
+        return $value === $other;
     }
 
 

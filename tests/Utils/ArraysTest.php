@@ -1,10 +1,27 @@
 <?php
 namespace Tests\Utils;
 
+use Framework\Enum\Enum;
+use Framework\Enum\IsEnum;
 use Framework\Utils\Arrays;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+enum TestArraysStatus: string implements Enum {
+    use IsEnum;
+
+    case None   = "";
+    case Active = "active";
+    case Closed = "closed";
+}
+
+enum TestArraysOther: string implements Enum {
+    use IsEnum;
+
+    case None   = "";
+    case Active = "active";
+}
 
 class ArraysTest extends TestCase {
 
@@ -985,8 +1002,11 @@ class ArraysTest extends TestCase {
     }
 
     public static function providerFindIndex(): array {
-        $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
-        $assoc   = [ "a" => [ "id" => 1 ], "b" => [ "id" => 2 ] ];
+        $rowsObj  = [(object)[ "id" => 1 ], (object)[ "id" => 2 ]];
+        $assoc    = [ "a" => [ "id" => 1 ], "b" => [ "id" => 2 ] ];
+        $enumRows = [[ "st" => TestArraysStatus::Active ], [ "st" => TestArraysStatus::Closed ]];
+        $strRows  = [[ "st" => "active" ], [ "st" => "closed" ]];
+        $enumObjs = [(object)[ "st" => TestArraysStatus::Active ], (object)[ "st" => TestArraysStatus::Closed ]];
         return [
             "simple_found_at_first"         => [ [[ "id" => 1 ]], "id", 1, 0 ],
             "not_found_empty_input"         => [ [], "id", 1, -1 ],
@@ -995,6 +1015,19 @@ class ArraysTest extends TestCase {
             "missing_key_returns_minus_one" => [ [[ "no" => 1 ]], "id", 1, -1 ],
             "strict_comparison_no_match"    => [ [[ "id" => "1" ]], "id", 1, -1 ],
             "assoc_array_returns_key"       => [ $assoc, "id", 2, "b" ],
+            "object_row_missing_key"        => [ [(object)[ "no" => 1 ]], "id", 1, -1 ],
+
+            // Enums are compared by their string value
+            "enum_row_and_enum_value"       => [ $enumRows, "st", TestArraysStatus::Closed, 1 ],
+            "enum_row_and_string_value"     => [ $enumRows, "st", "closed", 1 ],
+            "string_row_and_enum_value"     => [ $strRows, "st", TestArraysStatus::Closed, 1 ],
+            "enum_object_row"               => [ $enumObjs, "st", "closed", 1 ],
+            "enum_row_no_match"             => [ $enumRows, "st", "missing", -1 ],
+            // Any Enum with the same string matches, even from another Enum
+            "enum_from_another_enum"        => [ $enumRows, "st", TestArraysOther::Active, 0 ],
+            // The None case stringifies to an empty string
+            "enum_none_no_match"            => [ $enumRows, "st", TestArraysStatus::None, -1 ],
+            "enum_none_matches_empty"       => [ [[ "st" => "" ]], "st", TestArraysStatus::None, 0 ],
         ];
     }
 
@@ -1013,6 +1046,12 @@ class ArraysTest extends TestCase {
             "missing_key"            => [ [[ "no" => 1 ]], "id", 1, false ],
             "strict_comparison"      => [ [[ "id" => "1" ]], "id", 1, false ],
             "duplicates_handled"     => [ [[ "id" => 2 ], [ "id" => 2 ]], "id", 2, true ],
+
+            // Enums are compared by their string value
+            "enum_row_string_value"  => [ [[ "st" => TestArraysStatus::Active ]], "st", "active", true ],
+            "enum_row_enum_value"    => [ [[ "st" => TestArraysStatus::Active ]], "st", TestArraysStatus::Active, true ],
+            "string_row_enum_value"  => [ [[ "st" => "active" ]], "st", TestArraysStatus::Active, true ],
+            "enum_row_no_match"      => [ [[ "st" => TestArraysStatus::Active ]], "st", "closed", false ],
         ];
     }
 
@@ -1023,8 +1062,12 @@ class ArraysTest extends TestCase {
     }
 
     public static function providerFindValue(): array {
-        $rowsObj = [(object)[ "id" => 1, "x" => 9 ], (object)[ "id" => 2, "x" => 8 ]];
-        $assoc   = [ "a" => [ "id" => 1, "x" => 9 ], "b" => [ "id" => 2, "x" => 8 ] ];
+        $rowsObj  = [(object)[ "id" => 1, "x" => 9 ], (object)[ "id" => 2, "x" => 8 ]];
+        $assoc    = [ "a" => [ "id" => 1, "x" => 9 ], "b" => [ "id" => 2, "x" => 8 ] ];
+        $enumRows = [
+            [ "st" => TestArraysStatus::Active, "n" => 1 ],
+            [ "st" => TestArraysStatus::Closed, "n" => 2 ],
+        ];
         return [
             "simple_found_at_first"  => [ [[ "id" => 1, "x" => 9 ], [ "id" => 2, "x" => 8 ]], "id", 1, [ "id" => 1, "x" => 9 ] ],
             "works_with_object_rows" => [ $rowsObj, "id", 2, $rowsObj[1] ],
@@ -1033,6 +1076,11 @@ class ArraysTest extends TestCase {
             "strict_comparison"      => [ [[ "id" => "1" ]], "id", 1, null ],
             "multiple_matches"       => [ [[ "id" => 2, "x" => 1 ], [ "id" => 2, "x" => 2 ]], "id", 2, [ "id" => 2, "x" => 1 ] ],
             "assoc_array"            => [ $assoc, "id", 2, $assoc["b"] ],
+
+            // Enums are compared by their string value
+            "enum_row_string_value"  => [ $enumRows, "st", "closed", $enumRows[1] ],
+            "enum_row_enum_value"    => [ $enumRows, "st", TestArraysStatus::Active, $enumRows[0] ],
+            "enum_row_no_match"      => [ $enumRows, "st", "missing", null ],
         ];
     }
 
@@ -1043,8 +1091,13 @@ class ArraysTest extends TestCase {
     }
 
     public static function providerFindValues(): array {
-        $rowsObj = [(object)[ "id" => 1 ], (object)[ "id" => 2 ], (object)[ "id" => 1 ]];
-        $assoc   = [ "a" => [ "id" => 1 ], "b" => [ "id" => 1 ] ];
+        $rowsObj  = [(object)[ "id" => 1 ], (object)[ "id" => 2 ], (object)[ "id" => 1 ]];
+        $assoc    = [ "a" => [ "id" => 1 ], "b" => [ "id" => 1 ] ];
+        $enumRows = [
+            [ "st" => TestArraysStatus::Active, "n" => 1 ],
+            [ "st" => TestArraysStatus::Closed, "n" => 2 ],
+            [ "st" => TestArraysStatus::Active, "n" => 3 ],
+        ];
         return [
             "simple_multiple_matches"    => [ [[ "id" => 1 ], [ "id" => 1 ], [ "id" => 2 ]], "id", 1, [[ "id" => 1 ], [ "id" => 1 ]] ],
             "objects_preserved"          => [ $rowsObj, "id", 1, [ $rowsObj[0], $rowsObj[2] ] ],
@@ -1052,6 +1105,11 @@ class ArraysTest extends TestCase {
             "rows_missing_key"           => [ [[ "no" => 1 ], [ "id" => 1 ]], "id", 1, [[ "id" => 1 ]] ],
             "strict_comparison_no_match" => [ [[ "id" => "1" ]], "id", 1, [] ],
             "assoc_array"                => [ $assoc, "id", 1, [ $assoc["a"], $assoc["b"] ] ],
+
+            // Enums are compared by their string value
+            "enum_rows_string_value"     => [ $enumRows, "st", "active", [ $enumRows[0], $enumRows[2] ] ],
+            "enum_rows_enum_value"       => [ $enumRows, "st", TestArraysStatus::Active, [ $enumRows[0], $enumRows[2] ] ],
+            "enum_rows_no_match"         => [ $enumRows, "st", "missing", [] ],
         ];
     }
 
