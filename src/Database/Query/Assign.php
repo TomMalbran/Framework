@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Database\Query;
 
+use Framework\Database\Type\Column;
 use Framework\Utils\Strings;
 
 /**
@@ -105,11 +106,14 @@ class Assign {
     }
 
     /**
-     * Assigns the Greatest between the Field value and another value
-     * @param int $value
+     * Assigns the Greatest between the Field value and another value or Column
+     * @param Column|int $value
      * @return Assign
      */
-    public static function greatest(int $value): Assign {
+    public static function greatest(Column|int $value): Assign {
+        if ($value instanceof Column) {
+            return new Assign("GREATEST(`__FIELD__`, `{$value->base()}`)");
+        }
         return new Assign("GREATEST(`__FIELD__`, ?)", [ $value ]);
     }
 
