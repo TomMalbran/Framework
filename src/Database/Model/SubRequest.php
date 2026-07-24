@@ -20,6 +20,8 @@ class SubRequest {
     public string $fieldName = "";
     public string $valueName = "";
     public string $query     = "";
+    public string $orderBy   = "";
+    public bool   $orderAsc  = true;
 
 
     /**
@@ -29,6 +31,8 @@ class SubRequest {
      * @param string            $fieldName Optional.
      * @param string            $valueName Optional.
      * @param string            $query     Optional.
+     * @param string            $orderBy   Optional.
+     * @param bool              $orderAsc  Optional.
      */
     public function __construct(
         ?string $modelName = null,
@@ -36,12 +40,16 @@ class SubRequest {
         string $fieldName = "",
         string $valueName = "",
         string $query = "",
+        string $orderBy = "",
+        bool $orderAsc = true,
     ) {
         $this->modelName = SchemaModel::getBaseModelName($modelName);
         $this->idName    = $idName;
         $this->fieldName = $fieldName;
         $this->valueName = $valueName;
         $this->query     = $query;
+        $this->orderBy   = $orderBy;
+        $this->orderAsc  = $orderAsc;
     }
 
 
@@ -66,6 +74,8 @@ class SubRequest {
      * @param string      $fieldName
      * @param string      $valueName
      * @param string      $query
+     * @param string      $orderBy     Optional.
+     * @param bool        $orderAsc    Optional.
      * @return SubRequest
      */
     public static function create(
@@ -76,8 +86,10 @@ class SubRequest {
         string $fieldName,
         string $valueName,
         string $query,
+        string $orderBy = "",
+        bool $orderAsc = true,
     ): SubRequest {
-        $result = new self(null, $idName, $fieldName, $valueName, $query);
+        $result = new self(null, $idName, $fieldName, $valueName, $query, $orderBy, $orderAsc);
         $result->schemaModel = $schemaModel;
         $result->name        = $name;
         $result->idDbName    = $idDbName;
@@ -243,7 +255,9 @@ class SubRequest {
                 $isDeleted = $this->schemaModel->getKey("isDeleted");
                 $query->where($isDeleted, Operator::Equal, 0);
             }
-            if ($this->schemaModel->hasPositions) {
+            if ($this->orderBy !== "") {
+                $query->orderBy($this->orderBy, isASC: $this->orderAsc);
+            } elseif ($this->schemaModel->hasPositions) {
                 $positionKey = $this->schemaModel->getKey($this->schemaModel->positionName);
                 $query->orderBy($positionKey, isASC: true);
             }
@@ -288,6 +302,8 @@ class SubRequest {
             "fieldName"   => $this->fieldName,
             "valueName"   => $this->valueName,
             "query"       => $this->query,
+            "orderBy"     => $this->orderBy,
+            "orderAsc"    => $this->orderAsc,
         ];
     }
 }
