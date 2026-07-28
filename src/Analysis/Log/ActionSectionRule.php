@@ -5,40 +5,38 @@ use Framework\Log\Attr\Action;
 use Framework\Log\Attr\Section;
 
 use PHPStan\Analyser\Scope;
+use PHPStan\Node\InClassNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\IdentifierRuleError;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
 
 /**
  * The Action Section Rule
- * @implements Rule<Class_>
+ * @implements Rule<InClassNode>
  */
 class ActionSectionRule implements Rule {
 
     /**
      * Returns the type of node this rule is interested in
-     * @return class-string<Class_>
+     * @return class-string<InClassNode>
      */
     #[\Override]
     public function getNodeType(): string {
-        return Class_::class;
+        return InClassNode::class;
     }
 
     /**
      * Processes the node and returns an array of errors if any
-     * @param Class_ $node
-     * @param Scope  $scope
+     * @param InClassNode $node
+     * @param Scope       $scope
      * @return list<IdentifierRuleError>
      */
     #[\Override]
     public function processNode(Node $node, Scope $scope): array {
-        $classReflection = $scope->getClassReflection();
-        if ($classReflection === null) {
-            return [];
-        }
+        $classReflection = $node->getClassReflection();
+        $classLine       = $node->getOriginalNode()->getStartLine();
 
         $className   = $classReflection->getName();
         $nativeClass = $classReflection->getNativeReflection();
@@ -55,7 +53,7 @@ class ActionSectionRule implements Rule {
             }
 
             $methodStartLine = $method->getStartLine();
-            $actionLine      = $node->getStartLine();
+            $actionLine      = $classLine;
             if ($methodStartLine !== false) {
                 $actionLine = $methodStartLine;
             }
@@ -69,7 +67,7 @@ class ActionSectionRule implements Rule {
                 RuleErrorBuilder::message(
                     "Class {$className} has a #[Section] but no method with #[Action]."
                 )
-                    ->line($node->getStartLine())
+                    ->line($classLine)
                     ->identifier("framework.actionSection")
                     ->build(),
             ];

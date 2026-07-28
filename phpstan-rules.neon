@@ -11,10 +11,15 @@ rules:
     - Framework\Analysis\Route\RouteDuplicateRule
     - Framework\Analysis\Signal\ListenerReturnVoidRule
     - Framework\Analysis\Log\ActionSectionRule
+    - Framework\Analysis\Log\SectionDuplicateRule
 
 services:
     -
         class: Framework\Analysis\Route\RoutePathCollector
+        tags:
+            - phpstan.collector
+    -
+        class: Framework\Analysis\Log\SectionNameCollector
         tags:
             - phpstan.collector
     -
