@@ -85,13 +85,13 @@ class ServerTest extends TestCase {
 
 
     #[DataProvider("providerGetPayload")]
-    public function testGetPayload(array $request, ?string $input, array $expected): void {
+    public function testGetPayload(array $request, ?string $input, bool $withRequest, array $expected): void {
         $_REQUEST = $request;
         if ($input !== null) {
             global $test_file_get_contents;
             $test_file_get_contents = $input;
         }
-        $payload = Server::getPayload();
+        $payload = Server::getPayload($withRequest);
         foreach ($expected as $key => $value) {
             $this->assertEquals($value, $payload->getString($key));
         }
@@ -99,8 +99,12 @@ class ServerTest extends TestCase {
 
     public static function providerGetPayload(): array {
         return [
-            "request_data" => [ [ "a" => "1", "b" => "2" ], null, [ "a" => "1", "b" => "2" ] ],
-            "json_input"   => [ [], '{"x":"y","num":123}', [ "x" => "y", "num" => "123" ] ],
+            "request_data"           => [ [ "a" => "1", "b" => "2" ], null, true, [ "a" => "1", "b" => "2" ] ],
+            "json_input"             => [ [], '{"x":"y","num":123}', true, [ "x" => "y", "num" => "123" ] ],
+            // Without the request, the $_REQUEST data is ignored
+            "without_request"        => [ [ "a" => "1", "b" => "2" ], null, false, [ "a" => "", "b" => "" ] ],
+            // The JSON payload still applies when the request is excluded
+            "without_request_json"   => [ [ "a" => "1" ], '{"x":"y"}', false, [ "x" => "y", "a" => "" ] ],
         ];
     }
 

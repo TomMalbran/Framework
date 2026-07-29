@@ -58,10 +58,11 @@ class Server {
 
     /**
      * Returns the current Payload
+     * @param bool $withRequest Optional.
      * @return Dictionary
      */
-    public static function getPayload(): Dictionary {
-        $data    = new Dictionary($_REQUEST);
+    public static function getPayload(bool $withRequest = true): Dictionary {
+        $data    = new Dictionary($withRequest ? $_REQUEST : null);
         $payload = file_get_contents("php://input");
         if ($payload !== false && $payload !== "" && JSON::isValid($payload)) {
             $data = JSON::decodeAsDictionary($payload);

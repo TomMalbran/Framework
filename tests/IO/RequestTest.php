@@ -54,6 +54,7 @@ class RequestTest extends TestCase {
     protected function tearDown(): void {
         $_REQUEST = [];
         $_FILES = [];
+        unset($GLOBALS["test_file_get_contents"]);
     }
 
 
@@ -70,6 +71,37 @@ class RequestTest extends TestCase {
         return [
             "with_request"  => [ [ "a" => 1, "b" => "x" ], [ [[ "a" ], 1], [[ "b" ], "x" ] ]],
             "empty_request" => [ [], [ [[ "missing" ], "" ]]],
+        ];
+    }
+
+
+    #[DataProvider("providerAddPayload")]
+    public function testAddPayload(array $input, array $requestGlobal, ?string $payload, array $expected): void {
+        $_REQUEST = $requestGlobal;
+        if ($payload !== null) {
+            global $test_file_get_contents;
+            $test_file_get_contents = $payload;
+        }
+
+        $request = new Request($input);
+        $result  = $request->addPayload();
+
+        // The same instance is returned so it can be chained
+        $this->assertSame($request, $result);
+        foreach ($expected as $key => $value) {
+            $this->assertSame($value, $result->getString($key));
+        }
+    }
+
+    public static function providerAddPayload(): array {
+        return [
+            "merges_into_empty"  => [ [], [], '{"x":"y"}', [ "x" => "y" ] ],
+            "keeps_existing"     => [ [ "a" => "1" ], [], '{"x":"y"}', [ "a" => "1", "x" => "y" ] ],
+            "payload_overrides"  => [ [ "a" => "1" ], [], '{"a":"2"}', [ "a" => "2" ] ],
+            // The payload uses getPayload(withRequest: false), so $_REQUEST is ignored
+            "ignores_request"    => [ [ "a" => "1" ], [ "r" => "z" ], '{"x":"y"}', [ "a" => "1", "x" => "y", "r" => "" ] ],
+            // Without a JSON payload the request is left unchanged
+            "no_payload"         => [ [ "a" => "1" ], [ "r" => "z" ], null, [ "a" => "1", "r" => "" ] ],
         ];
     }
 

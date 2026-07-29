@@ -9,6 +9,7 @@ use Framework\Utils\Arrays;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
+use Framework\Utils\Server;
 use Framework\Utils\Strings;
 
 use ArrayIterator;
@@ -40,6 +41,19 @@ class Request implements IteratorAggregate, JsonSerializable {
         } else {
             $this->request = $request;
         }
+    }
+
+    /**
+     * Adds the Payload to the request data
+     * @return Request
+     */
+    public function addPayload(): Request {
+        $payload = Server::getPayload(withRequest: false);
+        $this->request = array_merge(
+            $this->request,
+            $payload->toStringMixedMap(),
+        );
+        return $this;
     }
 
 

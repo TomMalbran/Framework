@@ -4,7 +4,9 @@ namespace Framework;
 use Framework\IO\Request;
 use Framework\IO\Response;
 use Framework\Auth\Auth;
+use Framework\Intl\NLS;
 use Framework\Log\ErrorLog;
+use Framework\System\Access;
 use Framework\System\Router;
 use Framework\Utils\Dictionary;
 use Framework\Utils\JSON;
@@ -70,6 +72,11 @@ class Framework {
             );
         }
 
+        // The API can send the content as a JSON payload
+        if (Auth::hasAPI()) {
+            $request->addPayload();
+        }
+
         // Perform the Request
         try {
             $response = self::request($route, $request);
@@ -101,28 +108,47 @@ class Framework {
     private static function request(string $route, Request $request): Response {
         // The Route doesn't exist
         if (!Router::has($route)) {
-            return Response::error("GENERAL_ERROR_PATH");
+            return self::errorResponse("GENERAL_ERROR_PATH");
         }
 
         // Grab the Access Name for the given Route
         $accessName = Router::getAccessName($route);
+        $isAPI      = Access::isValidAPI($accessName);
 
         // The route requires login and the user is Logged Out
         if (Auth::requiresLogin($accessName)) {
+            if ($isAPI) {
+                return self::errorResponse("GENERAL_ERROR_AUTH", isAPI: true);
+            }
             return Response::logout();
         }
 
         // The Provided Access Name is lower than the Required One
         if (!Auth::grant($accessName)) {
-            return Response::error("GENERAL_ERROR_PATH");
+            return self::errorResponse("GENERAL_ERROR_PATH");
         }
 
         // Perform the Request
         $response = Router::call($route, $request);
 
-        // Add the Token and return the Response
-        $response->addTokens(Auth::getAccessToken(), Auth::getRefreshToken());
+        // Add the Tokens, the API doesn't use them
+        if (!Auth::hasAPI()) {
+            $response->addTokens(Auth::getAccessToken(), Auth::getRefreshToken());
+        }
         return $response;
+    }
+
+    /**
+     * Creates an Error Response using the translated text for the API
+     * @param string $error
+     * @param bool   $isAPI Optional.
+     * @return Response
+     */
+    private static function errorResponse(string $error, bool $isAPI = false): Response {
+        if ($isAPI || Auth::hasAPI()) {
+            return Response::result([ "error" => NLS::getString($error) ]);
+        }
+        return Response::error($error);
     }
 
     /**
