@@ -19,9 +19,15 @@
             }
         },
         "^DATE_[A-Z][A-Z_]*[A-Z]$" : {
-            "type"  : [ "string", "array" ],
+            "type"  : [ "string", "array", "object" ],
             "items" : {
                 "type" : "string"
+            },
+            "additionalProperties" : false,
+            "patternProperties" : {
+                "\\d" : {
+                    "type" : "string"
+                }
             }
         },
         "^(?!SELECT_|DATE_)[A-Z][A-Z_]*[A-Z]$" : {
