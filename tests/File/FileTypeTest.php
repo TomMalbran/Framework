@@ -348,6 +348,36 @@ class FileTypeTest extends TestCase {
     }
 
 
+    #[DataProvider("providerGetMimeType")]
+    public function testGetMimeType(string $input, string $expected): void {
+        $this->assertSame($expected, FileType::getMimeType($input));
+    }
+
+    public static function providerGetMimeType(): array {
+        return [
+            "jpg"            => [ "photo.jpg", "image/jpeg" ],
+            "jpeg"           => [ "photo.jpeg", "image/jpeg" ],
+            "png"            => [ "image.png", "image/png" ],
+            "svg"            => [ "vector.svg", "image/svg+xml" ],
+            "ico"            => [ "favicon.ico", "image/x-icon" ],
+            "pdf"            => [ "doc.pdf", "application/pdf" ],
+            "docx"           => [ "report.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ],
+            "csv"            => [ "data.csv", "text/csv" ],
+            "json"           => [ "config.json", "application/json" ],
+            "zip"            => [ "archive.zip", "application/zip" ],
+            "mp4"            => [ "movie.mp4", "video/mp4" ],
+            "mp3"            => [ "song.mp3", "audio/mpeg" ],
+            // The extension is matched case-insensitively
+            "uppercase_ext"  => [ "PHOTO.JPG", "image/jpeg" ],
+            "path_with_dirs" => [ "uploads/2024/image.PNG", "image/png" ],
+            // Unknown or missing extensions return an empty string
+            "unknown_ext"    => [ "file.xyz", "" ],
+            "no_extension"   => [ "README", "" ],
+            "empty_name"     => [ "", "" ],
+        ];
+    }
+
+
     #[DataProvider("providerGetExtension")]
     public function testGetExtension(string $input, string $expected): void {
         $this->assertSame($expected, FileType::getExtension($input));
