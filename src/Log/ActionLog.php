@@ -4,6 +4,8 @@ namespace Framework\Log;
 use Framework\Auth\Auth;
 use Framework\Database\Query\Operator;
 use Framework\Log\SessionLog;
+use Framework\Log\Type\Sec;
+use Framework\Log\Type\Act;
 use Framework\Log\Type\LogIntl;
 use Framework\Log\Schema\LogActionSchema;
 use Framework\Log\Schema\LogActionRequest;
@@ -15,6 +17,7 @@ use Framework\Date\Date;
 use Framework\Utils\Arrays;
 use Framework\Utils\JSON;
 use Framework\Utils\Numbers;
+use Framework\Utils\Strings;
 
 /**
  * The Actions Log
@@ -176,15 +179,15 @@ class ActionLog extends LogActionSchema {
 
     /**
      * Logs the given Action
-     * @param string    $module
-     * @param string    $action
-     * @param mixed|int $dataID       Optional.
-     * @param int       $credentialID Optional.
+     * @param Sec|string $section
+     * @param Act|string $action
+     * @param mixed|int  $dataID       Optional.
+     * @param int        $credentialID Optional.
      * @return bool
      */
     public static function add(
-        string $module,
-        string $action,
+        Sec|string $section,
+        Act|string $action,
         mixed $dataID = 0,
         int $credentialID = 0,
     ): bool {
@@ -203,8 +206,8 @@ class ActionLog extends LogActionSchema {
             sessionID:    $sessionID,
             credentialID: $credentialID,
             currentUser:  Auth::getUserID(),
-            module:       $module,
-            action:       $action,
+            module:       Strings::toString($section),
+            action:       Strings::toString($action),
             dataID:       JSON::encode($dataID),
         );
         return true;
