@@ -6,6 +6,8 @@ use Framework\Provider\Type\CurlMethod;
 use Framework\Provider\Type\OpenAIOutput;
 use Framework\System\Config;
 use Framework\Date\Timer;
+use Framework\File\File;
+use Framework\File\Storage;
 use Framework\Utils\Dictionary;
 use Framework\Utils\Strings;
 
@@ -18,6 +20,35 @@ class OpenAI {
 
     private const BaseUrl = "https://api.openai.com/v1";
 
+    /** The Api Key to use in the next request, instead of the one in the config */
+    private static string $tempApiKey = "";
+
+
+
+    /**
+     * Sets the Api Key to use in the next request, instead of the one in the config.
+     * It is removed once that request is done, so it can not affect the other ones
+     * @param string $apiKey
+     * @return void
+     */
+    public static function setTempApiKey(string $apiKey): void {
+        self::$tempApiKey = $apiKey;
+    }
+
+    /**
+     * Returns the Api Key to use in the request, consuming the temporal one
+     * @return string
+     */
+    private static function getApiKey(): string {
+        if (self::$tempApiKey !== "") {
+            $apiKey = self::$tempApiKey;
+            self::$tempApiKey = "";
+            return $apiKey;
+        }
+        return Config::getOpenAiKey();
+    }
+
+
 
     /**
      * Does a GET Request
@@ -27,7 +58,7 @@ class OpenAI {
      */
     private static function get(string $route, ?array $request = null): Dictionary {
         $response = Curl::execute(CurlMethod::GET, self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . Config::getOpenAiKey(),
+            "Authorization" => "Bearer " . self::getApiKey(),
         ], jsonResponse: true);
         return new Dictionary($response);
     }
@@ -44,7 +75,7 @@ class OpenAI {
             url:     self::BaseUrl . $route,
             params:  $request,
             headers: [
-                "Authorization" => "Bearer " . Config::getOpenAiKey(),
+                "Authorization" => "Bearer " . self::getApiKey(),
                 "Content-Type"  => "application/json",
             ],
             jsonBody:     true,
@@ -62,7 +93,7 @@ class OpenAI {
      */
     private static function upload(string $route, ?array $request = null): Dictionary {
         $response = Curl::execute(CurlMethod::POST, self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . Config::getOpenAiKey(),
+            "Authorization" => "Bearer " . self::getApiKey(),
             "Content-Type"  => "multipart/form-data",
         ], jsonResponse: true);
         return new Dictionary($response);
@@ -76,7 +107,7 @@ class OpenAI {
      */
     private static function delete(string $route, ?array $request = null): Dictionary {
         $response = Curl::execute(CurlMethod::DELETE, self::BaseUrl . $route, $request, [
-            "Authorization" => "Bearer " . Config::getOpenAiKey(),
+            "Authorization" => "Bearer " . self::getApiKey(),
             "Content-Type"  => "application/json",
         ], jsonResponse: true);
         return new Dictionary($response);
@@ -365,8 +396,9 @@ class OpenAI {
 
 
         // Perform the Request
-        $response = self::post("/chat/completions", $params);
-        $result   = new OpenAIOutput($response);
+        $route    = "/chat/completions";
+        $response = self::post($route, $params);
+        $result   = new OpenAIOutput($response, url: self::BaseUrl, route: $route);
 
         // Check for errors
         if ($result->error !== "") {
@@ -392,14 +424,39 @@ class OpenAI {
     }
 
     /**
+     * Returns the given Image as a base64 data url, to be sent in a Response
+     * @param File $image
+     * @return string
+     */
+    private static function getImageDataUrl(File $image): string {
+        $filePath = $image->getTmpName();
+        if ($filePath === "" || !Storage::fileExists($filePath)) {
+            return "";
+        }
+
+        $content = Storage::readFile($filePath);
+        if ($content === "") {
+            return "";
+        }
+
+        $fileType = $image->getType();
+        if ($fileType === "") {
+            $fileType = "image/jpeg";
+        }
+        return "data:$fileType;base64," . base64_encode($content);
+    }
+
+    /**
      * Creates a Response and returns the Result
      * @param string                                  $model
      * @param string                                  $prompt
      * @param list<array{role:string,content:string}> $context          Optional.
      * @param Dictionary|null                         $schema           Optional.
+     * @param list<File>                              $images           Optional.
      * @param string                                  $vectorStoreID    Optional.
      * @param bool                                    $allowWebSearch   Optional.
      * @param string                                  $allowedDomain    Optional.
+     * @param bool                                    $store            Optional.
      * @param bool                                    $removeReferences Optional.
      * @return OpenAIOutput
      */
@@ -408,18 +465,42 @@ class OpenAI {
         string $prompt,
         array $context = [],
         ?Dictionary $schema = null,
+        array $images = [],
         string $vectorStoreID = "",
         bool $allowWebSearch = false,
         string $allowedDomain = "",
+        bool $store = true,
         bool $removeReferences = true,
     ): OpenAIOutput {
-        $timer  = new Timer();
+        $timer = new Timer();
+
+        // With Images the content has to be sent as a list of parts
+        $content = $prompt;
+        if (count($images) > 0) {
+            $content = [
+                [
+                    "type" => "input_text",
+                    "text" => $prompt,
+                ],
+            ];
+            foreach ($images as $image) {
+                $dataUrl = self::getImageDataUrl($image);
+                if ($dataUrl !== "") {
+                    $content[] = [
+                        "type"      => "input_image",
+                        "image_url" => $dataUrl,
+                    ];
+                }
+            }
+        }
+
         $params = [
             "model" => $model,
+            "store" => $store,
             "input" => array_merge($context, [
                 [
                     "role"    => "user",
-                    "content" => $prompt,
+                    "content" => $content,
                 ],
             ]),
         ];
@@ -469,8 +550,9 @@ class OpenAI {
 
 
         // Perform the Request
-        $response = self::post("/responses", $params);
-        $result   = new OpenAIOutput($response);
+        $route    = "/responses";
+        $response = self::post($route, $params);
+        $result   = new OpenAIOutput($response, url: self::BaseUrl, route: $route);
 
         // Check for errors
         if ($result->error !== "") {

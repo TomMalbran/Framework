@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Provider\Type;
 
+use Framework\Provider\Type\CurlMethod;
 use Framework\Utils\Dictionary;
 
 /**
@@ -11,6 +12,11 @@ class OpenAIOutput {
     public Dictionary $response;
 
     public string $error         = "";
+
+    public string $url           = "";
+    public string $route         = "";
+
+    public CurlMethod $method    = CurlMethod::POST;
 
     public string $externalID    = "";
     public string $vectorStoreID = "";
@@ -28,17 +34,24 @@ class OpenAIOutput {
 
 
     /**
-     * Creates a Basic Output
+     * Creates a Basic Output.
+     * The method is always the same for now, so it is not given
      * @param Dictionary $response
      * @param string     $error    Optional.
+     * @param string     $url      Optional.
+     * @param string     $route    Optional.
      */
     public function __construct(
         Dictionary $response,
         string $error = "",
+        string $url = "",
+        string $route = "",
     ) {
         $this->response   = $response;
         $this->externalID = $response->getString("id");
         $this->error      = $error;
+        $this->url        = $url;
+        $this->route      = $route;
 
         if ($error === "" && $response->hasValue("error")) {
             $error = $response->get("error");
