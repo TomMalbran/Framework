@@ -272,8 +272,12 @@ class Configs implements DiscoveryBuilder {
             return Builder::generateCode("Config");
         }
 
+        // The "local" Environment is always generated, so it is skipped here
         $environments = [];
         foreach (self::getEnvironments() as $environment) {
+            if ($environment === "local") {
+                continue;
+            }
             $environments[] = [
                 "name"        => Strings::upperCaseFirst($environment),
                 "environment" => $environment,
