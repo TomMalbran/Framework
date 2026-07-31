@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore  josé, MCDONALD, O'CONNOR, OCONNOR, Oconnor
 namespace Tests\Utils;
 
 use Framework\Utils\Utils;
@@ -80,6 +81,43 @@ class UtilsTest extends TestCase {
             "last_name_first_space" => [ "Doe Smith John", true, " ", [ "Smith John", "Doe" ] ],
             "custom_separator"      => [ "Last|First Middle", true, "|", [ "First Middle", "Last" ] ],
             "single_name"           => [ "Single", false, " ", [ "Single", "" ] ],
+        ];
+    }
+
+
+    #[DataProvider("providerParseNameCase")]
+    public function testParseNameCase(string $name, string $expected): void {
+        $this->assertSame($expected, Utils::parseNameCase($name));
+    }
+
+    public static function providerParseNameCase(): array {
+        return [
+            "upper_to_title"       => [ "JOHN SMITH", "John Smith" ],
+            "already_title"        => [ "John Smith", "John Smith" ],
+            "empty"                => [ "", "" ],
+            "only_spaces"          => [ "   ", "" ],
+            "trims_and_collapses"  => [ "  extra   spaces  ", "Extra Spaces" ],
+            "keeps_accents"        => [ "josé maría garcía", "José María García" ],
+
+            // The particles of compound surnames are kept in lower case
+            "particles_lowercased" => [ "juan de la cruz", "Juan de la Cruz" ],
+            "van_der_particles"    => [ "luis van der berg", "Luis van der Berg" ],
+            // A leading particle is capitalized, since it is the surname itself
+            "leading_particle"     => [ "DE LA CRUZ", "De la Cruz" ],
+            "leading_particle_los" => [ "LOS ANGELES", "Los Angeles" ],
+
+            // The Mc surnames capitalize the letter after the prefix
+            "mc_surname"           => [ "PETER MCDONALD", "Peter McDonald" ],
+            "mc_leading"           => [ "OLD MCDONALD", "Old McDonald" ],
+            "mc_too_short"         => [ "MC", "Mc" ],
+
+            // A short prefix before an apostrophe capitalizes what follows
+            "apostrophe_o"         => [ "SEAN O'CONNOR", "Sean O'Connor" ],
+            "apostrophe_d"         => [ "GIOVANNI D'ANGELO", "Giovanni D'Angelo" ],
+            // A long prefix before an apostrophe is left as title case
+            "long_apostrophe"      => [ "MARIA DELL'ORTO", "Maria Dell'orto" ],
+            // Without an apostrophe there is no special handling
+            "no_apostrophe"        => [ "SEAN OCONNOR", "Sean Oconnor" ],
         ];
     }
 

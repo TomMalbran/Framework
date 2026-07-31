@@ -1,4 +1,5 @@
 <?php
+// spell-checker: ignore  delle
 namespace Framework\Utils;
 
 use Framework\Utils\Strings;
@@ -92,6 +93,57 @@ class Utils {
             $lastName  = "";
         }
         return [ $firstName, $lastName ];
+    }
+
+    /**
+     * Parses a Name into Title Case, as the documents print them in upper case.
+     * The particles are kept in lower case, unless the Name starts with one,
+     * and the Mc and the letter prefixes before an apostrophe are respected
+     * @param string $name
+     * @return string
+     */
+    public static function parseNameCase(string $name): string {
+        $particles = [
+            "a", "al", "bin", "da", "das", "de", "del", "della", "delle", "dei",
+            "der", "des", "di", "do", "dos", "du", "e", "el", "ibn", "la", "las",
+            "le", "les", "lo", "los", "san", "santa", "st", "te", "ten", "ter",
+            "van", "vd", "von", "y", "zu",
+        ];
+
+        $result = Strings::toTitleCase(trim($name));
+        if ($result === "") {
+            return "";
+        }
+
+        $words = preg_split("/\s+/", $result);
+        if ($words === false) {
+            return $result;
+        }
+
+        foreach ($words as $index => $word) {
+            // The particles of the compound surnames are not capitalized,
+            // unless the Name starts with one, as in a surname on its own
+            $lWord = Strings::toLowerCase($word);
+            if ($index > 0 && Arrays::contains($particles, $lWord)) {
+                $words[$index] = $lWord;
+                continue;
+            }
+
+            // The Mc surnames capitalize the letter after the prefix
+            if (mb_strlen($word) > 2 && mb_substr($word, 0, 2) === "Mc") {
+                $words[$index] = "Mc" . Strings::toTitleCase(mb_substr($word, 2));
+                continue;
+            }
+
+            // A short prefix before an apostrophe capitalizes what follows,
+            // as in O'Connor or D'Angelo, but not in names like Dell'Orto
+            $position = mb_strpos($word, "'");
+            if ($position !== false && $position > 0 && $position <= 2) {
+                $words[$index] = mb_substr($word, 0, $position + 1)
+                    . Strings::toTitleCase(mb_substr($word, $position + 1));
+            }
+        }
+        return implode(" ", $words);
     }
 
 
