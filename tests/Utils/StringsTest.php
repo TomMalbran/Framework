@@ -1,5 +1,5 @@
 <?php
-// spell-checker: ignore abbab bcdef preabc tést xyxyxy
+// spell-checker: ignore  abbab, bcdef, preabc, tést, xyxyxy, áñgel, Áñgel
 namespace Tests\Utils;
 
 use Framework\Date\Date;
@@ -1019,6 +1019,23 @@ class StringsTest extends TestCase {
             "basic"       => [ "hello", "Hello" ],
             "empty"       => [ "", "" ],
             "single_char" => [ "h", "H" ],
+        ];
+    }
+
+
+    #[DataProvider("providerToTitleCase")]
+    public function testToTitleCase(string $value, string $expected): void {
+        $this->assertSame($expected, Strings::toTitleCase($value));
+    }
+
+    public static function providerToTitleCase(): array {
+        return [
+            "each_word"       => [ "hello world", "Hello World" ],
+            "lowercases_rest" => [ "aBc dEf", "Abc Def" ],
+            "from_upper"      => [ "HELLO WORLD", "Hello World" ],
+            "unicode"         => [ "áñgel maría", "Áñgel María" ],
+            "single_word"     => [ "name", "Name" ],
+            "empty"           => [ "", "" ],
         ];
     }
 

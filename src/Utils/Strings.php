@@ -884,6 +884,15 @@ class Strings {
         return ucfirst($string);
     }
 
+    /**
+     * Transforms a String to Title Case
+     * @param string $string
+     * @return string
+     */
+    public static function toTitleCase(string $string): string {
+        return mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
+    }
+
 
 
     /**
