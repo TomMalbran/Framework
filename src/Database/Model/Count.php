@@ -123,15 +123,17 @@ class Count {
             $onTable = SchemaModel::getDbTableName($this->otherModelName);
         }
 
-        $query = Query::select($table)
+        // The table is aliased, so the Count also works when it is the main table
+        $asTable = "{$table}_count";
+        $query   = Query::select($table, as: $asTable)
             ->column("COUNT(*)")
-            ->whereExp("$table.$leftKey = $onTable.$rightKey");
+            ->whereExp("$asTable.$leftKey = $onTable.$rightKey");
 
         if ($this->query !== "") {
             $query->whereExp($this->query);
         }
         if ($this->hasDeleted) {
-            $query->whereExp("isDeleted = 0");
+            $query->whereExp("$asTable.isDeleted = 0");
         }
 
         return $query;
