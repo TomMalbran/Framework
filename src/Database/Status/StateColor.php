@@ -20,6 +20,7 @@ enum StateColor implements Enum, JsonSerializable {
     case Orange;
     case Red;
     case Blue;
+    case Gray;
 
 
 
