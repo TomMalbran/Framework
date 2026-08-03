@@ -13,6 +13,7 @@ class Application {
 
     // Composer Data
     private static bool   $loaded    = false;
+    private static string $name      = "";
     private static string $version   = "";
     private static string $namespace = "";
     private static string $baseDir   = "";
@@ -44,10 +45,20 @@ class Application {
 
         // Save the Data
         self::$loaded    = true;
+        self::$name      = $composer["name"];
         self::$version   = $composer["version"];
         self::$namespace = $composer["namespace"];
         self::$baseDir   = $baseDir;
         self::$sourceDir = $composer["sourceDir"];
+    }
+
+    /**
+     * Returns the Application Name
+     * @return string
+     */
+    public static function getName(): string {
+        self::load();
+        return self::$name;
     }
 
     /**

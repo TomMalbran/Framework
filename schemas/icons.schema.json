@@ -1,0 +1,19 @@
+{
+    "title" : "Icons",
+    "type"  : "object",
+    "additionalProperties" : false,
+    "patternProperties" : {
+        "^[a-z][a-z-]*$" : {
+            "title" : "Folder",
+            "type"  : "object",
+            "additionalProperties" : false,
+            "patternProperties" : {
+                "^[a-z][a-z0-9-]*$" : {
+                    "type"        : "string",
+                    "description" : "Where the Icon comes from: <source> [name] [modifiers]\n\n- google <name>: the Material Symbols name, outlined, weight 500, 20px\n  - fill: uses the filled variant\n  - w100 to w700: uses that weight instead of 500\n  - s20, s24, s40, s48: uses that optical size instead of 20px\n- fontAwesome: taken from Font Awesome\n- other: taken from another icon set\n- custom: drawn for this project",
+                    "pattern"     : "^(google [a-z0-9_]+( (fill|w[1-7]00|s(20|24|40|48)))*|fontAwesome|other|custom)$"
+                }
+            }
+        }
+    }
+}
