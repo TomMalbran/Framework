@@ -38,6 +38,21 @@ class URLTest extends TestCase {
     }
 
 
+    #[DataProvider("providerParseUrl")]
+    public function testParseUrl(array $pathParts, string $expected): void {
+        $this->assertSame($expected, URL::parseUrl(...$pathParts));
+    }
+
+    public static function providerParseUrl(): array {
+        return [
+            "http"  => [ [ "http://example.com//files/", "demo.txt" ], "http://example.com/files/demo.txt" ],
+            "https" => [ [ "https://example.com//files/", "demo.txt" ], "https://example.com/files/demo.txt" ],
+            "path"  => [ [ "/tmp//demo/", "demo.txt" ], "/tmp/demo/demo.txt" ],
+            "empty" => [ [], "" ],
+        ];
+    }
+
+
     #[DataProvider("providerGetHost")]
     public function testGetHost(string $url, string $expected): void {
         $this->assertEquals($expected, URL::getHost($url));

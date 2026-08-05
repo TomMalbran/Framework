@@ -19,6 +19,33 @@ class URL {
     }
 
     /**
+     * Returns the URL created with the given parts
+     * @param int|string ...$urlParts
+     * @return string
+     */
+    public static function parseUrl(int|string ...$urlParts): string {
+        $result   = Strings::join($urlParts, "/");
+        $protocol = "";
+
+        // Take out the protocol, so its slashes are not removed
+        foreach ([ "http://", "https://" ] as $prefix) {
+            if (Strings::startsWith($result, $prefix)) {
+                $protocol = $prefix;
+                $result   = Strings::substringAfter($result, $prefix);
+                break;
+            }
+        }
+
+        // Remove the double slashes and the last one
+        while (Strings::contains($result, "//")) {
+            $result = Strings::replace($result, "//", "/");
+        }
+        $result = Strings::stripEnd($result, "/");
+
+        return "{$protocol}{$result}";
+    }
+
+    /**
      * Returns the host of the given URL
      * @param string $url
      * @return string
