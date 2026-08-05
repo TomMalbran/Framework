@@ -2,25 +2,34 @@
 namespace Framework\Database;
 
 use Framework\Application;
+use Framework\Console;
 use Framework\Discovery\Discovery;
 use Framework\Discovery\DiscoveryConfig;
+use Framework\Discovery\Package;
 use Framework\Discovery\Type\DiscoveryMigration;
 use Framework\Discovery\Attr\ConsoleCommand;
 use Framework\Database\Database;
 use Framework\Database\SchemaMigration;
 use Framework\Database\DataMigration;
+use Framework\Provider\Mustache;
 use Framework\Core\Configs;
-use Framework\Core\SettingData;
-use Framework\File\Storage;
+use Framework\Core\MigrationData;
+use Framework\Date\Date;
 use Framework\Date\Timer;
+use Framework\File\Storage;
+use Framework\Utils\Arrays;
 use Framework\Utils\Strings;
-
-use ReflectionClass;
 
 /**
  * The Database Migration
  */
 class Migration {
+
+    private const Template = "src/Database/Template/Migration.mu";
+
+    private static string $migrationsPath = "config/migrations";
+    private static string $lastApplied    = "";
+
 
     /** @var list<array{from:string,to:string}> */
     private static array $tableRenames  = [];
@@ -28,6 +37,27 @@ class Migration {
     /** @var list<array{table:string,from:string,to:string}> */
     private static array $columnRenames = [];
 
+
+    /**
+     * Sets the Directory where the Data Migrations are created
+     * @param string $migrationsPath
+     * @return void
+     */
+    public static function setPath(string $migrationsPath): void {
+        if ($migrationsPath !== "") {
+            self::$migrationsPath = $migrationsPath;
+        }
+    }
+
+    /**
+     * Sets the last Data Migration that was applied before this system, so that
+     * it and the ones before it are stored as applied, without running them
+     * @param string $lastApplied
+     * @return void
+     */
+    public static function setLastApplied(string $lastApplied): void {
+        self::$lastApplied = $lastApplied;
+    }
 
     /**
      * Renames a Table
@@ -60,13 +90,70 @@ class Migration {
 
 
     /**
+     * Creates a new Data Migration with the given Title
+     * @param string $title Optional.
+     * @return void
+     */
+    #[ConsoleCommand("migration")]
+    public static function createMigration(string $title = ""): void {
+        DiscoveryConfig::load();
+
+        $title = Strings::trim($title);
+        if ($title === "") {
+            $title = Strings::trim(Console::prompt("Title of the migration"));
+        }
+        if ($title === "") {
+            print("The title of the migration is required\n");
+            return;
+        }
+
+        // The name is the date, so the migrations of every branch can live together,
+        // and they are grouped in a directory per year and month
+        $date     = Date::now();
+        $dirName  = Storage::parsePath($date->getYear(), $date->getMonthZero());
+        $basePath = Application::getBasePath(self::$migrationsPath, $dirName);
+
+        // Move to the next second while there is a migration with the same name
+        $name     = $date->format("Y-m-d-His");
+        $fileName = "$name.php";
+        while (Storage::fileExists($basePath, $fileName)) {
+            $date     = $date->add(seconds: 1);
+            $dirName  = Storage::parsePath($date->getYear(), $date->getMonthZero());
+            $basePath = Application::getBasePath(self::$migrationsPath, $dirName);
+            $name     = $date->format("Y-m-d-His");
+            $fileName = "$name.php";
+        }
+
+        // The class has the same date as the name, so it is unique too
+        $template = Storage::readFile(Package::getBasePath(self::Template));
+        $contents = Mustache::render($template, [
+            "class" => "M" . $date->format("Ymd") . "T" . $date->format("His"),
+            "title" => $title,
+        ]);
+
+        Storage::createDir($basePath);
+        Storage::createFile($basePath, $fileName, $contents);
+
+        $printPath = Storage::parsePath(self::$migrationsPath, $dirName, $fileName);
+        print("Created the migration $printPath\n");
+
+        // Open the new Migration, so it can be edited right away
+        Console::openFile(Storage::parsePath($basePath, $fileName));
+    }
+
+
+
+    /**
      * Migrates the Data
-     * @param string $envFile Optional.
-     * @param bool   $delete  Optional.
+     * @param string $envFile   Optional.
+     * @param bool   $canDelete Optional.
      * @return void
      */
     #[ConsoleCommand("migrate")]
-    public static function migrate(string $envFile = "", bool $delete = false): void {
+    public static function migrate(
+        string $envFile = "",
+        bool $canDelete = false,
+    ): void {
         $timer = new Timer();
         print("Migrating data...\n");
 
@@ -79,7 +166,11 @@ class Migration {
 
         // Migrate the Schema
         print("\nDATABASE MIGRATIONS\n");
-        SchemaMigration::migrateData(self::$tableRenames, self::$columnRenames, $delete);
+        SchemaMigration::migrateData(
+            self::$tableRenames,
+            self::$columnRenames,
+            $canDelete,
+        );
 
 
         // Apply other Migrations from the Framework
@@ -129,74 +220,106 @@ class Migration {
      * @return bool
      */
     public static function migrateData(): bool {
-        $appPath    = Application::getBasePath();
-        $filePaths  = Storage::getFilesInDir($appPath, recursive: true, skipVendor: true);
-        $migrations = [];
+        $migrations = self::getMigrations();
+        if (count($migrations) === 0) {
+            print("- No data migrations found\n");
+            return false;
+        }
 
-        // Find all the Migrations
+        // Store the Migrations that ran before this system, so they are not run again
+        self::storeApplied($migrations);
+
+        // Determine the Migrations that were not applied yet
+        $applied = MigrationData::getAppliedNames();
+        $pending = [];
+        foreach ($migrations as $name => $className) {
+            if (!Arrays::contains($applied, $name)) {
+                $pending[$name] = $className;
+            }
+        }
+
+        if (count($pending) === 0) {
+            print("- No data migrations required\n");
+            return false;
+        }
+
+        // Run the Migrations that are pending
+        $amount = count($pending);
+        print("Running $amount migrations\n");
+
+        $db = Database::getInstance();
+        foreach ($pending as $name => $className) {
+            $title = $className::getTitle();
+
+            print("- $name: $title\n");
+            $className::migrate($db);
+            MigrationData::add($name, $title);
+        }
+        return true;
+    }
+
+    /**
+     * Returns all the Data Migrations of the App, indexed and sorted by their Name
+     * @return array<string,class-string<DataMigration>>
+     */
+    private static function getMigrations(): array {
+        $appPath   = Application::getBasePath();
+        $filePaths = Storage::getFilesInDir($appPath, recursive: true, skipVendor: true);
+        $result    = [];
+
         foreach ($filePaths as $filePath) {
             if (!Strings::endsWith($filePath, ".php")) {
                 continue;
             }
 
             $content = Storage::readFile($filePath);
-            if (Strings::contains($content, DataMigration::class) &&
-                Strings::contains($content, " implements ")
+            if (!Strings::contains($content, DataMigration::class) ||
+                !Strings::contains($content, " implements ")
             ) {
-                $className = trim(Strings::substringBetween($content, "class", "implements"));
-                $migrations[$className] = $filePath;
-            }
-        }
-
-        // No Migrations Found
-        if (count($migrations) === 0) {
-            print("- No data migrations found\n");
-            return false;
-        }
-
-        // Sort the Migrations using the Class Name
-        ksort($migrations, SORT_NATURAL | SORT_FLAG_CASE);
-
-        // Determine the Migrations to Run
-        $startMigration = SettingData::getCore("migration");
-        $firstMigration = $startMigration + 1;
-        $lastMigration  = count($migrations);
-        if ($firstMigration > $lastMigration) {
-            print("- No data migrations required\n");
-            return false;
-        }
-
-        // Run the Migrations
-        $firstMigration += 1;
-        $lastMigration  += 1;
-        print("Running migrations $firstMigration -> $lastMigration\n");
-
-        $db    = Database::getInstance();
-        $index = 1;
-        foreach ($migrations as $className => $filePath) {
-            $index += 1;
-            if ($index < $firstMigration) {
                 continue;
             }
 
+            $className = Strings::trim(Strings::substringBetween($content, "class", "implements"));
             include_once $filePath;
-            if (!class_exists($className)) {
+            if (!class_exists($className) || !is_subclass_of($className, DataMigration::class)) {
                 continue;
             }
 
-            $reflection = new ReflectionClass($className);
-            $instance   = $reflection->newInstance();
-            if (!($instance instanceof DataMigration)) {
+            // The file name is the Name used to sort the Migrations and to store them
+            $name = Storage::getBaseName(Storage::getFileName($filePath));
+            if (isset($result[$name])) {
+                print("- There is more than one migration called $name\n");
                 continue;
             }
 
-            $title = $instance::getTitle();
-            print("- $index: $title\n");
-            $instance::migrate($db);
+            $result[$name] = $className;
         }
 
-        // Save the Last Migration
-        SettingData::setCore("migration", $lastMigration - 1);
-        return true;
+        ksort($result, SORT_NATURAL | SORT_FLAG_CASE);
+        return $result;
+    }
+
+    /**
+     * Stores the Migrations up to the last applied one, so that an App that is
+     * already running does not apply a second time the ones that already ran
+     * @param array<string,class-string<DataMigration>> $migrations
+     * @return void
+     */
+    private static function storeApplied(array $migrations): void {
+        if (self::$lastApplied === "" || !MigrationData::isEmpty()) {
+            return;
+        }
+
+        $index = 0;
+        foreach ($migrations as $name => $className) {
+            if (Strings::compare($name, self::$lastApplied) > 0) {
+                break;
+            }
+
+            MigrationData::add($name, $className::getTitle());
+            $index += 1;
+        }
+
+        print("- Stored $index migrations that were already applied\n");
     }
 }

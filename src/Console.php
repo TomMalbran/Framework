@@ -165,6 +165,26 @@ class Console {
     }
 
     /**
+     * Opens the given File in the editor, when running inside VS Code
+     * @param string $filePath
+     * @return bool
+     */
+    public static function openFile(string $filePath): bool {
+        if ($filePath === "" || getenv("TERM_PROGRAM") !== "vscode") {
+            return false;
+        }
+
+        // Run it in the background, so the console does not wait for the editor
+        $command = "code " . escapeshellarg($filePath);
+        if (PHP_OS_FAMILY !== "Windows") {
+            $command .= " > /dev/null 2>&1 &";
+        }
+
+        exec($command, result_code: $resultCode);
+        return $resultCode === 0;
+    }
+
+    /**
      * Prompts the user for confirmation in the console
      * @param string $prompt
      * @return bool
