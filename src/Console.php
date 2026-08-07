@@ -74,6 +74,31 @@ class Console {
         print("\nInstallation completed.\n");
     }
 
+    /**
+     * Serves the Documentation site in the local machine
+     * @param int $port Optional.
+     * @return void
+     */
+    #[ConsoleCommand("docs", isPrivate: true)]
+    public static function docs(int $port = Package::DocsPort): void {
+        $docsPath = Package::getBasePath(Package::DocsDir);
+        if (!Storage::fileExists($docsPath)) {
+            print("There is no documentation to serve\n");
+            return;
+        }
+
+        $url = "localhost:$port";
+        print("Serving the docs at http://$url\n");
+        print("Press Ctrl+C to stop\n\n");
+
+        $command = "php -S " . escapeshellarg($url) . " -t " . escapeshellarg($docsPath);
+        if (PHP_OS_FAMILY !== "Windows") {
+            // Drop the request logs, so only the errors are printed
+            $command .= " 2>&1 | grep --line-buffered -vE '(Accepted|Closing|\\[200\\]:)'";
+        }
+        passthru($command);
+    }
+
 
 
     /**
