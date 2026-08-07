@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="index.html"><img class="brand-logo" src="assets/favicon.svg" alt="" width="34" height="34">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -95,7 +95,7 @@
                     <h1>A PHP <span class="grad">Framework</span>,<br>built for building fast.</h1>
                     <p>A batteries-included toolkit: a discovery-driven code generator, a schema&#8209;first
                     database layer, and a broad, well-typed standard library — wired together by a single
-                    <code>./framework</code> CLI.</p>
+                    <a class="src-link" href="introduction/cli.html"><code>./framework</code></a> CLI.</p>
                     <div class="btn-row">
                         <a class="btn btn-primary" href="introduction/getting-started.html">Get Started →</a>
                         <a class="btn btn-ghost" href="https://github.com/FrameworkPHPAR/Framework" target="_blank" rel="noopener noreferrer">View on GitHub</a>
@@ -109,7 +109,7 @@
                     <div class="card"><h3>🔎 Discovery driven</h3><p>Routes, listeners, models, settings and commands are found by their attributes — nothing is registered in a central file that drifts out of date.</p></div>
                     <div class="card"><h3>🗄️ Schema-first data</h3><p>Describe a table once as a model; the build generates its schema, typed queries, entities and requests, and a migration keeps the database in step.</p></div>
                     <div class="card"><h3>🧭 Typed end to end</h3><p>Generated classes mean a renamed column or a missing route is a build error, not a surprise at runtime.</p></div>
-                    <div class="card"><h3>⌨️ First-class CLI</h3><p>Install, build, migrate, watch for changes and generate icons — all from one <code>./framework</code> binary, which your own commands join.</p></div>
+                    <div class="card"><h3>⌨️ First-class CLI</h3><p>Install, build, migrate, watch for changes and generate icons — all from one <a class="src-link" href="introduction/cli.html"><code>./framework</code></a> binary, which your own commands join.</p></div>
                     <div class="card"><h3>🧰 Rich standard library</h3><p>Strings, Arrays, Numbers, Dates, Files, a Dictionary wrapper and more — strict-typed and covered by an extensive test suite.</p></div>
                     <div class="card"><h3>🔌 Batteries included</h3><p>Auth, emails, notifications, logging, imports, icons and integrations from OpenAI to MercadoPago, ready to switch on.</p></div>
                 </div>
@@ -157,7 +157,7 @@ public static function edit(ProductRequest $request): Response {
                 <div class="grid grid-3">
                     <a class="card module-card" href="introduction/getting-started.html" style="--c: var(--blue)"><span class="tag"></span><h3>Introduction</h3><p>Install it, wire up the entry point, and configure it with <code>.env</code> and config files.</p></a>
                     <a class="card module-card" href="core/discovery.html" style="--c: var(--indigo)"><span class="tag"></span><h3>Core Concepts</h3><p>Discovery, the build system, routing and the signal/listener events underneath everything.</p></a>
-                    <a class="card module-card" href="database/database.html" style="--c: var(--bluegreen)"><span class="tag"></span><h3>Database</h3><p>Models, the generated schema, the query builder and migrations.</p></a>
+                    <a class="card module-card" href="database/database.html" style="--c: var(--blue-green)"><span class="tag"></span><h3>Database</h3><p>Models, the generated schema, the query builder and migrations.</p></a>
                     <a class="card module-card" href="subsystems/auth.html" style="--c: var(--red)"><span class="tag"></span><h3>Subsystems</h3><p>Authentication, credentials, settings, emails and notifications.</p></a>
                     <a class="card module-card" href="features/enums.html" style="--c: var(--purple)"><span class="tag"></span><h3>Features</h3><p>Enums, i18n, import/export, logging, icons, providers, Curl and the PHPStan rules.</p></a>
                     <a class="card module-card" href="utilities/utils.html" style="--c: var(--orange)"><span class="tag"></span><h3>Utilities</h3><p>Dates, files and storage, requests and responses, and the standard library.</p></a>
