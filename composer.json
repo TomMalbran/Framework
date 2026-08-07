@@ -1,6 +1,6 @@
 {
     "name": "frameworkphpar/framework",
-    "description": "My personal framework",
+    "description": "A PHP Framework, built for building fast",
     "version": "0.17.0",
     "authors": [
         {

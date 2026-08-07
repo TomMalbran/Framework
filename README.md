@@ -1,8 +1,8 @@
 # Framework
 
-My personal PHP Framework: routes, models, listeners and settings are found by their
-attributes, turned into typed classes by a build step, and driven from a single
-`./framework` CLI.
+A PHP Framework, built for building fast: routes, models, listeners and settings are
+found by their attributes, turned into typed classes by a build step, and driven from a
+single `./framework` CLI.
 
 **[Read the documentation →](https://frameworkphp.com.ar/)**
 
