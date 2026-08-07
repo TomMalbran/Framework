@@ -144,12 +144,14 @@ class Version {
             return;
         }
 
-        // The version badge in the sidebar and the require in the install snippets
+        // The badge in the sidebar, the tag it links to, and the require in the install snippets
         $patterns = [
-            '/(class="version">v)[^<]+(<)/',
+            '/(class="version" href="[^"]+\/tag\/v)[\d.]+(")/',
+            '/(class="version"[^>]*>v)[^<]+(<)/',
             '/(dev-main#v)[\d.]+/',
         ];
         $replaces = [
+            "\${1}$version\${2}",
             "\${1}$version\${2}",
             "\${1}$version",
         ];
