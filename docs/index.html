@@ -54,6 +54,7 @@
                     <a href="database/database.html">Database</a>
                     <a href="database/models.html">Models</a>
                     <a href="database/schema.html">Generated Schema</a>
+                    <a href="database/schema-json.html">Schema JSON</a>
                     <a href="database/query.html">Query builder</a>
                     <a href="database/migrations.html">Migrations</a>
                 </div>
@@ -90,7 +91,7 @@
         <div class="content">
             <section class="hero">
                 <div class="hero-inner">
-                    <div class="eyebrow">PHP 8.3 · MySQLi · Zero-config discovery</div>
+                    <div class="eyebrow">PHP 8.1 · MySQLi · Zero-config discovery</div>
                     <h1>A PHP <span class="grad">Framework</span>,<br>built for building fast.</h1>
                     <p>A batteries-included toolkit: a discovery-driven code generator, a schema&#8209;first
                     database layer, and a broad, well-typed standard library — wired together by a single
@@ -141,9 +142,9 @@ class ProductModel {
                 <p class="prose">A route is a method with an attribute, typed on both ends:</p>
                 <pre><code class="language-php">#[Route(&quot;/products/edit&quot;, Access::Admin)]
 public static function edit(ProductRequest $request): Response {
-    $errors = Product::validateRequest($request);
-    if ($errors-&gt;has()) {
-        return Response::error($errors);
+    $result = Product::validateRequest($request);
+    if ($result-&gt;hasError()) {
+        return Response::error($result-&gt;errors);
     }
 
     Product::edit($request-&gt;id, $request);

@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -96,8 +97,12 @@
 <p class="lead">Discovery is the reflection layer that finds classes and attributes across your app and the
 framework. It is the foundation the whole code generator is built on.</p>
 
+<p>Where your classes sit does not matter — Discovery scans the whole source tree, which is why the
+<a href="../introduction/getting-started.html#structure">project structure</a> is a convention rather than a
+requirement.</p>
+
 <h2 id="finding">Finding classes</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Discovery.php#L80" target="_blank" rel="noopener noreferrer"><code>Discovery::findClasses()</code></a> scans the source tree and returns the classes matching the given
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Discovery.php" target="_blank" rel="noopener noreferrer"><code>Discovery::findClasses()</code></a> scans the source tree and returns the classes matching the given
 filters — by parent class, by implemented interface, or within a path.</p>
 <pre><code class="language-php">use Framework\Discovery\Discovery;
 use Framework\Discovery\Type\DiscoveryBuilder;

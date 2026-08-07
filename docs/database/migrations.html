@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -152,8 +153,7 @@ table up to a point, for a database that was migrated by hand before it adopted 
 to keep a table in sync with your code or config, rather than for a one-off change. Implement the interface&#39;s
 single <code>migrateData()</code> method; it is <a href="../core/discovery.html#finding">discovered</a> and wired in on the next
 <a href="../core/build.html#how">build</a>, with no registration:</p>
-<pre><code class="language-php">use Framework\Discovery\Attr\Schema;
-use Framework\Discovery\Type\DiscoveryMigration;
+<pre><code class="language-php">use Framework\Discovery\Type\DiscoveryMigration;
 
 class RoleData extends RoleSchema implements DiscoveryMigration {
     public static function migrateData(): void {

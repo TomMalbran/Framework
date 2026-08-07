@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -174,7 +175,7 @@ change to the table goes through a method you control:</p>
         <tr><td><code>deleteEntity($id)</code></td><td>Soft delete — the row is flagged, not removed.</td></tr>
         <tr><td><code>removeEntity($id)</code> / <code>removeAllEntities($query)</code></td><td>Delete for good.</td></tr>
         <tr><td><code>ensureUniqueData(…)</code> / <code>ensureEntityOrder(…)</code></td><td>Keep unique values and the position order consistent.</td></tr>
-        <tr><td><code>validateRequest($request)</code></td><td>Run the <a href="models.html#validate">Validate</a> rules, returning the errors.</td></tr>
+        <tr><td><code>validateRequest($request)</code></td><td>Run the <a href="models.html#validate">Validate</a> rules, returning a <code>Result</code> — <code>hasError()</code> and the <code>errors</code> to hand back.</td></tr>
     </tbody>
 </table>
 <div class="note">The soft delete only exists when the model sets <code>canDelete</code>, and the create and edit
@@ -446,9 +447,9 @@ public static function edit(ProductRequest $request): Response {
 
     if ($request-&gt;isCreate) { /* … */ }
 
-    $errors = Product::validateRequest($request);
-    if ($errors-&gt;has()) {
-        return Response::error($errors);
+    $result = Product::validateRequest($request);
+    if ($result-&gt;hasError()) {
+        return Response::error($result-&gt;errors);
     }
 
     return Response::success(&quot;PRODUCT_SAVED&quot;);
@@ -471,7 +472,7 @@ ProductStatus::getFullSelect();   // including the hidden ones</code></pre>
 <p>Being a framework <a href="../features/enums.html">enum</a> it also has the <code>IsEnum</code> helpers, and the
 query takes the case directly — <code>$query-&gt;status-&gt;equal(ProductStatus::Active)</code> — so a status can
 never be compared against a string that does not exist.</p>
-                <div class="page-nav"><a href="models.html"><span class="dir">← Previous</span><span class="ttl">Models</span></a><a class="next" href="query.html"><span class="dir">Next →</span><span class="ttl">Query builder</span></a></div>
+                <div class="page-nav"><a href="models.html"><span class="dir">← Previous</span><span class="ttl">Models</span></a><a class="next" href="schema-json.html"><span class="dir">Next →</span><span class="ttl">Schema JSON</span></a></div>
                 </article>
                 <nav class="toc" aria-label="On this page">
                     <p class="toc-title">On this page</p>

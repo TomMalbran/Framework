@@ -61,13 +61,15 @@ class Docs {
 
         $broken  = self::checkSourceLinks($contents);
         $broken += self::checkPageLinks($docsPath, $contents);
+        $broken += self::checkCodeExamples($contents);
+        $broken += self::checkSearchIndex($docsPath);
 
         $total = count($pages);
         if ($broken === 0) {
-            print("- Checked $total documentation pages, every link resolves\n");
+            print("- Checked $total documentation pages, everything resolves\n");
         } else {
-            $links = $broken === 1 ? "link" : "links";
-            print("- Found $broken broken $links in $total documentation pages\n");
+            $problems = $broken === 1 ? "problem" : "problems";
+            print("- Found $broken $problems in $total documentation pages\n");
         }
     }
 
@@ -83,6 +85,29 @@ class Docs {
             return;
         }
 
+        $index = self::buildIndex($docsPath);
+
+        // Encoding returns an empty string when it fails, which would wipe the index
+        $encoded = JSON::encode($index);
+        if ($encoded === "") {
+            print("- Could not encode the search index, it was left untouched\n");
+            return;
+        }
+
+        Storage::writeFile(self::getIndexPath(), $encoded);
+
+        $total = count($index);
+        print("- Indexed $total documentation entries\n");
+    }
+
+
+
+    /**
+     * Builds the search index of the Documentation
+     * @param string $docsPath
+     * @return list<array<string,string>>
+     */
+    private static function buildIndex(string $docsPath): array {
         $index = [];
         foreach (self::getPages($docsPath) as $page) {
             // The 404 page is served for unknown paths, it is not a destination
@@ -120,19 +145,36 @@ class Docs {
                 ];
             }
         }
+        return $index;
+    }
 
-        // Encoding returns an empty string when it fails, which would wipe the index
-        $encoded = JSON::encode($index);
-        if ($encoded === "") {
-            print("- Could not encode the search index, it was left untouched\n");
-            return;
+    /**
+     * Returns the path of the search index
+     * @return string
+     */
+    private static function getIndexPath(): string {
+        return Package::getBasePath(Package::DocsDir, "assets", "search.json");
+    }
+
+    /**
+     * Checks that the search index matches the pages it was built from
+     * @param string $docsPath
+     * @return int
+     */
+    private static function checkSearchIndex(string $docsPath): int {
+        $expected = JSON::encode(self::buildIndex($docsPath));
+        if ($expected === "") {
+            print("  The search index cannot be encoded from the current pages\n");
+            return 1;
         }
 
-        $indexPath = Package::getBasePath(Package::DocsDir, "assets", "search.json");
-        Storage::writeFile($indexPath, $encoded);
+        $current = Storage::readFile(self::getIndexPath());
+        if ($current === $expected) {
+            return 0;
+        }
 
-        $total = count($index);
-        print("- Indexed $total documentation entries\n");
+        print("  The search index is out of date, run docsIndex to rebuild it\n");
+        return 1;
     }
 
 
@@ -148,7 +190,7 @@ class Docs {
 
         foreach ($contents as $page => $body) {
             $pattern = '~href="' . preg_quote(self::SourceUrl, "~") .
-                '([^"#]+)(?:#L(\d+))?"[^>]*><code>([^<]+)</code>~';
+                '([^"]+)"[^>]*><code>([^<]+)</code>~';
 
             foreach (self::matchSets($body, $pattern) as $found) {
                 $filePath = self::getGroup($found, 1);
@@ -158,24 +200,16 @@ class Docs {
                     continue;
                 }
 
-                // Without a line anchor there is nothing else to verify
-                $lineNumber = (int)self::getGroup($found, 2);
-                if ($lineNumber === 0) {
+                // A label like "Class::method()" has to name a method of that file. The
+                // parentheses are what tells it apart from an enum case or a constant.
+                $method = self::getFirstMatch(self::getGroup($found, 2), '~::(\w+)\(~', "");
+                if ($method === "") {
                     continue;
                 }
 
-                $lines = Strings::split(Storage::readFile($basePath, $filePath), "\n");
-                if ($lineNumber > count($lines)) {
-                    print("  $page -> $filePath#L$lineNumber is past the end of the file\n");
-                    $broken += 1;
-                    continue;
-                }
-
-                // A label like "Class::method()" must land on that method
-                $line   = $lines[$lineNumber - 1] ?? "";
-                $method = self::getFirstMatch(self::getGroup($found, 3), '~::(\w+)~', "");
-                if ($method !== "" && !Strings::contains($line, "function $method(")) {
-                    print("  $page -> $filePath#L$lineNumber is no longer $method()\n");
+                $source = Storage::readFile($basePath, $filePath);
+                if (!Strings::contains($source, "function $method(")) {
+                    print("  $page -> $filePath has no $method()\n");
                     $broken += 1;
                 }
             }
@@ -224,6 +258,68 @@ class Docs {
             }
         }
         return $broken;
+    }
+
+    /**
+     * Checks the Framework classes and methods used by the code examples
+     * @param array<string,string> $contents
+     * @return int
+     */
+    private static function checkCodeExamples(array $contents): int {
+        $snippetPattern = '~<pre><code class="language-php">(.*?)</code></pre>~s';
+        $importPattern  = '~^\s*use (Framework\\\\[A-Za-z0-9_\\\\]+);~m';
+        $callPattern    = '~\b([A-Z][A-Za-z0-9_]*)::([a-z][A-Za-z0-9_]*)\s*\(~';
+        $broken         = 0;
+
+        foreach ($contents as $page => $body) {
+            foreach (self::matchSets($body, $snippetPattern) as $snippet) {
+                $encoded = self::getGroup($snippet, 1);
+                $code    = html_entity_decode($encoded, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+                // The classes the example imports have to exist
+                $imports = [];
+                foreach (self::matchSets($code, $importPattern) as $found) {
+                    $class = self::getGroup($found, 1);
+                    $short = Strings::substringAfter($class, "\\");
+
+                    // Everything under System is written by the build of each app
+                    if (Strings::startsWith($class, "Framework\\System\\")) {
+                        continue;
+                    }
+                    if (!self::typeExists($class)) {
+                        print("  $page -> $class does not exist\n");
+                        $broken += 1;
+                        continue;
+                    }
+                    $imports[$short] = $class;
+                }
+
+                // And the static calls on them have to be real methods
+                foreach (self::matchSets($code, $callPattern) as $found) {
+                    $class = $imports[self::getGroup($found, 1)] ?? "";
+                    if ($class === "") {
+                        continue;
+                    }
+
+                    $method = self::getGroup($found, 2);
+                    if (!method_exists($class, $method)) {
+                        print("  $page -> $class has no $method()\n");
+                        $broken += 1;
+                    }
+                }
+            }
+        }
+        return $broken;
+    }
+
+    /**
+     * Returns whether the given name is a Class, Interface, Trait or Enum
+     * @param string $name
+     * @return bool
+     */
+    private static function typeExists(string $name): bool {
+        return class_exists($name) || interface_exists($name) ||
+            trait_exists($name) || enum_exists($name);
     }
 
     /**

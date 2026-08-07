@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -97,7 +98,9 @@ typed classes around it, and a migration keeps the database in step. This page i
 guide.</p>
 
 <h2 id="overview">How it fits together</h2>
-<p>One annotated class is the source of truth. Everything else is derived from it:</p>
+<p>One annotated class is the source of truth. Everything else is derived from it — the
+<a href="../introduction/getting-started.html#first-feature">first feature walkthrough</a> takes one from a
+model to a working route in five steps:</p>
 <pre><code class="language-bash">ProductModel          the model you write — fields, relations, rules
       ↓ ./framework build
 ProductSchema         the base class you extend

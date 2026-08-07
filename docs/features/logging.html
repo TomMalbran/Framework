@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -112,7 +113,7 @@ generated request — so wiring any of them to an admin screen looks alike.</p>
 <h2 id="actions">Action logging</h2>
 <p>Actions are declared with attributes, so they are typed and translatable. Tag a class with
 <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> to group its actions and each method with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> — both take a name plus
-per-language labels. Then record the action from inside that method with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLog.php#L188" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a>, passing the
+per-language labels. Then record the action from inside that method with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a>, passing the
 generated <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Sec.php" target="_blank" rel="noopener noreferrer"><code>Sec</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Act.php" target="_blank" rel="noopener noreferrer"><code>Act</code></a> cases (the current user and session are filled in for you):</p>
 <pre><code class="language-php">use Framework\Log\Attr\Section;
 use Framework\Log\Attr\Action;
@@ -121,7 +122,7 @@ use Framework\System\Sec;
 use Framework\System\Act;
 
 #[Section(&quot;Products&quot;, en: &quot;Products&quot;, es: &quot;Productos&quot;)]
-class ProductApi {
+class ProductConstructor {
     #[Action(&quot;Create&quot;, en: &quot;Created a product&quot;, es: &quot;Creó un producto&quot;)]
     public static function create(ProductRequest $request): Response {
         $productID = Product::create($request);
@@ -137,7 +138,7 @@ run <a href="../core/build.html#how"><code>./framework build</code></a> once aft
 <h3 id="sessions">Sessions &amp; what is stored</h3>
 <p>Actions are not stored as a flat list — each one belongs to a <strong>session</strong>. When a user signs in the
 framework opens a session row and keeps it open until they sign out, recording who it belongs to along with the
-<code>ip</code> and <code>userAgent</code> they connected from. Every <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLog.php#L188" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a> during that
+<code>ip</code> and <code>userAgent</code> they connected from. Every <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a> during that
 sign-in is attached to it, so the log reads as a timeline of what happened in each visit — and you can see the
 device and address behind a run of actions.</p>
 <p>Each action row itself stores:</p>
@@ -238,7 +239,7 @@ class QueryLogController {
 
 <h2 id="devices">Device log</h2>
 <p>Each <a href="../subsystems/credentials.html#devices">device</a> a user adds or removes when signing in and out is recorded by
-the framework through <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/DeviceLog.php#L43" target="_blank" rel="noopener noreferrer"><code>DeviceLog::added()</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/DeviceLog.php#L58" target="_blank" rel="noopener noreferrer"><code>DeviceLog::removed()</code></a>. An entry stores the
+the framework through <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog::added()</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog::removed()</code></a>. An entry stores the
 <code>credentialID</code>, the <code>playerID</code> of the device, the <code>userAgent</code> behind it, and a
 <code>wasAdded</code> flag telling the two apart — so you can trace when a user started or stopped receiving
 <a href="../subsystems/notifications.html#provider">notifications</a> on a device.</p>

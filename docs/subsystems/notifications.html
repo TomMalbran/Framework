@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -223,7 +224,7 @@ class NotificationCommands {
 use Framework\System\NotificationCode;
 
 $content = NotificationContent::get(NotificationCode::OrderShipped, &quot;en&quot;);</code></pre>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationContent.php#L43" target="_blank" rel="noopener noreferrer"><code>NotificationContent::render()</code></a> fills its <code>{{placeholders}}</code> — like
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent::render()</code></a> fills its <code>{{placeholders}}</code> — like
 <code>{{orderID}}</code> above — with per-send data before the title and message are <a href="#queue">queued</a>.</p>
 
                 <div class="page-nav"><a href="../subsystems/emails.html"><span class="dir">← Previous</span><span class="ttl">Emails</span></a><a class="next" href="../features/enums.html"><span class="dir">Next →</span><span class="ttl">Enums</span></a></div>

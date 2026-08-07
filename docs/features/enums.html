@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -93,78 +94,145 @@
 
 <div class="eyebrow">Features</div>
 <h1>Enums</h1>
-<p class="lead">Every enum in the framework — the generated <a href="../subsystems/auth.html#access">Access</a>, the settings
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a>, result types and dozens more — shares one interface and a trait of helpers, so they all
-behave the same.</p>
+<p class="lead">Your own enums join the ones the framework generates by implementing one interface and using one
+trait — which is what makes them safe to read from a request, store in a column and send back in a response.</p>
 
-<h2 id="pattern">The enum pattern</h2>
-<p>A framework enum implements <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Enum.php" target="_blank" rel="noopener noreferrer"><code>Enum</code></a> and <code>JsonSerializable</code>, uses the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a>
-trait, and opens with a <code>None</code> case (a <a href="../features/phpstan.html#rules-enums">PHPStan rule</a> enforces
-both):</p>
+<h2 id="declaring">Declaring one</h2>
+<p>A framework enum implements <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Enum.php" target="_blank" rel="noopener noreferrer"><code>Enum</code></a> and <code>JsonSerializable</code>, uses the
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a> trait, and opens with a <code>None</code> case. A
+<a href="phpstan.html#rules-enums">PHPStan rule</a> enforces all three, so the shape is never optional:</p>
 <pre><code class="language-php">use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 use JsonSerializable;
 
-enum Status implements Enum, JsonSerializable {
+enum Plan implements Enum, JsonSerializable {
     use IsEnum;
 
     case None;
-    case Active;
-    case Blocked;
+    case Free;
+    case Pro;
+    case Enterprise;
+}</code></pre>
+<p><code>None</code> is what every conversion falls back to, which is why it comes first and why nothing in the
+framework returns <code>null</code> for an enum. A pure enum like the one above is identified by its case name; a
+backed one by its value, so use a backed enum when the stored string has to differ from the case:</p>
+<pre><code class="language-php">enum Plan: string implements Enum, JsonSerializable {
+    use IsEnum;
+
+    case None       = &quot;&quot;;
+    case Free       = &quot;free&quot;;
+    case Pro        = &quot;pro&quot;;
+    case Enterprise = &quot;enterprise&quot;;
 }</code></pre>
 
-<h2 id="helpers">Shared helpers</h2>
-<p>The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a> trait gives every enum the same typed API — use these rather than the native
-<code>cases()</code> / <code>from()</code>, which a <a href="../features/phpstan.html#framework">rule</a> disallows:</p>
+<h2 id="reading">Reading one in</h2>
+<p>Input arrives as a string, and <code>fromValue()</code> is the only conversion you need — it takes a string, a
+case, or another enum, and returns <code>None</code> when nothing matches instead of throwing:</p>
+<pre><code class="language-php">Plan::fromValue(&quot;pro&quot;);        // Plan::Pro
+Plan::fromValue(&quot;nonsense&quot;);   // Plan::None
+Plan::fromValue($plan);        // already a case — returned as is
+
+// Or fall back to something other than None
+Plan::fromValue($request-&gt;plan, Plan::Free);</code></pre>
+<p>For a multi-select, <code>fromList()</code> takes the array a request sends and gives back a list of cases,
+skipping what does not map:</p>
+<pre><code class="language-php">$plans = Plan::fromList($request-&gt;plans);   // list&lt;Plan&gt;
+
+foreach ($plans as $plan) {
+    // ...
+}</code></pre>
+<p>Use these rather than the native <code>from()</code>, <code>tryFrom()</code> and <code>cases()</code>, which a
+<a href="phpstan.html#framework">rule</a> disallows precisely because they throw or return null.</p>
+
+<h2 id="using">Working with the cases</h2>
+<p>The trait covers the questions you actually ask of an enum — is this valid, is it one of these, what are they
+all — so none of it needs writing per enum:</p>
 <table class="api-table">
     <thead><tr><th>Method</th><th>Does</th></tr></thead>
     <tbody>
-        <tr><td><code>fromValue(string)</code></td><td>The case for a backing string (or <code>None</code>).</td></tr>
+        <tr><td><code>fromValue($value, $default)</code></td><td>The case for a string, or the default — <code>None</code> unless you say otherwise.</td></tr>
+        <tr><td><code>fromList($values)</code></td><td>A <code>list</code> of cases from an array of strings.</td></tr>
+        <tr><td><code>isValid($value)</code></td><td>Whether a value maps to a case.</td></tr>
+        <tr><td><code>contains($values, $case)</code></td><td>Whether a case is in a given set.</td></tr>
         <tr><td><code>getAll()</code></td><td>Every case as a list.</td></tr>
         <tr><td><code>getNames()</code></td><td>The case names.</td></tr>
-        <tr><td><code>isValid(value)</code></td><td>Whether a value maps to a case.</td></tr>
-        <tr><td><code>contains(values, case)</code></td><td>Whether a case is in a given set.</td></tr>
-        <tr><td><code>toString()</code></td><td>The case as its string name.</td></tr>
-        <tr><td><code>jsonSerialize()</code></td><td>Serializes to that string, so enums encode cleanly in a <a href="../utilities/io.html#response">Response</a>.</td></tr>
+        <tr><td><code>toString()</code></td><td>The name, or the backing value when the enum is backed. <code>None</code> is the empty string.</td></tr>
+        <tr><td><code>jsonSerialize()</code></td><td>That same string, so a case encodes cleanly inside a <a href="../utilities/io.html#response">Response</a>.</td></tr>
     </tbody>
 </table>
-<pre><code class="language-php">use Framework\Utils\Color;
+<pre><code class="language-php">Plan::isValid(&quot;pro&quot;);                            // true
+Plan::contains([ Plan::Pro, Plan::Enterprise ], $plan);   // is it a paid plan
+Plan::getAll();                                  // [Plan::None, Plan::Free, …]
 
-Color::fromValue(&quot;Blue&quot;);   // Color::Blue
-Color::getAll();            // [Color::None, Color::Red, …]
-Color::isValid(&quot;Blue&quot;);     // true
-Color::Blue-&gt;toString();    // &quot;Blue&quot;</code></pre>
+Plan::Pro-&gt;toString();     // &quot;pro&quot; when backed, &quot;Pro&quot; when not
+Plan::None-&gt;toString();    // &quot;&quot; — always</code></pre>
+<p>Because <code>match</code> on an enum is exhaustive and a
+<a href="phpstan.html#rules-enums">rule</a> checks that every case is handled, adding a case to the enum turns
+every place that switches on it into a build error rather than a silent fallthrough:</p>
+<pre><code class="language-php">$price = match ($plan) {
+    Plan::None, Plan::Free =&gt; 0,
+    Plan::Pro              =&gt; 20,
+    Plan::Enterprise       =&gt; 100,
+};</code></pre>
+
+<h2 id="storing">In a model and a query</h2>
+<p>Typing a <a href="../database/models.html#field-types">model field</a> as your enum is all it takes to store
+it — the column is written as the case name, and read back as the case:</p>
+<figure class="code"><figcaption class="code-tab">src/Account/Model/AccountModel.php</figcaption><pre><code class="language-php">namespace App\Account\Model;
+
+use App\Account\Plan;
+
+use Framework\Database\Model\Model;
+use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
+
+#[Model(hasTimestamps: true, canCreate: true, canEdit: true)]
+class AccountModel {
+
+    // ...
+
+    #[Field]
+    #[Requested]
+    public Plan $plan;
+}</code></pre></figure>
+<p>The <a href="../database/schema.html#query">generated query</a> then exposes that column as an
+<code>EnumWhere</code>, which takes the case itself, so a filter can never compare against a string that does not
+exist:</p>
+<pre><code class="language-php">$query = new AccountQuery();
+$query-&gt;plan-&gt;equal(Plan::Pro);
+$query-&gt;plan-&gt;in([ Plan::Pro, Plan::Enterprise ]);</code></pre>
+<p>Returning one needs nothing either — <code>jsonSerialize()</code> means a case inside an entity or an array
+becomes its string on the way out:</p>
+<pre><code class="language-php">return Response::data([
+    &quot;plan&quot;  =&gt; $account-&gt;plan,     // &quot;pro&quot;
+    &quot;plans&quot; =&gt; Plan::getAll(),     // every case, as strings
+]);</code></pre>
 
 <h2 id="map">Enum-keyed maps</h2>
-<p>A plain PHP array only allows <code>int</code> or <code>string</code> keys, so you can&#39;t key one by an enum
-case. The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Map.php" target="_blank" rel="noopener noreferrer"><code>Map</code></a> class fills that gap — a typed container whose <strong>keys are enum cases</strong> —
-with <code>set</code>, <code>get</code> / <code>getInt</code> / <code>getString</code>, <code>has</code>,
-<code>count</code> and iteration:</p>
+<p>A PHP array only takes <code>int</code> or <code>string</code> keys, so an enum case cannot be one.
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Map.php" target="_blank" rel="noopener noreferrer"><code>Map</code></a> is the container that can — the keys are cases, and the getters are typed:</p>
 <pre><code class="language-php">use Framework\Enum\Map;
 
-$labels = new Map();
-$labels-&gt;set(Status::Active,  &quot;Active&quot;);
-$labels-&gt;set(Status::Blocked, &quot;Blocked&quot;);
+$limits = new Map();
+$limits-&gt;set(Plan::Free, 10);
+$limits-&gt;set(Plan::Pro,  1000);
 
-$labels-&gt;get(Status::Active);   // &quot;Active&quot;
-$labels-&gt;has(Status::None);     // false</code></pre>
+$limits-&gt;getInt(Plan::Pro);     // 1000
+$limits-&gt;has(Plan::Enterprise); // false
+$limits-&gt;count();               // 2
 
-<h2 id="common">Common enums</h2>
-<p>The framework defines around forty enums; the ones you meet most often:</p>
-<table class="api-table">
-    <thead><tr><th>Enum</th><th>Used for</th></tr></thead>
-    <tbody>
-        <tr><td><code>Access</code></td><td>The generated access roles — see <a href="../subsystems/auth.html#access">Authentication</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/VariableType.php" target="_blank" rel="noopener noreferrer"><code>VariableType</code></a></td><td>The type of a <a href="../subsystems/settings.html#types">setting</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/FieldType.php" target="_blank" rel="noopener noreferrer"><code>FieldType</code></a></td><td>The type of a <a href="../database/models.html">model</a> field.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Type/DateType.php" target="_blank" rel="noopener noreferrer"><code>DateType</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Type/DateFormat.php" target="_blank" rel="noopener noreferrer"><code>DateFormat</code></a></td><td>Date parsing and <a href="../utilities/date.html#date">formatting</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Type/PeriodType.php" target="_blank" rel="noopener noreferrer"><code>PeriodType</code></a></td><td>Named <a href="../utilities/date.html#period">date ranges</a> (today, this week…).</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailResult.php" target="_blank" rel="noopener noreferrer"><code>EmailResult</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationResult.php" target="_blank" rel="noopener noreferrer"><code>NotificationResult</code></a></td><td>The outcome of a <a href="../subsystems/emails.html#result">send</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Color.php" target="_blank" rel="noopener noreferrer"><code>Color</code></a></td><td>The <a href="../utilities/utils.html#color">brand palette</a>.</td></tr>
-    </tbody>
-</table>
+foreach ($limits as $plan =&gt; $limit) {
+    // ...
+}</code></pre>
+<p>It also has <code>get()</code> and <code>getString()</code>, <code>isEmpty()</code> /
+<code>isNotEmpty()</code>, and serializes to JSON with the case names as keys.</p>
 
-                <div class="page-nav"><a href="../subsystems/notifications.html"><span class="dir">← Previous</span><span class="ttl">Notifications</span></a><a class="next" href="../features/intl.html"><span class="dir">Next →</span><span class="ttl">Internationalization</span></a></div>
+<div class="note">The framework&#39;s own enums — the generated <a href="../subsystems/auth.html#access">Access</a>
+and <a href="../database/schema.html#status">Status</a>, the <a href="../subsystems/settings.html#types">setting
+types</a>, the <a href="../utilities/date.html#period">date periods</a> — are documented with the subsystem that
+uses them. They are all built exactly like the one above.</div>
+
+<div class="page-nav"><a href="../subsystems/notifications.html"><span class="dir">← Previous</span><span class="ttl">Notifications</span></a><a class="next" href="../features/intl.html"><span class="dir">Next →</span><span class="ttl">Internationalization</span></a></div>
                 </article>
                 <nav class="toc" aria-label="On this page">
                     <p class="toc-title">On this page</p>

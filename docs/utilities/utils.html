@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -94,7 +95,7 @@
 <div class="eyebrow">Utilities</div>
 <h1>Utils</h1>
 <p class="lead">A broad, strict-typed standard library. Every helper is static:
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Strings.php#L985" target="_blank" rel="noopener noreferrer"><code>Strings::toKebabCase($x)</code></a>.</p>
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Strings.php" target="_blank" rel="noopener noreferrer"><code>Strings::toKebabCase($x)</code></a>.</p>
 
 <h2 id="strings">Strings</h2>
 <p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Strings.php" target="_blank" rel="noopener noreferrer"><code>Strings</code></a> is the largest of them — every string operation the framework needs, always returning a
@@ -327,8 +328,8 @@ $bytes  = AES::toHexBytes($hexString);</code></pre>
 <p>Convert text between character encodings and clean up stray bytes:</p>
 <pre><code class="language-php">use Framework\Utils\Encoding;
 
-Encoding::toUTF($text);      // → UTF-8
-Encoding::toISO($text);      // → ISO-8859-1
+Encoding::toUTF8($text);     // → UTF-8
+Encoding::toISO8859($text);  // → ISO-8859-1
 Encoding::removeBOM($text);  // strip a byte-order mark</code></pre>
 
 <h2 id="csv">CSV</h2>

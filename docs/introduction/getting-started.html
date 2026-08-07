@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -93,11 +94,12 @@
 
 <div class="eyebrow">Introduction</div>
 <h1>Getting Started</h1>
-<p class="lead">Install the framework, run the installer, and generate the code that powers your app.</p>
+<p class="lead">Install the framework, configure it, and build a first feature end to end — a table, the
+                    typed code generated from it, and a route that serves it.</p>
 
 <h2 id="requirements">Requirements</h2>
 <ul>
-    <li><strong>PHP 8.3+</strong> with the <code>mysqli</code>, <code>gd</code> and <code>mbstring</code> extensions.</li>
+    <li><strong>PHP 8.1+</strong> with the <code>mysqli</code>, <code>curl</code>, <code>zip</code>, <code>gd</code> and <code>mbstring</code> extensions.</li>
     <li><strong>Composer</strong> for dependency management.</li>
     <li>A <strong>MySQL / MariaDB</strong> database for the schema and migration layer.</li>
 </ul>
@@ -111,8 +113,8 @@
 </ul>
 <p>The rest are truly optional — pull them in only when you use the feature:</p>
 <ul>
-    <li><code>phpmailer/phpmailer</code> — sending mail over SMTP</li>
-    <li><code>openspout/openspout</code> — XLSX import / export</li>
+    <li><code>phpmailer/phpmailer</code> — <a href="../subsystems/emails.html">sending mail</a> over SMTP</li>
+    <li><code>openspout/openspout</code> — XLSX <a href="../features/import-export.html">import / export</a></li>
     <li><code>dompdf/dompdf</code> — PDF generation</li>
 </ul>
 
@@ -124,7 +126,7 @@
     &quot;tommalbran/framework&quot;: &quot;dev-main#v0.17.0&quot;
 }</code></pre></figure><pre><code class="language-bash">./vendor/bin/framework install</code></pre>
 <p>Then wire it into a single entry point — your <code>index.php</code> hands each request to
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Framework.php#L31" target="_blank" rel="noopener noreferrer"><code>Framework::execute()</code></a>. See <a href="../introduction/bootstrapping.html#entry">Bootstrapping</a>.</p>
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Framework.php" target="_blank" rel="noopener noreferrer"><code>Framework::execute()</code></a>. See <a href="../introduction/bootstrapping.html#entry">Bootstrapping</a>.</p>
 
 <h2 id="structure">Project structure</h2>
 <pre><code class="language-bash">your-app/
@@ -184,7 +186,121 @@ full details.</p>
 <pre><code class="language-bash">./framework watch</code></pre>
 <p>See the <a href="../introduction/cli.html#commands">CLI reference</a> for every command.</p>
 
-                <div class="page-nav"><a href="../index.html"><span class="dir">← Previous</span><span class="ttl">Overview</span></a><a class="next" href="../introduction/bootstrapping.html"><span class="dir">Next →</span><span class="ttl">Bootstrapping</span></a></div>
+                <h2 id="first-feature">Your first feature</h2>
+<p>The pieces above are the setup; this is the loop you repeat. One annotated class describes a table, the build
+turns it into typed code, and a route exposes it — four files, and nothing registered anywhere central.</p>
+
+<h3 id="first-model">1. Describe the table</h3>
+<p>A <a href="../database/models.html">model</a> is a plain class of public properties. The attributes say what each
+one is: which is the id, which the user may send, and which must be filled in.</p>
+<figure class="code"><figcaption class="code-tab">src/Product/Model/ProductModel.php</figcaption><pre><code class="language-php">namespace App\Product\Model;
+
+use Framework\Database\Model\Model;
+use Framework\Database\Model\Field;
+use Framework\Database\Model\Requested;
+use Framework\Database\Model\Validate;
+
+#[Model(hasTimestamps: true, canCreate: true, canEdit: true, canDelete: true)]
+class ProductModel {
+
+    #[Field(isID: true)]
+    #[Requested(isID: true)]
+    public int $productID;
+
+    #[Field(isUnique: true, length: 100)]
+    #[Validate(isRequired: true)]
+    #[Requested]
+    public string $name;
+
+    #[Field(decimals: 2)]
+    #[Requested]
+    public float $price;
+}</code></pre></figure>
+
+<h3 id="first-build">2. Build</h3>
+<pre><code class="language-bash">./framework build</code></pre>
+<p>That writes the <a href="../database/schema.html">six classes</a> for the model — the schema, a typed query, an
+entity, a column enum, a request and a status enum — next to it in a <code>Schema/</code> folder. Then create the
+table from the same model:</p>
+<pre><code class="language-bash">./framework migrate</code></pre>
+<p>The <a href="../database/migrations.html">migration</a> compares the models against the database and asks before
+it changes anything, so the first run creates <code>products</code> and later runs only add what is new.</p>
+
+<h3 id="first-class">3. Write the class</h3>
+<p>The generated schema is a base class, not something you edit. Yours extends it, and is the only door to the
+table — the reads are inherited, and the writes are protected so they can only be called from here.</p>
+<figure class="code"><figcaption class="code-tab">src/Product/Product.php</figcaption><pre><code class="language-php">namespace App\Product;
+
+use App\Product\Schema\ProductSchema;
+use App\Product\Schema\ProductQuery;
+use App\Product\Schema\ProductRequest;
+
+class Product extends ProductSchema {
+
+    /** Every product, newest first */
+    public static function getAll(): array {
+        $query = new ProductQuery();
+        $query-&gt;createdTime-&gt;orderByDesc();
+
+        return self::getEntityList($query);
+    }
+
+    public static function create(ProductRequest $request): int {
+        return self::createEntity($request);
+    }
+}</code></pre></figure>
+
+<h3 id="first-route">4. Expose it</h3>
+<p>A <a href="../core/routing.html">route</a> is a static method with an attribute. The second argument is the
+minimum <a href="../subsystems/auth.html#access">access level</a>, and type-hinting the generated request is what
+gives you typed properties instead of raw input.</p>
+<figure class="code"><figcaption class="code-tab">src/Product/ProductConstructor.php</figcaption><pre><code class="language-php">namespace App\Product;
+
+use App\Product\Schema\ProductRequest;
+
+use Framework\Discovery\Attr\Route;
+use Framework\System\Access;
+use Framework\IO\Response;
+
+class ProductConstructor {
+
+    #[Route(&quot;/products/getAll&quot;, Access::General)]
+    public static function getAll(): Response {
+        return Response::data([
+            &quot;list&quot; =&gt; Product::getAll(),
+        ]);
+    }
+
+    #[Route(&quot;/products/create&quot;, Access::Admin)]
+    public static function create(ProductRequest $request): Response {
+        $result = Product::validateRequest($request);
+        if ($result-&gt;hasError()) {
+            return Response::error($result-&gt;errors);
+        }
+
+        Product::create($request);
+        return Response::success(&quot;PRODUCT_CREATED&quot;);
+    }
+}</code></pre></figure>
+<h3 id="first-rebuild">5. Build again</h3>
+<p>Routes are discovered at build time, so the new ones do not exist until you rebuild. This is the step that is
+easy to forget — nothing warns you, the route simply is not there:</p>
+<pre><code class="language-bash">./framework build</code></pre>
+<p>Now they are live:</p>
+<pre><code class="language-bash">curl &quot;https://example.com/api/products/getAll&quot; \
+     -H &quot;Authorization: Bearer $TOKEN&quot;</code></pre>
+<p>Running <a href="cli.html#watch"><code>./framework watch</code></a> instead rebuilds on every save, which is how
+you want to work while developing — then this step takes care of itself.</p>
+
+<h3 id="first-loop">What just happened</h3>
+<p>Nothing was registered in a central file. The build found the model by its
+<a href="../core/discovery.html">attributes</a> and the routes by theirs, and generated the code that connects
+them — which is why renaming <code>price</code> breaks the build instead of quietly returning null at runtime.</p>
+<p>From here: <a href="../database/models.html#relations">relations</a> pull columns from other tables into the same
+entity, <a href="../database/query.html">queries</a> cover the filtering a listing needs, and
+<a href="../core/signals.html">signals</a> let other code react without this class knowing about it.</p>
+
+<div class="page-nav"><a href="../index.html"><span class="dir">← Previous</span><span class="ttl">Overview</span></a><a class="next" href="../introduction/bootstrapping.html"><span class="dir">Next →</span><span class="ttl">Bootstrapping</span></a></div>
                 </article>
                 <nav class="toc" aria-label="On this page">
                     <p class="toc-title">On this page</p>

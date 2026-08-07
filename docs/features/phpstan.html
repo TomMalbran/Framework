@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -162,28 +163,28 @@ use Framework\System\Access;
 use Framework\IO\Request;
 use Framework\IO\Response;
 
-class UserApi {
+class UserConstructor {
     #[Route(&quot;/users/get&quot;, Access::General)]
     public static function fetch(Request $request): Response {   // ✗ must be named get()
         return Response::empty();
     }
 }</code></pre>
 <p><code>RouteParamType</code> — a route takes no params or a single <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a>.</p>
-<pre><code class="language-php">class UserApi {
+<pre><code class="language-php">class UserConstructor {
     #[Route(&quot;/users/get&quot;, Access::General)]
     public static function get(int $id): Response {   // ✗ only a Request (or nothing) is allowed
         return Response::empty();
     }
 }</code></pre>
 <p><code>RouteReturnType</code> — a route returns a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Response.php" target="_blank" rel="noopener noreferrer"><code>Response</code></a>.</p>
-<pre><code class="language-php">class UserApi {
+<pre><code class="language-php">class UserConstructor {
     #[Route(&quot;/users/get&quot;, Access::General)]
     public static function get(Request $request): array {   // ✗ must return a Response
         return [];
     }
 }</code></pre>
 <p><code>RouteDuplicate</code> — no two routes share the same path.</p>
-<pre><code class="language-php">class UserApi {
+<pre><code class="language-php">class UserConstructor {
     #[Route(&quot;/users/get&quot;, Access::General)]
     public static function get(Request $request): Response { /* … */ }
 }

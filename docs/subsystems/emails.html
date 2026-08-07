@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -97,7 +98,7 @@
 content, a shared HTML template and a white list for safe testing.</p>
 
 <h2 id="sending">Sending</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/Email.php#L37" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a> sends one message and returns an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailResult.php" target="_blank" rel="noopener noreferrer"><code>EmailResult</code></a>. By default it wraps the
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a> sends one message and returns an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailResult.php" target="_blank" rel="noopener noreferrer"><code>EmailResult</code></a>. By default it wraps the
 message in the <a href="#templates">HTML template</a>, honours the <a href="#whitelist">white list</a>, and does
 nothing when email is disabled:</p>
 <pre><code class="language-php">use Framework\Email\Email;
@@ -162,7 +163,7 @@ EMAIL_REPLY_TO = &quot;support@myapp.com&quot;</code></pre></figure>
 
 <h2 id="providers">Providers</h2>
 <p><code>EMAIL_PROVIDER</code> names an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailProvider.php" target="_blank" rel="noopener noreferrer"><code>EmailProvider</code></a> — one of the transports below. When you call
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/Email.php#L37" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a>, it builds the message from the shared &quot;from&quot; identity and hands it to the
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a>, it builds the message from the shared &quot;from&quot; identity and hands it to the
 matching transport: the API providers post to their HTTP API, while the default sends over a plain SMTP server. If
 the transport rejects the message, the send returns <a href="#result"><code>ProviderError</code></a>.</p>
 <p>Each provider reads <strong>its own</strong> credentials, so switching is just a matter of changing
@@ -244,7 +245,7 @@ class EmailCommands {
 <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailWhiteList.php" target="_blank" rel="noopener noreferrer"><code>EmailWhiteList</code></a> — every other recipient is skipped with a
 <a href="#result"><code>WhiteListFilter</code></a> result. Staging can then run the real send path with no risk of
 emailing real customers.</p>
-<p>Manage the list with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailWhiteList.php#L17" target="_blank" rel="noopener noreferrer"><code>EmailWhiteList::add()</code></a>, <code>edit()</code> and <code>remove()</code>, and pass
+<p>Manage the list with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailWhiteList.php" target="_blank" rel="noopener noreferrer"><code>EmailWhiteList::add()</code></a>, <code>edit()</code> and <code>remove()</code>, and pass
 <code>sendAlways: true</code> on a message that must always go out — a password reset, say — to skip the filter for
 that one send.</p>
 
@@ -274,9 +275,9 @@ use Framework\System\EmailCode;
 
 $content = EmailContent::get(EmailCode::Welcome, &quot;en&quot;);
 Email::sendContent($content, &quot;user@example.com&quot;);</code></pre>
-<p>The stored copy renders through Mustache, so <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailContent.php#L45" target="_blank" rel="noopener noreferrer"><code>EmailContent::render()</code></a> fills the message&#39;s
+<p>The stored copy renders through Mustache, so <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent::render()</code></a> fills the message&#39;s
 <code>{{placeholders}}</code> — like <code>{{name}}</code> above — with per-send data, and
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailQueue.php#L73" target="_blank" rel="noopener noreferrer"><code>EmailQueue::add()</code></a> takes the very same content when you want it <a href="#queue">queued</a> instead of
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailQueue.php" target="_blank" rel="noopener noreferrer"><code>EmailQueue::add()</code></a> takes the very same content when you want it <a href="#queue">queued</a> instead of
 sent inline.</p>
 
 <h2 id="templates">The HTML template</h2>
@@ -284,13 +285,19 @@ sent inline.</p>
 carries the same branded shell. <code>send()</code> loads the file named by <code>EMAIL_TEMPLATE</code>, renders it
 with <a href="../core/build.html#templates">Mustache</a>, and drops your message into it — you write only the body (plain
 text or HTML), and the template supplies the header, logo and footer around it.</p>
+<p>You do not have to write one to start. The framework ships a working template at
+<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/data/email.html" target="_blank" rel="noopener noreferrer"><code>data/email.html</code></a> — a
+centered, responsive shell with the logo above the message — and <code>EMAIL_TEMPLATE</code> points at it by
+default. The path is looked up in your app first and only then in the framework, so dropping your own
+<code>data/email.html</code> into the project replaces it without touching the configuration. Point
+<code>EMAIL_TEMPLATE</code> somewhere else to keep both.</p>
 <p>The template is a normal HTML file with a handful of placeholders that <code>send()</code> fills in:</p>
 <table class="api-table">
     <thead><tr><th>Placeholder</th><th>Filled with</th></tr></thead>
     <tbody>
         <tr><td><code>{{message}}</code></td><td>Your message — the body passed to <code>send()</code>.</td></tr>
         <tr><td><code>{{name}}</code> / <code>{{siteName}}</code></td><td>The application name.</td></tr>
-        <tr><td><code>{{logo}}</code> / <code>{{logoHeight}}</code></td><td>The logo image (<code>EMAIL_LOGO</code>) and its height.</td></tr>
+        <tr><td><code>{{logo}}</code> / <code>{{logoHeight}}</code></td><td>The logo file name (<code>EMAIL_LOGO</code>) and its height — the shipped template builds the src as <code>{{files}}/{{logo}}</code>.</td></tr>
         <tr><td><code>{{url}}</code></td><td>The email base url (<code>EMAIL_URL</code>).</td></tr>
         <tr><td><code>{{files}}</code></td><td>The app&#39;s files base url.</td></tr>
     </tbody>

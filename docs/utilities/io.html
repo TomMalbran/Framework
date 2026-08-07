@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -197,7 +198,7 @@ Select::createFromMap($map);   // from an enum-keyed Map</code></pre>
 <p><code>create()</code> is the one for database rows: point it at the id and name columns, optionally add a
 <code>descName</code> for a second line, <code>extraKey</code> to carry extra columns along, <code>useEmpty</code>
 for a blank first option and <code>distinct</code> to drop duplicates. Enums build their own lists through the
-same class — that is what <a href="../features/enums.html#helpers"><code>getSelect()</code></a> returns.</p>
+same class — that is what <a href="../database/schema.html#status"><code>getSelect()</code></a> returns.</p>
 
 <h2 id="search">Search</h2>
 <p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Search.php" target="_blank" rel="noopener noreferrer"><code>Search</code></a> is the shape returned by an autocomplete or a search box — an id and a title per match,

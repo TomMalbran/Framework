@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -163,9 +164,9 @@ $period-&gt;getDaysAmount();  // how many days it spans</code></pre>
 <table class="api-table">
     <thead><tr><th>Way</th><th>Use when</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Period.php#L85" target="_blank" rel="noopener noreferrer"><code>Period::fromPeriod(PeriodType::X)</code></a></td><td>You know the named range in code.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period::fromPeriod(PeriodType::X)</code></a></td><td>You know the named range in code.</td></tr>
         <tr><td><code>new Period($request)</code></td><td>The range comes from a <a href="../utilities/io.html#request">request</a> — the usual case.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Period.php#L96" target="_blank" rel="noopener noreferrer"><code>Period::fromDictionary($data)</code></a></td><td>It comes from stored or decoded data.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period::fromDictionary($data)</code></a></td><td>It comes from stored or decoded data.</td></tr>
     </tbody>
 </table>
 <p>Passing a request is the common path: the constructor reads a <code>period</code> field for a named range, or

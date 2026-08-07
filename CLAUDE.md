@@ -1,6 +1,6 @@
 # Framework
 
-A PHP 8.3 framework built around attribute discovery and code generation.
+A PHP 8.1 framework built around attribute discovery and code generation.
 
 ## Checks
 
@@ -26,17 +26,25 @@ Three private console commands back it, all only visible from inside this repo:
 
 ```bash
 ./framework docs          # serve it locally on port 3005
-./framework docsCheck     # verify every link still resolves
+./framework docsCheck     # verify the links, and the code examples
 ./framework docsIndex     # rebuild docs/assets/search.json
 ```
 
+`docsCheck` covers four things: that every source link points at a file that exists and,
+when labelled `Class::method()`, at a method it declares; that every page link and
+`#anchor` resolves; that every `use Framework\...` in a PHP example is a real class whose
+called methods exist; and that `search.json` matches the pages it was built from. Classes
+under `Framework\System` are skipped, since the build of each app writes those.
+
 Things that are easy to get wrong:
 
-- **Run `docsIndex` after editing any page.** Nothing does it automatically, so the
-  search silently keeps answering from a stale index.
+- **Run `docsIndex` after editing any page.** Nothing does it automatically, and the
+  search would keep answering from a stale index — `docsCheck` fails when it is stale.
 - **Run `docsCheck` before merging to `main`.** The source links point at
   `blob/main/...`, so a link to a file that only exists on `dev` passes locally and
   404s on the published site.
+- **`vendor/bin/phpcs` needs a path.** On its own it exits with an error and checks
+  nothing, so run `vendor/bin/phpcs src`.
 - **Do not hand-edit the version.** `./framework incVersion` (and `decVersion`,
   `setVersion`) rewrites `composer.json`, `README.md` and every docs page — the sidebar
   badge, the GitHub tag it links to, and the `dev-main#v` requires.

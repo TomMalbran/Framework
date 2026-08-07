@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Schemas — Framework</title>
-    <meta name="description" content="Editor validation for the framework's JSON files.">
+    <title>Schema JSON — Framework</title>
+    <meta name="description" content="The JSON the build can write from the models, describing every table for a tool outside the project.">
     <meta name="theme-color" content="#2f6fd0">
     <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
     <link rel="mask-icon" href="../assets/favicon.svg" color="#2f6fd0">
@@ -91,85 +91,76 @@
         <div class="content">
             <div class="doc">
                 <article class="doc-main prose">
+<div class="eyebrow">Database</div>
+                    <h1>Schema JSON</h1>
+                    <p class="lead">Besides the typed classes, the build can write the models out as plain JSON — a
+                    description of every table for something outside the project to read.</p>
 
-<div class="eyebrow">Features</div>
-<h1>JSON Schemas</h1>
-<p class="lead">The framework ships JSON Schema files for the JSON it reads — strings, emails, notifications and
-icons — so your editor validates and autocompletes those files as you type them.</p>
+<div class="note">Not to be confused with the <a href="../features/schema-json.html">JSON Schemas</a> in
+Features — those validate the framework&#39;s own config files in the editor. This one describes your
+database.</div>
 
-<div class="note">Not to be confused with the <a href="../database/schema-json.html">Schema JSON</a> in
-Database — that one describes your tables. These validate the config files as you edit them.</div>
+<h2 id="writing">Turning it on</h2>
+<p>It is off unless you name a file for it, through
+<a href="../introduction/configuration.html#reference"><code>DB_SCHEMA_FILE</code></a> in the <code>.env</code>:</p>
+<pre><code class="language-ini">DB_SCHEMA_FILE = &quot;database&quot;</code></pre>
+<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Builder/SchemaJSON.php" target="_blank" rel="noopener noreferrer"><code>SchemaJSON</code></a> then writes
+<code>database.json</code> at the root of the app on the next <a href="../core/build.html">build</a>, adding the
+<code>.json</code> for you. It is a <a href="../core/build.html#builders">builder</a> like any other, so
+<code>destroy</code> removes the file again, and leaving the variable empty skips it entirely.</p>
 
-<h2 id="schemas">The schemas</h2>
-<p>They live in the package&#39;s <code>schemas/</code> directory, one per kind of file:</p>
-<table class="api-table">
-    <thead><tr><th>Schema</th><th>Validates</th></tr></thead>
-    <tbody>
-        <tr><td><code>strings.schema.json</code></td><td>The <a href="../features/intl.html#files">translation</a> files in <code>nls/strings</code>.</td></tr>
-        <tr><td><code>emails.schema.json</code></td><td>The <a href="../subsystems/emails.html#content">email content</a> in <code>nls/emails</code>.</td></tr>
-        <tr><td><code>notifications.schema.json</code></td><td>The <a href="../subsystems/notifications.html#content">notification content</a> in <code>nls/notifications</code>.</td></tr>
-        <tr><td><code>icons.schema.json</code></td><td>The icon set read by <a href="../introduction/cli.html#icons"><code>./framework icons</code></a>.</td></tr>
-    </tbody>
-</table>
-
-<h2 id="setup">Setting them up</h2>
-<p>Point your editor at them by file pattern. In VS Code that is the <code>json.schemas</code> setting — the paths
-resolve inside <code>vendor</code>, so they update with the package:</p>
-<figure class="code"><figcaption class="code-tab">.vscode/settings.json</figcaption><pre><code class="language-json">{
-    &quot;json.schemas&quot;: [
-        {
-            &quot;fileMatch&quot;: [ &quot;/nls/strings/*.json&quot; ],
-            &quot;url&quot;: &quot;./vendor/tommalbran/framework/schemas/strings.schema.json&quot;
-        },
-        {
-            &quot;fileMatch&quot;: [ &quot;/nls/emails/*.json&quot; ],
-            &quot;url&quot;: &quot;./vendor/tommalbran/framework/schemas/emails.schema.json&quot;
-        },
-        {
-            &quot;fileMatch&quot;: [ &quot;/nls/notifications/*.json&quot; ],
-            &quot;url&quot;: &quot;./vendor/tommalbran/framework/schemas/notifications.schema.json&quot;
-        },
-        {
-            &quot;fileMatch&quot;: [ &quot;/icons/*.json&quot; ],
-            &quot;url&quot;: &quot;./vendor/tommalbran/framework/schemas/icons.schema.json&quot;
-        }
-    ]
-}</code></pre></figure>
-<p>Any editor with JSON Schema support works the same way — PhpStorm maps schemas to file patterns under its JSON
-Schema settings, and editors driven by a language server read the same mapping.</p>
-
-<h2 id="rules">What they enforce</h2>
-<p>The schemas are strict: each sets <code>additionalProperties: false</code>, so a key that does not match the
-expected pattern is flagged rather than silently ignored at build time.</p>
-
-<h3 id="rules-strings">Strings</h3>
-<p>Keys are <code>UPPER_SNAKE_CASE</code> and hold a plain string, with two special prefixes:
-<code>SELECT_…</code> keys hold an object of options (this is what <a href="../features/enums.html">enum</a> labels read
-through), and <code>DATE_…</code> keys may be a string, an array or an object of formats.</p>
-
-<h3 id="rules-content">Emails &amp; notifications</h3>
-<p>Keys are <code>PascalCase</code> — they become the generated <code>EmailCode</code> /
-<code>NotificationCode</code> cases — and every entry <strong>requires</strong> its fields: a
-<code>description</code>, plus <code>subject</code> and a <code>message</code> array for emails, or
-<code>title</code> and <code>message</code> for notifications. Miss one and the editor says so immediately.</p>
-
-<h3 id="rules-icons">Icons</h3>
-<p>Icons are grouped in lowercase folders, and each icon&#39;s value declares where it comes from — validated
-against a pattern, so a typo is caught as you write it:</p>
+<h2 id="shape">What it returns</h2>
+<p>One entry per table, sorted by name, covering the framework&#39;s own models as well as yours. Each entry
+repeats the flags from the <a href="models.html#model">#[Model]</a> attribute and then lists the columns and how
+they are wired together:</p>
 <pre><code class="language-json">{
-    &quot;actions&quot;: {
-        &quot;add&quot;:    &quot;google add_circle fill&quot;,
-        &quot;delete&quot;: &quot;google delete w300 s24&quot;,
-        &quot;star&quot;:   &quot;fontAwesome&quot;,
-        &quot;logo&quot;:   &quot;custom&quot;
+    &quot;settings&quot;: {
+        &quot;hasTimestamps&quot;: true,
+        &quot;hasStatus&quot;: false,
+        &quot;hasUsers&quot;: false,
+        &quot;canCreate&quot;: false,
+        &quot;canEdit&quot;: true,
+        &quot;canDelete&quot;: false,
+        &quot;fields&quot;: [
+            { &quot;name&quot;: &quot;section&quot;,      &quot;type&quot;: &quot;string&quot;, &quot;length&quot;: 0, &quot;isPrimary&quot;: true,  &quot;isKey&quot;: false },
+            { &quot;name&quot;: &quot;variable&quot;,     &quot;type&quot;: &quot;string&quot;, &quot;length&quot;: 0, &quot;isPrimary&quot;: true,  &quot;isKey&quot;: false },
+            { &quot;name&quot;: &quot;value&quot;,        &quot;type&quot;: &quot;text&quot;,   &quot;length&quot;: 0, &quot;isPrimary&quot;: false, &quot;isKey&quot;: false },
+            { &quot;name&quot;: &quot;variableType&quot;, &quot;type&quot;: &quot;enum&quot;,   &quot;length&quot;: 0, &quot;isPrimary&quot;: false, &quot;isKey&quot;: false }
+        ],
+        &quot;joins&quot;: [],
+        &quot;foreigns&quot;: []
     }
 }</code></pre>
-<p>A <code>google</code> icon names a Material Symbol and accepts the <code>fill</code>, <code>w100</code>–<code>w700</code>
-weight and <code>s20</code>/<code>s24</code>/<code>s40</code>/<code>s48</code> size modifiers; the rest are
-<code>fontAwesome</code>, <code>other</code> or <code>custom</code>. Hovering a value in the editor shows that same
-explanation, since it is carried in the schema&#39;s description.</p>
+<table class="api-table">
+    <thead><tr><th>Key</th><th>Is</th></tr></thead>
+    <tbody>
+        <tr><td><code>fields</code></td><td>Every column of the table itself, as <code>name</code>, <code>type</code>, <code>length</code>, <code>isPrimary</code> and <code>isKey</code>. The type is the <a href="models.html#field-types">field type</a> — <code>number</code>, <code>string</code>, <code>text</code>, <code>longtext</code>, <code>boolean</code>, <code>date</code>, <code>enum</code> or <code>json</code>.</td></tr>
+        <tr><td><code>joins</code></td><td>The tables this one is read together with, from its <a href="models.html#relations">relations</a>.</td></tr>
+        <tr><td><code>foreigns</code></td><td>The columns that point at another table without being joined into the entity.</td></tr>
+    </tbody>
+</table>
+<p>Both are given the same way — <code>fromField</code>, <code>toTable</code>, <code>toField</code> — so a
+reader can treat them as edges without caring which produced them:</p>
+<pre><code class="language-json">&quot;joins&quot;: [
+    { &quot;fromField&quot;: &quot;SESSION_ID&quot;,    &quot;toTable&quot;: &quot;log_session&quot;, &quot;toField&quot;: &quot;SESSION_ID&quot; },
+    { &quot;fromField&quot;: &quot;CREDENTIAL_ID&quot;, &quot;toTable&quot;: &quot;credential&quot;,  &quot;toField&quot;: &quot;CREDENTIAL_ID&quot; }
+]</code></pre>
 
-                <div class="page-nav"><a href="curl.html"><span class="dir">← Previous</span><span class="ttl">Curl</span></a><a class="next" href="phpstan.html"><span class="dir">Next →</span><span class="ttl">PHPStan Rules</span></a></div>
+<h2 id="using">Using it</h2>
+<p>The file is regenerated on every build, so it should be committed only if the thing reading it expects to find
+it in the repository — otherwise treat it like the rest of the generated code and ignore it. Nothing in the
+framework reads it back; it exists purely to be consumed from outside:</p>
+<pre><code class="language-php">$schema = JSON::readFile($path, &quot;database.json&quot;);
+
+foreach ($schema as $tableName =&gt; $table) {
+    foreach ($table[&quot;joins&quot;] as $join) {
+        // ... draw an edge from $tableName to $join[&quot;toTable&quot;]
+    }
+}</code></pre>
+<p>Because it is written from the same <a href="models.html">models</a> the
+<a href="migrations.html">migrations</a> read, it never drifts from the database the app actually builds.</p>
+
+<div class="page-nav"><a href="schema.html"><span class="dir">← Previous</span><span class="ttl">Generated Schema</span></a><a class="next" href="query.html"><span class="dir">Next →</span><span class="ttl">Query builder</span></a></div>
                 </article>
                 <nav class="toc" aria-label="On this page">
                     <p class="toc-title">On this page</p>

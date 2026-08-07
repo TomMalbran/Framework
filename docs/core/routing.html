@@ -54,6 +54,7 @@
                     <a href="../database/database.html">Database</a>
                     <a href="../database/models.html">Models</a>
                     <a href="../database/schema.html">Generated Schema</a>
+                    <a href="../database/schema-json.html">Schema JSON</a>
                     <a href="../database/query.html">Query builder</a>
                     <a href="../database/migrations.html">Migrations</a>
                 </div>
@@ -105,7 +106,7 @@ use Framework\System\Access;
 use Framework\IO\Request;
 use Framework\IO\Response;
 
-class UserApi {
+class UserConstructor {
     #[Route(&quot;/users/get&quot;, Access::General)]
     public static function get(Request $request): Response {
         $id = $request-&gt;getInt(&quot;id&quot;);
@@ -154,11 +155,11 @@ class ProductModel {
 and the generated <code>Router</code> builds it from the incoming request with
 <code>ProductRequest::fromRequest($request)</code>. Your handler receives the correct type, with typed,
 autocompleted fields and no manual <code>getString()</code> / <code>getInt()</code>:</p>
-<figure class="code"><figcaption class="code-tab">src/Product/ProductApi.php</figcaption><pre><code class="language-php">use Framework\Discovery\Attr\Route;
+<figure class="code"><figcaption class="code-tab">src/Product/ProductConstructor.php</figcaption><pre><code class="language-php">use Framework\Discovery\Attr\Route;
 use Framework\System\Access;
 use Framework\IO\Response;
 
-class ProductApi {
+class ProductConstructor {
     #[Route(&quot;/products/edit&quot;, Access::Admin)]
     public static function edit(ProductRequest $request): Response {
         $id    = $request-&gt;id;      // int
@@ -248,7 +249,7 @@ return Response::warning(&quot;PRODUCT_PARTIAL&quot;);
 return Response::error(&quot;PRODUCT_ERROR_EXISTS&quot;);
 
 // Validation failures, keyed by field
-return Response::error($errors);
+return Response::error($result-&gt;errors);
 
 // Nothing to send back
 return Response::empty();</code></pre>
@@ -258,9 +259,9 @@ client renders them in the user&#39;s language. On the way out, <code>execute()<
 <p>A typical route is therefore validate, act, respond — with no plumbing in between:</p>
 <pre><code class="language-php">#[Route(&quot;/products/edit&quot;, Access::Admin)]
 public static function edit(ProductRequest $request): Response {
-    $errors = Product::validateRequest($request);
-    if ($errors-&gt;has()) {
-        return Response::error($errors);
+    $result = Product::validateRequest($request);
+    if ($result-&gt;hasError()) {
+        return Response::error($result-&gt;errors);
     }
 
     if ($request-&gt;isCreate) {
