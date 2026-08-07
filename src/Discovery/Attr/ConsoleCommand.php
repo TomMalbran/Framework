@@ -18,6 +18,9 @@ class ConsoleCommand {
     public string $name  = "";
     public string $alias = "";
 
+    // A private Command is only available while working on the Framework itself
+    public bool $isPrivate = false;
+
     private ?ReflectionMethod $handler = null;
 
 
@@ -25,11 +28,17 @@ class ConsoleCommand {
     /**
      * The Console Command Attribute
      * @param string $name
-     * @param string $alias Optional.
+     * @param string $alias     Optional.
+     * @param bool   $isPrivate Optional.
      */
-    public function __construct(string $name, string $alias = "") {
-        $this->name  = $name;
-        $this->alias = $alias;
+    public function __construct(
+        string $name,
+        string $alias = "",
+        bool $isPrivate = false,
+    ) {
+        $this->name      = $name;
+        $this->alias     = $alias;
+        $this->isPrivate = $isPrivate;
     }
 
 

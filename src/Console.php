@@ -92,10 +92,11 @@ class Console {
      * @return list<ConsoleCommand>
      */
     private static function getCommands(): array {
-        $classes    = Discovery::findClasses(forAll: true);
-        $priorities = [];
-        $instances  = [];
-        $result     = [];
+        $classes     = Discovery::findClasses(forAll: true);
+        $isFramework = Package::isFramework();
+        $priorities  = [];
+        $instances   = [];
+        $result      = [];
 
         foreach ($classes as $class) {
             $methods = $class->getMethods();
@@ -105,11 +106,17 @@ class Console {
                     continue;
                 }
 
+                // Private Commands are only available inside the Framework
+                $instance = $attributes[0]->newInstance();
+                if ($instance->isPrivate && !$isFramework) {
+                    continue;
+                }
+
                 $priority = Discovery::getPriority($method);
                 if (!isset($instances[$priority])) {
                     $priorities[] = $priority;
                 }
-                $instances[$priority][] = $attributes[0]->newInstance()->setHandler($method);
+                $instances[$priority][] = $instance->setHandler($method);
             }
         }
         sort($priorities);
