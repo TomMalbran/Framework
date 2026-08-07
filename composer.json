@@ -12,7 +12,9 @@
         "php": "^8.1",
         "ext-mysqli": "*",
         "ext-curl": "*",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "ext-gd": "*",
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "firebase/php-jwt": "^6.10",
