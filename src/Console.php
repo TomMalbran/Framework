@@ -48,17 +48,6 @@ class Console {
     }
 
     /**
-     * Displays the version information
-     * @return void
-     */
-    #[ConsoleCommand("version", "-v")]
-    #[Priority(Priority::Highest)]
-    public static function version(): void {
-        $version = Application::getVersion();
-        print("Version: $version\n");
-    }
-
-    /**
      * Installs the Framework
      * @return void
      */

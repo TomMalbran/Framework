@@ -14,6 +14,9 @@ class Package {
     public const ConfigDir   = "config";
     public const TemplateDir = "data/templates";
 
+    // Documentation
+    public const DocsDir     = "docs";
+
     // Source Directories
     public const SystemDir   = "System";
     public const SchemaDir   = "Schema";

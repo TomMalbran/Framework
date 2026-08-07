@@ -17,7 +17,7 @@ Add the repository to the repositories:
 Add the require using the corresponding version:
 ```json
 "require": {
-    "tommalbran/framework": "dev-main#v0.1.0"
+    "tommalbran/framework": "dev-main#v0.17.0"
 }
 ```
 
