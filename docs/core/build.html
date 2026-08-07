@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -100,18 +100,18 @@ the bridge between <a href="../core/discovery.html#finding">Discovery</a> and th
 <h2 id="how">How a build runs</h2>
 <p>The build is the step between writing a class and being able to use it — it is steps two and five of the
 <a href="../introduction/getting-started.html#first-feature">first feature walkthrough</a>.</p>
-<p><code>./framework build</code> calls <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Builder/Builder.php" target="_blank" rel="noopener noreferrer"><code>Builder::build()</code></a>, which:</p>
+<p><code>./framework build</code> calls <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Builder/Builder.php" target="_blank" rel="noopener noreferrer"><code>Builder::build()</code></a>, which:</p>
 <ol>
     <li>loads the config and the Mustache <code>.mu</code> templates,</li>
-    <li>discovers every class implementing <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryBuilder.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryBuilder</code></a> (in the app and framework),</li>
-    <li>orders them by their <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Priority.php" target="_blank" rel="noopener noreferrer"><code>#[Priority]</code></a>, and</li>
+    <li>discovers every class implementing <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryBuilder.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryBuilder</code></a> (in the app and framework),</li>
+    <li>orders them by their <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Priority.php" target="_blank" rel="noopener noreferrer"><code>#[Priority]</code></a>, and</li>
     <li>calls <code>generateCode()</code> on each, writing the result into <code>src/System</code>.</li>
 </ol>
 <pre><code class="language-bash">./framework build       # generate src/System
 ./framework destroy     # remove the generated code</code></pre>
 
 <h2 id="builders">Writing a builder</h2>
-<p>A builder implements <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryBuilder.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryBuilder</code></a> — a <code>generateCode()</code> that writes files and a
+<p>A builder implements <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryBuilder.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryBuilder</code></a> — a <code>generateCode()</code> that writes files and a
 matching <code>destroyCode()</code> that removes them, both annotated <code>#[\Override]</code>. Collect data
 from the discovered classes and render it through the <a href="#templates">Template</a> enum, which knows every
 <code>.mu</code> file. Each case exposes <code>-&gt;create($path, $data)</code> and <code>-&gt;delete($path)</code>,
@@ -152,10 +152,10 @@ class AgentPromptCode implements DiscoveryBuilder {
 }</code></pre></figure>
 <p><code>generateCode()</code> usually ends by printing a one-line summary of what it did and returning the number
 of files it added; <code>destroyCode()</code> mirrors it, returning the number removed. Both can create and
-remove their own sub-directories through <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/Storage.php" target="_blank" rel="noopener noreferrer"><code>Storage</code></a>.</p>
+remove their own sub-directories through <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/Storage.php" target="_blank" rel="noopener noreferrer"><code>Storage</code></a>.</p>
 <div class="note"><strong>Pattern:</strong> keep the pure data collection in its own method (e.g.
 <code>collectPrompts()</code>) and let <code>generateCode()</code> only wire it to the template — the collector
-is then trivial to unit-test. Note that <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Builder/Builder.php" target="_blank" rel="noopener noreferrer"><code>Builder::generateCode()</code></a> is a framework-internal shortcut
+is then trivial to unit-test. Note that <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Builder/Builder.php" target="_blank" rel="noopener noreferrer"><code>Builder::generateCode()</code></a> is a framework-internal shortcut
 and is not used outside of it; apps render through the <code>Template</code> enum as above.</div>
 
 <h2 id="templates">Templates &amp; the Template enum</h2>
@@ -200,15 +200,15 @@ knowing by name, because a question about generated code is usually a question a
 <table class="api-table">
     <thead><tr><th>Builder</th><th>Generates</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Builder/RouterCode.php" target="_blank" rel="noopener noreferrer"><code>RouterCode</code></a></td><td>The <code>Router</code> — collects every <a href="routing.html">#[Route]</a> and writes the dispatch table.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Builder/SignalCode.php" target="_blank" rel="noopener noreferrer"><code>SignalCode</code></a></td><td>The <code>Signal</code> class — collects the <a href="signals.html">listeners</a> and merges their parameters.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Builder/TemplateCode.php" target="_blank" rel="noopener noreferrer"><code>TemplateCode</code></a></td><td>The <a href="#templates"><code>Template</code></a> enum — one case per <code>.mu</code> file found.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/SchemaBuilder.php" target="_blank" rel="noopener noreferrer"><code>SchemaBuilder</code></a></td><td>The <a href="../database/schema.html">schema classes</a> of every <a href="../database/models.html">model</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Intl/LanguageBuilder.php" target="_blank" rel="noopener noreferrer"><code>LanguageBuilder</code></a></td><td>The <code>Language</code> class, from the <a href="../features/intl.html#files">language files</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLogBuilder.php" target="_blank" rel="noopener noreferrer"><code>ActionLogBuilder</code></a></td><td>The <code>Sec</code> and <code>Act</code> enums, from the <a href="../features/logging.html#actions">log attributes</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/Configs.php" target="_blank" rel="noopener noreferrer"><code>Configs</code></a></td><td>The <a href="../introduction/configuration.html#env-methods"><code>Config</code></a> class, from the <code>.env</code> files.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/AccessRole.php" target="_blank" rel="noopener noreferrer"><code>AccessRole</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/SettingConfig.php" target="_blank" rel="noopener noreferrer"><code>SettingConfig</code></a></td><td>The <code>Access</code> and <code>Setting</code> classes.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/FilePath.php" target="_blank" rel="noopener noreferrer"><code>FilePath</code></a></td><td>The <a href="../utilities/file.html#paths"><code>Path</code></a> class.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Builder/RouterCode.php" target="_blank" rel="noopener noreferrer"><code>RouterCode</code></a></td><td>The <code>Router</code> — collects every <a href="routing.html">#[Route]</a> and writes the dispatch table.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Builder/SignalCode.php" target="_blank" rel="noopener noreferrer"><code>SignalCode</code></a></td><td>The <code>Signal</code> class — collects the <a href="signals.html">listeners</a> and merges their parameters.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Builder/TemplateCode.php" target="_blank" rel="noopener noreferrer"><code>TemplateCode</code></a></td><td>The <a href="#templates"><code>Template</code></a> enum — one case per <code>.mu</code> file found.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/SchemaBuilder.php" target="_blank" rel="noopener noreferrer"><code>SchemaBuilder</code></a></td><td>The <a href="../database/schema.html">schema classes</a> of every <a href="../database/models.html">model</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Intl/LanguageBuilder.php" target="_blank" rel="noopener noreferrer"><code>LanguageBuilder</code></a></td><td>The <code>Language</code> class, from the <a href="../features/intl.html#files">language files</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/ActionLogBuilder.php" target="_blank" rel="noopener noreferrer"><code>ActionLogBuilder</code></a></td><td>The <code>Sec</code> and <code>Act</code> enums, from the <a href="../features/logging.html#actions">log attributes</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/Configs.php" target="_blank" rel="noopener noreferrer"><code>Configs</code></a></td><td>The <a href="../introduction/configuration.html#env-methods"><code>Config</code></a> class, from the <code>.env</code> files.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/AccessRole.php" target="_blank" rel="noopener noreferrer"><code>AccessRole</code></a> / <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/SettingConfig.php" target="_blank" rel="noopener noreferrer"><code>SettingConfig</code></a></td><td>The <code>Access</code> and <code>Setting</code> classes.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/FilePath.php" target="_blank" rel="noopener noreferrer"><code>FilePath</code></a></td><td>The <a href="../utilities/file.html#paths"><code>Path</code></a> class.</td></tr>
     </tbody>
 </table>
 <p>Each one is a <code>DiscoveryBuilder</code> found the same way your own would be, so nothing about them is
@@ -216,7 +216,7 @@ special — they are just the ones that come with the framework.</p>
 
 <h2 id="watching">Watching for changes</h2>
 <p>Running <code>build</code> by hand after every edit gets old quickly.
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Builder/Watcher.php" target="_blank" rel="noopener noreferrer"><code>Watcher</code></a> backs the <a href="../introduction/cli.html#watch">watch</a>
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Builder/Watcher.php" target="_blank" rel="noopener noreferrer"><code>Watcher</code></a> backs the <a href="../introduction/cli.html#watch">watch</a>
 command: it scans the app, and rebuilds whenever a file changes:</p>
 <pre><code class="language-bash">./framework watch</code></pre>
 <p>It respects <code>.gitignore</code>, polls every couple of seconds, and runs until you stop it — so a new route,
@@ -236,13 +236,13 @@ where that subsystem is:</p>
         <tr><td><code>Setting</code></td><td>Typed database settings — <a href="../subsystems/settings.html#usage">Settings</a>.</td></tr>
         <tr><td><code>Path</code></td><td>File-path helpers — <a href="../utilities/file.html#paths">Files &amp; Storage</a>.</td></tr>
         <tr><td><code>Template</code></td><td>The enum of every <code>.mu</code> file — <a href="#templates">above</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Schema.php" target="_blank" rel="noopener noreferrer"><code>Schema</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Query/Query.php" target="_blank" rel="noopener noreferrer"><code>Query</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Type/Entity.php" target="_blank" rel="noopener noreferrer"><code>Entity</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Type/Column.php" target="_blank" rel="noopener noreferrer"><code>Column</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Status/Status.php" target="_blank" rel="noopener noreferrer"><code>Status</code></a></td><td>Per-model database classes — <a href="../database/schema.html">Database</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a></td><td>Per-model typed request — <a href="../core/routing.html#model">Model-backed routes</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Schema.php" target="_blank" rel="noopener noreferrer"><code>Schema</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Query/Query.php" target="_blank" rel="noopener noreferrer"><code>Query</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Type/Entity.php" target="_blank" rel="noopener noreferrer"><code>Entity</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Type/Column.php" target="_blank" rel="noopener noreferrer"><code>Column</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Status/Status.php" target="_blank" rel="noopener noreferrer"><code>Status</code></a></td><td>Per-model database classes — <a href="../database/schema.html">Database</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a></td><td>Per-model typed request — <a href="../core/routing.html#model">Model-backed routes</a>.</td></tr>
         <tr><td><code>MediaSchema</code></td><td>Generated media models — <a href="../database/schema.html">Database</a>.</td></tr>
         <tr><td><code>EmailCode</code></td><td>Localized email content — <a href="../subsystems/emails.html#templates">Emails</a>.</td></tr>
         <tr><td><code>NotificationCode</code></td><td>Notification content — <a href="../subsystems/notifications.html#content">Notifications</a>.</td></tr>
         <tr><td><code>Language</code></td><td>The NLS string accessor for your <a href="../introduction/config-files.html#intl">languages</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Act.php" target="_blank" rel="noopener noreferrer"><code>Act</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Sec.php" target="_blank" rel="noopener noreferrer"><code>Sec</code></a>, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/LogIntl.php" target="_blank" rel="noopener noreferrer"><code>LogIntl</code></a></td><td>Action log types — see <a href="../features/logging.html#actions">Logging</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Type/Act.php" target="_blank" rel="noopener noreferrer"><code>Act</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Type/Sec.php" target="_blank" rel="noopener noreferrer"><code>Sec</code></a>, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Type/LogIntl.php" target="_blank" rel="noopener noreferrer"><code>LogIntl</code></a></td><td>Action log types — see <a href="../features/logging.html#actions">Logging</a>.</td></tr>
     </tbody>
 </table>
 

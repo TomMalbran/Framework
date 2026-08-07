@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -98,8 +98,8 @@
 trait — which is what makes them safe to read from a request, store in a column and send back in a response.</p>
 
 <h2 id="declaring">Declaring one</h2>
-<p>A framework enum implements <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Enum.php" target="_blank" rel="noopener noreferrer"><code>Enum</code></a> and <code>JsonSerializable</code>, uses the
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a> trait, and opens with a <code>None</code> case. A
+<p>A framework enum implements <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Enum/Enum.php" target="_blank" rel="noopener noreferrer"><code>Enum</code></a> and <code>JsonSerializable</code>, uses the
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a> trait, and opens with a <code>None</code> case. A
 <a href="phpstan.html#rules-enums">PHPStan rule</a> enforces all three, so the shape is never optional:</p>
 <pre><code class="language-php">use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
@@ -210,7 +210,7 @@ becomes its string on the way out:</p>
 
 <h2 id="map">Enum-keyed maps</h2>
 <p>A PHP array only takes <code>int</code> or <code>string</code> keys, so an enum case cannot be one.
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Map.php" target="_blank" rel="noopener noreferrer"><code>Map</code></a> is the container that can — the keys are cases, and the getters are typed:</p>
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Enum/Map.php" target="_blank" rel="noopener noreferrer"><code>Map</code></a> is the container that can — the keys are cases, and the getters are typed:</p>
 <pre><code class="language-php">use Framework\Enum\Map;
 
 $limits = new Map();

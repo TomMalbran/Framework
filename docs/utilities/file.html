@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -97,7 +97,7 @@
 through generated accessors.</p>
 
 <h2 id="storage">Storage</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/Storage.php" target="_blank" rel="noopener noreferrer"><code>Storage</code></a> is the filesystem layer — every read, write and path operation goes through it, so paths
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/Storage.php" target="_blank" rel="noopener noreferrer"><code>Storage</code></a> is the filesystem layer — every read, write and path operation goes through it, so paths
 are built consistently and nothing touches PHP&#39;s filesystem functions directly.</p>
 
 <h3 id="storage-files">Reading &amp; writing</h3>
@@ -149,7 +149,7 @@ Storage::addFirstSlash($path);    // and removeFirstSlash()</code></pre>
 Storage::extractZip($zipPath, $toDir);</code></pre>
 
 <h2 id="file">File uploads</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/File.php" target="_blank" rel="noopener noreferrer"><code>File</code></a> wraps a single uploaded file. Build one from the
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/File.php" target="_blank" rel="noopener noreferrer"><code>File</code></a> wraps a single uploaded file. Build one from the
 <a href="io.html#request">request</a> or from raw content, check it, then move it into place:</p>
 <pre><code class="language-php">use Framework\File\File;
 
@@ -172,7 +172,7 @@ $file-&gt;delete();</code></pre>
 into a payload for forwarding it to another API.</p>
 
 <h2 id="types">File types</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/FileType.php" target="_blank" rel="noopener noreferrer"><code>FileType</code></a> classifies a file from its extension, so the UI can pick an icon and the code can accept
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/FileType.php" target="_blank" rel="noopener noreferrer"><code>FileType</code></a> classifies a file from its extension, so the UI can pick an icon and the code can accept
 only what it should:</p>
 <pre><code class="language-php">use Framework\File\FileType;
 
@@ -188,7 +188,7 @@ FileType::getMimeType($path);      // &quot;image/jpeg&quot;
 FileType::getIcon($path);          // the icon name for the type</code></pre>
 
 <h2 id="images">Images</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/Image.php" target="_blank" rel="noopener noreferrer"><code>Image</code></a> resizes and crops with GD, reading the EXIF orientation so photos are not left sideways.
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/Image.php" target="_blank" rel="noopener noreferrer"><code>Image</code></a> resizes and crops with GD, reading the EXIF orientation so photos are not left sideways.
 The three modes decide how the target box is filled:</p>
 <table class="api-table">
     <thead><tr><th>Mode</th><th>Does</th></tr></thead>
@@ -212,7 +212,7 @@ Image::getMimeType($path);          // and getContentType, getExtension
 Image::hasTransparency($path);
 Image::isValidType($path);</code></pre>
 <h2 id="picture">Picture</h2>
-<p>Where <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/Image.php" target="_blank" rel="noopener noreferrer"><code>Image</code></a> transforms a file on disk, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/Picture.php" target="_blank" rel="noopener noreferrer"><code>Picture</code></a> is for <strong>drawing</strong> —
+<p>Where <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/Image.php" target="_blank" rel="noopener noreferrer"><code>Image</code></a> transforms a file on disk, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/Picture.php" target="_blank" rel="noopener noreferrer"><code>Picture</code></a> is for <strong>drawing</strong> —
 you open an image, paint on it, and send it straight to the browser. It is an instance rather than a set of static
 helpers, and exposes the size it loaded:</p>
 <pre><code class="language-php">use Framework\File\Picture;
@@ -242,7 +242,7 @@ $picture-&gt;print(download: true, name: &quot;ticket&quot;); // save as ticket.
 <p>Generated avatars, watermarks and share images are all built this way.</p>
 
 <h2 id="media">The media library</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/MediaFile.php" target="_blank" rel="noopener noreferrer"><code>MediaFile</code></a> manages the files a user uploads through a media browser — the tree of folders, the
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/MediaFile.php" target="_blank" rel="noopener noreferrer"><code>MediaFile</code></a> manages the files a user uploads through a media browser — the tree of folders, the
 files inside, and the thumbnails that go with them:</p>
 <pre><code class="language-php">use Framework\File\MediaFile;
 
@@ -260,7 +260,7 @@ MediaFile::getThumbPath($path);   // and getThumbUrl()</code></pre>
 <p>Moving, renaming or deleting a file carries its thumbnail along, so the two never drift apart.</p>
 
 <h2 id="filelist">FileList</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/FileList.php" target="_blank" rel="noopener noreferrer"><code>FileList</code></a> is what a media listing is built with. You add an entry per file or folder — with its
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/FileList.php" target="_blank" rel="noopener noreferrer"><code>FileList</code></a> is what a media listing is built with. You add an entry per file or folder — with its
 source and thumbnail paths and urls — and read the result back sorted, folders first:</p>
 <pre><code class="language-php">use Framework\File\FileList;
 
@@ -278,15 +278,15 @@ $list-&gt;add(
 );
 
 $list-&gt;getSorted();   // or get() for the insertion order</code></pre>
-<p>Each entry becomes a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/Type/FileItem.php" target="_blank" rel="noopener noreferrer"><code>FileItem</code></a>, which is the shape the front end renders. Besides the name
+<p>Each entry becomes a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/Type/FileItem.php" target="_blank" rel="noopener noreferrer"><code>FileItem</code></a>, which is the shape the front end renders. Besides the name
 and urls it carries the flags a file browser needs — <code>isDir</code>, <code>isImage</code>,
 <code>isPDF</code>, <code>isAudio</code>, <code>isDocument</code>, <code>isTransparent</code> and
 <code>isBack</code> — plus the <code>icon</code> for its <a href="#types">type</a> and the image
-<code>width</code> and <code>height</code>. The companion <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/Type/MediaType.php" target="_blank" rel="noopener noreferrer"><code>MediaType</code></a> enum names the kind of
+<code>width</code> and <code>height</code>. The companion <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/Type/MediaType.php" target="_blank" rel="noopener noreferrer"><code>MediaType</code></a> enum names the kind of
 media being browsed.</p>
 
 <h2 id="registered">Registered paths</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/File/FilePath.php" target="_blank" rel="noopener noreferrer"><code>FilePath</code></a> owns the storage layout. The framework ships the <code>source</code>,
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/File/FilePath.php" target="_blank" rel="noopener noreferrer"><code>FilePath</code></a> owns the storage layout. The framework ships the <code>source</code>,
 <code>thumbs</code>, <code>avatars</code> and <code>temp</code> paths, and an app
 <a href="../introduction/config-files.html#file">registers</a> whatever else it needs:</p>
 <pre><code class="language-php">// config/File.config.php

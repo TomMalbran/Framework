@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -94,11 +94,11 @@
 
 <div class="eyebrow">Core Concepts</div>
 <h1>Routing</h1>
-<p class="lead">Routes are plain methods annotated with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route]</code></a>. The build discovers them and
+<p class="lead">Routes are plain methods annotated with <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route]</code></a>. The build discovers them and
 generates a typed <code>System\Router</code> that dispatches requests.</p>
 
 <h2 id="declaring">Declaring a route</h2>
-<p>Add the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route]</code></a> attribute to a public static method. The first argument is the path, the
+<p>Add the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route]</code></a> attribute to a public static method. The first argument is the path, the
 second is the minimum <a href="../subsystems/auth.html#access">access level</a> required to call it. The method receives a
 <a href="../utilities/io.html#request">Request</a> and returns a <a href="../utilities/io.html#response">Response</a>.</p>
 <pre><code class="language-php">use Framework\Discovery\Attr\Route;
@@ -130,7 +130,7 @@ marks a path as non-existent.</p>
 <h2 id="model">Routes backed by a Model</h2>
 <p>Instead of pulling loose values out of the generic <a href="../utilities/io.html#request">Request</a>, a route can take a
 <strong>typed request generated from a <a href="../database/models.html">Model</a></strong>. Mark the fields that make
-up the request with the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Database/Model/Requested.php" target="_blank" rel="noopener noreferrer"><code>#[Requested]</code></a> attribute:</p>
+up the request with the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Database/Model/Requested.php" target="_blank" rel="noopener noreferrer"><code>#[Requested]</code></a> attribute:</p>
 <figure class="code"><figcaption class="code-tab">src/Product/Model/ProductModel.php</figcaption><pre><code class="language-php">use Framework\Database\Model\Model;
 use Framework\Database\Model\Field;
 use Framework\Database\Model\Requested;
@@ -151,7 +151,7 @@ class ProductModel {
 }</code></pre></figure>
 <p>The <a href="../core/build.html#how">build</a> turns those into a <code>&lt;Model&gt;Request</code> class — here
 <code>ProductRequest</code> — with a typed property per requested field (plus the <code>id</code> and the
-<code>isCreate</code> / <code>isEdit</code> flags). Type-hint it in the route in place of <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a>,
+<code>isCreate</code> / <code>isEdit</code> flags). Type-hint it in the route in place of <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a>,
 and the generated <code>Router</code> builds it from the incoming request with
 <code>ProductRequest::fromRequest($request)</code>. Your handler receives the correct type, with typed,
 autocompleted fields and no manual <code>getString()</code> / <code>getInt()</code>:</p>

@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -101,10 +101,10 @@
 <table class="api-table">
     <thead><tr><th>Log</th><th>Records</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog</code></a></td><td>User actions — who did what, and to which record.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ErrorLog.php" target="_blank" rel="noopener noreferrer"><code>ErrorLog</code></a></td><td>PHP errors and uncaught exceptions.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/QueryLog.php" target="_blank" rel="noopener noreferrer"><code>QueryLog</code></a></td><td>Slow database queries (past <code>DB_LOG_TIME</code>).</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog</code></a></td><td>Devices added and removed on <a href="../subsystems/credentials.html#devices">sign-in</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog</code></a></td><td>User actions — who did what, and to which record.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/ErrorLog.php" target="_blank" rel="noopener noreferrer"><code>ErrorLog</code></a></td><td>PHP errors and uncaught exceptions.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/QueryLog.php" target="_blank" rel="noopener noreferrer"><code>QueryLog</code></a></td><td>Slow database queries (past <code>DB_LOG_TIME</code>).</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog</code></a></td><td>Devices added and removed on <a href="../subsystems/credentials.html#devices">sign-in</a>.</td></tr>
     </tbody>
 </table>
 <p>Each one is read back the same way — a <code>getList()</code> / <code>getTotal()</code> pair fed by its
@@ -112,9 +112,9 @@ generated request — so wiring any of them to an admin screen looks alike.</p>
 
 <h2 id="actions">Action logging</h2>
 <p>Actions are declared with attributes, so they are typed and translatable. Tag a class with
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> to group its actions and each method with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> — both take a name plus
-per-language labels. Then record the action from inside that method with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a>, passing the
-generated <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Sec.php" target="_blank" rel="noopener noreferrer"><code>Sec</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Act.php" target="_blank" rel="noopener noreferrer"><code>Act</code></a> cases (the current user and session are filled in for you):</p>
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> to group its actions and each method with <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> — both take a name plus
+per-language labels. Then record the action from inside that method with <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a>, passing the
+generated <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Type/Sec.php" target="_blank" rel="noopener noreferrer"><code>Sec</code></a> / <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Type/Act.php" target="_blank" rel="noopener noreferrer"><code>Act</code></a> cases (the current user and session are filled in for you):</p>
 <pre><code class="language-php">use Framework\Log\Attr\Section;
 use Framework\Log\Attr\Action;
 use Framework\Log\ActionLog;
@@ -131,14 +131,14 @@ class ProductConstructor {
         return Response::success(&quot;PRODUCT_CREATED&quot;);
     }
 }</code></pre>
-<div class="note">The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Sec.php" target="_blank" rel="noopener noreferrer"><code>Sec</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Type/Act.php" target="_blank" rel="noopener noreferrer"><code>Act</code></a> enums are <em>generated</em> from these attributes, so
+<div class="note">The <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Type/Sec.php" target="_blank" rel="noopener noreferrer"><code>Sec</code></a> and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Type/Act.php" target="_blank" rel="noopener noreferrer"><code>Act</code></a> enums are <em>generated</em> from these attributes, so
 run <a href="../core/build.html#how"><code>./framework build</code></a> once after adding or changing a
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> / <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> before you can reference <code>Sec::Products</code> or
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> / <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> before you can reference <code>Sec::Products</code> or
 <code>Act::Create</code>.</div>
 <h3 id="sessions">Sessions &amp; what is stored</h3>
 <p>Actions are not stored as a flat list — each one belongs to a <strong>session</strong>. When a user signs in the
 framework opens a session row and keeps it open until they sign out, recording who it belongs to along with the
-<code>ip</code> and <code>userAgent</code> they connected from. Every <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a> during that
+<code>ip</code> and <code>userAgent</code> they connected from. Every <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/ActionLog.php" target="_blank" rel="noopener noreferrer"><code>ActionLog::add()</code></a> during that
 sign-in is attached to it, so the log reads as a timeline of what happened in each visit — and you can see the
 device and address behind a run of actions.</p>
 <p>Each action row itself stores:</p>
@@ -147,7 +147,7 @@ device and address behind a run of actions.</p>
     <tbody>
         <tr><td><code>sessionID</code></td><td>The sign-in session the action belongs to.</td></tr>
         <tr><td><code>credentialID</code> / <code>currentUser</code></td><td>Who performed it (and the impersonated user, when <a href="../subsystems/auth.html#impersonation">signed in as</a> someone).</td></tr>
-        <tr><td><code>module</code> / <code>action</code></td><td>The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> it came from.</td></tr>
+        <tr><td><code>module</code> / <code>action</code></td><td>The <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> it came from.</td></tr>
         <tr><td><code>dataID</code></td><td>The record it affected — what you pass as <code>dataID</code>.</td></tr>
         <tr><td><code>moduleName</code> / <code>actionName</code></td><td>The translated labels, ready to display.</td></tr>
     </tbody>
@@ -173,7 +173,7 @@ class ActionLogController {
         ]);
     }
 }</code></pre>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Schema/LogActionRequest.php" target="_blank" rel="noopener noreferrer"><code>LogActionRequest</code></a> is the <a href="../core/routing.html#model">generated request</a> for the log model, so its
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Schema/LogActionRequest.php" target="_blank" rel="noopener noreferrer"><code>LogActionRequest</code></a> is the <a href="../core/routing.html#model">generated request</a> for the log model, so its
 fields — page, amount, credential, date range — filter and paginate the query straight from what the front end
 sent. Pass a <code>field =&gt; LogActionColumn</code> map as a second argument to also filter by your own columns,
 such as a client or organization.</p>
@@ -239,7 +239,7 @@ class QueryLogController {
 
 <h2 id="devices">Device log</h2>
 <p>Each <a href="../subsystems/credentials.html#devices">device</a> a user adds or removes when signing in and out is recorded by
-the framework through <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog::added()</code></a> and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog::removed()</code></a>. An entry stores the
+the framework through <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog::added()</code></a> and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/DeviceLog.php" target="_blank" rel="noopener noreferrer"><code>DeviceLog::removed()</code></a>. An entry stores the
 <code>credentialID</code>, the <code>playerID</code> of the device, the <code>userAgent</code> behind it, and a
 <code>wasAdded</code> flag telling the two apart — so you can trace when a user started or stopped receiving
 <a href="../subsystems/notifications.html#provider">notifications</a> on a device.</p>

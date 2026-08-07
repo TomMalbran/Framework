@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -97,13 +97,13 @@
 <p class="lead">Credentials, JWT access &amp; refresh tokens, device tracking, password resets and spam
 protection.</p>
 
-<p>The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth</code></a> class is the entry point: it signs a <a href="../subsystems/credentials.html">credential</a> in, issues
+<p>The <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth</code></a> class is the entry point: it signs a <a href="../subsystems/credentials.html">credential</a> in, issues
 the JWT tokens, and answers the questions your code and routes ask about the current request.</p>
 
 <h2 id="signin">Signing in</h2>
 <p>Resolve a <a href="../subsystems/credentials.html">credential</a> by email, confirm it may sign in and that the password
-matches, then call <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::login()</code></a> — which issues the tokens and starts the session.
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::logout()</code></a> ends it:</p>
+matches, then call <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::login()</code></a> — which issues the tokens and starts the session.
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::logout()</code></a> ends it:</p>
 <pre><code class="language-php">use Framework\Auth\Auth;
 
 $credential = Auth::getLoginCredential($email);
@@ -140,14 +140,14 @@ Auth::getRefreshToken();  // the refresh token</code></pre>
 standard <code>iat</code> (issued-at), <code>nbf</code> (not-before) and <code>exp</code> (expiry) claims plus a
 <code>data</code> payload with the credential id, and expires <code>AUTH_HOURS</code> hours after it is issued.
 Because it is signed, it is validated by <em>decoding</em> it with the key — no database lookup — which is what
-keeps the request path stateless. <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/AuthToken.php" target="_blank" rel="noopener noreferrer"><code>AuthToken</code></a> creates and verifies it.</p>
+keeps the request path stateless. <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/AuthToken.php" target="_blank" rel="noopener noreferrer"><code>AuthToken</code></a> creates and verifies it.</p>
 
 <h3 id="refresh-token">The refresh token</h3>
 <p>The refresh token is the opposite: an opaque token <strong>stored in the database</strong> (one row per device),
 valid for <code>AUTH_DAYS</code> days. Once the access token has expired, the client sends its refresh token and
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Framework.php" target="_blank" rel="noopener noreferrer"><code>Framework::execute()</code></a> looks it up to resolve the credential and mint a <em>new</em> access token — so
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Framework.php" target="_blank" rel="noopener noreferrer"><code>Framework::execute()</code></a> looks it up to resolve the credential and mint a <em>new</em> access token — so
 the user stays signed in without re-entering a password. Being stored means they can be revoked: signing out
-removes the row, and <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/RefreshToken.php" target="_blank" rel="noopener noreferrer"><code>RefreshToken::removeOld()</code></a> prunes expired ones on a
+removes the row, and <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/RefreshToken.php" target="_blank" rel="noopener noreferrer"><code>RefreshToken::removeOld()</code></a> prunes expired ones on a
 <a href="../features/logging.html#retention">schedule</a>.</p>
 
 <h3 id="token-config">Configuring the tokens</h3>
@@ -164,11 +164,11 @@ removes the row, and <a class="src-link" href="https://github.com/TomMalbran/Fra
 <h2 id="api">API access</h2>
 <p>For server-to-server calls, set a static <code>AUTH_API_TOKEN</code> and send it as the <code>token</code> field
 or an <code>Authorization</code> header. <a href="../introduction/bootstrapping.html#auth">Framework::execute()</a> validates it with
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::validateAPI()</code></a> and marks the request as an API call — those may send a JSON body instead of form
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Auth.php" target="_blank" rel="noopener noreferrer"><code>Auth::validateAPI()</code></a> and marks the request as an API call — those may send a JSON body instead of form
 fields.</p>
 
 <h2 id="access">Access roles &amp; the Access class</h2>
-<p>Access levels are declared with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Core/AccessRole.php" target="_blank" rel="noopener noreferrer"><code>AccessRole::register()</code></a> and grouped in a
+<p>Access levels are declared with <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Core/AccessRole.php" target="_blank" rel="noopener noreferrer"><code>AccessRole::register()</code></a> and grouped in a
 <a href="../introduction/config-files.html#access">config file</a>. The <a href="../core/build.html#how">build</a> turns them into a typed
 <code>Access</code> enum — one case per role, ordered by the level you registered them at:</p>
 <pre><code class="language-php">use Framework\System\Access;
@@ -195,11 +195,11 @@ Access::getStaffs();                  // [Access::Owner, Access::Manager]
 Access::getStaffSelect();             // a Select list of the group&#039;s roles</code></pre>
 <p>Use a group when a permission spans several roles that a single <code>OrHigher</code> check can&#39;t express —
 membership is by set, not by level. The same enum is what every <a href="../core/routing.html#declaring">route</a>
-declares in its <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route("/path", Access::Admin)]</code></a> attribute, and
+declares in its <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route("/path", Access::Admin)]</code></a> attribute, and
 <a href="../introduction/bootstrapping.html#entry"><code>Framework::execute()</code></a> enforces it before your method runs.</p>
 
 <h2 id="reset">Password resets</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Reset.php" target="_blank" rel="noopener noreferrer"><code>Reset</code></a> drives the forgot-password flow: <code>create()</code> issues a one-time code to email the
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Reset.php" target="_blank" rel="noopener noreferrer"><code>Reset</code></a> drives the forgot-password flow: <code>create()</code> issues a one-time code to email the
 user, <code>codeExists()</code> validates the code they return, and <code>getCredentialID()</code> resolves it back
 to an account so a new password can be set. <code>deleteOld()</code> prunes expired codes:</p>
 <pre><code class="language-php">use Framework\Auth\Reset;
@@ -214,8 +214,8 @@ if (Reset::codeExists($code)) {
 }</code></pre>
 
 <h2 id="spam">Spam protection</h2>
-<p>To blunt brute-force and abuse, <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Spam.php" target="_blank" rel="noopener noreferrer"><code>Spam::protect()</code></a> rate-limits repeated attempts from the same source
-and returns whether the action should be blocked; <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Auth/Spam.php" target="_blank" rel="noopener noreferrer"><code>Spam::reset()</code></a> clears the counter after a success.
+<p>To blunt brute-force and abuse, <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Spam.php" target="_blank" rel="noopener noreferrer"><code>Spam::protect()</code></a> rate-limits repeated attempts from the same source
+and returns whether the action should be blocked; <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Auth/Spam.php" target="_blank" rel="noopener noreferrer"><code>Spam::reset()</code></a> clears the counter after a success.
 <a href="../introduction/bootstrapping.html#entry">Framework::execute()</a> also runs a spam check on incoming requests:</p>
 <pre><code class="language-php">use Framework\Auth\Spam;
 

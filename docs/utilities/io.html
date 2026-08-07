@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -98,7 +98,7 @@ came in, and the structured responses that go back out — plus the helpers for 
 searches.</p>
 
 <h2 id="request">Request</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a> wraps the incoming values so nothing is read raw. Every getter returns the type you ask
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a> wraps the incoming values so nothing is read raw. Every getter returns the type you ask
 for, with a default when the field is missing, so a route never juggles <code>isset</code> and casts:</p>
 <pre><code class="language-php">use Framework\IO\Request;
 
@@ -131,7 +131,7 @@ request is iterable too, yielding each value.</p>
 request.</div>
 
 <h2 id="response">Response</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Response.php" target="_blank" rel="noopener noreferrer"><code>Response</code></a> is what every route returns. Rather than echoing anything, you pick the factory that
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Response.php" target="_blank" rel="noopener noreferrer"><code>Response</code></a> is what every route returns. Rather than echoing anything, you pick the factory that
 matches the outcome and the framework prints the JSON:</p>
 <table class="api-table">
     <thead><tr><th>Factory</th><th>Returns</th></tr></thead>
@@ -158,7 +158,7 @@ language. <a href="../introduction/bootstrapping.html#entry"><code>Framework::ex
 <a href="../subsystems/auth.html#tokens">tokens</a> to the response on its way out.</p>
 
 <h2 id="errors">Errors</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Errors.php" target="_blank" rel="noopener noreferrer"><code>Errors</code></a> collects validation problems as you check a request, so the client can show each message
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Errors.php" target="_blank" rel="noopener noreferrer"><code>Errors</code></a> collects validation problems as you check a request, so the client can show each message
 next to the field it belongs to instead of one message at a time:</p>
 <pre><code class="language-php">use Framework\IO\Errors;
 
@@ -187,7 +187,7 @@ $errors-&gt;addIf(!Product::exists($id), &quot;id&quot;,  &quot;PRODUCT_ERROR_EX
 </table>
 
 <h2 id="select">Select</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Select.php" target="_blank" rel="noopener noreferrer"><code>Select</code></a> builds the option lists a dropdown needs — an id and a name per entry — from whatever
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Select.php" target="_blank" rel="noopener noreferrer"><code>Select</code></a> builds the option lists a dropdown needs — an id and a name per entry — from whatever
 shape the data is already in:</p>
 <pre><code class="language-php">use Framework\IO\Select;
 
@@ -201,7 +201,7 @@ for a blank first option and <code>distinct</code> to drop duplicates. Enums bui
 same class — that is what <a href="../database/schema.html#status"><code>getSelect()</code></a> returns.</p>
 
 <h2 id="search">Search</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Search.php" target="_blank" rel="noopener noreferrer"><code>Search</code></a> is the shape returned by an autocomplete or a search box — an id and a title per match,
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Search.php" target="_blank" rel="noopener noreferrer"><code>Search</code></a> is the shape returned by an autocomplete or a search box — an id and a title per match,
 built from the rows a query returned, skipping repeats:</p>
 <pre><code class="language-php">use Framework\IO\Search;
 

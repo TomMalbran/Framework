@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -98,7 +98,7 @@
 content, a shared HTML template and a white list for safe testing.</p>
 
 <h2 id="sending">Sending</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a> sends one message and returns an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailResult.php" target="_blank" rel="noopener noreferrer"><code>EmailResult</code></a>. By default it wraps the
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a> sends one message and returns an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailResult.php" target="_blank" rel="noopener noreferrer"><code>EmailResult</code></a>. By default it wraps the
 message in the <a href="#templates">HTML template</a>, honours the <a href="#whitelist">white list</a>, and does
 nothing when email is disabled:</p>
 <pre><code class="language-php">use Framework\Email\Email;
@@ -124,7 +124,7 @@ if ($result === EmailResult::Sent) {
 </table>
 
 <h2 id="result">Send results</h2>
-<p>Rather than throw, a send returns an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailResult.php" target="_blank" rel="noopener noreferrer"><code>EmailResult</code></a> — <code>Sent</code> on success, or the reason it
+<p>Rather than throw, a send returns an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailResult.php" target="_blank" rel="noopener noreferrer"><code>EmailResult</code></a> — <code>Sent</code> on success, or the reason it
 did not go out, so callers can branch on it:</p>
 <table class="api-table">
     <thead><tr><th>Result</th><th>Meaning</th></tr></thead>
@@ -162,8 +162,8 @@ EMAIL_EMAIL    = &quot;hi@myapp.com&quot;
 EMAIL_REPLY_TO = &quot;support@myapp.com&quot;</code></pre></figure>
 
 <h2 id="providers">Providers</h2>
-<p><code>EMAIL_PROVIDER</code> names an <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailProvider.php" target="_blank" rel="noopener noreferrer"><code>EmailProvider</code></a> — one of the transports below. When you call
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a>, it builds the message from the shared &quot;from&quot; identity and hands it to the
+<p><code>EMAIL_PROVIDER</code> names an <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailProvider.php" target="_blank" rel="noopener noreferrer"><code>EmailProvider</code></a> — one of the transports below. When you call
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/Email.php" target="_blank" rel="noopener noreferrer"><code>Email::send()</code></a>, it builds the message from the shared &quot;from&quot; identity and hands it to the
 matching transport: the API providers post to their HTTP API, while the default sends over a plain SMTP server. If
 the transport rejects the message, the send returns <a href="#result"><code>ProviderError</code></a>.</p>
 <p>Each provider reads <strong>its own</strong> credentials, so switching is just a matter of changing
@@ -211,7 +211,7 @@ with a single key:</p>
 SEND_GRID_KEY  = &quot;…&quot;</code></pre></figure>
 
 <h2 id="queue">The queue</h2>
-<p>For bulk or deferred delivery, push messages onto the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailQueue.php" target="_blank" rel="noopener noreferrer"><code>EmailQueue</code></a> instead of sending inline, so a
+<p>For bulk or deferred delivery, push messages onto the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailQueue.php" target="_blank" rel="noopener noreferrer"><code>EmailQueue</code></a> instead of sending inline, so a
 slow provider never blocks a request:</p>
 <pre><code class="language-php">use Framework\Email\EmailQueue;
 
@@ -242,10 +242,10 @@ class EmailCommands {
 <h2 id="whitelist">White list</h2>
 <p>The white list is a safety net for non-production environments. Turn it on with
 <code>EMAIL_USE_WHITE_LIST</code>, and <code>send()</code> delivers only to addresses you have added to the
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailWhiteList.php" target="_blank" rel="noopener noreferrer"><code>EmailWhiteList</code></a> — every other recipient is skipped with a
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailWhiteList.php" target="_blank" rel="noopener noreferrer"><code>EmailWhiteList</code></a> — every other recipient is skipped with a
 <a href="#result"><code>WhiteListFilter</code></a> result. Staging can then run the real send path with no risk of
 emailing real customers.</p>
-<p>Manage the list with <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailWhiteList.php" target="_blank" rel="noopener noreferrer"><code>EmailWhiteList::add()</code></a>, <code>edit()</code> and <code>remove()</code>, and pass
+<p>Manage the list with <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailWhiteList.php" target="_blank" rel="noopener noreferrer"><code>EmailWhiteList::add()</code></a>, <code>edit()</code> and <code>remove()</code>, and pass
 <code>sendAlways: true</code> on a message that must always go out — a password reset, say — to skip the filter for
 that one send.</p>
 
@@ -265,7 +265,7 @@ your app name:</p>
     }
 }</code></pre></figure>
 <p>Add an <code>es.json</code> with the same keys for the Spanish copy. At <a href="../core/build.html#how">build</a> time the
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailBuilder.php" target="_blank" rel="noopener noreferrer"><code>EmailBuilder</code></a> turns each key into a typed <code>EmailCode</code> — <code>Welcome</code> becomes
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailBuilder.php" target="_blank" rel="noopener noreferrer"><code>EmailBuilder</code></a> turns each key into a typed <code>EmailCode</code> — <code>Welcome</code> becomes
 <code>EmailCode::Welcome</code> — and a <a href="../database/migrations.html#discovery">migration</a> loads the copy into the
 database so it can be edited without a deploy. To send one, fetch its content in the recipient&#39;s language and hand
 it to <code>sendContent()</code>:</p>
@@ -275,9 +275,9 @@ use Framework\System\EmailCode;
 
 $content = EmailContent::get(EmailCode::Welcome, &quot;en&quot;);
 Email::sendContent($content, &quot;user@example.com&quot;);</code></pre>
-<p>The stored copy renders through Mustache, so <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent::render()</code></a> fills the message&#39;s
+<p>The stored copy renders through Mustache, so <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailContent.php" target="_blank" rel="noopener noreferrer"><code>EmailContent::render()</code></a> fills the message&#39;s
 <code>{{placeholders}}</code> — like <code>{{name}}</code> above — with per-send data, and
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Email/EmailQueue.php" target="_blank" rel="noopener noreferrer"><code>EmailQueue::add()</code></a> takes the very same content when you want it <a href="#queue">queued</a> instead of
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Email/EmailQueue.php" target="_blank" rel="noopener noreferrer"><code>EmailQueue::add()</code></a> takes the very same content when you want it <a href="#queue">queued</a> instead of
 sent inline.</p>
 
 <h2 id="templates">The HTML template</h2>
@@ -286,7 +286,7 @@ carries the same branded shell. <code>send()</code> loads the file named by <cod
 with <a href="../core/build.html#templates">Mustache</a>, and drops your message into it — you write only the body (plain
 text or HTML), and the template supplies the header, logo and footer around it.</p>
 <p>You do not have to write one to start. The framework ships a working template at
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/data/email.html" target="_blank" rel="noopener noreferrer"><code>data/email.html</code></a> — a
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/data/email.html" target="_blank" rel="noopener noreferrer"><code>data/email.html</code></a> — a
 centered, responsive shell with the logo above the message — and <code>EMAIL_TEMPLATE</code> points at it by
 default. The path is looked up in your app first and only then in the framework, so dropping your own
 <code>data/email.html</code> into the project replaces it without touching the configuration. Point

@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -98,7 +98,7 @@
 with unread counts, read state and localized copy.</p>
 
 <h2 id="sending">Sending</h2>
-<p>The <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/Notification.php" target="_blank" rel="noopener noreferrer"><code>Notification</code></a> class pushes to devices directly. <code>sendToAll()</code> broadcasts to every
+<p>The <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Notification/Notification.php" target="_blank" rel="noopener noreferrer"><code>Notification</code></a> class pushes to devices directly. <code>sendToAll()</code> broadcasts to every
 registered device, while <code>sendToSome()</code> targets specific device <em>player ids</em>. Each carries a
 title, a message, a <code>url</code> to open, and a <code>dataType</code> / <code>dataID</code> pair the app can
 route on:</p>
@@ -124,7 +124,7 @@ Notification::sendToSome(
 );</code></pre>
 
 <h2 id="result">Send results</h2>
-<p>Delivery records a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationResult.php" target="_blank" rel="noopener noreferrer"><code>NotificationResult</code></a> per user — <code>Sent</code>, or the reason it was skipped:</p>
+<p>Delivery records a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Notification/NotificationResult.php" target="_blank" rel="noopener noreferrer"><code>NotificationResult</code></a> per user — <code>Sent</code>, or the reason it was skipped:</p>
 <table class="api-table">
     <thead><tr><th>Result</th><th>Meaning</th></tr></thead>
     <tbody>
@@ -158,7 +158,7 @@ ONESIGNAL_APP_ID    = &quot;…&quot;
 ONESIGNAL_REST_KEY  = &quot;…&quot;</code></pre></figure>
 
 <h2 id="queue">The queue &amp; inbox</h2>
-<p>Most notifications go through the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationQueue.php" target="_blank" rel="noopener noreferrer"><code>NotificationQueue</code></a> rather than pushing straight away. It stores one
+<p>Most notifications go through the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Notification/NotificationQueue.php" target="_blank" rel="noopener noreferrer"><code>NotificationQueue</code></a> rather than pushing straight away. It stores one
 row per user, which makes it two things at once: a delivery buffer that a cron flushes to each user&#39;s devices,
 and an <strong>in-app inbox</strong> with read state and unread counts. Queue one for a credential:</p>
 <pre><code class="language-php">use Framework\Notification\NotificationQueue;
@@ -218,13 +218,13 @@ class NotificationCommands {
     }
 }</code></pre></figure>
 <p>Add the matching <code>es.json</code>, and at <a href="../core/build.html#how">build</a> time the
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationBuilder.php" target="_blank" rel="noopener noreferrer"><code>NotificationBuilder</code></a> turns each key into a typed <code>NotificationCode</code>, while a
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Notification/NotificationBuilder.php" target="_blank" rel="noopener noreferrer"><code>NotificationBuilder</code></a> turns each key into a typed <code>NotificationCode</code>, while a
 <a href="../database/migrations.html#discovery">migration</a> loads the copy into the database. Fetch it by language:</p>
 <pre><code class="language-php">use Framework\Notification\NotificationContent;
 use Framework\System\NotificationCode;
 
 $content = NotificationContent::get(NotificationCode::OrderShipped, &quot;en&quot;);</code></pre>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent::render()</code></a> fills its <code>{{placeholders}}</code> — like
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Notification/NotificationContent.php" target="_blank" rel="noopener noreferrer"><code>NotificationContent::render()</code></a> fills its <code>{{placeholders}}</code> — like
 <code>{{orderID}}</code> above — with per-send data before the title and message are <a href="#queue">queued</a>.</p>
 
                 <div class="page-nav"><a href="../subsystems/emails.html"><span class="dir">← Previous</span><span class="ttl">Emails</span></a><a class="next" href="../features/enums.html"><span class="dir">Next →</span><span class="ttl">Enums</span></a></div>

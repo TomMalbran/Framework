@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -102,7 +102,7 @@ framework. It is the foundation the whole code generator is built on.</p>
 requirement.</p>
 
 <h2 id="finding">Finding classes</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Discovery.php" target="_blank" rel="noopener noreferrer"><code>Discovery::findClasses()</code></a> scans the source tree and returns the classes matching the given
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Discovery.php" target="_blank" rel="noopener noreferrer"><code>Discovery::findClasses()</code></a> scans the source tree and returns the classes matching the given
 filters — by parent class, by implemented interface, or within a path.</p>
 <pre><code class="language-php">use Framework\Discovery\Discovery;
 use Framework\Discovery\Type\DiscoveryBuilder;
@@ -130,7 +130,7 @@ foreach ($classes as $class) {
 </table>
 
 <h2 id="class">The DiscoveryClass</h2>
-<p>Every match is a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryClass.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryClass</code></a> — a thin wrapper over reflection with the helpers the generators
+<p>Every match is a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryClass.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryClass</code></a> — a thin wrapper over reflection with the helpers the generators
 need, so a <a href="../core/build.html#builders">builder</a> rarely touches <code>ReflectionClass</code> directly:</p>
 <pre><code class="language-php">foreach ($classes as $class) {
     $class-&gt;getName();                   // short class name
@@ -152,8 +152,8 @@ runner calls it, so there is nothing to register — implement the interface and
 <table class="api-table">
     <thead><tr><th>Interface</th><th>Runs when</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryBuilder.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryBuilder</code></a></td><td>On the <a href="../core/build.html#builders">build</a> — its <code>generateCode()</code> / <code>destroyCode()</code> write and remove the generated files.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a></td><td>On <a href="../database/migrations.html#discovery">migrate</a> — its <code>migrateData()</code> keeps a table in sync with your code or config.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryBuilder.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryBuilder</code></a></td><td>On the <a href="../core/build.html#builders">build</a> — its <code>generateCode()</code> / <code>destroyCode()</code> write and remove the generated files.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Type/DiscoveryMigration.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryMigration</code></a></td><td>On <a href="../database/migrations.html#discovery">migrate</a> — its <code>migrateData()</code> keeps a table in sync with your code or config.</td></tr>
     </tbody>
 </table>
 
@@ -163,15 +163,15 @@ build turns those annotations into typed <code>src/System</code> classes. The ke
 <table class="api-table">
     <thead><tr><th>Attribute</th><th>Used for</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route("/path", Access::X)]</code></a></td><td>Declares an HTTP <a href="../core/routing.html#declaring">route</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Listener.php" target="_blank" rel="noopener noreferrer"><code>#[Listener("event")]</code></a></td><td>Subscribes a method to a <a href="../core/signals.html#listening">signal</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/ConsoleCommand.php" target="_blank" rel="noopener noreferrer"><code>#[ConsoleCommand("name")]</code></a></td><td>Exposes a <a href="../introduction/cli.html#commands">CLI command</a>.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Priority.php" target="_blank" rel="noopener noreferrer"><code>#[Priority(Priority::Highest)]</code></a></td><td>Orders a builder during the <a href="../core/build.html#how">build</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route("/path", Access::X)]</code></a></td><td>Declares an HTTP <a href="../core/routing.html#declaring">route</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Listener.php" target="_blank" rel="noopener noreferrer"><code>#[Listener("event")]</code></a></td><td>Subscribes a method to a <a href="../core/signals.html#listening">signal</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/ConsoleCommand.php" target="_blank" rel="noopener noreferrer"><code>#[ConsoleCommand("name")]</code></a></td><td>Exposes a <a href="../introduction/cli.html#commands">CLI command</a>.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Priority.php" target="_blank" rel="noopener noreferrer"><code>#[Priority(Priority::Highest)]</code></a></td><td>Orders a builder during the <a href="../core/build.html#how">build</a>.</td></tr>
     </tbody>
 </table>
 
 <h2 id="config">Loading the config files</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/DiscoveryConfig.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryConfig</code></a> is what makes a
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/DiscoveryConfig.php" target="_blank" rel="noopener noreferrer"><code>DiscoveryConfig</code></a> is what makes a
 <a href="../introduction/config-files.html">config file</a> take effect. It walks the app once, includes every file
 whose name ends in <code>.config.php</code>, and remembers that it has done so:</p>
 <pre><code class="language-php">use Framework\Discovery\DiscoveryConfig;
@@ -195,7 +195,7 @@ the registrations are in place.</p>
 
 <h2 id="priority">Ordering with Priority</h2>
 <p>Discovery returns classes in no particular order, which matters when one generator depends on another having
-run. <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Priority.php" target="_blank" rel="noopener noreferrer"><code>#[Priority]</code></a> fixes that — <code>Discovery::getPriority()</code>
+run. <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Priority.php" target="_blank" rel="noopener noreferrer"><code>#[Priority]</code></a> fixes that — <code>Discovery::getPriority()</code>
 reads it, and the callers sort by it:</p>
 <pre><code class="language-php">use Framework\Discovery\Attr\Priority;
 

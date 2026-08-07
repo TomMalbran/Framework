@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -137,7 +137,7 @@ class ProductModel {
     #[Field(isID: true)] public int $id;
     #[Field(isID: true)] public int $code;   // ✗ a second isID field
 }</code></pre>
-<p><code>ModelEnum</code> — an enum used in a model implements <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/Enum.php" target="_blank" rel="noopener noreferrer"><code>Enum</code></a> and <code>JsonSerializable</code>.</p>
+<p><code>ModelEnum</code> — an enum used in a model implements <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Enum/Enum.php" target="_blank" rel="noopener noreferrer"><code>Enum</code></a> and <code>JsonSerializable</code>.</p>
 <pre><code class="language-php">use Framework\Enum\Enum;
 use Framework\Enum\IsEnum;
 use JsonSerializable;
@@ -157,7 +157,7 @@ $query-&gt;request($subRequest, &quot;extra&quot;);      // ✗ positional `as`
 $query-&gt;request($subRequest, as: &quot;extra&quot;);  // ✓ named argument</code></pre>
 
 <h3 id="rules-routes">Routes</h3>
-<p><code>RouteMethodName</code> — a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route]</code></a> method&#39;s name matches its route.</p>
+<p><code>RouteMethodName</code> — a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Route.php" target="_blank" rel="noopener noreferrer"><code>#[Route]</code></a> method&#39;s name matches its route.</p>
 <pre><code class="language-php">use Framework\Discovery\Attr\Route;
 use Framework\System\Access;
 use Framework\IO\Request;
@@ -169,14 +169,14 @@ class UserConstructor {
         return Response::empty();
     }
 }</code></pre>
-<p><code>RouteParamType</code> — a route takes no params or a single <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a>.</p>
+<p><code>RouteParamType</code> — a route takes no params or a single <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Request.php" target="_blank" rel="noopener noreferrer"><code>Request</code></a>.</p>
 <pre><code class="language-php">class UserConstructor {
     #[Route(&quot;/users/get&quot;, Access::General)]
     public static function get(int $id): Response {   // ✗ only a Request (or nothing) is allowed
         return Response::empty();
     }
 }</code></pre>
-<p><code>RouteReturnType</code> — a route returns a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/IO/Response.php" target="_blank" rel="noopener noreferrer"><code>Response</code></a>.</p>
+<p><code>RouteReturnType</code> — a route returns a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/IO/Response.php" target="_blank" rel="noopener noreferrer"><code>Response</code></a>.</p>
 <pre><code class="language-php">class UserConstructor {
     #[Route(&quot;/users/get&quot;, Access::General)]
     public static function get(Request $request): array {   // ✗ must return a Response
@@ -195,7 +195,7 @@ class AdminApi {
 }</code></pre>
 
 <h3 id="rules-signals">Signals</h3>
-<p><code>ListenerReturnVoid</code> — a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Discovery/Attr/Listener.php" target="_blank" rel="noopener noreferrer"><code>#[Listener]</code></a> method returns <code>void</code>.</p>
+<p><code>ListenerReturnVoid</code> — a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Discovery/Attr/Listener.php" target="_blank" rel="noopener noreferrer"><code>#[Listener]</code></a> method returns <code>void</code>.</p>
 <pre><code class="language-php">use Framework\Discovery\Attr\Listener;
 
 class UserHooks {
@@ -216,12 +216,12 @@ enum Status implements Enum {
     case Active;
     case Blocked;
 }</code></pre>
-<p><code>EnumInternalMethods</code> — the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a> helpers are used, not the native enum methods.</p>
+<p><code>EnumInternalMethods</code> — the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Enum/IsEnum.php" target="_blank" rel="noopener noreferrer"><code>IsEnum</code></a> helpers are used, not the native enum methods.</p>
 <pre><code class="language-php">$all = Status::cases();    // ✗ native enum method
 $all = Status::getAll();   // ✓ IsEnum helper</code></pre>
 
 <h3 id="rules-logs">Logs</h3>
-<p><code>ActionSection</code> — a class with a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> has at least one <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> method.</p>
+<p><code>ActionSection</code> — a class with a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Section.php" target="_blank" rel="noopener noreferrer"><code>#[Section]</code></a> has at least one <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> method.</p>
 <pre><code class="language-php">use Framework\Log\Attr\Section;
 use Framework\Log\Attr\Action;
 
@@ -288,7 +288,7 @@ $label = $status-&gt;toString();   // ✓</code></pre>
 
 setPrice(10);     // ✗ int widened to float
 setPrice(10.0);   // ✓</code></pre>
-<p><code>disallowNativeDate</code> — dates use the <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> class, not native date functions.</p>
+<p><code>disallowNativeDate</code> — dates use the <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> class, not native date functions.</p>
 <pre><code class="language-php">use Framework\Date\Date;
 
 $today = date(&quot;Y-m-d&quot;);             // ✗ native date function
@@ -348,7 +348,7 @@ public function list(int $page = 1): void {}</code></pre>
 public function count(): int {     // ✓
     return 0;
 }</code></pre>
-<p><code>actionLogLanguages</code> — log <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> attributes are named and translated to the given
+<p><code>actionLogLanguages</code> — log <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Log/Attr/Action.php" target="_blank" rel="noopener noreferrer"><code>#[Action]</code></a> attributes are named and translated to the given
 languages (default <code>[en, es]</code>).</p>
 <pre><code class="language-php">use Framework\Log\Attr\Action;
 

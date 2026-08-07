@@ -4,7 +4,7 @@ My personal PHP Framework: routes, models, listeners and settings are found by t
 attributes, turned into typed classes by a build step, and driven from a single
 `./framework` CLI.
 
-**[Read the documentation →](https://tommalbran.github.io/Framework/)**
+**[Read the documentation →](https://frameworkphp.com.ar/)**
 
 
 ## Requirements
@@ -19,7 +19,7 @@ Add the repository to the repositories:
 "repositories": [
     {
         "type": "git",
-        "url": "https://github.com/TomMalbran/Framework.git"
+        "url": "https://github.com/FrameworkPHPAR/Framework.git"
     }
 ]
 ```
@@ -27,7 +27,7 @@ Add the repository to the repositories:
 Add the require using the corresponding version:
 ```json
 "require": {
-    "tommalbran/framework": "dev-main#v0.17.0"
+    "frameworkphpar/framework": "dev-main#v0.17.0"
 }
 ```
 
@@ -36,7 +36,7 @@ Execute the installer:
 ./vendor/bin/framework install
 ```
 
-See [Getting Started](https://tommalbran.github.io/Framework/introduction/getting-started.html)
+See [Getting Started](https://frameworkphp.com.ar/introduction/getting-started.html)
 for the entry point, the `.env` files and the first build.
 
 

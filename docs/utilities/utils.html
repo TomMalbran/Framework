@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -95,10 +95,10 @@
 <div class="eyebrow">Utilities</div>
 <h1>Utils</h1>
 <p class="lead">A broad, strict-typed standard library. Every helper is static:
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Strings.php" target="_blank" rel="noopener noreferrer"><code>Strings::toKebabCase($x)</code></a>.</p>
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Utils/Strings.php" target="_blank" rel="noopener noreferrer"><code>Strings::toKebabCase($x)</code></a>.</p>
 
 <h2 id="strings">Strings</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Strings.php" target="_blank" rel="noopener noreferrer"><code>Strings</code></a> is the largest of them — every string operation the framework needs, always returning a
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Utils/Strings.php" target="_blank" rel="noopener noreferrer"><code>Strings</code></a> is the largest of them — every string operation the framework needs, always returning a
 string rather than <code>false</code>, so results chain without checks.</p>
 
 <h3 id="strings-check">Checking</h3>
@@ -155,7 +155,7 @@ Strings::randomCode(6);           // a short code
 Strings::toString($value);        // and toNumber, getNumber, getLetter</code></pre>
 
 <h2 id="arrays">Arrays</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Arrays.php" target="_blank" rel="noopener noreferrer"><code>Arrays</code></a> works on both lists and maps, and always hands back an array of the type you asked for.</p>
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Utils/Arrays.php" target="_blank" rel="noopener noreferrer"><code>Arrays</code></a> works on both lists and maps, and always hands back an array of the type you asked for.</p>
 
 <h3 id="arrays-find">Finding &amp; testing</h3>
 <pre><code class="language-php">use Framework\Utils\Arrays;
@@ -204,7 +204,7 @@ Arrays::createMap($rows, &quot;id&quot;);         // index rows by a column</cod
 <code>length</code>, <code>random</code> and <code>getDiff</code>.</p>
 
 <h2 id="numbers">Numbers</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Numbers.php" target="_blank" rel="noopener noreferrer"><code>Numbers</code></a> parses, rounds and formats — including money, which it keeps in cents to avoid float
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Utils/Numbers.php" target="_blank" rel="noopener noreferrer"><code>Numbers</code></a> parses, rounds and formats — including money, which it keeps in cents to avoid float
 drift:</p>
 <pre><code class="language-php">use Framework\Utils\Numbers;
 
@@ -230,7 +230,7 @@ Numbers::zerosPad(7, 3);            // &quot;007&quot;
 Numbers::coordinatesDistance($lat1, $lng1, $lat2, $lng2);</code></pre>
 
 <h2 id="dictionary">Dictionary</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Dictionary.php" target="_blank" rel="noopener noreferrer"><code>Dictionary</code></a> wraps an array of loose values — decoded JSON, a config block, a database row — and
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Utils/Dictionary.php" target="_blank" rel="noopener noreferrer"><code>Dictionary</code></a> wraps an array of loose values — decoded JSON, a config block, a database row — and
 reads it as types, so nothing downstream deals with strings-that-might-be-numbers:</p>
 <pre><code class="language-php">use Framework\Utils\Dictionary;
 
@@ -262,7 +262,7 @@ counts, iterates and encodes like an array — and the <code>to…</code> conver
 <code>toJSON()</code>) hand back plain data when a boundary needs it.</p>
 
 <h2 id="validation">Validation &amp; parsing</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Utils/Utils.php" target="_blank" rel="noopener noreferrer"><code>Utils</code></a> validates and parses the everyday user data — emails, phones, names and national IDs:</p>
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Utils/Utils.php" target="_blank" rel="noopener noreferrer"><code>Utils</code></a> validates and parses the everyday user data — emails, phones, names and national IDs:</p>
 <pre><code class="language-php">use Framework\Utils\Utils;
 
 Utils::isValidEmail(&quot;a@b.com&quot;);        // true

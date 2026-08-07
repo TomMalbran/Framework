@@ -12,7 +12,7 @@ use Framework\Utils\Strings;
  */
 class Docs {
 
-    private const SourceUrl = "https://github.com/TomMalbran/Framework/blob/main/";
+    private const SourceUrl = "https://github.com/FrameworkPHPAR/Framework/blob/main/";
 
 
 

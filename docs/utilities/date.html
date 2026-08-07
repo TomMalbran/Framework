@@ -25,7 +25,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="brand-row">
-                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/TomMalbran/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
+                    <a class="brand" href="../index.html">Framework</a><a class="version" href="https://github.com/FrameworkPHPAR/Framework/releases/tag/v0.17.0" target="_blank" rel="noopener noreferrer">v0.17.0</a>
                 </div>
                 <button class="search-open" id="searchOpen" type="button" data-search>
                     <span>Search the docs…</span>
@@ -94,16 +94,16 @@
 
 <div class="eyebrow">Utilities</div>
 <h1>Date &amp; Time</h1>
-<p class="lead">An immutable <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> value object plus helpers for periods, time tables, zones and
+<p class="lead">An immutable <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> value object plus helpers for periods, time tables, zones and
 timing.</p>
 
 <h2 id="date">Date</h2>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> is an immutable value object — every transform returns a <em>new</em> instance, so a date can
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> is an immutable value object — every transform returns a <em>new</em> instance, so a date can
 be passed around without anyone changing it underneath you.</p>
 
 <h3 id="creating">Creating a date</h3>
 <p><code>create()</code> is the general entry point and takes whatever you have: a timestamp, a date string, an
-optional separate hour, another <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a>, or nothing for an empty one. The rest are shortcuts for the
+optional separate hour, another <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a>, or nothing for an empty one. The rest are shortcuts for the
 common cases:</p>
 <pre><code class="language-php">use Framework\Date\Date;
 
@@ -146,9 +146,9 @@ $date-&gt;setHourMinute(9, 30);</code></pre>
 </table>
 
 <h2 id="period">Period</h2>
-<p>A <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period</code></a> is a from/to pair of dates — the date-range filter behind a report or a listing. It
-exposes <code>fromTime</code> and <code>toTime</code> as <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> objects, plus the
-<a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Type/PeriodType.php" target="_blank" rel="noopener noreferrer"><code>PeriodType</code></a> it resolved from:</p>
+<p>A <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period</code></a> is a from/to pair of dates — the date-range filter behind a report or a listing. It
+exposes <code>fromTime</code> and <code>toTime</code> as <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> objects, plus the
+<a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Type/PeriodType.php" target="_blank" rel="noopener noreferrer"><code>PeriodType</code></a> it resolved from:</p>
 <pre><code class="language-php">use Framework\Date\Period;
 use Framework\Date\Type\PeriodType;
 
@@ -164,9 +164,9 @@ $period-&gt;getDaysAmount();  // how many days it spans</code></pre>
 <table class="api-table">
     <thead><tr><th>Way</th><th>Use when</th></tr></thead>
     <tbody>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period::fromPeriod(PeriodType::X)</code></a></td><td>You know the named range in code.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period::fromPeriod(PeriodType::X)</code></a></td><td>You know the named range in code.</td></tr>
         <tr><td><code>new Period($request)</code></td><td>The range comes from a <a href="../utilities/io.html#request">request</a> — the usual case.</td></tr>
-        <tr><td><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period::fromDictionary($data)</code></a></td><td>It comes from stored or decoded data.</td></tr>
+        <tr><td><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Period.php" target="_blank" rel="noopener noreferrer"><code>Period::fromDictionary($data)</code></a></td><td>It comes from stored or decoded data.</td></tr>
     </tbody>
 </table>
 <p>Passing a request is the common path: the constructor reads a <code>period</code> field for a named range, or
@@ -182,7 +182,7 @@ set of fields (<code>createdFromDate</code>, <code>createdToDate</code>, …):</
 $updated = new Period($request, prefix: &quot;updated&quot;);</code></pre>
 
 <h3 id="period-types">The period types</h3>
-<p><a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Type/PeriodType.php" target="_blank" rel="noopener noreferrer"><code>PeriodType</code></a> covers the ranges an app usually offers, each resolving to its own from/to pair:</p>
+<p><a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Type/PeriodType.php" target="_blank" rel="noopener noreferrer"><code>PeriodType</code></a> covers the ranges an app usually offers, each resolving to its own from/to pair:</p>
 <table class="api-table">
     <thead><tr><th>Group</th><th>Types</th></tr></thead>
     <tbody>
@@ -197,14 +197,14 @@ $updated = new Period($request, prefix: &quot;updated&quot;);</code></pre>
 filtering a query by it.</p>
 
 <h3 id="period-iterate">Iterating the days</h3>
-<p>A period is iterable, yielding one <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> per day from start to end — handy for filling a chart or a
+<p>A period is iterable, yielding one <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a> per day from start to end — handy for filling a chart or a
 calendar with every day in the range, including the ones with no data:</p>
 <pre><code class="language-php">foreach ($period as $date) {
     $totals[$date-&gt;toString()] = 0;
 }</code></pre>
 
 <h2 id="timetable">TimeTable</h2>
-<p>A <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/TimeTable.php" target="_blank" rel="noopener noreferrer"><code>TimeTable</code></a> models a <strong>weekly schedule</strong> — opening hours, availability, working days —
+<p>A <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/TimeTable.php" target="_blank" rel="noopener noreferrer"><code>TimeTable</code></a> models a <strong>weekly schedule</strong> — opening hours, availability, working days —
 as a set of day/time ranges. Create one from stored data (an array, a <a href="../utilities/utils.html#dictionary">Dictionary</a>
 or another table) and ask it questions:</p>
 <pre><code class="language-php">use Framework\Date\TimeTable;
@@ -221,7 +221,7 @@ $schedule-&gt;getText();            // a readable, translated summary</code></pr
 it.</p>
 
 <h2 id="timezone">TimeZone</h2>
-<p>Timestamps are stored in server time and shown in the user&#39;s. <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/TimeZone.php" target="_blank" rel="noopener noreferrer"><code>TimeZone</code></a> holds the current offset
+<p>Timestamps are stored in server time and shown in the user&#39;s. <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/TimeZone.php" target="_blank" rel="noopener noreferrer"><code>TimeZone</code></a> holds the current offset
 — set from the signed-in <a href="../subsystems/credentials.html#profile">credential</a> on each request — and converts between
 the two:</p>
 <pre><code class="language-php">use Framework\Date\TimeZone;
@@ -247,7 +247,7 @@ $timer-&gt;getElapsedMinutes();</code></pre>
 
 <h2 id="dateutils">DateUtils</h2>
 <p>Static helpers for the pieces around a date — names, minute conversions and validation of raw input before it
-becomes a <a class="src-link" href="https://github.com/TomMalbran/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a>:</p>
+becomes a <a class="src-link" href="https://github.com/FrameworkPHPAR/Framework/blob/main/src/Date/Date.php" target="_blank" rel="noopener noreferrer"><code>Date</code></a>:</p>
 <pre><code class="language-php">use Framework\Date\DateUtils;
 
 DateUtils::getMonthName(3);         // &quot;March&quot;, translated
